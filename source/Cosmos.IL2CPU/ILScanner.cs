@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Reflection;
 using Cosmos.Assembler;
 
 using Cosmos.IL2CPU.Extensions;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.X86.IL;
 
 namespace Cosmos.IL2CPU

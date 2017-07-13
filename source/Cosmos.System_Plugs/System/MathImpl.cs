@@ -1,7 +1,7 @@
 using System;
 
 using Cosmos.Debug.Kernel;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.System_Plugs.System
 {

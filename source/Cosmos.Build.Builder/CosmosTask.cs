@@ -312,7 +312,7 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.HAL"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.API"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System_Plugs"), xPackagesDir, xVersion);
     }

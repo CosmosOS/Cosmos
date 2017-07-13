@@ -1,5 +1,5 @@
 using Cosmos.Assembler;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using XSharp.Common;
 using CPUx86 = Cosmos.Assembler.x86;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core_Plugs.System.Globalization
 {

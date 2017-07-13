@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU
             if ((xName == "Cosmos.Debug.Kernel") ||
                 (xName == "Cosmos.Debug.Kernel.Plugs.Asm") ||
                 (xName == "Cosmos.IL2CPU") ||
-                (xName == "Cosmos.IL2CPU.Plugs") ||
+                (xName == "Cosmos.IL2CPU.API") ||
                 (xName == "Cosmos.Common") ||
                 (xName == "Cosmos.TestRunner.TestController"))
             {

@@ -13,7 +13,7 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.Extensions;

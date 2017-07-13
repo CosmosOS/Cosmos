@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Reflection;
 
-namespace Cosmos.IL2CPU.Plugs
+namespace Cosmos.IL2CPU.API
 {
   public static class ObjectUtils
   {

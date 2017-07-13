@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.System_Plugs.System.Globalization
 {

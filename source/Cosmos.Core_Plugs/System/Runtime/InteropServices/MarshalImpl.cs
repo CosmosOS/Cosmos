@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core_Plugs.System.Runtime.InteropServices
 {

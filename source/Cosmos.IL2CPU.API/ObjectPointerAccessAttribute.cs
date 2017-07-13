@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace Cosmos.IL2CPU.Plugs
+namespace Cosmos.IL2CPU.API
 {
     /// <summary>
     /// This attribute is used on plug parameters, that need the unsafe pointer to an object's data area

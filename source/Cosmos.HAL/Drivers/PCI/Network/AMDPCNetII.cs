@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Cosmos.Common;
 using Cosmos.Core;
 using Cosmos.Core.IOGroup.Network;
 using Cosmos.HAL.Network;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
 {

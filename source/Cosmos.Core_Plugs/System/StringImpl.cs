@@ -4,7 +4,7 @@ using System;
 using System.Globalization;
 
 using Cosmos.Common;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 

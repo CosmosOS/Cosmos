@@ -1,6 +1,6 @@
 using System;
 
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using Cosmos.HAL;
 
 namespace Cosmos.System_Plugs.System

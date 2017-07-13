@@ -1,9 +1,9 @@
-﻿#if DEBUG
+#if DEBUG
 //#define GC_DEBUG
 #endif
 using System;
 using System.Diagnostics;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core.Common
 {

@@ -1,4 +1,4 @@
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using System;
 using System.Linq;
 using CPU = Cosmos.Assembler.x86;

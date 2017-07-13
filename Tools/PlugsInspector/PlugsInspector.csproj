@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net462</TargetFramework>
@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
     </ItemGroup>
 

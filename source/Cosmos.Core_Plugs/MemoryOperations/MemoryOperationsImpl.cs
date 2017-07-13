@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core_Plugs.MemoryOperations
 {

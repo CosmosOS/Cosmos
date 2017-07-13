@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.MSBuild", "sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.Plugs", "source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{34AEEB7C-FD5D-4B15-A830-B429681844BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj", "{34AEEB7C-FD5D-4B15-A830-B429681844BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Common", "source\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj", "{A97A1EF7-AEEC-43F3-8CB0-5C7269DC7E85}"
 EndProject

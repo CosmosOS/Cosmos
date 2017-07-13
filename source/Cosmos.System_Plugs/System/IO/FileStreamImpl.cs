@@ -4,7 +4,7 @@ using global::System;
 using global::System.IO;
 
 using Cosmos.System;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 
