@@ -7,9 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml;
 
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;

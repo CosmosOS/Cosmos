@@ -3,9 +3,7 @@ using System.Linq;
 using CPU = Cosmos.Assembler;
 using System.Text;
 using Cosmos.Assembler;
-
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.Plugs;
 using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL

@@ -4,8 +4,6 @@ using Cosmos.Assembler;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
-
-using Cosmos.IL2CPU.Plugs;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
