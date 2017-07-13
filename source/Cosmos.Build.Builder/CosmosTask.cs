@@ -307,7 +307,6 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xPackagesDir, xVersion);
       //
       Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Memory"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core_Plugs"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xPackagesDir, xVersion);
       //

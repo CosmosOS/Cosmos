@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\Cosmos.Core.Memory\Cosmos.Core.Memory.csproj" />
+      <ProjectReference Include="..\..\source\Cosmos.Core\Cosmos.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
