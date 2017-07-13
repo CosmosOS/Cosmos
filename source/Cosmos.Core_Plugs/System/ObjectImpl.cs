@@ -33,7 +33,7 @@ namespace Cosmos.Core_Plugs.System
         public static unsafe ulong MemberwiseClone([ObjectPointerAccess] uint aThis)
         {
             var xThisPointer = (uint*)aThis;
-            var xSize = ObjectUtilities.FieldDataOffset + xThisPointer[2];
+            var xSize = ObjectUtils.FieldDataOffset + xThisPointer[2];
 
             var xResult = GCImplementation.AllocNewObject(xSize);
 

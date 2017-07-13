@@ -1,3 +1,4 @@
+using Cosmos.IL2CPU.Plugs;
 using System;
 using Cosmos.Assembler;
 using System.Reflection;
