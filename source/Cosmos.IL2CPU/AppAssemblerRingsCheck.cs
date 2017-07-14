@@ -27,8 +27,7 @@ namespace Cosmos.IL2CPU {
                 (xName == "Cosmos.Debug.Kernel.Plugs.Asm") ||
                 (xName == "Cosmos.IL2CPU") ||
                 (xName == "Cosmos.IL2CPU.API") ||
-                (xName == "Cosmos.Common") ||
-                (xName == "Cosmos.TestRunner.TestController")) {
+                (xName == "Cosmos.Common")) {
                 return true;
             }
 
