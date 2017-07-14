@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU
 
         static GCImplementationRefs()
         {
-            Type xType = Type.GetType("Cosmos.Core.Common.GCImplementation, Cosmos.Core.Common", true);
+            Type xType = Type.GetType("Cosmos.Core.GCImplementation, Cosmos.Core", true);
             if (xType == null)
             {
                 throw new Exception("GCImplementation type not found!");
