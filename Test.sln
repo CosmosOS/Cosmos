@@ -28,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Common", "sour
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.DebugConnectors", "source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj", "{BA661F30-9F3B-4356-B47B-D9C9375A473B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.DebugStub", "source\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj", "{5049175E-F1EE-4D8F-8354-F547444B8F10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "source\Cosmos.Core.DebugStub\Cosmos.Core.DebugStub.csproj", "{5049175E-F1EE-4D8F-8354-F547444B8F10}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Hosts", "source\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj", "{C9826909-2E5E-4453-93FA-B6BE4503DF02}"
 EndProject

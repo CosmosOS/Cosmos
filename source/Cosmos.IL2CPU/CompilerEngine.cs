@@ -284,9 +284,9 @@ namespace Cosmos.IL2CPU {
             mLoadedExtensions = new List<CompilerExtensionBase>();
             Type xKernelType = null;
 
-            foreach (string xReference in References) {
-                if (File.Exists(xReference)) {
-                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyCacheOrPath(xReference);
+            foreach (string xRef in References) {
+                if (File.Exists(xRef)) {
+                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyCacheOrPath(xRef);
 
                     CompilerHelpers.Debug($"Looking for kernel in {xAssembly}");
 

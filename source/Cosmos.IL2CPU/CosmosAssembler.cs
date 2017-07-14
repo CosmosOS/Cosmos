@@ -6,7 +6,7 @@ using System.Reflection;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
-using Cosmos.Debug.DebugStub;
+using Cosmos.Core.DebugStub;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 

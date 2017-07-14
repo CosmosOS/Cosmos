@@ -46,6 +46,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "source
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel.Plugs.Asm", "source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj", "{6C770E55-8EED-444C-AD4E-017E823E5BA3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "source\Cosmos.Core.DebugStub\Cosmos.Core.DebugStub.csproj", "{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,14 @@ Global
 		{6C770E55-8EED-444C-AD4E-017E823E5BA3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6C770E55-8EED-444C-AD4E-017E823E5BA3}.Release|x86.ActiveCfg = Release|Any CPU
 		{6C770E55-8EED-444C-AD4E-017E823E5BA3}.Release|x86.Build.0 = Release|Any CPU
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}.Debug|x86.Build.0 = Debug|Any CPU
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}.Release|x86.ActiveCfg = Release|Any CPU
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -187,5 +197,6 @@ Global
 		{49F2C01D-D2C5-4564-810B-1AE92236C5C1} = {A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7}
 		{79D68062-46C5-466D-9289-C033F7348485} = {A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7}
 		{31D48401-77B2-44AF-B6D3-27AB67C10759} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
+		{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82} = {04B18FFC-8EA0-4E9F-9E1B-478527B19AFA}
 	EndGlobalSection
 EndGlobal

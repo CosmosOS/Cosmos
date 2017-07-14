@@ -22,7 +22,7 @@ namespace IL2CPURunner
             System.Reflection.Assembly.Load("Cosmos.Compiler.Assembler.X86");
             System.Reflection.Assembly.Load("Cosmos.Core_Plugs");
             System.Reflection.Assembly.Load("Cosmos.Debug.Common");
-            System.Reflection.Assembly.Load("Cosmos.Debug.DebugStub");
+            System.Reflection.Assembly.Load("Cosmos.Core.DebugStub");
             System.Reflection.Assembly.Load("Cosmos.Debug.Kernel");
             System.Reflection.Assembly.Load("Cosmos.Debug.Kernel.Plugs");
             System.Reflection.Assembly.Load("Cosmos.IL2CPU");
