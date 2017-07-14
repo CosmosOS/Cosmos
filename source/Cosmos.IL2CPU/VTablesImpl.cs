@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-
-using Cosmos.Common;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.IL2CPU
