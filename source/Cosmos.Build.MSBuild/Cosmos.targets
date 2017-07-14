@@ -8,7 +8,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <CosmosDir Condition="$(CosmosDir) == ''">$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\Software\Cosmos", "UserKit"))</CosmosDir>
+    <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
     <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>
     <NasmFile Condition="'$(NasmFile)' == ''">$(BuildToolsDir)\Nasm\nasm.exe</NasmFile>
@@ -17,7 +17,15 @@
     <CosmosBuildTaskAssemblyFile Condition="'$(CosmosBuildTaskAssemblyFile)' == ''">$(VSIPDir)\Cosmos.Build.MSBuild.dll</CosmosBuildTaskAssemblyFile>
     <AssemblySearchPaths>$(CosmosDir)\Kernel</AssemblySearchPaths>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <Reference Include="Cosmos.Core_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Core_Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Debug.Kernel.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.System_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Exclude="System.Core" />
+  </ItemGroup>
+
   <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>

@@ -14,10 +14,4 @@
     <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Cosmos.IL2CPU">
-      <HintPath>..\..\Build\bin\Cosmos.IL2CPU.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
