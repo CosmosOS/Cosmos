@@ -4,13 +4,11 @@ using System.Reflection;
 
 using Cosmos.Assembler;
 using Cosmos.Common;
+using Cosmos.IL2CPU.API;
 
-namespace Cosmos.IL2CPU
-{
-    public static class AppAssemblerRingsCheck
-    {
-        private static bool IsAssemblySkippedDuringRingCheck(Assembly assembly)
-        {
+namespace Cosmos.IL2CPU {
+    public static class AppAssemblerRingsCheck {
+        private static bool IsAssemblySkippedDuringRingCheck(Assembly assembly) {
             var xServicable = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Where(x => x.Key == "Serviceable").SingleOrDefault();
             var xNetFrameworkAssembly = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Where(x => x.Key == ".NETFrameworkAssembly").SingleOrDefault();
             var xProduct = assembly.GetCustomAttribute<AssemblyProductAttribute>();
@@ -21,8 +19,7 @@ namespace Cosmos.IL2CPU
             if ((xServicable?.Value == "True" || xNetFrameworkAssembly != null) &&
                 ((xProduct != null && xProduct.Product.Contains(".NET Framework"))
                 || (xCopyright != null && xCopyright.Copyright.Contains("Microsoft Corporation"))
-                || (xCompany != null && xCompany.Company.Contains("Microsoft Corporation"))))
-            {
+                || (xCompany != null && xCompany.Company.Contains("Microsoft Corporation")))) {
                 return true;
             }
 
@@ -31,8 +28,7 @@ namespace Cosmos.IL2CPU
                 (xName == "Cosmos.IL2CPU") ||
                 (xName == "Cosmos.IL2CPU.API") ||
                 (xName == "Cosmos.Common") ||
-                (xName == "Cosmos.TestRunner.TestController"))
-            {
+                (xName == "Cosmos.TestRunner.TestController")) {
                 return true;
             }
 
@@ -45,10 +41,8 @@ namespace Cosmos.IL2CPU
         /// </summary>
         /// <param name="scanner"></param>
         /// <param name="entryAssembly"></param>
-        public static void Execute(ILScanner scanner, Assembly entryAssembly)
-        {
-            if (entryAssembly == null)
-            {
+        public static void Execute(ILScanner scanner, Assembly entryAssembly) {
+            if (entryAssembly == null) {
                 throw new ArgumentNullException(nameof(entryAssembly));
             }
 
@@ -56,15 +50,12 @@ namespace Cosmos.IL2CPU
 
             // verify the entry assembly is in the User ring.
             var xRing = GetRingFromAssembly(entryAssembly);
-            if (xRing != Ring.User)
-            {
+            if (xRing != Ring.User) {
                 throw new Exception($"Assembly '{entryAssembly.GetName().Name}' contains your kernel class, which means it should be in the ring {Ring.User}!");
             }
 
-            foreach (var xAssembly in scanner.mUsedAssemblies)
-            {
-                if (IsAssemblySkippedDuringRingCheck(xAssembly))
-                {
+            foreach (var xAssembly in scanner.mUsedAssemblies) {
+                if (IsAssemblySkippedDuringRingCheck(xAssembly)) {
                     continue;
                 }
 
@@ -73,11 +64,9 @@ namespace Cosmos.IL2CPU
                 var xRingInt = (int)xRing;
 
                 RingsWriteLine("\t\tRing = {0}", xRing);
-                foreach (var xAsmDepRef in xAssembly.GetReferencedAssemblies())
-                {
+                foreach (var xAsmDepRef in xAssembly.GetReferencedAssemblies()) {
                     var xAsmDep = scanner.mUsedAssemblies.FirstOrDefault(i => i.GetName().Name == xAsmDepRef.Name);
-                    if (xAsmDep == null || IsAssemblySkippedDuringRingCheck(xAsmDep))
-                    {
+                    if (xAsmDep == null || IsAssemblySkippedDuringRingCheck(xAsmDep)) {
                         continue;
                     }
                     RingsWriteLine("\tDependency '{0}'", xAsmDepRef.Name);
@@ -86,19 +75,16 @@ namespace Cosmos.IL2CPU
 
                     var xDepRingInt = (int)xDepRing;
 
-                    if (xDepRingInt == xRingInt)
-                    {
+                    if (xDepRingInt == xRingInt) {
                         // assembly and its dependency are in the same ring.
                         continue;
                     }
-                    if (xDepRingInt > xRingInt)
-                    {
+                    if (xDepRingInt > xRingInt) {
                         throw new Exception($"Assembly '{xAssembly.GetName().Name}' is in ring {xRing}({xRingInt}). It references assembly '{xAsmDepRef.Name}' which is in ring {xDepRing}({xDepRingInt}), but this is not allowed!");
                     }
 
                     var xRingDiff = xRingInt - xDepRingInt;
-                    if (xRingDiff == 1)
-                    {
+                    if (xRingDiff == 1) {
                         // 1 level up is allowed
                         continue;
                     }
@@ -106,8 +92,7 @@ namespace Cosmos.IL2CPU
                 }
 
                 // now do per-ring checks:
-                switch (xRing)
-                {
+                switch (xRing) {
                     case Ring.User:
                         ValidateUserAssembly(xAssembly);
                         break;
@@ -126,61 +111,48 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        private static bool HasAssemblyPlugs(Assembly assembly)
-        {
-            foreach (var xType in assembly.GetTypes())
-            {
-                if (xType.GetTypeInfo().IsSubclassOf(typeof(AssemblerMethod)))
-                {
+        private static bool HasAssemblyPlugs(Assembly assembly) {
+            foreach (var xType in assembly.GetTypes()) {
+                if (xType.GetTypeInfo().IsSubclassOf(typeof(AssemblerMethod))) {
                     return true;
                 }
             }
             return false;
         }
 
-        private static void ValidateCoreAssembly(Assembly assembly)
-        {
+        private static void ValidateCoreAssembly(Assembly assembly) {
             // any checks to do?
         }
 
-        private static void ValidateHALAssembly(Assembly assembly)
-        {
-            if (HasAssemblyPlugs(assembly))
-            {
+        private static void ValidateHALAssembly(Assembly assembly) {
+            if (HasAssemblyPlugs(assembly)) {
                 throw new Exception($"HAL assembly '{assembly.GetName().Name}' uses Assembly plugs, which are not allowed!");
             }
         }
 
-        private static void ValidateSystemAssembly(Assembly assembly)
-        {
-            if (HasAssemblyPlugs(assembly))
-            {
+        private static void ValidateSystemAssembly(Assembly assembly) {
+            if (HasAssemblyPlugs(assembly)) {
                 throw new Exception(String.Format("System assembly '{0}' uses Assembly plugs, which are not allowed!", assembly.GetName().Name));
             }
         }
 
-        private static void ValidateUserAssembly(Assembly assembly)
-        {
-            if (HasAssemblyPlugs(assembly))
-            {
+        private static void ValidateUserAssembly(Assembly assembly) {
+            if (HasAssemblyPlugs(assembly)) {
                 throw new Exception($"User assembly '{assembly.GetName().Name}' uses Assembly plugs, which are not allowed!");
             }
         }
 
-        private static Ring GetRingFromAssembly(Assembly assembly)
-        {
+        private static Cosmos.IL2CPU.API.Ring GetRingFromAssembly(Assembly assembly) {
             var xRingAttrib = assembly.GetCustomAttribute<RingAttribute>();
 
-            if (xRingAttrib == null)
-            {
+            if (xRingAttrib == null) {
                 return Ring.User;
             }
 
             return xRingAttrib.Ring;
         }
 
-        private static void RingsWriteLine(string line, params object[] args)
-        {
+        private static void RingsWriteLine(string line, params object[] args) {
             Console.WriteLine("Rings: " + String.Format(line.Replace("\t", "    "), args));
         }
     }

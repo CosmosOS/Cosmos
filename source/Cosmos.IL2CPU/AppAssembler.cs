@@ -1549,7 +1549,7 @@ namespace Cosmos.IL2CPU
             // This test fixes issue #15638
             if (null != aNamespace)
             {
-                // Check options for Debug Level
+                // Check options for Debug RingEnum
                 // Set based on TracedAssemblies
                 if (TraceAssemblies > TraceAssemblies.None)
                 {

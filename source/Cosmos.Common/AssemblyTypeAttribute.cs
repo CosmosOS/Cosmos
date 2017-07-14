@@ -1,12 +1,14 @@
 ﻿using System;
 
-namespace Cosmos.Common
-{
+namespace Cosmos.IL2CPU.API {
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class AssemblyTypeAttribute : Attribute
-    {
-        public AssemblyTypeAttribute(AssemblyType aType)
-        {
+    public class AssemblyTypeAttribute : Attribute {
+        public enum AssemblyType {
+            Plugs,
+            AssemblerPlugs
+        }
+
+        public AssemblyTypeAttribute(AssemblyType aType) {
             Type = aType;
         }
 

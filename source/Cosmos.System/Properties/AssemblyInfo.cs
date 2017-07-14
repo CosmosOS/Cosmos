@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using Cosmos.Common;
+using Cosmos.IL2CPU.API;
 
 [assembly: Ring(Ring.System)]
 
