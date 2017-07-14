@@ -22,6 +22,7 @@ namespace Cosmos.IL2CPU {
                 return true;
             }
 
+            // Assemblies with no rings
             if ((xName == "Cosmos.Debug.Kernel") ||
                 (xName == "Cosmos.Debug.Kernel.Plugs.Asm") ||
                 (xName == "Cosmos.IL2CPU") ||
