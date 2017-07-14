@@ -79,7 +79,7 @@ namespace Cosmos.IL2CPU
         EnableDebug = true;
         DebugHex("Type", aType);
         DebugHex("MethodId", aMethodId);
-        Debugger.SendKernelPanic(KernelPanicTypes.VMT_TypeIdInvalid);
+        Debugger.SendKernelPanic(KernelPanics.VMT_TypeIdInvalid);
         while (true)
         ;
       }
@@ -96,7 +96,7 @@ namespace Cosmos.IL2CPU
         {
           EnableDebug = true;
           DebugHex("MethodIndexes is null for type", aType);
-          Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodIndexesNull);
+          Debugger.SendKernelPanic(KernelPanics.VMT_MethodIndexesNull);
           while (true)
             ;
         }
@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU
         {
           EnableDebug = true;
           DebugHex("MethodAddresses is null for type", aType);
-          Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodAddressesNull);
+          Debugger.SendKernelPanic(KernelPanics.VMT_MethodAddressesNull);
           while (true)
             ;
         }
@@ -122,7 +122,7 @@ namespace Cosmos.IL2CPU
               DebugHex("MethodCount", (uint)xCurrentTypeInfo.MethodCount);
               DebugHex("MethodAddresses.Length", (uint)xCurrentTypeInfo.MethodAddresses.Length);
               Debug("Method found, but address is invalid!");
-              Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodFoundButAddressInvalid);
+              Debugger.SendKernelPanic(KernelPanics.VMT_MethodFoundButAddressInvalid);
               while (true)
                 ;
             }
@@ -143,7 +143,7 @@ namespace Cosmos.IL2CPU
       DebugHex("Type", aType);
       DebugHex("MethodId", aMethodId);
       Debug("Not FOUND!");
-      Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodNotFound);
+      Debugger.SendKernelPanic(KernelPanics.VMT_MethodNotFound);
       while (true)
         ;
       throw new Exception("Cannot find virtual method!");
