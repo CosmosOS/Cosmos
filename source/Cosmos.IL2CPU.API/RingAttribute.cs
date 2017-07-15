@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.API {
         Core = 0,
         HAL = 1,
         System = 2,
-        User = 3,
+        User = 3
     }
 
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
