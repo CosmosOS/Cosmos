@@ -16,6 +16,8 @@ namespace Cosmos.HAL
 
     public static PCI Pci;
 
+    public static PS2Controller PS2Controller = new PS2Controller();
+
     private static void InitAta(Ata.ControllerIdEnum aControllerID,
                                 Ata.BusPositionEnum aBusPosition)
     {
@@ -106,6 +108,11 @@ namespace Cosmos.HAL
       InitPciDevices();
       mDebugger.Send("ACPI Init");
       StartACPI();
+      // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
+      // TODO: USB should be initialized before the PS/2 controller
+      // TODO: ACPI should be used to check if a PS/2 controller exists
+      mDebugger.Send("PS/2 Controller Init");
+      PS2Controller.Initialize();
       mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
       mDebugger.Send("ATA Primary Master");

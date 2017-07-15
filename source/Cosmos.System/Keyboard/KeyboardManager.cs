@@ -12,7 +12,6 @@ namespace Cosmos.System
 {
     public static class KeyboardManager
     {
-
         public static bool NumLock
         {
             get;
@@ -48,11 +47,16 @@ namespace Cosmos.System
             get;
             set;
         }
-
-        public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
-
-        private static ScanMapBase _scanMap = new US_Standard();
+        
+        private static List<KeyboardBase> mKeyboardList = new List<KeyboardBase>();
+        private static ScanMapBase mScanMap = new US_Standard();
         private static Queue<KeyEvent> mQueuedKeys = new Queue<KeyEvent>();
+
+        static KeyboardManager()
+        {
+            Global.mDebugger.Send("KeyboardManager cctor");
+            AddKeyboard((PS2Keyboard)HAL.Global.PS2Controller.FirstDevice);
+        }
 
         private static void Enqueue(KeyEvent keyEvent)
         {
@@ -69,40 +73,42 @@ namespace Cosmos.System
 
         private static void HandleScanCode(byte aScanCode, bool aReleased)
         {
+            Global.mDebugger.Send("KeyboardManager.HandleScanCode");
+
             byte key = aScanCode;
-            if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased)
+            if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased)
             {
                 // caps lock
                 CapsLock = !CapsLock;
                 UpdateLeds();
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased)
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased)
             {
                 // num lock
                 NumLock = !NumLock;
                 UpdateLeds();
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased)
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased)
             {
                 // scroll lock
                 ScrollLock = !ScrollLock;
                 UpdateLeds();
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl))
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl))
             {
                 ControlPressed = !aReleased;
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift))
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift))
             {
                 ShiftPressed = !aReleased;
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt))
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt))
             {
                 AltPressed = !aReleased;
             }
             else
             {
-                if (ControlPressed && AltPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
+                if (ControlPressed && AltPressed && mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
                 {
                     Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
                     Power.Reboot();
@@ -122,7 +128,7 @@ namespace Cosmos.System
 
         private static void UpdateLeds()
         {
-            foreach(KeyboardBase keyboard in Keyboards)
+            foreach(KeyboardBase keyboard in mKeyboardList)
             {
                 keyboard.UpdateLeds();
             }
@@ -130,12 +136,12 @@ namespace Cosmos.System
 
         public static bool GetKey(byte aScancode, out KeyEvent keyInfo)
         {
-            if (_scanMap == null)
+            if (mScanMap == null)
             {
                 Global.mDebugger.Send("No KeyLayout");
             }
 
-            keyInfo = _scanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
+            keyInfo = mScanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
 
             return keyInfo != null;
         }
@@ -165,37 +171,23 @@ namespace Cosmos.System
 
         public static ScanMapBase GetKeyLayout()
         {
-            return _scanMap;
+            return mScanMap;
         }
 
-        public static void SetKeyLayout(ScanMapBase ScanMap)
+        public static void SetKeyLayout(ScanMapBase aScanMap)
         {
-            if (ScanMap != null)
+            if (aScanMap != null)
             {
-                _scanMap = ScanMap;
+                mScanMap = aScanMap;
             }
         }
 
-        public static void AddKeyboard(KeyboardBase Keyboard)
+        private static void AddKeyboard(KeyboardBase aKeyboard)
         {
-            //if (!KeyboardExists(Keyboard.GetType()))
-            //{
-                Keyboard.OnKeyPressed = HandleScanCode;
-                Keyboards.Add(Keyboard);
-            //}
+            Global.mDebugger.Send("KeyboardManager.AddKeyboard");
+
+            aKeyboard.OnKeyPressed = HandleScanCode;
+            mKeyboardList.Add(aKeyboard);
         }
-
-        //public static bool KeyboardExists(Type KeyboardType)
-        //{
-        //    foreach (KeyboardBase Keyboard in Keyboards)
-        //    {
-        //        if (Keyboard.GetType() == KeyboardType)
-        //        {
-        //            return true;
-        //        }
-        //    }
-
-        //    return false;
-        //}
     }
 }

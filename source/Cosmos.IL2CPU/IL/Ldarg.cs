@@ -128,16 +128,17 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Comment("Arg idx = " + aParam);
       XS.Comment("Arg type = " + xType);
       XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
-      if (xArgRealSize < 4)
+      if (IsIntegralType(xType) && xArgRealSize == 1 || xArgRealSize == 2)
       {
-        if (xArgRealSize == 1)
+        if (IsIntegerSigned(xType))
         {
-          XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: xDisplacement, size: RegisterSize.Byte8);
+          XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: xDisplacement, size: (RegisterSize)(8 * xArgRealSize));
         }
         else
         {
-          XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: xDisplacement, size: RegisterSize.Short16);
+          XS.MoveZeroExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: xDisplacement, size: (RegisterSize)(8 * xArgRealSize));
         }
+
         XS.Push(EAX);
       }
       else

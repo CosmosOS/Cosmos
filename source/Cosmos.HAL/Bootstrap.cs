@@ -6,7 +6,7 @@ using Cosmos.Core;
 
 namespace Cosmos.HAL {
     // This and Core.Bootstrap are static on purpose to prevent 
-    // memalloc. Alhtough kernel has already used it, in the future we should call this pre kernel alloc so we
+    // memalloc. Although kernel has already used it, in the future we should call this pre kernel alloc so we
     // can better control the heap init.
     public static class Bootstrap {
         // The goal of init is to just "barely" get the system up
