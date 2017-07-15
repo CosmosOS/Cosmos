@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 using Cosmos.HAL;
 
@@ -135,8 +134,6 @@ namespace Cosmos.System
             {
                 Y = (uint)y;
             }
-
-            Global.mDebugger.Send("MOUSE: X = " + X + "; Y = " + Y + "; ScreenWidth = " + ScreenWidth + ";ScreenHeight = " + ScreenHeight);
         }
 
         private static void AddMouse(MouseBase aMouse)

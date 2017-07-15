@@ -17,10 +17,18 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal("GetFullScreenCanvas() with mode " + mode);
 
             if (mVideoDriver == null)
-                return mVideoDriver = new VBEScreen(mode);
+            {
+                mVideoDriver = new VBEScreen(mode);
+            }
+            else
+            {
+                /* We have already got a VideoDriver instance simple change its mode */
+                mVideoDriver.Mode = mode;
+            }
+            
+            MouseManager.ScreenWidth = (uint)mVideoDriver.Mode.Columns;
+            MouseManager.ScreenHeight = (uint)mVideoDriver.Mode.Rows;
 
-            /* We have already got a VideoDriver istance simple change its mode */
-            mVideoDriver.Mode = mode;
             return mVideoDriver;
         }
 
@@ -32,9 +40,11 @@ namespace Cosmos.System.Graphics
             {
                 mVideoDriver = new VBEScreen();
             }
-
-            /* We have already got a VideoDriver instance simple reset its mode to DefaultGraphicMode */
-            //mVideoDriver.Mode = mVideoDriver.DefaultGraphicMode;
+            else
+            {
+                /* We have already got a VideoDriver instance simple reset its mode to DefaultGraphicMode */
+                mVideoDriver.Mode = mVideoDriver.DefaultGraphicMode;
+            }
 
             MouseManager.ScreenWidth = (uint)mVideoDriver.Mode.Columns;
             MouseManager.ScreenHeight = (uint)mVideoDriver.Mode.Rows;
