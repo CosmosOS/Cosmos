@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
 
-using Cosmos.Core.Common;
-
 namespace Cosmos.IL2CPU
 {
     public static class GCImplementationRefs
@@ -13,7 +11,7 @@ namespace Cosmos.IL2CPU
 
         static GCImplementationRefs()
         {
-            Type xType = typeof(GCImplementation);
+            Type xType = Type.GetType("Cosmos.Core.GCImplementation, Cosmos.Core", true);
             if (xType == null)
             {
                 throw new Exception("GCImplementation type not found!");

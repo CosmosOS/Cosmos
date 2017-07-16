@@ -2,14 +2,17 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Cosmos Kit Builder" Height="496" Width="709" Loaded="Window_Loaded" Icon="/Cosmos.Build.Builder;component/Cosmos.ico" SizeChanged="Window_SizeChanged" Closing="Window_Closing">
-    <DockPanel>
-        <WrapPanel DockPanel.Dock="Top">
-            <Button Name="butnCopy" Click="butnCopy_Click">Copy</Button>
-        </WrapPanel>
-        <StackPanel Name="spnlTail" DockPanel.Dock="Top">
-        </StackPanel>
-        <ScrollViewer HorizontalScrollBarVisibility="Visible">
-            <StackPanel Name="spnlLog" />
-        </ScrollViewer>
-    </DockPanel>
+  <DockPanel>
+    <WrapPanel DockPanel.Dock="Top">
+      <Button Name="butnCopy" Click="butnCopy_Click">Copy</Button>
+    </WrapPanel>
+    <Rectangle Height="5" DockPanel.Dock="Top"/>
+    <TextBlock Text="Current Task Log Tail" DockPanel.Dock="Top" Background="LightGray" FontSize="18" Foreground="Blue" FontWeight="ExtraBold" Name="tblkTail"/>
+    <StackPanel Name="spnlTail" DockPanel.Dock="Top" Margin="5">
+    </StackPanel>
+    <Rectangle Height="5" DockPanel.Dock="Top" Fill="LightGray"/>
+    <ScrollViewer HorizontalScrollBarVisibility="Visible">
+      <StackPanel Name="spnlLog" />
+    </ScrollViewer>
+  </DockPanel>
 </Window>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -30,7 +30,6 @@ namespace Cosmos.TestRunner.Core
 
         private void RunDotnetPublish(string aProjectPath, string aOutputPath, string aRuntimeTarget)
         {
-            bool xResult = true;
             var xArgsString = $"publish \"{aProjectPath}\" -o \"{aOutputPath}\" -r {aRuntimeTarget}";
 
             RunProcess("dotnet", aProjectPath, xArgsString);
@@ -169,10 +168,10 @@ namespace Cosmos.TestRunner.Core
             References = new List<string>
             {
                 kernelFileName,
-                Assembly.Load(new AssemblyName("Cosmos.Core.Plugs")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.Core.Plugs.Asm")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.System.Plugs")).Location
+                Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.System_Plugs")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location
             };
 
             var xArgs = new List<string>

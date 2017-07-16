@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -41,9 +41,9 @@
     <Compile Include="Logger.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
+    <ProjectReference Include="..\..\source\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj">
       <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
-      <Name>Cosmos.System.Plugs</Name>
+      <Name>Cosmos.System_Plugs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
       <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>

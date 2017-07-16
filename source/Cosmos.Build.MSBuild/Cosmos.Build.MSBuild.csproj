@@ -5,6 +5,11 @@
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    <!--
+        NU1605 (Detected package downgrade) is being logged as error, which may cause the build to fail.
+        The .NET Standard libraries can't be upgraded, as this project targets .NET Framework 4.6.2.
+    -->
+    <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

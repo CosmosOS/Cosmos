@@ -7,15 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml;
 
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.Extensions;
@@ -1153,7 +1151,7 @@ namespace Cosmos.IL2CPU
                         }
                         xTarget.Append("0,");
                         // todo: abstract this array code out.
-                        xTarget.Append((uint)ObjectUtilities.InstanceTypeEnum.StaticEmbeddedArray);
+                        xTarget.Append((uint)ObjectUtils.InstanceTypeEnum.StaticEmbeddedArray);
                         xTarget.Append(",");
                         xTarget.Append((int)xStream.Length);
                         xTarget.Append(",");
@@ -1551,7 +1549,7 @@ namespace Cosmos.IL2CPU
             // This test fixes issue #15638
             if (null != aNamespace)
             {
-                // Check options for Debug Level
+                // Check options for Debug RingEnum
                 // Set based on TracedAssemblies
                 if (TraceAssemblies > TraceAssemblies.None)
                 {

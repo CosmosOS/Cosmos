@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Cosmos.Core;
-using Cosmos.Core.Common;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 
@@ -105,6 +104,8 @@ namespace Cosmos.HAL
       InitStaticDevices();
       mDebugger.Send("PCI Devices");
       InitPciDevices();
+      mDebugger.Send("ACPI Init");
+      StartACPI();
       mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
       mDebugger.Send("ATA Primary Master");
@@ -130,9 +131,14 @@ namespace Cosmos.HAL
       // system level and not accessible from Core. Need to think about this
       // for the future.
       Console.WriteLine("Finding PCI Devices");
-      Console.WriteLine();
 
       PCI.Setup();
+    }
+
+    public static void StartACPI()
+    {
+      Console.WriteLine("Starting ACPI");
+      Core.ACPI.Start();
     }
 
     public static void EnableInterrupts()

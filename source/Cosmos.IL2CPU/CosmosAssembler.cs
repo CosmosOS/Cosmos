@@ -6,8 +6,9 @@ using System.Reflection;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
-using Cosmos.Debug.DebugStub;
+using Cosmos.Core.DebugStub;
 using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU
 {
@@ -193,7 +194,7 @@ namespace Cosmos.IL2CPU
 
             if (mComPort > 0)
             {
-                XS.Set("static_field__Cosmos_Core_Common_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true);
+                XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             }
             XS.Label("AfterCreateIDT");
@@ -422,7 +423,7 @@ namespace Cosmos.IL2CPU
             const byte ICW1_ICW4 = 0x01; /* ICW4 (not) needed */
             const byte ICW1_SINGLE = 0x02; /* Single (cascade) mode */
             const byte ICW1_INTERVAL4 = 0x04; /* Call address interval 4 (8) */
-            const byte ICW1_LEVEL = 0x08; /* Level triggered (edge) mode */
+            const byte ICW1_LEVEL = 0x08; /* RingEnum triggered (edge) mode */
             const byte ICW1_INIT = 0x10; /* Initialization - required! */
 
             const byte ICW4_8086 = 0x01; /* 8086/88 (MCS-80/85) mode */
