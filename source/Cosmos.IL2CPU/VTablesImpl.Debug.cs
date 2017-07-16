@@ -5,6 +5,7 @@ namespace Cosmos.IL2CPU
     partial class VTablesImpl
     {
         public static bool EnableDebug = false;
+        private static Debugger mDebugger = new Debugger("IL2CPU", "VTablesImpl");
 
         private static void Debug(string message)
         {
@@ -12,7 +13,7 @@ namespace Cosmos.IL2CPU
             {
                 return;
             }
-            Debugger.DoSend(message);
+            mDebugger.Send(message);
         }
 
         private static void DebugHex(string message, uint value)
@@ -21,8 +22,8 @@ namespace Cosmos.IL2CPU
             {
                 return;
             }
-            Debugger.DoSend(message);
-            Debugger.DoSendNumber(value);
+            mDebugger.Send(message);
+            mDebugger.SendNumber(value);
         }
 
         private static void DebugAndHalt(string message)

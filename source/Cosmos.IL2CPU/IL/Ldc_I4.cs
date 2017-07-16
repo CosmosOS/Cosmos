@@ -3,7 +3,8 @@ using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using System.Collections.Generic;
-using XSharp.Compiler;
+
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -12,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
         public Ldc_I4( Cosmos.Assembler.Assembler aAsmblr ) : base( aAsmblr ) { }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
           XS.Push((uint)((OpInt)aOpCode).Value);
         }

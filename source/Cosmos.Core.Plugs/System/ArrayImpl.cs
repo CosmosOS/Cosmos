@@ -1,21 +1,19 @@
 ﻿using System;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.Assemblers.Array;
 
 namespace Cosmos.Core.Plugs.System
 {
     [Plug(Target = typeof(Array))]
     public class ArrayImpl
     {
-
         [PlugMethod(Signature = "System_Void__System_Array_Clear_System_Array__System_Int32__System_Int32_")]
-        public static unsafe void Clear([ObjectPointerAccess]uint* aArray, uint aIndex, uint aLength)
+        public static unsafe void Clear([ObjectPointerAccess] uint* aArray, uint aIndex, uint aLength)
         {
-            aArray = (uint*)aArray[0];
+            aArray = (uint*) aArray[0];
             aArray += 3;
             uint xElementSize = *aArray;
             aArray += 1;
-            byte* xBytes = (byte*)aArray;
+            byte* xBytes = (byte*) aArray;
             for (uint i = aIndex * xElementSize; i < ((aIndex + aLength) * xElementSize); i++)
             {
                 xBytes[i] = 0;
@@ -36,25 +34,17 @@ namespace Cosmos.Core.Plugs.System
             return aThis.Length;
         }
 
-        [PlugMethod(Assembler = typeof(ArrayGetLengthAsm))]
-        public static int get_Length(Array aThis)
-        {
-            //aThis += 2;
-            //return *aThis;
-            return 0;
-        }
-
         [PlugMethod(Signature = "System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
         public static unsafe bool TrySZBinarySearch(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
-            aArray = (uint*)aArray[0];
+            aArray = (uint*) aArray[0];
             return TrySZIndexOf(aArray, sourceIndex, count, value, out retVal);
         }
 
         [PlugMethod(Signature = "System_Boolean__System_Array_TrySZLastIndexOf_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
         public static unsafe bool TrySZLastIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
-            aArray = (uint*)aArray[0];
+            aArray = (uint*) aArray[0];
             aArray += 4;
             for (uint i = (sourceIndex + count); i > sourceIndex; i--)
             {
@@ -71,7 +61,7 @@ namespace Cosmos.Core.Plugs.System
         //[PlugMethod(Signature = "System_Boolean__System_Array_TrySZIndexOf_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
         private static unsafe bool TrySZIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
-            aArray = (uint*)aArray[0];
+            aArray = (uint*) aArray[0];
             aArray += 4;
             for (uint i = sourceIndex; i < (sourceIndex + count); i++)
             {
@@ -85,19 +75,14 @@ namespace Cosmos.Core.Plugs.System
             return false;
         }
 
-        [PlugMethod(Assembler = typeof(ArrayInternalCopyAsm))]
-        public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable)
-        {
-        }
-
-        public static unsafe int get_Rank(int* aThis)
+        public static unsafe int get_Rank([ObjectPointerAccess]int* aThis)
         {
             return 1;
         }
 
-        public static unsafe int GetLowerBound(int* aThis, int aDimension)
+        public static unsafe int GetLowerBound([ObjectPointerAccess]int* aThis, int aDimension)
         {
-            aThis = (int*)aThis[0];
+            aThis = (int*) aThis[0];
             if (aDimension != 0)
             {
                 //throw new NotSupportedException("Multidimensional arrays not supported yet!");
@@ -108,17 +93,17 @@ namespace Cosmos.Core.Plugs.System
         [PlugMethod(Signature = "System_Object__System_Array_GetValue_System_Int32_")]
         public static unsafe uint GetValue(uint* aThis, int aIndex)
         {
-            aThis = (uint*)aThis[0];
+            aThis = (uint*) aThis[0];
             aThis += 3;
             uint xElementSize = *aThis;
             aThis += 1;
-            aThis = ((uint*)(((byte*)aThis) + aIndex * xElementSize));
+            aThis = ((uint*) (((byte*) aThis) + aIndex * xElementSize));
             switch (xElementSize)
             {
                 case 1:
-                    return *((byte*)aThis);
+                    return *((byte*) aThis);
                 case 2:
-                    return *((ushort*)aThis);
+                    return *((ushort*) aThis);
                 case 3:
                     return (*aThis) & 0x0FFFFFFF;
                 case 4:
@@ -135,24 +120,24 @@ namespace Cosmos.Core.Plugs.System
         [PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
         public static unsafe void SetValue(uint* aThis, uint aValue, int aIndex)
         {
-            aThis = (uint*)aThis[0];
+            aThis = (uint*) aThis[0];
             aThis += 3;
             uint xElementSize = *aThis;
             aThis += 1;
-            aThis = ((uint*)(((byte*)aThis) + aIndex * xElementSize));
+            aThis = ((uint*) (((byte*) aThis) + aIndex * xElementSize));
             switch (xElementSize)
             {
                 case 1:
-                    *((byte*)aThis) = (byte)aValue;
+                    *((byte*) aThis) = (byte) aValue;
                     return;
                 case 2:
-                    *((ushort*)aThis) = (ushort)aValue;
+                    *((ushort*) aThis) = (ushort) aValue;
                     return;
                 case 3:
-                    *((uint*)aThis) = (uint)aValue;
+                    *((uint*) aThis) = (uint) aValue;
                     return;
                 case 4:
-                    *((uint*)aThis) = (uint)aValue;
+                    *((uint*) aThis) = (uint) aValue;
                     return;
             }
             throw new NotSupportedException("SetValue not supported in this situation!");

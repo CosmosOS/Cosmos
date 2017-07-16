@@ -5,9 +5,10 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86.SSE;
 using Cosmos.Assembler.x86.x87;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -20,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xStackItem = aOpCode.StackPopTypes[0];
       var xStackItemSize = SizeOfType(xStackItem);

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
-using Cosmos.IL2CPU.X86.IL;
-using FieldInfo = System.Reflection.FieldInfo;
+
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
@@ -12,8 +12,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
     {
         public readonly FieldInfo Value;
 
-        public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, ExceptionHandlingClause aCurrentExceptionHandler)
-          : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
+        public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, _ExceptionRegionInfo aCurrentExceptionRegion)
+          : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
         {
             Value = aValue;
         }
@@ -68,9 +68,9 @@ namespace Cosmos.IL2CPU.ILOpCodes
             {
                 case Code.Ldsfld:
                     StackPushTypes[0] = Value.FieldType;
-                    if (StackPushTypes[0].IsEnum)
+                    if (StackPushTypes[0].GetTypeInfo().IsEnum)
                     {
-                        StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
+                        StackPushTypes[0] = StackPushTypes[0].GetTypeInfo().GetEnumUnderlyingType();
                     }
                     return;
                 case Code.Ldsflda:
@@ -78,23 +78,23 @@ namespace Cosmos.IL2CPU.ILOpCodes
                     return;
                 case Code.Ldfld:
                     StackPushTypes[0] = Value.FieldType;
-                    if (StackPushTypes[0].IsEnum)
+                    if (StackPushTypes[0].GetTypeInfo().IsEnum)
                     {
-                        StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
+                        StackPushTypes[0] = StackPushTypes[0].GetTypeInfo().GetEnumUnderlyingType();
                     }
-                    if (!Value.DeclaringType.IsValueType)
+                    if (!Value.DeclaringType.GetTypeInfo().IsValueType)
                     {
                         StackPopTypes[0] = Value.DeclaringType;
                     }
                     return;
                 case Code.Ldflda:
                     StackPopTypes[0] = Value.DeclaringType;
-                    if (StackPopTypes[0].IsEnum)
+                    if (StackPopTypes[0].GetTypeInfo().IsEnum)
                     {
-                        StackPopTypes[0] = StackPopTypes[0].GetEnumUnderlyingType();
+                        StackPopTypes[0] = StackPopTypes[0].GetTypeInfo().GetEnumUnderlyingType();
                     }
-                    if (StackPopTypes[0].IsValueType &&
-                        !StackPopTypes[0].IsPrimitive)
+                    if (StackPopTypes[0].GetTypeInfo().IsValueType &&
+                        !StackPopTypes[0].GetTypeInfo().IsPrimitive)
                     {
                         StackPopTypes[0] = StackPopTypes[0].MakeByRefType();
                     }
@@ -114,11 +114,11 @@ namespace Cosmos.IL2CPU.ILOpCodes
                         return;
                     }
                     var expectedType = Value.FieldType;
-                    if (expectedType.IsEnum)
+                    if (expectedType.GetTypeInfo().IsEnum)
                     {
-                        expectedType = expectedType.GetEnumUnderlyingType();
+                        expectedType = expectedType.GetTypeInfo().GetEnumUnderlyingType();
                     }
-                    else if (Value.DeclaringType.IsValueType && !Value.DeclaringType.IsPrimitive)
+                    else if (Value.DeclaringType.GetTypeInfo().IsValueType && !Value.DeclaringType.GetTypeInfo().IsPrimitive)
                     {
                         expectedType = typeof(void*);
                     }
@@ -127,8 +127,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
                     {
                         return;
                     }
-                    if (IsIntegralType(expectedType) &&
-                        IsIntegralType(StackPopTypes[1]))
+                    if (ILOp.IsIntegralType(expectedType) &&
+                        ILOp.IsIntegralType(StackPopTypes[1]))
                     {
                         return;
                     }
@@ -156,29 +156,29 @@ namespace Cosmos.IL2CPU.ILOpCodes
                     {
                         return;
                     }
-                    if (IsIntegralType(Value.FieldType) &&
-                        IsIntegralType(StackPopTypes[0]))
+                    if (ILOp.IsIntegralType(Value.FieldType) &&
+                        ILOp.IsIntegralType(StackPopTypes[0]))
                     {
                         return;
                     }
                     if (Value.FieldType == typeof(bool) &&
-                        IsIntegralType(StackPopTypes[0]))
+                        ILOp.IsIntegralType(StackPopTypes[0]))
                     {
                         return;
                     }
-                    if (Value.FieldType.IsEnum)
+                    if (Value.FieldType.GetTypeInfo().IsEnum)
                     {
-                        if (IsIntegralType(StackPopTypes[0]))
+                        if (ILOp.IsIntegralType(StackPopTypes[0]))
                         {
                             return;
                         }
                     }
-                    if (IsPointer(Value.FieldType) &&
-                        IsPointer(StackPopTypes[0]))
+                    if (ILOp.IsPointer(Value.FieldType) &&
+                        ILOp.IsPointer(StackPopTypes[0]))
                     {
                         return;
                     }
-                    if (Value.FieldType.IsClass &&
+                    if (Value.FieldType.GetTypeInfo().IsClass &&
                         StackPopTypes[0] == typeof(NullRef))
                     {
                         return;
@@ -191,17 +191,17 @@ namespace Cosmos.IL2CPU.ILOpCodes
                         return;
                     }
                     expectedType = Value.FieldType;
-                    if (expectedType.IsEnum)
+                    if (expectedType.GetTypeInfo().IsEnum)
                     {
-                        expectedType = expectedType.GetEnumUnderlyingType();
+                        expectedType = expectedType.GetTypeInfo().GetEnumUnderlyingType();
                     }
                     if (StackPopTypes[0] == expectedType ||
                         StackPopTypes[0] == Value.FieldType)
                     {
                         return;
                     }
-                    if (IsIntegralType(expectedType) &&
-                        IsIntegralType(StackPopTypes[0]))
+                    if (ILOp.IsIntegralType(expectedType) &&
+                        ILOp.IsIntegralType(StackPopTypes[0]))
                     {
                         return;
                     }
@@ -232,7 +232,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
                     {
                         return;
                     }
-                    if (!Value.DeclaringType.IsValueType)
+                    if (!Value.DeclaringType.GetTypeInfo().IsValueType)
                     {
                         return;
                     }

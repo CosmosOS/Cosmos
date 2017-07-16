@@ -1,11 +1,9 @@
-using System;
 using System.Linq;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.Plugs.System;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using Cosmos.IL2CPU.Plugs;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -27,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Pop(EAX);
       XS.Set(EDX, aElementSize);
       XS.Multiply(EDX);
-      XS.Add(EAX, (uint) (ObjectImpl.FieldDataOffset + 4));
+      XS.Add(EAX, (uint)(ObjectUtilities.FieldDataOffset + 4));
 
       // pop the array now
       XS.Add(ESP, 4);
@@ -37,9 +35,9 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Push(EDX);
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
-      var xOpType = (OpType) aOpCode;
+      var xOpType = (OpType)aOpCode;
       var xSize = SizeOfType(xOpType.Value);
       Assemble(Assembler, xOpType, xSize, DebugEnabled);
     }

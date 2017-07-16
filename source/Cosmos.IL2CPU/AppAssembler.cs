@@ -1,36 +1,28 @@
 //#define VMT_DEBUG
+//#define COSMOSDEBUG
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
-using System.Xml.Serialization;
+
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86._486AndUp;
 using Cosmos.Build.Common;
-using Cosmos.Common;
-using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.System;
 using Cosmos.IL2CPU.X86.IL;
-using Mono.Cecil;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
-using Add = Cosmos.Assembler.x86.Add;
+using Cosmos.Debug.Symbols;
+using Cosmos.IL2CPU.Extensions;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 using Call = Cosmos.Assembler.x86.Call;
-using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 using Label = Cosmos.Assembler.Label;
-using Pop = Cosmos.Assembler.x86.Pop;
-using Sub = Cosmos.Assembler.x86.Sub;
-using SysReflection = System.Reflection;
-
 
 namespace Cosmos.IL2CPU
 {
@@ -65,7 +57,7 @@ namespace Cosmos.IL2CPU
         public AppAssembler(int aComPort, string assemblerLogFile)
         {
             Assembler = CreateAssembler(aComPort);
-            mLog = new StreamWriter(assemblerLogFile, false);
+            mLog = new StreamWriter(File.OpenWrite(assemblerLogFile));
             InitILOps();
         }
 
@@ -84,11 +76,11 @@ namespace Cosmos.IL2CPU
             GC.SuppressFinalize(this);
         }
 
-        protected void MethodBegin(MethodInfo aMethod)
+        protected void MethodBegin(_MethodInfo aMethod)
         {
             XS.Comment("---------------------------------------------------------");
-            XS.Comment("Assembly: " + aMethod.MethodBase.DeclaringType.Assembly.FullName);
-            XS.Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
+            XS.Comment("Assembly: " + aMethod.MethodBase.DeclaringType.GetTypeInfo().Assembly.FullName);
+            XS.Comment("Type: " + aMethod.MethodBase.DeclaringType);
             XS.Comment("Name: " + aMethod.MethodBase.Name);
             XS.Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
             // for now:
@@ -98,14 +90,12 @@ namespace Cosmos.IL2CPU
                 if (aMethod.MethodAssembler == null && !aMethod.IsInlineAssembler)
                 {
                     // the body of aMethod is getting emitted
-                    var xBody = aMethod.MethodBase.GetMethodBody();
-                    if (xBody != null)
+                    var xLocals = aMethod.MethodBase.GetLocalVariables();
+                    for (int i = 0; i < xLocals.Count; i++)
                     {
-                        foreach (var localVariable in xBody.LocalVariables)
-                        {
-                            XS.Comment(String.Format("Local {0} at EBP-{1}", localVariable.LocalIndex, ILOp.GetEBPOffsetForLocal(aMethod, localVariable.LocalIndex)));
-                        }
+                        XS.Comment(String.Format("Local {0} at EBP-{1}", i, ILOp.GetEBPOffsetForLocal(aMethod, i)));
                     }
+
                     var xIdxOffset = 0u;
                     if (!aMethod.MethodBase.IsStatic)
                     {
@@ -121,12 +111,12 @@ namespace Cosmos.IL2CPU
                     for (ushort i = 0; i < xParamCount; i++)
                     {
                         var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
-                        var xSize = X86.IL.Ldarg.SizeOfType(xParams[i].ParameterType);
+                        var xSize = ILOp.SizeOfType(xParams[i].ParameterType);
                         // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
                         XS.Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
                     }
 
-                    var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+                    var xMethodInfo = aMethod.MethodBase as MethodInfo;
                     if (xMethodInfo != null)
                     {
                         var xSize = ILOp.Align(ILOp.SizeOfType(xMethodInfo.ReturnType), 4);
@@ -164,14 +154,14 @@ namespace Cosmos.IL2CPU
             if (DebugEnabled && StackCorruptionDetection)
             {
                 // if StackCorruption detection is active, we're also going to emit a stack overflow detection
-                XS.Set(XSRegisters.EAX, "Before_Kernel_Stack");
-                XS.Compare(XSRegisters.EAX, XSRegisters.ESP);
+                XS.Set(EAX, "Before_Kernel_Stack");
+                XS.Compare(EAX, ESP);
                 XS.Jump(ConditionalTestEnum.LessThan, mCurrentMethodLabel + ".StackOverflowCheck_End");
                 XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_GetAddress" };
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
-                XS.Pop(XSRegisters.EAX);
+                XS.Pop(EAX);
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackOverflowOccurred");
                 XS.Halt();
@@ -191,13 +181,13 @@ namespace Cosmos.IL2CPU
                 XS.Set(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 XS.Jump(".AfterCCTorAlreadyCalledCheck");
                 XS.Label(".BeforeQuickReturn");
-                XS.Set(XSRegisters.ECX, 0);
+                XS.Set(ECX, 0);
                 XS.Return();
                 XS.Label(".AfterCCTorAlreadyCalledCheck");
             }
 
-            XS.Push(XSRegisters.EBP);
-            XS.Set(XSRegisters.EBP, XSRegisters.ESP);
+            XS.Push(EBP);
+            XS.Set(EBP, ESP);
 
             if (DebugMode == DebugMode.Source)
             {
@@ -213,13 +203,13 @@ namespace Cosmos.IL2CPU
 
                     var xMethod = new Method();
                     xMethod.ID = mCurrentMethodGuid;
-                    xMethod.TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken;
+                    xMethod.TypeToken = aMethod.MethodBase.DeclaringType.GetTypeInfo().GetMetadataToken();
                     xMethod.MethodToken = aMethod.MethodBase.MetadataToken;
                     xMethod.LabelStartID = xLabelGuid;
                     xMethod.LabelEndID = mCurrentMethodLabelEndGuid;
                     xMethod.LabelCall = xMethodLabel;
                     long xAssemblyFileID;
-                    if (DebugInfo.AssemblyGUIDs.TryGetValue(aMethod.MethodBase.DeclaringType.Assembly, out xAssemblyFileID))
+                    if (DebugInfo.AssemblyGUIDs.TryGetValue(aMethod.MethodBase.DeclaringType.GetTypeInfo().Assembly, out xAssemblyFileID))
                     {
                         xMethod.AssemblyFileID = xAssemblyFileID;
                     }
@@ -233,48 +223,30 @@ namespace Cosmos.IL2CPU
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
                 // the body of aMethod is getting emitted
-                var xBody = aMethod.MethodBase.GetMethodBody();
-                if (xBody != null)
-                {
                     var xLocalsOffset = mLocals_Arguments_Infos.Count;
                     aMethod.LocalVariablesSize = 0;
-                    foreach (var xLocal in xBody.LocalVariables)
+                var xLocals = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase);
+                for (int i = 0; i < xLocals.Count; i++)
+                {
                     {
                         var xInfo = new LOCAL_ARGUMENT_INFO
-                        {
-                            METHODLABELNAME = xMethodLabel,
-                            IsArgument = false,
-                            INDEXINMETHOD = xLocal.LocalIndex,
-                            NAME = "Local" + xLocal.LocalIndex,
-                            OFFSET = 0 - (int)ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
-                            TYPENAME = xLocal.LocalType.AssemblyQualifiedName
-                        };
+                                    {
+                                        METHODLABELNAME = xMethodLabel,
+                                        IsArgument = false,
+                                        INDEXINMETHOD = xLocals[i].Slot,
+                                        NAME = xLocals[i].Name,
+                                        OFFSET = 0 - (int) ILOp.GetEBPOffsetForLocalForDebugger(aMethod, i),
+                                        TYPENAME = xLocals[i].Type.AssemblyQualifiedName
+                                    };
                         mLocals_Arguments_Infos.Add(xInfo);
 
-                        var xSize = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4);
-                        XS.Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
-                        for (int i = 0; i < xSize / 4; i++)
+                        var xSize = ILOp.Align(ILOp.SizeOfType(xLocals[i].Type), 4);
+                        XS.Comment(String.Format("Local {0}, Size {1}", i, xSize));
+                        for (int j = 0; j < xSize / 4; j++)
                         {
                             XS.Push(0);
                         }
                         aMethod.LocalVariablesSize += xSize;
-                        //new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
-                    }
-                    var xCecilMethod = GetCecilMethodDefinitionForSymbolReading(aMethod.MethodBase);
-                    if (xCecilMethod != null && xCecilMethod.Body != null)
-                    {
-                        // mLocals_Arguments_Infos is one huge list, so ourlatest additions are at the end
-                        for (int i = 0; i < xCecilMethod.Body.Variables.Count; i++)
-                        {
-                            mLocals_Arguments_Infos[xLocalsOffset + i].NAME = xCecilMethod.Body.Variables[i].Name;
-                        }
-                        for (int i = xLocalsOffset + xCecilMethod.Body.Variables.Count - 1; i >= xLocalsOffset; i--)
-                        {
-                            if (mLocals_Arguments_Infos[i].NAME.Contains('$'))
-                            {
-                                mLocals_Arguments_Infos.RemoveAt(i);
-                            }
-                        }
                     }
                 }
 
@@ -316,17 +288,17 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected void MethodEnd(MethodInfo aMethod)
+        protected void MethodEnd(_MethodInfo aMethod)
         {
             XS.Comment("End Method: " + aMethod.MethodBase.Name);
 
             uint xReturnSize = 0;
-            var xMethInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+            var xMethInfo = aMethod.MethodBase as MethodInfo;
             if (xMethInfo != null)
             {
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
             }
-            var xMethodLabel = ILOp.GetMethodLabel(aMethod);
+            var xMethodLabel = ILOp.GetLabel(aMethod);
             //if (aMethod.PlugMethod == null
             //    && !aMethod.IsInlineAssembler)
             {
@@ -336,12 +308,12 @@ namespace Cosmos.IL2CPU
                 XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
             }
 
-            XS.Set(XSRegisters.ECX, 0);
+            XS.Set(ECX, 0);
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
             if (!aMethod.MethodBase.IsStatic)
             {
-                if (aMethod.MethodBase.DeclaringType.IsValueType)
+                if (aMethod.MethodBase.DeclaringType.GetTypeInfo().IsValueType)
                 {
                     xTotalArgsSize += 4; // only a reference is passed
                 }
@@ -354,7 +326,7 @@ namespace Cosmos.IL2CPU
             if (aMethod.PluggedMethod != null)
             {
                 xReturnSize = 0;
-                xMethInfo = aMethod.PluggedMethod.MethodBase as SysReflection.MethodInfo;
+                xMethInfo = aMethod.PluggedMethod.MethodBase as MethodInfo;
                 if (xMethInfo != null)
                 {
                     xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -363,7 +335,7 @@ namespace Cosmos.IL2CPU
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
                 if (!aMethod.PluggedMethod.MethodBase.IsStatic)
                 {
-                    if (aMethod.PluggedMethod.MethodBase.DeclaringType.IsValueType)
+                    if (aMethod.PluggedMethod.MethodBase.DeclaringType.GetTypeInfo().IsValueType)
                     {
                         xTotalArgsSize += 4; // only a reference is passed
                     }
@@ -379,8 +351,8 @@ namespace Cosmos.IL2CPU
                 var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
                 for (int i = 0; i < ((int)(xReturnSize / 4)); i++)
                 {
-                    XS.Pop(XSRegisters.EAX);
-                    XS.Set(XSRegisters.EBP, XSRegisters.EAX, destinationDisplacement: (int)(xOffset + ((i + 0) * 4)));
+                    XS.Pop(EAX);
+                    XS.Set(EBP, EAX, destinationDisplacement: (int)(xOffset + ((i + 0) * 4)));
                 }
                 // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
             }
@@ -388,33 +360,31 @@ namespace Cosmos.IL2CPU
             XS.Label(xLabelExc);
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
-                var xBody = aMethod.MethodBase.GetMethodBody();
-                if (xBody != null)
-                {
                     uint xLocalsSize = 0;
-                    for (int j = xBody.LocalVariables.Count - 1; j >= 0; j--)
+                    var xLocalInfos = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase);
+                    for (int j = xLocalInfos.Count - 1; j >= 0; j--)
                     {
-                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
+                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xLocalInfos[j].Type), 4);
 
                         if (xLocalsSize >= 256)
                         {
-                            XS.Add(XSRegisters.ESP, 255);
+                            XS.Add(ESP, 255);
                             xLocalsSize -= 255;
                         }
                     }
                     if (xLocalsSize > 0)
                     {
-                        XS.Add(XSRegisters.ESP, xLocalsSize);
+                        XS.Add(ESP, xLocalsSize);
                     }
                 }
-            }
+
             if (DebugEnabled && StackCorruptionDetection)
             {
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
                 // if not, we should somehow break here.
-                XS.Set(XSRegisters.EAX, XSRegisters.ESP);
-                XS.Set(XSRegisters.EBX, XSRegisters.EBP);
-                XS.Compare(XSRegisters.EAX, XSRegisters.EBX);
+                XS.Set(EAX, ESP);
+                XS.Set(EBX, EBP);
+                XS.Compare(EAX, EBX);
                 XS.Jump(ConditionalTestEnum.Equal, xLabelExc + "__2");
                 XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
@@ -432,7 +402,7 @@ namespace Cosmos.IL2CPU
                 XS.Halt();
             }
             XS.Label(xLabelExc + "__2");
-            XS.Pop(XSRegisters.EBP);
+            XS.Pop(EBP);
             var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
             if (xRetSize < 0)
             {
@@ -466,14 +436,14 @@ namespace Cosmos.IL2CPU
             return xOffset;
         }
 
-        public void ProcessMethod(MethodInfo aMethod, List<ILOpCode> aOpCodes)
+        public void ProcessMethod(_MethodInfo aMethod, List<ILOpCode> aOpCodes)
         {
             try
             {
                 // We check this here and not scanner as when scanner makes these
                 // plugs may still have not yet been scanned that it will depend on.
                 // But by the time we make it here, they have to be resolved.
-                if (aMethod.Type == MethodInfo.TypeEnum.NeedsPlug && aMethod.PlugMethod == null)
+                if (aMethod.Type == _MethodInfo.TypeEnum.NeedsPlug && aMethod.PlugMethod == null)
                 {
                     throw new Exception("Method needs plug, but no plug was assigned.");
                 }
@@ -519,7 +489,7 @@ namespace Cosmos.IL2CPU
                     bool emitINT3 = true;
                     DebugInfo.SequencePoint xPreviousSequencePoint = null;
                     var xCurrentGroup = new List<ILOpCode>();
-                    ILOpCode.ILInterpretationDebugLine(() => String.Format("Method: {0}", aMethod.MethodBase.GetFullName()));
+                    CompilerHelpers.Debug($"AppAssembler: Method: {aMethod.MethodBase.GetFullName()}");
                     foreach (var xRawOpcode in aOpCodes)
                     {
                         var xSP = mSequences.FirstOrDefault(q => q.Offset == xRawOpcode.Position && q.LineStart != 0xFEEFEE);
@@ -549,12 +519,12 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        private void BeforeEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
+        private void BeforeEmitInstructions(_MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
         {
             // do optimizations
         }
 
-        private void AfterEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
+        private void AfterEmitInstructions(_MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
         {
             // do optimizations
 
@@ -570,7 +540,7 @@ namespace Cosmos.IL2CPU
         }
 
         //private static bool mDebugStackErrors = true;
-        private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
+        private void EmitInstructions(_MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
             ILOpCode.ILInterpretationDebugLine(() => "---- Group");
             InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
@@ -603,24 +573,24 @@ namespace Cosmos.IL2CPU
 
                 #region Exception handling support code
 
-                ExceptionHandlingClause xCurrentHandler = null;
+                _ExceptionRegionInfo xCurrentRegion = null;
                 var xBody = aMethod.MethodBase.GetMethodBody();
                 // todo: add support for nested handlers using a stack or so..
-                foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
+                foreach (_ExceptionRegionInfo xHandler in xBody.GetExceptionRegionInfos(aMethod.MethodBase.DeclaringType.GetTypeInfo().Module))
                 {
                     if (xHandler.TryOffset > 0)
                     {
                         if (xHandler.TryOffset <= xNextPosition && (xHandler.TryLength + xHandler.TryOffset) > xNextPosition)
                         {
-                            if (xCurrentHandler == null)
+                            if (xCurrentRegion == null)
                             {
-                                xCurrentHandler = xHandler;
+                                xCurrentRegion = xHandler;
                                 continue;
                             }
-                            else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
+                            else if (xHandler.TryOffset > xCurrentRegion.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentRegion.TryLength + xCurrentRegion.TryOffset))
                             {
                                 // only replace if the current found handler is narrower
-                                xCurrentHandler = xHandler;
+                                xCurrentRegion = xHandler;
                                 continue;
                             }
                         }
@@ -629,34 +599,34 @@ namespace Cosmos.IL2CPU
                     {
                         if (xHandler.HandlerOffset <= xNextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xNextPosition)
                         {
-                            if (xCurrentHandler == null)
+                            if (xCurrentRegion == null)
                             {
-                                xCurrentHandler = xHandler;
+                                xCurrentRegion = xHandler;
                                 continue;
                             }
-                            else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
+                            else if (xHandler.HandlerOffset > xCurrentRegion.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentRegion.HandlerOffset + xCurrentRegion.HandlerLength))
                             {
                                 // only replace if the current found handler is narrower
-                                xCurrentHandler = xHandler;
+                                xCurrentRegion = xHandler;
                                 continue;
                             }
                         }
                     }
-                    if (xHandler.Flags.HasFlag(ExceptionHandlingClauseOptions.Filter))
+                    if (xHandler.Kind.HasFlag(ExceptionRegionKind.Filter))
                     {
                         if (xHandler.FilterOffset > 0)
                         {
                             if (xHandler.FilterOffset <= xNextPosition)
                             {
-                                if (xCurrentHandler == null)
+                                if (xCurrentRegion == null)
                                 {
-                                    xCurrentHandler = xHandler;
+                                    xCurrentRegion = xHandler;
                                     continue;
                                 }
-                                else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
+                                else if (xHandler.FilterOffset > xCurrentRegion.FilterOffset)
                                 {
                                     // only replace if the current found handler is narrower
-                                    xCurrentHandler = xHandler;
+                                    xCurrentRegion = xHandler;
                                     continue;
                                 }
                             }
@@ -666,7 +636,7 @@ namespace Cosmos.IL2CPU
 
                 #endregion
 
-                var xNeedsExceptionPush = (xCurrentHandler != null) && (((xCurrentHandler.HandlerOffset > 0 && xCurrentHandler.HandlerOffset == xOpCode.Position) || ((xCurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && xCurrentHandler.FilterOffset > 0 && xCurrentHandler.FilterOffset == xOpCode.Position)) && (xCurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause));
+                var xNeedsExceptionPush = (xCurrentRegion != null) && (((xCurrentRegion.HandlerOffset > 0 && xCurrentRegion.HandlerOffset == xOpCode.Position) || (xCurrentRegion.Kind.HasFlag(ExceptionRegionKind.Filter) && xCurrentRegion.FilterOffset > 0 && xCurrentRegion.FilterOffset == xOpCode.Position)) && (xCurrentRegion.Kind == ExceptionRegionKind.Catch));
                 if (xNeedsExceptionPush)
                 {
                     Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
@@ -782,16 +752,17 @@ namespace Cosmos.IL2CPU
 
         protected virtual void InitILOps(Type aAssemblerBaseOp)
         {
-            foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes())
+            foreach (var xType in aAssemblerBaseOp.GetTypeInfo().Assembly.GetExportedTypes())
             {
-                if (xType.IsSubclassOf(aAssemblerBaseOp))
+                var xTypeInfo = xType.GetTypeInfo();
+                if (xTypeInfo.IsSubclassOf(aAssemblerBaseOp))
                 {
-                    var xAttribs = (OpCodeAttribute[])xType.GetCustomAttributes(typeof(OpCodeAttribute), false);
+                    var xAttribs = xTypeInfo.GetCustomAttributes<OpCodeAttribute>(false);
                     foreach (var xAttrib in xAttribs)
                     {
                         var xOpCode = (ushort)xAttrib.OpCode;
-                        var xCtor = xType.GetConstructor(new Type[] { typeof(Assembler.Assembler) });
-                        var xILOp = (ILOp)xCtor.Invoke(new Object[] { Assembler });
+                        var xCtor = xTypeInfo.GetConstructor(new Type[] { typeof(Assembler.Assembler) });
+                        var xILOp = (ILOp)xCtor.Invoke(new object[] { Assembler });
                         if (xOpCode <= 0xFF)
                         {
                             mILOpsLo[xOpCode] = xILOp;
@@ -830,30 +801,30 @@ namespace Cosmos.IL2CPU
             XS.Jump(aLabelName);
         }
 
-        protected FieldInfo ResolveField(MethodInfo method, string fieldId, bool aOnlyInstance)
+        protected _FieldInfo ResolveField(_MethodInfo method, string fieldId, bool aOnlyInstance)
         {
-            return X86.IL.Ldflda.ResolveField(method.MethodBase.DeclaringType, fieldId, aOnlyInstance);
+            return ILOp.ResolveField(method.MethodBase.DeclaringType, fieldId, aOnlyInstance);
         }
 
-        protected void Ldarg(MethodInfo aMethod, int aIndex)
+        protected void Ldarg(_MethodInfo aMethod, int aIndex)
         {
             X86.IL.Ldarg.DoExecute(Assembler, aMethod, (ushort)aIndex);
         }
 
-        protected void Call(MethodInfo aMethod, MethodInfo aTargetMethod, string aNextLabel)
+        protected void Call(_MethodInfo aMethod, _MethodInfo aTargetMethod, string aNextLabel)
         {
             var xSize = X86.IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
             if (xSize > 0)
             {
-                XS.Sub(XSRegisters.ESP, xSize);
+                XS.Sub(ESP, xSize);
             }
-            XS.Call(ILOp.GetMethodLabel(aTargetMethod));
-            var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+            XS.Call(ILOp.GetLabel(aTargetMethod));
+            var xMethodInfo = aMethod.MethodBase as MethodInfo;
 
             uint xReturnsize = 0;
             if (xMethodInfo != null)
             {
-                xReturnsize = ILOp.SizeOfType(((SysReflection.MethodInfo)aMethod.MethodBase).ReturnType);
+                xReturnsize = ILOp.SizeOfType(((MethodInfo)aMethod.MethodBase).ReturnType);
             }
 
             ILOp.EmitExceptionLogic(Assembler, aMethod, null, true,
@@ -866,17 +837,17 @@ namespace Cosmos.IL2CPU
                          }
                          for (int i = 0; i < xResultSize / 4; i++)
                          {
-                             XS.Add(XSRegisters.ESP, 4);
+                             XS.Add(ESP, 4);
                          }
                      }, aNextLabel);
         }
 
-        protected void Ldflda(MethodInfo aMethod, FieldInfo aFieldInfo)
+        protected void Ldflda(_MethodInfo aMethod, _FieldInfo aFieldInfo)
         {
             X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false, aFieldInfo.DeclaringType);
         }
 
-        protected void Ldsflda(MethodInfo aMethod, FieldInfo aFieldInfo)
+        protected void Ldsflda(_MethodInfo aMethod, _FieldInfo aFieldInfo)
         {
             X86.IL.Ldsflda.DoExecute(Assembler, aMethod, DataMember.GetStaticFieldName(aFieldInfo.Field), aMethod.MethodBase.DeclaringType, null);
         }
@@ -887,15 +858,14 @@ namespace Cosmos.IL2CPU
         }
 
         public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
-        public virtual void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID)
+        public virtual void GenerateVMTCode(HashSet<TypeInfo> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<TypeInfo, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID)
         {
             XS.Comment("---------------------------------------------------------");
             XS.Label(InitVMTCodeLabel);
-            XS.Push(XSRegisters.EBP);
-            XS.Set(XSRegisters.EBP, XSRegisters.ESP);
+            XS.Push(EBP);
+            XS.Set(EBP, ESP);
             mSequences = new DebugInfo.SequencePoint[0];
 
-            var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
             var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
                                                                          BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
@@ -909,7 +879,7 @@ namespace Cosmos.IL2CPU
                                                                                select item).First());
             }
             var xData = new byte[16 + (aTypesSet.Count * GetVTableEntrySize())];
-            var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+            var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array).GetTypeInfo()));
             Array.Copy(xTemp, 0, xData, 0, 4);
             xTemp = BitConverter.GetBytes(0x80000002);
             Array.Copy(xTemp, 0, xData, 4, 4);
@@ -918,77 +888,196 @@ namespace Cosmos.IL2CPU
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
             XS.DataMemberBytes(xTheName + "_Contents", xData);
-            XS.DataMember(xTheName,  1, "db", "0, 0, 0, 0, 0, 0, 0, 0");
+            XS.DataMember(xTheName, 1, "db", "0, 0, 0, 0, 0, 0, 0, 0");
             XS.Set(xTheName, xTheName + "_Contents", destinationIsIndirect: true, destinationDisplacement: 4);
 #if VMT_DEBUG
-            using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
+            using (var xVmtDebugOutput = XmlWriter.Create(File.OpenWrite(@"vmt_debug.xml")))
             {
                 xVmtDebugOutput.WriteStartDocument();
                 xVmtDebugOutput.WriteStartElement("VMT");
 #endif
-                //Push((uint)aTypesSet.Count);
-                foreach (var xType in aTypesSet)
-                {
+            //Push((uint)aTypesSet.Count);
+            foreach (var xType in aTypesSet)
+            {
 #if VMT_DEBUG
                     xVmtDebugOutput.WriteStartElement("Type");
                     xVmtDebugOutput.WriteAttributeString("TypeId", aGetTypeID(xType).ToString());
                     if (xType.BaseType != null)
                     {
-                        xVmtDebugOutput.WriteAttributeString("BaseTypeId", aGetTypeID(xType.BaseType).ToString());
+                        xVmtDebugOutput.WriteAttributeString("BaseTypeId", aGetTypeID(xType.BaseType.GetTypeInfo()).ToString());
                     }
                     xVmtDebugOutput.WriteAttributeString("Name", xType.FullName);
 #endif
-                    // value contains true if the method is an interface method definition
-                    SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
-                    foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                    {
-                        if (aMethodsSet.Contains(xMethod))
-                        { //) && !xMethod.IsAbstract) {
-                            if (!xEmittedMethods.ContainsKey(xMethod))
-                            {
-                                xEmittedMethods.Add(xMethod, false);
-                            }
-                        }
-                    }
-                    foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                    {
-                        if (aMethodsSet.Contains(xCtor))
-                        { // && !xCtor.IsAbstract) {
-                            if (!xEmittedMethods.ContainsKey(xCtor))
-                            {
-                                xEmittedMethods.Add(xCtor, false);
-                            }
-                        }
-                    }
-                    foreach (var xIntf in xType.GetInterfaces())
-                    {
-                        foreach (var xMethodIntf in xIntf.GetMethods())
+                // value contains true if the method is an interface method definition
+                SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
+                foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                {
+                    if (aMethodsSet.Contains(xMethod))
+                    { //) && !xMethod.IsAbstract) {
+                        if (!xEmittedMethods.ContainsKey(xMethod))
                         {
-                            var xActualMethod = xType.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
-                                                                (from xParam in xMethodIntf.GetParameters()
+                            xEmittedMethods.Add(xMethod, false);
+                        }
+                    }
+                }
+                foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                {
+                    if (aMethodsSet.Contains(xCtor))
+                    { // && !xCtor.IsAbstract) {
+                        if (!xEmittedMethods.ContainsKey(xCtor))
+                        {
+                            xEmittedMethods.Add(xCtor, false);
+                        }
+                    }
+                }
+                foreach (var xIntf in xType.GetInterfaces())
+                {
+                    foreach (var xMethodIntf in xIntf.GetTypeInfo().GetMethods())
+                    {
+                        var xActualMethod = xType.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
+                                                            (from xParam in xMethodIntf.GetParameters()
+                                                             select xParam.ParameterType).ToArray());
+
+                        if (xActualMethod == null)
+                        {
+                            // get private implemenation
+                            xActualMethod = xType.GetMethod(xMethodIntf.Name,
+                                                            (from xParam in xMethodIntf.GetParameters()
+                                                             select xParam.ParameterType).ToArray());
+                        }
+                        if (xActualMethod == null)
+                        {
+                            try
+                            {
+                                if (!xIntf.GetTypeInfo().IsGenericType)
+                                {
+                                    var xMap = xType.GetRuntimeInterfaceMap(xIntf);
+                                    for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                    {
+                                        if (xMap.InterfaceMethods[k] == xMethodIntf)
+                                        {
+                                            xActualMethod = xMap.TargetMethods[k];
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        if (aMethodsSet.Contains(xMethodIntf))
+                        {
+                            if (!xEmittedMethods.ContainsKey(xMethodIntf))
+                            {
+                                xEmittedMethods.Add(xMethodIntf, true);
+                            }
+                        }
+
+                    }
+                }
+                int? xBaseIndex = null;
+                if (xType.BaseType == null)
+                {
+                    xBaseIndex = (int)aGetTypeID(xType);
+                }
+                else
+                {
+                    for (int t = 0; t < aTypesSet.Count; t++)
+                    {
+                        // todo: optimize check
+                        var xItem = aTypesSet.Skip(t).First();
+                        if (xItem.ToString() == xType.BaseType.ToString())
+                        {
+                            xBaseIndex = (int)aGetTypeID(xItem);
+                            break;
+                        }
+                    }
+                }
+                if (xBaseIndex == null)
+                {
+                    throw new Exception("Base type not found!");
+                }
+                for (int x = xEmittedMethods.Count - 1; x >= 0; x--)
+                {
+                    if (!aMethodsSet.Contains(xEmittedMethods.Keys[x]))
+                    {
+                        xEmittedMethods.RemoveAt(x);
+                    }
+                }
+                if (!xType.IsInterface)
+                {
+                    Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
+                    XS.DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), aGetTypeID(xType));
+                    Push(aGetTypeID(xType));
+                    Push((uint)xBaseIndex.Value);
+                    xData = new byte[16 + (xEmittedMethods.Count * 4)];
+                    xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array).GetTypeInfo()));
+                    Array.Copy(xTemp, 0, xData, 0, 4);
+                    xTemp = BitConverter.GetBytes(0x80000002); // embedded array
+                    Array.Copy(xTemp, 0, xData, 4, 4);
+                    xTemp = BitConverter.GetBytes(xEmittedMethods.Count); // embedded array
+                    Array.Copy(xTemp, 0, xData, 8, 4);
+                    xTemp = BitConverter.GetBytes(4); // embedded array
+                    Array.Copy(xTemp, 0, xData, 12, 4);
+                    string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
+                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+                    Push(xDataName);
+                    Push(0);
+                    xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
+                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+                    Push(xDataName);
+                    Push(0);
+                    xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
+                    xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array).GetTypeInfo()));
+                    Array.Copy(xTemp, 0, xData, 0, 4);
+                    xTemp = BitConverter.GetBytes(0x80000002); // embedded array
+                    Array.Copy(xTemp, 0, xData, 4, 4);
+                    xTemp = BitConverter.GetBytes((xType.FullName + ", " + xType.Module.Assembly.GetName().FullName).Length);
+                    Array.Copy(xTemp, 0, xData, 8, 4);
+                    xTemp = BitConverter.GetBytes(2); // embedded array
+                    Array.Copy(xTemp, 0, xData, 12, 4);
+                    xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
+                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+                    Push("0" + xEmittedMethods.Count.ToString("X") + "h");
+                    Call(VTablesImplRefs.SetTypeInfoRef);
+                }
+                for (int j = 0; j < xEmittedMethods.Count; j++)
+                {
+                    MethodBase xMethod = xEmittedMethods.Keys[j];
+#if VMT_DEBUG
+                        xVmtDebugOutput.WriteStartElement("Method");
+                        xVmtDebugOutput.WriteAttributeString("Id", aGetMethodUID(xMethod).ToString());
+                        xVmtDebugOutput.WriteAttributeString("Name", xMethod.GetFullName());
+                        xVmtDebugOutput.WriteEndElement();
+#endif
+                    var xMethodId = aGetMethodUID(xMethod);
+                    if (!xType.IsInterface)
+                    {
+                        if (xEmittedMethods.Values[j])
+                        {
+                            var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
+                                                                (from xParam in xMethod.GetParameters()
                                                                  select xParam.ParameterType).ToArray());
 
-                            if (xActualMethod == null)
+                            if (xNewMethod == null)
                             {
-                                // get private implemenation
-                                xActualMethod = xType.GetMethod(xMethodIntf.Name,
-                                                                (from xParam in xMethodIntf.GetParameters()
+                                // get private implementation
+                                xNewMethod = xType.GetMethod(xMethod.Name,
+                                                                (from xParam in xMethod.GetParameters()
                                                                  select xParam.ParameterType).ToArray());
                             }
-                            if (xActualMethod == null)
+                            if (xNewMethod == null)
                             {
                                 try
                                 {
-                                    if (!xIntf.IsGenericType)
+                                    var xMap = xType.GetRuntimeInterfaceMap(xMethod.DeclaringType);
+                                    for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                     {
-                                        var xMap = xType.GetInterfaceMap(xIntf);
-                                        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                        if (xMap.InterfaceMethods[k] == xMethod)
                                         {
-                                            if (xMap.InterfaceMethods[k] == xMethodIntf)
-                                            {
-                                                xActualMethod = xMap.TargetMethods[k];
-                                                break;
-                                            }
+                                            xNewMethod = xMap.TargetMethods[k];
+                                            break;
                                         }
                                     }
                                 }
@@ -996,132 +1085,13 @@ namespace Cosmos.IL2CPU
                                 {
                                 }
                             }
-                            if (aMethodsSet.Contains(xMethodIntf))
-                            {
-                                if (!xEmittedMethods.ContainsKey(xMethodIntf))
-                                {
-                                    xEmittedMethods.Add(xMethodIntf, true);
-                                }
-                            }
+                            xMethod = xNewMethod;
+                        }
 
-                        }
-                    }
-                    int? xBaseIndex = null;
-                    if (xType.BaseType == null)
-                    {
-                        xBaseIndex = (int)aGetTypeID(xType);
-                    }
-                    else
-                    {
-                        for (int t = 0; t < aTypesSet.Count; t++)
-                        {
-                            // todo: optimize check
-                            var xItem = aTypesSet.Skip(t).First();
-                            if (xItem.ToString() == xType.BaseType.ToString())
-                            {
-                                xBaseIndex = (int)aGetTypeID(xItem);
-                                break;
-                            }
-                        }
-                    }
-                    if (xBaseIndex == null)
-                    {
-                        throw new Exception("Base type not found!");
-                    }
-                    for (int x = xEmittedMethods.Count - 1; x >= 0; x--)
-                    {
-                        if (!aMethodsSet.Contains(xEmittedMethods.Keys[x]))
-                        {
-                            xEmittedMethods.RemoveAt(x);
-                        }
-                    }
-                    if (!xType.IsInterface)
-                    {
-                        Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
-                        XS.DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), aGetTypeID(xType));
                         Push(aGetTypeID(xType));
-                        Push((uint)xBaseIndex.Value);
-                        xData = new byte[16 + (xEmittedMethods.Count * 4)];
-                        xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
-                        Array.Copy(xTemp, 0, xData, 0, 4);
-                        xTemp = BitConverter.GetBytes(0x80000002); // embedded array
-                        Array.Copy(xTemp, 0, xData, 4, 4);
-                        xTemp = BitConverter.GetBytes(xEmittedMethods.Count); // embedded array
-                        Array.Copy(xTemp, 0, xData, 8, 4);
-                        xTemp = BitConverter.GetBytes(4); // embedded array
-                        Array.Copy(xTemp, 0, xData, 12, 4);
-                        string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
-                        Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                        Push(xDataName);
-                        Push(0);
-                        xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
-                        Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                        Push(xDataName);
-                        Push(0);
-                        xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
-                        xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
-                        Array.Copy(xTemp, 0, xData, 0, 4);
-                        xTemp = BitConverter.GetBytes(0x80000002); // embedded array
-                        Array.Copy(xTemp, 0, xData, 4, 4);
-                        xTemp = BitConverter.GetBytes((xType.FullName + ", " + xType.Module.Assembly.GetName().FullName).Length);
-                        Array.Copy(xTemp, 0, xData, 8, 4);
-                        xTemp = BitConverter.GetBytes(2); // embedded array
-                        Array.Copy(xTemp, 0, xData, 12, 4);
-                        xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
-                        Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                        Push("0" + xEmittedMethods.Count.ToString("X") + "h");
-                        Call(xSetTypeInfoRef);
-                    }
-                    for (int j = 0; j < xEmittedMethods.Count; j++)
-                    {
-                        MethodBase xMethod = xEmittedMethods.Keys[j];
-#if VMT_DEBUG
-                        xVmtDebugOutput.WriteStartElement("Method");
-                        xVmtDebugOutput.WriteAttributeString("Id", aGetMethodUID(xMethod).ToString());
-                        xVmtDebugOutput.WriteAttributeString("Name", xMethod.GetFullName());
-                        xVmtDebugOutput.WriteEndElement();
-#endif
-                        var xMethodId = aGetMethodUID(xMethod);
-                        if (!xType.IsInterface)
-                        {
-                            if (xEmittedMethods.Values[j])
-                            {
-                                var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
-                                                                    (from xParam in xMethod.GetParameters()
-                                                                     select xParam.ParameterType).ToArray());
+                        Push((uint)j);
 
-                                if (xNewMethod == null)
-                                {
-                                    // get private implementation
-                                    xNewMethod = xType.GetMethod(xMethod.Name,
-                                                                    (from xParam in xMethod.GetParameters()
-                                                                     select xParam.ParameterType).ToArray());
-                                }
-                                if (xNewMethod == null)
-                                {
-                                    try
-                                    {
-                                        var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
-                                        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
-                                        {
-                                            if (xMap.InterfaceMethods[k] == xMethod)
-                                            {
-                                                xNewMethod = xMap.TargetMethods[k];
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                }
-                                xMethod = xNewMethod;
-                            }
-
-                            Push((uint)aGetTypeID(xType));
-                            Push((uint)j);
-
-                        Push((uint)xMethodId);
+                        Push(xMethodId);
                         if (xMethod.IsAbstract)
                         {
                             // abstract methods dont have bodies, oiw, are not emitted
@@ -1129,7 +1099,7 @@ namespace Cosmos.IL2CPU
                         }
                         else
                         {
-                            Push(ILOp.GetMethodLabel(xMethod));
+                            Push(ILOp.GetLabel(xMethod));
                         }
                         Call(VTablesImplRefs.SetMethodInfoRef);
                     }
@@ -1137,7 +1107,7 @@ namespace Cosmos.IL2CPU
 #if VMT_DEBUG
                     xVmtDebugOutput.WriteEndElement(); // type
 #endif
-                }
+            }
 #if VMT_DEBUG
                 xVmtDebugOutput.WriteEndElement(); // types
                 xVmtDebugOutput.WriteEndDocument();
@@ -1145,11 +1115,11 @@ namespace Cosmos.IL2CPU
 #endif
 
             XS.Label("_END_OF_" + InitVMTCodeLabel);
-            XS.Pop(XSRegisters.EBP);
+            XS.Pop(EBP);
             XS.Return();
         }
 
-        public void ProcessField(SysReflection.FieldInfo aField)
+        public void ProcessField(FieldInfo aField)
         {
             string xFieldName = LabelName.GetFullName(aField);
             xFieldName = DataMember.GetStaticFieldName(aField);
@@ -1166,7 +1136,7 @@ namespace Cosmos.IL2CPU
                 if (xItem != null)
                 {
                     var xItemType = xItem.GetType();
-                    xManifestResourceName = (string)xItemType.GetField("ResourceName").GetValue(xItem);
+                    xManifestResourceName = (string)xItemType.GetTypeInfo().GetField("ResourceName").GetValue(xItem);
                 }
                 if (xManifestResourceName != null)
                 {
@@ -1175,7 +1145,7 @@ namespace Cosmos.IL2CPU
                     //                                (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
                     //                                                                                                                       "_") + ".res");
                     var xTarget = new StringBuilder();
-                    using (var xStream = aField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
+                    using (var xStream = aField.DeclaringType.GetTypeInfo().Assembly.GetManifestResourceStream(xManifestResourceName))
                     {
                         if (xStream == null)
                         {
@@ -1183,7 +1153,7 @@ namespace Cosmos.IL2CPU
                         }
                         xTarget.Append("0,");
                         // todo: abstract this array code out.
-                        xTarget.Append((uint)InstanceTypeEnum.StaticEmbeddedArray);
+                        xTarget.Append((uint)ObjectUtilities.InstanceTypeEnum.StaticEmbeddedArray);
                         xTarget.Append(",");
                         xTarget.Append((int)xStream.Length);
                         xTarget.Append(",");
@@ -1205,47 +1175,52 @@ namespace Cosmos.IL2CPU
                 }
                 else
                 {
-                    uint xTheSize;
+                    uint xFieldSize;
                     //string theType = "db";
-                    Type xFieldTypeDef = aField.FieldType;
-                    if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
-                    {
-                        xTheSize = ILOp.SizeOfType(aField.FieldType);
-                    }
-                    else
-                    {
-                        xTheSize = 8;
-                    }
-                    byte[] xData = new byte[xTheSize];
-                    try
-                    {
-                        object xValue = aField.GetValue(null);
-                        if (xValue != null)
-                        {
+                    var xFieldType = aField.FieldType.GetTypeInfo();
+                    //if (!xFieldType.IsClass || xFieldType.IsValueType)
+                    //{
+                        xFieldSize = ILOp.SizeOfType(aField.FieldType);
+                    //}
+                    //else
+                    //{
+                    //    xTheSize = 8;
+                    //}
+                    byte[] xData = new byte[xFieldSize];
+
+                    //try
+                    //{
+                    //    object xValue = aField.GetValue(null);
+                    //    if (xValue != null)
+                    //    {
                             try
                             {
-                                Type xTyp = xValue.GetType();
-                                if (xTyp.IsEnum)
+                                //if (xFieldType.IsEnum)
+                                //{
+                                //    xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(aField.FieldType));
+                                //}
+                                //if (xTyp.GetTypeInfo().IsValueType)
+                                //{
+                                //    for (int x = 4; x < xTheSize; x++)
+                                //    {
+                                //        xData[x] = Marshal.ReadByte(xValue, x);
+                                //    }
+                                //}
+                                if (xFieldType.IsValueType)
                                 {
-                                    xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(xTyp));
-                                }
-                                if (xTyp.IsValueType)
-                                {
-                                    for (int x = 4; x < xTheSize; x++)
-                                    {
-                                        xData[x] = Marshal.ReadByte(xValue,
-                                                                    x);
-                                    }
+                                    DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
                                 }
                             }
                             catch
                             {
+                                throw;
                             }
-                        }
-                    }
-                    catch
-                    {
-                    }
+                    //    }
+                    //}
+                    //catch
+                    //{
+                    //    throw;
+                    //}
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xFieldName, xData));
                 }
             }
@@ -1256,9 +1231,9 @@ namespace Cosmos.IL2CPU
         /// </summary>
         /// <param name="aFrom">The method to forward to the plug</param>
         /// <param name="aTo">The plug</param>
-        internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo)
+        internal void GenerateMethodForward(_MethodInfo aFrom, _MethodInfo aTo)
         {
-            var xMethodLabel = ILOp.GetMethodLabel(aFrom);
+            var xMethodLabel = ILOp.GetLabel(aFrom);
             var xEndOfMethodLabel = xMethodLabel + EndOfMethodLabelNameNormal;
 
             // todo: completely get rid of this kind of trampoline code
@@ -1281,7 +1256,7 @@ namespace Cosmos.IL2CPU
 
                     if (!aTo.IsWildcard)
                     {
-                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttribute<ObjectPointerAccessAttribute>(true);
                         if (xObjectPointerAccessAttrib != null)
                         {
                             XS.Comment("Skipping the reference to the next object reference.");
@@ -1304,8 +1279,8 @@ namespace Cosmos.IL2CPU
                 var xOriginalParamsIdx = 0;
                 foreach (var xParam in xParams)
                 {
-                    var xFieldAccessAttrib = xParam.GetCustomAttributes<FieldAccessAttribute>(true).FirstOrDefault();
-                    var xObjectPointerAccessAttrib = xParam.GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                    var xFieldAccessAttrib = xParam.GetCustomAttribute<FieldAccessAttribute>(true);
+                    var xObjectPointerAccessAttrib = xParam.GetCustomAttribute<ObjectPointerAccessAttribute>(true);
                     if (xFieldAccessAttrib != null)
                     {
                         // field access
@@ -1348,22 +1323,22 @@ namespace Cosmos.IL2CPU
 
         protected static void WriteDebug(MethodBase aMethod, uint aSize, uint aSize2)
         {
-            var xLine = String.Format("{0}\t{1}\t{2}", LabelName.GenerateFullName(aMethod), aSize, aSize2);
+            var xLine = String.Format("{0}\t{1}\t{2}", LabelName.GetFullName(aMethod), aSize, aSize2);
         }
 
         // These are all temp functions until we move to the new assembler.
         // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
-        public static string TmpPosLabel(MethodInfo aMethod, int aOffset)
+        public static string TmpPosLabel(_MethodInfo aMethod, int aOffset)
         {
             return ILOp.GetLabel(aMethod, aOffset);
         }
 
-        public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode)
+        public static string TmpPosLabel(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             return TmpPosLabel(aMethod, aOpCode.Position);
         }
 
-        public static string TmpBranchLabel(MethodInfo aMethod, ILOpCode aOpCode)
+        public static string TmpBranchLabel(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             return TmpPosLabel(aMethod, ((OpBranch)aOpCode).Value);
         }
@@ -1373,9 +1348,9 @@ namespace Cosmos.IL2CPU
             // at the time the datamembers for literal strings are created, the type id for string is not yet determined.
             // for now, we fix this at runtime.
             XS.Label(InitStringIDsLabel);
-            XS.Push(XSRegisters.EBP);
-            XS.Set(XSRegisters.EBP, XSRegisters.ESP);
-            XS.Set(XSRegisters.EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
+            XS.Push(EBP);
+            XS.Set(EBP, ESP);
+            XS.Set(EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
             new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
 
             var xMemberId = 0;
@@ -1398,12 +1373,12 @@ namespace Cosmos.IL2CPU
                 new Mov { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
             }
             Assembler.WriteDebugVideo("Done");
-            XS.Pop(XSRegisters.EBP);
+            XS.Pop(EBP);
             XS.Return();
 
             XS.Label(CosmosAssembler.EntryPointName);
-            XS.Push(XSRegisters.EBP);
-            XS.Set(XSRegisters.EBP, XSRegisters.ESP);
+            XS.Push(EBP);
+            XS.Set(EBP, ESP);
             Assembler.WriteDebugVideo("Initializing VMT.");
             XS.Call(InitVMTCodeLabel);
             Assembler.WriteDebugVideo("Initializing string IDs.");
@@ -1417,9 +1392,9 @@ namespace Cosmos.IL2CPU
             Assembler.WriteDebugVideo("Kernel class created");
             xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
             XS.Label(xCurLabel);
-            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
+            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.GetTypeInfo().BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
             XS.Label(CosmosAssembler.EntryPointName + ".AfterStart");
-            XS.Pop(XSRegisters.EBP);
+            XS.Pop(EBP);
             XS.Return();
 
             if (ShouldOptimize)
@@ -1428,11 +1403,11 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected void AfterOp(MethodInfo aMethod, ILOpCode aOpCode)
+        protected void AfterOp(_MethodInfo aMethod, ILOpCode aOpCode)
         {
         }
 
-        protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode, bool emitInt3NotNop, out bool INT3Emitted, bool hasSourcePoint)
+        protected void BeforeOp(_MethodInfo aMethod, ILOpCode aOpCode, bool emitInt3NotNop, out bool INT3Emitted, bool hasSourcePoint)
         {
             string xLabel = TmpPosLabel(aMethod, aOpCode);
             Assembler.CurrentIlLabel = xLabel;
@@ -1464,14 +1439,11 @@ namespace Cosmos.IL2CPU
                 xMLSymbol.StackDiff = -1;
                 if (aMethod.MethodBase != null)
                 {
-                    var xBody = aMethod.MethodBase.GetMethodBody();
-                    if (xBody != null)
-                    {
-                        var xLocalsSize = (from item in xBody.LocalVariables
-                                           select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
+                    var xLocals = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase);
+                        var xLocalsSize = (from item in xLocals
+                                           select ILOp.Align(ILOp.SizeOfType(item.Type), 4)).Sum();
                         xMLSymbol.StackDiff = checked((int)(xLocalsSize + xStackSize));
                         xStackDifference = (uint?)xMLSymbol.StackDiff;
-                    }
                 }
                 xMLSymbol.IlOffset = aOpCode.Position;
                 xMLSymbol.MethodID = mCurrentMethodGuid;
@@ -1529,7 +1501,7 @@ namespace Cosmos.IL2CPU
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 XS.Call(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
-                XS.Pop(XSRegisters.EAX);
+                XS.Pop(EAX);
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
                 XS.Halt();
@@ -1538,7 +1510,7 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted, bool isNewSourcePoint)
+        protected void EmitTracer(_MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted, bool isNewSourcePoint)
         {
             // NOTE - These if statements can be optimized down - but clarity is
             // more important than the optimizations. Furthermore the optimizations available
@@ -1585,7 +1557,7 @@ namespace Cosmos.IL2CPU
                 {
                     if (TraceAssemblies < TraceAssemblies.All)
                     {
-                        if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase))
+                        if (aNamespace.StartsWith("System.", StringComparison.OrdinalIgnoreCase))
                         {
                             return;
                         }
@@ -1593,7 +1565,7 @@ namespace Cosmos.IL2CPU
                         {
                             return;
                         }
-                        if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase))
+                        if (aNamespace.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase))
                         {
                             return;
                         }
@@ -1602,7 +1574,7 @@ namespace Cosmos.IL2CPU
                     if (TraceAssemblies < TraceAssemblies.Cosmos)
                     {
                         //TODO: Maybe an attribute that could be used to turn tracing on and off
-                        if (aNamespace.StartsWith("Cosmos.", StringComparison.InvariantCultureIgnoreCase))
+                        if (aNamespace.StartsWith("Cosmos.", StringComparison.OrdinalIgnoreCase))
                         {
                             return;
                         }
@@ -1632,59 +1604,6 @@ namespace Cosmos.IL2CPU
                 INT3PlaceholderEmitted = true;
                 XS.DebugNoop();
             }
-        }
-
-        protected MethodDefinition GetCecilMethodDefinitionForSymbolReading(MethodBase methodBase)
-        {
-            var xMethodBase = methodBase;
-            if (xMethodBase.IsGenericMethod)
-            {
-                var xMethodInfo = (SysReflection.MethodInfo)xMethodBase;
-                xMethodBase = xMethodInfo.GetGenericMethodDefinition();
-                if (xMethodBase.IsGenericMethod && !xMethodBase.IsGenericMethod)
-                {
-                    // apparently, a generic method can be derived from a generic method..
-                    throw new Exception("Make recursive");
-                }
-            }
-            var xLocation = xMethodBase.DeclaringType.Assembly.Location;
-            ModuleDefinition xModule = null;
-            if (!mLoadedModules.TryGetValue(xLocation, out xModule))
-            {
-                // if not in cache, try loading.
-                if (xMethodBase.DeclaringType.Assembly.GlobalAssemblyCache || !File.Exists(xLocation))
-                {
-                    // file doesn't exist, so assume no symbols
-                    mLoadedModules.Add(xLocation, null);
-                    return null;
-                }
-                else
-                {
-                    try
-                    {
-                        xModule = ModuleDefinition.ReadModule(xLocation, new ReaderParameters { ReadSymbols = true, SymbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider() });
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        throw new Exception("Please check that dll and pdb file is matching on location: " + xLocation);
-                    }
-                    if (xModule.HasSymbols)
-                    {
-                        mLoadedModules.Add(xLocation, xModule);
-                    }
-                    else
-                    {
-                        mLoadedModules.Add(xLocation, null);
-                        return null;
-                    }
-                }
-            }
-            if (xModule == null)
-            {
-                return null;
-            }
-            // todo: cache MethodDefinition ?
-            return xModule.LookupToken(xMethodBase.MetadataToken) as MethodDefinition;
         }
     }
 }

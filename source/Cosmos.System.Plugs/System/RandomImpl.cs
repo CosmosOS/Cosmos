@@ -36,7 +36,7 @@ namespace Cosmos.System.Plugs.System
             return (int)((uint)(GetUniform() * diff) + minValue);
         }
 
-        public static void NextBytes(byte[] buffer)
+        public static void NextBytes(Random aThis, byte[] buffer)
         {
             for (int i = 0; i < buffer.Length; i++)
             {
@@ -44,7 +44,7 @@ namespace Cosmos.System.Plugs.System
             }
         }
 
-        public static double NextDouble()
+        public static double NextDouble(Random aThis)
         {
             return GetUniform();
         }

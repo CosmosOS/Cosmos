@@ -1,9 +1,6 @@
 ﻿using System;
-using Cosmos.IL2CPU;
+using Cosmos.Core.Common;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.Assemblers;
-using Cosmos.IL2CPU.Plugs.Assemblers.Delegate;
-using XSharp.Compiler;
 
 namespace Cosmos.Core.Plugs.System
 {
@@ -12,24 +9,6 @@ namespace Cosmos.Core.Plugs.System
     [PlugField(FieldType = typeof(int), FieldId = "$$ReturnsValue$$")]
     public static class DelegateImpl
     {
-        [PlugMethod(Assembler = typeof(DelegateCtorAsm), IsWildcard = true, WildcardMatchParameters = true)]
-        public static void Ctor(Delegate aThis, object aTarget, IntPtr aMethod)
-        {
-            throw new NotImplementedException("Implemented by method assembler");
-        }
-
-        [PlugMethod(IsWildcard = true, Assembler = typeof(DelegateInvokeAsm))]
-        public static void Invoke()
-        {
-            throw new NotImplementedException("Implemented by method assembler");
-        }
-
-        [PlugMethod(Assembler = typeof(DelegateGetMulticastInvokeAsm))]
-        public static IntPtr GetMulticastInvoke(Delegate aThis)
-        {
-            return IntPtr.Zero;
-        }
-
         public static bool Equals(Delegate aThis, object aThat)
         {
             // todo: implement proper Delegate.Equals(object)

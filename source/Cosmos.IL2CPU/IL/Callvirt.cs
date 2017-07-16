@@ -1,17 +1,13 @@
 using System;
 using System.Linq;
-// using System.Collections.Generic;
-// using System.Linq;
 using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 using System.Reflection;
 
-using Cosmos.IL2CPU.Plugs.System;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
-using SysReflection = System.Reflection;
+using Cosmos.IL2CPU.Plugs;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -23,13 +19,13 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpMethod = aOpCode as OpMethod;
             DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode, DebugEnabled);
         }
 
-        public static void DoExecute(Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp, bool debugEnabled)
+        public static void DoExecute(Assembler.Assembler Assembler, _MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp, bool debugEnabled)
         {
             string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
             Type xPopType = aOp.StackPopTypes.Last();
@@ -41,7 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
 
             uint xReturnSize = 0;
-            var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
+            var xMethodInfo = aTargetMethod as MethodInfo;
             if (xMethodInfo != null)
             {
                 xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
@@ -123,7 +119,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     */
                     // we need to see if $this is a boxed object, and if so, we need to box it
                     XS.Set(EAX, ESP, sourceDisplacement: (int)xThisOffset + 4);
-                    XS.Compare(EAX, (int)InstanceTypeEnum.BoxedValueType, destinationIsIndirect: true, destinationDisplacement: 4, size: RegisterSize.Int32);
+                    XS.Compare(EAX, (int)ObjectUtilities.InstanceTypeEnum.BoxedValueType, destinationIsIndirect: true, destinationDisplacement: 4, size: RegisterSize.Int32);
 
                     /*
                     * On the stack now:
@@ -143,7 +139,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     * ECX contains the method to call
                     * EAX contains the type pointer (not the handle!!)
                     */
-                    XS.Add(EAX, (uint)ObjectImpl.FieldDataOffset);
+                    XS.Add(EAX, (uint)ObjectUtilities.FieldDataOffset);
                     XS.Set(ESP, EAX, destinationDisplacement: (int)xThisOffset + 4);
 
                     /*

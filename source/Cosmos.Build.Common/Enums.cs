@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Reflection;
@@ -9,19 +10,29 @@ namespace Cosmos.Build.Common
 
     public enum DeploymentType
     {
-        [Description("ISO Image")] ISO,
-        [Description("USB Device")] USB,
-        [Description("PXE Network Boot")] PXE,
+        [Description("ISO Image")]
+        ISO,
+        [Description("USB Device")]
+        USB,
+        [Description("PXE Network Boot")]
+        PXE,
         BinaryImage
     }
 
     public enum LaunchType
     {
-        [Description("None")] None,
-        [Description("VMware")] VMware,
-        [Description("Attached Slave (CanaKit)")] Slave,
-        [Description("Bochs")] Bochs,
-        [Description("Intel Edison")] IntelEdison,
+        [Description("None")]
+        None,
+        [Description("VMware")]
+        VMware,
+        [Description("Attached Slave (CanaKit)")]
+        Slave,
+        [Description("Bochs")]
+        Bochs,
+        [Description("Intel Edison")]
+        IntelEdison,
+        [Description("Hyper-V")]
+        HyperV
     }
 
     public enum VMwareEdition
@@ -37,7 +48,8 @@ namespace Cosmos.Build.Common
 
     public enum Framework
     {
-        [Description("Microsoft .NET")] MicrosoftNET,
+        [Description("Microsoft .NET")]
+        MicrosoftNET,
         Mono
     }
 
@@ -65,51 +77,19 @@ namespace Cosmos.Build.Common
 
     public enum StackCorruptionDetectionLevel
     {
-        [Description("All Instructions")] AllInstructions,
-        [Description("Method Footers Only")] MethodFooters
+        [Description("All Instructions")]
+        AllInstructions,
+        [Description("Method Footers Only")]
+        MethodFooters
     }
 
-    public sealed class DescriptionAttribute : Attribute
+    public static class EnumHelper
     {
-        public static String GetDescription(object value)
+        public static string GetDescription(this Enum value)
         {
-            Type valueType = value.GetType();
-            MemberInfo[] valueMemberInfo;
-            Object[] valueMemberAttribute;
-
-            if (valueType.IsEnum)
-            {
-                valueMemberInfo = valueType.GetMember(value.ToString());
-
-                if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0))
-                {
-                    valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof (DescriptionAttribute), false);
-                    if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
-                    {
-                        return ((DescriptionAttribute) valueMemberAttribute[0]).Description;
-                    }
-                }
-            }
-
-            valueMemberAttribute = valueType.GetCustomAttributes(typeof (DescriptionAttribute), false);
-            if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
-            {
-                return ((DescriptionAttribute) valueMemberAttribute[0]).Description;
-            }
-
-            return value.ToString();
-        }
-
-        private string emDescription;
-
-        public DescriptionAttribute(String description)
-        {
-            emDescription = description;
-        }
-
-        public String Description
-        {
-            get { return emDescription; }
+            FieldInfo field = value.GetType().GetRuntimeField(value.ToString());
+            DescriptionAttribute attribute = field.GetCustomAttribute<DescriptionAttribute>();
+            return attribute == null ? value.ToString() : attribute.Description;
         }
     }
 }

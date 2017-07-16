@@ -1,6 +1,7 @@
 using System;
 using Cosmos.Assembler;
-using XSharp.Compiler;
+
+using XSharp.Common;
 using CPUx86 = Cosmos.Assembler.x86;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -12,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       Assemble(Assembler, 4, DebugEnabled);
     }

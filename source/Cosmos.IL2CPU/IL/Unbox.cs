@@ -1,11 +1,9 @@
-using System;
+using System.Reflection;
+
 using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
-using Cosmos.IL2CPU.Plugs.System;
-using XSharp.Compiler;
-using SysReflection = System.Reflection;
+using Cosmos.IL2CPU.Plugs;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -17,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       DoNullReferenceCheck(Assembler, DebugEnabled, 0);
       OpType xType = (OpType)aOpCode;
@@ -31,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
       XS.Push(XSRegisters.EAX, isIndirect: true);
       XS.Push(xTypeID, isIndirect: true);
-      SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
+      MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
       Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
       XS.Label(xBaseLabel + "_After_IsInstance_Call");
       XS.Pop(XSRegisters.EAX);
@@ -46,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
       int xItems = (int)xSize / 4;
       for (int i = xItems - 1; i >= 0; i--)
       {
-        new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectImpl.FieldDataOffset) };
+        new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectUtilities.FieldDataOffset) };
       }
       new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
       XS.Label(mReturnNullLabel);

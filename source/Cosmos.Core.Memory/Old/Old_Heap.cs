@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmos.Core.Common;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.Memory.Old
@@ -10,6 +11,8 @@ namespace Cosmos.Core.Memory.Old
     // Interrupts are disabled when trying to allocate a new block of memory.
     public static unsafe class Heap
     {
+        private static Debugger mDebugger = new Debugger("Core", "Memory");
+
         private static uint mEndOfRam;
 
         private static uint mLastTableIndex = 0u;
@@ -45,7 +48,7 @@ namespace Cosmos.Core.Memory.Old
         {
             if (aLength == 0)
             {
-                Debugger.DoSend("    Request to retrieve block with size = 0 was halted!");
+                mDebugger.Send("    Request to retrieve block with size = 0 was halted!");
                 while (true)
                 {
                 }
@@ -67,7 +70,7 @@ namespace Cosmos.Core.Memory.Old
                     {
                         if (xResult < CPU.GetEndOfKernel())
                         {
-                            Debugger.DoSend("Wrong handle returned!");
+                            mDebugger.Send("Wrong handle returned!");
                             while (true)
                             {
                             }
@@ -86,7 +89,7 @@ namespace Cosmos.Core.Memory.Old
                 if (xPreviousTable == null)
                 {
                     // this check should theoretically be unnecessary, but lets keep it, to do some double-checking.
-                    Debugger.DoSend("No PreviousTable found!");
+                    mDebugger.Send("No PreviousTable found!");
                     while (true)
                     {
                     }
@@ -102,7 +105,7 @@ namespace Cosmos.Core.Memory.Old
                 {
                     // Something seriously weird happened: we could create a new DataLookupTable (with new entries)
                     // but couldn't allocate a new handle from it.
-                    Debugger.DoSend("    Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
+                    mDebugger.Send("    Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
                     while (true)
                     {
                     }
@@ -141,7 +144,7 @@ namespace Cosmos.Core.Memory.Old
                     {
                         // once a handle is used, the size should be set. But at this point, it somehow got unset again.
                         // This should never occur.
-                        Debugger.DoSend("Found an entry which has no size, but there is a followup DataLookupTable");
+                        mDebugger.Send("Found an entry which has no size, but there is a followup DataLookupTable");
                         while (true)
                         {
                         }

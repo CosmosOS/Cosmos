@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using Microsoft.Build.Framework;
 using System.IO;
+using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild {
   public class NAsm : BaseToolTask {
@@ -77,7 +77,7 @@ namespace Cosmos.Build.MSBuild {
     }
 
     private static string GetLine(string fileName, int line) {
-      using (var sr = new StreamReader(fileName)) {
+      using (var sr = new StreamReader(File.OpenRead(fileName))) {
         for (int i = 1; i < line; i++)
           sr.ReadLine();
         return sr.ReadLine();

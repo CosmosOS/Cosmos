@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cosmos.Common.Extensions
+﻿namespace Cosmos.Common.Extensions
 {
     // This class duplicates BitConvertor. BitConvertor uses ulong though and currently does not
     // work in Cosmos. But even when it does work, this syntax is more convenient and we use
@@ -14,23 +12,23 @@ namespace Cosmos.Common.Extensions
     // Default methods are LittleEndian
     static public class ByteConverter
     {
-        static public UInt16 ToUInt16(this byte[] n, UInt64 aPos)
+        static public ushort ToUInt16(this byte[] n, ulong aPos)
         {
-            return (UInt16)(n[aPos + 1] << 8 | n[aPos]);
+            return (ushort)(n[aPos + 1] << 8 | n[aPos]);
         }
 
-        static public UInt32 ToUInt32(this byte[] n, UInt64 aPos)
+        static public uint ToUInt32(this byte[] n, ulong aPos)
         {
-            return (UInt32)(n[aPos + 3] << 24 | n[aPos + 2] << 16 | n[aPos + 1] << 8 | n[aPos]);
+            return (uint)(n[aPos + 3] << 24 | n[aPos + 2] << 16 | n[aPos + 1] << 8 | n[aPos]);
         }
 
-        public static void SetUInt16(this byte[] n, UInt64 aPos, UInt16 value)
+        public static void SetUInt16(this byte[] n, ulong aPos, ushort value)
         {
             n[aPos + 0] = (byte)value;
             n[aPos + 1] = (byte)(value >> 8);
         }
 
-        public static void SetUInt32(this byte[] n, UInt64 aPos, UInt32 value)
+        public static void SetUInt32(this byte[] n, ulong aPos, uint value)
         {
             n[aPos + 0] = (byte)value;
             n[aPos + 1] = (byte)(value >> 8);
@@ -38,7 +36,7 @@ namespace Cosmos.Common.Extensions
             n[aPos + 3] = (byte)(value >> 24);
         }
 
-        public static void SetUInt64(this byte[] n, UInt64 aPos, UInt64 value)
+        public static void SetUInt64(this byte[] n, ulong aPos, ulong value)
         {
             n[aPos + 0] = (byte)value;
             n[aPos + 1] = (byte)(value >> 8);
@@ -50,7 +48,7 @@ namespace Cosmos.Common.Extensions
             n[aPos + 7] = (byte)(value >> 56);
         }
 
-        static public string GetAsciiString(this byte[] n, UInt32 aStart, UInt32 aCharCount)
+        static public string GetAsciiString(this byte[] n, uint aStart, uint aCharCount)
         {
             var xChars = new char[aCharCount];
             for (int i = 0; i < aCharCount; i++)
@@ -64,7 +62,7 @@ namespace Cosmos.Common.Extensions
             return new string(xChars);
         }
 
-        static public string GetUtf8String(this byte[] n, UInt32 aStart, uint aCharCount)
+        static public string GetUtf8String(this byte[] n, uint aStart, uint aCharCount)
         {
             // TODO: This method handles ASCII only currently, no unicode.
             var xChars = new char[aCharCount];
@@ -79,7 +77,7 @@ namespace Cosmos.Common.Extensions
             return new string(xChars);
         }
 
-        static public byte[] GetUtf8Bytes(this string n, UInt32 aStart, UInt32 aCharCount)
+        static public byte[] GetUtf8Bytes(this string n, uint aStart, uint aCharCount)
         {
             // TODO: This method handles ASCII only currently, no unicode.
             var xBytes = new byte[aCharCount];
@@ -90,14 +88,14 @@ namespace Cosmos.Common.Extensions
             return xBytes;
         }
 
-        static public string GetUtf16String(this byte[] n, UInt32 aStart, UInt32 aCharCount)
+        static public string GetUtf16String(this byte[] n, uint aStart, uint aCharCount)
         {
             //TODO: This routine only handles ASCII. It does not handle unicode yet.
             var xChars = new char[aCharCount];
             for (int i = 0; i < aCharCount; i++)
             {
-                UInt32 xPos = (UInt32)(aStart + i * 2);
-                var xChar = (UInt16)(n[xPos + 1] << 8 | n[xPos]);
+                uint xPos = (uint)(aStart + i * 2);
+                var xChar = (ushort)(n[xPos + 1] << 8 | n[xPos]);
                 if (xChar == 0)
                 {
                     return new string(xChars, 0, i);
@@ -105,6 +103,20 @@ namespace Cosmos.Common.Extensions
                 xChars[i] = (char)xChar;
             }
             return new string(xChars);
+        }
+
+        static public byte[] GetUtf16Bytes(this string n, uint aStart, uint aCharCount)
+        {
+            //TODO: This routine only handles ASCII. It does not handle unicode yet.
+            var xBytes = new byte[2 * aCharCount];
+
+            for (int i = 0; i < aCharCount; i++)
+            {
+                xBytes[2 * i] = (byte)n[(int)((aStart) + i)];
+                xBytes[2 * i + 1] = (byte)(n[(int)(aStart + i)] >> 8);
+            }
+
+            return xBytes;
         }
     }
 }

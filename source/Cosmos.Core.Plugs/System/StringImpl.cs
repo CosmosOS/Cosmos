@@ -2,7 +2,6 @@
 
 using System;
 using System.Globalization;
-using System.Text;
 
 using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
@@ -18,7 +17,7 @@ namespace Cosmos.Core.Plugs.System
 
         public static unsafe void Ctor(
             string aThis,
-            [ObjectPointerAccess] char* aChars,
+            char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
@@ -39,7 +38,7 @@ namespace Cosmos.Core.Plugs.System
 
         public static unsafe void Ctor(
             string aThis,
-            [ObjectPointerAccess] char* aChars,
+            char* aChars,
             int start,
             int length,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
@@ -776,10 +775,10 @@ namespace Cosmos.Core.Plugs.System
             return true;
         }
 
-        public static string Remove(string aThis, int aStart, int aCount)
-        {
-            return aThis.Substring(0, aStart) + aThis.Substring(aStart + aCount, aThis.Length - (aStart + aCount));
-        }
+        //public static string Remove(string aThis, int aStart, int aCount)
+        //{
+        //    return aThis.Substring(0, aStart) + aThis.Substring(aStart + aCount, aThis.Length - (aStart + aCount));
+        //}
 
         public static string Replace(string aThis, string oldValue, string newValue)
         {
@@ -827,11 +826,6 @@ namespace Cosmos.Core.Plugs.System
             return new string(xChars);
         }
 
-        public static string ToString(string aThis)
-        {
-            return aThis;
-        }
-
         public static string FastAllocateString(int aLength)
         {
             return new string(new char[aLength]);
@@ -859,6 +853,11 @@ namespace Cosmos.Core.Plugs.System
             }
 
             throw new ArgumentNullException();
+        }
+
+        public static int CompareOrdinalHelper(string strA, int indexA, int countA, string strB, int indexB, int countB)
+        {
+            throw new NotImplementedException();
         }
 
         public static int GetHashCode(string aThis)

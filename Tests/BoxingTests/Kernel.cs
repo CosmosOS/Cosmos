@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.Debug.Kernel;
+using System.Drawing;
+
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
-using System.Drawing;
 
 namespace BoxingTests
 {
@@ -18,9 +16,11 @@ namespace BoxingTests
         protected override void Run()
         {
             Assert.IsTrue(TestBoxingCharToString(), "Boxing char to string test failed.");
-            //Assert.IsTrue(TestBoxingCharArrayToString(), "Boxing char[] to string test failed.");
+            Assert.IsTrue(TestBoxingCharArrayToString(), "Boxing char[] to string test failed.");
             Assert.IsTrue(TestBoxingIntToString(), "Boxing int to string test failed.");
+#if !NETSTANDARD1_5
             Assert.IsTrue(TestBoxingColorToString(), "Boxing of Color to string test failed.");
+#endif
 
             TestController.Completed();
         }
@@ -87,6 +87,7 @@ namespace BoxingTests
          * Cosmos ignores this and put no padding / writes the struct wrongly in memory and then when it should be
          * boxed garbage is copied instead of the structure itself!
          */
+#if !NETSTANDARD1_5
         private bool TestBoxingColorToString()
         {
             try
@@ -104,7 +105,6 @@ namespace BoxingTests
                 return false;
             }
         }
-
-
+#endif
     }
 }

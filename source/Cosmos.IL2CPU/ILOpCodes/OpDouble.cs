@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
+
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpDouble : ILOpCode {
-    public readonly Double Value;
+    public readonly double Value;
 
-    public OpDouble(Code aOpCode, int aPos, int aNextPos, Double aValue, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
+    public OpDouble(Code aOpCode, int aPos, int aNextPos, double aValue, _ExceptionRegionInfo aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }
 

@@ -7,7 +7,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>Cosmos.Compiler.Tests.MethodTestsBoot</Name>
     <BinFormat>elf</BinFormat>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>Bochs</Profile>
@@ -52,15 +52,14 @@
     <Bochs_TraceAssemblies>Cosmos</Bochs_TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include=".\Cosmos.Compiler.Tests.MethodTests.csproj">
-      <Name>Cosmos.Compiler.Tests.MethodTests</Name>
-      <Project>{fe8b9f39-7c96-4866-9a18-386735895cee}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Cosmos.Compiler.Tests.MethodTestsBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">

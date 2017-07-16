@@ -4,6 +4,8 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.nuget.props
+*.nuget.targets
 
 # Build results
 
@@ -33,6 +35,9 @@
 *.docstates
 *.vsp
 *.pdb
+*.lock.json
+*.nuget.props
+*.nuget.targets
 Thumbs.db
 build.force
 

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>DapperExtensions.StrongName</Description>
+    <Authors>Rafael.Carvalho</Authors>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <PackageId>DapperExtensions.StrongName</PackageId>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.50.2</Version>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
+    <PackageReference Include="Dapper.StrongName" Version="1.50.2" />
+  </ItemGroup>
+
+</Project>

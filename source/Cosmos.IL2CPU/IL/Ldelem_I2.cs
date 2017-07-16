@@ -1,5 +1,6 @@
 using System;
 
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldelem_I2 )]
@@ -10,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             Ldelem_Ref.Assemble(Assembler, 2, true, aMethod, aOpCode, DebugEnabled);
         }

@@ -1,6 +1,7 @@
 using System;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -12,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             // MtW: for now, disable this instruction. To me, it's unclear in what context it's being used.
             uint mObjSize = 0;

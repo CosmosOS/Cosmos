@@ -24,11 +24,9 @@ namespace Cosmos.System.Plugs.System
             throw new NotImplementedException("ValueType.GetHashCodeOfPtr()");
         }
 
-        public static string ToString(ValueType aThis)
-        {
-            return "<ValueType.ToString not yet implemented!>";
-        }
-
+        //public static string ToString(ValueType aThis)
+        //{
+        //    return "<ValueType.ToString not yet implemented!>";
+        //}
     }
-
 }

@@ -22,7 +22,7 @@ This directory contains the basic Cosmos demo project, it's a simple guess-the-n
 
 ### \Docs
 
-This direcotry contains the Cosmos documentation that you're currently reading.
+This directory contains the Cosmos documentation that you're currently reading.
 
 ### \QA
 
@@ -38,7 +38,7 @@ This directory contains all the scripts and languages to build the Cosmos User K
 
 ### \Source
 
-This directory contains all the code of the Cosmos project. You will spend most of your time here, including the Compiler, Installer, Debugger and the main features of Cosmos. It's contains unused code, the solution file of Cosmos and some support libraries.
+This directory contains all the code of the Cosmos project. You will spend most of your time here, including the Compiler, Installer, Debugger and the main features of Cosmos. It contains unused code, the solution file of Cosmos and some support libraries.
 
 #### \Source\Cosmos.Assembler
 
@@ -46,7 +46,7 @@ This directory contains the Cosmos assembler, the thing that writes generated as
 
 #### \Source\Cosmos.Build
 
-This directory contains any code related to the building process of Cosmos with the exception of
+This directory contains code related to the building process of Cosmos with the exception of
 IL2CPU which is however executed from here, it's contains code for executing ld,
 nasm, makeiso, MSBuild, and others.
 
@@ -92,7 +92,7 @@ This directory contains the code for the integration with Visual Studio. Adds su
 
 This directory contains the code for the Visual Studio debugger integration.
 
-##### \Source\Cosmos.VS.Package
+##### \Source\Cosmos.VS.ProjectSystem
 
 This directory contains the code for the Visual Studio package of Cosmos.
 

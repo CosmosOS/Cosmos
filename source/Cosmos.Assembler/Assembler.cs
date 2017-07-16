@@ -12,14 +12,17 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using Cosmos.Assembler.x86;
 
-namespace Cosmos.Assembler {
-  public class Assembler {
-    public Assembler() {
+namespace Cosmos.Assembler
+{
+  public class Assembler
+  {
+    public Assembler()
+    {
       mCurrentInstance = this;
       mInstances.Push(this);
     }
 
-    public Assembler(bool addWhitespaceWhileFlushing): this()
+    public Assembler(bool addWhitespaceWhileFlushing) : this()
     {
       mAddWhitespaceWhileFlushing = addWhitespaceWhileFlushing;
     }
@@ -40,97 +43,150 @@ namespace Cosmos.Assembler {
 
 
     protected string mCurrentIlLabel;
-    public string CurrentIlLabel {
-      get { return mCurrentIlLabel; }
-      set {
+
+    public string CurrentIlLabel
+    {
+      get
+      {
+        return mCurrentIlLabel;
+      }
+      set
+      {
         mCurrentIlLabel = value;
         mAsmIlIdx = 0;
       }
     }
 
     protected int mAsmIlIdx;
-    public int AsmIlIdx {
-      get { return mAsmIlIdx; }
+
+    public int AsmIlIdx
+    {
+      get
+      {
+        return mAsmIlIdx;
+      }
     }
 
     protected List<DataMember> mDataMembers = new List<DataMember>();
-    public List<DataMember> DataMembers {
-      get { return mDataMembers; }
-      set { mDataMembers = value; }
+
+    public List<DataMember> DataMembers
+    {
+      get
+      {
+        return mDataMembers;
+      }
+      set
+      {
+        mDataMembers = value;
+      }
     }
 
     protected internal List<Instruction> mInstructions = new List<Instruction>();
-    public List<Instruction> Instructions {
-      get { return mInstructions; }
-      set { mInstructions = value; }
+
+    public List<Instruction> Instructions
+    {
+      get
+      {
+        return mInstructions;
+      }
+      set
+      {
+        mInstructions = value;
+      }
     }
 
-    public static Assembler CurrentInstance {
-      get { return mCurrentInstance; }
+    public static Assembler CurrentInstance
+    {
+      get
+      {
+        return mCurrentInstance;
+      }
     }
 
-    internal int AllAssemblerElementCount {
-      get { return mInstructions.Count + mDataMembers.Count; }
+    internal int AllAssemblerElementCount
+    {
+      get
+      {
+        return mInstructions.Count + mDataMembers.Count;
+      }
     }
 
-    public BaseAssemblerElement GetAssemblerElement(int aIndex) {
-      if (aIndex >= mInstructions.Count) {
+    public BaseAssemblerElement GetAssemblerElement(int aIndex)
+    {
+      if (aIndex >= mInstructions.Count)
+      {
         return mDataMembers[aIndex - mInstructions.Count];
       }
       return mInstructions[aIndex];
     }
 
-    public BaseAssemblerElement TryResolveReference(Cosmos.Assembler.ElementReference aReference) {
-      foreach (var xInstruction in mInstructions) {
+    public BaseAssemblerElement TryResolveReference(Cosmos.Assembler.ElementReference aReference)
+    {
+      foreach (var xInstruction in mInstructions)
+      {
         var xLabel = xInstruction as Label;
-        if (xLabel != null) {
-          if (xLabel.QualifiedName.Equals(aReference.Name, StringComparison.InvariantCultureIgnoreCase)) {
+        if (xLabel != null)
+        {
+          if (xLabel.QualifiedName.Equals(aReference.Name, StringComparison.OrdinalIgnoreCase))
+          {
             return xLabel;
           }
         }
       }
-      foreach (var xDataMember in mDataMembers) {
-        if (xDataMember.Name.Equals(aReference.Name, StringComparison.InvariantCultureIgnoreCase)) {
+      foreach (var xDataMember in mDataMembers)
+      {
+        if (xDataMember.Name.Equals(aReference.Name, StringComparison.OrdinalIgnoreCase))
+        {
           return xDataMember;
         }
       }
       return null;
     }
 
-    public void Add(Instruction aReader) {
-        if (EmitAsmLabels)
+    public void Add(Instruction aReader)
+    {
+      if (EmitAsmLabels)
+      {
+        if (!(aReader is Label)
+            && !(aReader is Comment))
         {
-          if (!(aReader is Label)
-              && !(aReader is Comment))
-          {
-            // Only issue label if its executable code.
-            new Label("." + AsmIlIdx.ToString("X2"), "Asm");
-            mAsmIlIdx++;
-          }
+          // Only issue label if its executable code.
+          new Label("." + AsmIlIdx.ToString("X2"), "Asm");
+          mAsmIlIdx++;
         }
-        mInstructions.Add(aReader);
+      }
+      mInstructions.Add(aReader);
     }
 
-    public void Add(params Instruction[] aReaders) {
+    public void Add(params Instruction[] aReaders)
+    {
       mInstructions.Capacity += aReaders.Length;
-      foreach (Instruction xInstruction in aReaders) {
+      foreach (Instruction xInstruction in aReaders)
+      {
         mInstructions.Add(xInstruction);
       }
     }
 
     // Allows to emit footers to the code and datamember sections
-    protected virtual void OnBeforeFlush() {
-      
+    protected virtual void OnBeforeFlush()
+    {
+
     }
 
     private uint mDataMemberCounter = 0;
-    public string GetIdentifier(string aPrefix) {
+
+    public string GetIdentifier(string aPrefix)
+    {
       mDataMemberCounter++;
       return aPrefix + mDataMemberCounter.ToString("X4");
     }
+
     private bool mFlushInitializationDone = false;
-    protected void BeforeFlush() {
-      if (mFlushInitializationDone) {
+
+    protected void BeforeFlush()
+    {
+      if (mFlushInitializationDone)
+      {
         return;
       }
       mFlushInitializationDone = true;
@@ -138,17 +194,21 @@ namespace Cosmos.Assembler {
       //MergeAllElements();
     }
 
-    public virtual void FlushBinary(Stream aOutput, ulong aBaseAddress) {
+    public virtual void FlushBinary(Stream aOutput, ulong aBaseAddress)
+    {
       BeforeFlush();
       var xMax = AllAssemblerElementCount;
       var xCurrentAddresss = aBaseAddress;
-      for (int i = 0; i < xMax; i++) {
+      for (int i = 0; i < xMax; i++)
+      {
         GetAssemblerElement(i).UpdateAddress(this, ref xCurrentAddresss);
       }
-      aOutput.SetLength(aOutput.Length + (long)(xCurrentAddresss - aBaseAddress));
-      for (int i = 0; i < xMax; i++) {
+      aOutput.SetLength(aOutput.Length + (long) (xCurrentAddresss - aBaseAddress));
+      for (int i = 0; i < xMax; i++)
+      {
         var xItem = GetAssemblerElement(i);
-        if (!xItem.IsComplete(this)) {
+        if (!xItem.IsComplete(this))
+        {
           throw new Exception("Incomplete element encountered.");
         }
         //var xBuff = xItem.GetData(this);
@@ -157,18 +217,24 @@ namespace Cosmos.Assembler {
       }
     }
 
-    public virtual void FlushText(TextWriter aOutput) {
+    public virtual void FlushText(TextWriter aOutput)
+    {
       BeforeFlush();
       BeforeFlushText(aOutput);
       // Write out data declarations
       aOutput.WriteLine();
-      foreach (DataMember xMember in mDataMembers) {
-        if (mAddWhitespaceWhileFlushing) { 
+      foreach (DataMember xMember in mDataMembers)
+      {
+        if (mAddWhitespaceWhileFlushing)
+        {
           aOutput.Write("\t");
         }
-        if (xMember.IsComment) {
+        if (xMember.IsComment)
+        {
           aOutput.Write(xMember.Name);
-        } else {
+        }
+        else
+        {
           xMember.WriteText(this, aOutput);
         }
         aOutput.WriteLine();
@@ -176,22 +242,28 @@ namespace Cosmos.Assembler {
       aOutput.WriteLine();
 
       // Write out code
-      for (int i = 0; i < mInstructions.Count; i++) {
+      for (int i = 0; i < mInstructions.Count; i++)
+      {
         var xOp = mInstructions[i];
         string prefix = null;
-        if (mAddWhitespaceWhileFlushing) {
+        if (mAddWhitespaceWhileFlushing)
+        {
           prefix = "\t\t\t";
         }
-        if (xOp is Label) {
-          var xLabel = (Label)xOp;
+        if (xOp is Label)
+        {
+          var xLabel = (Label) xOp;
           aOutput.WriteLine();
-          if (mAddWhitespaceWhileFlushing) {  
+          if (mAddWhitespaceWhileFlushing)
+          {
             prefix = "\t\t";
           }
           aOutput.Write(prefix);
           xLabel.WriteText(this, aOutput);
           aOutput.WriteLine();
-        } else {
+        }
+        else
+        {
           aOutput.Write(prefix);
           xOp.WriteText(this, aOutput);
           aOutput.WriteLine();

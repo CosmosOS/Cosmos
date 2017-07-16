@@ -12,7 +12,7 @@ namespace Cosmos.System
 
 
         protected abstract void InitKeys();
-        
+
         protected ScanMapBase()
         {
             InitKeys();
@@ -40,8 +40,8 @@ namespace Cosmos.System
             if ((scan & 0x80) != 0)
                 scan = (byte)(scan ^ 0x80);
 
-            Debugger.DoSend("Number of keys: ");
-            Debugger.DoSendNumber((uint) _keys.Count);
+            Global.mDebugger.Send("Number of keys: ");
+            Global.mDebugger.SendNumber((uint) _keys.Count);
 
             for (int index = 0; index < _keys.Count; index++)
             {
@@ -49,7 +49,7 @@ namespace Cosmos.System
 
                 if (t == null)
                 {
-                    Debugger.DoSend("Key received but item is NULL");
+                    Global.mDebugger.Send("Key received but item is NULL");
                     continue;
                 }
                 else if (t.Scancode == scan)
