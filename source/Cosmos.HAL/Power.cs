@@ -16,27 +16,15 @@ namespace Cosmos.HAL
         }
 
         //Reboot with ACPI
-        public static void Reboot()
+        public static void ACPIReboot()
         {
-            ACPI.Reboot();
+            ACPI.Reboot(); //TODO
         }
 
         //Shutdown with ACPI
-        public static void Shutdown()
+        public static void ACPIShutdown()
         {
             ACPI.Shutdown();
-        }
-
-        //Enable ACPI
-        public static void ACPIEnable()
-        {
-            ACPI.Enable();
-        }
-
-        //Disable ACPI
-        public static void ACPIDisable()
-        {
-            ACPI.Disable();
         }
     }
 }
