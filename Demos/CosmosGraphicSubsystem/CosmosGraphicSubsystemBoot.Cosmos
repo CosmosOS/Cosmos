@@ -47,6 +47,21 @@
     <Bochs_OutputPath>bin\Debug\net462\</Bochs_OutputPath>
     <Bochs_EnableGDB>False</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>False</Bochs_StartCosmosGDB>
+    <USB_StackCorruptionDetectionEnabled>True</USB_StackCorruptionDetectionEnabled>
+    <USB_StackCorruptionDetectionLevel>MethodFooters</USB_StackCorruptionDetectionLevel>
+    <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
+    <USB_Deployment>USB</USB_Deployment>
+    <USB_Launch>None</USB_Launch>
+    <USB_DebugEnabled>False</USB_DebugEnabled>
+    <USB_DebugMode>Source</USB_DebugMode>
+    <USB_IgnoreDebugStubAttribute>False</USB_IgnoreDebugStubAttribute>
+    <USB_CosmosDebugPort>Serial: COM1</USB_CosmosDebugPort>
+    <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
+    <USB_PxeInterface>192.168.0.8</USB_PxeInterface>
+    <USB_OutputPath>bin\Debug\net462\</USB_OutputPath>
+    <USB_EnableGDB>False</USB_EnableGDB>
+    <USB_StartCosmosGDB>False</USB_StartCosmosGDB>
+    <Name>CosmosGraphicSubsystemBoot</Name>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="*" />
@@ -73,8 +88,8 @@
       <Project>{9431ff1f-ad75-4a1e-b38a-46e0f109411d}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos Graphic Subsystem\Cosmos Graphic Subsystem.csproj">
-      <Name>Cosmos Graphic Subsystem</Name>
+    <ProjectReference Include="..\CosmosGraphicSubsystem\CosmosGraphicSubsystem.csproj">
+      <Name>CosmosGraphicSubsystem</Name>
       <Project>{49f2c01d-d2c5-4564-810b-1ae92236c5c1}</Project>
       <Private>True</Private>
     </ProjectReference>
