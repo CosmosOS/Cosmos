@@ -171,6 +171,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
+          if (xValue1.GetTypeInfo().IsAssignableFrom(xValue2)
+            || xValue2.GetTypeInfo().IsAssignableFrom(xValue1))
+          {
+            return;
+          }
 
           throw new Exception(String.Format("Comparing types '{0}' and '{1}' not supported!", xValue1.AssemblyQualifiedName, xValue2.AssemblyQualifiedName));
         default:
