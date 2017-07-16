@@ -131,14 +131,13 @@ namespace Cosmos.HAL
       // system level and not accessible from Core. Need to think about this
       // for the future.
       Console.WriteLine("Finding PCI Devices");
-
       PCI.Setup();
     }
 
     public static void StartACPI()
     {
       Console.WriteLine("Starting ACPI");
-      Core.ACPI.Start();
+      ACPI.Start();
     }
 
     public static void EnableInterrupts()

@@ -8,25 +8,13 @@ namespace Cosmos.System
 {
     public class Power
     {
-        public static void CPUReboot()
+        public static void Reboot()
         {
             HAL.Power.CPUReboot();
         }
-        public static void Reboot()
-        {
-            HAL.Power.Reboot();
-        }
         public static void Shutdown()
         {
-            HAL.Power.Shutdown();
-        }
-        public static void ACPIEnable()
-        {
-            HAL.Power.ACPIEnable();
-        }
-        public static void ACPIDisable()
-        {
-            HAL.Power.ACPIDisable();
+            HAL.Power.ACPIShutdown();
         }
     }
 }

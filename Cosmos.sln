@@ -161,11 +161,11 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GuessKernelBoot", "Demos\Gu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Memory.Test", "Tests\Cosmos.Core.Memory.Test\Cosmos.Core.Memory.Test.csproj", "{408E5ACC-EA9A-41E8-AA95-514C5F47BD34}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cosmos Graphic Subsystem", "Cosmos Graphic Subsystem", "{A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CosmosGraphicSubsystem", "CosmosGraphicSubsystem", "{A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos Graphic Subsystem", "Demos\Cosmos Graphic Subsystem\Cosmos Graphic Subsystem.csproj", "{49F2C01D-D2C5-4564-810B-1AE92236C5C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosGraphicSubsystem", "Demos\CosmosGraphicSubsystem\CosmosGraphicSubsystem.csproj", "{49F2C01D-D2C5-4564-810B-1AE92236C5C1}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos Graphic SubsystemBoot", "Demos\Cosmos Graphic Subsystem\Cosmos Graphic SubsystemBoot.Cosmos", "{79D68062-46C5-466D-9289-C033F7348485}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "CosmosGraphicSubsystemBoot", "Demos\CosmosGraphicSubsystem\CosmosGraphicSubsystemBoot.Cosmos", "{79D68062-46C5-466D-9289-C033F7348485}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Asm", "source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj", "{B7077A34-D7F0-4422-BE7C-65DF26C65489}"
 EndProject
