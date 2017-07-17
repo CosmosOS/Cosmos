@@ -1,6 +1,4 @@
-﻿using Cosmos.Core.Common;
-
-namespace Cosmos.Core
+﻿namespace Cosmos.Core
 {
     public static class Bootstrap
     {

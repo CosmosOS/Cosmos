@@ -7,10 +7,10 @@
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>VBKernel</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
+        <CreateInPlace>true</CreateInPlace>
     </TemplateData>
     <TemplateContent>
         <Project File="VBProjKernel.vbproj" ReplaceParameters="true">
-            <ProjectItem ReplaceParameters="true">AssemblyInfo.vb</ProjectItem>
             <ProjectItem ReplaceParameters="true" OpenInEditor="true">Kernel.vb</ProjectItem>
         </Project>
     </TemplateContent>
