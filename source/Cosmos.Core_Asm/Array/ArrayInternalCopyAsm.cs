@@ -64,43 +64,40 @@ namespace Cosmos.Core_Asm
             XS.Comment("Count");
             XS.Set(EDX, EBP, sourceDisplacement: LengthDisplacement);
 
-            // If source and destination are equal, jump to end
+            // if length is 0, jump to end
             XS.Compare(EDX, 0);
             XS.Jump(ConditionalTestEnum.Equal, xArrayCopyEndLabel);
 
             XS.Multiply(EDX);
             XS.Set(ECX, EAX);
 
-            XS.Compare(EDI, ESI);
-            XS.Jump(ConditionalTestEnum.GreaterThan, xArrayCopyReverseLabel);
+            // if source and destination are equal, jump to end
+            XS.Set(EAX, ESI);
+            XS.Add(EAX, ECX);
+            XS.Compare(EDI, EAX);
+            XS.Jump(ConditionalTestEnum.Equal, xArrayCopyEndLabel);
+            XS.Jump(ConditionalTestEnum.LessThanOrEqualTo, xArrayCopyReverseLabel);
 
             new Movs { Size = 8, Prefixes = InstructionPrefixes.Repeat };
 
             XS.Jump(xArrayCopyEndLabel);
 
-            // source ptr < destination ptr
+            // source ptr + size >= destination ptr
             XS.Label(xArrayCopyReverseLabel);
 
-            XS.Comment("Array Reverse Copy: source ptr < destination ptr");
-            XS.Comment("Element size");
-            XS.Set(EAX, EBP, sourceDisplacement: DestinationArrayDisplacement);
-            XS.Add(EAX, ObjectUtils.FieldDataOffset);
-            XS.Set(EAX, EAX, sourceIsIndirect: true); // element size
+            XS.Comment("Array Reverse Copy: source ptr + size >= destination ptr");
 
             XS.Add(ESI, ECX);
             XS.Add(EDI, ECX);
-            
-            XS.Sub(ESI, EAX);
-            XS.Sub(EDI, EAX);
 
             XS.Label(xArrayCopyReverseLoopLabel);
-
-            XS.Set(AL, ESI, sourceIsIndirect: true);
-            XS.Set(EDI, AL, destinationIsIndirect: true);
 
             XS.Decrement(ESI);
             XS.Decrement(EDI);
             XS.Decrement(ECX);
+
+            XS.Set(AL, ESI, sourceIsIndirect: true);
+            XS.Set(EDI, AL, destinationIsIndirect: true);
 
             XS.Compare(ECX, 0);
             XS.Jump(ConditionalTestEnum.NotEqual, xArrayCopyReverseLoopLabel);
@@ -112,18 +109,19 @@ namespace Cosmos.Core_Asm
 
 // Old implementation
 // (it's a good memcpy implementation, as it doesn't check for array overlapping, so it can't be used for Array.Copy)
-//
+
 //using Cosmos.Assembler;
+//using Cosmos.Assembler.x86;
 //using Cosmos.IL2CPU.API;
 //using XSharp.Common;
-//using CPUx86 = Cosmos.Assembler.x86;
+//using static XSharp.Common.XSRegisters;
 
 //namespace Cosmos.Core_Asm
 //{
 //    public class ArrayInternalCopyAsm : AssemblerMethod
 //    {
 //        private const int SourceArrayDisplacement = 36;
-//        private const int SourceIndexDisplacement = 32;
+//        private const int SourceIndexDisplacement = 28;
 //        private const int DestinationArrayDisplacement = 24;
 //        private const int DestinationIndexDisplacement = 16;
 //        private const int LengthDisplacement = 12;
@@ -172,7 +170,7 @@ namespace Cosmos.Core_Asm
 //            XS.Set(EDX, EBP, sourceDisplacement: LengthDisplacement);
 //            XS.Multiply(EDX);
 //            XS.Set(ECX, EAX);
-//            new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
+//            new Movs { Size = 8, Prefixes = InstructionPrefixes.Repeat };
 //        }
 //    }
 //}

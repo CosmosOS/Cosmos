@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var xSize = SizeOfType(xVar.Type);
       bool xSigned = IsIntegerSigned(xVar.Type);
 
-      XS.Comment("Local type = " + xVar);
+      XS.Comment("Local type = " + xVar.Type);
       XS.Comment("Local EBP offset = " + xEBPOffset);
       XS.Comment("Local size = " + xSize);
 
