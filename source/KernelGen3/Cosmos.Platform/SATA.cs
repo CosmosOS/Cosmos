@@ -2,7 +2,7 @@
 
 namespace Cosmos.Platform {
     public class SATA : Cosmos.HAL.SATA {
-        public void InitHAL() {
+        static public void InitHAL() {
             Cosmos.HAL.SATA.mSataHalType = typeof(SATA);
         }
 
