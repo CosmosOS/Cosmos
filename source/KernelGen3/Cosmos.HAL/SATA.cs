@@ -2,7 +2,6 @@
 
 namespace Cosmos.HAL
 {
-    public class Class1
-    {
+    public abstract class SATA {
     }
 }
