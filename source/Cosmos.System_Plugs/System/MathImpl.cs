@@ -392,6 +392,12 @@ namespace Cosmos.System_Plugs.System
             double x2;
             int i;
 
+            if (double.IsNaN(x) || x < 0)
+                return double.NaN;
+
+            if (double.IsPositiveInfinity(x))
+                return double.PositiveInfinity;
+
             if (x == 0F)
                 return 0F;
 
