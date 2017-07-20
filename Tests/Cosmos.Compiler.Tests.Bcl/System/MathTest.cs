@@ -32,7 +32,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             result = Math.Sqrt(0);
             expectedResult = 0;
 
-            Assert.IsTrue((resultError == 0), "Sqrt of zero must be zero");
+            Assert.IsTrue((result == expectedResult), "Sqrt of zero must be zero");
 
             // Test with negative number
             result = Math.Sqrt(-433);
