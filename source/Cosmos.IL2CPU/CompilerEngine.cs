@@ -22,6 +22,7 @@ namespace Cosmos.IL2CPU {
         public Action<Exception> OnLogException;
         protected static Action<string> mStaticLog = null;
 
+        public bool UseGen3Kernel { get; set; }
         public string DebugMode { get; set; }
         public string TraceAssemblies { get; set; }
         public byte DebugCom { get; set; }
