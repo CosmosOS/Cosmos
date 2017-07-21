@@ -48,6 +48,7 @@ namespace Cosmos.IL2CPU {
                 if (CmdOptions.ContainsKey("UseGen3Kernel")) {
                     xTask.UseGen3Kernel = Convert.ToBoolean(CmdOptions["UseGen3Kernel".ToLower()]);
                 }
+
                 xTask.DebugEnabled = Convert.ToBoolean(CmdOptions["DebugEnabled".ToLower()]);
                 logMessage("Loaded : DebugEnabled");
                 xTask.StackCorruptionDetectionEnabled =
