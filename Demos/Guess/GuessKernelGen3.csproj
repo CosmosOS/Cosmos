@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.5</TargetFramework>
+    <ProjectGuid>{9E58E949-7B71-45ED-9610-11DA287EE933}</ProjectGuid>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="GuessKernelBootGen3.Cosmos" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj" />
+  </ItemGroup>
+
+</Project>
