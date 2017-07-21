@@ -401,7 +401,9 @@ namespace Cosmos.System_Plugs.System
             if (x == 0F)
                 return 0F;
 
-            // Approximate the square root value
+            // Approximating the square root value
+            // This makes use of IEEE 754 double-precision floating point format
+            // Sign: 1 bit, Exponent: 11 bits, Signficand: 52 bits
             x1 = BitConverter.DoubleToInt64Bits(x);
             x1 -= 1L << 53;
             x1 >>= 1;
@@ -409,7 +411,7 @@ namespace Cosmos.System_Plugs.System
 
             x2 = BitConverter.Int64BitsToDouble(x1);
 
-            // Use network method
+            // Use Newton's Method
             for(i = 0; i < 5; i++)
             {
                 x2 = x2 - (x2 * x2 - x) / (2 * x2);
