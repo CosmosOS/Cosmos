@@ -14,8 +14,6 @@ using Cosmos.Debug.Symbols;
 namespace Cosmos.IL2CPU {
     // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
     public class CompilerEngine {
-        const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
-
         public Action<string> OnLogMessage;
         public Action<string> OnLogError;
         public Action<string> OnLogWarning;
