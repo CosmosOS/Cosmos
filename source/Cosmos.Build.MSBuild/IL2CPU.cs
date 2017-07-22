@@ -11,6 +11,8 @@ namespace Cosmos.Build.MSBuild
     {
         // protected CompilerEngine mTask = new CompilerEngine();
 
+        public bool UseGen3Kernel { get; set; }
+
         [Required]
         public string CosmosBuildDir { get; set; }
 
@@ -83,6 +85,7 @@ namespace Cosmos.Build.MSBuild
                 //TODO: Add AdditionalReferences and AdditionalSearchDirs here and to log messages below.
                 Dictionary<string, string> args = new Dictionary<string, string>
                 {
+                    {"UseGen3Kernel", Convert.ToString(UseGen3Kernel)},
                     {"DebugEnabled", Convert.ToString(DebugEnabled)},
                     {"StackCorruptionDetectionEnabled", Convert.ToString(StackCorruptionDetectionEnabled)},
                     {"StackCorruptionDetectionLevel", Convert.ToString(StackCorruptionDetectionLevel)},

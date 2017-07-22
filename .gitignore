@@ -51,3 +51,5 @@ Cosmos.Assembler.Log
 UpgradeLog*.htm
 .sync/
 source/_ReSharper.Caches/
+*.~vsdx
+Docs/~$RingsGen2.xlsx
