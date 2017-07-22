@@ -8,7 +8,7 @@ namespace Cosmos.Core_Asm
     public class ArrayInternalCopyAsm : AssemblerMethod
     {
         private const int SourceArrayDisplacement = 36;
-        private const int SourceIndexDisplacement = 32;
+        private const int SourceIndexDisplacement = 28;
         private const int DestinationArrayDisplacement = 24;
         private const int DestinationIndexDisplacement = 16;
         private const int LengthDisplacement = 12;

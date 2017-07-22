@@ -24,7 +24,6 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Br:
           return 0;
         case Code.Brtrue:
-          return 1;
         case Code.Brfalse:
           return 1;
         case Code.Beq:
@@ -51,7 +50,6 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Br:
           return 0;
         case Code.Brtrue:
-          return 0;
         case Code.Brfalse:
           return 0;
         case Code.Beq:
