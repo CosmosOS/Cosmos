@@ -388,30 +388,35 @@ namespace Cosmos.System_Plugs.System
         #region Sqrt
         public static double Sqrt(double x)
         {
-            double i = 0;
-            double x1 = 0.0F;
-            double x2 = 0.0F;
+            long x1;
+            double x2;
+            int i;
+
+            if (double.IsNaN(x) || x < 0)
+                return double.NaN;
+
+            if (double.IsPositiveInfinity(x))
+                return double.PositiveInfinity;
 
             if (x == 0F)
                 return 0F;
 
-            while ((i * i) <= x)
+            // Approximating the square root value
+            // This makes use of IEEE 754 double-precision floating point format
+            // Sign: 1 bit, Exponent: 11 bits, Signficand: 52 bits
+            x1 = BitConverter.DoubleToInt64Bits(x);
+            x1 -= 1L << 53;
+            x1 >>= 1;
+            x1 += 1L << 61;
+
+            x2 = BitConverter.Int64BitsToDouble(x1);
+
+            // Use Newton's Method
+            for(i = 0; i < 5; i++)
             {
-                i += 0.1F;
+                x2 = x2 - (x2 * x2 - x) / (2 * x2);
             }
 
-            x1 = i;
-            // this originally used another variable here,
-            // but the use of i was done, thus it's faster
-            // to re-use the variable.
-            for (i = 0; i < 10; i++)
-            {
-                x2 = x;
-                x2 /= x1;
-                x2 += x1;
-                x2 /= 2;
-                x1 = x2;
-            }
             return x2;
         }
         #endregion
