@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="GuessKernelBoot.Cosmos" />
+    <None Remove="*.Cosmos" />
   </ItemGroup>
 
   <ItemGroup>

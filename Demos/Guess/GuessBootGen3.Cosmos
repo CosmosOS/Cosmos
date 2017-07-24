@@ -52,6 +52,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="*" />
+    <None Remove="*.Cosmos" />
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
