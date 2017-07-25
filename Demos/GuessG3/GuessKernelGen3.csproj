@@ -9,8 +9,4 @@
     <None Remove="*.Cosmos" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj" />
-  </ItemGroup>
-
 </Project>
