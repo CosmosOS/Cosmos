@@ -56,7 +56,7 @@
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Guess\GuessKernelGen3.csproj">
+    <ProjectReference Include="..\GuessG3\GuessKernelGen3.csproj">
       <Name>GuessKernelGen3</Name>
       <Project>{9e58e949-7b71-45ed-9610-11da287ee933}</Project>
       <Private>True</Private>
