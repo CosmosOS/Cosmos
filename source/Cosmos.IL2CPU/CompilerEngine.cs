@@ -297,6 +297,7 @@ namespace Cosmos.IL2CPU {
             mLoadedExtensions = new List<CompilerExtensionBase>();
 
             string xKernelBaseName = UseGen3Kernel ? "Cosmos.System.Boot" : "Cosmos.System.Kernel";
+            LogMessage("Kernel Base: " + xKernelBaseName);
             Type xKernelType = null;
 
             foreach (string xRef in References) {
