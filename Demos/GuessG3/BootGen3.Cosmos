@@ -48,7 +48,7 @@
     <Bochs_OutputPath>bin\Debug\net462\</Bochs_OutputPath>
     <Bochs_EnableGDB>False</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>False</Bochs_StartCosmosGDB>
-    <Name>GuessBootGen3</Name>
+    <Name>BootGen3</Name>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="*" />
@@ -56,8 +56,8 @@
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GuessG3\GuessKernelGen3.csproj">
-      <Name>GuessKernelGen3</Name>
+    <ProjectReference Include="..\GuessG3\KernelGen3.csproj">
+      <Name>KernelGen3</Name>
       <Project>{9e58e949-7b71-45ed-9610-11da287ee933}</Project>
       <Private>True</Private>
     </ProjectReference>
