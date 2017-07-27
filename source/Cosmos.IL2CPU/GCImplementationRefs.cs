@@ -8,7 +8,12 @@ namespace Cosmos.IL2CPU {
         public static readonly MethodBase DecRefCountRef;
 
         static GCImplementationRefs() {
-            var xType = Type.GetType("Cosmos.Core.GCImplementation, Cosmos.Core", true);
+            Type xType;
+            if (CompilerEngine.UseGen3Kernel) {
+                xType = Type.GetType("Cosmos.CPU.GCImplementation, Cosmos.CPU", true);
+            } else {
+                xType = Type.GetType("Cosmos.Core.GCImplementation, Cosmos.Core", true);
+            }
             if (xType == null) {
                 throw new Exception("GCImplementation type not found!");
             }

@@ -167,7 +167,11 @@ namespace Cosmos.TestRunner.Core
         {
             References = new List<string>() { kernelFileName };
 
-            if (!UseG3Kernel)
+            if (UseG3Kernel)
+            {
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.System3_Plugs")).Location);
+            }
+            else
             {
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location);
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location);
