@@ -4,7 +4,12 @@
     <TargetFramework>netstandard1.5</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
+    <ProjectReference Include="..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
     <ProjectReference Include="..\Cosmos.Shared\Cosmos.Shared.csproj" />
   </ItemGroup>
 
