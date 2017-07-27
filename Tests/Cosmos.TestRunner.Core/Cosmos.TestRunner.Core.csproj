@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Demos\GuessG3\GuessKernelGen3.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Assembler\Cosmos.Assembler.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
