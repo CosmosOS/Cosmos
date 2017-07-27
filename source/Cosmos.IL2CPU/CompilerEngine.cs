@@ -291,17 +291,19 @@ namespace Cosmos.IL2CPU {
             //
             // Plugs and refs in this list will be loaded absolute (or as proj refs) only. Asm resolution
             // will not be tried on them, but will on ASMs they reference.
-            //
 
             AssemblyLoadContext.Default.Resolving += Default_Resolving;
             mLoadedExtensions = new List<CompilerExtensionBase>();
 
             string xKernelBaseName = UseGen3Kernel ? "Cosmos.System.Boot" : "Cosmos.System.Kernel";
+            LogMessage("Kernel " + (UseGen3Kernel ? "Gen3" : "Gen2"));
             LogMessage("Kernel Base: " + xKernelBaseName);
             Type xKernelType = null;
 
             foreach (string xRef in References) {
+                LogMessage("Checking Reference: " + xRef);
                 if (File.Exists(xRef)) {
+                    LogMessage("  Exists");
                     var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyCacheOrPath(xRef);
 
                     CompilerHelpers.Debug($"Looking for kernel in {xAssembly}");

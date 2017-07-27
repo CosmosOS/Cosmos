@@ -314,7 +314,6 @@ namespace Cosmos.Build.Builder {
       //
       Pack(Path.Combine(mSourcePath, "Cosmos.System"), xNugetPkgDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System_Plugs"), xNugetPkgDir, xVersion);
-      //Pack(Path.Combine(Path.Combine(mSourcePath, "Kernel"), "Cosmos.System3_Plugs"), xNugetPkgDir, xVersion);
       //
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xNugetPkgDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xNugetPkgDir, xVersion);
