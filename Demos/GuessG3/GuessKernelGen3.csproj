@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Kernel\Cosmos.System\Cosmos.System.csproj" />
+    <ProjectReference Include="..\..\source\Kernel\Cosmos.System\Cosmos.System3.csproj" />
   </ItemGroup>
 
 </Project>

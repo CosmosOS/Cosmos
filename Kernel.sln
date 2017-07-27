@@ -60,7 +60,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform", "source\Kernel\Cosmos.Platform\Cosmos.Platform.csproj", "{63843265-D889-47D2-883E-595289C99F42}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Kernel\Cosmos.System\Cosmos.System.csproj", "{F8BF6943-B69D-4549-9C16-75146616E19C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System3", "source\Kernel\Cosmos.System\Cosmos.System3.csproj", "{F8BF6943-B69D-4549-9C16-75146616E19C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 CPU", "00 CPU", "{C5D22A6E-96F8-4F85-9EE4-C1EB8C5E0530}"
 EndProject
