@@ -7,7 +7,6 @@ namespace KernelGen3 {
     public class Boot : Sys.Boot {
 
         protected override void Run() {
-            //Console.WriteLine("Booted Kernel Gen3!");
             Cosmos.CPU.Temp.ShowText();
 
             while (true) {

@@ -72,9 +72,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "90 Application", "90 Applic
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "99 Shared", "99 Shared", "{EFB323E2-300A-4BC8-9A61-9E1D0E0C1FCD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KernelGen3", "Demos\GuessG3\KernelGen3.csproj", "{9E58E949-7B71-45ED-9610-11DA287EE933}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuessKernelGen3", "Demos\GuessG3\GuessKernelGen3.csproj", "{9E58E949-7B71-45ED-9610-11DA287EE933}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "BootGen3", "Demos\GuessG3\BootGen3.Cosmos", "{A262FBF6-211A-45D5-A201-F7DA2B135007}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GuessBootGen3", "Demos\GuessG3\GuessBootGen3.Cosmos", "{A262FBF6-211A-45D5-A201-F7DA2B135007}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "source\Cosmos.Assembler\Cosmos.Assembler.csproj", "{F0860B7D-3FF7-4E2A-AC10-18E87ADD62A3}"
 EndProject
@@ -87,6 +87,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{67FD9912-CE63-4EB2-880C-F4F0D9AED7CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{4E9B8F31-AEA0-402D-9B3A-223100F2156D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System3_Plugs", "source\Kernel\Cosmos.System3_Plugs\Cosmos.System3_Plugs.csproj", "{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -319,6 +321,14 @@ Global
 		{4E9B8F31-AEA0-402D-9B3A-223100F2156D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4E9B8F31-AEA0-402D-9B3A-223100F2156D}.Release|x86.ActiveCfg = Release|Any CPU
 		{4E9B8F31-AEA0-402D-9B3A-223100F2156D}.Release|x86.Build.0 = Release|Any CPU
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}.Debug|x86.Build.0 = Debug|Any CPU
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}.Release|x86.ActiveCfg = Release|Any CPU
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -361,5 +371,6 @@ Global
 		{47F9D446-ACD4-489A-AD6D-A46A19247E2F} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
 		{67FD9912-CE63-4EB2-880C-F4F0D9AED7CA} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
 		{4E9B8F31-AEA0-402D-9B3A-223100F2156D} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
+		{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C} = {2E1A72C6-5DD4-4AB9-92A1-6BB44D9B1009}
 	EndGlobalSection
 EndGlobal
