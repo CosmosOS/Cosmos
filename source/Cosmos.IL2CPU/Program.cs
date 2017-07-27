@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU {
                 var xEngine = new CompilerEngine();
 
                 xEngine.UseGen3Kernel = false;
-                if (CmdOptions.ContainsKey("UseGen3Kernel")) {
+                if (CmdOptions.ContainsKey("UseGen3Kernel".ToLower())) {
                     xEngine.UseGen3Kernel = Convert.ToBoolean(CmdOptions["UseGen3Kernel".ToLower()]);
                 }
 

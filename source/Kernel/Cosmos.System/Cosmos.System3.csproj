@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.HAL\Cosmos.HAL.csproj" />
+    <ProjectReference Include="..\Cosmos.HAL\Cosmos.HAL3.csproj" />
     <ProjectReference Include="..\Cosmos.Platform\Cosmos.Platform.csproj" />
     <ProjectReference Include="..\Cosmos.Shared\Cosmos.Shared.csproj" />
   </ItemGroup>
