@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.API;
 
 namespace Cosmos.CPU {
     [DebuggerStepThrough]
-    public static class GcHook {
+    public static class GCImplementationRefs {
         private static void AcquireLock() {
             throw new NotImplementedException();
         }
