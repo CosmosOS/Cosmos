@@ -22,6 +22,8 @@ namespace Cosmos.TestRunner.Core
 
             //yield return typeof(FrotzKernel.Kernel);
 
+            //yield return typeof(Guess.Boot);
+
             /* Please see the notes on the kernel itself before enabling it */
             //yield return typeof(GraphicTest.Kernel);
         }

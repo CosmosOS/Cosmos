@@ -229,26 +229,40 @@ namespace Cosmos.IL2CPU {
         }
 
         private Assembly Default_Resolving(AssemblyLoadContext aContext, AssemblyName aName) {
-            var xRequestingAssembly = Assembly.GetEntryAssembly();
-            if (xRequestingAssembly != null) {
-                // check for path in as requested dll is stored, this makes refrenced dll project working
-                var xPathAsRequested = Path.Combine(Path.GetDirectoryName(xRequestingAssembly.Location), aName.Name + ".dll");
-                if (File.Exists(xPathAsRequested)) {
-                    return aContext.LoadFromAssemblyPath(xPathAsRequested);
-                }
-            }
-
-            // check for assembly in working directory
-            var xPathToCheck = Path.Combine(Directory.GetCurrentDirectory(), aName.Name + ".dll");
-            if (File.Exists(xPathToCheck)) {
-                return aContext.LoadFromAssemblyPath(xPathToCheck);
-            }
-
             foreach (var xRef in References) {
                 var xName = AssemblyLoadContext.GetAssemblyName(xRef);
                 if (xName.Name == aName.Name) {
                     return aContext.LoadFromAssemblyPath(xRef);
                 }
+            }
+
+            foreach (var xRef in References)
+            {
+                var xKernelAssemblyDir = Path.GetDirectoryName(xRef);
+                var xAssemblyPath = Path.Combine(xKernelAssemblyDir, aName.Name);
+                if (File.Exists(xAssemblyPath + ".dll"))
+                {
+                    return aContext.LoadFromAssemblyPath(xAssemblyPath + ".dll");
+                }
+                if (File.Exists(xAssemblyPath + ".exe"))
+                {
+                    return aContext.LoadFromAssemblyPath(xAssemblyPath + ".exe");
+                }
+            }
+
+            //var xRequestingAssembly = Assembly.GetEntryAssembly();
+            //if (xRequestingAssembly != null) {
+            //    // check for path in as requested dll is stored, this makes referenced dll project working
+            //    var xPathAsRequested = Path.Combine(Path.GetDirectoryName(xRequestingAssembly.Location), aName.Name + ".dll");
+            //    if (File.Exists(xPathAsRequested)) {
+            //        return aContext.LoadFromAssemblyPath(xPathAsRequested);
+            //    }
+            //}
+
+            // check for assembly in working directory
+            var xPathToCheck = Path.Combine(Directory.GetCurrentDirectory(), aName.Name + ".dll");
+            if (File.Exists(xPathToCheck)) {
+                return aContext.LoadFromAssemblyPath(xPathToCheck);
             }
 
             foreach (var xDir in mSearchDirs) {

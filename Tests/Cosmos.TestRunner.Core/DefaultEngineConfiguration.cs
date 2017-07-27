@@ -28,6 +28,7 @@ namespace Cosmos.TestRunner.Core
             engine.DebugIL2CPU = false;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             //engine.EnableStackCorruptionChecks = false;
+            engine.UseG3Kernel = true;
 
             engine.EnableStackCorruptionChecks = true;
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
