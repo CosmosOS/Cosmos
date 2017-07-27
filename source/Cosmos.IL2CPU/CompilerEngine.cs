@@ -14,14 +14,13 @@ using Cosmos.Debug.Symbols;
 namespace Cosmos.IL2CPU {
     // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
     public class CompilerEngine {
-        const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
-
         public Action<string> OnLogMessage;
         public Action<string> OnLogError;
         public Action<string> OnLogWarning;
         public Action<Exception> OnLogException;
         protected static Action<string> mStaticLog = null;
 
+        public bool UseGen3Kernel { get; set; }
         public string DebugMode { get; set; }
         public string TraceAssemblies { get; set; }
         public byte DebugCom { get; set; }
@@ -123,8 +122,8 @@ namespace Cosmos.IL2CPU {
                 LogTime("Engine execute started");
 
                 // Find the kernel's entry point. We are looking for a public class Kernel, with public static void Boot()
-                var xInitMethod = LoadAssemblies();
-                if (xInitMethod == null) {
+                var xKernelCtor = LoadAssemblies();
+                if (xKernelCtor == null) {
                     return false;
                 }
 
@@ -160,10 +159,10 @@ namespace Cosmos.IL2CPU {
                                     LogWarning("Could not create the file \"" + xLogFile + "\"! No log will be created!");
                                 }
                             }
-                            xScanner.QueueMethod(xInitMethod.DeclaringType.GetTypeInfo().BaseType.GetTypeInfo().GetMethod("Start"));
-                            xScanner.Execute(xInitMethod);
+                            xScanner.QueueMethod(xKernelCtor.DeclaringType.GetTypeInfo().BaseType.GetTypeInfo().GetMethod(UseGen3Kernel ? "EntryPoint" : "Start"));
+                            xScanner.Execute(xKernelCtor);
 
-                            AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.GetTypeInfo().Assembly);
+                            AppAssemblerRingsCheck.Execute(xScanner, xKernelCtor.DeclaringType.GetTypeInfo().Assembly);
 
                             using (var xOut = new StreamWriter(File.Create(OutputFilename), Encoding.ASCII, 128 * 1024)) {
                                 //if (EmitDebugSymbols) {
@@ -282,6 +281,8 @@ namespace Cosmos.IL2CPU {
 
             AssemblyLoadContext.Default.Resolving += Default_Resolving;
             mLoadedExtensions = new List<CompilerExtensionBase>();
+
+            string xKernelBaseName = UseGen3Kernel ? "Cosmos.System.Boot" : "Cosmos.System.Kernel";
             Type xKernelType = null;
 
             foreach (string xRef in References) {
@@ -301,7 +302,7 @@ namespace Cosmos.IL2CPU {
                             // will force user to implement what is needed if replacing our core. But in the end this is a "not needed" feature
                             // and would only complicate things.
                             // So for now at least, we look by name so we dont have a dependency since the method returns a MethodBase and not a Kernel instance anyway.
-                            if (xType.GetTypeInfo().BaseType.FullName == "Cosmos.System.Kernel") {
+                            if (xType.GetTypeInfo().BaseType.FullName == xKernelBaseName) {
                                 if (xKernelType != null) {
                                     LogError($"Two kernels found: {xType.FullName} and {xKernelType.FullName}");
                                     return null;

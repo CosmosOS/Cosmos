@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.5</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.HAL\Cosmos.HAL.csproj" />
+    <ProjectReference Include="..\Cosmos.Platform\Cosmos.Platform.csproj" />
+    <ProjectReference Include="..\Cosmos.Shared\Cosmos.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

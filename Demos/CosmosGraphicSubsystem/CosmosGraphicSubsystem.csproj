@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Cosmos Graphic SubsystemBoot.Cosmos" />
+    <None Remove="CosmosGraphicSubsystemBoot.Cosmos" />
   </ItemGroup>
 
   <ItemGroup>

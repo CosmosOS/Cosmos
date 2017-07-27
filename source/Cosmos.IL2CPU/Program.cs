@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Cosmos.IL2CPU
-{
-    public class Program
-    {
+namespace Cosmos.IL2CPU {
+    public class Program {
         public const string CosmosRoot = "";
         private const string KernelFile = CosmosRoot + "";
         private const string OutputFile = CosmosRoot + "";
@@ -13,97 +11,91 @@ namespace Cosmos.IL2CPU
         private static List<string> AdditionalReferences = new List<string>();
         private static List<string> AdditionalSearchDirs = new List<string>();
 
-        public static int Run(string[] args, Action<string> logMessage, Action<string> logError)
-        {
-            if (args == null)
-            {
+        public static int Run(string[] args, Action<string> logMessage, Action<string> logError) {
+            if (args == null) {
                 throw new ArgumentNullException("args");
             }
-            if (logMessage == null)
-            {
+            if (logMessage == null) {
                 throw new ArgumentNullException("logMessage");
             }
-            if (logError == null)
-            {
+            if (logError == null) {
                 throw new ArgumentNullException("logError");
             }
 
-            try
-            {
+            try {
                 var tmp = "";
-                foreach (var s in args)
-                {
+                foreach (var s in args) {
                     tmp += s;
                     string[] s1 = s.Split(':');
                     string argID = s1[0].ToLower();
-                    if (argID == "References".ToLower())
-                    {
+                    if (argID == "References".ToLower()) {
                         References.Add(s.Replace(s1[0] + ":", ""));
                     }
-                    else if (argID == "AdditionalReferences".ToLower())
-                    {
+                    else if (argID == "AdditionalReferences".ToLower()) {
                         AdditionalReferences.Add(s.Replace(s1[0] + ":", ""));
                     }
-                    else if (argID == "AdditionalSearchDirs".ToLower())
-                    {
+                    else if (argID == "AdditionalSearchDirs".ToLower()) {
                         AdditionalSearchDirs.Add(s.Replace(s1[0] + ":", ""));
                     }
-                    else
-                    {
+                    else {
                         CmdOptions.Add(argID, s.Replace(s1[0] + ":", ""));
                     }
                 }
 
-                var xTask = new CompilerEngine();
-                xTask.DebugEnabled = Convert.ToBoolean(CmdOptions["DebugEnabled".ToLower()]);
+                var xEngine = new CompilerEngine();
+
+                xEngine.UseGen3Kernel = false;
+                if (CmdOptions.ContainsKey("UseGen3Kernel")) {
+                    xEngine.UseGen3Kernel = Convert.ToBoolean(CmdOptions["UseGen3Kernel".ToLower()]);
+                }
+
+                xEngine.DebugEnabled = Convert.ToBoolean(CmdOptions["DebugEnabled".ToLower()]);
                 logMessage("Loaded : DebugEnabled");
-                xTask.StackCorruptionDetectionEnabled = Convert.ToBoolean(CmdOptions["StackCorruptionDetectionEnabled".ToLower()]);
+                xEngine.StackCorruptionDetectionEnabled =
+                    Convert.ToBoolean(CmdOptions["StackCorruptionDetectionEnabled".ToLower()]);
                 logMessage("Loaded : StackCorruptionDetectionEnabled");
-                xTask.DebugMode = CmdOptions["DebugMode".ToLower()];
+                xEngine.DebugMode = CmdOptions["DebugMode".ToLower()];
                 logMessage("Loaded : DebugMode");
-                xTask.StackCorruptionDetectionLevel = CmdOptions["StackCorruptionDetectionLevel".ToLower()];
+                xEngine.StackCorruptionDetectionLevel = CmdOptions["StackCorruptionDetectionLevel".ToLower()];
                 logMessage("Loaded : StackCorruptionDetectionLevel");
-                xTask.TraceAssemblies = CmdOptions["TraceAssemblies".ToLower()];
+                xEngine.TraceAssemblies = CmdOptions["TraceAssemblies".ToLower()];
                 logMessage("Loaded : TraceAssemblies");
-                xTask.DebugCom = Convert.ToByte(CmdOptions["DebugCom".ToLower()]);
+                xEngine.DebugCom = Convert.ToByte(CmdOptions["DebugCom".ToLower()]);
                 logMessage("Loaded : DebugCom");
-                xTask.UseNAsm = Convert.ToBoolean(CmdOptions["UseNAsm".ToLower()]);
+                xEngine.UseNAsm = Convert.ToBoolean(CmdOptions["UseNAsm".ToLower()]);
                 logMessage("Loaded : UseNAsm");
-                xTask.OutputFilename = CmdOptions["OutputFilename".ToLower()];
+                xEngine.OutputFilename = CmdOptions["OutputFilename".ToLower()];
                 logMessage("Loaded : OutputFilename");
-                xTask.EnableLogging = Convert.ToBoolean(CmdOptions["EnableLogging".ToLower()]);
+                xEngine.EnableLogging = Convert.ToBoolean(CmdOptions["EnableLogging".ToLower()]);
                 logMessage("Loaded : EnableLogging");
-                xTask.EmitDebugSymbols = Convert.ToBoolean(CmdOptions["EmitDebugSymbols".ToLower()]);
+                xEngine.EmitDebugSymbols = Convert.ToBoolean(CmdOptions["EmitDebugSymbols".ToLower()]);
                 logMessage("Loaded : EmitDebugSymbols");
-                xTask.IgnoreDebugStubAttribute = Convert.ToBoolean(CmdOptions["IgnoreDebugStubAttribute".ToLower()]);
+                xEngine.IgnoreDebugStubAttribute = Convert.ToBoolean(CmdOptions["IgnoreDebugStubAttribute".ToLower()]);
                 logMessage("Loaded : IgnoreDebugStubAttribute");
-                xTask.References = References.ToArray();
+                xEngine.References = References.ToArray();
                 logMessage("Loaded : References");
-                xTask.AdditionalSearchDirs = AdditionalSearchDirs.ToArray();
+                xEngine.AdditionalSearchDirs = AdditionalSearchDirs.ToArray();
                 logMessage("Loaded : AdditionalSearchDirs");
-                xTask.AdditionalReferences = AdditionalReferences.ToArray();
+                xEngine.AdditionalReferences = AdditionalReferences.ToArray();
                 logMessage("Loaded : AdditionalReferences");
 
-                xTask.OnLogError = logError;
-                xTask.OnLogWarning = m => logMessage(String.Format("Warning: {0}", m));
-                xTask.OnLogMessage = logMessage;
-                xTask.OnLogException = (m) => logError(String.Format("Exception: {0}", m.ToString()));
-                xTask.AssemblerLog = "Cosmos.Assembler.log";
-                if (xTask.Execute())
-                {
+                xEngine.OnLogError = logError;
+                xEngine.OnLogWarning = m => logMessage(String.Format("Warning: {0}", m));
+                xEngine.OnLogMessage = logMessage;
+                xEngine.OnLogException = (m) => logError(String.Format("Exception: {0}", m.ToString()));
+                xEngine.AssemblerLog = "Cosmos.Assembler.log";
+                if (xEngine.Execute()) {
                     logMessage("Executed OK");
                     //          File.WriteAllText(@"e:\compiler.log", "OK");
                     return 0;
                 }
-                else
-                {
+                else {
                     logMessage("Errorred");
                     //          File.WriteAllText(@"e:\compiler.log", "Errored");
                     return 2;
                 }
             }
-            catch (Exception E)
-            {
+            catch (Exception E) {
                 logError(String.Format("Error occurred: " + E.ToString()));
                 return 1;
             }

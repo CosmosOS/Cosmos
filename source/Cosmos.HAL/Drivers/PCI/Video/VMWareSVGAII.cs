@@ -1,6 +1,5 @@
 ﻿using System;
 using Cosmos.Core;
-using Cosmos.Core;
 
 namespace Cosmos.HAL.Drivers.PCI.Video
 {
