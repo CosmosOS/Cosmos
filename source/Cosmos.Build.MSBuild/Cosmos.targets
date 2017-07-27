@@ -26,7 +26,6 @@
     <Reference Remove="System.Core" />
   </ItemGroup>
   <ItemGroup Condition="$(UseGen3Kernel) == 'True'">
-    <Reference Include="Cosmos.Platform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.System3_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Remove="System.Core" />
   </ItemGroup>
