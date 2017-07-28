@@ -6,17 +6,14 @@ namespace Cosmos.CPU {
     [DebuggerStepThrough]
     public static class GCImplementation {
         private static void AcquireLock() {
-            throw new NotImplementedException();
         }
 
         private static void ReleaseLock() {
-            throw new NotImplementedException();
         }
 
         [PlugMethod(PlugRequired = true)]
         public static uint AllocNewObject(uint aSize) {
-            throw new NotImplementedException();
-
+            return 0;
         }
 
         /// <summary>
@@ -24,7 +21,6 @@ namespace Cosmos.CPU {
         /// </summary>
         /// <param name="aObject"></param>
         public static unsafe void IncRefCount(uint aObject) {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -32,7 +28,6 @@ namespace Cosmos.CPU {
         /// </summary>
         /// <param name="aObject"></param>
         public static unsafe void DecRefCount(uint aObject) {
-            throw new NotImplementedException();
         }
     }
 }
