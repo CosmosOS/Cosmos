@@ -25,6 +25,7 @@
         <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj" />
+        <ProjectReference Include="..\..\source\Kernel\Cosmos.Platform\Cosmos.Platform.csproj" />
         <ProjectReference Include="..\..\source\Kernel\Cosmos.System3_Plugs\Cosmos.System3_Plugs.csproj" />
         <ProjectReference Include="..\BoxingTests\BoxingTests.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />

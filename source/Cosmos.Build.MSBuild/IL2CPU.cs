@@ -47,9 +47,7 @@ namespace Cosmos.Build.MSBuild
 
         public bool EmitDebugSymbols { get; set; }
 
-        public string[] AdditionalSearchDirs { get; set; }
-
-        public string[] AdditionalReferences { get; set; }
+        public string AssemblySearchDirs { get; set; }
 
         protected void LogMessage(string aMsg)
         {
@@ -108,6 +106,7 @@ namespace Cosmos.Build.MSBuild
 
                 string Arguments = args.Aggregate("", (current, arg) => current + "\"" + arg.Key + ":" + arg.Value + "\" ");
                 Arguments = refs.Aggregate(Arguments, (current, Ref) => current + "\"References:" + Ref + "\" ");
+                Arguments = AssemblySearchDirs.Split(';').Aggregate(Arguments, (current, Dir) => current + "\"AssemblySearchDirs:" + Dir + "\" ");
 
                 Log.LogMessage(MessageImportance.High, $"Invoking il2cpu.exe {Arguments}");
                 return ExecuteTool(WorkingDir, Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"), Arguments, "IL2CPU");
