@@ -31,8 +31,7 @@ namespace Cosmos.IL2CPU {
         public bool EmitDebugSymbols { get; set; }
         public bool IgnoreDebugStubAttribute { get; set; }
         public string StackCorruptionDetectionLevel { get; set; }
-        public string[] AdditionalSearchDirs { get; set; }
-        public string[] AdditionalReferences { get; set; }
+        public string[] AssemblySearchDirs { get; set; }
 
         private List<CompilerExtensionBase> mLoadedExtensions;
 
@@ -41,7 +40,6 @@ namespace Cosmos.IL2CPU {
         protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
         protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
         protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
-        protected static List<string> mSearchDirs = new List<string>();
 
         public string AssemblerLog = "Cosmos.Assembler.log";
 
@@ -83,15 +81,6 @@ namespace Cosmos.IL2CPU {
             if (!EnsureCosmosPathsInitialization()) {
                 return false;
             }
-
-            if (AdditionalSearchDirs != null) {
-                mSearchDirs.AddRange(AdditionalSearchDirs);
-            }
-
-            // Add UserKit dirs for asms to load from.
-            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).GetTypeInfo().Assembly.Location));
-            mSearchDirs.Add(CosmosPaths.UserKit);
-            mSearchDirs.Add(CosmosPaths.Kernel);
 
             mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             if (string.IsNullOrEmpty(TraceAssemblies)) {
@@ -265,7 +254,7 @@ namespace Cosmos.IL2CPU {
                 return aContext.LoadFromAssemblyPath(xPathToCheck);
             }
 
-            foreach (var xDir in mSearchDirs) {
+            foreach (var xDir in AssemblySearchDirs) {
                 var xPath = Path.Combine(xDir, aName.Name + ".dll");
                 if (File.Exists(xPath)) {
                     return aContext.LoadFromAssemblyPath(xPath);
