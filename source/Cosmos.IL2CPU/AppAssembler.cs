@@ -1390,7 +1390,7 @@ namespace Cosmos.IL2CPU
             Assembler.WriteDebugVideo("Kernel class created");
             xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
             XS.Label(xCurLabel);
-            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.GetTypeInfo().BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
+            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.GetTypeInfo().BaseType.GetMethod(CompilerEngine.UseGen3Kernel ? "EntryPoint" : "Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
             XS.Label(CosmosAssembler.EntryPointName + ".AfterStart");
             XS.Pop(EBP);
             XS.Return();

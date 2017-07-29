@@ -148,6 +148,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System3", "source\Ke
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System3_Plugs", "source\Kernel\Cosmos.System3_Plugs\Cosmos.System3_Plugs.csproj", "{756ECECD-B213-42F0-BF58-4A91B4C47FAA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU_Plugs", "source\Kernel\00-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj", "{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -549,6 +551,14 @@ Global
 		{756ECECD-B213-42F0-BF58-4A91B4C47FAA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{756ECECD-B213-42F0-BF58-4A91B4C47FAA}.Release|x86.ActiveCfg = Release|Any CPU
 		{756ECECD-B213-42F0-BF58-4A91B4C47FAA}.Release|x86.Build.0 = Release|Any CPU
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}.Debug|x86.Build.0 = Debug|Any CPU
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}.Release|x86.ActiveCfg = Release|Any CPU
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -618,6 +628,7 @@ Global
 		{9E58E949-7B71-45ED-9610-11DA287EE933} = {02FF94AF-6BA3-49ED-A027-A63F591C310D}
 		{F588033A-6B7D-4ABF-96C4-73D8B2271A6B} = {DE38917F-969B-486C-AF83-C59E5E52400A}
 		{756ECECD-B213-42F0-BF58-4A91B4C47FAA} = {DE38917F-969B-486C-AF83-C59E5E52400A}
+		{C000BFB2-DFDE-4B1E-BDA6-988B30370C7A} = {29B893F7-6C0F-4710-A60E-7FB3498BCA63}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4418C803-277E-448F-A0A0-52788FA215AD}
