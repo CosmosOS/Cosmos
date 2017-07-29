@@ -4,13 +4,13 @@ VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel G2", "Kernel G2", "{9A923E6F-FF63-4F02-A4EA-C2D44F9323FD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Cosmos.HAL\Cosmos.HAL.csproj", "{1425715D-1C93-44C7-8BB5-F124F195A41A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL\Cosmos.HAL2.csproj", "{1425715D-1C93-44C7-8BB5-F124F195A41A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Common", "source\Cosmos.Common\Cosmos.Common.csproj", "{09099C80-8262-486A-94A5-492F51B08823}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core", "source\Cosmos.Core\Cosmos.Core.csproj", "{9AF5BD03-8A49-49DC-A56E-3AE8DA6B0FF4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Cosmos.System\Cosmos.System.csproj", "{4AC1AFCE-C8CE-484D-AE22-F9EE27008FAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2", "source\Cosmos.System\Cosmos.System2.csproj", "{4AC1AFCE-C8CE-484D-AE22-F9EE27008FAF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
 EndProject

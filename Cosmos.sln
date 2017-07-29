@@ -42,7 +42,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "source\Cosmos.Deploy.USB\Cosmos.Deploy.USB.csproj", "{3D84CF8B-C6DF-4D78-8DE1-708582B43711}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Cosmos.HAL\Cosmos.HAL.csproj", "{1425715D-1C93-44C7-8BB5-F124F195A41A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL\Cosmos.HAL2.csproj", "{1425715D-1C93-44C7-8BB5-F124F195A41A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{9F5F046A-1BB1-4208-ADBE-C9417F2A8A48}"
 EndProject
@@ -50,7 +50,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Common", "source\Cos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core", "source\Cosmos.Core\Cosmos.Core.csproj", "{9AF5BD03-8A49-49DC-A56E-3AE8DA6B0FF4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Cosmos.System\Cosmos.System.csproj", "{4AC1AFCE-C8CE-484D-AE22-F9EE27008FAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2", "source\Cosmos.System\Cosmos.System2.csproj", "{4AC1AFCE-C8CE-484D-AE22-F9EE27008FAF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{CFE37077-B9BD-4430-8DA0-F9F02DFD14C3}"
 EndProject

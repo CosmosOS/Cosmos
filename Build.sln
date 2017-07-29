@@ -73,11 +73,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "sour
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "source\Cosmos.Core.DebugStub\Cosmos.Core.DebugStub.csproj", "{72EEFBFE-AF88-4E16-AD6C-7D9857CDC32C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Cosmos.System\Cosmos.System.csproj", "{3C515676-8565-4A19-98E7-266F83D579A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2", "source\Cosmos.System\Cosmos.System2.csproj", "{3C515676-8565-4A19-98E7-266F83D579A8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core", "source\Cosmos.Core\Cosmos.Core.csproj", "{B45F760C-6D3D-48E1-9E2C-97CECC6A7061}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Cosmos.HAL\Cosmos.HAL.csproj", "{DE4F000A-B65C-4395-B066-891B7423E9EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL\Cosmos.HALw.csproj", "{DE4F000A-B65C-4395-B066-891B7423E9EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "source\XSharp.Common\XSharp.Common.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
 EndProject
