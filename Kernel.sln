@@ -58,7 +58,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU", "source\Kernel
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform", "source\Kernel\Cosmos.Platform\Cosmos.Platform.csproj", "{63843265-D889-47D2-883E-595289C99F42}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System3", "source\Kernel\Cosmos.System\Cosmos.System3.csproj", "{F8BF6943-B69D-4549-9C16-75146616E19C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Kernel\80-System\Cosmos.System\Cosmos.System.csproj", "{F8BF6943-B69D-4549-9C16-75146616E19C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 CPU", "00 CPU", "{C5D22A6E-96F8-4F85-9EE4-C1EB8C5E0530}"
 EndProject
@@ -80,7 +80,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "source\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "source\XSharp.Common\XSharp.Common.csproj", "{F785B091-7E4D-4D2E-A310-B18690623F74}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL3", "source\Kernel\Cosmos.HAL\Cosmos.HAL3.csproj", "{3F8EDE0E-61BD-4D01-95F5-4A5A17F6221E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel\Cosmos.HAL\Cosmos.HAL.csproj", "{3F8EDE0E-61BD-4D01-95F5-4A5A17F6221E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{47F9D446-ACD4-489A-AD6D-A46A19247E2F}"
 EndProject
@@ -88,7 +88,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "sour
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{4E9B8F31-AEA0-402D-9B3A-223100F2156D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System3_Plugs", "source\Kernel\Cosmos.System3_Plugs\Cosmos.System3_Plugs.csproj", "{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System_Plugs", "source\Kernel\80-System\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj", "{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU_Plugs", "source\Kernel\00-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj", "{365810FC-AFC2-4130-8A70-EF1F2C3FA5D6}"
 EndProject

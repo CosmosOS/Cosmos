@@ -61,8 +61,8 @@
       <Project>{fc65d765-990d-4f00-b240-8dd17fa91ea9}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\source\Kernel\Cosmos.HAL\Cosmos.HAL3.csproj">
-      <Name>Cosmos.HAL3</Name>
+    <ProjectReference Include="..\..\source\Kernel\Cosmos.HAL\Cosmos.HAL.csproj">
+      <Name>Cosmos.HAL</Name>
       <Project>{3f8ede0e-61bd-4d01-95f5-4a5a17f6221e}</Project>
       <Private>True</Private>
     </ProjectReference>
