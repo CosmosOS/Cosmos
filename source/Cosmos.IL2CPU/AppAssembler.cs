@@ -135,6 +135,13 @@ namespace Cosmos.IL2CPU
             }
             XS.Label(xMethodLabel);
 
+            // Alternative asm labels for the method
+            var xAsmLabelAttributes = aMethod.MethodBase.GetCustomAttributes<AsmLabelAttribute>();
+            foreach (var xAttribute in xAsmLabelAttributes)
+            {
+                XS.Label(xAttribute.Label);
+            }
+
             //Assembler.WriteDebugVideo("Method " + aMethod.UID);
 
             // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
