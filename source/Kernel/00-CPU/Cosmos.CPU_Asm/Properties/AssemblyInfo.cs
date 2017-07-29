@@ -1,3 +1,3 @@
 ﻿using Cosmos.IL2CPU.API;
 
-[assembly: Ring(Ring.Core)]
+//[assembly: Ring(Ring.Core)]
