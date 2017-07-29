@@ -110,16 +110,22 @@ namespace Cosmos.System.FileSystem.VFS
         public static void DeleteDirectory(string aPath, bool recursive)
         {
             if (mVFS == null)
+            {
                 throw new Exception("VFSManager isn't ready.");
+            }
 
             var xDirectory = mVFS.GetDirectory(aPath);
             var xDirectoryListing = mVFS.GetDirectoryListing(xDirectory);
 
             if (xDirectory.mEntryType != DirectoryEntryTypeEnum.Directory)
+            {
                 throw new IOException("The specified path isn't a directory");
+            }
 
             if (xDirectoryListing.Count > 0 && !recursive)
+            {
                 throw new IOException("Directory is not empty");
+            }
 
             if (recursive)
             {
