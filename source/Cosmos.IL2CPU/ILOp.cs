@@ -416,20 +416,23 @@ namespace Cosmos.IL2CPU
       }
       if (debugEnabled)
       {
-        XS.Compare(XSRegisters.ESP, 0, destinationDisplacement: (int)stackOffsetToCheck);
-        XS.Jump(CPU.ConditionalTestEnum.NotEqual, ".AfterNullCheck");
-        XS.ClearInterruptFlag();
-        // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-        XS.Call(".NullCheck_GetCurrAddress");
-        XS.Label(".NullCheck_GetCurrAddress");
-        XS.Pop(XSRegisters.EAX);
-        new CPU.Mov
+        if (!CompilerEngine.UseGen3Kernel)
         {
-          DestinationRef = ElementReference.New("DebugStub_CallerEIP"),
-          DestinationIsIndirect = true,
-          SourceReg = CPU.RegistersEnum.EAX
-        };
-        XS.Call("DebugStub_SendNullReferenceOccurred");
+          XS.Compare(XSRegisters.ESP, 0, destinationDisplacement: (int)stackOffsetToCheck);
+          XS.Jump(CPU.ConditionalTestEnum.NotEqual, ".AfterNullCheck");
+          XS.ClearInterruptFlag();
+          // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+          XS.Call(".NullCheck_GetCurrAddress");
+          XS.Label(".NullCheck_GetCurrAddress");
+          XS.Pop(XSRegisters.EAX);
+          new CPU.Mov
+          {
+            DestinationRef = ElementReference.New("DebugStub_CallerEIP"),
+            DestinationIsIndirect = true,
+            SourceReg = CPU.RegistersEnum.EAX
+          };
+          XS.Call("DebugStub_SendNullReferenceOccurred");
+        }
         XS.Halt();
         XS.Label(".AfterNullCheck");
       }
