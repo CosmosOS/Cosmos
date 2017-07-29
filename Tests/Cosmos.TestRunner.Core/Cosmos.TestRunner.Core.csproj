@@ -24,7 +24,8 @@
         <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.System_Plugs\Cosmos.System2_Plugs.csproj" />
+        <ProjectReference Include="..\..\source\Kernel\00-CPU\Cosmos.CPU_Asm\Cosmos.CPU_Asm.csproj" />
         <ProjectReference Include="..\..\source\Kernel\00-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj" />
         <ProjectReference Include="..\..\source\Kernel\Cosmos.Platform\Cosmos.Platform.csproj" />
         <ProjectReference Include="..\..\source\Kernel\Cosmos.System3_Plugs\Cosmos.System3_Plugs.csproj" />

@@ -170,13 +170,14 @@ namespace Cosmos.TestRunner.Core
             if (UseG3Kernel)
             {
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.System3_Plugs")).Location);
             }
             else
             {
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location);
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location);
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.System_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.System2_Plugs")).Location);
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location);
             }
 
