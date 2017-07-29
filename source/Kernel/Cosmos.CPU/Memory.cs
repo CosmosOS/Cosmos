@@ -1,9 +1,9 @@
 ﻿using System;
 
 namespace Cosmos.CPU {
-    public class Memory {
+    public class Memory2 {
         int mPtr;
-        public Memory(int aPtr) {
+        public Memory2(int aPtr) {
             mPtr = aPtr;
         }
     }

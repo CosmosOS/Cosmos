@@ -7,8 +7,8 @@ namespace Cosmos.CPU_Plugs {
     [Plug(Target = typeof(Cosmos.CPU.GCImplementation))]
     public static class GCImplementionImpl {
         public static uint AllocNewObject(uint aSize) {
-            //GlobalSystemInfo.EnsureInitialized();
-            //return Heap.MemAlloc(aSize);
+            Cosmos.CPU.Memory.Old.GlobalSystemInfo.EnsureInitialized();
+            return Cosmos.CPU.Memory.Old.Heap.MemAlloc(aSize);
             return 0;
         }
 

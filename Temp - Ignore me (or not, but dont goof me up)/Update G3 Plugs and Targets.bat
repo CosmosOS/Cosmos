@@ -8,4 +8,4 @@ copy cosmos.targets "C:\source\Cosmos\Build\VSIP\"
 copy cosmos.targets "C:\source\Cosmos\Build\VSIP\MSBuild\"
 copy cosmos.targets "C:\source\Cosmos\source\Cosmos.Build.MSBuild\bin\Debug\net462\win7-x86\"
 
-@timeout 1
+@timeout 3

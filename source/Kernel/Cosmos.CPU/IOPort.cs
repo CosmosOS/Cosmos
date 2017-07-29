@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.API;
 
-namespace Cosmos.Core {
+namespace Cosmos.CPU {
     public abstract class IOPortBase {
         //TODO Make it that IO port classes are exclusive to each port. For example
         // only one IOPort class can be created per port number. This will prevent

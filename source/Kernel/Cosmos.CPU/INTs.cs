@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Cosmos.CPU;
 
 namespace Cosmos.Core {
     public class INTs {
@@ -484,7 +485,7 @@ namespace Cosmos.Core {
 
         // This is to trick IL2CPU to compile it in
         //TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this.
-        // We dont actually need to call this method
+        // We dont actually need to cal this method
         public static void Dummy() {
             // Compiler magic
             bool xTest = false;
