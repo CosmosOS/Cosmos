@@ -310,10 +310,10 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.Core_Plugs"), xNugetPkgDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xNugetPkgDir, xVersion);
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.HAL"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.HAL2"), xNugetPkgDir, xVersion);
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.System"), xNugetPkgDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.System_Plugs"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.System2"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.System2_Plugs"), xNugetPkgDir, xVersion);
       //
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xNugetPkgDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xNugetPkgDir, xVersion);
