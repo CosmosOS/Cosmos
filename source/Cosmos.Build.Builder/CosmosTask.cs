@@ -255,7 +255,7 @@ namespace Cosmos.Build.Builder {
       StartConsole(xNuget, xRestoreParams);
     }
 
-    private void Update(string project) {
+    private void Update() {
       string xNuget = Path.Combine(mCosmosPath, "Build", "Tools", "nuget.exe");
       string xUpdateParams = $"update -self";
       StartConsole(xNuget, xUpdateParams);
@@ -283,13 +283,13 @@ namespace Cosmos.Build.Builder {
       }
 
       Section("Clean NuGet Local Feed");
-      Clean(Path.Combine(mCosmosPath, @"Cosmos.sln"));
+      Clean(Path.Combine(mCosmosPath, @"Build.sln"));
 
       Section("Restore NuGet Packages");
-      Restore(Path.Combine(mCosmosPath, @"Cosmos.sln"));
+      Restore(Path.Combine(mCosmosPath, @"Build.sln"));
 
       Section("Update NuGet");
-      Update(Path.Combine(mCosmosPath, @"Cosmos.sln"));
+      Update();
 
       Section("Build Cosmos");
       // Build.sln is the old master but because of how VS manages refs, we have to hack
