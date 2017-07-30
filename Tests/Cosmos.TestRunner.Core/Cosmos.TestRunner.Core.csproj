@@ -27,8 +27,8 @@
         <ProjectReference Include="..\..\source\Cosmos.System_Plugs\Cosmos.System2_Plugs.csproj" />
         <ProjectReference Include="..\..\source\Kernel\00-CPU\Cosmos.CPU_Asm\Cosmos.CPU_Asm.csproj" />
         <ProjectReference Include="..\..\source\Kernel\00-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj" />
+        <ProjectReference Include="..\..\source\Kernel\80-System\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj" />
         <ProjectReference Include="..\..\source\Kernel\Cosmos.Platform\Cosmos.Platform.csproj" />
-        <ProjectReference Include="..\..\source\Kernel\Cosmos.System3_Plugs\Cosmos.System3_Plugs.csproj" />
         <ProjectReference Include="..\BoxingTests\BoxingTests.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
