@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.API;
 
-namespace Cosmos.System_Plugs.System
-{
-    [Plug(Target = typeof (global::System.Console))]
-    public static class ConsoleImpl
-    {
+namespace Cosmos.System_Plugs.System {
+    [Plug(Target = typeof(global::System.Console))]
+    public static class ConsoleImpl {
         //private static ConsoleColor mForeground = ConsoleColor.White;
         //private static ConsoleColor mBackground = ConsoleColor.Black;
 
