@@ -34,7 +34,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Hosts", "sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{ECC4319F-A844-45B8-BF63-2FD04F05E56A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL\Cosmos.HAL2.csproj", "{1425715D-1C93-44C7-8BB5-F124F195A41A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL2\Cosmos.HAL2.csproj", "{1425715D-1C93-44C7-8BB5-F124F195A41A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{9F5F046A-1BB1-4208-ADBE-C9417F2A8A48}"
 EndProject
@@ -42,7 +42,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Common", "source\Cos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core", "source\Cosmos.Core\Cosmos.Core.csproj", "{9AF5BD03-8A49-49DC-A56E-3AE8DA6B0FF4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2", "source\Cosmos.System\Cosmos.System2.csproj", "{4AC1AFCE-C8CE-484D-AE22-F9EE27008FAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2", "source\Cosmos.System2\Cosmos.System2.csproj", "{4AC1AFCE-C8CE-484D-AE22-F9EE27008FAF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{CFE37077-B9BD-4430-8DA0-F9F02DFD14C3}"
 EndProject
@@ -54,7 +54,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel.Plugs.Asm", "source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj", "{7E450662-B34C-49B0-A826-F45AD3A18891}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2_Plugs", "source\Cosmos.System_Plugs\Cosmos.System2_Plugs.csproj", "{9431FF1F-AD75-4A1E-B38A-46E0F109411D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2_Plugs", "source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj", "{9431FF1F-AD75-4A1E-B38A-46E0F109411D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 Core", "0 Core", "{04B18FFC-8EA0-4E9F-9E1B-478527B19AFA}"
 EndProject
