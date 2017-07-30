@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConsoleApp1 {
+namespace TempCompileTest {
     class Program {
         static void Main(string[] args) {
             var x = new Cosmos.System.FileSystem();
