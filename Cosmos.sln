@@ -181,23 +181,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "80 System", "80 System", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "90 Application", "90 Application", "{B7D2F094-E6D8-43F0-9767-05D44D67F4EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU", "source\Kernel\Cosmos.CPU\Cosmos.CPU.csproj", "{F52D0F4C-C11F-4E1C-AE7C-65351AF1D4B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU", "source\Kernel-X86\00-CPU\Cosmos.CPU\Cosmos.CPU.csproj", "{F52D0F4C-C11F-4E1C-AE7C-65351AF1D4B0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform", "source\Kernel\Cosmos.Platform\Cosmos.Platform.csproj", "{F027A41F-32AF-47E8-894C-51CAF7079BEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform", "source\Kernel-X86\10-Platform\Cosmos.Platform\Cosmos.Platform.csproj", "{F027A41F-32AF-47E8-894C-51CAF7079BEE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel\Cosmos.HAL\Cosmos.HAL.csproj", "{EB682871-15A5-479C-8577-7890B6BC9DBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel-X86\20-HAL\Cosmos.HAL\Cosmos.HAL.csproj", "{EB682871-15A5-479C-8577-7890B6BC9DBB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Kernel\80-System\Cosmos.System\Cosmos.System.csproj", "{C8E4085A-BECE-4F66-A66F-0734FC5D7DA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Kernel-X86\80-System\Cosmos.System\Cosmos.System.csproj", "{C8E4085A-BECE-4F66-A66F-0734FC5D7DA6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System_Plugs", "source\Kernel\Cosmos.System_Plugs\Cosmos.System3_Plugs.csproj", "{9B607855-13D6-4714-8D12-A2B6B0C66E67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System_Plugs", "source\Kernel-X86\Cosmos.System_Plugs\Cosmos.System3_Plugs.csproj", "{9B607855-13D6-4714-8D12-A2B6B0C66E67}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuessKernelGen3", "Demos\GuessG3\GuessKernelGen3.csproj", "{9E58E949-7B71-45ED-9610-11DA287EE933}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "source\Kernel\ConsoleApp1\Test.csproj", "{BE6476D7-19F6-459B-878E-38C5754EEA97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "source\Kernel-X86\ConsoleApp1\Test.csproj", "{BE6476D7-19F6-459B-878E-38C5754EEA97}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "99 Shared", "99 Shared", "{17E3D4A9-7790-43C2-9E4B-B6BB2ECEC7C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Shared", "source\Kernel\Cosmos.Shared\Cosmos.Shared.csproj", "{6652628A-5912-43A8-BAC6-5F9AD72AA0DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Shared", "source\Kernel-X86\99-Shared\Cosmos.Shared\Cosmos.Shared.csproj", "{6652628A-5912-43A8-BAC6-5F9AD72AA0DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

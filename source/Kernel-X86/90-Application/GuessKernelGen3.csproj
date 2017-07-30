@@ -10,13 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-<<<<<<< HEAD
     <ProjectReference Include="..\00-CPU\Cosmos.CPU\Cosmos.CPU.csproj" />
     <ProjectReference Include="..\80-System\Cosmos.System\Cosmos.System.csproj" />
-=======
-    <ProjectReference Include="..\..\source\Kernel-X86\80-System\Cosmos.System\Cosmos.System.csproj" />
-    <ProjectReference Include="..\..\source\Kernel-X86\Cosmos.CPU\Cosmos.CPU.csproj" />
->>>>>>> 5e02740c76808c69d0752d1f9ae3fa6439efeed8
   </ItemGroup>
 
 </Project>

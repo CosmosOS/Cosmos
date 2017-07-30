@@ -13,7 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Demos\GuessG3\GuessKernelGen3.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Assembler\Cosmos.Assembler.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
@@ -27,8 +26,9 @@
         <ProjectReference Include="..\..\source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\00-CPU\Cosmos.CPU_Asm\Cosmos.CPU_Asm.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\00-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj" />
+        <ProjectReference Include="..\..\source\Kernel-X86\10-Platform\Cosmos.Platform\Cosmos.Platform.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\80-System\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj" />
-        <ProjectReference Include="..\..\source\Kernel-X86\Cosmos.Platform\Cosmos.Platform.csproj" />
+        <ProjectReference Include="..\..\source\Kernel-X86\90-Application\GuessKernelGen3.csproj" />
         <ProjectReference Include="..\BoxingTests\BoxingTests.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
