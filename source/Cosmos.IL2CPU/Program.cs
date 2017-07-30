@@ -44,9 +44,9 @@ namespace Cosmos.IL2CPU {
 
                 var xEngine = new CompilerEngine();
 
-                CompilerEngine.UseGen3Kernel = false;
+                CompilerEngine.KernelPkg = "";
                 if (CmdOptions.ContainsKey("KernelPkg".ToLower())) {
-                    CompilerEngine.KernelPkg = Convert.ToBoolean(CmdOptions["KernelPkg".ToLower()]);
+                    CompilerEngine.KernelPkg = Convert.ToString(CmdOptions["KernelPkg".ToLower()]);
                 }
 
                 xEngine.DebugEnabled = Convert.ToBoolean(CmdOptions["DebugEnabled".ToLower()]);
