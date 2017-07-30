@@ -5,7 +5,7 @@
         // we eventually eliminate them
         static public PIC PIC;
         // Has to be static for now, ZeroFill gets called before the Init.
-        static public readonly CPU CPU = new CPU();
+        static public readonly Processor Processor = new Processor();
 
         // Bootstrap is a class designed only to get the essentials done.
         // ie the stuff needed to "pre boot". Do only the very minimal here.
@@ -16,10 +16,10 @@
             Cosmos.Core.INTs.Dummy();
 
             PIC = new PIC();
-            CPU.UpdateIDT(true);
+            Processor.UpdateIDT(true);
 
             /* TODO check using CPUID that SSE2 is supported */
-            CPU.InitSSE();
+            Processor.InitSSE();
 
             /*
              * We liked to use SSE for all floating point operation and end to mix SSE / x87 in Cosmos code
@@ -27,7 +27,7 @@
              * for long to double) so - in some rare cases - x87 continue to be used. I hope passing to the x32 or x64 IA will solve
              * definively this problem.
              */
-            CPU.InitFloat();
+            Processor.InitFloat();
 
             // Managed_Memory_System.ManagedMemory.Initialize();
             // Managed_Memory_System.ManagedMemory.SetUpMemoryArea();

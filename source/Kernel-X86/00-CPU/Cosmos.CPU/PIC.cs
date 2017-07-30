@@ -1,7 +1,7 @@
 ﻿using Cosmos.Core;
 
 namespace Cosmos.CPU {
-    // PIC is not in hardware becuase its a special core piece like CPU that is not interacted with by anything except Core.
+    // PIC is not in hardware becuase its a special core piece like Processor that is not interacted with by anything except Core.
     //
     // Remaps the IRQ's to INT20-INT2F
     public class PIC {
@@ -94,7 +94,7 @@ namespace Cosmos.CPU {
         }
 
         protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask) {
-            // We need to remap the PIC interrupt lines to the CPU. The BIOS sets
+            // We need to remap the PIC interrupt lines to the Processor. The BIOS sets
             // them in a way compatible for 16 bit mode, but in a way that causes problems
             // for 32 bit mode.
             // The only way to remap them however is to completely reinitialize the PICs.
@@ -117,7 +117,7 @@ namespace Cosmos.CPU {
             Master.Data.Byte = aIDunno;
             IOPort.Wait();
 
-            //#define ICW4_AUTO	0x02		/C:\Data\Cosmos\source2\Kernel\System\Hardware\Core\Cosmos.Core\CPU.cs* Auto (normal) EOI */
+            //#define ICW4_AUTO	0x02		/C:\Data\Cosmos\source2\Kernel\System\Hardware\Core\Cosmos.Core\Processor.cs* Auto (normal) EOI */
             //#define ICW4_BUF_SLAVE	0x08		/* Buffered mode/slave */
             //#define ICW4_BUF_MASTER	0x0C		/* Buffered mode/master */
             //#define ICW4_SFNM	0x10		/* Special fully nested (not) */

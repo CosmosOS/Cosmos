@@ -33,7 +33,7 @@ namespace Cosmos.CPU.Memory.Old
             if (!mInitialized)
             {
                 mInitialized = true;
-                DoInitialize((CPU.GetAmountOfRAM() - 1) * 1024 * 1024);
+                DoInitialize((Processor.GetAmountOfRAM() - 1) * 1024 * 1024);
                 //DoInitialize(4 * 1024 * 1024, 16 * 1024 * 1024);
             }
         }
@@ -41,7 +41,7 @@ namespace Cosmos.CPU.Memory.Old
         private static void ClearMemory(void* aStartAddress, uint aLength)
         {
             //TODO: Move to memory. Internal access only...
-            CPU.ZeroFill((uint)aStartAddress, aLength);
+            Processor.ZeroFill((uint)aStartAddress, aLength);
         }
 
         public static uint MemAlloc(uint aLength)
@@ -53,7 +53,7 @@ namespace Cosmos.CPU.Memory.Old
                 {
                 }
             }
-            var xInterruptsWereEnabled = CPU.DisableInterrupts();
+            var xInterruptsWereEnabled = Processor.DisableInterrupts();
             try
             {
                 EnsureIsInitialized();
@@ -68,7 +68,7 @@ namespace Cosmos.CPU.Memory.Old
                     //mDebugger.Trace($"At address {(uint)xCurrentTable}");
                     if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
                     {
-                        if (xResult < CPU.GetEndOfKernel())
+                        if (xResult < Processor.GetEndOfKernel())
                         {
                             mDebugger.Send("Wrong handle returned!");
                             while (true)
@@ -118,7 +118,7 @@ namespace Cosmos.CPU.Memory.Old
             {
                 if (xInterruptsWereEnabled)
                 {
-                    CPU.EnableInterrupts();
+                    Processor.EnableInterrupts();
                 }
                 else
                 {

@@ -3,7 +3,7 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.CPU {
     public static class Global {
-        public static readonly Debugger mDebugger = new Debugger("CPU", "Global");
+        public static readonly Debugger mDebugger = new Debugger("Processor", "Global");
 
         public static BaseIOGroups BaseIOGroups = new BaseIOGroups();
 
@@ -16,9 +16,9 @@ namespace Cosmos.CPU {
             }
         }
 
-        static public CPU CPU {
+        static public Processor Processor {
             get {
-                return Bootstrap.CPU;
+                return Bootstrap.Processor;
             }
         }
 

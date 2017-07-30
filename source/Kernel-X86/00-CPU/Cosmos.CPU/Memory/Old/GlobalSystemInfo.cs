@@ -16,9 +16,9 @@ namespace Cosmos.CPU.Memory.Old {
             if (mGlobalInformationTable == null) {
                 // todo: should we align this structure somehow?
 
-                var xEndOfKernel = CPU.GetEndOfKernel();
+                var xEndOfKernel = Processor.GetEndOfKernel();
                 xEndOfKernel = xEndOfKernel + (1024 * 1024); // for now, skip 1 MB
-                CPU.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + TotalDataLookupTableSize) * 4);
+                Processor.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + TotalDataLookupTableSize) * 4);
                 mGlobalInformationTable = (GlobalInformationTable*)xEndOfKernel;
                 uint xFirstDataLookupLocation = (uint)(xEndOfKernel + sizeof(GlobalInformationTable));
                 //Debugger.DoSend("Setting FirstDataLookupTable to ");

@@ -1,10 +1,10 @@
 using Cosmos.IL2CPU.API;
 
 namespace Cosmos.CPU_Asm {
-    [Plug(Target = typeof(Cosmos.CPU.CPU))]
+    [Plug(Target = typeof(Cosmos.CPU.Processor))]
     public class CPUImpl {
         [PlugMethod(Assembler = typeof(CPUUpdateIDTAsm))]
-        public static void UpdateIDT(Cosmos.CPU.CPU aThis, bool aEnableInterruptsImmediately) {
+        public static void UpdateIDT(Cosmos.CPU.Processor aThis, bool aEnableInterruptsImmediately) {
         }
 
         [PlugMethod(Assembler = typeof(CPUGetAmountOfRAMAsm))]
@@ -23,15 +23,15 @@ namespace Cosmos.CPU_Asm {
         }
 
         [PlugMethod(Assembler = typeof(CPUInitFloatAsm))]
-        public static void InitFloat(Cosmos.CPU.CPU aThis) {
+        public static void InitFloat(Cosmos.CPU.Processor aThis) {
         }
 
         [PlugMethod(Assembler = typeof(CPUInitSSEAsm))]
-        public static void InitSSE(Cosmos.CPU.CPU aThis) {
+        public static void InitSSE(Cosmos.CPU.Processor aThis) {
         }
 
         [PlugMethod(Assembler = typeof(CPUHaltAsm))]
-        public static void Halt(Cosmos.CPU.CPU aThis) {
+        public static void Halt(Cosmos.CPU.Processor aThis) {
         }
 
         [PlugMethod(Assembler = typeof(CPUDisableINTsAsm))]

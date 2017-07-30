@@ -313,7 +313,7 @@ namespace Cosmos.Core {
 
         #endregion
 
-        #region CPU Exceptions
+        #region Processor Exceptions
 
         public static IRQDelegate GeneralProtectionFault;
 

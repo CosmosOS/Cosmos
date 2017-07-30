@@ -14,9 +14,9 @@ namespace Cosmos.CPU {
 
         internal static unsafe void EnsureInitialized() {
             //if (mGlobalInformationTable == null) {
-                //var xEndOfKernel = CPU.GetEndOfKernel();
+                //var xEndOfKernel = Processor.GetEndOfKernel();
                 //xEndOfKernel = xEndOfKernel + (1024 * 1024); // for now, skip 1 MB
-                //CPU.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + TotalDataLookupTableSize) * 4);
+                //Processor.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + TotalDataLookupTableSize) * 4);
                 //mGlobalInformationTable = (GlobalInformationTable*)xEndOfKernel;
                 //uint xFirstDataLookupLocation = (uint)(xEndOfKernel + sizeof(GlobalInformationTable));
                 //mGlobalInformationTable->FirstDataLookupTable = (DataLookupTable*)xFirstDataLookupLocation;

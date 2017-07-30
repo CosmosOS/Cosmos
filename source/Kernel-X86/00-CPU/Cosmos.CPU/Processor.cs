@@ -3,7 +3,7 @@ using Cosmos.IL2CPU.API;
 
 namespace Cosmos.CPU {
     // Non hardware class, only used by core and hardware drivers for ports etc.
-    public class CPU
+    public class Processor
     {
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
@@ -60,7 +60,7 @@ namespace Cosmos.CPU {
             {
             }
             myPort.Byte = 0xFE;
-            Halt(); // If it didn't work, Halt the CPU
+            Halt(); // If it didn't work, Halt the Processor
         }
 
         private static void DoEnableInterrupts()
