@@ -3,7 +3,7 @@
     <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
-    <UseGen3Kernel>True</UseGen3Kernel>
+    <KernelPkg>X86G3</KernelPkg>
     <BinFormat>elf</BinFormat>
     <DebugEnabled>False</DebugEnabled>
     <DebugMode>Source</DebugMode>

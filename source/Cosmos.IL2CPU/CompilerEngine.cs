@@ -20,7 +20,14 @@ namespace Cosmos.IL2CPU {
         public Action<Exception> OnLogException;
         protected static Action<string> mStaticLog = null;
 
-        public static bool UseGen3Kernel { get; set; }
+        public static string KernelPkg { get; set; }
+        public static bool UseGen3Kernel
+        {
+            get
+            {
+                return KernelPkg == "X86G3";
+            }
+        }
         public string DebugMode { get; set; }
         public string TraceAssemblies { get; set; }
         public byte DebugCom { get; set; }

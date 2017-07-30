@@ -9,9 +9,7 @@ namespace Cosmos.Build.MSBuild
 {
     public class IL2CPU : BaseToolTask
     {
-        // protected CompilerEngine mTask = new CompilerEngine();
-
-        public bool UseGen3Kernel { get; set; }
+        public string KernelPkg { get; set; }
 
         [Required]
         public string CosmosBuildDir { get; set; }
@@ -80,10 +78,9 @@ namespace Cosmos.Build.MSBuild
 
             try
             {
-                //TODO: Add AdditionalReferences and AdditionalSearchDirs here and to log messages below.
                 Dictionary<string, string> args = new Dictionary<string, string>
                 {
-                    {"UseGen3Kernel", Convert.ToString(UseGen3Kernel)},
+                    {"KernelPkg", Convert.ToString(KernelPkg)},
                     {"DebugEnabled", Convert.ToString(DebugEnabled)},
                     {"StackCorruptionDetectionEnabled", Convert.ToString(StackCorruptionDetectionEnabled)},
                     {"StackCorruptionDetectionLevel", Convert.ToString(StackCorruptionDetectionLevel)},
