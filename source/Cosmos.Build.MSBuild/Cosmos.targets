@@ -18,14 +18,14 @@
     <AssemblySearchPaths>$(CosmosDir)\Kernel</AssemblySearchPaths>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(UseGen3Kernel) != 'True'">
+  <ItemGroup Condition="$(KernelPkg) == ''">
     <Reference Include="Cosmos.Core_Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Core_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Debug.Kernel.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.System2_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Remove="System.Core" />
   </ItemGroup>
-  <ItemGroup Condition="$(UseGen3Kernel) == 'True'">
+  <ItemGroup Condition="$(KernelPkg) == 'X86G3'">
     <Reference Include="Cosmos.CPU_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.CPU_Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.System_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
@@ -48,7 +48,7 @@
     <CreateProperty Value="false" Condition="$(BinFormat) == 'bin'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>
     </CreateProperty>
-    <Cosmos.Build.MSBuild.IL2CPU UseGen3Kernel="$(UseGen3Kernel)" DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" UseNAsm="true" References="@(ReferencePath)" AssemblySearchDirs="$(AssemblySearchPaths)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)"/>
+    <Cosmos.Build.MSBuild.IL2CPU KernelPkg="$(KernelPkg)" DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" UseNAsm="true" References="@(ReferencePath)" AssemblySearchDirs="$(AssemblySearchPaths)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)"/>
     <Cosmos.Build.MSBuild.NAsm InputFile="$(TargetDir)$(MSBuildProjectName).asm" OutputFile="$(TargetDir)$(MSBuildProjectName).obj" IsELF="$(IsELF)" ExePath="$(NasmFile)"/>
     <!-- ELF only -->
     <!-- 16 MB 0x1000000 as per hpa (syslinux) is a good spot. For now just put some dummy values. 16 and 32 MB. Later size better. -->
