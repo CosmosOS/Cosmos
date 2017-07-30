@@ -32,6 +32,9 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Remove="System.Core" />
   </ItemGroup>
+  <ItemGroup Condition="$(KernelPkg) == 'X86-TapRoot'">
+    <Reference Remove="System.Core" />
+  </ItemGroup>
 
   <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>

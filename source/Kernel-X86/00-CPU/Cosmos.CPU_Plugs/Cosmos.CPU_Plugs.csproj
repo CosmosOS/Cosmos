@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
-    <ProjectReference Include="..\..\Cosmos.CPU\Cosmos.CPU.csproj" />
+    <ProjectReference Include="..\Cosmos.CPU\Cosmos.CPU.csproj" />
   </ItemGroup>
 
 </Project>
