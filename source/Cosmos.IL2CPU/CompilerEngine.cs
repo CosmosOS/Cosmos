@@ -306,6 +306,7 @@ namespace Cosmos.IL2CPU {
 
                     foreach (var xType in xAssembly.ExportedTypes) {
                         var xTypeInfo = xType.GetTypeInfo();
+
                         if (!xTypeInfo.IsGenericTypeDefinition && !xTypeInfo.IsAbstract) {
                             CompilerHelpers.Debug($"Checking type {xType.FullName}");
 
