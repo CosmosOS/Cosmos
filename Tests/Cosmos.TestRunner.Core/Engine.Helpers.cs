@@ -167,7 +167,7 @@ namespace Cosmos.TestRunner.Core
         {
             References = new List<string>() { kernelFileName };
 
-            if (UseG3Kernel)
+            if (KernelPkg == "X86G3")
             {
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
@@ -183,6 +183,7 @@ namespace Cosmos.TestRunner.Core
 
             var xArgs = new List<string>
             {
+                "KernelPkg:" + KernelPkg,
                 "DebugEnabled:True",
                 "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
                 "StackCorruptionDetectionLevel:" + StackCorruptionChecksLevel,
