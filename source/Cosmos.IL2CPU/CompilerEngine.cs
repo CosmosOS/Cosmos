@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU {
         {
             get
             {
-                return KernelPkg == "X86G3";
+                return string.Equals(KernelPkg, "X86G3", StringComparison.CurrentCultureIgnoreCase);
             }
         }
         public string DebugMode { get; set; }
@@ -305,7 +305,8 @@ namespace Cosmos.IL2CPU {
                     CompilerHelpers.Debug($"Looking for kernel in {xAssembly}");
 
                     foreach (var xType in xAssembly.ExportedTypes) {
-                        if (!xType.GetTypeInfo().IsGenericTypeDefinition && !xType.GetTypeInfo().IsAbstract) {
+                        var xTypeInfo = xType.GetTypeInfo();
+                        if (!xTypeInfo.IsGenericTypeDefinition && !xTypeInfo.IsAbstract) {
                             CompilerHelpers.Debug($"Checking type {xType.FullName}");
 
                             // We used to resolve with this:
@@ -315,7 +316,7 @@ namespace Cosmos.IL2CPU {
                             // will force user to implement what is needed if replacing our core. But in the end this is a "not needed" feature
                             // and would only complicate things.
                             // So for now at least, we look by name so we dont have a dependency since the method returns a MethodBase and not a Kernel instance anyway.
-                            if (xType.GetTypeInfo().BaseType.FullName == xKernelBaseName) {
+                            if (xTypeInfo.BaseType.FullName == xKernelBaseName) {
                                 if (xKernelType != null) {
                                     LogError($"Two kernels found: {xType.FullName} and {xKernelType.FullName}");
                                     return null;

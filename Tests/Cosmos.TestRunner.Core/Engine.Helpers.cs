@@ -196,11 +196,6 @@ namespace Cosmos.TestRunner.Core
                 "IgnoreDebugStubAttribute:False"
             };
 
-            if (UseG3Kernel)
-            {
-                xArgs.Add("UseGen3Kernel:True");
-            }
-
             xArgs.AddRange(References.Select(aReference => "References:" + aReference));
 
             bool xUsingUserkit = false;
