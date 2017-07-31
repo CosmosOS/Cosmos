@@ -11,9 +11,11 @@ namespace Cosmos.CPU_Plugs {
         }
 
         public static void IncRefCount(uint aObject) {
+            // Do nothing right now
         }
 
         public static void DecRefCount(uint aObject) {
+            // Do nothing right now
         }
 
     }
