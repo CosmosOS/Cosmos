@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.5</TargetFramework>
+    <ProjectGuid>f614d199-03e6-4cbd-836c-edb769b025a3</ProjectGuid>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="*.Cosmos" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Kernel-X86\00-CPU\Cosmos.CPU\Cosmos.CPU.csproj" />
+    <ProjectReference Include="..\..\Kernel-X86\80-System\Cosmos.System\Cosmos.System.csproj" />
+  </ItemGroup>
+
+</Project>

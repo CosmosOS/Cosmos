@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU {
         private static Dictionary<string, string> CmdOptions = new Dictionary<string, string>();
         private static List<string> References = new List<string>();
         private static List<string> AdditionalReferences = new List<string>();
-        private static List<string> AdditionalSearchDirs = new List<string>();
+        private static List<string> AssemblySearchDirs = new List<string>();
 
         public static int Run(string[] args, Action<string> logMessage, Action<string> logError) {
             if (args == null) {
@@ -34,8 +34,8 @@ namespace Cosmos.IL2CPU {
                     else if (argID == "AdditionalReferences".ToLower()) {
                         AdditionalReferences.Add(s.Replace(s1[0] + ":", ""));
                     }
-                    else if (argID == "AdditionalSearchDirs".ToLower()) {
-                        AdditionalSearchDirs.Add(s.Replace(s1[0] + ":", ""));
+                    else if (argID == "AssemblySearchDirs".ToLower()) {
+                        AssemblySearchDirs.Add(s.Replace(s1[0] + ":", ""));
                     }
                     else {
                         CmdOptions.Add(argID, s.Replace(s1[0] + ":", ""));
@@ -44,9 +44,9 @@ namespace Cosmos.IL2CPU {
 
                 var xEngine = new CompilerEngine();
 
-                xEngine.UseGen3Kernel = false;
-                if (CmdOptions.ContainsKey("UseGen3Kernel")) {
-                    xEngine.UseGen3Kernel = Convert.ToBoolean(CmdOptions["UseGen3Kernel".ToLower()]);
+                CompilerEngine.KernelPkg = "";
+                if (CmdOptions.ContainsKey("KernelPkg".ToLower())) {
+                    CompilerEngine.KernelPkg = Convert.ToString(CmdOptions["KernelPkg".ToLower()]);
                 }
 
                 xEngine.DebugEnabled = Convert.ToBoolean(CmdOptions["DebugEnabled".ToLower()]);
@@ -74,10 +74,8 @@ namespace Cosmos.IL2CPU {
                 logMessage("Loaded : IgnoreDebugStubAttribute");
                 xEngine.References = References.ToArray();
                 logMessage("Loaded : References");
-                xEngine.AdditionalSearchDirs = AdditionalSearchDirs.ToArray();
-                logMessage("Loaded : AdditionalSearchDirs");
-                xEngine.AdditionalReferences = AdditionalReferences.ToArray();
-                logMessage("Loaded : AdditionalReferences");
+                xEngine.AssemblySearchDirs = AssemblySearchDirs.ToArray();
+                logMessage("Loaded : AssemblySearchDirs");
 
                 xEngine.OnLogError = logError;
                 xEngine.OnLogWarning = m => logMessage(String.Format("Warning: {0}", m));

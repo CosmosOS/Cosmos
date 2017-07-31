@@ -161,8 +161,11 @@ namespace Cosmos.IL2CPU
             //
             if (mComPort > 0)
             {
-                SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
-                SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
+                if (!CompilerEngine.UseGen3Kernel)
+                {
+                    SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
+                    SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
+                }
 
                 //for (int i = 0; i < 256; i++)
                 //{
@@ -194,8 +197,11 @@ namespace Cosmos.IL2CPU
 
             if (mComPort > 0)
             {
-                XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
-                XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
+                if (!CompilerEngine.UseGen3Kernel)
+                {
+                    XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+                    XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
+                }
             }
             XS.Label("AfterCreateIDT");
             new Comment(this, "END - Create IDT");
@@ -336,8 +342,11 @@ namespace Cosmos.IL2CPU
 
             if (mComPort > 0)
             {
-                WriteDebugVideo("Initializing DebugStub.");
-                XS.Call("DebugStub_Init");
+                if (!CompilerEngine.UseGen3Kernel)
+                {
+                    WriteDebugVideo("Initializing DebugStub.");
+                    XS.Call("DebugStub_Init");
+                }
             }
 
             // Jump to Kernel entry point
@@ -374,26 +383,29 @@ namespace Cosmos.IL2CPU
                                                throw new Exception("Object type '" + i.ToString() + "' not supported!");
                                            }
                                        });
-                if (ReadDebugStubFromDisk)
+                if (!CompilerEngine.UseGen3Kernel)
                 {
-                    foreach (var xFile in Directory.GetFiles(CosmosPaths.DebugStubSrc, "*.xs"))
+                    if (ReadDebugStubFromDisk)
                     {
-                        xGenerateAssembler(xFile);
-                    }
-                }
-                else
-                {
-                    foreach (var xManifestName in typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceNames())
-                    {
-                        if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase))
+                        foreach (var xFile in Directory.GetFiles(CosmosPaths.DebugStubSrc, "*.xs"))
                         {
-                            continue;
+                            xGenerateAssembler(xFile);
                         }
-                        using (var xStream = typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(xManifestName))
+                    }
+                    else
+                    {
+                        foreach (var xManifestName in typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceNames())
                         {
-                            using (var xReader = new StreamReader(xStream))
+                            if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase))
                             {
-                                xGenerateAssembler(xReader);
+                                continue;
+                            }
+                            using (var xStream = typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(xManifestName))
+                            {
+                                using (var xReader = new StreamReader(xStream))
+                                {
+                                    xGenerateAssembler(xReader);
+                                }
                             }
                         }
                     }

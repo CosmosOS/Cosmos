@@ -8,6 +8,11 @@ using Cosmos.IL2CPU.API;
 namespace Cosmos.IL2CPU {
     public static class AppAssemblerRingsCheck {
         private static bool IsAssemblySkippedDuringRingCheck(Assembly assembly) {
+            if (CompilerEngine.UseGen3Kernel)
+            {
+                return true;
+            }
+
             var xServicable = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Where(x => x.Key == "Serviceable").SingleOrDefault();
             var xNetFrameworkAssembly = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Where(x => x.Key == ".NETFrameworkAssembly").SingleOrDefault();
             var xProduct = assembly.GetCustomAttribute<AssemblyProductAttribute>();
