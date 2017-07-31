@@ -1,5 +1,5 @@
 cd "%USERPROFILE%\AppData\Roaming\Cosmos User Kit\Kernel\"
-copy ..\source\Kernel-x86\00-CPU\Cosmos.CPU_Plugs\bin\Debug\netstandard1.5\Cosmos.CPU_Plugs.dll"
+copy "..\source\Kernel-x86\00-CPU\Cosmos.CPU_Plugs\bin\Debug\netstandard1.5\Cosmos.CPU_Plugs.dll"
 copy "..\source\Kernel-x86\00-CPU\Cosmos.CPU_Asm\bin\Debug\netstandard1.5\Cosmos.CPU_Asm.dll"
 copy "..\source\Kernel-x86\80-System\Cosmos.System_Plugs\bin\Debug\netstandard1.5\Cosmos.System_Plugs.dll"
 
