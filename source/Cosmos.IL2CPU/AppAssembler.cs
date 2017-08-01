@@ -1125,8 +1125,7 @@ namespace Cosmos.IL2CPU
 
         public void ProcessField(FieldInfo aField)
         {
-            string xFieldName = LabelName.GetFullName(aField);
-            xFieldName = DataMember.GetStaticFieldName(aField);
+            string xFieldName = DataMember.GetStaticFieldName(aField);
             if (Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Count(x => x.Name == xFieldName) == 0)
             {
                 var xItemList = (from item in aField.GetCustomAttributes(false)
@@ -1179,53 +1178,25 @@ namespace Cosmos.IL2CPU
                 }
                 else
                 {
-                    uint xFieldSize;
-                    //string theType = "db";
                     var xFieldType = aField.FieldType.GetTypeInfo();
-                    //if (!xFieldType.IsClass || xFieldType.IsValueType)
-                    //{
-                        xFieldSize = ILOp.SizeOfType(aField.FieldType);
-                    //}
-                    //else
-                    //{
-                    //    xTheSize = 8;
-                    //}
+                    uint xFieldSize = ILOp.SizeOfType(aField.FieldType);
                     byte[] xData = new byte[xFieldSize];
 
-                    //try
-                    //{
-                    //    object xValue = aField.GetValue(null);
-                    //    if (xValue != null)
-                    //    {
-                            try
-                            {
-                                //if (xFieldType.IsEnum)
-                                //{
-                                //    xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(aField.FieldType));
-                                //}
-                                //if (xTyp.GetTypeInfo().IsValueType)
-                                //{
-                                //    for (int x = 4; x < xTheSize; x++)
-                                //    {
-                                //        xData[x] = Marshal.ReadByte(xValue, x);
-                                //    }
-                                //}
-                                if (xFieldType.IsValueType)
-                                {
-                                    DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
-                                }
-                            }
-                            catch
-                            {
-                                throw;
-                            }
-                    //    }
-                    //}
-                    //catch
-                    //{
-                    //    throw;
-                    //}
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xFieldName, xData));
+                    if (xFieldType.IsValueType)
+                    {
+                        DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
+                    }
+
+                    var xAsmLabelAttributes = aField.GetCustomAttributes<AsmLabelAttribute>();
+                    if (xAsmLabelAttributes != null && xAsmLabelAttributes.Count() > 0)
+                    {
+                        Assembler.DataMembers.Add(new DataMember(
+                            xFieldName, xAsmLabelAttributes.Select(a => a.Label), xData));
+                    }
+                    else
+                    {
+                        Assembler.DataMembers.Add(new DataMember(xFieldName, xData));
+                    }
                 }
             }
         }

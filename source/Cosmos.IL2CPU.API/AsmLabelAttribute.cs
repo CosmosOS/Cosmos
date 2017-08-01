@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.API
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Field, AllowMultiple = true)]
     public sealed class AsmLabelAttribute : Attribute
     {
         public string Label { get; }

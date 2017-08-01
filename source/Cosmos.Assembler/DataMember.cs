@@ -13,6 +13,7 @@ namespace Cosmos.Assembler
         public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
 
         public string Name { get; }
+        public IEnumerable<string> AdditionalNames { get; }
         public bool IsComment { get; set; }
         public byte[] RawDefaultValue { get; set; }
         public uint Alignment { get; set; }
@@ -26,11 +27,6 @@ namespace Cosmos.Assembler
         public DataMember()
         {
             Name = "Dummy";
-        }
-
-        protected DataMember(string aName)
-        {
-            Name = aName;
         }
 
         public DataMember(string aName, string aValue)
@@ -114,6 +110,13 @@ namespace Cosmos.Assembler
             aData.Read(RawDefaultValue, 0, RawDefaultValue.Length);
         }
 
+        public DataMember(string aName, IEnumerable<string> aAdditionalNames, byte[] aDefaultValue)
+        {
+            Name = aName;
+            AdditionalNames = aAdditionalNames;
+            RawDefaultValue = aDefaultValue;
+        }
+
         public static string GetStaticFieldName(FieldInfo aField)
         {
             return FilterStringForIncorrectChars("static_field__" + LabelName.GetFullName(aField.DeclaringType) + "." + aField.Name);
@@ -145,18 +148,38 @@ namespace Cosmos.Assembler
                     aOutput.Write(":");
                     return;
                 }
-                if ((from item in RawDefaultValue
+                if (RawDefaultValue.Length < 250 ||
+                    (from item in RawDefaultValue
                      group item by item
                      into i
-                     select i).Count() > 1 || RawDefaultValue.Length < 250)
+                     select i).Count() > 1)
                 {
                     if (IsGlobal)
                     {
-                        aOutput.Write("global ");
+                        aOutput.Write("\tglobal ");
                         aOutput.WriteLine(Name);
+
+                        if (AdditionalNames != null && AdditionalNames.Count() > 0)
+                        {
+                            foreach (var xName in AdditionalNames)
+                            {
+                                aOutput.Write("\tglobal");
+                                aOutput.WriteLine(xName);
+                            }
+                        }
                     }
-                    aOutput.Write(Name);
-                    aOutput.Write(" db ");
+
+                    aOutput.WriteLine(Name + ":");
+
+                    if (AdditionalNames != null && AdditionalNames.Count() > 0)
+                    {
+                        foreach(var xName in AdditionalNames)
+                        {
+                            aOutput.WriteLine("\t" + xName + ":");
+                        }
+                    }
+
+                    aOutput.Write("\t  db ");
                     for (int i = 0; i < (RawDefaultValue.Length - 1); i++)
                     {
                         aOutput.Write(RawDefaultValue[i]);
@@ -166,10 +189,35 @@ namespace Cosmos.Assembler
                 }
                 else
                 {
-                    aOutput.Write("global ");
-                    aOutput.WriteLine(Name);
-                    aOutput.Write(Name);
-                    aOutput.Write(": TIMES ");
+                    if (IsGlobal)
+                    {
+                        aOutput.Write("global ");
+                        aOutput.WriteLine(Name);
+
+                        if (AdditionalNames != null && AdditionalNames.Count() > 0)
+                        {
+                            foreach (var xName in AdditionalNames)
+                            {
+                                aOutput.Write("\tglobal");
+                                aOutput.WriteLine(xName);
+                            }
+                        }
+                    }
+
+                    if (AdditionalNames != null && AdditionalNames.Count() > 0)
+                    {
+                        aOutput.WriteLine(Name + ":");
+                        foreach (var xName in AdditionalNames)
+                        {
+                            aOutput.WriteLine("\t" + xName + ":");
+                        }
+                    }
+                    else
+                    {
+                        aOutput.Write(Name + ":");
+                    }
+
+                    aOutput.Write("\t  TIMES ");
                     aOutput.Write(RawDefaultValue.Length);
                     aOutput.Write(" db ");
                     aOutput.Write(RawDefaultValue[0]);
