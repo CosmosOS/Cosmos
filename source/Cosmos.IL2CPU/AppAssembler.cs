@@ -309,10 +309,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(xMethodLabel + EndOfMethodLabelNameNormal);
 
                 XS.Comment("Following code is for debugging. Adjust accordingly!");
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
-                }
+                XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
             }
 
             XS.Set(ECX, 0);
@@ -387,29 +384,26 @@ namespace Cosmos.IL2CPU
 
             if (DebugEnabled && StackCorruptionDetection)
             {
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
-                    // if not, we should somehow break here.
-                    XS.Set(EAX, ESP);
-                    XS.Set(EBX, EBP);
-                    XS.Compare(EAX, EBX);
-                    XS.Jump(ConditionalTestEnum.Equal, xLabelExc + "__2");
-                    XS.ClearInterruptFlag();
-                    // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                    new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
-                    XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
-                    XS.Pop(ECX);
-                    XS.Push(EAX);
-                    XS.Push(EBX);
-                    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.ECX };
-                    XS.Call("DebugStub_SendSimpleNumber");
-                    XS.Add(ESP, 4);
-                    XS.Call("DebugStub_SendSimpleNumber");
-                    XS.Add(ESP, 4);
-                    XS.Call("DebugStub_SendStackCorruptionOccurred");
-                    XS.Halt();
-                }
+                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
+                // if not, we should somehow break here.
+                XS.Set(EAX, ESP);
+                XS.Set(EBX, EBP);
+                XS.Compare(EAX, EBX);
+                XS.Jump(ConditionalTestEnum.Equal, xLabelExc + "__2");
+                XS.ClearInterruptFlag();
+                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+                new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
+                XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
+                XS.Pop(ECX);
+                XS.Push(EAX);
+                XS.Push(EBX);
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.ECX };
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
+                XS.Call("DebugStub_SendStackCorruptionOccurred");
+                XS.Halt();
             }
             XS.Label(xLabelExc + "__2");
             XS.Pop(EBP);
@@ -1361,10 +1355,7 @@ namespace Cosmos.IL2CPU
             XS.Push(EBP);
             XS.Set(EBP, ESP);
             XS.Set(EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
-            if (!CompilerEngine.UseGen3Kernel)
-            {
-                new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
-            }
+            new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
 
             var xMemberId = 0;
 
@@ -1504,25 +1495,21 @@ namespace Cosmos.IL2CPU
                 }
                 XS.Compare(EAX, EBX);
                 XS.Jump(ConditionalTestEnum.Equal, xLabel + ".StackCorruptionCheck_End");
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    XS.Push(EAX);
-                    XS.Push(EBX);
-                    XS.Call("DebugStub_SendSimpleNumber");
-                    XS.Add(ESP, 4);
-                    XS.Call("DebugStub_SendSimpleNumber");
+                XS.Push(EAX);
+                XS.Push(EBX);
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
+                XS.Call("DebugStub_SendSimpleNumber");
 
-                    XS.ClearInterruptFlag();
-                    // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                    XS.Call(xLabel + ".StackCorruptionCheck_GetAddress");
-                    XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
-                    XS.Pop(EAX);
-                    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                    XS.Call("DebugStub_SendStackCorruptionOccurred");
-                    XS.Halt();
-                }
+                XS.ClearInterruptFlag();
+                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+                XS.Call(xLabel + ".StackCorruptionCheck_GetAddress");
+                XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
+                XS.Pop(EAX);
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                XS.Call("DebugStub_SendStackCorruptionOccurred");
+                XS.Halt();
                 XS.Label(xLabel + ".StackCorruptionCheck_End");
-
             }
         }
 
