@@ -8,10 +8,9 @@ using Cosmos.IL2CPU.API;
 namespace Cosmos.IL2CPU {
     public static class AppAssemblerRingsCheck {
         private static bool IsAssemblySkippedDuringRingCheck(Assembly assembly) {
-            if (CompilerEngine.UseGen3Kernel)
-            {
-                return true;
-            }
+            // Disable all rings for now. We will reenable them in Gen3 and then in an abstracted way.
+            // No real need to keep them enabled now for G2 which will be deprecated soon anyway.
+            return true;
 
             var xServicable = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Where(x => x.Key == "Serviceable").SingleOrDefault();
             var xNetFrameworkAssembly = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Where(x => x.Key == ".NETFrameworkAssembly").SingleOrDefault();

@@ -167,14 +167,10 @@ namespace Cosmos.IL2CPU
                 new Call { DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_GetAddress" };
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Pop(EAX);
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                    XS.Call("DebugStub_SendStackOverflowOccurred");
-                }
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                XS.Call("DebugStub_SendStackOverflowOccurred");
                 XS.Halt();
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
-
             }
 
             mCurrentMethodLabelEndGuid = DebugInfo.CreateId();
