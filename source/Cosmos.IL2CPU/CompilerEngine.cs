@@ -291,11 +291,14 @@ namespace Cosmos.IL2CPU {
             AssemblyLoadContext.Default.Resolving += Default_Resolving;
             mLoadedExtensions = new List<CompilerExtensionBase>();
 
-            string xKernelBaseName = UseGen3Kernel ? "Cosmos.System.Boot" : "Cosmos.System.Kernel";
-            LogMessage("Kernel " + (UseGen3Kernel ? "Gen3" : "Gen2"));
+            string xKernelBaseName = "Cosmos.System.Boot";
+            if (!UseGen3Kernel) {
+                xKernelBaseName = "Cosmos.System.Kernel";
+                LogMessage("Kernel is Gen2.");
+            }
             LogMessage("Kernel Base: " + xKernelBaseName);
-            Type xKernelType = null;
 
+            Type xKernelType = null;
             foreach (string xRef in References) {
                 LogMessage("Checking Reference: " + xRef);
                 if (File.Exists(xRef)) {
