@@ -9,8 +9,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            String result;
-            String expectedResult;
+            string result;
+            string expectedResult;
 
             int anInt = 1;
 
@@ -39,7 +39,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(ulongBytes) doesn't work: result " + result + " != " + expectedResult);
 
-
             // This test works, what is the difference with double? That is saved as an Int32 in oly a register?
             float aFloat = 1.0f;
 
@@ -51,16 +50,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(floatBytes) doesn't work: result " + result + " != " + expectedResult);
 
             //// This tests fails bytes are screwed!
-            //double aDouble = 1.0;
+            double aDouble = 1.0;
 
-            //byte[] doubleBytes = BitConverter.GetBytes(aDouble);
+            byte[] doubleBytes = BitConverter.GetBytes(aDouble);
 
-            //result = BitConverter.ToString(doubleBytes, 0);
-            //expectedResult = "00-00-00-00-00-00-F0-3F";
+            result = BitConverter.ToString(doubleBytes, 0);
+            expectedResult = "00-00-00-00-00-00-F0-3F";
 
-            //Assert.IsTrue((result == expectedResult), "BitConverter.ToString(doubleBytes) doesn't work: result " + result + " != " + expectedResult);
-
-
+            Assert.IsTrue((result == expectedResult), "BitConverter.ToString(doubleBytes) doesn't work: result " + result + " != " + expectedResult);
         }
     }
 }

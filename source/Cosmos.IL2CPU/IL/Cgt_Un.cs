@@ -50,7 +50,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Add(ESP, 8);
                     XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
                     XS.SSE2.CompareSD(XMM1, XMM0, comparision: NotLessThanOrEqualTo);
-                    XS.SSE2.MoveD(EBX, XMM1);
+                    XS.MoveD(EBX, XMM1);
                     XS.And(EBX, 1);
                     // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
                     XS.Add(ESP, 4);
@@ -95,7 +95,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Add(ESP, 4);
                     XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
                     XS.SSE.CompareSS(XMM1, XMM0, comparision: NotLessThanOrEqualTo);
-                    XS.SSE2.MoveD(EBX, XMM1);
+                    XS.MoveD(EBX, XMM1);
                     XS.And(EBX, 1);
                     XS.Set(ESP, EBX, destinationIsIndirect: true);
                 }

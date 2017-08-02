@@ -157,17 +157,29 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 #endif
 
             // Now test some castings operations
+            sbyte valueAsSByte = (sbyte)value;
+            Assert.IsTrue((valueAsSByte == (sbyte)42), "double (sbyte) operator doesn't work");
+
             byte valueAsByte = (byte)value;
             Assert.IsTrue((valueAsByte == (byte)42), "double (byte) operator doesn't work");
 
             short valueAsShort = (short)value;
-            Assert.IsTrue((valueAsByte == (short)42), "double (short) operator doesn't work");
+            Assert.IsTrue((valueAsShort == (short)42), "double (short) operator doesn't work");
+
+            ushort valueAsUShort = (ushort)value;
+            Assert.IsTrue((valueAsUShort == (ushort)42), "double (ushort) operator doesn't work");
 
             int valueAsInt = (int)value;
             Assert.IsTrue((valueAsInt == (int)42), "double (int) operator doesn't work");
 
+            uint valueAsUInt = (uint)value;
+            Assert.IsTrue((valueAsUInt == (uint)42), "double (uint) operator doesn't work");
+
             long valueAsLong = (long)value;
             Assert.IsTrue((valueAsLong == (long)42), "double (long) operator doesn't work");
+
+            ulong valueAsULong = (ulong)value;
+            Assert.IsTrue((valueAsULong == (ulong)42), "double (ulong) operator doesn't work");
 
             // We put on anUInt a very big value Int32.MaxValue + 42. Why all this 42 :-) ?
             uint anUInt = 2147483689;
