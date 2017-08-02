@@ -44,6 +44,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
+                TempStructTests();
 
                 System.Collections.Generic.ListTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
@@ -59,6 +60,21 @@ namespace Cosmos.Compiler.Tests.Bcl
                 Console.WriteLine(e.Message);
                 TestController.Failed();
             }
+        }
+
+        struct A
+        {
+            public int Int;
+
+            public A(int a, int b)
+            {
+                Int = a - b;
+            }
+        }
+
+        void TempStructTests()
+        {
+            Assert.IsTrue(new A(6, 5).Int == 1, "Newobj doesn't work");
         }
     }
 }
