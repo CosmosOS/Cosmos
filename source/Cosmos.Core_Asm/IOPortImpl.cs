@@ -1,10 +1,10 @@
 using System;
 using Cosmos.Assembler;
-using Cosmos.Core.Common;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.Core;
+using Cosmos.IL2CPU.API;
 using XSharp.Common;
 
-namespace Cosmos.Core_Plugs_Asm
+namespace Cosmos.Core_Asm
 {
     [Plug(Target = typeof(IOPortBase))]
     public class IOPortImpl

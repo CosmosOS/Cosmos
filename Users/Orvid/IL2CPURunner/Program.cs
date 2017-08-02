@@ -22,14 +22,14 @@ namespace IL2CPURunner
             System.Reflection.Assembly.Load("Cosmos.Compiler.Assembler.X86");
             System.Reflection.Assembly.Load("Cosmos.Core_Plugs");
             System.Reflection.Assembly.Load("Cosmos.Debug.Common");
-            System.Reflection.Assembly.Load("Cosmos.Debug.DebugStub");
+            System.Reflection.Assembly.Load("Cosmos.Core.DebugStub");
             System.Reflection.Assembly.Load("Cosmos.Debug.Kernel");
             System.Reflection.Assembly.Load("Cosmos.Debug.Kernel.Plugs");
             System.Reflection.Assembly.Load("Cosmos.IL2CPU");
-            System.Reflection.Assembly.Load("Cosmos.IL2CPU.Plugs");
+            System.Reflection.Assembly.Load("Cosmos.IL2CPU.API");
             System.Reflection.Assembly.Load("Cosmos.IL2CPU.X86");
             System.Reflection.Assembly.Load("Cosmos.System");
-            System.Reflection.Assembly.Load("Cosmos.System.Plugs");
+            System.Reflection.Assembly.Load("Cosmos.System_Plugs");
             var xInitMethod = typeof(StructTest.Kernel).GetConstructor(Type.EmptyTypes);
             var xOutputFilename = System.Windows.Forms.Application.StartupPath + "\\" + "StructTest";
             var xAsm = new AppAssemblerNasm(0);

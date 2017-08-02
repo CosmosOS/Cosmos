@@ -1,7 +1,7 @@
 using System;
 
 using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Pop(EAX);
       XS.Set(EDX, aElementSize);
       XS.Multiply(EDX);
-      XS.Add(EAX, ObjectUtilities.FieldDataOffset + 4);
+      XS.Add(EAX, ObjectUtils.FieldDataOffset + 4);
 
       if (aElementSize > 4)
       {

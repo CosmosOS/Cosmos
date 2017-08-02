@@ -1,5 +1,5 @@
 using System;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core_Plugs.System {
   [Plug(Target=typeof(OutOfMemoryException))]

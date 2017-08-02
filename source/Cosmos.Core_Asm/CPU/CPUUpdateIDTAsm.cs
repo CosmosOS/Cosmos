@@ -6,7 +6,7 @@ using Cosmos.Assembler.x86;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
-namespace Cosmos.Core_Plugs_Asm
+namespace Cosmos.Core_Asm
 {
     //TODO: This asm refs Hardware.. should not.. its a higher ring
     public class CPUUpdateIDTAsm : AssemblerMethod
@@ -121,7 +121,7 @@ namespace Cosmos.Core_Plugs_Asm
 
             // reload interrupt list
             XS.Set(EAX, "_NATIVE_IDT_Pointer");
-            XS.Set("static_field__Cosmos_Core_Common_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+            XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
             XS.LoadIdt(EAX, isIndirect: true);
             // Reenable interrupts
             XS.EnableInterrupts();

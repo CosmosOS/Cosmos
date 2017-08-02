@@ -1,7 +1,7 @@
 using System;
-using Cosmos.Core.Common;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core_Plugs.System
 {
@@ -33,7 +33,7 @@ namespace Cosmos.Core_Plugs.System
         public static unsafe ulong MemberwiseClone([ObjectPointerAccess] uint aThis)
         {
             var xThisPointer = (uint*)aThis;
-            var xSize = ObjectUtilities.FieldDataOffset + xThisPointer[2];
+            var xSize = ObjectUtils.FieldDataOffset + xThisPointer[2];
 
             var xResult = GCImplementation.AllocNewObject(xSize);
 

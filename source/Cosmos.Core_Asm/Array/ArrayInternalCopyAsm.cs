@@ -1,9 +1,9 @@
 using Cosmos.Assembler;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using XSharp.Common;
 using CPUx86 = Cosmos.Assembler.x86;
 
-namespace Cosmos.Core_Plugs_Asm
+namespace Cosmos.Core_Asm
 {
     public class ArrayInternalCopyAsm : AssemblerMethod
     {
@@ -27,31 +27,31 @@ namespace Cosmos.Core_Plugs_Asm
             XS.Comment("Source");
             XS.Comment("Element size");
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);
-            XS.Add(XSRegisters.EAX, ObjectUtilities.FieldDataOffset);
+            XS.Add(XSRegisters.EAX, ObjectUtils.FieldDataOffset);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // element size
             XS.Comment("Source ptr");
             XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: SourceIndexDisplacement);
             XS.Multiply(XSRegisters.EBX);
-            XS.Add(XSRegisters.EAX, ObjectUtilities.FieldDataOffset + 4); // first element
+            XS.Add(XSRegisters.EAX, ObjectUtils.FieldDataOffset + 4); // first element
             XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);
             XS.Add(XSRegisters.ESI, XSRegisters.EAX); // source ptr
 
             XS.Comment("Destination");
             XS.Comment("Element size");
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
-            XS.Add(XSRegisters.EAX, ObjectUtilities.FieldDataOffset);
+            XS.Add(XSRegisters.EAX, ObjectUtils.FieldDataOffset);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // element size
             XS.Comment("Destination ptr");
             XS.Set(XSRegisters.ECX, XSRegisters.EBP, sourceDisplacement: DestinationIndexDisplacement);
             XS.Multiply(XSRegisters.ECX);
-            XS.Add(XSRegisters.EAX, ObjectUtilities.FieldDataOffset + 4); // first element
+            XS.Add(XSRegisters.EAX, ObjectUtils.FieldDataOffset + 4); // first element
             XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
             XS.Add(XSRegisters.EDI, XSRegisters.EAX); // destination ptr
 
             XS.Comment("Copy byte count");
             XS.Comment("Element size");
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
-            XS.Add(XSRegisters.EAX, ObjectUtilities.FieldDataOffset);
+            XS.Add(XSRegisters.EAX, ObjectUtils.FieldDataOffset);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // element size
             XS.Comment("Count");
             XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: LengthDisplacement);

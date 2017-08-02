@@ -1,7 +1,7 @@
 using System;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
-namespace Cosmos.Core_Plugs_Asm
+namespace Cosmos.Core_Asm
 {
     [Plug(Target = typeof(Delegate), Inheritable = true)]
     public static class DelegateImpl

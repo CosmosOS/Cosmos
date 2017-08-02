@@ -255,7 +255,7 @@ namespace Cosmos.Build.Builder {
       StartConsole(xNuget, xRestoreParams);
     }
 
-    private void Update(string project) {
+    private void Update() {
       string xNuget = Path.Combine(mCosmosPath, "Build", "Tools", "nuget.exe");
       string xUpdateParams = $"update -self";
       StartConsole(xNuget, xUpdateParams);
@@ -274,8 +274,8 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CompileCosmos() {
-      string xVSIPDir = Path.Combine(mCosmosPath, "Build", "VSIP");
-      string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
+      string xVsipDir = Path.Combine(mCosmosPath, "Build", "VSIP");
+      string xNugetPkgDir = Path.Combine(xVsipDir, "KernelPackages");
       string xVersion = "1.0.2";
 
       if (!App.IsUserKit) {
@@ -283,13 +283,13 @@ namespace Cosmos.Build.Builder {
       }
 
       Section("Clean NuGet Local Feed");
-      Clean(Path.Combine(mCosmosPath, @"Cosmos.sln"));
+      Clean(Path.Combine(mCosmosPath, @"Build.sln"));
 
       Section("Restore NuGet Packages");
-      Restore(Path.Combine(mCosmosPath, @"Cosmos.sln"));
+      Restore(Path.Combine(mCosmosPath, @"Build.sln"));
 
       Section("Update NuGet");
-      Update(Path.Combine(mCosmosPath, @"Cosmos.sln"));
+      Update();
 
       Section("Build Cosmos");
       // Build.sln is the old master but because of how VS manages refs, we have to hack
@@ -297,24 +297,28 @@ namespace Cosmos.Build.Builder {
       MSBuild(Path.Combine(mCosmosPath, @"Build.sln"), "Debug");
 
       Section("Publish Tools");
-      Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVSIPDir, "MSBuild"));
-      Publish(Path.Combine(mSourcePath, "IL2CPU"), Path.Combine(xVSIPDir, "IL2CPU"));
-      Publish(Path.Combine(mSourcePath, "XSharp.Compiler"), Path.Combine(xVSIPDir, "XSharp"));
-      Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVSIPDir, "NASM"));
+      Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
+      Publish(Path.Combine(mSourcePath, "IL2CPU"), Path.Combine(xVsipDir, "IL2CPU"));
+      Publish(Path.Combine(mSourcePath, "XSharp.Compiler"), Path.Combine(xVsipDir, "XSharp"));
+      Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVsipDir, "NASM"));
 
       Section("Pack Kernel");
-      Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Common"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Memory"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Plugs"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.HAL"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.System"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.System.Plugs"), xPackagesDir, xVersion);
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xNugetPkgDir, xVersion);
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Plugs"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xNugetPkgDir, xVersion);
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.HAL2"), xNugetPkgDir, xVersion);
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.System2"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.System2_Plugs"), xNugetPkgDir, xVersion);
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xNugetPkgDir, xVersion);
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.API"), xNugetPkgDir, xVersion);
     }
 
     private void CopyTemplates() {

@@ -14,6 +14,7 @@ namespace Cosmos.TestRunner.Core
         public bool RunWithGDB = false;
         public bool StartBochsDebugGui = false;
         public bool EnableStackCorruptionChecks = true;
+        public string KernelPkg = "";
         public TraceAssemblies TraceAssembliesLevel = TraceAssemblies.User;
         public StackCorruptionDetectionLevel StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
         public List<string> References = new List<string>();

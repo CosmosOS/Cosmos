@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Reflection;
 using Cosmos.Assembler;
 
 using Cosmos.IL2CPU.Extensions;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.X86.IL;
 
 namespace Cosmos.IL2CPU
@@ -545,7 +545,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (xNeedsPlug)
                 {
-                    throw new Exception("Native code encountered, plug required. Please see http://www.gocosmos.org/docs/plugs/). " + LabelName.GetFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
+                    throw new Exception("Native code encountered, plug required. Please see http://www.gocosmos.org/docs/plugs/missing/). " + LabelName.GetFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
                 }
 
                 //TODO: As we scan each method, we could update or put in a new list

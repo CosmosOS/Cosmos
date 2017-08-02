@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core_Plugs.System.Runtime.InteropServices
 {

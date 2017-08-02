@@ -1,9 +1,9 @@
 using Cosmos.Assembler;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using XSharp.Common;
 using CPUx86 = Cosmos.Assembler.x86;
 
-namespace Cosmos.Core_Plugs_Asm
+namespace Cosmos.Core_Asm
 {
     public class BufferBlockCopyAsm : AssemblerMethod
     {
@@ -24,14 +24,14 @@ namespace Cosmos.Core_Plugs_Asm
         {
             XS.Comment("Source array");
             XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);
-            XS.Add(XSRegisters.ESI, ObjectUtilities.FieldDataOffset + 4);
+            XS.Add(XSRegisters.ESI, ObjectUtils.FieldDataOffset + 4);
             XS.Comment("Source index");
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: SourceIndexDisplacement);
             XS.Add(XSRegisters.ESI, XSRegisters.EAX);
 
             XS.Comment("Destination array");
             XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
-            XS.Add(XSRegisters.EDI, ObjectUtilities.FieldDataOffset + 4);
+            XS.Add(XSRegisters.EDI, ObjectUtils.FieldDataOffset + 4);
             XS.Comment("Destination index");
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: DestinationIndexDisplacement);
             XS.Add(XSRegisters.EDI, XSRegisters.EAX);

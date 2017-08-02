@@ -1,8 +1,8 @@
 #define COSMOSDEBUG
 using System;
 
-using Cosmos.Core_Plugs_Asm.MemoryOperations;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.Core_Asm.MemoryOperations;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core_Plugs.MemoryOperations
 {

@@ -7,15 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml;
 
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.Extensions;
@@ -137,6 +135,13 @@ namespace Cosmos.IL2CPU
             }
             XS.Label(xMethodLabel);
 
+            // Alternative asm labels for the method
+            var xAsmLabelAttributes = aMethod.MethodBase.GetCustomAttributes<AsmLabelAttribute>();
+            foreach (var xAttribute in xAsmLabelAttributes)
+            {
+                XS.Label(xAttribute.Label);
+            }
+
             //Assembler.WriteDebugVideo("Method " + aMethod.UID);
 
             // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
@@ -166,7 +171,6 @@ namespace Cosmos.IL2CPU
                 XS.Call("DebugStub_SendStackOverflowOccurred");
                 XS.Halt();
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
-
             }
 
             mCurrentMethodLabelEndGuid = DebugInfo.CreateId();
@@ -175,7 +179,7 @@ namespace Cosmos.IL2CPU
             {
                 XS.Comment("Static constructor. See if it has been called already, return if so.");
                 var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + LabelName.GetFullName(aMethod.MethodBase.DeclaringType));
-                XS.DataMember(xName, 0);
+                XS.DataMember(xName, 1, "db", "0");
                 XS.Compare(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 XS.Jump(ConditionalTestEnum.Equal, ".BeforeQuickReturn");
                 XS.Set(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
@@ -1121,8 +1125,7 @@ namespace Cosmos.IL2CPU
 
         public void ProcessField(FieldInfo aField)
         {
-            string xFieldName = LabelName.GetFullName(aField);
-            xFieldName = DataMember.GetStaticFieldName(aField);
+            string xFieldName = DataMember.GetStaticFieldName(aField);
             if (Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Count(x => x.Name == xFieldName) == 0)
             {
                 var xItemList = (from item in aField.GetCustomAttributes(false)
@@ -1153,7 +1156,7 @@ namespace Cosmos.IL2CPU
                         }
                         xTarget.Append("0,");
                         // todo: abstract this array code out.
-                        xTarget.Append((uint)ObjectUtilities.InstanceTypeEnum.StaticEmbeddedArray);
+                        xTarget.Append((uint)ObjectUtils.InstanceTypeEnum.StaticEmbeddedArray);
                         xTarget.Append(",");
                         xTarget.Append((int)xStream.Length);
                         xTarget.Append(",");
@@ -1175,53 +1178,25 @@ namespace Cosmos.IL2CPU
                 }
                 else
                 {
-                    uint xFieldSize;
-                    //string theType = "db";
                     var xFieldType = aField.FieldType.GetTypeInfo();
-                    //if (!xFieldType.IsClass || xFieldType.IsValueType)
-                    //{
-                        xFieldSize = ILOp.SizeOfType(aField.FieldType);
-                    //}
-                    //else
-                    //{
-                    //    xTheSize = 8;
-                    //}
+                    uint xFieldSize = ILOp.SizeOfType(aField.FieldType);
                     byte[] xData = new byte[xFieldSize];
 
-                    //try
-                    //{
-                    //    object xValue = aField.GetValue(null);
-                    //    if (xValue != null)
-                    //    {
-                            try
-                            {
-                                //if (xFieldType.IsEnum)
-                                //{
-                                //    xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(aField.FieldType));
-                                //}
-                                //if (xTyp.GetTypeInfo().IsValueType)
-                                //{
-                                //    for (int x = 4; x < xTheSize; x++)
-                                //    {
-                                //        xData[x] = Marshal.ReadByte(xValue, x);
-                                //    }
-                                //}
-                                if (xFieldType.IsValueType)
-                                {
-                                    DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
-                                }
-                            }
-                            catch
-                            {
-                                throw;
-                            }
-                    //    }
-                    //}
-                    //catch
-                    //{
-                    //    throw;
-                    //}
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xFieldName, xData));
+                    if (xFieldType.IsValueType)
+                    {
+                        DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
+                    }
+
+                    var xAsmLabelAttributes = aField.GetCustomAttributes<AsmLabelAttribute>();
+                    if (xAsmLabelAttributes != null && xAsmLabelAttributes.Count() > 0)
+                    {
+                        Assembler.DataMembers.Add(new DataMember(
+                            xFieldName, xAsmLabelAttributes.Select(a => a.Label), xData));
+                    }
+                    else
+                    {
+                        Assembler.DataMembers.Add(new DataMember(xFieldName, xData));
+                    }
                 }
             }
         }
@@ -1392,7 +1367,7 @@ namespace Cosmos.IL2CPU
             Assembler.WriteDebugVideo("Kernel class created");
             xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
             XS.Label(xCurLabel);
-            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.GetTypeInfo().BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
+            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.GetTypeInfo().BaseType.GetMethod(CompilerEngine.UseGen3Kernel ? "EntryPoint" : "Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
             XS.Label(CosmosAssembler.EntryPointName + ".AfterStart");
             XS.Pop(EBP);
             XS.Return();
@@ -1506,7 +1481,6 @@ namespace Cosmos.IL2CPU
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
                 XS.Halt();
                 XS.Label(xLabel + ".StackCorruptionCheck_End");
-
             }
         }
 
@@ -1551,7 +1525,7 @@ namespace Cosmos.IL2CPU
             // This test fixes issue #15638
             if (null != aNamespace)
             {
-                // Check options for Debug Level
+                // Check options for Debug RingEnum
                 // Set based on TracedAssemblies
                 if (TraceAssemblies > TraceAssemblies.None)
                 {

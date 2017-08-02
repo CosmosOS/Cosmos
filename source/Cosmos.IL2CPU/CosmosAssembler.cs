@@ -6,8 +6,9 @@ using System.Reflection;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
-using Cosmos.Debug.DebugStub;
+using Cosmos.Core.DebugStub;
 using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU
 {
@@ -160,8 +161,11 @@ namespace Cosmos.IL2CPU
             //
             if (mComPort > 0)
             {
-                SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
-                SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
+                if (!CompilerEngine.UseGen3Kernel)
+                {
+                    SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
+                    SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
+                }
 
                 //for (int i = 0; i < 256; i++)
                 //{
@@ -193,8 +197,11 @@ namespace Cosmos.IL2CPU
 
             if (mComPort > 0)
             {
-                XS.Set("static_field__Cosmos_Core_Common_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true);
-                XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
+                if (!CompilerEngine.UseGen3Kernel)
+                {
+                    XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+                    XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
+                }
             }
             XS.Label("AfterCreateIDT");
             new Comment(this, "END - Create IDT");
@@ -335,8 +342,11 @@ namespace Cosmos.IL2CPU
 
             if (mComPort > 0)
             {
-                WriteDebugVideo("Initializing DebugStub.");
-                XS.Call("DebugStub_Init");
+                if (!CompilerEngine.UseGen3Kernel)
+                {
+                    WriteDebugVideo("Initializing DebugStub.");
+                    XS.Call("DebugStub_Init");
+                }
             }
 
             // Jump to Kernel entry point
@@ -373,26 +383,29 @@ namespace Cosmos.IL2CPU
                                                throw new Exception("Object type '" + i.ToString() + "' not supported!");
                                            }
                                        });
-                if (ReadDebugStubFromDisk)
+                if (!CompilerEngine.UseGen3Kernel)
                 {
-                    foreach (var xFile in Directory.GetFiles(CosmosPaths.DebugStubSrc, "*.xs"))
+                    if (ReadDebugStubFromDisk)
                     {
-                        xGenerateAssembler(xFile);
-                    }
-                }
-                else
-                {
-                    foreach (var xManifestName in typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceNames())
-                    {
-                        if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase))
+                        foreach (var xFile in Directory.GetFiles(CosmosPaths.DebugStubSrc, "*.xs"))
                         {
-                            continue;
+                            xGenerateAssembler(xFile);
                         }
-                        using (var xStream = typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(xManifestName))
+                    }
+                    else
+                    {
+                        foreach (var xManifestName in typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceNames())
                         {
-                            using (var xReader = new StreamReader(xStream))
+                            if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase))
                             {
-                                xGenerateAssembler(xReader);
+                                continue;
+                            }
+                            using (var xStream = typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(xManifestName))
+                            {
+                                using (var xReader = new StreamReader(xStream))
+                                {
+                                    xGenerateAssembler(xReader);
+                                }
                             }
                         }
                     }
@@ -422,7 +435,7 @@ namespace Cosmos.IL2CPU
             const byte ICW1_ICW4 = 0x01; /* ICW4 (not) needed */
             const byte ICW1_SINGLE = 0x02; /* Single (cascade) mode */
             const byte ICW1_INTERVAL4 = 0x04; /* Call address interval 4 (8) */
-            const byte ICW1_LEVEL = 0x08; /* Level triggered (edge) mode */
+            const byte ICW1_LEVEL = 0x08; /* RingEnum triggered (edge) mode */
             const byte ICW1_INIT = 0x10; /* Initialization - required! */
 
             const byte ICW4_8086 = 0x01; /* 8086/88 (MCS-80/85) mode */

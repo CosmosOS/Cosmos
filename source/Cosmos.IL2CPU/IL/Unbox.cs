@@ -2,7 +2,7 @@ using System.Reflection;
 
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
       int xItems = (int)xSize / 4;
       for (int i = xItems - 1; i >= 0; i--)
       {
-        new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectUtilities.FieldDataOffset) };
+        new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectUtils.FieldDataOffset) };
       }
       new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
       XS.Label(mReturnNullLabel);
