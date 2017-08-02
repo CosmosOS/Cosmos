@@ -14,14 +14,20 @@ using Cosmos.Debug.Symbols;
 namespace Cosmos.IL2CPU {
     // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
     public class CompilerEngine {
-        const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
-
         public Action<string> OnLogMessage;
         public Action<string> OnLogError;
         public Action<string> OnLogWarning;
         public Action<Exception> OnLogException;
         protected static Action<string> mStaticLog = null;
 
+        public static string KernelPkg { get; set; }
+        public static bool UseGen3Kernel
+        {
+            get
+            {
+                return KernelPkg == "X86G3";
+            }
+        }
         public string DebugMode { get; set; }
         public string TraceAssemblies { get; set; }
         public byte DebugCom { get; set; }
@@ -32,8 +38,7 @@ namespace Cosmos.IL2CPU {
         public bool EmitDebugSymbols { get; set; }
         public bool IgnoreDebugStubAttribute { get; set; }
         public string StackCorruptionDetectionLevel { get; set; }
-        public string[] AdditionalSearchDirs { get; set; }
-        public string[] AdditionalReferences { get; set; }
+        public string[] AssemblySearchDirs { get; set; }
 
         private List<CompilerExtensionBase> mLoadedExtensions;
 
@@ -42,7 +47,6 @@ namespace Cosmos.IL2CPU {
         protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
         protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
         protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
-        protected static List<string> mSearchDirs = new List<string>();
 
         public string AssemblerLog = "Cosmos.Assembler.log";
 
@@ -85,15 +89,6 @@ namespace Cosmos.IL2CPU {
                 return false;
             }
 
-            if (AdditionalSearchDirs != null) {
-                mSearchDirs.AddRange(AdditionalSearchDirs);
-            }
-
-            // Add UserKit dirs for asms to load from.
-            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).GetTypeInfo().Assembly.Location));
-            mSearchDirs.Add(CosmosPaths.UserKit);
-            mSearchDirs.Add(CosmosPaths.Kernel);
-
             mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             if (string.IsNullOrEmpty(TraceAssemblies)) {
                 mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.User;
@@ -123,8 +118,8 @@ namespace Cosmos.IL2CPU {
                 LogTime("Engine execute started");
 
                 // Find the kernel's entry point. We are looking for a public class Kernel, with public static void Boot()
-                var xInitMethod = LoadAssemblies();
-                if (xInitMethod == null) {
+                var xKernelCtor = LoadAssemblies();
+                if (xKernelCtor == null) {
                     return false;
                 }
 
@@ -160,10 +155,10 @@ namespace Cosmos.IL2CPU {
                                     LogWarning("Could not create the file \"" + xLogFile + "\"! No log will be created!");
                                 }
                             }
-                            xScanner.QueueMethod(xInitMethod.DeclaringType.GetTypeInfo().BaseType.GetTypeInfo().GetMethod("Start"));
-                            xScanner.Execute(xInitMethod);
+                            xScanner.QueueMethod(xKernelCtor.DeclaringType.GetTypeInfo().BaseType.GetTypeInfo().GetMethod(UseGen3Kernel ? "EntryPoint" : "Start"));
+                            xScanner.Execute(xKernelCtor);
 
-                            AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.GetTypeInfo().Assembly);
+                            AppAssemblerRingsCheck.Execute(xScanner, xKernelCtor.DeclaringType.GetTypeInfo().Assembly);
 
                             using (var xOut = new StreamWriter(File.Create(OutputFilename), Encoding.ASCII, 128 * 1024)) {
                                 //if (EmitDebugSymbols) {
@@ -230,21 +225,6 @@ namespace Cosmos.IL2CPU {
         }
 
         private Assembly Default_Resolving(AssemblyLoadContext aContext, AssemblyName aName) {
-            var xRequestingAssembly = Assembly.GetEntryAssembly();
-            if (xRequestingAssembly != null) {
-                // check for path in as requested dll is stored, this makes refrenced dll project working
-                var xPathAsRequested = Path.Combine(Path.GetDirectoryName(xRequestingAssembly.Location), aName.Name + ".dll");
-                if (File.Exists(xPathAsRequested)) {
-                    return aContext.LoadFromAssemblyPath(xPathAsRequested);
-                }
-            }
-
-            // check for assembly in working directory
-            var xPathToCheck = Path.Combine(Directory.GetCurrentDirectory(), aName.Name + ".dll");
-            if (File.Exists(xPathToCheck)) {
-                return aContext.LoadFromAssemblyPath(xPathToCheck);
-            }
-
             foreach (var xRef in References) {
                 var xName = AssemblyLoadContext.GetAssemblyName(xRef);
                 if (xName.Name == aName.Name) {
@@ -252,7 +232,36 @@ namespace Cosmos.IL2CPU {
                 }
             }
 
-            foreach (var xDir in mSearchDirs) {
+            foreach (var xRef in References)
+            {
+                var xKernelAssemblyDir = Path.GetDirectoryName(xRef);
+                var xAssemblyPath = Path.Combine(xKernelAssemblyDir, aName.Name);
+                if (File.Exists(xAssemblyPath + ".dll"))
+                {
+                    return aContext.LoadFromAssemblyPath(xAssemblyPath + ".dll");
+                }
+                if (File.Exists(xAssemblyPath + ".exe"))
+                {
+                    return aContext.LoadFromAssemblyPath(xAssemblyPath + ".exe");
+                }
+            }
+
+            //var xRequestingAssembly = Assembly.GetEntryAssembly();
+            //if (xRequestingAssembly != null) {
+            //    // check for path in as requested dll is stored, this makes referenced dll project working
+            //    var xPathAsRequested = Path.Combine(Path.GetDirectoryName(xRequestingAssembly.Location), aName.Name + ".dll");
+            //    if (File.Exists(xPathAsRequested)) {
+            //        return aContext.LoadFromAssemblyPath(xPathAsRequested);
+            //    }
+            //}
+
+            // check for assembly in working directory
+            var xPathToCheck = Path.Combine(Directory.GetCurrentDirectory(), aName.Name + ".dll");
+            if (File.Exists(xPathToCheck)) {
+                return aContext.LoadFromAssemblyPath(xPathToCheck);
+            }
+
+            foreach (var xDir in AssemblySearchDirs) {
                 var xPath = Path.Combine(xDir, aName.Name + ".dll");
                 if (File.Exists(xPath)) {
                     return aContext.LoadFromAssemblyPath(xPath);
@@ -278,15 +287,20 @@ namespace Cosmos.IL2CPU {
             //
             // Plugs and refs in this list will be loaded absolute (or as proj refs) only. Asm resolution
             // will not be tried on them, but will on ASMs they reference.
-            //
 
             AssemblyLoadContext.Default.Resolving += Default_Resolving;
             mLoadedExtensions = new List<CompilerExtensionBase>();
+
+            string xKernelBaseName = UseGen3Kernel ? "Cosmos.System.Boot" : "Cosmos.System.Kernel";
+            LogMessage("Kernel " + (UseGen3Kernel ? "Gen3" : "Gen2"));
+            LogMessage("Kernel Base: " + xKernelBaseName);
             Type xKernelType = null;
 
-            foreach (string xReference in References) {
-                if (File.Exists(xReference)) {
-                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyCacheOrPath(xReference);
+            foreach (string xRef in References) {
+                LogMessage("Checking Reference: " + xRef);
+                if (File.Exists(xRef)) {
+                    LogMessage("  Exists");
+                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyCacheOrPath(xRef);
 
                     CompilerHelpers.Debug($"Looking for kernel in {xAssembly}");
 
@@ -301,7 +315,7 @@ namespace Cosmos.IL2CPU {
                             // will force user to implement what is needed if replacing our core. But in the end this is a "not needed" feature
                             // and would only complicate things.
                             // So for now at least, we look by name so we dont have a dependency since the method returns a MethodBase and not a Kernel instance anyway.
-                            if (xType.GetTypeInfo().BaseType.FullName == "Cosmos.System.Kernel") {
+                            if (xType.GetTypeInfo().BaseType.FullName == xKernelBaseName) {
                                 if (xKernelType != null) {
                                     LogError($"Two kernels found: {xType.FullName} and {xKernelType.FullName}");
                                     return null;

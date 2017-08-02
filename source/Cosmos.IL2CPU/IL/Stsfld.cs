@@ -26,8 +26,8 @@ namespace Cosmos.IL2CPU.X86.IL
       var xIsReferenceType = TypeIsReferenceType(xField.FieldType);
 
       // call cctor:
-      var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
-      if (xCctor != null && xCctor.DeclaringType != aMethod.MethodBase.DeclaringType)
+      var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic)).SingleOrDefault();
+      if (xCctor != null)
       {
         XS.Call(LabelName.Get(xCctor));
         ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null, ".AfterCCTorExceptionCheck");

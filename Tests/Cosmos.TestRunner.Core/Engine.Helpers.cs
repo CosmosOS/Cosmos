@@ -165,18 +165,26 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            References = new List<string>
+            References = new List<string>() { kernelFileName };
+
+            if (KernelPkg == "X86G3")
             {
-                kernelFileName,
-                Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.System.Plugs")).Location
-            };
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.System_Plugs")).Location);
+            }
+            else
+            {
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.System2_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location);
+            }
 
             var xArgs = new List<string>
             {
-                "DebugEnabled:true",
+                "KernelPkg:" + KernelPkg,
+                "DebugEnabled:True",
                 "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
                 "StackCorruptionDetectionLevel:" + StackCorruptionChecksLevel,
                 "DebugMode:Source",
@@ -188,6 +196,7 @@ namespace Cosmos.TestRunner.Core
                 "EmitDebugSymbols:True",
                 "IgnoreDebugStubAttribute:False"
             };
+
             xArgs.AddRange(References.Select(aReference => "References:" + aReference));
 
             bool xUsingUserkit = false;
@@ -219,11 +228,9 @@ namespace Cosmos.TestRunner.Core
                 else
                 {
                     xArgs.Insert(0, "run");
-                    xArgs.Insert(1, "--project");
-                    xArgs.Insert(2, Path.Combine(xIL2CPUPath, "IL2CPU.csproj"));
                     xArgs.Insert(3, "--no-build");
                     xArgs.Insert(4, " -- ");
-                    RunProcess("dotnet", Path.GetDirectoryName(kernelFileName), xArgs);
+                    RunProcess("dotnet", xIL2CPUPath, xArgs, true);
                 }
             }
         }

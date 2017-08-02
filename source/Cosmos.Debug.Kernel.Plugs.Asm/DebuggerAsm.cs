@@ -1,5 +1,5 @@
 using Cosmos.Assembler;
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 using XSharp.Common;
 
 namespace Cosmos.Debug.Kernel.Plugs.Asm

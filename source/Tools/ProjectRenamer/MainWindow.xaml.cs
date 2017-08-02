@@ -69,11 +69,24 @@ namespace ProjectRenamer {
             return xResult;
         }
 
+        List<string> GetFiles(string aDir, string aWildCard) {
+            string xArchive = IO.Path.Combine(aDir, @"source\archive\");
+            var xFiles = IO.Directory.GetFiles(aDir, aWildCard, IO.SearchOption.AllDirectories);
+
+            var xResult = new List<string>();
+            foreach (var x in xFiles) {
+                if (!x.StartsWith(xArchive, StringComparison.InvariantCultureIgnoreCase)) {
+                    xResult.Add(x);
+                }
+            }
+            return xResult;
+        }
+
         void FixCsprojs() {
             Log("Fix references in .csproj files");
 
             // Change to mSourceDir after we move tests
-            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.csproj", IO.SearchOption.AllDirectories);
+            var xProjs = GetFiles(mCosmosDir, "*.csproj");
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
@@ -90,7 +103,7 @@ namespace ProjectRenamer {
             Log("Fix namespaces in .cs files");
 
             // Change to mSourceDir after we move tests
-            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.cs", IO.SearchOption.AllDirectories);
+            var xProjs = GetFiles(mCosmosDir, "*.cs");
             foreach (var xProj in xProjs) {
                 if (IO.Path.GetDirectoryName(xProj).EndsWith(@"\ProjectRenamer")) {
                     continue;
@@ -110,7 +123,7 @@ namespace ProjectRenamer {
         void FixIss() {
             Log("Fix in .iss files");
 
-            var xProjs = IO.Directory.GetFiles(mSourceDir, "*.iss", IO.SearchOption.AllDirectories);
+            var xProjs = GetFiles(mSourceDir, "*.iss");
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
@@ -127,7 +140,7 @@ namespace ProjectRenamer {
             Log("Fix in .Cosmos files");
 
             // Change to mSourceDir after we move tests
-            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.Cosmos", IO.SearchOption.AllDirectories);
+            var xProjs = GetFiles(mCosmosDir, "*.Cosmos");
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
@@ -207,7 +220,7 @@ namespace ProjectRenamer {
             FixIss();
             FixCosmos();
 
-            //ModifySLNs();
+            ModifySLNs();
 
             MessageBox.Show("Done.");
         }

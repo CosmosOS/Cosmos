@@ -1,8 +1,8 @@
-using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.API;
 
 using System;
 using System.Diagnostics;
-using Cosmos.Core.Common;
+using Cosmos.Core;
 
 namespace Cosmos.Core_Plugs.System.Diagnostics
 {

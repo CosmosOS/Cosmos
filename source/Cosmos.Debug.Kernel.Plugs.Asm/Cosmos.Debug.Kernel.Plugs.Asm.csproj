@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard1.5</TargetFramework>
@@ -12,7 +12,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
+        <ProjectReference Include="..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
         <ProjectReference Include="..\XSharp.Common\XSharp.Common.csproj" />
     </ItemGroup>
 

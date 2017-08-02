@@ -14,7 +14,7 @@ namespace Cosmos.Compiler.Tests
     //        var xRunner = new CompilerRunner();
 
     //        xRunner.References.Add(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
-    //        xRunner.References.Add(typeof(Cosmos.System.Plugs.System.TypeImpl).Assembly.Location);
+    //        xRunner.References.Add(typeof(Cosmos.System_Plugs.System.TypeImpl).Assembly.Location);
     //        xRunner.References.Add(typeof(Cosmos.Core_Plugs.CPUImpl).Assembly.Location);
     //        xRunner.References.Add(typeof(Cosmos.Debug.Kernel.Plugs.DebugBreak).Assembly.Location);
 
@@ -37,7 +37,7 @@ namespace Cosmos.Compiler.Tests
     //        var xRunner = new CompilerRunner();
 
     //        xRunner.References.Add(typeof(Cosmos.Compiler.Tests.Interfaces.Kernel.Kernel).Assembly.Location);
-    //        xRunner.References.Add(typeof(Cosmos.System.Plugs.System.TypeImpl).Assembly.Location);
+    //        xRunner.References.Add(typeof(Cosmos.System_Plugs.System.TypeImpl).Assembly.Location);
     //        xRunner.References.Add(typeof(Cosmos.Core_Plugs.CPUImpl).Assembly.Location);
     //        xRunner.References.Add(typeof(Cosmos.Debug.Kernel.Plugs.DebugBreak).Assembly.Location);
 
