@@ -3,14 +3,11 @@
 using System;
 using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Common
-{
-    public static class StringHelper
-    {
+namespace Cosmos.Common {
+    public static class StringHelper {
         private static Debugger mDebugger = new Debugger("Common", "StringHelper");
 
-        internal enum StringComparisonResultEnum
-        {
+        internal enum StringComparisonResultEnum {
             Less = -1,
 
             Equal = 0,
@@ -18,22 +15,17 @@ namespace Cosmos.Common
             Greater = 1
         }
 
-        public static string GetNumberString(uint aValue)
-        {
+        public static string GetNumberString(uint aValue) {
             mDebugger.SendInternal("StringHelper.GetNumberString(uint)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
 
-            if (aValue == 0)
-            {
+            if (aValue == 0) {
                 xResult = "0";
-            }
-            else
-            {
+            } else {
                 uint xValue = aValue;
-                while (xValue > 0)
-                {
+                while (xValue > 0) {
                     uint xValue2 = xValue % 10;
                     xResult = string.Concat(xChars[xValue2], xResult);
                     xValue /= 10;
@@ -43,62 +35,50 @@ namespace Cosmos.Common
             return xResult;
         }
 
-        public static string GetNumberString(int aValue)
-        {
+        public static string GetNumberString(int aValue) {
             mDebugger.SendInternal("StringHelper.GetNumberString(int)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
 
-            if (aValue == 0)
-            {
+            if (aValue == 0) {
                 xResult = "0";
-            }
-            else
-            {
+            } else {
                 int xValue = aValue;
 
-                if (aValue < 0)
-                {
+                if (aValue < 0) {
                     xValue *= -1;
                 }
 
-                while (xValue > 0)
-                {
+                while (xValue > 0) {
                     int xValue2 = xValue % 10;
                     xResult = string.Concat(xChars[xValue2], xResult);
                     xValue /= 10;
                 }
             }
 
-            if (aValue < 0)
-            {
+            if (aValue < 0) {
                 xResult = string.Concat("-", xResult);
             }
 
             return xResult;
         }
 
-        public static string GetNumberString(ulong aValue)
-        {
+        public static string GetNumberString(ulong aValue) {
             mDebugger.SendInternal("StringHelper.GetNumberString(ulong)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
 
-            if (aValue == 0)
-            {
+            if (aValue == 0) {
                 xResult = "0";
                 mDebugger.SendInternal("xResult =");
                 mDebugger.SendInternal(xResult);
-            }
-            else
-            {
+            } else {
                 ulong xValue = aValue;
                 mDebugger.SendInternal("xValue =");
                 mDebugger.SendInternal(xValue);
-                while (xValue > 0)
-                {
+                while (xValue > 0) {
                     ulong xValue2 = xValue % 10;
                     mDebugger.SendInternal("xValue2 =");
                     mDebugger.SendInternal(xValue2);
@@ -116,31 +96,25 @@ namespace Cosmos.Common
             return xResult;
         }
 
-        public static string GetNumberString(long aValue)
-        {
+        public static string GetNumberString(long aValue) {
             mDebugger.SendInternal("StringHelper.GetNumberString(long)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
             long xValue = aValue;
 
-            if (aValue == 0)
-            {
+            if (aValue == 0) {
                 xResult = "0";
                 mDebugger.SendInternal("xResult =");
                 mDebugger.SendInternal(xResult);
-            }
-            else
-            {
-                if (aValue < 0)
-                {
+            } else {
+                if (aValue < 0) {
                     xValue *= -1;
                 }
 
                 mDebugger.SendInternal("xValue =");
                 mDebugger.SendInternal(xValue);
-                while (xValue > 0)
-                {
+                while (xValue > 0) {
                     long xValue2 = xValue % 10;
                     mDebugger.SendInternal("xValue2 =");
                     mDebugger.SendInternal(xValue2);
@@ -153,8 +127,7 @@ namespace Cosmos.Common
                 }
             }
 
-            if (aValue < 0)
-            {
+            if (aValue < 0) {
                 xResult = string.Concat("-", xResult);
             }
 
@@ -168,8 +141,7 @@ namespace Cosmos.Common
          * I'd have an analogous problem: to plug BigInteger.ToString() and I don't know how many other things.
          * We will retain this code for now it is OK for debug purposes and big value should be printed in scientific notation to be readable anyway...
          */
-        public static string GetNumberString(float aValue)
-        {
+        public static string GetNumberString(float aValue) {
             mDebugger.SendInternal("StringHelper.GetNumberString(float)");
 
             var singleBytes = BitConverter.GetBytes(aValue);
@@ -183,20 +155,17 @@ namespace Cosmos.Common
             ulong intPart = 0, fracPart = 0;
 
             /* First we handle the special cases INF, NaN, 0 and denormalized float */
-            switch (exp)
-            {
+            switch (exp) {
                 /*
                  * INF or NaN?
                  */
                 case 0xFF:
-                    if (mantissa == 0)
-                    {
+                    if (mantissa == 0) {
                         if (isNeg)
                             return "-∞";
                         else
                             return "∞";
-                    }
-                    else
+                    } else
                         /* It could exist -NaN but this is always printed as NaN */
                         return "NaN";
 
@@ -216,41 +185,32 @@ namespace Cosmos.Common
                     break;
             }
 
-            if (exp >= 23)
-            {
+            if (exp >= 23) {
                 intPart = mantissa << (exp - 23);
-            }
-            else if (exp >= 0)
-            {
+            } else if (exp >= 0) {
                 intPart = mantissa >> (23 - exp);
                 fracPart = (mantissa << (exp + 1)) & 0xFFFFFF;
-            }
-            else
-            {
+            } else {
                 fracPart = (mantissa & 0xFFFFFF) >> (-(exp + 1));
             }
 
             string result = "";
 
-            if (isNeg)
-            {
+            if (isNeg) {
                 result += "-";
             }
 
             result += intPart.ToString();
             int usedDigits = intPart.ToString().Length;
-            if (fracPart == 0)
-            {
+            if (fracPart == 0) {
                 return result;
             }
             result += ".";
 
-            if (usedDigits >= 7)
-            {
+            if (usedDigits >= 7) {
                 usedDigits = 6;
             }
-            for (int m = usedDigits; m < 7; m++)
-            {
+            for (int m = usedDigits; m < 7; m++) {
                 fracPart = (fracPart << 3) + (fracPart << 1);
 
                 char p = (char)((fracPart >> 24) + '0');
@@ -260,19 +220,16 @@ namespace Cosmos.Common
             }
             fracPart = (fracPart << 3) + (fracPart << 1);
             char remain = (char)((fracPart >> 24) + '0');
-            if ((remain > '5') && (result[result.Length - 1] > '0'))
-            {
+            if ((remain > '5') && (result[result.Length - 1] > '0')) {
                 char[] answer = result.ToCharArray();
                 int digitPos = answer.Length - 1;
                 char digit = result[digitPos];
                 answer[digitPos] = (char)(digit + 1);
-                while (answer[digitPos] > '9')
-                {
+                while (answer[digitPos] > '9') {
                     answer[digitPos] = '0';
                     digitPos--;
                     digit = result[digitPos];
-                    if (digit == '.')
-                    {
+                    if (digit == '.') {
                         digitPos--;
                         digit = result[digitPos];
                     }
@@ -282,8 +239,7 @@ namespace Cosmos.Common
                 result = new string(answer);
             }
 
-            while (result[result.Length - 1] == '0')
-            {
+            while (result[result.Length - 1] == '0') {
                 result = result.Substring(0, result.Length - 1);
             }
 
@@ -295,8 +251,7 @@ namespace Cosmos.Common
          * I'd have an analogous problem: to plug BigInteger.ToString() and I don't know how many other things.
          * We will retain this code for now it is OK for debug purposes and big value should be printed in scientific notation to be readable anyway...
          */
-        public static string GetNumberString(double aValue)
-        {
+        public static string GetNumberString(double aValue) {
             mDebugger.SendInternal("StringHelper.GetNumberString(double)");
             mDebugger.SendInternal("aValue = ");
             mDebugger.SendInternal(aValue);
@@ -319,17 +274,14 @@ namespace Cosmos.Common
             ulong intPart = 0, fracPart = 0;
 
             /* First we handle the special cases INF, NaN, 0 and denormalized float */
-            switch (exp)
-            {
+            switch (exp) {
                 case 0x07ff:
-                    if (mantissa == 0)
-                    {
+                    if (mantissa == 0) {
                         if (isNeg)
                             return "-∞";
                         else
                             return "∞";
-                    }
-                    else
+                    } else
                         /* It could exist -NaN but this is always printed as NaN */
                         return "NaN";
 
@@ -349,41 +301,32 @@ namespace Cosmos.Common
                     break;
             }
 
-            if (exp >= 52)
-            {
+            if (exp >= 52) {
                 intPart = mantissa << (exp - 52);
-            }
-            else if (exp >= 0)
-            {
+            } else if (exp >= 0) {
                 intPart = mantissa >> (52 - exp);
                 fracPart = (mantissa << (exp + 1)) & 0x1FFFFFFFFFFFFF;
-            }
-            else
-            {
+            } else {
                 fracPart = (mantissa & 0x1FFFFFFFFFFFFF) >> (-(exp + 1));
             }
 
             string result = "";
 
-            if (isNeg)
-            {
+            if (isNeg) {
                 result += "-";
             }
 
             result += intPart.ToString();
             int usedDigits = result.Length;
-            if (fracPart == 0)
-            {
+            if (fracPart == 0) {
                 return result;
             }
             result += ".";
 
-            if (usedDigits >= 15)
-            {
+            if (usedDigits >= 15) {
                 usedDigits = 14;
             }
-            for (int m = usedDigits; m < 15; m++)
-            {
+            for (int m = usedDigits; m < 15; m++) {
                 fracPart = (fracPart << 3) + (fracPart << 1);
                 char p = (char)(((fracPart >> 53) & 0xFF) + '0');
                 result += p;
@@ -392,19 +335,16 @@ namespace Cosmos.Common
             }
             fracPart = (fracPart << 3) + (fracPart << 1);
             char remain = (char)((fracPart >> 53) + '0');
-            if ((remain > '5') && (result[result.Length - 1] > '0'))
-            {
+            if ((remain > '5') && (result[result.Length - 1] > '0')) {
                 char[] answer = result.ToCharArray();
                 int digitPos = answer.Length - 1;
                 char digit = result[digitPos];
                 answer[digitPos] = (char)(digit + 1);
-                while (answer[digitPos] > '9')
-                {
+                while (answer[digitPos] > '9') {
                     answer[digitPos] = '0';
                     digitPos--;
                     digit = result[digitPos];
-                    if (digit == '.')
-                    {
+                    if (digit == '.') {
                         digitPos--;
                         digit = result[digitPos];
                     }
@@ -414,76 +354,57 @@ namespace Cosmos.Common
                 result = new string(answer);
             }
 
-            while (result[result.Length - 1] == '0')
-            {
+            while (result[result.Length - 1] == '0') {
                 result = result.Substring(0, result.Length - 1);
             }
 
             return result;
         }
 
-        public static int GetStringToNumber(string aString)
-        {
+        public static int GetStringToNumber(string aString) {
             bool xIsNegative = false;
             int xNumber = 0;
-            if (!string.IsNullOrWhiteSpace(aString))
-            {
+            if (!string.IsNullOrWhiteSpace(aString)) {
                 char[] xCharArray = aString.ToCharArray();
-                for (int i = 0; i < xCharArray.Length; i++)
-                {
-                    if (char.IsDigit(xCharArray[i]))
-                    {
+                for (int i = 0; i < xCharArray.Length; i++) {
+                    if (char.IsDigit(xCharArray[i])) {
                         int xValue = xCharArray[i] - '0';
                         int xMax = xCharArray.Length - 1;
-                        for (int j = 0; j < xMax - i; i++)
-                        {
+                        for (int j = 0; j < xMax - i; i++) {
                             xValue *= 10;
                         }
 
                         xNumber += xValue;
-                    }
-                    else if (xCharArray[i] == '-')
-                    {
+                    } else if (xCharArray[i] == '-') {
                         xIsNegative = true;
-                    }
-                    else if (xCharArray[i] == '.')
-                    {
+                    } else if (xCharArray[i] == '.') {
                         break;
-                    }
-                    else
-                    {
+                    } else {
                         throw new FormatException("The string parameter is not a number and is invalid.");
                     }
                 }
             }
 
-            if (xIsNegative)
-            {
+            if (xIsNegative) {
                 xNumber *= -1;
             }
 
             return xNumber;
         }
 
-        public static int Compare(string aString1, int aIndex1, string aString2, int aIndex2, int aLength1, int aLength2)
-        {
-            if (aString1.Length < aString2.Length)
-            {
+        public static int Compare(string aString1, int aIndex1, string aString2, int aIndex2, int aLength1, int aLength2) {
+            if (aString1.Length < aString2.Length) {
                 return (int)StringComparisonResultEnum.Less;
             }
-            if (aString1.Length > aString2.Length)
-            {
+            if (aString1.Length > aString2.Length) {
                 return (int)StringComparisonResultEnum.Greater;
             }
 
-            for (int i = aString1.Length; i < aString1.Length; i++)
-            {
-                if (aString1[i] < aString2[i])
-                {
+            for (int i = aString1.Length; i < aString1.Length; i++) {
+                if (aString1[i] < aString2[i]) {
                     return (int)StringComparisonResultEnum.Equal;
                 }
-                if (aString1[i] > aString2[i])
-                {
+                if (aString1[i] > aString2[i]) {
                     return (int)StringComparisonResultEnum.Greater;
                 }
             }
