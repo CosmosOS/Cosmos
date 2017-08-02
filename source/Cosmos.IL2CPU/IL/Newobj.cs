@@ -84,18 +84,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 XS.Comment("ArgSize: " + xArgSize);
 
-                // Set ESP so we can push the struct ptr
-                // int xShift = (int)(xArgSize - xStorageSize);
-                // XS.Comment("Shift: " + xShift);
-                // if (xShift < 0)
-                // {
-                    // XS.Sub(ESP, (uint)Math.Abs(xShift));
-                // }
-                // else if (xShift > 0)
-                // {
-                    // XS.Add(ESP, (uint)xShift);
-                // }
-
                 // set source of args copy
                 XS.Set(ESI, ESP);
 
@@ -113,19 +101,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Set(EAX, ESP);
                 XS.Add(EAX, xArgSize + 4);
                 XS.Set(ESP, EAX, destinationDisplacement: (int)xArgSize);
-
-                // push struct ptr
-                // XS.Push(ESP);
-
-                // Shift args
-                // foreach (var xParam in xParameterList)
-                // {
-                    // uint xArgSizeForThis = Align(SizeOfType(xParam.ParameterType), 4);
-                    // for (int i = 1; i <= xArgSizeForThis / 4; i++)
-                    // {
-                        // new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xStorageSize };
-                    // }
-                // }
 
                 new Call(aAssembler).Execute(aMethod, xMethod);
 
