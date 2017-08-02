@@ -475,11 +475,12 @@ namespace Cosmos.IL2CPU {
                     }
                 }
                 if (xNeedsPlug) {
-                    throw new Exception("Native code encountered, plug required." + Environment.NewLine
+                    throw new Exception(Environment.NewLine
+                        + "Native code encountered, plug required." + Environment.NewLine
                                         + "  DO NOT REPORT THIS AS A BUG." + Environment.NewLine
                                         + "  Please see http://www.gocosmos.org/docs/plugs/missing/" + Environment.NewLine
                         + "  Need plug for: " + LabelName.GetFullName(aMethod) + "." + Environment.NewLine
-                        + "  Called from :" + Environment.NewLine + sourceItem);
+                        + "  Called from :" + Environment.NewLine + sourceItem + Environment.NewLine);
                 }
 
                 //TODO: As we scan each method, we could update or put in a new list
