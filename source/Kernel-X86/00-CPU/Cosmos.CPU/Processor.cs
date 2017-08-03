@@ -1,5 +1,5 @@
 using System;
-using Cosmos.IL2CPU.API;
+
 using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU {
@@ -62,6 +62,7 @@ namespace Cosmos.CPU {
             throw new NotImplementedException();
         }
 
+        [AsmMarker(AsmMarkerType.Processor_InterruptsEnabled)]
         public static bool mInterruptsEnabled;
 
         public static void EnableInterrupts() {
