@@ -12,9 +12,6 @@
         // IDT, PIC, and Float
         // Note: This is changing a bit GDT (already) and IDT are moving to a real preboot area.
         public static void Init() {
-            // Drag this stuff in to the compiler manually until we add the always include attrib
-            Cosmos.Core.INTs.Dummy();
-
             PIC = new PIC();
             Processor.UpdateIDT(true);
 

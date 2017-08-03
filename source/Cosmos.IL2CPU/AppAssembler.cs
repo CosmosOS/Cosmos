@@ -1189,7 +1189,7 @@ namespace Cosmos.IL2CPU
                     }
 
                     var xAsmLabelAttributes = aField.GetCustomAttributes<AsmLabel>();
-                    if (xAsmLabelAttributes != null && xAsmLabelAttributes.Count() > 0)
+                    if (xAsmLabelAttributes.Count() > 0)
                     {
                         Assembler.DataMembers.Add(new DataMember(
                             xFieldName, xAsmLabelAttributes.Select(a => a.Label), xData));

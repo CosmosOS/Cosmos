@@ -11,7 +11,6 @@ using Cosmos.Assembler;
 using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.API.Attribs;
-using Cosmos.IL2CPU.X86.IL;
 
 namespace Cosmos.IL2CPU {
     public delegate void LogExceptionDelegate(Exception e);
@@ -234,23 +233,46 @@ namespace Cosmos.IL2CPU {
             Queue(typeof(MulticastDelegate).GetTypeInfo().GetMethod("GetInvocationList"), null, "Explicit Entry");
             Queue(ExceptionHelperRefs.CurrentExceptionRef, null, "Explicit Entry");
             
+            // Start from entry point of this program
+            Queue(aStartMethod, null, "Entry Point");
+
+            ScanQueue();
+
             // ForceInclude
-            foreach (var xAssembly in AssemblyLoadContext.Default.GetLoadedAssemblies())
+            foreach (var xAssembly in mUsedAssemblies)
             {
                 foreach (var xType in xAssembly.GetTypes())
                 {
+                    if (xType.Name == "INTs")
+                    {
+
+                    }
+
                     var xTypeInfo = xType.GetTypeInfo();
 
-                    if (xTypeInfo.GetCustomAttribute<ForceIncludeAttribute>() != null)
+                    if (xTypeInfo.GetCustomAttribute<ForceInclude>() != null)
                     {
                         Queue(xTypeInfo, null, "Explicit Entry");
+                        
+                        foreach (var xMethod in xTypeInfo.GetMethods(
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                        {
+                            Queue(xMethod, null, "Explicit Entry");
+                        }
+
+                        foreach (var xMethod in xTypeInfo.GetMethods(
+                            BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                        {
+                            Queue(xMethod, null, "Explicit Entry");
+                        }
+
                         continue;
                     }
 
                     foreach (var xMethod in xTypeInfo.GetMethods(
                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                     {
-                        if (xMethod.GetCustomAttribute<ForceIncludeAttribute>() != null)
+                        if (xMethod.GetCustomAttribute<ForceInclude>() != null)
                         {
                             Queue(xMethod, null, "Explicit Entry");
                         }
@@ -259,7 +281,7 @@ namespace Cosmos.IL2CPU {
                     foreach (var xMethod in xTypeInfo.GetMethods(
                         BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
                     {
-                        if (xMethod.GetCustomAttribute<ForceIncludeAttribute>() != null)
+                        if (xMethod.GetCustomAttribute<ForceInclude>() != null)
                         {
                             Queue(xMethod, null, "Explicit Entry");
                         }
@@ -267,10 +289,8 @@ namespace Cosmos.IL2CPU {
                 }
             }
 
-            // Start from entry point of this program
-            Queue(aStartMethod, null, "Entry Point");
-
             ScanQueue();
+
             UpdateAssemblies();
             Assemble();
 
@@ -568,7 +588,7 @@ namespace Cosmos.IL2CPU {
         }
 
         protected void ScanType(TypeInfo aType) {
-            CompilerHelpers.Debug($"ILScanner: ScanMethod");
+            CompilerHelpers.Debug($"ILScanner: ScanType");
             CompilerHelpers.Debug($"Type = '{aType}'");
 
             // Add immediate ancestor type
