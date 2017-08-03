@@ -3,6 +3,7 @@ using System.Reflection;
 
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using Cosmos.CPU;
 using Cosmos.IL2CPU.API.Attribs;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
@@ -31,7 +32,7 @@ namespace Cosmos.CPU_Asm {
 
         private static MethodBase GetInterruptHandler(byte aInterrupt)
         {
-            return GetMethodDef(typeof(Cosmos.Core.INTs).GetTypeInfo().Assembly, typeof(Cosmos.Core.INTs).FullName
+            return GetMethodDef(typeof(INTs).GetTypeInfo().Assembly, typeof(INTs).FullName
                 , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
         }
 
@@ -96,7 +97,7 @@ namespace Cosmos.CPU_Asm {
                 MethodBase xHandler = GetInterruptHandler((byte)j);
                 if (xHandler == null)
                 {
-                    xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).GetTypeInfo().Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
+                    xHandler = GetMethodDef(typeof(INTs).GetTypeInfo().Assembly, typeof(INTs).FullName, "HandleInterrupt_Default", true);
                 }
                 XS.Call(LabelName.Get(xHandler));
                 XS.Pop(EAX);

@@ -3,7 +3,7 @@
 using Cosmos.CPU;
 using Cosmos.IL2CPU.API.Attribs;
 
-namespace Cosmos.Core {
+namespace Cosmos.CPU {
     [ForceInclude]
     public class INTs {
         #region Enums

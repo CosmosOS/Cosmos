@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Cosmos.Core;
+
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.CPU.Memory.Old

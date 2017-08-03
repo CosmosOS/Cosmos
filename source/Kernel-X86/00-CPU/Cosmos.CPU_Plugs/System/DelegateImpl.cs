@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Core;
+
 using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.API.Attribs;
 
@@ -24,7 +24,7 @@ namespace Cosmos.CPU_Plugs.System {
         public static unsafe uint InternalAllocLike(uint* aDelegate) {
             uint xNeededSize = 1024; // 24 is needed fields for Multicast Delegate
             xNeededSize += 12;
-            uint xResultAddr = Cosmos.CPU_Plugs.GCImplementionImpl.AllocNewObject(xNeededSize);
+            uint xResultAddr = GCImplementationImpl.AllocNewObject(xNeededSize);
             byte* xResult = (byte*)xResultAddr;
             byte* xDelegateAsByte = (byte*)aDelegate;
             for (int i = 0; i < 1024; i++) {

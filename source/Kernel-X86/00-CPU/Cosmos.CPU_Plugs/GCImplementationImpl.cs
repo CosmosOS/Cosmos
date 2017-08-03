@@ -5,7 +5,7 @@ using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Plugs {
     [Plug(Target = typeof(GCImplementation))]
-    public static class GCImplementionImpl {
+    public static class GCImplementationImpl {
         public static uint AllocNewObject(uint aSize) {
             CPU.Memory.Old.GlobalSystemInfo.EnsureInitialized();
             return CPU.Memory.Old.Heap.MemAlloc(aSize);
