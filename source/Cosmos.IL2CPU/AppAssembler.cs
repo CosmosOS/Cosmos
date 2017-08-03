@@ -14,6 +14,7 @@ using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.Extensions;
@@ -136,7 +137,7 @@ namespace Cosmos.IL2CPU
             XS.Label(xMethodLabel);
 
             // Alternative asm labels for the method
-            var xAsmLabelAttributes = aMethod.MethodBase.GetCustomAttributes<AsmLabelAttribute>();
+            var xAsmLabelAttributes = aMethod.MethodBase.GetCustomAttributes<AsmLabel>();
             foreach (var xAttribute in xAsmLabelAttributes)
             {
                 XS.Label(xAttribute.Label);
@@ -1187,7 +1188,7 @@ namespace Cosmos.IL2CPU
                         DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
                     }
 
-                    var xAsmLabelAttributes = aField.GetCustomAttributes<AsmLabelAttribute>();
+                    var xAsmLabelAttributes = aField.GetCustomAttributes<AsmLabel>();
                     if (xAsmLabelAttributes != null && xAsmLabelAttributes.Count() > 0)
                     {
                         Assembler.DataMembers.Add(new DataMember(
@@ -1231,7 +1232,7 @@ namespace Cosmos.IL2CPU
 
                     if (!aTo.IsWildcard)
                     {
-                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttribute<ObjectPointerAccessAttribute>(true);
+                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttribute<ObjectPointerAccess>(true);
                         if (xObjectPointerAccessAttrib != null)
                         {
                             XS.Comment("Skipping the reference to the next object reference.");
@@ -1254,8 +1255,8 @@ namespace Cosmos.IL2CPU
                 var xOriginalParamsIdx = 0;
                 foreach (var xParam in xParams)
                 {
-                    var xFieldAccessAttrib = xParam.GetCustomAttribute<FieldAccessAttribute>(true);
-                    var xObjectPointerAccessAttrib = xParam.GetCustomAttribute<ObjectPointerAccessAttribute>(true);
+                    var xFieldAccessAttrib = xParam.GetCustomAttribute<FieldAccess>(true);
+                    var xObjectPointerAccessAttrib = xParam.GetCustomAttribute<ObjectPointerAccess>(true);
                     if (xFieldAccessAttrib != null)
                     {
                         // field access

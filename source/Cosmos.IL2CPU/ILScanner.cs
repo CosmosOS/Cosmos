@@ -9,6 +9,7 @@ using Cosmos.Assembler;
 
 using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 using Cosmos.IL2CPU.X86.IL;
 
 namespace Cosmos.IL2CPU {
@@ -746,10 +747,10 @@ namespace Cosmos.IL2CPU {
                     if (xMethodIdMethod == -1) {
                         throw new Exception("Method not in scanner list!");
                     }
-                    PlugMethodAttribute xPlugAttrib = null;
+                    PlugMethod xPlugAttrib = null;
                     if (xPlug != null) {
                         xMethodType = _MethodInfo.TypeEnum.NeedsPlug;
-                        xPlugAttrib = xPlug.GetCustomAttribute<PlugMethodAttribute>();
+                        xPlugAttrib = xPlug.GetCustomAttribute<PlugMethod>();
                         var xInlineAttrib = xPlug.GetCustomAttribute<InlineAttribute>();
                         var xMethodIdPlug = mItemsList.IndexOf(xPlug);
                         if ((xMethodIdPlug == -1) && (xInlineAttrib == null)) {
@@ -795,7 +796,7 @@ namespace Cosmos.IL2CPU {
                             }
                         }
                     } else {
-                        xPlugAttrib = xMethod.GetCustomAttribute<PlugMethodAttribute>();
+                        xPlugAttrib = xMethod.GetCustomAttribute<PlugMethod>();
 
                         if (xPlugAttrib != null) {
                             if (xPlugAttrib.IsWildcard) {

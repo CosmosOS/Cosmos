@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Plugs.System {
     [Plug(Target = typeof(global::System.Globalization.CharUnicodeInfo))]

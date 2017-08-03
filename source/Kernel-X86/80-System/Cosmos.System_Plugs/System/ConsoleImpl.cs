@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System {
     [Plug(Target = typeof(global::System.Console))]

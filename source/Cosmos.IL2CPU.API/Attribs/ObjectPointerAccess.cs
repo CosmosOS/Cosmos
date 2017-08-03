@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.API
     /// This attribute is used on plug parameters, that need the unsafe pointer to an object's data area
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class ObjectPointerAccessAttribute: Attribute
+    public class ObjectPointerAccess: Attribute
     {
 
     }

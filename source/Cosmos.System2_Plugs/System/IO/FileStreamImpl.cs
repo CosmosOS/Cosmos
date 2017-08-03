@@ -1,10 +1,9 @@
 //#define COSMOSDEBUG
-
 using global::System;
 using global::System.IO;
-
 using Cosmos.System;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 

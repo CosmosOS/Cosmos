@@ -1,6 +1,7 @@
 using System;
 using Cosmos.CPU;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Plugs {
     [Plug(Target = typeof(GCImplementation))]

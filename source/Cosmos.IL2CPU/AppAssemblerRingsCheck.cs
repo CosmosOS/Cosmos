@@ -4,6 +4,7 @@ using System.Reflection;
 
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.IL2CPU {
     public static class AppAssemblerRingsCheck {
@@ -145,7 +146,7 @@ namespace Cosmos.IL2CPU {
             }
         }
 
-        private static Cosmos.IL2CPU.API.Ring GetRingFromAssembly(Assembly assembly) {
+        private static Ring GetRingFromAssembly(Assembly assembly) {
             var xRingAttrib = assembly.GetCustomAttribute<RingAttribute>();
 
             if (xRingAttrib == null) {

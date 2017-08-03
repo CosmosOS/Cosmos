@@ -6,6 +6,7 @@ using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 using Cosmos.Assembler;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Debug.Symbols;
@@ -158,7 +159,7 @@ namespace Cosmos.IL2CPU {
       }
 
       // now check plugs
-      IDictionary<string, PlugFieldAttribute> xPlugFields;
+      IDictionary<string, PlugField> xPlugFields;
       if (mPlugManager.PlugFields.TryGetValue(aType, out xPlugFields)) {
         foreach (var xPlugField in xPlugFields) {
           _FieldInfo xPluggedField = null;

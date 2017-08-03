@@ -1,4 +1,5 @@
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Asm {
     [Plug(Target = typeof(Cosmos.CPU.Processor))]

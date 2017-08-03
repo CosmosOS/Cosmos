@@ -1,21 +1,21 @@
 using System;
 
-namespace Cosmos.IL2CPU.API
+namespace Cosmos.IL2CPU.API.Attribs
 {
   [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-  public sealed class PlugAttribute : Attribute 
+  public sealed class Plug : Attribute 
   {
-      public PlugAttribute()
+      public Plug()
       {
       }
-      public PlugAttribute(Type target)
+      public Plug(Type target)
       {
           if (null == target) { throw new ArgumentNullException(); }
           Target = target;
           return;
       }
 
-      public PlugAttribute(string targetName)
+      public Plug(string targetName)
       {
           if (string.IsNullOrEmpty(targetName)) { throw new ArgumentNullException(); }
           TargetName = targetName;

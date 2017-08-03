@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Cosmos.IL2CPU.API
-{
+namespace Cosmos.IL2CPU.API.Attribs {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple=true)]
-	public sealed class PlugFieldAttribute: Attribute {
-		public PlugFieldAttribute() {
+	public sealed class PlugField: Attribute {
+		public PlugField() {
 		}
 
 		public string FieldId {
