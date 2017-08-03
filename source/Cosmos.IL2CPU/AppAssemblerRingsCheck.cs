@@ -54,8 +54,8 @@ namespace Cosmos.IL2CPU {
 
             // verify the entry assembly is in the User ring.
             var xRing = GetRingFromAssembly(entryAssembly);
-            if (xRing != Ring.User) {
-                throw new Exception($"Assembly '{entryAssembly.GetName().Name}' contains your kernel class, which means it should be in the ring {Ring.User}!");
+            if (xRing != RingAttribute.RingEnum.User) {
+                throw new Exception($"Assembly '{entryAssembly.GetName().Name}' contains your kernel class, which means it should be in the ring {RingAttribute.RingEnum.User}!");
             }
 
             foreach (var xAssembly in scanner.mUsedAssemblies) {
@@ -97,16 +97,16 @@ namespace Cosmos.IL2CPU {
 
                 // now do per-ring checks:
                 switch (xRing) {
-                    case Ring.User:
+                    case RingAttribute.RingEnum.User:
                         ValidateUserAssembly(xAssembly);
                         break;
-                    case Ring.Core:
+                    case RingAttribute.RingEnum.Core:
                         ValidateCoreAssembly(xAssembly);
                         break;
-                    case Ring.HAL:
+                    case RingAttribute.RingEnum.HAL:
                         ValidateHALAssembly(xAssembly);
                         break;
-                    case Ring.System:
+                    case RingAttribute.RingEnum.System:
                         ValidateSystemAssembly(xAssembly);
                         break;
                     default:
@@ -146,11 +146,11 @@ namespace Cosmos.IL2CPU {
             }
         }
 
-        private static Ring GetRingFromAssembly(Assembly assembly) {
+        private static RingAttribute.RingEnum GetRingFromAssembly(Assembly assembly) {
             var xRingAttrib = assembly.GetCustomAttribute<RingAttribute>();
 
             if (xRingAttrib == null) {
-                return Ring.User;
+                return RingAttribute.RingEnum.User;
             }
 
             return xRingAttrib.Ring;

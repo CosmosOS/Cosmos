@@ -408,7 +408,7 @@ namespace Cosmos.IL2CPU {
             const byte ICW1_ICW4 = 0x01; /* ICW4 (not) needed */
             const byte ICW1_SINGLE = 0x02; /* Single (cascade) mode */
             const byte ICW1_INTERVAL4 = 0x04; /* Call address interval 4 (8) */
-            const byte ICW1_LEVEL = 0x08; /* RingEnum triggered (edge) mode */
+            const byte ICW1_LEVEL = 0x08; /* Ring triggered (edge) mode */
             const byte ICW1_INIT = 0x10; /* Initialization - required! */
 
             const byte ICW4_8086 = 0x01; /* 8086/88 (MCS-80/85) mode */

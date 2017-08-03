@@ -1,3 +1,3 @@
 ﻿using Cosmos.IL2CPU.API.Attribs;
 
-[assembly: Ring(Ring.System)]
+[assembly: Ring(RingAttribute.RingEnum.System)]
