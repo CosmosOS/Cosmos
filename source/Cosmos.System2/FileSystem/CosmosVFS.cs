@@ -182,7 +182,9 @@ namespace Cosmos.System.FileSystem
             try
             {
                 if (GetDirectoryListing(aPath).Count > 0)
+                {
                     throw new Exception("Directory is not empty");
+                }
 
                 var xFS = GetFileSystemFromPath(aPath.mFullPath);
                 xFS.DeleteDirectory(aPath);
