@@ -112,7 +112,22 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new NotImplementedException();
+            switch (origin)
+            {
+                case SeekOrigin.Begin:
+                    Position = offset;
+                    break;
+                case SeekOrigin.Current:
+                    Position += offset;
+                    break;
+                case SeekOrigin.End:
+                    Position = Length + offset;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return Position;
         }
 
         public override void SetLength(long value)
@@ -188,7 +203,7 @@ namespace Cosmos.System.FileSystem.FAT
 
                 //TODO: .Net Core
                 //Array.Copy(xCluster, xPosInCluster, aBuffer, xOffset, xReadSize);
-                Array.Copy(xCluster, (int) xPosInCluster, aBuffer, (int) xOffset, (int) xReadSize);
+                Array.Copy(xCluster, (int)xPosInCluster, aBuffer, (int)xOffset, (int)xReadSize);
 
                 xOffset += xReadSize;
                 xCount -= xReadSize;
@@ -228,6 +243,7 @@ namespace Cosmos.System.FileSystem.FAT
             long xOffset = aOffset;
 
             long xTotalLength = (mPosition + xCount);
+
             if (xTotalLength > Length)
             {
                 SetLength(xTotalLength);
@@ -238,6 +254,7 @@ namespace Cosmos.System.FileSystem.FAT
                 long xWriteSize;
                 long xClusterIdx = mPosition / xClusterSize;
                 long xPosInCluster = mPosition % xClusterSize;
+
                 if (xPosInCluster + xCount > xClusterSize)
                 {
                     xWriteSize = xClusterSize - xPosInCluster - 1;
@@ -248,11 +265,10 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 byte[] xCluster;
-                mFS.Read(xClusterIdx, out xCluster);
-                //TODO: .Net Core
-                //Array.Copy(aBuffer, aOffset, xCluster, xPosInCluster, xWriteSize);
-                Array.Copy(aBuffer, aOffset, xCluster, (int) xPosInCluster, (int) xWriteSize);
+                mFS.Read(mFatTable[xClusterIdx], out xCluster);
+                Array.Copy(aBuffer, aOffset, xCluster, (int)xPosInCluster, (int)xWriteSize);
                 mFS.Write(mFatTable[xClusterIdx], xCluster);
+
                 xOffset += xWriteSize;
                 xCount -= xWriteSize;
             }
