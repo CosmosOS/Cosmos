@@ -1,9 +1,8 @@
 ﻿using System;
+using System.IO;
 
 namespace Cosmos.System.FileSystem.Listing
 {
-    using global::System.IO;
-
     /// <summary>
     /// Enumeration for the directory entry type.
     /// </summary>

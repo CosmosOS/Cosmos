@@ -110,16 +110,22 @@ namespace Cosmos.System.FileSystem.VFS
         public static void DeleteDirectory(string aPath, bool recursive)
         {
             if (mVFS == null)
+            {
                 throw new Exception("VFSManager isn't ready.");
+            }
 
             var xDirectory = mVFS.GetDirectory(aPath);
             var xDirectoryListing = mVFS.GetDirectoryListing(xDirectory);
 
             if (xDirectory.mEntryType != DirectoryEntryTypeEnum.Directory)
+            {
                 throw new IOException("The specified path isn't a directory");
+            }
 
             if (xDirectoryListing.Count > 0 && !recursive)
+            {
                 throw new IOException("Directory is not empty");
+            }
 
             if (recursive)
             {
@@ -206,7 +212,6 @@ namespace Cosmos.System.FileSystem.VFS
             List<string> xDrives = new List<string>();
             foreach (FilesystemEntry entry in GetVolumes())
                 xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
-
             return xDrives.ToArray();
             */
         }
@@ -227,20 +232,15 @@ namespace Cosmos.System.FileSystem.VFS
             //TODO: Add SearchOption functionality
             //TODO: What is userPathOriginal?
             //TODO: Add SearchPattern functionality
-
             List<string> xFileAndDirectoryNames = new List<string>();
-
             //Validate input arguments
             if ((searchOption != SearchOption.TopDirectoryOnly) && (searchOption != SearchOption.AllDirectories))
                 throw new ArgumentOutOfRangeException("searchOption");
-
             searchPattern = searchPattern.TrimEnd(new char[0]);
             if (searchPattern.Length == 0)
                 return new string[0];
-
             //Perform search in filesystem
             FilesystemEntry[] xEntries = GetDirectoryListing(path);
-
             foreach (FilesystemEntry xEntry in xEntries)
             {
                 if (xEntry.IsDirectory && includeDirs)
@@ -248,9 +248,7 @@ namespace Cosmos.System.FileSystem.VFS
                 else if (!xEntry.IsDirectory && includeFiles)
                     xFileAndDirectoryNames.Add(xEntry.Name);
             }
-
             return xFileAndDirectoryNames.ToArray();
-
              */
         }
 

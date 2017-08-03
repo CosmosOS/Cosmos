@@ -459,6 +459,8 @@ namespace Cosmos.System.FileSystem.FAT
 
         internal void Read(long aCluster, out byte[] aData, long aSize = 0, long aOffset = 0)
         {
+            Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Read --");
+
             if (aSize == 0)
             {
                 aSize = BytesPerCluster;
@@ -479,6 +481,8 @@ namespace Cosmos.System.FileSystem.FAT
 
         internal void Write(long aCluster, byte[] aData, long aSize = 0, long aOffset = 0)
         {
+            Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Write --");
+
             if (aData == null)
             {
                 throw new ArgumentNullException(nameof(aData));
@@ -494,16 +498,16 @@ namespace Cosmos.System.FileSystem.FAT
             Read(aCluster, out xData);
             //TODO: .Net Core
             //Array.Copy(aData, 0, xData, aOffset, aData.Length);
-            Array.Copy(aData, 0, xData, (int) aOffset, aData.Length);
+            Array.Copy(aData, 0, xData, (int)aOffset, aData.Length);
 
             if (mFatType == FatTypeEnum.Fat32)
             {
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                mDevice.WriteBlock((ulong) xSector, SectorsPerCluster, xData);
+                mDevice.WriteBlock((ulong)xSector, SectorsPerCluster, xData);
             }
             else
             {
-                mDevice.WriteBlock((ulong) aCluster, RootSectorCount, xData);
+                mDevice.WriteBlock((ulong)aCluster, RootSectorCount, xData);
             }
         }
 
