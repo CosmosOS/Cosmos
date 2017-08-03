@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using Cosmos.Assembler;
 
 using Cosmos.IL2CPU.Extensions;
@@ -231,6 +232,39 @@ namespace Cosmos.IL2CPU {
             Queue(typeof(Array).GetTypeInfo().GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First(), null, "Explicit Entry");
             Queue(typeof(MulticastDelegate).GetTypeInfo().GetMethod("GetInvocationList"), null, "Explicit Entry");
             Queue(ExceptionHelperRefs.CurrentExceptionRef, null, "Explicit Entry");
+            
+            // ForceInclude
+            foreach (var xAssembly in AssemblyLoadContext.Default.GetLoadedAssemblies())
+            {
+                foreach (var xType in xAssembly.GetTypes())
+                {
+                    var xTypeInfo = xType.GetTypeInfo();
+
+                    if (xTypeInfo.GetCustomAttribute<ForceIncludeAttribute>() != null)
+                    {
+                        Queue(xTypeInfo, null, "Explicit Entry");
+                        continue;
+                    }
+
+                    foreach (var xMethod in xTypeInfo.GetMethods(
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                    {
+                        if (xMethod.GetCustomAttribute<ForceIncludeAttribute>() != null)
+                        {
+                            Queue(xMethod, null, "Explicit Entry");
+                        }
+                    }
+
+                    foreach (var xMethod in xTypeInfo.GetMethods(
+                        BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                    {
+                        if (xMethod.GetCustomAttribute<ForceIncludeAttribute>() != null)
+                        {
+                            Queue(xMethod, null, "Explicit Entry");
+                        }
+                    }
+                }
+            }
 
             // Start from entry point of this program
             Queue(aStartMethod, null, "Entry Point");

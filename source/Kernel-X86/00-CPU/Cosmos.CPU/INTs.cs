@@ -1,7 +1,10 @@
 ﻿using System.Runtime.InteropServices;
+
 using Cosmos.CPU;
+using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core {
+    [ForceInclude]
     public class INTs {
         #region Enums
         // TODO: Protect IRQs like memory and ports are
@@ -482,69 +485,5 @@ namespace Cosmos.Core {
                 PutErrorChar(line, startCol + i, error[i]);
             }
         }
-
-        // This is to trick IL2CPU to compile it in
-        //TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this.
-        // We dont actually need to cal this method
-        public static void Dummy() {
-            // Compiler magic
-            bool xTest = false;
-            if (xTest) {
-                unsafe
-                {
-                    var xCtx = new IRQContext();
-                    HandleInterrupt_Default(ref xCtx);
-                    HandleInterrupt_00(ref xCtx);
-                    HandleInterrupt_01(ref xCtx);
-                    HandleInterrupt_02(ref xCtx);
-                    HandleInterrupt_03(ref xCtx);
-                    HandleInterrupt_04(ref xCtx);
-                    HandleInterrupt_05(ref xCtx);
-                    HandleInterrupt_06(ref xCtx);
-                    HandleInterrupt_07(ref xCtx);
-                    HandleInterrupt_08(ref xCtx);
-                    HandleInterrupt_09(ref xCtx);
-                    HandleInterrupt_0A(ref xCtx);
-                    HandleInterrupt_0B(ref xCtx);
-                    HandleInterrupt_0C(ref xCtx);
-                    HandleInterrupt_0D(ref xCtx);
-                    HandleInterrupt_0E(ref xCtx);
-                    HandleInterrupt_0F(ref xCtx);
-                    HandleInterrupt_10(ref xCtx);
-                    HandleInterrupt_11(ref xCtx);
-                    HandleInterrupt_12(ref xCtx);
-                    HandleInterrupt_13(ref xCtx);
-                    HandleInterrupt_20(ref xCtx);
-                    HandleInterrupt_21(ref xCtx);
-                    HandleInterrupt_22(ref xCtx);
-                    HandleInterrupt_23(ref xCtx);
-                    HandleInterrupt_24(ref xCtx);
-                    HandleInterrupt_25(ref xCtx);
-                    HandleInterrupt_26(ref xCtx);
-                    HandleInterrupt_27(ref xCtx);
-                    HandleInterrupt_28(ref xCtx);
-                    HandleInterrupt_29(ref xCtx);
-                    HandleInterrupt_2A(ref xCtx);
-                    HandleInterrupt_2B(ref xCtx);
-                    HandleInterrupt_2C(ref xCtx);
-                    HandleInterrupt_2D(ref xCtx);
-                    HandleInterrupt_2E(ref xCtx);
-                    HandleInterrupt_2F(ref xCtx);
-                    HandleInterrupt_30(ref xCtx);
-                    HandleInterrupt_35(ref xCtx);
-                    HandleInterrupt_40(ref xCtx);
-                    HandleInterrupt_41(ref xCtx);
-                    HandleInterrupt_42(ref xCtx);
-                    HandleInterrupt_43(ref xCtx);
-                    HandleInterrupt_44(ref xCtx);
-                    HandleInterrupt_45(ref xCtx);
-                    HandleInterrupt_46(ref xCtx);
-                    HandleInterrupt_47(ref xCtx);
-                    HandleInterrupt_48(ref xCtx);
-                    HandleInterrupt_49(ref xCtx);
-                }
-            }
-        }
-
     }
 }
