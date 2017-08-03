@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
-    <ProjectGuid>$KernelProjectGuid$</ProjectGuid>
+    <ProjectGuid>$guid1$</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,8 +10,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Cosmos.Debug.Kernel" Version="1.0.2-*" />
-    <PackageReference Include="Cosmos.System" Version="1.0.2-*" />
+    <PackageReference Include="Cosmos.Debug.Kernel" Version="*" />
+    <PackageReference Include="Cosmos.System2" Version="*" />
   </ItemGroup>
 
 </Project>
