@@ -62,7 +62,7 @@ namespace Cosmos.CPU {
             throw new NotImplementedException();
         }
 
-        [AsmMarker(AsmMarkerType.Processor_InterruptsEnabled)]
+        [AsmMarker(AsmMarker.Type.Processor_InterruptsEnabled)]
         public static bool mInterruptsEnabled;
 
         public static void EnableInterrupts() {

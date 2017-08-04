@@ -168,8 +168,8 @@ namespace Cosmos.IL2CPU
                 XS.Call(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Pop(EAX);
-                XS.Set(AsmMarker.DebugStub_CallerEIP, EAX, destinationIsIndirect: true);
-                XS.Call(AsmMarker.DebugStub_SendStackOverflowOccurred);
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.DebugStub_CallerEIP], EAX, destinationIsIndirect: true);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackOverflowOccurred]);
                 XS.Halt();
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
             }
@@ -310,7 +310,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(xMethodLabel + EndOfMethodLabelNameNormal);
 
                 XS.Comment("Following code is for debugging. Adjust accordingly!");
-                XS.Set(AsmMarker.INTs_LastKnownAddress, xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.INTs_LastKnownAddress], xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
             }
 
             XS.Set(ECX, 0);
@@ -398,12 +398,12 @@ namespace Cosmos.IL2CPU
                 XS.Pop(ECX);
                 XS.Push(EAX);
                 XS.Push(EBX);
-                XS.Set(AsmMarker.DebugStub_CallerEIP, ECX, destinationIsIndirect: true);
-                XS.Call(AsmMarker.DebugStub_SendSimpleNumber);
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.DebugStub_CallerEIP], ECX, destinationIsIndirect: true);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
                 XS.Add(ESP, 4);
-                XS.Call(AsmMarker.DebugStub_SendSimpleNumber);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
                 XS.Add(ESP, 4);
-                XS.Call(AsmMarker.DebugStub_SendStackCorruptionOccurred);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackCorruptionOccurred]);
                 XS.Halt();
             }
             XS.Label(xLabelExc + "__2");
@@ -1469,17 +1469,17 @@ namespace Cosmos.IL2CPU
                 XS.Jump(ConditionalTestEnum.Equal, xLabel + ".StackCorruptionCheck_End");
                 XS.Push(EAX);
                 XS.Push(EBX);
-                XS.Call(AsmMarker.DebugStub_SendSimpleNumber);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
                 XS.Add(ESP, 4);
-                XS.Call(AsmMarker.DebugStub_SendSimpleNumber);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
 
                 XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 XS.Call(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Pop(EAX);
-                XS.Set(AsmMarker.DebugStub_CallerEIP, EAX, destinationIsIndirect: true);
-                XS.Call(AsmMarker.DebugStub_SendStackCorruptionOccurred);
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.DebugStub_CallerEIP], EAX, destinationIsIndirect: true);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackCorruptionOccurred]);
                 XS.Halt();
                 XS.Label(xLabel + ".StackCorruptionCheck_End");
             }
