@@ -169,7 +169,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Pop(EAX);
                 XS.Set(AsmMarker.Labels[AsmMarker.Type.DebugStub_CallerEIP], EAX, destinationIsIndirect: true);
-                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackOverflowOccurred]);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackOverflowEvent]);
                 XS.Halt();
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
             }
@@ -310,7 +310,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(xMethodLabel + EndOfMethodLabelNameNormal);
 
                 XS.Comment("Following code is for debugging. Adjust accordingly!");
-                XS.Set(AsmMarker.Labels[AsmMarker.Type.INTs_LastKnownAddress], xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.Int_LastKnownAddress], xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
             }
 
             XS.Set(ECX, 0);
@@ -403,7 +403,7 @@ namespace Cosmos.IL2CPU
                 XS.Add(ESP, 4);
                 XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
                 XS.Add(ESP, 4);
-                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackCorruptionOccurred]);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackCorruptedEvent]);
                 XS.Halt();
             }
             XS.Label(xLabelExc + "__2");
@@ -1479,7 +1479,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Pop(EAX);
                 XS.Set(AsmMarker.Labels[AsmMarker.Type.DebugStub_CallerEIP], EAX, destinationIsIndirect: true);
-                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackCorruptionOccurred]);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackCorruptedEvent]);
                 XS.Halt();
                 XS.Label(xLabel + ".StackCorruptionCheck_End");
             }

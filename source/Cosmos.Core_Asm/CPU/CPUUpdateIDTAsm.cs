@@ -122,7 +122,7 @@ namespace Cosmos.Core_Asm
 
             // reload interrupt list
             XS.Set(EAX, "_NATIVE_IDT_Pointer");
-            XS.Set(AsmMarker.Labels[AsmMarker.Type.Processor_InterruptsEnabled], 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+            XS.Set(AsmMarker.Labels[AsmMarker.Type.Processor_IntsEnabled], 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
             XS.LoadIdt(EAX, isIndirect: true);
             // Reenable interrupts
             XS.EnableInterrupts();

@@ -135,7 +135,7 @@ namespace Cosmos.Core {
         }
         #endregion
 
-        [AsmMarker(AsmMarker.Type.INTs_LastKnownAddress)]
+        [AsmMarker(AsmMarker.Type.Int_LastKnownAddress)]
         private static uint mLastKnownAddress;
 
         private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
