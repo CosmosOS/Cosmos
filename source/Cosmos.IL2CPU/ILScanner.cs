@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
 using Cosmos.Assembler;
 
 using Cosmos.IL2CPU.Extensions;
@@ -252,18 +251,18 @@ namespace Cosmos.IL2CPU {
 
                     if (xTypeInfo.GetCustomAttribute<ForceInclude>() != null)
                     {
-                        Queue(xTypeInfo, null, "Explicit Entry");
+                        Queue(xTypeInfo, null, "Force Include");
                         
                         foreach (var xMethod in xTypeInfo.GetMethods(
-                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                         {
-                            Queue(xMethod, null, "Explicit Entry");
+                            Queue(xMethod, null, "Force Include");
                         }
 
                         foreach (var xMethod in xTypeInfo.GetMethods(
-                            BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                            BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                         {
-                            Queue(xMethod, null, "Explicit Entry");
+                            Queue(xMethod, null, "Force Include");
                         }
 
                         continue;
@@ -274,7 +273,7 @@ namespace Cosmos.IL2CPU {
                     {
                         if (xMethod.GetCustomAttribute<ForceInclude>() != null)
                         {
-                            Queue(xMethod, null, "Explicit Entry");
+                            Queue(xMethod, null, "Force Include");
                         }
                     }
 
@@ -283,7 +282,7 @@ namespace Cosmos.IL2CPU {
                     {
                         if (xMethod.GetCustomAttribute<ForceInclude>() != null)
                         {
-                            Queue(xMethod, null, "Explicit Entry");
+                            Queue(xMethod, null, "Force Include");
                         }
                     }
                 }
