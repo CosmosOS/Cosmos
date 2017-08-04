@@ -344,12 +344,8 @@ namespace Cosmos.IL2CPU {
           XS.Call(".NullCheck_GetCurrAddress");
           XS.Label(".NullCheck_GetCurrAddress");
           XS.Pop(XSRegisters.EAX);
-          new CPU.Mov {
-            DestinationRef = ElementReference.New("DebugStub_CallerEIP"),
-            DestinationIsIndirect = true,
-            SourceReg = CPU.RegistersEnum.EAX
-          };
-          XS.Call("DebugStub_SendNullReferenceOccurred");
+          XS.Set(AsmMarker.DebugStub_CallerEIP, XSRegisters.EAX, destinationIsIndirect: true);
+          XS.Call(AsmMarker.DebugStub_SendNullReferenceOccurred);
         //}
         XS.Halt();
         XS.Label(".AfterNullCheck");

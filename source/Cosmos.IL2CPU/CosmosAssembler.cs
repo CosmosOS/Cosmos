@@ -7,6 +7,7 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.Core.DebugStub;
+using Cosmos.IL2CPU.API.Attribs;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
@@ -166,8 +167,8 @@ namespace Cosmos.IL2CPU {
 
             //
             if (mComPort > 0) {
-                SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
-                SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
+                SetIdtDescriptor(1, AsmMarker.DebugStub_TracerEntry, false);
+                SetIdtDescriptor(3, AsmMarker.DebugStub_TracerEntry, false);
 
                 //for (int i = 0; i < 256; i++)
                 //{
@@ -197,7 +198,7 @@ namespace Cosmos.IL2CPU {
             XS.Set(XSRegisters.EAX, "_NATIVE_IDT_Pointer");
 
             if (mComPort > 0) {
-                XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+                XS.Set(AsmMarker.Processor_InterruptsEnabled, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             }
             XS.Label("AfterCreateIDT");
@@ -340,7 +341,7 @@ namespace Cosmos.IL2CPU {
 
             if (mComPort > 0) {
                 WriteDebugVideo("Initializing DebugStub.");
-                XS.Call("DebugStub_Init");
+                XS.Call(AsmMarker.DebugStub_Init);
             }
 
             // Jump to Kernel entry point
@@ -388,7 +389,7 @@ namespace Cosmos.IL2CPU {
                 }
                 OnAfterEmitDebugStub();
             } else {
-                XS.Label("DebugStub_Step");
+                XS.Label(AsmMarker.DebugStub_Step);
                 XS.Return();
             }
 
