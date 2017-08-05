@@ -153,6 +153,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             if ((aEntryType == DirectoryEntryTypeEnum.Directory) || (aEntryType == DirectoryEntryTypeEnum.File))
             {
                 string xShortName = aName;
+                uint[] xDirectoryEntriesToAllocate = null;
 
                 //Stack corruption, just delete everything from this until commented if when it's fixed
                 var x1 = aEntryType == DirectoryEntryTypeEnum.File;
@@ -250,9 +251,11 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                     xLongNameWithPad[xLongNameWithPad.Length - 1] = (char)0xFFFF;
                     Array.Copy(xLongName.ToCharArray(), xLongNameWithPad, xLongName.Length);
 
+                    xDirectoryEntriesToAllocate = GetNextUnallocatedDirectoryEntries(xNumEntries + 1);
+
                     for (int i = xNumEntries - 1; i >= 0; i--)
                     {
-                        uint xEntry = GetNextUnallocatedDirectoryEntry();
+                        uint xEntry = xDirectoryEntriesToAllocate[xNumEntries - i - 1];
 
                         SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.SequenceNumberAndAllocationStatus, (i + 1) | (i == xNumEntries - 1 ? (1 << 6) : 0));
                         SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.Attributes, FatDirectoryEntryAttributeConsts.LongName);
@@ -266,7 +269,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
                 string xFullPath = Path.Combine(mFullPath, aName);
                 uint xFirstCluster = ((FatFileSystem)mFileSystem).GetFat(0).GetNextUnallocatedFatEntry();
-                uint xEntryHeaderDataOffset = GetNextUnallocatedDirectoryEntry();
+                uint xEntryHeaderDataOffset = xDirectoryEntriesToAllocate == null ? GetNextUnallocatedDirectoryEntry() : xDirectoryEntriesToAllocate[xDirectoryEntriesToAllocate.Length - 1];
 
                 Global.mFileSystemDebugger.SendInternal("xFullPath =");
                 Global.mFileSystemDebugger.SendInternal(xFullPath);
@@ -523,6 +526,45 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             // TODO: What should we return if no available entry is found. - Update Method description above.
             throw new Exception("Failed to find an unallocated directory entry.");
+        }
+
+        /// <summary>
+        /// Tries to find an empty space for the specified number of directory entries and returns an array of offsets to those spaces if successful, otherwise throws an exception.
+        /// </summary>
+        /// <param name="aEntryCount">The number of entried to allocate.</param>
+        /// <returns>Returns an array of offsets to the next unallocated directory entries.</returns>
+        private uint[] GetNextUnallocatedDirectoryEntries(int aEntryCount)
+        {
+            Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetNextUnallocatedDirectoryEntry --");
+
+            var xData = GetDirectoryEntryData();
+            int xCount = 0;
+            uint[] xEntries = new uint[aEntryCount];
+
+            for (uint i = 0; i < xData.Length; i += 32)
+            {
+                uint x1 = xData.ToUInt32(i);
+                uint x2 = xData.ToUInt32(i + 8);
+                uint x3 = xData.ToUInt32(i + 16);
+                uint x4 = xData.ToUInt32(i + 24);
+                if ((x1 == 0) && (x2 == 0) && (x3 == 0) && (x4 == 0))
+                {
+                    xEntries[xCount] = i;
+                    xCount++;
+
+                    if (aEntryCount == xCount)
+                    {
+                        return xEntries;
+                    }
+                }
+                else
+                {
+                    xCount = 0;
+                }
+            }
+
+            // TODO: What should we return if no available entry is found. - Update Method description above.
+            throw new Exception($"Failed to find {aEntryCount} unallocated directory entries.");
         }
 
         private byte[] GetDirectoryEntryData()
