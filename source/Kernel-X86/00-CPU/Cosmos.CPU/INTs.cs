@@ -4,7 +4,6 @@ using Cosmos.CPU;
 using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU {
-    [ForceInclude]
     public class INTs {
         #region Enums
         // TODO: Protect IRQs like memory and ports are
@@ -248,7 +247,6 @@ namespace Cosmos.CPU {
         }
 
         public static void HandleInterrupt_2C(ref IRQContext aContext) {
-
             IRQ(0x2C, ref aContext);
             Global.PIC.EoiSlave();
         }
