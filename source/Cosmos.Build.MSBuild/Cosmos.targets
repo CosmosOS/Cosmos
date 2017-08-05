@@ -16,6 +16,9 @@
     <BinFormat Condition="$(BinFormat) == ''">bin</BinFormat>
     <CosmosBuildTaskAssemblyFile Condition="'$(CosmosBuildTaskAssemblyFile)' == ''">$(VSIPDir)\Cosmos.Build.MSBuild.dll</CosmosBuildTaskAssemblyFile>
     <AssemblySearchPaths>$(CosmosDir)\Kernel</AssemblySearchPaths>
+    <!--
+    <CosmosKernelAssembly>$(OutDir)$(TargetName)$(TargetExt)</CosmosKernelAssembly>
+    -->
   </PropertyGroup>
 
   <ItemGroup Condition="$(KernelPkg) == ''">
@@ -36,6 +39,7 @@
     <Reference Remove="System.Core" />
   </ItemGroup>
 
+  <UsingTask TaskName="Cosmos.Build.MSBuild.RingCheck" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
@@ -44,6 +48,7 @@
   <UsingTask TaskName="Cosmos.Build.MSBuild.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   
   <Target Name="CoreCompile">
+    <Error Text="The Release configuration isn't currently supported!" Condition="$(Configuration) == 'Release'" />
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!" Condition="$(Compile) != ''"/>
     <CreateProperty Value="true" Condition="$(BinFormat) == 'elf'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>
@@ -51,6 +56,9 @@
     <CreateProperty Value="false" Condition="$(BinFormat) == 'bin'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>
     </CreateProperty>
+    <!--
+    <Cosmos.Build.MSBuild.RingCheck AssemblyPath="$(CosmosKernelAssembly)" WorkingDir="$(TargetDir)1" />
+    -->
     <Cosmos.Build.MSBuild.IL2CPU KernelPkg="$(KernelPkg)" DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" UseNAsm="true" References="@(ReferencePath)" AssemblySearchDirs="$(AssemblySearchPaths)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)"/>
     <Cosmos.Build.MSBuild.NAsm InputFile="$(TargetDir)$(MSBuildProjectName).asm" OutputFile="$(TargetDir)$(MSBuildProjectName).obj" IsELF="$(IsELF)" ExePath="$(NasmFile)"/>
     <!-- ELF only -->

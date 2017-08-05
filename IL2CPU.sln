@@ -32,6 +32,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "so
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{EDE13333-B2E6-4E04-B995-209B8BDFA9D4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RingCheck", "source\RingCheck\RingCheck.csproj", "{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +122,14 @@ Global
 		{EDE13333-B2E6-4E04-B995-209B8BDFA9D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EDE13333-B2E6-4E04-B995-209B8BDFA9D4}.Release|x86.ActiveCfg = Release|Any CPU
 		{EDE13333-B2E6-4E04-B995-209B8BDFA9D4}.Release|x86.Build.0 = Release|Any CPU
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}.Debug|x86.Build.0 = Debug|Any CPU
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}.Release|x86.ActiveCfg = Release|Any CPU
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,5 +145,9 @@ Global
 		{8037EF30-3CC2-4555-ACF0-8392250FAE2C} = {46490D36-261E-4D53-85BA-D4F71F09373C}
 		{D8E80776-2800-469B-AE31-D1C016D5E8D3} = {D232F471-5A59-438F-87EA-E1809E3BEDB4}
 		{EDE13333-B2E6-4E04-B995-209B8BDFA9D4} = {46490D36-261E-4D53-85BA-D4F71F09373C}
+		{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF} = {C286932C-3F6D-47F0-BEEF-26843D1BB11B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4B900D20-A763-44BD-BCD1-A61B32E80D94}
 	EndGlobalSection
 EndGlobal
