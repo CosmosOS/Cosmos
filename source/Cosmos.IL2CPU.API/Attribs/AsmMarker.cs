@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Cosmos.IL2CPU.API.Attribs {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Field, AllowMultiple = true)]
@@ -29,10 +28,10 @@ namespace Cosmos.IL2CPU.API.Attribs {
             //
             Labels.Add(Type.DebugStub_CallerEIP, "DebugStub_CallerEIP");
             Labels.Add(Type.DebugStub_Init, "DebugStub_Init");
-            Labels.Add(Type.DebugStub_SendNullRefEvent, "DebugStub_SendNullRefEvent");
+            Labels.Add(Type.DebugStub_SendNullRefEvent, "DebugStub_SendNullReferenceOccurred");
             Labels.Add(Type.DebugStub_SendSimpleNumber, "DebugStub_SendSimpleNumber");
-            Labels.Add(Type.DebugStub_SendStackCorruptedEvent, "DebugStub_SendStackCorruptEvent");
-            Labels.Add(Type.DebugStub_SendStackOverflowEvent, "DebugStub_SendStackOverflowEvent");
+            Labels.Add(Type.DebugStub_SendStackCorruptedEvent, "DebugStub_SendStackCorruptionOccurred");
+            Labels.Add(Type.DebugStub_SendStackOverflowEvent, "DebugStub_SendStackOverflowOccurred");
             Labels.Add(Type.DebugStub_Step, "DebugStub_Step");
             Labels.Add(Type.DebugStub_TracerEntry, "DebugStub_TracerEntry");
         }
@@ -41,5 +40,4 @@ namespace Cosmos.IL2CPU.API.Attribs {
           : base(Labels[aType]) {
         }
     }
-
 }

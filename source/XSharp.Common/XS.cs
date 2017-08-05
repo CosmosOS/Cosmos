@@ -700,13 +700,14 @@ namespace XSharp.Common
       Do<ShiftRight>(destination, bitCount);
     }
 
-    public static void ShiftRight(Register destination, Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
+    public static void ShiftRight(Register destination, Register8 bitCount, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
     {
-      if (source != CL)
+      if (bitCount != CL)
       {
         throw new InvalidOperationException();
       }
-      Do<ShiftRight>(destination, source, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
+
+      Do<ShiftRight>(destination, bitCount, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
     public static void ShiftLeft(Register destination, byte bitCount)
@@ -720,6 +721,7 @@ namespace XSharp.Common
       {
         throw new InvalidOperationException();
       }
+
       Do<ShiftLeft>(destination, bitCount, destinationIsIndirect: destinationIsIndirect, size: size);
     }
 
@@ -728,14 +730,14 @@ namespace XSharp.Common
       Do<ShiftRightArithmetic>(destination, bitCount);
     }
 
-    public static void ShiftRightArithmetic(Register destination, Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
+    public static void ShiftRightArithmetic(Register destination, Register8 bitCount, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
     {
-      if (source != CL)
+      if (bitCount != CL)
       {
         throw new InvalidOperationException();
       }
 
-      Do<ShiftRightArithmetic>(destination, source, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
+      Do<ShiftRightArithmetic>(destination, bitCount, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
     public static void ShiftLeftArithmetic(Register destination, byte bitCount)

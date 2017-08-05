@@ -242,11 +242,6 @@ namespace Cosmos.IL2CPU {
             {
                 foreach (var xType in xAssembly.GetTypes())
                 {
-                    if (xType.Name == "INTs")
-                    {
-
-                    }
-
                     var xTypeInfo = xType.GetTypeInfo();
 
                     if (xTypeInfo.GetCustomAttribute<ForceInclude>() != null)
@@ -262,7 +257,10 @@ namespace Cosmos.IL2CPU {
                         foreach (var xMethod in xTypeInfo.GetMethods(
                             BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                         {
-                            Queue(xMethod, null, "Force Include");
+                            if (!xMethod.IsSpecialName)
+                            {
+                                Queue(xMethod, null, "Force Include");
+                            }
                         }
 
                         continue;
