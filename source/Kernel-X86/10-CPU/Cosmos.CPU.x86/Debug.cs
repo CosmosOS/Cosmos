@@ -1,8 +1,8 @@
 ﻿using System;
 
 namespace Cosmos.CPU.x86 {
-    public static class Temp {
-        public static void ShowText() {
+    static public class Debug {
+        static public void ShowText() {
             unsafe {
                 byte* xTest = (byte*)0xB8000;
                 *xTest = 65;

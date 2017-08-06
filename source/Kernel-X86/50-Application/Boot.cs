@@ -7,7 +7,7 @@ namespace KernelGen3 {
 
         protected override void Run() {
             Bootstrap.Init();
-            Temp.ShowText();
+            Cosmos.Platform.PC.Debug.ShowText();
 
             while (true) {
             }
