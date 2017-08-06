@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.Plugs.System {
     [Plug(Target = typeof(global::System.Console))]
-    public static class ConsoleImpl {
+    public static class Console {
         //private static ConsoleColor mForeground = ConsoleColor.White;
         //private static ConsoleColor mBackground = ConsoleColor.Black;
 
