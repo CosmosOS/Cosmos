@@ -39,8 +39,6 @@ namespace Cosmos.IL2CPU {
         public string StackCorruptionDetectionLevel { get; set; }
         public string[] AssemblySearchDirs { get; set; }
 
-        private List<CompilerExtensionBase> mLoadedExtensions;
-
         public bool DebugEnabled = false;
         public bool StackCorruptionDetectionEnabled = false;
         protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
@@ -211,15 +209,6 @@ namespace Cosmos.IL2CPU {
         }
 
         private AppAssembler GetAppAssembler() {
-            if (mLoadedExtensions == null) {
-                throw new InvalidOperationException("Extensions have not been loaded!");
-            }
-            foreach (var xExt in mLoadedExtensions) {
-                if (xExt.TryCreateAppAssembler(DebugCom, AssemblerLog, out var xResult)) {
-                    return xResult;
-                }
-            }
-
             return new AppAssembler(DebugCom, AssemblerLog);
         }
 
@@ -288,7 +277,6 @@ namespace Cosmos.IL2CPU {
             // will not be tried on them, but will on ASMs they reference.
 
             AssemblyLoadContext.Default.Resolving += Default_Resolving;
-            mLoadedExtensions = new List<CompilerExtensionBase>();
 
             string xKernelBaseName = "Cosmos.System.Boot";
             if (!UseGen3Kernel) {
@@ -327,11 +315,6 @@ namespace Cosmos.IL2CPU {
                                 xKernelType = xType;
                             }
                         }
-                    }
-
-                    var xCompilerExtensionsMetas = xAssembly.GetCustomAttributes<CompilerExtensionAttribute>();
-                    foreach (var xMeta in xCompilerExtensionsMetas) {
-                        mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.Type));
                     }
                 }
             }
