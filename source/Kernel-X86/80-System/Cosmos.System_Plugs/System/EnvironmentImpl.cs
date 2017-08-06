@@ -1,8 +1,7 @@
 using System;
-using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System {
+namespace Cosmos.Plugs.System {
     [Plug(Target = typeof(Environment))]
     public static class EnvironmentImpl {
         //        [PlugMethod(Signature = "System_Environment_OSName__System_Environment_get_OSInfo__")]

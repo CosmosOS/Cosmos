@@ -78,7 +78,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "sour
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{4E9B8F31-AEA0-402D-9B3A-223100F2156D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System_Plugs", "source\Kernel-X86\80-System\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj", "{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Plugs", "source\Kernel-X86\80-System\Cosmos.System_Plugs\Cosmos.Plugs.csproj", "{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU_Plugs", "source\Kernel-X86\00-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj", "{365810FC-AFC2-4130-8A70-EF1F2C3FA5D6}"
 EndProject

@@ -6,7 +6,7 @@
         <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
         <Authors>Cosmos</Authors>
         <Company>Cosmos</Company>
-        <RootNamespace>Cosmos.System_Plugs</RootNamespace>
+        <RootNamespace>Cosmos.Plugs</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
