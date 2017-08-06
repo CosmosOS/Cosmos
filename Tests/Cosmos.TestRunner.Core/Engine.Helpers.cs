@@ -190,7 +190,6 @@ namespace Cosmos.TestRunner.Core
                 "DebugMode:Source",
                 "TraceAssemblies:" + TraceAssembliesLevel,
                 "DebugCom:1",
-                "UseNAsm:True",
                 "OutputFilename:" + outputFile,
                 "EnableLogging:True",
                 "EmitDebugSymbols:True",

@@ -33,9 +33,6 @@ namespace Cosmos.Build.MSBuild
         public byte DebugCom { get; set; }
 
         [Required]
-        public bool UseNAsm { get; set; }
-
-        [Required]
         public ITaskItem[] References { get; set; }
 
         [Required]
@@ -87,7 +84,6 @@ namespace Cosmos.Build.MSBuild
                     {"DebugMode", Convert.ToString(DebugMode)},
                     {"TraceAssemblies", Convert.ToString(TraceAssemblies)},
                     {"DebugCom", Convert.ToString(DebugCom)},
-                    {"UseNAsm", Convert.ToString(UseNAsm)},
                     {"OutputFilename", Convert.ToString(OutputFilename)},
                     {"EnableLogging", Convert.ToString(EnableLogging)},
                     {"EmitDebugSymbols", Convert.ToString(EmitDebugSymbols)},

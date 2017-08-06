@@ -31,7 +31,6 @@ namespace Cosmos.IL2CPU {
         public string DebugMode { get; set; }
         public string TraceAssemblies { get; set; }
         public byte DebugCom { get; set; }
-        public bool UseNAsm { get; set; }
         public string[] References { get; set; }
         public string OutputFilename { get; set; }
         public bool EnableLogging { get; set; }

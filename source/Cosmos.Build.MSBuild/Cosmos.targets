@@ -59,7 +59,7 @@
     <!--
     <Cosmos.Build.MSBuild.RingCheck AssemblyPath="$(CosmosKernelAssembly)" WorkingDir="$(TargetDir)1" />
     -->
-    <Cosmos.Build.MSBuild.IL2CPU KernelPkg="$(KernelPkg)" DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" UseNAsm="true" References="@(ReferencePath)" AssemblySearchDirs="$(AssemblySearchPaths)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)"/>
+    <Cosmos.Build.MSBuild.IL2CPU KernelPkg="$(KernelPkg)" DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" References="@(ReferencePath)" AssemblySearchDirs="$(AssemblySearchPaths)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)"/>
     <Cosmos.Build.MSBuild.NAsm InputFile="$(TargetDir)$(MSBuildProjectName).asm" OutputFile="$(TargetDir)$(MSBuildProjectName).obj" IsELF="$(IsELF)" ExePath="$(NasmFile)"/>
     <!-- ELF only -->
     <!-- 16 MB 0x1000000 as per hpa (syslinux) is a good spot. For now just put some dummy values. 16 and 32 MB. Later size better. -->

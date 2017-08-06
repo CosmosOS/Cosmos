@@ -62,8 +62,6 @@ namespace Cosmos.IL2CPU {
                 logMessage("Loaded : TraceAssemblies");
                 xEngine.DebugCom = Convert.ToByte(CmdOptions["DebugCom".ToLower()]);
                 logMessage("Loaded : DebugCom");
-                xEngine.UseNAsm = Convert.ToBoolean(CmdOptions["UseNAsm".ToLower()]);
-                logMessage("Loaded : UseNAsm");
                 xEngine.OutputFilename = CmdOptions["OutputFilename".ToLower()];
                 logMessage("Loaded : OutputFilename");
                 xEngine.EnableLogging = Convert.ToBoolean(CmdOptions["EnableLogging".ToLower()]);
