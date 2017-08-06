@@ -12,6 +12,7 @@
         // IDT, PIC, and Float
         // Note: This is changing a bit GDT (already) and IDT are moving to a real preboot area.
         public static void Init() {
+            INTs.Dummy();
             PIC = new PIC();
             Processor.UpdateIDT(true);
 
