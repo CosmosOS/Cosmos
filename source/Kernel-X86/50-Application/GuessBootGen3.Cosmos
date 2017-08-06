@@ -56,11 +56,6 @@
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj">
-      <Name>Cosmos.Platform.PC</Name>
-      <Project>{63843265-d889-47d2-883e-595289c99f42}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\50-Application\GuessKernelGen3.csproj">
       <Name>GuessKernelGen3</Name>
       <Project>{9e58e949-7b71-45ed-9610-11da287ee933}</Project>
