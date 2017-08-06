@@ -1327,7 +1327,8 @@ namespace Cosmos.IL2CPU
             XS.Push(EBP);
             XS.Set(EBP, ESP);
             XS.Set(EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
-            new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
+            XS.Set(DataMember.GetStaticFieldName(typeof(String).GetField("Empty", BindingFlags.Static | BindingFlags.Public)),
+                LdStr.GetContentsArrayName(""), destinationDisplacement: 4);
 
             var xMemberId = 0;
 

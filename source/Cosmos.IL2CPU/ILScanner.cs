@@ -231,7 +231,9 @@ namespace Cosmos.IL2CPU {
             Queue(typeof(Array).GetTypeInfo().GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First(), null, "Explicit Entry");
             Queue(typeof(MulticastDelegate).GetTypeInfo().GetMethod("GetInvocationList"), null, "Explicit Entry");
             Queue(ExceptionHelperRefs.CurrentExceptionRef, null, "Explicit Entry");
-            
+
+            mAsmblr.ProcessField(typeof(String).GetField("Empty", BindingFlags.Static | BindingFlags.Public));
+
             // Start from entry point of this program
             Queue(aStartMethod, null, "Entry Point");
 
