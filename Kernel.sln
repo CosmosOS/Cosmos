@@ -50,7 +50,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Shared", "source\Ker
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU.x86", "source\Kernel-X86\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj", "{FC65D765-990D-4F00-B240-8DD17FA91EA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform.PC", "source\Kernel-X86\20-Platform\Cosmos.Platform\Cosmos.Platform.PC.csproj", "{63843265-D889-47D2-883E-595289C99F42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform.PC", "source\Kernel-X86\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj", "{63843265-D889-47D2-883E-595289C99F42}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Kernel-X86\40-System\Cosmos.System\Cosmos.System.csproj", "{F8BF6943-B69D-4549-9C16-75146616E19C}"
 EndProject
