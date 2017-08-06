@@ -56,19 +56,19 @@
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\00-CPU\Cosmos.CPU\Cosmos.CPU.csproj">
+    <ProjectReference Include="..\10-CPU\Cosmos.CPU\Cosmos.CPU.csproj">
       <Name>Cosmos.CPU</Name>
       <Project>{fc65d765-990d-4f00-b240-8dd17fa91ea9}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\20-HAL\Cosmos.HAL\Cosmos.HAL.csproj">
-      <Name>Cosmos.HAL</Name>
-      <Project>{3f8ede0e-61bd-4d01-95f5-4a5a17f6221e}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\10-Platform\Cosmos.Platform\Cosmos.Platform.csproj">
+    <ProjectReference Include="..\20-Platform\Cosmos.Platform\Cosmos.Platform.csproj">
       <Name>Cosmos.Platform</Name>
       <Project>{63843265-d889-47d2-883e-595289c99f42}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj">
+      <Name>Cosmos.HAL</Name>
+      <Project>{3f8ede0e-61bd-4d01-95f5-4a5a17f6221e}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\90-Application\GuessKernelGen3.csproj">

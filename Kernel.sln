@@ -48,9 +48,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel G3", "Kernel G3", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Shared", "source\Kernel-X86\99-Shared\Cosmos.Shared\Cosmos.Shared.csproj", "{4DCF5D4A-29C3-4D14-82E8-B13C55A93F31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU", "source\Kernel-X86\00-CPU\Cosmos.CPU\Cosmos.CPU.csproj", "{FC65D765-990D-4F00-B240-8DD17FA91EA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU", "source\Kernel-X86\10-CPU\Cosmos.CPU\Cosmos.CPU.csproj", "{FC65D765-990D-4F00-B240-8DD17FA91EA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform", "source\Kernel-X86\10-Platform\Cosmos.Platform\Cosmos.Platform.csproj", "{63843265-D889-47D2-883E-595289C99F42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform", "source\Kernel-X86\20-Platform\Cosmos.Platform\Cosmos.Platform.csproj", "{63843265-D889-47D2-883E-595289C99F42}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Kernel-X86\80-System\Cosmos.System\Cosmos.System.csproj", "{F8BF6943-B69D-4549-9C16-75146616E19C}"
 EndProject
@@ -70,7 +70,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "source\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "source\XSharp.Common\XSharp.Common.csproj", "{F785B091-7E4D-4D2E-A310-B18690623F74}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel-X86\20-HAL\Cosmos.HAL\Cosmos.HAL.csproj", "{3F8EDE0E-61BD-4D01-95F5-4A5A17F6221E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel-X86\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj", "{3F8EDE0E-61BD-4D01-95F5-4A5A17F6221E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{47F9D446-ACD4-489A-AD6D-A46A19247E2F}"
 EndProject
@@ -80,9 +80,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Plugs", "source\Kernel-X86\91-Plugs\Cosmos.Plugs\Cosmos.Plugs.csproj", "{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU_Plugs", "source\Kernel-X86\00-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj", "{365810FC-AFC2-4130-8A70-EF1F2C3FA5D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU_Plugs", "source\Kernel-X86\10-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj", "{365810FC-AFC2-4130-8A70-EF1F2C3FA5D6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU_Asm", "source\Kernel-X86\00-CPU\Cosmos.CPU_Asm\Cosmos.CPU_Asm.csproj", "{08B5D5EF-45F5-45BC-B842-A413E8113A55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU_Asm", "source\Kernel-X86\10-CPU\Cosmos.CPU_Asm\Cosmos.CPU_Asm.csproj", "{08B5D5EF-45F5-45BC-B842-A413E8113A55}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel TapRoot", "Kernel TapRoot", "{DB771C12-E60D-41C9-9A39-74CC95A661CD}"
 EndProject
