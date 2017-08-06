@@ -88,13 +88,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel TapRoot", "Kernel Ta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.TapRoot", "source\Kernel-TapRoot\Cosmos.TapRoot\Cosmos.TapRoot.csproj", "{B22ED069-6DA3-43A8-A7E8-FD0B8F74EC3B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuessKernelGen3", "source\Kernel-X86\90-Application\GuessKernelGen3.csproj", "{9E58E949-7B71-45ED-9610-11DA287EE933}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuessKernelGen3", "source\Kernel-X86\50-Application\GuessKernelGen3.csproj", "{9E58E949-7B71-45ED-9610-11DA287EE933}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempCompileTest", "source\Kernel-X86\TempCompileTest\TempCompileTest.csproj", "{6B6EB060-C878-4C50-88BC-79128CA75F95}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRKernel", "source\Kernel-TapRoot\Demo\TRKernel.csproj", "{F614D199-03E6-4CBD-836C-EDB769B025A3}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GuessBootGen3", "source\Kernel-X86\90-Application\GuessBootGen3.Cosmos", "{362A57D5-34CB-4210-88B6-F467C8EB9B51}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GuessBootGen3", "source\Kernel-X86\50-Application\GuessBootGen3.Cosmos", "{362A57D5-34CB-4210-88B6-F467C8EB9B51}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "TRBoot", "source\Kernel-TapRoot\Demo\TRBoot.Cosmos", "{CDCBF37D-673C-49DE-A9BD-1F7DFC5945DD}"
 EndProject
