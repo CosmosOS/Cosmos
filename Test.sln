@@ -136,9 +136,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "90 Shared", "90 Shared", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "91 Plugs", "91 Plugs", "{1FC213DE-5033-40E1-9C16-5F1A0CDC9693}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU", "source\Kernel-X86\10-CPU\Cosmos.CPU\Cosmos.CPU.csproj", "{4D219A6D-4528-4622-AF29-96F830C4D076}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU.x86", "source\Kernel-X86\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj", "{4D219A6D-4528-4622-AF29-96F830C4D076}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform", "source\Kernel-X86\20-Platform\Cosmos.Platform\Cosmos.Platform.csproj", "{6CBABA8D-4207-4E1E-8122-63DB51D25F18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform.PC", "source\Kernel-X86\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj", "{6CBABA8D-4207-4E1E-8122-63DB51D25F18}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel-X86\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj", "{16ECD6DE-6F65-4A5C-8B49-A29782D9D057}"
 EndProject
