@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Kernel-X86\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
     <ProjectReference Include="..\..\Kernel-X86\40-System\Cosmos.System\Cosmos.System.csproj" />
   </ItemGroup>
 
