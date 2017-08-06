@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Cosmos.Platform {
+namespace Cosmos.Platform.PC {
     public class SATA : Cosmos.HAL.SATA {
         static public void InitHAL() {
             Cosmos.HAL.SATA.mSataHalType = typeof(SATA);

@@ -61,8 +61,8 @@
       <Project>{fc65d765-990d-4f00-b240-8dd17fa91ea9}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\Kernel-X86\20-Platform\Cosmos.Platform\Cosmos.Platform.csproj">
-      <Name>Cosmos.Platform</Name>
+    <ProjectReference Include="..\..\Kernel-X86\20-Platform\Cosmos.Platform\Cosmos.Platform.PC.csproj">
+      <Name>Cosmos.Platform.PC</Name>
       <Project>{63843265-d889-47d2-883e-595289c99f42}</Project>
       <Private>True</Private>
     </ProjectReference>

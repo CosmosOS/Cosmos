@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Platform {
+namespace Cosmos.Platform.PC {
     static public class TempHack {
         // Need to hack up Cosmos a bit
         // Remove hard ref from System to HAL.
