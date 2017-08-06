@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\80-System\Cosmos.System\Cosmos.System.csproj" />
+    <ProjectReference Include="..\40-System\Cosmos.System\Cosmos.System.csproj" />
     <ProjectReference Include="..\99-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
   </ItemGroup>
 
