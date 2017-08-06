@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" />
-    <ProjectReference Include="..\..\99-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
+    <ProjectReference Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
   </ItemGroup>
 
 </Project>
