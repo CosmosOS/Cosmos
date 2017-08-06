@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Cosmos.CPU {
+namespace Cosmos.CPU.x86 {
     internal static unsafe class GlobalSystemInfo {
         //private static volatile GlobalInformationTable* mGlobalInformationTable;
         //public static GlobalInformationTable* GlobalInformationTable {

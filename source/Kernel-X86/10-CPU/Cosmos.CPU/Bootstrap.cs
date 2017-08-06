@@ -1,4 +1,4 @@
-﻿namespace Cosmos.CPU {
+﻿namespace Cosmos.CPU.x86 {
     public static class Bootstrap {
         // See note in Global - these are a "hack" for now so
         // we dont force static init of Global, and it "pulls" these later till

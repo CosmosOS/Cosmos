@@ -1,5 +1,5 @@
 ﻿using System;
-using Cosmos.CPU;
+using Cosmos.CPU.x86;
 using Sys = Cosmos.System;
 
 namespace KernelGen3 {
@@ -7,7 +7,7 @@ namespace KernelGen3 {
 
         protected override void Run() {
             Bootstrap.Init();
-            Cosmos.CPU.Temp.ShowText();
+            Temp.ShowText();
 
             while (true) {
             }

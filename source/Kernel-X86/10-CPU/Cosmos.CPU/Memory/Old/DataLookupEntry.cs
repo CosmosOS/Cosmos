@@ -3,7 +3,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace Cosmos.CPU.Memory.Old {
+namespace Cosmos.CPU.x86.Memory.Old {
     [StructLayout(LayoutKind.Explicit)]
     public unsafe struct DataLookupEntry {
         [FieldOffset(0)]

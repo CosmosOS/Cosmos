@@ -48,7 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel G3", "Kernel G3", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Shared", "source\Kernel-X86\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj", "{4DCF5D4A-29C3-4D14-82E8-B13C55A93F31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU", "source\Kernel-X86\10-CPU\Cosmos.CPU\Cosmos.CPU.csproj", "{FC65D765-990D-4F00-B240-8DD17FA91EA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU.x86", "source\Kernel-X86\10-CPU\Cosmos.CPU\Cosmos.CPU.x86.csproj", "{FC65D765-990D-4F00-B240-8DD17FA91EA9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform", "source\Kernel-X86\20-Platform\Cosmos.Platform\Cosmos.Platform.csproj", "{63843265-D889-47D2-883E-595289C99F42}"
 EndProject

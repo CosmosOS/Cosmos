@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Cosmos.IL2CPU.API.Attribs;
 
-namespace Cosmos.CPU {
+namespace Cosmos.CPU.x86 {
     [DebuggerStepThrough]
     public static class GCImplementation {
         private static void AcquireLock() {

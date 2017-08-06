@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Cosmos.CPU {
+namespace Cosmos.CPU.x86 {
     public static class Temp {
         public static void ShowText() {
             unsafe {

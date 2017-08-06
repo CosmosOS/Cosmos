@@ -2,7 +2,7 @@ using System;
 
 using Cosmos.IL2CPU.API.Attribs;
 
-namespace Cosmos.CPU {
+namespace Cosmos.CPU.x86 {
     // Non hardware class, only used by core and hardware drivers for ports etc.
     public class Processor {
         // Amount of RAM in MB's.

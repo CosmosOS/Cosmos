@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Cosmos.IL2CPU.API.Attribs;
 
-namespace Cosmos.CPU {
+namespace Cosmos.CPU.x86 {
     
     [ForceInclude]
     public class INTs {

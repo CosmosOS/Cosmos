@@ -56,8 +56,8 @@
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\10-CPU\Cosmos.CPU\Cosmos.CPU.csproj">
-      <Name>Cosmos.CPU</Name>
+    <ProjectReference Include="..\10-CPU\Cosmos.CPU\Cosmos.CPU.x86.csproj">
+      <Name>Cosmos.CPU.x86</Name>
       <Project>{fc65d765-990d-4f00-b240-8dd17fa91ea9}</Project>
       <Private>True</Private>
     </ProjectReference>

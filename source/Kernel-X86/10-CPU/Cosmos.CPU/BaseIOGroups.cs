@@ -1,9 +1,9 @@
-﻿using System;
+﻿using global::System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.CPU {
+namespace Cosmos.CPU.x86 {
     public class BaseIOGroups {
         // These are common/fixed pieces of hardware. PCI, USB etc should be self discovering
         // and not hardcoded like this.

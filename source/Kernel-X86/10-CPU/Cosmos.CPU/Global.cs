@@ -1,6 +1,6 @@
 ﻿using Cosmos.Debug.Kernel;
 
-namespace Cosmos.CPU {
+namespace Cosmos.CPU.x86 {
     public static class Global {
         public static readonly Debugger mDebugger = new Debugger("Processor", "Global");
 

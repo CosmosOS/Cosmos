@@ -1,8 +1,8 @@
 ﻿using System;
-using Cosmos.CPU;
+using Cosmos.CPU.x86;
 using Cosmos.Debug.Kernel;
 
-namespace Cosmos.CPU.Memory.Old {
+namespace Cosmos.CPU.x86.Memory.Old {
     public static unsafe class GlobalSystemInfo {
         private static volatile GlobalInformationTable* mGlobalInformationTable;
         public static GlobalInformationTable* GlobalInformationTable {

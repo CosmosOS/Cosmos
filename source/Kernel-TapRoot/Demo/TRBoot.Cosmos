@@ -56,29 +56,29 @@
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Kernel\Cosmos.CPU\Cosmos.CPU.csproj">
-      <Name>Cosmos.CPU</Name>
+    <ProjectReference Include="..\..\Kernel-X86\10-CPU\Cosmos.CPU\Cosmos.CPU.x86.csproj">
+      <Name>Cosmos.CPU.x86</Name>
       <Project>{fc65d765-990d-4f00-b240-8dd17fa91ea9}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\source\Kernel\Cosmos.HAL\Cosmos.HAL.csproj">
+    <ProjectReference Include="..\..\Kernel-X86\20-Platform\Cosmos.Platform\Cosmos.Platform.csproj">
+      <Name>Cosmos.Platform</Name>
+      <Project>{63843265-d889-47d2-883e-595289c99f42}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Kernel-X86\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj">
       <Name>Cosmos.HAL</Name>
       <Project>{3f8ede0e-61bd-4d01-95f5-4a5a17f6221e}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\source\Kernel\Cosmos.Platform\Cosmos.Platform.csproj">
-      <Name>Cosmos.Platform</Name>
-      <Project>{63843265-d889-47d2-883e-595289c99f42}</Project>
+    <ProjectReference Include="..\..\Kernel-X86\50-Application\GuessKernelGen3.csproj">
+      <Name>GuessKernelGen3</Name>
+      <Project>{9e58e949-7b71-45ed-9610-11da287ee933}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.TapRoot\Cosmos.TapRoot.csproj">
       <Name>Cosmos.TapRoot</Name>
       <Project>{b22ed069-6da3-43a8-a7e8-fd0b8f74ec3b}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\GuessG3\GuessKernelGen3.csproj">
-      <Name>GuessKernelGen3</Name>
-      <Project>{9e58e949-7b71-45ed-9610-11da287ee933}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

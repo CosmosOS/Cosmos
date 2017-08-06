@@ -1,6 +1,4 @@
-﻿using Cosmos.CPU;
-
-namespace Cosmos.CPU.IOGroup {
+﻿namespace Cosmos.CPU.x86.IOGroup {
     public class PIC : IOGroup {
         public readonly IOPort Cmd = new IOPort(0x20);
         public readonly IOPort Data = new IOPort(0x21);

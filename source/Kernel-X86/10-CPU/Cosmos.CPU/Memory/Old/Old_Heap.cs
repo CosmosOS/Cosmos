@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Cosmos.Debug.Kernel;
 
-namespace Cosmos.CPU.Memory.Old
+namespace Cosmos.CPU.x86.Memory.Old
 {
     // This class must be static, as for creating objects, we need the heap
     // this heap implementation it the very most basic one: no reentrancy, etc.
