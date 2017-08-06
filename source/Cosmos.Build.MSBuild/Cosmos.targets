@@ -28,7 +28,7 @@
     <Reference Include="Cosmos.System2_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Remove="System.Core" />
   </ItemGroup>
-  <ItemGroup Condition="$(KernelPkg) == 'X86G3'">
+  <ItemGroup Condition="$(KernelPkg) == 'X86'">
     <Reference Include="Cosmos.CPU_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.CPU_Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />

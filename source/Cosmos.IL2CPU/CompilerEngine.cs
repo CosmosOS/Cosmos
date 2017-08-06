@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU {
         {
             get
             {
-                return string.Equals(KernelPkg, "X86G3", StringComparison.CurrentCultureIgnoreCase);
+                return string.Equals(KernelPkg, "X86", StringComparison.CurrentCultureIgnoreCase);
             }
         }
         public string DebugMode { get; set; }
