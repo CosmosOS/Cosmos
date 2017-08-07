@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Core {
-    public static class Bootstrap {
+﻿namespace Cosmos.Core
+{
+    public static class Bootstrap
+    {
         // See note in Global - these are a "hack" for now so
         // we dont force static init of Global, and it "pulls" these later till
         // we eventually eliminate them
@@ -16,14 +13,15 @@ namespace Cosmos.Core {
         // ie the stuff needed to "pre boot". Do only the very minimal here.
         // IDT, PIC, and Float
         // Note: This is changing a bit GDT (already) and IDT are moving to a real preboot area.
-        public static void Init() {
+        public static void Init()
+        {
             // Drag this stuff in to the compiler manually until we add the always include attrib
             INTs.Dummy();
 
             PIC = new PIC();
             CPU.UpdateIDT(true);
 
-            /* TODO check using CPUID that SSE2 is supported */ 
+            /* TODO check using CPUID that SSE2 is supported */
             CPU.InitSSE();
 
             /*
@@ -33,9 +31,9 @@ namespace Cosmos.Core {
              * definively this problem.
              */
             CPU.InitFloat();
-            
-           // Managed_Memory_System.ManagedMemory.Initialize();
-           // Managed_Memory_System.ManagedMemory.SetUpMemoryArea();
+
+            // Managed_Memory_System.ManagedMemory.Initialize();
+            // Managed_Memory_System.ManagedMemory.SetUpMemoryArea();
         }
     }
 }

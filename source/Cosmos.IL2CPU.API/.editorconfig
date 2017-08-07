@@ -1,0 +1,5 @@
+﻿[*.cs]
+indent_size = 2
+
+[Attribs/AsmMarker.cs]
+indent_size = 4

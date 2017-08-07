@@ -18,7 +18,7 @@
                 aText = aText.TrimStart(commentChar).TrimStart();
             }
 
-            Text = string.Intern(aText);
+            Text = aText;
         }
 
         public Comment(string aText) : base(true)
@@ -30,7 +30,7 @@
                 aText = aText.TrimStart(commentChar).TrimStart();
             }
 
-            Text = string.Intern(aText);
+            Text = aText;
         }
 
         public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)

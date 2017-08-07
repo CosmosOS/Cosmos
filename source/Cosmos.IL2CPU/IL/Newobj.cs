@@ -1,13 +1,12 @@
+using Cosmos.IL2CPU.API;
 using System;
 using System.Linq;
 using Cosmos.Assembler;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
-
-using Cosmos.IL2CPU.Plugs.System;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -19,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             OpMethod xMethod = (OpMethod)aOpCode;
             string xCurrentLabel = GetLabel(aMethod, aOpCode);
@@ -28,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assemble(Assembler, aMethod, xMethod, xCurrentLabel, xType, xMethod.Value);
         }
 
-        public static void Assemble(Assembler.Assembler aAssembler, MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
+        public static void Assemble(Assembler.Assembler aAssembler, _MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
         {
             // call cctor:
             if (aMethod != null)
@@ -42,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
             }
 
-            if (objectType.IsValueType)
+            if (objectType.GetTypeInfo().IsValueType)
             {
                 #region Valuetypes
 
@@ -186,7 +185,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Pop(EAX);
                 XS.Set(EBX, strTypeId, sourceIsIndirect: true);
                 XS.Set(EAX, EBX, destinationIsIndirect: true);
-                XS.Set(EAX, (uint)InstanceTypeEnum.NormalObject, destinationDisplacement: 4, destinationIsIndirect: true, size: RegisterSize.Int32);
+                XS.Set(EAX, (uint)ObjectUtils.InstanceTypeEnum.NormalObject, destinationDisplacement: 4, destinationIsIndirect: true, size: RegisterSize.Int32);
                 XS.Set(EAX, xMemSize, destinationDisplacement: 8, destinationIsIndirect: true, size: RegisterSize.Int32);
                 uint xSize = (uint)(from item in xParams
                                     let xQSize = Align(SizeOfType(item.ParameterType), 4)

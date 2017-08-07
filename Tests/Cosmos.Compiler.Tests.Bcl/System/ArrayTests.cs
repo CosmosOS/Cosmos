@@ -17,7 +17,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Array.Copy(xSource, 0, xResult, 7, 1);
 
-            Assert.IsTrue((xResult[7] == xExpectedResult[7]), "Array.Copy doesn't work: xResult[7] " + (uint)xResult[7] + " != " + (uint)xExpectedResult[7]);
+            Assert.IsTrue((xResult[7] == xExpectedResult[7]), "Array.Copy doesn't work: xResult[7] =  " + (uint)xResult[7] + " != " + (uint)xExpectedResult[7]);
         }
     }
 }

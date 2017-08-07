@@ -106,7 +106,8 @@ namespace Cosmos.Debug.Common {
           }
           catch (Exception)
           {
-            xPipe.Close();
+            xPipe.Dispose();
+            //xPipe.Close();
             return false;
           }
           mWriter = new StreamWriter(xPipe);

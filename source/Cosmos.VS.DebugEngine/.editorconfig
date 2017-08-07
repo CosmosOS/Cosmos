@@ -1,0 +1,6 @@
+[*.cs]
+indent_size=4
+indent_style=space
+
+[AD7.Impl/AD7StackFrame.cs]
+indent_size=2

@@ -37,9 +37,13 @@ namespace Cosmos.Assembler
 
 
     protected string mCurrentIlLabel;
+
     public string CurrentIlLabel
     {
-      get { return mCurrentIlLabel; }
+      get
+      {
+        return mCurrentIlLabel;
+      }
       set
       {
         mCurrentIlLabel = value;
@@ -48,23 +52,41 @@ namespace Cosmos.Assembler
     }
 
     protected int mAsmIlIdx;
+
     public int AsmIlIdx
     {
-      get { return mAsmIlIdx; }
+      get
+      {
+        return mAsmIlIdx;
+      }
     }
 
     protected List<DataMember> mDataMembers = new List<DataMember>();
+
     public List<DataMember> DataMembers
     {
-      get { return mDataMembers; }
-      set { mDataMembers = value; }
+      get
+      {
+        return mDataMembers;
+      }
+      set
+      {
+        mDataMembers = value;
+      }
     }
 
     protected internal List<Instruction> mInstructions = new List<Instruction>();
+
     public List<Instruction> Instructions
     {
-      get { return mInstructions; }
-      set { mInstructions = value; }
+      get
+      {
+        return mInstructions;
+      }
+      set
+      {
+        mInstructions = value;
+      }
     }
 
     public AssemblerStyles AssemblerStyle
@@ -81,7 +103,10 @@ namespace Cosmos.Assembler
 
     internal int AllAssemblerElementCount
     {
-      get { return mInstructions.Count + mDataMembers.Count; }
+      get
+      {
+        return mInstructions.Count + mDataMembers.Count;
+      }
     }
 
     public BaseAssemblerElement GetAssemblerElement(int aIndex)
@@ -100,7 +125,7 @@ namespace Cosmos.Assembler
         var xLabel = xInstruction as Label;
         if (xLabel != null)
         {
-          if (xLabel.QualifiedName.Equals(aReference.Name, StringComparison.InvariantCultureIgnoreCase))
+          if (xLabel.QualifiedName.Equals(aReference.Name, StringComparison.OrdinalIgnoreCase))
           {
             return xLabel;
           }
@@ -108,7 +133,7 @@ namespace Cosmos.Assembler
       }
       foreach (var xDataMember in mDataMembers)
       {
-        if (xDataMember.Name.Equals(aReference.Name, StringComparison.InvariantCultureIgnoreCase))
+        if (xDataMember.Name.Equals(aReference.Name, StringComparison.OrdinalIgnoreCase))
         {
           return xDataMember;
         }
@@ -147,12 +172,15 @@ namespace Cosmos.Assembler
     }
 
     private uint mDataMemberCounter = 0;
+
     public string GetIdentifier(string aPrefix)
     {
       mDataMemberCounter++;
       return aPrefix + mDataMemberCounter.ToString("X4");
     }
+
     private bool mFlushInitializationDone = false;
+
     protected void BeforeFlush()
     {
       if (mFlushInitializationDone)
@@ -173,7 +201,7 @@ namespace Cosmos.Assembler
       {
         GetAssemblerElement(i).UpdateAddress(this, ref xCurrentAddresss);
       }
-      aOutput.SetLength(aOutput.Length + (long)(xCurrentAddresss - aBaseAddress));
+      aOutput.SetLength(aOutput.Length + (long) (xCurrentAddresss - aBaseAddress));
       for (int i = 0; i < xMax; i++)
       {
         var xItem = GetAssemblerElement(i);

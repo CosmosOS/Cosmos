@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading;
+
 using Cosmos.Build.Common;
-using Cosmos.Debug.Common;
-using Cosmos.Debug.VSDebugEngine.Host;
+using Cosmos.Debug.DebugConnectors;
+using Cosmos.Debug.Hosts;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -17,7 +17,7 @@ namespace Cosmos.TestRunner.Core
                 throw new FileNotFoundException("Harddisk file not found!", harddisk);
             }
 
-            var xParams = new NameValueCollection();
+            var xParams = new Dictionary<string, string>();
 
             xParams.Add("ISOFile", iso);
             xParams.Add(BuildPropertyNames.VisualStudioDebugPortString, "Pipe: Cosmos\\Serial");

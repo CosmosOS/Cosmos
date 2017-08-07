@@ -1,5 +1,4 @@
-﻿
-namespace Cosmos.Core
+﻿namespace Cosmos.Core
 {
     public unsafe class ProcessorInformation
     {
@@ -36,7 +35,7 @@ namespace Cosmos.Core
         }
 
         internal static int CanReadCPUID() => 0; //plugged
-        
+
         internal static void FetchCPUVendor(int* target) { } //plugged
 
         /// <summary>

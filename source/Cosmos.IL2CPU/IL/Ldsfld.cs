@@ -4,9 +4,8 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using System.Reflection;
 using System.Linq;
-using XSharp.Compiler;
-using SysReflection = System.Reflection;
 
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -18,12 +17,12 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
 
       var xType = aMethod.MethodBase.DeclaringType;
       var xOpCode = (OpField)aOpCode;
-      SysReflection.FieldInfo xField = xOpCode.Value;
+      FieldInfo xField = xOpCode.Value;
 
       // call cctor:
       var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic)).SingleOrDefault();

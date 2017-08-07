@@ -42,7 +42,7 @@ namespace Cosmos.Assembler
                 return result;
             }
 
-            result = Final(GenerateFullName(aMethod));
+            result = Final(GetFullName(aMethod));
             labelNamesCache.Add(aMethod, result);
             return result;
         }
@@ -51,8 +51,10 @@ namespace Cosmos.Assembler
         {
             return aMethodLabel + ".IL_" + aIlPos.ToString("X4");
         }
+
         // no array bracket, they need to replace, for unique names for used types in methods
         public static System.Text.RegularExpressions.Regex IllegalCharsReplace = new System.Text.RegularExpressions.Regex(@"[&.,+$<>{}\-\`\\'/\\ \(\)\*!=]", System.Text.RegularExpressions.RegexOptions.Compiled);
+
         public static string Final(string xName)
         {
             //var xSB = new StringBuilder(xName);
@@ -74,7 +76,7 @@ namespace Cosmos.Assembler
             {
                 using (var xHash = MD5.Create())
                 {
-                    var xValue = xHash.ComputeHash(Encoding.Default.GetBytes(xName));
+                    var xValue = xHash.ComputeHash(Encoding.GetEncoding(0).GetBytes(xName));
                     var xSB = new StringBuilder(xName);
                     // Keep length max same as before.
                     xSB.Length = MaxLengthWithoutSuffix - xValue.Length * 2;
@@ -90,18 +92,24 @@ namespace Cosmos.Assembler
             return xName;
         }
 
+        // Compat shim
         public static string GetFullName(Type aType)
         {
-            if (aType.IsGenericParameter)
+            return GetFullName(aType.GetTypeInfo());
+        }
+
+        public static string GetFullName(TypeInfo aTypeInfo)
+        {
+            if (aTypeInfo.IsGenericParameter)
             {
-                return aType.FullName;
+                return aTypeInfo.FullName;
             }
             StringBuilder xSB = new StringBuilder(256);
-            if (aType.IsArray)
+            if (aTypeInfo.IsArray)
             {
-                xSB.Append(GetFullName(aType.GetElementType()));
+                xSB.Append(GetFullName(aTypeInfo.GetElementType()));
                 xSB.Append("[");
-                int xRank = aType.GetArrayRank();
+                int xRank = aTypeInfo.GetArrayRank();
                 while (xRank > 1)
                 {
                     xSB.Append(",");
@@ -110,21 +118,22 @@ namespace Cosmos.Assembler
                 xSB.Append("]");
                 return xSB.ToString();
             }
-            if (aType.IsByRef && aType.HasElementType)
+            if (aTypeInfo.IsByRef && aTypeInfo.HasElementType)
             {
-                return "&" + GetFullName(aType.GetElementType());
+                return "&" + GetFullName(aTypeInfo.GetElementType());
             }
-            if (aType.IsGenericType && !aType.IsGenericTypeDefinition)
+            if (aTypeInfo.IsGenericType && !aTypeInfo.IsGenericTypeDefinition)
             {
-                xSB.Append(GetFullName(aType.GetGenericTypeDefinition()));
+                xSB.Append(GetFullName(aTypeInfo.GetGenericTypeDefinition()));
             }
-            else {
-                xSB.Append(aType.FullName);
+            else
+            {
+                xSB.Append(aTypeInfo.FullName);
             }
-            if (aType.IsGenericType)
+            if (aTypeInfo.IsGenericType)
             {
                 xSB.Append("<");
-                var xArgs = aType.GetGenericArguments();
+                var xArgs = aTypeInfo.GetGenericArguments();
                 for (int i = 0; i < xArgs.Length - 1; i++)
                 {
                     xSB.Append(GetFullName(xArgs[i]));
@@ -136,7 +145,7 @@ namespace Cosmos.Assembler
             return xSB.ToString();
         }
 
-        public static string GenerateFullName(MethodBase aMethod)
+        public static string GetFullName(MethodBase aMethod)
         {
             if (aMethod == null)
             {
@@ -150,13 +159,15 @@ namespace Cosmos.Assembler
             {
                 xBuilder.Append(GetFullName(xMethodInfo.ReturnType));
             }
-            else {
+            else
+            {
                 var xCtor = aMethod as ConstructorInfo;
                 if (xCtor != null)
                 {
                     xBuilder.Append(typeof(void).FullName);
                 }
-                else {
+                else
+                {
                     xBuilder.Append(xParts[0]);
                 }
             }
@@ -200,7 +211,7 @@ namespace Cosmos.Assembler
                 }
             }
             xBuilder.Append(")");
-            return String.Intern(xBuilder.ToString());
+            return xBuilder.ToString();
         }
 
         public static string GetFullName(FieldInfo aField)

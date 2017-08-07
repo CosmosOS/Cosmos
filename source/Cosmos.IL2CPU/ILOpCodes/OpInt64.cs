@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Reflection.Metadata;
+
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
@@ -10,8 +9,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
   {
     public readonly UInt64 Value;
 
-    public OpInt64(Code aOpCode, int aPos, int aNextPos, UInt64 aValue, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
+    public OpInt64(Code aOpCode, int aPos, int aNextPos, UInt64 aValue, _ExceptionRegionInfo aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
     {
       Value = aValue;
     }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
-using Cosmos.Common;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.IL2CPU
@@ -81,7 +77,7 @@ namespace Cosmos.IL2CPU
         EnableDebug = true;
         DebugHex("Type", aType);
         DebugHex("MethodId", aMethodId);
-        Debugger.SendKernelPanic(KernelPanicTypes.VMT_TypeIdInvalid);
+        Debugger.SendKernelPanic(KernelPanics.VMT_TypeIdInvalid);
         while (true)
         ;
       }
@@ -98,7 +94,7 @@ namespace Cosmos.IL2CPU
         {
           EnableDebug = true;
           DebugHex("MethodIndexes is null for type", aType);
-          Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodIndexesNull);
+          Debugger.SendKernelPanic(KernelPanics.VMT_MethodIndexesNull);
           while (true)
             ;
         }
@@ -106,7 +102,7 @@ namespace Cosmos.IL2CPU
         {
           EnableDebug = true;
           DebugHex("MethodAddresses is null for type", aType);
-          Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodAddressesNull);
+          Debugger.SendKernelPanic(KernelPanics.VMT_MethodAddressesNull);
           while (true)
             ;
         }
@@ -124,7 +120,7 @@ namespace Cosmos.IL2CPU
               DebugHex("MethodCount", (uint)xCurrentTypeInfo.MethodCount);
               DebugHex("MethodAddresses.Length", (uint)xCurrentTypeInfo.MethodAddresses.Length);
               Debug("Method found, but address is invalid!");
-              Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodFoundButAddressInvalid);
+              Debugger.SendKernelPanic(KernelPanics.VMT_MethodFoundButAddressInvalid);
               while (true)
                 ;
             }
@@ -142,12 +138,10 @@ namespace Cosmos.IL2CPU
       while (true);
       //}
       EnableDebug = true;
-      Debugger.DoSend("Type");
-      Debugger.DoSendNumber(aType);
-      Debugger.DoSend("MethodId");
-      Debugger.DoSendNumber(aMethodId);
-      Debugger.DoSend("Not FOUND!");
-      Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodNotFound);
+      DebugHex("Type", aType);
+      DebugHex("MethodId", aMethodId);
+      Debug("Not FOUND!");
+      Debugger.SendKernelPanic(KernelPanics.VMT_MethodNotFound);
       while (true)
         ;
       throw new Exception("Cannot find virtual method!");

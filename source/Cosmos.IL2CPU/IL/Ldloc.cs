@@ -1,9 +1,11 @@
-using System;
-using System.Drawing;
+using Cosmos.Debug.Symbols;
+
+using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Common;
 using CPUx86 = Cosmos.Assembler.x86;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using static XSharp.Common.XSRegisters;
+
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -15,30 +17,40 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpVar = (OpVar)aOpCode;
-      var xVar = aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value];
-      var xStackCount = (int)GetStackCountForLocal(aMethod, xVar);
+      var xVar = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase)[xOpVar.Value];
+      var xStackCount = (int)GetStackCountForLocal(aMethod, xVar.Type);
       var xEBPOffset = (int)GetEBPOffsetForLocal(aMethod, xOpVar.Value);
-      var xSize = SizeOfType(xVar.LocalType);
+      var xSize = SizeOfType(xVar.Type);
+      bool xSigned = IsIntegerSigned(xVar.Type);
 
-      XS.Comment("Local type = " + xVar.LocalType);
+      XS.Comment("Local type = " + xVar);
       XS.Comment("Local EBP offset = " + xEBPOffset);
       XS.Comment("Local size = " + xSize);
 
       switch (xSize)
       {
         case 1:
-        case 2:
-          bool xSigned = IsIntegerSigned(xVar.LocalType);
           if (xSigned)
           {
-            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
+            XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: (0 - xEBPOffset), size: RegisterSize.Byte8);
           }
           else
           {
-            new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
+            XS.MoveZeroExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: (0 - xEBPOffset), size: RegisterSize.Byte8);
+          }
+          XS.Push(EAX);
+          break;
+        case 2:
+          if (xSigned)
+          {
+            XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: (0 - xEBPOffset), size: RegisterSize.Short16);
+          }
+          else
+          {
+            XS.MoveZeroExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: (0 - xEBPOffset), size: RegisterSize.Short16);
           }
           XS.Push(EAX);
           break;

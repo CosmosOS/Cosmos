@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Installer {
   public abstract class Task {
@@ -11,35 +12,37 @@ namespace Cosmos.Build.Installer {
 
     public void Run() {
       var exceptions = new List<string>();
-      try
-      {
-          exceptions.AddRange(DoRun());
-      }
-      catch(Exception ex){
+      try {
+        exceptions.AddRange(DoRun());
+      } catch (Exception ex) {
         exceptions.Add(ex.Message);
-        if (ex.InnerException != null){
-            exceptions.Add(ex.InnerException.Message);
+        if (ex.InnerException != null) {
+          exceptions.Add(ex.InnerException.Message);
         }
         exceptions.Add(ex.StackTrace);
       }
 
       if (exceptions.Any()) {
-        Log.SetError();
+        Log.SetError(); // Existing section
+
         Log.NewSection("Error");
+        Log.SetError();
         //Collect all the exceptions from the build stage, and list them
-        foreach(var msg in exceptions) {
+        foreach (var msg in exceptions) {
           Log.WriteLine(msg);
         }
       }
     }
 
-    public bool AmRunning32Bit() {
-      return IntPtr.Size == 4;
-    }
-
     public bool IsRunning(string aName) {
       var xList = Process.GetProcessesByName(aName);
       return xList.Length > 0;
+    }
+
+    public void KillProcesses(string aName) {
+      foreach (var p in Process.GetProcessesByName(aName)) {
+        p.Kill();
+      }
     }
 
     public bool WaitForStart(string aName, int? aMilliSec = null) {
@@ -115,9 +118,6 @@ namespace Cosmos.Build.Installer {
       }
     }
 
-    private Log mLog = new Log();
-    public Log Log { get { return mLog; } }
-
     public void Section(string aText) {
       Log.NewSection(aText);
     }
@@ -139,46 +139,5 @@ namespace Cosmos.Build.Installer {
       return "\"" + aValue + "\"";
     }
 
-    public void CD(string aPath) {
-      ChDir(aPath);
-    }
-    public void ChDir(string aPath) {
-      Log.WriteLine("Change Dir: " + aPath);
-      CurrPath = aPath;
-    }
-
-    public void ResetReadOnly(string aPathname) {
-      var xAttrib = File.GetAttributes(aPathname);
-      if ((xAttrib & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
-        File.SetAttributes(aPathname, xAttrib & ~FileAttributes.ReadOnly);
-      }
-    }
-
-    public void Copy(string aSrcPathname, bool clearReadonlyIfDestExists) {
-      Copy(aSrcPathname, Path.GetFileName(aSrcPathname), clearReadonlyIfDestExists);
-    }
-    public void Copy(string aSrcPathname, string aDestPathname, bool clearReadonlyIfDestExists) {
-      Log.WriteLine("Copy");
-
-      string xSrc = Path.Combine(SrcPath, aSrcPathname);
-      Log.WriteLine("  From: " + xSrc);
-
-      string xDest = Path.Combine(CurrPath, aDestPathname);
-      Log.WriteLine("  To: " + xDest);
-
-      // Copying files that are in TFS often they will be read only, so need to kill this file before copy
-      if (clearReadonlyIfDestExists && File.Exists(xDest)) {
-        ResetReadOnly(xDest);
-      }
-      File.Copy(xSrc, xDest, true);
-      ResetReadOnly(xDest);
-    }
-
-    public void Echo() {
-      Echo("");
-    }
-    public void Echo(string aText) {
-      mLog.WriteLine(aText);
-    }
   }
 }

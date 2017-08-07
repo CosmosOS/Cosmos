@@ -1,14 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Cosmos.Assembler;
+using XSharp.Common;
 
-namespace XSharp.Compiler {
-  class Program {
-    static void Main(string[] aArgs) {
-      try {
+namespace XSharp.Compiler
+{
+  class Program
+  {
+    static void Main(string[] aArgs)
+    {
+      try
+      {
         string xSrc = aArgs[0];
 
         var xGenerator = new AsmGenerator();
@@ -35,7 +37,9 @@ namespace XSharp.Compiler {
             ");
         var xResult = xGenerator.Generate(xStreamReader);
         Console.WriteLine("done");
-      } catch (Exception ex) {
+      }
+      catch (Exception ex)
+      {
         Console.WriteLine(ex.ToString());
         Environment.Exit(1);
       }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace Cosmos.Assembler
 {
@@ -67,8 +69,8 @@ namespace Cosmos.Assembler
                 return xMnemonic;
             }
 
-            var xAttribs = type.GetCustomAttributes(typeof(OpCodeAttribute), false);
-            if (xAttribs != null && xAttribs.Length > 0)
+            var xAttribs = type.GetTypeInfo().GetCustomAttributes(typeof(OpCodeAttribute), false)?.ToList();
+            if (xAttribs != null && xAttribs.Any())
             {
                 var xAttrib = (OpCodeAttribute)xAttribs[0];
                 xMnemonic = xAttrib.Mnemonic;

@@ -1,0 +1,14 @@
+﻿<local:DebuggerUC x:Class="Cosmos.VS.Windows.StackUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Cosmos.VS.Windows"
+             mc:Ignorable="d" 
+             x:Name="CosmosStackUserControl"
+             Background="WhiteSmoke" xmlns:my="clr-namespace:Cosmos.VS.Windows">
+    <WrapPanel>
+        <my:MemoryViewUC Margin="5,0,0,0" x:Name="memvEBP" Title="Arguments" />
+        <my:MemoryViewUC Margin="15,0,0,0" x:Name="memvESP" Title="Stack" />
+    </WrapPanel>
+</local:DebuggerUC>

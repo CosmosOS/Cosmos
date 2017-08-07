@@ -1,1 +1,3 @@
-install-vs2015 -USERKIT
+@echo off
+
+install-VS2017 -USERKIT

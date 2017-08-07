@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Reflection.Metadata;
+
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpSingle : ILOpCode {
     public readonly Single Value;
 
-    public OpSingle(Code aOpCode, int aPos, int aNextPos, Single aValue, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
+    public OpSingle(Code aOpCode, int aPos, int aNextPos, Single aValue, _ExceptionRegionInfo aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }
 

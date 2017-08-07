@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Pipes;
-using System.Linq;
 using System.Threading;
 
 namespace Cosmos.Debug.Common {
@@ -17,7 +16,8 @@ namespace Cosmos.Debug.Common {
     public void Stop() {
       KillThread = true;
       if (mPipe.IsConnected) {
-        mPipe.Close();
+        mPipe.Dispose();
+        //mPipe.Close();
       } else {
         // Kick it out of the WaitForConnection
         var xPipe = new NamedPipeClientStream(".", mPipeName, PipeDirection.Out);

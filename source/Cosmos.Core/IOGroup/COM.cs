@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core;
 
 namespace Cosmos.Core.IOGroup
 {
@@ -17,7 +18,7 @@ namespace Cosmos.Core.IOGroup
         public readonly IOPort Scratch;
 
         /// <summary>
-        /// Initializes a new set of IOPorts for the specified COM port number. 
+        /// Initializes a new set of IOPorts for the specified COM port number.
         /// </summary>
         /// <param name="comPortNumber">Can be either 1,2,3, or 4.</param>
         public COM(byte comPortNumber)

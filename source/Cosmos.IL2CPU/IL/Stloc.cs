@@ -1,6 +1,9 @@
+using Cosmos.Debug.Symbols;
+
+using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.ILOpCodes;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -12,15 +15,15 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpVar = (OpVar) aOpCode;
-      var xVar = aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value];
-      var xStackCount = (int) GetStackCountForLocal(aMethod, xVar);
+      var xVar = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase)[xOpVar.Value];
+      var xStackCount = (int) GetStackCountForLocal(aMethod, xVar.Type);
       var xEBPOffset = (int) GetEBPOffsetForLocal(aMethod, xOpVar.Value);
-      var xSize = SizeOfType(xVar.LocalType);
+      var xSize = SizeOfType(xVar.Type);
 
-      XS.Comment("Local type = " + xVar.LocalType);
+      XS.Comment("Local type = " + xVar);
       XS.Comment("Local EBP offset = " + xEBPOffset);
       XS.Comment("Local size = " + xSize);
 

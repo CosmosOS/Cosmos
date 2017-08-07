@@ -1,25 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
-using Microsoft.Build.Framework;
-using System.Reflection;
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
-using System.IO;
-using Cosmos.Build.Common;
-using Microsoft.Win32;
-using Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
-using System.Reflection.Emit;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild
 {
     public class IL2CPU : BaseToolTask
     {
-        // protected CompilerEngine mTask = new CompilerEngine();
+        public string KernelPkg { get; set; }
 
         [Required]
         public string CosmosBuildDir { get; set; }
@@ -43,9 +33,6 @@ namespace Cosmos.Build.MSBuild
         public byte DebugCom { get; set; }
 
         [Required]
-        public bool UseNAsm { get; set; }
-
-        [Required]
         public ITaskItem[] References { get; set; }
 
         [Required]
@@ -54,6 +41,8 @@ namespace Cosmos.Build.MSBuild
         public bool EnableLogging { get; set; }
 
         public bool EmitDebugSymbols { get; set; }
+
+        public string AssemblySearchDirs { get; set; }
 
         protected void LogMessage(string aMsg)
         {
@@ -88,13 +77,13 @@ namespace Cosmos.Build.MSBuild
             {
                 Dictionary<string, string> args = new Dictionary<string, string>
                 {
+                    {"KernelPkg", Convert.ToString(KernelPkg)},
                     {"DebugEnabled", Convert.ToString(DebugEnabled)},
                     {"StackCorruptionDetectionEnabled", Convert.ToString(StackCorruptionDetectionEnabled)},
                     {"StackCorruptionDetectionLevel", Convert.ToString(StackCorruptionDetectionLevel)},
                     {"DebugMode", Convert.ToString(DebugMode)},
                     {"TraceAssemblies", Convert.ToString(TraceAssemblies)},
                     {"DebugCom", Convert.ToString(DebugCom)},
-                    {"UseNAsm", Convert.ToString(UseNAsm)},
                     {"OutputFilename", Convert.ToString(OutputFilename)},
                     {"EnableLogging", Convert.ToString(EnableLogging)},
                     {"EmitDebugSymbols", Convert.ToString(EmitDebugSymbols)},
@@ -110,6 +99,7 @@ namespace Cosmos.Build.MSBuild
 
                 string Arguments = args.Aggregate("", (current, arg) => current + "\"" + arg.Key + ":" + arg.Value + "\" ");
                 Arguments = refs.Aggregate(Arguments, (current, Ref) => current + "\"References:" + Ref + "\" ");
+                Arguments = AssemblySearchDirs.Split(';').Aggregate(Arguments, (current, Dir) => current + "\"AssemblySearchDirs:" + Dir + "\" ");
 
                 Log.LogMessage(MessageImportance.High, $"Invoking il2cpu.exe {Arguments}");
                 return ExecuteTool(WorkingDir, Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"), Arguments, "IL2CPU");
@@ -117,8 +107,7 @@ namespace Cosmos.Build.MSBuild
             finally
             {
                 xSW.Stop();
-                Log.LogMessage(MessageImportance.High,
-                    $"IL2CPU invoked with DebugMode='{DebugMode}', DebugEnabled='{DebugEnabled}',StackCorruptionDetectionLevel='{StackCorruptionDetectionLevel ?? "{NULL}"}', TraceAssemblies='{TraceAssemblies ?? "{NULL}"}', IgnoreDebugStub='{IgnoreDebugStubAttribute}'");
+                Log.LogMessage(MessageImportance.High, $"IL2CPU invoked with DebugMode='{DebugMode}', DebugEnabled='{DebugEnabled}',StackCorruptionDetectionLevel='{StackCorruptionDetectionLevel ?? "{NULL}"}', TraceAssemblies='{TraceAssemblies ?? "{NULL}"}', IgnoreDebugStub='{IgnoreDebugStubAttribute}'");
                 Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
             }
         }
