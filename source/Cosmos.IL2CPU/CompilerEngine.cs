@@ -403,16 +403,22 @@ namespace Cosmos.IL2CPU {
 
                             if (xMethod.ReturnType != typeof(void))
                             {
-                                throw new NotSupportedException("Boot Entry should return void!");
+                                throw new NotSupportedException("Boot Entry should return void! Method: " + LabelName.Get(xMethod));
                             }
 
                             if (xMethod.GetParameters().Length != 0)
                             {
-                                throw new NotSupportedException("Boot Entry shouldn't have parameters!");
+                                throw new NotSupportedException("Boot Entry shouldn't have parameters! Method: " + LabelName.Get(xMethod));
                             }
 
                             mBootEntries.Add(xMethod, xEntryIndex);
                         }
+                    }
+
+                    if (xType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                             .Where(m => m.GetCustomAttribute<BootEntry>() != null).Any())
+                    {
+                        throw new NotSupportedException("Boot Entry should be static! Type: " + LabelName.GetFullName(xType));
                     }
                 }
 
@@ -445,7 +451,12 @@ namespace Cosmos.IL2CPU {
             {
                 throw new NotSupportedException("No boot entries found!");
             }
-            
+
+            if (mBootEntries.Where(e => e.Value == null).Count() == 0)
+            {
+                throw new NotImplementedException("No default boot entries found!");
+            }
+
             mBootEntries = mBootEntries.OrderBy(e => e.Value)
                                        .OrderByDescending(e => e.Value.HasValue)
                                        .ToDictionary(e => e.Key, e => e.Value);
