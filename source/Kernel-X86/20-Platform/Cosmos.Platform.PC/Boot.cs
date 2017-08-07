@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.HAL;
 
-namespace Cosmos.System {
+namespace Cosmos.Platform.PC {
     static public class Boot {
-        // [BootEntry(40)]
+        // [BootEntry(20)]
         static public void Init() {
             // Temp
-            HAL.Boot.Init();
+            CPU.x86.Boot.Init();
+
+            HAL.Globals.Devices = new Devices();
         }
     }
 }
