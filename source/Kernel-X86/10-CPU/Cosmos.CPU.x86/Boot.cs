@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU.x86 {
     static public class Boot {
@@ -20,8 +21,8 @@ namespace Cosmos.CPU.x86 {
         // IDT, PIC, and Float
         // Note: This is changing a bit GDT (already) and IDT are moving to a real preboot area.
 
-        // [BootEntry(10)]
-        static public void Init() {
+        [BootEntry(10)]
+        static private void Init() {
             PIC = new PIC();
             Processor.UpdateIDT(true);
 
