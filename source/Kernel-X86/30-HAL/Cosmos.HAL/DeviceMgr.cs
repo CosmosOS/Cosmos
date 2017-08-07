@@ -4,6 +4,6 @@ using System.Text;
 
 namespace Cosmos.HAL {
     public abstract class DeviceMgr {
-        public List<Device> All = new List<Device>();
+        public List<Devices.Device> All = new List<Devices.Device>();
     }
 }
