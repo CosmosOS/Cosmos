@@ -295,10 +295,6 @@ namespace Cosmos.IL2CPU {
             // will not be tried on them, but will on ASMs they reference.
 
             string xKernelBaseName = "Cosmos.System.BootOld";
-            if (UseGen3Kernel == false) {
-                xKernelBaseName = "Cosmos.System.Kernel";
-                LogMessage("Kernel is Gen2.");
-            }
             LogMessage("Kernel Base: " + xKernelBaseName);
 
             Type xKernelType = null;
