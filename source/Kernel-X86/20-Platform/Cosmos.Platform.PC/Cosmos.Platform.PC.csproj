@@ -5,15 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj">
-            <PrivateAssets>All</PrivateAssets>
-        </ProjectReference>
-        <ProjectReference Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj">
-            <PrivateAssets>All</PrivateAssets>
-        </ProjectReference>
-        <ProjectReference Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj">
-            <PrivateAssets>All</PrivateAssets>
-        </ProjectReference>
+        <ProjectReference PrivateAssets="All" Include="..\..\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
     </ItemGroup>
 
 </Project>
