@@ -294,7 +294,13 @@ namespace Cosmos.IL2CPU {
             // Plugs and refs in this list will be loaded absolute (or as proj refs) only. Asm resolution
             // will not be tried on them, but will on ASMs they reference.
 
-            string xKernelBaseName = "Cosmos.System.BootOld";
+            // Gen2
+            string xKernelBaseName = null;
+            if (UseGen3Kernel == false)
+            {
+                xKernelBaseName = "Cosmos.System.Kernel";
+                LogMessage("Kernel is Gen2.");
+            }
             LogMessage("Kernel Base: " + xKernelBaseName);
 
             Type xKernelType = null;
