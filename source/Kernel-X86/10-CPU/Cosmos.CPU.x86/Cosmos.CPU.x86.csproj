@@ -10,9 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-    <ProjectReference Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
-    <ProjectReference Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
+    <ProjectReference Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <PrivateAssets>All</PrivateAssets>
+      </ProjectReference>
+      <ProjectReference Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj">
+      <PrivateAssets>All</PrivateAssets>
+      </ProjectReference>
+      <ProjectReference Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" >
+      <PrivateAssets>All</PrivateAssets>
+      </ProjectReference>
   </ItemGroup>
 
 </Project>
