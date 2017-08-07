@@ -8,8 +8,10 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
 
+using Cosmos.Assembler;
 using Cosmos.Build.Common;
 using Cosmos.Debug.Symbols;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.IL2CPU {
     // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
@@ -44,6 +46,8 @@ namespace Cosmos.IL2CPU {
         protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
         protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
         protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
+        protected Dictionary<MethodBase, int?> mBootEntries;
+        protected List<MemberInfo> mForceIncludes;
 
         public string AssemblerLog = "Cosmos.Assembler.log";
 
@@ -114,10 +118,23 @@ namespace Cosmos.IL2CPU {
                 }
                 LogTime("Engine execute started");
 
+                AssemblyLoadContext.Default.Resolving += Default_Resolving;
+
+                // Gen2
                 // Find the kernel's entry point. We are looking for a public class Kernel, with public static void Boot()
-                var xKernelCtor = LoadAssemblies();
-                if (xKernelCtor == null) {
-                    return false;
+                MethodBase xKernelCtor = null;
+
+                if (UseGen3Kernel)
+                {
+                    LoadBootEntries();
+                }
+                else
+                {
+                    xKernelCtor = LoadAssemblies();
+                    if (xKernelCtor == null)
+                    {
+                        return false;
+                    }
                 }
 
                 var xOutputFilename = Path.Combine(Path.GetDirectoryName(OutputFilename), Path.GetFileNameWithoutExtension(OutputFilename));
@@ -152,10 +169,18 @@ namespace Cosmos.IL2CPU {
                                     LogWarning("Could not create the file \"" + xLogFile + "\"! No log will be created!");
                                 }
                             }
-                            xScanner.QueueMethod(xKernelCtor.DeclaringType.GetTypeInfo().BaseType.GetTypeInfo().GetMethod(UseGen3Kernel ? "EntryPoint" : "Start"));
-                            xScanner.Execute(xKernelCtor);
 
-                            AppAssemblerRingsCheck.Execute(xScanner, xKernelCtor.DeclaringType.GetTypeInfo().Assembly);
+                            if (UseGen3Kernel)
+                            {
+                                xScanner.Execute(mBootEntries.Keys.ToArray(), mForceIncludes);
+                            }
+                            else
+                            {
+                                xScanner.QueueMethod(xKernelCtor.DeclaringType.GetTypeInfo().BaseType.GetTypeInfo().GetMethod(UseGen3Kernel ? "EntryPoint" : "Start"));
+                                xScanner.Execute(xKernelCtor);
+                            }
+
+                            //AppAssemblerRingsCheck.Execute(xScanner, xKernelCtor.DeclaringType.GetTypeInfo().Assembly);
 
                             using (var xOut = new StreamWriter(File.Create(OutputFilename), Encoding.ASCII, 128 * 1024)) {
                                 //if (EmitDebugSymbols) {
@@ -234,15 +259,6 @@ namespace Cosmos.IL2CPU {
                 }
             }
 
-            //var xRequestingAssembly = Assembly.GetEntryAssembly();
-            //if (xRequestingAssembly != null) {
-            //    // check for path in as requested dll is stored, this makes referenced dll project working
-            //    var xPathAsRequested = Path.Combine(Path.GetDirectoryName(xRequestingAssembly.Location), aName.Name + ".dll");
-            //    if (File.Exists(xPathAsRequested)) {
-            //        return aContext.LoadFromAssemblyPath(xPathAsRequested);
-            //    }
-            //}
-
             // check for assembly in working directory
             var xPathToCheck = Path.Combine(Directory.GetCurrentDirectory(), aName.Name + ".dll");
             if (File.Exists(xPathToCheck)) {
@@ -263,6 +279,8 @@ namespace Cosmos.IL2CPU {
             return null;
         }
 
+        #region Gen2
+
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for
         /// the kernel default constructor.</summary>
         /// <returns>The kernel default constructor or a null reference if either none or several such
@@ -275,8 +293,6 @@ namespace Cosmos.IL2CPU {
             //
             // Plugs and refs in this list will be loaded absolute (or as proj refs) only. Asm resolution
             // will not be tried on them, but will on ASMs they reference.
-
-            AssemblyLoadContext.Default.Resolving += Default_Resolving;
 
             string xKernelBaseName = "Cosmos.System.Boot";
             if (!UseGen3Kernel) {
@@ -329,6 +345,162 @@ namespace Cosmos.IL2CPU {
                 return null;
             }
             return xCtor;
+        }
+
+        #endregion
+
+        private void LoadBootEntries()
+        {
+            mBootEntries = new Dictionary<MethodBase, int?>();
+            mForceIncludes = new List<MemberInfo>();
+
+            var xCheckedAssemblies = new List<string>();
+
+            foreach (string xRef in References)
+            {
+                LogMessage("Checking Reference: " + xRef);
+                if (File.Exists(xRef))
+                {
+                    LogMessage("  Exists");
+                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyCacheOrPath(xRef);
+                    CheckAssembly(xAssembly);
+                }
+            }
+
+            void CheckAssembly(Assembly aAssembly)
+            {
+                // Just for debugging
+                //LogMessage("Checking Assembly: " + aAssembly.Location);
+
+                xCheckedAssemblies.Add(aAssembly.GetName().ToString());
+
+                foreach (var xType in aAssembly.GetTypes())
+                {
+                    var xForceIncludeAttribute = xType.GetTypeInfo().GetCustomAttribute<ForceInclude>();
+
+                    if (xForceIncludeAttribute != null)
+                    {
+                        ForceInclude(xType.GetTypeInfo(), xForceIncludeAttribute);
+                    }
+
+                    foreach (var xMethod in xType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                    {
+                        xForceIncludeAttribute = xMethod.GetCustomAttribute<ForceInclude>();
+
+                        if (xForceIncludeAttribute != null)
+                        {
+                            ForceInclude(xMethod, xForceIncludeAttribute);
+                        }
+
+                        var xBootEntryAttribute = xMethod.GetCustomAttribute<BootEntry>();
+
+                        if (xBootEntryAttribute != null)
+                        {
+                            var xEntryIndex = xBootEntryAttribute.EntryIndex;
+
+                            LogMessage("Boot Entry found: Name: " + xMethod + ", Entry Index: "
+                                + (xEntryIndex.HasValue ? xEntryIndex.Value.ToString() : "null"));
+
+                            if (xMethod.ReturnType != typeof(void))
+                            {
+                                throw new NotSupportedException("Boot Entry should return void!");
+                            }
+
+                            if (xMethod.GetParameters().Length != 0)
+                            {
+                                throw new NotSupportedException("Boot Entry shouldn't have parameters!");
+                            }
+
+                            mBootEntries.Add(xMethod, xEntryIndex);
+                        }
+                    }
+                }
+
+                foreach (var xReference in aAssembly.GetReferencedAssemblies())
+                {
+                    try
+                    {
+                        if (!xCheckedAssemblies.Contains(xReference.ToString()))
+                        {
+                            var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyName(xReference);
+
+                            if (xAssembly != null)
+                            {
+                                CheckAssembly(xAssembly);
+                            }
+                        }
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        if (xReference.Name.Contains("Cosmos"))
+                        {
+                            LogWarning("Cosmos Assembly not found!" + Environment.NewLine +
+                                       "Assembly Name: " + xReference.FullName);
+                        }
+                    }
+                }
+            }
+
+            if (mBootEntries.Count == 0)
+            {
+                throw new NotSupportedException("No boot entries found!");
+            }
+            
+            mBootEntries = mBootEntries.OrderBy(e => e.Value)
+                                       .OrderByDescending(e => e.Value.HasValue)
+                                       .ToDictionary(e => e.Key, e => e.Value);
+
+            if (mBootEntries.Count > 1)
+            {
+                var xLastEntryIndex = mBootEntries.Values.ElementAt(0);
+
+                for (int i = 1; i < mBootEntries.Count; i++)
+                {
+                    var xEntryIndex = mBootEntries.Values.ElementAt(i);
+
+                    if (xLastEntryIndex == xEntryIndex)
+                    {
+                        throw new NotSupportedException("Two boot entries with the same entry index were found! Methods: '" +
+                                                        LabelName.GetFullName(mBootEntries.Keys.ElementAt(i - 1)) + "' and '" +
+                                                        LabelName.GetFullName(mBootEntries.Keys.ElementAt(i)) + "'");
+                    }
+
+                    xLastEntryIndex = xEntryIndex;
+                }
+            }
+        }
+
+        private void ForceInclude(MemberInfo aMemberInfo, ForceInclude aForceIncludeAttribute)
+        {
+            if (aMemberInfo is TypeInfo)
+            {
+                mForceIncludes.Add(aMemberInfo);
+
+                var xTypeInfo = (TypeInfo)aMemberInfo;
+
+                foreach (var xMethod in xTypeInfo.GetMethods(
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                {
+                    mForceIncludes.Add(xMethod);
+                }
+
+                foreach (var xMethod in xTypeInfo.GetMethods(
+                    BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                {
+                    if (!xMethod.IsSpecialName)
+                    {
+                        mForceIncludes.Add(xMethod);
+                    }
+                }
+            }
+            else if (aMemberInfo is MethodInfo)
+            {
+                mForceIncludes.Add(aMemberInfo);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
     }
 }

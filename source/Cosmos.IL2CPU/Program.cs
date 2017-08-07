@@ -86,7 +86,7 @@ namespace Cosmos.IL2CPU {
                     return 0;
                 }
                 else {
-                    logMessage("Errorred");
+                    logMessage("Errored");
                     //          File.WriteAllText(@"e:\compiler.log", "Errored");
                     return 2;
                 }

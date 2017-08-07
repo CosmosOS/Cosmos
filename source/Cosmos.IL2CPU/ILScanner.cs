@@ -132,6 +132,8 @@ namespace Cosmos.IL2CPU {
             }
         }
 
+        #region Gen2
+
         public void Execute(MethodBase aStartMethod) {
             if (aStartMethod == null) {
                 throw new ArgumentNullException("aStartMethod");
@@ -214,18 +216,7 @@ namespace Cosmos.IL2CPU {
             Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow", new Type[] { }, null), null, "Explicit Entry");
             Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowInvalidOperation", new Type[] { typeof(string) }, null), null, "Explicit Entry");
             Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowArgumentOutOfRange", new Type[] { typeof(string) }, null), null, "Explicit Entry");
-
-            //Type.GetType("System.ThrowHelper").GetMethods(BindingFlags.NonPublic | BindingFlags.Static).ToList()
-            //    .ForEach(method =>
-            //                      {
-            //                          if (method.Name.Contains("ArgumentOutOfRange"))
-            //                          {
-            //                              Queue(method, null, "Explicit Entry");
-            //                          }
-            //                      });
-
-            Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
-            Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
+            
             // register system types:
             Queue(typeof(Array).GetTypeInfo(), null, "Explicit Entry");
             Queue(typeof(Array).GetTypeInfo().GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First(), null, "Explicit Entry");
@@ -238,63 +229,68 @@ namespace Cosmos.IL2CPU {
             Queue(aStartMethod, null, "Entry Point");
 
             ScanQueue();
-
-            // ForceInclude
-            foreach (var xAssembly in mUsedAssemblies)
-            {
-                foreach (var xType in xAssembly.GetTypes())
-                {
-                    var xTypeInfo = xType.GetTypeInfo();
-
-                    if (xTypeInfo.GetCustomAttribute<ForceInclude>() != null)
-                    {
-                        Queue(xTypeInfo, null, "Force Include");
-                        
-                        foreach (var xMethod in xTypeInfo.GetMethods(
-                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
-                        {
-                            Queue(xMethod, null, "Force Include");
-                        }
-
-                        foreach (var xMethod in xTypeInfo.GetMethods(
-                            BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
-                        {
-                            if (!xMethod.IsSpecialName)
-                            {
-                                Queue(xMethod, null, "Force Include");
-                            }
-                        }
-
-                        continue;
-                    }
-
-                    foreach (var xMethod in xTypeInfo.GetMethods(
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-                    {
-                        if (xMethod.GetCustomAttribute<ForceInclude>() != null)
-                        {
-                            Queue(xMethod, null, "Force Include");
-                        }
-                    }
-
-                    foreach (var xMethod in xTypeInfo.GetMethods(
-                        BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                    {
-                        if (xMethod.GetCustomAttribute<ForceInclude>() != null)
-                        {
-                            Queue(xMethod, null, "Force Include");
-                        }
-                    }
-                }
-            }
-
-            ScanQueue();
-
             UpdateAssemblies();
             Assemble();
 
             mAsmblr.EmitEntrypoint(aStartMethod);
         }
+
+        #endregion
+
+        #region Gen3
+
+        public void Execute(MethodBase[] aBootEntries, List<MemberInfo> aForceIncludes)
+        {
+            foreach (var xBootEntry in aBootEntries)
+            {
+                Queue(xBootEntry.DeclaringType.GetTypeInfo(), null, "Boot Entry Declaring Type");
+                Queue(xBootEntry, null, "Boot Entry");
+            }
+
+            foreach (var xForceInclude in aForceIncludes)
+            {
+                Queue(xForceInclude, null, "Force Include");
+            }
+
+            mPlugManager.FindPlugImpls();
+            // Now that we found all plugs, scan them.
+            // We have to scan them after we find all plugs, because
+            // plugs can use other plugs
+            mPlugManager.ScanFoundPlugs();
+            foreach (var xPlug in mPlugManager.PlugImpls)
+            {
+                CompilerHelpers.Debug($"Plug found: '{xPlug.Key.FullName}' in '{xPlug.Key.GetTypeInfo().Assembly.FullName}'");
+            }
+
+            ILOp.mPlugManager = mPlugManager;
+
+            // Pull in extra implementations, GC etc.
+            Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
+            Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
+            Queue(VTablesImplRefs.SetMethodInfoRef, null, "Explicit Entry");
+            Queue(VTablesImplRefs.IsInstanceRef, null, "Explicit Entry");
+            Queue(VTablesImplRefs.SetTypeInfoRef, null, "Explicit Entry");
+            Queue(VTablesImplRefs.GetMethodAddressForTypeRef, null, "Explicit Entry");
+            Queue(GCImplementationRefs.IncRefCountRef, null, "Explicit Entry");
+            Queue(GCImplementationRefs.DecRefCountRef, null, "Explicit Entry");
+            Queue(GCImplementationRefs.AllocNewObjectRef, null, "Explicit Entry");
+
+            // Pull in Array constructor
+            Queue(typeof(Array).GetTypeInfo().GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First(), null, "Explicit Entry");
+
+            // Pull in MulticastDelegate.GetInvocationList, needed by the Invoke plug
+            Queue(typeof(MulticastDelegate).GetTypeInfo().GetMethod("GetInvocationList"), null, "Explicit Entry");
+
+            mAsmblr.ProcessField(typeof(String).GetField("Empty", BindingFlags.Static | BindingFlags.Public));
+
+            ScanQueue();
+            UpdateAssemblies();
+            Assemble();
+
+            mAsmblr.EmitEntrypoint(null, aBootEntries);
+        }
+
+        #endregion
 
         public void QueueMethod(MethodBase method) {
             Queue(method, null, "Explicit entry via QueueMethod");
