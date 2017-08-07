@@ -1,13 +1,18 @@
 ﻿using System;
-using Cosmos.CPU;
+
+using Cosmos.IL2CPU.API.Attribs;
 using Sys = Cosmos.System;
 
 namespace KernelGen3 {
-    public class Boot : Sys.Boot {
+    static public class Boot {
+        [BootEntry]
+        static private void Init() {
+            // temp
+            Cosmos.Platform.PC.Boot.Init();
+            // temp
+            Cosmos.System.Boot.Init();
 
-        protected override void Run() {
-            Bootstrap.Init();
-            Cosmos.CPU.Temp.ShowText();
+            Cosmos.Platform.PC.Debug.ShowText();
 
             while (true) {
             }

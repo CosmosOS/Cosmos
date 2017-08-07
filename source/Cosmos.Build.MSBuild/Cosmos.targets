@@ -28,15 +28,13 @@
     <Reference Include="Cosmos.System2_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Remove="System.Core" />
   </ItemGroup>
-  <ItemGroup Condition="$(KernelPkg) == 'X86G3'">
-    <Reference Include="Cosmos.CPU_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+  <ItemGroup Condition="$(KernelPkg) == 'X86'">
+    <Reference Include="Cosmos.CPU.x86, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.CPU_Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
-    <Reference Include="Cosmos.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.CPU_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Debug.Kernel.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
-    <Reference Remove="System.Core" />
-  </ItemGroup>
-  <ItemGroup Condition="$(KernelPkg) == 'X86-TapRoot'">
-    <Reference Remove="System.Core" />
+    <Reference Include="Cosmos.Platform.PC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
 
   <UsingTask TaskName="Cosmos.Build.MSBuild.RingCheck" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>

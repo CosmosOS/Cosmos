@@ -6,8 +6,10 @@ copy cosmos.targets "..\..\source\Cosmos.Build.MSBuild\bin\Debug\net462\win7-x86
 cd ..\..
 
 cd source\kernel-x86
+copy "10-CPU\Cosmos.CPU.x86\bin\Debug\netstandard1.5\Cosmos.CPU.x86.dll" "%USERPROFILE%\AppData\Roaming\Cosmos User Kit\Kernel\"
 copy "10-CPU\Cosmos.CPU_Plugs\bin\Debug\netstandard1.5\Cosmos.CPU_Plugs.dll" "%USERPROFILE%\AppData\Roaming\Cosmos User Kit\Kernel\"
 copy "10-CPU\Cosmos.CPU_Asm\bin\Debug\netstandard1.5\Cosmos.CPU_Asm.dll" "%USERPROFILE%\AppData\Roaming\Cosmos User Kit\Kernel\"
+copy "20-Platform\Cosmos.Platform.PC\bin\Debug\netstandard1.5\Cosmos.Platform.PC.dll" "%USERPROFILE%\AppData\Roaming\Cosmos User Kit\Kernel\"
 copy "91-Plugs\Cosmos.Plugs\bin\Debug\netstandard1.5\Cosmos.Plugs.dll" "%USERPROFILE%\AppData\Roaming\Cosmos User Kit\Kernel\"
 cd ..\..
 

@@ -3,7 +3,7 @@ using System.Reflection;
 
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using Cosmos.CPU;
+using Cosmos.CPU.x86;
 using Cosmos.IL2CPU.API.Attribs;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;

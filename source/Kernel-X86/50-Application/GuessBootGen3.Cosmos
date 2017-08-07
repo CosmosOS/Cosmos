@@ -3,7 +3,7 @@
     <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
-    <KernelPkg>X86G3</KernelPkg>
+    <KernelPkg>X86</KernelPkg>
     <BinFormat>elf</BinFormat>
     <DebugEnabled>False</DebugEnabled>
     <DebugMode>Source</DebugMode>
@@ -56,21 +56,6 @@
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\10-CPU\Cosmos.CPU\Cosmos.CPU.csproj">
-      <Name>Cosmos.CPU</Name>
-      <Project>{fc65d765-990d-4f00-b240-8dd17fa91ea9}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\20-Platform\Cosmos.Platform\Cosmos.Platform.csproj">
-      <Name>Cosmos.Platform</Name>
-      <Project>{63843265-d889-47d2-883e-595289c99f42}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj">
-      <Name>Cosmos.HAL</Name>
-      <Project>{3f8ede0e-61bd-4d01-95f5-4a5a17f6221e}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\50-Application\GuessKernelGen3.csproj">
       <Name>GuessKernelGen3</Name>
       <Project>{9e58e949-7b71-45ed-9610-11da287ee933}</Project>

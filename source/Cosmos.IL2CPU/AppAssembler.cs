@@ -1319,7 +1319,7 @@ namespace Cosmos.IL2CPU
             return TmpPosLabel(aMethod, ((OpBranch)aOpCode).Value);
         }
 
-        public void EmitEntrypoint(MethodBase aEntrypoint)
+        public void EmitEntrypoint(MethodBase aEntrypoint, MethodBase[] aBootEntries = null)
         {
             // at the time the datamembers for literal strings are created, the type id for string is not yet determined.
             // for now, we fix this at runtime.
@@ -1365,11 +1365,25 @@ namespace Cosmos.IL2CPU
             var xCurLabel = CosmosAssembler.EntryPointName + ".CreateEntrypoint";
             XS.Label(xCurLabel);
             Assembler.WriteDebugVideo("Now create the kernel class");
-            Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
-            Assembler.WriteDebugVideo("Kernel class created");
+            if (!CompilerEngine.UseGen3Kernel)
+            {
+                Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
+                Assembler.WriteDebugVideo("Kernel class created");
+            }
             xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
             XS.Label(xCurLabel);
-            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.GetTypeInfo().BaseType.GetMethod(CompilerEngine.UseGen3Kernel ? "EntryPoint" : "Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
+            if (CompilerEngine.UseGen3Kernel)
+            {
+                foreach (var xBootEntry in aBootEntries)
+                {
+                    Assembler.WriteDebugVideo(xBootEntry.Name);
+                    X86.IL.Call.DoExecute(Assembler, null, xBootEntry, null, null, null, DebugEnabled);
+                }
+            }
+            else
+            {
+                X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.GetTypeInfo().BaseType.GetMethod(CompilerEngine.UseGen3Kernel ? "EntryPoint" : "Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
+            }
             XS.Label(CosmosAssembler.EntryPointName + ".AfterStart");
             XS.Pop(EBP);
             XS.Return();

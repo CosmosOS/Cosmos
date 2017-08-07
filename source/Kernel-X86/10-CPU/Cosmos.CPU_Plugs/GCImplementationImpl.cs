@@ -1,14 +1,13 @@
 using System;
-using Cosmos.CPU;
-using Cosmos.IL2CPU.API;
+using Cosmos.CPU.x86.Memory.Old;
 using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Plugs {
-    [Plug(Target = typeof(GCImplementation))]
+    [Plug(Target = typeof(Cosmos.CPU.x86.GCImplementation))]
     public static class GCImplementationImpl {
         public static uint AllocNewObject(uint aSize) {
-            CPU.Memory.Old.GlobalSystemInfo.EnsureInitialized();
-            return CPU.Memory.Old.Heap.MemAlloc(aSize);
+            GlobalSystemInfo.EnsureInitialized();
+            return Heap.MemAlloc(aSize);
         }
 
         public static void IncRefCount(uint aObject) {

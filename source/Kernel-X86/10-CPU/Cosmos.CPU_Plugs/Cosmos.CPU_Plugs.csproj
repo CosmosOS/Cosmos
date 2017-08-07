@@ -14,8 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
-    <ProjectReference Include="..\Cosmos.CPU\Cosmos.CPU.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
   </ItemGroup>
 
 </Project>

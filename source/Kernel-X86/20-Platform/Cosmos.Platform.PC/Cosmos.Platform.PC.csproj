@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard1.5</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference PrivateAssets="All" Include="..\..\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
+    </ItemGroup>
+
+</Project>
