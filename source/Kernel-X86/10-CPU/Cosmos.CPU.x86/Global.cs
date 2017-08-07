@@ -11,13 +11,13 @@ namespace Cosmos.CPU.x86 {
         // later user
         static public PIC PIC {
             get {
-                return Bootstrap.PIC;
+                return Boot.PIC;
             }
         }
 
         static public Processor Processor {
             get {
-                return Bootstrap.Processor;
+                return Boot.Processor;
             }
         }
 

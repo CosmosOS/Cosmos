@@ -278,8 +278,8 @@ namespace Cosmos.IL2CPU {
 
             AssemblyLoadContext.Default.Resolving += Default_Resolving;
 
-            string xKernelBaseName = "Cosmos.System.Boot";
-            if (!UseGen3Kernel) {
+            string xKernelBaseName = "Cosmos.System.BootOld";
+            if (UseGen3Kernel == false) {
                 xKernelBaseName = "Cosmos.System.Kernel";
                 LogMessage("Kernel is Gen2.");
             }

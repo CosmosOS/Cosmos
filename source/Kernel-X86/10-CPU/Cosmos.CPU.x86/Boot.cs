@@ -1,5 +1,13 @@
-﻿namespace Cosmos.CPU.x86 {
-    public static class Bootstrap {
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Cosmos.CPU.x86 {
+    static public class Boot {
+
+        // OLD CODE pasted.. .still cleaning/porting
+
+
         // See note in Global - these are a "hack" for now so
         // we dont force static init of Global, and it "pulls" these later till
         // we eventually eliminate them
@@ -11,7 +19,9 @@
         // ie the stuff needed to "pre boot". Do only the very minimal here.
         // IDT, PIC, and Float
         // Note: This is changing a bit GDT (already) and IDT are moving to a real preboot area.
-        public static void Init() {
+
+        // [BootEntry(10)]
+        static public void Init() {
             PIC = new PIC();
             Processor.UpdateIDT(true);
 
