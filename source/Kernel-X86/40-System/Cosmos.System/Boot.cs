@@ -7,7 +7,7 @@ using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.System {
     static public class Boot {
-        [BootEntry(false, 40)]
+        //[BootEntry(false, 40)]
         static public void Init() {
             // Temp
             HAL.Boot.Init();
