@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.HAL {
-    public class Devices {
+    public abstract class DeviceMgr {
         public List<Device> All = new List<Device>();
     }
 }

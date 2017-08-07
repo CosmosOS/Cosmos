@@ -10,7 +10,7 @@ namespace Cosmos.Platform.PC {
             // Temp
             CPU.x86.Boot.Init();
 
-            HAL.Globals.Devices = new Devices();
+            HAL.Globals.DeviceMgr = new DeviceMgr();
         }
     }
 }

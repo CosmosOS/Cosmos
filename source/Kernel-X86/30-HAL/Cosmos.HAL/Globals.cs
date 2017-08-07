@@ -4,6 +4,6 @@ using System.Text;
 
 namespace Cosmos.HAL {
     static public class Globals {
-        static public Devices Devices;
+        static public DeviceMgr DeviceMgr;
     }
 }

@@ -5,7 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference PrivateAssets="All" Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj"/>
+    <ProjectReference PrivateAssets="All" Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Devices\" />
   </ItemGroup>
 
 </Project>
