@@ -4,5 +4,8 @@ using System.Text;
 
 namespace Cosmos.Platform.PC {
     public class DeviceMgr : HAL.DeviceMgr {
+        public DeviceMgr() {
+            var xProcessor = new Devices.Processor();
+        }
     }
 }
