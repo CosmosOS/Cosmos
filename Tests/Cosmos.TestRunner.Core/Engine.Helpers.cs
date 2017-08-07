@@ -167,11 +167,11 @@ namespace Cosmos.TestRunner.Core
         {
             References = new List<string>() { kernelFileName };
 
-            if (KernelPkg == "X86G3")
+            if (KernelPkg == "X86")
             {
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.System_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Plugs")).Location);
             }
             else
             {
