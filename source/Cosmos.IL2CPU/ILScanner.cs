@@ -274,12 +274,12 @@ namespace Cosmos.IL2CPU {
             Queue(GCImplementationRefs.IncRefCountRef, null, "Explicit Entry");
             Queue(GCImplementationRefs.DecRefCountRef, null, "Explicit Entry");
             Queue(GCImplementationRefs.AllocNewObjectRef, null, "Explicit Entry");
-
             // Pull in Array constructor
             Queue(typeof(Array).GetTypeInfo().GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First(), null, "Explicit Entry");
-
             // Pull in MulticastDelegate.GetInvocationList, needed by the Invoke plug
             Queue(typeof(MulticastDelegate).GetTypeInfo().GetMethod("GetInvocationList"), null, "Explicit Entry");
+            // Exception support
+            Queue(ExceptionHelperRefs.CurrentExceptionRef, null, "Explicit Entry");
 
             mAsmblr.ProcessField(typeof(String).GetField("Empty", BindingFlags.Static | BindingFlags.Public));
 

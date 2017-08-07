@@ -4,6 +4,18 @@ using System.Text;
 
 namespace Cosmos.HAL {
     public abstract class DeviceMgr {
-        public List<Devices.Device> All = new List<Devices.Device>();
+        protected readonly List<Devices.Device> mAll = new List<Devices.Device>();
+        protected readonly IList<Devices.Device> mAllRO;
+        public IList<Devices.Device> All {
+            get { return mAllRO; }
+        }
+
+        public DeviceMgr() {
+            mAllRO = mAll.AsReadOnly();
+        }
+
+        public void Add(Devices.Device aDevice) {
+            mAll.Add(aDevice);
+        }
     }
 }

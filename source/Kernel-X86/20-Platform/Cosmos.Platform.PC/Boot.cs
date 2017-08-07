@@ -8,7 +8,11 @@ namespace Cosmos.Platform.PC {
     static public class Boot {
         [BootEntry(20)]
         static private void Init() {
-            HAL.Globals.DeviceMgr = new DeviceMgr();
+            var xMgr = new DeviceMgr();
+            HAL.Globals.DeviceMgr = xMgr;
+
+            var xProcessor = new Devices.Processor();
+
         }
     }
 }
