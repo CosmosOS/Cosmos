@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.API.Attribs;
 
-namespace Cosmos.Plugs.System {
+namespace Cosmos.Plugs.TapRoot.System {
     [Plug(Target = typeof(global::System.Environment))]
     public static class Environment {
         //        [PlugMethod(Signature = "System_Environment_OSName__System_Environment_get_OSInfo__")]

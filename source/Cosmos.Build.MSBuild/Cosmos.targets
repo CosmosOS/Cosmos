@@ -34,7 +34,7 @@
     <Reference Include="Cosmos.CPU_Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Debug.Kernel.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Platform.PC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
-    <Reference Include="Cosmos.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Plugs.TapRoot, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
 
   <UsingTask TaskName="Cosmos.Build.MSBuild.RingCheck" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>

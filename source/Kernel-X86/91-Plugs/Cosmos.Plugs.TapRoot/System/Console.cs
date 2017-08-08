@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using Cosmos.IL2CPU.API.Attribs;
 
-namespace Cosmos.Plugs.System {
+namespace Cosmos.Plugs.TapRoot.System {
     [Plug(Target = typeof(global::System.Console))]
     public static class Console {
         //private static ConsoleColor mForeground = ConsoleColor.White;
