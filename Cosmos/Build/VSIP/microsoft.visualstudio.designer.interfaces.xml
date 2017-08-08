@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.Designer.Interfaces</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDOPTION">
+      <summary>Represents the types of property grid options.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDOPTION.PGOPT_HELP">
+      <summary>Help options.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDOPTION.PGOPT_HOTCOMMANDS">
+      <summary>Commands options.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDOPTION.PGOPT_TOOLBAR">
+      <summary>Toolbar options.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDSORT">
+      <summary>Defines the sort order of the property grid.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDSORT.PGSORT_ALPHABETICAL">
+      <summary>Alphabetical sort order.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDSORT.PGSORT_CATEGORIZED">
+      <summary>Sort by categories.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDSORT.PGSORT_NOSORT">
+      <summary>No sorting.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDCodeDomCreator">
+      <summary>Creates a CodeDom provider for a given hierarchy and item ID. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDCodeDomCreator.CreateCodeDomProvider(System.Object,System.Int32)">
+      <summary>Creates a <see cref="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDCodeDomProvider" />.</summary>
+      <returns>The <see cref="T:Microsoft.VisualStudio.Designer.Interfaces.IVsCodeDomProvider" />.</returns>
+      <param name="pHier">The <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy" />.</param>
+      <param name="itemid">The item ID.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDCodeDomProvider">
+      <summary>Provides access to a CodeDomProvider object.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDCodeDomProvider.CodeDomProvider">
+      <summary>Gets the provider.</summary>
+      <returns>The dispatch interface of the provider.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner">
+      <summary>Represents a managed form designer.  </summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner.CommandGuid">
+      <summary>Gets the GUID of the designer command.</summary>
+      <returns>The GUID of the designer command.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner.Dispose">
+      <summary>Releases all resources used by the <see cref="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner" />. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner.Flush">
+      <summary>Flushes any changes that the designer has made to the text buffer.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner.GetLoadError">
+      <summary>Gets the HRESULT of the last load error, should one exist.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner.SelectionContainer">
+      <summary>Gets the selection container.</summary>
+      <returns>An object of type <see cref="T:Microsoft.VisualStudio.Shell.Interop.ISelectionContainer" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner.View">
+      <summary>Gets the view for this designer.</summary>
+      <returns>An object that is typically of type <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsWindowPane" /> or a document object.  </returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerLoader">
+      <summary>Provide a Visual Studio-specific way to initialize a designer loader. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerLoader.Dispose">
+      <summary>Disposes this designer loader.  </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerLoader.GetEditorCaption(System.Int32)">
+      <summary>Gets the editor caption for the design surface. </summary>
+      <returns>The caption.</returns>
+      <param name="status">
+        <see cref="T:Microsoft.VisualStudio.TextManager.Interop.READONLYSTATUS" />.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerLoader.Initialize(System.Object,System.Object,System.Int32,System.Object)">
+      <summary>Initializes the loader. This associates it with a doc data object and an item ID.</summary>
+      <param name="pSp">The <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" />.</param>
+      <param name="pHier">The <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy" />.</param>
+      <param name="itemid">The <see cref="T:Microsoft.VisualStudio.VSConstants.VSITEMID" />.</param>
+      <param name="pDocData">An <see cref="T:System.IntPtr" /> to a doc data object.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerLoader.SetBaseEditorCaption(System.String)">
+      <summary>Sets the base editor caption. </summary>
+      <param name="pwszCaption">The caption.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerService">
+      <summary>Provides VS shell support for managed form designers.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerService.CreateDesigner(System.Object,System.Object)">
+      <summary>Creates a designer based on the contents of the given designer loader.</summary>
+      <returns>The <see cref="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner" />.</returns>
+      <param name="pSp">The <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" />.</param>
+      <param name="pDesignerLoader">The <see cref="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerLoader" />.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerService.CreateDesignerForClass(System.Object,System.String)">
+      <summary>Creates a designer based on the designer of the given component class.  </summary>
+      <returns>The new <see cref="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesigner" />.</returns>
+      <param name="pSp">The <see cref="T:Microsoft.VisualStudio.OLE.Interop.IServiceProvider" />.</param>
+      <param name="pwszComponentClass">The fully-qualified name of the class.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerService.CreateDesignerLoader(System.String)">
+      <summary>Creates an uninitialized designer loader.</summary>
+      <returns>The <see cref="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerLoader" />.</returns>
+      <param name="pwszCodeStreamClass">The type name of the loader class.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerService.DesignViewAttribute">
+      <summary>Gets the name of the metadata attribute we will use to determine if a class supports a design view.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerService.GetDesignerLoaderClassForFile(System.String)">
+      <summary>Finds a registered designer loader for the specified file extension.</summary>
+      <returns>The type name of the designer loader.</returns>
+      <param name="pwszFileName">The file name.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDDesignerService.RegisterDesignViewAttribute(System.Object,System.Int32,System.Int32,System.String)">
+      <summary>Registers the specified attribute value for the specified file.  </summary>
+      <param name="pHier">The T:Microsoft.VisualStudio.Shell.Interop.IVSHierarchy object.</param>
+      <param name="itemid">The <see cref="T:Microsoft.VisualStudio.VSConstants.VSITEMID" />.</param>
+      <param name="dwClass">The index of the class. The only requirement is that it be unique for each class and be in increasing value for each class declared in the file.</param>
+      <param name="pwszAttributeValue">The name of the attribute value.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPerPropertyBrowsing">
+      <summary>Allows native COM objects to specify managed attributes on values.  It can be used to expose the richer functionality of managed objects as COM objects.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPerPropertyBrowsing.GetPropertyAttributes(System.Int32,System.UInt32@,System.IntPtr,System.IntPtr)">
+      <summary>Gets the list of attributes for the object.</summary>
+      <param name="dispid">The dispatch ID of the property for which to retrieve attributes.</param>
+      <param name="pceltAttrs">The number of attribute type names in <paramref name="pbstrTypeName" />s.</param>
+      <param name="ppbstrTypeNames">An array of variants to be used to initialize the given attributes. If the attributes have a constructor that takes a parameter, the given attribute will be used to initialize the attribute.  </param>
+      <param name="ppvarAttrValues">If the initializer is NULL, VT_EMPTY or VT_NULL, the default ctor will be called. Variants will be caller freed individually using variant clear, then CoTaskMemFree on the array itself.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyBrowser">
+      <summary>Provides access to the designer properties window service.  </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyBrowser.CreatePropertyGrid">
+      <summary>Creates a properties window. You must populate this grid with data yourself.</summary>
+      <returns>The new <see cref="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyBrowser.Refresh">
+      <summary>Refreshes the properties window.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyBrowser.WindowGlyphResourceID">
+      <summary>Gets the resource ID of the glyph that the properties window should use as its tool window icon.</summary>
+      <returns>The resource ID.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid">
+      <summary>Defines a small property browser that can be hosted in dialog boxes or other windows.  </summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.CommandsVisible">
+      <summary>Gets the current visible state of the commands window.</summary>
+      <returns>true if the command window is visible, otherwise false.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.Dispose">
+      <summary>Destroys the properties window.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.GetOption(Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDOPTION)">
+      <summary>Gets the value of the given option.</summary>
+      <returns>The value.</returns>
+      <param name="option">The <see cref="T:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDOPTION" />.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.GridSort">
+      <summary>Gets or sets the sort order of the properties window</summary>
+      <returns>The <see cref="T:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDSORT" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.Handle">
+      <summary>Gets the top-level HWND for the grid window.</summary>
+      <returns>The top-level HWND for the grid window.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.Refresh">
+      <summary>Refreshes the property grid.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.SelectedPropertyName">
+      <summary>Gets the name of the currently-selected property.</summary>
+      <returns>The name of the currently-selected property.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.SetOption(Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDOPTION,System.Object)">
+      <summary>Sets the specified option.</summary>
+      <param name="option">The <see cref="T:Microsoft.VisualStudio.Designer.Interfaces._PROPERTYGRIDOPTION" />.</param>
+      <param name="vtOption">The value of the option.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Designer.Interfaces.IVSMDPropertyGrid.SetSelectedObjects(System.Int32,System.Int32)">
+      <summary>Sets objects for the grid to browse.</summary>
+      <param name="cObjects">The number of objects.</param>
+      <param name="ppUnk">A pointer to a set of objects.</param>
+    </member>
+  </members>
+</doc>

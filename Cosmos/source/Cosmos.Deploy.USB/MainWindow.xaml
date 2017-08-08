@@ -1,0 +1,15 @@
+﻿<Window x:Class="Cosmos.Deploy.USB.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="307" Width="460" ResizeMode="CanMinimize" Icon="/Cosmos.Deploy.USB;component/Cosmos.ico">
+    <Grid>
+        <Label Content=".obj file:" Height="28" HorizontalAlignment="Left" Margin="12,12,0,0" Name="label1" VerticalAlignment="Top" />
+        <TextBox Height="23" Margin="31,46,15,0" Name="tboxObjFile" VerticalAlignment="Top" IsReadOnly="True" />
+        <Button Content="Create" Height="23" HorizontalAlignment="Left" Margin="259,230,0,0" Name="butnCreate" VerticalAlignment="Top" Width="75" IsDefault="True" Click="butnCreate_Click" />
+        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="348,230,0,0" Name="butnCancel" VerticalAlignment="Top" Width="75" IsCancel="True" Click="butnCancel_Click" />
+        <ListBox Height="100" Margin="31,109,15,0" Name="lboxTarget" VerticalAlignment="Top" />
+        <Label Content="Target drive:" Height="28" HorizontalAlignment="Left" Margin="12,75,0,0" Name="label2" VerticalAlignment="Top" />
+        <Button Content="Refresh" Height="23" HorizontalAlignment="Left" Margin="31,230,0,0" Name="butnRefresh" VerticalAlignment="Top" Width="75" Click="butnRefresh_Click" />
+        <Label Content="*Only removable drives are listed." Height="27" Margin="0,84,15,0" Name="label3" VerticalAlignment="Top" HorizontalAlignment="Right" Width="199" FontStyle="Italic" FontSize="11" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" Foreground="Blue" />
+    </Grid>
+</Window>

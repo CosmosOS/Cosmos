@@ -1,0 +1,1353 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.Data.Sqlite</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Data.Sqlite.SqliteCacheMode">
+            <summary>
+            Represents the caching modes that can be used when creating a new <see cref="T:Microsoft.Data.Sqlite.SqliteConnection" />.
+            </summary>
+            <seealso href="http://sqlite.org/sharedcache.html">SQLite Shared-Cache Mode</seealso>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteCacheMode.Default">
+            <summary>
+            Default mode.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteCacheMode.Private">
+            <summary>
+            Private-cache mode. Each connection uses a private cache.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteCacheMode.Shared">
+            <summary>
+            Shared-cache mode. Connections share a cache. This mode can change the behavior of transaction and table
+            locking.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteCommand">
+            <summary>
+            Represents a SQL statement to be executed against a SQLite database.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteCommand" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteCommand" /> class.
+            </summary>
+            <param name="commandText">The SQL to execute against the database.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.#ctor(System.String,Microsoft.Data.Sqlite.SqliteConnection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteCommand" /> class.
+            </summary>
+            <param name="commandText">The SQL to execute against the database.</param>
+            <param name="connection">The connection used by the command.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.#ctor(System.String,Microsoft.Data.Sqlite.SqliteConnection,Microsoft.Data.Sqlite.SqliteTransaction)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteCommand" /> class.
+            </summary>
+            <param name="commandText">The SQL to execute against the database.</param>
+            <param name="connection">The connection used by the command.</param>
+            <param name="transaction">The transaction within which the command executes.</param>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.CommandType">
+            <summary>
+            Gets or sets a value indicating how <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> is interpreted. Only
+            <see cref="F:System.Data.CommandType.Text" /> is supported.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText">
+            <summary>
+            Gets or sets the SQL to execute against the database.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.Connection">
+            <summary>
+            Gets or sets the connection used by the command.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.DbConnection">
+            <summary>
+            Gets or sets the connection used by the command. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteConnection" />.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.Transaction">
+            <summary>
+            Gets or sets the transaction within which the command executes.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.DbTransaction">
+            <summary>
+            Gets or sets the transaction within which the command executes. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteTransaction" />.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.Parameters">
+            <summary>
+            Gets the collection of parameters used by the command.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.DbParameterCollection">
+            <summary>
+            Gets the collection of parameters used by the command.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.CommandTimeout">
+            <summary>
+            Gets or sets the wait time before terminating the attempt to execute the command.
+            </summary>
+            <remarks>
+            The timeout is used when the command is waiting to obtain a lock on the table.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.DesignTimeVisible">
+            <summary>
+            Gets or sets a value indicating whether the command should be visible in an interface control.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteCommand.UpdatedRowSource">
+            <summary>
+            Gets or sets a value indicating how the results are applied to the row being updated.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.CreateParameter">
+            <summary>
+            Creates a new parameter.
+            </summary>
+            <returns>The new parameter.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.CreateDbParameter">
+            <summary>
+            Creates a new parameter.
+            </summary>
+            <returns>The new parameter.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.Prepare">
+            <summary>
+            Creates a prepared version of the command on the database. This has no effect.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> against the database and returns a data reader.
+            </summary>
+            <returns>The data reader.</returns>
+            <exception cref="T:Microsoft.Data.Sqlite.SqliteException">A SQLite error occurs during execution.</exception>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(System.Data.CommandBehavior)">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> against the database and returns a data reader.
+            </summary>
+            <param name="behavior">
+            A description of the results of the query and its effect on the database.
+            <para>Only <see cref="F:System.Data.CommandBehavior.Default" />, <see cref="F:System.Data.CommandBehavior.SequentialAccess" />,
+            <see cref="F:System.Data.CommandBehavior.SingleResult" />, <see cref="F:System.Data.CommandBehavior.SingleRow" />, and
+            <see cref="F:System.Data.CommandBehavior.CloseConnection" /> are supported.</para>
+            </param>
+            <returns>The data reader.</returns>
+            <exception cref="T:Microsoft.Data.Sqlite.SqliteException">A SQLite error occurs during execution.</exception>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteDbDataReader(System.Data.CommandBehavior)">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> against the database and returns a data reader.
+            </summary>
+            <param name="behavior">A description of query's results and its effect on the database.</param>
+            <returns>The data reader.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteReaderAsync">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> asynchronously against the database and returns a data reader.
+            </summary>
+            <returns>A task representing the asynchronous operation.</returns>
+            <remarks>
+            SQLite does not support asynchronous execution. Use write-ahead logging instead.
+            </remarks>
+            <seealso href="http://sqlite.org/wal.html">Write-Ahead Logging</seealso>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteReaderAsync(System.Threading.CancellationToken)">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> asynchronously against the database and returns a data reader.
+            </summary>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+            <remarks>
+            SQLite does not support asynchronous execution. Use write-ahead logging instead.
+            </remarks>
+            <seealso href="http://sqlite.org/wal.html">Write-Ahead Logging</seealso>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteReaderAsync(System.Data.CommandBehavior)">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> asynchronously against the database and returns a data reader.
+            </summary>
+            <param name="behavior">A description of query's results and its effect on the database.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+            <remarks>
+            SQLite does not support asynchronous execution. Use write-ahead logging instead.
+            </remarks>
+            <seealso href="http://sqlite.org/wal.html">Write-Ahead Logging</seealso>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteReaderAsync(System.Data.CommandBehavior,System.Threading.CancellationToken)">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> asynchronously against the database and returns a data reader.
+            </summary>
+            <param name="behavior">A description of query's results and its effect on the database.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+            <remarks>
+            SQLite does not support asynchronous execution. Use write-ahead logging instead.
+            </remarks>
+            <seealso href="http://sqlite.org/wal.html">Write-Ahead Logging</seealso>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteDbDataReaderAsync(System.Data.CommandBehavior,System.Threading.CancellationToken)">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> asynchronously against the database and returns a data reader.
+            </summary>
+            <param name="behavior">A description of query's results and its effect on the database.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteNonQuery">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> against the database.
+            </summary>
+            <returns>The number of rows inserted, updated, or deleted. -1 for SELECT statements.</returns>
+            <exception cref="T:Microsoft.Data.Sqlite.SqliteException">A SQLite error occurs during execution.</exception>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.ExecuteScalar">
+            <summary>
+            Executes the <see cref="P:Microsoft.Data.Sqlite.SqliteCommand.CommandText" /> against the database and returns the result.
+            </summary>
+            <returns>The first column of the first row of the results, or null if no results.</returns>
+            <exception cref="T:Microsoft.Data.Sqlite.SqliteException">A SQLite error occurs during execution.</exception>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteCommand.Cancel">
+            <summary>
+            Attempts to cancel the execution of the command. Does nothing.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteConnection">
+            <summary>
+            Represents a connection to a SQLite database.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteConnection" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteConnection" /> class.
+            </summary>
+            <param name="connectionString">The string used to open the connection.</param>
+            <seealso cref="T:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder" />
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnection.Handle">
+            <summary>
+            Gets a handle to underlying database connection.
+            </summary>
+            <seealso href="http://sqlite.org/c3ref/sqlite3.html">Database Connection Handle</seealso>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnection.ConnectionString">
+            <summary>
+            Gets or sets a string used to open the connection.
+            </summary>
+            <seealso cref="T:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder" />
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnection.Database">
+            <summary>
+            Gets the name of the current database. Always 'main'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnection.DataSource">
+            <summary>
+            Gets the path to the database file. Will be absolute for open connections.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnection.ServerVersion">
+            <summary>
+            Gets the version of SQLite used by the connection.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnection.State">
+            <summary>
+            Gets the current state of the connection.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnection.Transaction">
+            <summary>
+            Gets or sets the transaction currently being used by the connection, or null if none.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.Open">
+            <summary>
+            Opens a connection to the database using the value of <see cref="P:Microsoft.Data.Sqlite.SqliteConnection.ConnectionString" />.
+            </summary>
+            <exception cref="T:Microsoft.Data.Sqlite.SqliteException">A SQLite error occurs while opening the connection.</exception>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.Close">
+            <summary>
+            Closes the connection to the database. Open transactions are rolled back.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.Dispose(System.Boolean)">
+            <summary>
+            Releases any resources used by the connection and closes it.
+            </summary>
+            <param name="disposing">
+            true to release managed and unmanaged resources; false to release only unmanaged resources.
+            </param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.CreateCommand">
+            <summary>
+            Creates a new command associated with the connection.
+            </summary>
+            <returns>The new command.</returns>
+            <remarks>
+            The command's <seealso cref="P:Microsoft.Data.Sqlite.SqliteCommand.Transaction" /> property will also be set to the current
+            transaction.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.CreateDbCommand">
+            <summary>
+            Creates a new command associated with the connection.
+            </summary>
+            <returns>The new command.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.BeginTransaction">
+            <summary>
+            Begins a transaction on the connection.
+            </summary>
+            <returns>The transaction.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.BeginDbTransaction(System.Data.IsolationLevel)">
+            <summary>
+            Begins a transaction on the connection.
+            </summary>
+            <param name="isolationLevel">The isolation level of the transaction.</param>
+            <returns>The transaction.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.BeginTransaction(System.Data.IsolationLevel)">
+            <summary>
+            Begins a transaction on the connection.
+            </summary>
+            <param name="isolationLevel">
+            The isolation level of the transaction.
+            <para>Only <see cref="F:System.Data.IsolationLevel.ReadUncommitted" /> and <see cref="F:System.Data.IsolationLevel.Serializable" /> are
+            supported.</para>
+            </param>
+            <returns>The transaction.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.ChangeDatabase(System.String)">
+            <summary>
+            Changes the current database. Not supported.
+            </summary>
+            <param name="databaseName">The name of the database to use.</param>
+            <exception cref="T:System.NotSupportedException">Always.</exception>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnection.EnableExtensions(System.Boolean)">
+            <summary>
+            Enables extension loading on the connection.
+            </summary>
+            <param name="enable">true to enable; false to disable</param>
+            <seealso href="http://sqlite.org/loadext.html">Run-Time Loadable Extensions</seealso>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder">
+            <summary>
+            Provides a simple way to create and manage the contents of connection strings used by
+            <see cref="T:Microsoft.Data.Sqlite.SqliteConnection" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder" /> class.
+            </summary>
+            <param name="connectionString">
+            The initial connection string the builder will represent. Can be null.
+            </param>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.DataSource">
+            <summary>
+            Gets or sets the database file.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.Mode">
+            <summary>
+            Gets or sets the connection mode.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.Keys">
+            <summary>
+            Gets a collection containing the keys used by the connection string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.Values">
+            <summary>
+            Gets a collection containing the values used by the connection string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.Cache">
+            <summary>
+            Gets or sets the caching mode used by the connection.
+            </summary>
+            <seealso href="http://sqlite.org/sharedcache.html">SQLite Shared-Cache Mode</seealso>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.Item(System.String)">
+            <summary>
+            Gets or sets the value associated with the specified key.
+            </summary>
+            <param name="keyword">The key.</param>
+            <returns>The value.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.Clear">
+            <summary>
+            Clears the contents of the builder.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.ContainsKey(System.String)">
+            <summary>
+            Determines whether the specified key is used by the connection string.
+            </summary>
+            <param name="keyword">The key to look for.</param>
+            <returns>true if it is use; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.Remove(System.String)">
+            <summary>
+            Removes the specified key and its value from the connection string.
+            </summary>
+            <param name="keyword">The key to remove.</param>
+            <returns>true if the key was used; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.ShouldSerialize(System.String)">
+            <summary>
+            Determines whether the specified key should be serialized into the connection string.
+            </summary>
+            <param name="keyword">The key to check.</param>
+            <returns>true if it should be serialized; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteConnectionStringBuilder.TryGetValue(System.String,System.Object@)">
+            <summary>
+            Gets the value of the specified key if it is used.
+            </summary>
+            <param name="keyword">The key.</param>
+            <param name="value">The value.</param>
+            <returns>true if the key was used; otherwise, false.</returns>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteDataReader">
+            <summary>
+            Provides methods for reading the result of a command executed against a SQLite database.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteDataReader.Depth">
+            <summary>
+            Gets the depth of nesting for the current row. Always zero.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteDataReader.FieldCount">
+            <summary>
+            Gets the number of columns in the current row.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteDataReader.Handle">
+            <summary>
+            Gets a handle to underlying prepared statement.
+            </summary>
+            <seealso href="http://sqlite.org/c3ref/stmt.html">Prepared Statement Object</seealso>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteDataReader.HasRows">
+            <summary>
+            Gets a value indicating whether the data reader contains any rows.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteDataReader.IsClosed">
+            <summary>
+            Gets a value indicating whether the data reader is closed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteDataReader.RecordsAffected">
+            <summary>
+            Gets the number of rows inserted, updated, or deleted. -1 for SELECT statements.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteDataReader.Item(System.String)">
+            <summary>
+            Gets the value of the specified column.
+            </summary>
+            <param name="name">The name of the column. The value is case-sensitive.</param>
+            <returns>The value.</returns>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteDataReader.Item(System.Int32)">
+            <summary>
+            Gets the value of the specified column.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetEnumerator">
+            <summary>
+            Gets an enumerator that can be used to iterate through the rows in the data reader.
+            </summary>
+            <returns>The enumerator.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.Read">
+            <summary>
+            Advances to the next row in the result set.
+            </summary>
+            <returns>true if there are more rows; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.NextResult">
+            <summary>
+            Advances to the next result set for batched statements.
+            </summary>
+            <returns>true if there are more result sets; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.Close">
+            <summary>
+            Closes the data reader.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetSchemaTable">
+            <summary>
+            Returns a data table that describes the column metadata.
+            </summary>
+            <returns>The data table.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.Dispose(System.Boolean)">
+            <summary>
+            Releases any resources used by the data reader and closes it.
+            </summary>
+            <param name="disposing">
+            true to release managed and unmanaged resources; false to release only unmanaged resources.
+            </param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetName(System.Int32)">
+            <summary>
+            Gets the name of the specified column.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The name of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetOrdinal(System.String)">
+            <summary>
+            Gets the ordinal of the specified column.
+            </summary>
+            <param name="name">The name of the column.</param>
+            <returns>The zero-based column ordinal.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetDataTypeName(System.Int32)">
+            <summary>
+            Gets the declared data type name of the specified column. The storage class is returned for computed
+            columns.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The data type name of the column.</returns>
+            <remarks>Due to SQLite's dynamic type system, this may not reflect the actual type of the value.</remarks>
+            <seealso href="http://sqlite.org/datatype3.html">Datatypes In SQLite Version 3</seealso>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetFieldType(System.Int32)">
+            <summary>
+            Gets the data type of the specified column.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The data type of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.IsDBNull(System.Int32)">
+            <summary>
+            Gets a value indicating whether the specified column is <see cref="T:System.DBNull" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>true if the specified column is <see cref="T:System.DBNull" />; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetBoolean(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Boolean" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetByte(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Byte" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetChar(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Char" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetDateTime(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.DateTime" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetDecimal(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Decimal" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetDouble(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Double" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetFloat(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Single" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetGuid(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Guid" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetInt16(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Int16" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetInt32(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Int32" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetInt64(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.Int64" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetString(System.Int32)">
+            <summary>
+            Gets the value of the specified column as a <see cref="T:System.String" />.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetBytes(System.Int32,System.Int64,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Reads a stream of bytes from the specified column. Not supported.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <param name="dataOffset">The index from which to begin the read operation.</param>
+            <param name="buffer">The buffer into which the data is copied.</param>
+            <param name="bufferOffset">The index to which the data will be copied.</param>
+            <param name="length">The maximum number of bytes to read.</param>
+            <returns>The actual number of bytes read.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetChars(System.Int32,System.Int64,System.Char[],System.Int32,System.Int32)">
+            <summary>
+            Reads a stream of characters from the specified column. Not supported.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <param name="dataOffset">The index from which to begin the read operation.</param>
+            <param name="buffer">The buffer into which the data is copied.</param>
+            <param name="bufferOffset">The index to which the data will be copied.</param>
+            <param name="length">The maximum number of characters to read.</param>
+            <returns>The actual number of characters read.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetFieldValue``1(System.Int32)">
+            <summary>
+            Gets the value of the specified column.
+            </summary>
+            <typeparam name="T">The type of the value.</typeparam>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetValue(System.Int32)">
+            <summary>
+            Gets the value of the specified column.
+            </summary>
+            <param name="ordinal">The zero-based column ordinal.</param>
+            <returns>The value of the column.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteDataReader.GetValues(System.Object[])">
+            <summary>
+            Gets the column values of the current row.
+            </summary>
+            <param name="values">An array into which the values are copied.</param>
+            <returns>The number of values copied into the array.</returns>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteException">
+            <summary>
+            Represents a SQLite error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteException.#ctor(System.String,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteException" /> class.
+            </summary>
+            <param name="message">The message to display for the exception. Can be null.</param>
+            <param name="errorCode">The SQLite error code.</param>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteException.SqliteErrorCode">
+            <summary>
+            Gets the SQLite error code.
+            </summary>
+            <seealso href="http://sqlite.org/rescode.html">SQLite Result Codes</seealso>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteFactory">
+            <summary>
+            Creates instances of various Microsoft.Data.Sqlite classes.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteFactory.Instance">
+            <summary>
+            The singleton instance.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteFactory.CreateCommand">
+            <summary>
+            Creates a new command.
+            </summary>
+            <returns>The new command.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteFactory.CreateConnection">
+            <summary>
+            Creates a new connection.
+            </summary>
+            <returns>The new connection.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteFactory.CreateConnectionStringBuilder">
+            <summary>
+            Creates a new connection string builder.
+            </summary>
+            <returns>The new connection string builder.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteFactory.CreateParameter">
+            <summary>
+            Creates a new parameter.
+            </summary>
+            <returns>The new parameter.</returns>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteOpenMode">
+            <summary>
+            Represents the connection modes that can be used when opening a connection.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteOpenMode.ReadWriteCreate">
+            <summary>
+            Opens the database for reading and writing, and creates it if it doesn't exist.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteOpenMode.ReadWrite">
+            <summary>
+            Opens the database for reading and writing.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteOpenMode.ReadOnly">
+            <summary>
+            Opens the database in read-only mode.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteOpenMode.Memory">
+            <summary>
+            Opens an in-memory database.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteParameter">
+            <summary>
+            Represents a parameter and its value in a <see cref="T:Microsoft.Data.Sqlite.SqliteCommand" />.
+            </summary>
+            <remarks>Due to SQLite's dynamic type system, parameter values are not converted.</remarks>
+            <seealso href="http://sqlite.org/datatype3.html">Datatypes In SQLite Version 3</seealso>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameter.#ctor(System.String,System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" /> class.
+            </summary>
+            <param name="name">The name of the parameter.</param>
+            <param name="value">The value of the parameter. Can be null.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameter.#ctor(System.String,Microsoft.Data.Sqlite.SqliteType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" /> class.
+            </summary>
+            <param name="name">The name of the parameter.</param>
+            <param name="type">The type of the parameter.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameter.#ctor(System.String,Microsoft.Data.Sqlite.SqliteType,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" /> class.
+            </summary>
+            <param name="name">The name of the parameter.</param>
+            <param name="type">The type of the parameter.</param>
+            <param name="size">The maximum size, in bytes, of the parameter.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameter.#ctor(System.String,Microsoft.Data.Sqlite.SqliteType,System.Int32,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" /> class.
+            </summary>
+            <param name="name">The name of the parameter.</param>
+            <param name="type">The type of the parameter.</param>
+            <param name="size">The maximum size, in bytes, of the parameter.</param>
+            <param name="sourceColumn">The source column used for loading the value. Can be null.</param>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.DbType">
+            <summary>
+            Gets or sets the type of the parameter.
+            </summary>
+            <remarks>Due to SQLite's dynamic type system, parameter values are not converted.</remarks>
+            <seealso href="http://sqlite.org/datatype3.html">Datatypes In SQLite Version 3</seealso>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.SqliteType">
+            <summary>
+            Gets or sets the SQLite type of the parameter.
+            </summary>
+            <remarks>Due to SQLite's dynamic type system, parameter values are not converted.</remarks>
+            <seealso href="http://sqlite.org/datatype3.html">Datatypes In SQLite Version 3</seealso>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.Direction">
+            <summary>
+            Gets or sets direction of the parameter. Only <see cref="F:System.Data.ParameterDirection.Input" /> is supported.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.IsNullable">
+            <summary>
+            Gets or sets a value indicating whether the parameter is nullable.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.ParameterName">
+            <summary>
+            Gets or sets the name of the parameter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.Size">
+            <summary>
+            Gets or sets the maximum size, in bytes, of the parameter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.SourceColumn">
+            <summary>
+            Gets or sets the source column used for loading the value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.SourceColumnNullMapping">
+            <summary>
+            Gets or sets a value indicating whether the source column is nullable.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.SourceVersion">
+            <summary>
+            Gets or sets the version to use when loading the value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameter.Value">
+            <summary>
+            Gets or sets the value of the parameter.
+            </summary>
+            <remarks>Due to SQLite's dynamic type system, parameter values are not converted.</remarks>
+            <seealso href="http://sqlite.org/datatype3.html">Datatypes In SQLite Version 3</seealso>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameter.ResetDbType">
+            <summary>
+            Resets the <see cref="P:Microsoft.Data.Sqlite.SqliteParameter.DbType" /> property to its original value.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameter.ResetSqliteType">
+            <summary>
+            Resets the <see cref="P:Microsoft.Data.Sqlite.SqliteParameter.SqliteType" /> property to its original value.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteParameterCollection">
+            <summary>
+            Represents a collection of SQLite parameters.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Data.Sqlite.SqliteParameterCollection" /> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameterCollection.Count">
+            <summary>
+            Gets the number of items in the collection.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameterCollection.SyncRoot">
+            <summary>
+            Gets the object used to synchronize access to the collection.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameterCollection.IsFixedSize">
+            <summary>
+            Gets a value indicating whether the collection is a fixed size.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameterCollection.IsReadOnly">
+            <summary>
+            Gets a value indicating whether the collection is read-only.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameterCollection.IsSynchronized">
+            <summary>
+            Gets a value indicating whether the collection is synchronized.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameterCollection.Item(System.Int32)">
+            <summary>
+            Gets or sets the parameter at the specified index.
+            </summary>
+            <param name="index">The zero-based index of the parameter.</param>
+            <returns>The parameter.</returns>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteParameterCollection.Item(System.String)">
+            <summary>
+            Gets or sets the parameter with the specified name.
+            </summary>
+            <param name="parameterName">The name of the parameter.</param>
+            <returns>The parameter.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Add(System.Object)">
+            <summary>
+            Adds a parameter to the collection.
+            </summary>
+            <param name="value">The parameter to add. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" />.</param>
+            <returns>The zero-based index of the parameter that was added.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Add(Microsoft.Data.Sqlite.SqliteParameter)">
+            <summary>
+            Adds a parameter to the collection.
+            </summary>
+            <param name="value">The parameter to add.</param>
+            <returns>The parameter that was added.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Add(System.String,Microsoft.Data.Sqlite.SqliteType)">
+            <summary>
+            Adds a parameter to the collection.
+            </summary>
+            <param name="parameterName">The name of the parameter.</param>
+            <param name="type">The SQLite type of the parameter.</param>
+            <returns>The parameter that was added.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Add(System.String,Microsoft.Data.Sqlite.SqliteType,System.Int32)">
+            <summary>
+            Adds a parameter to the collection.
+            </summary>
+            <param name="parameterName">The name of the parameter.</param>
+            <param name="type">The SQLite type of the parameter.</param>
+            <param name="size">The maximum size, in bytes, of the parameter.</param>
+            <returns>The parameter that was added.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Add(System.String,Microsoft.Data.Sqlite.SqliteType,System.Int32,System.String)">
+            <summary>
+            Adds a parameter to the collection.
+            </summary>
+            <param name="parameterName">The name of the parameter.</param>
+            <param name="type">The SQLite type of the parameter.</param>
+            <param name="size">The maximum size, in bytes, of the parameter.</param>
+            <param name="sourceColumn">
+            The source column used for loading the value of the parameter. Can be null.
+            </param>
+            <returns>The parameter that was added.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.AddRange(System.Array)">
+            <summary>
+            Adds multiple parameters to the collection.
+            </summary>
+            <param name="values">
+            An array of parameters to add. They must be <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" /> objects.
+            </param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.AddRange(System.Collections.Generic.IEnumerable{Microsoft.Data.Sqlite.SqliteParameter})">
+            <summary>
+            Adds multiple parameters to the collection.
+            </summary>
+            <param name="values">The parameters to add.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.AddWithValue(System.String,System.Object)">
+            <summary>
+            Adds a parameter to the collection.
+            </summary>
+            <param name="parameterName">The name of the parameter.</param>
+            <param name="value">The value of the parameter. Can be null.</param>
+            <returns>The parameter that was added.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Clear">
+            <summary>
+            Removes all parameters from the collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Contains(System.Object)">
+            <summary>
+            Gets a value indicating whether the collection contains the specified parameter.
+            </summary>
+            <param name="value">The parameter to look for. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" />.</param>
+            <returns>true if the collection contains the parameter; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Contains(Microsoft.Data.Sqlite.SqliteParameter)">
+            <summary>
+            Gets a value indicating whether the collection contains the specified parameter.
+            </summary>
+            <param name="value">The parameter to look for.</param>
+            <returns>true if the collection contains the parameter; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Contains(System.String)">
+            <summary>
+            Gets a value indicating whether the collection contains a parameter with the specified name.
+            </summary>
+            <param name="value">The name of the parameter.</param>
+            <returns>true if the collection contains the parameter; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.CopyTo(System.Array,System.Int32)">
+            <summary>
+            Copies the collection to an array of parameters.
+            </summary>
+            <param name="array">
+            The array into which the parameters are copied. Must be an array of <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" /> objects.
+            </param>
+            <param name="index">The zero-based index to which the parameters are copied.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.CopyTo(Microsoft.Data.Sqlite.SqliteParameter[],System.Int32)">
+            <summary>
+            Copies the collection to an array of parameters.
+            </summary>
+            <param name="array">The array into which the parameters are copied.</param>
+            <param name="index">The zero-based index to which the parameters are copied.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.GetEnumerator">
+            <summary>
+            Gets an enumerator that iterates through the collection.
+            </summary>
+            <returns>The enumerator.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.GetParameter(System.Int32)">
+            <summary>
+            Gets a parameter at the specified index.
+            </summary>
+            <param name="index">The zero-based index of the parameter.</param>
+            <returns>The parameter.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.GetParameter(System.String)">
+            <summary>
+            Gets a parameter with the specified name.
+            </summary>
+            <param name="parameterName">The name of the parameter.</param>
+            <returns>The parameter.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.IndexOf(System.Object)">
+            <summary>
+            Gets the index of the specified parameter.
+            </summary>
+            <param name="value">The parameter. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" />.</param>
+            <returns>The zero-based index of the parameter.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.IndexOf(Microsoft.Data.Sqlite.SqliteParameter)">
+            <summary>
+            Gets the index of the specified parameter.
+            </summary>
+            <param name="value">The parameter.</param>
+            <returns>The zero-based index of the parameter.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.IndexOf(System.String)">
+            <summary>
+            Gets the index of the parameter with the specified name.
+            </summary>
+            <param name="parameterName">The name of the parameter.</param>
+            <returns>The zero-based index of the parameter or -1 if not found.</returns>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Insert(System.Int32,System.Object)">
+            <summary>
+            Inserts a parameter into the collection at the specified index.
+            </summary>
+            <param name="index">The zero-based index at which the parameter should be inserted.</param>
+            <param name="value">The parameter to insert. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" />.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Insert(System.Int32,Microsoft.Data.Sqlite.SqliteParameter)">
+            <summary>
+            Inserts a parameter into the collection at the specified index.
+            </summary>
+            <param name="index">The zero-based index at which the parameter should be inserted.</param>
+            <param name="value">The parameter to insert.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Remove(System.Object)">
+            <summary>
+            Removes a parameter from the collection.
+            </summary>
+            <param name="value">The parameter to remove. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" />.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.Remove(Microsoft.Data.Sqlite.SqliteParameter)">
+            <summary>
+            Removes a parameter from the collection.
+            </summary>
+            <param name="value">The parameter to remove.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.RemoveAt(System.Int32)">
+            <summary>
+            Removes a parameter from the collection at the specified index.
+            </summary>
+            <param name="index">The zero-based index of the parameter to remove.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.RemoveAt(System.String)">
+            <summary>
+            Removes a parameter with the specified name from the collection.
+            </summary>
+            <param name="parameterName">The name of the parameter to remove.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.SetParameter(System.Int32,System.Data.Common.DbParameter)">
+            <summary>
+            Sets the parameter at the specified index.
+            </summary>
+            <param name="index">The zero-based index of the parameter to set.</param>
+            <param name="value">The parameter. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" />.</param>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteParameterCollection.SetParameter(System.String,System.Data.Common.DbParameter)">
+            <summary>
+            Sets the parameter with the specified name.
+            </summary>
+            <param name="parameterName">The name of the parameter to set.</param>
+            <param name="value">The parameter. Must be a <see cref="T:Microsoft.Data.Sqlite.SqliteParameter" />.</param>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteTransaction">
+            <summary>
+            Represents a transaction made against a SQLite database.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteTransaction.Connection">
+            <summary>
+            Gets the connection associated with the transaction.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteTransaction.DbConnection">
+            <summary>
+            Gets the connection associated with the transaction.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.SqliteTransaction.IsolationLevel">
+            <summary>
+            Gets the isolation level for the transaction. This cannot be changed if the transaction is completed or
+            closed.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteTransaction.Commit">
+            <summary>
+            Applies the changes made in the transaction.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteTransaction.Rollback">
+            <summary>
+            Reverts the changes made in the transaction.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.SqliteTransaction.Dispose(System.Boolean)">
+            <summary>
+            Releases any resources used by the transaction and rolls it back.
+            </summary>
+            <param name="disposing">
+            true to release managed and unmanaged resources; false to release only unmanaged resources.
+            </param>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.SqliteType">
+            <summary>
+            Represents the type affinities used by columns in SQLite tables.
+            </summary>
+            <seealso href="http://sqlite.org/datatype3.html">Datatypes In SQLite Version 3</seealso>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteType.Integer">
+            <summary>
+            A signed integer.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteType.Real">
+            <summary>
+            A floating point value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteType.Text">
+            <summary>
+            A text string.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Data.Sqlite.SqliteType.Blob">
+            <summary>
+            A blob of data.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Data.Sqlite.Internal.SqliteEngine">
+            <summary>
+            Enables configuration of global SQLite settings. This API may change or be removed in future releases.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Internal.SqliteEngine.UseWinSqlite3">
+            <summary>
+            Configures Microsoft.Data.Sqlite to use winsqlite3.dll. This is a version of SQLite that ships in Windows
+            10. This method must be called before any other interaction with SQLite. This API may change or be removed
+            in future releases.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.CallRequiresOpenConnection(System.Object)">
+            <summary>
+            {methodName} can only be called when the connection is open.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.CallRequiresSetCommandText(System.Object)">
+            <summary>
+            CommandText must be set before {methodName} can be called.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.ConnectionStringRequiresClosedConnection">
+            <summary>
+            ConnectionString cannot be set when the connection is open.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.DataReaderClosed(System.Object)">
+            <summary>
+            Invalid attempt to call {operation} when reader is closed.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.InvalidCacheMode(System.Object)">
+            <summary>
+            The cache mode '{mode}' is invalid.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.InvalidCommandBehavior(System.Object)">
+            <summary>
+            The CommandBehavior '{behavior}' is invalid.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.InvalidCommandType(System.Object)">
+            <summary>
+            The CommandType '{commandType}' is invalid.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.InvalidIsolationLevel(System.Object)">
+            <summary>
+            The IsolationLevel '{isolationLevel}' is invalid.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.InvalidIsolationLevelForUnsharedCache(System.Object)">
+            <summary>
+            The IsolationLevel '{isolationLevel}' can only be used with a shared cache. Set 'Cache=Shared' in the connection string.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.InvalidParameterDirection(System.Object)">
+            <summary>
+            The ParameterDirection '{direction}' is invalid.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.KeywordNotSupported(System.Object)">
+            <summary>
+            Keyword not supported: '{keyword}'.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.MissingParameters(System.Object)">
+            <summary>
+            Must add values for the following parameters: {parameters}
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.NoData">
+            <summary>
+            No data exists for the row/column.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.OpenRequiresSetConnectionString">
+            <summary>
+            ConnectionString must be set before Open can be called.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.ParallelTransactionsNotSupported">
+            <summary>
+            SqliteConnection does not support nested transactions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.ParameterNotFound(System.Object)">
+            <summary>
+            A SqliteParameter with ParameterName '{parameterName}' is not contained by this SqliteParameterCollection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.RequiresSet(System.Object)">
+            <summary>
+            {propertyName} must be set.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.TransactionCompleted">
+            <summary>
+            This SqliteTransaction has completed; it is no longer usable.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.TransactionConnectionMismatch">
+            <summary>
+            The transaction object is not associated with the connection object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.TransactionRequired">
+            <summary>
+            Execute requires the command to have a transaction object when the connection assigned to the command is in a pending local transaction.  The Transaction property of the command has not been initialized.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.UnknownDataType(System.Object)">
+            <summary>
+            No mapping exists from object type {typeName} to a known managed provider native type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.SqliteNativeError(System.Object,System.Object)">
+            <summary>
+            SQLite Error {errorCode}: '{message}'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.DefaultNativeError">
+            <summary>
+            For more information on this error code see http://sqlite.org/rescode.html
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.AmbiguousParameterName(System.Object)">
+            <summary>
+            Cannot bind the value for parameter '{parameterName}' because multiple matching parameters were found in the command text. Specify the parameter name with the symbol prefix, e.g. '@{parameterName}'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.AlreadyLoaded">
+            <summary>
+            The SQLite library is already loaded. UseWinSqlite3 must be called before using SQLite.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.InvalidEnumValue(System.Object,System.Object)">
+            <summary>
+            The {enumType} enumeration value, {value}, is invalid.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Data.Sqlite.Strings.ConvertFailed(System.Object,System.Object)">
+            <summary>
+            Cannot convert object of type '{sourceType}' to object of type '{targetType}'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Data.Sqlite.Strings.CannotStoreNaN">
+            <summary>
+            Cannot store 'NaN' values.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,30 @@
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
+  <Metadata>
+    <Identity Id="Cosmos.VS.ProjectSystem" Version="1.0" Language="en-US" Publisher="Cosmos" />
+    <DisplayName>Cosmos Visual Studio Project System</DisplayName>
+    <Description xml:space="preserve">The Visual Studio project system for the Cosmos Operating System.</Description>
+    <Icon>Resources\Cosmos.ico</Icon>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0]" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" Version="[4.5,)" />
+    <Dependency Id="Microsoft.VisualStudio.MPF.15.0" DisplayName="Visual Studio MPF 15.0" Version="[15.0,16.0)" />
+  </Dependencies>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+    <Prerequisite Id="Microsoft.NetCore.ComponentGroup.Web" Version="[15.0,16.0)" DisplayName=".NET Core 1.0 - 1.1 development tools" />
+    <Prerequisite Id="Microsoft.Component.NetFX.Core.Runtime" Version="[15.0,16.0)" DisplayName=".NET Core runtime" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.ManagedDesktop.Prerequisites" Version="[15.0,16.0)" DisplayName=".NET desktop development tools" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.VSSDK" Version="[15.0,16.0)" DisplayName="Visual Studio SDK" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.NuGet" Version="[15.0,16.0)" DisplayName="NuGet package manager" />
+  </Prerequisites>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" Path="Cosmos.VS.ProjectSystem.pkgdef" />
+    <Asset Type="Microsoft.VisualStudio.ProjectTemplate" Path="ProjectTemplates" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" Path="Cosmos.VS.Wizards.dll" AssemblyName="Cosmos.VS.Wizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Asset Type="Microsoft.VisualStudio.VsPackage" Path="|Cosmos.VS.DebugEngine;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.VsPackage" Path="Cosmos.VS.Windows.pkgdef" />
+  </Assets>
+</PackageManifest>

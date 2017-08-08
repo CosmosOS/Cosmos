@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="SettingsDS" targetNamespace="http://tempuri.org/SettingsDS.xsd" xmlns:mstns="http://tempuri.org/SettingsDS.xsd" xmlns="http://tempuri.org/SettingsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="SettingsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="SettingsDS" msprop:Generator_DataSetName="SettingsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Breakpoint" msprop:Generator_UserTableName="Breakpoint" msprop:Generator_RowDeletedName="BreakpointRowDeleted" msprop:Generator_RowChangedName="BreakpointRowChanged" msprop:Generator_RowClassName="BreakpointRow" msprop:Generator_RowChangingName="BreakpointRowChanging" msprop:Generator_RowEvArgName="BreakpointRowChangeEvent" msprop:Generator_RowEvHandlerName="BreakpointRowChangeEventHandler" msprop:Generator_TableClassName="BreakpointDataTable" msprop:Generator_TableVarName="tableBreakpoint" msprop:Generator_RowDeletingName="BreakpointRowDeleting" msprop:Generator_TablePropName="Breakpoint">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Label" msprop:Generator_UserColumnName="Label" msprop:Generator_ColumnVarNameInTable="columnLabel" msprop:Generator_ColumnPropNameInRow="Label" msprop:Generator_ColumnPropNameInTable="LabelColumn" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Watch" msprop:Generator_UserTableName="Watch" msprop:Generator_RowDeletedName="WatchRowDeleted" msprop:Generator_RowChangedName="WatchRowChanged" msprop:Generator_RowClassName="WatchRow" msprop:Generator_RowChangingName="WatchRowChanging" msprop:Generator_RowEvArgName="WatchRowChangeEvent" msprop:Generator_RowEvHandlerName="WatchRowChangeEventHandler" msprop:Generator_TableClassName="WatchDataTable" msprop:Generator_TableVarName="tableWatch" msprop:Generator_RowDeletingName="WatchRowDeleting" msprop:Generator_TablePropName="Watch">
+          <xs:complexType>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Window" msprop:Generator_UserTableName="Window" msprop:Generator_RowDeletedName="WindowRowDeleted" msprop:Generator_RowChangedName="WindowRowChanged" msprop:Generator_RowClassName="WindowRow" msprop:Generator_RowChangingName="WindowRowChanging" msprop:Generator_RowEvArgName="WindowRowChangeEvent" msprop:Generator_RowEvHandlerName="WindowRowChangeEventHandler" msprop:Generator_TableClassName="WindowDataTable" msprop:Generator_TableVarName="tableWindow" msprop:Generator_RowDeletingName="WindowRowDeleting" msprop:Generator_TablePropName="Window">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInTable="NameColumn" type="xs:string" />
+              <xs:element name="Left" msprop:Generator_UserColumnName="Left" msprop:Generator_ColumnPropNameInRow="Left" msprop:Generator_ColumnVarNameInTable="columnLeft" msprop:Generator_ColumnPropNameInTable="LeftColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Top" msprop:Generator_UserColumnName="Top" msprop:Generator_ColumnPropNameInRow="Top" msprop:Generator_ColumnVarNameInTable="columnTop" msprop:Generator_ColumnPropNameInTable="TopColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Width" msprop:Generator_UserColumnName="Width" msprop:Generator_ColumnPropNameInRow="Width" msprop:Generator_ColumnVarNameInTable="columnWidth" msprop:Generator_ColumnPropNameInTable="WidthColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Height" msprop:Generator_UserColumnName="Height" msprop:Generator_ColumnPropNameInRow="Height" msprop:Generator_ColumnVarNameInTable="columnHeight" msprop:Generator_ColumnPropNameInTable="HeightColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Visible" msprop:Generator_UserColumnName="Visible" msprop:Generator_ColumnVarNameInTable="columnVisible" msprop:Generator_ColumnPropNameInRow="Visible" msprop:Generator_ColumnPropNameInTable="VisibleColumn" type="xs:boolean" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="General" msprop:Generator_UserTableName="General" msprop:Generator_RowDeletedName="GeneralRowDeleted" msprop:Generator_TableClassName="GeneralDataTable" msprop:Generator_RowChangedName="GeneralRowChanged" msprop:Generator_RowClassName="GeneralRow" msprop:Generator_RowChangingName="GeneralRowChanging" msprop:Generator_RowEvArgName="GeneralRowChangeEvent" msprop:Generator_RowEvHandlerName="GeneralRowChangeEventHandler" msprop:Generator_TablePropName="General" msprop:Generator_TableVarName="tableGeneral" msprop:Generator_RowDeletingName="GeneralRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BinPath" msprop:Generator_UserColumnName="BinPath" msprop:Generator_ColumnPropNameInRow="BinPath" msprop:Generator_ColumnVarNameInTable="columnBinPath" msprop:Generator_ColumnPropNameInTable="BinPathColumn" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Breakpoint" />
+      <xs:field xpath="mstns:Label" />
+    </xs:unique>
+    <xs:unique name="Window_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Window" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>
