@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using Cosmos.HAL;
 using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.System {
@@ -11,6 +9,7 @@ namespace Cosmos.System {
         }
 
         static public void TempDebugTest() {
+            Cosmos.CPU.x86.TempDebug.ShowText('B');
             HAL.Globals.DeviceMgr.Processor.SetOption(1);
         }
     }

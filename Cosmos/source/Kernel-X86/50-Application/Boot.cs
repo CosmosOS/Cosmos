@@ -7,8 +7,7 @@ namespace KernelGen3 {
         [BootEntry]
         static private void Init() {
             Cosmos.CPU.x86.TempDebug.ShowText('A');
-            Cosmos.CPU.x86.TempDebug.ShowText('c');
-            //Cosmos.System.Boot.TempDebugTest();
+            Cosmos.System.Boot.TempDebugTest();
 
             while (true) {
             }
