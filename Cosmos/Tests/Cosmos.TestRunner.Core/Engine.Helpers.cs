@@ -171,7 +171,7 @@ namespace Cosmos.TestRunner.Core
             {
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
                 References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Plugs.TapRoot")).Location);
             }
             else
             {
