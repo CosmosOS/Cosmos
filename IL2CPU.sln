@@ -32,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "so
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{EDE13333-B2E6-4E04-B995-209B8BDFA9D4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RingCheck", "source\RingCheck\RingCheck.csproj", "{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheRingMaster", "source\TheRingMaster\TheRingMaster.csproj", "{CCC115FA-1E7E-4013-95C2-B43FCCF27DFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

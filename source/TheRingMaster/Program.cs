@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace RingCheck
+namespace TheRingMaster
 {
     class Program
     {
@@ -9,7 +9,7 @@ namespace RingCheck
         {
             if (args.Length != 1)
             {
-                Console.WriteLine("Usage: ringcheck <path-to-kernel>");
+                Console.WriteLine("Usage: theringmaster <path-to-kernel>");
                 return;
             }
 

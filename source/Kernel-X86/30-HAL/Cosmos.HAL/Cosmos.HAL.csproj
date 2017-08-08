@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+    <Authors>Cosmos</Authors>
+    <Company>Cosmos</Company>
   </PropertyGroup>
 
   <ItemGroup>
