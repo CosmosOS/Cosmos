@@ -103,7 +103,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Runner", "Test Runner"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.TestController", "Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj", "{2EEC1BF8-758F-4D9D-B063-8CF005468B24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RingCheck", "source\RingCheck\RingCheck.csproj", "{0EE3DF1C-44E6-4669-88AA-D8D2612DA817}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheRingMaster", "source\TheRingMaster\TheRingMaster.csproj", "{0EE3DF1C-44E6-4669-88AA-D8D2612DA817}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{3C4B0261-3B1D-4503-97F1-AC0252D500E6}"
 EndProject
