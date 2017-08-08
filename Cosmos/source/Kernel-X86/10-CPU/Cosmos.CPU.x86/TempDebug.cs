@@ -2,16 +2,12 @@
 
 namespace Cosmos.CPU.x86 {
     static public class TempDebug {
-        static public void ShowText() {
+        static public void ShowText(byte aChar, int aOffset) {
             unsafe {
-                byte* xTest = (byte*)0xB8000;
-                *xTest = 65;
-                xTest = (byte*)0xB8001;
-                *xTest = 0x0A;
+                byte* xTest = (byte*)0xB8000 + aOffset * 2;
+                *xTest = aChar;
 
-                xTest = (byte*)0xB8002;
-                *xTest = 90;
-                xTest = (byte*)0xB8003;
+                xTest++;
                 *xTest = 0x0A;
             }
         }
