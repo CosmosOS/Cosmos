@@ -45,6 +45,10 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.VisualStudio.Setup.Configuration.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Interop.1.11.2290\lib\net35\Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="NuGet.Common, Version=4.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NuGet.Common.4.2.0\lib\net45\NuGet.Common.dll</HintPath>
     </Reference>
@@ -74,11 +78,17 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FileMgr.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="Tasks\MSBuildTask.cs" />
+    <Compile Include="Tasks\NugetTask.cs" />
+    <Compile Include="VSHelper.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\Task.cs" />
+    <Compile Include="Enums\VSVersion.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -87,8 +97,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BuildState.cs" />
-    <Compile Include="CosmosTask.cs" />
+    <Compile Include="Enums\BuildState.cs" />
+    <Compile Include="Tasks\CosmosTask.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -110,12 +120,7 @@
   <ItemGroup>
     <Resource Include="Cosmos.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Build.Installer\Cosmos.Build.Installer.csproj">
-      <Project>{27d94586-fe88-4203-be6a-c99013fd5018}</Project>
-      <Name>Cosmos.Build.Installer</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
