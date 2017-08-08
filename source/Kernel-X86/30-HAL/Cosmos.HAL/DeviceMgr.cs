@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.HAL.Devices;
 
 namespace Cosmos.HAL {
     public abstract class DeviceMgr {
@@ -14,8 +15,17 @@ namespace Cosmos.HAL {
             mAllRO = mAll.AsReadOnly();
         }
 
+        protected Processor mProcessor;
+        public Processor Processor {
+            get { return mProcessor; }
+        }
+
         public void Add(Devices.Device aDevice) {
             mAll.Add(aDevice);
+
+            if (aDevice is Processor) {
+                
+            }
         }
     }
 }
