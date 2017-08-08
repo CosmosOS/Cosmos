@@ -37,7 +37,7 @@
     <Reference Include="Cosmos.Plugs.TapRoot, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
 
-  <UsingTask TaskName="RingCheck" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
+  <UsingTask TaskName="TheRingMaster" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="IL2CPU" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="NAsm" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="MakeISO" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
