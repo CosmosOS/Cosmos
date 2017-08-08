@@ -24,7 +24,7 @@ namespace Cosmos.HAL {
             mAll.Add(aDevice);
 
             if (aDevice is Processor) {
-                
+                mProcessor = (Processor)aDevice;
             }
         }
     }
