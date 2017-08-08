@@ -9,7 +9,6 @@ namespace Cosmos.System {
         }
 
         static public void TempDebugTest() {
-            Cosmos.CPU.x86.TempDebug.ShowText('B');
             HAL.Globals.DeviceMgr.Processor.SetOption(1);
         }
     }
