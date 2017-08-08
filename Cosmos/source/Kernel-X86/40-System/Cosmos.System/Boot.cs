@@ -9,5 +9,9 @@ namespace Cosmos.System {
         [BootEntry(40)]
         static private void Init() {
         }
+
+        static public void TempDebugTest() {
+            HAL.Globals.DeviceMgr.Processor.SetOption(1);
+        }
     }
 }
