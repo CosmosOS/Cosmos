@@ -24,8 +24,6 @@ build_script:
     msbuild "Cosmos/Test.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug
 
 
-    xcopy /Y "%APPVEYOR_BUILD_FOLDER%\Cosmos\Build\VSIP\Cosmos.targets" "%ProgramFiles(x86)%\MSBuild\Cosmos\"
-
     dotnet publish Cosmos/source/Cosmos.Build.MSBuild -f net462 -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
 
     dotnet publish Cosmos/source/IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
