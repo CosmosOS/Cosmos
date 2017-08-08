@@ -14,12 +14,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Assembler\Cosmos.Assembler.csproj"/>
-        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj"/>
-        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj"/>
-        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj"/>
-        <ProjectReference PrivateAssets="All" Include="..\..\..\XSharp.Common\XSharp.Common.csproj"/>
-        <ProjectReference PrivateAssets="All" Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj"/>
+        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Assembler\Cosmos.Assembler.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\XSharp.Common\XSharp.Common.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
     </ItemGroup>
 
 </Project>
