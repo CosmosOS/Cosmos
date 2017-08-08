@@ -195,7 +195,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Ker
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuessKernelGen3", "source\Kernel-X86\50-Application\GuessKernelGen3.csproj", "{9E58E949-7B71-45ED-9610-11DA287EE933}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Plugs", "source\Kernel-X86\91-Plugs\Cosmos.Plugs\Cosmos.Plugs.csproj", "{9B607855-13D6-4714-8D12-A2B6B0C66E67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Plugs.TapRoot", "source\Kernel-X86\91-Plugs\Cosmos.Plugs.TapRoot\Cosmos.Plugs.TapRoot.csproj", "{9B607855-13D6-4714-8D12-A2B6B0C66E67}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Shared", "source\Kernel-X86\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj", "{6652628A-5912-43A8-BAC6-5F9AD72AA0DC}"
 EndProject
