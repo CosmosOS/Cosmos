@@ -6,15 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v1.0": {
-      "ringcheck/1.0.0": {
+      "theringmaster/1.0.0": {
         "runtime": {
-          "RingCheck.dll": {}
+          "TheRingMaster.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "ringcheck/1.0.0": {
+    "theringmaster/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
