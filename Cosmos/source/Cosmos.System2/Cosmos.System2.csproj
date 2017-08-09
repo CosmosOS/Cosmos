@@ -15,8 +15,4 @@
     <ProjectReference Include="..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
 </Project>

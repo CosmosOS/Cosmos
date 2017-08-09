@@ -163,6 +163,30 @@ namespace Cosmos.TestRunner.Core
             RunObjDump(CosmosPaths.Build, workingDir, kernelFileName, OutputHandler.LogError, OutputHandler.LogMessage);
         }
 
+        private void RunTheRingMaster(string kernelFileName)
+        {
+            var xArgs =  new List<string>() { kernelFileName };
+
+            bool xUsingUserKit = false;
+            string xTheRingMasterPath = Path.Combine(FindCosmosRoot(), "source", "TheRingMaster");
+            if (!Directory.Exists(xTheRingMasterPath))
+            {
+                xUsingUserKit = true;
+                xTheRingMasterPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "TheRingMaster");
+            }
+
+            if (xUsingUserKit)
+            {
+                RunProcess("TheRingMaster.exe", xTheRingMasterPath, xArgs);
+            }
+            else
+            {
+                xArgs.Insert(0, "run");
+                xArgs.Insert(1, "--no-build");
+                RunProcess("dotnet", xTheRingMasterPath, xArgs);
+            }
+        }
+
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
             References = new List<string>() { kernelFileName };
@@ -227,8 +251,8 @@ namespace Cosmos.TestRunner.Core
                 else
                 {
                     xArgs.Insert(0, "run");
-                    xArgs.Insert(3, "--no-build");
-                    xArgs.Insert(4, " -- ");
+                    xArgs.Insert(1, "--no-build");
+                    xArgs.Insert(2, " -- ");
                     RunProcess("dotnet", xIL2CPUPath, xArgs, true);
                 }
             }

@@ -20,6 +20,10 @@ namespace Cosmos.TestRunner.Core
                 var xTempObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.o");
                 var xIsoFile = Path.Combine(mBaseWorkingDirectory, "Kernel.iso");
 
+                if (KernelPkg == "X86")
+                {
+                    RunTask("TheRingMaster", () => RunTheRingMaster(assemblyFileName));
+                }
                 RunTask("IL2CPU", () => RunIL2CPU(assemblyFileName, xAssemblyFile));
                 RunTask("Nasm", () => RunNasm(xAssemblyFile, xObjectFile, configuration.IsELF));
                 if (configuration.IsELF)
