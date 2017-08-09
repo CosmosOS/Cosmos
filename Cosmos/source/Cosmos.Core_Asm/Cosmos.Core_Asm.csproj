@@ -22,8 +22,4 @@
     <ProjectReference Include="..\XSharp.Common\XSharp.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
 </Project>
