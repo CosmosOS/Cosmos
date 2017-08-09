@@ -2,6 +2,15 @@
   
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+  </ItemGroup>
 
 </Project>

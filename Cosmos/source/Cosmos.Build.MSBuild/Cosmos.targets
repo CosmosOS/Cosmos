@@ -1,12 +1,12 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">  
-  
+
   <PropertyGroup>
     <CopyBuildOutputToOutputDirectory>False</CopyBuildOutputToOutputDirectory>
     <DisableImplicitFrameworkReferences>True</DisableImplicitFrameworkReferences>
     <ImplicitlyExpandDesignTimeFacades>False</ImplicitlyExpandDesignTimeFacades>
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
@@ -44,7 +44,7 @@
   <UsingTask TaskName="Ld" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="ReadNAsmMapToDebugInfo" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
-  
+
   <Target Name="CoreCompile">
     <Error Text="The Release configuration isn't currently supported!" Condition="$(Configuration) == 'Release'" />
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!" Condition="$(Compile) != ''"/>
@@ -54,8 +54,15 @@
     <CreateProperty Value="false" Condition="$(BinFormat) == 'bin'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>
     </CreateProperty>
+
     <!--
-    <TheRingMaster AssemblyPath="$(CosmosKernelAssembly)" WorkingDir="$(TargetDir)" />
+    <CreateProperty Value="%(ReferencePath.Identity)" Condition="%(ReferencePath)">
+      <Output PropertyName="CosmosKernelAssembly" TaskParameter="Value"/>
+    </CreateProperty>
+    -->
+    
+    <!--
+    <TheRingMaster AssemblyPath="$(CosmosKernelAssembly)" WorkingDir="$(TargetDir)" Condition="$(KernelPkg) == 'X86'" />
     -->
     <IL2CPU KernelPkg="$(KernelPkg)" DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" References="@(ReferencePath)" AssemblySearchDirs="$(AssemblySearchPaths)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)"/>
     <NAsm InputFile="$(TargetDir)$(MSBuildProjectName).asm" OutputFile="$(TargetDir)$(MSBuildProjectName).obj" IsELF="$(IsELF)" ExePath="$(NasmFile)"/>
@@ -75,7 +82,7 @@
     <!-- <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin" OutputFile="$(TargetDir)$(MSBuildProjectName).iso" CosmosBuildDir="$(CosmosDir)\Build" /> -->
     <Delete Files="$(TargetDir)$(MSBuildProjectName).iso"/>
   </Target>
-  
+
   <Target Name="CreateManifestResourceNames" />
-  
+
 </Project>
