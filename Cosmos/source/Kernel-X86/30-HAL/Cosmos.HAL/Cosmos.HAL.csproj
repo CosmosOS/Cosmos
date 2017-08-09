@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Cosmos.cfg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
   </ItemGroup>

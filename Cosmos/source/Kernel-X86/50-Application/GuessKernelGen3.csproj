@@ -10,6 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Cosmos.cfg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
     <ProjectReference Include="..\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
     <ProjectReference Include="..\40-System\Cosmos.System\Cosmos.System.csproj" />
