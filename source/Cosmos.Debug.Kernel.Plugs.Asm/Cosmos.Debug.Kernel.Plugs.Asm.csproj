@@ -10,9 +10,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
         <ProjectReference Include="..\..\..\XSharp\source\Cosmos.Assembler\Cosmos.Assembler.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference Include="..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
         <ProjectReference Include="..\..\..\XSharp\source\XSharp.Common\XSharp.Common.csproj" />
     </ItemGroup>
 
