@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{C286932C-3F6D-47F0-BEEF-26843D1BB11B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "source\Cosmos.Assembler\Cosmos.Assembler.csproj", "{0CDB3F6E-7971-426B-81F8-38B966A54C2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "..\XSharp\source\Cosmos.Assembler\Cosmos.Assembler.csproj", "{0CDB3F6E-7971-426B-81F8-38B966A54C2B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767}"
 EndProject
@@ -14,11 +14,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "source
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{E9CD521E-C386-466D-B5F7-A5EB19A61625}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "source\XSharp.Common\XSharp.Common.csproj", "{72EB557A-8A2D-4B0F-823E-C70A791831B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "..\XSharp\source\XSharp.Common\XSharp.Common.csproj", "{72EB557A-8A2D-4B0F-823E-C70A791831B5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU", "source\IL2CPU\IL2CPU.csproj", "{295AA95F-BEC6-4F9E-A2E1-8205FD06E951}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Compiler", "source\XSharp.Compiler\XSharp.Compiler.csproj", "{6EE75318-F00B-4295-A132-484CDB812801}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Compiler", "..\XSharp\source\XSharp.Compiler\XSharp.Compiler.csproj", "{6EE75318-F00B-4295-A132-484CDB812801}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{D232F471-5A59-438F-87EA-E1809E3BEDB4}"
 EndProject
