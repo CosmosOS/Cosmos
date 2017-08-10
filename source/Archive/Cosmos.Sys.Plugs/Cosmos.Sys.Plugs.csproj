@@ -67,7 +67,7 @@
     <Compile Include="VFS\PathImpl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Cosmos.Assembler\Cosmos.Assembler.csproj">
+    <ProjectReference Include="..\..\..\XSharp\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>Cosmos.Assembler</Name>
     </ProjectReference>

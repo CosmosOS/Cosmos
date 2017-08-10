@@ -403,29 +403,7 @@ namespace Cosmos.Build.Builder {
 
       string setupName = GetSetupName(mReleaseNo);
 
-      if (App.UseTask) {
-        // This is a hack to avoid the UAC dialog on every run which can be very disturbing if you run
-        // the dev kit a lot.
-        Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"), true, false);
-
-        // Must check for start before stop, else on slow machines we exit quickly because Exit is found before
-        // it starts.
-        // Some slow user PCs take around 5 seconds to start up the task...
-        int xSeconds = 10;
-        var xTimed = DateTime.Now;
-        Log.WriteLine("Waiting " + xSeconds + " seconds for Setup to start.");
-        if (WaitForStart(setupName, xSeconds * 1000)) {
-          mExceptionList.Add("Setup did not start.");
-          return;
-        }
-        Log.WriteLine("Setup is running. " + DateTime.Now.Subtract(xTimed).ToString(@"ss\.fff"));
-
-        // Scheduler starts it and exits, but we need to wait for the setup itself to exit before proceding
-        Log.WriteLine("Waiting for Setup to complete.");
-        WaitForExit(setupName);
-      } else {
-        Start(mCosmosPath + @"Setup\Output\" + setupName + ".exe", @"/SILENT");
-      }
+      Start(mCosmosPath + @"Setup\Output\" + setupName + ".exe", @"/SILENT");
     }
 
     private void Done() {

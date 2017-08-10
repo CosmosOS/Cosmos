@@ -4,7 +4,7 @@
         <TargetFramework>netstandard1.5</TargetFramework>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
         <Authors>Cosmos</Authors>
         <Company>Cosmos</Company>
     </PropertyGroup>
@@ -16,7 +16,6 @@
     <ItemGroup>
         <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
         <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
-        <ProjectReference PrivateAssets="All" Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26724.1
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -18,9 +18,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD42844B-2767-4DF4-B0AF-EA5F7CB11528}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{9C8A3E55-9045-44CA-BFD4-16D5B4343A90}"
-	ProjectSection(SolutionItems) = preProject
-		XSharp Projects.txt = XSharp Projects.txt
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{4D3F3613-E112-4013-AB81-B8CCED78A555}"
 EndProject
@@ -49,15 +46,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Wizards", "source
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows", "source\Cosmos.VS.Windows\Cosmos.VS.Windows.csproj", "{47E8F3DC-FF3F-4CC7-8643-1807260B0B18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.VS", "source\XSharp.VS\XSharp.VS.csproj", "{FB71E8EF-E229-4D81-984A-B9170D752BF9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.VS", "..\XSharp\source\XSharp.VS\XSharp.VS.csproj", "{FB71E8EF-E229-4D81-984A-B9170D752BF9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "source\Cosmos.Deploy.USB\Cosmos.Deploy.USB.csproj", "{3D84CF8B-C6DF-4D78-8DE1-708582B43711}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "source\Cosmos.Deploy.Pixie\Cosmos.Deploy.Pixie.csproj", "{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "source\XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "..\XSharp\source\XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Compiler", "source\XSharp.Compiler\XSharp.Compiler.csproj", "{69E08155-F075-4728-8387-1549CFD4FA97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Compiler", "..\XSharp\source\XSharp.Compiler\XSharp.Compiler.csproj", "{69E08155-F075-4728-8387-1549CFD4FA97}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU", "source\IL2CPU\IL2CPU.csproj", "{F3025446-D2C7-4FEA-AB03-C707F7B48B43}"
 EndProject
@@ -79,7 +76,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core", "source\Cosmo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL2\Cosmos.HAL2.csproj", "{DE4F000A-B65C-4395-B066-891B7423E9EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "source\XSharp.Common\XSharp.Common.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "..\XSharp\source\XSharp.Common\XSharp.Common.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj", "{89DB6325-2C81-467D-BE8A-C4AEBB6540A5}"
 EndProject
@@ -89,7 +86,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2_Plugs", "sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel.Plugs.Asm", "source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj", "{7549D7F8-58A3-4F4F-8544-DEF2ABF79A0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "source\Cosmos.Assembler\Cosmos.Assembler.csproj", "{E1AC1E9B-27EA-4AE0-8C83-328BD96F978A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "..\XSharp\source\Cosmos.Assembler\Cosmos.Assembler.csproj", "{E1AC1E9B-27EA-4AE0-8C83-328BD96F978A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{CB20F8F9-8C1D-43A6-96EA-89FEC2512C99}"
 EndProject

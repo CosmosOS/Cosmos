@@ -11,9 +11,7 @@ namespace Cosmos.Build.Builder {
     public static bool IsUserKit;
     public static bool ResetHive;
     public static bool StayOpen;
-    public static bool UseTask;
     public static bool NoMSBuildClean;
-    public static bool InstallTask;
     public static bool UseVsHive;
     public static Dictionary<string, string> mArgs = new Dictionary<string, string>();
 
@@ -32,16 +30,14 @@ namespace Cosmos.Build.Builder {
       IsUserKit = mArgs.ContainsKey("USERKIT");
       ResetHive = mArgs.ContainsKey("RESETHIVE");
       StayOpen = mArgs.ContainsKey("STAYOPEN");
-      UseTask = !mArgs.ContainsKey("NOTASK");
       NoMSBuildClean = mArgs.ContainsKey("NOCLEAN");
-      InstallTask = mArgs.ContainsKey("INSTALLTASK");
       DoNotLaunchVS = mArgs.ContainsKey("NOVSLAUNCH");
       UseVsHive = mArgs.ContainsKey("VSEXPHIVE");
 
       if (mArgs.ContainsKey("VSPATH")) {
         Paths.VSPath = mArgs["VSPATH"];
         Paths.UpdateVSPath();
-      } else if (!InstallTask) {
+      } else {
         throw new ArgumentNullException(nameof(e.Args), "Visual Studio path must be provided. (-VSPATH or /VSPATH)");
       }
 

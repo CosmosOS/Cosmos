@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
     <Authors>Cosmos</Authors>
     <Company>Cosmos</Company>
   </PropertyGroup>
@@ -19,7 +19,6 @@
   <ItemGroup>
     <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" />
-    <ProjectReference PrivateAssets="All" Include="..\..\90-Shared\Cosmos.Shared\Cosmos.Shared.csproj" />
   </ItemGroup>
 
 </Project>
