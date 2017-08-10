@@ -1,6 +1,3 @@
 [submodule "XSharp"]
 	path = XSharp
 	url = https://github.com/CosmosOS/XSharp
-[submodule "IL2CPU"]
-	path = IL2CPU
-	url = https://github.com/CosmosOS/IL2CPU
