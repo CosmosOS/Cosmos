@@ -11,20 +11,26 @@ namespace TheRingMaster
 {
     public class Program
     {
-        static Dictionary<Assembly, string> RingCache = new Dictionary<Assembly, string>();
+        enum Ring
+        {
+            External = 0,
+            CPU = 10,
+            Platform = 20,
+            HAL = 30,
+            System = 40,
+            Application = 50,
+            Shared = 90,
+            Plugs = 91,
+            Debug
+        }
+
+        static Dictionary<Assembly, Ring> RingCache = new Dictionary<Assembly, Ring>();
         static string KernelDir;
 
         public static void Main(string[] args)
         {
             if (args.Length != 1)
             {
-                Console.WriteLine("ARGS:");
-
-                foreach (var xArg in args)
-                {
-                    Console.WriteLine(xArg);
-                }
-
                 Console.WriteLine("Usage: theringmaster <path-to-kernel>");
                 return;
             }
@@ -40,13 +46,11 @@ namespace TheRingMaster
             AssemblyLoadContext.Default.Resolving += Default_Resolving;
 
             var xKernelAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(xKernelAssemblyPath);
-            CheckRings(xKernelAssembly, "Application");
+            CheckRings(xKernelAssembly, Ring.Application);
 
-            void CheckRings(Assembly aAssembly, string aRing, string aSourceAssemblyName = null)
+            void CheckRings(Assembly aAssembly, Ring aRing, string aSourceAssemblyName = null)
             {
-                RingCache.TryGetValue(aAssembly, out var xRing);
-
-                if (xRing == null)
+                if (!RingCache.TryGetValue(aAssembly, out var xRing))
                 {
                     var xManifestName = aAssembly.GetManifestResourceNames()
                                                  .Where(n => n == aAssembly.GetName().Name + ".Cosmos.cfg")
@@ -66,17 +70,12 @@ namespace TheRingMaster
                             throw new Exception("Invalid Cosmos configuration! Resource name: " + xManifestName);
                         }
 
-                        xCfg.TryGetValue("Ring", out xRing);
+                        xCfg.TryGetValue("Ring", out var xRingName);
 
-                        if (!new string[] { "CPU", "Platform", "HAL", "System", "Application", /*"Plug",*/ "Debug" }.Contains(xRing))
+                        if (!Enum.TryParse(xRingName, out xRing))
                         {
-                            throw new Exception("Unknown ring! Ring: " + xRing);
+                            throw new Exception("Unknown ring! Ring: " + xRingName);
                         }
-                    }
-
-                    if (xRing == null)
-                    {
-                        xRing = "External";
                     }
                 }
 
@@ -91,7 +90,7 @@ namespace TheRingMaster
                 // External ring, can be referenced by any ring
                 // OR
                 // One of the assemblies is Debug
-                if (aRing == xRing || xRing == "External" || aRing == "Debug" || xRing == "Debug")
+                if (aRing == xRing || xRing == Ring.External || aRing == Ring.Debug || xRing == Ring.Debug)
                 {
                     xValid = true;
                 }
@@ -100,11 +99,10 @@ namespace TheRingMaster
                 {
                     switch (aRing)
                     {
-                        case "Application" when xRing == "System":
-                        case "System" when xRing == "HAL":
-                        case "Platform" when xRing == "CPU":
-                        case "Platform" when xRing == "HAL":
-                        //case "Plug" when xRing == "System":
+                        case Ring.Application when xRing == Ring.System:
+                        case Ring.System when xRing == Ring.HAL:
+                        case Ring.Platform when xRing == Ring.CPU:
+                        case Ring.Platform when xRing == Ring.HAL:
                             return;
                     }
                 }
@@ -112,8 +110,8 @@ namespace TheRingMaster
                 if (!xValid)
                 {
                     var xExceptionMessage = "Invalid rings! Source assembly: " + (aSourceAssemblyName ?? "(no assembly)") +
-                                            ": Ring " + aRing + "; Referenced assembly: " + aAssembly.GetName().Name +
-                                            ": Ring " + xRing;
+                                            ", Ring: " + aRing + "; Referenced assembly: " + aAssembly.GetName().Name +
+                                            ", Ring: " + xRing;
 
                     throw new Exception(xExceptionMessage);
                 }
