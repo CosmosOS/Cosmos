@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 
 using Cosmos.Build.Common;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace TheRingMaster
 {
@@ -50,6 +51,8 @@ namespace TheRingMaster
 
             void CheckRings(Assembly aAssembly, Ring aRing, string aSourceAssemblyName = null)
             {
+                bool xDebugAllowed = false;
+
                 if (!RingCache.TryGetValue(aAssembly, out var xRing))
                 {
                     var xManifestName = aAssembly.GetManifestResourceNames()
@@ -72,10 +75,13 @@ namespace TheRingMaster
 
                         xCfg.TryGetValue("Ring", out var xRingName);
 
-                        if (!Enum.TryParse(xRingName, out xRing))
+                        if (!Enum.TryParse(xRingName, true, out xRing))
                         {
                             throw new Exception("Unknown ring! Ring: " + xRingName);
                         }
+
+                        xCfg.TryGetValue("DebugRing", out var xDebugRing);
+                        xDebugAllowed = xDebugRing.ToLower() == "allowed";
                     }
                 }
 
@@ -90,7 +96,9 @@ namespace TheRingMaster
                 // External ring, can be referenced by any ring
                 // OR
                 // One of the assemblies is Debug
-                if (aRing == xRing || xRing == Ring.External || aRing == Ring.Debug || xRing == Ring.Debug)
+                // OR
+                // Debug ring allowed
+                if (aRing == xRing || xRing == Ring.External || aRing == Ring.Debug || xRing == Ring.Debug || xDebugAllowed)
                 {
                     xValid = true;
                 }
@@ -114,6 +122,25 @@ namespace TheRingMaster
                                             ", Ring: " + xRing;
 
                     throw new Exception(xExceptionMessage);
+                }
+
+                if (xRing != Ring.CPU && xRing != Ring.Plugs)
+                {
+                    foreach (var xModule in aAssembly.Modules)
+                    {
+                        // TODO: Check unsafe code
+                    }
+                }
+
+                foreach (var xType in aAssembly.GetTypes())
+                {
+                    if (xRing != Ring.Plugs)
+                    {
+                        if (xType.GetTypeInfo().GetCustomAttribute<Plug>() != null)
+                        {
+                            throw new Exception("Plugs are only allowed in the Plugs ring! Assembly: " + aAssembly.GetName().Name);
+                        }
+                    }
                 }
 
                 foreach (var xReference in aAssembly.GetReferencedAssemblies())
