@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" />
   </ItemGroup>
 

@@ -38,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "sour
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj", "{31D48401-77B2-44AF-B6D3-27AB67C10759}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj", "{31D48401-77B2-44AF-B6D3-27AB67C10759}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel.Plugs.Asm", "source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj", "{6C770E55-8EED-444C-AD4E-017E823E5BA3}"
 EndProject
@@ -68,7 +68,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "..\XSharp\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel-X86\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj", "{3F8EDE0E-61BD-4D01-95F5-4A5A17F6221E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{47F9D446-ACD4-489A-AD6D-A46A19247E2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{47F9D446-ACD4-489A-AD6D-A46A19247E2F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{67FD9912-CE63-4EB2-880C-F4F0D9AED7CA}"
 EndProject
