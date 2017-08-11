@@ -1,5 +1,5 @@
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
+using XSharp.Assembler;
+using XSharp.Assembler.x86;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
@@ -18,7 +18,7 @@ namespace Cosmos.Core_Asm.MemoryOperations
          *                       int value, [ebp + 12]
          *                       int BlocksNum) [ebp + 16]
          */
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             /* First we copy dest, value and DestSize from EBP (stack) to 3 different registers */
             XS.Comment("Destination (int pointer)");

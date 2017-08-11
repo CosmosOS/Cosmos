@@ -62,7 +62,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "40 System", "40 System", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "50 Application", "50 Application", "{2A22DC4C-E237-4D4B-A592-47D477F9ED5B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "..\XSharp\source\Cosmos.Assembler\Cosmos.Assembler.csproj", "{F0860B7D-3FF7-4E2A-AC10-18E87ADD62A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Assembler", "..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj", "{F0860B7D-3FF7-4E2A-AC10-18E87ADD62A3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "..\XSharp\source\XSharp.Common\XSharp.Common.csproj", "{F785B091-7E4D-4D2E-A310-B18690623F74}"
 EndProject
