@@ -10,21 +10,21 @@ build_script:
     rem %APPVEYOR_BUILD_FOLDER%
 
     git clone https://github.com/CosmosOS/XSharp.git c:\XSharp
-    
+
     git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU
     
 
     nuget restore "Builder.sln"
 
     nuget restore "..\XSharp\XSharp.sln"
-    
+
     nuget restore "..\IL2CPU\IL2CPU.sln"
-    
+
     nuget restore "Build.sln"
 
     nuget restore "Test.sln"
 
-    
+
     msbuild "Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
     msbuild "Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
@@ -38,14 +38,15 @@ build_script:
         
     dotnet publish ..\XSharp\source\XSharp.XSC -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\XSharp\"
 
+
     xcopy /Y "Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
-    
+
     xcopy /Y "Build\VSIP\Cosmos.Core.*" "c:\CosmosRun\Kernel\"
-    
+
     xcopy /Y "Build\VSIP\Cosmos.HAL.*" "c:\CosmosRun\Kernel\"
-    
+
     xcopy /Y "Build\VSIP\Cosmos.System.*" "c:\CosmosRun\Kernel\"
-    
+
     xcopy /Y "Build\VSIP\Cosmos.Common.*" "c:\CosmosRun\Kernel\"
 
     xcopy /Y "Build\VSIP\Cosmos.Debug.GDB.exe" "c:\CosmosRun\Build\VSIP\"
@@ -91,6 +92,6 @@ notifications:
 
 matrix:
   fast_finish: true
-  
+
 artifacts:
   - path: '**\TestResult.xml'
