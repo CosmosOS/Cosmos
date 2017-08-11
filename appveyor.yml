@@ -36,7 +36,7 @@ build_script:
 
     dotnet publish ..\IL2CPU\source\IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
         
-    dotnet publish ..\XSharp\source\XSharp.Compiler -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\XSharp\"
+    dotnet publish ..\XSharp\source\XSharp.XSC -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\XSharp\"
 
     xcopy /Y "Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
     
