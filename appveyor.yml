@@ -16,6 +16,10 @@ build_script:
 
     nuget restore "Builder.sln"
 
+    nuget restore "..\XSharp\XSharp.sln"
+    
+    nuget restore "..\IL2CPU\IL2CPU.sln"
+    
     nuget restore "Build.sln"
 
     nuget restore "Test.sln"
