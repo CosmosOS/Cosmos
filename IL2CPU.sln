@@ -18,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "..\XSharp\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU", "..\IL2CPU\source\IL2CPU\IL2CPU.csproj", "{295AA95F-BEC6-4F9E-A2E1-8205FD06E951}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Compiler", "..\XSharp\source\XSharp.Compiler\XSharp.Compiler.csproj", "{6EE75318-F00B-4295-A132-484CDB812801}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.XSC", "..\XSharp\source\XSharp.XSC\XSharp.XSC.csproj", "{6EE75318-F00B-4295-A132-484CDB812801}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{D232F471-5A59-438F-87EA-E1809E3BEDB4}"
 EndProject
