@@ -9,6 +9,10 @@ build_script:
 - cmd: >-
     rem %APPVEYOR_BUILD_FOLDER%
 
+    git clone https:/github.com/CosmosOS/XSharp.git c:\XSharp
+    
+    git clone https:/github.com/CosmosOS/IL2CPU.git c:\IL2CPU
+    
 
     nuget restore "Builder.sln"
 
