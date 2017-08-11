@@ -4,8 +4,8 @@ using System.Reflection;
 using XSharp.Assembler;
 using XSharp.Assembler.x86;
 using Cosmos.IL2CPU.API.Attribs;
-using XSharp.Common;
-using static XSharp.Common.XSRegisters;
+using XSharp;
+using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
 {

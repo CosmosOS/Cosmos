@@ -74,7 +74,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core", "source\Cosmo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL2\Cosmos.HAL2.csproj", "{DE4F000A-B65C-4395-B066-891B7423E9EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "..\XSharp\source\XSharp.Common\XSharp.Common.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp", "..\XSharp\source\XSharp\XSharp.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj", "{89DB6325-2C81-467D-BE8A-C4AEBB6540A5}"
 EndProject

@@ -35,7 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visual Studio", "Visual Stu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{E9CD521E-C386-466D-B5F7-A5EB19A61625}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "..\XSharp\source\XSharp.Common\XSharp.Common.csproj", "{72EB557A-8A2D-4B0F-823E-C70A791831B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp", "..\XSharp\source\XSharp\XSharp.csproj", "{72EB557A-8A2D-4B0F-823E-C70A791831B5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NASM", "Tools\NASM\NASM.csproj", "{A2E6978B-FE78-433C-8A17-624579B393DF}"
 EndProject

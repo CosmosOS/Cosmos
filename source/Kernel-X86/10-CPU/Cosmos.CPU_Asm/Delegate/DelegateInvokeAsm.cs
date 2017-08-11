@@ -3,7 +3,7 @@ using System.Reflection;
 using XSharp.Assembler;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.IL;
-using XSharp.Common;
+using XSharp;
 using x86 = XSharp.Assembler.x86;
 
 // ReSharper disable once CheckNamespace

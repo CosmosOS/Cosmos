@@ -5,8 +5,8 @@ using XSharp.Assembler;
 using XSharp.Assembler.x86;
 using Cosmos.CPU.x86;
 using Cosmos.IL2CPU.API.Attribs;
-using XSharp.Common;
-using static XSharp.Common.XSRegisters;
+using XSharp;
+using static XSharp.XSRegisters;
 
 namespace Cosmos.CPU_Asm {
     //TODO: This asm refs Hardware.. should not.. its a higher ring

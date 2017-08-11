@@ -1,5 +1,5 @@
 using XSharp.Assembler;
-using XSharp.Common;
+using XSharp;
 using x86 = XSharp.Assembler.x86;
 
 namespace Cosmos.Core_Asm
