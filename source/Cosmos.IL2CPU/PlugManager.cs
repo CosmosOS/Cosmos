@@ -6,6 +6,7 @@ using System.Runtime.Loader;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.IL2CPU
 {
@@ -33,7 +34,7 @@ namespace Cosmos.IL2CPU
         protected Dictionary<Type, List<Type>> mGenericPlugImplsInhrt = new Dictionary<Type, List<Type>>();
 
         // list of field plugs
-        protected IDictionary<Type, IDictionary<string, PlugFieldAttribute>> mPlugFields = new Dictionary<Type, IDictionary<string, PlugFieldAttribute>>();
+        protected IDictionary<Type, IDictionary<string, PlugField>> mPlugFields = new Dictionary<Type, IDictionary<string, PlugField>>();
 
         public Dictionary<Type, List<Type>> PlugImpls
         {
@@ -51,7 +52,7 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        public IDictionary<Type, IDictionary<string, PlugFieldAttribute>> PlugFields
+        public IDictionary<Type, IDictionary<string, PlugField>> PlugFields
         {
             get
             {
@@ -92,7 +93,7 @@ namespace Cosmos.IL2CPU
                 foreach (var xPlugType in xAsm.GetTypes())
                 {
                     // Foreach, it is possible there could be one plug class with mult plug targets
-                    foreach (PlugAttribute xAttrib in xPlugType.GetTypeInfo().GetCustomAttributes<PlugAttribute>(false))
+                    foreach (var xAttrib in xPlugType.GetTypeInfo().GetCustomAttributes<Plug>(false))
                     {
                         var xTargetType = xAttrib.Target;
                         // If no type is specified, try to find by a specified name.
@@ -160,8 +161,8 @@ namespace Cosmos.IL2CPU
 
                     foreach (var xMethod in xImpl.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static))
                     {
-                        PlugMethodAttribute xAttrib = null;
-                        foreach (PlugMethodAttribute x in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), false))
+                        PlugMethod xAttrib = null;
+                        foreach (PlugMethod x in xMethod.GetCustomAttributes(typeof(PlugMethod), false))
                         {
                             xAttrib = x;
                         }
@@ -186,8 +187,8 @@ namespace Cosmos.IL2CPU
                                 // We also skip methods which do method access.
                                 if (xMethod.GetParameters().Where(x =>
                                 {
-                                    return x.GetCustomAttributes(typeof(FieldAccessAttribute)).Count() > 0
-                                           || x.GetCustomAttributes(typeof(ObjectPointerAccessAttribute)).Count() > 0;
+                                    return x.GetCustomAttributes(typeof(FieldAccess)).Count() > 0
+                                           || x.GetCustomAttributes(typeof(ObjectPointerAccess)).Count() > 0;
                                 }).Count() > 0)
                                 {
                                     OK = true;
@@ -334,12 +335,12 @@ namespace Cosmos.IL2CPU
 
                     #region PlugFields scan
 
-                    foreach (var xField in xImpl.GetTypeInfo().GetCustomAttributes(typeof(PlugFieldAttribute), true).Cast<PlugFieldAttribute>())
+                    foreach (var xField in xImpl.GetTypeInfo().GetCustomAttributes(typeof(PlugField), true).Cast<PlugField>())
                     {
-                        IDictionary<string, PlugFieldAttribute> xFields = null;
+                        IDictionary<string, PlugField> xFields = null;
                         if (!mPlugFields.TryGetValue(xPlug.Key, out xFields))
                         {
-                            xFields = new Dictionary<string, PlugFieldAttribute>();
+                            xFields = new Dictionary<string, PlugField>();
                             mPlugFields.Add(xPlug.Key, xFields);
                         }
                         if (xFields.ContainsKey(xField.FieldId))
@@ -378,7 +379,7 @@ namespace Cosmos.IL2CPU
                 xParamTypes[0] = aTargetType;
             }
 
-            PlugMethodAttribute xAttrib = null;
+            PlugMethod xAttrib = null;
             foreach (var xImpl in aImpls)
             {
                 // TODO: cleanup this loop, next statement shouldnt be neccessary
@@ -411,7 +412,7 @@ namespace Cosmos.IL2CPU
                         // TODO: Only allow one, but this code for now takes the last one
                         // if there is more than one
                         xAttrib = null;
-                        foreach (PlugMethodAttribute x in xSigMethod.GetCustomAttributes(typeof(PlugMethodAttribute), false))
+                        foreach (PlugMethod x in xSigMethod.GetCustomAttributes(typeof(PlugMethod), false))
                         {
                             xAttrib = x;
                         }
@@ -452,7 +453,7 @@ namespace Cosmos.IL2CPU
                             var xActualParamCount = xParams.Length;
                             foreach (var xParam in xParams)
                             {
-                                if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Any())
+                                if (xParam.GetCustomAttributes(typeof(FieldAccess), false).Any())
                                 {
                                     xActualParamCount--;
                                 }
@@ -465,10 +466,10 @@ namespace Cosmos.IL2CPU
                             {
                                 xTypesInst = new Type[0];
 
-                                var xReplaceType = xParams[0].GetCustomAttributes(typeof(FieldTypeAttribute), false).ToList();
+                                var xReplaceType = xParams[0].GetCustomAttributes(typeof(FieldType), false).ToList();
                                 if (xReplaceType.Any())
                                 {
-                                    xTypesStatic[0] = Type.GetType(((FieldTypeAttribute) xReplaceType[0]).Name, true);
+                                    xTypesStatic[0] = Type.GetType(((FieldType) xReplaceType[0]).Name, true);
                                 }
                                 else
                                 {
@@ -481,15 +482,15 @@ namespace Cosmos.IL2CPU
                                 var xCurIdx = 0;
                                 foreach (var xParam in xParams.Skip(1))
                                 {
-                                    if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Any())
+                                    if (xParam.GetCustomAttributes(typeof(FieldAccess), false).Any())
                                     {
                                         continue;
                                     }
 
-                                    var xReplaceType = xParam.GetCustomAttributes(typeof(FieldTypeAttribute), false).ToList();
+                                    var xReplaceType = xParam.GetCustomAttributes(typeof(FieldType), false).ToList();
                                     if (xReplaceType.Any())
                                     {
-                                        xTypesInst[xCurIdx] = Type.GetType(((FieldTypeAttribute) xReplaceType[0]).Name, true);
+                                        xTypesInst[xCurIdx] = Type.GetType(((FieldType) xReplaceType[0]).Name, true);
                                     }
                                     else
                                         xTypesInst[xCurIdx] = xParam.ParameterType;
@@ -499,7 +500,7 @@ namespace Cosmos.IL2CPU
                                 xCurIdx = 0;
                                 foreach (var xParam in xParams)
                                 {
-                                    if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Any())
+                                    if (xParam.GetCustomAttributes(typeof(FieldAccess), false).Any())
                                     {
                                         xCurIdx++;
                                         continue;
@@ -612,7 +613,7 @@ namespace Cosmos.IL2CPU
             {
                 // TODO: Only allow one, but this code for now takes the last one
                 // if there is more than one
-                foreach (PlugMethodAttribute x in xResult.GetCustomAttributes(typeof(PlugMethodAttribute), false))
+                foreach (PlugMethod x in xResult.GetCustomAttributes(typeof(PlugMethod), false))
                 {
                     xAttrib = x;
                 }
@@ -773,7 +774,7 @@ namespace Cosmos.IL2CPU
         {
             mPlugImpls = new Dictionary<Type, List<Type>>();
             mPlugImplsInhrt = new Dictionary<Type, List<Type>>();
-            mPlugFields = new Dictionary<Type, IDictionary<string, PlugFieldAttribute>>();
+            mPlugFields = new Dictionary<Type, IDictionary<string, PlugField>>();
 
             ResolvedPlugs = new Orvid.Collections.SkipList();
         }

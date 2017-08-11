@@ -14,6 +14,7 @@ using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.Extensions;
@@ -136,7 +137,7 @@ namespace Cosmos.IL2CPU
             XS.Label(xMethodLabel);
 
             // Alternative asm labels for the method
-            var xAsmLabelAttributes = aMethod.MethodBase.GetCustomAttributes<AsmLabelAttribute>();
+            var xAsmLabelAttributes = aMethod.MethodBase.GetCustomAttributes<AsmLabel>();
             foreach (var xAttribute in xAsmLabelAttributes)
             {
                 XS.Label(xAttribute.Label);
@@ -164,17 +165,13 @@ namespace Cosmos.IL2CPU
                 XS.Jump(ConditionalTestEnum.LessThan, mCurrentMethodLabel + ".StackOverflowCheck_End");
                 XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                new Call { DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_GetAddress" };
+                XS.Call(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Pop(EAX);
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                    XS.Call("DebugStub_SendStackOverflowOccurred");
-                }
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.DebugStub_CallerEIP], EAX, destinationIsIndirect: true);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackOverflowEvent]);
                 XS.Halt();
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
-
             }
 
             mCurrentMethodLabelEndGuid = DebugInfo.CreateId();
@@ -313,10 +310,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(xMethodLabel + EndOfMethodLabelNameNormal);
 
                 XS.Comment("Following code is for debugging. Adjust accordingly!");
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
-                }
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.Int_LastKnownAddress], xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
             }
 
             XS.Set(ECX, 0);
@@ -391,29 +385,26 @@ namespace Cosmos.IL2CPU
 
             if (DebugEnabled && StackCorruptionDetection)
             {
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
-                    // if not, we should somehow break here.
-                    XS.Set(EAX, ESP);
-                    XS.Set(EBX, EBP);
-                    XS.Compare(EAX, EBX);
-                    XS.Jump(ConditionalTestEnum.Equal, xLabelExc + "__2");
-                    XS.ClearInterruptFlag();
-                    // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                    new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
-                    XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
-                    XS.Pop(ECX);
-                    XS.Push(EAX);
-                    XS.Push(EBX);
-                    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.ECX };
-                    XS.Call("DebugStub_SendSimpleNumber");
-                    XS.Add(ESP, 4);
-                    XS.Call("DebugStub_SendSimpleNumber");
-                    XS.Add(ESP, 4);
-                    XS.Call("DebugStub_SendStackCorruptionOccurred");
-                    XS.Halt();
-                }
+                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
+                // if not, we should somehow break here.
+                XS.Set(EAX, ESP);
+                XS.Set(EBX, EBP);
+                XS.Compare(EAX, EBX);
+                XS.Jump(ConditionalTestEnum.Equal, xLabelExc + "__2");
+                XS.ClearInterruptFlag();
+                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+                XS.Call(".MethodFooterStackCorruptionCheck_Break_on_location");
+                XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
+                XS.Pop(ECX);
+                XS.Push(EAX);
+                XS.Push(EBX);
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.DebugStub_CallerEIP], ECX, destinationIsIndirect: true);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
+                XS.Add(ESP, 4);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
+                XS.Add(ESP, 4);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackCorruptedEvent]);
+                XS.Halt();
             }
             XS.Label(xLabelExc + "__2");
             XS.Pop(EBP);
@@ -1135,8 +1126,7 @@ namespace Cosmos.IL2CPU
 
         public void ProcessField(FieldInfo aField)
         {
-            string xFieldName = LabelName.GetFullName(aField);
-            xFieldName = DataMember.GetStaticFieldName(aField);
+            string xFieldName = DataMember.GetStaticFieldName(aField);
             if (Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Count(x => x.Name == xFieldName) == 0)
             {
                 var xItemList = (from item in aField.GetCustomAttributes(false)
@@ -1189,53 +1179,25 @@ namespace Cosmos.IL2CPU
                 }
                 else
                 {
-                    uint xFieldSize;
-                    //string theType = "db";
                     var xFieldType = aField.FieldType.GetTypeInfo();
-                    //if (!xFieldType.IsClass || xFieldType.IsValueType)
-                    //{
-                        xFieldSize = ILOp.SizeOfType(aField.FieldType);
-                    //}
-                    //else
-                    //{
-                    //    xTheSize = 8;
-                    //}
+                    uint xFieldSize = ILOp.SizeOfType(aField.FieldType);
                     byte[] xData = new byte[xFieldSize];
 
-                    //try
-                    //{
-                    //    object xValue = aField.GetValue(null);
-                    //    if (xValue != null)
-                    //    {
-                            try
-                            {
-                                //if (xFieldType.IsEnum)
-                                //{
-                                //    xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(aField.FieldType));
-                                //}
-                                //if (xTyp.GetTypeInfo().IsValueType)
-                                //{
-                                //    for (int x = 4; x < xTheSize; x++)
-                                //    {
-                                //        xData[x] = Marshal.ReadByte(xValue, x);
-                                //    }
-                                //}
-                                if (xFieldType.IsValueType)
-                                {
-                                    DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
-                                }
-                            }
-                            catch
-                            {
-                                throw;
-                            }
-                    //    }
-                    //}
-                    //catch
-                    //{
-                    //    throw;
-                    //}
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xFieldName, xData));
+                    if (xFieldType.IsValueType)
+                    {
+                        DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
+                    }
+
+                    var xAsmLabelAttributes = aField.GetCustomAttributes<AsmLabel>();
+                    if (xAsmLabelAttributes.Count() > 0)
+                    {
+                        Assembler.DataMembers.Add(new DataMember(
+                            xFieldName, xAsmLabelAttributes.Select(a => a.Label), xData));
+                    }
+                    else
+                    {
+                        Assembler.DataMembers.Add(new DataMember(xFieldName, xData));
+                    }
                 }
             }
         }
@@ -1270,7 +1232,7 @@ namespace Cosmos.IL2CPU
 
                     if (!aTo.IsWildcard)
                     {
-                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttribute<ObjectPointerAccessAttribute>(true);
+                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttribute<ObjectPointerAccess>(true);
                         if (xObjectPointerAccessAttrib != null)
                         {
                             XS.Comment("Skipping the reference to the next object reference.");
@@ -1293,8 +1255,8 @@ namespace Cosmos.IL2CPU
                 var xOriginalParamsIdx = 0;
                 foreach (var xParam in xParams)
                 {
-                    var xFieldAccessAttrib = xParam.GetCustomAttribute<FieldAccessAttribute>(true);
-                    var xObjectPointerAccessAttrib = xParam.GetCustomAttribute<ObjectPointerAccessAttribute>(true);
+                    var xFieldAccessAttrib = xParam.GetCustomAttribute<FieldAccess>(true);
+                    var xObjectPointerAccessAttrib = xParam.GetCustomAttribute<ObjectPointerAccess>(true);
                     if (xFieldAccessAttrib != null)
                     {
                         // field access
@@ -1365,10 +1327,7 @@ namespace Cosmos.IL2CPU
             XS.Push(EBP);
             XS.Set(EBP, ESP);
             XS.Set(EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
-            if (!CompilerEngine.UseGen3Kernel)
-            {
-                new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
-            }
+            new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
 
             var xMemberId = 0;
 
@@ -1508,25 +1467,21 @@ namespace Cosmos.IL2CPU
                 }
                 XS.Compare(EAX, EBX);
                 XS.Jump(ConditionalTestEnum.Equal, xLabel + ".StackCorruptionCheck_End");
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    XS.Push(EAX);
-                    XS.Push(EBX);
-                    XS.Call("DebugStub_SendSimpleNumber");
-                    XS.Add(ESP, 4);
-                    XS.Call("DebugStub_SendSimpleNumber");
+                XS.Push(EAX);
+                XS.Push(EBX);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
+                XS.Add(ESP, 4);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendSimpleNumber]);
 
-                    XS.ClearInterruptFlag();
-                    // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                    XS.Call(xLabel + ".StackCorruptionCheck_GetAddress");
-                    XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
-                    XS.Pop(EAX);
-                    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                    XS.Call("DebugStub_SendStackCorruptionOccurred");
-                    XS.Halt();
-                }
+                XS.ClearInterruptFlag();
+                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+                XS.Call(xLabel + ".StackCorruptionCheck_GetAddress");
+                XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
+                XS.Pop(EAX);
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.DebugStub_CallerEIP], EAX, destinationIsIndirect: true);
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_SendStackCorruptedEvent]);
+                XS.Halt();
                 XS.Label(xLabel + ".StackCorruptionCheck_End");
-
             }
         }
 
@@ -1571,7 +1526,7 @@ namespace Cosmos.IL2CPU
             // This test fixes issue #15638
             if (null != aNamespace)
             {
-                // Check options for Debug RingEnum
+                // Check options for Debug Ring
                 // Set based on TracedAssemblies
                 if (TraceAssemblies > TraceAssemblies.None)
                 {

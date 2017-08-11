@@ -1,6 +1,4 @@
-﻿using Cosmos.Core;
-
-namespace Cosmos.CPU {
+﻿namespace Cosmos.CPU {
     // PIC is not in hardware becuase its a special core piece like Processor that is not interacted with by anything except Core.
     //
     // Remaps the IRQ's to INT20-INT2F

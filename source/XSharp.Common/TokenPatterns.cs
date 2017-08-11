@@ -217,7 +217,8 @@ namespace XSharp.Common {
       if (mInIntHandler) {
         XS.InterruptReturn();
       } else {
-        XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit", destinationIsIndirect: true, size: XSRegisters.RegisterSize.Int32);
+        // TODO: this shouldn't be here
+        XS.Set("INTs_LastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit", destinationIsIndirect: true, size: XSRegisters.RegisterSize.Int32);
         XS.Return();
       }
       mFuncName = null;

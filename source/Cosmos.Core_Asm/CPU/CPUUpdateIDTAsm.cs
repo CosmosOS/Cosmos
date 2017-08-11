@@ -3,6 +3,7 @@ using System.Reflection;
 
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using Cosmos.IL2CPU.API.Attribs;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
@@ -121,7 +122,7 @@ namespace Cosmos.Core_Asm
 
             // reload interrupt list
             XS.Set(EAX, "_NATIVE_IDT_Pointer");
-            XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+            XS.Set(AsmMarker.Labels[AsmMarker.Type.Processor_IntsEnabled], 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
             XS.LoadIdt(EAX, isIndirect: true);
             // Reenable interrupts
             XS.EnableInterrupts();

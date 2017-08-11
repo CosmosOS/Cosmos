@@ -57,7 +57,7 @@ namespace Cosmos.Debug.Symbols
             var pdbFilename = Path.ChangeExtension(peFilePath, ".pdb");
             string searchPath = "";
 
-                if (!File.Exists(pdbFilename))
+            if (!File.Exists(pdbFilename))
             {
                 pdbFilename = null;
 
@@ -237,7 +237,7 @@ namespace Cosmos.Debug.Symbols
             {
                 case HandleKind.TypeReference:
                     return MetadataHelper.GetTypeFromReference(xReader, aModule,
-                        (TypeReferenceHandle) aRegion.CatchType, 0);
+                        (TypeReferenceHandle)aRegion.CatchType, 0);
                 case HandleKind.TypeDefinition:
                     break;
                 case HandleKind.FieldDefinition:
@@ -298,7 +298,7 @@ namespace Cosmos.Debug.Symbols
             var xMetadataReader = GetReader(xAssemblyPath).mMetadataReader;
             var xPEReader = GetReader(xAssemblyPath).mPEReader;
 
-            var xHandle = (FieldDefinitionHandle) MetadataTokens.Handle(aMetadataToken);
+            var xHandle = (FieldDefinitionHandle)MetadataTokens.Handle(aMetadataToken);
 
             if (!xHandle.IsNil)
             {

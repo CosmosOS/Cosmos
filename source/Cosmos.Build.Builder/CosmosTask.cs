@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
+using NuGet.Configuration;
+
 using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Builder {
@@ -245,7 +247,29 @@ namespace Cosmos.Build.Builder {
             }
           }
         }
-      }  
+      }
+
+      // Clean Cosmos packages from NuGet cache
+      var xGlobalFolder = SettingsUtility.GetGlobalPackagesFolder(Settings.LoadDefaultSettings(Environment.SystemDirectory));
+
+      // Later we should specify the packages, currently we're moving to gen3 so package names are a bit unstable
+      foreach (var xFolder in Directory.EnumerateDirectories(xGlobalFolder))
+      {
+        if (new DirectoryInfo(xFolder).Name.StartsWith("Cosmos", StringComparison.InvariantCultureIgnoreCase))
+        {
+          CleanPackage(xFolder);
+        }
+      }
+
+      void CleanPackage(string aPackage)
+      {
+        var xPath = Path.Combine(xGlobalFolder, aPackage);
+
+        if (Directory.Exists(xPath))
+        {
+          Directory.Delete(xPath, true);
+        }
+      }
     }
 
     private void Restore(string project)
@@ -276,11 +300,8 @@ namespace Cosmos.Build.Builder {
     private void CompileCosmos() {
       string xVsipDir = Path.Combine(mCosmosPath, "Build", "VSIP");
       string xNugetPkgDir = Path.Combine(xVsipDir, "KernelPackages");
-      string xVersion = "1.0.2";
-
-      if (!App.IsUserKit) {
-        xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
-      }
+      string xVersion = DateTime.Now.ToString("yyyy.MM.dd");
+      
 
       Section("Clean NuGet Local Feed");
       Clean(Path.Combine(mCosmosPath, @"Build.sln"));

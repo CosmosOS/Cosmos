@@ -1,5 +1,6 @@
 using System;
-using Cosmos.IL2CPU.API;
+
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU {
     // Non hardware class, only used by core and hardware drivers for ports etc.
@@ -61,6 +62,7 @@ namespace Cosmos.CPU {
             throw new NotImplementedException();
         }
 
+        [AsmMarker(AsmMarker.Type.Processor_IntsEnabled)]
         public static bool mInterruptsEnabled;
 
         public static void EnableInterrupts() {

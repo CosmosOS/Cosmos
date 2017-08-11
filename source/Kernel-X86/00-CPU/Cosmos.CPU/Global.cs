@@ -1,5 +1,4 @@
-﻿using Cosmos.Core;
-using Cosmos.Debug.Kernel;
+﻿using Cosmos.Debug.Kernel;
 
 namespace Cosmos.CPU {
     public static class Global {

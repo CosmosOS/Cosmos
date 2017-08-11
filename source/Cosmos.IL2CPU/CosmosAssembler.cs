@@ -7,15 +7,13 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.Core.DebugStub;
+using Cosmos.IL2CPU.API.Attribs;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
-namespace Cosmos.IL2CPU
-{
-    public class CosmosAssembler: Assembler.Assembler
-    {
-        public CosmosAssembler(int comPort)
-        {
+namespace Cosmos.IL2CPU {
+    public class CosmosAssembler : Assembler.Assembler {
+        public CosmosAssembler(int comPort) {
             mComPort = comPort;
         }
 
@@ -27,8 +25,7 @@ namespace Cosmos.IL2CPU
         /// </summary>
         public static bool ReadDebugStubFromDisk = true;
 
-        public virtual void WriteDebugVideo(string aText)
-        {
+        public virtual void WriteDebugVideo(string aText) {
             // This method emits a lot of ASM, but thats what we want becuase
             // at this point we need ASM as simple as possible and completely transparent.
             // No stack changes, no register mods, etc.
@@ -36,26 +33,22 @@ namespace Cosmos.IL2CPU
             // TODO: Add an option on the debug project properties to turn this off.
             // Also see TokenPatterns.cs Checkpoint in X#
             var xPreBootLogging = true;
-            if (xPreBootLogging)
-            {
+            if (xPreBootLogging) {
                 new Comment("DebugVideo '" + aText + "'");
                 UInt32 xVideo = 0xB8000;
-                for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2)
-                {
+                for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
                     new LiteralAssemblerCode("mov byte [0x" + i.ToString("X") + "], 0");
                     new LiteralAssemblerCode("mov byte [0x" + (i + 1).ToString("X") + "], 0x02");
                 }
 
-                foreach (var xChar in aText)
-                {
+                foreach (var xChar in aText) {
                     new LiteralAssemblerCode("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar);
                     xVideo = xVideo + 2;
                 }
             }
         }
 
-        public void CreateGDT()
-        {
+        public void CreateGDT() {
             new Comment(this, "BEGIN - Create GDT");
             var xGDT = new List<byte>();
 
@@ -81,8 +74,7 @@ namespace Cosmos.IL2CPU
             // Size of GDT Table - 1
             xGdtPtr[0] = (UInt16)(xGDT.Count - 1);
             DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", xGdtPtr));
-            new Mov
-            {
+            new Mov {
                 DestinationRef = ElementReference.New("_NATIVE_GDT_Pointer"),
                 DestinationIsIndirect = true,
                 DestinationDisplacement = 2,
@@ -100,58 +92,73 @@ namespace Cosmos.IL2CPU
             XS.Set(XSRegisters.SS, XSRegisters.AX);
 
             XS.Comment("Force reload of code segment");
-            new JumpToSegment
-            {
-                Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT"
+            new JumpToSegment {
+                Segment = mGdCode,
+                DestinationLabel = "Boot_FlushCsGDT"
             };
             XS.Label("Boot_FlushCsGDT");
             new Comment(this, "END - Create GDT");
         }
 
-        protected void SetIdtDescriptor(int aNo, string aLabel, bool aDisableInts)
-        {
+        protected void SetIdtDescriptor(int aNo, string aLabel, bool aDisableInts) {
             int xOffset = aNo * 8;
             XS.Set(XSRegisters.EAX, aLabel);
             var xIDT = ElementReference.New("_NATIVE_IDT_Contents");
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset, SourceReg = RegistersEnum.AL
+            new Mov {
+                DestinationRef = xIDT,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = xOffset,
+                SourceReg = RegistersEnum.AL
             };
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = RegistersEnum.AH
+            new Mov {
+                DestinationRef = xIDT,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = xOffset + 1,
+                SourceReg = RegistersEnum.AH
             };
             XS.ShiftRight(XSRegisters.EAX, 16);
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 6, SourceReg = RegistersEnum.AL
+            new Mov {
+                DestinationRef = xIDT,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = xOffset + 6,
+                SourceReg = RegistersEnum.AL
             };
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 7, SourceReg = RegistersEnum.AH
+            new Mov {
+                DestinationRef = xIDT,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = xOffset + 7,
+                SourceReg = RegistersEnum.AH
             };
 
             // Code Segment
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 2, SourceValue = mGdCode, Size = 16
+            new Mov {
+                DestinationRef = xIDT,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = xOffset + 2,
+                SourceValue = mGdCode,
+                Size = 16
             };
 
             // Reserved
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 4, SourceValue = 0x00, Size = 8
+            new Mov {
+                DestinationRef = xIDT,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = xOffset + 4,
+                SourceValue = 0x00,
+                Size = 8
             };
 
             // Type
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 5, SourceValue = (byte)(aDisableInts ? 0x8E : 0x8F), Size = 8
+            new Mov {
+                DestinationRef = xIDT,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = xOffset + 5,
+                SourceValue = (byte)(aDisableInts ? 0x8E : 0x8F),
+                Size = 8
             };
         }
 
-        public void CreateIDT()
-        {
+        public void CreateIDT() {
             new Comment(this, "BEGIN - Create IDT");
 
             // Create IDT
@@ -159,13 +166,9 @@ namespace Cosmos.IL2CPU
             DataMembers.Add(new DataMember("_NATIVE_IDT_Contents", new byte[xIdtSize]));
 
             //
-            if (mComPort > 0)
-            {
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
-                    SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
-                }
+            if (mComPort > 0) {
+                SetIdtDescriptor(1, AsmMarker.Labels[AsmMarker.Type.DebugStub_TracerEntry], false);
+                SetIdtDescriptor(3, AsmMarker.Labels[AsmMarker.Type.DebugStub_TracerEntry], false);
 
                 //for (int i = 0; i < 256; i++)
                 //{
@@ -185,8 +188,7 @@ namespace Cosmos.IL2CPU
                                                                   {
                                                                       xIdtSize, 0, 0
                                                                   }));
-            new Mov
-            {
+            new Mov {
                 DestinationRef = ElementReference.New("_NATIVE_IDT_Pointer"),
                 DestinationIsIndirect = true,
                 DestinationDisplacement = 2,
@@ -195,20 +197,15 @@ namespace Cosmos.IL2CPU
 
             XS.Set(XSRegisters.EAX, "_NATIVE_IDT_Pointer");
 
-            if (mComPort > 0)
-            {
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
-                    XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
-                }
+            if (mComPort > 0) {
+                XS.Set(AsmMarker.Labels[AsmMarker.Type.Processor_IntsEnabled], 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+                XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             }
             XS.Label("AfterCreateIDT");
             new Comment(this, "END - Create IDT");
         }
 
-        public void Initialize()
-        {
+        public void Initialize() {
             uint xSig = 0x1BADB002;
 
             DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
@@ -254,8 +251,7 @@ namespace Cosmos.IL2CPU
             DataMembers.Add(new DataMember(@"__doublesignbit", 0x8000000000000000));
             DataMembers.Add(new DataMember(@"__floatsignbit", 0x80000000));
 
-            if (mComPort > 0)
-            {
+            if (mComPort > 0) {
                 new Define("DEBUGSTUB");
             }
 
@@ -284,21 +280,24 @@ namespace Cosmos.IL2CPU
             new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot-compliant loader ");
             new Comment(this, "                ;- copy mb info - some stuff for you  ");
             new Comment(this, "BEGIN - Multiboot Info");
-            new Mov
-            {
-                DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EBX
+            new Mov {
+                DestinationRef = ElementReference.New("MultiBootInfo_Structure"),
+                DestinationIsIndirect = true,
+                SourceReg = RegistersEnum.EBX
             };
             XS.Add(XSRegisters.EBX, 4);
             XS.Set(XSRegisters.EAX, XSRegisters.EBX, sourceIsIndirect: true);
-            new Mov
-            {
-                DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
+            new Mov {
+                DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"),
+                DestinationIsIndirect = true,
+                SourceReg = RegistersEnum.EAX
             };
             XS.Add(XSRegisters.EBX, 4);
             XS.Set(XSRegisters.EAX, XSRegisters.EBX, sourceIsIndirect: true);
-            new Mov
-            {
-                DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
+            new Mov {
+                DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"),
+                DestinationIsIndirect = true,
+                SourceReg = RegistersEnum.EAX
             };
             new Comment(this, "END - Multiboot Info");
             new LiteralAssemblerCode("%endif");
@@ -340,13 +339,9 @@ namespace Cosmos.IL2CPU
             //XS.Mov(XSRegisters.CR0, XSRegisters.Registers.EAX);
             //new Comment(this, "END - SSE Init");
 
-            if (mComPort > 0)
-            {
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    WriteDebugVideo("Initializing DebugStub.");
-                    XS.Call("DebugStub_Init");
-                }
+            if (mComPort > 0) {
+                WriteDebugVideo("Initializing DebugStub.");
+                XS.Call(AsmMarker.Labels[AsmMarker.Type.DebugStub_Init]);
             }
 
             // Jump to Kernel entry point
@@ -359,62 +354,42 @@ namespace Cosmos.IL2CPU
             XS.Halt();
             XS.Jump(".loop");
 
-            if (mComPort > 0)
-            {
+            if (mComPort > 0) {
                 var xGen = new AsmGenerator();
 
                 var xGenerateAssembler =
-                    new Action<object>(i =>
-                                       {
-                                           if (i is StreamReader)
-                                           {
-                                               var xAsm = xGen.Generate((StreamReader)i);
-                                               CurrentInstance.Instructions.AddRange(xAsm.Instructions);
-                                               CurrentInstance.DataMembers.AddRange(xAsm.DataMembers);
-                                           }
-                                           else if (i is string)
-                                           {
-                                               var xAsm = xGen.Generate((string)i);
-                                               CurrentInstance.Instructions.AddRange(xAsm.Instructions);
-                                               CurrentInstance.DataMembers.AddRange(xAsm.DataMembers);
-                                           }
-                                           else
-                                           {
-                                               throw new Exception("Object type '" + i.ToString() + "' not supported!");
-                                           }
-                                       });
-                if (!CompilerEngine.UseGen3Kernel)
-                {
-                    if (ReadDebugStubFromDisk)
-                    {
-                        foreach (var xFile in Directory.GetFiles(CosmosPaths.DebugStubSrc, "*.xs"))
-                        {
-                            xGenerateAssembler(xFile);
+                    new Action<object>(i => {
+                        if (i is StreamReader) {
+                            var xAsm = xGen.Generate((StreamReader)i);
+                            CurrentInstance.Instructions.AddRange(xAsm.Instructions);
+                            CurrentInstance.DataMembers.AddRange(xAsm.DataMembers);
+                        } else if (i is string) {
+                            var xAsm = xGen.Generate((string)i);
+                            CurrentInstance.Instructions.AddRange(xAsm.Instructions);
+                            CurrentInstance.DataMembers.AddRange(xAsm.DataMembers);
+                        } else {
+                            throw new Exception("Object type '" + i.ToString() + "' not supported!");
                         }
+                    });
+                if (ReadDebugStubFromDisk) {
+                    foreach (var xFile in Directory.GetFiles(CosmosPaths.DebugStubSrc, "*.xs")) {
+                        xGenerateAssembler(xFile);
                     }
-                    else
-                    {
-                        foreach (var xManifestName in typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceNames())
-                        {
-                            if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase))
-                            {
-                                continue;
-                            }
-                            using (var xStream = typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(xManifestName))
-                            {
-                                using (var xReader = new StreamReader(xStream))
-                                {
-                                    xGenerateAssembler(xReader);
-                                }
+                } else {
+                    foreach (var xManifestName in typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceNames()) {
+                        if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase)) {
+                            continue;
+                        }
+                        using (var xStream = typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(xManifestName)) {
+                            using (var xReader = new StreamReader(xStream)) {
+                                xGenerateAssembler(xReader);
                             }
                         }
                     }
                 }
                 OnAfterEmitDebugStub();
-            }
-            else
-            {
-                XS.Label("DebugStub_Step");
+            } else {
+                XS.Label(AsmMarker.Labels[AsmMarker.Type.DebugStub_Step]);
                 XS.Return();
             }
 
@@ -422,8 +397,7 @@ namespace Cosmos.IL2CPU
             CurrentInstance.EmitAsmLabels = true;
         }
 
-        private void ConfigurePIC()
-        {
+        private void ConfigurePIC() {
             // initial configuration of PIC
             const byte PIC1 = 0x20; /* IO base address for master PIC */
             const byte PIC2 = 0xA0; /* IO base address for slave PIC */
@@ -435,7 +409,7 @@ namespace Cosmos.IL2CPU
             const byte ICW1_ICW4 = 0x01; /* ICW4 (not) needed */
             const byte ICW1_SINGLE = 0x02; /* Single (cascade) mode */
             const byte ICW1_INTERVAL4 = 0x04; /* Call address interval 4 (8) */
-            const byte ICW1_LEVEL = 0x08; /* RingEnum triggered (edge) mode */
+            const byte ICW1_LEVEL = 0x08; /* Ring triggered (edge) mode */
             const byte ICW1_INIT = 0x10; /* Initialization - required! */
 
             const byte ICW4_8086 = 0x01; /* 8086/88 (MCS-80/85) mode */
@@ -445,12 +419,11 @@ namespace Cosmos.IL2CPU
             const byte ICW4_SFNM = 0x10; /* Special fully nested (not) */
 
             // emit helper functions:
-            Action<byte, byte> xOutBytes = (port, value) =>
-                                           {
-                                               XS.Set(XSRegisters.DX, port);
-                                               XS.Set(XSRegisters.EAX, value);
-                                               XS.WriteToPortDX(XSRegisters.AL);
-                                           };
+            Action<byte, byte> xOutBytes = (port, value) => {
+                XS.Set(XSRegisters.DX, port);
+                XS.Set(XSRegisters.EAX, value);
+                XS.WriteToPortDX(XSRegisters.AL);
+            };
 
             Action xIOWait = () => xOutBytes(0x80, 0x22);
 
@@ -477,15 +450,13 @@ namespace Cosmos.IL2CPU
             xOutBytes(PIC2_DATA, 0xFF);
         }
 
-        protected virtual void OnAfterEmitDebugStub()
-        {
+        protected virtual void OnAfterEmitDebugStub() {
             //
         }
 
         public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
 
-        protected byte[] GdtDescriptor(UInt32 aBase, UInt32 aSize, bool aCode)
-        {
+        protected byte[] GdtDescriptor(UInt32 aBase, UInt32 aSize, bool aCode) {
             // Limit is a confusing word. Is it the max physical address or size?
             // In fact it is the size, and 286 docs actually refer to it as size
             // rather than limit.
@@ -495,8 +466,7 @@ namespace Cosmos.IL2CPU
             var xResult = new byte[8];
 
             // Check the limit to make sure that it can be encoded
-            if ((aSize > 65536) && (aSize & 0x0FFF) != 0x0FFF)
-            {
+            if ((aSize > 65536) && (aSize & 0x0FFF) != 0x0FFF) {
                 // If larger than 16 bit, must be an even page (4kb) size
                 throw new Exception("Invalid size in GDT descriptor.");
             }
@@ -508,8 +478,7 @@ namespace Cosmos.IL2CPU
             // 5: 0 - Reserved
             // 4: 0 - Reserved
             xResult[6] = 0x40;
-            if (aSize > 65536)
-            {
+            if (aSize > 65536) {
                 // Set page sizing instead of byte sizing
                 aSize = aSize >> 12;
                 xResult[6] = (byte)(xResult[6] | 0x80);
@@ -544,8 +513,7 @@ namespace Cosmos.IL2CPU
             return xResult;
         }
 
-        protected override void BeforeFlushText(TextWriter aOutput)
-        {
+        protected override void BeforeFlushText(TextWriter aOutput) {
             base.BeforeFlushText(aOutput);
             aOutput.WriteLine("%ifndef ELF_COMPILATION");
             aOutput.WriteLine("use32");
@@ -554,13 +522,11 @@ namespace Cosmos.IL2CPU
             aOutput.WriteLine("%endif");
         }
 
-        protected override void OnBeforeFlush()
-        {
+        protected override void OnBeforeFlush() {
             DataMembers.AddRange(new DataMember[] { new DataMember("_end_data", new byte[0]) });
         }
 
-        protected override void OnFlushTextAfterEmitEverything(TextWriter aOutput)
-        {
+        protected override void OnFlushTextAfterEmitEverything(TextWriter aOutput) {
             base.OnFlushTextAfterEmitEverything(aOutput);
 
             aOutput.WriteLine("SystemExceptionOccurred:");
