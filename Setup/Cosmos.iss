@@ -62,7 +62,7 @@ DisableReadyMemo=True
 FlatComponentsList=False
 AlwaysShowComponentsList=False
 ShowComponentSizes=False
-LicenseFile=..\LICENSE
+LicenseFile=LICENSE.txt
 DisableDirPage=yes
 
 [Dirs]
