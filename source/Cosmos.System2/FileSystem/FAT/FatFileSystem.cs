@@ -359,7 +359,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// <param name="aDevice">The partition.</param>
         /// <param name="aRootPath">The root path.</param>
         /// <exception cref="Exception">FAT signature not found.</exception>
-        public FatFileSystem(Partition aDevice, string aRootPath, long aSize)
+        public FatFileSystem(Partition aDevice, string aRootPath, ulong aSize)
             : base(aDevice, aRootPath, aSize)
         {
             if (aDevice == null)

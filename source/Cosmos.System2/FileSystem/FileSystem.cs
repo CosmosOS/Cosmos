@@ -9,7 +9,7 @@ namespace Cosmos.System.FileSystem
 {
     public abstract class FileSystem
     {
-        protected FileSystem(Partition aDevice, string aRootPath, long aSize)
+        protected FileSystem(Partition aDevice, string aRootPath, ulong aSize)
         {
             mDevice = aDevice;
             mRootPath = aRootPath;
@@ -44,6 +44,6 @@ namespace Cosmos.System.FileSystem
 
         public string mRootPath { get; }
 
-        public long mSize { get; }
+        public ulong mSize { get; }
     }
 }
