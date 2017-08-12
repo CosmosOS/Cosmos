@@ -44,7 +44,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             string aFullPath,
             string aName,
             uint aFirstCluster)
-            : base(aFileSystem, aParent, aFullPath, aName, 0, DirectoryEntryTypeEnum.Directory)
+            : base(aFileSystem, aParent, aFullPath, aName, aSize, DirectoryEntryTypeEnum.Directory)
         {
             if (aFirstCluster < aFileSystem.RootCluster)
             {
