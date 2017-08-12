@@ -319,8 +319,8 @@ namespace Cosmos.Build.Builder {
 
       Section("Publish Tools");
       Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
-      Publish(Path.Combine(mSourcePath, "../../IL2CPU"), Path.Combine(xVsipDir, "Cosmos.IL2CPU"));
-      Publish(Path.Combine(mSourcePath, "../../XSharp.Compiler"), Path.Combine(xVsipDir, "Cosmos.XSharp"));
+      Publish(Path.Combine(mSourcePath, "../../IL2CPU/source/IL2CPU"), Path.Combine(xVsipDir, "IL2CPU"));
+      Publish(Path.Combine(mSourcePath, "../../XSharp/source/XSharp.XSC"), Path.Combine(xVsipDir, "XSharp"));
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVsipDir, "NASM"));
 
       Section("Pack Kernel");
