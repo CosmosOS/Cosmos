@@ -23,7 +23,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             FatDirectoryEntry aParent,
             string aFullPath,
             string aName,
-            ulong aSize,
+            long aSize,
             uint aFirstCluster,
             uint aEntryHeaderDataOffset,
             DirectoryEntryTypeEnum aEntryType)
@@ -42,7 +42,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             FatFileSystem aFileSystem,
             FatDirectoryEntry aParent,
             string aFullPath,
-            ulong aSize,
+            long aSize,
             string aName,
             uint aFirstCluster)
             : base(aFileSystem, aParent, aFullPath, aName, aSize, DirectoryEntryTypeEnum.Directory)
@@ -61,7 +61,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFatTable --");
 
             var xFat = ((FatFileSystem)mFileSystem).GetFat(0);
-            return xFat?.GetFatChain(mFirstClusterNum, (long)mSize);
+            return xFat?.GetFatChain(mFirstClusterNum, mSize);
         }
 
         public FatFileSystem GetFileSystem()
@@ -110,7 +110,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
 
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.Size, aSize);
-            mSize = (ulong)aSize;
+            mSize = aSize;
         }
 
         private void AllocateDirectoryEntry(string aShortName)

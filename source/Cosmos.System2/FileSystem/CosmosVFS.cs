@@ -360,7 +360,7 @@ namespace Cosmos.System.FileSystem
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
-                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath, (ulong)xSize));
+                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath, xSize));
                         break;
                     default:
                         global::System.Console.WriteLine("Unknown filesystem type!");
