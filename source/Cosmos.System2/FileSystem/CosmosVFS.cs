@@ -355,8 +355,7 @@ namespace Cosmos.System.FileSystem
             for (int i = 0; i < mPartitions.Count; i++)
             {
                 string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
-                ulong Size = mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024;
-                long xSize = (long)Size;
+                var xSize = (long)(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
