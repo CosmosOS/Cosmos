@@ -52,7 +52,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "source
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "source\Cosmos.Deploy.Pixie\Cosmos.Deploy.Pixie.csproj", "{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.XSC", "..\XSharp\source\XSharp.XSC\XSharp.XSC.csproj", "{69E08155-F075-4728-8387-1549CFD4FA97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.DotNetCLI", "..\XSharp\source\XSharp.DotNetCLI\XSharp.DotNetCLI.csproj", "{69E08155-F075-4728-8387-1549CFD4FA97}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU", "..\IL2CPU\source\IL2CPU\IL2CPU.csproj", "{F3025446-D2C7-4FEA-AB03-C707F7B48B43}"
 EndProject
