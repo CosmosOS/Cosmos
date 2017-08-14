@@ -325,10 +325,9 @@ namespace Cosmos.System.Graphics
 
         public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
         {
-            for (int i = 0; i != width; i++)
+            for (int y = y_start; y < y_start + height; y++)
             {
-                DrawLine(pen, x_start, y_start, x_start + height, y_start);
-                y_start++;
+                DrawLine(pen, x_start, y, x_start + width - 1, y);
             }
         }
 
