@@ -14,6 +14,7 @@ for /f "usebackq delims=" %%i in (`%VSWhere% -latest -version "[15.0,16.0)" -req
   set InstallDir=%%i
 )
 
+
 if exist "%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe" (
   set MSBuild="%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe"
 )
@@ -21,5 +22,6 @@ if exist "%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe" (
 if exist %MSBuild% (
   %MSBuild% Builder.sln /nologo /maxcpucount /nodeReuse:false /p:Configuration="Debug" /p:Platform="Any CPU"
 )
+
 
 start "Cosmos Builder" "source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-VSPATH=%InstallDir%" %1 %2 %3 %4 %5 %6 %7 %8 %9

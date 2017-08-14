@@ -1,6 +1,7 @@
 using System;
 using System.Resources;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Resources
 {

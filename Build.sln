@@ -18,9 +18,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD42844B-2767-4DF4-B0AF-EA5F7CB11528}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{9C8A3E55-9045-44CA-BFD4-16D5B4343A90}"
-	ProjectSection(SolutionItems) = preProject
-		XSharp Projects.txt = XSharp Projects.txt
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{4D3F3613-E112-4013-AB81-B8CCED78A555}"
 EndProject
@@ -49,19 +46,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Wizards", "source
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows", "source\Cosmos.VS.Windows\Cosmos.VS.Windows.csproj", "{47E8F3DC-FF3F-4CC7-8643-1807260B0B18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.VS", "source\XSharp.VS\XSharp.VS.csproj", "{FB71E8EF-E229-4D81-984A-B9170D752BF9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.VS", "..\XSharp\source\XSharp.VS\XSharp.VS.csproj", "{FB71E8EF-E229-4D81-984A-B9170D752BF9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "source\Cosmos.Deploy.USB\Cosmos.Deploy.USB.csproj", "{3D84CF8B-C6DF-4D78-8DE1-708582B43711}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "source\Cosmos.Deploy.Pixie\Cosmos.Deploy.Pixie.csproj", "{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "source\XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.DotNetCLI", "..\XSharp\source\XSharp.DotNetCLI\XSharp.DotNetCLI.csproj", "{69E08155-F075-4728-8387-1549CFD4FA97}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Compiler", "source\XSharp.Compiler\XSharp.Compiler.csproj", "{69E08155-F075-4728-8387-1549CFD4FA97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU", "..\IL2CPU\source\IL2CPU\IL2CPU.csproj", "{F3025446-D2C7-4FEA-AB03-C707F7B48B43}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU", "source\IL2CPU\IL2CPU.csproj", "{F3025446-D2C7-4FEA-AB03-C707F7B48B43}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{3C45A898-4AA9-476F-8302-63391D6ED044}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{3C45A898-4AA9-476F-8302-63391D6ED044}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{2E740096-911F-47D0-A46D-998DBB76FC5D}"
 EndProject
@@ -73,27 +68,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "sour
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "source\Cosmos.Core.DebugStub\Cosmos.Core.DebugStub.csproj", "{72EEFBFE-AF88-4E16-AD6C-7D9857CDC32C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Cosmos.System\Cosmos.System.csproj", "{3C515676-8565-4A19-98E7-266F83D579A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2", "source\Cosmos.System2\Cosmos.System2.csproj", "{3C515676-8565-4A19-98E7-266F83D579A8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core", "source\Cosmos.Core\Cosmos.Core.csproj", "{B45F760C-6D3D-48E1-9E2C-97CECC6A7061}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Cosmos.HAL\Cosmos.HAL.csproj", "{DE4F000A-B65C-4395-B066-891B7423E9EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL2\Cosmos.HAL2.csproj", "{DE4F000A-B65C-4395-B066-891B7423E9EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "source\XSharp.Common\XSharp.Common.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp", "..\XSharp\source\XSharp\XSharp.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj", "{89DB6325-2C81-467D-BE8A-C4AEBB6540A5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Asm", "source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj", "{2A24DA41-0D3A-48A6-83D5-8584A1D4CA94}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System_Plugs", "source\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj", "{9A327DB7-42E2-4C82-9537-0D995B9171FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2_Plugs", "source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj", "{9A327DB7-42E2-4C82-9537-0D995B9171FF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel.Plugs.Asm", "source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj", "{7549D7F8-58A3-4F4F-8544-DEF2ABF79A0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Assembler", "source\Cosmos.Assembler\Cosmos.Assembler.csproj", "{E1AC1E9B-27EA-4AE0-8C83-328BD96F978A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Assembler", "..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj", "{E1AC1E9B-27EA-4AE0-8C83-328BD96F978A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{CB20F8F9-8C1D-43A6-96EA-89FEC2512C99}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj", "{A9469897-4FD8-49E7-97F1-FE420A2B75B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj", "{A9469897-4FD8-49E7-97F1-FE420A2B75B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Common", "source\Cosmos.Common\Cosmos.Common.csproj", "{366C2EC6-B9D8-4676-9C88-98F041B8FC93}"
 EndProject
@@ -102,6 +97,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Runner", "Test Runner", "{D4833110-032D-40E3-ACB3-F11583727B08}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.TestController", "Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj", "{2EEC1BF8-758F-4D9D-B063-8CF005468B24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheRingMaster", "source\TheRingMaster\TheRingMaster.csproj", "{0EE3DF1C-44E6-4669-88AA-D8D2612DA817}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{3C4B0261-3B1D-4503-97F1-AC0252D500E6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NASM", "Tools\NASM\NASM.csproj", "{A7C295D2-8DEA-4CAE-A8CB-44CD0529EC65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -145,10 +146,6 @@ Global
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Any CPU.Build.0 = Release|Any CPU
-		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{69E08155-F075-4728-8387-1549CFD4FA97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{69E08155-F075-4728-8387-1549CFD4FA97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69E08155-F075-4728-8387-1549CFD4FA97}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -237,6 +234,14 @@ Global
 		{2EEC1BF8-758F-4D9D-B063-8CF005468B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EEC1BF8-758F-4D9D-B063-8CF005468B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EEC1BF8-758F-4D9D-B063-8CF005468B24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EE3DF1C-44E6-4669-88AA-D8D2612DA817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EE3DF1C-44E6-4669-88AA-D8D2612DA817}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EE3DF1C-44E6-4669-88AA-D8D2612DA817}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EE3DF1C-44E6-4669-88AA-D8D2612DA817}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7C295D2-8DEA-4CAE-A8CB-44CD0529EC65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7C295D2-8DEA-4CAE-A8CB-44CD0529EC65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7C295D2-8DEA-4CAE-A8CB-44CD0529EC65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7C295D2-8DEA-4CAE-A8CB-44CD0529EC65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -256,7 +261,6 @@ Global
 		{FB71E8EF-E229-4D81-984A-B9170D752BF9} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
-		{841A734E-9606-4AAB-9C4A-74E7E303FF5D} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{69E08155-F075-4728-8387-1549CFD4FA97} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{F3025446-D2C7-4FEA-AB03-C707F7B48B43} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{3C45A898-4AA9-476F-8302-63391D6ED044} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
@@ -279,5 +283,10 @@ Global
 		{366C2EC6-B9D8-4676-9C88-98F041B8FC93} = {CAF5EB57-6CAD-446D-8FC7-4C03D4B996A6}
 		{535A7E34-AC73-4781-B791-2C81A9066A2C} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{2EEC1BF8-758F-4D9D-B063-8CF005468B24} = {D4833110-032D-40E3-ACB3-F11583727B08}
+		{0EE3DF1C-44E6-4669-88AA-D8D2612DA817} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
+		{A7C295D2-8DEA-4CAE-A8CB-44CD0529EC65} = {3C4B0261-3B1D-4503-97F1-AC0252D500E6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E5429BF0-2CEE-45B0-BC73-2188A409E1D3}
 	EndGlobalSection
 EndGlobal

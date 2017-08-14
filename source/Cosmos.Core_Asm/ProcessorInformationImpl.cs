@@ -1,8 +1,9 @@
 using System.Reflection;
-using Cosmos.Assembler;
+using XSharp.Assembler;
 using Cosmos.Core;
 using Cosmos.IL2CPU.API;
-using XSharp.Common;
+using Cosmos.IL2CPU.API.Attribs;
+using XSharp;
 
 namespace Cosmos.Core_Asm
 {

@@ -1,17 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Cosmos.Core.Memory.Old;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs
-{
+namespace Cosmos.Core_Plugs {
     [Plug(Target = typeof(Cosmos.Core.GCImplementation))]
-    public static class GCImplementionImpl
-    {
-        public static uint AllocNewObject(uint aSize)
-        {
+    public static class GCImplementionImpl {
+        public static uint AllocNewObject(uint aSize) {
             //if (Managed_Memory_System.ManagedMemory.SetUpDone == false)
             //{
             //    return Managed_Memory_System.ManagedMemory.SetUpMemoryAlloc(aSize);
@@ -24,12 +20,10 @@ namespace Cosmos.Core_Plugs
             return Heap.MemAlloc(aSize);
         }
 
-        public static void IncRefCount(uint aObject)
-        {
+        public static void IncRefCount(uint aObject) {
             //
         }
-        public static void DecRefCount(uint aObject)
-        {
+        public static void DecRefCount(uint aObject) {
             //
         }
 
