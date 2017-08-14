@@ -3,20 +3,6 @@ cls
 
 set NuGet=Build\Tools\nuget.exe
 set VSWhere=Build\Tools\vswhere.exe
-set IL2CPU=..\IL2CPU\IL2CPU.sln
-set XS=..\XSharp\XSharp.sln
-
-echo Finding XSharp repo directory
-IF EXIST %XS% (echo XSharp solution found!) else ( 
-echo XSharp not found!
-goto NOI2CXS 
-)
-
-echo Looking for IL2CPU repo directory...
-IF EXIST %IL2CPU% (echo IL2CPU solution found!) else (
-echo IL2CPU not found!
-goto NOI2CXS )
-
 
 :NuGet
 echo Running NuGet restore
@@ -39,8 +25,3 @@ if exist %MSBuild% (
 
 
 start "Cosmos Builder" "source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-VSPATH=%InstallDir%" %1 %2 %3 %4 %5 %6 %7 %8 %9
-
-
-:NOI2CXS
-echo install-vs2017.bat failed to find the required IL2CPU or XSharp directories
-echo Be sure to see the Cosmos documentation for instructions on building Cosmos
