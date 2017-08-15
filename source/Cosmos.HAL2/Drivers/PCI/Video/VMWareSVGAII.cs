@@ -145,13 +145,13 @@ namespace Cosmos.HAL.Drivers.PCI.Video
 
         public VMWareSVGAII()
         {
-            device = (PCIDeviceNormal)(HAL.PCI.GetDevice(0x15AD, 0x0405));
+            //device = (PCIDeviceNormal)(HAL.PCI.GetDevice(0x15AD, 0x0405));
             device.EnableMemory(true);
-            uint basePort = device.BaseAddresses[0].BaseAddress();
-            IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));
-            ValuePort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Value));
-            BiosPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Bios));
-            IRQPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.IRQ));
+            //uint basePort = device.BaseAddresses[0].BaseAddress();
+            //IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));
+            //ValuePort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Value));
+            //BiosPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Bios));
+           // IRQPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.IRQ));
 
             WriteRegister(Register.ID, (uint)ID.V2);
             if (ReadRegister(Register.ID) != (uint)ID.V2)
