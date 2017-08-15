@@ -308,6 +308,8 @@ namespace Cosmos.Build.Builder {
 
       Section("Restore NuGet Packages");
       Restore(Path.Combine(mCosmosPath, @"Build.sln"));
+	  Restore(Path.Combine(mCosmosPath, @"../IL2CPU/IL2CPU.sln"));
+	  Restore(Path.Combine(mCosmosPath, @"../XSharp/XSharp.sln"));
 
       Section("Update NuGet");
       Update();
@@ -319,8 +321,8 @@ namespace Cosmos.Build.Builder {
 
       Section("Publish Tools");
       Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
-      Publish(Path.Combine(mSourcePath, "IL2CPU"), Path.Combine(xVsipDir, "IL2CPU"));
-      Publish(Path.Combine(mSourcePath, "XSharp.Compiler"), Path.Combine(xVsipDir, "XSharp"));
+      Publish(Path.Combine(mSourcePath, "../../IL2CPU/source/IL2CPU"), Path.Combine(xVsipDir, "IL2CPU"));
+      Publish(Path.Combine(mSourcePath, "../../XSharp/source/XSharp.DotNetCLI"), Path.Combine(xVsipDir, "XSharp"));
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVsipDir, "NASM"));
 
       Section("Pack Kernel");
@@ -339,7 +341,7 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xNugetPkgDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xNugetPkgDir, xVersion);
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.API"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "../../IL2CPU/source/Cosmos.IL2CPU.API"), xNugetPkgDir, xVersion);
     }
 
     private void CopyTemplates() {
