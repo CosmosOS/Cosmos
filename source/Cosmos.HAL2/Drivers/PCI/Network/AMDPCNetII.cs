@@ -34,7 +34,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
             this.pciCard = device;
             // this.pciCard.Claimed = true;
-            this.pciCard.EnableDevice();
+            //this.pciCard.EnableDevice();
 
             //this.io = new AMDPCNetIIIOGroup((ushort) this.pciCard.BaseAddresses[0].BaseAddress());
             this.io.RegisterData.DWord = 0;

@@ -45,9 +45,9 @@ namespace Cosmos.HAL
             MaxLatency = ReadRegister8(0x3F);
         }
 
-        public void EnableDevice()
-        {
-            Command |= PCICommand.Master | PCICommand.IO | PCICommand.Memory;
-        }
+        //public void EnableDevice()
+        //{
+        //    Command |= PCICommand.Master | PCICommand.IO | PCICommand.Memory;
+        //}
     }
 }
