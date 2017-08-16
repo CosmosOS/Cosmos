@@ -75,7 +75,8 @@ namespace Cosmos_Graphic_Subsytem
                  * canvas.DrawString(pen, "Please press any key to end the Demo...");
                  */
                 Console.ReadKey();
-                Stop();
+
+                Sys.Power.Shutdown();
             }
             catch (Exception e)
             {
