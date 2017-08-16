@@ -5,15 +5,16 @@ platform: AnyCPU
 shallow_clone: true
 clone_folder: c:\Cosmos
 
+init:
+- cmd: |
+    git clone https://github.com/CosmosOS/XSharp.git c:\XSharp --depth 1
+    git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
+
 build_script:
 - cmd: >-
     rem %APPVEYOR_BUILD_FOLDER%
 
-    git clone https://github.com/CosmosOS/XSharp.git c:\XSharp
-
-    git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU
     
-
     nuget restore "Builder.sln"
 
     nuget restore "..\XSharp\XSharp.sln"
@@ -35,8 +36,6 @@ build_script:
     dotnet publish source\Cosmos.Build.MSBuild -f net462 -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
 
     dotnet publish ..\IL2CPU\source\IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
-        
-    dotnet publish ..\XSharp\source\XSharp.XSC -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\XSharp\"
 
 
     xcopy /Y "Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
