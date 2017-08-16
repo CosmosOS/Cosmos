@@ -38,7 +38,7 @@ namespace Cosmos.TestRunner.UnitTest
                 xEngine.TraceAssembliesLevel = TraceAssemblies.User;
 
                 xEngine.EnableStackCorruptionChecks = true;
-                xEngine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
+                xEngine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
 
                 // Select kernels to be tested by adding them to the engine
                 xEngine.AddKernel(kernelToRun.GetTypeInfo().Assembly.Location);
