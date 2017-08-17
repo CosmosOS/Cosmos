@@ -28,7 +28,7 @@ namespace Cosmos.TestRunner.Core
             engine.DebugIL2CPU = false;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             //engine.EnableStackCorruptionChecks = false;
-            engine.KernelPkg = "X86G3";
+            engine.KernelPkg = "X86";
 
             engine.EnableStackCorruptionChecks = true;
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
@@ -37,7 +37,7 @@ namespace Cosmos.TestRunner.Core
             //engine.StartBochsDebugGui = true;
 
             // Select kernels to be tested by adding them to the engine
-            foreach (var xType in TestKernelSets.GetStableKernelTypes())
+            foreach (var xType in TestKernelSets.GetKernelTypesToRun())
             {
                 engine.AddKernel(xType.GetTypeInfo().Assembly.Location);
             }

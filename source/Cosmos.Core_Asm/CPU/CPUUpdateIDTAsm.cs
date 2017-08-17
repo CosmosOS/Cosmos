@@ -1,10 +1,11 @@
 using System;
 using System.Reflection;
 
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
-using XSharp.Common;
-using static XSharp.Common.XSRegisters;
+using XSharp.Assembler;
+using XSharp.Assembler.x86;
+using Cosmos.IL2CPU.API.Attribs;
+using XSharp;
+using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
 {
@@ -35,7 +36,7 @@ namespace Cosmos.Core_Asm
                 , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
         }
 
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             // IDT is already initialized but just for base hooks, and asm only.
             // ie Int 1, 3 and GPF
@@ -121,7 +122,7 @@ namespace Cosmos.Core_Asm
 
             // reload interrupt list
             XS.Set(EAX, "_NATIVE_IDT_Pointer");
-            XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+            XS.Set(AsmMarker.Labels[AsmMarker.Type.Processor_IntsEnabled], 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
             XS.LoadIdt(EAX, isIndirect: true);
             // Reenable interrupts
             XS.EnableInterrupts();

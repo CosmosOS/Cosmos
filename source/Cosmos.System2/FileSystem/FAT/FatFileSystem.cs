@@ -35,9 +35,9 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Gets the size of a fat entry in bytes.
+            /// Gets the size of a FAT entry in bytes.
             /// </summary>
-            /// <returns>The size of a fat entry in bytes.</returns>
+            /// <returns>The size of a FAT entry in bytes.</returns>
             /// <exception cref="NotSupportedException">Can not get the FAT entry size for an unknown FAT type.</exception>
             private uint GetFatEntrySizeInBytes()
             {
@@ -56,11 +56,11 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Gets the fat chain.
+            /// Gets the FAT chain.
             /// </summary>
             /// <param name="aFirstEntry">The first entry.</param>
             /// <param name="aDataSize">Size of a data to be stored in bytes.</param>
-            /// <returns>An array of cluster numbers for the fat chain.</returns>
+            /// <returns>An array of cluster numbers for the FAT chain.</returns>
             /// <exception cref="ArgumentOutOfRangeException"></exception>
             public uint[] GetFatChain(uint aFirstEntry, long aDataSize = 0)
             {
@@ -132,7 +132,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Gets the next unallocated fat entry.
+            /// Gets the next unallocated FAT entry.
             /// </summary>
             /// <returns>The index of the next unallocated FAT entry.</returns>
             /// <exception cref="Exception">Failed to find an unallocated FAT entry.</exception>
@@ -157,7 +157,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Clears a fat entry.
+            /// Clears a FAT entry.
             /// </summary>
             /// <param name="aEntryNumber">The entry number.</param>
             public void ClearFatEntry(ulong aEntryNumber)
@@ -186,7 +186,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Gets a fat entry.
+            /// Gets a FAT entry.
             /// </summary>
             /// <param name="aEntryNumber">The entry number.</param>
             /// <param name="aValue">The entry value.</param>
@@ -242,7 +242,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Sets a fat entry.
+            /// Sets a FAT entry.
             /// </summary>
             /// <param name="aEntryNumber">The entry number.</param>
             /// <param name="aValue">The value.</param>
@@ -459,6 +459,8 @@ namespace Cosmos.System.FileSystem.FAT
 
         internal void Read(long aCluster, out byte[] aData, long aSize = 0, long aOffset = 0)
         {
+            Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Read --");
+
             if (aSize == 0)
             {
                 aSize = BytesPerCluster;
@@ -479,6 +481,8 @@ namespace Cosmos.System.FileSystem.FAT
 
         internal void Write(long aCluster, byte[] aData, long aSize = 0, long aOffset = 0)
         {
+            Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Write --");
+
             if (aData == null)
             {
                 throw new ArgumentNullException(nameof(aData));
@@ -494,16 +498,16 @@ namespace Cosmos.System.FileSystem.FAT
             Read(aCluster, out xData);
             //TODO: .Net Core
             //Array.Copy(aData, 0, xData, aOffset, aData.Length);
-            Array.Copy(aData, 0, xData, (int) aOffset, aData.Length);
+            Array.Copy(aData, 0, xData, (int)aOffset, aData.Length);
 
             if (mFatType == FatTypeEnum.Fat32)
             {
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                mDevice.WriteBlock((ulong) xSector, SectorsPerCluster, xData);
+                mDevice.WriteBlock((ulong)xSector, SectorsPerCluster, xData);
             }
             else
             {
-                mDevice.WriteBlock((ulong) aCluster, RootSectorCount, xData);
+                mDevice.WriteBlock((ulong)aCluster, RootSectorCount, xData);
             }
         }
 

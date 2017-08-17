@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using Cosmos.Core.Memory.Old;
 using Cosmos.IL2CPU.API;
+using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs {
     [Plug(Target = typeof(Cosmos.Core.GCImplementation))]
