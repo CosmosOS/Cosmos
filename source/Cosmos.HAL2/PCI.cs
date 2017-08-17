@@ -18,7 +18,6 @@ namespace Cosmos.HAL
         public static void Setup()
         {
             Devices = new List<PCIDevice>();
-
             if ((PCIDevice.GetHeaderType(0x0, 0x0, 0x0) & 0x80) == 0)
             {
                 CheckBus(0x0);
@@ -31,26 +30,6 @@ namespace Cosmos.HAL
                         break;
 
                     CheckBus(fn);
-                }
-            }
-
-            foreach (PCIDevice device in Devices)
-            {
-
-                if (device.ClassCode == 0x01 && device.Subclass == 0x06 && device.ProgIF == 0x01)
-                {
-                    //Serial ATA (AHCI 1.0)
-                    Global.atamode = 1;
-                }
-                else if (device.ClassCode == 0x01 && device.Subclass == 0x04 && device.ProgIF == 0x00)
-                {
-                    //RAID Controller
-                    Global.atamode = 2;
-                }
-                else if (device.ClassCode == 0x01 && device.Subclass == 0x01)
-                {
-                    //IDE Controller
-                    Global.atamode = 3;
                 }
             }
         }
@@ -95,12 +74,12 @@ namespace Cosmos.HAL
             return null;
         }
 
-        public static PCIDevice GetDeviceClass(ushort Class, ushort SubClass)
+        public static PCIDevice GetDevice(ushort VendorID, ushort DeviceID)
         {
             for (int i = 0; i < Devices.Count; i++)
             {
                 var xDevice = Devices[i];
-                if (xDevice.ClassCode == Class && xDevice.Subclass == SubClass)
+                if (xDevice.VendorID == VendorID && xDevice.DeviceID == DeviceID)
                 {
                     return Devices[i];
                 }

@@ -198,6 +198,106 @@ namespace Cosmos.HAL
             WriteRegister16(0x04, command);
         }
 
+        public class DeviceClass
+        {
+            public static string GetString(PCIDevice device)
+            {
+                switch (device.VendorID)
+                {
+                    case 0x1022: //AMD
+                        switch (device.DeviceID)
+                        {
+                            case 0x2000:
+                                return "AMD PCnet LANCE PCI Ethernet Controller";
+                        }
+                        break;
+                    case 0x104B: //Sony
+                        switch (device.DeviceID)
+                        {
+                            case 0x1040:
+                                return "Mylex BT958 SCSI Host Adaptor";
+                        }
+                        break;
+                    case 0x1274: //Ensoniq
+                        switch (device.DeviceID)
+                        {
+                            case 0x1371:
+                                return "Ensoniq AudioPCI";
+                        }
+                        break;
+                    case 0x15AD: //VMware
+                        switch (device.DeviceID)
+                        {
+                            case 0x0405:
+                                return "VMware NVIDIA 9500MGS";
+                            case 0x0770:
+                                return "VMware Standard Enhanced PCI to USB Host Controller";
+                            case 0x0790:
+                                return "VMware 6.0 Virtual USB 2.0 Host Controller";
+                            case 0x07A0:
+                                return "VMware PCI Express Root Port";
+                        }
+                        break;
+                    case 0x8086: //Intel
+                        switch (device.DeviceID)
+                        {
+                            case 0x7190:
+                                return "Intel 440BX/ZX AGPset Host Bridge";
+                            case 0x7191:
+                                return "Intel 440BX/ZX AGPset PCI-to-PCI bridge";
+                            case 0x7110:
+                                return "Intel PIIX4/4E/4M ISA Bridge";
+                            case 0x7112:
+                                return "Intel PIIX4/4E/4M USB Interface";
+                        }
+                        break;
+                }
+
+                switch (device.ClassCode)
+                {
+                    //case 0x00:
+                    //    return "Any device";
+                    case 0x01:
+                        return "Mass Storage Controller";
+                    case 0x02:
+                        return "Network Controller";
+                    case 0x03:
+                        return "Display Controller";
+                    case 0x04:
+                        return "Multimedia Controller";
+                    case 0x05:
+                        return "Memory Controller";
+                    case 0x06:
+                        return "Bridge Device";
+                    case 0x07:
+                        return "Simple Communication Controller";
+                    case 0x08:
+                        return "Base System Peripheral";
+                    case 0x09:
+                        return "Input Device";
+                    case 0x0A:
+                        return "Docking Station";
+                    case 0x0B:
+                        return "Processor";
+                    case 0x0C:
+                        return "Serial Bus Controller";
+                    case 0x0D:
+                        return "Wireless Controller";
+                    case 0x0E:
+                        return "Intelligent I/O Controller";
+                    case 0x0F:
+                        return "Satellite Communication Controller";
+                    case 0x10:
+                        return "Encryption/Decryption Controller";
+                    case 0x11:
+                        return "Data Acquisition and Signal Processing Controller";
+                        //case 0xFF:
+                        //    return "Unkown device";
+                }
+                return "ClassCode: " + device.ClassCode + "     Subclass: " + device.Subclass + "     ProgIF: " + device.ProgIF;
+            }
+        }
+
         private static string ToHex(uint aNumber, byte aBits)
         {
             return "0x" + aNumber.ToHex(aBits / 4);
