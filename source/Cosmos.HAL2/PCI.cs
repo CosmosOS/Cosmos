@@ -61,19 +61,6 @@ namespace Cosmos.HAL
                 CheckBus(xPCIDevice.SecondaryBusNumber);
         }
 
-        public static PCIDevice GetDeviceVendorID(ushort VendorID, ushort DeviceID)
-        {
-            for (int i = 0; i < Devices.Count; i++)
-            {
-                var xDevice = Devices[i];
-                if (xDevice.VendorID == VendorID && xDevice.DeviceID == DeviceID)
-                {
-                    return Devices[i];
-                }
-            }
-            return null;
-        }
-
         public static PCIDevice GetDevice(ushort VendorID, ushort DeviceID)
         {
             for (int i = 0; i < Devices.Count; i++)
