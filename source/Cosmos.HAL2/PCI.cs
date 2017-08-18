@@ -86,5 +86,18 @@ namespace Cosmos.HAL
             }
             return null;
         }
+
+        public static PCIDevice GetDeviceClass(ushort Class, ushort SubClass)
+        {
+            for (int i = 0; i < Devices.Count; i++)
+            {
+                var xDevice = Devices[i];
+                if (xDevice.ClassCode == Class && xDevice.Subclass == SubClass)
+                {
+                    return Devices[i];
+                }
+            }
+            return null;
+        }
     }
 }
