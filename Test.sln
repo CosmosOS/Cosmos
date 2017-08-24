@@ -154,7 +154,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "92 CpuPlug", "92 CpuPlug", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\Spruce\Spruce.csproj", "{FF46829E-B612-4D36-80BE-ED04521AD91A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\XSharp.x86\XSharp.x86.csproj", "{D0EABA08-88C9-4F7C-BCA9-361B58B20D67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\source\XSharp.x86\XSharp.x86.csproj", "{D0EABA08-88C9-4F7C-BCA9-361B58B20D67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
