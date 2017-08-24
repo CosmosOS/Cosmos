@@ -16,8 +16,6 @@ namespace Cosmos.Build.MSBuild
         [Required]
         public string WorkingDir { get; set; }
 
-        private List<string> mAssemblySearchPaths;
-
         public override bool Execute()
         {
             var xSW = Stopwatch.StartNew();

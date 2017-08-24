@@ -10,6 +10,14 @@ init:
     git clone https://github.com/CosmosOS/XSharp.git c:\XSharp --depth 1
     git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
 
+install:
+- ps: |
+    $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
+    mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1"
+    '& "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1" -Version 2.0.0 -InstallDir $env:DOTNET_INSTALL_DIR'
+    $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+
 build_script:
 - cmd: >-
     rem %APPVEYOR_BUILD_FOLDER%
