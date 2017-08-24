@@ -1,5 +1,5 @@
 version: 0.20150918.{build}
-image: Visual Studio 2017 Preview
+image: Visual Studio 2017
 configuration: Debug
 platform: AnyCPU
 shallow_clone: true
@@ -23,15 +23,15 @@ build_script:
     rem %APPVEYOR_BUILD_FOLDER%
 
     
-    nuget restore "Builder.sln"
+    Build\Tools\nuget restore "Builder.sln"
 
-    nuget restore "..\XSharp\XSharp.sln"
+    Build\Tools\nuget restore "..\XSharp\XSharp.sln"
 
-    nuget restore "..\IL2CPU\IL2CPU.sln"
+    Build\Tools\nuget restore "..\IL2CPU\IL2CPU.sln"
 
-    nuget restore "Build.sln"
+    Build\Tools\nuget restore "Build.sln"
 
-    nuget restore "Test.sln"
+    Build\Tools\nuget restore "Test.sln"
 
 
     msbuild "Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
