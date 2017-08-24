@@ -41,9 +41,9 @@ build_script:
     msbuild "Test.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug
 
 
-    dotnet publish source\Cosmos.Build.MSBuild -f net462 -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
+    dotnet publish source\Cosmos.Build.MSBuild -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
 
-    dotnet publish ..\IL2CPU\source\IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
+    dotnet publish ..\IL2CPU\source\IL2CPU -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
 
 
     xcopy /Y "Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
