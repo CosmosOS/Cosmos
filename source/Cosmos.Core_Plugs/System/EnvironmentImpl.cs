@@ -8,7 +8,7 @@ namespace Cosmos.Core_Plugs.System
 {
     // System.Private.CoreLib, internal
     [Plug(TargetName = "System.Environment, System.Private.CoreLib")]
-    public static class EnvironmentImpl
+    public static class InternalEnvironmentImpl
     {
         public static void CCtor()
         {
