@@ -6,7 +6,7 @@ using System.Text;
 
 using Microsoft.Win32;
 
-namespace Cosmos.Debug.Common
+namespace Cosmos.Build.Common
 {
     /// <summary>An helper class that is used from both Cosmos.VS.ProjectSystem and Cosmos.VS.DebugEngine for
     /// Bochs emulator support.</summary>

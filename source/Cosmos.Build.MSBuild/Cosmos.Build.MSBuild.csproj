@@ -23,8 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-    <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
-    <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj" />
+    <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj" />
   </ItemGroup>
   
   <Target Name="ExcludeSystemDataCommon" AfterTargets="ImplicitlyExpandNETStandardFacades">
