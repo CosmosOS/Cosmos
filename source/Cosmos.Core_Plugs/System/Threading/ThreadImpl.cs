@@ -32,5 +32,15 @@ namespace Cosmos.Core_Plugs.System.Threading
         //        else if (ms < 0)
         //            throw new ThreadInterruptedException();
         //    }
+
+        public static void Sleep(int ms)
+        {
+            if (ms < -1)
+            {
+                throw new ArgumentOutOfRangeException("ms");
+            }
+
+            new PIT().Wait(ms);
+        }
     }
 }
