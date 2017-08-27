@@ -28,7 +28,7 @@
   
   <Target Name="ExcludeSystemDataCommon" AfterTargets="ImplicitlyExpandNETStandardFacades">
     <ItemGroup>
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="%(Filename) == 'System.Data.Common'" />
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'System.Data.Common'" />
     </ItemGroup>
   </Target>
 
