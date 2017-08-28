@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,17 +10,22 @@ namespace Cosmos.Core_Plugs.System
     [Plug(TargetName = "System.Environment, System.Private.CoreLib")]
     public static class InternalEnvironmentImpl
     {
-        public static void CCtor()
-        {
-        }
+        public static void CCtor() {}
     }
 
     // System.Runtime.Extensions, public
     [Plug(typeof(Environment))]
     public static class EnvironmentImpl
     {
-        public static void CCtor()
+        public static void CCtor() {}
+
+        public static String NewLine
         {
+            get
+            {
+                Contract.Ensures(Contract.Result<String>() != null);
+                return "\r\n";
+            }
         }
     }
 }
