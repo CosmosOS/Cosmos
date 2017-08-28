@@ -15,5 +15,7 @@ namespace Cosmos.Core_Plugs.System.Diagnostics.Contracts
         }
 
         public static T Result<T>() { return default(T); }
+      
+        public static void EndContractBlock() { }
     }
 }
