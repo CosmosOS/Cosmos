@@ -443,8 +443,6 @@ namespace Cosmos.Debug.Symbols
             BulkInsert("LOCAL_ARGUMENT_INFOS", aInfos, aFlush: true);
         }
 
-      private static int DataDumpIndex;
-
         // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
         // SqlBulk operations are on average 15x faster. So we use a hybrid approach by using the entities as containers
         // and EntityDataReader to bridge the gap to SqlBulk.

@@ -38,5 +38,11 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         {
             throw new NotImplementedException();
         }
+
+        // TODO: Implement this correctly
+        public static bool IsReferenceOrContainsReferences<T>()
+        {
+            return false;
+        }
     }
 }
