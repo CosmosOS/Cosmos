@@ -23,6 +23,6 @@ namespace Cosmos.Core_Plugs.System
         {
         }
         
-        public static string NewLine => return "\n";
+        public static string NewLine => "\n";
     }
 }
