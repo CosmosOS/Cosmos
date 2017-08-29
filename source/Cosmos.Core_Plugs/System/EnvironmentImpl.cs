@@ -22,5 +22,7 @@ namespace Cosmos.Core_Plugs.System
         public static void CCtor()
         {
         }
+        
+        public static string NewLine => return "\n";
     }
 }
