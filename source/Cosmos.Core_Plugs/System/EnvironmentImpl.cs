@@ -19,13 +19,6 @@ namespace Cosmos.Core_Plugs.System
     {
         public static void CCtor() {}
 
-        public static String NewLine
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<String>() != null);
-                return "\r\n";
-            }
-        }
+        public static String NewLine => "\n"
     }
 }
