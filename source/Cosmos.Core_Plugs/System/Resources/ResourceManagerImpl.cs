@@ -19,7 +19,7 @@ namespace Cosmos.Core_Plugs.System.Resources
 
         public static string GetString(string aString)
         {
-            return EnvironmentImpl.GetResourceString(aString);
+            return SRImpl.InternalGetResourceString(aString);
         }
     }
 }

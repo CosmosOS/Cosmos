@@ -1,0 +1,21 @@
+<Project>
+
+    <PropertyGroup>
+        <!--
+            This property should exist, according to the docs, but it has no effect on pack.
+        -->
+        <PackageVersionPrefix>$([System.DateTime]::Now.ToString("yyyy.MM.dd"))</PackageVersionPrefix>
+        <PackageVersion Condition="$(PackageVersionPrefix) != '' and $(VersionSuffix) != ''">$(PackageVersionPrefix)-$(VersionSuffix)</PackageVersion>
+        <PackageVersion Condition="$(PackageVersionPrefix) != '' and $(VersionSuffix) == ''">$(PackageVersionPrefix)</PackageVersion>
+        <Authors>Cosmos</Authors>
+        <Company>Cosmos</Company>
+        <Copyright>Copyright © 2007-$([System.DateTime]::Now.Year) COSMOS Project</Copyright>
+        <PackageIconUrl>https://github.com/CosmosOS/Cosmos/raw/master/Artwork/Cosmos.ico</PackageIconUrl>
+        <PackageProjectUrl>http://www.gocosmos.org</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt</PackageLicenseUrl>
+        <PackageTags>Cosmos OS Operating System .NET C# VB VB.NET F#</PackageTags>
+        <RepositoryUrl>https://github.com/CosmosOS/Cosmos</RepositoryUrl>
+        <CosmosDescription>Cosmos is an operating system "construction kit". Build your own OS using managed languages such as C#, VB.NET, and more!</CosmosDescription>
+    </PropertyGroup>
+
+</Project>

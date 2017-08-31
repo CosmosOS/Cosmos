@@ -1,18 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard1.5</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+        <PackageReference Include="System.IO.Ports" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+        <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
     </ItemGroup>
 
 </Project>
