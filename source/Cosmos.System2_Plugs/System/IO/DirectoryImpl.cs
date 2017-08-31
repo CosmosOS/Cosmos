@@ -23,17 +23,6 @@ namespace Cosmos.System_Plugs.System.IO
             return mCurrentDirectory;
         }
 
-        public static string GetParent(string path)
-        {
-            char[] delimiter = { '\\', '/' };
-            string[] CurrentDirectoryArray = mCurrentDirectory.Split(delimiter);
-
-            string DirectoryParentWithSlash = mCurrentDirectory.Replace(CurrentDirectoryArray[CurrentDirectoryArray.Length - 1], "");
-            string mDirectoryParent = DirectoryParentWithSlash.Remove(DirectoryParentWithSlash.Length - 1);
-
-            return mDirectoryParent;
-        }
-
         public static void SetCurrentDirectory(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal($"Directory.SetCurrentDirectory : aPath = {aPath}");
