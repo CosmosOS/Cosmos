@@ -4,6 +4,9 @@
     <CopyBuildOutputToOutputDirectory>False</CopyBuildOutputToOutputDirectory>
     <DisableImplicitFrameworkReferences>True</DisableImplicitFrameworkReferences>
     <ImplicitlyExpandDesignTimeFacades>False</ImplicitlyExpandDesignTimeFacades>
+    <ImplicitlyExpandNETStandardFacades>False</ImplicitlyExpandNETStandardFacades>
+    <DesignTimeBuild>True</DesignTimeBuild>
+    <ProjectAssetsFile>NULL</ProjectAssetsFile>
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
 

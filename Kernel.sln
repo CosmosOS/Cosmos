@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel G2", "Kernel G2", "{9A923E6F-FF63-4F02-A4EA-C2D44F9323FD}"
 EndProject
@@ -72,7 +72,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "..\IL2CPU\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{67FD9912-CE63-4EB2-880C-F4F0D9AED7CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{4E9B8F31-AEA0-402D-9B3A-223100F2156D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "..\IL2CPU\source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{4E9B8F31-AEA0-402D-9B3A-223100F2156D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Plugs.TapRoot", "source\Kernel-X86\91-Plugs\Cosmos.Plugs.TapRoot\Cosmos.Plugs.TapRoot.csproj", "{BEEDA0BE-0105-40BF-BD8D-7F6A2BC3B05C}"
 EndProject
@@ -97,6 +97,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "91 Plug", "91 Plug", "{1B2F7229-B8F1-4F40-966A-AA8C2DC30A54}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "92 CpuPlug", "92 CpuPlug", "{AD495579-C209-48FA-8F0F-633D22438DDD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\Spruce\Spruce.csproj", "{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\source\XSharp.x86\XSharp.x86.csproj", "{7370A62F-12DA-4181-BE3B-009D0926CA7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -354,6 +358,22 @@ Global
 		{B612BDBD-DF82-43DB-873D-AA6F2E9369A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B612BDBD-DF82-43DB-873D-AA6F2E9369A5}.Release|x86.ActiveCfg = Release|Any CPU
 		{B612BDBD-DF82-43DB-873D-AA6F2E9369A5}.Release|x86.Build.0 = Release|Any CPU
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Debug|x86.Build.0 = Debug|Any CPU
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Release|x86.ActiveCfg = Release|Any CPU
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Release|x86.Build.0 = Release|Any CPU
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E}.Debug|x86.Build.0 = Debug|Any CPU
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E}.Release|x86.ActiveCfg = Release|Any CPU
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -401,5 +421,10 @@ Global
 		{B612BDBD-DF82-43DB-873D-AA6F2E9369A5} = {5FF9BF2A-5162-4F12-82B6-1693AD776636}
 		{1B2F7229-B8F1-4F40-966A-AA8C2DC30A54} = {00F0CA9C-51B2-4E99-B4D9-DD24D488D3FC}
 		{AD495579-C209-48FA-8F0F-633D22438DDD} = {00F0CA9C-51B2-4E99-B4D9-DD24D488D3FC}
+		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
+		{7370A62F-12DA-4181-BE3B-009D0926CA7E} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1A1E8F1D-82B3-471F-9B59-0350DEA9203D}
 	EndGlobalSection
 EndGlobal

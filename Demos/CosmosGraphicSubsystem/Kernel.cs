@@ -70,12 +70,17 @@ namespace Cosmos_Graphic_Subsytem
                 pen.Color = Color.LimeGreen;
                 canvas.DrawRectangle(pen, 450, 450, 80, 60);
 
+                /* A filled rectange */
+                pen.Color = Color.Chocolate;
+                canvas.DrawFilledRectangle(pen, 200, 150, 400, 300);
+
                 /*
                  * It will be really beautiful to do here:
                  * canvas.DrawString(pen, "Please press any key to end the Demo...");
                  */
                 Console.ReadKey();
-                Stop();
+
+                Sys.Power.Shutdown();
             }
             catch (Exception e)
             {

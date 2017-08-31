@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
 {
-    [Plug(TargetName = "System.RuntimeType", IsMicrosoftdotNETOnly = true)]
+    [Plug(TargetName = "System.RuntimeType")]
     public static class RuntimeType
     {
         [PlugMethod(Signature = "System_RuntimeType_RuntimeTypeCache__System_RuntimeType_get_Cache__")]
