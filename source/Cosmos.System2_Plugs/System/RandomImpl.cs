@@ -4,6 +4,19 @@ using Cosmos.HAL;
 
 namespace Cosmos.System_Plugs.System
 {
+    //System.Private.CoreLib, Other methods
+    [Plug(TargetName = "System.Random, System.Private.CoreLib")]
+    public class CoreLibRandomImpl
+    {
+        public static void Cctor() 
+        {
+            
+        }
+        
+        public static void GenerateGlobalSeed(Random aThis) {
+            return 21; // Random value 
+        }
+    }
     [Plug(Target = typeof(Random))]
     public class RandomImpl
     {
