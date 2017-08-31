@@ -13,7 +13,7 @@ namespace Cosmos.System_Plugs.System
             
         }
         
-        public static void GenerateGlobalSeed(Random aThis) {
+        public static int GenerateGlobalSeed(Random aThis) {
             return 21; // Random value 
         }
     }
