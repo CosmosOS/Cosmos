@@ -162,11 +162,48 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void Copy(string srcFile, string destFile)
         {
-            using (var xFS = new FileStream(srcFile, FileMode.Open))
+            if (File.Exists(destFile))
             {
-                var xBuff = new byte[(int)xFS.Length];
-                var yFS = new FileStream(destFile, FileMode.Create);
-                yFS.Write(xBuff, 0, xBuff.Length);
+                throw new IOException();
+            }
+            else
+            {
+                using (var xFS = new FileStream(srcFile, FileMode.Open))
+                {
+                    var xBuff = new byte[(int)xFS.Length];
+                    var yFS = new FileStream(destFile, FileMode.Create);
+                    yFS.Write(xBuff, 0, xBuff.Length);
+                }
+            }
+        }
+
+        public static void Copy(string srcFile, string destFile, bool overwriting)
+        {
+            if (File.Exists(destFile))
+            {
+                if (overwriting)
+                {
+                    File.Delete(destFile);
+                    using (var xFS = new FileStream(srcFile, FileMode.Open))
+                    {
+                        var xBuff = new byte[(int)xFS.Length];
+                        var yFS = new FileStream(destFile, FileMode.Create);
+                        yFS.Write(xBuff, 0, xBuff.Length);
+                    }
+                }
+                else
+                {
+                    throw new IOException();
+                }
+            }
+            else
+            {
+                using (var xFS = new FileStream(srcFile, FileMode.Open))
+                {
+                    var xBuff = new byte[(int)xFS.Length];
+                    var yFS = new FileStream(destFile, FileMode.Create);
+                    yFS.Write(xBuff, 0, xBuff.Length);
+                }
             }
         }
 
