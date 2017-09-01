@@ -120,18 +120,25 @@ namespace Cosmos.System_Plugs.System.IO
             return result;
         }
 
-        public static void WriteAllLines(string aFile, IEnumerable<string> contents)
+      /* public static void WriteAllLines(string aFile, IEnumerable<string> contents)
+       * {
+       *    string text = null;
+       *
+       *    foreach (var line in contents)
+       *    {
+       *        text = string.Concat(text, line, Environment.NewLine);
+       *    }
+       *
+       *    Global.mFileSystemDebugger.SendInternal("Writing contents");
+       *    Global.mFileSystemDebugger.SendInternal(text);
+       *
+       *    WriteAllText(aFile, text);
+       * }
+       */
+        
+        public static void WriteAllLines(string aFile, string[] contents)
         {
-            string text = null;
-
-            foreach (var line in contents)
-            {
-                text = string.Concat(text, line, Environment.NewLine);
-            }
-
-            Global.mFileSystemDebugger.SendInternal("Writing contents");
-            Global.mFileSystemDebugger.SendInternal(text);
-
+            string text = String.Join(Environment.NewLine, contents);
             WriteAllText(aFile, text);
         }
 
