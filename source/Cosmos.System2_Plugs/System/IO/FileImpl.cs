@@ -139,6 +139,8 @@ namespace Cosmos.System_Plugs.System.IO
         public static void WriteAllLines(string aFile, string[] contents)
         {
             string text = String.Join(Environment.NewLine, contents);
+            Global.mFileSystemDebugger.SendInternal("Writing contents");
+            Global.mFileSystemDebugger.SendInternal(text);
             WriteAllText(aFile, text);
         }
 
