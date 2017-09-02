@@ -162,47 +162,30 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void Copy(string srcFile, string destFile)
         {
-            if (File.Exists(destFile))
+            try
             {
-                throw new IOException();
+                byte[] srcFileBytes = File.ReadAllBytes(srcFile);
+                File.WriteAllBytes(destFile, srcFileBytes);
             }
-            else
+            catch (IOException ioEx)
             {
-                using (var xFS = new FileStream(srcFile, FileMode.Open))
-                {
-                    var xBuff = new byte[(int)xFS.Length];
-                    var yFS = new FileStream(destFile, FileMode.Create);
-                    yFS.Write(xBuff, 0, xBuff.Length);
-                }
+                throw new IOException("File Copy", ioEx);
             }
         }
 
         public static void Copy(string srcFile, string destFile, bool overwriting)
         {
-            if (File.Exists(destFile))
+            if (overwriting)
             {
-                if (overwriting)
+                File.Delete(destFile);
+                try
                 {
-                    File.Delete(destFile);
-                    using (var xFS = new FileStream(srcFile, FileMode.Open))
-                    {
-                        var xBuff = new byte[(int)xFS.Length];
-                        var yFS = new FileStream(destFile, FileMode.Create);
-                        yFS.Write(xBuff, 0, xBuff.Length);
-                    }
+                    byte[] srcFileBytes = File.ReadAllBytes(srcFile);
+                    File.WriteAllBytes(destFile, srcFileBytes);
                 }
-                else
+                catch (IOException ioEx)
                 {
-                    throw new IOException();
-                }
-            }
-            else
-            {
-                using (var xFS = new FileStream(srcFile, FileMode.Open))
-                {
-                    var xBuff = new byte[(int)xFS.Length];
-                    var yFS = new FileStream(destFile, FileMode.Create);
-                    yFS.Write(xBuff, 0, xBuff.Length);
+                    throw new IOException("File Copy", ioEx);
                 }
             }
         }
