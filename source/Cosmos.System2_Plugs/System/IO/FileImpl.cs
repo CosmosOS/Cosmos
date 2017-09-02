@@ -177,7 +177,15 @@ namespace Cosmos.System_Plugs.System.IO
         {
             if (overwriting)
             {
-                File.Delete(destFile);
+                if (File.Exists(destFile))
+                {
+                    File.Delete(destFile);
+                }
+                else
+                {
+                    throw new FileNotFoundException();
+                }
+
                 try
                 {
                     byte[] srcFileBytes = File.ReadAllBytes(srcFile);
@@ -201,6 +209,10 @@ namespace Cosmos.System_Plugs.System.IO
                     {
                         throw new IOException("File Copy", ioEx);
                     }
+                }
+                else
+                {
+                    throw new IOException("destFileName exists and overwrite is false.");
                 }
             }
         }
