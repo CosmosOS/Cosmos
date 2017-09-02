@@ -8,7 +8,7 @@ using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.Core_Plugs.System
 {
-    [Plug(Target = typeof(string), IsMicrosoftdotNETOnly = true)]
+    [Plug(Target = typeof(string))]
     public static class StringImpl
     {
         internal static Debugger mDebugger = new Debugger("Core", "String Plugs");

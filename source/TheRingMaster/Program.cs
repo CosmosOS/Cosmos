@@ -20,8 +20,8 @@ namespace TheRingMaster
             HAL = 30,
             System = 40,
             Application = 50,
-            Shared = 90,
-            Plugs = 91,
+            Plug = 91,
+            CpuPlug = 92,
             Debug
         }
 
@@ -124,7 +124,7 @@ namespace TheRingMaster
                     throw new Exception(xExceptionMessage);
                 }
 
-                if (xRing != Ring.CPU && xRing != Ring.Plugs)
+                if (xRing != Ring.CPU && xRing != Ring.CpuPlug)
                 {
                     foreach (var xModule in aAssembly.Modules)
                     {
@@ -134,7 +134,7 @@ namespace TheRingMaster
 
                 foreach (var xType in aAssembly.GetTypes())
                 {
-                    if (xRing != Ring.Plugs)
+                    if (xRing != Ring.Plug)
                     {
                         if (xType.GetTypeInfo().GetCustomAttribute<Plug>() != null)
                         {

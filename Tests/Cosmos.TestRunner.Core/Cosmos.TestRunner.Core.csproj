@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     
     <PropertyGroup>
-        <TargetFramework>netstandard1.5</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
@@ -30,7 +30,7 @@
     <ItemGroup>
         <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
         <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
-        <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.Hosts
