@@ -188,6 +188,21 @@ namespace Cosmos.System_Plugs.System.IO
                     throw new IOException("File Copy", ioEx);
                 }
             }
+            else
+            {
+                if (!File.Exists(destFile))
+                {
+                    try
+                    {
+                        byte[] srcFileBytes = File.ReadAllBytes(srcFile);
+                        File.WriteAllBytes(destFile, srcFileBytes);
+                    }
+                    catch (IOException ioEx)
+                    {
+                        throw new IOException("File Copy", ioEx);
+                    }
+                }
+            }
         }
 
         public static void Delete(string aPath)
