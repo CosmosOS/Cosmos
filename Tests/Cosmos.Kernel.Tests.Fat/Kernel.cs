@@ -50,6 +50,7 @@ namespace Cosmos.Kernel.Tests.Fat
                 TestStreamReader();
                 TestBinaryWriter();
                 TestBinaryReader();
+                TestCopy();
 
                 TestController.Completed();
             }
@@ -525,6 +526,24 @@ namespace Cosmos.Kernel.Tests.Fat
         #endregion
 
         #region System.IO.File Tests
+
+        private void TestCopy()
+        {
+            mDebugger.Send("START TEST: Copy a file:");
+            File.Copy(@"0:\Kudzu.txt", @"0:\Kudzu2.txt");
+            if (File.Exists(@"0:\Kudzu2.txt"))
+            {
+                mDebugger.Send(" The new file has been created, reading...");
+                string KudzuTxtContent = File.ReadAllText(@"0:\Kudzu.txt");
+                string Kudzu2TxtContent = File.ReadAllText(@"0:\Kudzu2.txt");
+
+                if (Kudzu2TxtContent == KudzuTxtContent)
+                {
+                    mDebugger.Send("Same content, the file has been copied succesfull");
+                }
+            }
+            mDebugger.Send("END TEST");
+        }
 
         /// <summary>
         /// Tests System.IO.File plugs.
