@@ -178,7 +178,7 @@ namespace Cosmos.System_Plugs.System.IO
                 }
                 else
                 {
-                    throw new FileNotFoundException();
+                    throw new IOException("File not found !");
                 }
 
                 try
