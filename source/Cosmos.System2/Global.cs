@@ -41,6 +41,16 @@ namespace Cosmos.System
             set { KeyboardManager.ScrollLock = value; }
         }
 
+        public static void UpArrow()
+        {
+            Console.WriteLine("up");
+        }
+
+        public static void DownArrow()
+        {
+            Console.WriteLine("down");
+        }
+
         public static void Init(TextScreenBase textScreen)
         {
             // We must init Console before calling Inits.

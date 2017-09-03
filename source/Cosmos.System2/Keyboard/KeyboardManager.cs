@@ -108,6 +108,29 @@ namespace Cosmos.System
                     Power.Reboot();
                 }
 
+                if (ControlPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.C))
+                {
+                    Global.Console.Clear();
+                }
+
+                if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.UpArrow))
+                {
+                    Global.UpArrow();
+                }
+
+                if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.DownArrow))
+                {
+                    Global.DownArrow();
+                }
+
+                //if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.D2))
+                //{
+                //    if (!CapsLock)
+                //    {
+                //        Global.Console.Write("é");
+                //    }
+                //}
+
                 if (!aReleased)
                 {
                     KeyEvent keyInfo;
