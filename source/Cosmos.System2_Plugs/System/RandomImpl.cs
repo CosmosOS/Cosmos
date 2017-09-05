@@ -13,28 +13,36 @@ namespace Cosmos.Core_Plugs.System
     [Plug(TargetName = "System.Random, System.Private.CoreLib")]
     public static class RandomImpl
     {
+        public static int globalSeed;
+
         public static void Cctor()
         {
+            // Empty
         }
 
         public static void Ctor(Random aThis)
         {
+            next = (ulong)GenerateGlobalSeed();
+            //next = (ulong)GenerateSeed();
         }
 
         public static void Ctor(Random aThis, int Seed)
         {
-
+            globalSeed = Seed;
         }
 
         public static int GenerateGlobalSeed()
         {
-            throw new NotImplementedException("GenerateGlobalSeed() not implemented yet");
+            Random aThis = new Random();
+            byte[] randomByte = new byte[Next(aThis)];
+            NextBytes(aThis, randomByte);
+            uint randomInteger = Cosmos.Common.Extensions.ByteConverter.ToUInt32(randomByte, 0);
+            return (int)randomInteger;
         }
-        
 
         public static int Next(Random aThis)
         {
-            return (int)(Sample() * 2147483647);
+            return (int)(Next(aThis, 2147483647));
         }
 
         public static int Next(Random aThis, int maxValue)
@@ -85,17 +93,17 @@ namespace Cosmos.Core_Plugs.System
             num2 += 2147483646.0;
             return num2 / 4294967293.0;
         }
-        static ulong next = 1;
+        static ulong next;
 
         public static double Sample()
         {
-            next = next * 1103515245 + 12345;
-            uint seed = (uint)next;
-            uint m_w = (uint)(seed >> 16);
+            if (next != 0) SampleSeed(globalSeed);
+            uint seed = (uint)next + 1;
+            uint m_w = seed >> 16;
             uint m_z = (uint)(seed % 4294967296);
             m_z = 36969 * (m_z & 65535) + (m_z >> 16);
             m_w = 18000 * (m_w & 65535) + (m_w >> 16);
-            uint u = (m_z << 16) + m_w;
+            var u = (m_z << 16) + m_w;
             double uniform = (u + 1.0) * 2.328306435454494e-10;
             return uniform;
         }
@@ -104,10 +112,10 @@ namespace Cosmos.Core_Plugs.System
         {
             next = (ulong)Seed;
             uint seed = (uint)next;
-            uint m_w = (uint)(seed >> 16);
+            uint m_w = seed >> 16;
             uint m_z = (uint)(seed % 4294967296);
-            m_z = 36969 * (m_z & 65535) + (m_z >> 16);
-            m_w = 18000 * (m_w & 65535) + (m_w >> 16);
+            // m_z = 36969 * (m_z & 65535) + (m_z >> 16);
+            // m_w = 18000 * (m_w & 65535) + (m_w >> 16);
             uint u = (m_z << 16) + m_w;
             double uniform = (u + 1.0) * 2.328306435454494e-10;
             return uniform;
