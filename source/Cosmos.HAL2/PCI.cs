@@ -8,75 +8,83 @@ namespace Cosmos.HAL
 {
     public class PCI
     {
-        private static List<PCIDevice> devices;
-        internal static Debugger mDebugger = new Debugger("HAL", "PCI");
+        private static List<PCIDevice> Devices;
+
+        public static uint Count
+        {
+            get { return (uint)Devices.Count; }
+        }
 
         public static void Setup()
         {
-            EnumerateDevices();
-        }
-
-        public static PCIDevice GetDevice(ushort VendorID, ushort DeviceID)
-        {
-            for (int i = 0; i < devices.Count; i++)
+            Devices = new List<PCIDevice>();
+            if ((PCIDevice.GetHeaderType(0x0, 0x0, 0x0) & 0x80) == 0)
             {
-                if (devices[i].VendorID == VendorID && devices[i].DeviceID == DeviceID)
-                    return devices[i];
+                CheckBus(0x0);
             }
-            return null;
-        }
-
-        private static void EnumerateDevices()
-        {
-            devices = new List<PCIDevice>();
-            //EnumerateBus(0, 0);
-        }
-
-        private static void EnumerateBus(uint xBus, uint step)
-        {
-            for (uint xDevice = 0; xDevice < 32; xDevice++)
+            else
             {
-                PCIDevice xPCIDevice = new PCIDevice(xBus, xDevice, 0x00);
-                if (xPCIDevice.DeviceExists)
+                for (ushort fn = 0; fn < 8; fn++)
                 {
-                    if (xPCIDevice.HeaderType == PCIDevice.PCIHeaderType.Bridge)
+                    if (PCIDevice.GetVendorID(0x0, 0x0, fn) != 0xFFFF)
+                        break;
+
+                    CheckBus(fn);
+                }
+            }
+        }
+
+        private static void CheckBus(ushort xBus)
+        {
+            for (ushort device = 0; device < 32; device++)
+            {
+                if (PCIDevice.GetVendorID(xBus, device, 0x0) == 0xFFFF)
+                    continue;
+
+                CheckFunction(new PCIDevice(xBus, device, 0x0));
+                if ((PCIDevice.GetHeaderType(xBus, device, 0x0) & 0x80) != 0)
+                {
+                    for (ushort fn = 1; fn < 8; fn++)
                     {
-                        for (uint xFunction = 0; xFunction < 8; xFunction++)
-                        {
-                            xPCIDevice = new PCIDevice(xBus, xDevice, xFunction);
-                            if (xPCIDevice.DeviceExists)
-                                AddDevice(new PCIDeviceBridge(xBus, xDevice, xFunction), step);
-                        }
-                    }
-                    else if (xPCIDevice.HeaderType == PCIDevice.PCIHeaderType.Cardbus)
-                    {
-                        AddDevice(new PCIDeviceCardbus(xBus, xDevice, 0x00), step);
-                    }
-                    else
-                    {
-                        AddDevice(new PCIDeviceNormal(xBus, xDevice, 0x00), step);
+                        if (PCIDevice.GetVendorID(xBus, device, fn) != 0xFFFF)
+                            CheckFunction(new PCIDevice(xBus, device, fn));
                     }
                 }
             }
         }
 
-        private static void AddDevice(PCIDevice device, uint step)
+        private static void CheckFunction(PCIDevice xPCIDevice)
         {
-            Console.WriteLine("Adding PCIDevice");
-            string str = "";
-            for (int i = 0; i < step; i++)
+            Devices.Add(xPCIDevice);
+
+            if (xPCIDevice.ClassCode == 0x6 && xPCIDevice.Subclass == 0x4)
+                CheckBus(xPCIDevice.SecondaryBusNumber);
+        }
+
+        public static PCIDevice GetDevice(ushort VendorID, ushort DeviceID)
+        {
+            for (int i = 0; i < Devices.Count; i++)
             {
-                str += "     ";
+                var xDevice = Devices[i];
+                if (xDevice.VendorID == VendorID && xDevice.DeviceID == DeviceID)
+                {
+                    return Devices[i];
+                }
             }
-            var xText = str + device.bus + ":" + device.slot + ":" + device.function + "   " + PCIDevice.DeviceClass.GetString(device);
-            mDebugger.Send(xText);
-            Console.WriteLine(xText);
-            devices.Add(device);
-            if (device is PCIDeviceBridge)
+            return null;
+        }
+
+        public static PCIDevice GetDeviceClass(ushort Class, ushort SubClass)
+        {
+            for (int i = 0; i < Devices.Count; i++)
             {
-                var xDevice = device as PCIDeviceBridge;
-                EnumerateBus((xDevice).SecondaryBusNumber, step + 1);
+                var xDevice = Devices[i];
+                if (xDevice.ClassCode == Class && xDevice.Subclass == SubClass)
+                {
+                    return Devices[i];
+                }
             }
+            return null;
         }
     }
 }
