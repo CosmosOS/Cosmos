@@ -22,7 +22,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static void Ctor(Random aThis)
         {
-            next = (ulong)GenerateGlobalSeed();
+            next = 42;
             //next = (ulong)GenerateSeed();
         }
 
