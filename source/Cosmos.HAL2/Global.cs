@@ -1,5 +1,5 @@
-﻿using System;
-
+using System;
+using Cosmos.HAL.Drivers.PCI.SATA;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
@@ -15,6 +15,13 @@ namespace Cosmos.HAL
 
     public static TextScreenBase TextScreen = new TextScreen();
     public static PCI Pci;
+    public static SATAControllerMode SATAMode;
+    public enum SATAControllerMode
+    {
+      AHCI,
+      RAID,
+      IDE,
+    };
 
     static public void Init(TextScreenBase textScreen)
     {
@@ -35,6 +42,7 @@ namespace Cosmos.HAL
       //TODO: Since this is FCL, its "common". Otherwise it should be
       // system level and not accessible from Core. Need to think about this
       // for the future.
+      Console.Clear();
 
       Console.WriteLine("Finding PCI Devices");
       mDebugger.Send("PCI Devices");
@@ -46,81 +54,32 @@ namespace Cosmos.HAL
 
       mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
-      mDebugger.Send("ATA Primary Master");
-      InitAta(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-
-      //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum?
-      // They do show up in PCI space as well as the fixed space.
-      // Or is it always here, and was our compiler stack corruption issue?
-      mDebugger.Send("ATA Secondary Master");
-      InitAta(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-      //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
-      
+      switch(SATAMode) // Detect what SATA Controller Mode is in:
+      {
+        case SATAControllerMode.AHCI: // SATA-native (AHCI) Mode
+         mDebugger.Send("AHCI Controller Detected, Initializing");
+         AHCI.InitSATA();
+         break;
+        case SATAControllerMode.RAID: // RAID Mode
+          // TODO: Initialize Raid Driver here
+          break;
+        case SATAControllerMode.IDE: // IDE Mode
+          mDebugger.Send("ATA Primary Master");
+          IDE.InitAta(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
+          
+          //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum?
+          // They do show up in PCI space as well as the fixed space.
+          // Or is it always here, and was our compiler stack corruption issue?
+          mDebugger.Send("ATA Secondary Master");
+          IDE.InitAta(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
+          //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
+          break;
+      }
     }
 
     public static void EnableInterrupts()
     {
       CPU.EnableInterrupts();
-    }
-
-    private static void InitAta(Ata.ControllerIdEnum aControllerID,
-                                Ata.BusPositionEnum aBusPosition)
-    {
-      var xIO = aControllerID == Ata.ControllerIdEnum.Primary
-                  ? Core.Global.BaseIOGroups.ATA1
-                  : Core.Global.BaseIOGroups.ATA2;
-      var xATA = new AtaPio(xIO, aControllerID, aBusPosition);
-      if (xATA.DriveType == AtaPio.SpecLevel.Null)
-      {
-        return;
-      }
-      if (xATA.DriveType == AtaPio.SpecLevel.ATA)
-      {
-        BlockDevice.BlockDevice.Devices.Add(xATA);
-        Ata.AtaDebugger.Send("ATA device with speclevel ATA found.");
-      }
-      else
-      {
-        //Ata.AtaDebugger.Send("ATA device with spec level " + (int)xATA.DriveType +
-        //                     " found, which is not supported!");
-        return;
-      }
-      var xMbrData = new byte[512];
-      xATA.ReadBlock(0UL, 1U, xMbrData);
-      var xMBR = new MBR(xMbrData);
-
-      if (xMBR.EBRLocation != 0)
-      {
-        //EBR Detected
-        var xEbrData = new byte[512];
-        xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
-        var xEBR = new EBR(xEbrData);
-
-        for (int i = 0; i < xEBR.Partitions.Count; i++)
-        {
-          //var xPart = xEBR.Partitions[i];
-          //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-          //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-        }
-      }
-
-      // TODO Change this to foreach when foreach is supported
-      Ata.AtaDebugger.Send("Number of MBR partitions found:");
-      Ata.AtaDebugger.SendNumber(xMBR.Partitions.Count);
-      for (int i = 0; i < xMBR.Partitions.Count; i++)
-      {
-        var xPart = xMBR.Partitions[i];
-        if (xPart == null)
-        {
-          Console.WriteLine("Null partition found at idx: " + i);
-        }
-        else
-        {
-          var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
-          BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-          Console.WriteLine("Found partition at idx" + i);
-        }
-      }
     }
 
     public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
