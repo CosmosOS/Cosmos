@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +18,7 @@ namespace Cosmos.HAL
         public static void Setup()
         {
             Devices = new List<PCIDevice>();
+
             if ((PCIDevice.GetHeaderType(0x0, 0x0, 0x0) & 0x80) == 0)
             {
                 CheckBus(0x0);
@@ -30,6 +31,26 @@ namespace Cosmos.HAL
                         break;
 
                     CheckBus(fn);
+                }
+            }
+
+            foreach (PCIDevice device in Devices)
+            {
+
+                if (device.ClassCode == 0x01 && device.Subclass == 0x06 && device.ProgIF == 0x01)
+                {
+                    //Serial ATA (AHCI 1.0)
+                    Global.SATAMode = Global.SATAControllerMode.AHCI;
+                }
+                else if (device.ClassCode == 0x01 && device.Subclass == 0x04 && device.ProgIF == 0x00)
+                {
+                    //RAID Controller
+                    Global.SATAMode = Global.SATAControllerMode.RAID;
+                }
+                else if (device.ClassCode == 0x01 && device.Subclass == 0x01)
+                {
+                    //IDE Controller
+                    Global.SATAMode = Global.SATAControllerMode.IDE;
                 }
             }
         }
@@ -88,3 +109,4 @@ namespace Cosmos.HAL
         }
     }
 }
+
