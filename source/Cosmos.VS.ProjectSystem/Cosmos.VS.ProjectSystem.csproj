@@ -371,6 +371,10 @@
         <IncludeInVSIX>True</IncludeInVSIX>
         <VSIXSubPath>/</VSIXSubPath>
       </Content>
+      <Content Include="..\..\packages\System.Data.Common.4.1.0\lib\net451\System.Data.Common.dll">
+        <IncludeInVSIX>True</IncludeInVSIX>
+        <VSIXSubPath>/</VSIXSubPath>
+      </Content>
     </ItemGroup>
   </Target>
   <Import Project="$(ProjectBasePath)\ProjectBase.Files" />

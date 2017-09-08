@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "so
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Hosts", "source\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj", "{C9826909-2E5E-4453-93FA-B6BE4503DF02}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{ECC4319F-A844-45B8-BF63-2FD04F05E56A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "..\IL2CPU\source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{ECC4319F-A844-45B8-BF63-2FD04F05E56A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL2\Cosmos.HAL2.csproj", "{1425715D-1C93-44C7-8BB5-F124F195A41A}"
 EndProject

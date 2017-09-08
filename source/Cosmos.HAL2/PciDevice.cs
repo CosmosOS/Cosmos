@@ -10,54 +10,21 @@ namespace Cosmos.HAL
 {
     public class PCIDevice
     {
+
+        #region Enums
         public enum PCIHeaderType : byte
         {
             Normal = 0x00,
             Bridge = 0x01,
             Cardbus = 0x02
-        }
+        };
 
-        [Flags]
         public enum PCIBist : byte
         {
-            CocdMask = 0x0f,   /* Return result */
-            Start = 0x40,   /* 1 to start BIST, 2 secs or less */
-            Capable = 0x80    /* 1 if BIST capable */
-        }
-
-        [Flags]
-        public enum PCICommand : short
-        {
-            IO = 0x1,     /* Enable response in I/O space */
-            Memory = 0x2,     /* Enable response in Memory space */
-            Master = 0x4,     /* Enable bus mastering */
-            Special = 0x8,     /* Enable response to special cycles */
-            Invalidate = 0x10,    /* Use memory write and invalidate */
-            VGA_Pallete = 0x20,   /* Enable palette snooping */
-            Parity = 0x40,    /* Enable parity checking */
-            Wait = 0x80,    /* Enable address/data stepping */
-            SERR = 0x100,   /* Enable SERR */
-            Fast_Back = 0x200,   /* Enable back-to-back writes */
-        }
-
-        [Flags]
-        public enum PCIStatus : int
-        {
-            CAP_LIST = 0x10,   /* Support Capability List */
-            SUPPORT_66MHZ = 0x20,    /* Support 66 Mhz PCI 2.1 bus */
-            UDF = 0x40,    /* Support User Definable Features [obsolete] */
-            FAST_BACK = 0x80,    /* Accept fast-back to back */
-            PARITY = 0x100,   /* Detected parity error */
-            DEVSEL_MASK = 0x600,   /* DEVSEL timing */
-            DEVSEL_FAST = 0x000,
-            DEVSEL_MEDIUM = 0x200,
-            DEVSEL_SLOW = 0x400,
-            SIG_TARGET_ABORT = 0x800, /* Set on target abort */
-            REC_TARGET_ABORT = 0x1000, /* Master ack of " */
-            REC_MASTER_ABORT = 0x2000, /* Set on master abort */
-            SIG_SYSTEM_ERROR = 0x4000, /* Set when we drive SERR */
-            DETECTED_PARITY = 0x8000 /* Set on parity error */
-        }
+            CocdMask = 0x0f,
+            Start = 0x40,
+            Capable = 0x80
+        };
 
         public enum PCIInterruptPIN : byte
         {
@@ -66,95 +33,106 @@ namespace Cosmos.HAL
             INTB = 0x02,
             INTC = 0x03,
             INTD = 0x04
-        }
+        };
 
-        public ushort VendorID { get; private set; }
-        public ushort DeviceID { get; private set; }
+        public enum Config : byte
+        {
+            VendorID = 0, DeviceID = 2,
+            Command = 4, Status = 6,
+            RevisionID = 8, ProgIF = 9, SubClass = 10, Class = 11,
+            CacheLineSize = 12, LatencyTimer = 13, HeaderType = 14, BIST = 15,
+            BAR0 = 16,
+            BAR1 = 20,
+            PrimaryBusNo = 24, SecondaryBusNo = 25, SubBusNo = 26, SecondarLT = 27,
+            IOBase = 28, IOLimit = 29, SecondaryStatus = 30,
+            MemoryBase = 32, MemoryLimit = 34,
+            PrefMemoryBase = 36, PrefMemoryLimit = 38,
+            PrefBase32Upper = 40,
+            PrefLimit32upper = 44,
+            PrefBase16Upper = 48, PrefLimit16upper = 50,
+            CapabilityPointer = 52, Reserved = 53,
+            ExpROMBaseAddress = 56,
+            InterruptLine = 60, InterruptPIN = 61, BridgeControl = 62
+        };
+        #endregion
 
-        //public PCICommand Command { get; private set; }
-        //public PCIStatus Status { get; private set; }
-        public PCICommand Command { get { return (PCICommand)ReadRegister16(0x04); } set { WriteRegister16(0x04, (ushort)value); } }
-        public PCIStatus Status { get { return (PCIStatus)ReadRegister16(0x06); } set { WriteRegister16(0x06, (ushort)value); } }
+        public readonly uint bus;
+        public readonly uint slot;
+        public readonly uint function;
 
-        public byte RevisionID { get; private set; }
-        public byte ProgIF { get; private set; }
-        public byte Subclass { get; private set; }
-        public byte ClassCode { get; private set; }
+        public readonly ushort VendorID;
+        public readonly ushort DeviceID;
 
-        public byte CacheLineSize { get; private set; }
-        public byte LatencyTimer { get; private set; }
-        public PCIHeaderType HeaderType { get; private set; }
-        public PCIBist BIST { get; private set; }
+        public readonly ushort Command;
+        public readonly ushort Status;
 
-        public byte InterruptLine { get; private set; }
-        public PCIInterruptPIN InterruptPIN { get; private set; }
+        public readonly byte RevisionID;
+        public readonly byte ProgIF;
+        public readonly byte Subclass;
+        public readonly byte ClassCode;
+        public readonly byte SecondaryBusNumber;
 
-        public bool DeviceExists { get; private set; }
+        public readonly bool DeviceExists;
 
-        /// <summary>
-        /// Has this device been claimed by a driver
-        /// </summary>
-        public bool Claimed { get; set; }
+        public readonly PCIHeaderType HeaderType;
+        public readonly PCIBist BIST;
+        public readonly PCIInterruptPIN InterruptPIN;
 
-        public uint bus = 0;
-        public uint slot = 0;
-        public uint function = 0;
+        public const ushort ConfigAddressPort = 0xCF8;
+        public const ushort ConfigDataPort = 0xCFC;
 
-        protected Core.IOGroup.PCI IO = new Core.IOGroup.PCI();
+        public PCIBaseAddressBar[] BaseAddressBar;
+
+        protected static Core.IOGroup.PCI IO = new Core.IOGroup.PCI();
+
         public PCIDevice(uint bus, uint slot, uint function)
         {
             this.bus = bus;
             this.slot = slot;
             this.function = function;
 
-            VendorID = ReadRegister16(0x00);
-            DeviceID = ReadRegister16(0x02);
-            //Command = (PCICommand)ReadRegister16(0x04);
-            //Status = (PCIStatus)ReadRegister16(0x06);
+            VendorID = ReadRegister16((byte)Config.VendorID);
+            DeviceID = ReadRegister16((byte)Config.DeviceID);
 
-            RevisionID = ReadRegister8(0x08);
-            ProgIF = ReadRegister8(0x09);
-            Subclass = ReadRegister8(0x0A);
-            ClassCode = ReadRegister8(0x0B);
+            Command = ReadRegister16((byte)Config.Command);
+            Status = ReadRegister16((byte)Config.Status);
 
-            CacheLineSize = ReadRegister8(0x0C);
-            LatencyTimer = ReadRegister8(0x0D);
-            HeaderType = (PCIHeaderType)ReadRegister8(0x0E);
-            BIST = (PCIBist)ReadRegister8(0x0F);
 
-            InterruptLine = ReadRegister8(0x3C);
-            InterruptPIN = (PCIInterruptPIN)ReadRegister8(0x3D);
+            RevisionID = ReadRegister8((byte)Config.RevisionID);
+            ProgIF = ReadRegister8((byte)Config.ProgIF);
+            Subclass = ReadRegister8((byte)Config.SubClass);
+            ClassCode = ReadRegister8((byte)Config.Class);
+            SecondaryBusNumber = ReadRegister8((byte)Config.SecondaryBusNo);
+
+            HeaderType = (PCIHeaderType)ReadRegister8((byte)Config.HeaderType);
+            BIST = (PCIBist)ReadRegister8((byte)Config.BIST);
+            InterruptPIN = (PCIInterruptPIN)ReadRegister8((byte)Config.InterruptPIN);
 
             DeviceExists = (uint)VendorID != 0xFFFF && (uint)DeviceID != 0xFFFF;
+            if (HeaderType == PCIHeaderType.Normal)
+            {
+                BaseAddressBar = new PCIBaseAddressBar[6];
+                BaseAddressBar[0] = new PCIBaseAddressBar(ReadRegister32(0x10));
+                BaseAddressBar[1] = new PCIBaseAddressBar(ReadRegister32(0x14));
+                BaseAddressBar[2] = new PCIBaseAddressBar(ReadRegister32(0x18));
+                BaseAddressBar[3] = new PCIBaseAddressBar(ReadRegister32(0x1C));
+                BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20));
+                BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24));
+            }
         }
 
-        protected UInt32 GetAddressBase(uint aBus, uint aSlot, uint aFunction)
+        public static ushort GetHeaderType(ushort Bus, ushort Slot, ushort Function)
         {
-            // 31 	        30 - 24    23 - 16      15 - 11 	    10 - 8 	          7 - 2 	        1 - 0
-            // Enable Bit 	Reserved   Bus Number 	Device Number 	Function Number   Register Number 	00
-            return (UInt32)(
-                // Enable bit - must be set
-                0x80000000
-                // Bits 23-16
-                | (aBus << 16)
-                // Bits 15-11
-                | ((aSlot & 0x1F) << 11)
-                // Bits 10-8
-                | ((aFunction & 0x07) << 8));
+            UInt32 xAddr = GetAddressBase(Bus, Slot, Function) | 0xE & 0xFC;
+            IO.ConfigAddressPort.DWord = xAddr;
+            return (byte)(IO.ConfigDataPort.DWord >> ((0xE % 4) * 8) & 0xFF);
         }
 
-        public void EnableMemory(bool enable)
+        public static UInt16 GetVendorID(ushort Bus, ushort Slot, ushort Function)
         {
-            UInt16 command = ReadRegister16(0x04);
-
-            UInt16 flags = 0x0007;
-
-            if (enable)
-                command |= flags;
-            else
-                command &= (ushort)~flags;
-
-            WriteRegister16(0x04, command);
+            UInt32 xAddr = GetAddressBase(Bus, Slot, Function) | 0x0 & 0xFC;
+            IO.ConfigAddressPort.DWord = xAddr;
+            return (UInt16)(IO.ConfigDataPort.DWord >> ((0x0 % 4) * 8) & 0xFFFF);
         }
 
         #region IOReadWrite
@@ -176,7 +154,7 @@ namespace Cosmos.HAL
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
-            return (UInt16)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFFFF); ;
+            return (UInt16)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFFFF);
         }
 
         protected void WriteRegister16(byte aRegister, ushort value)
@@ -200,6 +178,25 @@ namespace Cosmos.HAL
             IO.ConfigDataPort.DWord = value;
         }
         #endregion
+
+        protected static UInt32 GetAddressBase(uint aBus, uint aSlot, uint aFunction)
+        {
+            return 0x80000000 | (aBus << 16) | ((aSlot & 0x1F) << 11) | ((aFunction & 0x07) << 8);
+        }
+
+        public void EnableMemory(bool enable)
+        {
+            UInt16 command = ReadRegister16(0x04);
+
+            UInt16 flags = 0x0007;
+
+            if (enable)
+                command |= flags;
+            else
+                command &= (ushort)~flags;
+
+            WriteRegister16(0x04, command);
+        }
 
         public class DeviceClass
         {
@@ -294,8 +291,8 @@ namespace Cosmos.HAL
                         return "Encryption/Decryption Controller";
                     case 0x11:
                         return "Data Acquisition and Signal Processing Controller";
-                    //case 0xFF:
-                    //    return "Unkown device";
+                        //case 0xFF:
+                        //    return "Unkown device";
                 }
                 return "ClassCode: " + device.ClassCode + "     Subclass: " + device.Subclass + "     ProgIF: " + device.ProgIF;
             }
@@ -304,6 +301,48 @@ namespace Cosmos.HAL
         private static string ToHex(uint aNumber, byte aBits)
         {
             return "0x" + aNumber.ToHex(aBits / 4);
+        }
+    }
+
+    public class PCIBaseAddressBar
+    {
+        private uint baseAddress = 0;
+        private ushort prefetchable = 0;
+        private ushort type = 0;
+        private bool isIO = false;
+
+        public PCIBaseAddressBar(uint raw)
+        {
+            isIO = (raw & 0x01) == 1;
+
+            if (isIO)
+            {
+                baseAddress = raw & 0xFFFFFFFC;
+            }
+            else
+            {
+                type = (ushort)((raw >> 1) & 0x03);
+                prefetchable = (ushort)((raw >> 3) & 0x01);
+                switch (type)
+                {
+                    case 0x00:
+                        baseAddress = raw & 0xFFFFFFF0;
+                        break;
+                    case 0x01:
+                        baseAddress = raw & 0xFFFFFFF0;
+                        break;
+                }
+            }
+        }
+
+        public uint BaseAddress
+        {
+            get { return baseAddress; }
+        }
+
+        public bool IsIO
+        {
+            get { return isIO; }
         }
     }
 }
