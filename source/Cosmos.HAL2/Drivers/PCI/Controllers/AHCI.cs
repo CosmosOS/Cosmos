@@ -47,14 +47,61 @@ namespace Cosmos.HAL.Drivers.PCI.SATA
 
     public enum FISType
     {
-        FIS_Type_RegisterH2D = 0x27, // Register FIS: Host to Device
-        FIS_Type_RegisterD2H = 0x34, // Register FIS: Device to Host
+        FIS_Type_RegisterH2D = 0x27,  // Register FIS: Host to Device
+        FIS_Type_RegisterD2H = 0x34,  // Register FIS: Device to Host
         FIS_Type_DMA_Activate = 0x39, // DMA Activate
-        FIS_Type_DMA_Setup = 0x41, // DMA Setup: Device to Host
-        FIS_Type_Data = 0x46, // Data FIS: Bidirectional
-        FIS_Type_BIST = 0x58, // BIST
-        FIS_Type_PIO_Setup = 0x5F, // PIO Setup: Device to Host
-        FIS_Type_DeviceBits = 0xA1  // Device bits
+        FIS_Type_DMA_Setup = 0x41,    // DMA Setup: Device to Host
+        FIS_Type_Data = 0x46,         // Data FIS: Bidirectional
+        FIS_Type_BIST = 0x58,         // BIST
+        FIS_Type_PIO_Setup = 0x5F,    // PIO Setup: Device to Host
+        FIS_Type_DeviceBits = 0xA1    // Device bits
+    }
+
+    public struct HBACommandHeader
+    {
+        public byte CFL;          // 5 bits
+        public byte ATAPI;        // 1 bit
+        public byte Write;        // 1 = H2D | 0 = D2H // 1bit
+        public byte Prefetchable; // 1 bit
+
+        public byte Reset;        // 1 bit
+        public byte BIST;         // 1 bit
+        public byte ClearBusy;    // 1 bit
+        public byte Reserved0;    // 1 bit
+        public byte PMP;          // 4 bits
+
+        public ushort PRDTL;      // Physical region descriptor table length in entries
+
+        public uint PRDBC;        // Physical region descriptor byte count transferred
+
+        public uint CTBA;         // Command table descriptor base address
+        public uint CTBAU;        // Command table descriptor base address upper 32 bits (4 bytes)
+
+        public uint[] Reserved1;  // [4]
+    }
+
+    public struct HBACommandTable
+    {
+        // 0x00
+        public byte[] CFIS;     // [64] // = 64
+
+        // 0x40
+        public byte[] ACMD;     // [16] // = 16 + 64 = 80
+
+        // 0x50
+        public byte[] Reserved; // [48] // = 48 + 80 = 128
+
+        public HBAPRDTEntry[] PRDTEntry; // [1] // = 24 + 128 = 152
+    }
+    public struct HBAPRDTEntry
+    {                                      
+        public uint DBA;                   // Data base address
+        public uint DBAU;                  // Data base address upper 32 bits
+        public uint Reserved0;
+
+        public uint DBC;                   // Byte count, 4M max // 22 bits (2.75 Bytes)
+        public uint Reserved1;             // Reserved // 9 bits
+        public uint InterruptOnCompletion; // Interrupt on completion // 1 bit
     }
 
     public enum PortType
@@ -66,72 +113,72 @@ namespace Cosmos.HAL.Drivers.PCI.SATA
         PM = 0x04
     }
     
-    //public struct FIS_REG_H2D
-    //{
-    //    public byte FISType;
-    //
-    //    public byte Options;
-    //    // Reserved
-    //    //public byte CMDCTRL;
-    //    public byte Command;
-    //    public byte FeatureL;
-    //
-    //    public byte LBA0;
-    //    public byte LBA1;
-    //    public byte LBA2;
-    //    public byte Device;
-    //
-    //    public byte LBA3;
-    //    public byte LBA4;
-    //    public byte LBA5;
-    //    public byte FeatureH;
-    //
-    //    public byte CountL;
-    //    public byte CountH;
-    //    public byte ICC;
-    //    public byte Control;
-    //
-    //    public byte Res2;
-    //}
+    public struct FISRegisterH2D
+    {
+        public byte FISType;
+    
+        //public byte Options;
+        // Reserved
+        public byte IsCommand;
+        public byte Command;
+        public byte FeatureL;
+    
+        public byte LBA0;
+        public byte LBA1;
+        public byte LBA2;
+        public byte Device;
+    
+        public byte LBA3;
+        public byte LBA4;
+        public byte LBA5;
+        public byte FeatureH;
+    
+        public byte CountL;
+        public byte CountH;
+        public byte ICC;
+        public byte Control;
+    
+        public byte Res2;
+    }
 
-    //public struct FIS_REG_D2H {
-    //    public byte FISType;
-    //
-    //    public byte Options;
-    //    // Reserved
-    //    //public byte InterruptBit;
-    //    // Rseerved
-    //    public byte Status;
-    //    public byte Error;
-    //
-    //    public byte LBA0;
-    //    public byte LBA1;
-    //    public byte LBA2;
-    //    public byte Device;
-    //
-    //    public byte LBA3;
-    //    public byte LBA4;
-    //    public byte LBA5;
-    //    // Reserved
-    //
-    //    public byte CountL;
-    //    public byte CountH;
-    //    public byte ICC;
-    //    public ushort Res2;
-    //    // Reserved
-    //    public uint Res3;
-    //    // Reserved
-    //}
+    public struct FISRegisterD2H {
+        public byte FISType;
+    
+        //public byte Options;
+        // Reserved
+        //public byte InterruptBit;
+        // Rseerved
+        public byte Status;
+        public byte Error;
+    
+        public byte LBA0;
+        public byte LBA1;
+        public byte LBA2;
+        public byte Device;
+    
+        public byte LBA3;
+        public byte LBA4;
+        public byte LBA5;
+        // Reserved
+    
+        public byte CountL;
+        public byte CountH;
+        public byte ICC;
+        public ushort Res2;
+        // Reserved
+        public uint Res3;
+        // Reserved
+    }
 
-    //public struct FIS_DATA {
-    //    public byte FISType;
-    //
-    //    public byte Options;
-    //    // Reserved
-    //
-    //    // Reserved
-    //    public byte Payload;
-    //}
+    public struct FISData {
+        public byte FISType;
+    
+        //public byte Options;
+        // Reserved
+    
+        // Reserved
+        public byte Payload;
+    }
 
     // Unused
     //public struct PIO_SETUP {
@@ -189,58 +236,82 @@ namespace Cosmos.HAL.Drivers.PCI.SATA
 
     public class AHCI
     {
-        public const uint SSTS_ADDRESS        = 0x00000133;
-        public const uint SATA_SIG_ATA        = 0x00000101; // SATA drive
-        public const uint SATA_SIG_ATAPI      = 0xEB140101; // SATAPI drive
-        public const uint SATA_SIG_SEMB       = 0xC33C0101; // Enclosure management bridge
-        public const uint SATA_SIG_PM         = 0x96690101; // Port multiplier
-        public const uint PORT_DET_PRESENT     = 0x00000003;
-        public const uint PORT_IPM_ACTIVE      = 0x00000001;
-        public static uint PortLocation;
+        //___________________________________________________//
+        // SATA Signatures Constants                         //
+        public const uint SATA_SIG_ATA         = 0x00000101; // SATA drive
+        public const uint SATA_SIG_ATAPI       = 0xEB140101; // SATAPI drive
+        public const uint SATA_SIG_SEMB        = 0xC33C0101; // Enclosure management bridge
+        public const uint SATA_SIG_PM          = 0x96690101; // Port multiplier
+                                                             //
+        // SATA Status Bits Constants                        //
+        public const uint PORT_DET_PRESENT     = 0x00000003; // DET Present Value
+        public const uint PORT_IPM_ACTIVE      = 0x00000001; // IPM Active Value
+                                                             //
+        public const uint AHCI_BASE            = 0x00400000; // AHCI Base
+                                                             //
+        // ATA Device Status                                 //
+        public const uint ATA_DEV_BUSY         = 0x00000080; // ATA Device Busy
+        public const uint ATA_DEV_DRQ          = 0x00000008; // ATA Device DRQ?
+                                                             //
+        // HBA PortX Command Constants                       //
+        public const uint HBA_PxCMD_CR         = (01 << 15); // 
+        public const uint HBA_PxCMD_FR         = (01 << 14); //
+        public const uint HBA_PxCMD_FRE        = (01 << 04); //
+        public const uint HBA_PxCMD_SUD        = (01 << 01); // 
+        public const uint HBA_PxCMD_ST         = (01 << 00); //
+        public const uint HBA_PxIS_TFES        = (01 << 30); //
+                                                             //
+        // ATA Command Constants                             //
+        public const uint ATA_CMD_READ_DMA_EX  = 0x00000025; // 
+        public const uint ATA_CMD_WRITE_DMA_EX = 0x00000025; //
+                                                             //
+        //___________________________________________________//
+        private static uint mPortLocation;
+        private static uint[] mPorts = new uint[32];
 
         public static PCIDevice mAHCIDevice = HAL.PCI.GetDeviceClass(0x01, 0x06);
         public static uint BAR5 = mAHCIDevice.BaseAddressBar[5].BaseAddress;
         public static MemoryBlock mAHCIMemory = new MemoryBlock(BAR5, 0x10FF);
-        public static MemoryBlock mAHCIPortMemory = new MemoryBlock(BAR5 + PortLocation, 0x10FF);
+        public static MemoryBlock mAHCIPortMemory = new MemoryBlock(BAR5 + mPortLocation, 0x10FF);
         internal static Debugger mAHCIDebugger = new Debugger("HAL", "AHCI");
 
         internal class PortHelper
         {
             public static PortRegisters GetPort(int aPortNumber)
             {
-                PortLocation = (uint)(aPortNumber);
-                if (aPortNumber == 00) PortLocation = 0x0100;
-                else if (aPortNumber == 01) PortLocation = 0x0180;
-                else if (aPortNumber == 02) PortLocation = 0x0200;
-                else if (aPortNumber == 03) PortLocation = 0x0280;
-                else if (aPortNumber == 04) PortLocation = 0x0300;
-                else if (aPortNumber == 05) PortLocation = 0x0380;
-                else if (aPortNumber == 06) PortLocation = 0x0400;
-                else if (aPortNumber == 07) PortLocation = 0x0480;
-                else if (aPortNumber == 08) PortLocation = 0x0500;
-                else if (aPortNumber == 09) PortLocation = 0x0580;
-                else if (aPortNumber == 10) PortLocation = 0x0600;
-                else if (aPortNumber == 11) PortLocation = 0x0680;
-                else if (aPortNumber == 12) PortLocation = 0x0700;
-                else if (aPortNumber == 13) PortLocation = 0x0780;
-                else if (aPortNumber == 14) PortLocation = 0x0800;
-                else if (aPortNumber == 15) PortLocation = 0x0880;
-                else if (aPortNumber == 16) PortLocation = 0x0900;
-                else if (aPortNumber == 17) PortLocation = 0x0980;
-                else if (aPortNumber == 18) PortLocation = 0x0A00;
-                else if (aPortNumber == 19) PortLocation = 0x0A80;
-                else if (aPortNumber == 20) PortLocation = 0x0B00;
-                else if (aPortNumber == 21) PortLocation = 0x0B80;
-                else if (aPortNumber == 22) PortLocation = 0x0C00;
-                else if (aPortNumber == 23) PortLocation = 0x0C80;
-                else if (aPortNumber == 24) PortLocation = 0x0D00;
-                else if (aPortNumber == 25) PortLocation = 0x0D80;
-                else if (aPortNumber == 26) PortLocation = 0x0E00;
-                else if (aPortNumber == 27) PortLocation = 0x0E80;
-                else if (aPortNumber == 28) PortLocation = 0x0F00;
-                else if (aPortNumber == 29) PortLocation = 0x0F80;
-                else if (aPortNumber == 30) PortLocation = 0x1000;
-                else if (aPortNumber == 31) PortLocation = 0x1080;
+                mPortLocation = (uint)(aPortNumber);
+                if (aPortNumber == 00) mPortLocation = 0x0100;
+                else if (aPortNumber == 01) mPortLocation = 0x0180;
+                else if (aPortNumber == 02) mPortLocation = 0x0200;
+                else if (aPortNumber == 03) mPortLocation = 0x0280;
+                else if (aPortNumber == 04) mPortLocation = 0x0300;
+                else if (aPortNumber == 05) mPortLocation = 0x0380;
+                else if (aPortNumber == 06) mPortLocation = 0x0400;
+                else if (aPortNumber == 07) mPortLocation = 0x0480;
+                else if (aPortNumber == 08) mPortLocation = 0x0500;
+                else if (aPortNumber == 09) mPortLocation = 0x0580;
+                else if (aPortNumber == 10) mPortLocation = 0x0600;
+                else if (aPortNumber == 11) mPortLocation = 0x0680;
+                else if (aPortNumber == 12) mPortLocation = 0x0700;
+                else if (aPortNumber == 13) mPortLocation = 0x0780;
+                else if (aPortNumber == 14) mPortLocation = 0x0800;
+                else if (aPortNumber == 15) mPortLocation = 0x0880;
+                else if (aPortNumber == 16) mPortLocation = 0x0900;
+                else if (aPortNumber == 17) mPortLocation = 0x0980;
+                else if (aPortNumber == 18) mPortLocation = 0x0A00;
+                else if (aPortNumber == 19) mPortLocation = 0x0A80;
+                else if (aPortNumber == 20) mPortLocation = 0x0B00;
+                else if (aPortNumber == 21) mPortLocation = 0x0B80;
+                else if (aPortNumber == 22) mPortLocation = 0x0C00;
+                else if (aPortNumber == 23) mPortLocation = 0x0C80;
+                else if (aPortNumber == 24) mPortLocation = 0x0D00;
+                else if (aPortNumber == 25) mPortLocation = 0x0D80;
+                else if (aPortNumber == 26) mPortLocation = 0x0E00;
+                else if (aPortNumber == 27) mPortLocation = 0x0E80;
+                else if (aPortNumber == 28) mPortLocation = 0x0F00;
+                else if (aPortNumber == 29) mPortLocation = 0x0F80;
+                else if (aPortNumber == 30) mPortLocation = 0x1000;
+                else if (aPortNumber == 31) mPortLocation = 0x1080;
                 PortRegisters Port = new PortRegisters()
                 {
                     CLB            = mAHCIPortMemory[0x00],
@@ -298,38 +369,46 @@ namespace Cosmos.HAL.Drivers.PCI.SATA
             // Search for disks
             var xImplementedPort = aGeneric.PI;
             var xPort = 0;
+            var xPortType = 0U;
             var xSupportedPorts = 0x1F;
             while (xPort <= xSupportedPorts)
             {
                 if (xImplementedPort != 0)
                 {
-                    PortType dt = CheckPortType(PortHelper.GetPort(xPort));
+                    PortType PortType = CheckPortType(PortHelper.GetPort(xPort));
                     var xPortString = "0:" + xPort;
-                    if (dt == PortType.SATA) // If Port Type was SATA.
+                    if (PortType == PortType.SATA) // If Port Type was SATA.
                     {
                         mAHCIDebugger.Send("SATA drive found at port " + xPortString);
                         Console.WriteLine("SATA Drive found at port " + xPortString);
+                        xPortType = 0x01;
+                        PortRebase(PortHelper.GetPort(xPort), xPort);
+                        Read(PortHelper.GetPort(xPort), 0, 0, 2, (ushort)BAR5);
                     }
-                    else if (dt == PortType.SATAPI) // If Port Type was SATAPI.
+                    else if (PortType == PortType.SATAPI) // If Port Type was SATAPI.
                     {
                         mAHCIDebugger.Send("SATAPI drive found at port " + xPortString);
                         Console.WriteLine("CD/DVD Drive found at port " + xPortString);
+                        xPortType = 0x02;
                     }
-                    else if (dt == PortType.SEMB) // If Port Type was SEMB.
+                    else if (PortType == PortType.SEMB) // If Port Type was SEMB.
                     {
                         mAHCIDebugger.Send("SEMB drive found at port " + xPortString);
                         Console.WriteLine("SEMB Drive found at port " + xPortString);
+                        xPortType = 0x03;
                     }
-                    else if (dt == PortType.PM) // If Port Type was Port Mulitplier.
+                    else if (PortType == PortType.PM) // If Port Type was Port Mulitplier.
                     {
                         mAHCIDebugger.Send("Port Multiplier drive found at port " + xPortString);
                         Console.WriteLine("Port Multiplier Drive found at port " + xPortString);
+                        xPortType = 0x04;
                     }
-                    else if (dt == PortType.Nothing) // If Nothing in this Port.
+                    else if (PortType == PortType.Nothing) // If Nothing in this Port.
                         mAHCIDebugger.Send("No drive found at port " + xPortString);
                     else // If Implemented Port value was not zero and not one of the above.
                         mAHCIDebugger.Send("Unknown drive found at port " + xPortString);
                 }
+                mPorts[xPort] = xPortType;
                 xPort++;
                 xImplementedPort >>= 1;
             }
@@ -363,6 +442,260 @@ namespace Cosmos.HAL.Drivers.PCI.SATA
             }
         }
 
+        public void PortRebase(PortRegisters aPort, int aPortNumber)
+        {
+            StopCMD(aPort);
+
+            aPort.CLB = (uint)(AHCI_BASE + (aPortNumber << 10));
+            aPort.CLBU = 0;
+            mAHCIPortMemory.Fill(aPort.CLB, 0, 1024);
+
+            // FIS offset: 32K+256*portno
+            // FIS entry size = 256 bytes per port
+            aPort.FB = (uint)(AHCI_BASE + (32 << 10) + (aPortNumber << 8));
+            aPort.FBU = 0;
+            mAHCIPortMemory.Fill(aPort.FB, 0, 256);
+
+            HBACommandHeader[] xCMDHeader = new HBACommandHeader[32];
+            for (int i = 0; i < 32; i++)
+            {
+                xCMDHeader[i].PRDTL = 8; // 8 prdt entries per command table
+                                         // 256 bytes per command table, 64+16+48+16*8
+                                         // Command table offset: 40K + 8K*portno + cmdheader_index*256
+                xCMDHeader[i].CTBA = (uint)(AHCI_BASE + (40 << 10) + (aPortNumber << 13) + (i << 8));
+                xCMDHeader[i].CTBAU = 0;
+                mAHCIPortMemory.Fill(xCMDHeader[i].CTBA, 0, 256);
+            }
+
+            StartCMD(aPort);
+        }
+        public void StartCMD(PortRegisters aPort)
+        {
+            while ((aPort.CMD & HBA_PxCMD_CR) != 0) ;
+
+            aPort.CMD |= HBA_PxCMD_FRE;
+            aPort.CMD |= HBA_PxCMD_ST;
+        }
+
+        public void StopCMD(PortRegisters aPort)
+        {
+            aPort.CMD &= ~HBA_PxCMD_ST;
+
+            while(true)
+            {
+                if ((aPort.CMD & HBA_PxCMD_FR) != 0)
+                    continue;
+                if ((aPort.CMD & HBA_PxCMD_CR) != 0)
+                    continue;
+                break;
+            }
+
+            aPort.CMD &= ~HBA_PxCMD_FRE;
+        }
+
+        public bool Read(PortRegisters aPort, uint aStartLow, uint aStartHigh, uint aCount, ushort aBuffer)
+        {
+            aPort.IS -= 1;
+            int xSpin = 0; // Spin lock Timeout Counter
+            int xSlot = FindCMDSlot(aPort);
+            if (xSlot == -1)
+                return false;
+
+            HBACommandHeader xCMDHeader = new HBACommandHeader();
+            aPort.CLB += (uint)xSlot;
+            xCMDHeader.CFL = (byte)(17 / sizeof(uint));
+            xCMDHeader.Write = 0;
+            xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
+
+            HBACommandTable xCMDTable = new HBACommandTable();  // xCMDHeader.CTBA
+            mAHCIPortMemory.Fill(xCMDHeader.CTBA, 0, (158 + (xCMDHeader.PRDTL - 1U)) * 24);
+            xCMDTable.PRDTEntry = new HBAPRDTEntry[1];
+
+            int i = 0; // i for PRDTEntry outside the loop?
+
+            for (i = 0; i < xCMDHeader.PRDTL - 1; i++)
+            {
+
+                xCMDTable.PRDTEntry[i].DBA = (uint)(aBuffer);
+                xCMDTable.PRDTEntry[i].DBC = 8 * 1024;
+                xCMDTable.PRDTEntry[i].InterruptOnCompletion = 1;
+                aBuffer += 4 * 1024;
+                aCount -= 16;
+            }
+            // Last entry
+
+            xCMDTable.PRDTEntry[i].DBA = (uint)aBuffer;
+            xCMDTable.PRDTEntry[i].DBC = aCount << 9;
+            xCMDTable.PRDTEntry[i].InterruptOnCompletion = 1;
+
+            // Setup the command
+            FISRegisterH2D CommandFIS = new FISRegisterH2D() // Address CMDTBL.CFIS;
+            {
+                FISType = (byte)FISType.FIS_Type_RegisterH2D,
+                IsCommand = 1,
+                Command = (byte)ATA_CMD_READ_DMA_EX,
+
+                LBA0 = (byte)aStartLow,
+                LBA1 = (byte)(aStartLow >> 8),
+                LBA2 = (byte)(aStartLow >> 16),
+                Device = 1 << 6, // LBA Mode
+
+                LBA3 = (byte)(aStartLow >> 24),
+                LBA4 = (byte)aStartHigh,
+                LBA5 = (byte)(aStartHigh >> 8),
+
+                CountL = (byte)(aCount & 0xFF),
+                CountH = (byte)(aCount >> 8),
+            };
+            while ((aPort.TFD & (ATA_DEV_BUSY | ATA_DEV_DRQ)) != 0 && xSpin < 1000000)
+            {
+                xSpin++;
+            }
+            if (xSpin == 1000000)
+            {
+                mAHCIDebugger.Send("Port timed out");
+                return false;
+            }
+
+            aPort.CI = 1U << xSlot; // Issue with Command
+
+            // Wait for Completion
+            while (true)
+            {
+                // In some longer duration reads, It may be Helpful to Spin on the DPS bit
+                // in the aPort.IS port field as well (1 << 5)
+                if ((aPort.CI & (1 << xSlot)) == 0)
+                    break;
+                if ((aPort.IS == HBA_PxIS_TFES))
+                {
+                    Console.WriteLine("Error occured while Reading the Disk");
+                    mAHCIDebugger.Send("Read disk error!");
+                    return false;
+                }
+            }
+
+            // Check Again
+            if (aPort.IS == HBA_PxIS_TFES)
+            {
+                Console.WriteLine("Error occured while Reading the Disk");
+                mAHCIDebugger.Send("Read disk error!");
+                return false;
+            }
+
+            return true;
+        }
+
+        // Inverting Some codes (Read -> Write)
+        public bool Write(PortRegisters aPort, uint aStartLow, uint aStartHigh, uint aCount, ushort aBuffer)
+        {
+            aPort.IS -= 1;
+            int xSpin = 0; // Spin lock Timeout Counter
+            int xSlot = FindCMDSlot(aPort);
+            if (xSlot == -1)
+                return false;
+
+            HBACommandHeader xCMDHeader = new HBACommandHeader();
+            aPort.CLB += (uint)xSlot;
+            xCMDHeader.CFL = 15 / sizeof(uint);
+            xCMDHeader.Write = 1;
+            xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
+
+            HBACommandTable xCMDTable = new HBACommandTable();  // xCMDHeader.CTBA
+            mAHCIPortMemory.Fill(xCMDHeader.CTBA, 0, (158 + (xCMDHeader.PRDTL - 1U)) * 24);
+            xCMDTable.PRDTEntry = new HBAPRDTEntry[1];
+
+            int i = 0; // i for PRDTEntry outside the loop?
+
+            for (i = 0; i < xCMDHeader.PRDTL - 1; i++)
+            {
+
+                xCMDTable.PRDTEntry[i].DBA = (uint)(aBuffer);
+                xCMDTable.PRDTEntry[i].DBC = 8 * 1024;
+                xCMDTable.PRDTEntry[i].InterruptOnCompletion = 1;
+                aBuffer += 4 * 1024;
+                aCount -= 16;
+            }
+            // Last entry
+
+            xCMDTable.PRDTEntry[i].DBA = (uint)aBuffer;
+            xCMDTable.PRDTEntry[i].DBC = aCount << 9;
+            xCMDTable.PRDTEntry[i].InterruptOnCompletion = 1;
+
+            // Setup the command
+            FISRegisterH2D CommandFIS = new FISRegisterH2D // Address CMDTBL.CFIS;
+            {
+                FISType = (byte)FISType.FIS_Type_RegisterH2D,
+                IsCommand = 1,
+                Command = (byte)ATA_CMD_WRITE_DMA_EX,
+
+                LBA0 = (byte)aStartLow,
+                LBA1 = (byte)(aStartLow >> 8),
+                LBA2 = (byte)(aStartLow >> 16),
+                Device = 1 << 6, // LBA Mode
+
+                LBA3 = (byte)(aStartLow >> 24),
+                LBA4 = (byte)aStartHigh,
+                LBA5 = (byte)(aStartHigh >> 8),
+
+                CountL = (byte)(aCount & 0xFF),
+                CountH = (byte)(aCount >> 8)
+            };
+
+            while ((aPort.TFD & (ATA_DEV_BUSY | ATA_DEV_DRQ)) != 0 && xSpin < 1000000)
+            {
+                xSpin++;
+            }
+
+            if (xSpin == 1000000)
+            {
+                mAHCIDebugger.Send("Port timed out");
+                return false;
+            }
+
+            aPort.CI = 1U << xSlot; // Issue with Command
+
+            // Wait for Completion
+            while (true)
+            {
+                // In some longer duration writes, It may be Helpful to Spin on the DPS bit
+                // in the aPort.IS port field as well (1 << 5)
+                if ((aPort.CI & (1 << xSlot)) == 0)
+                    break;
+                if ((aPort.IS == HBA_PxIS_TFES))
+                {
+                    Console.WriteLine("Error occured while Writing to the Disk");
+                    mAHCIDebugger.Send("Write disk error!");
+                    return false;
+                }
+            }
+
+            // Check Again
+            if (aPort.IS == HBA_PxIS_TFES)
+            {
+                Console.WriteLine("Error occured while Writing to the Disk");
+                mAHCIDebugger.Send("Write disk error!");
+                return false;
+            }
+
+            return true;
+        }
+
+        public int FindCMDSlot(PortRegisters aPort)
+        {
+            // If not set in SACT and CI, the slot is free
+            var xSlots = (aPort.SACT | aPort.CI);
+            for (int i = 0; i < xSlots; i++)
+            {
+                if ((xSlots & 1) == 0)
+                    mAHCIDebugger.Send("Found a command slot: ");
+                    mAHCIDebugger.SendNumber(i);
+                    return i;
+                xSlots >>= 1;
+            }
+            mAHCIDebugger.Send("Cannot find free command list entry");
+            return -1;
+        }
+
         public static void InitSATA()
         {
             GenericRegisters mGeneric = new GenericRegisters()
@@ -384,6 +717,7 @@ namespace Cosmos.HAL.Drivers.PCI.SATA
             };
             var xSelf = new AHCI();
             xSelf.SearchForDisks(mGeneric);
+            //xSelf.GetPartitions(xPorts, );
         }
     }
 }
