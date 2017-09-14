@@ -23,12 +23,12 @@ namespace GraphicTest
         {
             Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
             
-            var xSVGAIIDevice = HAL.PCI.GetDevice(0x15AD, 0x0405);
+            var xSVGAIIDevice = Cosmos.HAL.PCI.GetDevice(0x15AD, 0x0405);
                         
-            var xSVGAIIExists = xVideoDriver.DeviceExists;
+            var xSVGAIIExists = xSVGAIIDevice.DeviceExists;
 
             if(xSVGAIIExists) canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VBEDriver);
-            else canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanas.VideoDriver.VMWareSVGAIIDrier);
+            else canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VMWareSVGAIIDrier);
 
             canvas.Clear(Color.Blue);
         }
