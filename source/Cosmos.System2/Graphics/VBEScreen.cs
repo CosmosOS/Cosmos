@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using Cosmos.HAL.Drivers;
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cosmos.System.Graphics;
+using Cosmos.Common.Extensions;
 
 namespace Cosmos.System
 {
@@ -26,7 +27,7 @@ namespace Cosmos.System
 
         public VBEScreen(Mode mode) : base(mode)
         {
-            //Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {mode}");
+            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {mode.Columns}x{mode.Rows}x{(uint)mode.ColorDepth}");
 
             ThrowIfModeIsNotValid(mode);
 
@@ -128,9 +129,7 @@ namespace Cosmos.System
              * For now we can Draw only if the ColorDepth is 32 bit, we will throw otherwise.
              *
              * How to support other ColorDepth? The offset calculation should be the same (and so could be done out of the switch)
-             * adding support ColorDepth.ColorDepth24 is easier as you need can use the version of SetVRAM() that take a byte
-             * and call it 3 time for the B, G and R component (the Color class has properties to do this!), the problem is
-             * for ColorDepth.ColorDepth16 and ColorDepth.ColorDepth8 than need a conversion from color (an ARGB32 color) to the RGB16 and RGB8
+             * ColorDepth.ColorDepth16 and ColorDepth.ColorDepth8 need a conversion from color (an ARGB32 color) to the RGB16 and RGB8
              * how to do this conversion faster maybe using pre-computed tables? What happens if the color cannot be converted? We will throw?
              */
             switch (mode.ColorDepth)
@@ -148,7 +147,18 @@ namespace Cosmos.System
 
                     Global.mDebugger.SendInternal("Point drawn");
                     break;
+                case ColorDepth.ColorDepth24:
+                    Global.mDebugger.SendInternal("Computing offset...");
+                    pitch = (uint)mode.Columns * ColorDepthInBytes;
+                    stride = ColorDepthInBytes;
+                    //offset = ((uint)x * pitch) + ((uint)y * stride);
+                    offset = ((uint)x * stride) + ((uint)y * pitch);
 
+                    Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
+                    VBEDriver.SetVRAM(offset, (((uint)color.R * 1000 + color.G) * 1000 + color.B));
+
+                    Global.mDebugger.SendInternal("Point drawn");
+                    break;
                 default:
                     String errorMsg = "DrawPoint() with ColorDepth " + (int)Mode.ColorDepth + " not yet supported";
                     throw new NotImplementedException(errorMsg);
@@ -163,7 +173,22 @@ namespace Cosmos.System
         #endregion
 
         #region Reading
-        // TODO add to Canvas GetPointColor()
+        public override Color GetPointColor(int x, int y)
+        {
+            uint pitch;
+            uint stride;
+            uint offset;
+            uint ColorDepthInBytes = (uint)mode.ColorDepth / 8;
+
+            Global.mDebugger.SendInternal("Computing offset...");
+            pitch = (uint)mode.Columns * ColorDepthInBytes;
+            stride = ColorDepthInBytes;
+            //offset = ((uint)x * pitch) + ((uint)y * stride);
+            offset = ((uint)x * stride) + ((uint)y * pitch);
+
+            Global.mDebugger.SendInternal($"Getting color from point at offset {offset}");
+            return Color.FromArgb(VBEDriver.GetVRAM(offset));
+        }
 
         #endregion
 
