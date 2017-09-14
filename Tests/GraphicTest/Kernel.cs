@@ -28,7 +28,7 @@ namespace GraphicTest
             var xSVGAIIExists = xSVGAIIDevice.DeviceExists;
 
             if(xSVGAIIExists) canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VBEDriver);
-            else canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VMWareSVGAIIDrier);
+            else canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VMWareSVGAIIDriver);
 
             canvas.Clear(Color.Blue);
         }
