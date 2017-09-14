@@ -15,7 +15,7 @@ namespace Cosmos_Graphic_Subsytem
         {
             Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
 
-            var xSVGAIIDevice = HAL.PCI.GetDevice(0x15AD, 0x0405);
+            var xSVGAIIDevice = Cosmos.HAL.PCI.GetDevice(0x15AD, 0x0405);
                         
             var xSVGAIIExists = xVideoDriver.DeviceExists;
            /* Check if there is SVGAII Device here to
