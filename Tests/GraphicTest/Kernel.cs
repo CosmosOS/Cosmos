@@ -22,13 +22,8 @@ namespace GraphicTest
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
-            
-            var xSVGAIIDevice = Cosmos.HAL.PCI.GetDevice(0x15AD, 0x0405);
-                        
-            var xSVGAIIExists = xSVGAIIDevice.DeviceExists;
 
-            if(xSVGAIIExists) canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VBEDriver);
-            else canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VMWareSVGAIIDriver);
+            canvas = FullScreenCanvas.GetFullScreenCanvas();
 
             canvas.Clear(Color.Blue);
         }
