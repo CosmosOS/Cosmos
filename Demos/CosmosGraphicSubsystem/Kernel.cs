@@ -17,12 +17,12 @@ namespace Cosmos_Graphic_Subsytem
 
             var xSVGAIIDevice = Cosmos.HAL.PCI.GetDevice(0x15AD, 0x0405);
                         
-            var xSVGAIIExists = xVideoDriver.DeviceExists;
+            var xSVGAIIExists = xSVGAIIDevice.DeviceExists;
            /* Check if there is SVGAII Device here to
             * Get on istance of the Canvas that is all the Screen
             */
             if(xSVGAIIExists) canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VBEDriver);
-            else canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanas.VideoDriver.VMWareSVGAIIDrier);
+            else canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VMWareSVGAIIDrier);
 
             /* Clear the Screen with the color 'Blue' */
             canvas.Clear(Color.Blue);
