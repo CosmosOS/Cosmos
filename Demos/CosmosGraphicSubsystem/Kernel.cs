@@ -14,15 +14,9 @@ namespace Cosmos_Graphic_Subsytem
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
-
-            var xSVGAIIDevice = Cosmos.HAL.PCI.GetDevice(0x15AD, 0x0405);
-                        
-            var xSVGAIIExists = xSVGAIIDevice.DeviceExists;
-           /* Check if there is SVGAII Device here to
-            * Get on istance of the Canvas that is all the Screen
-            */
-            if(xSVGAIIExists) canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VBEDriver);
-            else canvas = FullScreenCanvas.GetFullScreenCanvas(FullScreenCanvas.VideoDriver.VMWareSVGAIIDrier);
+            
+            /* Get on instance of the Canvas that is all the Screen */
+            canvas = FullScreenCanvas.GetFullScreenCanvas();
 
             /* Clear the Screen with the color 'Blue' */
             canvas.Clear(Color.Blue);
