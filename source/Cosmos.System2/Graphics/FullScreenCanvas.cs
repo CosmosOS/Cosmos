@@ -26,12 +26,12 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal("GetFullScreenCanvas() with mode " + mode);
 
             /* Use SVGAII When Exists in PCI */
-            if(xSVGAIIExists)
-                xVideoDevice = VideoDriver.VMWareSVGAIIDriver;
+            if(SVGAIIExists)
+                videoDevice = VideoDriver.VMWareSVGAIIDriver;
             
-            if (xVideoDevice == VideoDriver.VMWareSVGAIIDriver)
+            if (videoDevice == VideoDriver.VMWareSVGAIIDriver)
                 return MyVideoDriver = new SVGAIIScreen(mode);
-            else if (xVideoDevice == VideoDriver.VBEDriver)
+            else if (videoDevice == VideoDriver.VBEDriver)
                 return MyVideoDriver = new VBEScreen(mode);
 
             /* We have already got a VideoDriver istance simple change its mode */
@@ -44,12 +44,12 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
             
             /* Use SVGAII When Exists in PCI */
-            if(xSVGAIIExists)
-                xVideoDevice = VideoDriver.VMWareSVGAIIDriver;
+            if(SVGAIIExists)
+                videoDevice = VideoDriver.VMWareSVGAIIDriver;
             
-            if (xVideoDevice == VideoDriver.VMWareSVGAIIDriver)
+            if (videoDevice == VideoDriver.VMWareSVGAIIDriver)
                 return MyVideoDriver = new SVGAIIScreen();
-            else if (xVideoDevice == VideoDriver.VBEDriver)
+            else if (videoDevice == VideoDriver.VBEDriver)
                 return MyVideoDriver = new VBEScreen();
 
             /* We have already got a VideoDriver istance simple reset its mode to DefaultGraphicMode */
