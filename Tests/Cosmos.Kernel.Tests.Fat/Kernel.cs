@@ -6,6 +6,7 @@ using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
+using Cosmos.Kernel.Tests.Fat.System.IO;
 
 namespace Cosmos.Kernel.Tests.Fat
 {
@@ -42,6 +43,18 @@ namespace Cosmos.Kernel.Tests.Fat
             {
                 mDebugger.Send("Run");
 
+#if false
+
+                PathTest.Execute(mDebugger);
+                DirectoryTest.Execute(mDebugger);
+                FileTest.Execute(mDebugger);
+                FileStreamTest.Execute(mDebugger);
+#endif
+                //StreamWriterTest.Execute(mDebugger);
+                DirectoryInfoTest.Execute(mDebugger);
+
+#if false
+
                 TestPath();
                 TestDirectory();
                 TestFile();
@@ -50,19 +63,21 @@ namespace Cosmos.Kernel.Tests.Fat
                 TestStreamReader();
                 TestBinaryWriter();
                 TestBinaryReader();
+#endif
 
                 TestController.Completed();
+
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception occurred");
-                Console.WriteLine(e.Message);
-                mDebugger.Send("Exception occurred: " + e.Message);
+                Console.WriteLine(e.ToString());
+                mDebugger.Send("Exception occurred: " + e.ToString());
                 TestController.Failed();
             }
         }
 
-        #region System.IO.Path Tests
+#region System.IO.Path Tests
 
         /// <summary>
         /// Tests System.IO.Path plugs.
@@ -437,9 +452,9 @@ namespace Cosmos.Kernel.Tests.Fat
             // Path.IsPathRooted(string)
         }
 
-        #endregion
+#endregion
 
-        #region System.IO.Directory Tests
+#region System.IO.Directory Tests
 
         /// <summary>
         /// Tests System.IO.Directory plugs.
@@ -522,9 +537,9 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("");
         }
 
-        #endregion
+#endregion
 
-        #region System.IO.File Tests
+#region System.IO.File Tests
 
         /// <summary>
         /// Tests System.IO.File plugs.
@@ -719,9 +734,9 @@ namespace Cosmos.Kernel.Tests.Fat
             //mDebugger.Send("END TEST");
         }
 
-        #endregion
+#endregion
 
-        #region System.IO.FileStream Tests
+#region System.IO.FileStream Tests
 
         /// <summary>
         /// Tests System.IO.FileStream plugs.
@@ -749,9 +764,9 @@ namespace Cosmos.Kernel.Tests.Fat
             }
         }
 
-        #endregion
+#endregion
 
-        #region System.IO.StreamWriter Tests
+#region System.IO.StreamWriter Tests
 
         private void TestStreamWriter()
         {
@@ -784,9 +799,9 @@ namespace Cosmos.Kernel.Tests.Fat
             */
         }
 
-        #endregion
+#endregion
 
-        #region System.IO.StreamReader Tests
+#region System.IO.StreamReader Tests
 
         private void TestStreamReader()
         {
@@ -813,9 +828,9 @@ namespace Cosmos.Kernel.Tests.Fat
             */
         }
 
-        #endregion
+#endregion
 
-        #region System.IO.BinaryWriter Tests
+#region System.IO.BinaryWriter Tests
 
         private void TestBinaryWriter()
         {
@@ -849,9 +864,9 @@ namespace Cosmos.Kernel.Tests.Fat
             */
         }
 
-        #endregion
+#endregion
 
-        #region System.IO.BinaryReader Tests
+#region System.IO.BinaryReader Tests
 
         private void TestBinaryReader()
         {
@@ -900,9 +915,9 @@ namespace Cosmos.Kernel.Tests.Fat
             */
         }
 
-        #endregion
+#endregion
 
-        #region Helper Methods
+#region Helper Methods
 
         /// <summary>
         /// Utility method to test Byte[] equality.
@@ -980,7 +995,7 @@ namespace Cosmos.Kernel.Tests.Fat
             return true;
         }
 
-        #endregion
+#endregion
 
     }
 }
