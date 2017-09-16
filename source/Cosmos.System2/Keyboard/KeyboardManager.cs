@@ -54,6 +54,8 @@ namespace Cosmos.System
         private static ScanMapBase _scanMap = new US_Standard();
         private static Queue<KeyEvent> mQueuedKeys = new Queue<KeyEvent>();
 
+        public static string RebootMessage = "Detected Ctrl-Alt-Delete! Rebooting System...";
+
         private static void Enqueue(KeyEvent keyEvent)
         {
             mQueuedKeys.Enqueue(keyEvent);
@@ -104,30 +106,20 @@ namespace Cosmos.System
             {
                 if (ControlPressed && AltPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
                 {
-                    Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                    Global.Console.WriteLine(RebootMessage);
                     Power.Reboot();
                 }
 
                 if (ControlPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.C))
                 {
-                    Global.Console.Clear();
-                }
-
-                if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.UpArrow))
-                {
-                    Global.UpArrow();
-                }
-
-                if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.DownArrow))
-                {
-                    Global.DownArrow();
+                    global::System.Console.Clear();
                 }
 
                 //if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.D2))
                 //{
                 //    if (!CapsLock)
                 //    {
-                //        Global.Console.Write("é");
+                //        global::System.Console.Write("é");
                 //    }
                 //}
 
