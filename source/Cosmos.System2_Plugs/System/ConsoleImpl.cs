@@ -199,8 +199,7 @@ namespace Cosmos.System_Plugs.System
 
         public static bool get_KeyAvailable()
         {
-            WriteLine("Not implemented: get_KeyAvailable");
-            return false;
+            return KeyboardManager.KeyAvailable;
         }
 
         public static int get_LargestWindowHeight()
@@ -392,6 +391,29 @@ namespace Cosmos.System_Plugs.System
             {
                 return -1;
             }
+        }
+
+        // ReadKey() pure CIL
+
+        public static ConsoleKeyInfo ReadKey(bool intercept)
+        {
+            var key = KeyboardManager.ReadKey();
+            if (intercept == false && key.KeyChar != '\0')
+            {
+                Write(key.KeyChar);
+            }
+
+            //TODO: Plug HasFlag and use the next 3 lines instead of the 3 following lines
+            
+            //bool xShift = key.Modifiers.HasFlag(ConsoleModifiers.Shift);
+            //bool xAlt = key.Modifiers.HasFlag(ConsoleModifiers.Alt);
+            //bool xControl = key.Modifiers.HasFlag(ConsoleModifiers.Control);
+            
+            bool xShift = (key.Modifiers & ConsoleModifiers.Shift) == ConsoleModifiers.Shift;
+            bool xAlt = (key.Modifiers & ConsoleModifiers.Alt) == ConsoleModifiers.Alt;
+            bool xControl = (key.Modifiers & ConsoleModifiers.Control) == ConsoleModifiers.Control;
+
+            return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), xShift, xAlt, xControl);
         }
 
         public static String ReadLine()
