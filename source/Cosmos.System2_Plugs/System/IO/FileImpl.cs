@@ -181,34 +181,14 @@ namespace Cosmos.System_Plugs.System.IO
                 {
                     File.Delete(destFile);
                 }
-                else
-                {
-                    throw new FileNotFoundException();
-                }
 
-                try
-                {
-                    byte[] srcFileBytes = File.ReadAllBytes(srcFile);
-                    File.WriteAllBytes(destFile, srcFileBytes);
-                }
-                catch (IOException ioEx)
-                {
-                    throw new IOException("File Copy", ioEx);
-                }
+                Copy(srcFile, destFile);
             }
             else
             {
                 if (!File.Exists(destFile))
                 {
-                    try
-                    {
-                        byte[] srcFileBytes = File.ReadAllBytes(srcFile);
-                        File.WriteAllBytes(destFile, srcFileBytes);
-                    }
-                    catch (IOException ioEx)
-                    {
-                        throw new IOException("File Copy", ioEx);
-                    }
+                    Copy(srcFile, destFile);
                 }
                 else
                 {
