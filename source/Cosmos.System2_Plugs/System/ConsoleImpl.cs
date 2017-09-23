@@ -393,6 +393,11 @@ namespace Cosmos.System_Plugs.System
             }
         }
 
+        public static ConsoleKeyInfo ReadKey()
+        {
+            return ReadKey(false);
+        }
+
         // ReadKey() pure CIL
 
         public static ConsoleKeyInfo ReadKey(bool intercept)
