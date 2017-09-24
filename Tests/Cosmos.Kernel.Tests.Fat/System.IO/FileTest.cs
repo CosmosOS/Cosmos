@@ -100,32 +100,22 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
                 mDebugger.Send("");
             }
 
-            // Generic methods on arrays don't work, see https://github.com/CosmosOS/Cosmos/issues/583
-            //
-            //string[] contents = { "One", "Two", "Three" };
-            //File.WriteAllLines(@"0:\test3.txt", contents);
-            //mDebugger.Send("Text written");
-            //mDebugger.Send("Now reading with ReadAllLines()");
-            //string[] readLines = File.ReadAllLines(@"0:\test3.txt");
-            //mDebugger.Send("Contents retrieved after writing");
-            //for (int i = 0; i < readLines.Length; i++)
-            //{
-            //    mDebugger.Send(readLines[i]);
-            //}
-            //Assert.IsTrue(StringArrayAreEquals(contents, readLines), "Contents of test3.txt was written incorrectly!");
-#if false
-                // TODO maybe the more correct test is to implement ReadAllLines and then check that two arrays are equals
-                        var xContents = File.ReadAllText(@"0:\test3.txt");
-                        mDebugger.Send("Contents retrieved after writing");
-                        mDebugger.Send(xContents);
-                        String expectedResult = String.Concat("One", Environment.NewLine, "Two", Environment.NewLine, "Three");
-                        mDebugger.Send("expectedResult: " + expectedResult);
-                        Assert.IsTrue(xContents == expectedResult, "Contents of test3.txt was written incorrectly!");
-#endif
+            string[] contents = { "One", "Two", "Three" };
+            File.WriteAllLines(@"0:\test3.txt", contents);
+            mDebugger.Send("Text written");
+            mDebugger.Send("Now reading with ReadAllLines()");
+            // OK let's read it with ReadAllLines() and check that we read the same content
+            string[] readLines = File.ReadAllLines(@"0:\test3.txt");
+            mDebugger.Send("Contents retrieved after writing");
+            for (int i = 0; i < readLines.Length; i++)
+            {
+                mDebugger.Send(readLines[i]);
+            }
+            Assert.IsTrue(StringArrayAreEquals(contents, readLines), "Contents of test3.txt was written incorrectly!");
+
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
-            //
             mDebugger.Send("START TEST: Write binary data to file now:");
             using (var xFile = File.Create(@"0:\test.dat"))
             {
