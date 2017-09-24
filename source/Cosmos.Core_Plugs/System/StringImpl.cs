@@ -994,7 +994,7 @@ namespace Cosmos.Core_Plugs.System
             return countA - countB;
         }
 
-        internal static unsafe int CompareOrdinalHelper(string strA, int indexA, int countA, string strB, int indexB, int countB)
+        public static unsafe int CompareOrdinalHelper(string strA, int indexA, int countA, string strB, int indexB, int countB)
         {
             // Please note that Argument validation should be handled by callers.
 
