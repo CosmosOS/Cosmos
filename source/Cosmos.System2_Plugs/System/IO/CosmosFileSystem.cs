@@ -10,17 +10,23 @@ using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 
+/*
+ * This plug is a little different from usual because in future while now is plugging Win32FileSystem
+ * when we will compile Cosmos on Linux / MacOS this will have to plug UnixFileSystem, using the attibute
+ * Inheritable we should accomplish this without problems.
+ * It is for this that the name is different too the usual plugs and does not ends in "Impl"
+ */
 namespace Cosmos.System_Plugs.System.IO
 {
-    //[Plug(TargetName = "System.IO.Win32FileSystem")]
-    [Plug(TargetName = "System.IO.Win32FileSystem, System.IO.FileSystem") ]
+    [Plug(TargetName = "System.IO.FileSystem, System.IO.FileSystem", Inheritable = true)]
     public static class CosmosFileSystem
     {
         public static void CreateDirectory(object aThis, string fullPath)
         {
-            // TODO check if 'fullPath' exists already and return in this case
-
-            // XXX If the Directory 'aPath' already exits this method must not do nothing
+            // If 'fullPath' exists already we return already without dealing with VFSManager
+            if (DirectoryExists(aThis, fullPath))
+                return;
+ 
             var xEntry = VFSManager.CreateDirectory(fullPath);
 
             if (xEntry == null)
@@ -41,11 +47,34 @@ namespace Cosmos.System_Plugs.System.IO
             return VFSManager.DirectoryExists(fullPath);
         }
 
+        public static bool FileExists(object aThis, string fullPath)
+        {
+            if (fullPath == null)
+            {
+                return false;
+            }
+
+            Global.mFileSystemDebugger.SendInternal($"FileExists : fullPath = {fullPath}");
+            return VFSManager.FileExists(fullPath);
+        }
+
         public static void RemoveDirectory(object aThis, string fullPath, bool recursive)
         {
             Global.mFileSystemDebugger.SendInternal($"RemoveDirectory : fullPath = {fullPath}");
             VFSManager.DeleteDirectory(fullPath, recursive);
         }
+
+        public static void MoveDirectory(object aThis, string sourceFullPath, string destFullPath)
+        {
+            throw new NotImplementedException("MoveDirectory not implemented");
+        }
+
+#if false
+        public static string GetCurrentDirectory(object aThis)
+        {
+            return "";
+        }
+#endif
 
         public static object /* FileStreamBase */ Open(object aThis, string fullPath, FileMode mode, FileAccess access, FileShare share, int bufferSize, FileOptions options, FileStream parent)
         {
@@ -143,6 +172,33 @@ namespace Cosmos.System_Plugs.System.IO
             }
 
             return aStream;
+        }
+
+        public static FileSystem Current([FieldAccess(Name = "System.IO.FileSystem System.IO.Win32FileSystem.this")]
+        ref FileSystem aThis)
+        {
+            return aThis;
+        }
+
+        /* Other bug of IL2CPU that does not permit to use this, IEnumerableToArray() does not work :-( */
+        public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(object aThis, string aPath, string searchPattern,
+        SearchOption searchOption, [FieldType(Name = "System.IO.SearchTarget, System.IO.FileSystem")] int searchTarget)
+        {
+            // TODO only for directories for now, searchPath is ignored for now
+            Global.mFileSystemDebugger.SendInternal("EnumerateFileSystemInfos");
+            if (aPath == null)
+            {
+                throw new ArgumentNullException(aPath);
+            }
+
+            var xEntries = VFSManager.GetDirectoryListing(aPath);
+            for (int i = 0; i < xEntries.Count; i++)
+            {
+                if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.Directory)
+                {
+                    yield return new DirectoryInfo(xEntries[i].mName);
+                }
+            }
         }
     }
 }

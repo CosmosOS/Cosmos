@@ -21,6 +21,29 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             return a;
         }
 
+        private static unsafe bool StartsWithOrdinal(char* source, uint sourceLength, string value)
+        {
+            if (sourceLength < (uint)value.Length) return false;
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (value[i] != source[i]) return false;
+            }
+            return true;
+        }
+
+        public static unsafe void TestFixed()
+        {
+            String pathAsString = @"0:\DiTest";
+            int pathLength = pathAsString.Length;
+            bool val1;
+            fixed (char* path = pathAsString)
+            {
+                val1 = StartsWithOrdinal(path, (uint)pathLength, "\\\\?\\");
+            }
+
+            Assert.IsTrue(val1 == false, "Path does is UNC path");
+        }
+
         public static void Execute()
         {
 
@@ -50,6 +73,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             //Console.WriteLine("asLong is : " + BitConverter.ToString(hexDump, 0));
             //Assert.IsTrue(asLong == 0x3FF0000000000000, "DoubleToInt64Bits is wrong!");
 
+            TestFixed();
 
         }
 

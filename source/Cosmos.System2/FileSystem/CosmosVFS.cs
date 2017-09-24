@@ -310,6 +310,51 @@ namespace Cosmos.System.FileSystem
         }
 
         /// <summary>
+        /// Gets the attributes for a File / Directory.
+        /// </summary>
+        /// <param name="aPath">The path of the File / Directory.</param>
+        /// <returns>The File / Directory attributes.</returns>
+        public override FileAttributes GetFileAttributes(string aPath)
+        {
+            /*
+             * We are limiting ourselves to the simpler attributes File and Directory for now.
+             * I think that in the end FAT does not support anything else
+             */
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileAttributes() for path {aPath}");
+
+            var xFileSystem = GetFileSystemFromPath(aPath);
+            var xEntry = DoGetDirectoryEntry(aPath, xFileSystem);
+
+            if (xEntry == null)
+                throw new Exception($"{aPath} is neither a file neither a directory");
+
+            switch (xEntry.mEntryType)
+            {
+                    case DirectoryEntryTypeEnum.File:
+                        Global.mFileSystemDebugger.SendInternal($"It is a File");
+                        return FileAttributes.Normal;
+
+                    case DirectoryEntryTypeEnum.Directory:
+                        Global.mFileSystemDebugger.SendInternal($"It is a Directory");
+                        return FileAttributes.Directory;
+
+                    case DirectoryEntryTypeEnum.Unknown:
+                    default:
+                        throw new Exception($"{aPath} is neither a file neither a directory");
+            }
+        }
+
+        /// <summary>
+        /// Sets the attributes for a File / Directory.
+        /// </summary>
+        /// <param name="aPath">The path of the File / Directory.</param>
+        /// <param name="fileAttributes">The attributes of the File / Directory.</param>
+        public override void SetFileAttributes(string aPath, FileAttributes fileAttributes)
+        {
+            throw new NotImplementedException("SetFileAttributes not implemented");
+        }
+
+        /// <summary>
         /// Initializes the partitions for all block devices.
         /// </summary>
         protected virtual void InitializePartitions()

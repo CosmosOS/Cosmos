@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using Cosmos.TestRunner;
 using Cosmos.Debug.Kernel;
-using Cosmos.Common.Extensions;
 
 namespace Cosmos.Kernel.Tests.Fat.System.IO
 {
@@ -15,10 +14,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             mDebugger.Send("START TEST: StreamWriter:");
             mDebugger.Send("Create StreamWriter");
 
-            // Net Core 1.0 as removed the most simpler way to create a StreamWriter (using a String as arg) let's do in the more complex way...
-            //using (var xSW = new StreamWriter(@"0:\test.txt"))
-            using(var stream = new FileStream(@"0:\test.txt", FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.SequentialScan))
-            using (var xSW = new StreamWriter(stream))
+            using (var xSW = new StreamWriter(@"0:\test.txt"))
             {
                 if (xSW != null)
                 {

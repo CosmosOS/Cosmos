@@ -421,6 +421,17 @@ namespace Cosmos.System.FileSystem.VFS
             return xFileInfo.GetFileStream();
         }
 
+        public static FileAttributes GetFileAttributes(string aPath)
+        {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFileAttributes ---");
+            return mVFS.GetFileAttributes(aPath);
+        }
+
+        public static void SetFileAttributes(string aPath, FileAttributes fileAttributes)
+        {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFileAttributes ---");
+            mVFS.SetFileAttributes(aPath, fileAttributes);
+        }
         #region Helpers
 
         public static char GetAltDirectorySeparatorChar()

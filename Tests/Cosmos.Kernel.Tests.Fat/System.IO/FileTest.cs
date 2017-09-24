@@ -20,7 +20,6 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             File.WriteAllText(@"0:\Kudzu.txt", "Hello Cosmos");
             mDebugger.Send("Text written");
 
-
             mDebugger.Send("File contents of Kudzu.txt: ");
             xContents = File.ReadAllText(@"0:\Kudzu.txt");
             mDebugger.Send("Contents retrieved");

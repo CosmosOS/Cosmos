@@ -1,4 +1,4 @@
-//#define COSMOSDEBUG
+#define COSMOSDEBUG
 using global::System;
 using global::System.IO;
 using Cosmos.System;
@@ -103,7 +103,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream InitializeStream(string aPath, FileMode aMode)
         {
-            Global.mFileSystemDebugger.SendInternal("In FileStream.InitializeStream");
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.InitializeStream aPath {aPath}");
             if (aPath == null)
             {
                 Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path == null is true");

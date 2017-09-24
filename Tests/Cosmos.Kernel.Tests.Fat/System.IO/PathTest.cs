@@ -323,7 +323,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             // Path.GetTempPath();
             mDebugger.Send("START TEST");
             xStringResult = Path.GetTempPath();
-            xStringExpectedResult = @"\Temp";
+            xStringExpectedResult = @"0:\Temp";
             xMessage = "Path.GetTempPath failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");

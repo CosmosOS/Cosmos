@@ -242,7 +242,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static string GetTempPath()
         {
-            return @"\Temp";
+            return @"0:\Temp";
         }
 
         public static string RemoveLongPathPrefix(string aPath)

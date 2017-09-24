@@ -1007,7 +1007,6 @@ namespace Cosmos.Core_Plugs.System
             }
         }
 
-
         public static int CompareOrdinalHelperIgnoreCase(string strA, int indexA, int countA, string strB, int indexB, int countB)
         {
             return CompareOrdinalHelper(strA.ToLower(), indexA, countA, strB.ToLower(), indexB, countB);
