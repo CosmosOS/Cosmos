@@ -5,6 +5,9 @@
     <DisableImplicitFrameworkReferences>True</DisableImplicitFrameworkReferences>
     <ImplicitlyExpandDesignTimeFacades>False</ImplicitlyExpandDesignTimeFacades>
     <NoStdLib>true</NoStdLib>
+	<ImplicitlyExpandNETStandardFacades>False</ImplicitlyExpandNETStandardFacades>
+	<DesignTimeBuild>True</DesignTimeBuild>
+	<ProjectAssetsFile>NULL</ProjectAssetsFile>
   </PropertyGroup>
   
   <PropertyGroup>
