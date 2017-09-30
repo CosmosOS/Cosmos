@@ -9,7 +9,7 @@ Build status for master branch:
 
 ## Updated Sep 29, 2017
 
-The hosting service which hosts our website has a technical issue which has taken our website offline. We are urgently working to resolve this issue. We hope that our primary website will be restored today.
+The hosting service which hosts our website has a technical issue which has taken our website offline. We are urgently working to resolve this issue.
 
 ## Hurricane Harvey
 
