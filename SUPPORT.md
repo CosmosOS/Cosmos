@@ -6,3 +6,4 @@
 <DesignTimeBuild>True</DesignTimeBuild>
 <ProjectAssetsFile>NULL</ProjectAssetsFile>
 ```
+^This issue is fixed in Userkit 20170928 https://github.com/CosmosOS/Cosmos/releases/tag/Userkit_20170928
