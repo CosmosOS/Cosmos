@@ -122,6 +122,14 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
 
             mDebugger.Send("");
 
+            mDebugger.Send("START TEST: Set Current Directory:");
+            var ExpectedCurrentDirectory = @"0:\TestDir1";
+            Directory.SetCurrentDirectory(ExpectedCurrentDirectory);
+            var CurrentDirectory = Directory.GetCurrentDirectory();
+            Assert.IsTrue(ExpectedCurrentDirectory == CurrentDirectory, "Current Directory is wrong!");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -21,6 +21,12 @@ namespace Cosmos.System_Plugs.System.IO
     [Plug(TargetName = "System.IO.FileSystem, System.IO.FileSystem", Inheritable = true)]
     public static class CosmosFileSystem
     {
+        /*
+         * This "trick" will work until we have not multi threading / multi process then you must do in the correct
+         * way (an "attribute" of the running thread itself?)
+         */
+        private static string mCurrentDirectory = string.Empty;
+
         public static void CreateDirectory(object aThis, string fullPath)
         {
             // If 'fullPath' exists already we return already without dealing with VFSManager
@@ -69,12 +75,17 @@ namespace Cosmos.System_Plugs.System.IO
             throw new NotImplementedException("MoveDirectory not implemented");
         }
 
-#if false
         public static string GetCurrentDirectory(object aThis)
         {
-            return "";
+            Global.mFileSystemDebugger.SendInternal($"Directory.GetCurrentDirectory : mCurrentDirectory = {mCurrentDirectory}");
+            return mCurrentDirectory;
         }
-#endif
+
+        public static void SetCurrentDirectory(object aThis, string fullPath)
+        {
+            Global.mFileSystemDebugger.SendInternal($"Directory.SetCurrentDirectory : aPath = {fullPath}");
+            mCurrentDirectory = fullPath;
+        }
 
         public static object /* FileStreamBase */ Open(object aThis, string fullPath, FileMode mode, FileAccess access, FileShare share, int bufferSize, FileOptions options, FileStream parent)
         {
