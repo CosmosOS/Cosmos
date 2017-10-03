@@ -17,8 +17,6 @@
         <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
         <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.3.409" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.8" />
         <PackageReference Include="System.Data.Common" Version="4.1.0" />
     </ItemGroup>
 
@@ -31,10 +29,6 @@
         <ItemGroup>
             <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'System.Data.Common'" />
         </ItemGroup>
-    </Target>
-
-    <Target Name="ExcludeESqlite3FromPublishDir" AfterTargets="Publish">
-        <Delete Files="$(PublishDir)e_sqlite3.dll" Condition="Exists('$(PublishDir)e_sqlite3.dll')" />
     </Target>
 
 </Project>
