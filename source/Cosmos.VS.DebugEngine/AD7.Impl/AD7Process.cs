@@ -379,6 +379,27 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         private void DbgCmdNullReferenceOccurred(uint lastEIPAddress)
         {
+            if (mDebugInfo.TryGetValue(BuildPropertyNames.DebugModeString, out var xDebugMode))
+            {
+                if (xDebugMode == "Source")
+                {
+                    try
+                    {
+                        var xMethod = mDebugInfoDb.GetMethod(lastEIPAddress);
+                        var xLabel = mDebugInfoDb.GetLabels(lastEIPAddress)[0];
+                        var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
+                        var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
+                        var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+
+                        AD7Util.MessageBox($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(xMethod.DocumentID)}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
+                        return;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                    }
+                }
+            }
+
             AD7Util.MessageBox(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
         }
 
