@@ -325,7 +325,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         mDbgConnector = new DebugConnectorPipeServer(xPortParam);
                     }
                     break;
-#if SERIAL_PORT
                 case "serial:":
                     if (xLaunch == "IntelEdison")
                     {
@@ -336,7 +335,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         mDbgConnector = new DebugConnectorSerial(xPortParam);
                     }
                     break;
-#endif
                 default:
                     throw new Exception("No debug connector found for port type '" + xPortType + "'");
 
@@ -457,8 +455,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                             if (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running)
                             {
                                 AD7Util.MessageBox(
-                                    "The Hyper-V Virtual Machine Management Service will be stopped. This is needed to allow to run VMware. If you press \"No\" the debug will stop.",
-                                    "Question");
+                                    "The Hyper-V Virtual Machine Management Service will be stopped. This is needed to allow to run VMware.");
                                 sc.Stop();
                             }
                         }
@@ -468,15 +465,13 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         }
                     }
 
-                    #endregion CheckIfHyperVServiceIsRunning
+                    #endregion
 
                     mHost = new VMware(mDebugInfo, xUseGDB);
                     break;
-#if SERIAL_PORT
                 case LaunchType.Slave:
                     mHost = new Slave(mDebugInfo, xUseGDB);
                     break;
-#endif
                 case LaunchType.Bochs:
                     // The project has been created on another machine or Bochs has been uninstalled since the project has
                     // been created.

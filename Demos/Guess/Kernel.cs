@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using Cosmos.Debug.Kernel;
+//using Cosmos.Debug.Kernel;
 using Sys = Cosmos.System;
 
 /*
@@ -37,8 +37,8 @@ namespace Guess
         {
             mCount++;
 
-            mDebugger.Send("");
-            mDebugger.SendMessage("Kernel", "New iteration");
+            //mDebugger.Send("");
+            //mDebugger.SendMessage("Kernel", "New iteration");
             Console.WriteLine();
             Console.WriteLine("Guess #" + mCount);
             Console.Write("Please enter a guess: ");

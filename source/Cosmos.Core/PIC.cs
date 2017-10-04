@@ -1,4 +1,4 @@
-﻿using Cosmos.Core.Common;
+﻿using Cosmos.Core;
 
 namespace Cosmos.Core
 {

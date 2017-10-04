@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Win32;
@@ -63,7 +63,7 @@ namespace Cosmos.Build.Common
                     DevKit = (string) xReg.GetValue("DevKit");
                     try
                     {
-                        DebugStubSrc = CheckPath(DevKit, @"source\Cosmos.Debug.DebugStub");
+                        DebugStubSrc = CheckPath(DevKit, @"source\Cosmos.Core.DebugStub");
                     }
                     catch
                     {

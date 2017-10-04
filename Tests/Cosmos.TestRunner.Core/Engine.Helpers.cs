@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -30,7 +30,6 @@ namespace Cosmos.TestRunner.Core
 
         private void RunDotnetPublish(string aProjectPath, string aOutputPath, string aRuntimeTarget)
         {
-            bool xResult = true;
             var xArgsString = $"publish \"{aProjectPath}\" -o \"{aOutputPath}\" -r {aRuntimeTarget}";
 
             RunProcess("dotnet", aProjectPath, xArgsString);
@@ -164,35 +163,67 @@ namespace Cosmos.TestRunner.Core
             RunObjDump(CosmosPaths.Build, workingDir, kernelFileName, OutputHandler.LogError, OutputHandler.LogMessage);
         }
 
+        private void RunTheRingMaster(string kernelFileName)
+        {
+            var xArgs =  new List<string>() { kernelFileName };
+
+            bool xUsingUserKit = false;
+            string xTheRingMasterPath = Path.Combine(FindCosmosRoot(), "source", "TheRingMaster");
+            if (!Directory.Exists(xTheRingMasterPath))
+            {
+                xUsingUserKit = true;
+                xTheRingMasterPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "TheRingMaster");
+            }
+
+            if (xUsingUserKit)
+            {
+                RunProcess("TheRingMaster.exe", xTheRingMasterPath, xArgs);
+            }
+            else
+            {
+                xArgs.Insert(0, "run");
+                xArgs.Insert(1, "--no-build");
+                RunProcess("dotnet", xTheRingMasterPath, xArgs);
+            }
+        }
+
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            References = new List<string>
+            References = new List<string>() { kernelFileName };
+
+            if (KernelPkg == "X86")
             {
-                kernelFileName,
-                Assembly.Load(new AssemblyName("Cosmos.Core.Plugs")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.Core.Plugs.Asm")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.System.Plugs")).Location
-            };
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Plugs.TapRoot")).Location);
+            }
+            else
+            {
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.System2_Plugs")).Location);
+                References.Add(Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location);
+            }
 
             var xArgs = new List<string>
             {
-                "DebugEnabled:true",
+                "KernelPkg:" + KernelPkg,
+                "DebugEnabled:True",
                 "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
                 "StackCorruptionDetectionLevel:" + StackCorruptionChecksLevel,
                 "DebugMode:Source",
                 "TraceAssemblies:" + TraceAssembliesLevel,
                 "DebugCom:1",
-                "UseNAsm:True",
                 "OutputFilename:" + outputFile,
                 "EnableLogging:True",
                 "EmitDebugSymbols:True",
                 "IgnoreDebugStubAttribute:False"
             };
+
             xArgs.AddRange(References.Select(aReference => "References:" + aReference));
 
             bool xUsingUserkit = false;
-            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "source", "IL2CPU");
+            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU");
             if (!Directory.Exists(xIL2CPUPath))
             {
                 xUsingUserkit = true;
@@ -220,11 +251,9 @@ namespace Cosmos.TestRunner.Core
                 else
                 {
                     xArgs.Insert(0, "run");
-                    xArgs.Insert(1, "--project");
-                    xArgs.Insert(2, Path.Combine(xIL2CPUPath, "IL2CPU.csproj"));
-                    xArgs.Insert(3, "--no-build");
-                    xArgs.Insert(4, " -- ");
-                    RunProcess("dotnet", Path.GetDirectoryName(kernelFileName), xArgs);
+                    xArgs.Insert(1, "--no-build");
+                    xArgs.Insert(2, " -- ");
+                    RunProcess("dotnet", xIL2CPUPath, xArgs, true);
                 }
             }
         }

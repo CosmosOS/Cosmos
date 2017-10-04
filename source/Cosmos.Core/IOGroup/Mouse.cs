@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Core.Common;
+using Cosmos.Core;
 
 namespace Cosmos.Core.IOGroup
 {

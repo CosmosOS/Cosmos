@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using Cosmos.Debug.Common;
+using Cosmos.Build.Common;
 
 namespace Cosmos.VS.ProjectSystem
 {

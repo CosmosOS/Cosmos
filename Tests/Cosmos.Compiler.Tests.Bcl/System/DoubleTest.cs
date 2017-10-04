@@ -1,24 +1,13 @@
 ﻿using System;
 using Cosmos.TestRunner;
 using Cosmos.Debug.Kernel;
+using Cosmos.Compiler.Tests.Bcl.Helper;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
     class DoubleTest
     {
         public readonly Debugger mDebugger = new Debugger("User", "Double");
-
-        /* The double== equality operator is so imprecise to not be really ever useful we should be happy if the two values are "similar" */
-        private static bool DoublesAreEqual(double left, double right)
-        {
-            // Define the tolerance for variation in their values
-            double difference = Math.Abs(left * .00001);
-
-            if (Math.Abs(left - right) <= difference)
-                return true;
-            else
-                return false;
-        }
 
         public static void Execute()
         {
@@ -137,23 +126,23 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             OperationResult = value + otherValue;
 
-            Assert.IsTrue((DoublesAreEqual(OperationResult, 44.62)), "double operator+ doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(OperationResult, 44.62)), "double operator+ doesn't work");
 
             // Now test subtraction
             OperationResult = value - otherValue;
 
-            Assert.IsTrue((DoublesAreEqual(OperationResult, 40.22)), "double operator- doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(OperationResult, 40.22)), "double operator- doesn't work");
 
             // Now test multiplication
             otherValue = 2.00; // I'll change 'otherValue' to 2.00 because if not the result is too much wrong to make sense...
             OperationResult = value * otherValue;
 
-            Assert.IsTrue((DoublesAreEqual(OperationResult, 84.84)), "double operator* doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(OperationResult, 84.84)), "double operator* doesn't work");
 
             // Now test division
             OperationResult = value / otherValue;
 
-            Assert.IsTrue((DoublesAreEqual(OperationResult, 21.21)), "double operator/ doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(OperationResult, 21.21)), "double operator/ doesn't work");
 
             // Now test division again but with dividend 0 the expected result should be Double.PositiveInfinity
             OperationResult = value / 0.00;
@@ -183,21 +172,21 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // We put on anUInt a very big value Int32.MaxValue + 42. Why all this 42 :-) ?
             uint anUInt = 2147483689;
             value = (double)anUInt;
-            Assert.IsTrue((DoublesAreEqual(value, 2147483689d)), "(double) from uint operator doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(value, 2147483689d)), "(double) from uint operator doesn't work");
 
             // We put on anUlong a very big value Int64MaxValue + 42. Hmm that '42' again :-)) ?
             ulong anULong = 9223372036854775849;
             value = (double)anULong;
-            Assert.IsTrue((DoublesAreEqual(value, 9223372036854775849d)), "(double) from ulong operator doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(value, 9223372036854775849d)), "(double) from ulong operator doesn't work");
 
             value = -42.0;
             double valueNegated = -value;
-            Assert.IsTrue((DoublesAreEqual(valueNegated, 42d)), "(double) negation doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(valueNegated, 42d)), "(double) negation doesn't work");
 
             // Let's try if it works in the other way too
             value = 42.0;
             valueNegated = -value;
-            Assert.IsTrue((DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive double doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive double doesn't work");
         }
     }
 }

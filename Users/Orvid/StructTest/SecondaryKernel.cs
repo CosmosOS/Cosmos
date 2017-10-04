@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-//using Math = Cosmos.System.Plugs.MathImpl;
+//using Math = Cosmos.System_Plugs.MathImpl;
 using System.Text;
 using Sys = Cosmos.System;
 using Orvid.Graphics;
