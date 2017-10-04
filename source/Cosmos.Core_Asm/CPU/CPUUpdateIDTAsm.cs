@@ -1,11 +1,11 @@
 using System;
 using System.Reflection;
 
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
+using XSharp.Assembler;
+using XSharp.Assembler.x86;
 using Cosmos.IL2CPU.API.Attribs;
-using XSharp.Common;
-using static XSharp.Common.XSRegisters;
+using XSharp;
+using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
 {
@@ -36,7 +36,7 @@ namespace Cosmos.Core_Asm
                 , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
         }
 
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             // IDT is already initialized but just for base hooks, and asm only.
             // ie Int 1, 3 and GPF

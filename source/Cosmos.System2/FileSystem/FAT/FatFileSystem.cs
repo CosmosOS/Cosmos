@@ -35,9 +35,9 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Gets the size of a fat entry in bytes.
+            /// Gets the size of a FAT entry in bytes.
             /// </summary>
-            /// <returns>The size of a fat entry in bytes.</returns>
+            /// <returns>The size of a FAT entry in bytes.</returns>
             /// <exception cref="NotSupportedException">Can not get the FAT entry size for an unknown FAT type.</exception>
             private uint GetFatEntrySizeInBytes()
             {
@@ -56,11 +56,11 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Gets the fat chain.
+            /// Gets the FAT chain.
             /// </summary>
             /// <param name="aFirstEntry">The first entry.</param>
             /// <param name="aDataSize">Size of a data to be stored in bytes.</param>
-            /// <returns>An array of cluster numbers for the fat chain.</returns>
+            /// <returns>An array of cluster numbers for the FAT chain.</returns>
             /// <exception cref="ArgumentOutOfRangeException"></exception>
             public uint[] GetFatChain(uint aFirstEntry, long aDataSize = 0)
             {
@@ -132,7 +132,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Gets the next unallocated fat entry.
+            /// Gets the next unallocated FAT entry.
             /// </summary>
             /// <returns>The index of the next unallocated FAT entry.</returns>
             /// <exception cref="Exception">Failed to find an unallocated FAT entry.</exception>
@@ -157,7 +157,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Clears a fat entry.
+            /// Clears a FAT entry.
             /// </summary>
             /// <param name="aEntryNumber">The entry number.</param>
             public void ClearFatEntry(ulong aEntryNumber)
@@ -186,7 +186,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Gets a fat entry.
+            /// Gets a FAT entry.
             /// </summary>
             /// <param name="aEntryNumber">The entry number.</param>
             /// <param name="aValue">The entry value.</param>
@@ -242,7 +242,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Sets a fat entry.
+            /// Sets a FAT entry.
             /// </summary>
             /// <param name="aEntryNumber">The entry number.</param>
             /// <param name="aValue">The value.</param>
@@ -359,8 +359,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// <param name="aDevice">The partition.</param>
         /// <param name="aRootPath">The root path.</param>
         /// <exception cref="Exception">FAT signature not found.</exception>
-        public FatFileSystem(Partition aDevice, string aRootPath)
-            : base(aDevice, aRootPath)
+        public FatFileSystem(Partition aDevice, string aRootPath, long aSize)
+            : base(aDevice, aRootPath, aSize)
         {
             if (aDevice == null)
             {
@@ -603,7 +603,7 @@ namespace Cosmos.System.FileSystem.FAT
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetRootDirectory --");
 
-            var xRootEntry = new FatDirectoryEntry(this, null, mRootPath, mRootPath, RootCluster);
+            var xRootEntry = new FatDirectoryEntry(this, null, mRootPath, mSize, mRootPath, RootCluster);
             return xRootEntry;
         }
 

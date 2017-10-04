@@ -137,7 +137,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         private MemoryBlock Video_Memory;
         private MemoryBlock FIFO_Memory;
 
-        private PCIDeviceNormal device;
+        private PCIDevice device;
         private uint height;
         private uint width;
         private uint depth;
@@ -145,9 +145,9 @@ namespace Cosmos.HAL.Drivers.PCI.Video
 
         public VMWareSVGAII()
         {
-            device = (PCIDeviceNormal)(HAL.PCI.GetDevice(0x15AD, 0x0405));
+            device = (HAL.PCI.GetDevice(0x15AD, 0x0405));
             device.EnableMemory(true);
-            uint basePort = device.BaseAddresses[0].BaseAddress();
+            uint basePort = device.BaseAddressBar[0].BaseAddress;
             IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));
             ValuePort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Value));
             BiosPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Bios));

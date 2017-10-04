@@ -285,9 +285,9 @@ namespace Cosmos.Build.Builder {
       StartConsole(xNuget, xUpdateParams);
     }
       
-    private void Pack(string project, string destDir, string version) {
+    private void Pack(string project, string destDir) {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
-      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:PackageVersion={Quoted(version)} /p:PackageOutputPath={Quoted(destDir)}";
+      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:PackageOutputPath={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
@@ -300,14 +300,14 @@ namespace Cosmos.Build.Builder {
     private void CompileCosmos() {
       string xVsipDir = Path.Combine(mCosmosPath, "Build", "VSIP");
       string xNugetPkgDir = Path.Combine(xVsipDir, "KernelPackages");
-      string xVersion = DateTime.Now.ToString("yyyy.MM.dd");
-      
 
       Section("Clean NuGet Local Feed");
       Clean(Path.Combine(mCosmosPath, @"Build.sln"));
 
       Section("Restore NuGet Packages");
       Restore(Path.Combine(mCosmosPath, @"Build.sln"));
+	  Restore(Path.Combine(mCosmosPath, @"../IL2CPU/IL2CPU.sln"));
+	  Restore(Path.Combine(mCosmosPath, @"../XSharp/XSharp.sln"));
 
       Section("Update NuGet");
       Update();
@@ -319,27 +319,26 @@ namespace Cosmos.Build.Builder {
 
       Section("Publish Tools");
       Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
-      Publish(Path.Combine(mSourcePath, "IL2CPU"), Path.Combine(xVsipDir, "IL2CPU"));
-      Publish(Path.Combine(mSourcePath, "XSharp.Compiler"), Path.Combine(xVsipDir, "XSharp"));
+      Publish(Path.Combine(mSourcePath, "../../IL2CPU/source/IL2CPU"), Path.Combine(xVsipDir, "IL2CPU"));
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVsipDir, "NASM"));
 
       Section("Pack Kernel");
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xNugetPkgDir);
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xNugetPkgDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Plugs"), xNugetPkgDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xNugetPkgDir);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Plugs"), xNugetPkgDir);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xNugetPkgDir);
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.HAL2"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.HAL2"), xNugetPkgDir);
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.System2"), xNugetPkgDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.System2_Plugs"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.System2"), xNugetPkgDir);
+      Pack(Path.Combine(mSourcePath, "Cosmos.System2_Plugs"), xNugetPkgDir);
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xNugetPkgDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xNugetPkgDir);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xNugetPkgDir);
       //
-      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.API"), xNugetPkgDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "../../IL2CPU/source/Cosmos.IL2CPU.API"), xNugetPkgDir);
     }
 
     private void CopyTemplates() {
@@ -403,29 +402,7 @@ namespace Cosmos.Build.Builder {
 
       string setupName = GetSetupName(mReleaseNo);
 
-      if (App.UseTask) {
-        // This is a hack to avoid the UAC dialog on every run which can be very disturbing if you run
-        // the dev kit a lot.
-        Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"), true, false);
-
-        // Must check for start before stop, else on slow machines we exit quickly because Exit is found before
-        // it starts.
-        // Some slow user PCs take around 5 seconds to start up the task...
-        int xSeconds = 10;
-        var xTimed = DateTime.Now;
-        Log.WriteLine("Waiting " + xSeconds + " seconds for Setup to start.");
-        if (WaitForStart(setupName, xSeconds * 1000)) {
-          mExceptionList.Add("Setup did not start.");
-          return;
-        }
-        Log.WriteLine("Setup is running. " + DateTime.Now.Subtract(xTimed).ToString(@"ss\.fff"));
-
-        // Scheduler starts it and exits, but we need to wait for the setup itself to exit before proceding
-        Log.WriteLine("Waiting for Setup to complete.");
-        WaitForExit(setupName);
-      } else {
-        Start(mCosmosPath + @"Setup\Output\" + setupName + ".exe", @"/SILENT");
-      }
+      Start(mCosmosPath + @"Setup\Output\" + setupName + ".exe", @"/SILENT");
     }
 
     private void Done() {

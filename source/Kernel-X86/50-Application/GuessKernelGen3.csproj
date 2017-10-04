@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ProjectGuid>{9E58E949-7B71-45ED-9610-11DA287EE933}</ProjectGuid>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="*.Cosmos" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Cosmos.cfg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+    <ProjectReference Include="..\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
+    <ProjectReference Include="..\40-System\Cosmos.System\Cosmos.System.csproj" />
+  </ItemGroup>
+
+</Project>

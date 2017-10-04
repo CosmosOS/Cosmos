@@ -18,7 +18,6 @@ namespace Cosmos.System.FileSystem
     /// <seealso cref="Cosmos.System.FileSystem.VFS.VFSBase" />
     public class CosmosVFS : VFSBase
     {
-
         private List<Partition> mPartitions;
 
 
@@ -78,7 +77,7 @@ namespace Cosmos.System.FileSystem
             Global.mFileSystemDebugger.SendInternal("xFileToCreate =");
             Global.mFileSystemDebugger.SendInternal(xFileToCreate);
 
-            string xParentDirectory = aPath.Remove(aPath.Length - xFileToCreate.Length);
+            string xParentDirectory = Path.GetDirectoryName(aPath);
             Global.mFileSystemDebugger.SendInternal("After removing last path part");
             Global.mFileSystemDebugger.SendInternal("xParentDirectory =");
             Global.mFileSystemDebugger.SendInternal(xParentDirectory);
@@ -127,14 +126,14 @@ namespace Cosmos.System.FileSystem
 
             Global.mFileSystemDebugger.SendInternal("Path doesn't exist.");
 
-            string xDirectoryToCreate = Path.GetFileName(aPath);
+            aPath = aPath.TrimEnd(DirectorySeparatorChar, AltDirectorySeparatorChar);
 
+            string xDirectoryToCreate = Path.GetFileName(aPath);
             Global.mFileSystemDebugger.SendInternal("After GetFileName");
             Global.mFileSystemDebugger.SendInternal("xDirectoryToCreate =");
             Global.mFileSystemDebugger.SendInternal(xDirectoryToCreate);
 
-            string xParentDirectory = aPath.Remove(aPath.Length - xDirectoryToCreate.Length);
-
+            string xParentDirectory = Path.GetDirectoryName(aPath);
             Global.mFileSystemDebugger.SendInternal("After removing last path part");
             Global.mFileSystemDebugger.SendInternal("xParentDirectory =");
             Global.mFileSystemDebugger.SendInternal(xParentDirectory);
@@ -356,10 +355,11 @@ namespace Cosmos.System.FileSystem
             for (int i = 0; i < mPartitions.Count; i++)
             {
                 string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
+                var xSize = (long)(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
-                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath));
+                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath, xSize));
                         break;
                     default:
                         global::System.Console.WriteLine("Unknown filesystem type!");
@@ -474,6 +474,7 @@ namespace Cosmos.System.FileSystem
                     {
                         xBaseDirectory = xListingItem;
                         xPartFound = true;
+                        break;
                     }
                 }
 

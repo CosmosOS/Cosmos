@@ -1,9 +1,9 @@
 using System;
-using Cosmos.Assembler;
+using XSharp.Assembler;
 using Cosmos.Core;
 using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.API.Attribs;
-using XSharp.Common;
+using XSharp;
 
 namespace Cosmos.Core_Asm
 {
@@ -15,7 +15,7 @@ namespace Cosmos.Core_Asm
 
         private class Write8Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
                 //TODO: This is a lot of work to write to a single port.
                 // We need to have some kind of inline ASM option that can
@@ -37,7 +37,7 @@ namespace Cosmos.Core_Asm
 
         private class Write16Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
                 XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
                 XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
@@ -56,7 +56,7 @@ namespace Cosmos.Core_Asm
 
         private class Write32Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
                 XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
                 XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
@@ -75,7 +75,7 @@ namespace Cosmos.Core_Asm
 
         private class Read8Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
                 XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
                 //TODO: Do we need to clear rest of EAX first?
@@ -98,7 +98,7 @@ namespace Cosmos.Core_Asm
 
         private class Read16Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
                 XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
                 XS.Set(XSRegisters.EAX, 0);
@@ -119,7 +119,7 @@ namespace Cosmos.Core_Asm
 
         private class Read32Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
                 XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
                 XS.ReadFromPortDX(XSRegisters.EAX);

@@ -1,7 +1,7 @@
-using Cosmos.Assembler;
+using XSharp.Assembler;
 using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.API.Attribs;
-using XSharp.Common;
+using XSharp;
 
 namespace Cosmos.Debug.Kernel.Plugs.Asm
 {
@@ -78,7 +78,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
   // Maybe could merge this into the same unit as the plug
   public class DebugTraceOff : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");
@@ -90,7 +90,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugTraceOn : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");
@@ -111,7 +111,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
   /// </remarks>
   public class DebugSendChannelCommand : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("mov AL, [EBP + 20]");
@@ -134,7 +134,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
   /// </remarks>
   public class DebugSendChannelCommandNoData : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("mov AL, [EBP + 12]");
@@ -148,7 +148,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugBreak : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("mov dword [DebugStub_DebugBreakOnNextTrace], 1");
@@ -165,7 +165,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
   /// </remarks>
   public class DebugDoSend : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       XS.Label(".BeforeArgumentsPrepare");
@@ -182,7 +182,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugDoSendNumber : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 8]");
@@ -194,7 +194,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugDoSendLongNumber : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 12]");
@@ -207,7 +207,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugDoSendComplexNumber : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 8]");
@@ -219,7 +219,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugDoSendComplexLongNumber : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 12]");
@@ -232,7 +232,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugSendMessageBox : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");
@@ -244,7 +244,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugSendPtr : AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");
@@ -256,7 +256,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DoBochsBreak : AssemblerMethod
   {
-    public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       XS.Exchange(XSRegisters.BX, XSRegisters.BX);
     }
@@ -264,7 +264,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DoRealHalt : AssemblerMethod
   {
-    public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       XS.DisableInterrupts();
       // bochs magic break
