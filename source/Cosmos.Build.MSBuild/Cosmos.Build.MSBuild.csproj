@@ -13,12 +13,11 @@
         </Content>
     </ItemGroup>
 
-    <ItemGroup>
+   <ItemGroup>
         <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
         <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.3.409" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
         <PackageReference Include="System.Data.Common" Version="4.1.0" />
-    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
@@ -31,4 +30,7 @@
         </ItemGroup>
     </Target>
 
+    <Target Name="ExcludeESqlite3FromPublishDir" AfterTargets="Publish">
+        <Delete Files="$(PublishDir)e_sqlite3.dll" Condition="Exists('$(PublishDir)e_sqlite3.dll')" />
+    </Target>
 </Project>
