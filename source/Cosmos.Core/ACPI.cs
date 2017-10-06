@@ -113,9 +113,31 @@ namespace Cosmos.Core
         // Reboot
         public static void Reboot()
         {
-            throw new NotImplementedException("ACPI Reset not implemented yet."); //TODO
-        }
+            byte good = 0x02;
+            while ((good & 0x02) != 0)
+                good = Inb(0x64);
+            Outb(0x64, 0xFE);
 
+            Global.CPU.Halt();
+        }
+        public static byte Inb(ushort port)
+        {
+            if (io.Port != port)
+                io = new IOPort(port);
+            return io.Byte;
+
+        }
+        static int PP = 0, D = 0;
+        public static void Outb(ushort port, byte data)
+        {
+            if (io.Port != port)
+                io = new IOPort(port);
+            io.Byte = data;
+            PP = port;
+            D = data;
+
+        }
+        static IOPort io = new IOPort(0);
         // Initializazion
         private static bool Init()
         {
