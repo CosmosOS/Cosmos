@@ -42,15 +42,16 @@ namespace Cosmos.Kernel.Tests.Fat
             {
                 mDebugger.Send("Run");
 
-                TestPath();
-                TestDirectory();
-                TestFile();
-                TestFileStream();
-                TestStreamWriter();
-                TestStreamReader();
-                TestBinaryWriter();
-                TestBinaryReader();
-                TestCopy();
+                Console.WriteLine(HAL.Drivers.PCI.Network.AMDPCNetII.PhysicalAdress());
+                //TestPath();
+                //TestDirectory();
+                //TestFile();
+                //TestFileStream();
+                //TestStreamWriter();
+                //TestStreamReader();
+                //TestBinaryWriter();
+                //TestBinaryReader();
+                //TestCopy();
 
                 TestController.Completed();
             }

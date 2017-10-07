@@ -129,22 +129,40 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             Cosmos.Core.Global.PIC.EoiSlave();
         }
 
+        // 
+        // Retrieve all AMD PCNetII network cards found on computer.
+        // 
+        //public static void FindAll()
+        //{
+        //    Console.WriteLine("Scanning for AMD PCNetII cards...");
+        //    PCIDevice device;
+        //    device = HAL.PCI.GetDevice(0x1022, 0x2000);
+        //    if (device != null)
+        //    {
+        //        AMDPCNetII nic = new AMDPCNetII(device);
+          
+        //        Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
+        //                        device.function);
+        //        Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+        //        Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
+        //    }
+        //}
+
         /// <summary>
-        /// Retrieve all AMD PCNetII network cards found on computer.
+        /// Get MAC Address String
         /// </summary>
-        public static void FindAll()
-        {
-            Console.WriteLine("Scanning for AMD PCNetII cards...");
+        public static string PhysicalAdress()
+        {           
             PCIDevice device;
             device = HAL.PCI.GetDevice(0x1022, 0x2000);
             if (device != null)
             {
                 AMDPCNetII nic = new AMDPCNetII(device);
-          
-                //Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
-                  //                device.function);
-                //Console.WriteLine("NIC IRQ: " + device.InterruptLine);
-                Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
+                return nic.MACAddress.ToString();
+            }
+            else
+            {
+                return "";
             }
         }
 
