@@ -148,6 +148,20 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         //    }
         //}
 
+        public static bool NetworkCardAvailable()
+        {
+            PCIDevice device;
+            device = HAL.PCI.GetDevice(0x1022, 0x2000);
+            if (device != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Get MAC Address String
         /// </summary>
@@ -155,7 +169,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {           
             PCIDevice device;
             device = HAL.PCI.GetDevice(0x1022, 0x2000);
-            if (device != null)
+            if (NetworkCardAvailable())
             {
                 AMDPCNetII nic = new AMDPCNetII(device);
                 return nic.MACAddress.ToString();
