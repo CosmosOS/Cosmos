@@ -32,6 +32,26 @@ namespace Cosmos.HAL
                     CheckBus(fn);
                 }
             }
+
+            foreach (PCIDevice device in Devices)
+            {
+
+                if (device.ClassCode == 0x01 && device.Subclass == 0x06 && device.ProgIF == 0x01)
+                {
+                    //Serial ATA (AHCI 1.0)
+                    Global.atamode = 1;
+                }
+                else if (device.ClassCode == 0x01 && device.Subclass == 0x04 && device.ProgIF == 0x00)
+                {
+                    //RAID Controller
+                    Global.atamode = 2;
+                }
+                else if (device.ClassCode == 0x01 && device.Subclass == 0x01)
+                {
+                    //IDE Controller
+                    Global.atamode = 3;
+                }
+            }
         }
 
         private static void CheckBus(ushort xBus)

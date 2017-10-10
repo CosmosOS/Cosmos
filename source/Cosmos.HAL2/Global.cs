@@ -15,6 +15,7 @@ namespace Cosmos.HAL
 
     public static TextScreenBase TextScreen = new TextScreen();
     public static PCI Pci;
+    public static int atamode;
 
     static public void Init(TextScreenBase textScreen)
     {
@@ -46,16 +47,26 @@ namespace Cosmos.HAL
 
       mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
-      mDebugger.Send("ATA Primary Master");
-      InitAta(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
+      if (atamode == 1)
+      {
+        //TODO Implement an AHCI Driver
+      }
+      else if (atamode == 2)
+      {
+        //TODO Implement a RAID Driver
+      }
+      else if (atamode == 3)
+      {
+        mDebugger.Send("ATA Primary Master");
+        InitAta(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
 
-      //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum?
-      // They do show up in PCI space as well as the fixed space.
-      // Or is it always here, and was our compiler stack corruption issue?
-      mDebugger.Send("ATA Secondary Master");
-      InitAta(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-      //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
-      
+        //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum?
+        // They do show up in PCI space as well as the fixed space.
+        // Or is it always here, and was our compiler stack corruption issue?
+        mDebugger.Send("ATA Secondary Master");
+        InitAta(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
+        //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
+      }
     }
 
     public static void EnableInterrupts()
