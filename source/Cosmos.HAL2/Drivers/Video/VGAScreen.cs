@@ -502,12 +502,14 @@ namespace Cosmos.HAL
             }
         }
 
-        private Color[] _Palette = new Color[256];
+        // TODO: Enable code that uses Color when we move to .NET Core 2.1 (plug won't be needed)
 
-        public Color GetPaletteEntry(int index)
-        {
-            return _Palette[index];
-        }
+        //private Color[] _Palette = new Color[256];
+
+        //public Color GetPaletteEntry(int index)
+        //{
+        //    return _Palette[index];
+        //}
 
         public void SetPalette(int index, byte[] pallete)
         {
@@ -516,10 +518,10 @@ namespace Cosmos.HAL
                 mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);
         }
 
-        public void SetPaletteEntry(int index, Color color)
-        {
-            SetPaletteEntry(index, color.R, color.G, color.B);
-        }
+        //public void SetPaletteEntry(int index, Color color)
+        //{
+        //    SetPaletteEntry(index, color.R, color.G, color.B);
+        //}
 
         public void SetPaletteEntry(int index, byte r, byte g, byte b)
         {
