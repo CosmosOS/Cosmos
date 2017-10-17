@@ -1,12 +1,6 @@
 ﻿//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Collections;
-using System.Collections.ObjectModel;
 
 namespace Cosmos.System.Graphics
 {
@@ -343,7 +337,7 @@ namespace Cosmos.System.Graphics
             throw new NotImplementedException();
         }
 
-        // Image and Font aren't implemented in .NET Core
+        // Image and Font will be available in .NET Core 2.1
         //public void DrawImage(Image image, int x, int y)
         //{
         //    throw new NotImplementedException();

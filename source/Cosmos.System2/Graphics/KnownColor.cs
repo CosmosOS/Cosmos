@@ -1,5 +1,5 @@
-﻿// Modified from https://github.com/dotnet/corefx/blob/master/src/System.Drawing.Primitives/src/System/Drawing/KnownColor.cs
-// This won't be needed anymore when .NET Core 2.0 is released
+﻿// Modified from https://github.com/dotnet/corefx/blob/34bd99277390609219bd742ca10b9f246fb81a98/src/System.Drawing.Primitives/src/System/Drawing/KnownColor.cs
+// This enum is internal in .NET Core 2.0, but will be public in .NET Core 2.1
 
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.

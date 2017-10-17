@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU", "..\IL2CPU\source\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{3C45A898-4AA9-476F-8302-63391D6ED044}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Symbols", "..\IL2CPU\source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj", "{2E740096-911F-47D0-A46D-998DBB76FC5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU.Debug.Symbols", "..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj", "{2E740096-911F-47D0-A46D-998DBB76FC5D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.DebugConnectors", "source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj", "{BC91BCEF-D146-4EB0-BE63-C637880C5800}"
 EndProject
