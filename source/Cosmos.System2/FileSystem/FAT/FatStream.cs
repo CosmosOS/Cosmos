@@ -201,9 +201,7 @@ namespace Cosmos.System.FileSystem.FAT
                     xReadSize = xCount;
                 }
 
-                //TODO: .Net Core
-                //Array.Copy(xCluster, xPosInCluster, aBuffer, xOffset, xReadSize);
-                Array.Copy(xCluster, (int)xPosInCluster, aBuffer, (int)xOffset, (int)xReadSize);
+                Array.Copy(xCluster, xPosInCluster, aBuffer, xOffset, xReadSize);
 
                 xOffset += xReadSize;
                 xCount -= xReadSize;

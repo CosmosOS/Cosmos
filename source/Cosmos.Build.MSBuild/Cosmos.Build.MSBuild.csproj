@@ -13,16 +13,16 @@
         </Content>
     </ItemGroup>
 
-    <ItemGroup>
+   <ItemGroup>
         <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
         <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.3.409" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
         <PackageReference Include="System.Data.Common" Version="4.1.0" />
     </ItemGroup>
-
+  
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-        <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj" />
+        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
     </ItemGroup>
   
     <Target Name="ExcludeSystemDataCommon" AfterTargets="ImplicitlyExpandNETStandardFacades">
