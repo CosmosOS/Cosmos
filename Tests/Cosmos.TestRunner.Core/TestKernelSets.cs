@@ -8,8 +8,8 @@ namespace Cosmos.TestRunner.Core
         // Kernel types to run: the ones that will run in test runners that use the default engine configuration.
         public static IEnumerable<Type> GetKernelTypesToRun()
         {
-            yield return typeof(KernelGen3.Boot);
-            //return GetStableKernelTypes();
+            //yield return typeof(KernelGen3.Boot);
+            return GetStableKernelTypes();
         }
 
         // Stable kernel types: the ones that are stable and will run in AppVeyor
