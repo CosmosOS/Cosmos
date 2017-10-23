@@ -12,8 +12,6 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Microsoft.VisualBasic;
-using TaskScheduler;
 using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Builder {
@@ -50,99 +48,6 @@ namespace Cosmos.Build.Builder {
     StringBuilder mClipboard = new StringBuilder();
     DispatcherTimer mCloseTimer;
 
-    const string InstallScheduledTaskName = "CosmosSetup";
-
-    // Install the UAC bypass CosmosTask. This must be performed while the program is running under
-    // administrator credentials with elevation.
-    void InstallScheduledTask() {
-      ITaskService xService = new TaskScheduler.TaskScheduler();
-      xService.Connect();
-      ITaskFolder xFolder = xService.GetFolder(@"\");
-      IRegisteredTask xTask = TryGetInstallScheduledTask(xFolder);
-
-      if (null != xTask) {
-        // The first parameter MUST NOT be prefixed with the folder path.
-        xFolder.DeleteTask(InstallScheduledTaskName, 0);
-      }
-
-      ITaskDefinition xTaskDef = xService.NewTask(0);
-      xTaskDef.RegistrationInfo.Description = "Cosmos DevKit UAC Bypass";
-      xTaskDef.RegistrationInfo.Author = "Cosmos Group";
-      xTaskDef.Settings.Compatibility = _TASK_COMPATIBILITY.TASK_COMPATIBILITY_V2_1;
-      xTaskDef.Settings.DisallowStartIfOnBatteries = false;
-      xTaskDef.Principal.RunLevel = _TASK_RUNLEVEL.TASK_RUNLEVEL_HIGHEST;
-
-      IActionCollection xActions = xTaskDef.Actions;
-      IAction xAction = xActions.Create(_TASK_ACTION_TYPE.TASK_ACTION_EXEC);
-      IExecAction xExecAction = xAction as IExecAction;
-      xExecAction.Path = mSetupPath;
-      xExecAction.Arguments = @"/SILENT";
-
-      // 6 = task can be created or updated ["CreateOrUpdate" flag]
-      // if Name id empty or null, System will create a task with name as GUID
-      xTask = xFolder.RegisterTaskDefinition(InstallScheduledTaskName, xTaskDef, 6, null, null, _TASK_LOGON_TYPE.TASK_LOGON_NONE, null);
-    }
-
-    // Check for task path change. This is invoked in normal user mode (not administrator) and is intended
-    // to fix issue #15528
-    bool IsInstallScheduledTaskPathFixRequired(IRegisteredTask existingTask, string expectedPath) {
-      // This is a defensive programming test. This should never happen unless someone modifies
-      // the task creation code and forget to fix the task update part.
-      if (1 != existingTask.Definition.Actions.Count) { return true; }
-      IExecAction xExistingExecAction = null;
-      IActionCollection xActions;
-
-      try {
-        xActions = existingTask.Definition.Actions;
-        IEnumerator xActionsEnumerator = xActions.GetEnumerator();
-        if (!xActionsEnumerator.MoveNext()) { return true; }
-        xExistingExecAction = xActionsEnumerator.Current as IExecAction;
-      } catch { return true; }
-
-      if (null == xExistingExecAction) { return true; }
-      if (0 != string.Compare(xExistingExecAction.Path, expectedPath, true)) { return true; }
-      return false;
-    }
-
-    // http://yoursandmyideas.wordpress.com/2012/01/07/task-scheduler-in-c-net/
-    bool ScheduledTaskIsInstalled() {
-      ITaskService xService = new TaskScheduler.TaskScheduler();
-      xService.Connect();
-
-      ITaskFolder xFolder = xService.GetFolder(@"\");
-      IRegisteredTask xExistingTask = TryGetInstallScheduledTask(xFolder);
-
-      if (null == xExistingTask) { return false; }
-      return (!IsInstallScheduledTaskPathFixRequired(xExistingTask, mSetupPath));
-    }
-
-    // Attempt to retrieve the CosmosSetup UAC bypass task. If the task can't be retrieved either
-    // because it doesn't exist or because access is denied, return a null reference.
-    IRegisteredTask TryGetInstallScheduledTask(ITaskFolder folder) {
-      try { return folder.GetTask(InstallScheduledTaskName); } catch { return null; }
-    }
-
-    void InstallTaskAsAdmin() {
-      // Restart with UAC and just install scheduled task
-      using (var xProcess = new Process()) {
-        var xPSI = xProcess.StartInfo;
-        xPSI.UseShellExecute = true;
-        xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase.Replace("file:///", "");
-        xPSI.Arguments = "-InstallTask";
-
-        xPSI.Verb = "runas";
-        try {
-          xProcess.Start();
-        } catch (System.ComponentModel.Win32Exception) {
-          // happens if user press "cancel" on UAC dialog
-          Log_LogSection("Error");
-          Log_LogLine("User pressed \"Cancel\" on UAC dialog for install task!");
-          Log_LogError();
-          return;
-        }
-        xProcess.WaitForExit();
-      }
-    }
 
     public bool Build() {
       Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
@@ -151,12 +56,6 @@ namespace Cosmos.Build.Builder {
 
       if (App.IsUserKit) {
         mReleaseNo = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
-      } else {
-        if (App.UseTask) {
-          if (!ScheduledTaskIsInstalled()) {
-            InstallTaskAsAdmin();
-          }
-        }
       }
       if (mPreventAutoClose) {
         return true;
@@ -287,10 +186,7 @@ namespace Cosmos.Build.Builder {
       string xAppPath = AppContext.BaseDirectory;
       mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\");
       mSetupPath = Path.Combine(mCosmosDir, @"Setup\Output\" + CosmosTask.GetSetupName(mReleaseNo) + ".exe");
-      if (App.InstallTask) {
-        InstallScheduledTask();
-        Close();
-      } else if (!Build()) {
+      if (!Build()) {
         Close();
       }
     }

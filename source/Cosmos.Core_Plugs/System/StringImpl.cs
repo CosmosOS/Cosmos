@@ -1,16 +1,14 @@
 //#define COSMOSDEBUG
-
 using System;
 using System.Globalization;
-
 using Cosmos.Common;
 using Cosmos.IL2CPU.API;
-
+using Cosmos.IL2CPU.API.Attribs;
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.Core_Plugs.System
 {
-    [Plug(Target = typeof(string), IsMicrosoftdotNETOnly = true)]
+    [Plug(Target = typeof(string))]
     public static class StringImpl
     {
         internal static Debugger mDebugger = new Debugger("Core", "String Plugs");
@@ -116,6 +114,11 @@ namespace Cosmos.Core_Plugs.System
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
             return *(aFirstChar + aIndex);
+        }
+
+        public static bool InternalUseRandomizedHashing()
+        {
+            return false;
         }
 
         public static bool IsAscii(string aThis)

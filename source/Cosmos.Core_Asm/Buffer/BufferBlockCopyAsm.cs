@@ -1,7 +1,7 @@
-using Cosmos.Assembler;
+using XSharp.Assembler;
 using Cosmos.IL2CPU.API;
-using XSharp.Common;
-using CPUx86 = Cosmos.Assembler.x86;
+using XSharp;
+using CPUx86 = XSharp.Assembler.x86;
 
 namespace Cosmos.Core_Asm
 {
@@ -20,7 +20,7 @@ namespace Cosmos.Core_Asm
          *			int dstOffset, [ebp + 12]
          *			int count); [ebp + 8]
          */
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             XS.Comment("Source array");
             XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);

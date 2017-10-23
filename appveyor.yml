@@ -5,18 +5,27 @@ platform: AnyCPU
 shallow_clone: true
 clone_folder: c:\Cosmos
 
+init:
+- cmd: |
+    git clone https://github.com/CosmosOS/XSharp.git c:\XSharp --depth 1
+    git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
+
 build_script:
 - cmd: >-
     rem %APPVEYOR_BUILD_FOLDER%
 
-
-    nuget restore "Builder.sln"
-
-    nuget restore "Build.sln"
-
-    nuget restore "Test.sln"
-
     
+    Build\Tools\nuget restore "Builder.sln"
+
+    Build\Tools\nuget restore "..\XSharp\XSharp.sln"
+
+    Build\Tools\nuget restore "..\IL2CPU\IL2CPU.sln"
+
+    Build\Tools\nuget restore "Build.sln"
+
+    Build\Tools\nuget restore "Test.sln"
+
+
     msbuild "Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
     msbuild "Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
@@ -24,37 +33,34 @@ build_script:
     msbuild "Test.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug
 
 
-    xcopy /Y "%APPVEYOR_BUILD_FOLDER%\Build\VSIP\Cosmos.targets" "%ProgramFiles(x86)%\MSBuild\Cosmos\"
+    dotnet publish source\Cosmos.Build.MSBuild -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
 
-    dotnet publish source/Cosmos.Build.MSBuild -f net462 -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
+    dotnet publish ..\IL2CPU\source\IL2CPU -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
 
-    dotnet publish source/IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
-        
-    dotnet publish source/XSharp.Compiler -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\XSharp\"
 
-    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
-    
-    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Core.*" "c:\CosmosRun\Kernel\"
-    
-    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.HAL.*" "c:\CosmosRun\Kernel\"
-    
-    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.System.*" "c:\CosmosRun\Kernel\"
-    
-    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Common.*" "c:\CosmosRun\Kernel\"
+    xcopy /Y "Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
 
-    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Debug.GDB.exe" "c:\CosmosRun\Build\VSIP\"
+    xcopy /Y "Build\VSIP\Cosmos.Core.*" "c:\CosmosRun\Kernel\"
 
-    xcopy /Y /S "c:\Cosmos\Build\ISO" "c:\CosmosRun\Build\ISO\"
+    xcopy /Y "Build\VSIP\Cosmos.HAL.*" "c:\CosmosRun\Kernel\"
 
-    xcopy /Y "c:\Cosmos\Build\*.*" "c:\CosmosRun\Build\ISO\"
+    xcopy /Y "Build\VSIP\Cosmos.System.*" "c:\CosmosRun\Kernel\"
 
-    xcopy /Y /S "c:\Cosmos\Build\VMware\*" "c:\CosmosRun\Build\VMware\"
+    xcopy /Y "Build\VSIP\Cosmos.Common.*" "c:\CosmosRun\Kernel\"
 
-    xcopy /Y /S "c:\Cosmos\Build\Tools" "c:\CosmosRun\Build\Tools\"
+    xcopy /Y "Build\VSIP\Cosmos.Debug.GDB.exe" "c:\CosmosRun\Build\VSIP\"
 
-    xcopy /Y "c:\Cosmos\source\Cosmos.Core.DebugStub\*.xs" "c:\CosmosRun\XSharp\DebugStub\"
+    xcopy /Y /S "Build\ISO" "c:\CosmosRun\Build\ISO\"
 
-    xcopy /Y /S "c:\Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
+    xcopy /Y "Build\*.*" "c:\CosmosRun\Build\ISO\"
+
+    xcopy /Y /S "Build\VMware\*" "c:\CosmosRun\Build\VMware\"
+
+    xcopy /Y /S "Build\Tools" "c:\CosmosRun\Build\Tools\"
+
+    xcopy /Y "source\Cosmos.Core.DebugStub\*.xs" "c:\CosmosRun\XSharp\DebugStub\"
+
+    xcopy /Y /S "Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
 
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
@@ -85,6 +91,6 @@ notifications:
 
 matrix:
   fast_finish: true
-  
+
 artifacts:
   - path: '**\TestResult.xml'

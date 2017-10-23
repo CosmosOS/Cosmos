@@ -1,11 +1,11 @@
-using Cosmos.Assembler;
-using XSharp.Common;
+using XSharp.Assembler;
+using XSharp;
 
 namespace Cosmos.Core_Asm
 {
     public class CPUDisableINTsAsm : AssemblerMethod
     {
-        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             XS.ClearInterruptFlag();
         }

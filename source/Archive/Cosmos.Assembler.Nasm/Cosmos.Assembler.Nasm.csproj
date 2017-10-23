@@ -8,8 +8,8 @@
     <ProjectGuid>{D5321EC7-9F27-4713-A7EC-9BED3ACA8D9F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Assembler.Nasm</RootNamespace>
-    <AssemblyName>Cosmos.Assembler.Nasm</AssemblyName>
+    <RootNamespace>XSharp.Assembler.Nasm</RootNamespace>
+    <AssemblyName>XSharp.Assembler.Nasm</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>

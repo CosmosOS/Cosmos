@@ -1,9 +1,7 @@
+using Cosmos.Build.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-
-using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -14,6 +12,7 @@ namespace Cosmos.TestRunner.Core
         public bool RunWithGDB = false;
         public bool StartBochsDebugGui = false;
         public bool EnableStackCorruptionChecks = true;
+        public string KernelPkg = "";
         public TraceAssemblies TraceAssembliesLevel = TraceAssemblies.User;
         public StackCorruptionDetectionLevel StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
         public List<string> References = new List<string>();
@@ -58,7 +57,7 @@ namespace Cosmos.TestRunner.Core
                     {
                         foreach (var xAssemblyFile in KernelsToRun)
                         {
-                            mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).GetTypeInfo().Assembly.Location), "WorkingDirectory");
+                            mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
                             if (Directory.Exists(mBaseWorkingDirectory))
                             {
                                 Directory.Delete(mBaseWorkingDirectory, true);

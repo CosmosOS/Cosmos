@@ -1,0 +1,7 @@
+<Project>
+
+    <PropertyGroup>
+        <CosmosDescription>Cosmos is an operating system "construction kit". Build your own OS using managed languages such as C#, VB.NET, and more!</CosmosDescription>
+    </PropertyGroup>
+
+</Project>

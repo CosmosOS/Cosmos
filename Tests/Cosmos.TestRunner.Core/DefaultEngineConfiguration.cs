@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Cosmos.Build.Common;
+using System;
 using System.Reflection;
-
-using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -28,6 +27,7 @@ namespace Cosmos.TestRunner.Core
             engine.DebugIL2CPU = false;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             //engine.EnableStackCorruptionChecks = false;
+            engine.KernelPkg = "X86";
 
             engine.EnableStackCorruptionChecks = true;
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
@@ -36,11 +36,12 @@ namespace Cosmos.TestRunner.Core
             //engine.StartBochsDebugGui = true;
 
             // Select kernels to be tested by adding them to the engine
-            foreach (var xType in TestKernelSets.GetStableKernelTypes())
+            foreach (var xType in TestKernelSets.GetKernelTypesToRun())
             {
                 engine.AddKernel(xType.GetTypeInfo().Assembly.Location);
             }
 
+            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.TypeSystem.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);

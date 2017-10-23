@@ -1,8 +1,8 @@
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.API;
-using XSharp.Common;
-using static XSharp.Common.XSRegisters;
+using XSharp;
+using XSharp.Assembler;
+using XSharp.Assembler.x86;
+using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
 {
@@ -23,7 +23,7 @@ namespace Cosmos.Core_Asm
          *			 bool reliable);			ebp + 8
          */
 
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             var xArrayCopyReverseLabel = "ArrayCopy_Reverse";
             var xArrayCopyReverseLoopLabel = "ArrayCopy_Reverse_Loop";

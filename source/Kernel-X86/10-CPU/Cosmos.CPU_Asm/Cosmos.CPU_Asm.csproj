@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Cosmos.cfg" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\XSharp\source\XSharp\XSharp.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
+    </ItemGroup>
+
+</Project>

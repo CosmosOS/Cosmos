@@ -1,16 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp1.0</TargetFramework>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <OutputType>Exe</OutputType>
         <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
         <DebugType>Full</DebugType>
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\IL2CPU\IL2CPU.csproj" />
+        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU\IL2CPU.csproj" />
+        <ProjectReference Include="..\..\source\TheRingMaster\TheRingMaster.csproj" />
         <ProjectReference Include="..\..\Tools\NASM\NASM.csproj" />
         <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
     </ItemGroup>

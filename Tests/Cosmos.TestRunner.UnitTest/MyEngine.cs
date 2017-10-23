@@ -1,11 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-
-using Cosmos.Build.Common;
+﻿using Cosmos.Build.Common;
 using Cosmos.TestRunner.Core;
-
 using NUnit.Framework;
+using System;
+using System.IO;
 
 namespace Cosmos.TestRunner.UnitTest
 {
@@ -19,7 +16,7 @@ namespace Cosmos.TestRunner.UnitTest
         {
             try
             {
-                Directory.SetCurrentDirectory(Path.GetDirectoryName(typeof(RunKernels).GetTypeInfo().Assembly.Location));
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(typeof(RunKernels).Assembly.Location));
 
                 var xEngine = new Engine();
 
@@ -38,10 +35,10 @@ namespace Cosmos.TestRunner.UnitTest
                 xEngine.TraceAssembliesLevel = TraceAssemblies.User;
 
                 xEngine.EnableStackCorruptionChecks = true;
-                xEngine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
+                xEngine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
 
                 // Select kernels to be tested by adding them to the engine
-                xEngine.AddKernel(kernelToRun.GetTypeInfo().Assembly.Location);
+                xEngine.AddKernel(kernelToRun.Assembly.Location);
 
                 xEngine.OutputHandler = new TestOutputHandler();
 
