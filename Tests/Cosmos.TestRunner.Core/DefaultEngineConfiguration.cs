@@ -28,10 +28,11 @@ namespace Cosmos.TestRunner.Core
             engine.DebugIL2CPU = false;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             //engine.EnableStackCorruptionChecks = false;
-            engine.KernelPkg = "X86";
+            //engine.KernelPkg = "X86G3";
 
             engine.EnableStackCorruptionChecks = true;
-            engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
+            engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
+            //engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
 
             //engine.RunWithGDB = true;
             //engine.StartBochsDebugGui = true;

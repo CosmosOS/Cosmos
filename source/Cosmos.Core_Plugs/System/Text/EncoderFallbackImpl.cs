@@ -11,5 +11,10 @@ namespace Cosmos.Core_Plugs.System.Text
         {
             return new object();
         }
+
+        public static EncoderFallbackBuffer CreateFallbackBuffer(EncoderFallback aThis)
+        {
+            return null;
+        }
     }
 }

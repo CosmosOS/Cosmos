@@ -22,4 +22,8 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="System\Threading\TaskImpl.cs" />
+  </ItemGroup>
+
 </Project>
