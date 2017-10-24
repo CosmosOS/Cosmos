@@ -253,7 +253,7 @@ namespace Cosmos.TestRunner.Core
                     xArgs.Insert(0, "run");
                     xArgs.Insert(1, "--no-build");
                     xArgs.Insert(2, " -- ");
-                    RunProcess("dotnet", xIL2CPUPath, xArgs, true);
+                    RunProcess("dotnet", xIL2CPUPath, xArgs);
                 }
             }
         }

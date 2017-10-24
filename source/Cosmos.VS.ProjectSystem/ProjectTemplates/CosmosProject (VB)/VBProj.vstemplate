@@ -8,6 +8,7 @@
         <DefaultName>CosmosKernel</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
         <CreateInPlace>true</CreateInPlace>
+		<PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     </TemplateData>
     <TemplateContent>
         <Project File="VBProjKernel.vbproj" ReplaceParameters="true">
