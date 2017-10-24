@@ -11,22 +11,31 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
     {
         public static void Execute()
         {
-            var dictionary = new Dictionary<string, string>
+            Dictionary<String, Object> commands = new Dictionary<String, Object>()
             {
-                {"a", "a"},
-                {"b", "b" },
-                {"c", "c"}
+                {"echo", "ECHO"},
+                {"reboot", "REBOOT" },
+                {"shutdown", "SHUTDOWN"},
+                {"integer", 500}
             };
 
-            Assert.IsTrue(dictionary.ContainsKey("a"), "Dictionary ContainsKey does not work1");
-            Assert.IsFalse(dictionary.ContainsKey("d"), "Dictionary ContainsKey does not work 2");
+            Assert.IsTrue(commands.ContainsKey("echo"), "Dictionary ContainsKey does not work1");
+            Assert.IsFalse(commands.ContainsKey("musterror"), "Dictionary ContainsKey does not work 2");
             
 
 
             //String test
-            Assert.IsTrue(dictionary["a"] == "a", "Dictionary string not work");
-            dictionary["b"] = "d";
-            Assert.IsTrue(dictionary["b"] == "d", "Dictionary string been reset not working");
+            Assert.IsTrue((string)commands["echo"] == "ECHO", "Dictionary string not work");
+            commands["echo"] = "notEcho";
+            Assert.IsTrue((string)commands["echo"] == "notEcho", "Dictionary string been reset not working");
+            
+            
+            //Integer test
+            Assert.IsTrue((int)commands["integer"] == 500, "Dictionary integer not working");
+            commands["integer"] = 321;
+            Assert.IsTrue((int)commands["integer"] == 321, "Dictionary integer been reset not working");
+
+
         }
     }
 }

@@ -7,7 +7,6 @@
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>Cosmos</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
-		<PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     </TemplateData>
     <TemplateContent>
         <Project File="CosmosProject.Cosmos" ReplaceParameters="true">

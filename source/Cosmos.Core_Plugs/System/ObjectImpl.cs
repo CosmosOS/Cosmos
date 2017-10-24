@@ -1,8 +1,8 @@
+using System;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.API.Attribs;
-using System;
 
 namespace Cosmos.Core_Plugs.System
 {
@@ -21,10 +21,9 @@ namespace Cosmos.Core_Plugs.System
         {
         }
 
-        public static unsafe Type GetType([ObjectPointerAccess] uint* aThis)
+        public static Type GetType(object aThis)
         {
-            uint xType = *aThis;
-            return new CosmosRuntimeType(xType);
+            return null;
         }
 
         public static int GetHashCode(object aThis)

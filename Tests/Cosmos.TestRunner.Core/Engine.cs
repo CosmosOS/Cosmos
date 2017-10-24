@@ -1,7 +1,9 @@
-using Cosmos.Build.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+
+using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -57,7 +59,7 @@ namespace Cosmos.TestRunner.Core
                     {
                         foreach (var xAssemblyFile in KernelsToRun)
                         {
-                            mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
+                            mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).GetTypeInfo().Assembly.Location), "WorkingDirectory");
                             if (Directory.Exists(mBaseWorkingDirectory))
                             {
                                 Directory.Delete(mBaseWorkingDirectory, true);

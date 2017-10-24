@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.ComponentModel;
 
 namespace Cosmos.Build.Common
 {
@@ -21,7 +24,7 @@ namespace Cosmos.Build.Common
             T result = @default;
 
             Type valueType = typeof(T);
-            if (valueType.IsEnum == false)
+            if (valueType.GetTypeInfo().IsEnum == false)
             {
                 throw new ArgumentException("Enum types only supported.", "T");
             }
@@ -52,7 +55,7 @@ namespace Cosmos.Build.Common
 
         public static EnumValue[] GetEnumValues(Type enumType, bool aSort)
         {
-            if (!enumType.IsEnum)
+            if (!enumType.GetTypeInfo().IsEnum)
             {
                 throw new Exception("Invalid type, only enum types allowed.");
             }

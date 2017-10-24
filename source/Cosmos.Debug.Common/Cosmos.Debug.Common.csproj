@@ -8,6 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
         <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
         <PackageReference Include="System.IO.Pipes" Version="4.3.0" />

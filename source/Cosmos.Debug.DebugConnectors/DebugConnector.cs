@@ -317,6 +317,8 @@ namespace Cosmos.Debug.DebugConnectors
             }
             if (mBackgroundThread != null)
             {
+                // not supported in .net core
+                //mBackgroundThread.Abort();
                 mCancellationTokenSource.Cancel();
                 mBackgroundThread.Join();
                 mBackgroundThread = null;
