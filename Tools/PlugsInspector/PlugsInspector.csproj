@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net462</TargetFramework>
-        <RuntimeIdentifiers>win7-x86</RuntimeIdentifiers>
+        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
         <DebugType>Full</DebugType>
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
