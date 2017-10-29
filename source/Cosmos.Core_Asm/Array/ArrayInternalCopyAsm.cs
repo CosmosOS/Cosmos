@@ -71,21 +71,14 @@ namespace Cosmos.Core_Asm
             XS.Multiply(EDX);
             XS.Set(ECX, EAX);
 
-            // if source and destination are equal, jump to end
-            XS.Set(EAX, ESI);
-            XS.Add(EAX, ECX);
-            XS.Compare(EDI, EAX);
-            XS.Jump(ConditionalTestEnum.Equal, xArrayCopyEndLabel);
-            XS.Jump(ConditionalTestEnum.LessThanOrEqualTo, xArrayCopyReverseLabel);
+            XS.Compare(EDI, ESI);
+            XS.Jump(ConditionalTestEnum.GreaterThan, xArrayCopyReverseLabel);
 
             new Movs { Size = 8, Prefixes = InstructionPrefixes.Repeat };
 
             XS.Jump(xArrayCopyEndLabel);
 
-            // source ptr + size >= destination ptr
             XS.Label(xArrayCopyReverseLabel);
-
-            XS.Comment("Array Reverse Copy: source ptr + size >= destination ptr");
 
             XS.Add(ESI, ECX);
             XS.Add(EDI, ECX);

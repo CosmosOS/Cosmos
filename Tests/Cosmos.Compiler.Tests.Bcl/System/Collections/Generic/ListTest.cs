@@ -38,11 +38,27 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
             Assert.AreEqual(1, xList[2], "List<int>.Insert: xList[2] != 1");
             Assert.AreEqual(2, xList[3], "List<int>.Insert: xList[3] != 2");
 
+            xList.Insert(0, 7);
+
+            Assert.AreEqual(7, xList[0], "List<int>.Insert: xList[0] != 7");
+            Assert.AreEqual(0, xList[1], "List<int>.Insert: xList[1] != 0");
+            Assert.AreEqual(5, xList[2], "List<int>.Insert: xList[2] != 5");
+            Assert.AreEqual(1, xList[3], "List<int>.Insert: xList[3] != 1");
+            Assert.AreEqual(2, xList[4], "List<int>.Insert: xList[4] != 2");
+
             xList.RemoveAt(2);
 
+            Assert.AreEqual(7, xList[0], "List<int>.RemoveAt: xList[0] != 7");
+            Assert.AreEqual(0, xList[1], "List<int>.RemoveAt: xList[1] != 0");
+            Assert.AreEqual(1, xList[2], "List<int>.RemoveAt: xList[2] != 1");
+            Assert.AreEqual(2, xList[3], "List<int>.RemoveAt: xList[3] != 2");
+
+            xList.RemoveAt(0);
+
             Assert.AreEqual(0, xList[0], "List<int>.RemoveAt: xList[0] != 0");
-            Assert.AreEqual(5, xList[1], "List<int>.RemoveAt: xList[1] != 5");
+            Assert.AreEqual(1, xList[1], "List<int>.RemoveAt: xList[1] != 1");
             Assert.AreEqual(2, xList[2], "List<int>.RemoveAt: xList[2] != 2");
+
 
             // Commented tests depend on #583
 
