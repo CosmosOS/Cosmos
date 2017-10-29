@@ -191,6 +191,22 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             //Assert.IsTrue(Directory.Exists(@"0:\Dir1"), "Yeah, it's actually deleting the directory. That isn't right.");
 
             //mDebugger.Send("END TEST");
+
+            mDebugger.Send("START TEST: Copy a file:");
+            File.Copy(@"0:\Kudzu.txt", @"0:\Kudzu2.txt");
+            if (File.Exists(@"0:\Kudzu2.txt"))
+            {
+                mDebugger.Send(" The new file has been created, reading...");
+                string KudzuTxtContent = File.ReadAllText(@"0:\Kudzu.txt");
+                string Kudzu2TxtContent = File.ReadAllText(@"0:\Kudzu2.txt");
+
+                if (Kudzu2TxtContent == KudzuTxtContent)
+                {
+                    mDebugger.Send("Same content, the file has been copied succesfull");
+                }
+            }
+
+            mDebugger.Send("END TEST");
         }
     }
 }

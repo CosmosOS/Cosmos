@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Cosmos.Build.Common;
+using System;
 using System.Reflection;
-
-using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -43,6 +42,7 @@ namespace Cosmos.TestRunner.Core
                 engine.AddKernel(xType.GetTypeInfo().Assembly.Location);
             }
 
+            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.TypeSystem.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);

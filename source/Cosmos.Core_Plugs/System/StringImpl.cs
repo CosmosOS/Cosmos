@@ -116,6 +116,11 @@ namespace Cosmos.Core_Plugs.System
             return *(aFirstChar + aIndex);
         }
 
+        public static bool InternalUseRandomizedHashing()
+        {
+            return false;
+        }
+
         public static bool IsAscii(string aThis)
         {
             for (int i = 0; i < aThis.Length; i++)
