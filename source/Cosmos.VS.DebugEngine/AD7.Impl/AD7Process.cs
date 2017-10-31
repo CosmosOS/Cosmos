@@ -391,7 +391,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
                         var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
 
-                        AD7Util.MessageBox($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(xMethod.DocumentID)}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
+                        AD7Util.MessageBox($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(xMethod.DocumentID).Pathname}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
                         return;
                     }
                     catch (InvalidOperationException)

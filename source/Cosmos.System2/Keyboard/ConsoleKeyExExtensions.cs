@@ -8,9 +8,8 @@ namespace Cosmos.System
         {
             switch (keyEx)
             {
-                //TODO: .Net Core
-                //case ConsoleKeyEx.NoName:
-                //    return ConsoleKey.NoName;
+                case ConsoleKeyEx.NoName:
+                    return ConsoleKey.NoName;
                 case ConsoleKeyEx.Escape:
                     return ConsoleKey.Escape;
                 case ConsoleKeyEx.F1:
@@ -199,13 +198,12 @@ namespace Cosmos.System
                 case ConsoleKeyEx.Semicolon:
                 case ConsoleKeyEx.Colon:
                     return ConsoleKey.Oem1;
-                //TODO: .Net Core
-                //case ConsoleKeyEx.OEM102:
-                //    return ConsoleKey.Oem102;
-                //case ConsoleKeyEx.LWin:
-                //    return ConsoleKey.LeftWindows;
-                //case ConsoleKeyEx.RWin:
-                //    return ConsoleKey.RightWindows;
+                case ConsoleKeyEx.OEM102:
+                    return ConsoleKey.Oem102;
+                case ConsoleKeyEx.LWin:
+                    return ConsoleKey.LeftWindows;
+                case ConsoleKeyEx.RWin:
+                    return ConsoleKey.RightWindows;
                 default:
                     throw new Exception("KeyEx not implemented!");
             }
