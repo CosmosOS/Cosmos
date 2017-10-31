@@ -8,7 +8,6 @@ using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
 {
-    //TODO: This asm refs Hardware.. should not.. its a higher ring
     public class CPUUpdateIDTAsm : AssemblerMethod
     {
         private static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound)

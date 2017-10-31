@@ -15,7 +15,6 @@
         <PackageLicenseUrl>https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt</PackageLicenseUrl>
         <PackageTags>Cosmos OS Operating System .NET C# VB VB.NET F#</PackageTags>
         <RepositoryUrl>https://github.com/CosmosOS/Cosmos</RepositoryUrl>
-        <CosmosDescription>Cosmos is an operating system "construction kit". Build your own OS using managed languages such as C#, VB.NET, and more!</CosmosDescription>
     </PropertyGroup>
 
 </Project>
