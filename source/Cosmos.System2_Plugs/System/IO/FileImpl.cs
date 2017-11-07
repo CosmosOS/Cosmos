@@ -157,11 +157,38 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void Copy(string srcFile, string destFile)
         {
-            using (var xFS = new FileStream(srcFile, FileMode.Open))
+            try
             {
-                var xBuff = new byte[(int)xFS.Length];
-                var yFS = new FileStream(destFile, FileMode.Create);
-                yFS.Write(xBuff, 0, xBuff.Length);
+                byte[] srcFileBytes = File.ReadAllBytes(srcFile);
+                File.WriteAllBytes(destFile, srcFileBytes);
+            }
+            catch (IOException ioEx)
+            {
+                throw new IOException("File Copy", ioEx);
+            }
+        }
+
+        public static void Copy(string srcFile, string destFile, bool overwriting)
+        {
+            if (overwriting)
+            {
+                if (File.Exists(destFile))
+                {
+                    File.Delete(destFile);
+                }
+
+                Copy(srcFile, destFile);
+            }
+            else
+            {
+                if (!File.Exists(destFile))
+                {
+                    Copy(srcFile, destFile);
+                }
+                else
+                {
+                    throw new IOException("destFileName exists and overwrite is false.");
+                }
             }
         }
 
