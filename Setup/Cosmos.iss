@@ -105,13 +105,19 @@ Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion 
 ; ISO
 Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\ISO\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\ISO\"
 ; USB
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\USB\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
 Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
