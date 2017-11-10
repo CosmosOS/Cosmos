@@ -24,6 +24,8 @@ namespace Cosmos.Build.Common
             File.Copy(Path.Combine(buildISO, "isolinux.bin"), Path.Combine(isoDirectory, "isolinux.bin"));
             File.Copy(Path.Combine(buildISO, "mboot.c32"), Path.Combine(isoDirectory, "mboot.c32"));
             File.Copy(Path.Combine(buildISO, "syslinux.cfg"), Path.Combine(isoDirectory, "syslinux.cfg"));
+            File.Copy(Path.Combine(buildISO, "ldlinux.c32"), Path.Combine(isoDirectory, "ldlinux.c32"));
+            File.Copy(Path.Combine(buildISO, "libcom32.c32"), Path.Combine(isoDirectory, "libcom32.c32"));
             File.Copy(imageFile, Path.Combine(isoDirectory, "Cosmos.bin"));
 
             string arg =
