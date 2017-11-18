@@ -19,17 +19,35 @@ namespace Cosmos.System_Plugs.System.IO
 
         //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
 
-        public static void Ctor(FileStream aThis, string aPathname, FileMode aMode,
-            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        private static void Init(string aPathname, FileMode aMode, ref Stream innerStream)
         {
             Global.mFileSystemDebugger.SendInternal("FileStream.Ctor:");
 
             innerStream = InitializeStream(aPathname, aMode);
         }
 
+
+        public static void Ctor(FileStream aThis, string aPathname, FileMode aMode,
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            Init(aPathname, aMode, ref innerStream);
+#if false
+            Global.mFileSystemDebugger.SendInternal("FileStream.Ctor:");
+
+            innerStream = InitializeStream(aPathname, aMode);
+#endif
+        }
+
         public static void CCtor()
         {
             // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
+        }
+
+        public static void Ctor(FileStream aThis, string aPathname, FileMode aMode, FileAccess access,
+                                FileShare share, int bufferSize, FileOptions options,
+                                [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            Init(aPathname, aMode, ref innerStream);
         }
 
         public static int Read(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
@@ -48,7 +66,7 @@ namespace Cosmos.System_Plugs.System.IO
         public static void Write(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
-            Global.mFileSystemDebugger.SendInternal("FileStream.Write:");
+            Global.mFileSystemDebugger.SendInternal($"FileStream.Write: aOffset {aOffset} aCount {aCount}");
 
             innerStream.Write(aBuffer, aOffset, aCount);
         }
@@ -83,6 +101,7 @@ namespace Cosmos.System_Plugs.System.IO
         public static void Flush(FileStream aThis,
            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.InitializeStream Flush()");
             innerStream.Flush();
         }
 
@@ -143,7 +162,13 @@ namespace Cosmos.System_Plugs.System.IO
                 case FileMode.Create:
                     Global.mFileSystemDebugger.SendInternal("Create Mode aPath will be overwritten if existing");
                     // TODO it seems that GetFileStream effectively Creates the file if not exist
-                    aStream = File.Create(aPath);
+                    var xEntry = VFSManager.CreateFile(aPath);
+                    if (xEntry == null)
+                    {
+                        return null;
+                    }
+                    //aStream = File.Create(aPath);
+                    aStream = VFSManager.GetFileStream(aPath);
                     break;
 
                 case FileMode.CreateNew:

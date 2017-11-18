@@ -2,7 +2,7 @@
 using Cosmos.IL2CPU.API.Attribs;
 using Cosmos.System;
 
-namespace Cosmos.Kernel.Tests.Fat.System.IO
+namespace Cosmos.System_Plugs.System.IO
 {
     [Plug(TargetName = "System.IO.PathInternal, System.IO.FileSystem")]
     public static class PathInternalImpl

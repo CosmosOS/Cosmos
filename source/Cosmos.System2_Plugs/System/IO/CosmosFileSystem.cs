@@ -89,15 +89,15 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static object /* FileStreamBase */ Open(object aThis, string fullPath, FileMode mode, FileAccess access, FileShare share, int bufferSize, FileOptions options, FileStream parent)
         {
-            Global.mFileSystemDebugger.SendInternal("In FileStream.InitializeStream");
+            Global.mFileSystemDebugger.SendInternal("In CosmosFileSystem.Open");
             if (fullPath == null)
             {
-                Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path == null is true");
+                Global.mFileSystemDebugger.SendInternal("In CosmosFileSystem.Open: Path == null is true");
                 throw new ArgumentNullException("The file path cannot be null.");
             }
             if (fullPath.Length == 0)
             {
-                Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path.Length == 0 is true");
+                Global.mFileSystemDebugger.SendInternal("In CosmosFileSystem.Open: Path.Length == 0 is true");
                 throw new ArgumentException("The file path cannot be empty.");
             }
 
@@ -108,6 +108,17 @@ namespace Cosmos.System_Plugs.System.IO
 
             Stream aStream = null;
 
+            Global.mFileSystemDebugger.SendInternal($"Create Mode aPath {fullPath}");
+
+            var xEntry = VFSManager.CreateFile(fullPath);
+            if (xEntry == null)
+            {
+                return null;
+            }
+
+            aStream = VFSManager.GetFileStream(fullPath);
+
+#if false
             switch (mode)
             {
                 case FileMode.Append:
@@ -129,7 +140,8 @@ namespace Cosmos.System_Plugs.System.IO
                 case FileMode.Create:
                     Global.mFileSystemDebugger.SendInternal("Create Mode aPath will be overwritten if existing");
                     // TODO it seems that GetFileStream effectively Creates the file if not exist
-                    aStream = File.Create(fullPath);
+                    //aStream = File.Create(fullPath);
+                    aStream = VFSManager.GetFileStream(fullPath);
                     break;
 
                 case FileMode.CreateNew:
@@ -141,7 +153,8 @@ namespace Cosmos.System_Plugs.System.IO
 
                     Global.mFileSystemDebugger.SendInternal("CreateNew Mode with aPath not existing new file created");
                     // TODO it seems that GetFileStream effectively Creates the file if it does not exist
-                    aStream = File.Create(fullPath);
+                    //aStream = File.Create(fullPath);
+                    aStream = VFSManager.GetFileStream(fullPath);
                     break;
 
                 case FileMode.Open:
@@ -181,6 +194,7 @@ namespace Cosmos.System_Plugs.System.IO
                     Global.mFileSystemDebugger.SendInternal("The mode " + mode + "is out of range");
                     throw new ArgumentOutOfRangeException("The file mode is invalid");
             }
+#endif
 
             return aStream;
         }
@@ -209,6 +223,38 @@ namespace Cosmos.System_Plugs.System.IO
                 {
                     yield return new DirectoryInfo(xEntries[i].mName);
                 }
+            }
+        }
+
+        public static void DeleteFile(object aThis, string fullPath)
+        {
+            Global.mFileSystemDebugger.SendInternal($"DeleteFile : fullPath = {fullPath}");
+            VFSManager.DeleteFile(fullPath);
+        }
+
+        public static void CopyFile(object aThis, string sourceFullPath, string destFullPath, bool overwrite)
+        {
+            Global.mFileSystemDebugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath}");
+
+            // The destination path may just be a directory into which the file should be copied.
+            // If it is, append the filename from the source onto the destination directory
+            if (Directory.Exists(destFullPath))
+            {
+                destFullPath = Path.Combine(destFullPath, Path.GetFileName(sourceFullPath));
+            }
+
+            // Copy the contents of the file from the source to the destination, creating the destination in the process
+            using (var src = new FileStream(sourceFullPath, FileMode.Open))
+            using (var dst = new FileStream(destFullPath, overwrite ? FileMode.Create : FileMode.CreateNew))
+            {
+                int xSize = (int)src.Length;
+                Global.mFileSystemDebugger.SendInternal($"size of {sourceFullPath} is {xSize} bytes");
+                byte[] content = new byte[xSize];
+                Global.mFileSystemDebugger.SendInternal($"content byte buffer allocated");
+                src.Read(content, 0, xSize);
+                Global.mFileSystemDebugger.SendInternal($"content byte buffer read");
+                dst.Write(content, 0, xSize);
+                Global.mFileSystemDebugger.SendInternal($"content byte buffer written");
             }
         }
     }

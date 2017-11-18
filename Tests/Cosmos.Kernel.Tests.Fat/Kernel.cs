@@ -39,7 +39,7 @@ namespace Cosmos.Kernel.Tests.Fat
                 PathTest.Execute(mDebugger);
                 DirectoryTest.Execute(mDebugger);
 #endif
-                //FileTest.Execute(mDebugger);
+//                FileTest.Execute(mDebugger);
 #if false
                 FileStreamTest.Execute(mDebugger);
                 DirectoryInfoTest.Execute(mDebugger);

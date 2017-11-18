@@ -9,6 +9,7 @@ using Cosmos.IL2CPU.API;
 using Cosmos.IL2CPU.API.Attribs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
+using System.Text;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -16,6 +17,7 @@ namespace Cosmos.System_Plugs.System.IO
     [Plug(Target = typeof(File))]
     public static class FileImpl
     {
+#if false
         public static bool Exists(string aFile)
         {
             Global.mFileSystemDebugger.SendInternal("File.Exists:");
@@ -29,7 +31,17 @@ namespace Cosmos.System_Plugs.System.IO
 
             return VFSManager.FileExists(aFile);
         }
-
+#endif
+        public static string ReadAllText(string aFile)
+        {
+            string result;
+            using (StreamReader streamReader = new StreamReader(aFile, Encoding.UTF8, true))
+            {
+                result = streamReader.ReadToEnd();
+            }
+            return result;
+        }
+#if false
         public static string ReadAllText(string aFile)
         {
             Global.mFileSystemDebugger.SendInternal("File.ReadAllText:");
@@ -55,7 +67,9 @@ namespace Cosmos.System_Plugs.System.IO
                 return xResultStr;
             }
         }
+#endif
 
+#if false
         public static void WriteAllText(string aFile, string aText)
         {
             Global.mFileSystemDebugger.SendInternal("Creating stream with file " + aFile);
@@ -93,6 +107,7 @@ namespace Cosmos.System_Plugs.System.IO
             }
         }
 
+
         public static void AppendAllText(string aFile, string aText)
         {
             Global.mFileSystemDebugger.SendInternal("Creating stream in Append Mode with file  " + aFile);
@@ -105,6 +120,7 @@ namespace Cosmos.System_Plugs.System.IO
                 Global.mFileSystemDebugger.SendInternal("Bytes written");
             }
         }
+
 
         public static string[] ReadAllLines(string aFile)
         {
@@ -119,15 +135,34 @@ namespace Cosmos.System_Plugs.System.IO
 
             return result;
         }
-        
+#endif
+
+        /*
+         * Plug needed for the usual issue that Array can not be converted in IEnumerable... it is starting
+         * to become annoying :-(
+         */
         public static void WriteAllLines(string aFile, string[] contents)
         {
-            string text = String.Join(Environment.NewLine, contents);
-            
+            if (aFile == null)
+            {
+                throw new ArgumentNullException("path");
+            }
+            if (contents == null)
+            {
+                throw new ArgumentNullException("contents");
+            }
+            if (aFile.Length == 0)
+            {
+                throw new ArgumentException("Empty", "aFile");
+            }
+
             Global.mFileSystemDebugger.SendInternal("Writing contents");
-            Global.mFileSystemDebugger.SendInternal(text);
-            
-            WriteAllText(aFile, text);
+
+            using (var xSW = new StreamWriter(aFile))
+            {
+                foreach (var current in contents)
+                    xSW.WriteLine(current);
+            }
         }
 
         public static byte[] ReadAllBytes(string aFile)
@@ -155,40 +190,14 @@ namespace Cosmos.System_Plugs.System.IO
             }
         }
 
+#if false
         public static void Copy(string srcFile, string destFile)
         {
-            try
+            using (var xFS = new FileStream(srcFile, FileMode.Open))
             {
-                byte[] srcFileBytes = File.ReadAllBytes(srcFile);
-                File.WriteAllBytes(destFile, srcFileBytes);
-            }
-            catch (IOException ioEx)
-            {
-                throw new IOException("File Copy", ioEx);
-            }
-        }
-
-        public static void Copy(string srcFile, string destFile, bool overwriting)
-        {
-            if (overwriting)
-            {
-                if (File.Exists(destFile))
-                {
-                    File.Delete(destFile);
-                }
-
-                Copy(srcFile, destFile);
-            }
-            else
-            {
-                if (!File.Exists(destFile))
-                {
-                    Copy(srcFile, destFile);
-                }
-                else
-                {
-                    throw new IOException("destFileName exists and overwrite is false.");
-                }
+                var xBuff = new byte[(int)xFS.Length];
+                var yFS = new FileStream(destFile, FileMode.Create);
+                yFS.Write(xBuff, 0, xBuff.Length);
             }
         }
 
@@ -198,6 +207,7 @@ namespace Cosmos.System_Plugs.System.IO
 
             VFSManager.DeleteFile(xFullPath);
         }
+
 
         public static FileStream Create(string aFile)
         {
@@ -216,5 +226,6 @@ namespace Cosmos.System_Plugs.System.IO
 
             return new FileStream(aFile, FileMode.Open);
         }
+#endif
     }
 }

@@ -17,17 +17,19 @@ namespace Cosmos.TestRunner.Core
         {
 
             //yield return typeof(BoxingTests.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.TypeSystem.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
+//            yield return typeof(Cosmos.Compiler.Tests.TypeSystem.Kernel);
+//            yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
             //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
+#if false
             yield return typeof(Cosmos.Compiler.Tests.Exceptions.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.LinqTests.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.MethodTests.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel);
+#endif
             /* Let's test only this for now */
             yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
-            yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
+            //yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
 #if false
             yield return typeof(SimpleStructsAndArraysTest.Kernel);
             yield return typeof(VGACompilerCrash.Kernel);
