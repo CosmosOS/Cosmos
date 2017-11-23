@@ -7,20 +7,20 @@
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
 ; IDE so that we don't get an undefined error.
 ; We default to devkit so we dont have to wait on compression.
-#define BuildConfiguration "devkit"
-;#define BuildConfiguration "userkit"
+#define BuildConfiguration "DevKit"
+;#define BuildConfiguration "UserKit"
 #endif
 
 #ifndef VSVersion
   #define VSVersion "vs2017"
 #endif
 
-#if BuildConfiguration == "Devkit"
+#if BuildConfiguration == "DevKit"
 	; devkit releases are not compressed
-	#pragma warning "Building Devkit release"
+	#pragma warning "Building Dev Kit release"
 #else
 	; userkit releases get compressed, and get languages included
-	#pragma message "Building Userkit release"
+	#pragma message "Building User Kit release"
 	#define Compress true
 	#define IncludeUILanguages true
 #endif
@@ -105,13 +105,19 @@ Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion 
 ; ISO
 Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\ISO\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\ISO\"
 ; USB
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\USB\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
 Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
@@ -148,9 +154,9 @@ Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS
 
 [Code]
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
-  const Wait: TExecWait; var ResultCode: Integer; var ResultString: String): Boolean;
+  const Wait: TExecWait; var ResultCode: Integer; var ResultString: AnsiString): Boolean;
 var
-  TempFilename: String;
+  TempFilename: AnsiString;
   Command: String;
 begin
   TempFilename :=
@@ -182,11 +188,11 @@ end;
 
 function GetVSPath(): String;
 var
-  Command: String;
-  Params: String;
+  Command: AnsiString;
+  Params: AnsiString;
   Success: Boolean;
   ResultCode: Integer;
-  ResultText: String;
+  ResultText: AnsiString;
 begin
   Command := ExpandConstant('{app}\Build\Tools\vswhere.exe');
   Params := '-latest -version "[15.0,16.0)" -requires Microsoft.Component.MSBuild -property installationPath';

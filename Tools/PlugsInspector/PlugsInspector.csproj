@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net462</TargetFramework>
-        <RuntimeIdentifiers>win7-x86</RuntimeIdentifiers>
+        <TargetFramework>net471</TargetFramework>
+        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
         <DebugType>Full</DebugType>
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>

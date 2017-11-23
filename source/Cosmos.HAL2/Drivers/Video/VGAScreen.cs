@@ -1,5 +1,6 @@
 ﻿#define COSMOSDEBUG
 using System;
+using System.Drawing;
 
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
@@ -501,10 +502,10 @@ namespace Cosmos.HAL
             }
         }
 
-        //TODO: .Net Core
+        // TODO: Enable code that uses Color when we move to .NET Core 2.1 (plug won't be needed)
+
         //private Color[] _Palette = new Color[256];
 
-        //TODO: .Net Core
         //public Color GetPaletteEntry(int index)
         //{
         //    return _Palette[index];
@@ -517,7 +518,6 @@ namespace Cosmos.HAL
                 mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);
         }
 
-        //TODO: .Net Core
         //public void SetPaletteEntry(int index, Color color)
         //{
         //    SetPaletteEntry(index, color.R, color.G, color.B);

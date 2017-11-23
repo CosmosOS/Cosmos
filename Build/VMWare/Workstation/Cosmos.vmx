@@ -42,7 +42,7 @@ scsi0.pciSlotNumber = "16"
 vmci0.pciSlotNumber = "32"
 vmotion.checkpointFBSize = "23920640"
 vmci0.id = "1821907405"
-
+monitor.allowLegacyCPU = "TRUE"
 serial0.present = "TRUE"
 serial0.yieldOnMsrRead = "TRUE"
 serial0.fileType = "pipe"
