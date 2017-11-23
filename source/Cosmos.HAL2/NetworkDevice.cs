@@ -11,12 +11,11 @@ namespace Cosmos.HAL
 
     public abstract class NetworkDevice : Device
     {
-        //public static List<NetworkDevice> Devices { get; private set; }
-        public static List<PCIDevice> Devices { get; private set; }
+        public static List<NetworkDevice> Devices { get; private set; }
 
         static NetworkDevice()
         {
-            Devices = new List<PCIDevice>();
+            Devices = new List<NetworkDevice>();
         }
 
         public DataReceivedHandler DataReceived;
@@ -24,8 +23,7 @@ namespace Cosmos.HAL
         protected NetworkDevice()
         {
             //mType = DeviceType.Network;
-            PCIDevice card_AMDPcnETTII = PCI.GetDevice(0x1022, 0x2000);
-            Devices.Add(card_AMDPcnETTII);
+            Devices.Add(this);
         }
 
         public abstract MACAddress MACAddress

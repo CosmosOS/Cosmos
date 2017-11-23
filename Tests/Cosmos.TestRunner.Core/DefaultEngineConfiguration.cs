@@ -18,8 +18,8 @@ namespace Cosmos.TestRunner.Core
             engine.AllowedSecondsInKernel = 6000;
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
-            //engine.RunTargets.Add(RunTargetEnum.Bochs);
-            engine.RunTargets.Add(RunTargetEnum.VMware);
+            engine.RunTargets.Add(RunTargetEnum.Bochs);
+            //engine.RunTargets.Add(RunTargetEnum.VMware);
             //engine.RunTargets.Add(RunTargetEnum.HyperV);
 
             // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
@@ -27,7 +27,7 @@ namespace Cosmos.TestRunner.Core
             engine.DebugIL2CPU = false;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             //engine.EnableStackCorruptionChecks = false;
-            //engine.KernelPkg = "X86";
+            engine.KernelPkg = "X86";
 
             engine.EnableStackCorruptionChecks = true;
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
