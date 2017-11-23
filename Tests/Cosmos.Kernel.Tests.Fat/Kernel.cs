@@ -6,6 +6,10 @@ using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
+using Cosmos.System.Network.IPv4;
+using Cosmos.System.Network;
+using Cosmos.HAL;
+using Cosmos.HAL.Drivers.PCI.Network;
 
 namespace Cosmos.Kernel.Tests.Fat
 {
@@ -62,6 +66,23 @@ namespace Cosmos.Kernel.Tests.Fat
                 mDebugger.Send("Exception occurred: " + e.Message);
                 TestController.Failed();
             }
+        }
+
+        private void TestNetwork()
+        {
+            Address computer = new Address(192, 168, 1, 99);
+            Address subnet = new Address(255, 255, 255, 0);
+            Address gateway = new Address(192, 168, 1, 254);
+
+            PCIDevice device;
+            device = PCI.GetDevice(0x1022, 0x2000);
+            AMDPCNetII nic = new AMDPCNetII(device);
+
+            Config config = new Config(computer, subnet, gateway);
+
+            NetworkStack.Init();
+            NetworkStack.ConfigIP(nic, config);
+            NetworkStack.Update();
         }
 
         #region System.IO.Path Tests

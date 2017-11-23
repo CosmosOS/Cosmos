@@ -5,7 +5,7 @@ using Cosmos.HAL;
 
 namespace Cosmos.System.Network.ARP
 {
-    internal class ARPPacket : EthernetPacket
+    public class ARPPacket : EthernetPacket
     {
         protected UInt16 aHardwareType;
         protected UInt16 aProtocolType;
