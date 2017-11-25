@@ -16,7 +16,7 @@
         <PackageDescription Condition="'$(PackageDescription)' == ''">$(CosmosDescription)</PackageDescription>
         <PackageIconUrl Condition="'$(PackageIconUrl)' == ''">https://github.com/CosmosOS/Cosmos/raw/master/Artwork/Cosmos.ico</PackageIconUrl>
         <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">http://www.gocosmos.org</PackageProjectUrl>
-        <PackageLicenseUrl Condition="'$(PackageLicenseUrl)' == ''">https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt</PackageLicenseUrl>
+        <PackageLicenseUrl Condition="'$(PackageLicenseUrl)' == ''">https://github.com/CosmosOS/Cosmos/raw/master/LICENSE.txt</PackageLicenseUrl>
         <PackageRequireLicenseAcceptance Condition="'$(PackageRequireLicenseAcceptance)' == ''">True</PackageRequireLicenseAcceptance>
         <PackageTags Condition="'$(PackageTags)' == ''">Cosmos OS Operating System .NET C# VB VB.NET F#</PackageTags>
         <RepositoryType Condition="'$(RepositoryType)' == ''">git</RepositoryType>
