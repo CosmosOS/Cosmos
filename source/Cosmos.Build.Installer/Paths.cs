@@ -85,7 +85,7 @@ namespace Cosmos.Build.Installer
 
         if (xCurrentInstance == null)
         {
-          throw new Exception("The Visual Studio instance is invalid!");
+          throw new Exception("The found Visual Studio instances are not the expected Visual Studio 2017!");
         }
       }
 
