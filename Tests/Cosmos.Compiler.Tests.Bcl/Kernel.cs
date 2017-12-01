@@ -44,9 +44,10 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
+                EncodingTest.Execute();
 
-                System.Collections.Generic.ListTest.Execute();
-                System.Collections.Generic.QueueTest.Execute();
+                //System.Collections.Generic.ListTest.Execute();
+                //System.Collections.Generic.QueueTest.Execute();
                 //System.Collections.Generic.DictionaryTest.Execute();
 
                 TestController.Completed();

@@ -41,7 +41,6 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             }
             mDebugger.Send("END TEST");
 
-#if true
             /* We use StreamReader() instead of File now it is more "correct" and we test 2 classes in one too! */
             mDebugger.Send("START TEST: StreamReader:");
             using (var xSR = new StreamReader(file))
@@ -60,7 +59,6 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
                     Assert.IsTrue(false, $"Couldn't read from file {file} using StreamReader");
                 }
             }
-#endif
 
             using (StreamReader xSR2 = new StreamReader(file, Encoding.UTF8, true))
             {

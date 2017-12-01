@@ -1,4 +1,4 @@
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using global::System;
 using global::System.IO;
 using Cosmos.System;
@@ -101,8 +101,11 @@ namespace Cosmos.System_Plugs.System.IO
         public static void Flush(FileStream aThis,
            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
+            /*
+             * It gives NRE and kills the OS, commented it for now... we will "de-plug" FileStream soon
+             */
             Global.mFileSystemDebugger.SendInternal($"In FileStream.InitializeStream Flush()");
-            innerStream.Flush();
+            //innerStream.Flush();
         }
 
         public static long get_Position(FileStream aThis,

@@ -15,6 +15,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
         public static void Execute(Debugger mDebugger)
         {
             string xContents;
+
             // Moved this test here because if not the test can be executed only a time!
             mDebugger.Send("Write to file now");
             File.WriteAllText(@"0:\Kudzu.txt", "Hello Cosmos");
@@ -163,18 +164,18 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             //mDebugger.Send("Contents retrieved");
             //Assert.IsTrue(xContents == WrittenText, "Failed to read from file");
 
-            //mDebugger.Send("START TEST: Append text to file:");
-            //string appendedText = "Yet other text.";
-            //File.AppendAllText(@"0:\Kudzu.txt", appendedText);
-            //mDebugger.Send("Text appended");
-            //xContents = File.ReadAllText(@"0:\Kudzu.txt");
-            //mDebugger.Send("Contents retrieved after writing");
-            //mDebugger.Send(xContents);
-            //// XXX Use String.Concat() with Enviroment.NewLine this not Linux there are is '\n'!
-            //Assert.IsTrue(xContents == "Test FAT write.\nYet other text.",
-            //    "Contents of Kudzu.txt was appended incorrectly!");
-            //mDebugger.Send("END TEST");
-            //mDebugger.Send("");
+            mDebugger.Send("START TEST: Append text to file:");
+            string appendedText = "\nYet other text.";
+            File.AppendAllText(@"0:\Kudzu.txt", appendedText);
+            mDebugger.Send("Text appended");
+            xContents = File.ReadAllText(@"0:\Kudzu.txt");
+            mDebugger.Send("Contents retrieved after writing");
+            mDebugger.Send(xContents);
+            // XXX Use String.Concat() with Enviroment.NewLine this not Linux there are is '\n'!
+            Assert.IsTrue(xContents == "Test FAT write.\nYet other text.",
+                "Contents of Kudzu.txt was appended incorrectly!");
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
 
             mDebugger.Send("START TEST: Delete a file:");
             File.Create(@"0:\test1.txt");
@@ -200,10 +201,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
                 string KudzuTxtContent = File.ReadAllText(@"0:\Kudzu.txt");
                 string Kudzu2TxtContent = File.ReadAllText(@"0:\Kudzu2.txt");
 
-                if (Kudzu2TxtContent == KudzuTxtContent)
-                {
-                    mDebugger.Send("Same content, the file has been copied succesfull");
-                }
+                Assert.IsTrue(KudzuTxtContent == Kudzu2TxtContent, "File has not been copied correctly");
             }
 
             mDebugger.Send("END TEST");

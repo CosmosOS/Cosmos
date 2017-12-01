@@ -35,20 +35,15 @@ namespace Cosmos.Kernel.Tests.Fat
             {
                 mDebugger.Send("Run");
 
-#if false
                 PathTest.Execute(mDebugger);
                 DirectoryTest.Execute(mDebugger);
-#endif
-//                FileTest.Execute(mDebugger);
-#if false
+                FileTest.Execute(mDebugger);
                 FileStreamTest.Execute(mDebugger);
                 DirectoryInfoTest.Execute(mDebugger);
-#endif
                 StreamWriterTest.Execute(mDebugger);
                 //StreamReaderTest.Execute(mDebugger);
                 //BinaryWriterTest.Execute(mDebugger);
                 //BinaryReaderTest.Execute(mDebugger);
-
 
                 TestController.Completed();
             }
