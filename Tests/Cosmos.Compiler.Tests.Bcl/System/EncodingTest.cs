@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.TestRunner;
-using Cosmos.System2.Encoding;
 using Cosmos.Compiler.Tests.Bcl.Helper;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
