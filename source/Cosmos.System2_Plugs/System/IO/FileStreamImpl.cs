@@ -1,17 +1,16 @@
 //#define COSMOSDEBUG
-using global::System;
-using global::System.IO;
-using Cosmos.System;
-using Cosmos.IL2CPU.API;
+using System;
+using System.IO;
+
 using Cosmos.IL2CPU.API.Attribs;
-using Cosmos.System.FileSystem;
+using Cosmos.System;
 using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System_Plugs.System.IO
 {
     [Plug(Target = typeof(FileStream))]
     [PlugField(FieldId = InnerStreamFieldId, FieldType = typeof(Stream))]
-    public class FileStreamImpl
+    public static class FileStreamImpl
     {
         private const string InnerStreamFieldId = "$$InnerStream$$";
 
@@ -162,7 +161,8 @@ namespace Cosmos.System_Plugs.System.IO
                     if (!aPathExists)
                     {
                         Global.mFileSystemDebugger.SendInternal("Open Mode with aPath not existing");
-#warning TODO: Change IOException to FileNotFoundException, it asks for a plug
+
+                        // TODO: Change IOException to FileNotFoundException, it asks for a plug
                         throw new IOException("File not existing but Open Requested");
                     }
 
