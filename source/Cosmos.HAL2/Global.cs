@@ -92,8 +92,7 @@ namespace Cosmos.HAL
       CPU.EnableInterrupts();
     }
 
-    private static void InitAta(Ata.ControllerIdEnum aControllerID,
-                                Ata.BusPositionEnum aBusPosition)
+    private static void InitAta(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
     {
       var xIO = aControllerID == Ata.ControllerIdEnum.Primary
                   ? Core.Global.BaseIOGroups.ATA1
