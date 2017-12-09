@@ -60,7 +60,7 @@ namespace Cosmos.HAL
         Console.Write("AHCI Controller not supported yet");
         Console.Write("Booting without ATA Initialization");
       }
-      else if (PCI.GetDeviceClass(0x01, 0x01) == null)
+      else
       {
         Console.Write("Booting without ATA Initialization");
       }
