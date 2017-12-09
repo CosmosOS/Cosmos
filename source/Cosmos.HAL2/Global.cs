@@ -51,20 +51,20 @@ namespace Cosmos.HAL
       // Subclass 0x01 = Subclass code of IDE Controller
       // Subclass 0x04 = Subclass code of RAID Controller
       // Subclass 0x06 = Subclass code of AHCI Controller
-      if (PCI.GetDeviceClass(0x01, 0x00) != null)
-      {
-        mDebugger.Send("SCSI isn't supported yet");
-        Console.WriteLine("SCSI Controller not supported yet");
-        Console.WriteLine("Booting without ATA Initialization");
-        Console.WriteLine("FAT cannot be used while ATA isn't initialized"); 
-      }
-      else if (PCI.GetDeviceClass(0x01, 0x01) != null)
+      if (PCI.GetDeviceClass(0x01, 0x01) != null)
       {
         mDebugger.Send("ATA Primary Master");
         InitAta(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
         mDebugger.Send("ATA Secondary Master");
         InitAta(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
         //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
+      }
+      else if (PCI.GetDeviceClass(0x01, 0x00) != null)
+      {
+        mDebugger.Send("SCSI isn't supported yet");
+        Console.WriteLine("SCSI Controller not supported yet");
+        Console.WriteLine("Booting without ATA Initialization");
+        Console.WriteLine("FAT cannot be used while ATA isn't initialized"); 
       }
       else if (PCI.GetDeviceClass(0x01, 0x04) != null)
       {
