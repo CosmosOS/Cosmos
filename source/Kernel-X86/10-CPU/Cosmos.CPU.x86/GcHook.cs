@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Diagnostics;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU.x86 {
     [DebuggerStepThrough]

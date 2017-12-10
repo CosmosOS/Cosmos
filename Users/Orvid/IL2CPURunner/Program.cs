@@ -26,7 +26,7 @@ namespace IL2CPURunner
             System.Reflection.Assembly.Load("Cosmos.Debug.Kernel");
             System.Reflection.Assembly.Load("Cosmos.Debug.Kernel.Plugs");
             System.Reflection.Assembly.Load("Cosmos.IL2CPU");
-            System.Reflection.Assembly.Load("Cosmos.IL2CPU.API");
+            System.Reflection.Assembly.Load("IL2CPU.API");
             System.Reflection.Assembly.Load("Cosmos.IL2CPU.X86");
             System.Reflection.Assembly.Load("Cosmos.System");
             System.Reflection.Assembly.Load("Cosmos.System_Plugs");
