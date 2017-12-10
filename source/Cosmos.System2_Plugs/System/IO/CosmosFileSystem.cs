@@ -234,7 +234,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void CopyFile(object aThis, string sourceFullPath, string destFullPath, bool overwrite)
         {
-            Global.mFileSystemDebugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath}");
+            Global.mFileSystemDebugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath} with overwrite {overwrite}");
 
             // The destination path may just be a directory into which the file should be copied.
             // If it is, append the filename from the source onto the destination directory

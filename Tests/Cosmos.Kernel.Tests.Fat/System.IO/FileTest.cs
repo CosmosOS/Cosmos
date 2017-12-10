@@ -124,10 +124,11 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             }
             byte[] dataWritten = new byte[] { 0x01, 0x02, 0x03 };
             File.WriteAllBytes(@"0:\test.dat", dataWritten);
-            mDebugger.Send("Text written");
+            mDebugger.Send("Binary Text written");
             byte[] dataRead = File.ReadAllBytes(@"0:\test.dat");
+            mDebugger.Send("Bynary Text read");
 
-            Assert.IsTrue(ByteArrayAreEquals(dataWritten, dataRead), "Failed to write binary data to a file.");
+            Assert.IsTrue(ByteArrayAreEquals(dataWritten, dataRead), "Failed to write and read binary data to a file.");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
@@ -195,14 +196,25 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
 
             mDebugger.Send("START TEST: Copy a file:");
             File.Copy(@"0:\Kudzu.txt", @"0:\Kudzu2.txt");
-            if (File.Exists(@"0:\Kudzu2.txt"))
-            {
-                mDebugger.Send(" The new file has been created, reading...");
-                string KudzuTxtContent = File.ReadAllText(@"0:\Kudzu.txt");
-                string Kudzu2TxtContent = File.ReadAllText(@"0:\Kudzu2.txt");
 
-                Assert.IsTrue(KudzuTxtContent == Kudzu2TxtContent, "File has not been copied correctly");
-            }
+            string KudzuTxtContent = File.ReadAllText(@"0:\Kudzu.txt");
+
+            Assert.IsTrue(File.Exists(@"0:\Kudzu2.txt"), "Copy failed destination file not created");
+ 
+            mDebugger.Send(" The new file has been created, reading...");
+                
+            string Kudzu2TxtContent = File.ReadAllText(@"0:\Kudzu2.txt");
+
+            Assert.IsTrue(KudzuTxtContent == Kudzu2TxtContent, "File has not been copied correctly");
+            
+            /* Now Try to Copy '0:\Kudzu.txt' onto an existing file with the overload of Copy that does permit this */
+            mDebugger.Send("START TEST: Copy a file (overwrite existing) :");
+            File.Copy(@"0:\Kudzu.txt", @"0:\test.dat", true);
+
+            mDebugger.Send("The existing file has been overwritten, reading...");
+            string TestDatContent = File.ReadAllText(@"0:\test.dat");
+  
+            Assert.IsTrue(KudzuTxtContent == TestDatContent, "File has not been copied correctly");
 
             mDebugger.Send("END TEST");
         }

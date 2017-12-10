@@ -102,6 +102,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             text = Encoder.GetString(UTF8GothicText);
             expectedText = "𐍈";
             Assert.IsTrue((text == expectedText), "UTF8 Decoding of Gothic text failed strings different");
+
+            /* But this not work is searching '437' in some native Windows tables, we need plugs for this sadly! */
+            //Encoder = Encoding.GetEncoding(437);
+            //text = "àèìòù";
+            //result = Encoder.GetBytes(text);
+            //expectedResult = new byte[] { 0x85, 0x8A, 0x8D, 0x95, 0x97 };
+            //Assert.IsTrue(EqualityHelper.ByteArrayAreEquals(result, expectedResult), "CP437 Encoding of accents text failed byte arrays different");
+
         }
     }
 }

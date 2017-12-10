@@ -77,18 +77,32 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             // XXX EnumerateDirectories() and EnumerateFiles() can not be neither tested as IL2CPU crashes!
             //var xEnumDir = xDi.EnumerateDirectories();
 
-            // Not working xFiles[0].FullName is null I'll return on it when I'll test FileInfo
-#if false
             mDebugger.Send("START TEST: GetFiles on xDi");
-            //var expectedFilePath = Path.Combine(xDi.FullName, "test");
+ 
             var expectedFilePath = @"0:\DiTest\test";
             File.Create(expectedFilePath);
+
             var xFiles = xDi.GetFiles();
-            Assert.IsTrue(xFiles != null, "GetFiles() failed it returns null array");
-            Assert.IsTrue(xFiles.Length != 0, "GetFiles() failed it returns empty array");
-            Assert.IsTrue(xFiles[0].FullName == expectedFilePath, "GetFiles() does not return the expected directories");
+          
+            Assert.IsTrue(xFiles[0].FullName == expectedFilePath, "GetFiles() does not return the expected files");
             mDebugger.Send("END TEST");
-#endif
+
+            mDebugger.Send("START TEST: GetFileSystemInfos on xDi");
+            var xEntries = xDi.GetFileSystemInfos();
+
+            /* This the correct way to implement dir :-) */
+            // There 2 entries on xDi a subdir and a file, let's check that xEntries has lenght 2 first */
+            Assert.IsTrue(xEntries.Length == 2, "There are not 2 entries inside xDi");
+            // OK let's see if they are the expected ones...
+            foreach (var xEntry in xEntries)
+            {
+                if (xEntry is DirectoryInfo)
+                    Assert.IsTrue(xEntry.FullName == xSubDi.FullName, "Directory found but with wrong name");
+                if (xEntry is FileInfo)
+                    Assert.IsTrue(xEntry.FullName == expectedFilePath, "File found but with wrong name");
+            }
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
 
             // TODO we need to implement Move at VFS level to have this working
 #if false

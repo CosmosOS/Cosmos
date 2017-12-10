@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Cosmos.Kernel.Tests.Fat.System.IO
 {
-    class StreamWriterTest
+    class StreamWriterStreamReaderTest
     {
         /// <summary>
         /// Tests System.IO.StreamWriter plugs.

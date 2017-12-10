@@ -40,10 +40,9 @@ namespace Cosmos.Kernel.Tests.Fat
                 FileTest.Execute(mDebugger);
                 FileStreamTest.Execute(mDebugger);
                 DirectoryInfoTest.Execute(mDebugger);
-                StreamWriterTest.Execute(mDebugger);
-                //StreamReaderTest.Execute(mDebugger);
-                //BinaryWriterTest.Execute(mDebugger);
-                //BinaryReaderTest.Execute(mDebugger);
+                StreamWriterStreamReaderTest.Execute(mDebugger);
+                BinaryWriterBinaryReaderTest.Execute(mDebugger);
+                FileInfoTest.Execute(mDebugger);
 
                 TestController.Completed();
             }

@@ -183,7 +183,14 @@ namespace Cosmos.System_Plugs.System.IO
 
                     Global.mFileSystemDebugger.SendInternal("CreateNew Mode with aPath not existing new file created");
                     // TODO it seems that GetFileStream effectively Creates the file if it does not exist
-                    aStream = File.Create(aPath);
+                    //aStream = File.Create(aPath);
+                    xEntry = VFSManager.CreateFile(aPath);
+                    if (xEntry == null)
+                    {
+                        return null;
+                    }
+                    //aStream = File.Create(aPath);
+                    aStream = VFSManager.GetFileStream(aPath);
                     break;
 
                 case FileMode.Open:
@@ -225,6 +232,16 @@ namespace Cosmos.System_Plugs.System.IO
             }
 
             return aStream;
+        }
+
+        public static bool get_CanWrite(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            return innerStream.CanWrite;
+        }
+
+        public static bool get_CanRead(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            return innerStream.CanRead;
         }
     }
 }
