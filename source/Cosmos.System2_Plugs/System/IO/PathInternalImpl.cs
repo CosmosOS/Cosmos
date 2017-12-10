@@ -1,5 +1,5 @@
 ﻿//#define COSMOSDEBUG
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 using Cosmos.System;
 
 namespace Cosmos.System_Plugs.System.IO

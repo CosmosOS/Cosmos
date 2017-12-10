@@ -302,10 +302,9 @@ namespace Cosmos.System.FileSystem.VFS
 
                 return GetFile(xPath) != null;
             }
-            catch (Exception e)
+            catch
             {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(e.Message);
+                /* Simply map any Exception to false as this method should return only bool */
                 return false;
             }
         }
@@ -331,10 +330,9 @@ namespace Cosmos.System.FileSystem.VFS
 
                 return GetDirectory(xPath) != null;
             }
-            catch (Exception e)
+            catch
             {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(e.Message);
+                /* Simply map any Exception to false as this method should return only bool */
                 return false;
             }
         }

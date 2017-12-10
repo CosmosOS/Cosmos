@@ -1,8 +1,7 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 using System.IO;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 using Cosmos.System;
-using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System2_Plugs.System.IO

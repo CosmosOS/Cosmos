@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 using System.Threading.Tasks;
 
 namespace Cosmos.Core_Plugs.System.Threading

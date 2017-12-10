@@ -1,8 +1,5 @@
 ﻿using System.IO;
-using Cosmos.IL2CPU.API.Attribs;
-using Cosmos.System;
-using Cosmos.System.FileSystem.Listing;
-using Cosmos.System.FileSystem.VFS;
+using IL2CPU.API.Attribs;
 using System;
 
 namespace Cosmos.System2_Plugs.System.IO
