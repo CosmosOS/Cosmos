@@ -1,8 +1,8 @@
 //#define COSMOSDEBUG
 using System;
 using System.Globalization;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.CPU_Plugs.System {

@@ -2,8 +2,8 @@
 using System;
 using System.Globalization;
 using Cosmos.Common;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.Core_Plugs.System

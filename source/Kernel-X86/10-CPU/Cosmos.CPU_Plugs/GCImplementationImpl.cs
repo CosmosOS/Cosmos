@@ -1,6 +1,6 @@
 using System;
 using Cosmos.CPU.x86.Memory.Old;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Plugs {
     [Plug(Target = typeof(Cosmos.CPU.x86.GCImplementation))]
