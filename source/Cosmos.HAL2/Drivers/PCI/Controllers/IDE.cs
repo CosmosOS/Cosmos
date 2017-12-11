@@ -1,7 +1,7 @@
 using System;
 using Cosmos.HAL.BlockDevice;
 
-namespace Cosmos.HAL.Drivers.PCI.SATA
+namespace Cosmos.HAL.Drivers.PCI.Controllers
 {
     public class IDE
     {
