@@ -48,14 +48,14 @@ namespace Cosmos.HAL
   
             // Currently ATA won't be initialized until we find a solution for the
             // Two Controllers initialize bug
-            //if (PCI.GetDeviceClass(0x01, 0x01) != null)
-            //{
-            //    mDebugger.Send("ATA Primary Master");
-            //    IDE ATA1 = new IDE(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-            //    mDebugger.Send("ATA Secondary Master");
-            //    IDE ATA2 = new IDE(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-            //    //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
-            //}
+            if (PCI.GetDeviceClass(0x01, 0x01) != null)
+            {
+                mDebugger.Send("ATA Primary Master");
+                IDE ATA1 = new IDE(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
+                mDebugger.Send("ATA Secondary Master");
+                IDE ATA2 = new IDE(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
+                //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
+            }
             if (PCI.GetDeviceClass(0x01, 0x06) != null)
             {
                 Console.WriteLine("Initializing AHCI Controller");
