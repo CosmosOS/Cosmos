@@ -7,7 +7,7 @@ using static Cosmos.Kernel.Tests.Fat.System.IO.HelperMethods;
 
 namespace Cosmos.Kernel.Tests.Fat.System.IO
 {
-    class FileTest
+    public class FileTest
     {
         /// <summary>
         /// Tests System.IO.File plugs.

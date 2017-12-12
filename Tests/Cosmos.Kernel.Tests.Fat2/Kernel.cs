@@ -48,8 +48,8 @@ namespace Cosmos.Kernel.Tests.Fat2
                 FileInfoTest.Execute(mDebugger);
 #endif
 
-                Cosmos.System.Power.Shutdown();
-                //TestController.Completed();
+                //Cosmos.System.Power.Shutdown();
+                TestController.Completed();
             }
             catch (Exception e)
             {
