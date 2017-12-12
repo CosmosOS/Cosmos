@@ -6,7 +6,7 @@ using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 using Cosmos.Kernel.Tests.Fat.System.IO;
 
-namespace Cosmos.Kernel.Tests.Fat
+namespace Cosmos.Kernel.Tests.Fat2
 {
     /// <summary>
     /// The kernel implementation.
@@ -34,17 +34,20 @@ namespace Cosmos.Kernel.Tests.Fat
             try
             {
                 mDebugger.Send("Run");
-
+#if false
                 PathTest.Execute(mDebugger);
                 DirectoryTest.Execute(mDebugger);
-                //FileTest.Execute(mDebugger);
+#endif
+                FileTest.Execute(mDebugger);
+#if false
                 FileStreamTest.Execute(mDebugger);
-#if true
+
                 DirectoryInfoTest.Execute(mDebugger);
                 StreamWriterStreamReaderTest.Execute(mDebugger);
                 BinaryWriterBinaryReaderTest.Execute(mDebugger);
                 FileInfoTest.Execute(mDebugger);
 #endif
+
                 Cosmos.System.Power.Shutdown();
                 //TestController.Completed();
             }
