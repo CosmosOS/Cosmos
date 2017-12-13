@@ -45,8 +45,8 @@ namespace Cosmos.Kernel.Tests.Fat
                 BinaryWriterBinaryReaderTest.Execute(mDebugger);
                 FileInfoTest.Execute(mDebugger);
 #endif
-                Cosmos.System.Power.Shutdown();
-                //TestController.Completed();
+                //Cosmos.System.Power.Shutdown();
+                TestController.Completed();
             }
             catch (Exception e)
             {
