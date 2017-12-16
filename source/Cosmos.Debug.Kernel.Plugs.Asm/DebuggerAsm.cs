@@ -1,6 +1,6 @@
 using XSharp.Assembler;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using XSharp;
 
 namespace Cosmos.Debug.Kernel.Plugs.Asm

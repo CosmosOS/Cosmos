@@ -1,5 +1,5 @@
 using System;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Plugs.System {
     [Plug(Target = typeof(global::System.Globalization.CharUnicodeInfo))]

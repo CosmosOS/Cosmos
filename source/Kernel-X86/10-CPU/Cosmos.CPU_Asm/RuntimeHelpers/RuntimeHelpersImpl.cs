@@ -1,6 +1,6 @@
 using System;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using XSharp;
 using CPUx86 = XSharp.Assembler.x86;
 
