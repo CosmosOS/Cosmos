@@ -379,16 +379,12 @@ namespace Cosmos.System.Graphics
                 throw new ArgumentOutOfRangeException($"Mode {mode} is not supported by this Driver");
 #endif
 
-            foreach (var elem in availableModes)
+            if (CheckIfModeIsValid(mode))
             {
-                if (elem == mode)
-                {
-                    Global.mDebugger.SendInternal($"mode {mode} found");
-                    return; // All OK mode does exists in availableModes
-                }
+                return;
             }
 
-            Global.mDebugger.SendInternal($"foreach ended mode is not found! Raising exception...");
+            Global.mDebugger.SendInternal($"mode is not found! Raising exception...");
             /* 'mode' was not in the 'availableModes' List ==> 'mode' in NOT Valid */
             throw new ArgumentOutOfRangeException(nameof(mode), $"Mode {mode} is not supported by this Driver");
         }
