@@ -393,6 +393,13 @@ namespace Cosmos.System.Graphics
             throw new ArgumentOutOfRangeException(nameof(mode), $"Mode {mode} is not supported by this Driver");
         }
 
+        protected void ThrowIfCoordNotValid(Point point)
+        {
+
+            ThrowIfCoordNotValid(point.X, point.Y);
+
+        }
+
         protected void ThrowIfCoordNotValid(int x, int y)
         {
             if (x < 0 || x >= Mode.Columns)
