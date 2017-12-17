@@ -71,6 +71,7 @@ namespace Cosmos.System.Graphics
             //    throw new ArgumentNullException(nameof(color));
 
             Pen pen = new Pen(color);
+            
             for (int x = 0; x < mode.Rows; x++)
             {
                 for (int y = 0; y < mode.Columns; y++)
@@ -80,7 +81,11 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        
+
+        public void DrawPoint(Pen pen, Point point)
+        {
+            DrawPoint(pen, point.X, point.Y);
+        }
 
         public abstract void DrawPoint(Pen pen, int x, int y);
 
@@ -230,6 +235,13 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public virtual void DrawCircle(Pen pen, Point point, int radius)
+        {
+
+            DrawCircle(pen, point.X, point.Y, radius);
+
+        }
+
         //http://members.chello.at/~easyfilter/bresenham.html
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
@@ -263,6 +275,11 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public virtual void DrawEllipse(Pen pen, Point point, int x_radius, int y_radius)
+        {
+            DrawEllipse(pen, point.X, point.Y, x_radius, y_radius);
+        }
+
         public virtual void DrawPolygon(Pen pen, params Point[] points)
         {
             if (points.Length < 3)
@@ -277,7 +294,7 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, points[0], points[points.Length - 1]);
         }
 
-        public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height)
+        public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height = -1)
         {
             /*
              * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
@@ -285,6 +302,11 @@ namespace Cosmos.System.Graphics
              */
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
+
+            if (height == -1)
+            {
+                height = width;
+            }
 
             /* The check of the validity of x and y are done in DrawLine() */
 
@@ -317,19 +339,40 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, xc, yc, xd, yd);
         }
 
-        public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
+        public virtual void DrawFilledRectangle(Pen pen, Point point, int width, int height = -1)
         {
+
+            DrawFilledRectangle(pen, point.X, point.Y, width, height);
+
+        }
+
+        public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height = -1)
+        {
+            if (height == -1)
+            {
+                height = width;
+            }
+
             for (int y = y_start; y < y_start + height; y++)
             {
                 DrawLine(pen, x_start, y, x_start + width - 1, y);
             }
         }
 
+        public virtual void DrawTriangle(Pen pen, Point point0, Point point1, Point point2)
+        {
+
+            DrawTriangle(pen, point0.X, point0.Y, point1.X, point1.Y, point2.X, point2.Y);
+
+        }
+
         public virtual void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
         {
+
             DrawLine(pen, v1x, v1y, v2x, v2y);
             DrawLine(pen, v1x, v1y, v3x, v3y);
             DrawLine(pen, v2x, v2y, v3x, v3y);
+
         }
          
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
@@ -395,7 +438,7 @@ namespace Cosmos.System.Graphics
             ThrowIfCoordNotValid(point.X, point.Y);
 
         }
-
+        
         protected void ThrowIfCoordNotValid(int x, int y)
         {
             if (x < 0 || x >= Mode.Columns)
