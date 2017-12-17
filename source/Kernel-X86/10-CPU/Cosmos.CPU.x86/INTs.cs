@@ -1,5 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using Cosmos.IL2CPU.API.Attribs;
+using System.Runtime.InteropServices;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU.x86 {
     

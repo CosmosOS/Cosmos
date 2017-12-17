@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+    <ProjectReference Include="..\..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
     <ProjectReference Include="..\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
     <ProjectReference Include="..\40-System\Cosmos.System\Cosmos.System.csproj" />
   </ItemGroup>

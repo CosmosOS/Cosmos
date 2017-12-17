@@ -1,5 +1,5 @@
 using System;
-using Cosmos.IL2CPU.API;
+using IL2CPU.API;
 
 namespace GuessKernel
 {

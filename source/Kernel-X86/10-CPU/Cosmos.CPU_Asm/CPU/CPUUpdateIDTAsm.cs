@@ -1,5 +1,5 @@
 using Cosmos.CPU.x86;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 using System;
 using System.Reflection;
 using XSharp;

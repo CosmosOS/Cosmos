@@ -338,7 +338,7 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xNugetPkgDir);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xNugetPkgDir);
       //
-      Pack(Path.Combine(mSourcePath, "../../IL2CPU/source/Cosmos.IL2CPU.API"), xNugetPkgDir);
+      Pack(Path.Combine(mSourcePath, "../../IL2CPU/source/IL2CPU.API"), xNugetPkgDir);
     }
 
     private void CopyTemplates() {

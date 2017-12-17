@@ -38,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "sour
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj", "{31D48401-77B2-44AF-B6D3-27AB67C10759}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU.API", "..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj", "{31D48401-77B2-44AF-B6D3-27AB67C10759}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel.Plugs.Asm", "source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj", "{6C770E55-8EED-444C-AD4E-017E823E5BA3}"
 EndProject

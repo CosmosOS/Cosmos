@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" />
   </ItemGroup>
 

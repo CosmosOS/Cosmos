@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
 {

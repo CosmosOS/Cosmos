@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Plugs.TapRoot.System {
     [Plug(Target = typeof(global::System.Console))]
