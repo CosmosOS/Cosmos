@@ -1,6 +1,9 @@
 ﻿//#define COSMOSDEBUG
 using System;
+using System.Drawing;
 using System.Collections.Generic;
+
+
 
 namespace Cosmos.System.Graphics
 {
@@ -294,6 +297,13 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, points[0], points[points.Length - 1]);
         }
 
+        public virtual void DrawRectangle(Pen pen, Point point, int width, int height = -1)
+        {
+
+            DrawRectangle(pen, point.X, point.Y, width, height);
+
+        }
+
         public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height = -1)
         {
             /*
@@ -374,16 +384,55 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, v2x, v2y, v3x, v3y);
 
         }
-         
+
+        public virtual void DrawArray(Color[] colors, Point point, int width, int height = -1)
+        {
+
+            DrawArray(colors, point.X, point.Y, width, height);
+
+        }
+        
+        public virtual void DrawArray(Color[] colors, int x, int y, int width, int height = -1)
+        {
+
+            if (height == -1)
+            {
+                height = width;
+            }
+
+            ThrowIfCoordNotValid(x, y);
+
+            ThrowIfCoordNotValid(x + width, y + height);           
+
+            for (int i = 0; i < x; i++)
+            {
+
+                for (int ii = 0; ii < y; ii++)
+                {
+
+                    DrawPoint(new Pen(colors[i + (ii * width)]), new Point(i, ii));
+
+                }
+
+            }
+
+        }
+        
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
         }
 
         // Image and Font will be available in .NET Core 2.1
+        // dot net core does not have Image
         //public void DrawImage(Image image, int x, int y)
         //{
         //    throw new NotImplementedException();
+        //}
+
+        //public void DrawString(String str, Font aFont, Brush brush, Point point)
+        //{
+        //    DrawString(str, aFont, brush, point.X, point.Y);
         //}
 
         //public void DrawString(String str, Font aFont, Brush brush, int x, int y)
@@ -397,6 +446,13 @@ namespace Cosmos.System.Graphics
 
             if (mode == null)
                 return false;
+
+            /* This would have been the more "modern" version but LINQ is not working 
+
+            if (!availableModes.Exists(element => element == mode))
+                return true;
+
+            */
 
             foreach (var elem in availableModes)
             {
@@ -416,11 +472,7 @@ namespace Cosmos.System.Graphics
                 Global.mDebugger.SendInternal($"mode is null raising exception!");
                 throw new ArgumentNullException(nameof(mode));
             }
-#if false
-            /* This would have been the more "modern" version but LINQ is not working */
-            if (!availableModes.Exists(element => element == mode))
-                throw new ArgumentOutOfRangeException($"Mode {mode} is not supported by this Driver");
-#endif
+
 
             if (CheckIfModeIsValid(mode))
             {
