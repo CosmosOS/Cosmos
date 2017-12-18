@@ -430,6 +430,11 @@ namespace Cosmos.System.Graphics
         //    throw new NotImplementedException();
         //}
 
+        //public void DrawImage(Image image, Point point)
+        //{
+        //    DrawImage(image, point.X, point.Y));
+        //}
+
         //public void DrawString(String str, Font aFont, Brush brush, Point point)
         //{
         //    DrawString(str, aFont, brush, point.X, point.Y);
