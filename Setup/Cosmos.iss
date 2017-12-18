@@ -64,6 +64,7 @@ AlwaysShowComponentsList=False
 ShowComponentSizes=False
 LicenseFile=LICENSE.txt
 DisableDirPage=yes
+PrivilegesRequired=lowest
 
 [Dirs]
 Name: {app}; Flags: uninsalwaysuninstall
