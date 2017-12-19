@@ -63,8 +63,10 @@ FlatComponentsList=False
 AlwaysShowComponentsList=False
 ShowComponentSizes=False
 LicenseFile=LICENSE.txt
-DisableDirPage=yes
-PrivilegesRequired=lowest
+DisableDirPage=no
+
+[Messages]
+SelectDirDesc=If the user installing the Cosmos User Kit is not the admin. Please choose the corresponding AppData/Roaming directory.
 
 [Dirs]
 Name: {app}; Flags: uninsalwaysuninstall
