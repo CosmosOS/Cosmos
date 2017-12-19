@@ -47,8 +47,10 @@ namespace Cosmos.HAL
       
             Console.WriteLine("Initializing Devices");
             mDebugger.Send("Device Init");
-            //PCIDriver.InitializeAll();
-            AHCI.Initialize(HAL.PCI.GetDeviceClass(0x01, 0x06));
+            PCIDriver.InitializeAll();
+            
+            mDebugger.Send("After Core.Global.Init");
+          
         }
 
         public static void EnableInterrupts()
