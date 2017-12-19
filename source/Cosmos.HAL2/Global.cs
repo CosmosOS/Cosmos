@@ -1,157 +1,61 @@
-﻿using System;
-
+using System;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
+using Cosmos.HAL.Drivers;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Drivers.PCI.Controllers;
 
 namespace Cosmos.HAL
 {
-  public static class Global
-  {
-    public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
-
-    //static public PIT PIT = new PIT();
-    // Must be static init, other static inits rely on it not being null
-
-    public static TextScreenBase TextScreen = new TextScreen();
-    public static PCI Pci;
-
-    static public void Init(TextScreenBase textScreen)
+    public static class Global
     {
-      if (textScreen != null)
-      {
-        TextScreen = textScreen;
-      }
+        public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
 
-      mDebugger.Send("Before Core.Global.Init");
-      Core.Global.Init();
+        //static public PIT PIT = new PIT();
+        // Must be static init, other static inits rely on it not being null
 
-      //TODO Redo this - Global init should be other.
-      // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
-      // If we let hardware do it, we need to protect it from being used by System.
-      // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
-      //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
+        public static TextScreenBase TextScreen = new TextScreen();
+        public static PCI Pci;
 
-      //TODO: Since this is FCL, its "common". Otherwise it should be
-      // system level and not accessible from Core. Need to think about this
-      // for the future.
+        static public void Init(TextScreenBase textScreen)
+        {
+            if (textScreen != null)
+            {
+                TextScreen = textScreen;
+            }
 
-      Console.WriteLine("Finding PCI Devices");
-      mDebugger.Send("PCI Devices");
-      PCI.Setup();
+            mDebugger.Send("Before Core.Global.Init");
+            Core.Global.Init();
 
-      Console.WriteLine("Starting ACPI");
-      mDebugger.Send("ACPI Init");
-      ACPI.Start();
+            //TODO Redo this - Global init should be other.
+            // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
+            // If we let hardware do it, we need to protect it from being used by System.
+            // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
+            //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
 
-      mDebugger.Send("Done initializing Cosmos.HAL.Global");
+            //TODO: Since this is FCL, its "common". Otherwise it should be
+            // system level and not accessible from Core. Need to think about this
+            // for the future.
+
+            Console.WriteLine("Finding PCI Devices");
+            mDebugger.Send("PCI Devices");
+            PCI.Setup();
+
+            Console.WriteLine("Starting ACPI");
+            mDebugger.Send("ACPI Init");
+            ACPI.Start();
       
-      // Class 0x01 = Mass Storage Controllers' Class code
-      // Subclass 0x00 = Subclass code of SCSI Controller
-      // Subclass 0x01 = Subclass code of IDE Controller
-      // Subclass 0x04 = Subclass code of RAID Controller
-      // Subclass 0x06 = Subclass code of AHCI Controller
-      if (PCI.GetDeviceClass(0x01, 0x01) != null)
-      {
-        mDebugger.Send("ATA Primary Master");
-        InitAta(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-        mDebugger.Send("ATA Secondary Master");
-        InitAta(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-        //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
-      }
-      else if (PCI.GetDeviceClass(0x01, 0x00) != null)
-      {
-        mDebugger.Send("SCSI isn't supported yet");
-        Console.WriteLine("SCSI Controller not supported yet");
-        Console.WriteLine("Booting without ATA Initialization");
-        Console.WriteLine("FAT cannot be used while ATA isn't initialized"); 
-      }
-      else if (PCI.GetDeviceClass(0x01, 0x04) != null)
-      {
-        mDebugger.Send("RAID isn't supported yet");
-        Console.WriteLine("RAID Controller is not supported yet");
-        Console.WriteLine("Booting without ATA Initialization");
-        Console.WriteLine("FAT cannot be used while ATA isn't initialized");
-      }
-      else if (PCI.GetDeviceClass(0x01, 0x06) != null)
-      {
-        mDebugger.Send("AHCI isn't supported yet");
-        Console.WriteLine("AHCI Controller is not supported yet");
-        Console.WriteLine("Booting without ATA Initialization");
-        Console.WriteLine("FAT cannot be used while ATA isn't initialized");
-      }
-      else
-      {
-        Console.WriteLine("Booting without ATA Initialization");
-      }
-      
-    }
-
-    public static void EnableInterrupts()
-    {
-      CPU.EnableInterrupts();
-    }
-
-    private static void InitAta(Ata.ControllerIdEnum aControllerID,
-                                Ata.BusPositionEnum aBusPosition)
-    {
-      var xIO = aControllerID == Ata.ControllerIdEnum.Primary
-                  ? Core.Global.BaseIOGroups.ATA1
-                  : Core.Global.BaseIOGroups.ATA2;
-      var xATA = new AtaPio(xIO, aControllerID, aBusPosition);
-      if (xATA.DriveType == AtaPio.SpecLevel.Null)
-      {
-        return;
-      }
-      if (xATA.DriveType == AtaPio.SpecLevel.ATA)
-      {
-        BlockDevice.BlockDevice.Devices.Add(xATA);
-        Ata.AtaDebugger.Send("ATA device with speclevel ATA found.");
-      }
-      else
-      {
-        //Ata.AtaDebugger.Send("ATA device with spec level " + (int)xATA.DriveType +
-        //                     " found, which is not supported!");
-        return;
-      }
-      var xMbrData = new byte[512];
-      xATA.ReadBlock(0UL, 1U, xMbrData);
-      var xMBR = new MBR(xMbrData);
-
-      if (xMBR.EBRLocation != 0)
-      {
-        //EBR Detected
-        var xEbrData = new byte[512];
-        xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
-        var xEBR = new EBR(xEbrData);
-
-        for (int i = 0; i < xEBR.Partitions.Count; i++)
-        {
-          //var xPart = xEBR.Partitions[i];
-          //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-          //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+            Console.WriteLine("Initializing Devices");
+            mDebugger.Send("Device Init");
+            //PCIDriver.InitializeAll();
+            AHCI.Initialize(HAL.PCI.GetDeviceClass(0x01, 0x06));
         }
-      }
 
-      // TODO Change this to foreach when foreach is supported
-      Ata.AtaDebugger.Send("Number of MBR partitions found:");
-      Ata.AtaDebugger.SendNumber(xMBR.Partitions.Count);
-      for (int i = 0; i < xMBR.Partitions.Count; i++)
-      {
-        var xPart = xMBR.Partitions[i];
-        if (xPart == null)
+        public static void EnableInterrupts()
         {
-          Console.WriteLine("Null partition found at idx: " + i);
+            CPU.EnableInterrupts();
         }
-        else
-        {
-          var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
-          BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-          Console.WriteLine("Found partition at idx" + i);
-        }
-      }
+
+        public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
     }
-
-    public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
-  }
 }
