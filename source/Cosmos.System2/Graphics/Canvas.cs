@@ -94,6 +94,15 @@ namespace Cosmos.System.Graphics
 
         public abstract void DrawPoint(Pen pen, float x, float y);
 
+        public virtual void DrawArray(Color[] colors, Point point, int width, int height)
+        {
+
+            DrawArray(colors, point.X, point.Y, width, height);
+
+        }
+
+        public abstract void DrawArray(Color[] colors, int x, int y, int width, int height);
+
         private void DrawHorizontalLine(Pen pen, int dx, int x1, int y1)
         {
             int i;
@@ -297,14 +306,28 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, points[0], points[points.Length - 1]);
         }
 
-        public virtual void DrawRectangle(Pen pen, Point point, int width, int height = -1)
+        public virtual void DrawSquare(Pen pen, Point point, int size)
+        {
+
+            DrawRectangle(pen, point.X, point.Y, size, size);
+
+        }
+
+        public virtual void DrawSquare(Pen pen, int x, int y, int size)
+        {
+
+            DrawRectangle(pen, x, y, size, size);
+
+        }
+
+        public virtual void DrawRectangle(Pen pen, Point point, int width, int height)
         {
 
             DrawRectangle(pen, point.X, point.Y, width, height);
 
         }
 
-        public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height = -1)
+        public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height)
         {
             /*
              * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
@@ -313,10 +336,6 @@ namespace Cosmos.System.Graphics
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
 
-            if (height == -1)
-            {
-                height = width;
-            }
 
             /* The check of the validity of x and y are done in DrawLine() */
 
@@ -349,14 +368,14 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, xc, yc, xd, yd);
         }
 
-        public virtual void DrawFilledRectangle(Pen pen, Point point, int width, int height = -1)
+        public virtual void DrawFilledRectangle(Pen pen, Point point, int width, int height)
         {
 
             DrawFilledRectangle(pen, point.X, point.Y, width, height);
 
         }
 
-        public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height = -1)
+        public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
         {
             if (height == -1)
             {
@@ -385,38 +404,7 @@ namespace Cosmos.System.Graphics
 
         }
 
-        public virtual void DrawArray(Color[] colors, Point point, int width, int height = -1)
-        {
 
-            DrawArray(colors, point.X, point.Y, width, height);
-
-        }
-        
-        public virtual void DrawArray(Color[] colors, int x, int y, int width, int height = -1)
-        {
-
-            if (height == -1)
-            {
-                height = width;
-            }
-
-            ThrowIfCoordNotValid(x, y);
-
-            ThrowIfCoordNotValid(x + width, y + height);           
-
-            for (int i = 0; i < x; i++)
-            {
-
-                for (int ii = 0; ii < y; ii++)
-                {
-
-                    DrawPoint(new Pen(colors[i + (ii * width)]), new Point(i, ii));
-
-                }
-
-            }
-
-        }
         
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
