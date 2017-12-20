@@ -36,7 +36,10 @@ namespace Cosmos.Core_Plugs.System.Threading
                     xVoid = Core.Global.BaseIOGroups.ATA1.Status.Byte;
                 }
             }
-            else if (ms < 0) throw new ArgumentOutOfRangeException("millisecondsTimeout", "millisecondsTimeout should be greater than or equals to 0");
+            else if (ms < 0) 
+                throw new ArgumentOutOfRangeException
+                ("millisecondsTimeout",
+                 "millisecondsTimeout should be greater than or equals to 0");
         }
     }
 }
