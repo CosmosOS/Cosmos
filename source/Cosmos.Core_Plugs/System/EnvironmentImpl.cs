@@ -17,7 +17,5 @@ namespace Cosmos.Core_Plugs.System
     public static class EnvironmentImpl
     {
         public static void CCtor() {}
-
-        public static String NewLine => "\n"
     }
 }
