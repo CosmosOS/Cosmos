@@ -1,26 +1,11 @@
 using System;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
 {
     [Plug(Target = typeof(Buffer))]
     public class BufferImpl
     {
-        // __Memcpy doesn't exist in net core
-        //[PlugMethod(IsOptional = true)]
-        //public static unsafe void __Memcpy(byte* src, byte* dest, int count)
-        //{
-        //    Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, count);
-        //}
-
-        //[PlugMethod(IsOptional = true)]
-        //public static unsafe void __Memcpy(byte* src, byte* dest, long count)
-        //{
-        //    // TODO: Cast could cause a loss of data.
-        //    Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, (int) count);
-        //}
-
         /// <summary>
         /// The memmove() function copies n bytes from memory area src to memory area dest.
         /// The memory areas may overlap: copying takes place as though the bytes in src

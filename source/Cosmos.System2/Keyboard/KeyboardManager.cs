@@ -48,8 +48,17 @@ namespace Cosmos.System
             get;
             set;
         }
+ 
+ 
+        public static bool KeyAvailable
+        {
+            get
+            {
+                return mQueuedKeys.Count > 0;
+            }
+        }
 
-        public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
+public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
 
         private static ScanMapBase _scanMap = new US_Standard();
         private static Queue<KeyEvent> mQueuedKeys = new Queue<KeyEvent>();

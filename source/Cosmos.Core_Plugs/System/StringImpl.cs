@@ -2,8 +2,8 @@
 using System;
 using System.Globalization;
 using Cosmos.Common;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.Core_Plugs.System
@@ -114,6 +114,11 @@ namespace Cosmos.Core_Plugs.System
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
             return *(aFirstChar + aIndex);
+        }
+
+        public static bool InternalUseRandomizedHashing()
+        {
+            return false;
         }
 
         public static bool IsAscii(string aThis)

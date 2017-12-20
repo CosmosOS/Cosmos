@@ -1,0 +1,7 @@
+<Project>
+
+    <PropertyGroup>
+        <IsPackable Condition="'$(IsPackable)' == ''">False</IsPackable>
+    </PropertyGroup>
+
+</Project>

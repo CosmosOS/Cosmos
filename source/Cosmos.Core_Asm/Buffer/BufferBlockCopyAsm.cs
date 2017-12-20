@@ -1,5 +1,5 @@
 using XSharp.Assembler;
-using Cosmos.IL2CPU.API;
+using IL2CPU.API;
 using XSharp;
 using CPUx86 = XSharp.Assembler.x86;
 
@@ -14,9 +14,9 @@ namespace Cosmos.Core_Asm
         private const int CountDisplacement = 8;
 
         /*public static void BlockCopy(
-         *			Array src, [ebp + 24]
-         *			int srcOffset, [ebp + 20]
-         *			Array dst, [ebp + 16]
+         *			Array src, [ebp + 32]
+         *			int srcOffset, [ebp + 24]
+         *			Array dst, [ebp + 20]
          *			int dstOffset, [ebp + 12]
          *			int count); [ebp + 8]
          */

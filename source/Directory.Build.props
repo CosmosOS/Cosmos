@@ -1,0 +1,26 @@
+<Project>
+
+    <PropertyGroup>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\build\Cosmos.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <CosmosDescription>Cosmos is an operating system "construction kit". Build your own OS using managed languages such as C#, VB.NET, and more!</CosmosDescription>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <Authors Condition="'$(Authors)' == ''">Cosmos</Authors>
+        <Company Condition="'$(Company)' == ''">Cosmos</Company>
+        <Copyright Condition="'$(Copyright)' == ''">Copyright © 2007-$([System.DateTime]::Now.Year) COSMOS Project</Copyright>
+        <PackageDescription Condition="'$(PackageDescription)' == ''">$(CosmosDescription)</PackageDescription>
+        <PackageIconUrl Condition="'$(PackageIconUrl)' == ''">https://github.com/CosmosOS/Cosmos/raw/master/Artwork/Cosmos.ico</PackageIconUrl>
+        <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">http://www.gocosmos.org</PackageProjectUrl>
+        <PackageLicenseUrl Condition="'$(PackageLicenseUrl)' == ''">https://github.com/CosmosOS/Cosmos/raw/master/LICENSE.txt</PackageLicenseUrl>
+        <PackageRequireLicenseAcceptance Condition="'$(PackageRequireLicenseAcceptance)' == ''">True</PackageRequireLicenseAcceptance>
+        <PackageTags Condition="'$(PackageTags)' == ''">Cosmos OS Operating System .NET C# VB VB.NET F#</PackageTags>
+        <RepositoryType Condition="'$(RepositoryType)' == ''">git</RepositoryType>
+        <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">https://github.com/CosmosOS/Cosmos</RepositoryUrl>
+    </PropertyGroup>
+
+</Project>

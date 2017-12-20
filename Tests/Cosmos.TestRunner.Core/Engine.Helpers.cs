@@ -223,7 +223,7 @@ namespace Cosmos.TestRunner.Core
             xArgs.AddRange(References.Select(aReference => "References:" + aReference));
 
             bool xUsingUserkit = false;
-            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU");
+            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU.Compiler");
             if (!Directory.Exists(xIL2CPUPath))
             {
                 xUsingUserkit = true;
@@ -253,7 +253,7 @@ namespace Cosmos.TestRunner.Core
                     xArgs.Insert(0, "run");
                     xArgs.Insert(1, "--no-build");
                     xArgs.Insert(2, " -- ");
-                    RunProcess("dotnet", xIL2CPUPath, xArgs, true);
+                    RunProcess("dotnet", xIL2CPUPath, xArgs);
                 }
             }
         }

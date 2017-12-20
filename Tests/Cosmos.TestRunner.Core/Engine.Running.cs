@@ -43,7 +43,7 @@ namespace Cosmos.TestRunner.Core
             debugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
             debugConnector.CmdKernelPanic = n =>
                                             {
-                                                OutputHandler.LogMessage("Kernel panic! Nummer = " + n);
+                                                OutputHandler.LogMessage("Kernel panic! Number = " + n);
                                                 // todo: add core dump here, call stack.
                                             };
             debugConnector.CmdTrace = t => { };

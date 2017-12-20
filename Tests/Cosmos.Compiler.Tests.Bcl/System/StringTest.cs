@@ -9,6 +9,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
+            string xTestStr = "Test";
+            int xExpectedLength = 4;
+            int xLength = xTestStr.Length;
+            Assert.IsTrue(xLength == xExpectedLength, "String.Length is not returning the correct value.");
+
             Assert.IsTrue(("a" + "b") == "ab", "concatting 2 string using + doesn't work");
             Assert.IsTrue(("a" + 'b') == "ab", "concatting 1 string and 1 character doesn't work");
 
@@ -43,8 +48,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(test.Contains("test"), "string.Contains(string) doesn't find a substring that actually exists.");
             Assert.IsFalse(test.Contains("cosmos"), "string.Contains(string) found a substring that didn't actually exist in a string.");
 
-            //Assert.IsTrue(test.EndsWith("string."), "string.EndsWith(string) is not reporting false even though the string actually does end with the substring.");
-            //Assert.IsFalse(test.EndsWith("sentence."), "string.EndsWith(string) is not reporting true even though the string actually doesn't end with the substring.");
+            Assert.IsTrue(test.EndsWith("string."), "string.EndsWith(string) is not reporting false even though the string actually does end with the substring.");
+            Assert.IsFalse(test.EndsWith("sentence."), "string.EndsWith(string) is not reporting true even though the string actually doesn't end with the substring.");
 
             Assert.IsTrue(test.StartsWith("This"), "string.StartsWith(string) is reporting false even though the string does start with the supplied substring.");
             Assert.IsFalse(test.StartsWith("That"), "string.StartsWith(string) is reporting true even though the string doesn't start with the supplied substring.");

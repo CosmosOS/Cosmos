@@ -1,8 +1,8 @@
 using System;
 using XSharp.Assembler;
 using Cosmos.Core;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using XSharp;
 
 namespace Cosmos.Core_Asm

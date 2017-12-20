@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Text;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.System {
     static public class Boot {
