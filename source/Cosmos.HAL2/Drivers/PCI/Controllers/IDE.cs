@@ -5,7 +5,7 @@ namespace Cosmos.HAL.Drivers.PCI.Controllers
 {
     public class IDE
     {
-        public static void InitAta(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
+        public IDE(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
         {
             var xIO = aControllerID == Ata.ControllerIdEnum.Primary ? Core.Global.BaseIOGroups.ATA1 : Core.Global.BaseIOGroups.ATA2;
             var xATA = new AtaPio(xIO, aControllerID, aBusPosition);
