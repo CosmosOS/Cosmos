@@ -140,6 +140,7 @@ namespace Cosmos.Core
                 (*(UInt32*)(Base + i)) = aBuffer[i];
         }
         #endregion ReadWrite
+            
     }
 
     public class MemoryBlock08
