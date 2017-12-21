@@ -38,8 +38,10 @@ namespace Cosmos.Core_Plugs.System.Threading
             }
             else if (ms < 0) 
                 throw new ArgumentOutOfRangeException
-                ("millisecondsTimeout",
-                 "millisecondsTimeout should be greater than or equals to 0");
+                (
+                    "millisecondsTimeout",
+                    "millisecondsTimeout should be greater than or equals to 0"
+                );
         }
     }
 }
