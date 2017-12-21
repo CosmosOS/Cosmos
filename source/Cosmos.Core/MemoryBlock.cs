@@ -239,6 +239,5 @@ namespace Cosmos.Core
                 (*(UInt32*)(Base + aByteOffset)) = value;
             }
         }
-
     }
 }
