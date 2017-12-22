@@ -22,11 +22,6 @@ namespace Cosmos.HAL.BlockDevice
 
         private static void Initialize(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
         {
-            if (aControllerID == Ata.ControllerIdEnum.Primary && aBusPosition == Ata.BusPositionEnum.Master)
-            else if (aControllerID == Ata.ControllerIdEnum.Secondary && aBusPosition == Ata.BusPositionEnum.Master)
-            else if (aControllerID == Ata.ControllerIdEnum.Primary && aBusPosition == Ata.BusPositionEnum.Slave)
-            else if (aControllerID == Ata.ControllerIdEnum.Secondary && aBusPosition == Ata.BusPositionEnum.Master)
-
             var xIO = aControllerID == Ata.ControllerIdEnum.Primary ? Core.Global.BaseIOGroups.ATA1 : Core.Global.BaseIOGroups.ATA2;
             var xATA = new AtaPio(xIO, aControllerID, aBusPosition);
             if (xATA.DriveType == AtaPio.SpecLevel.Null) return;
