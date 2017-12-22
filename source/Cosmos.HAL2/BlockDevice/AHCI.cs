@@ -145,25 +145,25 @@ namespace Cosmos.HAL.BlockDevice
         private void GetCapabilities()
         {
             NumOfPorts = mGeneric.Capabilities & 0x1F;
-            SupportsExternalSATA = Convert.ToBoolean(mGeneric.Capabilities >> 5 & 1);
-            EnclosureManagementSupported = Convert.ToBoolean(mGeneric.Capabilities >> 6 & 1);
-            CommandCompletionCoalsecingSupported = Convert.ToBoolean(mGeneric.Capabilities >> 7 & 1);
+            SupportsExternalSATA = (mGeneric.Capabilities >> 5 & 1) == 1;
+            EnclosureManagementSupported = (mGeneric.Capabilities >> 6 & 1) == 1;
+            CommandCompletionCoalsecingSupported = (mGeneric.Capabilities >> 7 & 1) == 1;
             NumOfCommandSlots = mGeneric.Capabilities >> 8 & 0x1F;
-            PartialStateCapable = Convert.ToBoolean(mGeneric.Capabilities >> 13 & 1);
-            SlumberStateCapable = Convert.ToBoolean(mGeneric.Capabilities >> 14 & 1);
-            PIOMultipleDRQBlock = Convert.ToBoolean(mGeneric.Capabilities >> 15 & 1);
-            FISBasedSwitchingSupported = Convert.ToBoolean(mGeneric.Capabilities >> 16 & 1);
-            SupportsPortMutliplier = Convert.ToBoolean(mGeneric.Capabilities >> 17 & 1);
-            SupportsAHCIModeOnly = Convert.ToBoolean(mGeneric.Capabilities >> 18 & 1);
+            PartialStateCapable = (mGeneric.Capabilities >> 13 & 1) == 1;
+            SlumberStateCapable = (mGeneric.Capabilities >> 14 & 1) == 1;
+            PIOMultipleDRQBlock = (mGeneric.Capabilities >> 15 & 1) == 1;
+            FISBasedSwitchingSupported = (mGeneric.Capabilities >> 16 & 1) == 1;
+            SupportsPortMutliplier = (mGeneric.Capabilities >> 17 & 1) == 1;
+            SupportsAHCIModeOnly = (mGeneric.Capabilities >> 18 & 1) == 1;
             InterfaceSpeedSupport = mGeneric.Capabilities >> 20 & 0x0F;
-            SupportsCommandListOverride = Convert.ToBoolean(mGeneric.Capabilities >> 24 & 1);
-            SupportsActivityLED = Convert.ToBoolean(mGeneric.Capabilities >> 25 & 1);
-            SupportsAggressiveLinkPowerManagement = Convert.ToBoolean(mGeneric.Capabilities >> 26 & 1);
-            SupportsStaggeredSpinup = Convert.ToBoolean(mGeneric.Capabilities >> 27 & 1);
-            SupportsMechanicalPresenceSwitch = Convert.ToBoolean(mGeneric.Capabilities >> 28 & 1);
-            SupportsSNotificationRegister = Convert.ToBoolean(mGeneric.Capabilities >> 29 & 1);
-            SupportsNativeCommandQueuing = Convert.ToBoolean(mGeneric.Capabilities >> 30 & 1);
-            Supports64bitAddressing = Convert.ToBoolean(mGeneric.Capabilities >> 31 & 1);
+            SupportsCommandListOverride = (mGeneric.Capabilities >> 24 & 1) == 1;
+            SupportsActivityLED = (mGeneric.Capabilities >> 25 & 1) == 1;
+            SupportsAggressiveLinkPowerManagement = (mGeneric.Capabilities >> 26 & 1) == 1;
+            SupportsStaggeredSpinup = (mGeneric.Capabilities >> 27 & 1) == 1;
+            SupportsMechanicalPresenceSwitch = (mGeneric.Capabilities >> 28 & 1) == 1;
+            SupportsSNotificationRegister = (mGeneric.Capabilities >> 29 & 1) == 1;
+            SupportsNativeCommandQueuing = (mGeneric.Capabilities >> 30 & 1) == 1;
+            Supports64bitAddressing = (mGeneric.Capabilities >> 31 & 1) == 1;
         }
 
         private void GetPorts()
