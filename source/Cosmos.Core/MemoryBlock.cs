@@ -102,6 +102,44 @@ namespace Cosmos.Core
         {
             throw new Exception("TODO");
         }
+
+        #region ReadWrite
+        public unsafe void Read8(Byte[] aBuffer)
+        {
+            for (int i = 0; i < aBuffer.Length; i++)
+                aBuffer[i] = (*(Byte*)(Base + i));
+        }
+
+        public unsafe void Write8(Byte[] aBuffer)
+        {
+            for (int i = 0; i < aBuffer.Length; i++)
+                (*(Byte*)(Base + i)) = aBuffer[i];
+        }
+
+        public unsafe void Read16(UInt16[] aBuffer)
+        {
+            for (int i = 0; i < aBuffer.Length; i++)
+                aBuffer[i] = (*(UInt16*)(Base + i));
+        }
+
+        public unsafe void Write16(UInt16[] aBuffer)
+        {
+            for (int i = 0; i < aBuffer.Length; i++)
+                (*(UInt16*)(Base + i)) = aBuffer[i];
+        }
+
+        public unsafe void Read32(UInt32[] aBuffer)
+        {
+            for (int i = 0; i < aBuffer.Length; i++)
+                aBuffer[i] = (*(UInt32*)(Base + i));
+        }
+
+        public unsafe void Write32(UInt32[] aBuffer)
+        {
+            for (int i = 0; i < aBuffer.Length; i++)
+                (*(UInt32*)(Base + i)) = aBuffer[i];
+        }
+        #endregion ReadWrite
     }
 
     public class MemoryBlock08
