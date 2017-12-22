@@ -16,7 +16,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public override uint mPortNumber => mPortReg.mPortNumber;
 
         public PortRegisters mPortReg;
-        public Core.MemoryGroup.SATA Mem;
+        public Core.MemoryGroup.AHCI Mem;
 
         // Constants
         public const ulong RegularSectorSize = 512UL;
@@ -33,7 +33,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 return;
             }
 
-            Mem = new Core.MemoryGroup.SATA();
+            Mem = new Core.MemoryGroup.AHCI();
 
             mPortReg = aSATAPort;
 
