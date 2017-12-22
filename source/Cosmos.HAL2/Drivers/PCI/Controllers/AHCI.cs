@@ -10,10 +10,10 @@ using Cosmos.Core.Memory.Old;
 
 namespace Cosmos.HAL.BlockDevice
 {
-    public class AHCI : Drivers.PCIDriver
+    public class AHCI
     {
         internal static Debugger mAHCIDebugger = new Debugger("HAL", "AHCI");
-        internal static PCIDevice xDevice = HAL.PCI.GetDevice(0x001, 0x0006);
+        internal static PCIDevice xDevice = HAL.PCI.GetDevice(0x01, 0x06);
 
         private static List<StoragePort> mPorts = new List<StoragePort>();
         private static GenericRegisters mGeneric;
