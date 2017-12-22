@@ -45,11 +45,13 @@ namespace Cosmos.HAL
             mDebugger.Send("ACPI Init");
             ACPI.Start();
       
-            Console.WriteLine("Initializing Devices");
-            mDebugger.Send("Device Init");
-            PCIDriver.InitializeAll();
+            Console.WriteLine("Initializing Drivers");
+            mDebugger.Send("Driver Init");
+          
+            IDE.InitDriver();
+            //AHCI.InitDriver();
             
-            mDebugger.Send("After Core.Global.Init");
+            mDebugger.Send("Done initializing Cosmos.HAL.Global");
           
         }
 
