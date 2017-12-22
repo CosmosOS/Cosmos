@@ -61,7 +61,7 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
 
-        internal override PCIDevice GetDevice() => xDevice;
+        internal PCIDevice GetDevice() => xDevice;
 
         public AHCI(PCIDevice aAHCIDevice)
         {
