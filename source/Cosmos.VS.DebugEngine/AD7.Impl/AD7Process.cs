@@ -12,11 +12,11 @@ using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 using Cosmos.Debug.DebugConnectors;
 using Cosmos.Debug.Hosts;
-using Cosmos.Debug.Symbols;
+using IL2CPU.Debug.Symbols;
 using Cosmos.VS.DebugEngine.Engine.Impl;
 using Cosmos.VS.DebugEngine.Properties;
 using Cosmos.VS.DebugEngine.Utilities;
-using Label = Cosmos.Debug.Symbols.Label;
+using Label = IL2CPU.Debug.Symbols.Label;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {

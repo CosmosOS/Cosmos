@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Debug.Symbols;
+using IL2CPU.Debug.Symbols;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 //using Dapper;
 //using SQLinq.Dapper;
 //using SQLinq;
-using FIELD_INFO = Cosmos.Debug.Symbols.FIELD_INFO;
+using FIELD_INFO = IL2CPU.Debug.Symbols.FIELD_INFO;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {

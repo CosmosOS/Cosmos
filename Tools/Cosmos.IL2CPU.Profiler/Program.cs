@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Cosmos.Build.Common;
-using Cosmos.Debug.Symbols;
+using IL2CPU.Debug.Symbols;
 using Cosmos.System;
 using Console = System.Console;
 

@@ -3,7 +3,7 @@ using System.Linq;
 using Cosmos.VS.DebugEngine.AD7.Definitions;
 using Cosmos.VS.DebugEngine.Engine.Impl;
 using Microsoft.VisualStudio.Debugger.Interop;
-using Cosmos.Debug.Symbols;
+using IL2CPU.Debug.Symbols;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 

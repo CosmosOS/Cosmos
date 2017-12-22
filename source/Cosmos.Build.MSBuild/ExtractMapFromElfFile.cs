@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Build.Framework;
 
-using Cosmos.Debug.Symbols;
+using IL2CPU.Debug.Symbols;
 
 namespace Cosmos.Build.MSBuild {
     public class ExtractMapFromElfFile : BaseToolTask {
