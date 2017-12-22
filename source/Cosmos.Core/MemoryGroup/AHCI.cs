@@ -10,7 +10,7 @@ namespace Cosmos.Core.MemoryGroup
 
         public AHCI(uint aSectorSize)
         {
-            DataBlock = new Core.MemoryBlock(0x00400000, aSectorSize * 256)
+            DataBlock = new Core.MemoryBlock(0x00400000, aSectorSize * 256);
             DataBlock.Fill(0);
         }
     }
