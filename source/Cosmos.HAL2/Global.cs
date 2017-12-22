@@ -2,7 +2,6 @@ using System;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
-using Cosmos.HAL.Drivers.PCI.Controllers;
 
 namespace Cosmos.HAL
 {
