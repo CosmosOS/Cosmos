@@ -1,28 +1,43 @@
 using System;
 using Cosmos.HAL.BlockDevice;
 
-namespace Cosmos.HAL.Drivers.PCI.Controllers
+namespace Cosmos.HAL.BlockDevice
 {
     public class IDE
     {
-        public IDE(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
+        private static PCIDevice xDevice = HAL.PCI.GetDeviceClass(0x01, 0x01);
+
+        internal static void InitDriver()
         {
+            if (xDevice == null) return;
+            Console.WriteLine("ATA Primary Master");
+            Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
+            //Console.WriteLine("ATA Primary Slave");
+            //Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
+            Console.WriteLine("ATA Secondary Master");
+            Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
+            //Console.WriteLine("ATA Secondary Slave");
+            //Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
+        }
+
+        private static void Initialize(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
+        {
+            if (aControllerID == Ata.ControllerIdEnum.Primary && aBusPosition == Ata.BusPositionEnum.Master)
+            else if (aControllerID == Ata.ControllerIdEnum.Secondary && aBusPosition == Ata.BusPositionEnum.Master)
+            else if (aControllerID == Ata.ControllerIdEnum.Primary && aBusPosition == Ata.BusPositionEnum.Slave)
+            else if (aControllerID == Ata.ControllerIdEnum.Secondary && aBusPosition == Ata.BusPositionEnum.Master)
+
             var xIO = aControllerID == Ata.ControllerIdEnum.Primary ? Core.Global.BaseIOGroups.ATA1 : Core.Global.BaseIOGroups.ATA2;
             var xATA = new AtaPio(xIO, aControllerID, aBusPosition);
-            if (xATA.DriveType == AtaPio.SpecLevel.Null)
-            {
-                return;
-            }
+            if (xATA.DriveType == AtaPio.SpecLevel.Null) return;
             if (xATA.DriveType == AtaPio.SpecLevel.ATA)
             {
-                BlockDevice.BlockDevice.Devices.Add(xATA);
+                BlockDevice.Devices.Add(xATA);
                 Ata.AtaDebugger.Send("ATA device with speclevel ATA found.");
             }
-            else
+            else if (xATA.DriveType != (AtaPio.SpecLevel)1) 
             {
-                //Ata.AtaDebugger.Send("ATA device with spec level " + (int)xATA.DriveType +
-                //                     " found, which is not supported!");
-                return;
+                Ata.AtaDebugger.Send("ATA device with speclevel " + (byte)xATA.DriveType + " found, which is not supported yet!");
             }
             var xMbrData = new byte[512];
             xATA.ReadBlock(0UL, 1U, xMbrData);
@@ -46,7 +61,7 @@ namespace Cosmos.HAL.Drivers.PCI.Controllers
             // TODO Change this to foreach when foreach is supported
             Ata.AtaDebugger.Send("Number of MBR partitions found:");
             Ata.AtaDebugger.SendNumber(xMBR.Partitions.Count);
-            for (int i = 0; i < xMBR.Partitions.Count; i++)
+            for(int i = 0; i < xMBR.Partitions.Count; i++)
             {
                 var xPart = xMBR.Partitions[i];
                 if (xPart == null)
@@ -56,8 +71,8 @@ namespace Cosmos.HAL.Drivers.PCI.Controllers
                 else
                 {
                     var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                    BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-                    Console.WriteLine("Found partition at idx" + i);
+                    BlockDevice.Devices.Add(xPartDevice);
+                    Console.WriteLine("Found partition at idx: " + i);
                 }
             }
         }
