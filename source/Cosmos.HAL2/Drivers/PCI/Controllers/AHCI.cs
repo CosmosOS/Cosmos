@@ -80,7 +80,7 @@ namespace Cosmos.HAL.BlockDevice
             {
                 if(xPort.mPortType == PortType.SATA)
                 {
-                    mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
+                    mAHCIDebugger.Send($"{xPort.mPortName} Port [0:{xPort.mPortNumber}]");
                     var xMBRData = new byte[512];
                     xPort.ReadBlock(0UL, 1U, xMBRData);
                     var xMBR = new MBR(xMBRData);
@@ -88,7 +88,6 @@ namespace Cosmos.HAL.BlockDevice
                     if (xMBR.EBRLocation != 0)
                     {
                         // EBR Detected!
-                        mAHCIDebugger.Send("EBR Detected within MBR code");
                         var xEBRData = new byte[512];
                         xPort.ReadBlock(xMBR.EBRLocation, 1U, xEBRData);
                         var xEBR = new EBR(xEBRData);
@@ -100,7 +99,7 @@ namespace Cosmos.HAL.BlockDevice
                         }
                     }
                     
-                    mAHCIDebugger.Send($"Number of MBR partitions found on port 0:{xPort.mPortNumber}: ");
+                    mAHCIDebugger.Send($"Number of MBR partitions in port [0:{xPort.mPortNumber}]: ");
                     mAHCIDebugger.SendNumber(xMBR.Partitions.Count);
                     for (int i = 0; i < xMBR.Partitions.Count; i++)
                     {
@@ -120,7 +119,7 @@ namespace Cosmos.HAL.BlockDevice
                 else if (xPort.mPortType == PortType.SATAPI)
                 {
                     mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
-
+                    // TODO: Implement ISO-9660 or UDF and Fix SATAPI
                 }
             }
         }
@@ -182,7 +181,6 @@ namespace Cosmos.HAL.BlockDevice
                     var xPortString = "0:" + ((xPort.ToString().Length <= 1) ? xPort.ToString().PadLeft(1, '0') : xPort.ToString());
                     if (PortType == PortType.SATA) // If Port Type was SATA.
                     {
-                        mAHCIDebugger.Send("SATA");
                         Console.WriteLine("Initializing Port " + xPortString + " with type SATA");
                         UInt16[] xSectorData = new UInt16[256];
                         PortRebase(xPortReg, (uint)xPort);
@@ -199,12 +197,10 @@ namespace Cosmos.HAL.BlockDevice
                     }
                     else if (PortType == PortType.SEMB) // If Port Type was SEMB.
                     {
-                        //Console.WriteLine("SEMB drive at port " + xPortString + " found, which is not supported yet!");
                         Console.WriteLine("SEMB Drive at port " + xPortString + " found, which is not supported yet!");
                     }
                     else if (PortType == PortType.PM) // If Port Type was Port Mulitplier.
                     {
-                        //Console.WriteLine("Port Multiplier drive at port " + xPortString + " found, which is not supported yet!");
                         Console.WriteLine("Port Multiplier Drive at port " + xPortString + " found, which is not supported yet!");
                     }
                     else if (PortType == PortType.Nothing)
@@ -247,53 +243,24 @@ namespace Cosmos.HAL.BlockDevice
             mAHCIDebugger.Send("Stop");
             if (!StopCMD(aPort)) aPort.SCTL = 1;
 
-            //Check for Command Process
-            mAHCIDebugger.SendNumber((aPort.CMD & 1));
-            mAHCIDebugger.SendNumber((aPort.CMD >> 4) & 1);
-            mAHCIDebugger.SendNumber((aPort.CMD >> 14) & 1);
-            mAHCIDebugger.SendNumber((aPort.CMD >> 15) & 1);
-
-            mAHCIDebugger.Send("CLB");
             ulong mCLBAddress = Heap.MemAlloc(1024);
             aPort.CLB = (uint)mCLBAddress & 0xFFFFFFFF;
-            //aPort.CLBU = (uint)((mCLBAddress >> 32)) & 0xFFFFFFFF;
-            //if(is64DMA)
-            //{
-            //    mSATAMemory[mPortLocation + 0x04] |= CLBUAddress;
-            //    new MemoryBlock(mSATAMemory[mPortLocation + 0x04], 1024).Fill(0);
-            //}
-            mAHCIDebugger.SendNumber((aPort.CMD & 1));
-            mAHCIDebugger.SendNumber((aPort.CMD >> 4) & 1);
-            mAHCIDebugger.SendNumber((aPort.CMD >> 14) & 1);
-            mAHCIDebugger.SendNumber((aPort.CMD >> 15) & 1);
-            mAHCIDebugger.Send("FB");
+            
             var mFBAddress = Heap.MemAlloc(256);
-            aPort.FB = mFBAddress;
+            aPort.FB = (uint)mFBAddress & 0xFFFFFFFF;
 
             aPort.SERR = 1;
             aPort.IS = 0;
             aPort.IE = 0;
-            //aPort.FBU = 0;
+            
             new MemoryBlock(aPort.CLB, 1024).Fill(0);
             new MemoryBlock(aPort.FB, 256).Fill(0);
-            //if (is64DMA)
-            //{
-            //    mSATAMemory[mPortLocation + 0x0C] |= FBUAddress;
-            //    new MemoryBlock(mSATAMemory[mPortLocation + 0x0C], 256).Fill(0);
-            //}
-
-            mAHCIDebugger.Send("GetCommandHeader");
+            
             GetCommandHeader(aPort); // Rebasing Command Header
 
-            mAHCIDebugger.Send("Start");
             StartCMD(aPort);
-            mAHCIDebugger.SendNumber((aPort.CMD & 1));
-            mAHCIDebugger.SendNumber((aPort.CMD >> 4) & 1);
-            mAHCIDebugger.SendNumber((aPort.CMD >> 14) & 1);
-            mAHCIDebugger.SendNumber((aPort.CMD >> 15) & 1);
             aPort.IS = 0;
             aPort.IE = 0xFFFFFFFF;
-            mAHCIDebugger.Send("Finished!");
         }
 
         private static HBACommandHeader[] GetCommandHeader(PortRegisters aPort)
