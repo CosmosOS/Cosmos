@@ -33,7 +33,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 return;
             }
 
-            Mem = new Core.MemoryGroup.AHCI();
+            Mem = new Core.MemoryGroup.AHCI(RegularSectorSize);
 
             mPortReg = aSATAPort;
 
