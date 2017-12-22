@@ -16,7 +16,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public override string mPortName => "SATAPI";
         public override uint mPortNumber => mPortReg.mPortNumber;
 
-        public SATAPI(PortRegisters aSATAPIPort)
+        public Satapi(PortRegisters aSATAPIPort)
         {
 
             // Check if it is really a SATAPI Port!
