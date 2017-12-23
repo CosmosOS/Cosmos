@@ -4,7 +4,7 @@ using Cosmos.Common;
 using Cosmos.Core;
 using Cosmos.Core.IOGroup.Network;
 using Cosmos.HAL.Network;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
 {

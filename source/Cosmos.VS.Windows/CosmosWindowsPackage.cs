@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows;
 using System.Windows.Threading;
+using Microsoft.VisualStudio.Shell;
+
 using Cosmos.Debug.Common;
 using Cosmos.Debug.DebugConnectors;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Cosmos.VS.Windows
 {

@@ -1,4 +1,4 @@
-using Cosmos.IL2CPU.API;
+using IL2CPU.API;
 using XSharp;
 using XSharp.Assembler;
 using XSharp.Assembler.x86;
@@ -105,7 +105,7 @@ namespace Cosmos.CPU_Asm
 
 //using Cosmos.Assembler;
 //using Cosmos.Assembler.x86;
-//using Cosmos.IL2CPU.API;
+//using IL2CPU.API;
 //using XSharp.Common;
 //using static XSharp.Common.XSRegisters;
 

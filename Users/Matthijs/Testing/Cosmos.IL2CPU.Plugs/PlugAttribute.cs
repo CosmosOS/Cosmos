@@ -1,6 +1,6 @@
 using System;
 
-namespace Cosmos.IL2CPU.API
+namespace IL2CPU.API
 {
   [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
   public sealed class PlugAttribute : Attribute {

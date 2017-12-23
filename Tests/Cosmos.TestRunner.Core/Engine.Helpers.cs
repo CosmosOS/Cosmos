@@ -223,7 +223,7 @@ namespace Cosmos.TestRunner.Core
             xArgs.AddRange(References.Select(aReference => "References:" + aReference));
 
             bool xUsingUserkit = false;
-            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU");
+            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU.Compiler");
             if (!Directory.Exists(xIL2CPUPath))
             {
                 xUsingUserkit = true;

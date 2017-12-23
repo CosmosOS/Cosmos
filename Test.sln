@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DAEF99B5-22F0-4885-B45B-9B600B857E1C}"
 EndProject
@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.MSBuild", "sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU.API", "..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj", "{34AEEB7C-FD5D-4B15-A830-B429681844BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU.API", "..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj", "{34AEEB7C-FD5D-4B15-A830-B429681844BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Common", "source\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj", "{A97A1EF7-AEEC-43F3-8CB0-5C7269DC7E85}"
 EndProject
@@ -66,7 +66,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{65532163
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NASM", "Tools\NASM\NASM.csproj", "{A2E6978B-FE78-433C-8A17-624579B393DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU", "..\IL2CPU\source\IL2CPU\IL2CPU.csproj", "{295AA95F-BEC6-4F9E-A2E1-8205FD06E951}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU.Compiler", "..\IL2CPU\source\IL2CPU.Compiler\IL2CPU.Compiler.csproj", "{295AA95F-BEC6-4F9E-A2E1-8205FD06E951}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{ECEA7778-E786-4317-90B9-A2D4427CB91C}"
 EndProject
@@ -156,7 +156,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\source\XSharp.x86\XSharp.x86.csproj", "{D0EABA08-88C9-4F7C-BCA9-361B58B20D67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.TypeSystem", "Tests\Cosmos.Compiler.Tests.TypeSystem\Cosmos.Compiler.Tests.TypeSystem.csproj", "{D21A7C6C-A696-4EC3-84EB-70700C1E3B34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.TypeSystem", "Tests\Cosmos.Compiler.Tests.TypeSystem\Cosmos.Compiler.Tests.TypeSystem.csproj", "{D21A7C6C-A696-4EC3-84EB-70700C1E3B34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

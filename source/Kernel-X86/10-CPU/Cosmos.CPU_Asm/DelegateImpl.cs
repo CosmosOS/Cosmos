@@ -1,6 +1,6 @@
 using System;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Asm {
     [Plug(Target = typeof(Delegate), Inheritable = true)]

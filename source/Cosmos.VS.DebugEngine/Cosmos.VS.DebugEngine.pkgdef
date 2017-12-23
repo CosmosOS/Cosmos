@@ -12,7 +12,7 @@
 [$RootKey$\Menus]
 "{a82b45e9-2a89-43bd-925d-c7f0edd212aa}"=", Menus.ctmenu, 1"
 
-[$RootKey$\AD7Metrics\Engine\{FA1DA3A6-66FF-4C65-B077-E65F7164EF83}]
+[$RootKey$\AD7Metrics\Engine\{fa1da3a6-66ff-4c65-b077-e65f7164ef83}]
 @="Cosmos Debug Engine"
 ; "AddressBP"=dword:00000001
 "AlwaysLoadLocal"=dword:00000001
@@ -29,10 +29,10 @@
 "Name"="Cosmos Debug"
 "SetNextStatement"=dword:00000001
 ; "SuspendThread"=dword:00000001
-"CLSID"="{f129e39e-168e-4cbc-a966-90988ebda375}"
+"CLSID"="{dc8503ab-7ee6-456c-a209-66c690d9f6f4}"
 "GlobalVisualizersDirectory"="$PackageFolder$"
 
-[$RootKey$\CLSID\{f129e39e-168e-4cbc-a966-90988ebda375}]
+[$RootKey$\CLSID\{dc8503ab-7ee6-456c-a209-66c690d9f6f4}]
 "Assembly"="Cosmos.VS.DebugEngine"
 "Class"="Cosmos.VS.DebugEngine.AD7.Impl.AD7Engine"
 "InprocServer32"="$WinDir$\SYSTEM32\MSCOREE.DLL"

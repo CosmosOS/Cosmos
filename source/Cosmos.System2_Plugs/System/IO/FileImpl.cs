@@ -5,8 +5,8 @@ using System.IO;
 using Cosmos.System;
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 

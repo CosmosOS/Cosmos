@@ -1,5 +1,5 @@
 using System;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 using Cosmos.HAL;
 
 namespace Cosmos.System_Plugs.System
@@ -12,7 +12,7 @@ namespace Cosmos.System_Plugs.System
         public static int GenerateGlobalSeed(Random aThis) => 21;
     }
     [Plug(Target = typeof(Random))]
-    public class RandomImpl
+    public static class RandomImpl
     {
         public static void Ctor(Random aThis)
         {
@@ -23,6 +23,9 @@ namespace Cosmos.System_Plugs.System
         {
             //empty ATM
         }
+
+        // TODO: improve this
+        public static int GenerateGlobalSeed() => RTC.Second;
 
         public static int Next(Random aThis, int maxValue)
         {
