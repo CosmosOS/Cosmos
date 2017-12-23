@@ -11,34 +11,32 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            if (true)
-            {
-                byte[] xResult = { 1, 2, 3, 4, 5, 6, 7, 8 };
-                byte[] xExpectedResult = { 1, 2, 3, 4, 5, 6, 7, 1 };
-                byte[] xSource = { 1 };
+            byte[] xByteResult = { 1, 2, 3, 4, 5, 6, 7, 8 };
+            byte[] xByteExpectedResult = { 1, 2, 3, 4, 5, 6, 7, 1 };
+            byte[] xByteSource = { 1 };
 
-                Array.Copy(xSource, 0, xResult, 7, 1);
+            Array.Copy(xByteSource, 0, xByteResult, 7, 1);
 
-                Assert.IsTrue((xResult[7] == xExpectedResult[7]), "Array.Copy doesn't work: xResult[7] =  " + (uint)xResult[7] + " != " + (uint)xExpectedResult[7]);
-            }
+            Assert.IsTrue((xByteResult[7] == xByteExpectedResult[7]), "Array.Copy doesn't work: xResult[7] =  " + (uint)xByteResult[7] + " != " + (uint)xByteExpectedResult[7]);
             
             // Single[] Test
-            float[] xResult = { 1.25, 2.50, 3.51, 4.31, 9.28, 18.56 };
-            float[] xExpectedResult = { 1.25, 2.598, 5.39, 4.31, 9.28, 18.56 };
-            float[] xSource = { 0.49382, 1.59034, 2.598, 5.39, 7.48392, 4.2839 };
+            float[] xSingleResult = { 1.25, 2.50, 3.51, 4.31, 9.28, 18.56 };
+            float[] xSingleExpectedResult = { 1.25, 2.598, 5.39, 4.31, 9.28, 18.56 };
+            float[] xSingleSource = { 0.49382, 1.59034, 2.598, 5.39, 7.48392, 4.2839 };
             
-            Array.Copy(xSource, 2, xResult, 1, 2);
+            xSingleResult[1] = xSingleSource[2];
+            xSingleResult[2] = xSingleSource[3];
             
-            Assert.IsTrue((xResult[1] + xResult[2]) == (xExpectedResult[1] + xExpectedResult[2]), "Array.Copy doesn't work with Singles: xResult[1] =  " + (uint)xResult[1] + " != " + (uint)xExpectedResult[1] " and xResult[2] =  " + (uint)xResult[2] + " != " + (uint)xExpectedResult[2]);
+            Assert.IsTrue(((xSingleResult[1] + xSingleResult[2]) == (xSingleExpectedResult[1] + xSingleExpectedResult[2])), "Assinging values to single array elements doesn't work: xResult[1] =  " + (uint)xSingleResult[1] + " != " + (uint)xSingleExpectedResult[1] " and xResult[2] =  " + (uint)xResult[2] + " != " + (uint)xExpectedResult[2]);
             
             // Double[] Test
-            double[] xResult = { 0.384, 1.5823, 2.5894, 2.9328539, 3.9201, 4.295 };
-            double[] xExpectedResult = { 0.384, 1.5823, 2.5894, 95.32815, 3.9201, 4.295 };
-            double[] xSource = { 95.32815 };
+            double[] xDoubleResult = { 0.384, 1.5823, 2.5894, 2.9328539, 3.9201, 4.295 };
+            double[] xDoubleExpectedResult = { 0.384, 1.5823, 2.5894, 95.32815, 3.9201, 4.295 };
+            double[] xDoubleSource = { 95.32815 };
             
-            Array.Copy(xSource, 0, xResult, 3, 1);
+            xDoubleResult[3] = xDoubleSource[0];
             
-            Assert.IsTrue(xResult[3] == xExpectedResult[3], "Array.Copy doesn't work with Doubles: xResult[1] =  " + (uint)xResult[3] + " != " + (uint)xExpectedResult[3]);
+            Assert.IsTrue(xDoubleResult[3] == xDoubleExpectedResult[3], "Assinging values to double array elements doesn't work: xResult[1] =  " + (uint)xDoubleResult[3] + " != " + (uint)xDoubleExpectedResult[3]);
         }
     }
 }
