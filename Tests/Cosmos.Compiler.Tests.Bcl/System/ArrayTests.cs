@@ -27,7 +27,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             xSingleResult[1] = xSingleSource[2];
             xSingleResult[2] = xSingleSource[3];
             
-            Assert.IsTrue(((xSingleResult[1] + xSingleResult[2]) == (xSingleExpectedResult[1] + xSingleExpectedResult[2])), "Assinging values to single array elements doesn't work: xResult[1] =  " + (uint)xSingleResult[1] + " != " + (uint)xSingleExpectedResult[1] " and xResult[2] =  " + (uint)xResult[2] + " != " + (uint)xExpectedResult[2]);
+            Assert.IsTrue(((xSingleResult[1] + xSingleResult[2]) == (xSingleExpectedResult[1] + xSingleExpectedResult[2])), "Assinging values to single array elements doesn't work: xResult[1] =  " + (uint)xSingleResult[1] + " != " + (uint)xSingleExpectedResult[1] + " and xResult[2] =  " + (uint)xResult[2] + " != " + (uint)xExpectedResult[2]);
             
             // Double[] Test
             double[] xDoubleResult = { 0.384, 1.5823, 2.5894, 2.9328539, 3.9201, 4.295 };
