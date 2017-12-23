@@ -20,9 +20,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((xByteResult[7] == xByteExpectedResult[7]), "Array.Copy doesn't work: xResult[7] =  " + (uint)xByteResult[7] + " != " + (uint)xByteExpectedResult[7]);
             
             // Single[] Test
-            float[] xSingleResult = { 1.25, 2.50, 3.51, 4.31, 9.28, 18.56 };
-            float[] xSingleExpectedResult = { 1.25, 2.598, 5.39, 4.31, 9.28, 18.56 };
-            float[] xSingleSource = { 0.49382, 1.59034, 2.598, 5.39, 7.48392, 4.2839 };
+            float[] xSingleResult = { 1.25f, 2.50f, 3.51f, 4.31f, 9.28f, 18.56f };
+            float[] xSingleExpectedResult = { 1.25f, 2.598f, 5.39f, 4.31f, 9.28f, 18.56f };
+            float[] xSingleSource = { 0.49382f, 1.59034f, 2.598f, 5.39f, 7.48392f, 4.2839f };
             
             xSingleResult[1] = xSingleSource[2];
             xSingleResult[2] = xSingleSource[3];
