@@ -8,9 +8,9 @@
     <ProjectGuid>{CDDAF88B-8726-469A-B906-16FD5EC99799}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.IL2CPU.API</RootNamespace>
-    <AssemblyName>Cosmos.IL2CPU.API</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <RootNamespace>IL2CPU.API</RootNamespace>
+    <AssemblyName>IL2CPU.API</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <SccProjectName>SAK</SccProjectName>
