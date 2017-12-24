@@ -331,11 +331,10 @@
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.VS.DebugEngine\Cosmos.VS.DebugEngine.csproj">
-      <Project>{535A7E34-AC73-4781-B791-2C81A9066A2C}</Project>
+      <Project>{535a7e34-ac73-4781-b791-2c81a9066a2c}</Project>
       <Name>Cosmos.VS.DebugEngine</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3bVSIXContainerProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.VS.Windows\Cosmos.VS.Windows.csproj">
       <Project>{47E8F3DC-FF3F-4CC7-8643-1807260B0B18}</Project>
