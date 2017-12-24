@@ -33,9 +33,9 @@
   </Commands>
   
   <Symbols>
-    <GuidSymbol name="guidDebugPackage" value="{A82B45E9-2A89-43BD-925D-C7F0EDD212AA}" />
+    <GuidSymbol name="guidDebugPackage" value="{a82b45e9-2a89-43bd-925d-c7f0edd212aa}" />
 
-    <GuidSymbol name="guidDebugPackageCmdSet" value="{94EBFC49-EC0F-4BD3-B3FF-D3AADB8DAC9F}">
+    <GuidSymbol name="guidDebugPackageCmdSet" value="{94ebfc49-ec0f-4bd3-b3ff-d3aadb8dac9f}">
       <IDSymbol name="cmdidLaunchDebug" value="0x0100" />
       <IDSymbol name="cmdidDebugExec" value="0x0101" />
       <IDSymbol name="cmdidDebugLog" value="0x0102" />
