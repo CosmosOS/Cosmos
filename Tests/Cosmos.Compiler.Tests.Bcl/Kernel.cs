@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.Debug.Kernel;
+
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 using Cosmos.Compiler.Tests.Bcl.System;
@@ -24,7 +22,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 CSharp.WhileLoopTests.Execute();
                 CSharp.ForeachLoopTests.Execute();
 
-                //ObjectTests.Execute(); Stack corruption on method Clone()
+                ObjectTests.Execute();
                 ArrayTests.Execute();
                 StringTest.Execute();
                 ByteTest.Execute();
@@ -45,6 +43,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
                 EncodingTest.Execute();
+                RandomTests.Execute();
 
                 //System.Collections.Generic.ListTest.Execute();
                 //System.Collections.Generic.QueueTest.Execute();
