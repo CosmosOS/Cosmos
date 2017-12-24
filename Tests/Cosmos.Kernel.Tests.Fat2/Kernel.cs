@@ -6,6 +6,12 @@ using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 using Cosmos.Kernel.Tests.Fat.System.IO;
 
+/*
+ * Split FAT Tests in two separate kernels because it would take too much time ( > 47 minutes)
+ * and make go AppVoyer in timeout. There is a bug somewhere or in Bochs or in the debug
+ * connector for sure...
+ * VmWare works correctly!
+ */
 namespace Cosmos.Kernel.Tests.Fat2
 {
     /// <summary>
@@ -34,21 +40,9 @@ namespace Cosmos.Kernel.Tests.Fat2
             try
             {
                 mDebugger.Send("Run");
-#if false
-                PathTest.Execute(mDebugger);
-                DirectoryTest.Execute(mDebugger);
-#endif
+
                 FileTest.Execute(mDebugger);
-#if false
-                FileStreamTest.Execute(mDebugger);
 
-                DirectoryInfoTest.Execute(mDebugger);
-                StreamWriterStreamReaderTest.Execute(mDebugger);
-                BinaryWriterBinaryReaderTest.Execute(mDebugger);
-                FileInfoTest.Execute(mDebugger);
-#endif
-
-                //Cosmos.System.Power.Shutdown();
                 TestController.Completed();
             }
             catch (Exception e)

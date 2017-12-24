@@ -9,7 +9,7 @@ namespace Cosmos.System2_Plugs.System.IO
     {
         public static string ToString(FileNotFoundException aThis)
         {
-            throw new NotImplementedException("FileNotFoundException.ToString()");
+            return "FileNotFoundException";
         }
     }
 }

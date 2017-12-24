@@ -5,6 +5,7 @@ using Cosmos.System.FileSystem.VFS;
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 using Cosmos.Kernel.Tests.Fat.System.IO;
+using System.IO;
 
 namespace Cosmos.Kernel.Tests.Fat
 {
@@ -37,15 +38,12 @@ namespace Cosmos.Kernel.Tests.Fat
 
                 PathTest.Execute(mDebugger);
                 DirectoryTest.Execute(mDebugger);
-                //FileTest.Execute(mDebugger);
                 FileStreamTest.Execute(mDebugger);
-#if true
                 DirectoryInfoTest.Execute(mDebugger);
                 StreamWriterStreamReaderTest.Execute(mDebugger);
                 BinaryWriterBinaryReaderTest.Execute(mDebugger);
                 FileInfoTest.Execute(mDebugger);
-#endif
-                //Cosmos.System.Power.Shutdown();
+
                 TestController.Completed();
             }
             catch (Exception e)

@@ -29,7 +29,6 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
-            //
             using (var xFS = new FileStream(@"0:\Kudzu.txt", FileMode.Open))
             {
                 xFS.SetLength(5);
@@ -55,7 +54,6 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
-            //
             mDebugger.Send("Write to file now");
             File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
             mDebugger.Send("Text written");
@@ -66,7 +64,6 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
-            //
             mDebugger.Send("START TEST: Create file:");
             // Attention! File.Create() returns a FileStream that should be Closed / Disposed on Windows trying to write to the file next gives "File in Use" exception!
 
@@ -113,6 +110,24 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
                 mDebugger.Send(readLines[i]);
             }
             Assert.IsTrue(StringArrayAreEquals(contents, readLines), "Contents of test3.txt was written incorrectly!");
+
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST: WriteAllLines (less content):");
+
+            string[] contents2 = { "FortyTwo" };
+            File.WriteAllLines(@"0:\test3.txt", contents2);
+            mDebugger.Send("Text written");
+            mDebugger.Send("Now reading with ReadAllLines()");
+            // OK let's read it with ReadAllLines() and check that we read the same content
+            string[] readLines2 = File.ReadAllLines(@"0:\test3.txt");
+            mDebugger.Send("Contents retrieved after writing");
+            for (int i = 0; i < readLines2.Length; i++)
+            {
+                mDebugger.Send(readLines2[i]);
+            }
+            Assert.IsTrue(StringArrayAreEquals(contents2, readLines2), "Contents of test3.txt was written incorrectly!");
 
             mDebugger.Send("END TEST");
             mDebugger.Send("");
@@ -175,6 +190,18 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             // XXX Use String.Concat() with Enviroment.NewLine this not Linux there are is '\n'!
             Assert.IsTrue(xContents == "Test FAT write.\nYet other text.",
                 "Contents of Kudzu.txt was appended incorrectly!");
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
+
+            mDebugger.Send("Write to file again (less text)");
+            File.WriteAllText(@"0:\Kudzu.txt", "Test");
+            mDebugger.Send("Text written");
+
+            mDebugger.Send("File contents of Kudzu.txt: ");
+            xContents = File.ReadAllText(@"0:\Kudzu.txt");
+            mDebugger.Send("Contents retrieved");
+            mDebugger.Send(xContents);
+            Assert.IsTrue(xContents == "Test", "Contents of Kudzu.txt was read incorrectly!");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
