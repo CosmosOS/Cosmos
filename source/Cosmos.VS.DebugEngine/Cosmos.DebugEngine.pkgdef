@@ -17,3 +17,9 @@
 ; "SuspendThread"=dword:00000001
 "CLSID"="{dc8503ab-7ee6-456c-a209-66c690d9f6f4}"
 "GlobalVisualizersDirectory"="$PackageFolder$"
+
+[$RootKey$\CLSID\{dc8503ab-7ee6-456c-a209-66c690d9f6f4}]
+"Assembly"="Cosmos.VS.DebugEngine"
+"Class"="Cosmos.VS.DebugEngine.AD7.Impl.AD7Engine"
+"InprocServer32"="$WinDir$\SYSTEM32\MSCOREE.DLL"
+"CodeBase"="$PackageFolder$\Cosmos.VS.DebugEngine.dll"
