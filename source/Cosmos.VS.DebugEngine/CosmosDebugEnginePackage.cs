@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 
-using Cosmos.VS.DebugEngine.AD7.Impl;
 using Cosmos.VS.DebugEngine.Commands;
 
 namespace Cosmos.VS.DebugEngine
@@ -12,7 +11,6 @@ namespace Cosmos.VS.DebugEngine
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideObject(typeof(AD7Engine))]
     public sealed class CosmosDebugEnginePackage : Package, IOleCommandTarget
     {
         private IOleCommandTarget packageCommandTarget;
