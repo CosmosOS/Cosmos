@@ -1,0 +1,101 @@
+<Project InitialTargets="CheckMSBuildRuntimeType">
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+    <PropertyGroup>
+        <TargetFramework>net471</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <UseCodebase>True</UseCodebase>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="ProjectTemplates\**" />
+        <Content Include="ProjectTemplates\**">
+            <IncludeInVSIX>True</IncludeInVSIX>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="CosmosImages.imagemanifest">
+            <IncludeInVSIX>True</IncludeInVSIX>
+        </Content>
+        <Content Include="Resources\Cosmos.ico">
+          <IncludeInVSIX>True</IncludeInVSIX>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Resource Include="Resources\CosmosProjectRootIcon.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="BuildSystem\**">
+            <IncludeInVSIX>True</IncludeInVSIX>
+            <InstallRoot>MSBuild</InstallRoot>
+            <VSIXSubPath>Cosmos\%(RecursiveDir)</VSIXSubPath>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\Cosmos.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <XamlPropertyRule Include="BuildSystem\Rules\BootableConfiguration.xaml" />
+        <XamlPropertyRule Include="BuildSystem\Rules\CosmosDebugger.xaml" />
+        <XamlPropertyRule Include="BuildSystem\Rules\LaunchConfiguration.xaml" />
+    </ItemGroup>
+
+    <!--
+        WinForms
+    -->
+    <ItemGroup>
+        <Compile Update="ProjectSystem\VS\PropertyPages\CosmosPropertyPageControl.Designer.cs">
+          <DependentUpon>CosmosPropertyPageControl.cs</DependentUpon>
+        </Compile>
+        <EmbeddedResource Update="ProjectSystem\VS\PropertyPages\CosmosPropertyPageControl.resx">
+          <DependentUpon>CosmosPropertyPageControl.cs</DependentUpon>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="Microsoft.VisualBasic" />
+        <Reference Include="System.Xaml" />
+        <Reference Include="System.Windows.Forms" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime" Version="14.3.25407" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem" Version="15.3.224" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" Version="15.3.224" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" Version="15.3.224" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK.Tools" Version="15.3.224" />
+        <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.14" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.4.27004" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.Framework" Version="15.4.27004" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="15.5.24" />
+        <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="15.1.192" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\XSharp\source\VSPropertyPages\VSPropertyPages.csproj" />
+        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+    </ItemGroup>
+
+    <Target Name="IncludeMissingAssemblies" AfterTargets="GetVsixSourceItems" BeforeTargets="RemoveVSSDKAssemblies">
+        <ItemGroup>
+            <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Microsoft.Win32.Registry'" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="CheckMSBuildRuntimeType">
+        <Error Text="$(MSBuildRuntimeType) MSBuild not supported!" Condition="'$(MSBuildRuntimeType)' != 'Full'" />
+    </Target>
+
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+    <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets') AND '$(MSBuildProjectExtension)' != '.tmp_proj'" />
+
+</Project>

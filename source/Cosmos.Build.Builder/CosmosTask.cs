@@ -299,15 +299,15 @@ namespace Cosmos.Build.Builder {
 
     private void CompileCosmos() {
       string xVsipDir = Path.Combine(mCosmosPath, "Build", "VSIP");
-      string xNugetPkgDir = Path.Combine(xVsipDir, "KernelPackages");
+      string xNugetPkgDir = Path.Combine(xVsipDir, "Packages");
 
       Section("Clean NuGet Local Feed");
       Clean(Path.Combine(mCosmosPath, @"Build.sln"));
 
       Section("Restore NuGet Packages");
       Restore(Path.Combine(mCosmosPath, @"Build.sln"));
-	  Restore(Path.Combine(mCosmosPath, @"../IL2CPU/IL2CPU.sln"));
-	  Restore(Path.Combine(mCosmosPath, @"../XSharp/XSharp.sln"));
+      Restore(Path.Combine(mCosmosPath, @"../IL2CPU/IL2CPU.sln"));
+      Restore(Path.Combine(mCosmosPath, @"../XSharp/XSharp.sln"));
 
       Section("Update NuGet");
       Update();
@@ -318,11 +318,13 @@ namespace Cosmos.Build.Builder {
       MSBuild(Path.Combine(mCosmosPath, @"Build.sln"), "Debug");
 
       Section("Publish Tools");
-      Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
+      //Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
       Publish(Path.Combine(mSourcePath, "../../IL2CPU/source/IL2CPU.Compiler"), Path.Combine(xVsipDir, "IL2CPU"));
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVsipDir, "NASM"));
 
-      Section("Pack Kernel");
+      Section("Create Packages");
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.Build.Tasks"), xNugetPkgDir);
       //
       Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xNugetPkgDir);
       //

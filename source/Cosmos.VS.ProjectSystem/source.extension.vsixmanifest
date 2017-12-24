@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0"
+                 xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011"
+                 xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+
+    <Metadata>
+        <Identity Id="Cosmos.VS.ProjectSystem" Version="1.0" Language="en-US" Publisher="Cosmos" />
+        <DisplayName>Cosmos Project System</DisplayName>
+        <Description xml:space="preserve">Cosmos Project System for Visual Studio</Description>
+        <Icon>Resources\Cosmos.ico</Icon>
+    </Metadata>
+
+    <Installation AllUsers="true">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0]" />
+    </Installation>
+
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|"/>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="%CurrentProject%" d:TargetPath="|%CurrentProject%;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+    </Assets>
+
+</PackageManifest>
