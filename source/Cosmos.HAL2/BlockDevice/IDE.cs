@@ -26,15 +26,16 @@ namespace Cosmos.HAL.BlockDevice
         {
             var xIO = aControllerID == Ata.ControllerIdEnum.Primary ? Core.Global.BaseIOGroups.ATA1 : Core.Global.BaseIOGroups.ATA2;
             var xATA = new AtaPio(xIO, aControllerID, aBusPosition);
-            if (xATA.DriveType == AtaPio.SpecLevel.Null) return;
-            if (xATA.DriveType == AtaPio.SpecLevel.ATA)
+            if (xATA.DriveType == AtaPio.SpecLevel.Null)
+                return;
+            else if (xATA.DriveType == AtaPio.SpecLevel.ATA)
             {
                 BlockDevice.Devices.Add(xATA);
                 Ata.AtaDebugger.Send("ATA device with speclevel ATA found.");
             }
-            else if (xATA.DriveType != (AtaPio.SpecLevel)1) 
+            else if (xATA.DriveType == AtaPio.SpecLevel.ATAPI)
             {
-                Ata.AtaDebugger.Send("ATA device with speclevel " + (byte)xATA.DriveType + " found, which is not supported yet!");
+                Ata.AtaDebugger.Send("ATA device with speclevel ATAPI found, which is not supported yet!");
             }
             var xMbrData = new byte[512];
             xATA.ReadBlock(0UL, 1U, xMbrData);
