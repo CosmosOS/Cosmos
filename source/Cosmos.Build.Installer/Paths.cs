@@ -85,7 +85,7 @@ namespace Cosmos.Build.Installer
 
         if (xCurrentInstance == null)
         {
-          throw new Exception("The found Visual Studio instances are not the expected Visual Studio 2017!");
+          throw new Exception("There is more than one Visual Studio instance installed, but neither one of them matches the specified path: " + VSPath);
         }
       }
 
