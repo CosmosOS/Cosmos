@@ -21,242 +21,208 @@ namespace Cosmos.HAL.BlockDevice.Ports
         // Constants
         public const ulong RegularSectorSize = 512UL;
 
+        // Properties
+        private string mSerialNo;
+        private string mFirmwareRev;
+        private string mModelNo;
+
+        public string SerialNo { get => mSerialNo; }
+        public string FirmwareRev { get => mFirmwareRev; }
+        public string ModelNo { get => mModelNo; }
+
         public SATA(PortRegisters aSATAPort)
         {
             // Check if it is really a SATA Port!
-            if(aSATAPort.mPortType != PortType.SATA || (aSATAPort.CMD & (1U << 24)) != 0)
+            if (aSATAPort.mPortType != PortType.SATA || (aSATAPort.CMD & (1U << 24)) != 0)
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("\n[Error]");
+                Console.Write("[Error]");
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($" 0:{aSATAPort.mPortNumber} is not a SATA port!\n");
                 return;
             }
 
-            Mem = new Core.MemoryGroup.AHCI((uint)RegularSectorSize);
+            Mem = new Core.MemoryGroup.AHCI();
 
             mPortReg = aSATAPort;
 
             // Setting Offset arg to Global offset
             mBlockSize = RegularSectorSize;
-            mBlockCount = 256;
 
-            SendSATACommand(ATACommands.Identify);
+            // TODO: Use SendSATACommand(ATACommands.Identify) and copy the useful isIdentify if's from SendSATA28Command
+            //       But make sure that isIdentify returns the exact value (true if the command is identify
+            //       or false if not identify).
+            SendSATA28Command((ATACommands)0x00, 0, 0);
             UInt16[] xBuffer = new UInt16[256];
-            System.Threading.Thread.Sleep(1000);
             Mem.DataBlock.Read16(xBuffer);
             
-            var xBlockCount48 = (xBuffer[102] << 32 | (xBuffer[101] << 16 | xBuffer[100])) - 1;
-            mBlockCount = (ulong)xBlockCount48;
+            mSerialNo = GetString(xBuffer, 10, 20);
+            mFirmwareRev = GetString(xBuffer, 23, 8);
+            mModelNo = GetString(xBuffer, 27, 40);
+
+            mBlockCount = ((UInt32)xBuffer[61] << 16 | xBuffer[60]) - 1;
 
         }
 
         public void SendSATACommand(ATACommands aCommand)
         {
-            bool isIdentify = (aCommand == ATACommands.Identify);
-
-            mPortReg.IS = unchecked((uint)-1);
+            mPortReg.IS = 0xFFFF;
 
             int xSlot = FindCMDSlot();
             if (xSlot == -1) return;
-            
+
             HBACommandHeader xCMDHeader = new HBACommandHeader(mPortReg.CLB, (uint)xSlot);
             xCMDHeader.CFL = 5;
-            xCMDHeader.PRDTL = (ushort)((isIdentify) ? 1 : 0);
+            xCMDHeader.PRDTL = 1;
             xCMDHeader.Write = 0;
-            
-            xCMDHeader.CTBA = Heap.MemAlloc(256);
 
-            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, (uint)xSlot);
-            
-            if (isIdentify)
-            {
-                Console.WriteLine("Identify");
-                xCMDTable.PRDTEntry = new HBAPRDTEntry[xCMDHeader.PRDTL];
-                for (uint i = 0; i < xCMDTable.PRDTEntry.Length; i++)
-                {
-                    xCMDTable.PRDTEntry[i] = new HBAPRDTEntry(xCMDHeader.CTBA + 0x80, i);
-                }
+            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + (0x2000 * mPortNumber) + (0x100 * xSlot));
 
-                var BaseAddress = Mem.DataBlock.Base;
-                xCMDTable.PRDTEntry[xCMDTable.PRDTEntry.Length - 1].DBA = BaseAddress - 2;
-                xCMDTable.PRDTEntry[xCMDTable.PRDTEntry.Length - 1].DBC = 511;
-                xCMDTable.PRDTEntry[xCMDTable.PRDTEntry.Length - 1].InterruptOnCompletion = 0;
-            }
+            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
             
+            uint DataBaseAddress = Mem.DataBlock.Base;
+            xCMDTable.PRDTEntry[0].DBA = DataBaseAddress;
+            xCMDTable.PRDTEntry[0].DBC = 511;
+            xCMDTable.PRDTEntry[0].InterruptOnCompletion = 1;
+
             FISRegisterH2D xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
             {
                 FISType = (byte)FISType.FIS_Type_RegisterH2D,
                 IsCommand = 1,
                 Command = (byte)aCommand,
-                Device = 0,
+                Device = 0
             };
             
-            int xSpin = 0;
-            do xSpin++; while ((mPortReg.TFD & 0x88) != 0 && xSlot < 1000000);
+            while ((mPortReg.TFD & 0x88) != 0) ;
             
-            mPortReg.CI = 1U << xSlot;
+            mPortReg.CI = 1U;
 
             while (true)
             {
-                if ((mPortReg.CI & (1 << xSlot)) == 0)
-                {
-                    break;
-                }
+                if ((mPortReg.CI & (1 << xSlot)) == 0) break;
                 if ((mPortReg.IS & (1 << 30)) != 0)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.Write("\n[Fatal]: ");
-                    Console.Write("Fatal error occurred while sending command!\n");
-                    Console.ResetColor();
+                    mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
+                    PortReset(mPortReg);
                     return;
                 }
             }
 
-            if ((mPortReg.IS & (1 << 30)) != 0)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("\n[Fatal]: ");
-                Console.Write("Fatal error occurred while sending command!\n");
-                Console.ResetColor();
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("\n[Success]: ");
-            Console.Write("Command has been sent successfully!\n");
-            Console.ResetColor();
-
-            while (mPortReg.CI != 0) ;
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //Console.Write("[Success]: ");
+            //Console.Write("Command has been sent successfully!\n");
+            //Console.ResetColor();
 
             return;
         }
 
-        public void SendSATA24Command(ATACommands aCommand, uint aStart, uint aCount)
+        public void SendSATA28Command(ATACommands aCommand, uint aStart, uint aCount)
         {
-            mPortReg.IS = unchecked((uint)-1);
+            bool isIdentify = false;
+            if (aStart == 0 && aCount == 0) isIdentify = true;
 
+            mPortReg.IS = 0xFFFF;
+            
             int xSlot = FindCMDSlot();
             if (xSlot == -1) return;
-
+            
             HBACommandHeader xCMDHeader = new HBACommandHeader(mPortReg.CLB, (uint)xSlot);
             xCMDHeader.CFL = 5;
-            xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
+            xCMDHeader.PRDTL = 1;
             xCMDHeader.Write = 0;
+            
+            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + (0x2000 * mPortNumber) + (0x100 * xSlot));
 
-            xCMDHeader.CTBA = Heap.MemAlloc(256);
+            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 
-            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, (uint)xSlot);
+            uint DataBaseAddress = Mem.DataBlock.Base;
 
-            xCMDTable.PRDTEntry = new HBAPRDTEntry[xCMDHeader.PRDTL];
-            for (uint i = 0; i < xCMDTable.PRDTEntry.Length; i++)
+            // Last entry
+            if (isIdentify)
             {
-                xCMDTable.PRDTEntry[i] = new HBAPRDTEntry(xCMDHeader.CTBA + 0x80, i);
+                xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBA = DataBaseAddress;
+                xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = 511;
+                xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].InterruptOnCompletion = 1;
+            }
+            else
+            {
+                xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBA = DataBaseAddress;
+                xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = aCount * 512 - 1;   // 8K bytes (this value should always be set to 1 less than the actual value)
+                xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].InterruptOnCompletion = 1;
             }
 
-            uint BaseAddress = Mem.DataBlock.Base;
-            for (uint i = 0; i < xCMDHeader.PRDTL - 1; i++)
+            if (isIdentify)
             {
-                xCMDTable.PRDTEntry[i].DBA = BaseAddress;
-                xCMDTable.PRDTEntry[i].DBC = 8191;
-                xCMDTable.PRDTEntry[i].InterruptOnCompletion = 0;
-                BaseAddress += 8192;
-                aCount -= 16;
+                FISRegisterH2D xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
+                {
+                    FISType = (byte)FISType.FIS_Type_RegisterH2D,
+                    IsCommand = 1,
+                    Command = (byte)ATACommands.Identify,
+                    Device = 0
+                };
             }
-
-            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBA = BaseAddress - 2;
-            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = 512 * aCount - 1;
-            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].InterruptOnCompletion = 0;
-
-            FISRegisterH2D xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
+            else
             {
-                FISType = (byte)FISType.FIS_Type_RegisterH2D,
-                IsCommand = 1,
-                Command = (byte)aCommand,
+                FISRegisterH2D xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
+                {
+                    FISType = (byte)FISType.FIS_Type_RegisterH2D,
+                    IsCommand = 1,
+                    Command = (byte)aCommand,
 
-                LBA0 = (byte)(aStart),
-                LBA1 = (byte)(aStart >> 8),
-                LBA2 = (byte)(aStart >> 16),
-                Device = (byte)(0x40 | ((aStart >> 24) & 0x0F)),
+                    LBA0 = (byte)((aStart) & 0xFF),
+                    LBA1 = (byte)((aStart >> 8) & 0xFF),
+                    LBA2 = (byte)((aStart >> 16) & 0xFF),
+                    Device = (byte)(0x40 | ((aStart >> 24) & 0x0F)),
 
-                CountL = (byte)(aCount & 0xFF)
-            };
-
-            int xSpin = 0;
-            do xSpin++; while ((mPortReg.TFD & 0x88) != 0 && xSlot < 1000000);
-
-            mPortReg.CI = 1U << xSlot;
+                    CountL = (byte)(aCount & 0xFF)
+                };
+            }
+            
+            while ((mPortReg.TFD & 0x88) != 0);
+            
+            mPortReg.CI = 1U;
 
             while (true)
             {
-                if ((mPortReg.CI & (1 << xSlot)) == 0)
-                {
-                    break;
-                }
+                if ((mPortReg.CI & (1 << xSlot)) == 0) break;
                 if ((mPortReg.IS & (1 << 30)) != 0)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.Write("\n[Fatal]: ");
-                    Console.Write("Fatal error occurred while sending command!\n");
-                    Console.ResetColor();
+                    mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
+                    PortReset(mPortReg);
                     return;
                 }
             }
-
-            if ((mPortReg.IS & (1 << 30)) != 0)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("\n[Fatal]: ");
-                Console.Write("Fatal error occurred while sending command!\n");
-                Console.ResetColor();
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("\n[Success]: ");
-            Console.Write("Command has been sent successfully!\n");
-            Console.ResetColor();
-
-            while (mPortReg.CI != 0) ;
+            
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //Console.Write("[Success]: ");
+            //Console.Write("Command has been sent successfully!\n");
+            //Console.ResetColor();
 
             return;
         }
 
         public void SendSATA48Command(ATACommands aCommand, ulong aStart, uint aCount)
         {
-            mPortReg.IS = unchecked((uint)-1);
+            mPortReg.IS = 0xFFFF;
 
             int xSlot = FindCMDSlot();
             if (xSlot == -1) return;
             
             HBACommandHeader xCMDHeader = new HBACommandHeader(mPortReg.CLB, (uint)xSlot);
             xCMDHeader.CFL = 5;
-            xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
+            xCMDHeader.PRDTL = 1;
             xCMDHeader.Write = 0;
 
-            xCMDHeader.CTBA = Heap.MemAlloc(256);
+            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + (0x2000 * mPortNumber) + (0x100 * xSlot));
 
-            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, (uint)xSlot);
+            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 
-            xCMDTable.PRDTEntry = new HBAPRDTEntry[xCMDHeader.PRDTL];
-            for (uint i = 0; i < xCMDTable.PRDTEntry.Length; i++)
-            {
-                xCMDTable.PRDTEntry[i] = new HBAPRDTEntry(xCMDHeader.CTBA + 0x80, i);
-            }
+            uint DataBaseAddress = Mem.DataBlock.Base;
 
-            uint BaseAddress = Mem.DataBlock.Base;
-            for (uint i = 0; i < xCMDHeader.PRDTL - 1; i++)
-            {
-                xCMDTable.PRDTEntry[i].DBA = BaseAddress;
-                xCMDTable.PRDTEntry[i].DBC = 8191;
-                xCMDTable.PRDTEntry[i].InterruptOnCompletion = 0;
-                BaseAddress += 8192;
-                aCount -= 16;
-            }
-
-            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBA = BaseAddress - 2;
-            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = 512 * aCount - 1;
-            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].InterruptOnCompletion = 0;
+            // Last entry
+            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBA = DataBaseAddress;
+            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = (aCount * 512) - 1;   // 8K bytes (this value should always be set to 1 less than the actual value)
+            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].InterruptOnCompletion = 1;
 
             FISRegisterH2D xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
             {
@@ -264,64 +230,74 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 IsCommand = 1,
                 Command = (byte)aCommand,
 
-                LBA0 = (byte)(aStart),
-                LBA1 = (byte)(aStart >> 8),
-                LBA2 = (byte)(aStart >> 16),
-                LBA3 = (byte)(aStart >> 24),
-                LBA4 = (byte)(aStart >> 32),
-                LBA5 = (byte)(aStart >> 40),
-                Device = 0x40,
+                LBA0 = (byte)((aStart >> 00) & 0xFF),
+                LBA1 = (byte)((aStart >> 08) & 0xFF),
+                LBA2 = (byte)((aStart >> 16) & 0xFF),
+                LBA3 = (byte)((aStart >> 24) & 0xFF),
+                LBA4 = (byte)((aStart >> 32) & 0xFF),
+                LBA5 = (byte)((aStart >> 40) & 0xFF),
+
+                Device = 1 << 6,
 
                 CountL = (byte)(aCount & 0xFF),
-                CountH = (byte)((aCount >> 8))
+                CountH = (byte)((aCount >> 8) & 0xFF)
             };
+            
+            while ((mPortReg.TFD & 0x88) != 0) ;
 
-            int xSpin = 0;
-            do xSpin++; while ((mPortReg.TFD & 0x88) != 0 && xSlot < 1000000);
-
-            mPortReg.CI = 1U << xSlot;
+            mPortReg.CI = 1U;
 
             while (true)
             {
-                if ((mPortReg.CI & (1 << xSlot)) == 0)
-                {
-                    break;
-                }
+                if ((mPortReg.CI & (1 << xSlot)) == 0) break;
                 if ((mPortReg.IS & (1 << 30)) != 0)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.Write("\n[Fatal]: ");
-                    Console.Write("Fatal error occurred while sending command!\n");
-                    Console.ResetColor();
+                    mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
+                    PortReset(mPortReg);
                     return;
                 }
             }
 
-            if ((mPortReg.IS & (1 << 30)) != 0)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("\n[Fatal]: ");
-                Console.Write("Fatal error occurred while sending command!\n");
-                Console.ResetColor();
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("\n[Success]: ");
-            Console.Write("Command has been sent successfully!\n");
-            Console.ResetColor();
-
-            while (mPortReg.CI != 0) ;
-
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //Console.Write("[Success]: ");
+            //Console.Write("Command has been sent successfully!\n");
+            //Console.ResetColor();
             return;
         }
 
-        public int FindCMDSlot()
+        public static void PortReset(PortRegisters aPort)
+        {
+            // TODO: Make a connection between AHCI Methods and SATA
+
+            // Semi-StopCMD()
+            aPort.CMD &= ~(1U << 0);
+            int i;
+            for(i = 0; i <= 50; i++)
+            {
+                if ((aPort.CMD & (1 << 0)) == 0) break;
+                AHCI.Wait(10000);
+            }
+            if (i == 101) AHCI.HBAReset();
+
+            aPort.SCTL = 1;
+            AHCI.Wait(1000);
+            aPort.SCTL &= ~(1U << 0);
+
+            while ((aPort.SSTS & 0x0F) != 3) ;
+
+            aPort.SERR = 1;
+
+            while ((aPort.SCTL & 0x0F) != 0) ;
+        }
+
+        private void HBAReset() => AHCI.HBAReset();
+
+        private int FindCMDSlot()
         {
             // If not set in SACT and CI, the slot is free
             var xSlots = (mPortReg.SACT | mPortReg.CI);
         
-            for (int i = 1; i < 32; i++)
+            for (int i = 0; i < 32; i++)
             {
                 if ((xSlots & 1) == 0)
                     return i;
@@ -329,19 +305,34 @@ namespace Cosmos.HAL.BlockDevice.Ports
             }
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("\n[Error]: ");
+            Console.Write("[Error]: ");
             Console.Write("Cannot find a free command slot!\n");
             Console.ResetColor();
             return -1;
         }
 
+        protected string GetString(UInt16[] aBuffer, int aIndexStart, int aStringLength)
+        {
+            // Would be nice to convert to byte[] and use
+            // new string(ASCIIEncoding.ASCII.GetChars(xBytes));
+            // But it requires some code Cosmos doesnt support yet
+            var xChars = new char[aStringLength];
+            for (int i = 0; i < aStringLength / 2; i++)
+            {
+                UInt16 xChar = aBuffer[aIndexStart + i];
+                xChars[i * 2] = (char)(xChar >> 8);
+                xChars[i * 2 + 1] = (char)xChar;
+            }
+            return new string(xChars);
+        }
+
+        // BlockDevice Methods
         public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
         {
+            //CheckDataSize(aData, aBlockCount);
+            //CheckBlockNo(aBlockNo, aBlockCount);
             SendSATA48Command(ATACommands.ReadDmaExt, (uint)aBlockNo, (uint)aBlockCount);
-            System.Threading.Thread.Sleep(500);
             Mem.DataBlock.Read8(aData);
-            foreach (byte xData in aData)
-                mSATADebugger.SendNumber(xData);
         }
 
         public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
