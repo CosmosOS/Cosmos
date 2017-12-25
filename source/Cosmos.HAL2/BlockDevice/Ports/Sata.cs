@@ -304,10 +304,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 xSlots >>= 1;
             }
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("[Error]: ");
-            Console.Write("Cannot find a free command slot!\n");
-            Console.ResetColor();
+            //Console.ForegroundColor = ConsoleColor.Red;
+            //Console.Write("[Error]: ");
+            //Console.Write("Cannot find a free command slot!\n");
+            //Console.ResetColor();
             return -1;
         }
 
