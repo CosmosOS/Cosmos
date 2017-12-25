@@ -36,6 +36,7 @@ namespace Cosmos.HAL.BlockDevice
             else if (xATA.DriveType == AtaPio.SpecLevel.ATAPI)
             {
                 Ata.AtaDebugger.Send("ATA device with speclevel ATAPI found, which is not supported yet!");
+                return;
             }
             var xMbrData = new byte[512];
             xATA.ReadBlock(0UL, 1U, xMbrData);
