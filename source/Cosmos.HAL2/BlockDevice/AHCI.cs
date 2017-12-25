@@ -10,7 +10,7 @@ using Cosmos.Core.Memory.Old;
 
 namespace Cosmos.HAL.BlockDevice
 {
-    public class AHCI : Drivers.PCIDriver
+    public class AHCI
     {
         internal static Debugger mAHCIDebugger = new Debugger("HAL", "AHCI");
         internal static PCIDevice xDevice = HAL.PCI.GetDevice(0x001, 0x0006);
@@ -59,7 +59,7 @@ namespace Cosmos.HAL.BlockDevice
             if (xDevice != null) AHCI Driver = new AHCI(xDevice);
         }
 
-        internal override PCIDevice GetDevice() => xDevice;
+        internal PCIDevice GetDevice() => xDevice;
 
         public AHCI(PCIDevice aAHCIDevice)
         {
