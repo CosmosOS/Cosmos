@@ -5,6 +5,10 @@ using Cosmos.Core;
 
 namespace Cosmos.HAL.BlockDevice.Registers
 {
+    public enum Base : uint
+    {
+        AHCI = 0x00400000
+    }
     // Registers
     public class GenericRegisters
     {
@@ -93,7 +97,7 @@ namespace Cosmos.HAL.BlockDevice.Registers
         {
             xAddress = aAddress;
             mPortNumber = aPortNumber;
-            xBlock = new MemoryBlock(aAddress, 0x80);
+            xBlock = new MemoryBlock(aAddress + (0x80 * mPortNumber), 0x80);
             Active = false;
         }
 
@@ -215,7 +219,7 @@ namespace Cosmos.HAL.BlockDevice.Registers
         {
             xAddress = aAddress;
             xSlot = aSlot;
-            xBlock = new MemoryBlock(aAddress + (0x20 * aSlot), 0x20);
+            xBlock = new MemoryBlock(aAddress + (32 * aSlot), 0x20);
             xBlock.Fill(0);
         }
 
@@ -265,8 +269,8 @@ namespace Cosmos.HAL.BlockDevice.Registers
         }
         public ushort PRDTL
         {
-            get { return (ushort)(xBlock.Words[0x02] & 0xFFFF); }
-            set { xBlock.Words[0x02] = (ushort)(value); }
+            get { return xBlock.Words[0x02]; }
+            set { xBlock.Words[0x02] = value; }
         }
 
         public uint PRDBC
@@ -277,8 +281,8 @@ namespace Cosmos.HAL.BlockDevice.Registers
 
         public uint CTBA
         {
-            get { return xBlock[0x08] >> 7; }
-            set { xBlock[0x08] = (value << 7); }
+            get { return xBlock[0x08]; }
+            set { xBlock[0x08] = value; }
         }
 
         public uint CTBAU
@@ -312,13 +316,16 @@ namespace Cosmos.HAL.BlockDevice.Registers
     {
         private MemoryBlock xBlock;
         private uint xAddress;
-        private uint xSlot;
-        public HBACommandTable(uint aAddress, uint aSlot)
+        public HBACommandTable(uint aAddress, uint aPRDTCount)
         {
             xAddress = aAddress;
-            xSlot = aSlot;
-            xBlock = new MemoryBlock(aAddress + (256 * xSlot), 0x80);
+            xBlock = new MemoryBlock(aAddress, 0x80);
             xBlock.Fill(0);
+            PRDTEntry = new HBAPRDTEntry[aPRDTCount];
+            for(uint i = 0; i < aPRDTCount; i++)
+            {
+                PRDTEntry[i] = new HBAPRDTEntry(aAddress + 0x80, i);
+            }
         }
 
         public uint CFIS
@@ -354,8 +361,8 @@ namespace Cosmos.HAL.BlockDevice.Registers
 
         public uint DBA
         {
-            get { return xBlock[0x00] >> 1; }
-            set { xBlock[0x00] = (uint)(value << 1); }
+            get { return xBlock[0x00]; }
+            set { xBlock[0x00] = value; }
         }
 
         public uint DBAU
@@ -381,7 +388,7 @@ namespace Cosmos.HAL.BlockDevice.Registers
         public byte InterruptOnCompletion
         {
             get { return (byte)(xBlock.Bytes[0x0F] >> 7); }
-            set { xBlock.Bytes[0x0F] |= (byte)(value << 7); }
+            set { xBlock.Bytes[0x0F] = (byte)(value << 7); }
         }
     }
 
@@ -406,7 +413,7 @@ namespace Cosmos.HAL.BlockDevice.Registers
         public byte IsCommand
         {
             get { return (byte)((xBlock.Bytes[0x01] >> 7)); }
-            set { xBlock.Bytes[0x01] |= (byte)(value << 7); }
+            set { xBlock.Bytes[0x01] = (byte)(value << 7); }
         }
         public byte Command
         {
