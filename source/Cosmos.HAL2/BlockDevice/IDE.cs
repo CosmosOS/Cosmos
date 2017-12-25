@@ -9,15 +9,17 @@ namespace Cosmos.HAL.BlockDevice
 
         internal static void InitDriver()
         {
-            if (xDevice == null) return;
-            Console.WriteLine("ATA Primary Master");
-            Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-            //Console.WriteLine("ATA Primary Slave");
-            //Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
-            Console.WriteLine("ATA Secondary Master");
-            Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-            //Console.WriteLine("ATA Secondary Slave");
-            //Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
+            if (xDevice != null)
+            {
+                Console.WriteLine("ATA Primary Master");
+                Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
+                //Console.WriteLine("ATA Primary Slave");
+                //Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
+                Console.WriteLine("ATA Secondary Master");
+                Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
+                //Console.WriteLine("ATA Secondary Slave");
+                //Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
+            }
         }
 
         private static void Initialize(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
