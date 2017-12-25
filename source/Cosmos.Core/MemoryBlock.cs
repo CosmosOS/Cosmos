@@ -120,7 +120,7 @@ namespace Cosmos.Core
             {
                 throw new Exception("Memory access violation");
             }
-            for (int i = 0; i < aBuffer.Length; i++)
+            for (int i = 0; i < aBuffer.Length / 2; i++)
                 (*(Byte*)(Base + i)) = aBuffer[i];
         }
 
@@ -130,8 +130,11 @@ namespace Cosmos.Core
             {
                 throw new Exception("Memory access violation");
             }
-            for (int i = 0; i < aBuffer.Length; i++)
-                aBuffer[i] = (*(UInt16*)(Base + i));
+            for (int i = 0; i < aBuffer.Length / 2; i++)
+            {
+                aBuffer[i*2+0] = (*(UInt16*)(Base + i*2+0));
+                aBuffer[i*2+1] = (*(UInt16*)(Base + i*2+1));
+            }
         }
 
         public unsafe void Write16(UInt16[] aBuffer)
@@ -140,8 +143,11 @@ namespace Cosmos.Core
             {
                 throw new Exception("Memory access violation");
             }
-            for (int i = 0; i < aBuffer.Length; i++)
-                (*(UInt16*)(Base + i)) = aBuffer[i];
+            for (int i = 0; i < aBuffer.Length / 2; i++)
+            {
+                (*(UInt16*)(Base + i*2+0)) = aBuffer[i*2+0];
+                (*(UInt16*)(Base + i*2+1)) = aBuffer[i*2+1];
+            }
         }
 
         public unsafe void Read32(UInt32[] aBuffer)
