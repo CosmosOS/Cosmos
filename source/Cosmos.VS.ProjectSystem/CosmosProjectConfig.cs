@@ -91,7 +91,7 @@ namespace Cosmos.VS.ProjectSystem
                     xInfo.bstrExe = DictionaryHelper.DumpToString(xValues);
 
                     // Select the debugger
-                    xInfo.clsidCustom = Cosmos.VS.DebugEngine.AD7.Impl.AD7Engine.EngineID; // Debug engine identifier.
+                    //xInfo.clsidCustom = Cosmos.VS.DebugEngine.AD7.Impl.AD7Engine.EngineID; // Debug engine identifier.
                     // ??? This identifier doesn't seems to appear anywhere else in souce code.
                     //xInfo.clsidPortSupplier = new Guid("{708C1ECA-FF48-11D2-904F-00C04FA302A1}");
 
