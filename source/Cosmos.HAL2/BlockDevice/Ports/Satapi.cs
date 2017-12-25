@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Core.Memory.Old;
 using Cosmos.HAL.BlockDevice.Registers;
+using Cosmos.Core;
 
 namespace Cosmos.HAL.BlockDevice.Ports
 {
-    public class Satapi : StoragePort
+    public class SATAPI : StoragePort
     {
         public Debug.Kernel.Debugger mSATAPIDebugger = new Debug.Kernel.Debugger("HAL", "SATAPI");
 
@@ -16,7 +17,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public override string mPortName => "SATAPI";
         public override uint mPortNumber => mPortReg.mPortNumber;
 
-        public Satapi(PortRegisters aSATAPIPort)
+        public SATAPI(PortRegisters aSATAPIPort)
         {
 
             // Check if it is really a SATAPI Port!
@@ -45,20 +46,34 @@ namespace Cosmos.HAL.BlockDevice.Ports
             HBACommandHeader xCMDHeader = new HBACommandHeader(mPortReg.CLB, (uint)xSlot);
             xCMDHeader.CFL = 5;
             xCMDHeader.ATAPI = 1;
-            xCMDHeader.PRDTL = 0;
+            xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
             xCMDHeader.Write = 0;
-            xCMDHeader.ClearBusy = 1;
 
-            xCMDHeader.CTBA = Heap.MemAlloc(256) + (uint)(256 * xSlot);
+            xCMDHeader.CTBA = Heap.MemAlloc(128 + ((uint)xCMDHeader.PRDTL) * 16);
 
-            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, (uint)xSlot);
+            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
+
+            uint DataBaseAddress = 0x0046C000;
+            for (int i = 0; i < xCMDHeader.PRDTL - 1; i++)
+            {
+                xCMDTable.PRDTEntry[i].DBA = DataBaseAddress;
+                xCMDTable.PRDTEntry[i].DBC = 8 * 1024 - 1;   // 8K bytes (this value should always be set to 1 less than the actual value)
+                xCMDTable.PRDTEntry[i].InterruptOnCompletion = 1;
+                DataBaseAddress += 8 * 1024;    // 4K words
+                aCount -= 16;    // 16 sectors
+            }
+
+            // Last entry
+            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBA = DataBaseAddress;
+            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = aCount * 512 - 1;   // 8K bytes (this value should always be set to 1 less than the actual value)
+            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].InterruptOnCompletion = 1;
 
             FISRegisterH2D xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
             {
                 FISType = (byte)FISType.FIS_Type_RegisterH2D,
                 IsCommand = 1,
                 Command = (byte)ATACommands.Packet,
-                Device = 0
+                Device = 1 << 4
             };
 
             byte[] xATAPICMD = new byte[12];
@@ -139,6 +154,12 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
         {
             SendSATAPICommand(ATACommands.Read, (uint)aBlockNo, (uint)aBlockCount);
+            byte[] xByte = new byte[512];
+            new MemoryBlock(0x0046C000, 512).Read8(xByte);
+            for (int i = 0; i < 512; i++)
+            {
+                Console.Write(xByte[i]);
+            }
         }
 
         public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
