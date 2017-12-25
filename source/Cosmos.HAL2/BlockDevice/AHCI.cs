@@ -56,7 +56,10 @@ namespace Cosmos.HAL.BlockDevice
         internal static void InitDriver()
         {
 
-            if (xDevice != null) AHCI Driver = new AHCI(xDevice);
+            if (xDevice != null)
+            {
+                AHCI Driver = new AHCI(xDevice);
+            }
         }
 
         internal PCIDevice GetDevice() => xDevice;
