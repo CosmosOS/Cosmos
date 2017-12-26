@@ -318,7 +318,7 @@ namespace Cosmos.System.FileSystem
             {
                 if (BlockDevice.Devices[i] is Partition)
                 {
-                    mPartition.Add(BlockDevice.Devices[i]);
+                    mPartitions.Add((Partition)BlockDevice.Devices[i]);
                 }
             }
 
