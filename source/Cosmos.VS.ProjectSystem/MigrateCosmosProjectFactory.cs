@@ -147,7 +147,7 @@ namespace Cosmos.VS.ProjectSystem
 
             MigrateProject(bstrFileName, codeProjectPath);
 
-            pbstrUpgradedFullyQualifiedFileName = codeProjectPath;
+            pbstrUpgradedFullyQualifiedFileName = null;
             return VSConstants.S_OK;
         }
 
@@ -161,24 +161,7 @@ namespace Cosmos.VS.ProjectSystem
 
             if (isCosmos)
             {
-                string projectTypeGuid = null;
-
-                if (Directory.GetFiles(Path.GetDirectoryName(bstrFileName), "*.cs", SearchOption.AllDirectories).Any())
-                {
-                    projectTypeGuid = CSharpProjectTypeGuid;
-                }
-
-                if (Directory.GetFiles(Path.GetDirectoryName(bstrFileName), "*.fs", SearchOption.AllDirectories).Any())
-                {
-                    projectTypeGuid = FSharpProjectTypeGuid;
-                }
-
-                if (Directory.GetFiles(Path.GetDirectoryName(bstrFileName), "*.vb", SearchOption.AllDirectories).Any())
-                {
-                    projectTypeGuid = VisualBasicProjectTypeGuid;
-                }
-
-                pguidNewProjectFactory = new Guid(projectTypeGuid);
+                pguidNewProjectFactory = Guid.Empty;
                 pUpgradeProjectCapabilityFlags = (uint)(__VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_BACKUPSUPPORTED | __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_COPYBACKUP);
             }
             else
@@ -232,6 +215,11 @@ namespace Cosmos.VS.ProjectSystem
                     (a.Value == "Cosmos.System" || a.Value == "Cosmos.System2" || a.Value == "Cosmos.Debug.Kernel"))
                     .Count() == 0);
             var references = itemGroups.Descendants().Where(e => e.Name == "Reference");
+
+            if (packageReferences.Any(p => p.Attributes().Any(a => a.Name == "Include" && a.Value == "Cosmos.Build")))
+            {
+                return;
+            }
 
             codeProjectStream.Dispose();
 
