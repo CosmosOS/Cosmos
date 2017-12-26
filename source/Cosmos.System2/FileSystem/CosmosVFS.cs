@@ -313,8 +313,8 @@ namespace Cosmos.System.FileSystem
         /// Initializes the partitions for all block devices.
         /// </summary>
         protected virtual void InitializePartitions()
-        {  
-            for(int i = 0; i < BlockDeviec.Devices.Count; i++)
+        { 
+            for (int i = 0; i < BlockDevice.Devices.Count; i++)
             {
                 if (BlockDevice.Devices[i] is Partition)
                 {
