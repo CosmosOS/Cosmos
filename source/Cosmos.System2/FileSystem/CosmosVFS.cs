@@ -314,9 +314,12 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         protected virtual void InitializePartitions()
         {  
-            foreach(Partition xPart in BlockDevice.Devices)
+            for(int i = 0; i < BlockDeviecs.Devices.Count; i++)
             {
-                mPartitions.Add(xPart);
+                if (BlockDevices.Devices[i] is Partition)
+                {
+                    mPartition.Add(BlockDevices.Devices[i]);
+                }
             }
 
             if (mPartitions.Count > 0)
