@@ -314,11 +314,11 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         protected virtual void InitializePartitions()
         {  
-            for(int i = 0; i < BlockDeviecs.Devices.Count; i++)
+            for(int i = 0; i < BlockDeviec.Devices.Count; i++)
             {
-                if (BlockDevices.Devices[i] is Partition)
+                if (BlockDevice.Devices[i] is Partition)
                 {
-                    mPartition.Add(BlockDevices.Devices[i]);
+                    mPartition.Add(BlockDevice.Devices[i]);
                 }
             }
 
