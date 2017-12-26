@@ -143,9 +143,18 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         private uint depth;
         private uint capabilities;
 
-        public VMWareSVGAII()
+        public static void InitDriver()
         {
-            device = (HAL.PCI.GetDevice(0x15AD, 0x0405));
+            var xDevice = (HAL.PCI.GetDevice(0x15AD, 0x0405));
+            if (xDevice != null)
+            {
+                Initialize(xDevice);
+            }
+        }
+        
+        private void Initialize(PCIDevice aPCIDevice)
+        {
+            device = aPCIDevice;
             device.EnableMemory(true);
             uint basePort = device.BaseAddressBar[0].BaseAddress;
             IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));
