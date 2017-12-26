@@ -1,7 +1,7 @@
 using System;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
-using Cosmos.HAL.Drivers;
+using Cosmos.HAL.Drivers.PCI.Video;
 using Cosmos.HAL.BlockDevice;
 
 namespace Cosmos.HAL
@@ -46,14 +46,19 @@ namespace Cosmos.HAL
       
             Console.WriteLine("Initializing Drivers");
             mDebugger.Send("Driver Init");
-          
-            IDE.InitDriver();
-            //AHCI.InitDriver();
+            InitializeDriversWithCheck();
             
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
           
         }
 
+        private static void InitializeDriversWithCheck()
+        {
+            IDE.InitDriver();
+            AHCI.InitDriver();
+            VMWareSVGAII.InitDriver();
+        }
+      
         public static void EnableInterrupts()
         {
             CPU.EnableInterrupts();
