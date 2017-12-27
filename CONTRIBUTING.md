@@ -7,8 +7,8 @@ CosmosOS is a volunteer effort. We encourage you to pitch in. Join the team!
 - Please be sure to install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328). This ensures your pull requests meet the required formatting and conventions. [See here](https://github.com/CosmosOS/Cosmos/wiki/FAQ#what-is-this-editorconfig-file-and-how-do-i-use-it) for more info.
 
 Want to get started contributing to Cosmos? Check out the open issues page:
-- [High priority](https://github.com/CosmosOS/Cosmos/issues?q=is%3Aopen+is%3Aissue+label%3Apriority_high)
-- [Medium priority](https://github.com/CosmosOS/Cosmos/labels/priority_medium)
+- [High priority](https://github.com/CosmosOS/Cosmos/labels/Priority%3A%20High)
+- [Medium priority](https://github.com/CosmosOS/Cosmos/labels/Priority%3A%20Medium)
 
 
 Thanks!
