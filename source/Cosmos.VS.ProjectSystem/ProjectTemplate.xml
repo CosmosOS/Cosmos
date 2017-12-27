@@ -7,10 +7,4 @@
     <PropertyGroup>
     </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Cosmos.Build" Version="*" />
-        <PackageReference Include="Cosmos.Debug.Kernel" Version="*" />
-        <PackageReference Include="Cosmos.System2" Version="*" />
-    </ItemGroup>
-
 </Project>

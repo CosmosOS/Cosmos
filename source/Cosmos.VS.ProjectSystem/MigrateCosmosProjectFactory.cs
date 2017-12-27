@@ -203,23 +203,21 @@ namespace Cosmos.VS.ProjectSystem
 
             var document = XDocument.Load(codeProjectStream);
             var itemGroups = document.Root.Descendants().Where(e => e.Name == "ItemGroup");
-            var projectReferences = itemGroups.Descendants().Where(
-                e => e.Name == "ProjectReference" && e.Attributes().Where(
-                    a => a.Name == "Include" &&
-                    (a.Value.EndsWith("Cosmos.System.csproj") || a.Value.EndsWith("Cosmos.System2.csproj")
-                    || a.Value.EndsWith("Cosmos.Debug.Kernel.csproj")))
-                    .Count() == 0);
-            var packageReferences = itemGroups.Descendants().Where(
-                e => e.Name == "PackageReference" && e.Attributes().Where(
-                    a => a.Name == "Include" &&
-                    (a.Value == "Cosmos.System" || a.Value == "Cosmos.System2" || a.Value == "Cosmos.Debug.Kernel"))
-                    .Count() == 0);
             var references = itemGroups.Descendants().Where(e => e.Name == "Reference");
+            var projectReferences = itemGroups.Descendants().Where(e => e.Name == "ProjectReference");
+            var packageReferences = itemGroups.Descendants().Where(e => e.Name == "PackageReference");
 
             if (packageReferences.Any(p => p.Attributes().Any(a => a.Name == "Include" && a.Value == "Cosmos.Build")))
             {
                 return;
             }
+
+            var cosmosBuildPackageReference = new XElement("PackageReference");
+            cosmosBuildPackageReference.Add(new XAttribute("Include", "Cosmos.Build"));
+            cosmosBuildPackageReference.Add(new XAttribute("Version", "*"));
+
+            packageReferences.Append(cosmosBuildPackageReference);
+            packageReferences = packageReferences.OrderBy(p => p.Attributes().Where(a => a.Name == "Include").First().Value);
 
             codeProjectStream.Dispose();
 
@@ -230,6 +228,11 @@ namespace Cosmos.VS.ProjectSystem
             codeProjectDocument.Root.Descendants().Where(d => d.Name == "PropertyGroup").LastOrDefault()
                 .Add(cosmosProjectProperties);
 
+            if (references.Count() > 0)
+            {
+                codeProjectDocument.Root.Add(new XElement("ItemGroup", references));
+            }
+
             if (projectReferences.Count() > 0)
             {
                 codeProjectDocument.Root.Add(new XElement("ItemGroup", projectReferences));
@@ -238,11 +241,6 @@ namespace Cosmos.VS.ProjectSystem
             if (packageReferences.Count() > 0)
             {
                 codeProjectDocument.Root.Add(new XElement("ItemGroup", packageReferences));
-            }
-
-            if (references.Count() > 0)
-            {
-                codeProjectDocument.Root.Add(new XElement("ItemGroup", references));
             }
 
             using (var xmlWriter = XmlWriter.Create(codeProject,
