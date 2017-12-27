@@ -47,7 +47,6 @@
         <ProjectReference Include="..\..\source\Kernel-X86\10-CPU\Cosmos.CPU_Asm\Cosmos.CPU_Asm.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\10-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
-        <ProjectReference Include="..\..\source\Kernel-X86\50-Application\GuessKernelGen3.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\91-Plugs\Cosmos.Plugs.TapRoot\Cosmos.Plugs.TapRoot.csproj" />
         <ProjectReference Include="..\BoxingTests\BoxingTests.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
