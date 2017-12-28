@@ -253,19 +253,19 @@ namespace Cosmos.HAL.BlockDevice
             var xDET = (DeviceDetectionStatus)(aPort.SSTS & 0x0F);
             var xSignature = aPort.SIG;
 
-            // Check if not reading wrong data!
+            // Check if the port is active!
             if (xIPM != InterfacePowerManagementStatus.Active)
                 return PortType.Nothing;
             if (xDET != DeviceDetectionStatus.DeviceDetectedWithPhy)
                 return PortType.Nothing;
 
-            switch (xSignature >> 16)
+            switch ((AHCISignature)xSignature >> 16)
             {
-                case 0xEB14: return PortType.SATAPI;
-                case 0xC33C: return PortType.SEMB;
-                case 0x9669: return PortType.PM;
-                case 0xFFFF: return PortType.Nothing;
-                default: return PortType.SATA;
+                case AHCISignature.SATA: return PortType.SATA;
+                case AHCISignature.SATAPI: return PortType.SATAPI;
+                case AHCISignature.SEMB: return PortType.SEMB;
+                case AHCISignature.PortMultiplier: return PortType.PM;
+                case AHCISignature.Null: return PortType.Nothing;
             }
         }
 
