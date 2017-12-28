@@ -148,7 +148,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             var xDevice = (HAL.PCI.GetDevice(0x15AD, 0x0405));
             if (xDevice != null)
             {
-                Initialize(xDevice);
+                new VMWareSVGAII().Initialize(xDevice);
             }
         }
         
