@@ -55,7 +55,7 @@ namespace Cosmos.HAL
         private static void InitializeDriversWithCheck()
         {
             IDE.InitDriver();
-            AHCI.InitDriver();
+            //AHCI.InitDriver();
             VMWareSVGAII.InitDriver();
         }
       
