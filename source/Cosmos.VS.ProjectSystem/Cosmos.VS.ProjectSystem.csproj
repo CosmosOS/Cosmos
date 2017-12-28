@@ -8,6 +8,8 @@
 
     <PropertyGroup>
         <UseCodebase>True</UseCodebase>
+        <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
+        <ExtensionInstallationFolder>Cosmos\ProjectSystem\</ExtensionInstallationFolder>
     </PropertyGroup>
 
     <ItemGroup>

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="1" xml:space="preserve">
-    <value>Cosmos C# Project</value>
+    <value>Cosmos Kernel</value>
   </data>
   <data name="2" xml:space="preserve">
     <value>A project for creating a C# Cosmos Kernel.</value>
@@ -128,12 +128,12 @@
     <value>Resources\CSharpProject.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="4" xml:space="preserve">
-    <value>Cosmos Visual Basic Project</value>
+    <value>Cosmos Kernel</value>
   </data>
   <data name="5" xml:space="preserve">
     <value>A project for creating a Visual Basic Cosmos Kernel.</value>
   </data>
   <data name="6" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\VBProject.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>Resources\VisualBasicProject.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
