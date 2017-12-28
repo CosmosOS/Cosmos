@@ -265,7 +265,7 @@ namespace Cosmos.HAL.BlockDevice
                 case AHCISignature.SATAPI: return PortType.SATAPI;
                 case AHCISignature.SEMB: return PortType.SEMB;
                 case AHCISignature.PortMultiplier: return PortType.PM;
-                case AHCISignature.Null: return PortType.Nothing;
+                case AHCISignature.Nothing: return PortType.Nothing;
             }
         }
 
