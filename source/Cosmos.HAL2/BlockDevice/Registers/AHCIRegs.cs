@@ -631,188 +631,6 @@ namespace Cosmos.HAL.BlockDevice.Registers
         }
     }
 
-    public class FISPIOSetup
-    {
-        private static MemoryBlock xBlock;
-        private static uint xAddress;
-        private static uint xDataSize;
-        public static FISPIOSetup GetFIS(uint aAddress)
-        {
-            xAddress = aAddress;
-            xBlock = new MemoryBlock(xAddress + 0x20, 0x14);
-            return new FISPIOSetup();
-        }
-
-        public byte FISType
-        {
-            get { return xBlock.Bytes[0x00]; }
-            set { xBlock.Bytes[0x00] = value; }
-        }
-        public byte PortMultiplier
-        {
-            get { return (byte)(xBlock.Bytes[0x01] & 0x0F); }
-            set { xBlock.Bytes[0x01] = value; }
-        }
-        public byte Reserved
-        {
-            get { return (byte)((xBlock.Bytes[0x01] >> 4) & 1); }
-        }
-        public byte DataTransferDir
-        {
-            get { return (byte)((xBlock.Bytes[0x01] >> 5) & 1); }
-            set { xBlock.Bytes[0x01] |= (byte)((value) << 5); }
-        }
-        public byte InterruptBit
-        {
-            get { return (byte)((xBlock.Bytes[0x01] >> 6) & 1); }
-            set { xBlock.Bytes[0x01] |= (byte)((value) << 6); }
-        }
-        public byte Reserved1
-        {
-            get { return (byte)((xBlock.Bytes[0x01] >> 7) & 1); }
-        }
-
-        public byte Status
-        {
-            get { return xBlock.Bytes[0x02]; }
-            set { xBlock.Bytes[0x02] = value; }
-        }
-        public byte Error
-        {
-            get { return xBlock.Bytes[0x03]; }
-            set { xBlock.Bytes[0x03] = value; }
-        }
-
-        public byte LBA0
-        {
-            get { return xBlock.Bytes[0x04]; }
-            set { xBlock.Bytes[0x04] = value; }
-        }
-        public byte LBA1
-        {
-            get { return xBlock.Bytes[0x05]; }
-            set { xBlock.Bytes[0x05] = value; }
-        }
-        public byte LBA2
-        {
-            get { return xBlock.Bytes[0x06]; }
-            set { xBlock.Bytes[0x06] = value; }
-        }
-        public byte Device
-        {
-            get { return xBlock.Bytes[0x07]; }
-            set { xBlock.Bytes[0x07] = value; }
-        }
-
-        public byte LBA3
-        {
-            get { return xBlock.Bytes[0x08]; }
-            set { xBlock.Bytes[0x08] = value; }
-        }
-        public byte LBA4
-        {
-            get { return xBlock.Bytes[0x09]; }
-            set { xBlock.Bytes[0x09] = value; }
-        }
-        public byte LBA5
-        {
-            get { return xBlock.Bytes[0x0A]; }
-            set { xBlock.Bytes[0x0A] = value; }
-        }
-        public byte Reserved2 // FeatureL in other Fis types
-        {
-            get { return xBlock.Bytes[0x0B]; }
-            set { xBlock.Bytes[0x0B] = value; }
-        }
-
-        public byte CountLow
-        {
-            get { return xBlock.Bytes[0x0C]; }
-            set { xBlock.Bytes[0x0C] = value; }
-        }
-        public byte CountHigh
-        {
-            get { return xBlock.Bytes[0x0D]; }
-            set { xBlock.Bytes[0x0D] = value; }
-        }
-        public byte Reserved3 // ICC in other Fis types
-        {
-            get { return xBlock.Bytes[0x0E]; }
-            set { xBlock.Bytes[0x0E] = value; }
-        }
-        public byte E_Status
-        {
-            get { return xBlock.Bytes[0x0F]; }
-            set { xBlock.Bytes[0x0F] = value; }
-        }
-
-        public ushort DataCount
-        {
-            get { return xBlock.Words[0x10]; }
-            set { xBlock.Words[0x10] = value; }
-        }
-        public byte Reserved4
-        {
-            get { return xBlock.Bytes[0x12]; }
-            set { xBlock.Bytes[0x12] = value; }
-        }
-        public byte Reserved5
-        {
-            get { return xBlock.Bytes[0x13]; }
-            set { xBlock.Bytes[0x13] = value; }
-        }
-    }
-
-    public class FISData
-    {
-        private static MemoryBlock xBlock;
-        private static uint xAddress;
-        private static uint xDataSize;
-        public static FISData GetFIS(uint aAddress, uint aDataSize)
-        {
-            xAddress = aAddress;
-            xDataSize = aDataSize;
-            xBlock = new MemoryBlock(xAddress, 4 + (4 * aDataSize));
-            return new FISData();
-        }
-
-        public byte FISType
-        {
-            get { return xBlock.Bytes[0x00]; }
-            set { xBlock.Bytes[0x00] = value; }
-        }
-        public byte PortMultiplier
-        {
-            get { return (byte)((xBlock.Bytes[0x01]) & 0x0F); }
-            set { xBlock.Bytes[0x01] = value; }
-        }
-        public byte Reserved
-        {
-            get { return (byte)(((xBlock.Bytes[0x01]) >> 4) & 0x0F); }
-        }
-        public byte Reserved1
-        {
-            get { return xBlock.Bytes[0x02]; }
-        }
-        public byte Reserved2
-        {
-            get { return xBlock.Bytes[0x03]; }
-        }
-
-        public uint[] Data
-        {
-            get
-            {
-                UInt32[] xResult = new UInt32[xDataSize];
-                for (int i = 0; i < xResult.Length; i++)
-                {
-                    xResult[i] = xBlock[(uint)(0x04 * i)];
-                }
-                return xResult;
-            }
-        }
-    }
-
     // Enums
     public enum PortType
     {
@@ -841,13 +659,13 @@ namespace Cosmos.HAL.BlockDevice.Registers
         FISRegisterH2D = 40 / sizeof(uint)
     }
 
-    public enum DriveSignature : uint // Drive Signature to identify what drive is plugged to Port X:X
+    public enum AHCISignature : uint // Drive Signature to identify what drive is plugged to Port X:X
     {
-        SATADrive = 0x00000101,
-        PMDrive = 0x96690101,
-        SATAPIDrive = 0xEB140101,
-        SEMBDrive = 0xC33C0101,
-        NullDrive = 0xFFFFFFFF
+        SATA = 0x0000,
+        PortMultiplier = 0x9669,
+        SATAPI = 0xEB14,
+        SEMB = 0xC33C,
+        Nothing = 0xFFFF
     }
 
     public enum InterfacePowerManagementStatus : uint // SATA Status: Interface Power Management Status 
