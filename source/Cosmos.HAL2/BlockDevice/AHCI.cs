@@ -13,7 +13,9 @@ namespace Cosmos.HAL.BlockDevice
     public class AHCI
     {
         internal static Debugger mAHCIDebugger = new Debugger("HAL", "AHCI");
-        internal static PCIDevice xDevice = HAL.PCI.GetDevice(0x001, 0x0006);
+        internal static PCIDevice xDevice = HAL.PCI.GetDeviceClass(HAL.ClassID.MassStorageController,
+                                                                   HAL.SubclassID.SATAController,
+                                                                   HAL.ProgramIF.SATA_AHCI);
 
         private static List<StoragePort> mPorts = new List<StoragePort>();
         private static GenericRegisters mGeneric;
