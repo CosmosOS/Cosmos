@@ -66,13 +66,12 @@ namespace Cosmos.HAL.BlockDevice
 
         public AHCI(PCIDevice aAHCIDevice)
         {
-            mAHCIDebugger.Send("Something wrong!");
             aAHCIDevice.EnableBusMaster(true);
             aAHCIDevice.EnableMemory(true);
 
             mABAR = aAHCIDevice.BaseAddressBar[5].BaseAddress;
             mGeneric = new GenericRegisters(aAHCIDevice.BaseAddressBar[5].BaseAddress);
-            mGeneric.GlobalHostControl |= (1U << 31);
+            mGeneric.GlobalHostControl |= (1U << 31); // Enable AHCI
 
             GetCapabilities();
             mPorts.Capacity = (int)NumOfPorts;
