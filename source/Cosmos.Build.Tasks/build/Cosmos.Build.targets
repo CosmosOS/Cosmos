@@ -3,7 +3,6 @@
     <PropertyGroup>
         <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
         <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
-        <AssemblySearchPaths>$(AssemblySearchPaths);$(KernelAssembliesDir)</AssemblySearchPaths>
     </PropertyGroup>
     
     <PropertyGroup>
@@ -113,7 +112,7 @@
                 IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
                 DebugCom="1"
                 References="$(TargetPath);@(PlugReference)"
-                AssemblySearchDirs="$(AssemblySearchPaths)"
+                AssemblySearchDirs="$(KernelAssembliesDir)"
                 OutputFilename="$(Il2cpuOutput)"
                 EnableLogging="True"
                 EmitDebugSymbols="$(DebugSymbols)"
