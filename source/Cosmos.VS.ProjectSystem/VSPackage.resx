@@ -136,4 +136,13 @@
   <data name="6" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\VisualBasicProject.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="7" xml:space="preserve">
+    <value>Cosmos Kernel</value>
+  </data>
+  <data name="8" xml:space="preserve">
+    <value>A project for creating an F# Cosmos Kernel.</value>
+  </data>
+  <data name="9" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\FSharpProject.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
