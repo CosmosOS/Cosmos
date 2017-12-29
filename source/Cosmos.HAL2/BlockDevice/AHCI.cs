@@ -259,7 +259,9 @@ namespace Cosmos.HAL.BlockDevice
             if (xDET != DeviceDetectionStatus.DeviceDetectedWithPhy)
                 return PortType.Nothing;
 
-            switch ((AHCISignature)xSignature >> 16)
+            xSignature >>= 16;
+            
+            switch ((AHCISignature)xSignature)
             {
                 case AHCISignature.SATA: return PortType.SATA;
                 case AHCISignature.SATAPI: return PortType.SATAPI;
