@@ -81,6 +81,9 @@ namespace Cosmos.Build.Tasks
             Arguments = refs.Aggregate(Arguments, (current, Ref) => current + "\"References:" + Ref + "\" ");
             Arguments = AssemblySearchDirs.Split(';').Aggregate(Arguments, (current, Dir) => current + "\"AssemblySearchDirs:" + Dir + "\" ");
 
+            // replace \" by \\"
+            Arguments = Arguments.Replace("\\\"", "\\\\\"");
+
             Log.LogMessage(MessageImportance.High, $"Invoking IL2CPU.exe {Arguments}");
 
             return Arguments;

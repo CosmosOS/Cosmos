@@ -1,127 +1,132 @@
 ﻿<Project>
 
-    <PropertyGroup>
-        <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
-        <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
-    </PropertyGroup>
-    
-    <PropertyGroup>
-        <BinFile Condition="'$(BinFile)' == ''">$(OutputPath)$(AssemblyName).bin</BinFile>
-        <IsoFile Condition="'$(IsoFile)' == ''">$(OutputPath)$(AssemblyName).iso</IsoFile>
-    </PropertyGroup>
+  <PropertyGroup>
+    <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
+    <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
+  <PropertyGroup>
+    <BinFile Condition="'$(BinFile)' == ''">$(OutputPath)$(AssemblyName).bin</BinFile>
+    <IsoFile Condition="'$(IsoFile)' == ''">$(OutputPath)$(AssemblyName).iso</IsoFile>
+  </PropertyGroup>
 
-        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)nasm\</NasmToolPath>
-        <NasmToolExe Condition = "'$(NasmToolExe)' == ''">nasm.exe</NasmToolExe>
+  <PropertyGroup>
+    <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
 
-        <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\</LdToolPath>
-        <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
+    <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)nasm\</NasmToolPath>
+    <NasmToolExe Condition = "'$(NasmToolExe)' == ''">nasm.exe</NasmToolExe>
 
-        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\</ObjdumpToolPath>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.exe</ObjdumpToolExe>
+    <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\</LdToolPath>
+    <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
 
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\</MkisofsToolPath>
-        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
-    </PropertyGroup>
+    <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\</ObjdumpToolPath>
+    <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.exe</ObjdumpToolExe>
 
-    <PropertyGroup>
-        <Il2cpuOutput Condition="'$(Il2cpuOutput)' == ''">$(OutputPath)$(AssemblyName).asm</Il2cpuOutput>
+    <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\</MkisofsToolPath>
+    <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
+  </PropertyGroup>
 
-        <NasmOutput Condition="'$(NasmOutput)' == '' AND '$(BinFormat)' == 'ELF'">$(OutputPath)$(AssemblyName).obj</NasmOutput>
-        <NasmOutput Condition="'$(NasmOutput)' == ''">$(OutputPath)$(AssemblyName).bin</NasmOutput>
-        <BinFormat Condition="'$(BinFormat)' == ''">Bin</BinFormat>
-        
-        <_NasmMap>$([System.IO.Path]::GetDirectoryName('$(NasmOutput)'))\main.map</_NasmMap>
-        
-        <MapFile Condition="'$(MapFile)' == ''">$(OutputPath)$(AssemblyName).map</MapFile>
-        <CosmosDebugSymbolsFile Condition="'$(CosmosDebugSymbolsFile)' == ''">$(OutputPath)$(AssemblyName).cdb</CosmosDebugSymbolsFile>
+  <PropertyGroup>
+    <Il2cpuOutput Condition="'$(Il2cpuOutput)' == ''">$(OutputPath)$(AssemblyName).asm</Il2cpuOutput>
 
-        <IntermediateIsoDirectory Condition="'$(IntermediateIsoDirectory)' == ''">$(OutputPath)ISO\</IntermediateIsoDirectory>
-        <ISOLINUX Condition="'$(ISOLINUX)' == ''">$(CosmosToolsPath)isolinux\</ISOLINUX>
-    </PropertyGroup>
+    <NasmOutput Condition="'$(NasmOutput)' == '' AND '$(BinFormat)' == 'ELF'">$(OutputPath)$(AssemblyName).obj</NasmOutput>
+    <NasmOutput Condition="'$(NasmOutput)' == ''">$(OutputPath)$(AssemblyName).bin</NasmOutput>
+    <BinFormat Condition="'$(BinFormat)' == ''">Bin</BinFormat>
 
-    <PropertyGroup>
-        <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
-    </PropertyGroup>
+    <_NasmMap>$([System.IO.Path]::GetDirectoryName('$(NasmOutput)'))\main.map</_NasmMap>
 
-    <ItemGroup>
-        <PlugReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
-        <PlugReference Include="$(KernelAssembliesDir)Cosmos.Core_Plugs.dll" />
-        <PlugReference Include="$(KernelAssembliesDir)Cosmos.Debug.Kernel.Plugs.Asm.dll" />
-        <PlugReference Include="$(KernelAssembliesDir)Cosmos.System2_Plugs.dll" />
-    </ItemGroup>
+    <MapFile Condition="'$(MapFile)' == ''">$(OutputPath)$(AssemblyName).map</MapFile>
+    <CosmosDebugSymbolsFile Condition="'$(CosmosDebugSymbolsFile)' == ''">$(OutputPath)$(AssemblyName).cdb</CosmosDebugSymbolsFile>
 
-    <UsingTask TaskName="Cosmos.Build.Tasks.CreateSyslinuxConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.ReadNasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.TheRingMaster" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <IntermediateIsoDirectory Condition="'$(IntermediateIsoDirectory)' == ''">$(OutputPath)ISO\</IntermediateIsoDirectory>
+    <ISOLINUX Condition="'$(ISOLINUX)' == ''">$(CosmosToolsPath)isolinux\</ISOLINUX>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <CosmosBuildDependsOn>
-            FailIfRelease;
-            TheRingMaster;
-            IL2CPU;
-            Nasm;
-            Ld;
-            ExtractMapFromElfFile;
-            ReadNasmMapToDebugInfo;
-            MakeIso
-        </CosmosBuildDependsOn>
-    </PropertyGroup>
-    
-    <Target Name="CosmosBuild" AfterTargets="Build" DependsOnTargets="$(CosmosBuildDependsOn)" />
+  <PropertyGroup>
+    <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
+  </PropertyGroup>
 
-    <Target Name="FailIfRelease" Condition="'$(Configuration)' == 'Release'">
-        <Error Text="The Release configuration isn't currently supported!" />
-    </Target>
+  <ItemGroup>
+    <PlugReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
+    <PlugReference Include="$(KernelAssembliesDir)Cosmos.Core_Plugs.dll" />
+    <PlugReference Include="$(KernelAssembliesDir)Cosmos.Debug.Kernel.Plugs.Asm.dll" />
+    <PlugReference Include="$(KernelAssembliesDir)Cosmos.System2_Plugs.dll" />
+  </ItemGroup>
 
-    <!--
+  <UsingTask TaskName="Cosmos.Build.Tasks.CreateSyslinuxConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+  <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+  <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+  <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+  <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+  <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+  <UsingTask TaskName="Cosmos.Build.Tasks.ReadNasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+  <UsingTask TaskName="Cosmos.Build.Tasks.TheRingMaster" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+
+  <PropertyGroup>
+    <CosmosBuildDependsOn>
+      FailIfRelease;
+      TheRingMaster;
+      IL2CPU;
+      Nasm;
+      Ld;
+      ExtractMapFromElfFile;
+      ReadNasmMapToDebugInfo;
+      MakeIso
+    </CosmosBuildDependsOn>
+  </PropertyGroup>
+
+  <Target Name="CosmosBuild" AfterTargets="Build" DependsOnTargets="$(CosmosBuildDependsOn)" />
+
+  <Target Name="FailIfRelease" Condition="'$(Configuration)' == 'Release'">
+    <Error Text="The Release configuration isn't currently supported!" />
+  </Target>
+
+  <!--
     ================================================================================
                                       TheRingMaster
     ================================================================================
     -->
-    <Target Name="TheRingMaster">
+  <Target Name="TheRingMaster">
 
-        <!--
+    <!--
             Disabled for now
         -->
-        <!--<TheRingMaster KernelAssemblyPath="$(TargetPath)"
+    <!--<TheRingMaster KernelAssemblyPath="$(TargetPath)"
                        ToolPath="$(TheRingMasterToolPath)"
                        ToolExe="$(TheRingMasterToolExe)" />-->
 
-    </Target>
+  </Target>
 
-    <!-- TODO: IL2CPU should provide targets for this, but how to consume them? implicit package reference? include it
+  <!-- TODO: IL2CPU should provide targets for this, but how to consume them? implicit package reference? include it
                in this package? -->
-    <Target Name="IL2CPU"
-            Inputs="$(TargetPath);@(PlugReference)"
-            Outputs="$(Il2cpuOutput)">
+  <Target Name="IL2CPU"
+          Inputs="$(TargetPath);@(PlugReference)"
+          Outputs="$(Il2cpuOutput)">
 
-        <IL2CPU KernelPkg="$(KernelPkg)"
-                DebugMode="$(DebugMode)"
-                DebugEnabled="$(DebugEnabled)"
-                StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)"
-                StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)"
-                TraceAssemblies="$(TraceAssemblies)"
-                IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
-                DebugCom="1"
-                References="$(TargetPath);@(PlugReference)"
-                AssemblySearchDirs="$(KernelAssembliesDir)"
-                OutputFilename="$(Il2cpuOutput)"
-                EnableLogging="True"
-                EmitDebugSymbols="$(DebugSymbols)"
-                CosmosBuildDir="$(CosmosDir)\Build"
-                WorkingDir="$(TargetDir)"/>
+    <ItemGroup>
+        <AssemblySearchDir Include="$(KernelAssembliesDir)" />
+        <AssemblySearchDir Include="%(ReferencePath.RootDir)%(ReferencePath.Directory)" />
+    </ItemGroup>
 
-    </Target>
-    
-    <!--
+    <IL2CPU KernelPkg="$(KernelPkg)"
+            DebugMode="$(DebugMode)"
+            DebugEnabled="$(DebugEnabled)"
+            StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)"
+            StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)"
+            TraceAssemblies="$(TraceAssemblies)"
+            IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
+            DebugCom="1"
+            References="$(TargetPath);@(PlugReference)"
+            AssemblySearchDirs="@(AssemblySearchDir)"
+            OutputFilename="$(Il2cpuOutput)"
+            EnableLogging="True"
+            EmitDebugSymbols="$(DebugSymbols)"
+            CosmosBuildDir="$(CosmosDir)\Build"
+            WorkingDir="$(TargetDir)"/>
+
+  </Target>
+
+  <!--
     ================================================================================
                                           Nasm
 
@@ -133,19 +138,19 @@
 
     ================================================================================
     -->
-    <Target Name="Nasm"
-            Inputs="$(Il2cpuOutput)"
-            Outputs="$(NasmOutput)">
+  <Target Name="Nasm"
+          Inputs="$(Il2cpuOutput)"
+          Outputs="$(NasmOutput)">
 
-        <NASM InputFile="$(Il2cpuOutput)"
-              OutputFile="$(NasmOutput)"
-              OutputFormat="$(BinFormat)"
-              ToolPath="$(NasmToolPath)"
-              ToolExe="$(NasmToolExe)" />
+    <NASM InputFile="$(Il2cpuOutput)"
+          OutputFile="$(NasmOutput)"
+          OutputFormat="$(BinFormat)"
+          ToolPath="$(NasmToolPath)"
+          ToolExe="$(NasmToolExe)" />
 
-    </Target>
+  </Target>
 
-    <!--
+  <!--
     ================================================================================
                                            Ld
 
@@ -157,22 +162,22 @@
 
     ================================================================================
     -->
-    <Target Name="Ld"
-            Inputs="$(NasmOutput)"
-            Outputs="$(BinFile)"
-            Condition="'$(BinFormat)' == 'ELF'">
+  <Target Name="Ld"
+          Inputs="$(NasmOutput)"
+          Outputs="$(BinFile)"
+          Condition="'$(BinFormat)' == 'ELF'">
 
-        <Ld InputFiles="$(NasmOutput)"
-            OutputFile="$(BinFile)"
-            TextAddress="0x2000000"
-            DataAddress="0x1000000"
-            Entry="Kernel_Start"
-            ToolPath="$(LdToolPath)"
-            ToolExe="$(LdToolExe)" />
+    <Ld InputFiles="$(NasmOutput)"
+        OutputFile="$(BinFile)"
+        TextAddress="0x2000000"
+        DataAddress="0x1000000"
+        Entry="Kernel_Start"
+        ToolPath="$(LdToolPath)"
+        ToolExe="$(LdToolExe)" />
 
-    </Target>
+  </Target>
 
-    <!--
+  <!--
     ================================================================================
                                   ExtractMapFromElfFile
 
@@ -184,20 +189,20 @@
 
     ================================================================================
     -->
-    <Target Name="ExtractMapFromElfFile"
-            Inputs="$(BinFile)"
-            Outputs="$(CosmosDebugSymbolsPath)"
-            Condition="'$(BinFormat)' == 'ELF'">
+  <Target Name="ExtractMapFromElfFile"
+          Inputs="$(BinFile)"
+          Outputs="$(CosmosDebugSymbolsPath)"
+          Condition="'$(BinFormat)' == 'ELF'">
 
-        <ExtractMapFromElfFile InputFile="$(BinFile)"
-                               MapFile="$(MapFile)"
-                               DebugInfoFile="$(CosmosDebugSymbolsFile)"
-                               ToolPath="$(ObjdumpToolPath)"
-                               ToolExe="$(ObjdumpToolExe)" />
+    <ExtractMapFromElfFile InputFile="$(BinFile)"
+                           MapFile="$(MapFile)"
+                           DebugInfoFile="$(CosmosDebugSymbolsFile)"
+                           ToolPath="$(ObjdumpToolPath)"
+                           ToolExe="$(ObjdumpToolExe)" />
 
-    </Target>
+  </Target>
 
-    <!--
+  <!--
     ================================================================================
                                  ReadNasmMapToDebugInfo
 
@@ -209,17 +214,17 @@
 
     ================================================================================
     -->
-    <Target Name="ReadNasmMapToDebugInfo"
-            Inputs="$(_NasmMap)"
-            Outputs="$(CosmosDebugSymbolsPath)"
-            Condition="'$(BinFormat)' != 'ELF'">
+  <Target Name="ReadNasmMapToDebugInfo"
+          Inputs="$(_NasmMap)"
+          Outputs="$(CosmosDebugSymbolsPath)"
+          Condition="'$(BinFormat)' != 'ELF'">
 
-        <ReadNasmMapToDebugInfo MapFile="$(_NasmMap)"
-                                DebugInfoFile="$(CosmosDebugSymbolsFile)" />
+    <ReadNasmMapToDebugInfo MapFile="$(_NasmMap)"
+                            DebugInfoFile="$(CosmosDebugSymbolsFile)" />
 
-    </Target>
+  </Target>
 
-    <!--
+  <!--
     ================================================================================
                                          MakeISO
 
@@ -231,34 +236,34 @@
 
     ================================================================================
     -->
-    <Target Name="MakeIso"
-            Inputs="$(BinFile)"
-            Outputs="$(IsoFile)"
-            Condition="'$(Deployment)' == 'ISO'">
+  <Target Name="MakeIso"
+          Inputs="$(BinFile)"
+          Outputs="$(IsoFile)"
+          Condition="'$(Deployment)' == 'ISO'">
 
-        <ItemGroup>
-            <_ISOLINUX Include="$(ISOLINUX)**" />
-        </ItemGroup>
+    <ItemGroup>
+      <_ISOLINUX Include="$(ISOLINUX)**" />
+    </ItemGroup>
 
-        <MakeDir Directories="$(IntermediateIsoDirectory)" />
+    <MakeDir Directories="$(IntermediateIsoDirectory)" />
 
-        <Copy SourceFiles="@(_ISOLINUX);$(BinFile)"
-              DestinationFolder="$(IntermediateIsoDirectory)" />
+    <Copy SourceFiles="@(_ISOLINUX);$(BinFile)"
+          DestinationFolder="$(IntermediateIsoDirectory)" />
 
-        <CreateSyslinuxConfig IsoDirectory="$(IntermediateIsoDirectory)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
+    <CreateSyslinuxConfig IsoDirectory="$(IntermediateIsoDirectory)"
+                          BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
 
-        <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
-                 OutputFile="$(IsoFile)"
-                 ToolPath="$(MkisofsToolPath)"
-                 ToolExe="$(MkisofsToolExe)" />
+    <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
+             OutputFile="$(IsoFile)"
+             ToolPath="$(MkisofsToolPath)"
+             ToolExe="$(MkisofsToolExe)" />
 
-    </Target>
+  </Target>
 
-    <PropertyGroup>
-        <CosmosDesignTimeTargetsPath Condition="'$(CosmosDesignTimeTargetsPath)'==''">$(MSBuildExtensionsPath)\Cosmos\Cosmos.DesignTime.targets</CosmosDesignTimeTargetsPath>
-    </PropertyGroup>
+  <PropertyGroup>
+    <CosmosDesignTimeTargetsPath Condition="'$(CosmosDesignTimeTargetsPath)'==''">$(MSBuildExtensionsPath)\Cosmos\Cosmos.DesignTime.targets</CosmosDesignTimeTargetsPath>
+  </PropertyGroup>
 
-    <Import Project="$(CosmosDesignTimeTargetsPath)" Condition="'$(CosmosDesignTimeTargetsPath)' != '' AND Exists('$(CosmosDesignTimeTargetsPath)')" />
+  <Import Project="$(CosmosDesignTimeTargetsPath)" Condition="'$(CosmosDesignTimeTargetsPath)' != '' AND Exists('$(CosmosDesignTimeTargetsPath)')" />
 
 </Project>
