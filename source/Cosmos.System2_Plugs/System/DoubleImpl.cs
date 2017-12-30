@@ -88,14 +88,14 @@ namespace Cosmos.System_Plugs.System
             double parsed = 0;
             for (int i = 0; i < internalDigits.Count; i++)
             {
-                parsed += internalDigits[i] * _Pow(10, (internalDigits.Count - (i + 1)));
+                parsed += internalDigits[i] * Math.Pow(10, (internalDigits.Count - (i + 1)));
             }
             for (int i = 0; i < fractionalDigits.Count; i++)
             {
-                parsed += fractionalDigits[i] * _Pow(10, -1 * (i + 1));
+                parsed += fractionalDigits[i] * Math.Pow(10, -1 * (i + 1));
             }
 
-            parsed *= _Pow(10, multiplier);
+            parsed *= Math.Pow(10, multiplier);
             parsed *= sign;
 
             return parsed;
@@ -113,19 +113,6 @@ namespace Cosmos.System_Plugs.System
                 result = 0;
                 return false;
             }
-        }
-
-        //Implement simple Math.Pow operation for whole number exponents, fix until Math.Pow is fixed
-        internal static double _Pow(double x, double y)
-        {
-            if (y == 0) return 1;
-
-            double mult = x;
-            for (int i = 0; i < Math.Abs(y) - 1; i++)
-            {
-                mult *= x;
-            }
-            return (y < 0 ? 1 / mult : mult);
         }
     }
 }
