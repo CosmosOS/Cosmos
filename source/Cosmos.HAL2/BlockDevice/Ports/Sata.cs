@@ -89,7 +89,13 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 Device = 0
             };
             
-            while ((mPortReg.TFD & 0x88) != 0) ;
+            while ((mPortReg.TFD & 0x88) != 0 && xSpin < 1000000);
+
+            if (xSpin == 1000000)
+            {
+                mSATAPIDebugger.Send($"Port {mPortNumber} timed out!");
+                return;
+            };
             
             mPortReg.CI = 1U;
 
