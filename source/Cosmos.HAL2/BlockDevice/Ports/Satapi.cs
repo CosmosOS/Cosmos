@@ -23,11 +23,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             // Check if it is really a SATAPI Port!
             if (aSATAPIPort.mPortType != PortType.SATAPI || (aSATAPIPort.CMD & (1U << 24)) == 0)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("\n[Error]");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($" 0:{aSATAPIPort.mPortNumber} is not a SATAPI port!");
-                return;
+                throw new Exception($"SATAPI Error: 0:{mPortNumber} is not SATAPI port!");
             }
             mSATAPIDebugger.Send("SATAPI Constructor");
 
