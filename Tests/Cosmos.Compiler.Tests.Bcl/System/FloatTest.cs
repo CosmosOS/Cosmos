@@ -12,8 +12,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             float value;
 
-
             #region Parsing
+
             value = float.Parse("0.4");
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.4), "simple parsing of float works");
 
@@ -36,7 +36,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue(float.TryParse("2.3", out value), " float TryParse returns true when it works");
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 2.3), "float TryParse returns correct result when it works");
-            #endregion
+
+            #endregion Parsing
         }
     }
 }

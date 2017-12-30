@@ -249,17 +249,16 @@ namespace Cosmos.System_Plugs.System
             double y, hi = 0, lo = 0, c, t;
             int k = 0, xsb;
 
-            const double one = 1.0,
-                o_threshold = 7.09782712893383973096e+02,
-                u_threshold = -7.45133219101941108420e+02,
-                invln2 = 1.44269504088896338700e+00,
-                twom1000 = 9.33263618503218878990e-302,
-                P1 = 1.66666666666666019037e-01,
-                P2 = -2.77777777770155933842e-03,
-                P3 = 6.61375632143793436117e-05,
-                P4 = -1.65339022054652515390e-06,
-                P5 = 4.13813679705723846039e-08,
-                huge = 1.0e+300;
+            const double o_threshold = 7.09782712893383973096e+02;
+            const double u_threshold = -7.45133219101941108420e+02;
+            const double invln2 = 1.44269504088896338700e+00;
+            const double twom1000 = 9.33263618503218878990e-302;
+            const double P1 = 1.66666666666666019037e-01;
+            const double P2 = -2.77777777770155933842e-03;
+            const double P3 = 6.61375632143793436117e-05;
+            const double P4 = -1.65339022054652515390e-06;
+            const double P5 = 4.13813679705723846039e-08;
+            const double huge = 1.0e+300;
 
             int hx = HighWord(x); //Highword of x
 
@@ -271,13 +270,15 @@ namespace Cosmos.System_Plugs.System
             {           /* if |x|>=709.78... */
                 if (hx >= 0x7ff00000)
                 {
-                    Console.WriteLine("Low word! Text");
                     if (((hx & 0xfffff) | LowWord(x)) != 0) //Assume that __Lo(x) is lower word of x
                         return x;       /* NaN */
-                    else return (xsb == 0) ? x : 0.0;   /* exp(+-inf)={inf,0} */
+                    else
+                        return (xsb == 0) ? x : 0.0;   /* exp(+-inf)={inf,0} */
                 }
-                if (x > o_threshold) throw new OverflowException(); /* overflow */
-                if (x < u_threshold) return double.MinValue; /* underflow */
+                if (x > o_threshold)
+                    return double.PositiveInfinity; /* overflow */
+                if (x < u_threshold)
+                    return 0; /* underflow */
             }
 
             /* argument reduction */
@@ -299,8 +300,10 @@ namespace Cosmos.System_Plugs.System
                 }
                 else
                 {
-                    if (xsb == 0) k = (int)(invln2 * x + 0.5);
-                    else k = (int)(invln2 * x + -0.5);
+                    if (xsb == 0)
+                        k = (int)(invln2 * x + 0.5);
+                    else
+                        k = (int)(invln2 * x + -0.5);
                     t = k;
                     hi = x - t * 6.93147180369123816490e-01;
                     lo = t * 1.90821492927058770002e-10;
@@ -309,16 +312,20 @@ namespace Cosmos.System_Plugs.System
             }
             else if (hx < 0x3e300000)
             {   /* when |x|<2**-28 */
-                if (huge + x > one) return one + x;/* trigger inexact */
+                if (huge + x > 1)
+                    return 1 + x;/* trigger inexact */
             }
-            else k = 0;
+            else
+                k = 0;
 
             /* x is now in primary range */
             t = x * x;
             c = x - t * (P1 + t * (P2 + t * (P3 + t * (P4 + t * P5))));
 
-            if (k == 0) return 1 - ((x * c) / (c - 2.0) - x);
-            else y = 1 - ((lo - (x * c) / (2.0 - c)) - hi);
+            if (k == 0)
+                return 1 - ((x * c) / (c - 2.0) - x);
+            else
+                y = 1 - ((lo - (x * c) / (2.0 - c)) - hi);
 
             if (k >= -1021)
             {
@@ -327,13 +334,9 @@ namespace Cosmos.System_Plugs.System
 
                 /* add k to y's exponent */
                 if (BitConverter.IsLittleEndian)
-                {
                     _y += ((long)k << 52);
-                }
                 else
-                {
                     _y += ((long)k << 20);
-                }
                 y = BitConverter.Int64BitsToDouble(_y);
                 return y;
             }
@@ -343,13 +346,9 @@ namespace Cosmos.System_Plugs.System
                 long _y = BitConverter.DoubleToInt64Bits(y);
 
                 if (BitConverter.IsLittleEndian)
-                {
                     _y += ((long)k + 1000 << 52);
-                }
                 else
-                {
                     _y += ((long)k + 1000 << 20);
-                }
                 y = BitConverter.Int64BitsToDouble(_y);
                 return y * twom1000;
             }
