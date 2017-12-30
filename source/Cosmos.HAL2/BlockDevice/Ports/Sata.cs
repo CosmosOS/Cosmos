@@ -89,7 +89,9 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 Device = 0
             };
             
-            while ((mPortReg.TFD & 0x88) != 0 && xSpin < 1000000);
+            int xSpin = 0;
+            
+            while ((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
 
             if (xSpin == 1000000)
             {
@@ -181,7 +183,15 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 };
             }
             
-            while ((mPortReg.TFD & 0x88) != 0);
+            int xSpin = 0;
+            
+            while ((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
+
+            if (xSpin == 1000000)
+            {
+                mSATAPIDebugger.Send($"Port {mPortNumber} timed out!");
+                return;
+            };
             
             mPortReg.CI = 1U;
 
@@ -247,8 +257,16 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 CountH = (byte)((aCount >> 8) & 0xFF)
             };
             
-            while ((mPortReg.TFD & 0x88) != 0) ;
+            int xSpin = 0;
+            
+            while ((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
 
+            if (xSpin == 1000000)
+            {
+                mSATAPIDebugger.Send($"Port {mPortNumber} timed out!");
+                return;
+            };
+            
             mPortReg.CI = 1U;
 
             while (true)
