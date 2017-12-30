@@ -91,10 +91,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
 
             if (xSpin == 1000000)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("\n[Error]: ");
-                Console.Write("Port timed out!");
-                Console.ResetColor();
+                mSATAPIDebugger.Send($"Port {mPortNumber} timed out!");
                 return;
             };
 
@@ -102,33 +99,20 @@ namespace Cosmos.HAL.BlockDevice.Ports
 
             while(true)
             {
-                if((mPortReg.CI & (1 << xSlot)) == 0)
-                {
-                    break;
-                }
+                if((mPortReg.CI & (1 << xSlot)) == 0) break;
                 if ((mPortReg.IS & (1 << 30)) != 0)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.Write("\n[Fatal]: ");
-                    Console.Write("Fatal error occurred while sending command!");
-                    Console.ResetColor();
+                    throw new Exception("SATA Fatal error: Command aborted");
+                    //mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
+                    //PortReset(mPortReg);
                     return;
                 }
             }
 
-            if ((mPortReg.IS & (1 << 30)) != 0)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("\n[Fatal]: ");
-                Console.Write("Fatal error occurred while sending command!");
-                Console.ResetColor();
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("\n[Success]: ");
-            Console.Write("Command has been sent successfully!");
-            Console.ResetColor();
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //Console.Write("\n[Success]: ");
+            //Console.Write("Command has been sent successfully!");
+            //Console.ResetColor();
 
             return;
         }
@@ -144,10 +128,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
                     return i;
                 xSlots >>= 1;
             }
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("\n[Error]: ");
-            Console.Write("Cannot find a free command slot!");
-            Console.ResetColor();
+            mSATAPIDebugger.Send("SATA Error: Cannot find a free command slot!");
             return -1;
         }
 
@@ -164,7 +145,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
 
         public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
         {
-
+            // To be implemented!
         }
     }
 }
