@@ -35,11 +35,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             // Check if it is really a SATA Port!
             if (aSATAPort.mPortType != PortType.SATA || (aSATAPort.CMD & (1U << 24)) != 0)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("[Error]");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($" 0:{aSATAPort.mPortNumber} is not a SATA port!\n");
-                return;
+                throw new Exception($" 0:{aSATAPort.mPortNumber} is not a SATA port!\n");
             }
 
             Mem = new Core.MemoryGroup.AHCI((uint)RegularSectorSize);
@@ -102,8 +98,9 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 if ((mPortReg.CI & (1 << xSlot)) == 0) break;
                 if ((mPortReg.IS & (1 << 30)) != 0)
                 {
-                    mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
-                    PortReset(mPortReg);
+                    throw new Exception("SATA Fatal error: Command aborted");
+                    //mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
+                    //PortReset(mPortReg);
                     return;
                 }
             }
@@ -187,8 +184,9 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 if ((mPortReg.CI & (1 << xSlot)) == 0) break;
                 if ((mPortReg.IS & (1 << 30)) != 0)
                 {
-                    mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
-                    PortReset(mPortReg);
+                    throw new Exception("SATA Fatal error: Command aborted");
+                    //mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
+                    //PortReset(mPortReg);
                     return;
                 }
             }
@@ -252,8 +250,9 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 if ((mPortReg.CI & (1 << xSlot)) == 0) break;
                 if ((mPortReg.IS & (1 << 30)) != 0)
                 {
-                    mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
-                    PortReset(mPortReg);
+                    throw new Exception("SATA Fatal error: Command aborted");
+                    //mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
+                    //PortReset(mPortReg);
                     return;
                 }
             }
