@@ -91,7 +91,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             
             int xSpin = 0;
             
-            while ((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
+            while (((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
 
             if (xSpin == 1000000)
             {
@@ -185,7 +185,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             
             int xSpin = 0;
             
-            while ((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
+            while (((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
 
             if (xSpin == 1000000)
             {
@@ -259,7 +259,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             
             int xSpin = 0;
             
-            while ((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
+            while (((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000) xSpin++;
 
             if (xSpin == 1000000)
             {
