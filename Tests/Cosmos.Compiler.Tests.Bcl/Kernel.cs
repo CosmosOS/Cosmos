@@ -37,7 +37,6 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BooleanTest.Execute();
                 SingleTest.Execute();
                 DoubleTest.Execute();
-                FloatTest.Execute();
                 MathTest.Execute();
                 //DecimalTest.Execute();
                 BitConverterTest.Execute();
