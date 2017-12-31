@@ -440,9 +440,51 @@ namespace Cosmos.System_Plugs.System
         {
             if (e == 0) return 1;
             if (e == 1) return b;
+            if (double.IsNaN(b) || double.IsNaN(e)) return double.NaN;
+            if (double.IsNegativeInfinity(b))
+            {
+                if (e < 0)
+                    return 0;
+                if ((long)e % 2 == 0)
+                    return double.PositiveInfinity;
+                else
+                    return double.NegativeInfinity;
+            }
+            if (double.IsPositiveInfinity(b))
+            {
+                if (e < 0)
+                    return 0;
+                else
+                    return double.PositiveInfinity;
+            }
+            if (double.IsInfinity(e))
+            {
+                bool t = -1 < b;
+                bool t1 = 1 > b;
+                if (t && t1)
+
+                    if (double.IsPositiveInfinity(e))
+                        return 0;
+                    else
+                        return double.PositiveInfinity;
+                else
+                {
+                    bool v = b < -1;
+                    bool v1 = 1 < b;
+                    if (v || v1)
+                    {
+                        if (double.IsPositiveInfinity(e))
+                            return double.PositiveInfinity;
+                        else
+                            return 0;
+                    }
+                    else
+                        return double.NaN;
+                }
+            }
             if (b < 0)
             {
-                if (Math.Abs(e % 1) <= (Double.Epsilon * 100)) throw new ArgumentException("This will produce non-real answer");
+                if (Math.Abs(e) - Math.Abs((int)e) > (Double.Epsilon * 100)) return double.NaN;
                 double logedBase = Math.Log(Math.Abs(b));
                 double pow = Exp(logedBase * e);
                 if ((long)e % 2 == 0) return pow;
