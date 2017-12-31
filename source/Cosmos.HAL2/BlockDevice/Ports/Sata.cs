@@ -95,7 +95,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
 
             if (xSpin == 1000000)
             {
-                mSATAPIDebugger.Send($"Port {mPortNumber} timed out!");
+                mSATADebugger.Send($"Port {mPortNumber} timed out!");
                 return;
             };
             
@@ -189,7 +189,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
 
             if (xSpin == 1000000)
             {
-                mSATAPIDebugger.Send($"Port {mPortNumber} timed out!");
+                mSATADebugger.Send($"Port {mPortNumber} timed out!");
                 return;
             };
             
@@ -263,7 +263,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
 
             if (xSpin == 1000000)
             {
-                mSATAPIDebugger.Send($"Port {mPortNumber} timed out!");
+                mSATADebugger.Send($"Port {mPortNumber} timed out!");
                 return;
             };
             
