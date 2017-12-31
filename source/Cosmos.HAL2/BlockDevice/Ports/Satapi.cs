@@ -4,12 +4,13 @@ using System.Text;
 using Cosmos.Core.Memory.Old;
 using Cosmos.HAL.BlockDevice.Registers;
 using Cosmos.Core;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL.BlockDevice.Ports
 {
     public class SATAPI : StoragePort
     {
-        public Debug.Kernel.Debugger mSATAPIDebugger = new Debug.Kernel.Debugger("HAL", "SATAPI");
+        internal static Debugger mSATAPIDebugger = new Debugger("HAL", "SATAPI");
 
         public PortRegisters mPortReg;
 
