@@ -1,6 +1,22 @@
 @echo off
 cls
 
+echo Check for installed .NET Framework 4.7.1
+
+FOR /F "tokens=2*" %%A IN ('REG.EXE QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" /V "Release" 2^>NUL ^| FIND "REG_DWORD"') DO SET Ver=%%B
+IF "%Ver%"=="" (
+  echo .NET Framework 4.7.1 or 4.5 or above 4.5 is not installed. Please download from https://www.microsoft.com/net/download/visual-studio-sdks
+  pause
+  goto:eof
+)
+SET "NET471_CREATORS=0x709fc"
+
+if NOT "%NET471_CREATORS%"=="%Ver%" (
+  echo .NET Framework 4.7.1 is required.
+  pause
+  goto:eof
+)
+
 set NuGet=Build\Tools\nuget.exe
 set VSWhere=Build\Tools\vswhere.exe
 

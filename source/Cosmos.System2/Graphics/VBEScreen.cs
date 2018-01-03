@@ -160,6 +160,27 @@ namespace Cosmos.System
         {
             throw new NotImplementedException();
         }
+
+        /* This is just temp */
+        public override void DrawArray(Color[] colors, int x, int y, int width, int height)
+        {
+            ThrowIfCoordNotValid(x, y);
+            
+            ThrowIfCoordNotValid(x + width, y + height);
+
+            for (int i = 0; i < x; i++)
+            {
+
+                for (int ii = 0; ii < y; ii++)
+                {
+
+                    DrawPoint(new Pen(colors[i + (ii * width)]), i, ii);
+
+                }
+
+            }
+        }
+
         #endregion
 
         #region Reading
