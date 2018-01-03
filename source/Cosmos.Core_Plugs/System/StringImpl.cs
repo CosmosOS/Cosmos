@@ -865,151 +865,35 @@ namespace Cosmos.Core_Plugs.System
             return aFirstChar;
         }
 
-        /*
-         * This function has been copied straight from CoreRt, it seems a sort of conversion from ASM or C of a safe
-         * memcmp() in future it could become MemoryOperations.Compare()
-         */
-        private static unsafe int FastCompareStringHelper(uint* strAChars, int countA, uint* strBChars, int countB)
-        {
-            int count = (countA < countB) ? countA : countB;
-
-#if BIT64
-            long diff = (long)((byte*)strAChars - (byte*)strBChars);
-#else
-            int diff = (int)((byte*)strAChars - (byte*)strBChars);
-#endif
-
-#if BIT64
-            int alignmentA = (int)((long)strAChars) & (sizeof(IntPtr) - 1);
-            int alignmentB = (int)((long)strBChars) & (sizeof(IntPtr) - 1);
-
-            if (alignmentA == alignmentB)
-            {
-                if ((alignmentA == 2 || alignmentA == 6) && (count >= 1))
-                {
-                    char* ptr2 = (char*)strBChars;
-
-                    if ((*((char*)((byte*)ptr2 + diff)) - *ptr2) != 0)
-                        return ((int)*((char*)((byte*)ptr2 + diff)) - (int)*ptr2);
-
-                    strBChars = (uint*)(++ptr2);
-                    count -= 1;
-                    alignmentA = (alignmentA == 2 ? 4 : 0);
-                }
-
-                if ((alignmentA == 4) && (count >= 2))
-                {
-                    uint* ptr2 = (uint*)strBChars;
-
-                    if ((*((uint*)((byte*)ptr2 + diff)) - *ptr2) != 0)
-                    {
-                        char* chkptr1 = (char*)((byte*)strBChars + diff);
-                        char* chkptr2 = (char*)strBChars;
-
-                        if (*chkptr1 != *chkptr2)
-                            return ((int)*chkptr1 - (int)*chkptr2);
-                        return ((int)*(chkptr1 + 1) - (int)*(chkptr2 + 1));
-                    }
-                    strBChars = ++ptr2;
-                    count -= 2;
-                    alignmentA = 0;
-                }
-
-                if ((alignmentA == 0))
-                {
-                    while (count >= 4)
-                    {
-                        long* ptr2 = (long*)strBChars;
-
-                        if ((*((long*)((byte*)ptr2 + diff)) - *ptr2) != 0)
-                        {
-                            if ((*((uint*)((byte*)ptr2 + diff)) - *(uint*)ptr2) != 0)
-                            {
-                                char* chkptr1 = (char*)((byte*)strBChars + diff);
-                                char* chkptr2 = (char*)strBChars;
-
-                                if (*chkptr1 != *chkptr2)
-                                    return ((int)*chkptr1 - (int)*chkptr2);
-                                return ((int)*(chkptr1 + 1) - (int)*(chkptr2 + 1));
-                            }
-                            else
-                            {
-                                char* chkptr1 = (char*)((uint*)((byte*)strBChars + diff) + 1);
-                                char* chkptr2 = (char*)((uint*)strBChars + 1);
-
-                                if (*chkptr1 != *chkptr2)
-                                    return ((int)*chkptr1 - (int)*chkptr2);
-                                return ((int)*(chkptr1 + 1) - (int)*(chkptr2 + 1));
-                            }
-                        }
-                        strBChars = (uint*)(++ptr2);
-                        count -= 4;
-                    }
-                }
-
-                {
-                    char* ptr2 = (char*)strBChars;
-                    while ((count -= 1) >= 0)
-                    {
-                        if ((*((char*)((byte*)ptr2 + diff)) - *ptr2) != 0)
-                            return ((int)*((char*)((byte*)ptr2 + diff)) - (int)*ptr2);
-                        ++ptr2;
-                    }
-                }
-            }
-            else
-#endif // BIT64
-            {
-#if BIT64
-                if (Math.Abs(alignmentA - alignmentB) == 4)
-                {
-                    if ((alignmentA == 2) || (alignmentB == 2))
-                    {
-                        char* ptr2 = (char*)strBChars;
-
-                        if ((*((char*)((byte*)ptr2 + diff)) - *ptr2) != 0)
-                            return ((int)*((char*)((byte*)ptr2 + diff)) - (int)*ptr2);
-                        strBChars = (uint*)(++ptr2);
-                        count -= 1;
-                    }
-                }
-#endif // BIT64
-
-                // Loop comparing a DWORD at a time.
-                // Reads are potentially unaligned
-                while ((count -= 2) >= 0)
-                {
-                    if ((*((uint*)((byte*)strBChars + diff)) - *strBChars) != 0)
-                    {
-                        char* ptr1 = (char*)((byte*)strBChars + diff);
-                        char* ptr2 = (char*)strBChars;
-                        if (*ptr1 != *ptr2)
-                            return ((int)*ptr1 - (int)*ptr2);
-                        return ((int)*(ptr1 + 1) - (int)*(ptr2 + 1));
-                    }
-                    ++strBChars;
-                }
-
-                int c;
-                if (count == -1)
-                    if ((c = *((char*)((byte*)strBChars + diff)) - *((char*)strBChars)) != 0)
-                        return c;
-            }
-
-            return countA - countB;
-        }
-
         public static unsafe int CompareOrdinalHelper(string strA, int indexA, int countA, string strB, int indexB, int countB)
         {
             // Please note that Argument validation should be handled by callers.
+            int count = (countA < countB) ? countA : countB;
+            int xResult = 0;
 
-            // Set up the loop variables.
-            fixed (char* pStrA = strA, pStrB = strB)
+            strA = strA.Substring(indexA);
+            strB = strB.Substring(indexB);
+
+            /*
+             * This optimization is not taking effect yet in Cosmos as String.Intern() is not implemented
+             */ 
+            if (ReferenceEquals(strA, strB))
             {
-                char* strAChars = pStrA + indexA;
-                char* strBChars = pStrB + indexB;
-                return FastCompareStringHelper((uint*)strAChars, countA, (uint*)strBChars, countB);
+                mDebugger.SendInternal($"strA ({strA}) is the same object of strB ({strB}) returning 0");
+                return 0;
             }
+            else
+                mDebugger.SendInternal($"strA ({strA}) is NOT the same object of StrB ({strB})");
+
+            for (int i = 0; i < count; i++)
+            {
+                xResult = strA[i] - strB[i];
+                // Different characters we have finished
+                if (xResult != 0)
+                    break;
+            }
+
+            return xResult;
         }
 
         public static int CompareOrdinalHelperIgnoreCase(string strA, int indexA, int countA, string strB, int indexB, int countB)

@@ -15,13 +15,6 @@ namespace Cosmos.System_Plugs.System.IO
     [Plug(Target = typeof(DirectoryInfo))]
     public static class DirectoryInfoImpl
     {
-        public static bool get_Exists(DirectoryInfo aThis)
-        {
-            string aPath = aThis.FullName;
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.Exists : aPath = {aPath}");
-            return VFSManager.DirectoryExists(aPath);
-        }
-
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
         public static DirectoryInfo[] GetDirectories(DirectoryInfo aThis)
         {

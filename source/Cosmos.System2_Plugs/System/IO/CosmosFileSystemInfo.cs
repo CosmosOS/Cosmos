@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 using System.IO;
 using IL2CPU.API.Attribs;
 using Cosmos.System;
@@ -16,12 +16,15 @@ namespace Cosmos.System_Plugs.System.IO
     [Plug(Target = typeof(FileSystemInfo))]
     public static class CosmosFileSystemInfo
     {
-        [PlugMethod(Signature = "System_Boolean__System_IO_FileSystemInfo__System_IO_IFileSystemObject_get_Exists")]
+        [PlugMethod(Signature = "System_Boolean__System_IO_FileSystemInfo_System_IO_IFileSystemObject_get_Exists__")]                               
         public static bool get_Exists(FileSystemInfo aThis)
         {
             Global.mFileSystemDebugger.SendInternal($"FileSystemInfo.get_Exists : fullPath = {aThis.FullName}");
             // TODO we have to find if 'aThis' is a DirectoryInfo or a FileInfo to decide what method to call
-            return VFSManager.DirectoryExists(aThis.FullName);
+            if (aThis is DirectoryInfo)
+                return VFSManager.DirectoryExists(aThis.FullName);
+            else
+                return VFSManager.FileExists(aThis.FullName);
         }
 
         public static FileAttributes get_Attributes(FileSystemInfo aThis)
