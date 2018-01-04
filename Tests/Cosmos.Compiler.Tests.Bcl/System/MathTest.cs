@@ -12,6 +12,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             double result;
 
+            #region Math.Sqrt
+
             // Test with small number
             result = Math.Sqrt(16);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 4), "Sqrt does not produce accurate result with small input");
@@ -35,6 +37,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Test with positive infinity
             result = Math.Sqrt(double.PositiveInfinity);
             Assert.IsTrue(double.IsPositiveInfinity(result), "Sqrt of PositiveInfinity must return PositiveInfinity");
+
+            #endregion Math.Sqrt
 
             #region Math.Exp
 

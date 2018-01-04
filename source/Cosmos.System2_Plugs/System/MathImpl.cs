@@ -229,20 +229,6 @@ namespace Cosmos.System_Plugs.System
         */
 
         // Look at http://www.netlib.org/fdlibm/e_exp.c for more a in deth explanation
-        private static int HighWord(double x)
-        {
-            long value = BitConverter.DoubleToInt64Bits(x);
-            Byte[] valueBytes = BitConverter.GetBytes(value);
-            int offset = BitConverter.IsLittleEndian ? 4 : 0;
-            return BitConverter.ToInt32(valueBytes, offset);
-        }
-
-        private static int LowWord(double x) //Opposite of high word
-        {
-            long value = BitConverter.DoubleToInt64Bits(x);
-            Byte[] valueBytes = BitConverter.GetBytes(value);
-            return BitConverter.ToInt32(valueBytes, BitConverter.IsLittleEndian ? 0 : 4);
-        }
 
         public static double Exp(double x)
         {
@@ -545,38 +531,141 @@ namespace Cosmos.System_Plugs.System
 
         #region Sqrt
 
+        /*
+         * ====================================================
+         * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+         *
+         * Developed at SunSoft, a Sun Microsystems, Inc. business.
+         * Permission to use, copy, modify, and distribute this
+         * software is freely granted, provided that this notice
+         * is preserved.
+         * ====================================================
+         */
+
         public static double Sqrt(double x)
         {
-            long x1;
-            double x2;
-            int i;
+            double z = 0;
+            const uint sign = 0x80000000;
+            uint r, t1, s1, ix1, q1;
+            int ix0, s0, q, m, t, i;
 
-            if (double.IsNaN(x) || x < 0)
-                return double.NaN;
+            ix0 = HighWord(x);          /* high word of x */
+            ix1 = (uint)LowWord(x);      /* low word of x */
 
-            if (double.IsPositiveInfinity(x))
-                return double.PositiveInfinity;
-
-            if (x == 0F)
-                return 0F;
-
-            // Approximating the square root value
-            // This makes use of IEEE 754 double-precision floating point format
-            // Sign: 1 bit, Exponent: 11 bits, Signficand: 52 bits
-            x1 = BitConverter.DoubleToInt64Bits(x);
-            x1 -= 1L << 53;
-            x1 >>= 1;
-            x1 += 1L << 61;
-
-            x2 = BitConverter.Int64BitsToDouble(x1);
-
-            // Use Newton's Method
-            for (i = 0; i < 5; i++)
+            /* take care of Inf and NaN */
+            if ((ix0 & 0x7ff00000) == 0x7ff00000)
+                return x * x + x;       /* sqrt(NaN)=NaN, sqrt(+inf)=+inf sqrt(-inf)=sNaN */
+            /* take care of zero */
+            if (ix0 <= 0)
             {
-                x2 = x2 - (x2 * x2 - x) / (2 * x2);
+                if (((ix0 & (~0x80000000)) | ix1) == 0)
+                    return x;/* sqrt(+-0) = +-0 */
+                else if (ix0 < 0)
+                    return (x - x) / (x - x);       /* sqrt(-ve) = sNaN */
+            }
+            /* normalize x */
+            m = (ix0 >> 20);
+            if (m == 0)
+            {               /* subnormal x */
+                while (ix0 == 0)
+                {
+                    m -= 21;
+                    ix0 |= ((int)ix1 >> 11); ix1 <<= 21;
+                }
+                for (i = 0; (ix0 & 0x00100000) == 0; i++) ix0 <<= 1;
+                m -= i - 1;
+                ix0 |= ((int)ix1 >> (32 - i));
+                ix1 <<= i;
+            }
+            m -= 1023;  /* unbias exponent */
+            ix0 = (ix0 & 0x000fffff) | 0x00100000;
+            if ((m & 1) % 2 != 0)
+            {   /* odd m, double x to make it even */
+                ix0 += ix0 + (int)((long)(ix1 & sign) >> 31);
+                ix1 += ix1;
+            }
+            m >>= 1;    /* m = [m/2] */
+
+            /* generate sqrt(x) bit by bit */
+            ix0 += ix0 + (int)((long)(ix1 & sign) >> 31);
+            ix1 += ix1;
+            s1 = 0;
+            s0 = (int)s1;
+            q1 = (uint)s0;
+            q = (int)q1;   /* [q,q1] = sqrt(x) */
+            r = 0x00200000;     /* r = moving bit from right to left */
+
+            while (r != 0)
+            {
+                t = s0 + (int)r;
+                if (t <= ix0)
+                {
+                    s0 = t + (int)r;
+                    ix0 -= t;
+                    q += (int)r;
+                }
+                ix0 += ix0 + ((int)(ix1 & sign) >> 31);
+                ix1 += ix1;
+                r >>= 1;
             }
 
-            return x2;
+            r = sign;
+            while (r != 0)
+            {
+                t1 = s1 + r;
+                t = s0;
+                if ((t < ix0) || ((t == ix0) && (t1 <= ix1)))
+                {
+                    s1 = t1 + r;
+                    if (((t1 & sign) == sign) && (s1 & sign) == 0) s0 += 1;
+                    ix0 -= t;
+                    if (ix1 < t1) ix0 -= 1;
+                    ix1 -= t1;
+                    q1 += r;
+                }
+                ix0 += ix0 + ((int)(ix1 & sign) >> 31);
+                ix1 += ix1;
+                r >>= 1;
+            }
+
+            /* use floating add to find out rounding direction */
+            if ((ix0 | ix1) != 0)
+            {
+                z = 1 - 1.0e-300; /* trigger inexact flag */
+                if (z >= 1)
+                {
+                    z = 1 + 1.0e-300;
+                    if (q1 == 0xffffffff)
+                    {
+                        q1 = 0; q += 1;
+                    }
+                    else if (z > 1)
+                    {
+                        if (q1 == 0xfffffffe)
+                            q += 1;
+                        q1 += 2;
+                    }
+                    else
+                        q1 += (q1 & 1);
+                }
+            }
+            ix0 = (q >> 1) + 0x3fe00000;
+            ix1 = q1 >> 1;
+            if ((q & 1) == 1) ix1 |= sign;
+            ix0 += (m << 20);
+
+            long value = BitConverter.DoubleToInt64Bits(x);
+            Byte[] valueBytes = BitConverter.GetBytes(value);
+            int offset = BitConverter.IsLittleEndian ? 4 : 0;
+            Byte[] toAddHigher = BitConverter.GetBytes(ix0);
+            Byte[] toAddLower = BitConverter.GetBytes(ix1);
+            for (int I = 0; I < 4; I++)
+            {
+                valueBytes[I + offset] = toAddHigher[I];
+                valueBytes[I] = toAddLower[I];
+            }
+            long _bits = BitConverter.ToInt64(valueBytes, 0);
+            return BitConverter.Int64BitsToDouble(_bits);
         }
 
         #endregion Sqrt
@@ -675,16 +764,6 @@ namespace Cosmos.System_Plugs.System
 
         #endregion Truncate
 
-        //#region Factorial (only used in Sin(), not plug )
-        //public static int Factorial(int n)
-        //{
-        //    if (n == 0)
-        //        return 1;
-        //    else
-        //        return n * Factorial(n - 1);
-        //}
-        //#endregion
-
         #region Internaly used functions
 
         #region expm1
@@ -773,6 +852,25 @@ namespace Cosmos.System_Plugs.System
         }
 
         #endregion atanx
+
+        #region Words
+
+        private static int HighWord(double x)
+        {
+            long value = BitConverter.DoubleToInt64Bits(x);
+            Byte[] valueBytes = BitConverter.GetBytes(value);
+            int offset = BitConverter.IsLittleEndian ? 4 : 0;
+            return BitConverter.ToInt32(valueBytes, offset);
+        }
+
+        private static int LowWord(double x) //Opposite of high word
+        {
+            long value = BitConverter.DoubleToInt64Bits(x);
+            Byte[] valueBytes = BitConverter.GetBytes(value);
+            return BitConverter.ToInt32(valueBytes, BitConverter.IsLittleEndian ? 0 : 4);
+        }
+
+        #endregion Words
 
         #endregion Internaly used functions
     }
