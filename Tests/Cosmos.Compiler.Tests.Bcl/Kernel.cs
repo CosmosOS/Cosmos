@@ -42,6 +42,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
+                EncodingTest.Execute();
                 RandomTests.Execute();
 
                 System.Collections.Generic.ListTest.Execute();
