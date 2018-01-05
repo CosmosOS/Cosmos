@@ -9,17 +9,6 @@ namespace Cosmos.System2_Plugs.System.IO
     [Plug(Target = typeof(FileInfo))]
     public static class FileInfoImpl
     {
-        /*
-         * If I try to remove this as done with DirectoryInfo the satanic IFileSystemObject.get_Exists
-         * of CosmosFileSystemInfo is not found... again! Why works with DirectoryInfo and not with FileInfo?
-         */
-        public static bool get_Exists(FileInfo aThis)
-        {
-            string aPath = aThis.FullName;
-            Global.mFileSystemDebugger.SendInternal($"FileInfo.Exists : aPath = {aPath}");
-            return VFSManager.FileExists(aPath);
-        }
-
         /* Optimize this: CosmosVFS should expose an attribute without the need to open the file for reading... */
         public static long get_Length(FileInfo aThis)
         {
