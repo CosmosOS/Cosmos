@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 using System.IO;
 using IL2CPU.API.Attribs;
 using Cosmos.System;

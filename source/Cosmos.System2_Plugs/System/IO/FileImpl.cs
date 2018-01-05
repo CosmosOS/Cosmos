@@ -40,7 +40,9 @@ namespace Cosmos.System_Plugs.System.IO
             using (var xSW = new StreamWriter(aFile))
             {
                 foreach (var current in contents)
+                { 
                     xSW.WriteLine(current);
+                }
             }
         }
     }
