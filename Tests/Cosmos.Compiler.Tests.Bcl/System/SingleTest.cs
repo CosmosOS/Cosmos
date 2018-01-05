@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmos.Compiler.Tests.Bcl.Helper;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    class SingleTest
+    internal class SingleTest
     {
         /* The single== equality operator is so imprecise to not be really ever useful we should be happy if the two values are "similar" */
+
         private static bool SinglesAreEqual(Single left, Single right)
         {
             // Define the tolerance for variation in their values
-            Single difference = (Single) Math.Abs(left * .00001);
+            Single difference = (Single)Math.Abs(left * .00001);
 
             if (Math.Abs(left - right) <= difference)
                 return true;
@@ -62,7 +64,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             expectedResult = "-42.42";
 
             Assert.IsTrue((result == expectedResult), "Single.ToString of negative number doesn't work");
-            
+
             /* A big value (to be correct toString should convert it in scientific notation) */
             value = 9223372036854775808f;
 
@@ -73,7 +75,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             /* OK now a normal value */
             value = 42.42F; // It exists Single.MaxValue but it is a too big value an can be represented only on Scientific notation but then how to confront with a String?
-           
+
             result = value.ToString();
             expectedResult = "42.42";
 
@@ -206,6 +208,33 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = 42.0f;
             valueNegated = -value;
             Assert.IsTrue((SinglesAreEqual(valueNegated, -42.0f)), "(float) negation of positive float doesn't work");
+
+            #region Parsing
+
+            value = float.Parse("0.4");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.4), "simple parsing of float works");
+
+            value = float.Parse("+0.3");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.3), "parsing of float with positive sign works!");
+
+            value = float.Parse("-0.4");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, -0.4), "parsing of negative float works!");
+
+            value = float.Parse("    0.7     ");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.7), "float parsing ignores leading and trailing whitespaces");
+
+            value = float.Parse("0.4E1");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 4), "float parsing takes in account E");
+
+            value = float.Parse("0.4E-1");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.04), "float parsing works with negative E");
+
+            Assert.IsFalse(float.TryParse("asd4", out value), "float TryParse returns false when it fails");
+
+            Assert.IsTrue(float.TryParse("2.3", out value), " float TryParse returns true when it works");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 2.3), "float TryParse returns correct result when it works");
+
+            #endregion Parsing
         }
     }
 }
