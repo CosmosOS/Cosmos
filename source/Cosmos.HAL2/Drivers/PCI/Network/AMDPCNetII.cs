@@ -151,7 +151,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static bool NetworkCardAvailable()
         {
             PCIDevice device;
-            device = HAL.PCI.GetDevice(0x1022, 0x2000);
+            device = HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
             if (device != null)
             {
                 return true;
@@ -168,7 +168,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static string PhysicalAdress()
         {           
             PCIDevice device;
-            device = HAL.PCI.GetDevice(0x1022, 0x2000);
+            device = HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
             if (NetworkCardAvailable())
             {
                 AMDPCNetII nic = new AMDPCNetII(device);

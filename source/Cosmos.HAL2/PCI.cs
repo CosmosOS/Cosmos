@@ -61,13 +61,14 @@ namespace Cosmos.HAL
     public enum VendorID
     {
         Intel = 0x8086,
-        AMD = 0x0438,
+        AMD = 0x1022,
         VMWare = 0x15AD
     }
     
     public enum DeviceID
     {
-        SVGAIIAdapter = 0x0405
+        SVGAIIAdapter = 0x0405,
+        PCNETII = 0x2000
     }
 
     public class PCI
