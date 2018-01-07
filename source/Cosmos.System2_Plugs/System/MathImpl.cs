@@ -157,49 +157,38 @@ namespace Cosmos.System_Plugs.System
 
         public static double Cos(double x)
         {
-            // First we need to anchor it to a valid range.
-            while (x > (2 * PI))
-            {
-                x -= (2 * PI);
-            }
+            double[] y = new double[2];
+            double z = 0.0;
+            int n, ix;
 
-            if (x < 0)
-                x = -x;
-            byte quadrand = 0;
-            if ((x > (PI / 2F)) && (x < (PI)))
-            {
-                quadrand = 1;
-                x = PI - x;
-            }
-            if ((x > (PI)) && (x < ((3F * PI) / 2)))
-            {
-                quadrand = 2;
-                x = x - PI;
-            }
-            if ((x > ((3F * PI) / 2)))
-            {
-                quadrand = 3;
-                x = (2F * PI) - x;
-            }
-            const double c1 = 0.9999999999999999999999914771;
-            const double c2 = -0.4999999999999999999991637437;
-            const double c3 = 0.04166666666666666665319411988;
-            const double c4 = -0.00138888888888888880310186415;
-            const double c5 = 0.00002480158730158702330045157;
-            const double c6 = -0.000000275573192239332256421489;
-            const double c7 = 0.000000002087675698165412591559;
-            const double c8 = -0.0000000000114707451267755432394;
-            const double c9 = 0.0000000000000477945439406649917;
-            const double c10 = -0.00000000000000015612263428827781;
-            const double c11 = 0.00000000000000000039912654507924;
-            double x2 = x * x;
-            if (quadrand == 0 || quadrand == 3)
-            {
-                return (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * (c5 + (x2 * (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + (x2 * (c10 + (x2 * c11))))))))))))))))))));
-            }
+            /* High word of x. */
+            ix = HighWord(x);
+
+            /* |x| ~< pi/4 */
+            ix &= 0x7fffffff;
+            if (ix <= 0x3fe921fb) return _cos(x, z);
+
+            /* cos(Inf or NaN) is NaN */
+            else if (ix >= 0x7ff00000) return x - x;
+
+            /* argument reduction needed */
             else
             {
-                return -(c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * (c5 + (x2 * (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + (x2 * (c10 + (x2 * c11))))))))))))))))))));
+                n = __ieee754_rem_pio2(x, y);
+                switch (n & 3)
+                {
+                    case 0:
+                        return _cos(y[0], y[1]);
+
+                    case 1:
+                        return -_sin(y[0], y[1], 1);
+
+                    case 2:
+                        return -_cos(y[0], y[1]);
+
+                    default:
+                        return _sin(y[0], y[1], 1);
+                }
             }
         }
 
@@ -583,7 +572,7 @@ namespace Cosmos.System_Plugs.System
             }
         }
 
-        public static double _sin(double x, double y, int iy)
+        private static double _sin(double x, double y, int iy)
         {
             const double half = 5.00000000000000000000e-01; /* 0x3FE00000; 0x00000000 */
             const double S1 = -1.66666666666666324348e-01; /* 0xBFC55555; 0x55555549 */

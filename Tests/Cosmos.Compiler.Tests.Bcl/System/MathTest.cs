@@ -12,6 +12,31 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             double result;
 
+            #region Math.Cos
+
+            result = Math.Cos(4);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -0.6536436208636), "Math.Cos works with positive number");
+
+            result = Math.Cos(0);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1), "Cos works with 0");
+
+            result = Math.Cos(1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.5403023058681), "Cos gives correct answer for 1");
+
+            result = Math.Cos(-1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.5403023058681), "Cos gives correct answer for -1");
+
+            result = Math.Cos(double.NaN);
+            Assert.IsTrue(double.IsNaN(result), "Cos works with NaN");
+
+            result = Math.Cos(double.PositiveInfinity);
+            Assert.IsTrue(double.IsNaN(result), "Cos works with INF");
+
+            result = Math.Cos(double.PositiveInfinity);
+            Assert.IsTrue(double.IsNaN(result), "Cos works with -INF");
+
+            #endregion Math.Cos
+
             #region Math.Sin
 
             result = Math.Sin(4);
