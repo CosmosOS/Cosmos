@@ -22,6 +22,8 @@ namespace Cosmos.VS.ProjectSystem
 
         protected override void Initialize()
         {
+            base.Initialize();
+
             _factory = new MigrateCosmosProjectFactory();
             RegisterProjectFactory(_factory);
         }

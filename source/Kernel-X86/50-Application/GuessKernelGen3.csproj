@@ -64,7 +64,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Cosmos.Build" Version="*" />
+        <PackageReference Include="Cosmos.Build" Version="*" NoWarn="NU1604" />
     </ItemGroup>
 
 </Project>

@@ -55,12 +55,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
-        <ProjectReference Include="..\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
-        <ProjectReference Include="..\40-System\Cosmos.System\Cosmos.System.csproj" />
+        <ProjectReference Include="..\..\Kernel-X86\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
+        <ProjectReference Include="..\..\Kernel-X86\40-System\Cosmos.System\Cosmos.System.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Cosmos.Build" Version="*" />
+        <PackageReference Include="Cosmos.Build" Version="*" NoWarn="NU1604" />
     </ItemGroup>
 
 </Project>

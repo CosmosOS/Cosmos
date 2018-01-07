@@ -7,30 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Update="Engine.Bochs.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.Helpers.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.HyperV.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.Run.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.Running.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.VMware.cs">
+        <Compile Update="Engine.*.cs">
             <DependentUpon>Engine.cs</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
         <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
         <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
-        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>
