@@ -12,6 +12,31 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             double result;
 
+            #region Math.Sin
+
+            result = Math.Sin(4);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -0.7568024953079), "Math.Sin works with positive number");
+
+            result = Math.Sin(0);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0), "Sin works with 0");
+
+            result = Math.Sin(1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.8414709848079), "Sin gives correct answer for 1");
+
+            result = Math.Sin(-1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -0.8414709848079), "Sin gives correct answer for -1");
+
+            result = Math.Sin(double.NaN);
+            Assert.IsTrue(double.IsNaN(result), "Sin works with NaN");
+
+            result = Math.Sin(double.PositiveInfinity);
+            Assert.IsTrue(double.IsNaN(result), "Sin works with INF");
+
+            result = Math.Sin(double.PositiveInfinity);
+            Assert.IsTrue(double.IsNaN(result), "Sin works with -INF");
+
+            #endregion Math.Sin
+
             #region Math.Sqrt
 
             // Test with small number
