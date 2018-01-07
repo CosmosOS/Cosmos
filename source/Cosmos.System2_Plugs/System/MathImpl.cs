@@ -11,6 +11,7 @@ namespace Cosmos.System_Plugs.System
         internal static Debugger mDebugger = new Debugger("System", "Math Plugs");
 
         #region Internal Constants
+
         private const double sq2p1 = 2.414213562373095048802e0F;
         private const double sq2m1 = .414213562373095048802e0F;
         private const double pio2 = 1.570796326794896619231e0F;
@@ -28,12 +29,14 @@ namespace Cosmos.System_Plugs.System
         private const double atan_q2 = .16667838148816337184521798e4F;
         private const double atan_q1 = .207933497444540981287275926e4F;
         private const double atan_q0 = .89678597403663861962481162e3F;
-        #endregion
+
+        #endregion Internal Constants
 
         public const double PI = 3.1415926535897932384626433832795;
         public const double E = 2.71828182845904523536;
 
         #region Abs
+
         public static double Abs(double value)
         {
             if (value < 0)
@@ -57,18 +60,22 @@ namespace Cosmos.System_Plugs.System
                 return value;
             }
         }
-        #endregion
+
+        #endregion Abs
 
         #region Acos
+
         public static double Acos(double x)
         {
             if ((x > 1.0) || (x < -1.0))
                 throw new ArgumentOutOfRangeException("Domain error");
             return (pio2 - Asin(x));
         }
-        #endregion
+
+        #endregion Acos
 
         #region Asin
+
         public static double Asin(double x)
         {
             if (x > 1.0F)
@@ -92,16 +99,20 @@ namespace Cosmos.System_Plugs.System
             }
             return (sign * temp);
         }
-        #endregion
+
+        #endregion Asin
 
         #region Atan
+
         public static double Atan(double x)
         {
             return ((x > 0F) ? atans(x) : (-atans(-x)));
         }
-        #endregion
+
+        #endregion Atan
 
         #region Atan2
+
         public static double Atan2(double x, double y)
         {
             if ((x + y) == x)
@@ -126,9 +137,11 @@ namespace Cosmos.System_Plugs.System
 
             //return (((x + y) == x) ? (((x == 0F) & (y == 0F)) ? 0F : ((x >= 0F) ? pio2 : (-pio2))) : ((y < 0F) ? ((x >= 0F) ? ((pio2 * 2) - atans((-x) / y)) : (((-pio2) * 2) + atans(x / y))) : ((x > 0F) ? atans(x / y) : -atans((-x) / y))));
         }
-        #endregion
+
+        #endregion Atan2
 
         #region Ceiling
+
         public static double Ceiling(double a)
         {
             // should be using assembler for bigger values than int or long max
@@ -137,9 +150,11 @@ namespace Cosmos.System_Plugs.System
             int i = (a - (int)a > 0) ? (int)(a + 1) : (int)a;
             return i;
         }
-        #endregion
+
+        #endregion Ceiling
 
         #region Cos
+
         public static double Cos(double x)
         {
             // First we need to anchor it to a valid range.
@@ -187,55 +202,162 @@ namespace Cosmos.System_Plugs.System
                 return -(c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * (c5 + (x2 * (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + (x2 * (c10 + (x2 * c11))))))))))))))))))));
             }
         }
-        #endregion
+
+        #endregion Cos
 
         #region Cosh
+
         public static double Cosh(double x)
         {
             if (x < 0.0F)
                 x = -x;
             return ((x == 0F) ? 1F : ((x <= (ln2 / 2)) ? (1 + (_power((Exp(x) - 1), 2) / (2 * Exp(x)))) : ((x <= 22F) ? ((Exp(x) + (1 / Exp(x))) / 2) : (0.5F * (Exp(x) + Exp(-x))))));
         }
-        #endregion
+
+        #endregion Cosh
 
         #region Exp
+
+        /*
+        * ====================================================
+        * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
+        *
+        * Permission to use, copy, modify, and distribute this
+        * software is freely granted, provided that this notice
+        * is preserved.
+        * ====================================================
+        */
+
+        // Look at http://www.netlib.org/fdlibm/e_exp.c for more a in deth explanation
+        private static int HighWord(double x)
+        {
+            long value = BitConverter.DoubleToInt64Bits(x);
+            Byte[] valueBytes = BitConverter.GetBytes(value);
+            int offset = BitConverter.IsLittleEndian ? 4 : 0;
+            return BitConverter.ToInt32(valueBytes, offset);
+        }
+
+        private static int LowWord(double x) //Opposite of high word
+        {
+            long value = BitConverter.DoubleToInt64Bits(x);
+            Byte[] valueBytes = BitConverter.GetBytes(value);
+            return BitConverter.ToInt32(valueBytes, BitConverter.IsLittleEndian ? 0 : 4);
+        }
+
         public static double Exp(double x)
         {
-            double c;
-            int n = 1;
-            double ex = 1F;
-            double m = 1F;
-            while (x > 10.000F)
-            {
-                m *= 22026.4657948067;
-                x -= 10F;
+            double y, hi = 0, lo = 0, c, t;
+            int k = 0, xsb;
+
+            const double o_threshold = 7.09782712893383973096e+02;
+            const double u_threshold = -7.45133219101941108420e+02;
+            const double invln2 = 1.44269504088896338700e+00;
+            const double twom1000 = 9.33263618503218878990e-302;
+            const double P1 = 1.66666666666666019037e-01;
+            const double P2 = -2.77777777770155933842e-03;
+            const double P3 = 6.61375632143793436117e-05;
+            const double P4 = -1.65339022054652515390e-06;
+            const double P5 = 4.13813679705723846039e-08;
+            const double huge = 1.0e+300;
+
+            int hx = HighWord(x); //Highword of x
+
+            xsb = ((int)hx >> 31) & 1; //Get sign of x
+            hx &= 0x7fffffff; //Get the abs(x) of the highword
+
+            //Check if non-finite argument
+            if (hx >= 0x40862E42)
+            {           /* if |x|>=709.78... */
+                if (hx >= 0x7ff00000)
+                {
+                    if (((hx & 0xfffff) | LowWord(x)) != 0) //Assume that __Lo(x) is lower word of x
+                        return x;       /* NaN */
+                    else
+                        return (xsb == 0) ? x : 0.0;   /* exp(+-inf)={inf,0} */
+                }
+                if (x > o_threshold)
+                    return double.PositiveInfinity; /* overflow */
+                if (x < u_threshold)
+                    return 0; /* underflow */
             }
-            while (x > 01.000F)
-            {
-                m *= E;
-                x -= 1F;
+
+            /* argument reduction */
+            if (hx > 0x3fd62e42)
+            {       /* if  |x| > 0.5 ln2 */
+                if (hx < 0x3FF0A2B2)
+                {   /* and |x| < 1.5 ln2 */
+                    if (xsb == 0)
+                    {
+                        hi = x - 6.93147180369123816490e-01;
+                        lo = 1.90821492927058770002e-10;
+                    }
+                    else
+                    {
+                        hi = x - -6.93147180369123816490e-01;
+                        lo = -1.90821492927058770002e-10;
+                    }
+                    k = 1 - xsb - xsb;
+                }
+                else
+                {
+                    if (xsb == 0)
+                        k = (int)(invln2 * x + 0.5);
+                    else
+                        k = (int)(invln2 * x + -0.5);
+                    t = k;
+                    hi = x - t * 6.93147180369123816490e-01;
+                    lo = t * 1.90821492927058770002e-10;
+                }
+                x = hi - lo;
             }
-            while (x > 00.100F)
-            {
-                m *= 1.10517091807565; ;
-                x -= 0.1F;
+            else if (hx < 0x3e300000)
+            {   /* when |x|<2**-28 */
+                if (huge + x > 1)
+                    return 1 + x;/* trigger inexact */
             }
-            while (x > 00.010F)
+            else
+                k = 0;
+
+            /* x is now in primary range */
+            t = x * x;
+            c = x - t * (P1 + t * (P2 + t * (P3 + t * (P4 + t * P5))));
+
+            if (k == 0)
+                return 1 - ((x * c) / (c - 2.0) - x);
+            else
+                y = 1 - ((lo - (x * c) / (2.0 - c)) - hi);
+
+            if (k >= -1021)
             {
-                m *= 1.01005016708417;
-                x -= 0.01F;
+                //The idea is to add hy to the exponent of y
+                long _y = BitConverter.DoubleToInt64Bits(y);
+
+                /* add k to y's exponent */
+                if (BitConverter.IsLittleEndian)
+                    _y += ((long)k << 52);
+                else
+                    _y += ((long)k << 20);
+                y = BitConverter.Int64BitsToDouble(_y);
+                return y;
             }
-            for (int y = 1; y <= 4; y++)
+            else
             {
-                c = _power(x, y);
-                ex += c / (double)n;
-                n *= (y + 1);
+                //The idea is to add hy to the exponent of y
+                long _y = BitConverter.DoubleToInt64Bits(y);
+
+                if (BitConverter.IsLittleEndian)
+                    _y += ((long)k + 1000 << 52);
+                else
+                    _y += ((long)k + 1000 << 20);
+                y = BitConverter.Int64BitsToDouble(_y);
+                return y * twom1000;
             }
-            return ex * m;
         }
-        #endregion
+
+        #endregion Exp
 
         #region Floor
+
         public static double Floor(double a)
         {
             // should be using assembler for bigger values than int or long max
@@ -244,16 +366,20 @@ namespace Cosmos.System_Plugs.System
             int i = (a - (int)a < 0) ? (int)(a - 1) : (int)a;
             return i;
         }
-        #endregion
+
+        #endregion Floor
 
         #region Log (base e)
+
         public static double Log(double x)
         {
             return Log(x, E);
         }
-        #endregion
+
+        #endregion Log (base e)
 
         #region Log (base specified)
+
         public static double Log(double x, double newBase)
         {
             if (x == 0.0F)
@@ -296,65 +422,94 @@ namespace Cosmos.System_Plugs.System
 
             return (integer + fractional);
         }
-        #endregion
+
+        #endregion Log (base specified)
 
         #region Log10
+
         public static double Log10(double x)
         {
             return Log(x, 10F);
         }
-        #endregion
+
+        #endregion Log10
 
         #region Pow
-        public static double Pow(double x, double y)
+
+        public static double Pow(double b, double e)
         {
-            if (x <= 0.0F)
+            if (e == 0) return 1;
+            if (e == 1) return b;
+            if (double.IsNaN(b) || double.IsNaN(e)) return double.NaN;
+            if (double.IsNegativeInfinity(b))
             {
-                double temp = 0F;
-                long l;
-                if (x == 0.0F && y <= 0.0F)
-                    throw new ArgumentException();
-
-                l = (long)Floor(y);
-                if (l != y)
-                    temp = Exp(y * Log(-x));
-                if ((l % 2) == 1)
-                    temp = -temp;
-
-                return (temp);
+                if (e < 0)
+                    return 0;
+                if ((long)e % 2 == 0)
+                    return double.PositiveInfinity;
+                else
+                    return double.NegativeInfinity;
             }
+            if (double.IsPositiveInfinity(b))
+            {
+                if (e < 0)
+                    return 0;
+                else
+                    return double.PositiveInfinity;
+            }
+            if (double.IsInfinity(e))
+            {
+                bool t = -1 < b;
+                bool t1 = 1 > b;
+                if (t && t1)
 
-            return (Exp(y * Log(x)));
-            //if (y == 0)
-            //{
-            //    return 1;
-            //}
-            //else if (y == 1)
-            //{
-            //    return x;
-            //}
-            //else
-            //{
-            //    double xResult = x;
-
-            //    for (int i = 2; i <= y; i++)
-            //    {
-            //        xResult = xResult * x;
-            //    }
-
-            //    return xResult;
-            //}
+                    if (double.IsPositiveInfinity(e))
+                        return 0;
+                    else
+                        return double.PositiveInfinity;
+                else
+                {
+                    bool v = b < -1;
+                    bool v1 = 1 < b;
+                    if (v || v1)
+                    {
+                        if (double.IsPositiveInfinity(e))
+                            return double.PositiveInfinity;
+                        else
+                            return 0;
+                    }
+                    else
+                        return double.NaN;
+                }
+            }
+            if (b < 0)
+            {
+                if (Math.Abs(e) - Math.Abs((int)e) > (Double.Epsilon * 100)) return double.NaN;
+                double logedBase = Math.Log(Math.Abs(b));
+                double pow = Exp(logedBase * e);
+                if ((long)e % 2 == 0) return pow;
+                else return -1 * pow;
+            }
+            else
+            {
+                double logedBase = Math.Log(b);
+                return Exp(logedBase * e);
+            }
         }
-        #endregion
+
+        #endregion Pow
 
         #region Round
+
         public static double Round(double d)
         {
             return ((Math.Floor(d) % 2 == 0) ? Math.Floor(d) : Math.Ceiling(d));
         }
-        #endregion
+
+        #endregion Round
 
         #region Sin
+
         public static double Sin(double x)
         {
             // First we need to anchor it to a valid range.
@@ -365,9 +520,11 @@ namespace Cosmos.System_Plugs.System
 
             return Cos((PI / 2.0F) - x);
         }
-        #endregion
+
+        #endregion Sin
 
         #region Sinh
+
         public static double Sinh(double x)
         {
             if (x < 0F)
@@ -383,9 +540,11 @@ namespace Cosmos.System_Plugs.System
                 return (Exp(x) / 2);
             }
         }
-        #endregion
+
+        #endregion Sinh
 
         #region Sqrt
+
         public static double Sqrt(double x)
         {
             long x1;
@@ -412,16 +571,18 @@ namespace Cosmos.System_Plugs.System
             x2 = BitConverter.Int64BitsToDouble(x1);
 
             // Use Newton's Method
-            for(i = 0; i < 5; i++)
+            for (i = 0; i < 5; i++)
             {
                 x2 = x2 - (x2 * x2 - x) / (2 * x2);
             }
 
             return x2;
         }
-        #endregion
+
+        #endregion Sqrt
 
         #region Tan
+
         public static double Tan(double x)
         {
             // First we need to anchor it to a valid range.
@@ -436,29 +597,35 @@ namespace Cosmos.System_Plugs.System
                 case 0:
                     x = x * (4 / PI);
                     break;
+
                 case 1:
                     x = ((PI / 2) - x) * (4 / PI);
                     break;
+
                 case 2:
                     x = (x - (PI / 2)) * (4 / PI);
                     break;
+
                 case 3:
                     x = (PI - x) * (4 / PI);
                     break;
+
                 case 4:
                     x = (x - PI) * (4 / PI);
                     break;
+
                 case 5:
                     x = ((3.5 * PI) - x) * (4 / PI);
                     break;
+
                 case 6:
                     x = (x - (3.5 * PI)) * (4 / PI);
                     break;
+
                 case 7:
                     x = ((2 * PI) - x) * (4 / PI);
                     break;
             }
-
 
             const double c1 = 4130240.588996024013440146267;
             const double c2 = -349781.8562517381616631012487;
@@ -487,21 +654,26 @@ namespace Cosmos.System_Plugs.System
                 return -((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2))))))));
             }
         }
-        #endregion
+
+        #endregion Tan
 
         #region Tanh
+
         public static double Tanh(double x)
         {
             return (expm1(2F * x) / (expm1(2F * x) + 2F));
         }
-        #endregion
+
+        #endregion Tanh
 
         #region Truncate
+
         public static double Truncate(double x)
         {
             return ((x == 0) ? 0F : ((x > 0F) ? Floor(x) : Ceiling(x)));
         }
-        #endregion
+
+        #endregion Truncate
 
         //#region Factorial (only used in Sin(), not plug )
         //public static int Factorial(int n)
@@ -516,14 +688,17 @@ namespace Cosmos.System_Plugs.System
         #region Internaly used functions
 
         #region expm1
+
         private static double expm1(double x)
         {
             double u = Exp(x);
             return ((u == 1.0F) ? x : ((u - 1.0F == -1.0F) ? -1.0F : ((u - 1.0F) * x / Log(u))));
         }
-        #endregion
+
+        #endregion expm1
 
         #region _power
+
         private static double _power(double x, int c)
         {
             if (c == 0)
@@ -545,9 +720,11 @@ namespace Cosmos.System_Plugs.System
 
             return ret;
         }
-        #endregion
+
+        #endregion _power
 
         #region atans
+
         private static double atans(double x)
         {
             if (x < sq2m1)
@@ -563,9 +740,11 @@ namespace Cosmos.System_Plugs.System
                 return (pio4 + atanx((x - 1.0F) / (x + 1.0F)));
             }
         }
-        #endregion
+
+        #endregion atans
 
         #region atanx
+
         private static double atanx(double x)
         {
             double argsq, value;
@@ -592,8 +771,9 @@ namespace Cosmos.System_Plugs.System
             //    /
             //    (((((ArgSquared + atan_q4) * ArgSquared + atan_q3) * ArgSquared + atan_q2) * ArgSquared + atan_q1) * ArgSquared + atan_q0) * x);
         }
-        #endregion
 
-        #endregion
+        #endregion atanx
+
+        #endregion Internaly used functions
     }
 }
