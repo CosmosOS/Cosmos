@@ -31,6 +31,25 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             #endregion Math.Asin
 
+            #region Math.Acos
+
+            result = Math.Acos(1.1);
+            Assert.IsTrue(double.IsNaN(result), "Math.Acos returns NaN for values larger than 1");
+
+            result = Math.Acos(-1.1);
+            Assert.IsTrue(double.IsNaN(result), "Math.Acos returns NaN for values smaller than -1");
+
+            result = Math.Acos(1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0), "Acos returns correct value for 1");
+
+            result = Math.Acos(-1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, Math.PI), "Acos returns correct value for -1");
+
+            result = Math.Acos(0);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.5707963267949), "Acos returns correct value for 9");
+
+            #endregion Math.Acos
+
             #region Math.Cos
 
             result = Math.Cos(4);
