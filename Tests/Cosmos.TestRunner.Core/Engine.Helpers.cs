@@ -189,20 +189,20 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            References = new List<string>() { kernelFileName };
+            var xReferences = new List<string>() { kernelFileName };
 
             if (KernelPkg == "X86")
             {
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.Plugs.TapRoot")).Location);
+                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
+                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
+                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Plugs.TapRoot")).Location);
             }
             else
             {
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location);
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location);
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.System2_Plugs")).Location);
-                References.Add(Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location);
+                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location);
+                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location);
+                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.System2_Plugs")).Location);
+                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location);
             }
 
             var xArgs = new List<string>
@@ -220,7 +220,7 @@ namespace Cosmos.TestRunner.Core
                 "IgnoreDebugStubAttribute:False"
             };
 
-            xArgs.AddRange(References.Select(aReference => "References:" + aReference));
+            xArgs.AddRange(xReferences.Select(aReference => "References:" + aReference));
 
             bool xUsingUserkit = false;
             string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU.Compiler");
@@ -238,7 +238,7 @@ namespace Cosmos.TestRunner.Core
             {
                 if (DebugIL2CPU)
                 {
-                    if (KernelsToRun.Count > 1)
+                    if (KernelsToRun.Count() > 1)
                     {
                         throw new Exception("Cannot run multiple kernels with in-process compilation!");
                     }

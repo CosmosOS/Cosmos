@@ -34,7 +34,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         internal AD7Process mProcess;
         // A unique identifier for the program being debugged.
         Guid mProgramID;
-        public static readonly Guid EngineID = new Guid("{fa1da3a6-66ff-4c65-b077-e65f7164ef83}");
+        public static readonly Guid EngineID = new Guid("fa1da3a6-66ff-4c65-b077-e65f7164ef83");
         internal AD7Module mModule;
         internal AD7Thread mThread;
         private AD7ProgramNode mProgNode;

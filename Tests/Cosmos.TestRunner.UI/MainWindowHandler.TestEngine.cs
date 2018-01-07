@@ -21,9 +21,7 @@ namespace Cosmos.TestRunner.UI
 
         private void TestEngineThreadMain()
         {
-            var xEngine = new Engine();
-
-            DefaultEngineConfiguration.Apply(xEngine);
+            var xEngine = new Engine(new DefaultEngineConfiguration());
 
             var xOutputXml = new OutputHandlerXml();
             xEngine.OutputHandler = new MultiplexingOutputHandler(

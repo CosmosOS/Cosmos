@@ -120,22 +120,38 @@ namespace Cosmos.Build.Builder {
       }
     }
 
-    protected void CheckIfVSRunning() {
-      int xSeconds = 500;
-
-      if (Debugger.IsAttached) {
-        Log.WriteLine("Check if Visual Studio is running is ignored by debugging of Builder.");
-      } else {
-        Log.WriteLine("Check if Visual Studio is running.");
-        if (IsRunning("devenv")) {
-          Log.WriteLine("--Visual Studio is running.");
-          Log.WriteLine("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
-          // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
-          // So we wait a few seconds first.
-          if (WaitForExit("devenv", xSeconds * 1000)) {
-            throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
-          }
-        }
+    protected void CheckIfVSandCoRunning() {
+      bool xRunningFound = false;
+      if (IsRunning("devenv")) {
+        xRunningFound = true;
+        Log.WriteLine("--Visual Studio is running.");
+      }
+      if (IsRunning("VSIXInstaller")) {
+        xRunningFound = true;
+        Log.WriteLine("--VSIXInstaller is running.");
+      }
+      if (IsRunning("ServiceHub.IdentityHost")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.IdentityHost is running.");
+      }
+      if (IsRunning("ServiceHub.VSDetouredHost")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.VSDetouredHost is running.");
+      }
+      if (IsRunning("ServiceHub.Host.Node.x86")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.Host.Node.x86 is running.");
+      }
+      if (IsRunning("ServiceHub.SettingsHost")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.SettingsHost is running.");
+      }
+      if (IsRunning("ServiceHub.Host.CLR.x86")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.Host.CLR.x86 is running.");
+      }
+      if (xRunningFound) {
+        Log.WriteLine("--Running blockers found. Setup will warning you and wait for it.");
       }
     }
 
@@ -148,7 +164,7 @@ namespace Cosmos.Build.Builder {
       Section("Check Prerequisites");
 
       CheckIfUserKitRunning();
-      CheckIfVSRunning();
+      CheckIfVSandCoRunning();
       CheckIfBuilderRunning();
 
       CheckForNetCore();

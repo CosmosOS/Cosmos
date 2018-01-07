@@ -107,6 +107,8 @@ namespace Cosmos.Core_Plugs.System
             {
                 return "The given path's format is not supported.";
             }
+            if (aKey == "Argument_InvalidSubPath")
+                return "The given path {0} is {1}";
 
             //Console.Write("Getting resource: '");
             //Console.Write(aResource);

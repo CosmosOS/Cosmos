@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cosmos.System.FileSystem.Listing;
+using System.IO;
 
 namespace Cosmos.System.FileSystem.VFS
 {
@@ -26,6 +27,10 @@ namespace Cosmos.System.FileSystem.VFS
         public abstract DirectoryEntry GetVolume(string aVolume);
 
         public abstract List<DirectoryEntry> GetVolumes();
+
+        public abstract FileAttributes GetFileAttributes(string aPath);
+
+        public abstract void SetFileAttributes(string aPath, FileAttributes fileAttributes);
 
         public static char DirectorySeparatorChar { get { return '\\'; } }
 

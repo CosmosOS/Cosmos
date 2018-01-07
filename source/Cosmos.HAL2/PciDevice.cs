@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -189,6 +189,20 @@ namespace Cosmos.HAL
             UInt16 command = ReadRegister16(0x04);
 
             UInt16 flags = 0x0007;
+
+            if (enable)
+                command |= flags;
+            else
+                command &= (ushort)~flags;
+
+            WriteRegister16(0x04, command);
+        }
+
+        public void EnableBusMaster(bool enable)
+        {
+            UInt16 command = ReadRegister16(0x04);
+
+            UInt16 flags = (1 << 2);
 
             if (enable)
                 command |= flags;

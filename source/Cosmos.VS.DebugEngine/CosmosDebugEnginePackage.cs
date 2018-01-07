@@ -7,10 +7,10 @@ using Cosmos.VS.DebugEngine.Commands;
 
 namespace Cosmos.VS.DebugEngine
 {
+    [Guid(Guids.guidPackageString)]
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(Guids.guidPackageString)]
     public sealed class CosmosDebugEnginePackage : Package, IOleCommandTarget
     {
         private IOleCommandTarget packageCommandTarget;
