@@ -12,6 +12,25 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             double result;
 
+            #region Math.Asin
+
+            result = Math.Asin(1.1);
+            Assert.IsTrue(double.IsNaN(result), "Math.Asin returns NaN for values larger than 1");
+
+            result = Math.Asin(-1.1);
+            Assert.IsTrue(double.IsNaN(result), "Math.Asin returns NaN for values smaller than -1");
+
+            result = Math.Asin(1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.5707963267949), "Asin returns correct value for 1");
+
+            result = Math.Asin(-1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1.5707963267949), "Asin returns correct value for -1");
+
+            result = Math.Asin(0);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0), "Asin returns correct value for 9");
+
+            #endregion Math.Asin
+
             #region Math.Cos
 
             result = Math.Cos(4);
