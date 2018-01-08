@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.VisualStudio;
@@ -13,9 +12,16 @@ namespace Cosmos.VS.ProjectSystem
 {
     internal class MigrateCosmosProjectFactory : IVsProjectFactory, IVsProjectUpgradeViaFactory, IVsProjectUpgradeViaFactory4
     {
-        private const string CSharpProjectTypeGuid = "9A19103F-16F7-4668-BE54-9A1E7A4F7556";
-        private const string FSharpProjectTypeGuid = "6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705";
-        private const string VisualBasicProjectTypeGuid = "778DAE3C-4631-46EA-AA77-85C1314464D9";
+        private const string PropertyGroup = nameof(PropertyGroup);
+        private const string ProjectGuid = nameof(ProjectGuid);
+        private const string TargetFramework = nameof(TargetFramework);
+
+        private const string ItemGroup = nameof(ItemGroup);
+        private const string Include = nameof(Include);
+        private const string Remove = nameof(Remove);
+        private const string None = nameof(None);
+        private const string PackageReference = nameof(PackageReference);
+        private const string ProjectReference = nameof(ProjectReference);
 
         private static readonly List<string> CommonProjectProperties = new List<string>()
         {
@@ -81,8 +87,8 @@ namespace Cosmos.VS.ProjectSystem
             using (var projectStream = File.OpenRead(bstrFileName))
             {
                 var document = XDocument.Load(projectStream);
-                var itemGroups = document.Root.Descendants().Where(e => e.Name == "ItemGroup");
-                var projectReferences = itemGroups.Descendants().Where(e => e.Name == "ProjectReference");
+                var itemGroups = document.Root.Descendants().Where(e => XNameEqualsString(e.Name, ItemGroup));
+                var projectReferences = itemGroups.Descendants().Where(e => XNameEqualsString(e.Name, ProjectReference));
 
                 if (!projectReferences.Any())
                 {
@@ -93,7 +99,8 @@ namespace Cosmos.VS.ProjectSystem
                 }
                 else if (projectReferences.Count() == 1)
                 {
-                    var codeProject = projectReferences.Single().Attributes().Where(a => a.Name == "Include").Single().Value;
+                    var codeProject = projectReferences.Single().Attributes().Where(
+                        a => XNameEqualsString(a.Name, Include)).Single().Value;
                     codeProjectPath = Path.IsPathRooted(codeProject) ? codeProject
                         : Path.GetFullPath(Path.Combine(projectDir.FullName, codeProject));
                 }
@@ -103,7 +110,7 @@ namespace Cosmos.VS.ProjectSystem
                         p => !PlugsProjects.Contains(
                             Path.GetFileNameWithoutExtension(
                                 p.Attributes().Where(
-                                    a => a.Name == "Include").Single().Value), StringComparer.OrdinalIgnoreCase));
+                                    a => XNameEqualsString(a.Name, Include)).Single().Value), StringComparer.OrdinalIgnoreCase));
 
                     if (projectReferencesWithoutPlugsProjects.Count() > 1)
                     {
@@ -114,9 +121,10 @@ namespace Cosmos.VS.ProjectSystem
                         var codeProjectPathWithoutExtension = Path.Combine(projectDir.FullName, codeProjectName);
 
                         var possibleCodeProjects = projectReferences.Where(
-                            p => Path.GetFileNameWithoutExtension(
-                                p.Attributes().Where(
-                                    a => a.Name == "Include").Single().Value) == codeProjectName);
+                            p => StringEquals(
+                                Path.GetFileNameWithoutExtension(
+                                    p.Attributes().Where(
+                                        a => XNameEqualsString(a.Name, Include)).Single().Value), codeProjectName));
 
                         if (possibleCodeProjects.Count() != 1)
                         {
@@ -128,14 +136,14 @@ namespace Cosmos.VS.ProjectSystem
                         }
 
                         var codeProject =
-                            possibleCodeProjects.Single().Attributes().Where(a => a.Name == "Include").Single().Value;
+                            possibleCodeProjects.Single().Attributes().Where(a => XNameEqualsString(a.Name, Include)).Single().Value;
                         codeProjectPath = Path.IsPathRooted(codeProject) ? codeProject
                             : Path.GetFullPath(Path.Combine(projectDir.FullName, codeProject));
                     }
                     else
                     {
                         var codeProject = projectReferencesWithoutPlugsProjects
-                            .Single().Attributes().Where(a => a.Name == "Include").Single().Value;
+                            .Single().Attributes().Where(a => XNameEqualsString(a.Name, Include)).Single().Value;
                         codeProjectPath = Path.IsPathRooted(codeProject) ? codeProject
                             : Path.GetFullPath(Path.Combine(projectDir.FullName, codeProject));
                     }
@@ -196,77 +204,149 @@ namespace Cosmos.VS.ProjectSystem
         private void MigrateProject(string cosmosProject, string codeProject)
         {
             var cosmosProjectProperties = XDocument.Parse(File.ReadAllText(cosmosProject)).Root.Descendants()
-                .Where(d => d.Name == "PropertyGroup").Select(p => p.Descendants()
+                .Where(d => XNameEqualsString(d.Name, PropertyGroup)).Select(p => p.Descendants()
                 .Where(e => !CommonProjectProperties.Contains(e.Name.LocalName, StringComparer.OrdinalIgnoreCase)));
 
-            var codeProjectStream = File.OpenRead(codeProject);
+            XDocument document;
 
-            var document = XDocument.Load(codeProjectStream);
-            var itemGroups = document.Root.Descendants().Where(e => e.Name == "ItemGroup");
-            var references = itemGroups.Descendants().Where(e => e.Name == "Reference");
-            var projectReferences = itemGroups.Descendants().Where(e => e.Name == "ProjectReference");
-            var packageReferences = itemGroups.Descendants().Where(e => e.Name == "PackageReference");
+            using (var codeProjectStream = File.OpenRead(codeProject))
+            {
+                document = XDocument.Load(codeProjectStream);
+            }
 
-            if (packageReferences.Any(p => p.Attributes().Any(a => a.Name == "Include" && a.Value == "Cosmos.Build")))
+            var root = document.Root;
+
+            root.Descendants().Where(
+                e => XNameEqualsString(e.Name, PropertyGroup)).Last().AddAfterSelf(
+                    new XElement(PropertyGroup, cosmosProjectProperties));
+
+            var packageReferencesItemGroups = root.Descendants().Where(
+                e => XNameEqualsString(e.Name, ItemGroup) && e.Descendants().Where(
+                    i => XNameEqualsString(i.Name, PackageReference)).Any());
+
+            if (packageReferencesItemGroups.Descendants().Any(
+                i => XNameEqualsString(i.Name, PackageReference) && i.Attributes().Any(
+                    a => XNameEqualsString(a.Name, Include) && XNameEqualsString(a.Value, "Cosmos.Build"))))
             {
                 return;
             }
 
+            var properties = root.Descendants().Where(
+                e => XNameEqualsString(e.Name, PropertyGroup)).Descendants();
+
+            foreach(var targetFrameworkProperty in properties.Where(
+                p => XNameEqualsString(p.Name, TargetFramework)))
+            {
+                targetFrameworkProperty.Value = "netstandard2.0";
+            }
+
+            properties.Where(p => XNameEqualsString(p.Name, ProjectGuid)).Remove();
+
+            var itemGroups = root.Descendants().Where(
+                e => XNameEqualsString(e.Name, ItemGroup));
+
+            itemGroups.Where(e =>
+            {
+                var items = e.Descendants();
+
+                if (items.Count() != 1)
+                {
+                    return false;
+                }
+
+                var singleItem = items.Single();
+
+                if (!XNameEqualsString(singleItem.Name, None))
+                {
+                    return false;
+                }
+
+                var removeAttribute = singleItem.Attributes().Where(a => XNameEqualsString(a.Name, Remove)).FirstOrDefault();
+
+                if (removeAttribute == null)
+                {
+                    return false;
+                }
+
+                if (removeAttribute.Value.IndexOf(Path.GetFileName(cosmosProject), StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    return true;
+                }
+
+                return false;
+            }).Remove();
+            
+            var count = packageReferencesItemGroups.Count();
+            XElement itemGroup;
+
+            if (count == 0)
+            {
+                itemGroup = new XElement(ItemGroup);
+                root.Add(itemGroup);
+            }
+            else if (count == 1)
+            {
+                itemGroup = packageReferencesItemGroups.Single();
+            }
+            else
+            {
+                var packageReferencesOnlyItemGroups = packageReferencesItemGroups.Where(
+                    e => e.Descendants().All(i => XNameEqualsString(i.Name, PackageReference)));
+
+                count = packageReferencesOnlyItemGroups.Count();
+
+                if (count == 1)
+                {
+                    itemGroup = packageReferencesOnlyItemGroups.Single();
+                }
+                else
+                {
+                    if (count == 0)
+                    {
+                        itemGroup = packageReferencesItemGroups.First();
+                    }
+                    else
+                    {
+                        var cosmosPackageReferencesItemGroups = packageReferencesOnlyItemGroups.Where(
+                            e => e.Descendants().Any(
+                                p => p.Attributes().First(
+                                    a => XNameEqualsString(a.Name, Include)).Value.Contains("Cosmos")));
+
+                        if (cosmosPackageReferencesItemGroups.Any())
+                        {
+                            itemGroup = cosmosPackageReferencesItemGroups.First();
+                        }
+                        else
+                        {
+                            itemGroup = packageReferencesItemGroups.First();
+                        }
+                    }
+                }
+            }
+
             var cosmosBuildPackageReference = new XElement("PackageReference");
-            cosmosBuildPackageReference.Add(new XAttribute("Include", "Cosmos.Build"));
+            cosmosBuildPackageReference.Add(new XAttribute(Include, "Cosmos.Build"));
             cosmosBuildPackageReference.Add(new XAttribute("Version", "*"));
+            cosmosBuildPackageReference.Add(new XAttribute("NoWarn", "NU1604"));
 
-            packageReferences.Append(cosmosBuildPackageReference);
-            packageReferences = packageReferences.OrderBy(p => p.Attributes().Where(a => a.Name == "Include").First().Value);
+            itemGroup.AddFirst(cosmosBuildPackageReference);
 
-            codeProjectStream.Dispose();
-
-            File.WriteAllText(codeProject, GetProjectTemplate());
-
-            var codeProjectDocument = XDocument.Parse(File.ReadAllText(codeProject));
-
-            codeProjectDocument.Root.Descendants().Where(d => d.Name == "PropertyGroup").LastOrDefault()
-                .Add(cosmosProjectProperties);
-
-            if (references.Count() > 0)
-            {
-                codeProjectDocument.Root.Add(new XElement("ItemGroup", references));
-            }
-
-            if (projectReferences.Count() > 0)
-            {
-                codeProjectDocument.Root.Add(new XElement("ItemGroup", projectReferences));
-            }
-
-            if (packageReferences.Count() > 0)
-            {
-                codeProjectDocument.Root.Add(new XElement("ItemGroup", packageReferences));
-            }
-
-            using (var xmlWriter = XmlWriter.Create(codeProject,
+            using (var xmlWriter = XmlWriter.Create(
+                codeProject,
                 new XmlWriterSettings()
                 {
                     Indent = true,
-                    IndentChars = "    ",
                     OmitXmlDeclaration = true
                 }))
             {
-                codeProjectDocument.Save(xmlWriter);
+                document.Save(xmlWriter);
             }
 
             File.Delete(cosmosProject);
         }
 
-        private string GetProjectTemplate()
-        {
-            using (var projectTemplateStream = Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream("Cosmos.VS.ProjectSystem.ProjectTemplate.xml"))
-            {
-                using (var projectTemplateReader = new StreamReader(projectTemplateStream))
-                {
-                    return projectTemplateReader.ReadToEnd();
-                }
-            }
-        }
+        private static bool XNameEqualsString(XName xName, string name) => StringEquals(xName.LocalName, name);
+
+        private static bool StringEquals(string a, string b) => String.Equals(a, b, StringComparison.OrdinalIgnoreCase);
     }
 }
