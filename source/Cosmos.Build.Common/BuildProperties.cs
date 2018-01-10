@@ -8,7 +8,7 @@ namespace Cosmos.Build.Common
 {
     public class BuildProperties : PropertiesBase
     {
-        static public List<string> PropNames = new List<string>();
+        public static List<string> PropNames = new List<string>();
 
         static BuildProperties()
         {
