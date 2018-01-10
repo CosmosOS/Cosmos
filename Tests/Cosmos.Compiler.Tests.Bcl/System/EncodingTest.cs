@@ -75,9 +75,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
         static void TestUTF8()
         {
-            Encoding xEncoding = new UTF8Encoding();
-
+            //Encoding xEncoding = new UTF8Encoding();
+            Encoding xEncoding = Encoding.UTF8;
             mDebugger.SendInternal($"Starting Test {xEncoding.BodyName} Encoding / Decoding");
+
+            Assert.IsTrue(xEncoding.BodyName == "UTF-8", "UTF8 BodyName failed not 'UTF-8");
+            Assert.IsTrue(xEncoding.IsSingleByte == false, "UTF8.IsSingleByte failed: it returns true");
 
             TestGetBytes(xEncoding, "Cosmos is wonderful!", UTF8EnglishText, "English");
             TestGetBytes(xEncoding, "Cosmos è fantastico!", UTF8ItalianText, "Italian");
@@ -104,6 +107,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Encoding xEncoding = Encoding.GetEncoding(437);
 
             mDebugger.SendInternal($"Starting Test {xEncoding.BodyName} Encoding / Decoding");
+
+            Assert.IsTrue(xEncoding.BodyName == "IBM437", "437 BodyName failed not 'IBM437");
+            Assert.IsTrue(xEncoding.IsSingleByte == true, "437.IsSingleByte failed: it returns false");
 
             TestGetBytes(xEncoding, "Cosmos is wonderful!", CP437EnglishText, "English");
             TestGetBytes(xEncoding, "Cosmos è fantastico!", CP437ItalianText, "Italian");
@@ -135,6 +141,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             mDebugger.SendInternal($"Starting Test {xEncoding.BodyName} Encoding / Decoding");
 
+            Assert.IsTrue(xEncoding.BodyName == "IBM00858", "858 BodyName failed not 'IBM00858");
+            Assert.IsTrue(xEncoding.IsSingleByte == true, "858.IsSingleByte failed: it returns false");
+
             TestGetBytes(xEncoding, "Cosmos is wonderful!", CP858EnglishText, "English");
             TestGetBytes(xEncoding, "Cosmos è fantastico!", CP858ItalianText, "Italian");
             TestGetBytes(xEncoding, "Cosmos es genial!", CP858SpanishText, "Spanish");
@@ -159,6 +168,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             mDebugger.SendInternal("Finished Test CP858 Encoding / Decoding");
         }
 
+#if true
         public static void Execute()
         {
             /*
@@ -170,12 +180,13 @@ namespace Cosmos.Compiler.Tests.Bcl.System
              */
             Encoding.RegisterProvider(CosmosEncodingProvider.Instance);
 
-            //TestUTF8();
+            TestUTF8();
             // TestAscii();
 
             TestCP437();
             TestCP858();
         }
+#endif
 
 #if false
         public static void Execute()
@@ -197,6 +208,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(!xEncoding.IsSingleByte, "IsSingleByte failed return true for UTF8");
 
 #if true
+            mDebugger.SendInternal($"Starting Test {xEncoding.BodyName} Encoding / Decoding");
+
             text = "Cosmos is wonderful!";
             result = xEncoding.GetBytes(text);
             expectedResult = UTF8EnglishText;

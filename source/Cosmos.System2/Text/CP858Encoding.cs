@@ -26,6 +26,6 @@ namespace Cosmos.System.ExtendedASCII
 
         public override string BodyName => "IBM00858";
 
-        public override int CodePage => 437;
+        public override int CodePage => 858;
     }
 }

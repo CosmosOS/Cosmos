@@ -101,16 +101,16 @@ namespace Cosmos.Core_Plugs.System
 
         /*
          * These 2 unsafe string Ctor are only "stubs" implemented because Encoding needed them existing but our implementation is not
-         * using them. Sincerely in Cosmos I hope there wi
+         * using them.
          */
         public unsafe static void Ctor(string aThis, sbyte* aValue)
         {
-            throw new NotImplementedException("String Ctor(sbyte * '\0' terminated)");
+            throw new NotImplementedException("String Ctor(sbyte ptr '\0' terminated)");
         }
 
         public unsafe static void Ctor(string aThis, sbyte* aValue, int aStartIndex, int aLength)
         {
-            throw new NotImplementedException("String Ctor(sbyte * with lenght)");
+            throw new NotImplementedException("String Ctor(sbyte ptr with lenght)");
         }
 
         public static unsafe int get_Length(
@@ -1083,5 +1083,13 @@ namespace Cosmos.Core_Plugs.System
                     throw new ArgumentException("Not Supported StringComparison");
             }
         }
+
+
+        public unsafe static int nativeCompareOrdinalIgnoreCaseWC(string strA, sbyte* strBBytes)
+        {
+            throw new NotImplementedException("nativeCompareOrdinalIgnoreCaseWC");
+        }
+
+
     }
 }

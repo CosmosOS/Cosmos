@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 using Cosmos.Compiler.Tests.Bcl.System;
+using Cosmos.Compiler.Tests.Bcl.System.Collections.Generic;
+using Cosmos.Compiler.Tests.Bcl.System.Collections.Not_Generic;
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
@@ -45,9 +48,10 @@ namespace Cosmos.Compiler.Tests.Bcl
                 EncodingTest.Execute();
                 RandomTests.Execute();
 
-                System.Collections.Generic.ListTest.Execute();
-                System.Collections.Generic.QueueTest.Execute();
-                //System.Collections.Generic.DictionaryTest.Execute();
+                ListTest.Execute();
+                QueueTest.Execute();
+                //DictionaryTest.Execute();
+                HashtableTest.Execute();
 
                 TestController.Completed();
             }

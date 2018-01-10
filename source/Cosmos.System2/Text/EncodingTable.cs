@@ -10,11 +10,11 @@ namespace Cosmos.System.ExtendedASCII
      */
     internal static class EncodingTable
     {
-        private static Debugger myDebugger = new Debugger("System", "CP437 Encoding");
+        private static Debugger mDebugger = new Debugger("System", "EncodingTable");
 
         static EncodingTable()
         {
-            myDebugger.SendInternal("Inizializing Encoding Table");
+            mDebugger.SendInternal("Inizializing Encoding Table");
 
             Add(437, "IBM437", new CP437Enconding());
             Add(858, "IBM0858", new CP858Enconding());
@@ -37,7 +37,7 @@ namespace Cosmos.System.ExtendedASCII
 
         public static void Add(int codepage, string desc, Encoding encoding)
         {
-            myDebugger.SendInternal($"Adding codepage {codepage} desc {desc}");
+            mDebugger.SendInternal($"Adding codepage {codepage} desc {desc}");
             CodepageCache[codepage] = new values(desc, encoding);
         }
 
