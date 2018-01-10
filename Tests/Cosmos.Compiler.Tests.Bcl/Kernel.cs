@@ -45,6 +45,8 @@ namespace Cosmos.Compiler.Tests.Bcl
                 EncodingTest.Execute();
                 RandomTests.Execute();
 
+                GuidTest.Execute();
+
                 System.Collections.Generic.ListTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
                 //System.Collections.Generic.DictionaryTest.Execute();
