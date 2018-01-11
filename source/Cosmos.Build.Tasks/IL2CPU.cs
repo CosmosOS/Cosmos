@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
@@ -50,6 +49,9 @@ namespace Cosmos.Build.Tasks
         #endregion
 
         protected override string ToolName => "IL2CPU.exe";
+
+        protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
+        protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
 
         protected override string GenerateFullPathToTool() => Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe");
 
