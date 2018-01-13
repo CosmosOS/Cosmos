@@ -35,7 +35,7 @@ build_script:
 
     dotnet publish source\Cosmos.Build.MSBuild -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
 
-    dotnet publish ..\IL2CPU\source\IL2CPU.Compiler -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
+    dotnet publish ..\IL2CPU\source\IL2CPU -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
 
 
     xcopy /Y "Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
