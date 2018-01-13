@@ -208,8 +208,8 @@ namespace Cosmos.TestRunner.Core
             var xArgs = new List<string>
             {
                 "KernelPkg:" + KernelPkg,
-                "DebugEnabled:True",
-                "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
+                "EnableDebug:True",
+                "EnableStackCorruptionDetection:" + EnableStackCorruptionChecks,
                 "StackCorruptionDetectionLevel:" + StackCorruptionChecksLevel,
                 "DebugMode:Source",
                 "TraceAssemblies:" + TraceAssembliesLevel,

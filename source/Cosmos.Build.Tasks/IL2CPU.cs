@@ -60,8 +60,8 @@ namespace Cosmos.Build.Tasks
             Dictionary<string, string> args = new Dictionary<string, string>
             {
                 {"KernelPkg", KernelPkg},
-                {"DebugEnabled", DebugEnabled.ToString()},
-                {"StackCorruptionDetectionEnabled", StackCorruptionDetectionEnabled.ToString()},
+                {"EnableDebug", DebugEnabled.ToString()},
+                {"EnableStackCorruptionDetection", StackCorruptionDetectionEnabled.ToString()},
                 {"StackCorruptionDetectionLevel", StackCorruptionDetectionLevel},
                 {"DebugMode", DebugMode},
                 {"TraceAssemblies", TraceAssemblies},
