@@ -90,6 +90,7 @@ namespace Cosmos.Build.Builder {
                        "/nologo " +
                        "/maxcpucount " +
                        "/nodeReuse:False " +
+                       "/p:DeployExtension=False " +
                        $"/p:Configuration={Quoted(aBuildCfg)} " +
                        $"/p:Platform={Quoted("Any CPU")} " +
                        $"/p:OutputPath={Quoted(mVsipPath)}";
