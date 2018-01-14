@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.TestRunner;
-using Cosmos.Compiler.Tests.Bcl.Helper;
+﻿using System.Text;
 
-namespace Cosmos.Compiler.Tests.Bcl.System
+using Cosmos.TestRunner;
+
+namespace Cosmos.Compiler.Tests.Bcl.System.Text
 {
     class EncodingTest
     {

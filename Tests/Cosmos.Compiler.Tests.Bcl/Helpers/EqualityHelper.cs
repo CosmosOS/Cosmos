@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Cosmos.Compiler.Tests.Bcl.Helper
+namespace Cosmos.Compiler.Tests.Bcl
 {
-    class EqualityHelper
+    internal static class EqualityHelper
     {
+        public static bool SinglesAreEqual(float left, float right)
+        {
+            // Define the tolerance for variation in their values
+            float difference = Math.Abs(left * .00001F);
+            return Math.Abs(left - right) <= difference;
+        }
+
         public static bool DoublesAreEqual(double left, double right)
         {
             // Define the tolerance for variation in their values
             double difference = Math.Abs(left * .00001);
-
-            if (Math.Abs(left - right) <= difference)
-                return true;
-            else
-                return false;
+            return Math.Abs(left - right) <= difference;
         }
 
         /// <summary>
