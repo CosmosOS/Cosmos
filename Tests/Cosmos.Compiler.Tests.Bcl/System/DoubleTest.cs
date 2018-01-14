@@ -196,6 +196,33 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = 42.0;
             valueNegated = -value;
             Assert.IsTrue((EqualityHelper.DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive double doesn't work");
+
+            #region Parsing
+
+            value = Double.Parse("0.4");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.4), "simple parsing of double works");
+
+            value = Double.Parse("+0.3");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.3), "parsing of double with positive sign works!");
+
+            value = Double.Parse("-0.4");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, -0.4), "parsing of negative double works!");
+
+            value = Double.Parse("    0.7     ");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.7), "double parsing ignores leading and trailing whitespaces");
+
+            value = Double.Parse("0.4E1");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 4), "double parsing takes in account E");
+
+            value = Double.Parse("0.4E-1");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.04), "double parsing works with negative E");
+
+            Assert.IsFalse(Double.TryParse("asd4", out value), "double TryParse returns false when it fails");
+
+            Assert.IsTrue(Double.TryParse("2.3", out value), "double TryParse returns true when it works");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 2.3), "double TryParse returns correct result when it works");
+
+            #endregion
         }
     }
 }
