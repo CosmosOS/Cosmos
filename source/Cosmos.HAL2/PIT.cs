@@ -30,19 +30,21 @@ namespace Cosmos.HAL {
                 this.NSRemaining = this.NanosecondsTimeout;
                 this.Recuring = Recuring;
             }
+
             public PITTimer(dOnTrigger HandleOnTrigger, int NanosecondsTimeout, int NanosecondsLeft) {
                 this.HandleTrigger = HandleOnTrigger;
                 this.NanosecondsTimeout = NanosecondsTimeout;
                 this.NSRemaining = NanosecondsLeft;
                 this.Recuring = true;
             }
+
             ~PITTimer() {
                 Dispose();
             }
 
             public void Dispose() {
                 if (ID != -1) {
-                    //Global.PIT.UnregisterTimer(ID);
+                    Global.PIT.UnregisterTimer(ID);
                 }
             }
         }
@@ -154,9 +156,13 @@ namespace Cosmos.HAL {
             RegisterTimer(new PITTimer(SignalWait, (int)(TimeoutMS * 1000000), false));
 
             while (!WaitSignaled) {
-                Core.Global.CPU.Halt();
+                var bytes = new byte[1];
+                IO.Data0.Read8(bytes);
+                if (bytes[0] == 0) HandleInterrupt();
+                //Core.Global.CPU.Halt();
             }
         }
+
         public void WaitNS(int TimeoutNS) {
             WaitSignaled = false;
 
