@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core;
 
 namespace Cosmos.HAL {
 	/// <summary>
@@ -58,6 +59,12 @@ namespace Cosmos.HAL {
         public const uint PITFrequency = 1193180;
         public const uint PITDelayNS = 838;
         public bool T0RateGen = false;
+
+	    public PIT()
+	    {
+            INTs.SetIrqHandler(0x00, HandleIRQ);
+	        _T0Countdown = 65535;
+        }
 
         public ushort T0Countdown {
             get {
@@ -132,6 +139,7 @@ namespace Cosmos.HAL {
         }
 
         //TODO: Why is sound in PIT? Is it a function of the PIT?
+        //Channel 3 is for the pc speaker ^
         public void EnableSound() {
             //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0x03);
         }
@@ -156,10 +164,7 @@ namespace Cosmos.HAL {
             RegisterTimer(new PITTimer(SignalWait, (int)(TimeoutMS * 1000000), false));
 
             while (!WaitSignaled) {
-                var bytes = new byte[1];
-                IO.Data0.Read8(bytes);
-                if (bytes[0] == 0) HandleInterrupt();
-                //Core.Global.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
         }
 
@@ -173,27 +178,36 @@ namespace Cosmos.HAL {
             }
         }
 
-        public void HandleInterrupt() {
-            int T0Delay = (int)T0DelyNS;
-            PITTimer hndlr = null;
-            for (int i = ActiveHandlers.Count - 1; i >= 0; i--) {
-                hndlr = ActiveHandlers[i];
+	    private void HandleIRQ(ref INTs.IRQContext aContext)
+	    {
 
-                hndlr.NSRemaining -= T0Delay;
+	        int T0Delay = (int) T0DelyNS;
+	        PITTimer hndlr = null;
+	        for (int i = ActiveHandlers.Count - 1; i >= 0; i--)
+	        {
+	            hndlr = ActiveHandlers[i];
 
-                if (hndlr.NSRemaining < 1) {
-                    if (hndlr.Recuring) {
-                        hndlr.NSRemaining = hndlr.NanosecondsTimeout;
-                    } else {
-                        hndlr.ID = -1;
-                        ActiveHandlers.RemoveAt(i);
-                    }
-                    hndlr.HandleTrigger();
-                }
-            }
-        }
+	            hndlr.NSRemaining -= T0Delay;
 
-        public int RegisterTimer(PITTimer timer) {
+	            if (hndlr.NSRemaining < 1)
+	            {
+	                if (hndlr.Recuring)
+	                {
+	                    hndlr.NSRemaining = hndlr.NanosecondsTimeout;
+	                }
+	                else
+	                {
+	                    hndlr.ID = -1;
+	                    ActiveHandlers.RemoveAt(i);
+	                }
+
+	                hndlr.HandleTrigger();
+	            }
+	        }
+
+	    }
+
+	    public int RegisterTimer(PITTimer timer) {
             if (timer.ID != -1)
                 throw new InvalidOperationException("Timer has already been registered!");
 
