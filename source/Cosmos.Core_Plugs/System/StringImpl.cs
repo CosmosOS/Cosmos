@@ -482,7 +482,6 @@ namespace Cosmos.Core_Plugs.System
         //{
         //    uint xValue = aValue;
         //    byte xCurrentBits = aBitCount;
-        //    Console.Write("0x");
         //    while (xCurrentBits >= 4)
         //    {
         //        xCurrentBits -= 4;
@@ -539,7 +538,6 @@ namespace Cosmos.Core_Plugs.System
         //                xDigitString = "F";
         //                goto default;
         //            default:
-        //                Console.Write(xDigitString);
         //                break;
         //        }
         //    }

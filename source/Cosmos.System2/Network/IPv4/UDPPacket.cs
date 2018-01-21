@@ -17,7 +17,7 @@ namespace Cosmos.System.Network.IPv4
             UdpClient receiver = UdpClient.Client(udp_packet.DestinationPort);
             if (receiver != null)
             {
-                Sys.Console.WriteLine("UDP Packet is for registered client");
+                Sys.Console.WriteLine("UDP Packet is for registered client"); //TODO: Better way to handle?
                 receiver.receiveData(udp_packet);
             //    DataReceived dlgt = udpClients[udp_packet.DestinationPort];
             //    if (dlgt != null)

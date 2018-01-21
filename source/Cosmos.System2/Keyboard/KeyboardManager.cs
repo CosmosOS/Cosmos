@@ -113,7 +113,7 @@ public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
             {
                 if (ControlPressed && AltPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
                 {
-                    Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                    Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System..."); //Not sure should be removed.
                     Power.Reboot();
                 }
 

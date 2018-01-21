@@ -12,11 +12,11 @@ namespace Cosmos.HAL.BlockDevice
         {
             if (xDevice != null)
             {
-                Console.WriteLine("ATA Primary Master");
+                Console.WriteLine("ATA Primary Master"); //Not sure should be removed.
                 Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
                 //Console.WriteLine("ATA Primary Slave");
                 //Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
-                Console.WriteLine("ATA Secondary Master");
+                Console.WriteLine("ATA Secondary Master"); //Not sure, should be removed.
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
                 //Console.WriteLine("ATA Secondary Slave");
                 //Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
@@ -66,13 +66,13 @@ namespace Cosmos.HAL.BlockDevice
                 var xPart = xMBR.Partitions[i];
                 if (xPart == null)
                 {
-                    Console.WriteLine("Null partition found at idx: " + i);
+                    Console.WriteLine("Null partition found at idx: " + i); //Not sure should be removed.
                 }
                 else
                 {
                     var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
                     BlockDevice.Devices.Add(xPartDevice);
-                    Console.WriteLine("Found partition at idx: " + i);
+                    Console.WriteLine("Found partition at idx: " + i); //Not sure should be removed.
                 }
             }
         }

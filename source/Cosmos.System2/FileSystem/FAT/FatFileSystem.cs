@@ -543,7 +543,7 @@ namespace Cosmos.System.FileSystem.FAT
             global::System.Console.WriteLine("Root Sector           = " + RootSector);
             global::System.Console.WriteLine("Root Sector Count     = " + RootSectorCount);
             global::System.Console.WriteLine("Sectors per Cluster   = " + SectorsPerCluster);
-            global::System.Console.WriteLine("Total Sector Count    = " + TotalSectorCount);
+            global::System.Console.WriteLine("Total Sector Count    = " + TotalSectorCount); // AFAIK this should stay.
 
             Global.mFileSystemDebugger.SendInternal("Bytes per Cluster =");
             Global.mFileSystemDebugger.SendInternal(BytesPerCluster);

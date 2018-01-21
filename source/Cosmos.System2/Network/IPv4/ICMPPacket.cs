@@ -1,6 +1,8 @@
 ﻿using System;
 using Sys = System;
 
+//Not sure Console.Writelines should be removed.
+
 namespace Cosmos.System.Network.IPv4
 {
     internal class ICMPPacket : IPPacket

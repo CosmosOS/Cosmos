@@ -261,24 +261,17 @@ namespace Cosmos.System.FileSystem.VFS
                 return false;
             }
 
-            try
-            {
-                Global.mFileSystemDebugger.SendInternal("aPath =");
-                Global.mFileSystemDebugger.SendInternal(aPath);
+			//Got rid of catch clause.
+			
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
 
-                string xPath = Path.GetFullPath(aPath);
-                Global.mFileSystemDebugger.SendInternal("After GetFullPath");
-                Global.mFileSystemDebugger.SendInternal("xPath =");
-                Global.mFileSystemDebugger.SendInternal(xPath);
+            string xPath = Path.GetFullPath(aPath);
+            Global.mFileSystemDebugger.SendInternal("After GetFullPath");
+            Global.mFileSystemDebugger.SendInternal("xPath =");
+            Global.mFileSystemDebugger.SendInternal(xPath);
 
-                return GetFile(xPath) != null;
-            }
-            catch (Exception e)
-            {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(e.Message);
-                return false;
-            }
+            return GetFile(xPath) != null;
         }
 
         public static bool FileExists(DirectoryEntry aEntry)
@@ -346,24 +339,24 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new ArgumentNullException(nameof(aEntry));
             }
 
-            try
-            {
-                Global.mFileSystemDebugger.SendInternal("aEntry.mName =");
-                Global.mFileSystemDebugger.SendInternal(aEntry.mName);
+            //try
+            //{
+            Global.mFileSystemDebugger.SendInternal("aEntry.mName =");
+            Global.mFileSystemDebugger.SendInternal(aEntry.mName);
 
-                string xPath = GetFullPath(aEntry);
-                Global.mFileSystemDebugger.SendInternal("After GetFullPath");
-                Global.mFileSystemDebugger.SendInternal("xPath =");
-                Global.mFileSystemDebugger.SendInternal(xPath);
+            string xPath = GetFullPath(aEntry);
+            Global.mFileSystemDebugger.SendInternal("After GetFullPath");
+            Global.mFileSystemDebugger.SendInternal("xPath =");
+            Global.mFileSystemDebugger.SendInternal(xPath);
 
-                return GetDirectory(xPath) != null;
-            }
-            catch (Exception e)
-            {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(e.Message);
-                return false;
-            }
+            return GetDirectory(xPath) != null;
+            //}
+            //catch (Exception e)
+            //{
+            //    global::System.Console.Write("Exception occurred: ");
+            //    global::System.Console.WriteLine(e.Message);
+            //    return false;
+            //}
         }
 
         public static string GetFullPath(DirectoryEntry aEntry)

@@ -25,7 +25,7 @@ namespace Cosmos.System.Network.ARP
                     IPv4.ARPRequest_Ethernet arp_request = new IPv4.ARPRequest_Ethernet(packetData);
                     if (arp_request.SenderIP == null)
                     {
-                        global::System.Console.WriteLine("SenderIP null in ARPHandler!");
+                        global::System.Console.WriteLine("SenderIP null in ARPHandler!"); //TODO: better way to handle.
                     }
                     arp_request = new IPv4.ARPRequest_Ethernet(packetData);
                     

@@ -374,16 +374,16 @@ namespace Cosmos.System.FileSystem
                 {
                     Global.mFileSystemDebugger.SendInternal("Partition #: ");
                     Global.mFileSystemDebugger.SendInternal(i + 1);
-                    global::System.Console.WriteLine("Partition #: " + (i + 1));
+                    global::System.Console.WriteLine("Partition #: " + (i + 1)); //Not sure should be removed.
                     Global.mFileSystemDebugger.SendInternal("Block Size:");
                     Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockSize);
-                    global::System.Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes");
+                    global::System.Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes"); //Not sure should be removed.
                     Global.mFileSystemDebugger.SendInternal("Block Count:");
                     Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount);
-                    global::System.Console.WriteLine("Block Count: " + mPartitions[i].BlockCount);
+                    global::System.Console.WriteLine("Block Count: " + mPartitions[i].BlockCount); //Not sure should be removed.
                     Global.mFileSystemDebugger.SendInternal("Size:");
                     Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
-                    global::System.Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
+                    global::System.Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB"); //Not sure should be removed.
                 }
             }
             else
@@ -404,7 +404,7 @@ namespace Cosmos.System.FileSystem
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
-                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath, xSize));
+                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath, xSize)); //Not sure should be removed.
                         break;
                     default:
                         global::System.Console.WriteLine("Unknown filesystem type!");
@@ -414,14 +414,14 @@ namespace Cosmos.System.FileSystem
                 if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].mRootPath == xRootPath))
                 {
                     string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
-                    global::System.Console.WriteLine(xMessage);
+                    global::System.Console.WriteLine(xMessage); //Not sure should be removed.
                     mFileSystems[i].DisplayFileSystemInfo();
                     Directory.SetCurrentDirectory(xRootPath);
                 }
                 else
                 {
                     string xMessage = string.Concat("No filesystem found on partition #", i);
-                    global::System.Console.WriteLine(xMessage);
+                    global::System.Console.WriteLine(xMessage); //Not sure should be removed.
                 }
             }
         }

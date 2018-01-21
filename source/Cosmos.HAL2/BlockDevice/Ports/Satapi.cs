@@ -136,7 +136,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             new MemoryBlock(0x0046C000, 512).Read8(xByte);
             for (int i = 0; i < 512; i++)
             {
-                Console.Write(xByte[i]);
+                Console.Write(xByte[i]); //Not sure should be removed.
             }
         }
 

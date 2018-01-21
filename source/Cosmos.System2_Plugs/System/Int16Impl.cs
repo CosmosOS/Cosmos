@@ -43,9 +43,9 @@ namespace Cosmos.System_Plugs.System
                 Int16 ind = (Int16)digits.IndexOf(s[i]);
                 if (ind == -1)
                 {
-                    global::System.Console.Write("Digit '");
-                    global::System.Console.Write(s[i]);
-                    global::System.Console.WriteLine("' not found!");
+                    //global::System.Console.Write("Digit '"); //Not sure should be removed.
+                    //global::System.Console.Write(s[i]);
+                    //global::System.Console.WriteLine("' not found!");
                     throw new FormatException();
                 }
                 result = (Int16)((result * 10) + ind);

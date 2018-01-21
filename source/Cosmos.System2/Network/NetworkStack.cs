@@ -50,7 +50,7 @@ namespace Cosmos.System.Network
             Sys.Console.Write("Received Packet Length=");
             if (packetData == null)
             {
-                Sys.Console.WriteLine("**NULL**");
+                Sys.Console.WriteLine("**NULL**"); //TODO: Better ways to handle
                 return;
             }
             Sys.Console.WriteLine(packetData.Length);

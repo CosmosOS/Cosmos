@@ -35,11 +35,11 @@ namespace Cosmos.HAL
             // system level and not accessible from Core. Need to think about this
             // for the future.
 
-            Console.WriteLine("Finding PCI Devices");
+            Console.WriteLine("Finding PCI Devices"); //Not sure should be removed.
             mDebugger.Send("PCI Devices");
             PCI.Setup();
 
-            Console.WriteLine("Starting ACPI");
+            Console.WriteLine("Starting ACPI"); //Not sure should be removed.
             mDebugger.Send("ACPI Init");
             ACPI.Start();
           

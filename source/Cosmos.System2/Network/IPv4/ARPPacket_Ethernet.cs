@@ -26,10 +26,10 @@ namespace Cosmos.System.Network.IPv4
             base.initFields();
             mSenderMAC = new MACAddress(mRawData, 22);
             mSenderIP = new Address(mRawData, 28);
-            global::System.Console.WriteLine("SenderIP created");
+            global::System.Console.WriteLine("SenderIP created"); //Not sure should be removed.
             if (SenderIP == null)
             {
-                global::System.Console.WriteLine("But its already null again");
+                global::System.Console.WriteLine("But its already null again"); //TODO: Better ways to handle.
             }
             mTargetMAC = new MACAddress(mRawData, 32);
             mTargetIP = new Address(mRawData, 38);
@@ -123,7 +123,7 @@ namespace Cosmos.System.Network.IPv4
         {
             if (SenderIP == null)
             {
-                global::System.Console.WriteLine("In ARPRequest_Ethernet, SenderIP is null!");
+                global::System.Console.WriteLine("In ARPRequest_Ethernet, SenderIP is null!"); //TODO: Better ways to handle
             }
         }
 
