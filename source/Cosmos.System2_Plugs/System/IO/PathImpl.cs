@@ -401,8 +401,8 @@ namespace Cosmos.System_Plugs.System.IO
                 string xText = NormalizePath(aPath, false);
                 if (aPath.Length > 0)
                 {
-                    //try
-                    //{
+                    try
+                    {
                         string text2 = aPath;
                         int num = 0;
                         while ((num < text2.Length) && (text2[num] != '?') && (text2[num] != '*'))
@@ -413,16 +413,16 @@ namespace Cosmos.System_Plugs.System.IO
                         {
                             Path.GetFullPath(text2.Substring(0, num));
                         }
-                    //}
-                    //catch (PathTooLongException)
-                    //{
-                    //}
-                    //catch (NotSupportedException)
-                    //{
-                    //}
-                    //catch (ArgumentException)
-                    //{
-                    //}
+                    }
+                    catch (PathTooLongException)
+                    {
+                    }
+                    catch (NotSupportedException)
+                    {
+                    }
+                    catch (ArgumentException)
+                    {
+                    }
                 }
                 aPath = xText;
                 int rootLength = GetRootLength(aPath);
