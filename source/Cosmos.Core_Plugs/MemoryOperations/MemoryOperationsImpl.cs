@@ -11,7 +11,8 @@ namespace Cosmos.Core_Plugs.MemoryOperations
     {
         unsafe public static void Fill(byte* dest, int value, int size)
         {
-            /* For very little sizes (until 15 bytes) we hand unroll the loop */
+            Console.WriteLine("Filling array of size " + size + " with value 0x" + value.ToString("X"));
+ -          Global.mDebugger.SendInternal("Filling array of size " + size + " with value " + value);
             switch (size)
             {
                 case 0:
