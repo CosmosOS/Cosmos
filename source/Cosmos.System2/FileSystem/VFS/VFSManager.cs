@@ -262,7 +262,7 @@ namespace Cosmos.System.FileSystem.VFS
             }
 
 			//Got rid of catch clause.
-			
+			try {
             Global.mFileSystemDebugger.SendInternal("aPath =");
             Global.mFileSystemDebugger.SendInternal(aPath);
 
@@ -272,6 +272,7 @@ namespace Cosmos.System.FileSystem.VFS
             Global.mFileSystemDebugger.SendInternal(xPath);
 
             return GetFile(xPath) != null;
+            } catch(Exception e) {return false;}
         }
 
         public static bool FileExists(DirectoryEntry aEntry)
@@ -339,8 +340,8 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new ArgumentNullException(nameof(aEntry));
             }
 
-            //try
-            //{
+            try
+            {
             Global.mFileSystemDebugger.SendInternal("aEntry.mName =");
             Global.mFileSystemDebugger.SendInternal(aEntry.mName);
 
@@ -350,13 +351,11 @@ namespace Cosmos.System.FileSystem.VFS
             Global.mFileSystemDebugger.SendInternal(xPath);
 
             return GetDirectory(xPath) != null;
-            //}
-            //catch (Exception e)
-            //{
-            //    global::System.Console.Write("Exception occurred: ");
-            //    global::System.Console.WriteLine(e.Message);
-            //    return false;
-            //}
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
 
         public static string GetFullPath(DirectoryEntry aEntry)
