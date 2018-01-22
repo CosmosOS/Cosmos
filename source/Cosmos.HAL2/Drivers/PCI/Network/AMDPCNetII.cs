@@ -10,7 +10,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 {
     public class AMDPCNetII : NetworkDevice
     {
-        protected PCIDevice pciCard;
+        protected PCIDeviceNormal pciCard;
         protected AMDPCNetIIIOGroup io;
         protected MACAddress mac;
         protected bool mInitDone;
@@ -24,7 +24,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         protected Queue<byte[]> mTransmitBuffer;
         private int mNextTXDesc;
 
-        public AMDPCNetII(PCIDevice device)
+        public AMDPCNetII(PCIDeviceNormal device)
             : base()
         {
             if (device == null)
@@ -33,10 +33,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             }
 
             this.pciCard = device;
-            //this.pciCard.Claimed = true;
+            // this.pciCard.Claimed = true;
             //this.pciCard.EnableDevice();
 
-            this.io = new AMDPCNetIIIOGroup((ushort) this.pciCard.BaseAddressBar[0].BaseAddress);
+            //this.io = new AMDPCNetIIIOGroup((ushort) this.pciCard.BaseAddresses[0].BaseAddress());
             this.io.RegisterData.DWord = 0;
 
             // Get the EEPROM MAC Address and set it as the devices MAC
@@ -129,55 +129,22 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             Cosmos.Core.Global.PIC.EoiSlave();
         }
 
-        // 
-        // Retrieve all AMD PCNetII network cards found on computer.
-        // 
-        //public static void FindAll()
-        //{
-        //    Console.WriteLine("Scanning for AMD PCNetII cards...");
-        //    PCIDevice device;
-        //    device = HAL.PCI.GetDevice(0x1022, 0x2000);
-        //    if (device != null)
-        //    {
-        //        AMDPCNetII nic = new AMDPCNetII(device);
-          
-        //        Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
-        //                        device.function);
-        //        Console.WriteLine("NIC IRQ: " + device.InterruptLine);
-        //        Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
-        //    }
-        //}
-
-        public static bool NetworkCardAvailable()
-        {
-            PCIDevice device;
-            device = HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
-            if (device != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         /// <summary>
-        /// Get MAC Address String
+        /// Retrieve all AMD PCNetII network cards found on computer.
         /// </summary>
-        public static string PhysicalAdress()
-        {           
-            PCIDevice device;
-            device = HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
-            if (NetworkCardAvailable())
-            {
-                AMDPCNetII nic = new AMDPCNetII(device);
-                return nic.MACAddress.ToString();
-            }
-            else
-            {
-                return "";
-            }
+        public static void FindAll()
+        {
+          Console.WriteLine("Scanning for AMD PCNetII cards...");
+          //  PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+          //  if (device != null)
+          // {
+          //      AMDPCNetII nic = new AMDPCNetII((PCIDeviceNormal) device);
+          //
+          //      Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
+          //                        device.function);
+          //      Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+          //      Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
+          //  }
         }
 
         #region Register Access Properties
