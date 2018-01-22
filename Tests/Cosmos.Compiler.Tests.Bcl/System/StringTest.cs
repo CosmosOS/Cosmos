@@ -47,11 +47,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(test.Contains("test"), "string.Contains(string) doesn't find a substring that actually exists.");
             Assert.IsFalse(test.Contains("cosmos"), "string.Contains(string) found a substring that didn't actually exist in a string.");
 
-            Assert.IsTrue(test.EndsWith("string."), "string.EndsWith(string) is not reporting false even though the string actually does end with the substring.");
-            Assert.IsFalse(test.EndsWith("sentence."), "string.EndsWith(string) is not reporting true even though the string actually doesn't end with the substring.");
-
             Assert.IsTrue(test.StartsWith("This"), "string.StartsWith(string) is reporting false even though the string does start with the supplied substring.");
             Assert.IsFalse(test.StartsWith("That"), "string.StartsWith(string) is reporting true even though the string doesn't start with the supplied substring.");
+
+            Assert.IsTrue(test.EndsWith("string."), "string.EndsWith(string) is not reporting false even though the string actually does end with the substring.");
+            Assert.IsFalse(test.EndsWith("sentence."), "string.EndsWith(string) is not reporting true even though the string actually doesn't end with the substring.");
 
             string lower_expected = "this is a test string.";
             string upper_expected = "THIS IS A TEST STRING.";

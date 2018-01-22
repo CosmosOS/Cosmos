@@ -7,30 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Update="Engine.Bochs.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.Helpers.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.HyperV.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.Run.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.Running.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Engine.VMware.cs">
+        <Compile Update="Engine.*.cs">
             <DependentUpon>Engine.cs</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
         <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
         <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
-        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -47,7 +32,6 @@
         <ProjectReference Include="..\..\source\Kernel-X86\10-CPU\Cosmos.CPU_Asm\Cosmos.CPU_Asm.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\10-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
-        <ProjectReference Include="..\..\source\Kernel-X86\50-Application\GuessKernelGen3.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\91-Plugs\Cosmos.Plugs.TapRoot\Cosmos.Plugs.TapRoot.csproj" />
         <ProjectReference Include="..\BoxingTests\BoxingTests.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
