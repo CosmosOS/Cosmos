@@ -1,0 +1,10 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        Title="Cosmos Test Runner">
+    <Grid>
+
+        <TextBox IsReadOnly="True"
+                 Text="{Binding TestRunnerLog}"
+                 CaretIndex="{Binding TestRunnerLog.Length}"/>
+        
+    </Grid>
+</Window>
