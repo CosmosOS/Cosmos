@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Debug.Symbols;
+using IL2CPU.Debug.Symbols;
 
 namespace Cosmos.IL2CPU.Profiler {
     public class Assembler : Cosmos.IL2CPU.AppAssembler

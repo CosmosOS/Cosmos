@@ -90,6 +90,7 @@ namespace Cosmos.Build.Builder {
                        "/nologo " +
                        "/maxcpucount " +
                        "/nodeReuse:False " +
+                       "/p:DeployExtension=False " +
                        $"/p:Configuration={Quoted(aBuildCfg)} " +
                        $"/p:Platform={Quoted("Any CPU")} " +
                        $"/p:OutputPath={Quoted(mVsipPath)}";
@@ -120,22 +121,38 @@ namespace Cosmos.Build.Builder {
       }
     }
 
-    protected void CheckIfVSRunning() {
-      int xSeconds = 500;
-
-      if (Debugger.IsAttached) {
-        Log.WriteLine("Check if Visual Studio is running is ignored by debugging of Builder.");
-      } else {
-        Log.WriteLine("Check if Visual Studio is running.");
-        if (IsRunning("devenv")) {
-          Log.WriteLine("--Visual Studio is running.");
-          Log.WriteLine("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
-          // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
-          // So we wait a few seconds first.
-          if (WaitForExit("devenv", xSeconds * 1000)) {
-            throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
-          }
-        }
+    protected void CheckIfVSandCoRunning() {
+      bool xRunningFound = false;
+      if (IsRunning("devenv")) {
+        xRunningFound = true;
+        Log.WriteLine("--Visual Studio is running.");
+      }
+      if (IsRunning("VSIXInstaller")) {
+        xRunningFound = true;
+        Log.WriteLine("--VSIXInstaller is running.");
+      }
+      if (IsRunning("ServiceHub.IdentityHost")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.IdentityHost is running.");
+      }
+      if (IsRunning("ServiceHub.VSDetouredHost")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.VSDetouredHost is running.");
+      }
+      if (IsRunning("ServiceHub.Host.Node.x86")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.Host.Node.x86 is running.");
+      }
+      if (IsRunning("ServiceHub.SettingsHost")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.SettingsHost is running.");
+      }
+      if (IsRunning("ServiceHub.Host.CLR.x86")) {
+        xRunningFound = true;
+        Log.WriteLine("--ServiceHub.Host.CLR.x86 is running.");
+      }
+      if (xRunningFound) {
+        Log.WriteLine("--Running blockers found. Setup will warning you and wait for it.");
       }
     }
 
@@ -148,7 +165,7 @@ namespace Cosmos.Build.Builder {
       Section("Check Prerequisites");
 
       CheckIfUserKitRunning();
-      CheckIfVSRunning();
+      CheckIfVSandCoRunning();
       CheckIfBuilderRunning();
 
       CheckForNetCore();
@@ -299,15 +316,15 @@ namespace Cosmos.Build.Builder {
 
     private void CompileCosmos() {
       string xVsipDir = Path.Combine(mCosmosPath, "Build", "VSIP");
-      string xNugetPkgDir = Path.Combine(xVsipDir, "KernelPackages");
+      string xNugetPkgDir = Path.Combine(xVsipDir, "Packages");
 
       Section("Clean NuGet Local Feed");
       Clean(Path.Combine(mCosmosPath, @"Build.sln"));
 
       Section("Restore NuGet Packages");
       Restore(Path.Combine(mCosmosPath, @"Build.sln"));
-	  Restore(Path.Combine(mCosmosPath, @"../IL2CPU/IL2CPU.sln"));
-	  Restore(Path.Combine(mCosmosPath, @"../XSharp/XSharp.sln"));
+      Restore(Path.Combine(mCosmosPath, @"../IL2CPU/IL2CPU.sln"));
+      Restore(Path.Combine(mCosmosPath, @"../XSharp/XSharp.sln"));
 
       Section("Update NuGet");
       Update();
@@ -318,11 +335,13 @@ namespace Cosmos.Build.Builder {
       MSBuild(Path.Combine(mCosmosPath, @"Build.sln"), "Debug");
 
       Section("Publish Tools");
-      Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
+      //Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
       Publish(Path.Combine(mSourcePath, "../../IL2CPU/source/IL2CPU"), Path.Combine(xVsipDir, "IL2CPU"));
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVsipDir, "NASM"));
 
-      Section("Pack Kernel");
+      Section("Create Packages");
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.Build.Tasks"), xNugetPkgDir);
       //
       Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xNugetPkgDir);
       //
@@ -338,7 +357,7 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xNugetPkgDir);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xNugetPkgDir);
       //
-      Pack(Path.Combine(mSourcePath, "../../IL2CPU/source/Cosmos.IL2CPU.API"), xNugetPkgDir);
+      Pack(Path.Combine(mSourcePath, "../../IL2CPU/source/IL2CPU.API"), xNugetPkgDir);
     }
 
     private void CopyTemplates() {

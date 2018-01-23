@@ -1,14 +1,11 @@
 ﻿using System;
+
 using Cosmos.TestRunner;
-using Cosmos.Debug.Kernel;
-using Cosmos.Compiler.Tests.Bcl.Helper;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    class DoubleTest
+    internal static class DoubleTest
     {
-        public readonly Debugger mDebugger = new Debugger("User", "Double");
-
         public static void Execute()
         {
             Double value;
@@ -157,17 +154,29 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 #endif
 
             // Now test some castings operations
+            sbyte valueAsSByte = (sbyte)value;
+            Assert.IsTrue((valueAsSByte == (sbyte)42), "double (sbyte) operator doesn't work");
+
             byte valueAsByte = (byte)value;
             Assert.IsTrue((valueAsByte == (byte)42), "double (byte) operator doesn't work");
 
             short valueAsShort = (short)value;
-            Assert.IsTrue((valueAsByte == (short)42), "double (short) operator doesn't work");
+            Assert.IsTrue((valueAsShort == (short)42), "double (short) operator doesn't work");
+
+            ushort valueAsUShort = (ushort)value;
+            Assert.IsTrue((valueAsUShort == (ushort)42), "double (ushort) operator doesn't work");
 
             int valueAsInt = (int)value;
             Assert.IsTrue((valueAsInt == (int)42), "double (int) operator doesn't work");
 
+            uint valueAsUInt = (uint)value;
+            Assert.IsTrue((valueAsUInt == (uint)42), "double (uint) operator doesn't work");
+
             long valueAsLong = (long)value;
             Assert.IsTrue((valueAsLong == (long)42), "double (long) operator doesn't work");
+
+            ulong valueAsULong = (ulong)value;
+            Assert.IsTrue((valueAsULong == (ulong)42), "double (ulong) operator doesn't work");
 
             // We put on anUInt a very big value Int32.MaxValue + 42. Why all this 42 :-) ?
             uint anUInt = 2147483689;
@@ -187,6 +196,33 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = 42.0;
             valueNegated = -value;
             Assert.IsTrue((EqualityHelper.DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive double doesn't work");
+
+            #region Parsing
+
+            value = Double.Parse("0.4");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.4), "simple parsing of double works");
+
+            value = Double.Parse("+0.3");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.3), "parsing of double with positive sign works!");
+
+            value = Double.Parse("-0.4");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, -0.4), "parsing of negative double works!");
+
+            value = Double.Parse("    0.7     ");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.7), "double parsing ignores leading and trailing whitespaces");
+
+            value = Double.Parse("0.4E1");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 4), "double parsing takes in account E");
+
+            value = Double.Parse("0.4E-1");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.04), "double parsing works with negative E");
+
+            Assert.IsFalse(Double.TryParse("asd4", out value), "double TryParse returns false when it fails");
+
+            Assert.IsTrue(Double.TryParse("2.3", out value), "double TryParse returns true when it works");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 2.3), "double TryParse returns correct result when it works");
+
+            #endregion
         }
     }
 }

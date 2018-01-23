@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.Debug.Kernel;
+
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
+
+using Cosmos.Compiler.Tests.Bcl.CSharp;
 using Cosmos.Compiler.Tests.Bcl.System;
+using Cosmos.Compiler.Tests.Bcl.System.Collections.Generic;
+using Cosmos.Compiler.Tests.Bcl.System.Text;
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
@@ -21,10 +23,12 @@ namespace Cosmos.Compiler.Tests.Bcl
             {
                 mDebugger.Send("Run");
 
-                CSharp.WhileLoopTests.Execute();
-                CSharp.ForeachLoopTests.Execute();
+                // C#
+                WhileLoopTests.Execute();
+                ForeachLoopTests.Execute();
 
-                //ObjectTests.Execute(); Stack corruption on method Clone()
+                // System
+                ObjectTests.Execute();
                 ArrayTests.Execute();
                 StringTest.Execute();
                 ByteTest.Execute();
@@ -44,10 +48,15 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
+                RandomTests.Execute();
 
-                System.Collections.Generic.ListTest.Execute();
-                System.Collections.Generic.QueueTest.Execute();
-                //System.Collections.Generic.DictionaryTest.Execute();
+                // System.Collections.Generic
+                ListTest.Execute();
+                QueueTest.Execute();
+                //DictionaryTest.Execute();
+
+                // System.Text
+                EncodingTest.Execute();
 
                 TestController.Completed();
             }

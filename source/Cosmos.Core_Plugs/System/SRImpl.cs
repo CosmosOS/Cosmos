@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
 {
@@ -107,6 +107,8 @@ namespace Cosmos.Core_Plugs.System
             {
                 return "The given path's format is not supported.";
             }
+            if (aKey == "Argument_InvalidSubPath")
+                return "The given path {0} is {1}";
 
             //Console.Write("Getting resource: '");
             //Console.Write(aResource);

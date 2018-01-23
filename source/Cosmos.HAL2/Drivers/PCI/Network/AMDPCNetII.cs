@@ -4,7 +4,7 @@ using Cosmos.Common;
 using Cosmos.Core;
 using Cosmos.Core.IOGroup.Network;
 using Cosmos.HAL.Network;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
 {
@@ -135,7 +135,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static void FindAll()
         {
           Console.WriteLine("Scanning for AMD PCNetII cards...");
-          // PCIDevice device = Cosmos.HAL.PCI.GetDevice(0x1022, 0x2000);
+          //  PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
           //  if (device != null)
           // {
           //      AMDPCNetII nic = new AMDPCNetII((PCIDeviceNormal) device);

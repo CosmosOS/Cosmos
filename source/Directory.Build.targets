@@ -8,10 +8,5 @@
         <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' != ''">$(PackageVersionPrefix)-$(VersionSuffix)</PackageVersion>
         <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' == ''">$(PackageVersionPrefix)</PackageVersion>
     </PropertyGroup>
-    
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net471'
-                           OR '$(TargetFrameworkVersion)' == 'v4.7.1'">
-        <_HasReferenceToSystemRuntime>True</_HasReferenceToSystemRuntime>
-    </PropertyGroup>
 
 </Project>

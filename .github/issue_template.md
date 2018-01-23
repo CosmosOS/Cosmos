@@ -10,4 +10,4 @@
 #### Reproduction - How did you get this error to appear?
 
 
-#### Version - Were you using the User Kit or Dev Kit? And what User Kit version or Dev Kit commit?
+#### Version - Were you using the User Kit or Dev Kit? And what User Kit version or Dev Kit commit (Cosmos, IL2CPU, X#)?

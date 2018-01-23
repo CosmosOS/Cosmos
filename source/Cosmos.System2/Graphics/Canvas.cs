@@ -1,6 +1,9 @@
 ﻿//#define COSMOSDEBUG
 using System;
+using System.Drawing;
 using System.Collections.Generic;
+
+
 
 namespace Cosmos.System.Graphics
 {
@@ -71,6 +74,7 @@ namespace Cosmos.System.Graphics
             //    throw new ArgumentNullException(nameof(color));
 
             Pen pen = new Pen(color);
+            
             for (int x = 0; x < mode.Rows; x++)
             {
                 for (int y = 0; y < mode.Columns; y++)
@@ -80,11 +84,24 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        
+
+        public void DrawPoint(Pen pen, Point point)
+        {
+            DrawPoint(pen, point.X, point.Y);
+        }
 
         public abstract void DrawPoint(Pen pen, int x, int y);
 
         public abstract void DrawPoint(Pen pen, float x, float y);
+
+        public virtual void DrawArray(Color[] colors, Point point, int width, int height)
+        {
+
+            DrawArray(colors, point.X, point.Y, width, height);
+
+        }
+
+        public abstract void DrawArray(Color[] colors, int x, int y, int width, int height);
 
         private void DrawHorizontalLine(Pen pen, int dx, int x1, int y1)
         {
@@ -230,6 +247,13 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public virtual void DrawCircle(Pen pen, Point point, int radius)
+        {
+
+            DrawCircle(pen, point.X, point.Y, radius);
+
+        }
+
         //http://members.chello.at/~easyfilter/bresenham.html
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
@@ -263,6 +287,11 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public virtual void DrawEllipse(Pen pen, Point point, int x_radius, int y_radius)
+        {
+            DrawEllipse(pen, point.X, point.Y, x_radius, y_radius);
+        }
+
         public virtual void DrawPolygon(Pen pen, params Point[] points)
         {
             if (points.Length < 3)
@@ -277,6 +306,27 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, points[0], points[points.Length - 1]);
         }
 
+        public virtual void DrawSquare(Pen pen, Point point, int size)
+        {
+
+            DrawRectangle(pen, point.X, point.Y, size, size);
+
+        }
+
+        public virtual void DrawSquare(Pen pen, int x, int y, int size)
+        {
+
+            DrawRectangle(pen, x, y, size, size);
+
+        }
+
+        public virtual void DrawRectangle(Pen pen, Point point, int width, int height)
+        {
+
+            DrawRectangle(pen, point.X, point.Y, width, height);
+
+        }
+
         public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height)
         {
             /*
@@ -285,6 +335,7 @@ namespace Cosmos.System.Graphics
              */
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
+
 
             /* The check of the validity of x and y are done in DrawLine() */
 
@@ -317,30 +368,64 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, xc, yc, xd, yd);
         }
 
+        public virtual void DrawFilledRectangle(Pen pen, Point point, int width, int height)
+        {
+
+            DrawFilledRectangle(pen, point.X, point.Y, width, height);
+
+        }
+
         public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
         {
+            if (height == -1)
+            {
+                height = width;
+            }
+
             for (int y = y_start; y < y_start + height; y++)
             {
                 DrawLine(pen, x_start, y, x_start + width - 1, y);
             }
         }
 
+        public virtual void DrawTriangle(Pen pen, Point point0, Point point1, Point point2)
+        {
+
+            DrawTriangle(pen, point0.X, point0.Y, point1.X, point1.Y, point2.X, point2.Y);
+
+        }
+
         public virtual void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
         {
+
             DrawLine(pen, v1x, v1y, v2x, v2y);
             DrawLine(pen, v1x, v1y, v3x, v3y);
             DrawLine(pen, v2x, v2y, v3x, v3y);
+
         }
-         
+
+
+        
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
         }
 
         // Image and Font will be available in .NET Core 2.1
+        // dot net core does not have Image
         //public void DrawImage(Image image, int x, int y)
         //{
         //    throw new NotImplementedException();
+        //}
+
+        //public void DrawImage(Image image, Point point)
+        //{
+        //    DrawImage(image, point.X, point.Y));
+        //}
+
+        //public void DrawString(String str, Font aFont, Brush brush, Point point)
+        //{
+        //    DrawString(str, aFont, brush, point.X, point.Y);
         //}
 
         //public void DrawString(String str, Font aFont, Brush brush, int x, int y)
@@ -354,6 +439,13 @@ namespace Cosmos.System.Graphics
 
             if (mode == null)
                 return false;
+
+            /* This would have been the more "modern" version but LINQ is not working 
+
+            if (!availableModes.Exists(element => element == mode))
+                return true;
+
+            */
 
             foreach (var elem in availableModes)
             {
@@ -373,26 +465,25 @@ namespace Cosmos.System.Graphics
                 Global.mDebugger.SendInternal($"mode is null raising exception!");
                 throw new ArgumentNullException(nameof(mode));
             }
-#if false
-            /* This would have been the more "modern" version but LINQ is not working */
-            if (!availableModes.Exists(element => element == mode))
-                throw new ArgumentOutOfRangeException($"Mode {mode} is not supported by this Driver");
-#endif
 
-            foreach (var elem in availableModes)
+
+            if (CheckIfModeIsValid(mode))
             {
-                if (elem == mode)
-                {
-                    Global.mDebugger.SendInternal($"mode {mode} found");
-                    return; // All OK mode does exists in availableModes
-                }
+                return;
             }
 
-            Global.mDebugger.SendInternal($"foreach ended mode is not found! Raising exception...");
+            Global.mDebugger.SendInternal($"mode is not found! Raising exception...");
             /* 'mode' was not in the 'availableModes' List ==> 'mode' in NOT Valid */
             throw new ArgumentOutOfRangeException(nameof(mode), $"Mode {mode} is not supported by this Driver");
         }
 
+        protected void ThrowIfCoordNotValid(Point point)
+        {
+
+            ThrowIfCoordNotValid(point.X, point.Y);
+
+        }
+        
         protected void ThrowIfCoordNotValid(int x, int y)
         {
             if (x < 0 || x >= Mode.Columns)

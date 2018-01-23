@@ -1,5 +1,5 @@
 using System.Text;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Text
 {
@@ -10,6 +10,11 @@ namespace Cosmos.Core_Plugs.System.Text
         public static object get_InternalSyncObject()
         {
             return new object();
+        }
+
+        public static EncoderFallbackBuffer CreateFallbackBuffer(EncoderFallback aThis)
+        {
+            return null;
         }
     }
 }

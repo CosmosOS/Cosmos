@@ -63,7 +63,10 @@ FlatComponentsList=False
 AlwaysShowComponentsList=False
 ShowComponentSizes=False
 LicenseFile=LICENSE.txt
-DisableDirPage=yes
+DisableDirPage=no
+
+[Messages]
+SelectDirDesc=If the user installing the Cosmos User Kit is not the admin. Please choose the corresponding AppData/Roaming directory.
 
 [Dirs]
 Name: {app}; Flags: uninsalwaysuninstall
@@ -83,7 +86,6 @@ Source: ".\Build\VSIP\NASM\*"; DestDir: "{app}\Build\NASM"; Flags: ignoreversion
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\MSBuild\*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion recursesubdirs uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.GDB.exe"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 ; Kernel assemblies
 Source: ".\Build\VSIP\Cosmos.Debug.Kernel*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
@@ -91,8 +93,9 @@ Source: ".\Build\VSIP\Cosmos.Core*"; DestDir: "{app}\Kernel"; Flags: ignoreversi
 Source: ".\Build\VSIP\Cosmos.HAL*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.System*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Common*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\IL2CPU.API*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 ; Kernel packages
-Source: ".\Build\VSIP\KernelPackages\*.nupkg"; DestDir: "{app}\Kernel\packages"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Packages\*.nupkg"; DestDir: "{app}\Kernel\packages"; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 ; XSharp
@@ -121,6 +124,7 @@ Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
@@ -144,15 +148,91 @@ Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packag
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.DebugEngine.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
 
 [UninstallRun]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; StatusMsg: "Uninstalling Kernel Packages"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
 [Code]
+function IsAppRunning(const FileName: string): Boolean;
+var
+  FWMIService: Variant;
+  FSWbemLocator: Variant;
+  FWbemObjectSet: Variant;
+begin
+  Result := false;
+  FSWbemLocator := CreateOleObject('WBEMScripting.SWBEMLocator');
+  FWMIService := FSWbemLocator.ConnectServer('', 'root\CIMV2', '', '');
+  FWbemObjectSet := FWMIService.ExecQuery(Format('SELECT Name FROM Win32_Process Where Name="%s"',[FileName]));
+  Result := (FWbemObjectSet.Count > 0);
+  FWbemObjectSet := Unassigned;
+  FWMIService := Unassigned;
+  FSWbemLocator := Unassigned;
+end;
+
+function IsAppRunningWithResponse(const FileName: string): Boolean;
+var
+  Retry: Integer;
+begin
+  Result := IsAppRunning(FileName);
+  if Result then
+    MsgBox(FileName  + ' is running. Please close the application before running the installer.', mbError, MB_OK);
+end;
+
+function InitializeSetup: boolean;
+var
+  Retry: Integer;
+begin
+for Retry := 0 to 2 do
+  begin
+    Result := not IsAppRunningWithResponse('devenv.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('VSIXInstaller.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.IdentityHost.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.VSDetouredHost.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.Host.Node.x86.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.SettingsHost.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.Host.CLR.x86.exe');
+    if not Result then
+    begin
+      continue;
+    end
+    else
+    begin
+      break;
+    end;
+  end;
+end;
+
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
   const Wait: TExecWait; var ResultCode: Integer; var ResultString: AnsiString): Boolean;
 var
