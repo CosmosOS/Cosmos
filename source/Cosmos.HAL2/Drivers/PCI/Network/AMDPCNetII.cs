@@ -135,7 +135,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static void FindAll()
         {
           Console.WriteLine("Scanning for AMD PCNetII cards...");
-          // PCIDevice device = Cosmos.HAL.PCI.GetDevice(0x1022, 0x2000);
+          //  PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
           //  if (device != null)
           // {
           //      AMDPCNetII nic = new AMDPCNetII((PCIDeviceNormal) device);

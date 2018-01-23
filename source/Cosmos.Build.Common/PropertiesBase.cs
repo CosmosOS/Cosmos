@@ -7,6 +7,11 @@ namespace Cosmos.Build.Common
     {
         protected Dictionary<string, string> mPropTable = new Dictionary<string, string>();
 
+        public event EventHandler<PropertyChangingEventArgs> PropertyChanging;
+        public event EventHandler<PropertyChangedEventArgs> PropertyChanged;
+
+        public bool IsDirty { get; private set; }
+
         public Dictionary<string, string> GetProperties()
         {
             Dictionary<string, string> clonedTable = new Dictionary<string, string>();
@@ -27,18 +32,18 @@ namespace Cosmos.Build.Common
         public void Reset()
         {
             mPropTable.Clear();
+            IsDirty = false;
         }
 
         public void SetProperty(string name, string value)
         {
-            if (mPropTable.ContainsKey(name) == false)
-            {
-                mPropTable.Add(name, value);
-            }
-            else
-            {
-                mPropTable[name] = value;
-            }
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(name));
+
+            mPropTable.TryGetValue(name, out var xOldValue);
+            mPropTable[name] = value;
+            
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name, xOldValue, value));
+            IsDirty = true;
         }
 
         public void SetProperty(string name, Object value)

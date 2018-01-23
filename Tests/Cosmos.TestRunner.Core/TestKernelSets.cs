@@ -23,7 +23,8 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(Cosmos.Compiler.Tests.MethodTests.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel);
             yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
-            yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
+            yield return typeof(Cosmos.Kernel.Tests.Fat2.Kernel);
+            //yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
             yield return typeof(SimpleStructsAndArraysTest.Kernel);
 
             //yield return typeof(FrotzKernel.Kernel);

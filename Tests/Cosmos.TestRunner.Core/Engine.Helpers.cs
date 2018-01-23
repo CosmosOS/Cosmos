@@ -208,8 +208,8 @@ namespace Cosmos.TestRunner.Core
             var xArgs = new List<string>
             {
                 "KernelPkg:" + KernelPkg,
-                "DebugEnabled:True",
-                "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
+                "EnableDebug:True",
+                "EnableStackCorruptionDetection:" + EnableStackCorruptionChecks,
                 "StackCorruptionDetectionLevel:" + StackCorruptionChecksLevel,
                 "DebugMode:Source",
                 "TraceAssemblies:" + TraceAssembliesLevel,
@@ -223,7 +223,7 @@ namespace Cosmos.TestRunner.Core
             xArgs.AddRange(xReferences.Select(aReference => "References:" + aReference));
 
             bool xUsingUserkit = false;
-            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU.Compiler");
+            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU");
             if (!Directory.Exists(xIL2CPUPath))
             {
                 xUsingUserkit = true;

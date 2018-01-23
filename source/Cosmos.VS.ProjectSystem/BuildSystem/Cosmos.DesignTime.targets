@@ -1,0 +1,23 @@
+﻿<Project>
+
+    <PropertyGroup>
+        <_CosmosXamlResourcesDirectory>$(MSBuildThisFileDirectory)</_CosmosXamlResourcesDirectory>
+        <DebuggerFlavor>CosmosDebugger</DebuggerFlavor>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectCapability Remove="LaunchProfiles" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectCapability Include="Bootable" />
+        <ProjectCapability Include="Cosmos" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\CosmosDebugger.xaml">
+            <Context>Project</Context>
+        </PropertyPageSchema>
+    </ItemGroup>
+
+</Project>

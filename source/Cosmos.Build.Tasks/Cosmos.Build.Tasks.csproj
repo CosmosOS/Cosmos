@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net471</TargetFramework>
+        <PackageId>Cosmos.Build</PackageId>
+        <PackageDescription>Cosmos build system.
+$(CosmosDescription)</PackageDescription>
+        <IsTool>True</IsTool>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="build\**">
+            <Pack>True</Pack>
+            <PackagePath>build\</PackagePath>
+        </Content>
+        <Content Include="tools\**">
+            <Pack>True</Pack>
+            <PackagePath>tools\</PackagePath>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
+    </ItemGroup>
+
+</Project>
