@@ -27,7 +27,7 @@ namespace Cosmos.TestRunner.Core
         string KernelPkg { get; }
         TraceAssemblies TraceAssembliesLevel { get; }
         bool EnableStackCorruptionChecks { get; }
-        StackCorruptionDetectionLevel StackCorruptionChecksLevel { get; }
+        StackCorruptionDetectionLevel StackCorruptionDetectionLevel { get; }
 
         /// <summary>
         /// An enumerable of kernel types which will be run.
