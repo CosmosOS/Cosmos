@@ -1,6 +1,6 @@
 ﻿using Cosmos.TestRunner;
 
-namespace Cosmos.Compiler.Tests.SimpleWriteLine
+namespace Cosmos.Compiler.Tests.Exceptions
 {
     public static class TestTryFinally
     {
@@ -87,7 +87,7 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine
             mWasAfterFinally = true;
         }
 
-        public static void TestNestedFinally()
+        private static void TestNestedFinally()
         {
             mWasBeforeTry = true;
 
