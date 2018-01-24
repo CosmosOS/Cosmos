@@ -9,16 +9,16 @@ namespace Cosmos.TestRunner.Core
         protected int AllowedSecondsInKernel => mConfiguration.AllowedSecondsInKernel;
         protected IEnumerable<RunTargetEnum> RunTargets => mConfiguration.RunTargets;
 
-        private bool ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
+        private bool ExecuteKernel(string assemblyFileName, string workingDirectory, RunConfiguration configuration)
         {
             var xResult = true;
             OutputHandler.ExecuteKernelStart(assemblyFileName);
             try
             {
-                var xAssemblyFile = Path.Combine(mBaseWorkingDirectory, "Kernel.asm");
-                var xObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.obj");
-                var xTempObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.o");
-                var xIsoFile = Path.Combine(mBaseWorkingDirectory, "Kernel.iso");
+                var xAssemblyFile = Path.Combine(workingDirectory, "Kernel.asm");
+                var xObjectFile = Path.Combine(workingDirectory, "Kernel.obj");
+                var xTempObjectFile = Path.Combine(workingDirectory, "Kernel.o");
+                var xIsoFile = Path.Combine(workingDirectory, "Kernel.iso");
 
                 if (KernelPkg == "X86")
                 {
@@ -31,19 +31,19 @@ namespace Cosmos.TestRunner.Core
                     File.Move(xObjectFile, xTempObjectFile);
 
                     RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
-                    RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(mBaseWorkingDirectory, xObjectFile));
+                    RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(workingDirectory, xObjectFile));
                 }
 
                 string xHarddiskPath;
                 if (configuration.RunTarget == RunTargetEnum.HyperV)
                 {
-                    xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vhdx");
+                    xHarddiskPath = Path.Combine(workingDirectory, "Harddisk.vhdx");
                     var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "HyperV", "Filesystem.vhdx");
                     File.Copy(xOriginalHarddiskPath, xHarddiskPath);
                 }
                 else
                 {
-                    xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vmdk");
+                    xHarddiskPath = Path.Combine(workingDirectory, "Harddisk.vmdk");
                     var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
                     File.Copy(xOriginalHarddiskPath, xHarddiskPath);
                 }
@@ -52,7 +52,7 @@ namespace Cosmos.TestRunner.Core
                 switch (configuration.RunTarget)
                 {
                     case RunTargetEnum.Bochs:
-                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath));
+                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath, workingDirectory));
                         break;
                     case RunTargetEnum.VMware:
                         RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
