@@ -63,7 +63,7 @@ namespace Cosmos.HAL {
 	    public PIT()
 	    {
             INTs.SetIrqHandler(0x00, HandleIRQ);
-	        _T0Countdown = 65535;
+	        T0Countdown = 65535;
         }
 
         public ushort T0Countdown {
@@ -183,7 +183,10 @@ namespace Cosmos.HAL {
 
 	        int T0Delay = (int) T0DelyNS;
 	        PITTimer hndlr = null;
-	        for (int i = ActiveHandlers.Count - 1; i >= 0; i--)
+
+	        T0Countdown = 65535;
+
+            for (int i = ActiveHandlers.Count - 1; i >= 0; i--)
 	        {
 	            hndlr = ActiveHandlers[i];
 
