@@ -5,17 +5,9 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <BinFormat>elf</BinFormat>
-        <DebugEnabled>False</DebugEnabled>
-        <DebugMode>Source</DebugMode>
-        <TraceMode>User</TraceMode>
         <EnableGDB>False</EnableGDB>
         <StartCosmosGDB>False</StartCosmosGDB>
-        <Deployment>ISO</Deployment>
         <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-        <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
-        <StackCorruptionDetectionLevel>MethodFooters</StackCorruptionDetectionLevel>
-        <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
         <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
         <Launch>VMware</Launch>
         <Profile>VMware</Profile>
