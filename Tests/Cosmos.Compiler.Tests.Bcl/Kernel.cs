@@ -5,7 +5,7 @@ using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 using Cosmos.Compiler.Tests.Bcl.System;
 using Cosmos.Compiler.Tests.Bcl.System.Collections.Generic;
-using Compiler.Tests.Bcl.System.Text;
+using Cosmos.Compiler.Tests.Bcl.System.Text;
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
