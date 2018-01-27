@@ -61,8 +61,6 @@ namespace Cosmos.System.ExtendedASCII
 
         private byte GetByte(char ch)
         {
-            //mDebugger.SendInternal($"Converting to CodePageTable ch {ch} (codepoint) {(int)ch}");
-
             /* ch is in reality an ASCII character? */
             if (ch < 127)
             {
@@ -70,7 +68,6 @@ namespace Cosmos.System.ExtendedASCII
                 return (byte)ch;
             }
 
-            mDebugger.SendInternal($"ch {ch} could be Extended Ascii");
             int idx = GetCodePageIdxFromChr(ch);
             if (idx == -1)
             {
@@ -129,9 +126,8 @@ namespace Cosmos.System.ExtendedASCII
         private char GetChar(byte b)
         {
             mDebugger.SendInternal($"Converting to UTF16: {b}...");
-
             /* Ascii? Simply cast it then... */
-            if (b >= 0 && b < 127)
+            if (b < 127)
             {
                 mDebugger.SendInternal($"b {b} is ASCII");
                 return (char)b;
@@ -171,8 +167,7 @@ namespace Cosmos.System.ExtendedASCII
         public override int GetMaxByteCount(int charCount)
         {
             if (charCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(charCount),
-                     "negative number");
+                throw new ArgumentOutOfRangeException(nameof(charCount), "negative number");
 
             // Characters would be # of characters + 1 in case high surrogate is ? * max fallback
             return charCount + 1;

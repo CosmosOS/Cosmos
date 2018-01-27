@@ -5,7 +5,6 @@ using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 using Cosmos.Compiler.Tests.Bcl.System;
 using Cosmos.Compiler.Tests.Bcl.System.Collections.Generic;
-using Cosmos.Compiler.Tests.Bcl.System.Collections.Not_Generic;
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
@@ -51,7 +50,6 @@ namespace Cosmos.Compiler.Tests.Bcl
                 ListTest.Execute();
                 QueueTest.Execute();
                 //DictionaryTest.Execute();
-                HashtableTest.Execute();
 
                 TestController.Completed();
             }

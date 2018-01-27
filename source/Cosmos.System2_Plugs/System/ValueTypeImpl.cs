@@ -24,24 +24,6 @@ namespace Cosmos.System_Plugs.System
             throw new NotImplementedException("ValueType.GetHashCodeOfPtr()");
         }
 
-        public static bool CanCompareBits(object obj)
-        {
-            return true;
-        }
-
-        public static bool FastEqualsCheck(object a, object b)
-        {
-            long aAsLong = (long) a;
-            long bAsLong = (long) b;
-
-            return (a == b);
-        }
-
-        public static bool Equals(ValueType aThis, object obj)
-        {
-            throw new NotImplementedException("ValueType.Equals()");
-        }
-
         //public static string ToString(ValueType aThis)
         //{
         //    return "<ValueType.ToString not yet implemented!>";

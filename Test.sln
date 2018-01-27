@@ -160,6 +160,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.TypeS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.Fat2", "Tests\Cosmos.Kernel.Tests.Fat2\Cosmos.Kernel.Tests.Fat2.csproj", "{D4B1618A-3653-43CD-B617-20482B12712B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "Tests\ConsoleTest\ConsoleTest.csproj", "{7A06CD95-A1D3-4989-A9F2-4088C27F8752}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -609,6 +611,14 @@ Global
 		{D4B1618A-3653-43CD-B617-20482B12712B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D4B1618A-3653-43CD-B617-20482B12712B}.Release|x86.ActiveCfg = Release|Any CPU
 		{D4B1618A-3653-43CD-B617-20482B12712B}.Release|x86.Build.0 = Release|Any CPU
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752}.Debug|x86.Build.0 = Debug|Any CPU
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752}.Release|x86.ActiveCfg = Release|Any CPU
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -685,6 +695,7 @@ Global
 		{D0EABA08-88C9-4F7C-BCA9-361B58B20D67} = {E9CD521E-C386-466D-B5F7-A5EB19A61625}
 		{D21A7C6C-A696-4EC3-84EB-70700C1E3B34} = {ECEA7778-E786-4317-90B9-A2D4427CB91C}
 		{D4B1618A-3653-43CD-B617-20482B12712B} = {29EEC029-6A2B-478A-B6E5-D63A91388ABA}
+		{7A06CD95-A1D3-4989-A9F2-4088C27F8752} = {ECEA7778-E786-4317-90B9-A2D4427CB91C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4418C803-277E-448F-A0A0-52788FA215AD}
