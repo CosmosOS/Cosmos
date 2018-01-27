@@ -9,12 +9,15 @@ namespace Cosmos.TestRunner.Core
 {
     public partial class Engine
     {
+        private static readonly string WorkingDirectoryBase = Path.Combine(
+            Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
+
         // configuration: in process eases debugging, but means certain errors (like stack overflow) kill the test runner.
         protected bool DebugIL2CPU => mConfiguration.DebugIL2CPU;
         protected string KernelPkg => mConfiguration.KernelPkg;
         protected TraceAssemblies TraceAssembliesLevel => mConfiguration.TraceAssembliesLevel;
         protected bool EnableStackCorruptionChecks => mConfiguration.EnableStackCorruptionChecks;
-        protected StackCorruptionDetectionLevel StackCorruptionChecksLevel => mConfiguration.StackCorruptionChecksLevel;
+        protected StackCorruptionDetectionLevel StackCorruptionDetectionLevel => mConfiguration.StackCorruptionDetectionLevel;
 
         protected bool RunWithGDB => mConfiguration.RunWithGDB;
         protected bool StartBochsDebugGui => mConfiguration.StartBochsDebugGUI;
@@ -22,7 +25,6 @@ namespace Cosmos.TestRunner.Core
         public IEnumerable<Type> KernelsToRun => mConfiguration.KernelTypesToRun;
 
         private IEngineConfiguration mConfiguration;
-        private string mBaseWorkingDirectory;
 
         public OutputHandlerBasic OutputHandler;
 
@@ -54,14 +56,18 @@ namespace Cosmos.TestRunner.Core
                     {
                         foreach (var xKernelType in KernelsToRun)
                         {
-                            mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
-                            if (Directory.Exists(mBaseWorkingDirectory))
-                            {
-                                Directory.Delete(mBaseWorkingDirectory, true);
-                            }
-                            Directory.CreateDirectory(mBaseWorkingDirectory);
+                            var xAssemblyPath = xKernelType.Assembly.Location;
+                            var xWorkingDirectory = Path.Combine(
+                                WorkingDirectoryBase, Path.GetFileNameWithoutExtension(xAssemblyPath));
 
-                            xResult &= ExecuteKernel(xKernelType.Assembly.Location, xConfig);
+                            if (Directory.Exists(xWorkingDirectory))
+                            {
+                                Directory.Delete(xWorkingDirectory, true);
+                            }
+
+                            Directory.CreateDirectory(xWorkingDirectory);
+
+                            xResult &= ExecuteKernel(xAssemblyPath, xWorkingDirectory, xConfig);
                         }
                     }
                     catch (Exception e)

@@ -11,14 +11,14 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        private void RunIsoInBochs(string iso, string harddisk)
+        private void RunIsoInBochs(string iso, string harddisk, string workingDir)
         {
             if (!File.Exists(harddisk))
             {
                 throw new FileNotFoundException("Harddisk file not found!", harddisk);
             }
 
-            var xBochsConfig = Path.Combine(mBaseWorkingDirectory, "Kernel.bochsrc");
+            var xBochsConfig = Path.Combine(workingDir, "Kernel.bochsrc");
             var xParams = new Dictionary<string, string>();
 
             xParams.Add("ISOFile", iso);

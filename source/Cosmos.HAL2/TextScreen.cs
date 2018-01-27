@@ -78,7 +78,12 @@ namespace Cosmos.HAL
 
         public override void SetColors(ConsoleColor aForeground, ConsoleColor aBackground)
         {
-            Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
+            //Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
+            // TODO: Use Real Mode to clear in Mode Control Register Index 10
+            //       the third bit to disable blinking and use the seventh bit
+            //       as the bright bit on background color for brighter colors :)
+            Color = (byte)(((byte)(aForeground) | ((byte)(aBackground) << 4)) & 0x7F);
+            
             // The Color | the NUL character this is used to Clear the Screen
             mTextClearCellValue = (UInt16)(Color << 8 | 0x00);
         }

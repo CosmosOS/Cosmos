@@ -26,7 +26,7 @@ namespace Cosmos.TestRunner.Core
         public virtual string KernelPkg => String.Empty;
         public virtual TraceAssemblies TraceAssembliesLevel => TraceAssemblies.User;
         public virtual bool EnableStackCorruptionChecks => true;
-        public virtual StackCorruptionDetectionLevel StackCorruptionChecksLevel => StackCorruptionDetectionLevel.AllInstructions;
+        public virtual StackCorruptionDetectionLevel StackCorruptionDetectionLevel => StackCorruptionDetectionLevel.AllInstructions;
 
         public virtual IEnumerable<Type> KernelTypesToRun => TestKernelSets.GetStableKernelTypes();
     }
