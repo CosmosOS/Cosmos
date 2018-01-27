@@ -5,6 +5,7 @@ using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 using Cosmos.Compiler.Tests.Bcl.System;
 using Cosmos.Compiler.Tests.Bcl.System.Collections.Generic;
+using Compiler.Tests.Bcl.System.Text;
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
@@ -44,12 +45,15 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
-                EncodingTest.Execute();
                 RandomTests.Execute();
 
+                // System.Collections.Generic
                 ListTest.Execute();
                 QueueTest.Execute();
                 //DictionaryTest.Execute();
+
+                // System.Text
+                EncodingTest.Execute();
 
                 TestController.Completed();
             }

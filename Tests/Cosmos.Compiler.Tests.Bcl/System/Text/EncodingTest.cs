@@ -7,7 +7,7 @@ using Cosmos.Compiler.Tests.Bcl.Helper;
 using Cosmos.Debug.Kernel;
 using Cosmos.System.ExtendedASCII;
 
-namespace Cosmos.Compiler.Tests.Bcl.System
+namespace Compiler.Tests.Bcl.System.Text
 {
     class EncodingTest
     {
