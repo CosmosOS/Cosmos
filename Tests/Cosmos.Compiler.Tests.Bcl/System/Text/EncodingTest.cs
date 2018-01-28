@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.TestRunner;
-using Cosmos.Compiler.Tests.Bcl.Helper;
 using Cosmos.Debug.Kernel;
 using Cosmos.System.ExtendedASCII;
 
-namespace Cosmos.Compiler.Tests.Bcl.System.Text;
+namespace Cosmos.Compiler.Tests.Bcl.System.Text
 {
     class EncodingTest
     {
