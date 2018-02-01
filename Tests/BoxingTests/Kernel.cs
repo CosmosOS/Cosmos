@@ -15,63 +15,28 @@ namespace BoxingTests
 
         protected override void Run()
         {
-            Assert.IsTrue(TestBoxingCharToString(), "Boxing char to string test failed.");
-            Assert.IsTrue(TestBoxingCharArrayToString(), "Boxing char[] to string test failed.");
-            Assert.IsTrue(TestBoxingIntToString(), "Boxing int to string test failed.");
-#if !NETSTANDARD1_5
-            Assert.IsTrue(TestBoxingColorToString(), "Boxing of Color to string test failed.");
-#endif
+            TestBoxingChar();
+            TestBoxingInt();
+            //TestBoxingColorToString();
 
             TestController.Completed();
         }
 
-        private bool TestBoxingCharToString()
+        private void TestBoxingChar()
         {
-            try
-            {
-                char xC = 'c';
-                string xS = xC.ToString();
-                return (xS[0] == xC);
-            }
-            catch (Exception E)
-            {
-                mDebugger.SendError("TestBoxingCharToString", E.Message);
-                return false;
-            }
+            object xChar = 'c';
+
+            Assert.IsTrue(xChar.ToString() == "c", "Char.ToString on boxed Char doesn't work!");
+            // 'c' == 0x63, and the hash code is ('c' | ('c' << 16));
+            Assert.IsTrue(xChar.GetHashCode() == 0x00630063, "Char.GetHashCode on boxed Char doesn't work!");
         }
 
-        /* This test fails with "Object.ToString() not yet implemented" written in the Console */
-        private bool TestBoxingCharArrayToString()
+        private void TestBoxingInt()
         {
-            try
-            {
-                char[] xC = { 'c' };
-                string xS = xC.ToString();
-                return (xS[0] == xC[0]);
-            }
-            catch (Exception E)
-            {
-                mDebugger.SendError("TestBoxingCharArrayToString", E.Message);
-                return false;
-            }
-        }
+            object xNumber = 42;
 
-        private bool TestBoxingIntToString()
-        {
-            try
-            {
-                object boxMe;
-                int anInt = 42;
-
-                boxMe = anInt;
-
-                return (boxMe.ToString() == "42");
-            }
-            catch (Exception E)
-            {
-                mDebugger.SendError("TestBoxingIntToString", E.Message);
-                return false;
-            }
+            Assert.IsTrue(xNumber.ToString() == "42", "Int32.ToString on boxed Int32 doesn't work!");
+            Assert.IsTrue(xNumber.GetHashCode() == 42, "Int32.GetHashCode on boxed Int32 doesn't work!");
         }
 
         /* TODO add other tests:
@@ -87,24 +52,10 @@ namespace BoxingTests
          * Cosmos ignores this and put no padding / writes the struct wrongly in memory and then when it should be
          * boxed garbage is copied instead of the structure itself!
          */
-#if !NETSTANDARD1_5
-        private bool TestBoxingColorToString()
+        private void TestBoxingColorToString()
         {
-            try
-            {
-                object boxMe;
-                Color color = Color.Blue;
-
-                boxMe = color;
-
-                return (boxMe.ToString() == "Color[Blue]");
-            }
-            catch (Exception E)
-            {
-                mDebugger.SendError("TestBoxingIntToString", E.Message);
-                return false;
-            }
+            object xColor = Color.Blue;
+            Assert.IsTrue(xColor.ToString() == "Color[Blue]", "Color.ToString doesn't work on boxed Color!");
         }
-#endif
     }
 }

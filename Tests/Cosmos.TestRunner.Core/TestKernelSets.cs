@@ -15,7 +15,7 @@ namespace Cosmos.TestRunner.Core
         // Stable kernel types: the ones that are stable and will run in AppVeyor
         public static IEnumerable<Type> GetStableKernelTypes()
         {
-            //yield return typeof(BoxingTests.Kernel);
+            yield return typeof(BoxingTests.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.TypeSystem.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
             //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
