@@ -33,6 +33,8 @@ namespace Cosmos.TestRunner.Core
 
             /* Please see the notes on the kernel itself before enabling it */
             //yield return typeof(GraphicTest.Kernel);
+            /* Please see the notes on the kernel itself before enabling it */
+           //yield return typeof(ConsoleTest.Kernel);
         }
     }
 }

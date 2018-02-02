@@ -39,7 +39,7 @@ namespace Cosmos.HAL
 
         public abstract void ScrollUp();
 
-        public abstract char this[int x, int y]
+        public abstract byte this[int x, int y]
         {
             get;
             set;

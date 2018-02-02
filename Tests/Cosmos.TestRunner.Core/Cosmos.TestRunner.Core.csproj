@@ -34,6 +34,7 @@
         <ProjectReference Include="..\..\source\Kernel-X86\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
         <ProjectReference Include="..\..\source\Kernel-X86\91-Plugs\Cosmos.Plugs.TapRoot\Cosmos.Plugs.TapRoot.csproj" />
         <ProjectReference Include="..\BoxingTests\BoxingTests.csproj" />
+        <ProjectReference Include="..\ConsoleTest\ConsoleTest.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
         <ProjectReference Include="..\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj" />
