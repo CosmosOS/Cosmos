@@ -1,5 +1,6 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
-        Title="Cosmos Test Runner">
+        Title="Cosmos Test Runner"
+        MinWidth="800" MinHeight="480">
     <Grid>
 
         <TextBox IsReadOnly="True"

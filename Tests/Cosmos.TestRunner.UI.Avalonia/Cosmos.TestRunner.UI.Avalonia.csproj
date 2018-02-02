@@ -22,8 +22,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.5.2-build4485-alpha" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.5.2-build4485-alpha" />
+        <PackageReference Include="Avalonia" Version="0.5.2-build4519-alpha" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.5.2-build4519-alpha" />
     </ItemGroup>
 
 </Project>
