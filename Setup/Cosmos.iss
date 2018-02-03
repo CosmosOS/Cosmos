@@ -117,11 +117,11 @@ Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\USB\"
 Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\USB\"
 Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
-Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
-Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
+Source: ".\Build\syslinux\pxelinux.0"; DestDir: "{app}\Build\PXE"
+Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
