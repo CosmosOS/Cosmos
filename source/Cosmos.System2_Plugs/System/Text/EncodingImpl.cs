@@ -1,13 +1,15 @@
 ﻿//#define COSMOSDEBUG
+
 using System.Text;
+
 using Cosmos.Debug.Kernel;
-using Cosmos.System2_Plugs.System.Text;
+
 using IL2CPU.API.Attribs;
 
 /* This plug is needed only because Cosmos does not support Hashtable :-( */
-namespace Cosmos.System2_Plugs.System.Text
+namespace Cosmos.System_Plugs.System.Text
 {
-    [Plug(Target = typeof(global::System.Text.Encoding))]
+    [Plug(Target = typeof(Encoding))]
     public static class EncodingImpl
     {
         private static Debugger mDebugger = new Debugger("System", "Encoding");

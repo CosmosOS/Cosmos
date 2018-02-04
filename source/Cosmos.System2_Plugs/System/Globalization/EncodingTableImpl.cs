@@ -1,12 +1,12 @@
 ﻿#define COSMOSDEBUG
-using Cosmos.Debug.Kernel;
-using Cosmos.System2_Plugs.System.Text;
-using IL2CPU.API.Attribs;
-using System;
-using System.Collections;
-using System.Text;
 
-namespace Cosmos.System2_Plugs.System.Globalization
+using System;
+
+using Cosmos.Debug.Kernel;
+
+using IL2CPU.API.Attribs;
+
+namespace Cosmos.System_Plugs.System.Globalization
 {
 
     [Plug(TargetName = "System.Globalization.EncodingTable")]
