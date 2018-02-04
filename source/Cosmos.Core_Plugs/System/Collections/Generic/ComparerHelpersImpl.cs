@@ -8,6 +8,8 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     [Plug(TargetName = "System.Collections.Generic.ComparerHelpers")]
     public static class ComparerHelpersImpl
     {
+        private static readonly Debugger mDebugger = new Debugger("Core", "ComparerHelpersImpl");
+
         public static object CreateDefaultComparer(Type aType)
         {
             Debugger.DoBochsBreak();
@@ -29,6 +31,11 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return new StringEqualityComparer();
             }
 
+            if (aType == typeof(int))
+            {
+                return new Int32EqualityComparer();
+            }
+
             // TODO: Nullable<>
 
             // TODO: Enum (Comparer is special to avoid boxing)
@@ -37,7 +44,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //{
             //    xResult = new ObjectComparer<object>();
             //}
-
+            mDebugger.Send($"No EqualityComparer for type {aType}");
             return null;
         }
     }
@@ -61,15 +68,32 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
         public override bool Equals(string x, string y)
         {
             mDebugger.Send("StringEqualityComparer.Equals");
-
-            throw new NotImplementedException();
+            return String.Equals(x, y);
         }
 
         public override int GetHashCode(string obj)
         {
             mDebugger.Send("StringEqualityComparer.GetHashCode");
 
-            throw new NotImplementedException();
+            return obj.GetHashCode();
+        }
+    }
+
+    public class Int32EqualityComparer : EqualityComparer<int>
+    {
+        private readonly Debugger mDebugger = new Debugger("Core", "Int32 Equality Comparer");
+
+        public override bool Equals(int x, int y)
+        {
+            mDebugger.Send("Int32EqualityComparer.Equals");
+            return x == y;
+        }
+
+        public override int GetHashCode(int val)
+        {
+            mDebugger.Send("Int32EqualityComparer.GetHashCode");
+
+            return val.GetHashCode();
         }
     }
 }
