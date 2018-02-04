@@ -98,6 +98,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             comparisionResult = String.Compare(strA, 0, strB, 0, strA.Length, StringComparison.OrdinalIgnoreCase);
             Assert.IsTrue(comparisionResult == 0, "String.Compare (uppercase vs lowercase ignoring case) not working!");
+
+            string stringToHash = "test";
+            int hashCode = stringToHash.GetHashCode();
+
+            Assert.IsTrue(hashCode == -354185609, "String.GetHashCode() not working!");
         }
     }
 }

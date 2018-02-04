@@ -128,10 +128,7 @@ namespace Cosmos.Core_Plugs.System
             return *(aFirstChar + aIndex);
         }
 
-        public static bool InternalUseRandomizedHashing()
-        {
-            return false;
-        }
+
 
         public static bool IsAscii(string aThis)
         {
@@ -1059,10 +1056,22 @@ namespace Cosmos.Core_Plugs.System
             return CompareOrdinalHelper(strA.ToLower(), indexA, countA, strB.ToLower(), indexB, countB);
         }
 
-        public static int GetHashCode(string aThis)
+        /*
+         * This disables Marvin Hashing end enable the legacy not randomized version of String HashCode.
+         * We could have ported Marvin to Cosmos as in CoreRt does exists a managed implementation but it will be used
+         * by String.GetHashCode() directly in Net Core 2.1 so better to wait. The only problem is that it needs Unsafe to work.
+         */
+        public static bool InternalUseRandomizedHashing()
         {
-            throw new NotImplementedException("String.GetHashCode()");
+            return false;
         }
+
+        public static int InternalMarvin32HashString(string s, int strLen, long additionalEntropy)
+        {
+            throw new NotImplementedException("String.InternalMarvin32HashString()");
+        }
+
+        /* It is not really needed to plug GetHashCode! */
 
         public static int Compare(string strA, int indexA, string strB, int indexB, int length, StringComparison comparisonType)
         {
