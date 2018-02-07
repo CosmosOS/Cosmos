@@ -59,7 +59,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 // System.Collections.Generic
                 ListTest.Execute();
                 QueueTest.Execute();
-                //DictionaryTest.Execute();
+                DictionaryTest.Execute();
 
                 // System.Text
                 EncodingTest.Execute();
