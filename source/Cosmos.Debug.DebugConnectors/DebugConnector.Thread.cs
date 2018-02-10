@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace Cosmos.Debug.DebugConnectors
@@ -118,37 +117,34 @@ namespace Cosmos.Debug.DebugConnectors
                 InitializeBackground();
                 DoConnected();
                 Next(1, WaitForSignature);
+
                 while (true)
                 {
-                    aCancellationToken.ThrowIfCancellationRequested();
+                    if (aCancellationToken.IsCancellationRequested)
+                    {
+                        while (mPendingWrites.TryTake(out var xPendingOutgoing))
+                        {
+                            xPendingOutgoing.Packet = null;
+                            xPendingOutgoing.Completed.Set();
+                        }
+
+                        return;
+                    }
 
                     if (!GetIsConnectedToDebugStub())
                     {
                         ConnectionLost(null);
                         return;
                     }
+
                     ProcessPendingActions();
                 }
             }
-            catch (OperationCanceledException)
+            catch (Exception e)
             {
-                while (true)
-                {
-                    Outgoing xPendingOutgoing;
-                    if (!mPendingWrites.TryTake(out xPendingOutgoing))
-                    {
-                        break;
-                    }
-                    xPendingOutgoing.Packet = null;
-                    xPendingOutgoing.Completed.Set();
-                }
+                CmdMessageBox("Error occurred in DebugConnector.ThreadMethod: " + e.ToString());
+            }
 
-                return;
-            }
-            catch (Exception E)
-            {
-                CmdMessageBox("Error occurred in DebugConnector.ThreadMethod: " + E.ToString());
-            }
             ConnectionLost(null);
         }
 
