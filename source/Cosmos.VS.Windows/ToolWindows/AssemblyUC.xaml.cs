@@ -1,15 +1,13 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Collections.Generic;
-using Cosmos.Debug.Common;
 using System.Windows.Threading;
 using System.Windows.Shapes;
+
 using Cosmos.Debug.DebugConnectors;
 
 namespace Cosmos.VS.Windows
@@ -41,8 +39,7 @@ namespace Cosmos.VS.Windows
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
             // the object returned by the Content property.
-            mUserControl = new AssemblyUC();
-            Content = mUserControl;
+            Content = new AssemblyUC();
         }
     }
 
@@ -152,9 +149,8 @@ namespace Cosmos.VS.Windows
 
                 if (aFilter)
                 {
-                    if (xLine is AsmLabel)
+                    if (xLine is AsmLabel xAsmLabel)
                     {
-                        var xAsmLabel = (AsmLabel)xLine;
                         xDisplayLine = xAsmLabel.Label + ":";
 
                         // Skip ASM labels
@@ -169,7 +165,7 @@ namespace Cosmos.VS.Windows
                             xLabelPrefixes.Add(xLabelParts[0] + ".");
                             foundMETHOD_Prefix = true;
                         }
-                        else if(!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_")
+                        else if (!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_")
                                                  && !xAsmLabel.Label.StartsWith("GUID_"))
                         {
                             var xLabelParts = xAsmLabel.Label.Split(':');
@@ -183,7 +179,7 @@ namespace Cosmos.VS.Windows
                     }
 
                     // Replace all and not just labels so we get jumps, calls etc
-                    foreach(string xLabelPrefix in xLabelPrefixes)
+                    foreach (string xLabelPrefix in xLabelPrefixes)
                     {
                         xDisplayLine = xDisplayLine.Replace(xLabelPrefix, "");
                     }
@@ -234,10 +230,8 @@ namespace Cosmos.VS.Windows
                 {
                     xRun.Foreground = Brushes.Green;
                 }
-                else if (xLine is AsmCode)
+                else if (xLine is AsmCode xAsmCode)
                 {
-                    var xAsmCode = (AsmCode)xLine;
-
                     gutterRect.MouseUp += gutterRect_MouseUp;
                     gutterRect.Fill = Brushes.LightGray;
                     mGutterRectsToCode.Add(gutterRect, xAsmCode);
@@ -261,11 +255,11 @@ namespace Cosmos.VS.Windows
                             nextCodeDistFromCurrent++;
                         }
 
-                        if(mASMBPs.Contains(GetLineId(xAsmCode)))
+                        if (mASMBPs.Contains(GetLineId(xAsmCode)))
                         {
                             xRun.Background = Brushes.MediumVioletRed;
                         }
-                        else if(Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
+                        else if (Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
                         {
                             xRun.Background = Brushes.LightYellow;
                         }
@@ -305,9 +299,9 @@ namespace Cosmos.VS.Windows
             var line = mGutterRectsToCode[rect];
             var xRun = mGutterRectsToRun[rect];
             //Search for associated label
-            Global.PipeUp.SendCommand(Windows2Debugger.ToggleAsmBreak2, Encoding.UTF8.GetBytes(((AsmCode)line).AsmLabel.Label));
+            Global.PipeUp.SendCommand(Windows2Debugger.ToggleAsmBreak2, Encoding.UTF8.GetBytes((line).AsmLabel.Label));
 
-            string lineId = GetLineId((AsmCode)line);
+            string lineId = GetLineId(line);
             if (mASMBPs.Contains(lineId))
             {
                 if (line.LabelMatches(mCurrentLabel))

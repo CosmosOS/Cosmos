@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Cosmos.VS.Windows
 {
@@ -11,9 +7,13 @@ namespace Cosmos.VS.Windows
     {
         public event EventHandler UpdateWindow;
 
-        protected DebuggerUC mUserControl;
+        public sealed override object Content
+        {
+            get => base.Content;
+            set => base.Content = value;
+        }
 
-        public DebuggerUC UserControl => mUserControl;
+        public DebuggerUC UserControl => Content as DebuggerUC;
 
         public ToolWindowPane2()
             : base(null)

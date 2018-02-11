@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Timers;
 using System.Windows.Threading;
 using Microsoft.VisualStudio.Shell;
 
@@ -25,10 +26,9 @@ namespace Cosmos.VS.Windows
     {
         private readonly Queue<ushort> mCommand;
         private readonly Queue<byte[]> mMessage;
-        private readonly System.Timers.Timer mTimer = new System.Timers.Timer(100);
+        private readonly Timer mTimer;
 
         private PipeServer mPipeDown;
-        private PipeServer mConsoleDown;
 
         public StateStorer StateStorer { get; }
 
@@ -43,6 +43,7 @@ namespace Cosmos.VS.Windows
 
             // There are a lot of threading issues in VSIP, and the WPF dispatchers do not work.
             // So instead we use a stack and a timer to poll it for data.
+            mTimer = new Timer(100);
             mTimer.AutoReset = true;
             mTimer.Elapsed += ProcessMessage;
             mTimer.Start();
@@ -61,6 +62,12 @@ namespace Cosmos.VS.Windows
             Global.OutputPane = xPane.Add("Cosmos");
             Global.OutputPane.OutputString("Debugger windows loaded.\r\n");
             CosmosMenuCmdSet.Initialize(this);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            mTimer?.Dispose();
         }
 
         void ProcessMessage(object sender, EventArgs e)
