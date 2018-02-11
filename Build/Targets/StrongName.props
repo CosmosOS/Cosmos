@@ -1,0 +1,8 @@
+<Project>
+
+    <PropertyGroup>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+</Project>

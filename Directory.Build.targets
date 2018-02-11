@@ -9,4 +9,6 @@
         <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' == ''">$(PackageVersionPrefix)</PackageVersion>
     </PropertyGroup>
 
+    <Import Project="build\Targets\Import.targets" />
+
 </Project>
