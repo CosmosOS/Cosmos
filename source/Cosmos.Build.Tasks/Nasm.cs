@@ -74,11 +74,8 @@ namespace Cosmos.Build.Tasks
 
             xBuilder.AppendSwitch("-g");
 
-            xBuilder.AppendSwitch("-f");
-            xBuilder.AppendSwitch(OutputFormat);
-
-            xBuilder.AppendSwitch("-o ");
-            xBuilder.AppendSwitch(OutputFile);
+            xBuilder.AppendSwitchIfNotNull("-f ", OutputFormat);
+            xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
 
             if (mOutputFormat == OutputFormatEnum.ELF)
             {

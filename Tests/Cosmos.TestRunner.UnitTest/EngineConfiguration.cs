@@ -25,7 +25,7 @@ namespace Cosmos.TestRunner.UnitTest
             }
         }
 
-        public override StackCorruptionDetectionLevel StackCorruptionChecksLevel => StackCorruptionDetectionLevel.MethodFooters;
+        public override StackCorruptionDetectionLevel StackCorruptionDetectionLevel => StackCorruptionDetectionLevel.MethodFooters;
 
         public override IEnumerable<Type> KernelTypesToRun
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
@@ -44,6 +45,11 @@ namespace Cosmos.Compiler.Tests.Bcl
                 SingleTest.Execute();
                 DoubleTest.Execute();
                 MathTest.Execute();
+
+                //mDebugger.Send("Thread test start of 500 ms");
+                //ThreadTest.Execute();
+                //mDebugger.Send("Thread test end");
+
                 //DecimalTest.Execute();
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
@@ -53,7 +59,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 // System.Collections.Generic
                 ListTest.Execute();
                 QueueTest.Execute();
-                //DictionaryTest.Execute();
+                DictionaryTest.Execute();
 
                 // System.Text
                 EncodingTest.Execute();

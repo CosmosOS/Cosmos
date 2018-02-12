@@ -1,10 +1,8 @@
-﻿//#define COSMOSDEBUG
-using System.IO;
-using IL2CPU.API.Attribs;
-using Cosmos.System;
-using Cosmos.System.FileSystem.VFS;
+﻿using System.IO;
 
-namespace Cosmos.System2_Plugs.System.IO
+using IL2CPU.API.Attribs;
+
+namespace Cosmos.System_Plugs.System.IO
 {
     [Plug(Target = typeof(FileInfo))]
     public static class FileInfoImpl

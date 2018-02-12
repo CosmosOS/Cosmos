@@ -20,12 +20,12 @@ $(CosmosDescription)</PackageDescription>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
+        <PackageReference Include="Microsoft.Build.Framework" Version="15.5.180" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
+        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

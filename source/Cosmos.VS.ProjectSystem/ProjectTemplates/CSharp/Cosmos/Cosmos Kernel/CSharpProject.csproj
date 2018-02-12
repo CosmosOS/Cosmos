@@ -1,21 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
     </PropertyGroup>
 
     <PropertyGroup>
-        <BinFormat>elf</BinFormat>
-        <DebugEnabled>False</DebugEnabled>
-        <DebugMode>Source</DebugMode>
-        <TraceMode>User</TraceMode>
         <EnableGDB>False</EnableGDB>
         <StartCosmosGDB>False</StartCosmosGDB>
-        <Deployment>ISO</Deployment>
         <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-        <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
-        <StackCorruptionDetectionLevel>MethodFooters</StackCorruptionDetectionLevel>
-        <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
         <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
         <Launch>VMware</Launch>
         <Profile>VMware</Profile>

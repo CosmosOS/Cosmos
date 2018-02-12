@@ -1,22 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using Cosmos.Debug.Common;
-using Microsoft.VisualStudio.Shell;
 
 namespace Cosmos.VS.Windows
 {
@@ -25,8 +10,6 @@ namespace Cosmos.VS.Windows
     /// </summary>
     public partial class ConsoleUC
     {
-        private DispatcherTimer mTimer;
-
         public ConsoleUC()
         {
             InitializeComponent();
@@ -48,15 +31,14 @@ namespace Cosmos.VS.Windows
             if (aCommand == ConsoleConsts.Command_WriteText)
             {
                 mOut.Write(Encoding.ASCII.GetString(aData).Replace("\t", "    "));
-            //    textBox.Text += Encoding.ASCII.GetString(aData).Replace("\t", "    ");
+                //textBox.Text += Encoding.ASCII.GetString(aData).Replace("\t", "    ");
             }
             else
             {
                 mOut.WriteLine("Command '{0}' not recognized. Data = '{1}'", aCommand, Encoding.ASCII.GetString(aData).Replace("\t", "    "));
-                //    textBox.Text += ("Command '" + aCommand + "' not recognized!\r\n");
+                //textBox.Text += ("Command '" + aCommand + "' not recognized!\r\n");
             }
             //textBox.ScrollToEnd();
-
         }
     }
 

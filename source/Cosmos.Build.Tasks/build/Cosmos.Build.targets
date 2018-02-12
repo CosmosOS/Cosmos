@@ -27,11 +27,18 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <BinFormat Condition="'$(BinFormat)' == ''">ELF</BinFormat>
+        <DebugEnabled Condition="'$(DebugEnabled)' == ''">True</DebugEnabled>
+        <DebugMode Condition="'$(DebugMode)' == ''">Source</DebugMode>
+        <TraceMode Condition="'$(TraceMode)' == ''">User</TraceMode>
+        <StackCorruptionDetectionEnabled Condition="'$(StackCorruptionDetectionEnabled)' == ''">True</StackCorruptionDetectionEnabled>
+        <StackCorruptionDetectionLevel Condition="'$(StackCorruptionDetectionLevel)' == ''">MethodFooters</StackCorruptionDetectionLevel>
+        <IgnoreDebugStubAttribute Condition="'$(IgnoreDebugStubAttribute)' == ''">False</IgnoreDebugStubAttribute>
+
         <Il2cpuOutput Condition="'$(Il2cpuOutput)' == ''">$(OutputPath)$(AssemblyName).asm</Il2cpuOutput>
 
         <NasmOutput Condition="'$(NasmOutput)' == '' AND '$(BinFormat)' == 'ELF'">$(OutputPath)$(AssemblyName).obj</NasmOutput>
         <NasmOutput Condition="'$(NasmOutput)' == ''">$(OutputPath)$(AssemblyName).bin</NasmOutput>
-        <BinFormat Condition="'$(BinFormat)' == ''">Bin</BinFormat>
 
         <_NasmMap>$([System.IO.Path]::GetDirectoryName('$(NasmOutput)'))\main.map</_NasmMap>
 
@@ -40,6 +47,8 @@
 
         <IntermediateIsoDirectory Condition="'$(IntermediateIsoDirectory)' == ''">$(OutputPath)ISO\</IntermediateIsoDirectory>
         <ISOLINUX Condition="'$(ISOLINUX)' == ''">$(CosmosToolsPath)isolinux\</ISOLINUX>
+
+        <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
     </PropertyGroup>
 
     <PropertyGroup>

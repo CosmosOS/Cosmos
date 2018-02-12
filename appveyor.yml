@@ -50,9 +50,7 @@ build_script:
 
     xcopy /Y "Build\VSIP\Cosmos.Debug.GDB.exe" "c:\CosmosRun\Build\VSIP\"
 
-    xcopy /Y /S "Build\ISO" "c:\CosmosRun\Build\ISO\"
-
-    xcopy /Y "Build\*.*" "c:\CosmosRun\Build\ISO\"
+    xcopy /Y "Build\syslinux\*.*" "c:\CosmosRun\Build\ISO\"
 
     xcopy /Y /S "Build\VMware\*" "c:\CosmosRun\Build\VMware\"
 

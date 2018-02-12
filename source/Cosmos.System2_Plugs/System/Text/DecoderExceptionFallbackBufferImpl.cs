@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Text;
+
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System2_Plugs.System.Text
+namespace Cosmos.System_Plugs.System.Text
 {
     [Plug(Target = typeof(DecoderExceptionFallbackBuffer))]
     public static class DecoderExceptionFallbackBufferImpl

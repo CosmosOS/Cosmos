@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp2.0;net471</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <AssemblyName>Cosmos.TestRunner.UI</AssemblyName>
+        <RootNamespace>Cosmos.TestRunner.UI</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Update="**\*.xaml.cs">
+            <DependentUpon>%(Filename)</DependentUpon>
+        </Compile>
+        <EmbeddedResource Include="**\*.xaml">
+            <SubType>Designer</SubType>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="0.5.2-build4519-alpha" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.5.2-build4519-alpha" />
+    </ItemGroup>
+
+</Project>
