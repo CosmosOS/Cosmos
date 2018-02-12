@@ -81,7 +81,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU.API", "..\IL2CPU\sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Common", "source\Cosmos.Common\Cosmos.Common.csproj", "{366C2EC6-B9D8-4676-9C88-98F041B8FC93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.DebugEngine", "source\Cosmos.VS.DebugEngine\Cosmos.VS.DebugEngine.csproj", "{535A7E34-AC73-4781-B791-2C81A9066A2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.VS.DebugEngine", "source\Cosmos.VS.DebugEngine\Cosmos.VS.DebugEngine.csproj", "{535A7E34-AC73-4781-B791-2C81A9066A2C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Runner", "Test Runner", "{D4833110-032D-40E3-ACB3-F11583727B08}"
 EndProject

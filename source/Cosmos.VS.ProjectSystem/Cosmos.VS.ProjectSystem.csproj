@@ -1,11 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk" InitialTargets="CheckMSBuildRuntimeType">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
     </PropertyGroup>
 
     <PropertyGroup>
-        <UseCodebase>True</UseCodebase>
         <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
         <ExtensionInstallationFolder>Cosmos\ProjectSystem\</ExtensionInstallationFolder>
     </PropertyGroup>
@@ -85,10 +84,6 @@
         <ItemGroup>
             <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Microsoft.Win32.Registry'" />
         </ItemGroup>
-    </Target>
-
-    <Target Name="CheckMSBuildRuntimeType">
-        <Error Text="$(MSBuildRuntimeType) MSBuild not supported!" Condition="'$(MSBuildRuntimeType)' != 'Full'" />
     </Target>
 
 </Project>

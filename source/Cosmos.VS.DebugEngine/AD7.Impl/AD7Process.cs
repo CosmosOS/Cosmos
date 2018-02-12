@@ -14,7 +14,6 @@ using Cosmos.Debug.DebugConnectors;
 using Cosmos.Debug.Hosts;
 using IL2CPU.Debug.Symbols;
 using Cosmos.VS.DebugEngine.Engine.Impl;
-using Cosmos.VS.DebugEngine.Properties;
 using Cosmos.VS.DebugEngine.Utilities;
 using Label = IL2CPU.Debug.Symbols.Label;
 
@@ -477,7 +476,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     // been created.
                     if (!BochsSupport.BochsEnabled)
                     {
-                        throw new Exception(Resources.BochsIsNotInstalled);
+                        throw new Exception("The Bochs emulator doesn't seem to be installed on this machine.");
                     }
 
                     string bochsConfigurationFileName;
