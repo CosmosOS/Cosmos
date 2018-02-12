@@ -12,11 +12,9 @@
     </PropertyGroup>
     -->
 
-    <!--
     <ItemGroup>
         <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="15.5.100" PrivateAssets="All" />
     </ItemGroup>
-    -->
 
     <Target Name="_MakeTargetVsixContainerDir"
             BeforeTargets="CreateVsixContainer"
