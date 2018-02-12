@@ -8,6 +8,8 @@ using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
 
+using MyConsole = System.Console;
+
 namespace Cosmos.System
 {
     public static class KeyboardManager
@@ -63,8 +65,6 @@ public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
         private static ScanMapBase _scanMap = new US_Standard();
         private static Queue<KeyEvent> mQueuedKeys = new Queue<KeyEvent>();
 
-        public static string RebootMessage = "Detected Ctrl-Alt-Delete! Rebooting System...";
-
         private static void Enqueue(KeyEvent keyEvent)
         {
             mQueuedKeys.Enqueue(keyEvent);
@@ -115,22 +115,10 @@ public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
             {
                 if (ControlPressed && AltPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
                 {
-                    Global.Console.WriteLine(RebootMessage);
+                    //Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                    MyConsole.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
                     Power.Reboot();
                 }
-
-                if (ControlPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.C))
-                {
-                    global::System.Console.Clear();
-                }
-
-                //if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.D2))
-                //{
-                //    if (!CapsLock)
-                //    {
-                //        global::System.Console.Write("é");
-                //    }
-                //}
 
                 if (!aReleased)
                 {
