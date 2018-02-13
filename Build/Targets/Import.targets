@@ -1,6 +1,8 @@
 <Project>
 
-    <Import Project="Workarounds.targets" />
+    <Import Project="StrongName.targets" />
+
     <Import Project="VSIX.targets" Condition="'$(IsVsixProject)' == 'True'" />
+    <Import Project="Workarounds.targets" />
 
 </Project>

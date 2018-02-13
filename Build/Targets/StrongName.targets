@@ -1,7 +1,6 @@
 <Project>
 
-    <PropertyGroup>
-        <SignAssembly>True</SignAssembly>
+    <PropertyGroup Condition="'$(SignAssembly)' == 'True'">
         <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
