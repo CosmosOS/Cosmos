@@ -1,12 +1,15 @@
 <Project>
 
     <PropertyGroup>
+        <_CosmosLocalPackageFeed>$(AppData)\Cosmos User Kit\packages\</_CosmosLocalPackageFeed>
+
         <RestoreSources>
             https://api.nuget.org/v3/index.json;
             https://www.myget.org/F/cosmos/api/v3/index.json;
-            https://www.myget.org/F/avalonia-ci/api/v2;
-            $(AppData)\Cosmos User Kit\packages\
+            https://www.myget.org/F/avalonia-ci/api/v2
         </RestoreSources>
+
+        <RestoreSources Condition="Exists('$(_CosmosLocalPackageFeed)')">$(RestoreSources);$(_CosmosLocalPackageFeed)</RestoreSources>
     </PropertyGroup>
 
 </Project>
