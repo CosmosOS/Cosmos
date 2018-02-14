@@ -1,13 +1,12 @@
 <Project>
 
     <PropertyGroup>
-        <RestoreSources>@(RestoreSource)</RestoreSources>
+        <RestoreSources>
+            https://api.nuget.org/v3/index.json;
+            https://www.myget.org/F/cosmos/api/v3/index.json;
+            https://www.myget.org/F/avalonia-ci/api/v2;
+            $(AppData)\Cosmos User Kit\packages\
+        </RestoreSources>
     </PropertyGroup>
-
-    <ItemGroup>
-        <RestoreSource Include="https://api.nuget.org/v3/index.json" />
-        <RestoreSource Include="https://www.myget.org/F/cosmos/api/v3/index.json" />
-        <RestoreSource Include="https://www.myget.org/F/avalonia-ci/api/v2" />
-    </ItemGroup>
 
 </Project>

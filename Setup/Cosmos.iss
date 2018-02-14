@@ -94,8 +94,8 @@ Source: ".\Build\VSIP\Cosmos.HAL*"; DestDir: "{app}\Kernel"; Flags: ignoreversio
 Source: ".\Build\VSIP\Cosmos.System*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Common*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\IL2CPU.API*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-; Kernel packages
-Source: ".\Build\VSIP\Packages\*.nupkg"; DestDir: "{app}\Kernel\packages"; Flags: ignoreversion uninsremovereadonly
+; Packages
+Source: ".\Build\VSIP\Packages\*.nupkg"; DestDir: "{app}\packages\"; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 ; XSharp
@@ -144,8 +144,8 @@ Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags
 UseRelativePaths=True
 
 [Run]
-Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packages"" ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
-Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
