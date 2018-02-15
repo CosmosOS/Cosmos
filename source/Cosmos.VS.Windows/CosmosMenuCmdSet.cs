@@ -1,7 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using System.Globalization;
-using System.Windows.Threading;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -40,11 +38,7 @@ namespace Cosmos.VS.Windows
             }
         }
 
-        public static CosmosMenuCmdSet Instance
-        {
-            get;
-            private set;
-        }
+        public static CosmosMenuCmdSet Instance { get; private set; }
 
         private IServiceProvider ServiceProvider => package;
 
