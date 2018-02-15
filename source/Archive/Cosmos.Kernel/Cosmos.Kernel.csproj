@@ -16,8 +16,6 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -68,9 +66,6 @@
     <Compile Include="ManagedMemory\ManagedByteArray.cs" />
     <Compile Include="KPaging\PagingStructs.cs" />
     <Compile Include="KPaging\PagingUtility.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core\Cosmos.Core.csproj">

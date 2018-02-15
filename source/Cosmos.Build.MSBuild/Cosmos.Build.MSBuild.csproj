@@ -3,8 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
         <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>

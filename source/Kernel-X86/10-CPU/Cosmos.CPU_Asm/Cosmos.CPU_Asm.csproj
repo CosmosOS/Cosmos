@@ -3,12 +3,10 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Cosmos.cfg" />
+        <EmbeddedResource Include="Cosmos.cfg" />
     </ItemGroup>
 
     <ItemGroup>
