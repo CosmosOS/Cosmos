@@ -1,4 +1,6 @@
-﻿using Cosmos.Debug.Common;
+﻿using Microsoft.VisualStudio.Shell.Interop;
+
+using Cosmos.Debug.Common;
 using Cosmos.Debug.DebugConnectors;
 
 namespace Cosmos.VS.Windows
@@ -8,7 +10,7 @@ namespace Cosmos.VS.Windows
         /// <summary>A pipe used to send requests to the AD7Process.</summary>
         public static PipeClient PipeUp = new PipeClient(Pipes.UpName);
 
-        public static EnvDTE.OutputWindowPane OutputPane;
+        public static IVsOutputWindowPane OutputPane;
 
         public static PipeClient ConsoleTextChannel;
     }

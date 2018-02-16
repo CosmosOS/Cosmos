@@ -4,6 +4,8 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
+using Cosmos.VS.Windows.ToolWindows;
+
 namespace Cosmos.VS.Windows
 {
     internal sealed class CosmosMenuCmdSet
@@ -63,7 +65,7 @@ namespace Cosmos.VS.Windows
 
         private void ShowWindowAssembly(object aCommand, EventArgs e)
         {
-            ShowWindow(typeof(AssemblyTW));
+            ShowWindow(typeof(AssemblyToolWindow));
         }
 
         private void ShowWindowInternal(object aCommand, EventArgs e)
