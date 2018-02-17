@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 {
-    internal partial class CosmosPropertyPageControl : WinFormsPropertyPageUI
+    internal partial class OldCosmosPropertyPageControl : WinFormsPropertyPageUI
     {
         protected class ProfileItem
         {
@@ -32,7 +32,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             }
         }
 
-        private CosmosPropertyPageViewModel mViewModel;
+        private OldCosmosPropertyPageViewModel mViewModel;
 
         protected ProfilePresets mPresets = new ProfilePresets();
 
@@ -52,14 +52,14 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
         protected bool FreezeEvents;
 
-        public CosmosPropertyPageControl()
+        public OldCosmosPropertyPageControl()
         {
             InitializeComponent();
         }
 
         public override Task SetViewModelAsync(PropertyPageViewModel propertyPageViewModel)
         {
-            mViewModel = (CosmosPropertyPageViewModel)propertyPageViewModel;
+            mViewModel = (OldCosmosPropertyPageViewModel)propertyPageViewModel;
 
             #region Profile
 
@@ -143,16 +143,6 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 if (value != mViewModel.BuildProperties.BinFormat)
                 {
                     mViewModel.BuildProperties.BinFormat = value;
-                }
-            };
-
-            textOutputPath.TextChanged += delegate (Object sender, EventArgs e)
-            {
-                if (FreezeEvents) return;
-                string value = textOutputPath.Text;
-                if (!string.Equals(value, mViewModel.BuildProperties.OutputPath, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    mViewModel.BuildProperties.OutputPath = textOutputPath.Text;
                 }
             };
 
@@ -412,6 +402,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             if (mViewModel.BuildProperties.Profile == "ISO")
             {
                 mShowTabDebug = false;
+                chckEnableDebugStub.Checked = false;
 
             }
             else if (mViewModel.BuildProperties.Profile == "USB")
@@ -498,7 +489,6 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 cmboVisualStudioDebugPort.SelectedIndex =
                     cmboVisualStudioDebugPort.Items.IndexOf(mViewModel.BuildProperties.VisualStudioDebugPort);
             }
-            textOutputPath.Text = mViewModel.BuildProperties.OutputPath;
             comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mViewModel.BuildProperties.Framework);
             comboBinFormat.SelectedItem = EnumValue.Find(comboBinFormat.Items, mViewModel.BuildProperties.BinFormat);
             checkUseInternalAssembler.Checked = mViewModel.BuildProperties.UseInternalAssembler;
@@ -807,56 +797,6 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             }
 
             return interfaces_list;
-        }
-
-        private void OutputBrowse_Click(object sender, EventArgs e)
-        {
-            string folderPath = String.Empty;
-            var dialog = new FolderBrowserDialog();
-            dialog.ShowNewFolderButton = true;
-
-            folderPath = textOutputPath.Text;
-            if ((String.IsNullOrEmpty(folderPath) == false)
-                && (folderPath.IndexOfAny(System.IO.Path.GetInvalidPathChars()) == -1))
-            {
-                if (System.IO.Path.IsPathRooted(folderPath) == false)
-                {
-                    folderPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(mViewModel.ProjectPath), folderPath);
-                }
-
-                while ((System.IO.Directory.Exists(folderPath) == false) && (String.IsNullOrEmpty(folderPath) == false))
-                {
-                    int index = -1;
-                    index =
-                        folderPath.IndexOfAny(
-                            new Char[] { System.IO.Path.PathSeparator, System.IO.Path.AltDirectorySeparatorChar });
-                    if (index > -1)
-                    {
-                        folderPath = folderPath.Substring(0, index - 1);
-                    }
-                    else
-                    {
-                        folderPath = String.Empty;
-                    }
-                }
-
-                if (String.IsNullOrEmpty(folderPath) == true)
-                {
-                    folderPath = System.IO.Path.GetDirectoryName(mViewModel.ProjectPath);
-                }
-            }
-            else
-            {
-                folderPath = System.IO.Path.GetDirectoryName(mViewModel.ProjectPath);
-            }
-
-            dialog.SelectedPath = folderPath;
-            dialog.Description = "Select build output path";
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                textOutputPath.Text = dialog.SelectedPath;
-            }
         }
 
         private void chkEnableStacckCorruptionDetection_CheckedChanged(object sender, EventArgs e)

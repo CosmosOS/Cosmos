@@ -47,11 +47,11 @@
         WinForms
     -->
     <ItemGroup>
-        <Compile Update="ProjectSystem\VS\PropertyPages\CosmosPropertyPageControl.Designer.cs">
-          <DependentUpon>CosmosPropertyPageControl.cs</DependentUpon>
+        <Compile Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.Designer.cs">
+          <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </Compile>
-        <EmbeddedResource Update="ProjectSystem\VS\PropertyPages\CosmosPropertyPageControl.resx">
-          <DependentUpon>CosmosPropertyPageControl.cs</DependentUpon>
+        <EmbeddedResource Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.resx">
+          <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </EmbeddedResource>
     </ItemGroup>
 

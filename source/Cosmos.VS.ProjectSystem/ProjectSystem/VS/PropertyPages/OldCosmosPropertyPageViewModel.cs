@@ -6,14 +6,14 @@ using Cosmos.Build.Common;
 
 namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 {
-    internal class CosmosPropertyPageViewModel : PropertyPageViewModel
+    internal class OldCosmosPropertyPageViewModel : PropertyPageViewModel
     {
         private OldPropertyManager mPropertyManager;
         private IProjectThreadingService mProjectThreadingService;
 
         public BuildProperties BuildProperties => mPropertyManager.BuildProperties;
 
-        public CosmosPropertyPageViewModel(
+        public OldCosmosPropertyPageViewModel(
             OldPropertyManager propertyManager,
             IProjectThreadingService projectThreadingService)
             : base(propertyManager, projectThreadingService)
