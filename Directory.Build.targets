@@ -8,6 +8,10 @@
         <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' != ''">$(PackageVersionPrefix)-$(VersionSuffix)</PackageVersion>
         <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' == ''">$(PackageVersionPrefix)</PackageVersion>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <SignAssembly>True</SignAssembly>
+    </PropertyGroup>
 
     <Import Project="build\Targets\Import.targets" />
 

@@ -2,9 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-        <PackageName>Cosmos.Debug.Common</PackageName>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 {
-    partial class CosmosPropertyPageControl
+    partial class OldCosmosPropertyPageControl
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CosmosPropertyPageControl));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OldCosmosPropertyPageControl));
             this.panel1 = new System.Windows.Forms.Panel();
             this.lablCurrentProfile = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -47,9 +47,7 @@
             this.labelBinFormat = new System.Windows.Forms.Label();
             this.comboBinFormat = new System.Windows.Forms.ComboBox();
             this.comboFramework = new System.Windows.Forms.ComboBox();
-            this.buttonOutputBrowse = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.textOutputPath = new System.Windows.Forms.TextBox();
             this.labelFramework = new System.Windows.Forms.Label();
             this.tabAssembler = new System.Windows.Forms.TabPage();
             this.checkUseInternalAssembler = new System.Windows.Forms.CheckBox();
@@ -283,9 +281,7 @@
             this.tabCompile.Controls.Add(this.labelBinFormat);
             this.tabCompile.Controls.Add(this.comboBinFormat);
             this.tabCompile.Controls.Add(this.comboFramework);
-            this.tabCompile.Controls.Add(this.buttonOutputBrowse);
             this.tabCompile.Controls.Add(this.label2);
-            this.tabCompile.Controls.Add(this.textOutputPath);
             this.tabCompile.Controls.Add(this.labelFramework);
             this.tabCompile.Location = new System.Drawing.Point(4, 22);
             this.tabCompile.Name = "tabCompile";
@@ -328,39 +324,6 @@
             this.comboFramework.Name = "comboFramework";
             this.comboFramework.Size = new System.Drawing.Size(228, 21);
             this.comboFramework.TabIndex = 5;
-            // 
-            // buttonOutputBrowse
-            // 
-            this.buttonOutputBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOutputBrowse.Location = new System.Drawing.Point(430, 37);
-            this.buttonOutputBrowse.Name = "buttonOutputBrowse";
-            this.buttonOutputBrowse.Size = new System.Drawing.Size(21, 23);
-            this.buttonOutputBrowse.TabIndex = 20;
-            this.buttonOutputBrowse.Text = "..";
-            this.buttonOutputBrowse.UseVisualStyleBackColor = true;
-            // 
-            // label2
-            // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(18, 17);
-            this.label2.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(75, 15);
-            this.label2.TabIndex = 19;
-            this.label2.Text = "Output path:";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // textOutputPath
-            // 
-            this.textOutputPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textOutputPath.Location = new System.Drawing.Point(34, 38);
-            this.textOutputPath.Name = "textOutputPath";
-            this.textOutputPath.Size = new System.Drawing.Size(390, 20);
-            this.textOutputPath.TabIndex = 4;
             // 
             // labelFramework
             // 
@@ -927,9 +890,7 @@
         private System.Windows.Forms.ListBox lboxLaunch;
         private System.Windows.Forms.TabPage tabCompile;
         private System.Windows.Forms.ComboBox comboFramework;
-        private System.Windows.Forms.Button buttonOutputBrowse;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textOutputPath;
         private System.Windows.Forms.Label labelFramework;
         private System.Windows.Forms.TabPage tabAssembler;
         private System.Windows.Forms.CheckBox checkUseInternalAssembler;

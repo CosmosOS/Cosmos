@@ -16,8 +16,6 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -114,9 +112,6 @@
     <Compile Include="Serial.cs" />
     <Compile Include="DeviceSerial.cs" />
     <Compile Include="VGAScreen.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">

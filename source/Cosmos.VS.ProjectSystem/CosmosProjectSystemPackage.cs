@@ -9,7 +9,7 @@ namespace Cosmos.VS.ProjectSystem
 {
     [Guid(PackageGuid)]
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [ProvideObject(typeof(CosmosPropertyPage))]
+    [ProvideObject(typeof(OldCosmosPropertyPage))]
     [ProvideProjectFactory(typeof(MigrateCosmosProjectFactory), null, "Cosmos Project Files (*.Cosmos);*.Cosmos", "Cosmos", "Cosmos", null)]
     internal class CosmosProjectSystemPackage : Package
     {
