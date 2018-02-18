@@ -19,7 +19,7 @@ namespace Cosmos.VS.Windows
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(AssemblyToolWindow))]
-    [ProvideToolWindow(typeof(RegistersTW))]
+    [ProvideToolWindow(typeof(RegistersToolWindow))]
     [ProvideToolWindow(typeof(StackTW))]
     [ProvideToolWindow(typeof(InternalTW))]
     [ProvideToolWindow(typeof(ConsoleTW))]
@@ -113,7 +113,7 @@ namespace Cosmos.VS.Windows
                             break;
 
                         case Debugger2Windows.Registers:
-                            UpdateWindow(typeof(RegistersTW), null, xMsg);
+                            UpdateWindow(typeof(RegistersToolWindow), null, xMsg);
                             break;
 
                         case Debugger2Windows.Quit:
@@ -218,7 +218,7 @@ namespace Cosmos.VS.Windows
             byte[] aData = cWindow.UserControl.GetCurrentState();
             StateStorer.StoreState("StackTW", aData == null ? null : (byte[])aData.Clone());
 
-            cWindow = FindWindow(typeof(RegistersTW));
+            cWindow = FindWindow(typeof(RegistersToolWindow));
             aData = cWindow.UserControl.GetCurrentState();
             StateStorer.StoreState("RegistersTW", aData == null ? null : (byte[])aData.Clone());
         }
@@ -229,7 +229,7 @@ namespace Cosmos.VS.Windows
             byte[] aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "StackTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
 
-            cWindow = FindWindow(typeof(RegistersTW));
+            cWindow = FindWindow(typeof(RegistersToolWindow));
             aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "RegistersTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
         }

@@ -75,7 +75,7 @@ namespace Cosmos.VS.Windows
 
         private void ShowWindowRegisters(object aCommand, EventArgs e)
         {
-            ShowWindow(typeof(RegistersTW));
+            ShowWindow(typeof(RegistersToolWindow));
         }
 
         private void ShowWindowStack(object aCommand, EventArgs e)
