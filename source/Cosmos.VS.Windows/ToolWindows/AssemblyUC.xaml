@@ -5,7 +5,6 @@
                   xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
                   xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
                   xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
-                  x:Name="CosmosAssemblyUserControl"
                   Background="{DynamicResource {x:Static platformui:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
                   Foreground="{DynamicResource {x:Static platformui:EnvironmentColors.ToolWindowTextBrushKey}}">
     <DockPanel>
