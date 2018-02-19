@@ -91,7 +91,8 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
                 {
                     ["ProjectFile"] = ConfiguredProject.UnconfiguredProject.FullPath,
                     ["ISOFile"] = ConfiguredProject.UnconfiguredProject.MakeRooted(isoFile),
-                    ["BinFormat"] = await GetPropertyAsync("BinFormat")
+                    ["BinFormat"] = await GetPropertyAsync("BinFormat"),
+                    ["OutputPath"] = await GetPropertyAsync("OutputPath")
                 };
 
                 foreach (var xName in BuildProperties.PropNames)
