@@ -19,7 +19,7 @@ namespace Cosmos.System.Graphics
         
         private static VideoDriver videoDevice;
 
-        private static Canvas MyVideoDriver;
+        private static Canvas MyVideoDriver = null;
 
         public static Canvas GetFullScreenCanvas(Mode mode)
         {
@@ -28,11 +28,20 @@ namespace Cosmos.System.Graphics
             /* Use SVGAII When Exists in PCI */
             if(SVGAIIExists)
                 videoDevice = VideoDriver.VMWareSVGAIIDriver;
+		
+	    // If there's no instance of a video driver created (which there isn't), create it:
+            if (MyVideoDriver == null) {
+		
+		// If running on VMWare and using SVGAII, then use that driver:
+		if (videoDevice == VideoDriver.VMWareSVGAIIDriver)
+			// Creates the instance
+			return MyVideoDriver = new SVGAIIScreen(mode);
+		// If not running on VMWare, then use the VESA BIOS Extensions:
+		else if (videoDevice == VideoDriver.VBEDriver)
+			// Creates the instance
+			return MyVideoDriver = new VBAScreen(mode);
+	    }
             
-            if (videoDevice == VideoDriver.VMWareSVGAIIDriver)
-                return MyVideoDriver = new SVGAIIScreen(mode);
-            else if (videoDevice == VideoDriver.VBEDriver)
-                return MyVideoDriver = new VBEScreen(mode);
 
             /* We have already got a VideoDriver istance simple change its mode */
             MyVideoDriver.Mode = mode;
