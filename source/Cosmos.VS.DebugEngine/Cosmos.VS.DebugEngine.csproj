@@ -5,21 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="Cosmos.DebugEngine.pkgdef">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-            <IncludeInVSIX>True</IncludeInVSIX>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Update="VSPackage.resx">
-            <MergeWithCTO>True</MergeWithCTO>
-            <ManifestResourceName>VSPackage</ManifestResourceName>
-        </EmbeddedResource>
-        <VSCTCompile Include="VSPackage.vsct">
-            <ResourceName>Menus.ctmenu</ResourceName>
-            <SubType>Designer</SubType>
-        </VSCTCompile>
+        <Content Include="Resources\Icon.png" IncludeInVSIX="True" />
+        <Content Include="Cosmos.DebugEngine.pkgdef" CopyToOutputDirectory="Always" IncludeInVSIX="True" />
+        <EmbeddedResource Update="VSPackage.resx" MergeWithCTO="True" />
+        <VSCTCompile Include="VSPackage.vsct" ResourceName="Menus.ctmenu" SubType="Designer" />
     </ItemGroup>
 
     <ItemGroup>
