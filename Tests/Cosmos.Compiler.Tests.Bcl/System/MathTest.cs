@@ -105,7 +105,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 2), "Math.Log10 gives correct value for integer exponent");
 
             result = Math.Log(50);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.69897000433602), "Log10 gives correct value for double exponent");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 3.91202300542814), "Log10 gives correct value for double exponent");
 
             result = Math.Log10(double.NaN);
             Assert.IsTrue(double.IsNaN(result), "Log10 returns NaN when being called with NaN");
@@ -114,7 +114,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 2), "Log with base gives correct result with called with int values");
 
             result = Math.Log(7.5, 2.5);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.34130309724299), "Log with base gives correct result with double values");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 2.19897784671579), "Log with base gives correct result with double values");
 
             #endregion Math.Log
 

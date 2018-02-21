@@ -529,10 +529,10 @@ namespace Cosmos.System_Plugs.System
             k = 0;
             if (hx < 0x00100000)
             {           /* x < 2**-1022  */
+                if (x < 0 || double.IsNaN(x))
+                    return double.NaN;  /* log(-#) = NaN */
                 if (((hx & (uint)0x7fff) | lx) == 0)
                     return double.NegativeInfinity;       /* log(+-0)=-inf */
-                if (hx < 0)
-                    return double.NaN;  /* log(-#) = NaN */
                 k -= 54; x *= two54; /* subnormal number, scale up x */
                 hx = HighWord(x);       /* high word of x */
             }
@@ -600,13 +600,13 @@ namespace Cosmos.System_Plugs.System
 
         #region Log (base specified)
 
-        public static double Log(double x, double newBase)
+        public static double Log(double Exponent, double Base)
         {
-            if (double.IsNaN(x) || x < 0)
+            if (double.IsNaN(Exponent) || Exponent < 0)
                 return double.NaN;
-            if (x == 0)
+            if (Exponent == 0)
                 return double.NegativeInfinity;
-            return Log(x) / Log(newBase);
+            return Log(Exponent) / Log(Base);
         }
 
         #endregion Log (base specified)
