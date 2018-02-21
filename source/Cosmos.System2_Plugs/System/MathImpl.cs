@@ -20,7 +20,7 @@ namespace Cosmos.System_Plugs.System
          */
 
         //Following functions which have been implemented in this file are functions taken from http://www.netlib.org/fdlibm/ and have then be changed to work in C#
-        //Acos, Asin, Cos, _cos,  __ieee754_rem_pio2, __kernel_rem_pio2, Scalbn, Log base e, Sin, _sin, exp
+        //Acos, Asin, Cos, _cos,  __ieee754_rem_pio2, __kernel_rem_pio2, Scalbn, Log base e, Sin, _sin, exp, atan
         internal static Debugger mDebugger = new Debugger("System", "Math Plugs");
 
         #region Internal Constants
@@ -231,7 +231,97 @@ namespace Cosmos.System_Plugs.System
 
         public static double Atan(double x)
         {
-            return ((x > 0F) ? atans(x) : (-atans(-x)));
+            if (double.IsNaN(x)) return double.NaN;
+            if (double.IsPositiveInfinity(x)) return Math.PI / 2;
+            if (double.IsNegativeInfinity(x)) return -Math.PI / 2;
+
+            double w, s1, s2, z;
+            int ix, hx, id;
+
+            double[] atanhi = {
+              4.63647609000806093515e-01, /* atan(0.5)hi 0x3FDDAC67, 0x0561BB4F */
+              7.85398163397448278999e-01, /* atan(1.0)hi 0x3FE921FB, 0x54442D18 */
+              9.82793723247329054082e-01, /* atan(1.5)hi 0x3FEF730B, 0xD281F69B */
+              1.57079632679489655800e+00, /* atan(inf)hi 0x3FF921FB, 0x54442D18 */
+            };
+
+            double[] atanlo = {
+                2.26987774529616870924e-17, /* atan(0.5)lo 0x3C7A2B7F, 0x222F65E2 */
+                3.06161699786838301793e-17, /* atan(1.0)lo 0x3C81A626, 0x33145C07 */
+                1.39033110312309984516e-17, /* atan(1.5)lo 0x3C700788, 0x7AF0CBBD */
+                6.12323399573676603587e-17, /* atan(inf)lo 0x3C91A626, 0x33145C07 */
+            };
+
+            double[] aT = {
+              3.33333333333329318027e-01, /* 0x3FD55555, 0x5555550D */
+             -1.99999999998764832476e-01, /* 0xBFC99999, 0x9998EBC4 */
+              1.42857142725034663711e-01, /* 0x3FC24924, 0x920083FF */
+             -1.11111104054623557880e-01, /* 0xBFBC71C6, 0xFE231671 */
+              9.09088713343650656196e-02, /* 0x3FB745CD, 0xC54C206E */
+             -7.69187620504482999495e-02, /* 0xBFB3B0F2, 0xAF749A6D */
+              6.66107313738753120669e-02, /* 0x3FB10D66, 0xA0D03D51 */
+             -5.83357013379057348645e-02, /* 0xBFADDE2D, 0x52DEFD9A */
+              4.97687799461593236017e-02, /* 0x3FA97B4B, 0x24760DEB */
+             -3.65315727442169155270e-02, /* 0xBFA2B444, 0x2C6A6C2F */
+              1.62858201153657823623e-02, /* 0x3F90AD3A, 0xE322DA11 */
+            };
+
+            hx = HighWord(x);
+            ix = hx & 0x7fffffff;
+            if (ix >= 0x44100000)
+            {   /* if |x| >= 2^66 */
+                if (ix > 0x7ff00000 ||
+                (ix == 0x7ff00000 && (LowWord(x) != 0)))
+                    return x + x;       /* NaN */
+                if (hx > 0) return atanhi[3] + atanlo[3];
+                else return -atanhi[3] - atanlo[3];
+            }
+            if (ix < 0x3fdc0000)
+            {   /* |x| < 0.4375 */
+                if (ix < 0x3e200000)
+                {   /* |x| < 2^-29 */
+                    if (1.0e+300 + x > 1) return x; /* raise inexact */
+                }
+                id = -1;
+            }
+            else
+            {
+                x = Math.Abs(x);
+                if (ix < 0x3ff30000)
+                {       /* |x| < 1.1875 */
+                    if (ix < 0x3fe60000)
+                    {   /* 7/16 <=|x|<11/16 */
+                        id = 0; x = (2.0 * x - 1) / (2.0 + x);
+                    }
+                    else
+                    {           /* 11/16<=|x|< 19/16 */
+                        id = 1; x = (x - 1) / (x + 1);
+                    }
+                }
+                else
+                {
+                    if (ix < 0x40038000)
+                    {   /* |x| < 2.4375 */
+                        id = 2; x = (x - 1.5) / (1 + 1.5 * x);
+                    }
+                    else
+                    {           /* 2.4375 <= |x| < 2^66 */
+                        id = 3; x = -1.0 / x;
+                    }
+                }
+            }
+            /* end of argument reduction */
+            z = x * x;
+            w = z * z;
+            /* break sum from i=0 to 10 aT[i]z**(i+1) into odd and even poly */
+            s1 = z * (aT[0] + w * (aT[2] + w * (aT[4] + w * (aT[6] + w * (aT[8] + w * aT[10])))));
+            s2 = w * (aT[1] + w * (aT[3] + w * (aT[5] + w * (aT[7] + w * aT[9]))));
+            if (id < 0) return x - x * (s1 + s2);
+            else
+            {
+                z = atanhi[id] - ((x * (s1 + s2) - atanlo[id]) - x);
+                return (hx < 0) ? -z : z;
+            }
         }
 
         #endregion Atan
@@ -936,74 +1026,8 @@ namespace Cosmos.System_Plugs.System
 
         public static double Tan(double x)
         {
-            // First we need to anchor it to a valid range.
-            while (x > (2 * PI))
-            {
-                x -= (2 * PI);
-            }
-
-            byte octant = (byte)Floor(x * (1 / (PI / 4)));
-            switch (octant)
-            {
-                case 0:
-                    x = x * (4 / PI);
-                    break;
-
-                case 1:
-                    x = ((PI / 2) - x) * (4 / PI);
-                    break;
-
-                case 2:
-                    x = (x - (PI / 2)) * (4 / PI);
-                    break;
-
-                case 3:
-                    x = (PI - x) * (4 / PI);
-                    break;
-
-                case 4:
-                    x = (x - PI) * (4 / PI);
-                    break;
-
-                case 5:
-                    x = ((3.5 * PI) - x) * (4 / PI);
-                    break;
-
-                case 6:
-                    x = (x - (3.5 * PI)) * (4 / PI);
-                    break;
-
-                case 7:
-                    x = ((2 * PI) - x) * (4 / PI);
-                    break;
-            }
-
-            const double c1 = 4130240.588996024013440146267;
-            const double c2 = -349781.8562517381616631012487;
-            const double c3 = 6170.317758142494245331944348;
-            const double c4 = -27.94920941380194872760036319;
-            const double c5 = 0.0175143807040383602666563058;
-            const double c6 = 5258785.647179987798541780825;
-            const double c7 = -1526650.549072940686776259893;
-            const double c8 = 54962.51616062905361152230566;
-            const double c9 = -497.495460280917265024506937;
-            double x2 = x * x;
-            if (octant == 0 || octant == 4)
-            {
-                return ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2))))))));
-            }
-            else if (octant == 1 || octant == 5)
-            {
-                return (1 / ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2)))))))));
-            }
-            else if (octant == 2 || octant == 6)
-            {
-                return (-1 / ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2)))))))));
-            }
-            else // octant == 3 || octant == 7
-            {
-                return -((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2))))))));
-            }
+            if (double.IsNegativeInfinity(x) || double.IsInfinity(x)) return double.NaN;
+            return Sin(x) / Cos(x);
         }
 
         #endregion Tan

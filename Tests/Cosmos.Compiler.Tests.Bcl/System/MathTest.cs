@@ -290,6 +290,80 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(double.IsPositiveInfinity(result), "Pow gives correct solution when x is INF and y > 0 ");
 
             #endregion Math.Pow
+
+            #region Math.Tan
+
+            result = Math.Tan(0);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0), "Tan works with 0");
+
+            result = Math.Tan(1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.5574077246549), "Tan works with 1");
+
+            result = Math.Tan(-1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1.5574077246549), "Tan works with -1");
+
+            result = Math.Tan(10);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.648360827459087), "Tan works with big numbers such as 10");
+
+            result = Math.Tan(-10);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -0.648360827459087), "Tan works with larger negative numbers");
+
+            result = Math.Tan(0.5);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.54630248984379), "Tan works with doubles");
+
+            result = Math.Tan(-0.5);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -0.54630248984379), "Tan works with negative doubles");
+
+            result = Math.Tan(Math.PI);
+            Assert.IsTrue(result <= -.22464679914735E-16, "Tan gives matching result for Pi but mathematically inaccurate result. " + result);
+
+            result = Math.Tan(Math.PI / 2);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.63312393531954E+16), "Tan gives result matching normal Math function but incorrect in mathematical sense");
+
+            result = Math.Tan(Math.PI / 3);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, Math.Sqrt(3)), "Tan gives correct value for PI / 3");
+
+            result = Math.Tan(double.NegativeInfinity);
+            Assert.IsTrue(double.IsNaN(result), "Tan return Nan for -INF");
+
+            result = Math.Tan(double.PositiveInfinity);
+            Assert.IsTrue(double.IsNaN(result), "Tan returns Nan for INF");
+
+            result = Math.Tan(double.NaN);
+            Assert.IsTrue(double.IsNaN(result), "Tan returns Nan for Nan");
+
+            #endregion Math.Tan
+
+            #region Math.Atan
+
+            result = Math.Atan(0);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0), "Atan works with 0");
+
+            result = Math.Atan(1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.785398163397448), "Atan works with 1");
+
+            result = Math.Atan(-1);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -0.785398163397448), "Atan works with -1");
+
+            result = Math.Atan(Math.PI);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.26262725567891), "Atan works with PI");
+
+            result = Math.Atan(Math.PI / 2);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.00388482185389), "Atan works with PI / 2");
+
+            result = Math.Atan(Math.PI / 3);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.808448792630022), "Atan works with PI / 3");
+
+            result = Math.Atan(double.NaN);
+            Assert.IsTrue(double.IsNaN(result), "Atan returns NaN for NaN");
+
+            result = Math.Atan(double.PositiveInfinity);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.5707963267949), "Atan works with INF");
+
+            result = Math.Atan(double.NegativeInfinity);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1.5707963267949), "Atan works with -INF");
+
+            #endregion Math.Atan
         }
     }
 }
