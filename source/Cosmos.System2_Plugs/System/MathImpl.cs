@@ -8,6 +8,19 @@ namespace Cosmos.System_Plugs.System
     [Plug(Target = typeof(Math))]
     public static class MathImpl
     {
+        /* @(#)fdlibm.h 1.5 04/04/22 */
+        /*
+         * ====================================================
+         * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
+         *
+         * Permission to use, copy, modify, and distribute this
+         * software is freely granted, provided that this notice
+         * is preserved.
+         * ====================================================
+         */
+
+        //Following functions which have been implemented in this file are functions taken from http://www.netlib.org/fdlibm/ and have then be changed to work in C#
+        //Acos, Asin, Cos, _cos,  __ieee754_rem_pio2, __kernel_rem_pio2, Scalbn, Log base e, Sin, _sin, exp
         internal static Debugger mDebugger = new Debugger("System", "Math Plugs");
 
         #region Internal Constants
@@ -110,7 +123,7 @@ namespace Cosmos.System_Plugs.System
                 z = (1 + x) * 0.5;
                 p = z * (pS0 + z * (pS1 + z * (pS2 + z * (pS3 + z * (pS4 + z * pS5)))));
                 q = 1 + z * (qS1 + z * (qS2 + z * (qS3 + z * qS4)));
-                s = Math.Sqrt(z);
+                s = Sqrt(z);
                 r = p / q;
                 w = r * s - pio2_lo;
                 return Math.PI - 2.0 * (s + w);
@@ -118,7 +131,7 @@ namespace Cosmos.System_Plugs.System
             else
             {           /* x > 0.5 */
                 z = (1 - x) * 0.5;
-                s = Math.Sqrt(z);
+                s = Sqrt(z);
                 df = s;
                 //__LO(df) = 0;
                 Byte[] bdf = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(df));
@@ -183,11 +196,11 @@ namespace Cosmos.System_Plugs.System
                 return x + x * w;
             }
             /* 1> |x|>= 0.5 */
-            w = 1 - Math.Abs(x);
+            w = 1 - Abs(x);
             t = w * 0.5;
             p = t * (pS0 + t * (pS1 + t * (pS2 + t * (pS3 + t * (pS4 + t * pS5)))));
             q = 1 + t * (qS1 + t * (qS2 + t * (qS3 + t * qS4)));
-            s = Math.Sqrt(t);
+            s = Sqrt(t);
             if (ix >= 0x3FEF3333)
             {   /* if |x| > 0.975 */
                 w = p / q;
@@ -367,18 +380,6 @@ namespace Cosmos.System_Plugs.System
 
         #region Exp
 
-        /*
-        * ====================================================
-        * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
-        *
-        * Permission to use, copy, modify, and distribute this
-        * software is freely granted, provided that this notice
-        * is preserved.
-        * ====================================================
-        */
-
-        // Look at http://www.netlib.org/fdlibm/e_exp.c for more a in deth explanation
-
         public static double Exp(double x)
         {
             double y, hi = 0, lo = 0, c, t;
@@ -508,7 +509,91 @@ namespace Cosmos.System_Plugs.System
 
         public static double Log(double x)
         {
-            return Log(x, E);
+            double ln2_hi = 6.93147180369123816490e-01,    /* 3fe62e42 fee00000 */
+            ln2_lo = 1.90821492927058770002e-10,    /* 3dea39ef 35793c76 */
+            two54 = 1.80143985094819840000e+16,  /* 43500000 00000000 */
+            Lg1 = 6.666666666666735130e-01,  /* 3FE55555 55555593 */
+            Lg2 = 3.999999999940941908e-01,  /* 3FD99999 9997FA04 */
+            Lg3 = 2.857142874366239149e-01,  /* 3FD24924 94229359 */
+            Lg4 = 2.222219843214978396e-01,  /* 3FCC71C5 1D8E78AF */
+            Lg5 = 1.818357216161805012e-01,  /* 3FC74664 96CB03DE */
+            Lg6 = 1.531383769920937332e-01,  /* 3FC39A09 D078C69F */
+            Lg7 = 1.479819860511658591e-01;  /* 3FC2F112 DF3E5244 */
+            double hfsq, f, s, z, R, w, t1, t2, dk;
+            int k, hx, i, j;
+            uint lx;
+
+            hx = HighWord(x);       /* high word of x */
+            lx = (uint)LowWord(x);       /* low  word of x */
+
+            k = 0;
+            if (hx < 0x00100000)
+            {           /* x < 2**-1022  */
+                if (((hx & (uint)0x7fff) | lx) == 0)
+                    return double.NegativeInfinity;       /* log(+-0)=-inf */
+                if (hx < 0)
+                    return double.NaN;  /* log(-#) = NaN */
+                k -= 54; x *= two54; /* subnormal number, scale up x */
+                hx = HighWord(x);       /* high word of x */
+            }
+            if (hx >= 0x7ff00000) return x + x;
+            k += (hx >> 20) - 1023;
+            hx &= 0x000fffff;
+            i = (hx + 0x95f64) & 0x100000;
+            //__HI(x) = hx | (i ^ 0x3ff00000);    /* normalize x or x/2 */
+            Byte[] bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
+            Byte[] bv = BitConverter.GetBytes(hx | (i ^ 0x3ff00000));
+            for (int _i = 0; _i < 4; _i++)
+            {
+                bx[_i + (BitConverter.IsLittleEndian ? 4 : 0)] = bv[_i];
+            }
+            x = BitConverter.Int64BitsToDouble(BitConverter.ToInt64(bx, 0));
+            k += (i >> 20);
+            f = x - 1.0;
+            if ((0x000fffff & (2 + hx)) < 3)
+            {   /* |f| < 2**-20 */
+                if (f == 0)
+                    if (k == 0)
+                        return 0;
+                    else
+                    {
+                        dk = k;
+                        return dk * ln2_hi + dk * ln2_lo;
+                    }
+                R = f * f * (0.5 - 0.33333333333333333 * f);
+                if (k == 0)
+                    return f - R;
+                else
+                {
+                    dk = k;
+                    return dk * ln2_hi - ((R - dk * ln2_lo) - f);
+                }
+            }
+            s = f / (2.0 + f);
+            dk = k;
+            z = s * s;
+            i = hx - 0x6147a;
+            w = z * z;
+            j = 0x6b851 - hx;
+            t1 = w * (Lg2 + w * (Lg4 + w * Lg6));
+            t2 = z * (Lg1 + w * (Lg3 + w * (Lg5 + w * Lg7)));
+            i |= j;
+            R = t2 + t1;
+            if (i > 0)
+            {
+                hfsq = 0.5 * f * f;
+                if (k == 0)
+                    return f - (hfsq - s * (hfsq + R));
+                else
+                    return dk * ln2_hi - ((hfsq - (s * (hfsq + R) + dk * ln2_lo)) - f);
+            }
+            else
+            {
+                if (k == 0)
+                    return f - s * (f - R);
+                else
+                    return dk * ln2_hi - ((s * (f - R) - dk * ln2_lo) - f);
+            }
         }
 
         #endregion Log (base e)
@@ -517,45 +602,11 @@ namespace Cosmos.System_Plugs.System
 
         public static double Log(double x, double newBase)
         {
-            if (x == 0.0F)
-            {
+            if (double.IsNaN(x) || x < 0)
+                return double.NaN;
+            if (x == 0)
                 return double.NegativeInfinity;
-            }
-            if ((x < 1.0F) && (newBase < 1.0F))
-            {
-                throw new ArgumentOutOfRangeException("can't compute Log");
-            }
-
-            double partial = 0.5F;
-            double integer = 0F;
-            double fractional = 0.0F;
-
-            while (x < 1.0F)
-            {
-                integer -= 1F;
-                x *= newBase;
-            }
-
-            while (x >= newBase)
-            {
-                integer += 1F;
-                x /= newBase;
-            }
-
-            x *= x;
-
-            while (partial >= 2.22045e-016)
-            {
-                if (x >= newBase)
-                {
-                    fractional += partial;
-                    x = x / newBase;
-                }
-                partial *= 0.5F;
-                x *= x;
-            }
-
-            return (integer + fractional);
+            return Log(x) / Log(newBase);
         }
 
         #endregion Log (base specified)
@@ -564,6 +615,7 @@ namespace Cosmos.System_Plugs.System
 
         public static double Log10(double x)
         {
+            //Use change of base formula
             return Log(x, 10F);
         }
 
@@ -619,16 +671,25 @@ namespace Cosmos.System_Plugs.System
             }
             if (b < 0)
             {
-                if (Math.Abs(e) - Math.Abs((int)e) > (Double.Epsilon * 100)) return double.NaN;
-                double logedBase = Math.Log(Math.Abs(b));
+                if (Abs(e) - Abs((int)e) > (Double.Epsilon * 100)) return double.NaN;
+                double logedBase = Log(Abs(b));
                 double pow = Exp(logedBase * e);
                 if ((long)e % 2 == 0) return pow;
                 else return -1 * pow;
             }
             else
             {
-                double logedBase = Math.Log(b);
-                return Exp(logedBase * e);
+                if (e < 0)
+                {
+                    e = Abs(e);
+                    double logedBase = Log(b);
+                    return 1 / Exp(logedBase * e);
+                }
+                else
+                {
+                    double logedBase = Log(b);
+                    return Exp(logedBase * e);
+                }
             }
         }
 
@@ -638,7 +699,7 @@ namespace Cosmos.System_Plugs.System
 
         public static double Round(double d)
         {
-            return ((Math.Floor(d) % 2 == 0) ? Math.Floor(d) : Math.Ceiling(d));
+            return ((Floor(d) % 2 == 0) ? Floor(d) : Ceiling(d));
         }
 
         #endregion Round
@@ -1049,7 +1110,7 @@ namespace Cosmos.System_Plugs.System
             }
             if (ix <= 0x413921fb)
             { /* |x| ~<= 2^19*(pi/2), medium size */
-                t = Math.Abs(x);
+                t = Abs(x);
                 n = (int)(t * invpio2 + 0.5);
                 fn = n;
                 r = t - fn * pio2_1;
@@ -1194,7 +1255,7 @@ namespace Cosmos.System_Plugs.System
 
             /* compute n */
             z = Scalbn(z, q0);     /* actual value of z */
-            z -= 8.0 * Math.Floor(z * 0.125);       /* trim off integer >= 8 */
+            z -= 8.0 * Floor(z * 0.125);       /* trim off integer >= 8 */
             n = (int)z;
             z -= n;
             ih = 0;

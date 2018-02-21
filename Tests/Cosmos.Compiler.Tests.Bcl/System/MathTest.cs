@@ -75,6 +75,49 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             #endregion Math.Cos
 
+            #region Math.Log
+
+            result = Math.Log(10);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 2.30258509299405), "Math.Log base e works with positive numbers");
+
+            result = Math.Log(Math.E);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1), "Math.Log base gives correct value for e");
+
+            result = Math.Log(Math.E * Math.E);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 2), "Math.Log base gives correct value for e^2");
+
+            result = Math.Log(0);
+            Assert.IsTrue(double.IsNegativeInfinity(result), "Math.Log base e gives correct value for 0");
+
+            result = Math.Log(-1.5);
+            Assert.IsTrue(double.IsNaN(result), "Math.Log base e gives correct answer for negative numbers");
+
+            result = Math.Log(double.NaN);
+            Assert.IsTrue(double.IsNaN(result), "Log base e returns NaN for NaN");
+
+            result = Math.Log(double.PositiveInfinity);
+            Assert.IsTrue(double.IsPositiveInfinity(result), "Log base e return INF for INF");
+
+            result = Math.Log(double.NegativeInfinity);
+            Assert.IsTrue(double.IsNaN(result), "Log base e return NaN for -INF");
+
+            result = Math.Log10(100);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 2), "Math.Log10 gives correct value for integer exponent");
+
+            result = Math.Log(50);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.69897000433602), "Log10 gives correct value for double exponent");
+
+            result = Math.Log10(double.NaN);
+            Assert.IsTrue(double.IsNaN(result), "Log10 returns NaN when being called with NaN");
+
+            result = Math.Log(4, 2);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 2), "Log with base gives correct result with called with int values");
+
+            result = Math.Log(7.5, 2.5);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.34130309724299), "Log with base gives correct result with double values");
+
+            #endregion Math.Log
+
             #region Math.Sin
 
             result = Math.Sin(4);
