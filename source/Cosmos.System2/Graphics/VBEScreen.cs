@@ -5,10 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cosmos.System.Graphics;
 using Cosmos.Common.Extensions;
 
-namespace Cosmos.System
+namespace Cosmos.System.Graphics
 {
    public class VBEScreen : Canvas
     {

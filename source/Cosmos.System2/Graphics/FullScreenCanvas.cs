@@ -13,7 +13,7 @@ namespace Cosmos.System.Graphics
             VBEDriver
         }
         
-        private static PCIDevice SVGAIIDevice = PCI.GetDevice(0x15AD, 0x0405);
+        private static PCIDevice SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
         
         private static bool SVGAIIExists = SVGAIIDevice.DeviceExists;
         
@@ -39,7 +39,7 @@ namespace Cosmos.System.Graphics
 		// If not running on VMWare, then use the VESA BIOS Extensions:
 		else if (videoDevice == VideoDriver.VBEDriver)
 			// Creates the instance
-			return MyVideoDriver = new VBAScreen(mode);
+			return MyVideoDriver = new VBEScreen(mode);
 	    }
             
 
@@ -51,8 +51,11 @@ namespace Cosmos.System.Graphics
         public static Canvas GetFullScreenCanvas()
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
- 
-            /* We have already got a VideoDriver istance simple reset its mode to DefaultGraphicMode */
+
+            /*            
+            WARNING: MyVideoDriver is initiated as null - needs changing!
+             We have already got a VideoDriver instance
+                - reset its mode to DefaultGraphicMode */
             return GetFullScreenCanvas(MyVideoDriver.DefaultGraphicMode);
         }
     }

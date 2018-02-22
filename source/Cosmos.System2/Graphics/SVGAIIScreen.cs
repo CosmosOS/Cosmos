@@ -46,8 +46,14 @@ namespace Cosmos.System.Graphics
             xSVGAIIDriver.Update(0, 0, (uint)mode.Columns, (uint)mode.Rows);
         }
 
+        public override void DrawArray(Color[] colors, int x, int y, int width, int height)
+        {
+            throw new NotImplementedException();
+            //xSVGAIIDriver.
+        }
         public override void DrawPoint(Pen pen, float x, float y)
         {
+            //xSVGAIIDriver.
             throw new NotImplementedException();
         }
 
