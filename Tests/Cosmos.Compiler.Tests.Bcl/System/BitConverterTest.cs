@@ -48,12 +48,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(floatBytes) doesn't work: result " + result + " != " + expectedResult);
 
-            double aDouble = 1.0;
-
-            byte[] doubleBytes = BitConverter.GetBytes(aDouble);
-
             double Result;
-            doubleBytes = BitConverter.GetBytes(0d);
+            byte[] doubleBytes = BitConverter.GetBytes(0d);
             Result = BitConverter.ToDouble(doubleBytes, 0);
             Assert.IsTrue(Result == 0f, "BitConverter.ToDouble works with 0");
 
@@ -80,7 +76,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             doubleBytes = BitConverter.GetBytes(-1.2345d);
             Result = BitConverter.ToDouble(doubleBytes, 0);
             Assert.IsTrue(Result == -1.2345, "BitConverter.ToDouble works with -1.2345");
-          
+
+            double aDouble = 1.0;
+
+            doubleBytes = BitConverter.GetBytes(aDouble);
+
             result = BitConverter.ToString(doubleBytes, 0);
             expectedResult = "00-00-00-00-00-00-F0-3F";
 
