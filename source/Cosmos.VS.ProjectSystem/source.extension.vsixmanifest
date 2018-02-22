@@ -6,8 +6,8 @@
     <Metadata>
         <Identity Id="Cosmos.VS.ProjectSystem" Version="1.0" Language="en-US" Publisher="Cosmos" />
         <DisplayName>Cosmos Project System</DisplayName>
-        <Description xml:space="preserve">Cosmos Project System for Visual Studio</Description>
-        <Icon>Resources\Cosmos.ico</Icon>
+        <Description xml:space="preserve">Cosmos project system for Visual Studio.</Description>
+        <Icon>Resources\Icon.png</Icon>
     </Metadata>
 
     <Installation AllUsers="true">

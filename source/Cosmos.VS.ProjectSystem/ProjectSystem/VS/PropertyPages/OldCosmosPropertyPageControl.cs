@@ -12,7 +12,6 @@ using VSPropertyPages;
 using Cosmos.Build.Common;
 
 using DebugMode = Cosmos.Build.Common.DebugMode;
-using System.Threading.Tasks;
 
 namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 {
@@ -26,10 +25,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             public bool IsPreset;
 
-            public override string ToString()
-            {
-                return Name;
-            }
+            public override string ToString() => Name;
         }
 
         private OldCosmosPropertyPageViewModel mViewModel;
@@ -52,14 +48,11 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
         protected bool FreezeEvents;
 
-        public OldCosmosPropertyPageControl()
+        public OldCosmosPropertyPageControl(OldCosmosPropertyPageViewModel aViewModel)
         {
             InitializeComponent();
-        }
 
-        public override Task SetViewModelAsync(PropertyPageViewModel propertyPageViewModel)
-        {
-            mViewModel = (OldCosmosPropertyPageViewModel)propertyPageViewModel;
+            mViewModel = aViewModel;
 
             #region Profile
 
@@ -308,11 +301,10 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                     mViewModel.BuildProperties.StartBochsDebugGui = x;
                 }
             };
+
             #endregion
 
             FillProperties();
-
-            return Task.CompletedTask;
         }
 
         protected void RemoveTab(TabPage aTab)

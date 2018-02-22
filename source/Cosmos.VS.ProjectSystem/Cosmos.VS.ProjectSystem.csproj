@@ -11,18 +11,9 @@
 
     <ItemGroup>
         <Compile Remove="ProjectTemplates\**" />
-        <Content Include="ProjectTemplates\**">
-            <IncludeInVSIX>True</IncludeInVSIX>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="CosmosImages.imagemanifest">
-            <IncludeInVSIX>True</IncludeInVSIX>
-        </Content>
-        <Content Include="Resources\Cosmos.ico">
-            <IncludeInVSIX>True</IncludeInVSIX>
-        </Content>
+        <Content Include="ProjectTemplates\**" IncludeInVSIX="True" />
+        <Content Include="Resources\Icon.png" IncludeInVSIX="True" />
+        <Content Include="CosmosImages.imagemanifest" IncludeInVSIX="True" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,11 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="BuildSystem\**">
-            <IncludeInVSIX>True</IncludeInVSIX>
-            <InstallRoot>MSBuild</InstallRoot>
-            <VSIXSubPath>Cosmos\%(RecursiveDir)</VSIXSubPath>
-        </Content>
+        <Content Include="BuildSystem\**" IncludeInVSIX="True" InstallRoot="MSBuild" VSIXSubPath="Cosmos\%(RecursiveDir)" />
     </ItemGroup>
 
     <ItemGroup>
