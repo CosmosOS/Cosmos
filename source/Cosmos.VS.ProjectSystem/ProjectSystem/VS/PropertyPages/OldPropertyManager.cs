@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.ProjectSystem;
 
@@ -23,6 +24,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
         public event EventHandler<ProjectPropertyChangedEventArgs> PropertyChanged;
         public event EventHandler<ProjectPropertyChangingEventArgs> PropertyChanging;
+        public event EventHandler ConfigurationsChanged;
 
         public OldPropertyManager(UnconfiguredProject unconfiguredProject)
         {
@@ -135,5 +137,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 return project.GetPropertyValue(propertyName);
             }
         }
+
+        public Task UpdateConfigurationsAsync(IReadOnlyCollection<ConfiguredProject> configuredProjects) => Task.CompletedTask;
     }
 }
