@@ -53,7 +53,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             byte[] doubleBytes = BitConverter.GetBytes(aDouble);
 
             double Result;
-            Byte[] doubleBytes = BitConverter.GetBytes(0d);
+            doubleBytes = BitConverter.GetBytes(0d);
             Result = BitConverter.ToDouble(doubleBytes, 0);
             Assert.IsTrue(Result == 0f, "BitConverter.ToDouble works with 0");
 
