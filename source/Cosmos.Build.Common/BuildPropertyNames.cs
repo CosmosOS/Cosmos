@@ -22,7 +22,6 @@ namespace Cosmos.Build.Common
         public const string PxeInterfaceString = "PxeInterface";
         public const string SlavePortString = "SlavePort";
         public const string VMwareEditionString = "VMwareEdition";
-        public const string OutputPathString = "OutputPath";
         public const string FrameworkString = "Framework";
         public const string UseInternalAssemblerString = "UseInternalAssembler";
         public const string TraceAssembliesString = "TraceAssemblies";

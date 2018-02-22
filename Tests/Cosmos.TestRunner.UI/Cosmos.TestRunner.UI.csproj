@@ -17,8 +17,6 @@
     <RootNamespace>Cosmos.TestRunner.UI</RootNamespace>
     <AssemblyName>Cosmos.TestRunner.UI</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <!--<SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,6 +81,22 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj">
+      <Project>{b7077a34-d7f0-4422-be7c-65df26c65489}</Project>
+      <Name>Cosmos.Core_Asm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj">
+      <Project>{1132e689-18b0-4d87-94e8-934d4802c540}</Project>
+      <Name>Cosmos.Core_Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj">
+      <Project>{7e450662-b34c-49b0-a826-f45ad3a18891}</Project>
+      <Name>Cosmos.Debug.Kernel.Plugs.Asm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj">
+      <Project>{9431ff1f-ad75-4a1e-b38a-46e0f109411d}</Project>
+      <Name>Cosmos.System2_Plugs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj">
       <Project>{eddf5700-d198-491b-b94c-d63916f8ba70}</Project>
       <Name>Cosmos.TestRunner.Core</Name>

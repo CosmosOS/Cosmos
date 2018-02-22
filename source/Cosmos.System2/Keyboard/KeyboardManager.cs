@@ -8,6 +8,8 @@ using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
 
+using MyConsole = System.Console;
+
 namespace Cosmos.System
 {
     public static class KeyboardManager
@@ -113,7 +115,8 @@ public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
             {
                 if (ControlPressed && AltPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
                 {
-                    Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                    //Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                    MyConsole.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
                     Power.Reboot();
                 }
 

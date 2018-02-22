@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Cosmos.TestRunner;
-using Cosmos.Compiler.Tests.Bcl.Helper;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    internal class MathTest
+    internal static class MathTest
     {
         public static void Execute()
         {

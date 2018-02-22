@@ -61,17 +61,17 @@ namespace Cosmos.HAL
             IO.Memory.Fill(mScrollSize, mRow2Addr, mBackgroundClearCellValue);
         }
 
-        public override char this[int aX, int aY]
+        public override byte this[int aX, int aY]
         {
             get
             {
                 var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
-                return (char)mRAM[xScreenOffset];
+                return (byte)mRAM[xScreenOffset];
             }
             set
             {
                 var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
-                mRAM[xScreenOffset] = (byte)value;
+                mRAM[xScreenOffset] = value;
                 mRAM[xScreenOffset + 1] = Color;
             }
         }

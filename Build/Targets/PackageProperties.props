@@ -1,0 +1,20 @@
+<Project>
+
+    <PropertyGroup>
+        <CosmosDescription>Cosmos is an operating system "construction kit". Build your own OS using managed languages such as C#, VB.NET, and more!</CosmosDescription>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <Authors>Cosmos</Authors>
+        <Copyright>Copyright © 2007-$([System.DateTime]::Now.Year) COSMOS Project</Copyright>
+        <PackageDescription>$(CosmosDescription)</PackageDescription>
+        <PackageIconUrl>https://github.com/CosmosOS/Cosmos/raw/master/Artwork/Cosmos.ico</PackageIconUrl>
+        <PackageProjectUrl>http://www.gocosmos.org</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/CosmosOS/Cosmos/raw/master/LICENSE.txt</PackageLicenseUrl>
+        <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+        <PackageTags>Cosmos OS Operating System .NET C# VB VB.NET F#</PackageTags>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/CosmosOS/Cosmos</RepositoryUrl>
+    </PropertyGroup>
+
+</Project>

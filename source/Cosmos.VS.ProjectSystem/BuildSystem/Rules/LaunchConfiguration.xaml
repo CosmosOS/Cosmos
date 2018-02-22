@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="LaunchConfiguration"
+      DisplayName="Launch Configuration"
+      PageTemplate="generic"
+      Description="Launch configuration."
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <Rule.DataSource>
+        <DataSource Persistence="ProjectFile"
+                    Label="Configuration"
+                    SourceOfDefaultValue="AfterContext" />
+    </Rule.DataSource>
+    <Rule.Categories>
+        <Category Name="General"
+                  DisplayName="General"
+                  Description="General" />
+    </Rule.Categories>
+
+    <EnumProperty Name="Deployment">
+        <EnumValue Name="ISO" DisplayName="ISO Image" />
+        <EnumValue Name="USB" DisplayName="USB Device" />
+        <EnumValue Name="PXE" DisplayName="PXE Network Boot" />
+        <EnumValue Name="BinaryImage" DisplayName="Binary Image" />
+    </EnumProperty>
+
+    <EnumProperty Name="Launch">
+        <EnumValue Name="None" DisplayName="None" />
+        <EnumValue Name="VMware" DisplayName="VMware" />
+        <EnumValue Name="Slave" DisplayName="Attached Slave (CanaKit)" />
+        <EnumValue Name="Bochs" DisplayName="Bochs" />
+        <EnumValue Name="IntelEdison" DisplayName="Intel Edison" />
+        <EnumValue Name="HyperV" DisplayName="Hyper-V" />
+    </EnumProperty>
+
+    <StringProperty Name="VisualStudioDebugPort" />
+
+</Rule>

@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections;
 
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
+
+using Cosmos.Compiler.Tests.Bcl.CSharp;
 using Cosmos.Compiler.Tests.Bcl.System;
+using Cosmos.Compiler.Tests.Bcl.System.Collections.Generic;
+using Cosmos.Compiler.Tests.Bcl.System.Text;
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
@@ -19,9 +24,11 @@ namespace Cosmos.Compiler.Tests.Bcl
             {
                 mDebugger.Send("Run");
 
-                CSharp.WhileLoopTests.Execute();
-                CSharp.ForeachLoopTests.Execute();
+                // C#
+                WhileLoopTests.Execute();
+                ForeachLoopTests.Execute();
 
+                // System
                 ObjectTests.Execute();
                 ArrayTests.Execute();
                 StringTest.Execute();
@@ -38,16 +45,24 @@ namespace Cosmos.Compiler.Tests.Bcl
                 SingleTest.Execute();
                 DoubleTest.Execute();
                 MathTest.Execute();
+
+                //mDebugger.Send("Thread test start of 500 ms");
+                //ThreadTest.Execute();
+                //mDebugger.Send("Thread test end");
+
                 //DecimalTest.Execute();
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
-                EncodingTest.Execute();
                 RandomTests.Execute();
 
-                System.Collections.Generic.ListTest.Execute();
-                System.Collections.Generic.QueueTest.Execute();
-                //System.Collections.Generic.DictionaryTest.Execute();
+                // System.Collections.Generic
+                ListTest.Execute();
+                QueueTest.Execute();
+                DictionaryTest.Execute();
+
+                // System.Text
+                EncodingTest.Execute();
 
                 TestController.Completed();
             }

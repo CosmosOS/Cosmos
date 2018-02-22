@@ -86,7 +86,6 @@ Source: ".\Build\VSIP\NASM\*"; DestDir: "{app}\Build\NASM"; Flags: ignoreversion
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\MSBuild\*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion recursesubdirs uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.GDB.exe"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 ; Kernel assemblies
 Source: ".\Build\VSIP\Cosmos.Debug.Kernel*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
@@ -94,8 +93,9 @@ Source: ".\Build\VSIP\Cosmos.Core*"; DestDir: "{app}\Kernel"; Flags: ignoreversi
 Source: ".\Build\VSIP\Cosmos.HAL*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.System*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Common*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-; Kernel packages
-Source: ".\Build\VSIP\KernelPackages\*.nupkg"; DestDir: "{app}\Kernel\packages"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\IL2CPU.API*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+; Packages
+Source: ".\Build\VSIP\Packages\*.nupkg"; DestDir: "{app}\packages\"; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 ; XSharp
@@ -106,24 +106,25 @@ Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion 
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
-Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
-Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\isolinux.bin"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
 ; USB
-Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
-Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
-Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\libcom32.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
+Source: ".\Build\syslinux\pxelinux.0"; DestDir: "{app}\Build\PXE"
+Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
@@ -143,17 +144,20 @@ Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags
 UseRelativePaths=True
 
 [Run]
-Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packages"" ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
-Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.DebugEngine.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
 
 [UninstallRun]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; StatusMsg: "Uninstalling Kernel Packages"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
 [Code]
 function IsAppRunning(const FileName: string): Boolean;

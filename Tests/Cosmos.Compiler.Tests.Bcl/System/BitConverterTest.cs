@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    internal class BitConverterTest
+    internal static class BitConverterTest
     {
         public static void Execute()
         {
-            String result;
-            String expectedResult;
+            string result;
+            string expectedResult;
 
             int anInt = 1;
 
@@ -49,15 +48,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(floatBytes) doesn't work: result " + result + " != " + expectedResult);
 
-            //// This tests fails bytes are screwed!
-            //double aDouble = 1.0;
+            double aDouble = 1.0;
 
-            //byte[] doubleBytes = BitConverter.GetBytes(aDouble);
-
-            //result = BitConverter.ToString(doubleBytes, 0);
-            //expectedResult = "00-00-00-00-00-00-F0-3F";
-
-            //Assert.IsTrue((result == expectedResult), "BitConverter.ToString(doubleBytes) doesn't work: result " + result + " != " + expectedResult);
+            byte[] doubleBytes = BitConverter.GetBytes(aDouble);
 
             double Result;
             Byte[] doubleBytes = BitConverter.GetBytes(0d);
@@ -87,6 +80,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             doubleBytes = BitConverter.GetBytes(-1.2345d);
             Result = BitConverter.ToDouble(doubleBytes, 0);
             Assert.IsTrue(Result == -1.2345, "BitConverter.ToDouble works with -1.2345");
+          
+            result = BitConverter.ToString(doubleBytes, 0);
+            expectedResult = "00-00-00-00-00-00-F0-3F";
+
+            Assert.IsTrue((result == expectedResult), "BitConverter.ToString(doubleBytes) doesn't work: result " + result + " != " + expectedResult);
         }
     }
 }

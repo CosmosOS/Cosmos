@@ -1,0 +1,8 @@
+<Project>
+
+    <PropertyGroup>
+        <ArtifactsDir Condition="'$(ArtifactsDir)' == ''">$(RepoRoot)artifacts\</ArtifactsDir>
+        <VsixOutputPath>$(ArtifactsDir)VSIX\</VsixOutputPath>
+    </PropertyGroup>
+
+</Project>

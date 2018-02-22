@@ -1,41 +1,63 @@
 ﻿<local:DebuggerUC x:Class="Cosmos.VS.Windows.AssemblyUC"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Cosmos.VS.Windows"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
-             x:Name="CosmosAssemblyUserControl"
-             Background="WhiteSmoke">
-    <DockPanel LastChildFill="True">
-        <ToolBar Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
-            <ToggleButton Name="butnFilter" IsChecked="True" BorderBrush="Black" Margin="1" ToolTip="Filter" Width="24" Height="24">
-                <Image Source="/Cosmos.VS.Windows;component/Images/filter-small.png" />
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:local="clr-namespace:Cosmos.VS.Windows"
+                  xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+                  xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+                  xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+                  Background="{DynamicResource {x:Static platformui:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+                  Foreground="{DynamicResource {x:Static platformui:EnvironmentColors.ToolWindowTextBrushKey}}">
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top"
+                 HorizontalAlignment="Left">
+            <ToggleButton Name="butnFilter"
+                          Width="24"
+                          Height="24"
+                          Margin="1"
+                          BorderBrush="Black"
+                          IsChecked="True"
+                          ToolTip="Filter">
+                <imaging:CrispImage Moniker="{x:Static imagecatalog:KnownMonikers.Filter}" />
             </ToggleButton>
             <Button ToolTip="Copy" Name="butnCopy" BorderBrush="Black" Margin="1" Width="24" Height="24">
-                <Image Source="/Cosmos.VS.Windows;component/Images/Copy_Icon_2.jpg" />
+                <imaging:CrispImage Moniker="{x:Static imagecatalog:KnownMonikers.Copy}" />
             </Button>
             <Rectangle Width="8" />
-            <Button ToolTip="Stepping Mode: Source" Name="butnStepMode" BorderBrush="Black" Margin="1" Height="24">
-              Step mode: Source
-            </Button>
-            <Button ToolTip="Step Into" Name="butnStepInto" BorderBrush="Black" Margin="1" Width="24" Height="24">
-                <Image Source="/Cosmos.VS.Windows;component/Images/StepInto.png" />
+            <Button Name="butnStepMode"
+                    Margin="1"
+                    Height="24"
+                    BorderBrush="Black"
+                    ToolTip="Stepping Mode: Source"
+                    Content="Step mode: Source" />
+            <Button ToolTip="Step Into"
+                    Name="butnStepInto"
+                    BorderBrush="Black"
+                    Margin="1"
+                    Width="24"
+                    Height="24">
+                <imaging:CrispImage Moniker="{x:Static imagecatalog:KnownMonikers.StepInto}" />
             </Button>
             <Rectangle Width="8" />
-            <Button ToolTip="Step Over" Name="butnStepOver" BorderBrush="Black" Margin="1" Width="24" Height="24">
-                <Image Source="/Cosmos.VS.Windows;component/Images/StepOver.png" />
+            <Button ToolTip="Step Over"
+                    Name="butnStepOver"
+                    BorderBrush="Black"
+                    Margin="1"
+                    Width="24"
+                    Height="24">
+                <imaging:CrispImage Moniker="{x:Static imagecatalog:KnownMonikers.StepOver}" />
             </Button>
             <Rectangle Width="8" />
         </ToolBar>
-        <ScrollViewer Name="ASMScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Name="ASMScrollViewer"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
             <TextBlock Name="tblkSource">
-        <TextBlock.ContextMenu>
-          <ContextMenu>
-            <MenuItem Name="mitmCopy" Header="Copy" />
-          </ContextMenu>
-        </TextBlock.ContextMenu>
+                <TextBlock.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="mitmCopy"
+                                  Header="Copy" />
+                    </ContextMenu>
+                </TextBlock.ContextMenu>
             </TextBlock>
         </ScrollViewer>
     </DockPanel>

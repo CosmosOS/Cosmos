@@ -8,7 +8,7 @@ namespace Cosmos.Build.Common
 {
     public class BuildProperties : PropertiesBase
     {
-        static public List<string> PropNames = new List<string>();
+        public static List<string> PropNames = new List<string>();
 
         static BuildProperties()
         {
@@ -367,17 +367,7 @@ namespace Cosmos.Build.Common
             }
         }
 
-        public String OutputPath
-        {
-            get
-            {
-                return GetProperty(BuildPropertyNames.OutputPathString, @"bin\debug");
-            }
-            set
-            {
-                SetProperty(BuildPropertyNames.OutputPathString, value);
-            }
-        }
+        public String OutputPath => GetProperty("OutputPath", @"bin\debug");
 
         public Framework Framework
         {

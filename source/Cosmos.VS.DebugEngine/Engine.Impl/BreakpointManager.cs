@@ -56,6 +56,5 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
             mEngine.mProcess.INT3sSet.RemoveAt(index);
             mDbgConnector.DeleteBreakpoint(aBBP.RemoteID);
         }
-
     }
 }

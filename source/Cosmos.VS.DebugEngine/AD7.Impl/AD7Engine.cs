@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using Cosmos.Debug.Common;
 using Cosmos.VS.DebugEngine.AD7.Definitions;
 using Cosmos.VS.DebugEngine.Engine.Impl;
-using Cosmos.VS.DebugEngine.Properties;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {
@@ -332,7 +331,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         {
             // Gets the name and identifier of the debug engine (DE) running this program.
 
-            engineName = Resources.EngineName;
+            engineName = "Cosmos Debug Engine";
             engineGuid = EngineID;
 
             return VSConstants.S_OK;

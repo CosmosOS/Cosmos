@@ -1,0 +1,9 @@
+<Project>
+
+    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.props" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj'" />
+
+    <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.tmp_proj'">
+        <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
+    </PropertyGroup>
+
+</Project>

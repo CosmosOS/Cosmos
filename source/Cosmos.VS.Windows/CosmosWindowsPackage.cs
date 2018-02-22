@@ -1,34 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Timers;
 using System.Windows.Threading;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 using Cosmos.Debug.Common;
 using Cosmos.Debug.DebugConnectors;
 
+using Cosmos.VS.Windows.ToolWindows;
+
 namespace Cosmos.VS.Windows
 {
+    [Guid(Guids.PackageGuidString)]
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(AssemblyTW))]
-    [ProvideToolWindow(typeof(RegistersTW))]
+    [ProvideToolWindow(typeof(AssemblyToolWindow))]
+    [ProvideToolWindow(typeof(RegistersToolWindow))]
     [ProvideToolWindow(typeof(StackTW))]
     [ProvideToolWindow(typeof(InternalTW))]
     [ProvideToolWindow(typeof(ConsoleTW))]
-    [Guid(Guids.PackageGuidString)]
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     public sealed class CosmosWindowsPackage: Package
     {
         private readonly Queue<ushort> mCommand;
         private readonly Queue<byte[]> mMessage;
-        private readonly System.Timers.Timer mTimer = new System.Timers.Timer(100);
+        private readonly Timer mTimer;
 
         private PipeServer mPipeDown;
-        private PipeServer mConsoleDown;
 
         public StateStorer StateStorer { get; }
 
@@ -43,6 +44,7 @@ namespace Cosmos.VS.Windows
 
             // There are a lot of threading issues in VSIP, and the WPF dispatchers do not work.
             // So instead we use a stack and a timer to poll it for data.
+            mTimer = new Timer(100);
             mTimer.AutoReset = true;
             mTimer.Elapsed += ProcessMessage;
             mTimer.Start();
@@ -56,11 +58,27 @@ namespace Cosmos.VS.Windows
         {
             base.Initialize();
 
-            var xDTE = (EnvDTE80.DTE2)GetGlobalService(typeof(EnvDTE.DTE));
-            var xPane = xDTE.ToolWindows.OutputWindow.OutputWindowPanes;
-            Global.OutputPane = xPane.Add("Cosmos");
-            Global.OutputPane.OutputString("Debugger windows loaded.\r\n");
+            var xOutputWindow = (IVsOutputWindow)GetService(typeof(SVsOutputWindow));
+            var xCosmosPaneGuid = Guid.NewGuid();
+
+            ErrorHandler.ThrowOnFailure(
+                xOutputWindow.CreatePane(ref xCosmosPaneGuid, "Cosmos", Convert.ToInt32(true), Convert.ToInt32(true)));
+            ErrorHandler.ThrowOnFailure(xOutputWindow.GetPane(ref xCosmosPaneGuid, out var xOutputPane));
+
+            Global.OutputPane = xOutputPane;
+            xOutputPane.OutputString($"Debugger windows loaded.{Environment.NewLine}");
+
             CosmosMenuCmdSet.Initialize(this);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                mTimer?.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
 
         void ProcessMessage(object sender, EventArgs e)
@@ -95,14 +113,14 @@ namespace Cosmos.VS.Windows
                             break;
 
                         case Debugger2Windows.Registers:
-                            UpdateWindow(typeof(RegistersTW), null, xMsg);
+                            UpdateWindow(typeof(RegistersToolWindow), null, xMsg);
                             break;
 
                         case Debugger2Windows.Quit:
                             break;
 
                         case Debugger2Windows.AssemblySource:
-                            UpdateWindow(typeof(AssemblyTW), null, xMsg);
+                            UpdateWindow(typeof(AssemblyToolWindow), null, xMsg);
                             break;
 
                         case Debugger2Windows.PongVSIP:
@@ -114,21 +132,14 @@ namespace Cosmos.VS.Windows
                             break;
 
                         case Debugger2Windows.OutputPane:
-                            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                                                                                 (Action)delegate
-                                                                                 {
-                                                                                     Global.OutputPane.OutputString(Encoding.UTF8.GetString(xMsg));
-                                                                                 }
-                                );
+                            System.Windows.Application.Current.Dispatcher.Invoke(
+                                () => Global.OutputPane.OutputString(Encoding.UTF8.GetString(xMsg)),
+                                DispatcherPriority.Normal);
                             break;
 
                         case Debugger2Windows.OutputClear:
-                            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                                                                                 (Action)delegate ()
-                                                                                         {
-                                                                                             Global.OutputPane.Clear();
-                                                                                             StateStorer.ClearState();
-                                                                                         });
+                            System.Windows.Application.Current.Dispatcher.Invoke(
+                                () => { Global.OutputPane.Clear(); StateStorer.ClearState(); }, DispatcherPriority.Normal);
                             break;
                     }
                 }
@@ -207,7 +218,7 @@ namespace Cosmos.VS.Windows
             byte[] aData = cWindow.UserControl.GetCurrentState();
             StateStorer.StoreState("StackTW", aData == null ? null : (byte[])aData.Clone());
 
-            cWindow = FindWindow(typeof(RegistersTW));
+            cWindow = FindWindow(typeof(RegistersToolWindow));
             aData = cWindow.UserControl.GetCurrentState();
             StateStorer.StoreState("RegistersTW", aData == null ? null : (byte[])aData.Clone());
         }
@@ -218,7 +229,7 @@ namespace Cosmos.VS.Windows
             byte[] aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "StackTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
 
-            cWindow = FindWindow(typeof(RegistersTW));
+            cWindow = FindWindow(typeof(RegistersToolWindow));
             aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "RegistersTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
         }

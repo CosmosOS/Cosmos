@@ -12,6 +12,8 @@ namespace Cosmos.System_Plugs.System
     {
         private static ConsoleColor mForeground = ConsoleColor.White;
         private static ConsoleColor mBackground = ConsoleColor.Black;
+        private static Encoding ConsoleInputEncoding = Encoding.ASCII;
+        private static Encoding ConsoleOutputEncoding = Encoding.ASCII;
 
         private static readonly Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
 
@@ -188,13 +190,23 @@ namespace Cosmos.System_Plugs.System
 
         public static Encoding get_InputEncoding()
         {
-            WriteLine("Not implemented: get_InputEncoding");
-            return null;
+            return ConsoleInputEncoding;
         }
 
         public static void set_InputEncoding(Encoding value)
         {
-            WriteLine("Not implemented: set_InputEncoding");
+            ConsoleInputEncoding = value;
+        }
+
+        public static Encoding get_OutputEncoding()
+        {
+            return ConsoleOutputEncoding;
+        }
+
+
+        public static void set_OutputEncoding(Encoding value)
+        {
+            ConsoleOutputEncoding = value;
         }
 
         public static bool get_KeyAvailable()
@@ -223,17 +235,6 @@ namespace Cosmos.System_Plugs.System
         //    WriteLine("Not implemented: get_Out");
         //    return null;
         //}
-
-        public static Encoding get_OutputEncoding()
-        {
-            WriteLine("Not implemented: get_OutputEncoding");
-            return null;
-        }
-
-        public static void set_OutputEncoding(Encoding value)
-        {
-            WriteLine("Not implemented: set_OutputEncoding");
-        }
 
         public static string get_Title()
         {
@@ -568,53 +569,28 @@ namespace Cosmos.System_Plugs.System
             Write(aBool.ToString());
         }
 
-        public static void Write(char aChar)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            GetConsole().WriteChar(aChar);
-        }
+        /*
+         * A .Net character can be effectevily more can one byte so calling the low level Console.Write() will be wrong as
+         * it accepts only bytes, we need to convert it using the specified OutputEncoding but to do this we have to convert
+         * it ToString first
+         */
+        public static void Write(char aChar) => Write(aChar.ToString());
 
-        public static void Write(char[] aBuffer)
-        {
-            Write(aBuffer, 0, aBuffer.Length);
-        }
+        public static void Write(char[] aBuffer) => Write(aBuffer, 0, aBuffer.Length);
 
-        //public static void Write(decimal aBuffer) {
-        //    Write("No Decimal.ToString()");
-        //}
+        /* Decimal type is not working yet... */
+        //public static void Write(decimal aDecimal) => Write(aDecimal.ToString());
 
-        public static void Write(double aDouble)
-        {
-            Write(aDouble.ToString());
-        }
+        public static void Write(double aDouble) => Write(aDouble.ToString());
 
-        public static void Write(float aFloat)
-        {
-            Write(aFloat.ToString());
-        }
+        public static void Write(float aFloat) => Write(aFloat.ToString());
 
-        public static void Write(int aInt)
-        {
-            Write(aInt.ToString());
-        }
+        public static void Write(int aInt) => Write(aInt.ToString());
 
-        public static void Write(long aLong)
-        {
-            Write(aLong.ToString());
-        }
+        public static void Write(long aLong) => Write(aLong.ToString());
 
-        public static void Write(object value)
-        {
-            if (value != null)
-            {
-                Write(value.ToString());
-            }
-        }
+        /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
+        public static void Write(object value) => Write((value ?? String.Empty));
 
         public static void Write(string aText)
         {
@@ -624,28 +600,24 @@ namespace Cosmos.System_Plugs.System
                 // for now:
                 return;
             }
-            GetConsole().Write(aText);
+
+            byte[] aTextEncoded = ConsoleOutputEncoding.GetBytes(aText);
+            GetConsole().Write(aTextEncoded);
         }
 
-        public static void Write(uint aInt)
-        {
-            Write(aInt.ToString());
-        }
+        public static void Write(uint aInt) => Write(aInt.ToString());
 
-        public static void Write(ulong aLong)
-        {
-            Write(aLong.ToString());
-        }
+        public static void Write(ulong aLong) => Write(aLong.ToString());
 
-        public static void Write(string format, object arg0)
-        {
-            WriteLine("Not implemented: Write");
-        }
+        public static void Write(string format, object arg0) => Write(String.Format(format, arg0));
 
-        public static void Write(string format, params object[] arg)
-        {
-            WriteLine("Not implemented: Write");
-        }
+        public static void Write(string format, object arg0, object arg1) => Write(String.Format(format, arg0, arg1));
+
+        public static void Write(string format, object arg0, object arg1, object arg2) => Write(String.Format(format, arg0, arg1, arg2));
+
+        public static void Write(string format, object arg0, object arg1, object arg2, object arg3) => Write(String.Format(format, arg0, arg1, arg2, arg3));
+
+        public static void Write(string format, params object[] arg) => Write(String.Format(format, arg));
 
         public static void Write(char[] aBuffer, int aIndex, int aCount)
         {
@@ -671,188 +643,60 @@ namespace Cosmos.System_Plugs.System
             }
         }
 
-        public static void Write(string format, object arg0, object arg1)
-        {
-            WriteLine("Not implemented: Write");
-        }
-
-        public static void Write(string format, object arg0, object arg1, object arg2)
-        {
-            WriteLine("Not implemented: Write");
-        }
-
-        public static void Write(string format, object arg0, object arg1, object arg2, object arg3)
-        {
-            WriteLine("Not implemented: Write");
-        }
-
         //You'd expect this to be on System.Console wouldn't you? Well, it ain't so we just rely on Write(object value)
         //public static void Write(byte aByte) {
         //    Write(aByte.ToString());
         //}
 
-        #endregion
+#endregion
 
-        #region WriteLine
+#region WriteLine
 
-        public static void WriteLine()
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            GetConsole().NewLine();
-        }
+        public static void WriteLine() => Write(Environment.NewLine);
 
-        public static void WriteLine(bool aBool)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            Write(aBool.ToString());
-            GetConsole().NewLine();
-        }
+        public static void WriteLine(bool aBool) => WriteLine(aBool.ToString());
 
-        public static void WriteLine(char aChar)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            Write(aChar);
-            GetConsole().NewLine();
-        }
+        public static void WriteLine(char aChar) => WriteLine(aChar.ToString());
 
-        public static void WriteLine(char[] aBuffer)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            Write(aBuffer, 0, aBuffer.Length);
-            GetConsole().NewLine();
-        }
+        public static void WriteLine(char[] aBuffer) => WriteLine(new String(aBuffer));
 
-        //public static void WriteLine(decimal aDecimal) {
-        //    Write(aDecimal);
-        //    Global.Console.NewLine();
-        //}
+        /* Decimal type is not working yet... */
+        //public static void WriteLine(decimal aDecimal) => WriteLine(aDecimal.ToString());
 
-        public static void WriteLine(double aDouble)
-        {
-            Write(aDouble.ToString());
-            GetConsole().NewLine();
-        }
+        public static void WriteLine(double aDouble) => WriteLine(aDouble.ToString());
 
-        public static void WriteLine(float aFloat)
-        {
-            Write(aFloat.ToString());
-            GetConsole().NewLine();
-        }
+        public static void WriteLine(float aFloat) => WriteLine(aFloat.ToString());
 
-        public static void WriteLine(int aInt)
-        {
-            Write(aInt.ToString());
-            GetConsole().NewLine();
-        }
+        public static void WriteLine(int aInt) => WriteLine(aInt.ToString());
 
-        public static void WriteLine(long aLong)
-        {
-            Write(aLong.ToString());
-            GetConsole().NewLine();
-        }
+        public static void WriteLine(long aLong) => WriteLine(aLong.ToString());
 
-        public static void WriteLine(object value)
-        {
-            if (value != null)
-            {
-                var xConsole = GetConsole();
-                if (xConsole == null)
-                {
-                    // for now:
-                    return;
-                }
-                Write(value.ToString());
-                xConsole.NewLine();
-            }
-        }
+        /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty line */
+        public static void WriteLine(object value) => Write((value ?? String.Empty) + Environment.NewLine);
 
-        public static void WriteLine(string aText)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            xConsole.Write(aText);
-            xConsole.NewLine();
-        }
+        public static void WriteLine(string aText) => Write(aText + Environment.NewLine);
 
-        public static void WriteLine(uint aInt)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            Write(aInt.ToString());
-            xConsole.NewLine();
-        }
+        public static void WriteLine(uint aInt) => WriteLine(aInt.ToString());
 
-        public static void WriteLine(ulong aLong)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            Write(aLong.ToString());
-            xConsole.NewLine();
-        }
+        public static void WriteLine(ulong aLong) => WriteLine(aLong.ToString());
 
-        public static void WriteLine(string format, object arg0)
-        {
-            WriteLine("Not implemented: WriteLine");
-        }
+        public static void WriteLine(string format, object arg0) => WriteLine(String.Format(format, arg0));
 
-        public static void WriteLine(string format, params object[] arg)
-        {
-            WriteLine("Not implemented: WriteLine");
-        }
+        public static void WriteLine(string format, object arg0, object arg1) => WriteLine(String.Format(format, arg0, arg1));
+
+        public static void WriteLine(string format, object arg0, object arg1, object arg2) => WriteLine(String.Format(format, arg0, arg1, arg2));
+
+        public static void WriteLine(string format, object arg0, object arg1, object arg2, object arg3) => WriteLine(String.Format(format, arg0, arg1, arg2, arg3));
+
+        public static void WriteLine(string format, params object[] arg) => WriteLine(String.Format(format, arg));
 
         public static void WriteLine(char[] aBuffer, int aIndex, int aCount)
         {
             Write(aBuffer, aIndex, aCount);
-            GetConsole().NewLine();
+            WriteLine();
         }
 
-        public static void WriteLine(string format, object arg0, object arg1)
-        {
-            WriteLine("Not implemented: WriteLine");
-        }
+#endregion
 
-        public static void WriteLine(string format, object arg0, object arg1, object arg2)
-        {
-            WriteLine("Not implemented: WriteLine");
-        }
-
-        public static void WriteLine(string format, object arg0, object arg1, object arg2, object arg3)
-        {
-            WriteLine("Not implemented: WriteLine");
-        }
-
-        #endregion
     }
 }

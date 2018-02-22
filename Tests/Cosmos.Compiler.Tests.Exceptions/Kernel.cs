@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+
 using Sys = Cosmos.System;
 
 namespace Cosmos.Compiler.Tests.Exceptions
@@ -17,6 +16,8 @@ namespace Cosmos.Compiler.Tests.Exceptions
         protected override void Run()
         {
             mDebugger.Send("Run");
+
+            TestTryFinally.Execute();
 
             TestSimpleException();
 
