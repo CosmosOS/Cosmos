@@ -637,7 +637,7 @@ namespace Cosmos.System_Plugs.System
             {
                 bx[_i + (BitConverter.IsLittleEndian ? 4 : 0)] = bv[_i];
             }
-            x = BitConverter.Int64BitsToDouble(BitConverter.ToInt64(bx, 0));
+            x = BitConverter.ToDouble(bx, 0);
             k += (i >> 20);
             f = x - 1.0;
             if ((0x000fffff & (2 + hx)) < 3)
@@ -1016,8 +1016,7 @@ namespace Cosmos.System_Plugs.System
                 valueBytes[I + offset] = toAddHigher[I];
                 valueBytes[I] = toAddLower[I];
             }
-            long _bits = BitConverter.ToInt64(valueBytes, 0);
-            return BitConverter.Int64BitsToDouble(_bits);
+            return BitConverter.ToDouble(valueBytes, 0);
         }
 
         #endregion Sqrt
