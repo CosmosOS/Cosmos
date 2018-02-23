@@ -71,6 +71,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             result = Math.Cos(double.PositiveInfinity);
             Assert.IsTrue(double.IsNaN(result), "Cos works with -INF");
 
+            result = Math.Cos(Math.PI);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1), "Cos gives correct answer for PI");
+
+            result = Math.Cos(Math.PI / 2);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 6.12323399573677E-17), "Cos gives correct answer for PI / 2");
+
+            result = Math.Cos(Math.PI / 3);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.5), "Cos gives correct answer for PI / 3");
+
             #endregion Math.Cos
 
             #region Math.Log
@@ -138,6 +147,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             result = Math.Sin(double.PositiveInfinity);
             Assert.IsTrue(double.IsNaN(result), "Sin works with -INF");
+
+            result = Math.Sin(Math.PI);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.22464679914735E-16), "Sin gives correct answer for PI");
+
+            result = Math.Sin(Math.PI / 2);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1), "Sin gives correct answer for PI / 2");
+
+            result = Math.Sin(Math.PI / 3);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.866025403784439), "Sin gives correct answer for PI / 3");
 
             #endregion Math.Sin
 
