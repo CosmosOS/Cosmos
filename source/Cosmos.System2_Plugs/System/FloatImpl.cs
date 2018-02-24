@@ -94,7 +94,6 @@ namespace Cosmos.System_Plugs.System
             {
                 parsed += fractionalDigits[i] * (float)Math.Pow(10, -1 * (i + 1));
             }
-
             parsed *= (float)Math.Pow(10, multiplier);
             parsed *= sign;
 
