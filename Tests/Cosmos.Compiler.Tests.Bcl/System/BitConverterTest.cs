@@ -38,7 +38,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(ulongBytes) doesn't work: result " + result + " != " + expectedResult);
 
-
             // This test works, what is the difference with double? That is saved as an Int32 in oly a register?
             float aFloat = 1.0f;
 
@@ -49,9 +48,38 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(floatBytes) doesn't work: result " + result + " != " + expectedResult);
 
+            double Result;
+            byte[] doubleBytes = BitConverter.GetBytes(0d);
+            Result = BitConverter.ToDouble(doubleBytes, 0);
+            Assert.IsTrue(Result == 0f, "BitConverter.ToDouble works with 0");
+
+            doubleBytes = BitConverter.GetBytes(1d);
+            Result = BitConverter.ToDouble(doubleBytes, 0);
+            Assert.IsTrue(Result == 1f, "BitConverter.ToDouble works with 1");
+
+            doubleBytes = BitConverter.GetBytes(2d);
+            Result = BitConverter.ToDouble(doubleBytes, 0);
+            Assert.IsTrue(Result == 2f, "BitConverter.ToDouble works with 2");
+
+            doubleBytes = BitConverter.GetBytes(101d);
+            Result = BitConverter.ToDouble(doubleBytes, 0);
+            Assert.IsTrue(Result == 101f, "BitConverter.ToDouble works with 101");
+
+            doubleBytes = BitConverter.GetBytes(-101d);
+            Result = BitConverter.ToDouble(doubleBytes, 0);
+            Assert.IsTrue(Result == -101f, "BitConverter.ToDouble works with -101");
+
+            doubleBytes = BitConverter.GetBytes(1.2345d);
+            Result = BitConverter.ToDouble(doubleBytes, 0);
+            Assert.IsTrue(Result == 1.2345, "BitConverter.ToDouble works with 1.2345");
+
+            doubleBytes = BitConverter.GetBytes(-1.2345d);
+            Result = BitConverter.ToDouble(doubleBytes, 0);
+            Assert.IsTrue(Result == -1.2345, "BitConverter.ToDouble works with -1.2345");
+
             double aDouble = 1.0;
 
-            byte[] doubleBytes = BitConverter.GetBytes(aDouble);
+            doubleBytes = BitConverter.GetBytes(aDouble);
 
             result = BitConverter.ToString(doubleBytes, 0);
             expectedResult = "00-00-00-00-00-00-F0-3F";
