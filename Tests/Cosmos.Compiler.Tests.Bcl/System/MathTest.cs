@@ -86,6 +86,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             result = Math.Ceiling(double.NegativeInfinity);
             Assert.IsTrue(double.IsNegativeInfinity(result), "Ceiling gives correct value for -INF");
 
+            result = Math.Ceiling((double)int.MaxValue + 2.5);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, (double)int.MaxValue + 3), "Ceiling works for values larger than an int can hold. " + result + " expected " + (double)int.MaxValue + 3);
+
             #endregion Ceiling
 
             #region Math.Cos
