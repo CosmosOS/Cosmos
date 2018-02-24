@@ -63,19 +63,19 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 3), "Ceiling gives correct value for 2.5");
 
             result = Math.Ceiling(-2.5d);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -3), "Ceiling gives correct value for -2.5");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -2), "Ceiling gives correct value for -2.5");
 
             result = Math.Ceiling(11.2d);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 12), "Ceiling gives correct value for 11.2");
 
             result = Math.Ceiling(-11.2d);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -12), "Ceiling gives correct value for -11.2");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -11), "Ceiling gives correct value for -11.2");
 
             result = Math.Ceiling(32.8d);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 33), "Ceiling gives correct value for 32.8");
 
             result = Math.Ceiling(-32.8d);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -33), "Ceiling gives correct value for -32.8");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -32), "Ceiling gives correct value for -32.8");
 
             result = Math.Ceiling(double.NaN);
             Assert.IsTrue(double.IsNaN(result), "Ceiling gives correct value for NaN");
