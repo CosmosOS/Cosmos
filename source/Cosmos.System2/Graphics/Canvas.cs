@@ -249,13 +249,13 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        // 
         public virtual void DrawCircle(Pen pen, Point point, int radius)
         {
 
             DrawCircle(pen, point.X, point.Y, radius);
 
         }
-
         //http://members.chello.at/~easyfilter/bresenham.html
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {

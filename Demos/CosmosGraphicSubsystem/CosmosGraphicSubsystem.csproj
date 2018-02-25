@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Bochs_Name>CosmosGraphicSubsystemBoot</Bochs_Name>
+        <VMware_Name>CosmosGraphicSubsystemBoot</VMware_Name>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -41,7 +42,7 @@
         <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
         <Bochs_Deployment>ISO</Bochs_Deployment>
         <Bochs_Launch>Bochs</Bochs_Launch>
-        <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
+        <Bochs_DebugEnabled>False</Bochs_DebugEnabled>
         <Bochs_DebugMode>Source</Bochs_DebugMode>
         <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
         <Bochs_CosmosDebugPort>Serial: COM1</Bochs_CosmosDebugPort>

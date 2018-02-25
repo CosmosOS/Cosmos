@@ -75,7 +75,7 @@ namespace Cosmos.System.Graphics
         }
 
         protected override Mode getDefaultGraphicMode() => new Mode(1024, 768, ColorDepth.ColorDepth32);
-
+        public static readonly Mode defaultGraphicsMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
         /// <summary>
         /// Use this to setup the screen, this will disable the console.
         /// </summary>

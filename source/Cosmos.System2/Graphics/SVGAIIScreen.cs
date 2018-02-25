@@ -140,7 +140,7 @@ namespace Cosmos.System.Graphics
                 new Mode(3840, 2400, ColorDepth.ColorDepth32), // WQUXGA
             };
         }
-
+        public static readonly Mode defaultGraphicsMode = new Mode(1024, 768, ColorDepth.ColorDepth16);
         protected override Mode getDefaultGraphicMode() => new Mode(1024, 768, ColorDepth.ColorDepth16);
 
         private void SetGraphicsMode(Mode aMode)
