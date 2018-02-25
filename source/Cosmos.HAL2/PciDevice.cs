@@ -107,8 +107,14 @@ namespace Cosmos.HAL
             HeaderType = (PCIHeaderType)ReadRegister8((byte)Config.HeaderType);
             BIST = (PCIBist)ReadRegister8((byte)Config.BIST);
             InterruptPIN = (PCIInterruptPIN)ReadRegister8((byte)Config.InterruptPIN);
-
-            DeviceExists = (uint)VendorID != 0xFFFF && (uint)DeviceID != 0xFFFF;
+            if ((uint)VendorID == 0xFF && (uint)DeviceID == 0xFFFF)
+            {
+                DeviceExists = false;
+            }
+            else
+            {
+                DeviceExists = true;
+            }
             if (HeaderType == PCIHeaderType.Normal)
             {
                 BaseAddressBar = new PCIBaseAddressBar[6];
