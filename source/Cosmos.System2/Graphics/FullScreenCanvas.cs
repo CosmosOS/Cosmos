@@ -15,7 +15,23 @@ namespace Cosmos.System.Graphics
 
         private static PCIDevice SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
-        private static bool SVGAIIExists = SVGAIIDevice.DeviceExists;
+        public static bool DoesSVGAIIExist()
+        {
+            if (SVGAIIDevice != null)
+            {
+                if (SVGAIIDevice.DeviceExists == true)
+                {
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+        //public static bool SVGAIIExists = SVGAIIDevice != null;
 
         private static VideoDriver videoDevice;
 
@@ -50,12 +66,12 @@ namespace Cosmos.System.Graphics
         }
         public static Canvas GetFullScreenCanvas(Mode mode)
         {
-            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
+            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);
             // If MyVideoDriver is null (hasn't checked if VMWare SVGA exists),
             // Do necessary check and set gfx mode as specified (mode)
             if (MyVideoDriver == null)
             {
-                if (SVGAIIExists)
+                if (DoesSVGAIIExist())
                 {
                     // Set videoDevice to SVGA, initialize MyVideoDriver as an SVGA display using specified mode
                     // MyVideoDriver.Mode = mode; isn't exactly needed, just done in case it doesn't set.

@@ -14,10 +14,14 @@ namespace Cosmos_Graphic_Subsytem
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
+            Console.WriteLine("Specifying custom graphics mode as 800x600@32");
+            // Specify custom graphics mode (800x600 @ 16)
+            Mode start = new Mode(800, 600, ColorDepth.ColorDepth32);
 
-            /* Get on instance of the Canvas that is all the Screen */
-            Mode start = new Mode(640, 480, ColorDepth.ColorDepth32);
+            Console.WriteLine("Here we go!");
+            // Create new instance of FullScreenCanvas, specifying graphics mode
             canvas = FullScreenCanvas.GetFullScreenCanvas(start);
+
 
             /* Clear the Screen with the color 'Blue' */
             canvas.Clear(Color.Blue);
