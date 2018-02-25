@@ -48,6 +48,49 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             #endregion Math.Acos
 
+            #region Ceiling
+
+            result = Math.Ceiling(0d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0), "Ceiling gives correct value for 0");
+
+            result = Math.Ceiling(1d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1), "Ceiling gives correct value for 1");
+
+            result = Math.Ceiling(-1d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1), "Ceiling gives correct value for -1");
+
+            result = Math.Ceiling(2.5d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 3), "Ceiling gives correct value for 2.5");
+
+            result = Math.Ceiling(-2.5d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -2), "Ceiling gives correct value for -2.5");
+
+            result = Math.Ceiling(11.2d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 12), "Ceiling gives correct value for 11.2");
+
+            result = Math.Ceiling(-11.2d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -11), "Ceiling gives correct value for -11.2");
+
+            result = Math.Ceiling(32.8d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 33), "Ceiling gives correct value for 32.8");
+
+            result = Math.Ceiling(-32.8d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -32), "Ceiling gives correct value for -32.8");
+
+            result = Math.Ceiling(double.NaN);
+            Assert.IsTrue(double.IsNaN(result), "Ceiling gives correct value for NaN");
+
+            result = Math.Ceiling(double.PositiveInfinity);
+            Assert.IsTrue(double.IsPositiveInfinity(result), "Ceiling gives correct value for INF");
+
+            result = Math.Ceiling(double.NegativeInfinity);
+            Assert.IsTrue(double.IsNegativeInfinity(result), "Ceiling gives correct value for -INF");
+
+            result = Math.Ceiling((double)int.MaxValue + 2.5);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, (double)int.MaxValue + 3), "Ceiling works for values larger than an int can hold. " + result + " expected " + (double)int.MaxValue + 3);
+
+            #endregion Ceiling
+
             #region Math.Cos
 
             result = Math.Cos(4);
