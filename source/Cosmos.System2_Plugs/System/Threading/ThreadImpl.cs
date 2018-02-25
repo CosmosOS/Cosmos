@@ -1,13 +1,11 @@
 using System;
-using System.Threading;
-
 using Cosmos.HAL;
-
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.Threading
 {
-    [Plug(Target = typeof(Thread))]
+    //[Plug(Target = typeof(Thread))]
+    [Plug(TargetName = "System.Threading.Thread")]
     public static class ThreadImpl
     {
         public static void Sleep(TimeSpan timeout)
@@ -18,6 +16,16 @@ namespace Cosmos.System_Plugs.System.Threading
         public static void Sleep(int millisecondsTimeout)
         {
             Global.PIT.Wait((uint)millisecondsTimeout);
+        }
+
+        public static bool Yield()
+        {
+            throw new NotImplementedException("Thread.Yield()");
+        }
+
+        public static void SpinWaitInternal(object iterations)
+        {
+            throw new NotImplementedException("Thread.SpinWaitInternal()");
         }
     }
 }
