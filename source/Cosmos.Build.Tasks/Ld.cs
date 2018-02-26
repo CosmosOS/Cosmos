@@ -28,7 +28,9 @@ namespace Cosmos.Build.Tasks
         #endregion
 
         protected override string ToolName => "ld.exe";
+
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
+        protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
 
         private static bool IsValidAddress(string aAddress)
         {
