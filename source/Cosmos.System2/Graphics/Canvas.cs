@@ -256,6 +256,39 @@ namespace Cosmos.System.Graphics
             DrawCircle(pen, point.X, point.Y, radius);
 
         }
+
+        public virtual void DrawFilledCircle(Pen pen, int x_center, int y_center, int radius)
+        {
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+            ThrowIfCoordNotValid(x_center + radius, y_center);
+            ThrowIfCoordNotValid(x_center - radius, y_center);
+            ThrowIfCoordNotValid(x_center, y_center + radius);
+            ThrowIfCoordNotValid(x_center, y_center - radius);
+            int x = radius;
+            int y = 0;
+            int e = 0;
+
+            while (x >= y)
+            {
+                DrawLine(pen, x_center - x, y_center + y, x_center + x, y_center + y);
+                y++;
+                if (e <= 0)
+                {
+                    e += 2 * y + 1;
+                }
+                if (e > 0)
+                {
+                    x--;
+                    e -= 2 * x + 1;
+                }
+            }
+        }
+        public virtual void DrawFilledCircle(Pen pen, Point point, int radius)
+        {
+            DrawFilledCircle(pen, point.X, point.Y, radius);
+        }
+
         //http://members.chello.at/~easyfilter/bresenham.html
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
@@ -292,6 +325,23 @@ namespace Cosmos.System.Graphics
         public virtual void DrawEllipse(Pen pen, Point point, int x_radius, int y_radius)
         {
             DrawEllipse(pen, point.X, point.Y, x_radius, y_radius);
+        }
+
+        public virtual void DrawFilledEllipse(Pen pen, Point point, int height, int width)
+        {
+            for (int y = -height; y <= height; y++)
+            {
+                for (int x = -width; x <= width; x++)
+                {
+                    if (x * x * height * height + y * y * width * width <= height * height * width * width)
+                        DrawPoint(pen, point.X + x, point.Y + y);
+                }
+            }
+        }
+
+        public virtual void DrawFilledEllipse(Pen pen, int x, int y, int height, int width)
+        {
+            DrawFilledEllipse(pen, new Point(x, y), height, width);
         }
 
         public virtual void DrawPolygon(Pen pen, params Point[] points)
