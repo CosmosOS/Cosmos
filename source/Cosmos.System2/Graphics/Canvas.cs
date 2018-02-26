@@ -257,8 +257,47 @@ namespace Cosmos.System.Graphics
 
         }
 
-        public virtual void DrawFilledCircle(Pen pen, int x_center, int y_center, int radius)
+        public virtual void DrawFilledCircle(Pen pen, int x0, int y0, int radius)
         {
+
+            int x = radius;
+            int y = 0;
+            int xChange = 1 - (radius << 1);
+            int yChange = 0;
+            int radiusError = 0;
+
+            while (x >= y)
+            {
+                for (int i = x0 - x; i <= x0 + x; i++)
+                {
+                    
+                    DrawPoint(pen, i, y0 + y);
+                    DrawPoint(pen, i, y0 - y);
+                }
+                for (int i = x0 - y; i <= x0 + y; i++)
+                {
+                    DrawPoint(pen, i, y0 + x);
+                    DrawPoint(pen, i, y0 - x);
+                }
+
+                y++;
+                radiusError += yChange;
+                yChange += 2;
+                if (((radiusError << 1) + xChange) > 0)
+                {
+                    x--;
+                    radiusError += xChange;
+                    xChange += 2;
+                }
+            }
+
+            /*
+            for (int y = -radius; y <= radius; y++)
+                for (int x = -radius; x <= radius; x++)
+                    if (x * x + y * y <= radius * radius)
+                        (origin.x + x, origin.y + y);
+
+
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
             ThrowIfCoordNotValid(x_center + radius, y_center);
@@ -282,7 +321,7 @@ namespace Cosmos.System.Graphics
                     x--;
                     e -= 2 * x + 1;
                 }
-            }
+            }*/
         }
         public virtual void DrawFilledCircle(Pen pen, Point point, int radius)
         {
