@@ -11,6 +11,7 @@ namespace Cosmos_Graphic_Subsytem
 {
     public class Kernel : Sys.Kernel
     {
+        public static Cosmos.HAL.Mouse m = new Cosmos.HAL.Mouse();
         public Debugger debugger = new Debugger("System", "CGS");
         Canvas canvas;
         protected override void BeforeRun()
