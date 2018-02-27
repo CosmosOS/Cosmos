@@ -91,6 +91,49 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             #endregion Ceiling
 
+            #region Floor
+
+            result = Math.Floor(0d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0), "Floor gives correct value for 0");
+
+            result = Math.Floor(1d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1), "Floor gives correct value for 1");
+
+            result = Math.Floor(-1d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1), "Floor gives correct value for -1");
+
+            result = Math.Floor(2.5d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 2), "Floor gives correct value for 2.5");
+
+            result = Math.Floor(-2.5d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -3), "Floor gives correct value for -2.5");
+
+            result = Math.Floor(11.2d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 11), "Floor gives correct value for 11.2");
+
+            result = Math.Floor(-11.2d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -12), "Floor gives correct value for -11.2");
+
+            result = Math.Floor(32.8d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 32), "Floor gives correct value for 32.8");
+
+            result = Math.Floor(-32.8d);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -33), "Floor gives correct value for -32.8");
+
+            result = Math.Floor(double.NaN);
+            Assert.IsTrue(double.IsNaN(result), "Floor gives correct value for NaN");
+
+            result = Math.Floor(double.PositiveInfinity);
+            Assert.IsTrue(double.IsPositiveInfinity(result), "Floor gives correct value for INF");
+
+            result = Math.Floor(double.NegativeInfinity);
+            Assert.IsTrue(double.IsNegativeInfinity(result), "Floor gives correct value for -INF");
+
+            result = Math.Floor((double)int.MaxValue + 2.5);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, (double)int.MaxValue + 2), "Floor works for values larger than an int can hold. " + result + " expected " + (double)int.MaxValue + 2);
+
+            #endregion Floor
+
             #region Math.Cos
 
             result = Math.Cos(4);
