@@ -364,7 +364,6 @@ namespace Cosmos.System.FileSystem
                 if (BlockDevice.Devices[i] is Partition)
                 {
                     mPartitions.Add((Partition)BlockDevice.Devices[i]);
-                    break;
                 }
             }
 
