@@ -92,7 +92,7 @@ namespace Cosmos.System.Graphics
         public abstract void DrawPoint(Pen pen, int x, int y);
 
         public abstract void DrawPoint(Pen pen, float x, float y);
-        
+
         public abstract Color GetPointColor(int x, int y);
 
         public virtual void DrawArray(Color[] colors, Point point, int width, int height)
@@ -248,11 +248,12 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        // 
+        //
         public virtual void DrawCircle(Pen pen, Point point, int radius)
         {
             DrawCircle(pen, point.X, point.Y, radius);
         }
+
         //http://members.chello.at/~easyfilter/bresenham.html
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
@@ -404,7 +405,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < image.height; _y++)
                 {
-                    DrawPoint(new Pen(Color.FromArgb(image.rawData[x + _x + (_y + y) * image.width])), x + _x, y + _y);
+                    DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.width])), x + _x, y + _y);
                 }
             }
         }

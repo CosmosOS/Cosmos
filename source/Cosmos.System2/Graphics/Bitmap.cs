@@ -142,12 +142,17 @@ namespace Cosmos.System.Graphics
 
             //Calculate padding
             int paddingPerRow = 0;
-            if (totalImageSize != 0) //I think this happens when there is not padding
+            if (totalImageSize != 0)
             {
                 int pureImageSize = (int)(imageWidth * imageHeight * pixelSize / 8);
                 int remainder = (int)totalImageSize - pureImageSize;
                 if (remainder < 0) throw new Exception("Total Image Size is smaller than pure image size");
                 paddingPerRow = remainder / (int)imageHeight;
+            }
+            else
+            {
+                //total image size is 0 if it is not compressed
+                paddingPerRow = 0;
             }
             //Read data
             int position = (int)pixelTableOffset;
