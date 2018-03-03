@@ -97,80 +97,99 @@ namespace Cosmos.System.Graphics
         {
             #region BMP Header
 
+            Bitmap bitmap;
             Byte[] text = File.ReadAllBytes(path);
-            //Assume that we are using the BMP (Windows) header format
-            //I am using http://www.fastgraph.com/help/bmp_header_format.html
-            //and https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png?1519566101894as as reference
-            //read header - bytes 10 -> 14 is the offset of the bitmap image data
-            uint pixelTableOffset = (uint)BitConverter.ToInt32(text, 10);
-            //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
-            uint infoHeaderSize = (uint)BitConverter.ToInt32(text, 14);
-            if (infoHeaderSize != 40) throw new Exception("Info header size has the wrong value!");
-
-            //now reading width of image in pixels - bytes 18 -> 22
-            uint imageWidth = (uint)BitConverter.ToInt32(text, 18);
-
-            //now reading height of image in pixels - byte 22 -> 26
-            uint imageHeight = (uint)BitConverter.ToInt32(text, 22);
-
-            //now reading number of planes should be 1 - byte 26 -> 28
-            ushort planes = (ushort)BitConverter.ToInt16(text, 26);
-            if (planes != 1)
-                throw new Exception("Number of planes is not 1! Can not read file!");
-
-            //now reading size of bits per pixel (1, 4, 8, 24, 32) - bytes 28 - 30
-            ushort pixelSize = (ushort)BitConverter.ToInt16(text, 28);
-            //TODO: Be able to handle other pixel sizes
-            if (pixelSize != 32)
-                throw new NotImplementedException("Can only handle 32bit pictures!");
-
-            //now reading compression type - bytes 30 -> 34
-            uint compression = (uint)BitConverter.ToInt32(text, 30);
-            //TODO: Be able to handle compressed files
-            if (compression != 0)
-                throw new NotImplementedException("Can only handle uncompressed files!");
-
-            //now reading total image data size(including padding) - bytes 34 -> 38
-            uint totalImageSize = (uint)BitConverter.ToInt32(text, 34);
-            //Somehow this is 0 for my test bmp
-
-            #endregion BMP Header
-
-            Bitmap bitmap = new Bitmap(imageWidth, imageHeight, (ColorDepth)pixelSize);
-
-            #region Pixel Table
-
-            //Calculate padding
-            int paddingPerRow = 0;
-            if (totalImageSize != 0)
+            Byte[] _int = new byte[4];
+            Byte[] _short = new byte[2];
+            using (FileStream fs = new FileStream(path, FileMode.Open))
             {
-                int pureImageSize = (int)(imageWidth * imageHeight * pixelSize / 8);
-                int remainder = (int)totalImageSize - pureImageSize;
-                if (remainder < 0) throw new Exception("Total Image Size is smaller than pure image size");
-                paddingPerRow = remainder / (int)imageHeight;
-            }
-            else
-            {
-                //total image size is 0 if it is not compressed
-                paddingPerRow = 0;
-            }
-            //Read data
-            int position = (int)pixelTableOffset;
-            Byte[] _pixel = new byte[pixelSize / 8]; //Pixel size is in byte
+                //Assume that we are using the BMP (Windows) header format
+                //I am using http://www.fastgraph.com/help/bmp_header_format.html
+                //and https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png?1519566101894as as reference
+                fs.Position = 10;
+                //read header - bytes 10 -> 14 is the offset of the bitmap image data
+                fs.Read(_int, 0, 4);
+                uint pixelTableOffset = (uint)BitConverter.ToInt32(_int, 0);
 
-            for (int x = 0; x < imageWidth; x++)
-            {
-                for (int y = 0; y < imageHeight; y++)
+                //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
+                fs.Read(_int, 0, 4);
+                uint infoHeaderSize = (uint)BitConverter.ToInt32(_int, 0);
+                if (infoHeaderSize != 40)
                 {
-                    bitmap.rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(text, position);
-                    position += (int)imageWidth * pixelSize / 8 + paddingPerRow;
+                    throw new Exception("Info header size has the wrong value!");
                 }
-                position += pixelSize / 8;
-                position -= pixelSize / 8 * ((int)imageWidth + paddingPerRow) * (int)imageHeight;
+
+                //now reading width of image in pixels - bytes 18 -> 22
+                fs.Read(_int, 0, 4);
+                uint imageWidth = (uint)BitConverter.ToInt32(_int, 0);
+
+                //now reading height of image in pixels - byte 22 -> 26
+                fs.Read(_int, 0, 4);
+                uint imageHeight = (uint)BitConverter.ToInt32(_int, 0);
+
+                //now reading number of planes should be 1 - byte 26 -> 28
+                fs.Read(_short, 0, 2);
+                ushort planes = (ushort)BitConverter.ToInt16(_short, 0);
+                if (planes != 1)
+                    throw new Exception("Number of planes is not 1! Can not read file!");
+
+                //now reading size of bits per pixel (1, 4, 8, 24, 32) - bytes 28 - 30
+                fs.Read(_short, 0, 2);
+                ushort pixelSize = (ushort)BitConverter.ToInt16(_short, 0);
+                //TODO: Be able to handle other pixel sizes
+                if (pixelSize != 32)
+                {
+                    throw new NotImplementedException("Can only handle 32bit pictures!");
+                }
+
+                //now reading compression type - bytes 30 -> 34
+                fs.Read(_int, 0, 4);
+                uint compression = (uint)BitConverter.ToInt32(_int, 0);
+                //TODO: Be able to handle compressed files
+                if (compression != 0)
+                    throw new NotImplementedException("Can only handle uncompressed files!");
+
+                //now reading total image data size(including padding) - bytes 34 -> 38
+                fs.Read(_int, 0, 4);
+                uint totalImageSize = (uint)BitConverter.ToInt32(_int, 0);
+                //Somehow this is 0 for my test bmp
+
+                #endregion BMP Header
+
+                bitmap = new Bitmap(imageWidth, imageHeight, (ColorDepth)pixelSize);
+
+                #region Pixel Table
+
+                //Calculate padding
+                int paddingPerRow = 0;
+                if (totalImageSize != 0)
+                {
+                    int pureImageSize = (int)(imageWidth * imageHeight * pixelSize / 8);
+                    int remainder = (int)totalImageSize - pureImageSize;
+                    if (remainder < 0) throw new Exception("Total Image Size is smaller than pure image size");
+                    paddingPerRow = remainder / (int)imageHeight;
+                }
+                else
+                {
+                    //total image size is 0 if it is not compressed
+                    paddingPerRow = 0;
+                }
+                //Read data
+                fs.Position = (int)pixelTableOffset;
+                Byte[] _pixel = new byte[pixelSize / 8]; //Pixel size is in byte
+
+                for (int x = 0; x < imageWidth; x++)
+                {
+                    for (int y = 0; y < imageHeight; y++)
+                    {
+                        fs.Read(_pixel, 0, pixelSize / 8);
+                        bitmap.rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(_pixel, 0);
+                    }
+                    fs.Position += paddingPerRow;
+                }
+
+                #endregion Pixel Table
             }
-
-            #endregion Pixel Table
-
             return bitmap;
         }
     }
