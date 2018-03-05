@@ -7,11 +7,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>PlaygroundBoot</Name>
     <BinFormat>elf</BinFormat>
-    <SccProjectName>SAK</SccProjectName>
-    <SccProvider>SAK</SccProvider>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>VMware</Profile>
@@ -118,21 +114,6 @@
     <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Name>Cosmos.Core.Plugs</Name>
-      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
-      <Name>Cosmos.Debug.Kernel.Plugs</Name>
-      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
-      <Name>Cosmos.System.Plugs</Name>
-      <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Playground\Playground.csproj">
       <Name>Playground</Name>
       <Project>{8e3537cb-d0f9-4cfb-ae6f-72b465ca03f6}</Project>

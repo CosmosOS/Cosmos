@@ -1,5 +1,4 @@
 ﻿using System;
-using Cosmos.Common.Extensions;
 
 namespace Cosmos.Core.SMBIOS
 {
@@ -98,7 +97,7 @@ namespace Cosmos.Core.SMBIOS
             tmpArray = new byte[2];
             tmpArray[0] = memPtr[22];
             tmpArray[1] = memPtr[23];
-            TableLength = ByteConverter.ToUInt16(tmpArray, 0);
+            TableLength = BitConverter.ToUInt16(tmpArray, 0);
 
             //Get the pointer to the main table
             // 4 bytes = 32 bits = address

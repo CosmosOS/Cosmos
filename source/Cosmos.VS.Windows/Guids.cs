@@ -1,16 +1,21 @@
-﻿// Guids.cs
-// MUST match guids.h - There is no such file???? I think its referencing old VS2005 style, but vsct is used now instead.
-using System;
+﻿using System;
 
-namespace Cosmos.VS.Windows {
-  static class GuidList {
-    public const string guidCosmos_VS_WindowsPkgString = "a82b45e9-2a89-43bd-925d-c7f0edd212aa";
-    // What is guidToolWindowPersistanceString used for?
-    public const string guidToolWindowPersistanceString = "f019fb29-c2c2-4d27-9abf-739533c939be";
-    public const string guidAsmToolbarCmdSetString = "A875EA24-689A-4EAB-B9C2-DAC3EACB9501";
-    public const string guidCosmosMenuString = "3247C3E4-34B8-4DB0-8748-AD62495A5222";
+namespace Cosmos.VS.Windows
+{
+    static class Guids
+    {
+        public const string PackageGuidString = "2084f89a-967c-4f7d-a3f8-217c3fa8ee66";
+        public const string CosmosMenuGuidString = "5c177460-f057-4ac1-8b7f-d1685c915e3d";
+        public const string AsmToolbarGuidString = "1a98fb64-8fc8-4d24-95e4-e507700ba23c";
+        public const string IDEToolbarGuidString = "425c500b-ab24-44b0-812a-74eca127e6a1";
+        public const string ImagesGuidString = "aa9d88d9-acd2-4f2c-ab40-92887bdce774";
 
-    public static readonly Guid guidCosmosMenu = new Guid(guidCosmosMenuString);
-    public static readonly Guid guidAsmToolbarCmdSet = new Guid(guidAsmToolbarCmdSetString);
-  };
+        public const string AsmToolbarCmdSetString = "a875ea24-689a-4eab-b9c2-dac3eacb9501";
+        public const string CosmosMenuCmdSetString = "3247c3e4-34b8-4db0-8748-ad62495a5222";
+        public const string IDEToolbarCmdSetString = "3d4b3f35-36e7-4cea-8acc-d9601e45c0b5";
+
+        public static readonly Guid CosmosMenuCmdSetGuid = new Guid(CosmosMenuCmdSetString);
+        public static readonly Guid AsmToolbarCmdSetGuid = new Guid(AsmToolbarCmdSetString);
+        public static readonly Guid IDEToolbarCmdSetGuid = new Guid(IDEToolbarCmdSetString);
+    }
 }

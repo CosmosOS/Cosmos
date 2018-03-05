@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -73,7 +73,7 @@ namespace PlugViewer
                                 }
                                 strm.WriteLine("namespace Cosmos.Plugs");
                                 strm.WriteLine("{");
-                                strm.WriteLine("\t[Cosmos.IL2CPU.Plugs.Plug(Target = typeof(" + t.Namespace + "." + t.Name + str + "), TargetFramework = Cosmos.IL2CPU.Plugs.FrameworkVersion.v4_0)]");
+                                strm.WriteLine("\t[IL2CPU.API.Plug(Target = typeof(" + t.Namespace + "." + t.Name + str + "), TargetFramework = IL2CPU.API.FrameworkVersion.v4_0)]");
                                 strm.WriteLine("\tpublic static class " + t.FullName.Replace('.', '_') + "Impl" + genParams);
                                 strm.WriteLine("\t{");
                                 TypeNeedsPlugs = true;

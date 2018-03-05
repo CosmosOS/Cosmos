@@ -1,34 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Cosmos.Build.Common;
-using Cosmos.Build.MSBuild;
-using Cosmos.Core.Plugs;
-using Cosmos.Debug.Kernel;
-using Cosmos.Debug.Kernel.Plugs;
-using Cosmos.System.Plugs.System;
-using IL2CPU;
-using Microsoft.Win32;
 
 namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        public int AllowedSecondsInKernel = 30;
-        public List<RunTargetEnum> RunTargets = new List<RunTargetEnum>();
+        protected int AllowedSecondsInKernel => mConfiguration.AllowedSecondsInKernel;
+        protected IEnumerable<RunTargetEnum> RunTargets => mConfiguration.RunTargets;
 
-        private bool ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
+        private bool ExecuteKernel(string assemblyFileName, string workingDirectory, RunConfiguration configuration)
         {
             var xResult = true;
             OutputHandler.ExecuteKernelStart(assemblyFileName);
             try
             {
+                var xAssemblyFile = Path.Combine(workingDirectory, "Kernel.asm");
+                var xObjectFile = Path.Combine(workingDirectory, "Kernel.obj");
+                var xTempObjectFile = Path.Combine(workingDirectory, "Kernel.o");
+                var xIsoFile = Path.Combine(workingDirectory, "Kernel.iso");
 
-                var xAssemblyFile = Path.Combine(mBaseWorkingDirectory, "Kernel.asm");
-                var xObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.obj");
-                var xTempObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.o");
-                var xIsoFile = Path.Combine(mBaseWorkingDirectory, "Kernel.iso");
-
+                if (KernelPkg == "X86")
+                {
+                    RunTask("TheRingMaster", () => RunTheRingMaster(assemblyFileName));
+                }
                 RunTask("IL2CPU", () => RunIL2CPU(assemblyFileName, xAssemblyFile));
                 RunTask("Nasm", () => RunNasm(xAssemblyFile, xObjectFile, configuration.IsELF));
                 if (configuration.IsELF)
@@ -36,19 +31,34 @@ namespace Cosmos.TestRunner.Core
                     File.Move(xObjectFile, xTempObjectFile);
 
                     RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
-                    RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(mBaseWorkingDirectory, xObjectFile));
+                    RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(workingDirectory, xObjectFile));
                 }
-                var xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vmdk");
-                var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
-                File.Copy(xOriginalHarddiskPath, xHarddiskPath);
+
+                string xHarddiskPath;
+                if (configuration.RunTarget == RunTargetEnum.HyperV)
+                {
+                    xHarddiskPath = Path.Combine(workingDirectory, "Harddisk.vhdx");
+                    var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "HyperV", "Filesystem.vhdx");
+                    File.Copy(xOriginalHarddiskPath, xHarddiskPath);
+                }
+                else
+                {
+                    xHarddiskPath = Path.Combine(workingDirectory, "Harddisk.vmdk");
+                    var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
+                    File.Copy(xOriginalHarddiskPath, xHarddiskPath);
+                }
+
                 RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
                 switch (configuration.RunTarget)
                 {
                     case RunTargetEnum.Bochs:
-                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath));
+                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath, workingDirectory));
                         break;
                     case RunTargetEnum.VMware:
                         RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
+                        break;
+                    case RunTargetEnum.HyperV:
+                        RunTask("RunISO", () => RunIsoInHyperV(xIsoFile, xHarddiskPath));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");

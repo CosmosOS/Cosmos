@@ -9,9 +9,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PlaygroundHAL</RootNamespace>
     <AssemblyName>PlaygroundHAL</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -76,29 +75,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Common\Cosmos.Common.csproj">
-      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
-      <Name>Cosmos.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.Core\Cosmos.Core.csproj">
-      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
-      <Name>Cosmos.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
-      <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
-      <Name>Cosmos.Debug.Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
-      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.HAL</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PlaygroundCore\PlaygroundCore.csproj">
       <Project>{AB869246-4887-4117-851D-766EB9FF1E29}</Project>
       <Name>PlaygroundCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

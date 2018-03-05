@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+  
+  <Commands package="guidDebugPackage">
+    <Buttons>
+      <Button guid="guidDebugPackageCmdSet" id="cmdidLaunchDebug" priority="0x0100" type="Button">
+        <CommandFlag>AllowParams</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos Debug Launch</ButtonText>
+          <CanonicalName>Debug.CosmosDebugLaunch</CanonicalName>
+          <LocCanonicalName>Debug.CosmosDebugLaunch</LocCanonicalName>
+        </Strings>
+      </Button>
+      <Button guid="guidDebugPackageCmdSet" id="cmdidDebugExec" priority="0x0100" type="Button">
+        <CommandFlag>AllowParams</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos Debug Execute Command</ButtonText>
+          <CanonicalName>Debug.CosmosDebugExec</CanonicalName>
+          <LocCanonicalName>Debug.CosmosDebugExec</LocCanonicalName>
+        </Strings>
+      </Button>
+      <Button guid="guidDebugPackageCmdSet" id="cmdidDebugLog" priority="0x0100" type="Button">
+        <CommandFlag>AllowParams</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos Debug Control Logging</ButtonText>
+          <CanonicalName>Debug.CosmosDebugLog</CanonicalName>
+          <LocCanonicalName>Debug.CosmosDebugLog</LocCanonicalName>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+  
+  <Symbols>
+    <GuidSymbol name="guidDebugPackage" value="{a82b45e9-2a89-43bd-925d-c7f0edd212aa}" />
+
+    <GuidSymbol name="guidDebugPackageCmdSet" value="{94ebfc49-ec0f-4bd3-b3ff-d3aadb8dac9f}">
+      <IDSymbol name="cmdidLaunchDebug" value="0x0100" />
+      <IDSymbol name="cmdidDebugExec" value="0x0101" />
+      <IDSymbol name="cmdidDebugLog" value="0x0102" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

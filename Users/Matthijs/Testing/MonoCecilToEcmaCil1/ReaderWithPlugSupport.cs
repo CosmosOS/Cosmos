@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
-using Cosmos.IL2CPU.Plugs;
+using IL2CPU.API;
 
 namespace MonoCecilToEcmaCil1
 {

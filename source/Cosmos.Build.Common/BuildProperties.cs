@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 
 namespace Cosmos.Build.Common
 {
     public class BuildProperties : PropertiesBase
     {
-        static public List<string> PropNames = new List<string>();
+        public static List<string> PropNames = new List<string>();
 
         static BuildProperties()
         {
-            foreach (var xField in typeof(BuildPropertyNames).GetFields())
+            var xFields = typeof(BuildPropertyNames).GetRuntimeFields();
+
+            foreach (var xField in xFields)
             {
                 // IsLiteral determines if its value is written at compile time and not changeable.
                 // Consts are static even if we dont use static keyword.
@@ -102,14 +104,13 @@ namespace Cosmos.Build.Common
                 Description = "Makes a USB device such as a flash drive or external hard disk bootable.";
                 Deployment = DeploymentType.USB;
                 Launch = LaunchType.None;
-
             }
             else if (aName == "VMware")
             {
                 Description = "Use VMware Player or Workstation to deploy and debug.";
                 Deployment = DeploymentType.ISO;
                 Launch = LaunchType.VMware;
-
+                VisualStudioDebugPort = @"Pipe: Cosmos\Serial";
             }
             else if (aName == "PXE")
             {
@@ -124,12 +125,20 @@ namespace Cosmos.Build.Common
                 Description = "Use Bochs emulator to deploy and debug.";
                 Deployment = DeploymentType.ISO;
                 Launch = LaunchType.Bochs;
+                VisualStudioDebugPort = @"Pipe: Cosmos\Serial";
             }
             else if (aName == "IntelEdison")
             {
                 Description = "Connect to Intel Edison device to deploy and debug.";
                 Deployment = DeploymentType.BinaryImage;
                 Launch = LaunchType.IntelEdison;
+            }
+            else if (aName == "HyperV")
+            {
+                Description = "Use Hyper-V to deploy and debug.";
+                Deployment = DeploymentType.ISO;
+                Launch = LaunchType.HyperV;
+                VisualStudioDebugPort = "Pipe: CosmosSerial";
             }
         }
 
@@ -358,17 +367,7 @@ namespace Cosmos.Build.Common
             }
         }
 
-        public String OutputPath
-        {
-            get
-            {
-                return GetProperty(BuildPropertyNames.OutputPathString, @"bin\debug");
-            }
-            set
-            {
-                SetProperty(BuildPropertyNames.OutputPathString, value);
-            }
-        }
+        public String OutputPath => GetProperty("OutputPath", @"bin\debug");
 
         public Framework Framework
         {

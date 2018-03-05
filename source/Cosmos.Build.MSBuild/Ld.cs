@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Framework;
+﻿using System.Diagnostics;
 using System.IO;
+using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild
 {

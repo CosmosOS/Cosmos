@@ -1,34 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Cosmos.Core;
 
-namespace Cosmos.Core {
+namespace Cosmos.Core
+{
     // PIC is not in hardware becuase its a special core piece like CPU that is not interacted with by anything except Core.
     //
     // Remaps the IRQ's to INT20-INT2F
-    public class PIC {
+    public class PIC
+    {
         // This is here and not in BaseGroups for 2 reasons.
         // 1) Its needed before the other Basegroups are created.
         // 2) Its only used by this class, and it also exists in Core.
         protected IOGroup.PIC Master = new IOGroup.PIC(false);
         protected IOGroup.PIC Slave = new IOGroup.PIC(true);
 
-        protected enum Cmd {
+        protected enum Cmd
+        {
             Init = 0x10,
             EOI = 0x20
         }
 
-        public void EoiMaster() {
-            Master.Cmd.Byte = (byte)Cmd.EOI;
+        public void EoiMaster()
+        {
+            Master.Cmd.Byte = (byte) Cmd.EOI;
         }
 
-        public void EoiSlave() {
-            Master.Cmd.Byte = (byte)Cmd.EOI;
-            Slave.Cmd.Byte = (byte)Cmd.EOI;
+        public void EoiSlave()
+        {
+            Master.Cmd.Byte = (byte) Cmd.EOI;
+            Slave.Cmd.Byte = (byte) Cmd.EOI;
         }
 
-        public PIC() {
+        public PIC()
+        {
             // MTW: to disable PIT, send 0x01 to Master mask
             // Right now we mask all IRQs. We enable them as we add
             // support for them. The 0x08 on master MUST remain. IRQ7
@@ -41,13 +44,13 @@ namespace Cosmos.Core {
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
             //for now enable keyboard, mouse(ps2)
-            Remap(0x20, 0xF9 | 0x08, 0x28, 0xEF);
-
+            Remap(0x20, 0xF8 | 0x08, 0x28, 0xEF);
         }
 
         private void Remap(byte masterStart, byte masterMask, byte slaveStart, byte slaveMask)
         {
             #region consts
+
             // source: osdev.org
 
 #pragma warning disable
@@ -63,6 +66,7 @@ namespace Cosmos.Core {
             const byte ICW4_BUF_MASTER = 0x0C; // buffered mode/master
             const byte ICW4_SFNM = 0x10; // special fully nested (not)
 #pragma warning restore
+
             #endregion
 
             var xOldMasterMask = Master.Data.Byte;
@@ -95,7 +99,8 @@ namespace Cosmos.Core {
             IOPort.Wait();
         }
 
-        protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask){
+        protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask)
+        {
             // We need to remap the PIC interrupt lines to the CPU. The BIOS sets
             // them in a way compatible for 16 bit mode, but in a way that causes problems
             // for 32 bit mode.
@@ -107,7 +112,7 @@ namespace Cosmos.Core {
             //#define ICW1_SINGLE	0x02		/* Single (cascade) mode */
             //#define ICW1_INTERVAL4	0x04		/* Call address interval 4 (8) */
             //#define ICW1_LEVEL	0x08		/* Level triggered (edge) mode */
-            Master.Cmd.Byte = (byte)Cmd.Init | 0x01;
+            Master.Cmd.Byte = (byte) Cmd.Init | 0x01;
             IOPort.Wait();
 
             // ICW2
@@ -130,6 +135,6 @@ namespace Cosmos.Core {
             // Set mask
             Master.Data.Byte = aMask;
             IOPort.Wait();
-		}
+        }
     }
 }

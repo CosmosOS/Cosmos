@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Cosmos.Common;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+using System;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
 {
@@ -51,21 +47,16 @@ namespace Cosmos.Core
 
         public void Fill(UInt32 aData)
         {
-            Fill(0, Size / 4, aData);
+            //Fill(0, Size / 4, aData);
+            Fill(0, Size, aData);
         }
 
         [DebugStub(Off = true)]
         public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt32 aData)
         {
-            //TODO: before next step can at least check bounds here and do the addition just once to 
-            //start the loop.
-            //TODO - When asm can check count against size just one time and use a native fill asm op
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             UInt32* xDest = (UInt32*)(this.Base + aStart);
-            for (UInt32 i = 0; i < aCount; i++)
-            {
-                *xDest = aData;
-                xDest++;
-            }
+            MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         public void Fill(byte aData)
@@ -75,35 +66,23 @@ namespace Cosmos.Core
 
         public void Fill(UInt16 aData)
         {
-            Fill(0, Size / 2, aData);
+            Fill(0, Size, aData);
         }
 
         [DebugStub(Off = true)]
         public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt16 aData)
         {
-            //TODO: before next step can at least check bounds here and do the addition just once to 
-            //start the loop.
-            //TODO - When asm can check count against size just one time and use a native fill asm op
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             UInt16* xDest = (UInt16*)(this.Base + aStart);
-            for (UInt32 i = 0; i < aCount; i++)
-            {
-                *xDest = aData;
-                xDest++;
-            }
+            MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         [DebugStub(Off = true)]
         public unsafe void Fill(UInt32 aStart, UInt32 aCount, byte aData)
         {
-            //TODO: before next step can at least check bounds here and do the addition just once to 
-            //start the loop.
-            //TODO - When asm can check count against size just one time and use a native fill asm op
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             byte* xDest = (byte*)(this.Base + aStart);
-            for (UInt32 i = 0; i < aCount; i++)
-            {
-                *xDest = aData;
-                xDest++;
-            }
+            MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         [DebugStub(Off = true)]
@@ -123,6 +102,73 @@ namespace Cosmos.Core
         {
             throw new Exception("TODO");
         }
+        
+        #region ReadWrite
+        public unsafe void Read8(Byte[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length; i++)
+                aBuffer[i] = (*(Byte*)(Base + i));
+        }
+
+        public unsafe void Write8(Byte[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length; i++)
+                (*(Byte*)(Base + i)) = aBuffer[i];
+        }
+
+        public unsafe void Read16(UInt16[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length / 2; i++)
+            {
+                aBuffer[i] = (*(UInt16*)(Base + i));
+            }
+        }
+
+        public unsafe void Write16(UInt16[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length / sizeof(ushort); i++)
+            {
+                (*(UInt16*)(Base + i)) = aBuffer[i];
+            }
+        }
+
+        public unsafe void Read32(UInt32[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length / sizeof(uint); i++)
+                aBuffer[i] = (*(UInt32*)(Base + i));
+        }
+
+        public unsafe void Write32(UInt32[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length / sizeof(uint); i++)
+                (*(UInt32*)(Base + i)) = aBuffer[i];
+        }
+        #endregion ReadWrite
+            
     }
 
     public class MemoryBlock08
@@ -221,6 +267,5 @@ namespace Cosmos.Core
                 (*(UInt32*)(Base + aByteOffset)) = value;
             }
         }
-
     }
 }

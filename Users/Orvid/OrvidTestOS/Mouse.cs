@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CPUBus = Cosmos.Core.Plugs.IOPortImpl;
+using CPUBus = Cosmos.Core_Plugs.IOPortImpl;
 using Cosmos.Core;
 using GuessKernel;
 //using Cosmos.Kernel;
@@ -35,7 +35,7 @@ namespace Cosmos.Hardware
         /// </summary>
         public void Initialize()
         {
-            Cosmos.Core.Plugs.IOPortImpl.Read8(0X60);
+            Cosmos.Core_Plugs.IOPortImpl.Read8(0X60);
             g.p60.Byte = 0x20;
             byte statusByte = Read();
             byte modstatusByte = (byte)(((statusByte >> 2) << 1) + 1); // Enable status byte 2

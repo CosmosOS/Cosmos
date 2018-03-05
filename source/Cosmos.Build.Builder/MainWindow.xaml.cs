@@ -2,64 +2,44 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Security.Permissions;
 using System.Windows.Threading;
-using System.IO;
-using Microsoft.VisualBasic;
-using Microsoft.Win32;
-using TaskScheduler;
-using System.Reflection;
 using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
-    protected int mTailLineCount = 5;
-    protected int mTailCurrent = 0;
-    protected List<TextBlock> mTailLines = new List<TextBlock>();
-    protected string mCosmosDir;
-    protected string mSetupPath;
+    int mTailLineCount = 10;
+    int mTailCurrent = 0;
+    List<TextBlock> mTailLines = new List<TextBlock>();
+    string mCosmosDir;
+    string mSetupPath;
     // Needs updating with each new release.
-    protected int mReleaseNo = 106027;
+    int mReleaseNo = 106027;
+    string mTailCaption;
+
 
     public MainWindow() {
       InitializeComponent();
       mApp = (App)Application.Current;
+      mTailCaption = tblkTail.Text + " - ";
 
       for (int i = 0; i < mTailLineCount; i++) {
         var xTextBlock = new TextBlock();
+        xTextBlock.Background = Brushes.Black;
+        xTextBlock.Foreground = Brushes.Green;
         xTextBlock.FontSize = 16;
         mTailLines.Add(xTextBlock);
         spnlTail.Children.Add(xTextBlock);
       }
-
-      // GetInstallList();
     }
-
-    //protected void GetInstallList() {
-    //  var xSB = new StringBuilder();
-
-    //  using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Products\", false)) {
-    //    var xSubKeyNames = xKey.GetSubKeyNames();
-    //    foreach (string xSubKeyName in xSubKeyNames) {
-    //      using (var xSubKey = xKey.OpenSubKey(xSubKeyName, false)) {
-    //        string xValue = (string)xSubKey.GetValue("ProductName");
-    //        xSB.AppendLine(xValue);
-    //      }
-    //    }
-    //  }
-
-    //  Clipboard.SetText(xSB.ToString());
-    //}
 
     bool mPreventAutoClose = false;
     App mApp;
@@ -68,138 +48,22 @@ namespace Cosmos.Build.Builder {
     StringBuilder mClipboard = new StringBuilder();
     DispatcherTimer mCloseTimer;
 
-    const string InstallScheduledTaskName = "CosmosSetup";
-
-    // Install the UAC bypass CosmosTask. This must be performed while the program is running under
-    // administrator credentials with elevation.
-    void InstallScheduledTask() {
-      ITaskService xService = new TaskScheduler.TaskScheduler();
-      xService.Connect();
-      ITaskFolder xFolder = xService.GetFolder(@"\");
-      IRegisteredTask xTask = TryGetInstallScheduledTask(xFolder);
-
-      if (null != xTask) {
-        // The first parameter MUST NOT be prefixed with the folder path.
-        xFolder.DeleteTask(InstallScheduledTaskName, 0);
-      }
-
-      ITaskDefinition xTaskDef = xService.NewTask(0);
-      xTaskDef.RegistrationInfo.Description = "Cosmos DevKit UAC Bypass";
-      xTaskDef.RegistrationInfo.Author = "Cosmos Group";
-      xTaskDef.Settings.Compatibility = _TASK_COMPATIBILITY.TASK_COMPATIBILITY_V2_1;
-      xTaskDef.Settings.DisallowStartIfOnBatteries = false;
-      xTaskDef.Principal.RunLevel = _TASK_RUNLEVEL.TASK_RUNLEVEL_HIGHEST;
-
-      IActionCollection xActions = xTaskDef.Actions;
-      IAction xAction = xActions.Create(_TASK_ACTION_TYPE.TASK_ACTION_EXEC);
-      IExecAction xExecAction = xAction as IExecAction;
-      xExecAction.Path = mSetupPath;
-      xExecAction.Arguments = @"/SILENT";
-
-      // 6 = task can be created or updated ["CreateOrUpdate" flag]
-      // if Name id empty or null, System will create a task with name as GUID
-      xTask = xFolder.RegisterTaskDefinition(InstallScheduledTaskName, xTaskDef, 6, null, null, _TASK_LOGON_TYPE.TASK_LOGON_NONE, null);
-    }
-
-    // Check for task path change. This is invoked in normal user mode (not administrator) and is intended
-    // to fix issue #15528
-    bool IsInstallScheduledTaskPathFixRequired(IRegisteredTask existingTask, string expectedPath)
-    {
-      // This is a defensive programming test. This should never happen unless someone modifies
-      // the task creation code and forget to fix the task update part.
-      if (1 != existingTask.Definition.Actions.Count) { return true; }
-      IExecAction xExistingExecAction = null;
-      IActionCollection xActions;
-
-      try {
-        xActions = existingTask.Definition.Actions;
-        IEnumerator xActionsEnumerator = xActions.GetEnumerator();
-        if (!xActionsEnumerator.MoveNext()) { return true; }
-        xExistingExecAction = xActionsEnumerator.Current as IExecAction;
-      }
-      catch { return true; }
-
-      if (null == xExistingExecAction) { return true; }
-      if (0 != string.Compare(xExistingExecAction.Path, expectedPath, true)) { return true; }
-      return false;
-    }
-
-    // http://yoursandmyideas.wordpress.com/2012/01/07/task-scheduler-in-c-net/
-    bool ScheduledTaskIsInstalled() {
-      ITaskService xService = new TaskScheduler.TaskScheduler();
-      xService.Connect();
-
-      ITaskFolder xFolder = xService.GetFolder(@"\");
-      IRegisteredTask xExistingTask = TryGetInstallScheduledTask(xFolder);
-
-      if (null == xExistingTask) { return false; }
-      return (!IsInstallScheduledTaskPathFixRequired(xExistingTask, mSetupPath));
-    }
-
-    // Attempt to retrieve the CosmosSetup UAC bypass task. If the task can't be retrieved either
-    // because it doesn't exist or because access is denied, return a null reference.
-    IRegisteredTask TryGetInstallScheduledTask(ITaskFolder folder)
-    {
-        try { return folder.GetTask(InstallScheduledTaskName); }
-        catch { return null; }
-    }
-
-    void InstallTaskAsAdmin() {
-      // Restart with UAC and just install scheduled task
-      using (var xProcess = new Process()) {
-        var xPSI = xProcess.StartInfo;
-        xPSI.UseShellExecute = true;
-        xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase.Replace("file:///", "");
-        xPSI.Arguments = "-InstallTask";
-        if (App.VsVersion == VsVersion.Vs2015)
-        {
-          xPSI.Arguments += " -Vs2015";
-        }
-
-        xPSI.Verb = "runas";
-        try {
-            xProcess.Start();
-        }
-        catch(System.ComponentModel.Win32Exception) {
-            // happens if user press "cancel" on UAC dialog
-            Log_LogSection("Error");
-            Log_LogLine("User pressed \"Cancel\" on UAC dialog for install task!");
-            Log_LogError();
-            return;
-        }
-        xProcess.WaitForExit();
-      }
-    }
 
     public bool Build() {
+      Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
+      Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
+      Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
+
       if (App.IsUserKit) {
-        do {
-          string x = Interaction.InputBox("Enter Release Number", "Cosmos Builder");
-          if (string.IsNullOrEmpty(x))
-          {
-            return false;
-          }
-          if (false == int.TryParse(x, out mReleaseNo))
-            MessageBox.Show("Please use only a number!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-          else
-            break;
-        } while (true);
-      } else {
-        if (App.UseTask) {
-          if (!ScheduledTaskIsInstalled()) {
-            InstallTaskAsAdmin();
-          }
-        }
+        mReleaseNo = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
       }
-      if (mPreventAutoClose)
+      if (mPreventAutoClose) {
         return true;
+      }
 
       var xTask = new CosmosTask(mCosmosDir, mReleaseNo);
-      xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
-      xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
-      xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
 
-      var xThread = new System.Threading.Thread(delegate() {
+      var xThread = new System.Threading.Thread(delegate () {
         xTask.Run();
         ThreadDone();
       });
@@ -209,7 +73,7 @@ namespace Cosmos.Build.Builder {
     }
 
     void ThreadDone() {
-      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate () {
         if (App.StayOpen == false) {
           mCloseTimer = new DispatcherTimer();
           mCloseTimer.Interval = TimeSpan.FromSeconds(5);
@@ -236,7 +100,7 @@ namespace Cosmos.Build.Builder {
     }
 
     void Log_LogError() {
-      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate () {
         ClearTail();
 
         mSection.Foreground = Brushes.Red;
@@ -245,11 +109,23 @@ namespace Cosmos.Build.Builder {
       });
     }
 
+    void Log_LogLine(string aLine) {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate () {
+        WriteTail(aLine);
+
+        mClipboard.AppendLine(aLine);
+
+        mContent.Inlines.Add(aLine);
+        mContent.Inlines.Add(new LineBreak());
+      });
+    }
+
     void Log_LogSection(string aLine) {
-      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate () {
         Title = aLine;
 
         ClearTail();
+        tblkTail.Text = mTailCaption + aLine;
 
         mClipboard.AppendLine();
         mClipboard.AppendLine(new string('=', aLine.Length));
@@ -296,20 +172,9 @@ namespace Cosmos.Build.Builder {
       }
     }
 
-    void Log_LogLine(string aLine) {
-      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-        WriteTail(aLine);
-
-        mClipboard.AppendLine(aLine);
-
-        mContent.Inlines.Add(aLine);
-        mContent.Inlines.Add(new LineBreak());
-      });
-    }
-
     protected bool mLoaded = false;
     void Window_Loaded(object sender, RoutedEventArgs e) {
-      if (!App.HasParams) {
+      if (!App.mArgs.Any()) {
         MessageBox.Show("Builder not meant to be called directly. Use install.bat instead.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         Close();
         return;
@@ -318,13 +183,10 @@ namespace Cosmos.Build.Builder {
       LoadPosition();
       mLoaded = true;
 
-      string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
+      string xAppPath = AppContext.BaseDirectory;
       mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\");
       mSetupPath = Path.Combine(mCosmosDir, @"Setup\Output\" + CosmosTask.GetSetupName(mReleaseNo) + ".exe");
-      if (App.InstallTask) {
-        InstallScheduledTask();
-        Close();
-      } else if (!Build()) {
+      if (!Build()) {
         Close();
       }
     }
@@ -359,6 +221,5 @@ namespace Cosmos.Build.Builder {
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
       SavePosition();
     }
-
   }
 }

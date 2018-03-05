@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MonoCecilToEcmaCil1</RootNamespace>
     <AssemblyName>MonoCecilToEcmaCil1</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -90,9 +90,9 @@
     <None Include="_QueueItems\QueuedMethod.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+    <ProjectReference Include="..\IL2CPU.API\IL2CPU.API.csproj">
       <Project>{CDDAF88B-8726-469A-B906-16FD5EC99799}</Project>
-      <Name>Cosmos.IL2CPU.Plugs</Name>
+      <Name>IL2CPU.API</Name>
     </ProjectReference>
     <ProjectReference Include="..\IRs\EcmaCil\EcmaCil.csproj">
       <Project>{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}</Project>
@@ -121,7 +121,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

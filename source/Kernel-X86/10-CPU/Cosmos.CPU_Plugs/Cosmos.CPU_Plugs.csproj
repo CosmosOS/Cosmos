@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Cosmos.cfg" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
+        <ProjectReference PrivateAssets="All" Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
+    </ItemGroup>
+
+</Project>

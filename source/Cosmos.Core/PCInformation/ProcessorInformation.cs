@@ -1,8 +1,5 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Runtime.CompilerServices;
-using Cosmos.Core.IOGroup;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.Core.IOGroup;
+using IL2CPU.API.Attribs;
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.Core.PCInformation

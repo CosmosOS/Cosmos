@@ -1,29 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-namespace Cosmos.Core {
+using System;
+
+using IL2CPU.API.Attribs;
+
+namespace Cosmos.Core
+{
     // Non hardware class, only used by core and hardware drivers for ports etc.
-    public class CPU {
+    public class CPU
+    {
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
         [PlugMethod(PlugRequired = true)]
-        public static uint GetAmountOfRAM() { return 0; } // Plugged
+        public static uint GetAmountOfRAM()
+        {
+            throw new NotImplementedException();
+        }
+
         // needs to be static, as Heap needs it before we can instantiate objects
         [PlugMethod(PlugRequired = true)]
-        public static uint GetEndOfKernel() { return 0; } // Plugged
+        public static uint GetEndOfKernel()
+        {
+            throw new NotImplementedException();
+        }
+
         [PlugMethod(PlugRequired = true)]
-        public void UpdateIDT(bool aEnableInterruptsImmediately) { } // Plugged
+        public void UpdateIDT(bool aEnableInterruptsImmediately)
+        {
+            throw new NotImplementedException();
+        }
+
         [PlugMethod(PlugRequired = true)]
-        public void InitFloat() { } // Plugged
+        public void InitFloat()
+        {
+            throw new NotImplementedException();
+        }
+
         [PlugMethod(PlugRequired = true)]
-        public void InitSSE() { } // Plugged
+        public void InitSSE()
+        {
+            throw new NotImplementedException();
+        }
+
         [PlugMethod(PlugRequired = true)]
-        public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
+        public static void ZeroFill(uint aStartAddress, uint aLength)
+        {
+            throw new NotImplementedException();
+        }
+
         [PlugMethod(PlugRequired = true)]
-        public void Halt() { } // Plugged
-        public void Reboot() {
+        public void Halt()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Reboot()
+        {
             // Disable all interrupts
             DisableInterrupts();
 
@@ -37,14 +67,17 @@ namespace Cosmos.Core {
 
         private static void DoEnableInterrupts()
         {
-
+            throw new NotImplementedException();
         }
 
         private static void DoDisableInterrupts()
         {
+            throw new NotImplementedException();
         }
 
+        [AsmMarker(AsmMarker.Type.Processor_IntsEnabled)]
         public static bool mInterruptsEnabled;
+
         public static void EnableInterrupts()
         {
             mInterruptsEnabled = true;

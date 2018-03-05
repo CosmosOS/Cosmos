@@ -1,0 +1,8 @@
+{
+    "profiles": {
+        "Cosmos.VS.DebugEngine": {
+            "executablePath": "$(DevEnvDir)devenv.exe",
+            "commandLineArgs": "/rootSuffix Exp"
+        }
+    }
+}

@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Cosmos.IL2CPU.Plugs
+namespace IL2CPU.API
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple=true)]
 	public sealed class PlugFieldAttribute: Attribute {

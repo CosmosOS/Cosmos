@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Cosmos.Debug.Common;
 using Microsoft.Build.Framework;
+
+using IL2CPU.Debug.Symbols;
 
 namespace Cosmos.Build.MSBuild {
     public class ExtractMapFromElfFile : BaseToolTask {

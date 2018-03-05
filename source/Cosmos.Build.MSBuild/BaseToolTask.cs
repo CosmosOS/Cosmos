@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
 using System.Diagnostics;
-using MessageImportance = Microsoft.Build.Framework.MessageImportance;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 
 namespace Cosmos.Build.MSBuild
 {
-	  public enum WriteType
-	  {
-		    Warning,
-		    Error,
-		    Message, // only issued on console
-		    Info
-	  }
+    public enum WriteType
+    {
+        Warning,
+        Error,
+        Message, // only issued on console
+        Info
+    }
 
     public class LogInfo
     {
@@ -79,12 +76,11 @@ namespace Cosmos.Build.MSBuild
         /// </summary>
         public object[] messageArgs;//TODO check if null is allowed, if yes document it here
     }
-
-
-	public abstract class BaseToolTask : AppDomainIsolatedTask
-	{
-	    public static bool ExecuteTool(string workingDir, string filename, string arguments, string name, Action<string> errorReceived, Action<string> outputReceived)
-	    {
+    
+    public abstract class BaseToolTask : Task
+    {
+        public static bool ExecuteTool(string workingDir, string filename, string arguments, string name, Action<string> errorReceived, Action<string> outputReceived)
+        {
             var xProcessStartInfo = new ProcessStartInfo();
             xProcessStartInfo.WorkingDirectory = workingDir;
             xProcessStartInfo.FileName = filename;
@@ -99,14 +95,14 @@ namespace Cosmos.Build.MSBuild
 
             using (var xProcess = new Process())
             {
-                xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                xProcess.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
                 {
                     if (e.Data != null)
                     {
                         errorReceived(e.Data);
                     }
                 };
-                xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                xProcess.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
                 {
                     if (e.Data != null)
                     {
@@ -134,83 +130,83 @@ namespace Cosmos.Build.MSBuild
                 }
                 return true;
             }
-	    }
+        }
 
-	    protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
-	    {
-	        var xResult = ExecuteTool(workingDir, filename, arguments, name, s => mErrors.Add(s), s => mOutput.Add(s));
+        protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
+        {
+            var xResult = ExecuteTool(workingDir, filename, arguments, name, s => mErrors.Add(s), s => mOutput.Add(s));
 
-	        LogInfo logContent;
-	        for (int xIndex = 0; xIndex < mErrors.Count; xIndex++)
-	        {
-	            var xError = mErrors[xIndex];
-	            if (ExtendLineError(xResult, xError, out logContent))
-	            {
-	                Logs(logContent);
-	            }
-	        }
+            LogInfo logContent;
+            for (int xIndex = 0; xIndex < mErrors.Count; xIndex++)
+            {
+                var xError = mErrors[xIndex];
+                if (ExtendLineError(xResult, xError, out logContent))
+                {
+                    Logs(logContent);
+                }
+            }
 
-	        for (int xIndex = 0; xIndex < mOutput.Count; xIndex++)
-	        {
-	            var xOutput = mOutput[xIndex];
-	            if (ExtendLineOutput(xResult, xOutput, out logContent))
-	            {
-	                Logs(logContent);
-	            }
-	        }
+            for (int xIndex = 0; xIndex < mOutput.Count; xIndex++)
+            {
+                var xOutput = mOutput[xIndex];
+                if (ExtendLineOutput(xResult, xOutput, out logContent))
+                {
+                    Logs(logContent);
+                }
+            }
 
-	        return xResult;
-	    }
+            return xResult;
+        }
 
-	    private List<string> mErrors = new List<string>();
-	    private List<string> mOutput = new List<string>();
+        private List<string> mErrors = new List<string>();
+        private List<string> mOutput = new List<string>();
 
-	  public virtual bool ExtendLineError(bool hasErrored, string errorMessage, out LogInfo log)
-	  {
-	    log = new LogInfo();
-	    log.logType = WriteType.Error;
-	    log.message = errorMessage;
-	    if (!hasErrored)
-	      return false;
-	    return true;
-	  }
+        public virtual bool ExtendLineError(bool hasErrored, string errorMessage, out LogInfo log)
+        {
+            log = new LogInfo();
+            log.logType = WriteType.Error;
+            log.message = errorMessage;
+            if (!hasErrored)
+                return false;
+            return true;
+        }
 
-	  public virtual bool ExtendLineOutput(bool hasErrored, string errorMessage, out LogInfo log)
-	  {
-	    log = new LogInfo();
-	    log.logType = WriteType.Info;
-	    log.message = errorMessage;
-	    return true;
-	  }
+        public virtual bool ExtendLineOutput(bool hasErrored, string errorMessage, out LogInfo log)
+        {
+            log = new LogInfo();
+            log.logType = WriteType.Info;
+            log.message = errorMessage;
+            return true;
+        }
 
-	  public void Logs(LogInfo logInfo)// string message, string category, string filename, string lineNumber = 0, string columnNumber = 0)
-		{
+        public void Logs(LogInfo logInfo)// string message, string category, string filename, string lineNumber = 0, string columnNumber = 0)
+        {
             switch (logInfo.logType)
-			{
-				case WriteType.Warning:
+            {
+                case WriteType.Warning:
                     //Log.LogWarning(category, string.Empty, string.Empty, filename, lineNumber, columnNumber, lineNumber, columnNumber, message);
                     Log.LogWarning(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
-					break;
-				case WriteType.Message:
+                    break;
+                case WriteType.Message:
                     Log.LogMessage(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
-					break;
-				case WriteType.Info:
-					// changed IDEBuildLogger.cs for this behavior of add to ErrorList Messages
+                    break;
+                case WriteType.Info:
+                    // changed IDEBuildLogger.cs for this behavior of add to ErrorList Messages
                     Log.LogMessage(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.importance, logInfo.message, logInfo.messageArgs);
-					break;
+                    break;
                 case WriteType.Error:
-				default:
-			        if (UseConsoleForLog)
-			        {
-			            LogError(logInfo.message, logInfo.messageArgs);
-			        }
-			        else
-			        {
-			            Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message??"", logInfo.messageArgs);
-			        }
-			        break;
-			}
-		}
+                default:
+                    if (UseConsoleForLog)
+                    {
+                        LogError(logInfo.message, logInfo.messageArgs);
+                    }
+                    else
+                    {
+                        Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message ?? "", logInfo.messageArgs);
+                    }
+                    break;
+            }
+        }
 
         protected void LogError(string message, params object[] args)
         {
@@ -228,6 +224,6 @@ namespace Cosmos.Build.MSBuild
             }
         }
 
-    public bool UseConsoleForLog { get; set; }
-	}
+        public bool UseConsoleForLog { get; set; }
+    }
 }

@@ -1,23 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Cosmos.VS.Windows
 {
     public class ToolWindowPane2 : ToolWindowPane
     {
-        protected DebuggerUC mUserControl;
-        public DebuggerUC UserControl
+        public event EventHandler UpdateWindow;
+
+        public sealed override object Content
         {
-            get { return mUserControl; }
+            get => base.Content;
+            set => base.Content = value;
         }
-        
+
+        public DebuggerUC UserControl => Content as DebuggerUC;
+
         public ToolWindowPane2()
             : base(null)
         {
+        }
+
+        protected virtual void OnUpdateWindow(EventArgs e)
+        {
+            UpdateWindow?.Invoke(this, e);
         }
     }
 }

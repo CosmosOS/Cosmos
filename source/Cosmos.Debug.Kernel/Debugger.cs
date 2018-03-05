@@ -5,191 +5,153 @@ using System.Linq;
 using System.Text;
 
 
-namespace Cosmos.Debug.Kernel
-{
-    public class Debugger
-    {
-        private string mRing;
+namespace Cosmos.Debug.Kernel {
+    public class Debugger {
+        protected string mRing;
 
-        public string Ring
-        {
-            get
-            {
+        public string Ring {
+            get {
                 return mRing;
             }
-            set
-            {
+            set {
                 mRing = value;
             }
         }
 
-        public string mSection { get; set; }
+        protected string mSection { get; set; }
 
-        public Debugger(string aRing, string aSection)
-        {
+        public Debugger(string aRing, string aSection) {
             mRing = aRing;
             mSection = aSection;
         }
 
-        public void Break()
-        {
+        public void Break() {
         } // Plugged
 
-        public static void DoBochsBreak()
-        {
+        public static void DoBochsBreak() {
             // plugged
         }
 
-        internal static void DoRealHalt()
-        {
+        internal static void DoRealHalt() {
             // plugged
         }
 
-        private static unsafe void ActualSend(int aLength, char* aText)
-        {
+        private static unsafe void ActualSend(int aLength, char* aText) {
         } // Plugged
 
-        public void SendPtr(object aObject)
-        {
+        public void SendPtr(object aObject) {
         } // plugged
 
-        internal static void DoSendNumber(uint aNumber)
-        {
+        internal static void DoSendNumber(uint aNumber) {
             // plugged
         }
 
-        internal static void DoSendNumber(int aNumber)
-        {
+        internal static void DoSendNumber(int aNumber) {
             // plugged
         }
 
-        internal static void DoSendNumber(ulong aNumber)
-        {
+        internal static void DoSendNumber(ulong aNumber) {
             // plugged
         }
 
-        internal static void DoSendNumber(long aNumber)
-        {
+        internal static void DoSendNumber(long aNumber) {
             // plugged
         }
 
-        internal static void DoSendNumber(float aNumber)
-        {
+        internal static void DoSendNumber(float aNumber) {
             // plugged
         }
 
-        internal static void DoSendNumber(double aNumber)
-        {
+        internal static void DoSendNumber(double aNumber) {
             // plugged
         }
 
-        internal static void DoSendCoreDump()
-        {
+        internal static void DoSendCoreDump() {
             // plugged
         }
 
-        public void SendNumber(uint aNumber)
-        {
+        public void SendNumber(uint aNumber) {
             DoSendNumber(aNumber);
         }
 
-        public void SendNumber(int aNumber)
-        {
+        public void SendNumber(int aNumber) {
             DoSendNumber(aNumber);
         }
 
-        public void SendNumber(ulong aNumber)
-        {
+        public void SendNumber(ulong aNumber) {
             DoSendNumber(aNumber);
         }
 
-        public void SendNumber(long aNumber)
-        {
+        public void SendNumber(long aNumber) {
             DoSendNumber(aNumber);
         }
 
-        public void SendNumber(float aNumber)
-        {
+        public void SendNumber(float aNumber) {
             DoSendNumber(aNumber);
         }
 
-        public void SendNumber(double aNumber)
-        {
+        public void SendNumber(double aNumber) {
             DoSendNumber(aNumber);
         }
 
-        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData)
-        {
-            fixed (byte* xPtr = &aData[0])
-            {
+        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData) {
+            fixed (byte* xPtr = &aData[0]) {
                 SendChannelCommand(aChannel, aCommand, aData.Length, xPtr);
             }
         }
 
-        public static unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData)
-        {
+        public static unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData) {
             //
         }
 
-        public static unsafe void SendChannelCommand(byte aChannel, byte aCommand)
-        {
+        public static unsafe void SendChannelCommand(byte aChannel, byte aCommand) {
             //
         }
 
-        internal static void DoSend(string aText)
-        {
+        internal static void DoSend(string aText) {
             // plugged
         }
 
-        public static void SendKernelPanic(uint id)
-        {
+        public static void SendKernelPanic(uint id) {
             // plugged
         }
 
-        public void Send(string aText)
-        {
+        public void Send(string aText) {
             DoSend(aText);
         }
 
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(string aText)
-        {
+        public void SendInternal(string aText) {
             DoSend(aText);
         }
 
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(uint aNumber)
-        {
+        public void SendInternal(uint aNumber) {
             DoSendNumber(aNumber);
         }
 
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(int aNumber)
-        {
+        public void SendInternal(int aNumber) {
             DoSendNumber(aNumber);
         }
 
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(ulong aNumber)
-        {
+        public void SendInternal(ulong aNumber) {
             DoSendNumber(aNumber);
         }
 
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(long aNumber)
-        {
+        public void SendInternal(long aNumber) {
             DoSendNumber(aNumber);
         }
 
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(float aNumber)
-        {
+        public void SendInternal(float aNumber) {
             DoSendNumber(aNumber);
         }
 
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(double aNumber)
-        {
+        public void SendInternal(double aNumber) {
             DoSendNumber(aNumber);
         }
         //public void OldSend(string aText) {
@@ -208,25 +170,21 @@ namespace Cosmos.Debug.Kernel
         //}
 
         public unsafe void SendMessageBox(int aLength, char* aText) { } // Plugged
-        public unsafe void SendMessageBox(string aText)
-        {
+        public unsafe void SendMessageBox(string aText) {
             // TODO: Need to fix this so it can send empty strings.
             // Sending empty strings locks it up right now
-            if (aText.Length == 0)
-            {
+            if (aText.Length == 0) {
                 return;
             }
 
             var xChars = aText.ToCharArray();
-            fixed (char* xPtr = &xChars[0])
-            {
+            fixed (char* xPtr = &xChars[0]) {
                 SendMessageBox(xChars.Length, xPtr);
             }
         }
 
         // TODO: Kudzu repacement methods for Cosmos.HAL.DebugUtil
-        public unsafe void SendMessage(string aModule, string aData)
-        {
+        public unsafe void SendMessage(string aModule, string aData) {
             //string xSingleString;
             //xSingleString = "Message Module: \"" + aModule + "\"";
             //xSingleString += " Data: \"" + aData + "\"";
@@ -238,39 +196,33 @@ namespace Cosmos.Debug.Kernel
             DoSend(aData);
         }
 
-        public unsafe void SendError(string aModule, string aData)
-        {
+        public unsafe void SendError(string aModule, string aData) {
             //string xSingleString;
             //xSingleString = "Error Module: \"" + aModule + "\"";
             //xSingleString += " Data: \"" + aData + "\"";
             //Send(xSingleString);
         }
 
-        public unsafe void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits)
-        {
+        public unsafe void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
             //string xSingleString;
             //xSingleString = "Number Module: \"" + aModule + "\"";
             //xSingleString += " Description: \"" + aDescription + "\"";
             //xSingleString += " Number: \"" + CreateNumber(aNumber, aBits) + "\"";
         }
 
-        public unsafe void WriteNumber(uint aNumber, byte aBits)
-        {
+        public unsafe void WriteNumber(uint aNumber, byte aBits) {
             WriteNumber(aNumber, aBits, true);
         }
 
-        public unsafe void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix)
-        {
+        public unsafe void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix) {
             Send(CreateNumber(aNumber, aBits, aWritePrefix));
         }
 
-        public unsafe string CreateNumber(uint aNumber, byte aBits)
-        {
+        public unsafe string CreateNumber(uint aNumber, byte aBits) {
             return CreateNumber(aNumber, aBits, true);
         }
 
-        public unsafe string CreateNumber(uint aNumber, byte aBits, bool aWritePrefix)
-        {
+        public unsafe string CreateNumber(uint aNumber, byte aBits, bool aWritePrefix) {
             return "Cosmos.Debug.Debugger.CreateNumber(aNumber, aBits, aWritePrefix) not implemented";
             //string xNumberString = null;
             //uint xValue = aNumber;
@@ -342,13 +294,11 @@ namespace Cosmos.Debug.Kernel
             //return xNumberString;
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue)
-        {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue) {
             WriteBinary(aModule, aMessage, aValue, 0, aValue.Length);
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength)
-        {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength) {
             //string xSingleString;
             //xSingleString = "Binary Module = \"" + aModule + "\"";
             //xSingleString += " Message = " + aMessage + "\"";
@@ -361,8 +311,7 @@ namespace Cosmos.Debug.Kernel
             //Send(xSingleString);
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength)
-        {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength) {
             //string xSingleString;
             //xSingleString = "Binary Module = \"" + aModule + "\"";
             //xSingleString += " Message = " + aMessage + "\"";
@@ -375,13 +324,11 @@ namespace Cosmos.Debug.Kernel
             //Send(xSingleString);
         }
 
-        public unsafe void ViewMemory()
-        {
+        public unsafe void ViewMemory() {
             ViewMemory(0);
         }
 
-        public unsafe void ViewMemory(int addr)
-        {
+        public unsafe void ViewMemory(int addr) {
             //while (true) {
             //    Console.Clear();
             //    Console.WriteLine();
@@ -420,20 +367,17 @@ namespace Cosmos.Debug.Kernel
             //}
         }
 
-        public void SendCoreDump()
-        {
+        public void SendCoreDump() {
             DoSendCoreDump();
         }
 
-        private int FromHex(string p)
-        {
+        private int FromHex(string p) {
             p = p.ToLower();
             string hex = "0123456789abcdef";
 
             int ret = 0;
 
-            for (int i = 0; i < p.Length; i++)
-            {
+            for (int i = 0; i < p.Length; i++) {
                 ret = ret * 16 + hex.IndexOf(p[i]);
             }
             return ret;

@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+  <Commands package="guidVSPackage">
+    <Menus>
+      <Menu guid="guidCosmosMenu" id="TopLevelMenu" priority="0x700" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings>
+          <ButtonText>Cosmos</ButtonText>
+          <CommandName>Cosmos</CommandName>
+        </Strings>
+      </Menu>
+      <Menu guid="guidIDEToolbar" id="Toolbar" type="Toolbar">
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos</ButtonText>
+          <CommandName>Cosmos Debugger Toolbar</CommandName>
+        </Strings>
+      </Menu>
+      <Menu guid="guidAsmToolbar" id="AsmToolbar" type="ToolWindowToolbar">
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos Assembly</ButtonText>
+          <CommandName>Cosmos Assembly Toolbar</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
+    <Groups>
+      <Group guid="guidCosmosMenu" id="TopLevelMenuGroup" priority="0x0600">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenu" />
+      </Group>
+      <Group guid="guidIDEToolbar" id="ToolbarGroup" priority="0x0000">
+        <Parent guid="guidIDEToolbar" id="Toolbar" />
+      </Group>
+      <Group guid="guidAsmToolbar" id="AsmToolbarGroup" priority="0x0000">
+        <Parent guid="guidAsmToolbar" id="AsmToolbar" />
+      </Group>
+    </Groups>
+    <Buttons>
+      <Button guid="guidCosmosMenuCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup"/>
+        <Icon guid="guidImages" id="bmpAssemblyIcon" />
+        <Strings>
+          <CommandName>cmdidCosmosAssembly</CommandName>
+          <ButtonText>Assembly Window</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmosMenuCmdSet" id="cmdidCosmosRegisters" priority="0x0101" type="Button">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup"/>
+        <Icon guid="guidImages" id="bmpRegisterIcon" />
+        <Strings>
+          <CommandName>cmdidCosmosRegisters</CommandName>
+          <ButtonText>Registers Window</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmosMenuCmdSet" id="cmdidCosmosStack" priority="0x0102" type="Button">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup"/>
+        <Icon guid="guidImages" id="bmpStackIcon" />
+        <Strings>
+          <CommandName>cmdidCosmosStack</CommandName>
+          <ButtonText>Stack Window</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmosMenuCmdSet" id="cmdidCosmosInternal" priority="0x0103" type="Button">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup"/>
+        <Strings>
+          <CommandName>cmdidCosmosInternal</CommandName>
+          <ButtonText>Internal VSIP Debug Window</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmosMenuCmdSet" id="cmdidCosmosShowAll" priority="0x0104" type="Button">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup"/>
+        <Icon guid="guidImages" id="bmpAllIcon" />
+        <Strings>
+          <CommandName>cmdidCosmosShowAll</CommandName>
+          <ButtonText>Show All Windows</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="Resources\Sprites.png" usedList="bmpCosmosIcon, bmpAssemblyIcon, bmpRegisterIcon, bmpStackIcon, bmpAllIcon" />
+    </Bitmaps>
+  </Commands>
+  <Symbols>
+    <GuidSymbol name="guidVSPackage" value="{2084F89A-967C-4F7D-A3F8-217C3FA8EE66}" />
+
+    <GuidSymbol name="guidCosmosMenu" value="{5C177460-F057-4AC1-8B7F-D1685C915E3D}">
+      <IDSymbol name="TopLevelMenu" value="0x1020" />
+      <IDSymbol name="TopLevelMenuGroup" value="0x1021" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidAsmToolbar" value="{1A98FB64-8FC8-4D24-95E4-E507700BA23C}">
+      <IDSymbol name="AsmToolbar" value="0x1001" />
+      <IDSymbol name="AsmToolbarGroup" value="0x1002" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidIDEToolbar" value="{425C500B-AB24-44B0-812A-74ECA127E6A1}">
+      <IDSymbol name="Toolbar" value="0x1000" />
+      <IDSymbol name="ToolbarGroup" value="0x1050" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidCosmosMenuCmdSet" value="{3247C3E4-34B8-4DB0-8748-AD62495A5222}">
+      <IDSymbol name="cmdidCosmosAssembly" value="0x0100" />
+      <IDSymbol name="cmdidCosmosRegisters" value="0x0101" />
+      <IDSymbol name="cmdidCosmosStack" value="0x0102" />
+      <IDSymbol name="cmdidCosmosInternal" value="0x0103" />
+      <IDSymbol name="cmdidCosmosShowAll" value="0x0104" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidIDEToolbarCmdSet" value="{3D4B3F35-36E7-4CEA-8ACC-D9601E45C0B5}">
+    </GuidSymbol>
+
+    <GuidSymbol name="guidAsmToolbarCmdSet" value="{A875EA24-689A-4EAB-B9C2-DAC3EACB9501}">
+      <IDSymbol name="cmdidAsmFilter" value="0x0105" />
+      <IDSymbol name="cmdidAsmStep" value="0x0106" />
+      <IDSymbol name="cmdidAsmCopy" value="0x0107" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{AA9D88D9-ACD2-4F2C-AB40-92887BDCE774}">
+      <IDSymbol name="bmpCosmosIcon" value="1" />
+      <IDSymbol name="bmpAssemblyIcon" value="2" />
+      <IDSymbol name="bmpRegisterIcon" value="3" />
+      <IDSymbol name="bmpStackIcon" value="4" />
+      <IDSymbol name="bmpAllIcon" value="5" />
+    </GuidSymbol>
+  </Symbols>
+  <KeyBindings>
+    <KeyBinding guid="guidCosmosMenuCmdSet" id="cmdidCosmosShowAll" mod1="CTRL ALT SHIFT" key1="G" key2="A" editor="guidVSStd97" />
+  </KeyBindings>
+</CommandTable>

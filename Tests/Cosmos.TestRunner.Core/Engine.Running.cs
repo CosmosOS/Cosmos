@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Text;
 using System.Threading;
-using Cosmos.Debug.Common;
-using Cosmos.Debug.VSDebugEngine.Host;
+
+using Cosmos.Debug.DebugConnectors;
+using Cosmos.Debug.Hosts;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -43,7 +43,7 @@ namespace Cosmos.TestRunner.Core
             debugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
             debugConnector.CmdKernelPanic = n =>
                                             {
-                                                OutputHandler.LogMessage("Kernel panic! Nummer = " + n);
+                                                OutputHandler.LogMessage("Kernel panic! Number = " + n);
                                                 // todo: add core dump here, call stack.
                                             };
             debugConnector.CmdTrace = t => { };
@@ -72,7 +72,6 @@ namespace Cosmos.TestRunner.Core
             debugConnector.CmdCoreDump = b =>
             {
                 string xCallStack = "";
-                string xRegisters = "";
                 int i = 0;
 
                 OutputHandler.LogMessage("Core dump:");
@@ -146,7 +145,7 @@ namespace Cosmos.TestRunner.Core
             }
         }
 
-        private void HandleRunning(DebugConnector debugConnector, Base host)
+        private void HandleRunning(DebugConnector debugConnector, Host host)
         {
             if (debugConnector == null)
             {
@@ -177,14 +176,10 @@ namespace Cosmos.TestRunner.Core
                     }
                 }
 
-                if (mKernelResultSet)
+                if (!mKernelResultSet)
                 {
-                    //OutputHandler.SetKernelTestResult(true, null);
+                    OutputHandler.SetKernelTestResult(true, null);
                     OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
-                }
-                else
-                {
-                    KernelTestFailed();
                 }
             }
             finally

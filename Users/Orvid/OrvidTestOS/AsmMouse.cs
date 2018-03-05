@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.IL2CPU.Plugs;
+using IL2CPU.API;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 using Cosmos.Core;

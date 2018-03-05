@@ -1,35 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Build.Installer {
-  public class Log {
-    public void WriteLine(string aText) {
-      if (LogLine != null) {
-        LogLine(aText);
-      }
+﻿namespace Cosmos.Build.Installer {
+  static public class Log {
+    static public void WriteLine(string aText) {
+      LogLine?.Invoke(aText);
     }
 
-    public void NewSection(string aText) {
-      if (LogSection != null) {
-        LogSection(aText);
-      }
+    static public void NewSection(string aText) {
+      LogSection?.Invoke(aText);
     }
 
-    public void SetError() {
-      if (LogError != null) {
-        LogError();
-      }
+    static public void SetError() {
+      LogError?.Invoke();
     }
 
     public delegate void LogErrorHandler();
-    public event LogErrorHandler LogError;
+    static public event LogErrorHandler LogError;
 
     public delegate void LogLineHandler(string aLine);
-    public event LogLineHandler LogLine;
+    static public event LogLineHandler LogLine;
 
     public delegate void LogSectionHandler(string aLine);
-    public event LogSectionHandler LogSection;
+    static public event LogSectionHandler LogSection;
   }
 }

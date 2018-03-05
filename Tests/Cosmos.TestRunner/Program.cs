@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Cosmos.TestRunner.Core;
-using Microsoft.Win32;
 
 namespace Cosmos.TestRunner.Console
 {
+    using Console = global::System.Console;
+
     class Program
     {
         [STAThread]
         static void Main(string[] args)
         {
-            var xEngine = new Engine();
-
-            DefaultEngineConfiguration.Apply(xEngine);
+            var xEngine = new Engine(new DefaultEngineConfiguration());
 
             var xOutputXml = new OutputHandlerXml();
             xEngine.OutputHandler = new MultiplexingOutputHandler(
@@ -26,19 +19,31 @@ namespace Cosmos.TestRunner.Console
 
             xEngine.Execute();
 
-            global::System.Console.WriteLine("Do you want to save test run details?");
-            global::System.Console.Write("Type yes, or nothing to just exit: ");
-            var xResult = global::System.Console.ReadLine();
+            Console.WriteLine("Do you want to save test run details?");
+            Console.Write("Type yes, or nothing to just exit: ");
+            var xResult = Console.ReadLine();
             if (xResult != null && xResult.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase))
             {
-                var xSaveDialog = new SaveFileDialog();
-                xSaveDialog.Filter = "XML documents|*.xml";
-                if (xSaveDialog.ShowDialog() != DialogResult.OK)
+                Console.Write("Path: ");
+                xResult = Console.ReadLine();
+
+                try
                 {
-                    return;
+                    xOutputXml.SaveToFile(xResult);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception: " + ex.ToString());
                 }
 
-                xOutputXml.SaveToFile(xSaveDialog.FileName);
+                //var xSaveDialog = new SaveFileDialog();
+                //xSaveDialog.Filter = "XML documents|*.xml";
+                //if (xSaveDialog.ShowDialog() != DialogResult.OK)
+                //{
+                //    return;
+                //}
+
+                //xOutputXml.SaveToFile(xSaveDialog.FileName);
             }
         }
     }
