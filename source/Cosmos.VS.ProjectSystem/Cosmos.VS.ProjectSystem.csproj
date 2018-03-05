@@ -5,6 +5,7 @@
 
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
+        <RootNamespace>Cosmos.VS.ProjectSystem</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup>
