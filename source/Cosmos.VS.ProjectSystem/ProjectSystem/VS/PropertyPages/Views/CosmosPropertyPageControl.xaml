@@ -1,0 +1,48 @@
+﻿<propertypages:WpfPropertyPageUI x:Class="Cosmos.VS.ProjectSystem.VS.PropertyPages.Views.CosmosPropertyPageControl"
+                                 x:ClassModifier="internal"
+                                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                                 xmlns:vm="clr-namespace:Cosmos.VS.ProjectSystem.VS.PropertyPages.ViewModels"
+                                 xmlns:propertypages="clr-namespace:VSPropertyPages;assembly=VSPropertyPages"
+                                 mc:Ignorable="d"
+                                 d:DataContext="{d:DesignInstance Type=vm:CosmosPropertyPageViewModel}"
+                                 Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+    <Grid Margin="8">
+
+        <GroupBox Padding="8"
+                  Header="IL2CPU">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
+                            Margin="0,0,16,0">
+                    <CheckBox Content="Enable debug"
+                              IsChecked="{Binding DebugEnabled}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <CheckBox Margin="0,0,0,16"
+                              Content="Enable stack corruption detection"
+                              IsChecked="{Binding DebugEnabled}" />
+                    <TextBlock Margin="0,0,0,8"
+                               Text="Stack corruption detection level:" />
+                    <ComboBox SelectedValuePath="Key"
+                              DisplayMemberPath="Value"
+                              ItemsSource="{Binding StackCorruptionDetectionLevelItems}"
+                              SelectedValue="{Binding StackCorruptionDetectionLevel}"/>
+                </StackPanel>
+
+            </Grid>
+
+        </GroupBox>
+
+    </Grid>
+
+</propertypages:WpfPropertyPageUI>

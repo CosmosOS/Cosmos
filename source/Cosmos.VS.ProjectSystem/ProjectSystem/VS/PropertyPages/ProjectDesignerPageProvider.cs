@@ -15,10 +15,13 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
     {
         private static readonly IPageMetadata OldCosmosPage =
             new PropertyPageMetadata("Cosmos", OldCosmosPropertyPage.PageGuid, -100, false);
+        private static readonly IPageMetadata CosmosPage =
+            new PropertyPageMetadata("Cosmos", CosmosPropertyPage.PageGuid, -50, true);
+
         public Task<IReadOnlyCollection<IPageMetadata>> GetPagesAsync()
         {
             return Task.FromResult<IReadOnlyCollection<IPageMetadata>>(
-                ImmutableArray.Create(OldCosmosPage));
+                ImmutableArray.Create(OldCosmosPage, CosmosPage));
         }
     }
 }
