@@ -115,7 +115,7 @@ namespace Cosmos.Core_Plugs.System
             {
                 if (startIndex % 2 == 0)
                 {
-                    // data is aligned 
+                    // data is aligned
                     return *((short*)pbyte);
                 }
                 else if (BitConverter.IsLittleEndian)
@@ -143,7 +143,7 @@ namespace Cosmos.Core_Plugs.System
             {
                 if (startIndex % 4 == 0)
                 {
-                    // data is aligned 
+                    // data is aligned
                     return *((int*)pbyte);
                 }
                 else if (BitConverter.IsLittleEndian)
@@ -171,7 +171,7 @@ namespace Cosmos.Core_Plugs.System
             {
                 if (startIndex % 8 == 0)
                 {
-                    // data is aligned 
+                    // data is aligned
                     return *((long*)pbyte);
                 }
                 else if (BitConverter.IsLittleEndian)
@@ -187,6 +187,20 @@ namespace Cosmos.Core_Plugs.System
                     return (uint)i2 | ((long)i1 << 32);
                 }
             }
+        }
+
+        public static unsafe double ToDouble(byte[] value, int startIndex)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+            if ((uint)startIndex > value.Length)
+                throw new ArgumentOutOfRangeException("startIndex");
+            if (startIndex > value.Length - 8)
+                throw new ArgumentException("Array with offset is too short");
+            Contract.EndContractBlock();
+
+            long val = ToInt64(value, startIndex);
+            return *(double*)&val;
         }
 
         private static void ThrowValueArgumentNull()

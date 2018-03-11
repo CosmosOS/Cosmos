@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using System.Drawing;
 using System.Collections.Generic;
@@ -93,6 +93,8 @@ namespace Cosmos.System.Graphics
         public abstract void DrawPoint(Pen pen, int x, int y);
 
         public abstract void DrawPoint(Pen pen, float x, float y);
+        
+        public abstract Color GetPointColor(int x, int y);
 
         public virtual void DrawArray(Color[] colors, Point point, int width, int height)
         {
@@ -247,13 +249,13 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        // 
         public virtual void DrawCircle(Pen pen, Point point, int radius)
         {
 
             DrawCircle(pen, point.X, point.Y, radius);
 
         }
-
         //http://members.chello.at/~easyfilter/bresenham.html
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {

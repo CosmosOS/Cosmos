@@ -12,6 +12,9 @@ namespace Cosmos.Build.Tasks
 
         protected override string ToolName => "TheRingMaster.exe";
 
+        protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
+        protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
+
         protected override bool ValidateParameters()
         {
             if (!File.Exists(KernelAssemblyPath))

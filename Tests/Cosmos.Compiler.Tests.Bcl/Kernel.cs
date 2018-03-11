@@ -45,6 +45,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 SingleTest.Execute();
                 DoubleTest.Execute();
                 MathTest.Execute();
+                ConvertTests.Execute();
 
                 //mDebugger.Send("Thread test start of 500 ms");
                 //ThreadTest.Execute();
