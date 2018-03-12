@@ -12,7 +12,9 @@
 
     <Grid Margin="8">
 
-        <GroupBox Padding="12"
+        <GroupBox HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  Padding="12"
                   Header="IL2CPU">
 
             <Grid>
