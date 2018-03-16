@@ -237,7 +237,7 @@ namespace Cosmos.VS.ProjectSystem
             foreach(var targetFrameworkProperty in properties.Where(
                 p => XNameEqualsString(p.Name, TargetFramework)))
             {
-                targetFrameworkProperty.Value = "netstandard2.0";
+                targetFrameworkProperty.Value = "netcoreapp2.0";
             }
 
             properties.Where(p => XNameEqualsString(p.Name, ProjectGuid)).Remove();
