@@ -22,98 +22,86 @@ namespace Cosmos.System.Graphics
 
         public void Save(Stream stream, ImageFormat imageFormat)
         {
+            //What should we do when a stream has already been used ie. the position is not 0?
             Byte[] file = new Byte[54 /*header*/ + width * height * (uint)depth / 8 /*assume that it is full bytes */];
+            //Writes all bytes at the end into the stream, rather than a few every time
+
             int position = 0;
             //Set signature
             byte[] data = BitConverter.GetBytes(0x4D42);
             Array.Copy(data, 0, file, position, 2);
             position += 2;
-            //stream.Write(data, 0, 2);
 
             //Write apporiximate file size
             data = BitConverter.GetBytes(54 /*header*/ + width * height * (uint)depth / 8 /*assume that it is full bytes */);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, data.Length);
 
             //Leave bytes 6 -> 10 empty
             data = new Byte[] { 0, 0, 0, 0 };
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Offset to start of iamge data
             uint offset = 54;
             data = BitConverter.GetBytes(offset);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Write size of bitmapinfoheader
             data = BitConverter.GetBytes(40);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Width in pixels
             data = BitConverter.GetBytes(width);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Height in pixels
             data = BitConverter.GetBytes(height);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Number of palnes(1)
             data = BitConverter.GetBytes(1);
             Array.Copy(data, 0, file, position, 2);
             position += 2;
-            //stream.Write(data, 0, 2);
 
             //Bits per pixel
             data = BitConverter.GetBytes((int)depth);
             Array.Copy(data, 0, file, position, 2);
             position += 2;
-            //stream.Write(data, 0, 2);
 
             //Compression type
             data = BitConverter.GetBytes(0);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Size of image data in bytes
             data = BitConverter.GetBytes(width * height * (uint)depth / 8);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Horizontal resolution in meters (is not accurate)
             data = BitConverter.GetBytes(width / 40);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Vertical resolution in meters (is not accurate)
             data = BitConverter.GetBytes(height / 40);
             Array.Copy(data, 0, file, position, 0);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Number of colors in image /zero
             data = BitConverter.GetBytes(0);
             Array.Copy(data, 0, file, position, 0);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //number of important colors in iamge / zero
             data = BitConverter.GetBytes(0);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
-            //stream.Write(data, 0, 4);
 
             //Finished header
 
@@ -126,10 +114,7 @@ namespace Cosmos.System.Graphics
                 for (int y = 0; y < height; y++)
                 {
                     data = BitConverter.GetBytes(rawData[x + (height - (y + 1)) * width]);
-                    for (int i = 0; i < data.Length; i++)
-                    {
-                        imageData[imageDataPoint + i] = data[i];
-                    }
+                    Array.Copy(data, 0, imageData, imageDataPoint, data.Length);
                     imageDataPoint += data.Length;
                 }
             }
@@ -218,12 +203,10 @@ namespace Cosmos.System.Graphics
                 int position = 0;
                 Byte[] pixelData = new byte[pureImageSize];
                 fs.Read(pixelData, 0, pureImageSize);
-                Byte[] _pixel = new byte[pixelSize / 8]; //Pixel size is in byte
-                Byte[] pixel = new byte[4];
+                Byte[] pixel = new byte[pixelSize / 8]; //Pixel size is in byte
 
                 for (int x = 0; x < imageWidth; x++)
                 {
-                    //Stops at row 25
                     for (int y = 0; y < imageHeight; y++)
                     {
                         pixel[0] = pixelData[position++];
