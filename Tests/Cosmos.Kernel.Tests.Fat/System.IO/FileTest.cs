@@ -254,17 +254,21 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             string read = File.ReadAllText("0:\\long.txt");
             Assert.IsTrue(read == text, "Reading files larger than one cluster works using read all text");
             byte[] textBytes = Encoding.ASCII.GetBytes(text);
+            mDebugger.Send("Reading all bytes");
             byte[] readBytes = File.ReadAllBytes("0:\\long.txt");
+            mDebugger.Send("Has read all bytes!");
             bool same = true;
+            int line = 0;
             for (int i = 0; i < textBytes.Length; i++)
             {
                 if (textBytes[i] != readBytes[i])
                 {
                     same = false;
+                    line = i;
                     break;
                 }
             }
-            Assert.IsTrue(same, "Reading large files works using read all bytes does not work");
+            Assert.IsTrue(same, "Reading large files works using read all bytes does not work. Error at position: " + line);
 
             #endregion Test Writing Large Files
         }
