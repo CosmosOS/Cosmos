@@ -81,8 +81,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\XSharp\source\VSPropertyPages\VSPropertyPages.csproj" />
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+        <ProjectReference Include="$(XSharpRepoRoot)source\VSPropertyPages\VSPropertyPages.csproj" />
     </ItemGroup>
 
     <Target Name="IncludeMissingAssemblies" AfterTargets="GetVsixSourceItems" BeforeTargets="RemoveVSSDKAssemblies">
