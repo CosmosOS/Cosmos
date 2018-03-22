@@ -7,15 +7,15 @@ namespace Cosmos.System.Graphics
     public abstract class Image
     {
         public int[] rawData;
-        public readonly uint width;
-        public readonly uint height;
-        public readonly ColorDepth depth;
+        public uint Width { get; protected set; }
+        public uint Height { get; protected set; }
+        public ColorDepth Depth { get; protected set; }
 
-        protected Image(uint Width, uint Height, ColorDepth Color)
+        protected Image(uint width, uint height, ColorDepth color)
         {
-            width = Width;
-            height = Height;
-            depth = Color;
+            Width = width;
+            Height = height;
+            Depth = color;
         }
     }
 

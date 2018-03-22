@@ -258,26 +258,26 @@ namespace Cosmos.System.FileSystem.FAT
                 long xWriteSize;
                 long xClusterIdx = mPosition / xClusterSize;
                 long xPosInCluster = mPosition % xClusterSize;
-
+                Global.mFileSystemDebugger.SendInternal("Cluster id" + xClusterIdx + " Pos: " + mPosition + " Pos in Cluster: " + xPosInCluster);
                 if (xPosInCluster + xCount > xClusterSize)
                 {
-                    xWriteSize = xClusterSize - xPosInCluster - 1;
+                    xWriteSize = xClusterSize - xPosInCluster;
                 }
                 else
                 {
                     xWriteSize = xCount;
                 }
 
-                byte[] xCluster;
-                mFS.Read(mFatTable[xClusterIdx], out xCluster);
+                mFS.Read(mFatTable[xClusterIdx], out byte[] xCluster);
                 Array.Copy(aBuffer, aOffset, xCluster, (int)xPosInCluster, (int)xWriteSize);
                 mFS.Write(mFatTable[xClusterIdx], xCluster);
 
+                Global.mFileSystemDebugger.SendInternal("xOffset: " + xOffset + " xCount: " + xCluster + " aOffset: " + aOffset + " mPosition: " + mPosition + " Write Size:" + xWriteSize);
                 xOffset += xWriteSize;
                 xCount -= xWriteSize;
+                aOffset += (int)xWriteSize;
+                mPosition += xWriteSize;
             }
-
-            mPosition += xOffset;
         }
     }
 }

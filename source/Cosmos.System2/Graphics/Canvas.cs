@@ -401,11 +401,11 @@ namespace Cosmos.System.Graphics
         //We are using a short term solution for bitmap
         public void DrawImage(Image image, int x, int y)
         {
-            for (int _x = 0; _x < image.width; _x++)
+            for (int _x = 0; _x < image.Width; _x++)
             {
-                for (int _y = 0; _y < image.height; _y++)
+                for (int _y = 0; _y < image.Height; _y++)
                 {
-                    DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.width])), x + _x, y + _y);
+                    DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])), x + _x, y + _y);
                 }
             }
         }

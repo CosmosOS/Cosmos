@@ -257,6 +257,16 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             mDebugger.Send("Reading all bytes");
             byte[] readBytes = File.ReadAllBytes("0:\\long.txt");
             mDebugger.Send("Has read all bytes!");
+            Assert.IsTrue(ByteArrayAreEquals(readBytes, textBytes), "Reading large files works using read all bytes does not work.");
+
+            using (FileStream fs = File.OpenWrite("0:\\long2.txt"))
+            {
+                fs.Write(textBytes, 0, textBytes.Length);
+            }
+            using (FileStream fs = File.OpenRead("0:\\long2.txt"))
+            {
+                fs.Read(readBytes, 0, (int)fs.Length);
+            }
             bool same = true;
             int line = 0;
             for (int i = 0; i < textBytes.Length; i++)
@@ -268,7 +278,8 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
                     break;
                 }
             }
-            Assert.IsTrue(same, "Reading large files works using read all bytes does not work. Error at position: " + line);
+            mDebugger.Send("Length:" + textBytes.Length + " vs " + readBytes.Length);
+            Assert.IsTrue(ByteArrayAreEquals(readBytes, textBytes), "Reading and writing large files works using filestreams. For: " + same + " Line: " + line);
 
             #endregion Test Writing Large Files
         }
