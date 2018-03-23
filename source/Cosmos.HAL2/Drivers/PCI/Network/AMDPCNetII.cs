@@ -10,7 +10,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 {
     public class AMDPCNetII : NetworkDevice
     {
-        protected PCIDeviceNormal pciCard;
+        protected PCIDevice pciCard;
         protected AMDPCNetIIIOGroup io;
         protected MACAddress mac;
         protected bool mInitDone;
@@ -24,7 +24,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         protected Queue<byte[]> mTransmitBuffer;
         private int mNextTXDesc;
 
-        public AMDPCNetII(PCIDeviceNormal device)
+        public AMDPCNetII(PCIDevice device)
             : base()
         {
             if (device == null)
@@ -138,7 +138,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
           //  PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
           //  if (device != null)
           // {
-          //      AMDPCNetII nic = new AMDPCNetII((PCIDeviceNormal) device);
+          //      AMDPCNetII nic = new AMDPCNetII((PCIDevice) device);
           //
           //      Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
           //                        device.function);

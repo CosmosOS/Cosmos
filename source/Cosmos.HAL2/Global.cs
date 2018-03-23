@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
@@ -15,13 +16,16 @@ namespace Cosmos.HAL
         public static TextScreenBase TextScreen = new TextScreen();
         public static PCI Pci;
 
+        public static List<string> logs = new List<string>();
+
         static public void Init(TextScreenBase textScreen)
         {
             if (textScreen != null)
             {
                 TextScreen = textScreen;
             }
-
+            Console.Clear();
+            Console.WriteLine("Aura Operating System v0.4.3 - Created by Valentin Charbonnier and Alexy Da Cruz");
             mDebugger.Send("Before Core.Global.Init");
             Core.Global.Init();
 
@@ -38,13 +42,17 @@ namespace Cosmos.HAL
             Console.WriteLine("Finding PCI Devices");
             mDebugger.Send("PCI Devices");
             PCI.Setup();
+            logs.Add("[ OK ] PCI initialized");
 
             Console.WriteLine("Starting ACPI");
             mDebugger.Send("ACPI Init");
             ACPI.Start();
+            logs.Add("[ OK ] ACPI initialized");
           
             IDE.InitDriver();
+            logs.Add("[ OK ] IDE initialized");
             AHCI.InitDriver();
+            logs.Add("[ OK ] AHCI initialized");
             //EHCI.InitDriver();
 
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
