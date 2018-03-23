@@ -73,7 +73,7 @@ namespace Cosmos.HAL
 
     public class PCI
     {
-        private static List<PCIDevice> Devices;
+        public static List<PCIDevice> Devices;
 
         public static uint Count
         {
