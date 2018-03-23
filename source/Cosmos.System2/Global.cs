@@ -49,6 +49,7 @@ namespace Cosmos.System
             if (textScreen != null)
             {
                 Console = new Console(textScreen);
+                HAL.Global.logs.Add("[ OK ] Console Created");
             }
 
             mDebugger.Send("Creating Keyboard");

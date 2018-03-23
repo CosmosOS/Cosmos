@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
@@ -36,6 +37,8 @@ namespace Cosmos.System
             KeyboardManager.SetKeyLayout(ScanMap);
         }
 
+        
+
         /// <summary>
         /// Start the system up using the properties for configuration.
         /// </summary>
@@ -43,9 +46,12 @@ namespace Cosmos.System
         {
             try
             {
+                HAL.Global.logs.Add("Aura Operating System v0.4.3 - Created by Valentin Charbonnier and Alexy Da Cruz");
+                HAL.Global.logs.Add("[Info]  Starting Cosmos kernel..");
                 Global.mDebugger.Send("Starting kernel");
                 if (mStarted)
                 {
+                    HAL.Global.logs.Add("[Error] Kernel Already Started");
                     Global.mDebugger.Send("ERROR: Kernel Already Started");
                     throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
                 }
@@ -53,17 +59,21 @@ namespace Cosmos.System
 
                 if (string.Empty == null)
                 {
+                    HAL.Global.logs.Add("[Error] Compiler didn't initialize System.String.Empty!");
                     throw new Exception("Compiler didn't initialize System.String.Empty!");
                 }
 
                 Global.mDebugger.Send("HW Bootstrap Init");
                 HAL.Bootstrap.Init();
+                HAL.Global.logs.Add("[ OK ] HW Bootstrap Initialized");
 
                 Global.mDebugger.Send("Global Init");
                 Global.Init(GetTextScreen());
+                HAL.Global.logs.Add("[ OK ] Global Initialized");
 
                 //Start with a PS2Keyboard
                 KeyboardManager.AddKeyboard(new PS2Keyboard());
+                HAL.Global.logs.Add("[ OK ] PS2 Keyboard added");
 
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen)
@@ -74,9 +84,11 @@ namespace Cosmos.System
 
                 Global.mDebugger.Send("Before Run");
                 BeforeRun();
+                HAL.Global.logs.Add("[ OK ] Before Run");
 
                 // now enable interrupts:
                 HAL.Global.EnableInterrupts();
+                HAL.Global.logs.Add("[ OK ] Interrupts Enabled");
 
                 Global.mDebugger.Send("Run");
                 if (mStopped)
