@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Win32;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -22,9 +23,11 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(Cosmos.Compiler.Tests.Exceptions.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.MethodTests.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel);
+            yield return typeof(Cosmos.Kernel.Tests.DeviceInformation.Kernel);
             yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
             yield return typeof(Cosmos.Kernel.Tests.Fat2.Kernel);
             //yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
+            yield return typeof(Cosmos.Kernel.Tests.SMBIOS.Kernel);
             yield return typeof(SimpleStructsAndArraysTest.Kernel);
 
             //yield return typeof(FrotzKernel.Kernel);
@@ -34,7 +37,7 @@ namespace Cosmos.TestRunner.Core
             /* Please see the notes on the kernel itself before enabling it */
             //yield return typeof(GraphicTest.Kernel);
             /* Please see the notes on the kernel itself before enabling it */
-           //yield return typeof(ConsoleTest.Kernel);
+            //yield return typeof(ConsoleTest.Kernel);
         }
     }
 }
