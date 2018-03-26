@@ -10,6 +10,25 @@ namespace Cosmos.System.Graphics
             rawData = new int[Width * Height];
         }
 
+        /// <summary>
+        /// Create a bitmap from a byte array representing the pixels
+        /// </summary>
+        /// <param name="Width">Width of the bitmap</param>
+        /// <param name="Height">Height of the bitmap</param>
+        /// <param name="pixelData">Byte array which includes the values for each pixel</param>
+        /// <param name="colorDepth">Format of pixel data</param>
+        public Bitmap(uint Width, uint Height, byte[] pixelData, ColorDepth colorDepth) : base(Width, Height, colorDepth)
+        {
+            rawData = new int[Width * Height];
+            if (colorDepth != ColorDepth.ColorDepth32)
+                throw new NotImplementedException("Only a color depth of 32 is supported!");
+
+            for (int i = 0; i < rawData.Length; i++)
+            {
+                rawData[i] = BitConverter.ToInt32(new byte[] { pixelData[(i * 4)], pixelData[(i * 4) + 1], pixelData[(i * 4) + 2], pixelData[(i * 4) + 3] }, 0);
+            }
+        }
+
         public Bitmap(string path) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
             using (var fs = new FileStream(path, FileMode.Open))
@@ -18,6 +37,11 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Creates a bitmaps from a byte array in the format of a bitmap file.
+        /// WARNING: Unitl IL2CPU problems have been fixed, Memory Streams do not work
+        /// </summary>
+        /// <param name="imageData"></param>
         public Bitmap(byte[] imageData) : base(0, 0, ColorDepth.ColorDepth32)//Call the image constructor with wrong values
         {
             using (var ms = new MemoryStream(imageData))
@@ -28,106 +52,107 @@ namespace Cosmos.System.Graphics
 
         private void CreateBitmap(Stream stream)
         {
-            using (stream)
+            #region BMP Header
+
+            Byte[] _int = new byte[4];
+            Byte[] _short = new byte[2];
+            //Assume that we are using the BMP (Windows) header format
+            //I am using http://www.fastgraph.com/help/bmp_header_format.html
+            //and https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png?1519566101894as as reference
+            stream.Position = 10;
+            //read header - bytes 10 -> 14 is the offset of the bitmap image data
+            stream.Read(_int, 0, 4);
+            uint pixelTableOffset = (uint)BitConverter.ToInt32(_int, 0);
+
+            //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
+            stream.Read(_int, 0, 4);
+            uint infoHeaderSize = (uint)BitConverter.ToInt32(_int, 0);
+            if (infoHeaderSize != 40)
             {
-                #region BMP Header
-
-                Byte[] _int = new byte[4];
-                Byte[] _short = new byte[2];
-                //Assume that we are using the BMP (Windows) header format
-                //I am using http://www.fastgraph.com/help/bmp_header_format.html
-                //and https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png?1519566101894as as reference
-                stream.Position = 10;
-                //read header - bytes 10 -> 14 is the offset of the bitmap image data
-                stream.Read(_int, 0, 4);
-                uint pixelTableOffset = (uint)BitConverter.ToInt32(_int, 0);
-
-                //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
-                stream.Read(_int, 0, 4);
-                uint infoHeaderSize = (uint)BitConverter.ToInt32(_int, 0);
-                if (infoHeaderSize != 40)
-                {
-                    throw new Exception("Info header size has the wrong value!");
-                }
-                //now reading width of image in pixels - bytes 18 -> 22
-                stream.Read(_int, 0, 4);
-                uint imageWidth = (uint)BitConverter.ToInt32(_int, 0);
-
-                //now reading height of image in pixels - byte 22 -> 26
-                stream.Read(_int, 0, 4);
-                uint imageHeight = (uint)BitConverter.ToInt32(_int, 0);
-
-                //now reading number of planes should be 1 - byte 26 -> 28
-                stream.Read(_short, 0, 2);
-                ushort planes = (ushort)BitConverter.ToInt16(_short, 0);
-                if (planes != 1)
-                    throw new Exception("Number of planes is not 1! Can not read file!");
-                //now reading size of bits per pixel (1, 4, 8, 24, 32) - bytes 28 - 30
-                stream.Read(_short, 0, 2);
-                ushort pixelSize = (ushort)BitConverter.ToInt16(_short, 0);
-                //TODO: Be able to handle other pixel sizes
-                if (pixelSize != 32)
-                {
-                    throw new NotImplementedException("Can only handle 32bit pictures!");
-                }
-                //now reading compression type - bytes 30 -> 34
-                stream.Read(_int, 0, 4);
-                uint compression = (uint)BitConverter.ToInt32(_int, 0);
-                //TODO: Be able to handle compressed files
-                if (compression != 0)
-                    throw new NotImplementedException("Can only handle uncompressed files!");
-                //now reading total image data size(including padding) - bytes 34 -> 38
-                stream.Read(_int, 0, 4);
-                uint totalImageSize = (uint)BitConverter.ToInt32(_int, 0);
-                //Somehow this is 0 for my test bmp
-
-                #endregion BMP Header
-
-                //Set the bitmap to have the correct values
-                Width = imageWidth;
-                Height = imageHeight;
-                Depth = (ColorDepth)pixelSize;
-
-                rawData = new int[Width * Height * pixelSize / 8];
-
-                #region Pixel Table
-
-                //Calculate padding
-                int paddingPerRow = 0;
-                int pureImageSize = (int)(imageWidth * imageHeight * pixelSize / 8);
-                if (totalImageSize != 0)
-                {
-                    int remainder = (int)totalImageSize - pureImageSize;
-                    if (remainder < 0) throw new Exception("Total Image Size is smaller than pure image size");
-                    paddingPerRow = remainder / (int)imageHeight;
-                }
-                else
-                {
-                    //total image size is 0 if it is not compressed
-                    paddingPerRow = 0;
-                }
-                //Read data
-                stream.Position = (int)pixelTableOffset;
-                int position = 0;
-                Byte[] pixelData = new byte[pureImageSize];
-                stream.Read(pixelData, 0, pureImageSize);
-                Byte[] pixel = new byte[pixelSize / 8]; //Pixel size is in byte
-
-                for (int x = 0; x < imageWidth; x++)
-                {
-                    for (int y = 0; y < imageHeight; y++)
-                    {
-                        pixel[0] = pixelData[position++];
-                        pixel[1] = pixelData[position++];
-                        pixel[2] = pixelData[position++];
-                        pixel[3] = pixelData[position++];
-                        rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0);
-                    }
-                    position += paddingPerRow;
-                }
-
-                #endregion Pixel Table
+                throw new Exception("Info header size has the wrong value!");
             }
+            //now reading width of image in pixels - bytes 18 -> 22
+            stream.Read(_int, 0, 4);
+            uint imageWidth = (uint)BitConverter.ToInt32(_int, 0);
+
+            //now reading height of image in pixels - byte 22 -> 26
+            stream.Read(_int, 0, 4);
+            uint imageHeight = (uint)BitConverter.ToInt32(_int, 0);
+
+            //now reading number of planes should be 1 - byte 26 -> 28
+            stream.Read(_short, 0, 2);
+            ushort planes = (ushort)BitConverter.ToInt16(_short, 0);
+            if (planes != 1)
+            {
+                throw new Exception("Number of planes is not 1! Can not read file!");
+            }
+            //now reading size of bits per pixel (1, 4, 8, 24, 32) - bytes 28 - 30
+            stream.Read(_short, 0, 2);
+            ushort pixelSize = (ushort)BitConverter.ToInt16(_short, 0);
+            //TODO: Be able to handle other pixel sizes
+            if (pixelSize != 32)
+            {
+                throw new NotImplementedException("Can only handle 32bit pictures!");
+            }
+            //now reading compression type - bytes 30 -> 34
+            stream.Read(_int, 0, 4);
+            uint compression = (uint)BitConverter.ToInt32(_int, 0);
+            //TODO: Be able to handle compressed files
+            if (compression != 0)
+            {
+                throw new NotImplementedException("Can only handle uncompressed files!");
+            }
+            //now reading total image data size(including padding) - bytes 34 -> 38
+            stream.Read(_int, 0, 4);
+            uint totalImageSize = (uint)BitConverter.ToInt32(_int, 0);
+            //Somehow this is 0 for my test bmp
+
+            #endregion BMP Header
+
+            //Set the bitmap to have the correct values
+            Width = imageWidth;
+            Height = imageHeight;
+            Depth = (ColorDepth)pixelSize;
+
+            rawData = new int[Width * Height * pixelSize / 8];
+
+            #region Pixel Table
+
+            //Calculate padding
+            int paddingPerRow = 0;
+            int pureImageSize = (int)(imageWidth * imageHeight * pixelSize / 8);
+            if (totalImageSize != 0)
+            {
+                int remainder = (int)totalImageSize - pureImageSize;
+                if (remainder < 0) throw new Exception("Total Image Size is smaller than pure image size");
+                paddingPerRow = remainder / (int)imageHeight;
+            }
+            else
+            {
+                //total image size is 0 if it is not compressed
+                paddingPerRow = 0;
+            }
+            //Read data
+            stream.Position = (int)pixelTableOffset;
+            int position = 0;
+            Byte[] pixelData = new byte[pureImageSize];
+            stream.Read(pixelData, 0, pureImageSize);
+            Byte[] pixel = new byte[pixelSize / 8]; //Pixel size is in byte
+
+            for (int x = 0; x < imageWidth; x++)
+            {
+                for (int y = 0; y < imageHeight; y++)
+                {
+                    pixel[0] = pixelData[position++];
+                    pixel[1] = pixelData[position++];
+                    pixel[2] = pixelData[position++];
+                    pixel[3] = pixelData[position++];
+                    rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0);
+                }
+                position += paddingPerRow;
+            }
+
+            #endregion Pixel Table
         }
 
         public void Save(string path)
