@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
 using Cosmos.Build.Builder.Collections;
+using Cosmos.Build.Builder.Models;
 
 namespace Cosmos.Build.Builder.ViewModels
 {
@@ -14,6 +17,9 @@ namespace Cosmos.Build.Builder.ViewModels
         public ICommand CopyCommand { get; }
 
         public ObservableFixedSizeStack<string> TailItems { get; }
+        public ObservableCollection<Section> Sections { get; }
+
+        public Section CurrentSection => Sections.LastOrDefault();
 
         public StringBuilder LogBuilder { get; set; }
 
@@ -22,6 +28,7 @@ namespace Cosmos.Build.Builder.ViewModels
             CopyCommand = new Command(this);
 
             TailItems = new ObservableFixedSizeStack<string>(TailItemCount);
+            Sections = new ObservableCollection<Section>();
         }
 
         private class Command : ICommand

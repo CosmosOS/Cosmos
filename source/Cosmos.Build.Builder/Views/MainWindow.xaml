@@ -12,6 +12,9 @@
         Title="Cosmos Kit Builder"
         WindowStartupLocation="CenterScreen"
         DataContext="{StaticResource MainWindowViewModel}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
 
     <DockPanel>
 
@@ -28,13 +31,13 @@
                    FontSize="18"
                    Foreground="Blue"
                    FontWeight="ExtraBold"
-                   Text="Current Task Log Tail" />
+                   Text="{Binding CurrentSection.Name, StringFormat='Current Task Log Tail - {0}', FallbackValue='Current Task Log Tail'}" />
         <ItemsControl DockPanel.Dock="Top"
                       Background="Black"
                       BorderBrush="DarkGray"
                       BorderThickness="0.5"
                       FontSize="16"
-                      Foreground="DarkGreen"
+                      Foreground="Green"
                       Margin="0,4"
                       ItemsSource="{Binding TailItems}">
             <ItemsControl.ItemTemplate>
@@ -51,8 +54,37 @@
         <Rectangle DockPanel.Dock="Top"
                    Height="5"
                    Fill="LightGray"/>
-        <ScrollViewer HorizontalScrollBarVisibility="Visible">
-            <StackPanel Name="spnlLog" />
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Sections}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <HeaderedContentControl>
+                            <HeaderedContentControl.Header>
+                                <ToggleButton x:Name="sectionToggleButton"
+                                              Background="LightGray"
+                                              FontSize="18"
+                                              FontWeight="Bold"
+                                              HorizontalContentAlignment="Left"
+                                              Content="{Binding Name}">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Foreground" Value="Green" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasLoggedErrors}" Value="True">
+                                                    <Setter Property="Foreground" Value="Red" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                            </HeaderedContentControl.Header>
+                            <TextBlock Visibility="{Binding IsChecked, ElementName=sectionToggleButton, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                       Text="{Binding Log}" />
+                        </HeaderedContentControl>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
 
     </DockPanel>
