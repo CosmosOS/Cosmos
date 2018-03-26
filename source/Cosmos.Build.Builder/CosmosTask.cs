@@ -20,6 +20,8 @@ namespace Cosmos.Build.Builder {
     private string mSourcePath; // Cosmos source rood
     private string mInnoPath;
     private string mInnoFile;
+    private string mIL2CPUPath;
+    private string mXSPath;
 
     private BuildState mBuildState;
     private int mReleaseNo;
@@ -33,6 +35,8 @@ namespace Cosmos.Build.Builder {
 
       mReleaseNo = aReleaseNo;
       mInnoFile = Path.Combine(mCosmosPath, @"Setup\Cosmos.iss");
+      mXSPath = Path.GetFullPath(Path.Combine(mCosmosPath, @"..\XSharp"));
+      mIL2CPUPath = Path.GetFullPath(Path.Combine(mCosmosPath, @"..\IL2CPU"));
     }
 
     /// <summary>
@@ -171,23 +175,49 @@ namespace Cosmos.Build.Builder {
       CheckForNetCore();
       CheckForVisualStudioExtensionTools();
       CheckForInno();
+      CheckForRepos();
 
       return mBuildState != BuildState.PrerequisiteMissing;
     }
 
-    private void CheckForInno() {
-      Log.WriteLine("Check for Inno Setup");
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
-        if (xKey == null) {
-          mExceptionList.Add("Cannot find Inno Setup.");
+    private void CheckForRepos()
+    {
+      Log.WriteLine("Checking for existing IL2CPU and XSharp repositories...");
+      if (!Directory.Exists(mIL2CPUPath))
+      {
+        if (!File.Exists(Path.Combine(mIL2CPUPath, @"IL2CPU.sln")))
+        {
+          mExceptionList.Add("Missing IL2CPU Repository! Make sure to clone IL2CPU in the parent directory of Cosmos! Download IL2CPU and extract to " + mIL2CPUPath + ".");
           mBuildState = BuildState.PrerequisiteMissing;
           return;
         }
-        mInnoPath = (string)xKey.GetValue("InstallLocation");
-        if (string.IsNullOrWhiteSpace(mInnoPath)) {
-          mExceptionList.Add("Cannot find Inno Setup.");
+      }
+      else if (!Directory.Exists(mXSPath))
+      {
+        if (!File.Exists(Path.Combine(mXSPath, @"XSharp.sln")))
+        {
+          mExceptionList.Add("Missing XSharp Repository! Make sure to clone XSharp in the parent directory of Cosmos! Download XSharp and extract to " + mXSPath + ".");
           mBuildState = BuildState.PrerequisiteMissing;
           return;
+        }
+      }
+    }
+
+    private void CheckForInno() {
+      Log.WriteLine("Check for Inno Setup");
+      using (var xLocalMachineKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)) {
+        using (var xKey = xLocalMachineKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
+          if (xKey == null) {
+            mExceptionList.Add("Cannot find Inno Setup.");
+            mBuildState = BuildState.PrerequisiteMissing;
+            return;
+          }
+          mInnoPath = (string)xKey.GetValue("InstallLocation");
+          if (string.IsNullOrWhiteSpace(mInnoPath)) {
+            mExceptionList.Add("Cannot find Inno Setup.");
+            mBuildState = BuildState.PrerequisiteMissing;
+            return;
+          }
         }
       }
 

@@ -58,9 +58,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
         <ProjectReference Include="..\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
         <ProjectReference Include="..\40-System\Cosmos.System\Cosmos.System.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -6,10 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
-        <ProjectReference Include="..\..\..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference Include="..\..\..\XSharp\source\XSharp\XSharp.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
+        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp.Assembler\XSharp.Assembler.csproj" />
+        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp\XSharp.csproj" />
     </ItemGroup>
 
 </Project>

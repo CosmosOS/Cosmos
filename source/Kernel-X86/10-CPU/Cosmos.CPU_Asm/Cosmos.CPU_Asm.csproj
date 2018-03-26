@@ -14,12 +14,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj" />
         <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
-        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
-        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\XSharp\source\XSharp\XSharp.csproj" />
         <ProjectReference PrivateAssets="All" Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
+        <ProjectReference PrivateAssets="All" Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
+        <ProjectReference PrivateAssets="All" Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
+        <ProjectReference PrivateAssets="All" Include="$(XSharpRepoRoot)source\XSharp\XSharp.csproj" />
+        <ProjectReference PrivateAssets="All" Include="$(XSharpRepoRoot)source\XSharp.Assembler\XSharp.Assembler.csproj" />
     </ItemGroup>
 
 </Project>

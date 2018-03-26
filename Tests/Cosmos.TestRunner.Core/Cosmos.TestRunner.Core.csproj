@@ -17,9 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
-        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
-        <ProjectReference Include="..\..\..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
@@ -48,6 +45,9 @@
         <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
         <ProjectReference Include="..\GraphicTest\GraphicTest.csproj" />
         <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
+        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp.Assembler\XSharp.Assembler.csproj" />
     </ItemGroup>
 
 </Project>

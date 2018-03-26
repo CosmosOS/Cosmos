@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,11 +10,10 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Cosmos.Build.Installer;
 
-namespace Cosmos.Build.Builder {
+namespace Cosmos.Build.Builder.Views {
   public partial class MainWindow : Window {
-    int mTailLineCount = 10;
-    int mTailCurrent = 0;
-    List<TextBlock> mTailLines = new List<TextBlock>();
+    private static readonly string[] NewLineStringArray = new string[] { Environment.NewLine };
+
     string mCosmosDir;
     string mSetupPath;
     // Needs updating with each new release.
@@ -28,21 +23,10 @@ namespace Cosmos.Build.Builder {
 
     public MainWindow() {
       InitializeComponent();
-      mApp = (App)Application.Current;
       mTailCaption = tblkTail.Text + " - ";
-
-      for (int i = 0; i < mTailLineCount; i++) {
-        var xTextBlock = new TextBlock();
-        xTextBlock.Background = Brushes.Black;
-        xTextBlock.Foreground = Brushes.Green;
-        xTextBlock.FontSize = 16;
-        mTailLines.Add(xTextBlock);
-        spnlTail.Children.Add(xTextBlock);
-      }
     }
 
     bool mPreventAutoClose = false;
-    App mApp;
     TextBlock mSection;
     TextBlock mContent;
     StringBuilder mClipboard = new StringBuilder();
@@ -50,9 +34,9 @@ namespace Cosmos.Build.Builder {
 
 
     public bool Build() {
-      Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
-      Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
-      Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
+      Log.LogLine += new Log.LogLineHandler(Log_LogLine);
+      Log.LogSection += new Log.LogSectionHandler(Log_LogSection);
+      Log.LogError += new Log.LogErrorHandler(Log_LogError);
 
       if (App.IsUserKit) {
         mReleaseNo = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
@@ -93,9 +77,9 @@ namespace Cosmos.Build.Builder {
     }
 
     void ClearTail() {
-      mTailCurrent = 0;
-      foreach (var x in mTailLines) {
-        x.Text = "";
+      if (DataContext is ViewModels.MainWindowViewModel viewModel)
+      {
+        viewModel.TailItems.Clear();
       }
     }
 
@@ -156,19 +140,13 @@ namespace Cosmos.Build.Builder {
       mPreventAutoClose = true;
     }
 
-    void ScrollTail() {
-      for (int i = 0; i < mTailLineCount - 1; i++) {
-        mTailLines[i].Text = mTailLines[i + 1].Text;
-      }
-    }
-
     void WriteTail(string aText) {
-      if (mTailCurrent == mTailLineCount - 1) {
-        ScrollTail();
-      }
-      mTailLines[mTailCurrent].Text = aText;
-      if (mTailCurrent < mTailLineCount - 1) {
-        mTailCurrent++;
+      if (DataContext is ViewModels.MainWindowViewModel viewModel)
+      {
+        foreach (var line in aText.Split(NewLineStringArray, StringSplitOptions.None))
+        {
+          viewModel.TailItems.Push(line);
+        }
       }
     }
 
@@ -180,46 +158,28 @@ namespace Cosmos.Build.Builder {
         return;
       }
 
-      LoadPosition();
       mLoaded = true;
 
+      if (DataContext is ViewModels.MainWindowViewModel viewModel)
+      {
+        viewModel.LogBuilder = mClipboard;
+      }
+
       string xAppPath = AppContext.BaseDirectory;
-      mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\");
+      mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
       mSetupPath = Path.Combine(mCosmosDir, @"Setup\Output\" + CosmosTask.GetSetupName(mReleaseNo) + ".exe");
       if (!Build()) {
         Close();
       }
     }
 
-    void butnCopy_Click(object sender, RoutedEventArgs e) {
-      mPreventAutoClose = true;
-      Clipboard.SetText(mClipboard.ToString());
-    }
-
-    void LoadPosition() {
-      Left = Properties.Settings.Default.Location.X;
-      Top = Properties.Settings.Default.Location.Y;
-      Width = Properties.Settings.Default.Size.Width;
-      Height = Properties.Settings.Default.Size.Height;
-    }
-
-    protected void SavePosition() {
-      Properties.Settings.Default.Location = new System.Drawing.Point((int)Left, (int)Top);
-      Properties.Settings.Default.Size = new System.Drawing.Size((int)Width, (int)Height);
-      Properties.Settings.Default.Save();
-    }
-
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e) {
       // User had non minimized window, or maximized it, or otherwise manually intervened.
       // Even if starting minimized, this event gets called with Normal before load.
       // This is why we have mLoaded.
-      if (mLoaded && WindowState != System.Windows.WindowState.Minimized) {
+      if (mLoaded && WindowState != WindowState.Minimized) {
         mPreventAutoClose = true;
       }
-    }
-
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-      SavePosition();
     }
   }
 }
