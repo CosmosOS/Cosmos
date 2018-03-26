@@ -34,7 +34,7 @@ namespace Cosmos.Core.Processing
             context.priority = 0;
             context.age = 0;
             context.parent = 0;
-            ProcessContext.m_ContextList[0] = context;
+            ProcessContext.m_ContextList.Add(context);
             //ProcessContext.StartContext("Test", test, ProcessContext.Context_Type.PROCESS);
         }
 

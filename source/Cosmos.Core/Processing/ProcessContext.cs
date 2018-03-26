@@ -84,7 +84,7 @@ namespace Cosmos.Core.Processing
             }*/ // nope, just not going to bother today
             for(int i = args.Length - 1; i >= 0; i++) // will push arguments when we patch in the object utils
             {
-                *--stack = 0; ObjUtilities.GetPointer(args[i]);
+                *--stack = ObjUtilities.GetPointer(args[i]);
             }
             *--stack = 0x10; // ss ?
             *--stack = 0x00000202; // eflags
