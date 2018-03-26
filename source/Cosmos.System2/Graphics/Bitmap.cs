@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Cosmos.System.Graphics
 {
@@ -12,15 +10,23 @@ namespace Cosmos.System.Graphics
             rawData = new int[Width * Height];
         }
 
-        public Bitmap(string path) : this(new FileStream(path, FileMode.Open))
+        public Bitmap(string path) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
+            using (var fs = new FileStream(path, FileMode.Open))
+            {
+                CreateBitmap(fs);
+            }
         }
 
-        public Bitmap(byte[] imageData) : this(new MemoryStream(imageData))
+        public Bitmap(byte[] imageData) : base(0, 0, ColorDepth.ColorDepth32)//Call the image constructor with wrong values
         {
+            using (var ms = new MemoryStream(imageData))
+            {
+                CreateBitmap(ms);
+            }
         }
 
-        public Bitmap(Stream stream) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
+        private void CreateBitmap(Stream stream)
         {
             using (stream)
             {
