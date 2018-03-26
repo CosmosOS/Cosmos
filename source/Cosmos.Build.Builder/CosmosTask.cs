@@ -205,17 +205,19 @@ namespace Cosmos.Build.Builder {
 
     private void CheckForInno() {
       Log.WriteLine("Check for Inno Setup");
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
-        if (xKey == null) {
-          mExceptionList.Add("Cannot find Inno Setup.");
-          mBuildState = BuildState.PrerequisiteMissing;
-          return;
-        }
-        mInnoPath = (string)xKey.GetValue("InstallLocation");
-        if (string.IsNullOrWhiteSpace(mInnoPath)) {
-          mExceptionList.Add("Cannot find Inno Setup.");
-          mBuildState = BuildState.PrerequisiteMissing;
-          return;
+      using (var xLocalMachineKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)) {
+        using (var xKey = xLocalMachineKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
+          if (xKey == null) {
+            mExceptionList.Add("Cannot find Inno Setup.");
+            mBuildState = BuildState.PrerequisiteMissing;
+            return;
+          }
+          mInnoPath = (string)xKey.GetValue("InstallLocation");
+          if (string.IsNullOrWhiteSpace(mInnoPath)) {
+            mExceptionList.Add("Cannot find Inno Setup.");
+            mBuildState = BuildState.PrerequisiteMissing;
+            return;
+          }
         }
       }
 
