@@ -77,6 +77,7 @@ namespace Cosmos.Core_Asm
                 }
                 XS.Push((uint)j);
                 XS.PushAllRegisters();
+                XS.Set("static_field__Cosmos_Core_INTs_mStackContext", ESP, destinationIsIndirect: true);
 
                 XS.Sub(ESP, 4);
                 XS.Set(EAX, ESP); // preserve old stack address for passing to interrupt handler
@@ -90,6 +91,7 @@ namespace Cosmos.Core_Asm
                 XS.Push(EAX); //
                 XS.Push(EAX); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
 
+
                 XS.JumpToSegment(8, "__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 XS.Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 MethodBase xHandler = GetInterruptHandler((byte)j);
@@ -98,12 +100,14 @@ namespace Cosmos.Core_Asm
                     xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
                 }
                 XS.Call(LabelName.Get(xHandler));
+
                 XS.Pop(EAX);
                 XS.SSE.FXRestore(ESP, isIndirect: true);
 
                 XS.Set(ESP, EAX); // this restores the stack for the FX stuff, except the pointer to the FX data
                 XS.Add(ESP, 4); // "pop" the pointer
 
+                XS.Set(ESP, "static_field__Cosmos_Core_INTs_mStackContext", sourceIsIndirect: true);
                 XS.PopAllRegisters();
 
                 XS.Add(ESP, 8);
