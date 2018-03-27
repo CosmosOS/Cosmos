@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -19,9 +18,9 @@ namespace Cosmos.Build.Builder.ViewModels
 
         public Section CurrentSection => Sections.LastOrDefault();
 
-        public StringBuilder LogBuilder { get; set; }
-
         public ICommand CopyCommand { get; }
+
+        private ILogger _logger;
 
         public MainWindowViewModel()
         {
@@ -29,6 +28,31 @@ namespace Cosmos.Build.Builder.ViewModels
             Sections = new ObservableCollection<Section>();
 
             CopyCommand = new CopyLogCommand(this);
+
+            _logger = new MainWindowLogger(this);
+        }
+
+        public string BuildLog()
+        {
+            var log = @"
+========================================
+    Builder Log
+========================================
+
+";
+
+            foreach (var section in Sections)
+            {
+                log += $@"
+========================================
+    {section.Name}
+========================================
+
+";
+                log += section.Log + Environment.NewLine;
+            }
+
+            return log;
         }
 
         private class CopyLogCommand : ICommand
@@ -45,7 +69,7 @@ namespace Cosmos.Build.Builder.ViewModels
             }
 
             public bool CanExecute(object parameter) => _canExecute?.Invoke() ?? true;
-            public void Execute(object parameter) => Clipboard.SetText(_viewModel.LogBuilder.ToString());
+            public void Execute(object parameter) => Clipboard.SetText(_viewModel.BuildLog());
 
             public void RaiseCanExecuteChanged(object sender, EventArgs e) => CanExecuteChanged?.Invoke(sender, e);
         }

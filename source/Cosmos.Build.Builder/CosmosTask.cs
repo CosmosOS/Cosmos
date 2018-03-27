@@ -13,7 +13,7 @@ namespace Cosmos.Build.Builder {
   /// Cosmos task.
   /// </summary>
   /// <seealso cref="Cosmos.Build.Installer.Task" />
-  public class CosmosTask : Task {
+  internal class CosmosTask : Tasks.Task {
     private string mCosmosPath; // Root Cosmos dir
     private string mVsipPath; // Build/VSIP
     private string mAppDataPath; // User Kit in AppData
@@ -27,7 +27,8 @@ namespace Cosmos.Build.Builder {
     private int mReleaseNo;
     private List<string> mExceptionList = new List<string>();
 
-    public CosmosTask(string aCosmosDir, int aReleaseNo) {
+    public CosmosTask(ILogger logger, string aCosmosDir, int aReleaseNo)
+        : base(logger) {
       mCosmosPath = aCosmosDir;
       mVsipPath = Path.Combine(mCosmosPath, @"Build\VSIP");
       mSourcePath = Path.Combine(mCosmosPath, "source");
@@ -56,11 +57,11 @@ namespace Cosmos.Build.Builder {
 
     private void CleanDirectory(string aName, string aPath) {
       if (Directory.Exists(aPath)) {
-        Log.WriteLine("Cleaning up existing " + aName + " directory.");
+        Logger.LogMessage("Cleaning up existing " + aName + " directory.");
         Directory.Delete(aPath, true);
       }
 
-      Log.WriteLine("Creating " + aName + " as " + aPath);
+      Logger.LogMessage("Creating " + aName + " as " + aPath);
       Directory.CreateDirectory(aPath);
     }
 
@@ -111,7 +112,7 @@ namespace Cosmos.Build.Builder {
 
     protected void CheckIfBuilderRunning() {
       //Check for builder process
-      Log.WriteLine("Check if Builder is running.");
+      Logger.LogMessage("Check if Builder is running.");
       // Check > 1 so we exclude ourself.
       if (NumProcessesContainingName("Cosmos.Build.Builder") > 1) {
         throw new Exception("Another instance of builder is running.");
@@ -119,7 +120,7 @@ namespace Cosmos.Build.Builder {
     }
 
     protected void CheckIfUserKitRunning() {
-      Log.WriteLine("Check if User Kit Installer is already running.");
+      Logger.LogMessage("Check if User Kit Installer is already running.");
       if (NumProcessesContainingName("CosmosUserKit") > 0) {
         throw new Exception("Another instance of the user kit installer is running.");
       }
@@ -129,34 +130,34 @@ namespace Cosmos.Build.Builder {
       bool xRunningFound = false;
       if (IsRunning("devenv")) {
         xRunningFound = true;
-        Log.WriteLine("--Visual Studio is running.");
+        Logger.LogMessage("--Visual Studio is running.");
       }
       if (IsRunning("VSIXInstaller")) {
         xRunningFound = true;
-        Log.WriteLine("--VSIXInstaller is running.");
+        Logger.LogMessage("--VSIXInstaller is running.");
       }
       if (IsRunning("ServiceHub.IdentityHost")) {
         xRunningFound = true;
-        Log.WriteLine("--ServiceHub.IdentityHost is running.");
+        Logger.LogMessage("--ServiceHub.IdentityHost is running.");
       }
       if (IsRunning("ServiceHub.VSDetouredHost")) {
         xRunningFound = true;
-        Log.WriteLine("--ServiceHub.VSDetouredHost is running.");
+        Logger.LogMessage("--ServiceHub.VSDetouredHost is running.");
       }
       if (IsRunning("ServiceHub.Host.Node.x86")) {
         xRunningFound = true;
-        Log.WriteLine("--ServiceHub.Host.Node.x86 is running.");
+        Logger.LogMessage("--ServiceHub.Host.Node.x86 is running.");
       }
       if (IsRunning("ServiceHub.SettingsHost")) {
         xRunningFound = true;
-        Log.WriteLine("--ServiceHub.SettingsHost is running.");
+        Logger.LogMessage("--ServiceHub.SettingsHost is running.");
       }
       if (IsRunning("ServiceHub.Host.CLR.x86")) {
         xRunningFound = true;
-        Log.WriteLine("--ServiceHub.Host.CLR.x86 is running.");
+        Logger.LogMessage("--ServiceHub.Host.CLR.x86 is running.");
       }
       if (xRunningFound) {
-        Log.WriteLine("--Running blockers found. Setup will warning you and wait for it.");
+        Logger.LogMessage("--Running blockers found. Setup will warning you and wait for it.");
       }
     }
 
@@ -182,7 +183,7 @@ namespace Cosmos.Build.Builder {
 
     private void CheckForRepos()
     {
-      Log.WriteLine("Checking for existing IL2CPU and XSharp repositories...");
+      Logger.LogMessage("Checking for existing IL2CPU and XSharp repositories...");
       if (!Directory.Exists(mIL2CPUPath))
       {
         if (!File.Exists(Path.Combine(mIL2CPUPath, @"IL2CPU.sln")))
@@ -204,7 +205,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForInno() {
-      Log.WriteLine("Check for Inno Setup");
+      Logger.LogMessage("Check for Inno Setup");
       using (var xLocalMachineKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)) {
         using (var xKey = xLocalMachineKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
           if (xKey == null) {
@@ -221,7 +222,7 @@ namespace Cosmos.Build.Builder {
         }
       }
 
-      Log.WriteLine("Check for Inno Preprocessor");
+      Logger.LogMessage("Check for Inno Preprocessor");
       if (!File.Exists(Path.Combine(mInnoPath, "ISPP.dll"))) {
         mExceptionList.Add("Inno Preprocessor not detected.");
         mBuildState = BuildState.PrerequisiteMissing;
@@ -230,7 +231,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForNetCore() {
-      Log.WriteLine("Check for .NET Core");
+      Logger.LogMessage("Check for .NET Core");
 
       if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.NetCoreTools")) {
         mExceptionList.Add(".NET Core not detected.");
@@ -239,7 +240,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForVisualStudioExtensionTools() {
-      Log.WriteLine("Check for Visual Studio Extension Tools");
+      Logger.LogMessage("Check for Visual Studio Extension Tools");
 
       if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.VisualStudioExtension")) {
         mExceptionList.Add("Visual Studio Extension tools not detected.");
@@ -269,7 +270,7 @@ namespace Cosmos.Build.Builder {
 
       var xStart = new ProcessStartInfo();
       xStart.FileName = xNuget;
-      xStart.WorkingDirectory = CurrPath;
+      xStart.WorkingDirectory = Directory.GetCurrentDirectory();
       xStart.Arguments = xListParams;
       xStart.UseShellExecute = false;
       xStart.CreateNoWindow = true;
@@ -391,7 +392,7 @@ namespace Cosmos.Build.Builder {
     private void CopyTemplates() {
       Section("Copy Templates");
 
-      using (var x = new FileMgr(Path.Combine(mSourcePath, @"Cosmos.VS.Package\obj\Debug"), mVsipPath)) {
+      using (var x = new FileMgr(Logger, Path.Combine(mSourcePath, @"Cosmos.VS.Package\obj\Debug"), mVsipPath)) {
         x.Copy("CosmosProject (C#).zip");
         x.Copy("CosmosKernel (C#).zip");
         x.Copy("CosmosProject (F#).zip");
@@ -418,7 +419,7 @@ namespace Cosmos.Build.Builder {
       if (App.BuilderConfiguration.VsExpHive) {
         vsVersionConfiguration += "Exp";
       }
-      Log.WriteLine($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
+      Logger.LogMessage($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
       StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
     }
 
@@ -432,11 +433,11 @@ namespace Cosmos.Build.Builder {
       }
 
       if (App.BuilderConfiguration.ResetHive) {
-        Log.WriteLine("Resetting hive");
+        Logger.LogMessage("Resetting hive");
         Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
       }
 
-      Log.WriteLine("Launching Visual Studio");
+      Logger.LogMessage("Launching Visual Studio");
       Start(xVisualStudio, Quoted(mCosmosPath + @"Kernel.sln"), false, true);
     }
 
