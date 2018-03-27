@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
@@ -34,7 +33,7 @@ namespace Cosmos.Build.Builder.Views
             Log.LogSection += new Log.LogSectionHandler(Log_LogSection);
             Log.LogError += new Log.LogErrorHandler(Log_LogError);
 
-            if (App.IsUserKit)
+            if (App.BuilderConfiguration.UserKit)
             {
                 mReleaseNo = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
             }
@@ -59,7 +58,7 @@ namespace Cosmos.Build.Builder.Views
         {
             Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate ()
             {
-                if (App.StayOpen == false)
+                if (App.BuilderConfiguration.StayOpen == false)
                 {
                     mCloseTimer = new DispatcherTimer();
                     mCloseTimer.Interval = TimeSpan.FromSeconds(5);
@@ -137,13 +136,6 @@ namespace Cosmos.Build.Builder.Views
         protected bool mLoaded = false;
         void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!App.mArgs.Any())
-            {
-                MessageBox.Show("Builder not meant to be called directly. Use install.bat instead.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                Close();
-                return;
-            }
-
             mLoaded = true;
 
             DoOnViewModel(vm => vm.LogBuilder = mClipboard);

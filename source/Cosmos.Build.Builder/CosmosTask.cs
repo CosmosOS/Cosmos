@@ -47,7 +47,7 @@ namespace Cosmos.Build.Builder {
     public static string GetSetupName(int releaseNumber) {
       string setupName = $"CosmosUserKit-{releaseNumber}-vs2017";
 
-      if (App.UseVsHive) {
+      if (App.BuilderConfiguration.VsExpHive) {
         setupName += "Exp";
       }
 
@@ -68,17 +68,17 @@ namespace Cosmos.Build.Builder {
       if (PrereqsOK()) {
         Section("Init Directories");
         CleanDirectory("VSIP", mVsipPath);
-        if (!App.IsUserKit) {
+        if (!App.BuilderConfiguration.UserKit) {
           CleanDirectory("User Kit", mAppDataPath);
         }
 
         CompileCosmos();
         CreateSetup();
 
-        if (!App.IsUserKit) {
+        if (!App.BuilderConfiguration.UserKit) {
           RunSetup();
           WriteDevKit();
-          if (!App.DoNotLaunchVS) {
+          if (!App.BuilderConfiguration.NoVsLaunch) {
             LaunchVS();
           }
         }
@@ -99,7 +99,7 @@ namespace Cosmos.Build.Builder {
                        $"/p:Platform={Quoted("Any CPU")} " +
                        $"/p:OutputPath={Quoted(mVsipPath)}";
 
-      if (!App.NoMSBuildClean) {
+      if (!App.BuilderConfiguration.NoClean) {
         StartConsole(xMSBuild, $"/t:Clean {xParams}");
       }
       StartConsole(xMSBuild, $"/t:Build {xParams}");
@@ -213,7 +213,7 @@ namespace Cosmos.Build.Builder {
             return;
           }
           mInnoPath = (string)xKey.GetValue("InstallLocation");
-          if (string.IsNullOrWhiteSpace(mInnoPath)) {
+          if (String.IsNullOrWhiteSpace(mInnoPath)) {
             mExceptionList.Add("Cannot find Inno Setup.");
             mBuildState = BuildState.PrerequisiteMissing;
             return;
@@ -365,9 +365,7 @@ namespace Cosmos.Build.Builder {
       MSBuild(Path.Combine(mCosmosPath, @"Build.sln"), "Debug");
 
       Section("Publish Tools");
-      //Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVsipDir, "MSBuild"));
       Publish(Path.Combine(mSourcePath, "../../IL2CPU/source/IL2CPU"), Path.Combine(xVsipDir, "IL2CPU"));
-      Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVsipDir, "NASM"));
 
       Section("Create Packages");
       //
@@ -413,11 +411,11 @@ namespace Cosmos.Build.Builder {
         return;
       }
 
-      string xCfg = App.IsUserKit ? "UserKit" : "DevKit";
+      string xCfg = App.BuilderConfiguration.UserKit ? "UserKit" : "DevKit";
       string vsVersionConfiguration = "vs2017";
 
       // Use configuration which will install to the VS Exp Hive
-      if (App.UseVsHive) {
+      if (App.BuilderConfiguration.VsExpHive) {
         vsVersionConfiguration += "Exp";
       }
       Log.WriteLine($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
@@ -433,7 +431,7 @@ namespace Cosmos.Build.Builder {
         return;
       }
 
-      if (App.ResetHive) {
+      if (App.BuilderConfiguration.ResetHive) {
         Log.WriteLine("Resetting hive");
         Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
       }
