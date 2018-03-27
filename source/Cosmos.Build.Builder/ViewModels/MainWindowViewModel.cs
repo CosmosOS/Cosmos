@@ -13,8 +13,6 @@ namespace Cosmos.Build.Builder.ViewModels
     internal class MainWindowViewModel
     {
         private const int TailItemCount = 10;
-        
-        public ICommand CopyCommand { get; }
 
         public ObservableFixedSizeStack<string> TailItems { get; }
         public ObservableCollection<Section> Sections { get; }
@@ -23,22 +21,24 @@ namespace Cosmos.Build.Builder.ViewModels
 
         public StringBuilder LogBuilder { get; set; }
 
+        public ICommand CopyCommand { get; }
+
         public MainWindowViewModel()
         {
-            CopyCommand = new Command(this);
-
             TailItems = new ObservableFixedSizeStack<string>(TailItemCount);
             Sections = new ObservableCollection<Section>();
+
+            CopyCommand = new CopyLogCommand(this);
         }
 
-        private class Command : ICommand
+        private class CopyLogCommand : ICommand
         {
             public event EventHandler CanExecuteChanged;
 
             private MainWindowViewModel _viewModel;
             private Func<bool> _canExecute;
 
-            public Command(MainWindowViewModel viewModel, Func<bool> canExecute = null)
+            public CopyLogCommand(MainWindowViewModel viewModel, Func<bool> canExecute = null)
             {
                 _viewModel = viewModel;
                 _canExecute = canExecute;

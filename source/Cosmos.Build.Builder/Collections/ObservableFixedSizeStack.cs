@@ -10,6 +10,7 @@ namespace Cosmos.Build.Builder.Collections
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         private T[] _items;
+        private int _itemCount;
 
         public ObservableFixedSizeStack(int size)
         {
@@ -23,13 +24,25 @@ namespace Cosmos.Build.Builder.Collections
 
         public void Push(T item)
         {
-            Array.Copy(_items, 1, _items, 0, _items.Length - 1);
-            _items[_items.Length - 1] = item;
+            if (_itemCount < _items.Length)
+            {
+                _items[_itemCount] = item;
+                _itemCount++;
+            }
+            else
+            {
+                Array.Copy(_items, 1, _items, 0, _items.Length - 1);
+                _items[_items.Length - 1] = item;
+            }
 
             OnCollectionChanged();
         }
 
-        public void Clear() => Array.Clear(_items, 0, _items.Length);
+        public void Clear()
+        {
+            _itemCount = 0;
+            Array.Clear(_items, 0, _items.Length);
+        }
 
         private void OnCollectionChanged() => CollectionChanged?.Invoke(
             this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
