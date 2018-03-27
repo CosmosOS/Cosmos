@@ -5,10 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
-        Loaded="Window_Loaded"
         MinHeight="480"
         MinWidth="800"
-        SizeChanged="Window_SizeChanged"
         Title="Cosmos Kit Builder"
         WindowStartupLocation="CenterScreen"
         DataContext="{StaticResource MainWindowViewModel}">
@@ -18,10 +16,21 @@
 
     <DockPanel>
 
-        <WrapPanel DockPanel.Dock="Top">
-            <Button Command="{Binding CopyCommand}"
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Command="{Binding CopyCommand}"
                     Content="Copy" />
-        </WrapPanel>
+
+            <CheckBox Grid.Column="2"
+                      IsChecked="{Binding CloseWhenCompleted}"
+                      Content="Close window when completed" />
+        </Grid>
 
         <Rectangle DockPanel.Dock="Top"
                    Height="5" />

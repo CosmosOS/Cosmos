@@ -13,8 +13,9 @@ namespace Cosmos.Build.Builder
         {
             if (e.Args.Length == 0)
             {
-                MessageBox.Show("Builder not meant to be called directly. Use install-VS2017.bat instead.");
+                ShowErrorMessageBox("Builder not meant to be called directly. Use install-VS2017.bat instead.");
                 Shutdown();
+                return;
             }
 
             var configuration = new CommandLineBuilderConfiguration(e.Args);
@@ -31,13 +32,17 @@ namespace Cosmos.Build.Builder
                 // For debugging, set params to something like this:
                 // -VSPath=C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise
 
-                MessageBox.Show("Visual Studio path must be provided. (-VSPATH or /VSPATH)");
+                ShowErrorMessageBox("Visual Studio path must be provided. (-VSPATH or /VSPATH)");
                 Shutdown();
+                return;
             }
 
             BuilderConfiguration = configuration;
 
             base.OnStartup(e);
         }
+
+        private void ShowErrorMessageBox(string message) =>
+            MessageBox.Show(message, "Cosmos Kit Builder", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }

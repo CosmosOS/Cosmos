@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-
 using Cosmos.Build.Builder.Collections;
 using Cosmos.Build.Builder.Models;
 
 namespace Cosmos.Build.Builder.ViewModels
 {
-    internal class MainWindowViewModel
+    internal class MainWindowViewModel : ViewModelBase
     {
+        private const int ReleaseNumber = 106027;
+
         private const int TailItemCount = 10;
 
         public ObservableFixedSizeStack<string> TailItems { get; }
@@ -20,19 +23,38 @@ namespace Cosmos.Build.Builder.ViewModels
 
         public ICommand CopyCommand { get; }
 
-        private ILogger _logger;
+        public bool CloseWhenCompleted
+        {
+            get => _closeWhenCompleted;
+            set => SetAndRaiseIfChanged(ref _closeWhenCompleted, value);
+        }
+
+        private CosmosTask _cosmosTask;
+        private Task _cosmosTaskTask;
+
+        private bool _closeWhenCompleted;
 
         public MainWindowViewModel()
         {
             TailItems = new ObservableFixedSizeStack<string>(TailItemCount);
             Sections = new ObservableCollection<Section>();
 
-            CopyCommand = new CopyLogCommand(this);
+            CopyCommand = new RelayCommand(CopyLogToClipboard);
 
-            _logger = new MainWindowLogger(this);
+            var logger = new MainWindowLogger(this);
+
+            _closeWhenCompleted = true;
+
+            var cosmosDir = Directory.GetCurrentDirectory();
+
+            _cosmosTask = new CosmosTask(logger, cosmosDir, ReleaseNumber);
+            _cosmosTaskTask = Task.Run((Action)_cosmosTask.Run);
+            _cosmosTaskTask.ContinueWith(CosmosTaskFinishedAsync);
         }
 
-        public string BuildLog()
+        private void CopyLogToClipboard(object parameter) => Clipboard.SetText(BuildLog());
+
+        private string BuildLog()
         {
             var log = @"
 ========================================
@@ -55,23 +77,25 @@ namespace Cosmos.Build.Builder.ViewModels
             return log;
         }
 
-        private class CopyLogCommand : ICommand
-        {
-            public event EventHandler CanExecuteChanged;
+        private Task CosmosTaskFinishedAsync(Task task) =>
+            Application.Current.Dispatcher.InvokeAsync(
+                async () =>
+                {
+                    var mainWindow = Application.Current.MainWindow;
 
-            private MainWindowViewModel _viewModel;
-            private Func<bool> _canExecute;
+                    await Task.Delay(5000);
 
-            public CopyLogCommand(MainWindowViewModel viewModel, Func<bool> canExecute = null)
-            {
-                _viewModel = viewModel;
-                _canExecute = canExecute;
-            }
-
-            public bool CanExecute(object parameter) => _canExecute?.Invoke() ?? true;
-            public void Execute(object parameter) => Clipboard.SetText(_viewModel.BuildLog());
-
-            public void RaiseCanExecuteChanged(object sender, EventArgs e) => CanExecuteChanged?.Invoke(sender, e);
-        }
+                    if (CloseWhenCompleted)
+                    {
+                        mainWindow.Close();
+                    }
+                    else
+                    {
+                        if (mainWindow.WindowState == WindowState.Maximized)
+                        {
+                            mainWindow.WindowState = WindowState.Normal;
+                        }
+                    }
+                }).Task;
     }
 }
