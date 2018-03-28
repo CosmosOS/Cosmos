@@ -192,8 +192,9 @@ namespace Cosmos.System.FileSystem.FAT
             while (xCount > 0)
             {
                 Global.mFileSystemDebugger.SendInternal("Position: " + mPosition + " Count: " + xCount + " Offset: " + xOffset);
-                long xClusterIdx = mPosition / xClusterSize;
-                long xPosInCluster = mPosition % xClusterSize;
+                var xPosition = mPosition + xOffset;
+				long xClusterIdx = xPosition / xClusterSize;
+				long xPosInCluster = xPosition % xClusterSize;
                 Global.mFileSystemDebugger.SendInternal("ClusterID: " + xClusterIdx + " Pos in Cluster: " + xPosInCluster);
                 byte[] xCluster;
                 mFS.Read(mFatTable[(int)xClusterIdx], out xCluster);
@@ -256,8 +257,9 @@ namespace Cosmos.System.FileSystem.FAT
             while (xCount > 0)
             {
                 long xWriteSize;
-                long xClusterIdx = mPosition / xClusterSize;
-                long xPosInCluster = mPosition % xClusterSize;
+                var xPosition = mPosition + xOffset;
+				long xClusterIdx = xPosition / xClusterSize;
+				long xPosInCluster = xPosition % xClusterSize;
                 Global.mFileSystemDebugger.SendInternal("Cluster id" + xClusterIdx + " Pos: " + mPosition + " Pos in Cluster: " + xPosInCluster);
                 if (xPosInCluster + xCount > xClusterSize)
                 {

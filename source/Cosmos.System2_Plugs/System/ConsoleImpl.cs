@@ -434,6 +434,48 @@ namespace Cosmos.System_Plugs.System
             KeyEvent current;
             int currentCount = 0;
 
+            if (Cosmos.System.Console.writecommand)
+            {
+                string Command = Cosmos.System.Console.commands[Cosmos.System.Console.commandindex];
+                foreach (char chr in Command)
+                {
+                    if (currentCount == chars.Count)
+                    {
+                        chars.Add(chr);
+                        Write(chr);
+                        currentCount++;
+                    }
+                    else
+                    {
+                        //Insert the new character in the correct location
+                        //For some reason, List.Insert() doesn't work properly
+                        //so the character has to be inserted manually
+                        List<char> temp = new List<char>();
+
+                        for (int x = 0; x < chars.Count; x++)
+                        {
+                            if (x == currentCount)
+                            {
+                                temp.Add(chr);
+                            }
+
+                            temp.Add(chars[x]);
+                        }
+
+                        chars = temp;
+
+                        //Shift the characters to the right
+                        for (int x = currentCount; x < chars.Count; x++)
+                        {
+                            Write(chars[x]);
+                        }
+
+                        GetConsole().X -= (chars.Count - currentCount) - 1;
+                        currentCount++;
+                    }
+                }
+            }
+
             while ((current = KeyboardManager.ReadKey()).Key != ConsoleKeyEx.Enter)
             {
                 if (current.Key == ConsoleKeyEx.NumEnter) break;
