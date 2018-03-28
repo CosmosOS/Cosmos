@@ -46,13 +46,7 @@ namespace Cosmos.Build.Builder {
     /// <param name="releaseNumber">Release number for the current setup.</param>
     /// <returns>Name of the setup file.</returns>
     public static string GetSetupName(int releaseNumber) {
-      string setupName = $"CosmosUserKit-{releaseNumber}-vs2017";
-
-      if (App.BuilderConfiguration.VsExpHive) {
-        setupName += "Exp";
-      }
-
-      return setupName;
+      return $"CosmosUserKit-{releaseNumber}-vs2017";
     }
 
     private void CleanDirectory(string aName, string aPath) {
@@ -415,10 +409,6 @@ namespace Cosmos.Build.Builder {
       string xCfg = App.BuilderConfiguration.UserKit ? "UserKit" : "DevKit";
       string vsVersionConfiguration = "vs2017";
 
-      // Use configuration which will install to the VS Exp Hive
-      if (App.BuilderConfiguration.VsExpHive) {
-        vsVersionConfiguration += "Exp";
-      }
       Logger.LogMessage($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
       StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
     }
@@ -430,11 +420,6 @@ namespace Cosmos.Build.Builder {
       if (!File.Exists(xVisualStudio)) {
         mExceptionList.Add("Cannot find Visual Studio.");
         return;
-      }
-
-      if (App.BuilderConfiguration.ResetHive) {
-        Logger.LogMessage("Resetting hive");
-        Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
       }
 
       Logger.LogMessage("Launching Visual Studio");
