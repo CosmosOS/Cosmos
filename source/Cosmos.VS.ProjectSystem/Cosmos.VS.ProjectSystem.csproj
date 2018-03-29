@@ -35,15 +35,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Page Include="ProjectSystem\VS\PropertyPages\**\*.xaml">
-            <SubType>Designer</SubType>
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <None Remove="Resources\Icon.png" />
-        <Compile Update="ProjectSystem\VS\PropertyPages\**\*.xaml.cs">
-            <SubType>Code</SubType>
-            <DependentUpon>%(Filename)</DependentUpon>
-        </Compile>
+        <Page Include="ProjectSystem\VS\PropertyPages\**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+        <Compile Update="ProjectSystem\VS\PropertyPages\**\*.xaml.cs" DependentUpon="%(Filename)" />
     </ItemGroup>
 
     <!--
@@ -51,10 +44,10 @@
     -->
     <ItemGroup>
         <Compile Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.Designer.cs">
-          <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
+            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </Compile>
         <EmbeddedResource Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.resx">
-          <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
+            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </EmbeddedResource>
     </ItemGroup>
 
