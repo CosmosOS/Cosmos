@@ -423,7 +423,7 @@ namespace Cosmos.Build.Builder {
       }
 
       Logger.LogMessage("Launching Visual Studio");
-      Start(xVisualStudio, Quoted(mCosmosPath + @"Kernel.sln"), false, true);
+      Start(xVisualStudio, Quoted(Path.Combine(mCosmosPath, "Kernel.sln")), false, true);
     }
 
     private void RunSetup() {
@@ -435,7 +435,7 @@ namespace Cosmos.Build.Builder {
 
       string setupName = GetSetupName(mReleaseNo);
 
-      Start(mCosmosPath + @"Setup\Output\" + setupName + ".exe", @"/SILENT");
+      Start(Path.Combine(mCosmosPath, "Setup", "Output", setupName + ".exe"), @"/SILENT");
     }
 
     private void Done() {
