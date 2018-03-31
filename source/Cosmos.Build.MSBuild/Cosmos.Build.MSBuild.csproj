@@ -19,7 +19,7 @@
   
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
     </ItemGroup>
 
 </Project>
