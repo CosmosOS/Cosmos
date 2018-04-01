@@ -14,7 +14,7 @@ namespace Cosmos.System {
 
         public static List<string> commands = new List<string>();
         public static bool writecommand = false;
-        public static int commandindex = 0;
+        public static int commandindex = -1;
         public static string cmd;
 
         protected int mX = 0;
