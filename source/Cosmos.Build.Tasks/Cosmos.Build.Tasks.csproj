@@ -25,7 +25,7 @@ $(CosmosDescription)</PackageDescription>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>
