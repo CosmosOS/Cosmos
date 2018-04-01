@@ -44,7 +44,6 @@
         <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat2\Cosmos.Kernel.Tests.Fat2.csproj" />
         <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
         <ProjectReference Include="..\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
-		<ProjectReference Include="..\Cosmos.Kernel.Tests.SMBIOS\Cosmos.Kernel.Tests.SMBIOS.csproj" />
         <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
         <ProjectReference Include="..\GraphicTest\GraphicTest.csproj" />
         <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />

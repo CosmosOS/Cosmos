@@ -27,7 +27,6 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
             yield return typeof(Cosmos.Kernel.Tests.Fat2.Kernel);
             //yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
-            yield return typeof(Cosmos.Kernel.Tests.SMBIOS.Kernel);
             yield return typeof(SimpleStructsAndArraysTest.Kernel);
 
             //yield return typeof(FrotzKernel.Kernel);
