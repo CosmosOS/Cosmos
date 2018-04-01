@@ -9,7 +9,7 @@ namespace Cosmos.System.Graphics
     {
         public override void Disable()
         {
-            throw new NotImplementedException();
+            xSVGAIIDriver.Disable();
         }
 
         public VMWareSVGAII xSVGAIIDriver;

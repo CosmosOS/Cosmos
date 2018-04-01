@@ -72,18 +72,18 @@ namespace Cosmos_Graphic_Subsytem
                  * canvas.DrawString(pen, "Please press any key to continue the Demo...");
                  */
                 Console.ReadKey();
-                /*
+                
                 // Throws a NotImplementedException in VMWare,
                 // due to being unable to escape from the clutches of the SVGA II driver...
                 //
                 // Probably best to leave this commented out until it can work in VMWare as well
-                
+                canvas.Clear();
                 canvas.Disable();
                 Console.Clear();
                 Console.WriteLine("If it worked, you've successfully returned back to standard VGA Text Mode!");
                 Console.WriteLine("Let's try returning back to CGS mode... Press any key!");
                 Console.ReadKey(true);
-                */
+                
 
                 /* Let's try to change mode...*/
                 canvas.Mode = new Mode(1024, 768, ColorDepth.ColorDepth32);

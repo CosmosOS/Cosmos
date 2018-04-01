@@ -333,6 +333,11 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WaitForFifo();
         }
 
+        public void Disable()
+        {
+            WriteRegister(Register.Enable, 0);
+        }
+
         public void SetCursor(bool visible, uint x, uint y)
         {
             WriteRegister(Register.CursorID, 1);
