@@ -54,7 +54,8 @@ namespace Cosmos.HAL.PCInformation
             this.Flags = ParseFlags();
             //Parses stepping, model and family
             ParseInformation();
-            this.Frequency = ProcessorInformation.GetFrequency();
+            // TODO: can't use PIT, because it's too fast, so it causes a stack overflow.
+            //this.Frequency = ProcessorInformation.GetFrequency();
         }
 
         /// <summary>
