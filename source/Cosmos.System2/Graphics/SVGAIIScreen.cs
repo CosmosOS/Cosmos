@@ -115,6 +115,7 @@ namespace Cosmos.System.Graphics
                 new Mode(640, 480, ColorDepth.ColorDepth32),
                 new Mode(720, 480, ColorDepth.ColorDepth32),
                 new Mode(800, 600, ColorDepth.ColorDepth32),
+                new Mode(1024, 768, ColorDepth.ColorDepth32),
                 new Mode(1152, 768, ColorDepth.ColorDepth32),
 
                 /* Old HD-Ready Resolutions */
