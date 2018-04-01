@@ -484,50 +484,50 @@ namespace Cosmos.System_Plugs.System
                 {
                     if (Cosmos.System.Console.writecommand) //IF SHELL
                     {
-                        if(Cosmos.System.Console.commandindex < 50)
+                        //if(Cosmos.System.Console.commandindex < 50)
+                        //{
+                        chars.Clear(); //remove chars if there were something
+                        Cosmos.System.Console.commandindex--;
+                        Command = Cosmos.System.Console.commands[Cosmos.System.Console.commandindex];
+
+                        foreach (char chr in Command)
                         {
-                            chars.Clear(); //remove chars if there were something
-                            Cosmos.System.Console.commandindex--;
-                            Command = Cosmos.System.Console.commands[Cosmos.System.Console.commandindex];
-
-                            foreach (char chr in Command)
+                            if (currentCount == chars.Count)
                             {
-                                if (currentCount == chars.Count)
-                                {
-                                    chars.Add(chr);
-                                    Write(chr);
-                                    currentCount++;
-                                }
-                                else
-                                {
-                                    //Insert the new character in the correct location
-                                    //For some reason, List.Insert() doesn't work properly
-                                    //so the character has to be inserted manually
-                                    List<char> temp = new List<char>();
-
-                                    for (int x = 0; x < chars.Count; x++)
-                                    {
-                                        if (x == currentCount)
-                                        {
-                                            temp.Add(chr);
-                                        }
-
-                                        temp.Add(chars[x]);
-                                    }
-
-                                    chars = temp;
-
-                                    //Shift the characters to the right
-                                    for (int x = currentCount; x < chars.Count; x++)
-                                    {
-                                        Write(chars[x]);
-                                    }
-
-                                    GetConsole().X -= (chars.Count - currentCount) - 1;
-                                    currentCount++;
-                                }
+                                chars.Add(chr);
+                                Write(chr);
+                                currentCount++;
                             }
-                        }                        
+                            else
+                            {
+                                //Insert the new character in the correct location
+                                //For some reason, List.Insert() doesn't work properly
+                                //so the character has to be inserted manually
+                                List<char> temp = new List<char>();
+
+                                for (int x = 0; x < chars.Count; x++)
+                                {
+                                    if (x == currentCount)
+                                    {
+                                        temp.Add(chr);
+                                    }
+
+                                    temp.Add(chars[x]);
+                                }
+
+                                chars = temp;
+
+                                //Shift the characters to the right
+                                for (int x = currentCount; x < chars.Count; x++)
+                                {
+                                    Write(chars[x]);
+                                }
+
+                                GetConsole().X -= (chars.Count - currentCount) - 1;
+                                currentCount++;
+                            }
+                        }
+                        //}                        
                     }
                     continue;
                 }
