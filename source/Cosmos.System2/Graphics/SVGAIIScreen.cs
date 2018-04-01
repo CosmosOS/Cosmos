@@ -7,6 +7,11 @@ namespace Cosmos.System.Graphics
 {
     public class SVGAIIScreen : Canvas
     {
+        public override void Disable()
+        {
+            throw new NotImplementedException();
+        }
+
         public VMWareSVGAII xSVGAIIDriver;
         internal Debug.Kernel.Debugger mSVGAIIDebugger = new Debug.Kernel.Debugger("System", "SVGAIIScreen");
 

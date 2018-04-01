@@ -36,7 +36,7 @@ namespace Cosmos_Graphic_Subsytem
                 mDebugger.Send("Run");
 
                 /* A red Point */
-                Pen pen = new Pen(Color.Red);
+                var pen = new Pen(Color.Red);
                 canvas.DrawPoint(pen, 69, 69);
 
                 /* A GreenYellow horizontal line */
@@ -72,10 +72,15 @@ namespace Cosmos_Graphic_Subsytem
                  * canvas.DrawString(pen, "Please press any key to continue the Demo...");
                  */
                 Console.ReadKey();
+                canvas.Disable();
+                Console.Clear();
+                Console.WriteLine("If it worked, you've successfully returned back to standard VGA Text Mode!");
+                Console.WriteLine("Let's try returning back to CGS mode... Press any key!");
+                Console.ReadKey(true);
 
                 /* Let's try to change mode...*/
-                canvas.Mode = new Mode(800, 600, ColorDepth.ColorDepth16);
-
+                canvas.Mode = new Mode(800, 600, ColorDepth.ColorDepth32);
+                canvas.Clear(Color.Blue);
                 /* A LimeGreen rectangle */
                 pen.Color = Color.LimeGreen;
                 canvas.DrawRectangle(pen, 450, 450, 80, 60);

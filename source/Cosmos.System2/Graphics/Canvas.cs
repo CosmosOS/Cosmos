@@ -84,6 +84,7 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public abstract void Disable();
 
         public void DrawPoint(Pen pen, Point point)
         {

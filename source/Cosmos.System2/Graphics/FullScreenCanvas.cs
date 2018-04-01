@@ -6,6 +6,18 @@ namespace Cosmos.System.Graphics
 {
     public static class FullScreenCanvas
     {
+        public static bool IsInUse = false;
+
+        public static void Disable()
+        {
+            if (IsInUse == false) { }
+            else if (IsInUse == true)
+            {
+                MyVideoDriver.Disable();
+                VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
+            }
+        }
+
         private enum VideoDriver
         {
             VMWareSVGAIIDriver,

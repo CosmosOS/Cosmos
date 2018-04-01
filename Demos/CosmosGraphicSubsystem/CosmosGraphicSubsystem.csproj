@@ -8,7 +8,7 @@
 
     <PropertyGroup>
         <BinFormat>Bin</BinFormat>
-        <DebugEnabled>True</DebugEnabled>
+        <DebugEnabled>False</DebugEnabled>
         <DebugMode>Source</DebugMode>
         <TraceMode>User</TraceMode>
         <EnableGDB>False</EnableGDB>
@@ -19,9 +19,9 @@
         <StackCorruptionDetectionLevel>MethodFooters</StackCorruptionDetectionLevel>
         <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
         <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
-        <Launch>VMware</Launch>
-        <Profile>VMware</Profile>
-        <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+        <Launch>Bochs</Launch>
+        <Profile>Bochs</Profile>
+        <Description>Use Bochs emulator to deploy and debug.</Description>
         <PxeInterface>192.168.0.8</PxeInterface>
         <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
         <VMware_StackCorruptionDetectionLevel>MethodFooters</VMware_StackCorruptionDetectionLevel>

@@ -64,7 +64,7 @@ namespace Cosmos.HAL.Drivers
             IO.VbeData.Word = value;
         }
 
-        private void VBEDisableDisplay()
+        public void VBEDisableDisplay()
         {
             Global.mDebugger.SendInternal($"Disabling VBE display");
             VBEWrite(VBERegisterIndex.VBEDisplayEnable, (ushort)VBEEnableValues.VBEDisabled);
