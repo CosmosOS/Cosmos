@@ -40,7 +40,7 @@ namespace Cosmos.Debug.Hosts
                                      + "print_timestamps: enabled=0\n"
                                      + "port_e9_hack: enabled=0\n"
                                      + "private_colormap: enabled=0\n"
-                                     + "clock: sync=slowdown, time0=local, rtc_sync=0\n"
+                                     + "clock: sync=none, time0=local, rtc_sync=0\n"
                                      + "# no cmosimage\n"
                                      + "# no loader\n"
                                      + "log: -\n"
