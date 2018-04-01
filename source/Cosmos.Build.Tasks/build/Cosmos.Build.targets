@@ -1,6 +1,11 @@
 ﻿<Project>
 
     <PropertyGroup>
+        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+        <AppendRuntimeIdentifierToOutputPath>False</AppendRuntimeIdentifierToOutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
         <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
     </PropertyGroup>
