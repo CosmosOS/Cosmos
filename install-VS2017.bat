@@ -12,11 +12,14 @@ if %ERRORLEVEL% neq 0 (
   goto:eof
 )
 
-set "VSWhere=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+set "ARCH=%PROCESSOR_ARCHITECTURE%"
+if %ARCH%==x86 set "VSWhere=%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"
+if %ARCH%==AMD64 set "VSWhere=%ProrgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+REM set "VSWhere=%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"
 
 :MSBuild
 echo Looking for MSBuild
-for /f "usebackq delims=" %%i in (`^""%VSWhere%" -latest -version "[15.0,16.0)" -requires "Microsoft.Component.MSBuild" -property "installationPath"^"`) do (
+for /f "usebackq delims=" %%i in (`^""%VSWhere%" -latest -version "[15.0,16.0)" -products * -requires "Microsoft.Component.MSBuild" -property "installationPath"^"`) do (
   set InstallDir=%%i
 )
 
