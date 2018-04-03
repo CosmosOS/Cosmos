@@ -17,90 +17,109 @@
                   Padding="12"
                   Header="IL2CPU">
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.Resources>
-                    <Style TargetType="TextBox">
-                        <Setter Property="Padding" Value="2" />
-                    </Style>
-                </Grid.Resources>
+            <StackPanel>
 
-                <CheckBox Grid.Column="0"
+                <CheckBox x:Name="checkBoxDebugEnabled"
+                          Grid.Column="0"
                           Grid.Row="0"
                           IsChecked="{Binding DebugEnabled}"
+                          Margin="0,0,0,12"
                           Content="Enable debug" />
 
-                <StackPanel Grid.Column="0"
-                            Grid.Row="1">
-                    <Label Margin="0,12,0,0"
-                           Content="Debug mode:" />
-                    <ComboBox Margin="0,8,0,0"
-                              SelectedValuePath="Key"
-                              DisplayMemberPath="Value"
-                              ItemsSource="{Binding DebugModeItems}"
-                              SelectedValue="{Binding DebugMode}" />
-                </StackPanel>
+                <GroupBox Padding="12"
+                          Header="Debug Settings"
+                          IsEnabled="{Binding ElementName=checkBoxDebugEnabled}">
 
-                <StackPanel Grid.Column="0"
-                            Grid.Row="2">
-                    <Label Margin="0,12,0,0"
-                           Content="Trace mode:" />
-                    <ComboBox Margin="0,8,0,0"
-                              SelectedValuePath="Key"
-                              DisplayMemberPath="Value"
-                              ItemsSource="{Binding TraceModeItems}"
-                              SelectedValue="{Binding TraceMode}" />
-                </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.Resources>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Padding" Value="2" />
+                            </Style>
+                        </Grid.Resources>
 
-                <StackPanel Grid.Column="0"
-                            Grid.Row="3">
-                    <Label Margin="0,12,0,0"
-                           Content="Visual Studio debug port:" />
-                    <TextBox Margin="0,8,0,0"
-                             Text="{Binding VisualStudioDebugPort}" />
-                </StackPanel>
+                        <StackPanel Grid.Column="0"
+                                    Grid.Row="0">
+                            <Label Content="Debug COM port:" />
+                            <ComboBox Margin="0,8,0,0"
+                                      ItemsSource="{Binding DebugComItems}"
+                                      SelectedItem="{Binding DebugCom}" />
+                        </StackPanel>
 
-                <CheckBox Grid.Column="2"
-                          Grid.Row="0"
-                          Content="Enable stack corruption detection"
-                          IsChecked="{Binding StackCorruptionDetectionEnabled}" />
+                        <StackPanel Grid.Column="0"
+                                    Grid.Row="1">
+                            <Label Margin="0,12,0,0"
+                                   Content="Debug mode:" />
+                            <ComboBox Margin="0,8,0,0"
+                                      SelectedValuePath="Key"
+                                      DisplayMemberPath="Value"
+                                      ItemsSource="{Binding DebugModeItems}"
+                                      SelectedValue="{Binding DebugMode}" />
+                        </StackPanel>
 
-                <StackPanel Grid.Column="2"
-                            Grid.Row="1">
-                    <Label Margin="0,12,0,0"
-                           Content="Stack corruption detection level:" />
-                    <ComboBox Margin="0,8,0,0"
-                              SelectedValuePath="Key"
-                              DisplayMemberPath="Value"
-                              ItemsSource="{Binding StackCorruptionDetectionLevelItems}"
-                              SelectedValue="{Binding StackCorruptionDetectionLevel}" />
-                </StackPanel>
+                        <StackPanel Grid.Column="0"
+                                    Grid.Row="2">
+                            <Label Margin="0,12,0,0"
+                                   Content="Trace mode:" />
+                            <ComboBox Margin="0,8,0,0"
+                                      SelectedValuePath="Key"
+                                      DisplayMemberPath="Value"
+                                      ItemsSource="{Binding TraceModeItems}"
+                                      SelectedValue="{Binding TraceMode}" />
+                        </StackPanel>
 
-                <StackPanel Grid.Column="2"
-                            Grid.Row="2">
-                    <Label Margin="0,12,0,0"
-                           Content="Cosmos debug port:" />
-                    <TextBox Margin="0,8,0,0"
-                             Text="{Binding CosmosDebugPort}" />
-                </StackPanel>
+                        <StackPanel Grid.Column="0"
+                                    Grid.Row="3">
+                            <Label Margin="0,12,0,0"
+                                   Content="Visual Studio debug port:" />
+                            <TextBox Margin="0,8,0,0"
+                                     Text="{Binding VisualStudioDebugPort}" />
+                        </StackPanel>
 
-                <CheckBox Grid.Column="2"
-                          Grid.Row="3"
-                          Margin="0,18,0,0"
-                          Content="Ignore debug stub attribute"
-                          IsChecked="{Binding IgnoreDebugStubAttribute}" />
+                        <StackPanel Grid.Column="2"
+                                    Grid.Row="0">
+                            <CheckBox Margin="0,4,0,0"
+                                      Content="Ignore debug stub attribute"
+                                      IsChecked="{Binding IgnoreDebugStubAttribute}" />
+                            <CheckBox Margin="0,18,0,0"
+                                      Content="Enable stack corruption detection"
+                                      IsChecked="{Binding StackCorruptionDetectionEnabled}" />
+                        </StackPanel>
 
-            </Grid>
+                        <StackPanel Grid.Column="2"
+                                    Grid.Row="1">
+                            <Label Margin="0,12,0,0"
+                                   Content="Stack corruption detection level:" />
+                            <ComboBox Margin="0,8,0,0"
+                                      SelectedValuePath="Key"
+                                      DisplayMemberPath="Value"
+                                      ItemsSource="{Binding StackCorruptionDetectionLevelItems}"
+                                      SelectedValue="{Binding StackCorruptionDetectionLevel}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2"
+                                    Grid.Row="2">
+                            <Label Margin="0,12,0,0"
+                                   Content="Cosmos debug port:" />
+                            <TextBox Margin="0,8,0,0"
+                                     Text="{Binding CosmosDebugPort}" />
+                        </StackPanel>
+
+                    </Grid>
+
+                </GroupBox>
+
+            </StackPanel>
 
         </GroupBox>
 

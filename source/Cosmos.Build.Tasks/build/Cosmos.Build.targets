@@ -38,6 +38,9 @@
         <DebugEnabled Condition="'$(DebugEnabled)' == '' AND '$(Configuration)' == 'Debug'">True</DebugEnabled>
         <DebugEnabled Condition="'$(DebugEnabled)' == ''">False</DebugEnabled>
 
+        <DebugCom Condition="'$(DebugCom)' == ''">1</DebugCom>
+        <DebugCom Condition="'$(DebugEnabled)' == 'False'">0</DebugCom>
+
         <BinFormat Condition="'$(BinFormat)' == ''">ELF</BinFormat>
         <DebugMode Condition="'$(DebugMode)' == ''">Source</DebugMode>
         <TraceMode Condition="'$(TraceMode)' == ''">User</TraceMode>
@@ -142,7 +145,7 @@
                 StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)"
                 TraceAssemblies="$(TraceAssemblies)"
                 IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
-                DebugCom="1"
+                DebugCom="$(DebugCom)"
                 References="$(TargetPath);@(PlugsReference)"
                 AssemblySearchDirs="@(AssemblySearchDir)"
                 OutputFilename="$(Il2cpuOutput)"
