@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <USB_Name>CosmosGraphicSubsystemBoot</USB_Name>
     <Bochs_Name>CosmosGraphicSubsystemBoot</Bochs_Name>
     <VMware_Name>CosmosGraphicSubsystemBoot</VMware_Name>
-    <USB_Name>CosmosGraphicSubsystemBoot</USB_Name>
   </PropertyGroup>
 
   <PropertyGroup>

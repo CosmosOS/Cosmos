@@ -11,7 +11,7 @@
 
     <ItemGroup>
         <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
+        <ProjectReference PrivateAssets="All" Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
     </ItemGroup>
 
 </Project>
