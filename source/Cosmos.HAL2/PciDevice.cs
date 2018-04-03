@@ -272,7 +272,7 @@ namespace Cosmos.HAL
                             default:
                                 return "VMware Unknown device";
                         }
-                    case 0x8086: //Intel
+                    case 0x8086: //Intel 80EE
                         switch (device.DeviceID)
                         {
                             case 0x7190:
@@ -289,6 +289,16 @@ namespace Cosmos.HAL
                                 return "Intel PIIX4/82371AB/EB/MB ACPI";
                             default:
                                 return "Intel Unknown device";
+                        }
+                    case 0x80EE: //VirtualBox
+                        switch (device.DeviceID)
+                        {
+                            case 0xBEEF:
+                                return "VirtualBox Graphics Adapter";
+                            case 0xCAFE:
+                                return "VirtualBox Guest Service";
+                            default:
+                                return "VirtualBox Unknown device";
                         }
                     default:
                         return "Unknown device";
