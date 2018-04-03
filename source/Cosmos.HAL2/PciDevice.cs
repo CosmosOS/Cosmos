@@ -240,6 +240,14 @@ namespace Cosmos.HAL
                             default:
                                 return "Mylex Unknown device";
                         }
+                    case 0x1234: //Bochs
+                        switch (device.DeviceID)
+                        {
+                            case 0x1111:
+                                return "Bochs BGA";
+                            default:
+                                return "Bochs Unknown device";
+                        }
                     case 0x1274: //Ensoniq
                         switch (device.DeviceID)
                         {
