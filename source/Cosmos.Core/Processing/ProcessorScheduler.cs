@@ -12,7 +12,7 @@ namespace Cosmos.Core.Processing
             var context = new ProcessContext.Context();
             context.type = ProcessContext.Context_Type.PROCESS;
             context.tid = ProcessContext.m_NextCID++;
-            //context.name = "Boot";
+            context.name = "Boot";
             context.esp = 0;
             context.stacktop = 0;
             context.cr3 = 0;
@@ -22,7 +22,6 @@ namespace Cosmos.Core.Processing
             context.priority = 0;
             context.age = 0;
             context.parent = 0;
-<<<<<<< HEAD
             ProcessContext.m_ContextList = context;
             ProcessContext.m_CurrentContext = context;
 
@@ -38,10 +37,6 @@ namespace Cosmos.Core.Processing
             IOPort p21 = new IOPort(0xA1);
             pA1.Byte = 0x00;
             p21.Byte = 0x00;
-=======
-            ProcessContext.m_ContextList.Add(context);
-            //ProcessContext.StartContext("Test", test, ProcessContext.Context_Type.PROCESS);
->>>>>>> origin/OgRok-Multitasking
         }
 
         public static void EntryPoint()
