@@ -12,10 +12,11 @@ if %ERRORLEVEL% neq 0 (
   goto:eof
 )
 
-set "ARCH=%PROCESSOR_ARCHITECTURE%"
-if %ARCH%==x86 set "VSWhere=%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"
-if %ARCH%==AMD64 set "VSWhere=%ProrgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
-REM set "VSWhere=%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"
+if not exist "%ProgramFiles(x86)%" (
+  set "ProgramFiles(x86)=%ProgramFiles%"
+)
+
+set "VSWhere=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 
 :MSBuild
 echo Looking for MSBuild
