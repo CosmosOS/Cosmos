@@ -12,5 +12,8 @@ namespace Cosmos.Core
 
         [PlugMethod(PlugRequired = true)]
         public static uint GetPointer(Object aVal) { return 0; }
+
+        [PlugMethod(PlugRequired = true)]
+        public static uint GetEntryPoint() { return 0; }
     }
 }

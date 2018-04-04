@@ -548,6 +548,8 @@ namespace Cosmos.Core {
                     HandleInterrupt_47(ref xCtx);
                     HandleInterrupt_48(ref xCtx);
                     HandleInterrupt_49(ref xCtx);
+                    Processing.ProcessorScheduler.SwitchTask();
+                    Processing.ProcessorScheduler.EntryPoint();
                 }
             }
         }

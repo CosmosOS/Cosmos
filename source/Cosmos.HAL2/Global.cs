@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
@@ -46,7 +47,7 @@ namespace Cosmos.HAL
       IDE.InitDriver();
       AHCI.InitDriver();
       //EHCI.InitDriver();
-      //Core.Processing.ProcessorScheduler.Initialize();
+      Core.Processing.ProcessorScheduler.Initialize();
       //PIT.RegisterTimer(new PIT.PITTimer(Core.Processing.ProcessorScheduler.SwitchTask, 20, true));
 
       mDebugger.Send("Done initializing Cosmos.HAL.Global");
@@ -59,5 +60,15 @@ namespace Cosmos.HAL
     }
 
     public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
+
+    public static uint SpawnThread(ThreadStart aStart)
+    {
+      return Core.Processing.ProcessContext.StartContext("", aStart, Core.Processing.ProcessContext.Context_Type.THREAD);
+    }
+
+    public static uint SpawnThread(ParameterizedThreadStart aStart, object param)
+    {
+      return Core.Processing.ProcessContext.StartContext("", aStart, Core.Processing.ProcessContext.Context_Type.THREAD, param);
+    }
   }
 }

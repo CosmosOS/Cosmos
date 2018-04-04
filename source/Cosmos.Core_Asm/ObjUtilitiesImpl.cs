@@ -14,6 +14,9 @@ namespace Cosmos.Core_Asm
 
         [PlugMethod(Assembler = typeof(ObjUtilitiesGetPointer))]
         public static uint GetPointer(Object aVal) { return 0; }
+
+        [PlugMethod(Assembler = typeof(ObjUtilitiesGetEntry))]
+        public static uint GetEntryPoint() { return 0; }
     }
 
     public class ObjUtilitiesGetPointer : AssemblerMethod
@@ -21,6 +24,15 @@ namespace Cosmos.Core_Asm
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x8);
+            XS.Push(XSRegisters.EAX);
+        }
+    }
+
+    public class ObjUtilitiesGetEntry : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.Set(XSRegisters.EAX, LabelName.Get(CPUUpdateIDTAsm.GetMethodDef(typeof(Cosmos.Core.Processing.ProcessorScheduler).Assembly, typeof(Cosmos.Core.Processing.ProcessorScheduler).FullName, "EntryPoint", true)));
             XS.Push(XSRegisters.EAX);
         }
     }

@@ -23,15 +23,18 @@ namespace Cosmos.Core.Processing
 
         public class Context
         {
+            public Context next;
             public Context_Type type;
             public uint tid;
             public string name;
             public uint esp;
             public uint stacktop;
-            public uint eip;
+            public System.Threading.ThreadStart entry;
+            public System.Threading.ParameterizedThreadStart paramentry;
             public uint cr3;
             public Thread_State state;
             public Thread_State old_state;
+            public object param;
             public uint arg;
 	        public uint priority;
             public uint age;
@@ -40,79 +43,106 @@ namespace Cosmos.Core.Processing
 
         public const uint STACK_SIZE = 4096;
         public static uint m_NextCID;
-        public static int m_CurrentContext;
-        public static List<Context> m_ContextList = new List<Context>(256);
-
-        public static Context GetContext()
-        {
-            return m_ContextList[m_CurrentContext];
-        }
+        public static Context m_CurrentContext;
+        public static Context m_ContextList;
 
         public static Context GetContext(int tid)
         {
-            for(int i = 0; i < m_ContextList.Count; i++)
+            /*for(int i = 0; i < m_ContextList.Count; i++)
             {
                 if(m_ContextList[i].tid == tid)
                 {
                     return m_ContextList[i];
                 }
+            }*/
+            Context ctx = m_ContextList;
+            while(ctx.next != null)
+            {
+                ctx = ctx.next;
             }
             return null;
         }
 
-        public static uint StartContext(string name, System.Threading.ThreadStart entry, Context_Type type, params object[] args)
+        public static uint* SetupStack(uint* stack)
         {
-            uint address = ObjUtilities.GetPointer(entry);
-            Context context = new Context();
-            context.type = type;
-            context.tid = m_NextCID++;
-            context.name = name;
-            uint[] tmp = new uint[STACK_SIZE / 4];
-            fixed (uint* p = tmp)
-            {
-                context.esp = (uint)p;
-            }
-            context.stacktop = context.esp;
-            uint* stack = (uint*)(context.esp + 4000);
+            uint origin = (uint)stack;
             *--stack = 0xFFFFFFFF; // trash
             *--stack = 0xFFFFFFFF; // trash
             *--stack = 0xFFFFFFFF; // trash
             *--stack = 0xFFFFFFFF; // trash
-            /*for(int i = 0; i < 512 / 4; i++)
-            {
-                *--stack = 0; // MMX
-            }*/ // nope, just not going to bother today
-            for(int i = args.Length - 1; i >= 0; i++) // will push arguments when we patch in the object utils
-            {
-                *--stack = 0; ObjUtilities.GetPointer(args[i]);
-            }
             *--stack = 0x10; // ss ?
             *--stack = 0x00000202; // eflags
             *--stack = 0x8; // cs
-            *--stack = address; // eip
+            *--stack = ObjUtilities.GetEntryPoint(); // eip
             *--stack = 0; // error
             *--stack = 0; // int
             *--stack = 0; // eax
             *--stack = 0; // ebx
             *--stack = 0; // ecx
-            *--stack = *stack; // offset
+            *--stack = 0; // offset
             *--stack = 0; // edx
             *--stack = 0; // esi
             *--stack = 0; // edi
-            *--stack = context.esp + 4000; //ebp
-            context.esp = (uint)stack;
-            context.eip = address;
+            *--stack = origin; //ebp
+            *--stack = 0x10; // ds
+            *--stack = 0x10; // fs
+            *--stack = 0x10; // es
+            *--stack = 0x10; // gs
+            return stack;
+        }
+
+        public static uint StartContext(string name, System.Threading.ThreadStart entry, Context_Type type)
+        {
+            Context context = new Context();
+            context.type = type;
+            context.tid = m_NextCID++;
+            context.name = name;
+            context.stacktop = GCImplementation.AllocNewObject(4096);
+            context.esp = (uint)SetupStack((uint*)(context.stacktop + 4000));
             context.state = Thread_State.ALIVE;
+            context.entry = entry;
             if (type == Context_Type.PROCESS)
             {
                 context.parent = 0;
             }
             else
             {
-                Context parent = GetContext();
-                context.parent = parent.tid;
+                context.parent = m_CurrentContext.tid;
             }
-            m_ContextList.Add(context);
+            Context ctx = m_ContextList;
+            while (ctx.next != null)
+            {
+                ctx = ctx.next;
+            }
+            ctx.next = context;
+            return context.tid;
+        }
+
+        public static uint StartContext(string name, System.Threading.ParameterizedThreadStart entry, Context_Type type, object param)
+        {
+            Context context = new Context();
+            context.type = type;
+            context.tid = m_NextCID++;
+            context.name = name;
+            context.stacktop = GCImplementation.AllocNewObject(4096);
+            context.esp = (uint)SetupStack((uint*)(context.stacktop + 4000));
+            context.state = Thread_State.ALIVE;
+            context.paramentry = entry;
+            context.param = param;
+            if (type == Context_Type.PROCESS)
+            {
+                context.parent = 0;
+            }
+            else
+            {
+                context.parent = m_CurrentContext.tid;
+            }
+            Context ctx = m_ContextList;
+            while (ctx.next != null)
+            {
+                ctx = ctx.next;
+            }
+            ctx.next = context;
             return context.tid;
         }
     }
