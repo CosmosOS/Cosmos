@@ -48,7 +48,11 @@ namespace Cosmos.HAL
       AHCI.InitDriver();
       //EHCI.InitDriver();
       Core.Processing.ProcessorScheduler.Initialize();
+<<<<<<< HEAD
       //PIT.RegisterTimer(new PIT.PITTimer(Core.Processing.ProcessorScheduler.SwitchTask, 20, true));
+=======
+      PIT.RegisterTimer(new PIT.PITTimer(Core.Processing.ProcessorScheduler.SwitchTask, 20, true));
+>>>>>>> origin/OgRok-Multitasking
 
       mDebugger.Send("Done initializing Cosmos.HAL.Global");
 

@@ -70,6 +70,17 @@ namespace Cosmos.Core.Processing
             *--stack = 0xFFFFFFFF; // trash
             *--stack = 0xFFFFFFFF; // trash
             *--stack = 0xFFFFFFFF; // trash
+<<<<<<< HEAD
+=======
+            /*for(int i = 0; i < 512 / 4; i++)
+            {
+                *--stack = 0; // MMX
+            }*/ // nope, just not going to bother today
+            for(int i = args.Length - 1; i >= 0; i++) // will push arguments when we patch in the object utils
+            {
+                *--stack = ObjUtilities.GetPointer(args[i]);
+            }
+>>>>>>> origin/OgRok-Multitasking
             *--stack = 0x10; // ss ?
             *--stack = 0x00000202; // eflags
             *--stack = 0x8; // cs
