@@ -1,8 +1,7 @@
 ﻿<Project>
 
     <PropertyGroup>
-        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
-        <AppendRuntimeIdentifierToOutputPath>False</AppendRuntimeIdentifierToOutputPath>
+        <SelfContained>True</SelfContained>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -131,11 +130,11 @@
 
     <Target Name="IL2CPU"
             Inputs="$(TargetPath);@(PlugsReference)"
-            Outputs="$(Il2cpuOutput)">
+            Outputs="$(Il2cpuOutput)"
+            DependsOnTargets="RunResolvePublishAssemblies">
 
         <ItemGroup>
-            <AssemblySearchDir Include="$(KernelAssembliesDir)" />
-            <AssemblySearchDir Include="%(ReferencePath.RootDir)%(ReferencePath.Directory)" />
+            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)" Condition="'%(AssetType)' != 'native'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"
@@ -146,13 +145,14 @@
                 TraceAssemblies="$(TraceAssemblies)"
                 IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
                 DebugCom="$(DebugCom)"
-                References="$(TargetPath);@(PlugsReference)"
-                AssemblySearchDirs="@(AssemblySearchDir)"
+                TargetAssembly="$(TargetPath)"
+                References="@(_Il2cpuAssemblies)"
+                PlugsReferences="@(PlugsReference)"
                 OutputFilename="$(Il2cpuOutput)"
                 EnableLogging="True"
                 EmitDebugSymbols="$(DebugSymbols)"
                 CosmosBuildDir="$(CosmosDir)\Build"
-                WorkingDir="$(TargetDir)"/>
+                WorkingDir="$(TargetDir)" />
 
     </Target>
 

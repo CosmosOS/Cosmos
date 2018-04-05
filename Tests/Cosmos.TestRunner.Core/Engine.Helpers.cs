@@ -189,20 +189,26 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            var xReferences = new List<string>() { kernelFileName };
+            var refsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".refs");
+            var workingDirectory = Path.Combine(FindCosmosRoot(), "Tests", "TestKernels");
+
+            RunProcess("dotnet", workingDirectory, $"msbuild /t:WriteReferenceAssembliesToFile \"/p:ReferencesFile={refsFilePath}\" /nologo");
+
+            var xReferences = File.ReadAllLines(refsFilePath);
+            var xPlugsReferences = new List<string>();
 
             if (KernelPkg == "X86")
             {
-                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
-                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
-                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Plugs.TapRoot")).Location);
+                xPlugsReferences.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Plugs")).Location);
+                xPlugsReferences.Add(Assembly.Load(new AssemblyName("Cosmos.CPU_Asm")).Location);
+                xPlugsReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Plugs.TapRoot")).Location);
             }
             else
             {
-                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location);
-                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location);
-                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.System2_Plugs")).Location);
-                xReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location);
+                xPlugsReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location);
+                xPlugsReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location);
+                xPlugsReferences.Add(Assembly.Load(new AssemblyName("Cosmos.System2_Plugs")).Location);
+                xPlugsReferences.Add(Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location);
             }
 
             var xArgs = new List<string>
@@ -214,13 +220,15 @@ namespace Cosmos.TestRunner.Core
                 "DebugMode:Source",
                 "TraceAssemblies:" + TraceAssembliesLevel,
                 "DebugCom:1",
+                "TargetAssembly:" + kernelFileName,
                 "OutputFilename:" + outputFile,
                 "EnableLogging:True",
                 "EmitDebugSymbols:True",
                 "IgnoreDebugStubAttribute:False"
             };
 
-            xArgs.AddRange(xReferences.Select(aReference => "References:" + aReference));
+            xArgs.AddRange(xReferences.Select(r => "References:" + r));
+            xArgs.AddRange(xPlugsReferences.Select(r => "PlugsReferences:" + r));
 
             bool xUsingUserkit = false;
             string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "..", "IL2CPU", "source", "IL2CPU");

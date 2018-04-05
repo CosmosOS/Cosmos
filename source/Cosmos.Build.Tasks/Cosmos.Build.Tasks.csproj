@@ -9,14 +9,9 @@ $(CosmosDescription)</PackageDescription>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="build\**">
-            <Pack>True</Pack>
-            <PackagePath>build\</PackagePath>
-        </Content>
-        <Content Include="tools\**">
-            <Pack>True</Pack>
-            <PackagePath>tools\</PackagePath>
-        </Content>
+        <Content Include="runtime.json" Pack="True" PackagePath="\" />
+        <Content Include="build\**" Pack="True" PackagePath="build\" />
+        <Content Include="tools\**" Pack="True" PackagePath="tools\" />
     </ItemGroup>
 
     <ItemGroup>
