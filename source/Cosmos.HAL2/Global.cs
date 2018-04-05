@@ -45,13 +45,13 @@ namespace Cosmos.HAL
       ACPI.Start();
       
       Console.WriteLine("Finding ATA Devices");
-      mDebugger.Send("ATA Devices")
+      mDebugger.Send("ATA Devices");
       IDE.InitDriver();
       AHCI.InitDriver();
       //EHCI.InitDriver();
 
       Console.WriteLine("Starting Processor Scheduler");
-      mDebugger.Send("Processor Scheduler")
+      mDebugger.Send("Processor Scheduler");
       Core.Processing.ProcessorScheduler.Initialize();
 
       mDebugger.Send("Done initializing Cosmos.HAL.Global");
