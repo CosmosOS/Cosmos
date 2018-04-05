@@ -21,17 +21,16 @@
         <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat2\Cosmos.Kernel.Tests.Fat2.csproj" />
         <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
         <ProjectReference Include="..\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
-        <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
         <ProjectReference Include="..\GraphicTest\GraphicTest.csproj" />
         <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
     </ItemGroup>
 
-    <Target Name="WriteReferenceAssembliesToFile" DependsOnTargets="RunResolvePublishAssemblies">
+    <Target Name="WriteReferenceAssembliesToFile" DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets">
 
         <Error Condition="'$(ReferencesFile)' == ''" Text="References file path is empty!" />
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)" Condition="'%(AssetType)' != 'native'" />
+            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)" Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'" />
         </ItemGroup>
 
         <WriteLinesToFile File="$(ReferencesFile)" Lines="@(_Il2cpuAssemblies)" Overwrite="True" />
