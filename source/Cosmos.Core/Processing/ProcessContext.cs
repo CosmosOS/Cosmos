@@ -11,8 +11,7 @@ namespace Cosmos.Core.Processing
             ALIVE = 0,
             DEAD = 1,
             WAITING_SLEEP = 2,
-            WAITING_SEMAPHORE = 3,
-            PAUSED = 4
+            PAUSED = 3
         }
 
         public enum Context_Type
@@ -31,11 +30,9 @@ namespace Cosmos.Core.Processing
             public uint stacktop;
             public System.Threading.ThreadStart entry;
             public System.Threading.ParameterizedThreadStart paramentry;
-            public uint cr3;
             public Thread_State state;
-            public Thread_State old_state;
             public object param;
-            public uint arg;
+            public int arg;
 	        public uint priority;
             public uint age;
             public uint parent;
@@ -46,7 +43,7 @@ namespace Cosmos.Core.Processing
         public static Context m_CurrentContext;
         public static Context m_ContextList;
 
-        public static Context GetContext(int tid)
+        public static Context GetContext(uint tid)
         {
             /*for(int i = 0; i < m_ContextList.Count; i++)
             {
@@ -58,7 +55,15 @@ namespace Cosmos.Core.Processing
             Context ctx = m_ContextList;
             while(ctx.next != null)
             {
+                if(ctx.tid == tid)
+                {
+                    return ctx;
+                }
                 ctx = ctx.next;
+            }
+            if (ctx.tid == tid)
+            {
+                return ctx;
             }
             return null;
         }
@@ -99,7 +104,7 @@ namespace Cosmos.Core.Processing
             context.name = name;
             context.stacktop = GCImplementation.AllocNewObject(4096);
             context.esp = (uint)SetupStack((uint*)(context.stacktop + 4000));
-            context.state = Thread_State.ALIVE;
+            context.state = Thread_State.PAUSED;
             context.entry = entry;
             if (type == Context_Type.PROCESS)
             {

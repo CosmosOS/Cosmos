@@ -15,9 +15,7 @@ namespace Cosmos.Core.Processing
             context.name = "Boot";
             context.esp = 0;
             context.stacktop = 0;
-            context.cr3 = 0;
             context.state = ProcessContext.Thread_State.ALIVE;
-            context.old_state = ProcessContext.Thread_State.ALIVE;
             context.arg = 0;
             context.priority = 0;
             context.age = 0;
@@ -28,7 +26,7 @@ namespace Cosmos.Core.Processing
             IOPort counter0 = new IOPort(0x40);
             IOPort cmd = new IOPort(0x43);
             
-            int divisor = 1193182 / 20;
+            int divisor = 1193182 / 25;
             cmd.Byte = (0x06 | 0x30);
             counter0.Byte = (byte)divisor;
             counter0.Byte = (byte)(divisor >> 8);
@@ -54,7 +52,34 @@ namespace Cosmos.Core.Processing
             interruptCount++;
             if (ProcessContext.m_CurrentContext != null)
             {
+                ProcessContext.Context ctx = ProcessContext.m_ContextList;
+                ProcessContext.Context last = ctx;
+                while (ctx != null)
+                {
+                    if(ctx.state == ProcessContext.Thread_State.DEAD)
+                    {
+                        last.next = ctx.next;
+                        break;
+                    }
+                    last = ctx;
+                    ctx = ctx.next;
+                }
+                ctx = ProcessContext.m_ContextList;
+                while (ctx != null)
+                {
+                    if(ctx.state == ProcessContext.Thread_State.WAITING_SLEEP)
+                    {
+                        ctx.arg -= 1000 / 25;
+                        if(ctx.arg <= 0)
+                        {
+                            ctx.state = ProcessContext.Thread_State.ALIVE;
+                        }
+                    }
+                    ctx.age++;
+                    ctx = ctx.next;
+                }
                 ProcessContext.m_CurrentContext.esp = INTs.mStackContext;
+                tryagain:;
                 if (ProcessContext.m_CurrentContext.next != null)
                 {
                     ProcessContext.m_CurrentContext = ProcessContext.m_CurrentContext.next;
@@ -63,6 +88,11 @@ namespace Cosmos.Core.Processing
                 {
                     ProcessContext.m_CurrentContext = ProcessContext.m_ContextList;
                 }
+                if(ProcessContext.m_CurrentContext.state != ProcessContext.Thread_State.ALIVE)
+                {
+                    goto tryagain;
+                }
+                ProcessContext.m_CurrentContext.age = ProcessContext.m_CurrentContext.priority;
                 INTs.mStackContext = ProcessContext.m_CurrentContext.esp;
             }
             Global.PIC.EoiMaster();

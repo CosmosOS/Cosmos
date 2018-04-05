@@ -11,10 +11,12 @@ namespace Cosmos.Core.Processing
 
         public void Lock()
         {
-            fixed (int* p = &gate)
+            while(gate != 0) { }
+            gate = 1;
+            /*fixed (int* p = &gate)
             {
                 MutexLock(p);
-            }
+            }*/
         }
 
         public void Unlock()
