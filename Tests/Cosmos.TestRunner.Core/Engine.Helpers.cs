@@ -192,9 +192,12 @@ namespace Cosmos.TestRunner.Core
             var refsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".refs");
             var workingDirectory = Path.Combine(FindCosmosRoot(), "Tests", "TestKernels");
 
-            RunProcess("dotnet", workingDirectory, $"msbuild /t:WriteReferenceAssembliesToFile \"/p:ReferencesFile={refsFilePath}\" /nologo");
+            RunProcess("dotnet", workingDirectory, $"msbuild /t:Restore;WriteReferenceAssembliesToFile \"/p:ReferencesFile={refsFilePath}\" /nologo");
 
             var xReferences = File.ReadAllLines(refsFilePath);
+
+            File.Delete(refsFilePath);
+
             var xPlugsReferences = new List<string>();
 
             if (KernelPkg == "X86")
