@@ -90,10 +90,6 @@ namespace Cosmos.Build.Tasks
             return String.Join(Environment.NewLine, args.Select(a => $"{a.Key}:{a.Value}"));
         }
 
-        protected override string GetResponseFileSwitch(string responseFilePath)
-        {
-            File.Copy(responseFilePath, @"c:\users\jpedr\Desktop\response.rsp", true);
-            return $"ResponseFile:{responseFilePath}";
-        }
+        protected override string GetResponseFileSwitch(string responseFilePath) => $"ResponseFile:{responseFilePath}";
     }
 }
