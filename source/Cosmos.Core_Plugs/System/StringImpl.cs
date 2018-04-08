@@ -730,14 +730,15 @@ namespace Cosmos.Core_Plugs.System
         {
             int skipOffset = 0;
 
-            while (aThis.IndexOf(oldValue, skipOffset) != -1)
+            while (aThis.Substring(skipOffset).IndexOf(oldValue) != -1)
             {
-                int xIndex = aThis.IndexOf(oldValue, skipOffset);
+                int xIndex = aThis.Substring(skipOffset).IndexOf(oldValue) + skipOffset;
                 aThis = aThis.Remove(xIndex, oldValue.Length);
                 aThis = aThis.Insert(xIndex, newValue);
 
                 skipOffset = xIndex + newValue.Length;
-                if(skipOffset > aThis.Length){
+                if (skipOffset > aThis.Length)
+                {
                     break;
                 }
             }
