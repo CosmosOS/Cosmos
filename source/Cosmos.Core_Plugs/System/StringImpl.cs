@@ -737,6 +737,9 @@ namespace Cosmos.Core_Plugs.System
                 aThis = aThis.Insert(xIndex, newValue);
 
                 skipOffset = xIndex + newValue.Length;
+                if(skipOffset > aThis.Length){
+                    break;
+                }
             }
             return aThis;
         }
