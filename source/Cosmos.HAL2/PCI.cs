@@ -63,6 +63,7 @@ namespace Cosmos.HAL
         Intel = 0x8086,
         AMD = 0x1022,
         VMWare = 0x15AD,
+        Bochs = 0x1234,
         VirtualBox = 0x80EE
     }
     
@@ -70,12 +71,14 @@ namespace Cosmos.HAL
     {
         SVGAIIAdapter = 0x0405,
         PCNETII = 0x2000,
+        BGA = 0x1111,
+        VBVGA = 0xBEEF,
         VBoxGuest = 0xCAFE
     }
 
     public class PCI
     {
-        private static List<PCIDevice> Devices;
+        public static List<PCIDevice> Devices;
 
         public static uint Count
         {
