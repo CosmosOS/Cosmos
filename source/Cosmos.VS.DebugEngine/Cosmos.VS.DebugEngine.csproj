@@ -12,7 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
@@ -22,6 +21,7 @@
             <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;SatelliteDllsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
             <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
         </ProjectReference>
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,7 +30,7 @@
         <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.16" />
         <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.6.27413" />
         <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="11.0.61031" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.10-pre20180223200113" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.10" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="4.4.1" />
     </ItemGroup>
 
@@ -47,7 +47,7 @@
     <Target Name="IncludePackageReferenceDependencies" AfterTargets="GetVsixSourceItems">
 
         <ItemGroup>
-            <VSIXSourceItem Include="@(ReferencePath)" Condition="!$([System.String]::new('%(ReferencePath.Filename)').StartsWith('Microsoft.VisualStudio')) AND !$([System.String]::new('%(ReferencePath.Filename)').StartsWith('System')) AND !$([System.String]::new('%(ReferencePath.Filename)').StartsWith('EnvDTE')) AND '%(ReferencePath.Filename)' != 'mscorlib' AND '%(ReferencePath.Filename)' != 'stdole'" />
+            <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="!$([System.String]::new('%(ReferenceCopyLocalPaths.Filename)').StartsWith('Microsoft.VisualStudio')) AND !$([System.String]::new('%(ReferenceCopyLocalPaths.Filename)').StartsWith('System')) AND !$([System.String]::new('%(ReferenceCopyLocalPaths.Filename)').StartsWith('EnvDTE')) AND '%(ReferenceCopyLocalPaths.Filename)' != 'mscorlib' AND '%(ReferenceCopyLocalPaths.Filename)' != 'stdole'" />
         </ItemGroup>
 
     </Target>

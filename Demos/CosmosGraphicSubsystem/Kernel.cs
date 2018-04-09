@@ -6,22 +6,42 @@ using Sys = Cosmos.System;
  * Beware Demo Kernels are not recompiled when its dependencies changes!
  * To force recompilation right click on on the Cosmos icon of the demo solution and do "Build".
  */
+
 namespace Cosmos_Graphic_Subsytem
 {
     public class Kernel : Sys.Kernel
     {
-        Canvas canvas;
+        private Canvas canvas;
+        private Bitmap bitmap;
+
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
             Console.WriteLine("Using default graphics mode");
             //Mode start = new Mode(800, 600, ColorDepth.ColorDepth32);
 
-            Console.WriteLine("Here we go!");
+            bitmap = new Bitmap(10, 10,
+                new byte[] { 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0,
+                    255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
+                    0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
+                    0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 23, 59, 88, 255,
+                    23, 59, 88, 255, 0, 255, 243, 255, 0, 255, 243, 255, 23, 59, 88, 255, 23, 59, 88, 255, 0, 255, 243, 255, 0,
+                    255, 243, 255, 0, 255, 243, 255, 23, 59, 88, 255, 153, 57, 12, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255,
+                    243, 255, 0, 255, 243, 255, 153, 57, 12, 255, 23, 59, 88, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243,
+                    255, 0, 255, 243, 255, 0, 255, 243, 255, 72, 72, 72, 255, 72, 72, 72, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0,
+                    255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 72, 72,
+                    72, 255, 72, 72, 72, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
+                    10, 66, 148, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255,
+                    243, 255, 10, 66, 148, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 10, 66, 148, 255, 10, 66, 148, 255,
+                    10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255,
+                    243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148,
+                    255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
+                    0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, }, ColorDepth.ColorDepth32);
+
+            Console.WriteLine("Press any key to continue!");
             Console.ReadKey(true);
             // Create new instance of FullScreenCanvas, using default graphics mode
             canvas = FullScreenCanvas.GetFullScreenCanvas();    // canvas = GetFullScreenCanvas(start);
-
 
             /* Clear the Screen with the color 'Blue' */
             canvas.Clear(Color.Blue);
@@ -62,6 +82,8 @@ namespace Cosmos_Graphic_Subsytem
                 pen.Color = Color.MediumPurple;
                 canvas.DrawPolygon(pen, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
 
+                canvas.DrawImage(bitmap, new Point(20, 20));
+
                 /*
                  * It will be really beautiful to do here:
                  * canvas.DrawString(pen, "Please press any key to continue the Demo...");
@@ -70,6 +92,9 @@ namespace Cosmos_Graphic_Subsytem
 
                 /* Let's try to change mode...*/
                 canvas.Mode = new Mode(800, 600, ColorDepth.ColorDepth32);
+
+                //If the background is not redrawn, it gets corrupted
+                canvas.Clear(Color.Blue);
 
                 /* A LimeGreen rectangle */
                 pen.Color = Color.LimeGreen;

@@ -1,10 +1,10 @@
 using System;
-using IL2CPU.API;
+
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
 {
-    [Plug(TargetName = "System.RuntimeType")]
+    [Plug("System.RuntimeType, System.Private.CoreLib")]
     public static class RuntimeType
     {
         [PlugMethod(Signature = "System_RuntimeType_RuntimeTypeCache__System_RuntimeType_get_Cache__")]

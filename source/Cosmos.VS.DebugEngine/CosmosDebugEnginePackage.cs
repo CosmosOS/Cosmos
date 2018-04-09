@@ -7,27 +7,27 @@ using Cosmos.VS.DebugEngine.Commands;
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.batteries_green",
-    NewVersion = "1.1.10.53",
+    NewVersion = "1.1.10.86",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.53")]
+    OldVersionUpperBound = "1.1.10.86")]
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.batteries_v2",
-    NewVersion = "1.1.10.53",
+    NewVersion = "1.1.10.86",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.53")]
+    OldVersionUpperBound = "1.1.10.86")]
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.core",
-    NewVersion = "1.1.10.53",
+    NewVersion = "1.1.10.86",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.53")]
+    OldVersionUpperBound = "1.1.10.86")]
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.provider.e_sqlite3",
-    NewVersion = "1.1.10.53",
+    NewVersion = "1.1.10.86",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.53")]
+    OldVersionUpperBound = "1.1.10.86")]
 
 namespace Cosmos.VS.DebugEngine
 {
@@ -35,7 +35,7 @@ namespace Cosmos.VS.DebugEngine
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    public sealed class CosmosDebugEnginePackage : Package, IOleCommandTarget
+    internal sealed class CosmosDebugEnginePackage : Package, IOleCommandTarget
     {
         private IOleCommandTarget packageCommandTarget;
         private DebugCommandHandler packageCommandHandler;
