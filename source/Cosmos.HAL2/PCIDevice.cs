@@ -240,14 +240,6 @@ namespace Cosmos.HAL
                             default:
                                 return "Mylex Unknown device";
                         }
-                    case 0x1234: //Bochs
-                        switch (device.DeviceID)
-                        {
-                            case 0x1111:
-                                return "Bochs BGA";
-                            default:
-                                return "Bochs Unknown device";
-                        }
                     case 0x1274: //Ensoniq
                         switch (device.DeviceID)
                         {
@@ -272,7 +264,7 @@ namespace Cosmos.HAL
                             default:
                                 return "VMware Unknown device";
                         }
-                    case 0x8086: //Intel 80EE
+                    case 0x8086: //Intel
                         switch (device.DeviceID)
                         {
                             case 0x7190:
@@ -289,16 +281,6 @@ namespace Cosmos.HAL
                                 return "Intel PIIX4/82371AB/EB/MB ACPI";
                             default:
                                 return "Intel Unknown device";
-                        }
-                    case 0x80EE: //VirtualBox
-                        switch (device.DeviceID)
-                        {
-                            case 0xBEEF:
-                                return "VirtualBox Graphics Adapter";
-                            case 0xCAFE:
-                                return "VirtualBox Guest Service";
-                            default:
-                                return "VirtualBox Unknown device";
                         }
                     default:
                         return "Unknown device";
@@ -781,7 +763,7 @@ namespace Cosmos.HAL
             return "0x" + aNumber.ToHex(aBits / 4);
         }
     }
-
+    
     public class PCIBaseAddressBar
     {
         private uint baseAddress = 0;
