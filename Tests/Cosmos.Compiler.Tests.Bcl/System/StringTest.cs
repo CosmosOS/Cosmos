@@ -61,6 +61,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             string replace_test = "That is a test string.";
             Assert.IsTrue((test.Replace("This", "That") == replace_test), "string.Replace(string, string) does not work.");
 
+            test = "000";
+            replace_test = "000000000000";
+            Assert.IsTrue((test.Replace("0", "0000") == replace_test), "string.Replace(string, string) is recursive.");
+
             string char_array_test = "char";
             char[] char_array_expected = { 'c', 'h', 'a', 'r' };
             Assert.IsTrue((char_array_test.ToCharArray().Length == 4), "string.ToCharArray() does not work.");
