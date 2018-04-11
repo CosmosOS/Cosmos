@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
@@ -143,5 +144,71 @@ namespace Cosmos.Core_Plugs.System
             }
             throw new NotSupportedException("SetValue not supported in this situation!");
         }
+
+        // IComparer is not used
+        [PlugMethod(Signature = "System_Void__System_Array_Sort_System_Array__System_Array__System_Int32__System_Int32__System_Collections_IComparer_")]
+        public static unsafe void Sort([ObjectPointerAccess] uint* keys, [ObjectPointerAccess] uint* items, int index, int length, IComparer comparer)
+        {
+            if (keys == null)
+            {
+                throw new ArgumentNullException("keys");
+            }
+
+            if (index < 0 || length < 0)
+            {
+                throw new ArgumentOutOfRangeException((length < 0 ? "length" : "index"));
+            }
+
+            QuickSort(keys, items, index, length);
+        }
+
+        private static unsafe void QuickSort(uint* keys, uint* items, int left, int right)
+        {
+            int l = left;
+            int r = right;
+            uint avg = GetValue(keys, (r + l) / 2);
+            do
+            {
+                while (GetValue(keys, l) < avg)
+                {
+                    ++l;
+                }
+
+                while (GetValue(keys, r) > avg)
+                {
+                    --r;
+                }
+
+                if (l <= r)
+                {
+                    if (l < r)
+                    {
+                        uint temp = GetValue(keys, l);
+                        SetValue(keys, GetValue(keys, r), l);
+                        SetValue(keys, temp, r);
+
+                        if (items != null)
+                        {
+                            temp = GetValue(items, l);
+                            SetValue(items, GetValue(items, r), l);
+                            SetValue(items, temp, r);
+                        }
+                    }
+                    ++l;
+                    --r;
+                }
+            }
+            while (l <= r);
+            if (left < r)
+            {
+                QuickSort(keys, items, left, r);
+            }
+
+            if (l < right)
+            {
+                QuickSort(keys, items, l, right);
+            }
+        }
+
     }
 }
