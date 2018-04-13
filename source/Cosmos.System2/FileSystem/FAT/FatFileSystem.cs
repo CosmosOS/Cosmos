@@ -353,6 +353,24 @@ namespace Cosmos.System.FileSystem.FAT
 
         private readonly Fat[] mFats;
 
+        public override string mType
+        {
+             get
+            {
+                switch (mFatType)
+                {
+                    case FatTypeEnum.Fat12:
+                        return "FAT12";
+                    case FatTypeEnum.Fat16:
+                        return "FAT16";
+                    case FatTypeEnum.Fat32:
+                        return "FAT32";
+                    default:
+                        throw new Exception("Unknown FAT file system type.");
+                }
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FatFileSystem"/> class.
         /// </summary>
@@ -587,7 +605,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             var result = new List<DirectoryEntry>();
-            var xEntry = (FatDirectoryEntry)baseDirectory;
+            var xEntry = (FatDiretoryEntry)baseDirectory;
             var fatListing = xEntry.ReadDirectoryContents();
 
             for (int i = 0; i < fatListing.Count; i++)
@@ -601,7 +619,7 @@ namespace Cosmos.System.FileSystem.FAT
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetRootDirectory --");
 
-            var xRootEntry = new FatDirectoryEntry(this, null, mRootPath, mSize, mRootPath, RootCluster);
+            var xRootEntry = new FatDiretoryEntry(this, null, mRootPath, mSize, mRootPath, RootCluster);
             return xRootEntry;
         }
 
@@ -623,7 +641,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(aNewDirectory));
             }
 
-            var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
+            var xParentDirectory = (FatDiretoryEntry)aParentDirectory;
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewDirectory, DirectoryEntryTypeEnum.Directory);
             return xDirectoryEntryToAdd;
         }
@@ -646,7 +664,8 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(aNewFile));
             }
 
-            var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
+            var xParentDirectory = (FatDiretoryEntry)aParentDirectory;
+
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewFile, DirectoryEntryTypeEnum.File);
             return xDirectoryEntryToAdd;
         }
@@ -658,7 +677,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(aDirectoryEntry));
             }
 
-            var xDirectoryEntry = (FatDirectoryEntry)aDirectoryEntry;
+            var xDirectoryEntry = (FatDiretoryEntry)aDirectoryEntry;
 
             xDirectoryEntry.DeleteDirectoryEntry();
         }
@@ -670,7 +689,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(aDirectoryEntry));
             }
 
-            var xDirectoryEntry = (FatDirectoryEntry)aDirectoryEntry;
+            var xDirectoryEntry = (FatDiretoryEntry)aDirectoryEntry;
 
             var entries = xDirectoryEntry.GetFatTable();
 
@@ -680,6 +699,64 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             xDirectoryEntry.DeleteDirectoryEntry();
+        }
+
+        public override string mLabel
+        {
+            /*
+             * In the FAT filesystem the name field of RootDirectory is - in reality - the Volume Label
+             */ 
+            get
+            {
+                Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.mLabel --");
+                var RootDirectory = (FatDiretoryEntry) GetRootDirectory();
+
+                var VolumeId = RootDirectory.FindVolumeId();
+                if (VolumeId == null)
+                {
+                    Global.mFileSystemDebugger.SendInternal("No VolumeID, returning drive name");
+                    return RootDirectory.mName;
+                }
+
+                Global.mFileSystemDebugger.SendInternal($"Volume label is {VolumeId.mName}");
+                return VolumeId.mName;
+            }
+            set
+            {
+                Global.mFileSystemDebugger.SendInternal($"Setting Volume label to {value}");
+
+                var RootDirectory = (FatDiretoryEntry) GetRootDirectory();
+
+                var VolumeId = RootDirectory.FindVolumeId();
+                if (VolumeId != null)
+                {
+                    VolumeId.SetName(value);
+                    return;
+                }
+
+                Global.mFileSystemDebugger.SendInternal("No VolumeID found, let's create it!");
+
+                VolumeId = RootDirectory.CreateVolumeId(value);
+            }
+        }
+
+        public override long mAvailableFreeSpace
+        {
+            get
+            {
+                var RootDirectory = (FatDiretoryEntry)GetRootDirectory();
+                // We do not support "user quotas" for now so this is effectively the same then mTotalFreeSpace
+                return mSize - RootDirectory.GetUsedSpace();
+            }
+        }
+
+        public override long mTotalFreeSpace
+        {
+            get
+            {
+                var RootDirectory = (FatDiretoryEntry)GetRootDirectory();
+                return mSize - RootDirectory.GetUsedSpace();
+            }
         }
 
         private enum FatTypeEnum

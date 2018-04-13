@@ -16,16 +16,6 @@ namespace Cosmos.System.FileSystem
             mSize = aSize;
         }
 
-        public static FileSystemType GetFileSystemType(Partition aDevice)
-        {
-            if (FatFileSystem.IsDeviceFat(aDevice))
-            {
-                return FileSystemType.FAT;
-            }
-
-            return FileSystemType.Unknown;
-        }
-
         public abstract void DisplayFileSystemInfo();
 
         public abstract List<DirectoryEntry> GetDirectoryListing(DirectoryEntry baseDirectory);
@@ -45,5 +35,13 @@ namespace Cosmos.System.FileSystem
         public string mRootPath { get; }
 
         public long mSize { get; }
+
+        public abstract long mAvailableFreeSpace { get; }
+
+        public abstract long mTotalFreeSpace { get; }
+
+        public abstract string mType { get; }
+
+        public abstract string mLabel { get; set; } 
     }
 }

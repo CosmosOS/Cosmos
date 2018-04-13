@@ -46,5 +46,20 @@ namespace Cosmos.System_Plugs.System
 
             return result;
         }
+
+        /* .Net Core TryParse is calling Number.TryParse() that does NRE in Cosmos, plugged it for now */
+        public static bool TryParse(string s, out int result)
+        {
+            try
+            {
+                result = Int32.Parse(s);
+                return true;
+            }
+            catch
+            {
+                result = 0;
+                return false;
+            }
+        }
     }
 }

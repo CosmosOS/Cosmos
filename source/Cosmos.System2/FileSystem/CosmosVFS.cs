@@ -19,12 +19,9 @@ namespace Cosmos.System.FileSystem
     public class CosmosVFS : VFSBase
     {
         private List<Partition> mPartitions;
-
-
         private List<FileSystem> mFileSystems;
-
-
         private FileSystem mCurrentFileSystem;
+        private List<FileSystemFactory> mRegisteredFileSystems;
 
         /// <summary>
         /// Initializes the virtual file system.
@@ -33,12 +30,21 @@ namespace Cosmos.System.FileSystem
         {
             mPartitions = new List<Partition>();
             mFileSystems = new List<FileSystem>();
+            mRegisteredFileSystems = new List<FileSystemFactory>();
+
+            RegisterFileSystem(new FatFileSystemFactory());
 
             InitializePartitions();
             if (mPartitions.Count > 0)
             {
                 InitializeFileSystems();
             }
+        }
+
+        public override void RegisterFileSystem(FileSystemFactory aFileSystemFactory)
+        {
+            Global.mFileSystemDebugger.SendInternal($"Registering filesystem {aFileSystemFactory.Name}");
+            mRegisteredFileSystems.Add(aFileSystemFactory);
         }
 
         /// <summary>
@@ -400,14 +406,15 @@ namespace Cosmos.System.FileSystem
             {
                 string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
                 var xSize = (long)(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
-                switch (FileSystem.GetFileSystemType(mPartitions[i]))
+
+                // We 'probe' the partition <i> with all the FileSystem registered until we find a Filesystem that can read / write to it
+                foreach (var fs in mRegisteredFileSystems)
                 {
-                    case FileSystemType.FAT:
+                    if (fs.IsType(mPartitions[i]))
+                    {
+                        Global.mFileSystemDebugger.SendInternal($"Partion {i} has a {fs.Name} filesystem");
                         mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath, xSize));
-                        break;
-                    default:
-                        global::System.Console.WriteLine("Unknown filesystem type!");
-                        return;
+                    }
                 }
 
                 if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].mRootPath == xRootPath))
@@ -546,6 +553,71 @@ namespace Cosmos.System.FileSystem
             }
 
             return aFS.GetRootDirectory();
+        }
+
+        /// <summary>
+        /// Verifies if driveId is a valid id for a drive.
+        /// </summary>
+        /// <param name="driveId">The id of the drive.</param>
+        /// <returns>true if the drive id is valid, false otherwise.</returns>
+        public override bool IsValidDriveId(string driveId)
+        {
+            Global.mFileSystemDebugger.SendInternal($"driveId is {driveId} after normalization");
+
+            /* We need to remove ':\' to get only the numeric value */
+            driveId = driveId.Remove(driveId.Length - 2);
+            Global.mFileSystemDebugger.SendInternal($"driveId is now {driveId}");
+
+            /*
+             * Cosmos Drive name is really similar to DOS / Windows but a number instead of a letter is used, it is not limited
+             * to 1 character but any number is valid
+             */
+
+            bool isOK = Int32.TryParse(driveId, out int val);
+            Global.mFileSystemDebugger.SendInternal($"isOK is {isOK}");
+
+            return isOK;
+        }
+
+        public override long GetTotalSize(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.mSize;
+        }
+
+        public override long GetAvailableFreeSpace(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.mAvailableFreeSpace;
+        }
+
+        public override long GetTotalFreeSpace(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.mTotalFreeSpace;
+        }
+
+        public override string GetFileSystemType(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.mType;
+        }
+
+        public override string GetFileSystemLabel(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.mLabel;
+        }
+
+        public override void SetFileSystemLabel(string aDriveId, string aLabel)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+            xFs.mLabel = aLabel;
         }
     }
 }

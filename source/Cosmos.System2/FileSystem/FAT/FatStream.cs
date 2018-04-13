@@ -15,7 +15,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         protected long mPosition;
 
-        private readonly FatDirectoryEntry mDirectoryEntry;
+        private readonly FatDiretoryEntry mDirectoryEntry;
 
         private readonly FatFileSystem mFS;
 
@@ -29,7 +29,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         private long mSize;
 
-        public FatStream(FatDirectoryEntry aEntry)
+        public FatStream(FatDiretoryEntry aEntry)
         {
             if (aEntry == null)
             {
