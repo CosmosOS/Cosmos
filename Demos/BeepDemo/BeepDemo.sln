@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleBeepDemo", "ConsoleBeepDemo\ConsoleBeepDemo.csproj", "{0AD02943-D563-43E4-A41F-D4FC1870C42A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeepDemo", "BeepDemo.csproj", "{0AD02943-D563-43E4-A41F-D4FC1870C42A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
