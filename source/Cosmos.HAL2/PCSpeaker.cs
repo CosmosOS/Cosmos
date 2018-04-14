@@ -28,7 +28,8 @@ namespace Cosmos.HAL
         }
         private static void DisableSound()
         {
-            IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
+            IO.Port61.Byte = (byte)(IO.Port61.Byte & ~3);
+            //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
         }
 
         public static void Beep(uint frequency)
@@ -61,7 +62,6 @@ namespace Cosmos.HAL
             SpeakerPIT.Wait(duration);
             DisableSound();
         }
-        internal static bool called = false;
     }
 
     /*
