@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsTemplatesProject>True</IsTemplatesProject>
+        <PackageDescription>Cosmos kernel templates for C#, Visual Basic and F#.
+$(CosmosDescription)</PackageDescription>
+    </PropertyGroup>
+
+</Project>

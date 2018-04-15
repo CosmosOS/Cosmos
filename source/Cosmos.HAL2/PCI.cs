@@ -62,13 +62,15 @@ namespace Cosmos.HAL
     {
         Intel = 0x8086,
         AMD = 0x1022,
-        VMWare = 0x15AD
+        VMWare = 0x15AD,
+        VirtualBox = 0x80EE
     }
     
     public enum DeviceID
     {
         SVGAIIAdapter = 0x0405,
-        PCNETII = 0x2000
+        PCNETII = 0x2000,
+        VBoxGuest = 0xCAFE
     }
 
     public class PCI

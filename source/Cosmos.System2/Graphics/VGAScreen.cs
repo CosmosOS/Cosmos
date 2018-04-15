@@ -1,7 +1,7 @@
 using System;
 using HALVGAScreen = Cosmos.HAL.VGAScreen;
 
-namespace Cosmos.System
+namespace Cosmos.System.Graphics
 {
     public class VGAScreen
     {

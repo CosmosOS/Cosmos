@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <RuntimeIdentifier>cosmos</RuntimeIdentifier>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Cosmos.Build" Version="*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.Debug.Kernel" Version="*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.System2" Version="*" NoWarn="NU1604" />
+    </ItemGroup>
+
+</Project>

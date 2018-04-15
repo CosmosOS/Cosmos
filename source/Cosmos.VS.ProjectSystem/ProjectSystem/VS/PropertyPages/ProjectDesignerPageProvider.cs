@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
@@ -14,13 +13,15 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
     [AppliesTo(ProjectCapability.CosmosAndAppDesigner)]
     internal class ProjectDesignerPageProvider : IVsProjectDesignerPageProvider
     {
+        private static readonly IPageMetadata OldCosmosPage =
+            new PropertyPageMetadata("Cosmos", OldCosmosPropertyPage.PageGuid, -100, false);
         private static readonly IPageMetadata CosmosPage =
-            new PropertyPageMetadata("Cosmos", CosmosPropertyPage.PageGuid, Int32.MinValue, false);
+            new PropertyPageMetadata("Cosmos", CosmosPropertyPage.PageGuid, -50, true);
 
         public Task<IReadOnlyCollection<IPageMetadata>> GetPagesAsync()
         {
             return Task.FromResult<IReadOnlyCollection<IPageMetadata>>(
-                ImmutableArray.Create(CosmosPage));
+                ImmutableArray.Create(OldCosmosPage, CosmosPage));
         }
     }
 }

@@ -4,6 +4,7 @@ using Cosmos.TestRunner;
 using Cosmos.Debug.Kernel;
 using Cosmos.Common.Extensions;
 using static Cosmos.Kernel.Tests.Fat.System.IO.HelperMethods;
+using System.Text;
 
 namespace Cosmos.Kernel.Tests.Fat.System.IO
 {
@@ -227,23 +228,60 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             string KudzuTxtContent = File.ReadAllText(@"0:\Kudzu.txt");
 
             Assert.IsTrue(File.Exists(@"0:\Kudzu2.txt"), "Copy failed destination file not created");
- 
+
             mDebugger.Send(" The new file has been created, reading...");
-                
+
             string Kudzu2TxtContent = File.ReadAllText(@"0:\Kudzu2.txt");
 
             Assert.IsTrue(KudzuTxtContent == Kudzu2TxtContent, "File has not been copied correctly");
-            
+
             /* Now Try to Copy '0:\Kudzu.txt' onto an existing file with the overload of Copy that does permit this */
             mDebugger.Send("START TEST: Copy a file (overwrite existing) :");
             File.Copy(@"0:\Kudzu.txt", @"0:\test.dat", true);
 
             mDebugger.Send("The existing file has been overwritten, reading...");
             string TestDatContent = File.ReadAllText(@"0:\test.dat");
-  
+
             Assert.IsTrue(KudzuTxtContent == TestDatContent, "File has not been copied correctly");
 
             mDebugger.Send("END TEST");
+
+            #region Test Writing Large Files
+
+            string text = new string('o', 4000);
+            text += new string('l', 4000);
+            File.WriteAllText("0:\\long.txt", text);
+            string read = File.ReadAllText("0:\\long.txt");
+            Assert.IsTrue(read == text, "Reading files larger than one cluster works using read all text");
+            byte[] textBytes = Encoding.ASCII.GetBytes(text);
+            mDebugger.Send("Reading all bytes");
+            byte[] readBytes = File.ReadAllBytes("0:\\long.txt");
+            mDebugger.Send("Has read all bytes!");
+            Assert.IsTrue(ByteArrayAreEquals(readBytes, textBytes), "Reading large files works using read all bytes does not work.");
+
+            using (FileStream fs = File.OpenWrite("0:\\long2.txt"))
+            {
+                fs.Write(textBytes, 0, textBytes.Length);
+            }
+            using (FileStream fs = File.OpenRead("0:\\long2.txt"))
+            {
+                fs.Read(readBytes, 0, (int)fs.Length);
+            }
+            bool same = true;
+            int line = 0;
+            for (int i = 0; i < textBytes.Length; i++)
+            {
+                if (textBytes[i] != readBytes[i])
+                {
+                    same = false;
+                    line = i;
+                    break;
+                }
+            }
+            mDebugger.Send("Length:" + textBytes.Length + " vs " + readBytes.Length);
+            Assert.IsTrue(ByteArrayAreEquals(readBytes, textBytes), "Reading and writing large files works using filestreams. For: " + same + " Line: " + line);
+
+            #endregion Test Writing Large Files
         }
     }
 }

@@ -367,17 +367,7 @@ namespace Cosmos.Build.Common
             }
         }
 
-        public String OutputPath
-        {
-            get
-            {
-                return GetProperty(BuildPropertyNames.OutputPathString, @"bin\debug");
-            }
-            set
-            {
-                SetProperty(BuildPropertyNames.OutputPathString, value);
-            }
-        }
+        public String OutputPath => GetProperty("OutputPath", @"bin\debug");
 
         public Framework Framework
         {

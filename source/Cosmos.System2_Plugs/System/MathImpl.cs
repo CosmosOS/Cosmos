@@ -8,6 +8,19 @@ namespace Cosmos.System_Plugs.System
     [Plug(Target = typeof(Math))]
     public static class MathImpl
     {
+        /* @(#)fdlibm.h 1.5 04/04/22 */
+        /*
+         * ====================================================
+         * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
+         *
+         * Permission to use, copy, modify, and distribute this
+         * software is freely granted, provided that this notice
+         * is preserved.
+         * ====================================================
+         */
+
+        //Following functions which have been implemented in this file are functions taken from http://www.netlib.org/fdlibm/ and have then be changed to work in C#
+        //Acos, Asin, Cos, _cos,  __ieee754_rem_pio2, __kernel_rem_pio2, Scalbn, Log base e, Sin, _sin, exp, atan
         internal static Debugger mDebugger = new Debugger("System", "Math Plugs");
 
         #region Internal Constants
@@ -67,9 +80,73 @@ namespace Cosmos.System_Plugs.System
 
         public static double Acos(double x)
         {
-            if ((x > 1.0) || (x < -1.0))
-                throw new ArgumentOutOfRangeException("Domain error");
-            return (pio2 - Asin(x));
+            double pio2_hi = 1.57079632679489655800e+00, /* 0x3FF921FB, 0x54442D18 */
+                pio2_lo = 6.12323399573676603587e-17, /* 0x3C91A626, 0x33145C07 */
+                pS0 = 1.66666666666666657415e-01, /* 0x3FC55555, 0x55555555 */
+                pS1 = -3.25565818622400915405e-01, /* 0xBFD4D612, 0x03EB6F7D */
+                pS2 = 2.01212532134862925881e-01, /* 0x3FC9C155, 0x0E884455 */
+                pS3 = -4.00555345006794114027e-02, /* 0xBFA48228, 0xB5688F3B */
+                pS4 = 7.91534994289814532176e-04, /* 0x3F49EFE0, 0x7501B288 */
+                pS5 = 3.47933107596021167570e-05, /* 0x3F023DE1, 0x0DFDF709 */
+                qS1 = -2.40339491173441421878e+00, /* 0xC0033A27, 0x1C8A2D4B */
+                qS2 = 2.02094576023350569471e+00, /* 0x40002AE5, 0x9C598AC8 */
+                qS3 = -6.88283971605453293030e-01, /* 0xBFE6066C, 0x1B8D0159 */
+                qS4 = 7.70381505559019352791e-02; /* 0x3FB3B8C5, 0xB12E9282 */
+
+            double z, p, q, r, w, s, c, df;
+            int hx, ix;
+            hx = HighWord(x);
+            ix = hx & 0x7fffffff;
+            if (ix >= 0x3ff00000)
+            {   /* |x| >= 1 */
+                if (((ix - 0x3ff00000) | LowWord(x)) == 0)
+                {   /* |x|==1 */
+                    if (hx > 0)
+                        return 0.0;     /* acos(1) = 0  */
+                    else
+                        return Math.PI + 2.0 * pio2_lo; /* acos(-1)= pi */
+                }
+                return (x - x) / (x - x);       /* acos(|x|>1) is NaN */
+            }
+            if (ix < 0x3fe00000)
+            {   /* |x| < 0.5 */
+                if (ix <= 0x3c600000)
+                    return pio2_hi + pio2_lo;/*if|x|<2**-57*/
+                z = x * x;
+                p = z * (pS0 + z * (pS1 + z * (pS2 + z * (pS3 + z * (pS4 + z * pS5)))));
+                q = 1 + z * (qS1 + z * (qS2 + z * (qS3 + z * qS4)));
+                r = p / q;
+                return pio2_hi - (x - (pio2_lo - x * r));
+            }
+            else if (hx < 0)
+            {       /* x < -0.5 */
+                z = (1 + x) * 0.5;
+                p = z * (pS0 + z * (pS1 + z * (pS2 + z * (pS3 + z * (pS4 + z * pS5)))));
+                q = 1 + z * (qS1 + z * (qS2 + z * (qS3 + z * qS4)));
+                s = Sqrt(z);
+                r = p / q;
+                w = r * s - pio2_lo;
+                return Math.PI - 2.0 * (s + w);
+            }
+            else
+            {           /* x > 0.5 */
+                z = (1 - x) * 0.5;
+                s = Sqrt(z);
+                df = s;
+                //__LO(df) = 0;
+                Byte[] bdf = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(df));
+                for (int i = 0; i < 4; i++)
+                {
+                    bdf[i + (BitConverter.IsLittleEndian ? 4 : 0)] = 0;
+                }
+                df = BitConverter.ToDouble(bdf, 0);
+                c = (z - df * df) / (s + df);
+                p = z * (pS0 + z * (pS1 + z * (pS2 + z * (pS3 + z * (pS4 + z * pS5)))));
+                q = 1 + z * (qS1 + z * (qS2 + z * (qS3 + z * qS4)));
+                r = p / q;
+                w = r * s + c;
+                return 2.0 * (df + w);
+            }
         }
 
         #endregion Acos
@@ -78,26 +155,74 @@ namespace Cosmos.System_Plugs.System
 
         public static double Asin(double x)
         {
-            if (x > 1.0F)
-            {
-                throw new ArgumentOutOfRangeException("Domain error");
+            double huge = 1.000e+300,
+               pio2_hi = 1.57079632679489655800e+00, /* 0x3FF921FB, 0x54442D18 */
+               pio2_lo = 6.12323399573676603587e-17, /* 0x3C91A626, 0x33145C07 */
+               pio4_hi = 7.85398163397448278999e-01, /* 0x3FE921FB, 0x54442D18 */
+                                                     /* coefficient for R(x^2) */
+               pS0 = 1.66666666666666657415e-01, /* 0x3FC55555, 0x55555555 */
+               pS1 = -3.25565818622400915405e-01, /* 0xBFD4D612, 0x03EB6F7D */
+               pS2 = 2.01212532134862925881e-01, /* 0x3FC9C155, 0x0E884455 */
+               pS3 = -4.00555345006794114027e-02, /* 0xBFA48228, 0xB5688F3B */
+               pS4 = 7.91534994289814532176e-04, /* 0x3F49EFE0, 0x7501B288 */
+               pS5 = 3.47933107596021167570e-05, /* 0x3F023DE1, 0x0DFDF709 */
+               qS1 = -2.40339491173441421878e+00, /* 0xC0033A27, 0x1C8A2D4B */
+               qS2 = 2.02094576023350569471e+00, /* 0x40002AE5, 0x9C598AC8 */
+               qS3 = -6.88283971605453293030e-01, /* 0xBFE6066C, 0x1B8D0159 */
+               qS4 = 7.70381505559019352791e-02; /* 0x3FB3B8C5, 0xB12E9282 */
+
+            double t = 0, w, p, q, c, r, s;
+            int hx, ix;
+            hx = HighWord(x);
+            ix = hx & 0x7fffffff;
+            if (ix >= 0x3ff00000)
+            {       /* |x|>= 1 */
+                if (((ix - 0x3ff00000) | LowWord(x)) == 0)
+                    /* asin(1)=+-pi/2 with inexact */
+                    return x * pio2_hi + x * pio2_lo;
+                return (x - x) / (x - x);       /* asin(|x|>1) is NaN */
             }
-            double sign = 1F, temp;
-            if (x < 0.0F)
-            {
-                x = -x;
-                sign = -1.0F;
+            else if (ix < 0x3fe00000)
+            {   /* |x|<0.5 */
+                if (ix < 0x3e400000)
+                {       /* if |x| < 2**-27 */
+                    if (huge + x > 1) return x;/* return x with inexact if x!=0*/
+                }
+                else
+                    t = x * x;
+                p = t * (pS0 + t * (pS1 + t * (pS2 + t * (pS3 + t * (pS4 + t * pS5)))));
+                q = 1 + t * (qS1 + t * (qS2 + t * (qS3 + t * qS4)));
+                w = p / q;
+                return x + x * w;
             }
-            temp = Sqrt(1.0F - (x * x));
-            if (x > 0.7)
-            {
-                temp = pio2 - Atan(temp / x);
+            /* 1> |x|>= 0.5 */
+            w = 1 - Abs(x);
+            t = w * 0.5;
+            p = t * (pS0 + t * (pS1 + t * (pS2 + t * (pS3 + t * (pS4 + t * pS5)))));
+            q = 1 + t * (qS1 + t * (qS2 + t * (qS3 + t * qS4)));
+            s = Sqrt(t);
+            if (ix >= 0x3FEF3333)
+            {   /* if |x| > 0.975 */
+                w = p / q;
+                t = pio2_hi - (2.0 * (s + s * w) - pio2_lo);
             }
             else
             {
-                temp = Atan(x / temp);
+                w = s;
+                //__LO(w) = 0;
+                Byte[] bw = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(w));
+                for (int i = 0; i < 4; i++)
+                {
+                    bw[i + (BitConverter.IsLittleEndian ? 4 : 0)] = 0;
+                }
+                w = BitConverter.ToDouble(bw, 0);
+                c = (t - w * w) / (s + w);
+                r = p / q;
+                p = 2.0 * s * r - (pio2_lo - 2.0 * c);
+                q = pio4_hi - 2.0 * w;
+                t = pio4_hi - (p - q);
             }
-            return (sign * temp);
+            if (hx > 0) return t; else return -t;
         }
 
         #endregion Asin
@@ -106,7 +231,97 @@ namespace Cosmos.System_Plugs.System
 
         public static double Atan(double x)
         {
-            return ((x > 0F) ? atans(x) : (-atans(-x)));
+            if (double.IsNaN(x)) return double.NaN;
+            if (double.IsPositiveInfinity(x)) return Math.PI / 2;
+            if (double.IsNegativeInfinity(x)) return -Math.PI / 2;
+
+            double w, s1, s2, z;
+            int ix, hx, id;
+
+            double[] atanhi = {
+              4.63647609000806093515e-01, /* atan(0.5)hi 0x3FDDAC67, 0x0561BB4F */
+              7.85398163397448278999e-01, /* atan(1.0)hi 0x3FE921FB, 0x54442D18 */
+              9.82793723247329054082e-01, /* atan(1.5)hi 0x3FEF730B, 0xD281F69B */
+              1.57079632679489655800e+00, /* atan(inf)hi 0x3FF921FB, 0x54442D18 */
+            };
+
+            double[] atanlo = {
+                2.26987774529616870924e-17, /* atan(0.5)lo 0x3C7A2B7F, 0x222F65E2 */
+                3.06161699786838301793e-17, /* atan(1.0)lo 0x3C81A626, 0x33145C07 */
+                1.39033110312309984516e-17, /* atan(1.5)lo 0x3C700788, 0x7AF0CBBD */
+                6.12323399573676603587e-17, /* atan(inf)lo 0x3C91A626, 0x33145C07 */
+            };
+
+            double[] aT = {
+              3.33333333333329318027e-01, /* 0x3FD55555, 0x5555550D */
+             -1.99999999998764832476e-01, /* 0xBFC99999, 0x9998EBC4 */
+              1.42857142725034663711e-01, /* 0x3FC24924, 0x920083FF */
+             -1.11111104054623557880e-01, /* 0xBFBC71C6, 0xFE231671 */
+              9.09088713343650656196e-02, /* 0x3FB745CD, 0xC54C206E */
+             -7.69187620504482999495e-02, /* 0xBFB3B0F2, 0xAF749A6D */
+              6.66107313738753120669e-02, /* 0x3FB10D66, 0xA0D03D51 */
+             -5.83357013379057348645e-02, /* 0xBFADDE2D, 0x52DEFD9A */
+              4.97687799461593236017e-02, /* 0x3FA97B4B, 0x24760DEB */
+             -3.65315727442169155270e-02, /* 0xBFA2B444, 0x2C6A6C2F */
+              1.62858201153657823623e-02, /* 0x3F90AD3A, 0xE322DA11 */
+            };
+
+            hx = HighWord(x);
+            ix = hx & 0x7fffffff;
+            if (ix >= 0x44100000)
+            {   /* if |x| >= 2^66 */
+                if (ix > 0x7ff00000 ||
+                (ix == 0x7ff00000 && (LowWord(x) != 0)))
+                    return x + x;       /* NaN */
+                if (hx > 0) return atanhi[3] + atanlo[3];
+                else return -atanhi[3] - atanlo[3];
+            }
+            if (ix < 0x3fdc0000)
+            {   /* |x| < 0.4375 */
+                if (ix < 0x3e200000)
+                {   /* |x| < 2^-29 */
+                    if (1.0e+300 + x > 1) return x; /* raise inexact */
+                }
+                id = -1;
+            }
+            else
+            {
+                x = Math.Abs(x);
+                if (ix < 0x3ff30000)
+                {       /* |x| < 1.1875 */
+                    if (ix < 0x3fe60000)
+                    {   /* 7/16 <=|x|<11/16 */
+                        id = 0; x = (2.0 * x - 1) / (2.0 + x);
+                    }
+                    else
+                    {           /* 11/16<=|x|< 19/16 */
+                        id = 1; x = (x - 1) / (x + 1);
+                    }
+                }
+                else
+                {
+                    if (ix < 0x40038000)
+                    {   /* |x| < 2.4375 */
+                        id = 2; x = (x - 1.5) / (1 + 1.5 * x);
+                    }
+                    else
+                    {           /* 2.4375 <= |x| < 2^66 */
+                        id = 3; x = -1.0 / x;
+                    }
+                }
+            }
+            /* end of argument reduction */
+            z = x * x;
+            w = z * z;
+            /* break sum from i=0 to 10 aT[i]z**(i+1) into odd and even poly */
+            s1 = z * (aT[0] + w * (aT[2] + w * (aT[4] + w * (aT[6] + w * (aT[8] + w * aT[10])))));
+            s2 = w * (aT[1] + w * (aT[3] + w * (aT[5] + w * (aT[7] + w * aT[9]))));
+            if (id < 0) return x - x * (s1 + s2);
+            else
+            {
+                z = atanhi[id] - ((x * (s1 + s2) - atanlo[id]) - x);
+                return (hx < 0) ? -z : z;
+            }
         }
 
         #endregion Atan
@@ -142,13 +357,83 @@ namespace Cosmos.System_Plugs.System
 
         #region Ceiling
 
-        public static double Ceiling(double a)
+        public static double Ceiling(double x)
         {
-            // should be using assembler for bigger values than int or long max
-            if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
-                return a;
-            int i = (a - (int)a > 0) ? (int)(a + 1) : (int)a;
-            return i;
+            if (double.IsNaN(x) || double.IsInfinity(x)) return x;
+
+            double huge = 1.0e+300;
+            int i0, i1, j0;
+            uint i, j;
+            i0 = HighWord(x);
+            i1 = LowWord(x);
+            j0 = ((i0 >> 20) & 0x7ff) - 0x3ff;
+            if (j0 < 20)
+            {
+                if (j0 < 0)
+                {   /* raise inexact if x != 0 */
+                    if (huge + x > 0.0)
+                    {/* return 0*sign(x) if |x|<1 */
+                        if (i0 < 0)
+                        {
+                            i0 = (int)(0x80000000 - 1); //Cant set 0x80000000 to int
+                            i1 = 0;
+                        }
+                        else if ((i0 | i1) != 0)
+                        {
+                            i0 = 0x3ff00000;
+                            i1 = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    i = (uint)(0x000fffff) >> j0;
+                    if (((i0 & i) | i1) == 0) return x; /* x is integral */
+                    if (huge + x > 0.0)
+                    {   /* raise inexact flag */
+                        if (i0 > 0)
+                            i0 += (0x00100000) >> j0;
+                        i0 &= (int)~i;
+                        i1 = 0;
+                    }
+                }
+            }
+            else if (j0 > 51)
+            {
+                if (j0 == 0x400) return x + x;  /* inf or NaN */
+                else return x;      /* x is integral */
+            }
+            else
+            {
+                i = 0xffffffff >> (j0 - 20);
+                if ((i1 & i) == 0) return x;    /* x is integral */
+                if (huge + x > 0.0)
+                {       /* raise inexact flag */
+                    if (i0 > 0)
+                    {
+                        if (j0 == 20) i0 += 1;
+                        else
+                        {
+                            j = (uint)(i1 + (1 << (52 - j0)));
+                            if (j < i1) i0 += 1;    /* got a carry */
+                            i1 = (int)j;
+                        }
+                    }
+                    i1 &= (int)~i;
+                }
+            }
+            Byte[] returnBytes = BitConverter.GetBytes(0d);
+            Byte[] highWord = BitConverter.GetBytes(i0);
+            Byte[] lowWord = BitConverter.GetBytes(i1);
+            for (int c = 0; c < 4; c++)
+            {
+                returnBytes[c + (BitConverter.IsLittleEndian ? 4 : 0)] = highWord[c];
+            }
+            for (int c = 0; c < 4; c++)
+            {
+                returnBytes[c + (BitConverter.IsLittleEndian ? 0 : 4)] = lowWord[c];
+            }
+            return BitConverter.ToDouble(returnBytes, 0);
         }
 
         #endregion Ceiling
@@ -157,49 +442,86 @@ namespace Cosmos.System_Plugs.System
 
         public static double Cos(double x)
         {
-            // First we need to anchor it to a valid range.
-            while (x > (2 * PI))
-            {
-                x -= (2 * PI);
-            }
+            double[] y = new double[2];
+            double z = 0.0;
+            int n, ix;
 
-            if (x < 0)
-                x = -x;
-            byte quadrand = 0;
-            if ((x > (PI / 2F)) && (x < (PI)))
-            {
-                quadrand = 1;
-                x = PI - x;
-            }
-            if ((x > (PI)) && (x < ((3F * PI) / 2)))
-            {
-                quadrand = 2;
-                x = x - PI;
-            }
-            if ((x > ((3F * PI) / 2)))
-            {
-                quadrand = 3;
-                x = (2F * PI) - x;
-            }
-            const double c1 = 0.9999999999999999999999914771;
-            const double c2 = -0.4999999999999999999991637437;
-            const double c3 = 0.04166666666666666665319411988;
-            const double c4 = -0.00138888888888888880310186415;
-            const double c5 = 0.00002480158730158702330045157;
-            const double c6 = -0.000000275573192239332256421489;
-            const double c7 = 0.000000002087675698165412591559;
-            const double c8 = -0.0000000000114707451267755432394;
-            const double c9 = 0.0000000000000477945439406649917;
-            const double c10 = -0.00000000000000015612263428827781;
-            const double c11 = 0.00000000000000000039912654507924;
-            double x2 = x * x;
-            if (quadrand == 0 || quadrand == 3)
-            {
-                return (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * (c5 + (x2 * (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + (x2 * (c10 + (x2 * c11))))))))))))))))))));
-            }
+            /* High word of x. */
+            ix = HighWord(x);
+
+            /* |x| ~< pi/4 */
+            ix &= 0x7fffffff;
+            if (ix <= 0x3fe921fb) return _cos(x, z);
+
+            /* cos(Inf or NaN) is NaN */
+            else if (ix >= 0x7ff00000) return x - x;
+
+            /* argument reduction needed */
             else
             {
-                return -(c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * (c5 + (x2 * (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + (x2 * (c10 + (x2 * c11))))))))))))))))))));
+                n = __ieee754_rem_pio2(x, y);
+                switch (n & 3)
+                {
+                    case 0:
+                        return _cos(y[0], y[1]);
+
+                    case 1:
+                        return -_sin(y[0], y[1], 1);
+
+                    case 2:
+                        return -_cos(y[0], y[1]);
+
+                    default:
+                        return _sin(y[0], y[1], 1);
+                }
+            }
+        }
+
+        private static double _cos(double x, double y)
+        {
+            const double one = 1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
+                C1 = 4.16666666666666019037e-02, /* 0x3FA55555, 0x5555554C */
+                C2 = -1.38888888888741095749e-03, /* 0xBF56C16C, 0x16C15177 */
+                C3 = 2.48015872894767294178e-05, /* 0x3EFA01A0, 0x19CB1590 */
+                C4 = -2.75573143513906633035e-07, /* 0xBE927E4F, 0x809C52AD */
+                C5 = 2.08757232129817482790e-09, /* 0x3E21EE9E, 0xBDB4B1C4 */
+                C6 = -1.13596475577881948265e-11; /* 0xBDA8FAE9, 0xBE8838D4 */
+            double a, hz, z, r, qx = 0;
+            int ix;
+            ix = HighWord(x) & 0x7fffffff;  /* ix = |x|'s high word*/
+            if (ix < 0x3e400000)
+            {           /* if x < 2**27 */
+                if (((int)x) == 0)
+                    return one;      /* generate inexact */
+            }
+            z = x * x;
+            r = z * (C1 + z * (C2 + z * (C3 + z * (C4 + z * (C5 + z * C6)))));
+            if (ix < 0x3FD33333)            /* if |x| < 0.3 */
+                return one - (0.5 * z - (z * r - x * y));
+            else
+            {
+                if (ix > 0x3fe90000)
+                {       /* x > 0.78125 */
+                    qx = 0.28125;
+                }
+                else
+                {
+                    //__HI(qx) = ix - 0x00200000; /* x/4 */
+                    Byte[] bqx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(qx));
+                    Byte[] bvh = BitConverter.GetBytes(ix - 0x00200000);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        bqx[i + (BitConverter.IsLittleEndian ? 4 : 0)] = bvh[i];
+                    }
+                    //__LO(qx) = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        bqx[i + (BitConverter.IsLittleEndian ? 4 : 0)] = 0;
+                    }
+                }
+                hz = 0.5 * z - qx;
+                a = one - qx;
+                return a - (hz - (z * r - x * y));
             }
         }
 
@@ -217,32 +539,6 @@ namespace Cosmos.System_Plugs.System
         #endregion Cosh
 
         #region Exp
-
-        /*
-        * ====================================================
-        * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
-        *
-        * Permission to use, copy, modify, and distribute this
-        * software is freely granted, provided that this notice
-        * is preserved.
-        * ====================================================
-        */
-
-        // Look at http://www.netlib.org/fdlibm/e_exp.c for more a in deth explanation
-        private static int HighWord(double x)
-        {
-            long value = BitConverter.DoubleToInt64Bits(x);
-            Byte[] valueBytes = BitConverter.GetBytes(value);
-            int offset = BitConverter.IsLittleEndian ? 4 : 0;
-            return BitConverter.ToInt32(valueBytes, offset);
-        }
-
-        private static int LowWord(double x) //Opposite of high word
-        {
-            long value = BitConverter.DoubleToInt64Bits(x);
-            Byte[] valueBytes = BitConverter.GetBytes(value);
-            return BitConverter.ToInt32(valueBytes, BitConverter.IsLittleEndian ? 0 : 4);
-        }
 
         public static double Exp(double x)
         {
@@ -358,13 +654,82 @@ namespace Cosmos.System_Plugs.System
 
         #region Floor
 
-        public static double Floor(double a)
+        public static double Floor(double x)
         {
-            // should be using assembler for bigger values than int or long max
-            if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
-                return a;
-            int i = (a - (int)a < 0) ? (int)(a - 1) : (int)a;
-            return i;
+            if (double.IsInfinity(x) || double.IsNaN(x)) return x;
+
+            int i0, i1, j0;
+            uint i, j;
+            i0 = HighWord(x);
+            i1 = LowWord(x);
+            j0 = ((i0 >> 20) & 0x7ff) - 0x3ff;
+            if (j0 < 20)
+            {
+                if (j0 < 0)
+                {   /* raise inexact if x != 0 */
+                    if (1.0e+300 + x > 0.0)
+                    {/* return 0*sign(x) if |x|<1 */
+                        if (i0 >= 0)
+                        {
+                            i0 = i1 = 0;
+                        }
+                        else if (((i0 & 0x7fffffff) | i1) != 0)
+                        {
+                            i0 = Int32.MaxValue;
+                            i1 = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    i = (uint)0x000fffff >> j0;
+                    if ((((uint)i0 & i) | (uint)i1) == 0)
+                        return x; /* x is integral */
+                    if (1.0e+300 + x > 0.0)
+                    {   /* raise inexact flag */
+                        if (i0 < 0)
+                            i0 += (0x00100000) >> j0;
+                        i0 &= (int)~i;
+                        i1 = 0;
+                    }
+                }
+            }
+            else if (j0 > 51)
+            {
+                if (j0 == 0x400) return x + x;  /* inf or NaN */
+                else return x;      /* x is integral */
+            }
+            else
+            {
+                i = ((uint)(0xffffffff)) >> (j0 - 20);
+                if ((i1 & i) == 0) return x;    /* x is integral */
+                if (1.0e+300 + x > 0.0)
+                {       /* raise inexact flag */
+                    if (i0 < 0)
+                    {
+                        if (j0 == 20) i0 += 1;
+                        else
+                        {
+                            j = (uint)i1 + (uint)(1 << (52 - j0));
+                            if (j < i1) i0 += 1;    /* got a carry */
+                            i1 = (int)j;
+                        }
+                    }
+                    i1 &= (int)~i;
+                }
+            }
+            Byte[] returnBytes = BitConverter.GetBytes(0d);
+            Byte[] highWord = BitConverter.GetBytes(i0);
+            Byte[] lowWord = BitConverter.GetBytes(i1);
+            for (int c = 0; c < 4; c++)
+            {
+                returnBytes[c + (BitConverter.IsLittleEndian ? 4 : 0)] = highWord[c];
+            }
+            for (int c = 0; c < 4; c++)
+            {
+                returnBytes[c + (BitConverter.IsLittleEndian ? 0 : 4)] = lowWord[c];
+            }
+            return BitConverter.ToDouble(returnBytes, 0);
         }
 
         #endregion Floor
@@ -373,54 +738,104 @@ namespace Cosmos.System_Plugs.System
 
         public static double Log(double x)
         {
-            return Log(x, E);
+            double ln2_hi = 6.93147180369123816490e-01,    /* 3fe62e42 fee00000 */
+            ln2_lo = 1.90821492927058770002e-10,    /* 3dea39ef 35793c76 */
+            two54 = 1.80143985094819840000e+16,  /* 43500000 00000000 */
+            Lg1 = 6.666666666666735130e-01,  /* 3FE55555 55555593 */
+            Lg2 = 3.999999999940941908e-01,  /* 3FD99999 9997FA04 */
+            Lg3 = 2.857142874366239149e-01,  /* 3FD24924 94229359 */
+            Lg4 = 2.222219843214978396e-01,  /* 3FCC71C5 1D8E78AF */
+            Lg5 = 1.818357216161805012e-01,  /* 3FC74664 96CB03DE */
+            Lg6 = 1.531383769920937332e-01,  /* 3FC39A09 D078C69F */
+            Lg7 = 1.479819860511658591e-01;  /* 3FC2F112 DF3E5244 */
+            double hfsq, f, s, z, R, w, t1, t2, dk;
+            int k, hx, i, j;
+            uint lx;
+
+            hx = HighWord(x);       /* high word of x */
+            lx = (uint)LowWord(x);       /* low  word of x */
+
+            k = 0;
+            if (hx < 0x00100000)
+            {           /* x < 2**-1022  */
+                if (x < 0 || double.IsNaN(x))
+                    return double.NaN;  /* log(-#) = NaN */
+                if (((hx & (uint)0x7fff) | lx) == 0)
+                    return double.NegativeInfinity;       /* log(+-0)=-inf */
+                k -= 54; x *= two54; /* subnormal number, scale up x */
+                hx = HighWord(x);       /* high word of x */
+            }
+            if (hx >= 0x7ff00000) return x + x;
+            k += (hx >> 20) - 1023;
+            hx &= 0x000fffff;
+            i = (hx + 0x95f64) & 0x100000;
+            //__HI(x) = hx | (i ^ 0x3ff00000);    /* normalize x or x/2 */
+            Byte[] bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
+            Byte[] bv = BitConverter.GetBytes(hx | (i ^ 0x3ff00000));
+            for (int _i = 0; _i < 4; _i++)
+            {
+                bx[_i + (BitConverter.IsLittleEndian ? 4 : 0)] = bv[_i];
+            }
+            x = BitConverter.ToDouble(bx, 0);
+            k += (i >> 20);
+            f = x - 1.0;
+            if ((0x000fffff & (2 + hx)) < 3)
+            {   /* |f| < 2**-20 */
+                if (f == 0)
+                    if (k == 0)
+                        return 0;
+                    else
+                    {
+                        dk = k;
+                        return dk * ln2_hi + dk * ln2_lo;
+                    }
+                R = f * f * (0.5 - 0.33333333333333333 * f);
+                if (k == 0)
+                    return f - R;
+                else
+                {
+                    dk = k;
+                    return dk * ln2_hi - ((R - dk * ln2_lo) - f);
+                }
+            }
+            s = f / (2.0 + f);
+            dk = k;
+            z = s * s;
+            i = hx - 0x6147a;
+            w = z * z;
+            j = 0x6b851 - hx;
+            t1 = w * (Lg2 + w * (Lg4 + w * Lg6));
+            t2 = z * (Lg1 + w * (Lg3 + w * (Lg5 + w * Lg7)));
+            i |= j;
+            R = t2 + t1;
+            if (i > 0)
+            {
+                hfsq = 0.5 * f * f;
+                if (k == 0)
+                    return f - (hfsq - s * (hfsq + R));
+                else
+                    return dk * ln2_hi - ((hfsq - (s * (hfsq + R) + dk * ln2_lo)) - f);
+            }
+            else
+            {
+                if (k == 0)
+                    return f - s * (f - R);
+                else
+                    return dk * ln2_hi - ((s * (f - R) - dk * ln2_lo) - f);
+            }
         }
 
         #endregion Log (base e)
 
         #region Log (base specified)
 
-        public static double Log(double x, double newBase)
+        public static double Log(double Exponent, double Base)
         {
-            if (x == 0.0F)
-            {
+            if (double.IsNaN(Exponent) || Exponent < 0)
+                return double.NaN;
+            if (Exponent == 0)
                 return double.NegativeInfinity;
-            }
-            if ((x < 1.0F) && (newBase < 1.0F))
-            {
-                throw new ArgumentOutOfRangeException("can't compute Log");
-            }
-
-            double partial = 0.5F;
-            double integer = 0F;
-            double fractional = 0.0F;
-
-            while (x < 1.0F)
-            {
-                integer -= 1F;
-                x *= newBase;
-            }
-
-            while (x >= newBase)
-            {
-                integer += 1F;
-                x /= newBase;
-            }
-
-            x *= x;
-
-            while (partial >= 2.22045e-016)
-            {
-                if (x >= newBase)
-                {
-                    fractional += partial;
-                    x = x / newBase;
-                }
-                partial *= 0.5F;
-                x *= x;
-            }
-
-            return (integer + fractional);
+            return Log(Exponent) / Log(Base);
         }
 
         #endregion Log (base specified)
@@ -429,6 +844,7 @@ namespace Cosmos.System_Plugs.System
 
         public static double Log10(double x)
         {
+            //Use change of base formula
             return Log(x, 10F);
         }
 
@@ -484,16 +900,25 @@ namespace Cosmos.System_Plugs.System
             }
             if (b < 0)
             {
-                if (Math.Abs(e) - Math.Abs((int)e) > (Double.Epsilon * 100)) return double.NaN;
-                double logedBase = Math.Log(Math.Abs(b));
+                if (Abs(e) - Abs((int)e) > (Double.Epsilon * 100)) return double.NaN;
+                double logedBase = Log(Abs(b));
                 double pow = Exp(logedBase * e);
                 if ((long)e % 2 == 0) return pow;
                 else return -1 * pow;
             }
             else
             {
-                double logedBase = Math.Log(b);
-                return Exp(logedBase * e);
+                if (e < 0)
+                {
+                    e = Abs(e);
+                    double logedBase = Log(b);
+                    return 1 / Exp(logedBase * e);
+                }
+                else
+                {
+                    double logedBase = Log(b);
+                    return Exp(logedBase * e);
+                }
             }
         }
 
@@ -503,7 +928,7 @@ namespace Cosmos.System_Plugs.System
 
         public static double Round(double d)
         {
-            return ((Math.Floor(d) % 2 == 0) ? Math.Floor(d) : Math.Ceiling(d));
+            return ((Floor(d) % 2 == 0) ? Floor(d) : Ceiling(d));
         }
 
         #endregion Round
@@ -512,13 +937,65 @@ namespace Cosmos.System_Plugs.System
 
         public static double Sin(double x)
         {
-            // First we need to anchor it to a valid range.
-            while (x > (2 * PI))
-            {
-                x -= (2 * PI);
-            }
+            double[] y = new double[2];
+            double z = 0.0;
+            int n, ix;
 
-            return Cos((PI / 2.0F) - x);
+            /* High word of x. */
+            ix = HighWord(x);
+
+            /* |x| ~< pi/4 */
+            ix &= 0x7fffffff;
+            if (ix <= 0x3fe921fb)
+                return _sin(x, z, 0);
+
+            /* sin(Inf or NaN) is NaN */
+            else if (ix >= 0x7ff00000)
+                return x - x;
+
+            /* argument reduction needed */
+            else
+            {
+                n = __ieee754_rem_pio2(x, y);
+                switch (n & 3)
+                {
+                    case 0:
+                        return _sin(y[0], y[1], 1);
+
+                    case 1:
+                        return _cos(y[0], y[1]);
+
+                    case 2:
+                        return -_sin(y[0], y[1], 1);
+
+                    default:
+                        return -_cos(y[0], y[1]);
+                }
+            }
+        }
+
+        private static double _sin(double x, double y, int iy)
+        {
+            const double half = 5.00000000000000000000e-01; /* 0x3FE00000; 0x00000000 */
+            const double S1 = -1.66666666666666324348e-01; /* 0xBFC55555; 0x55555549 */
+            const double S2 = 8.33333333332248946124e-03; /* 0x3F811111; 0x1110F8A6 */
+            const double S3 = -1.98412698298579493134e-04; /* 0xBF2A01A0; 0x19C161D5 */
+            const double S4 = 2.75573137070700676789e-06; /* 0x3EC71DE3; 0x57B1FE7D */
+            const double S5 = -2.50507602534068634195e-08; /* 0xBE5AE5E6; 0x8A2B9CEB */
+            const double S6 = 1.58969099521155010221e-10; /* 0x3DE5D93A; 0x5ACFD57C */
+
+            double z, r, v;
+            int ix;
+            ix = HighWord(x) & 0x7fffffff;  /* high word of x */
+            if (ix < 0x3e400000)            /* |x| < 2**-27 */
+            { if ((int)x == 0) return x; }       /* generate inexact */
+            z = x * x;
+            v = z * x;
+            r = S2 + z * (S3 + z * (S4 + z * (S5 + z * S6)));
+            if (iy == 0)
+                return x + v * (S1 + z * r);
+            else
+                return x - ((z * (half * y - v * r) - y) - v * S1);
         }
 
         #endregion Sin
@@ -545,38 +1022,140 @@ namespace Cosmos.System_Plugs.System
 
         #region Sqrt
 
+        /*
+         * ====================================================
+         * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+         *
+         * Developed at SunSoft, a Sun Microsystems, Inc. business.
+         * Permission to use, copy, modify, and distribute this
+         * software is freely granted, provided that this notice
+         * is preserved.
+         * ====================================================
+         */
+
         public static double Sqrt(double x)
         {
-            long x1;
-            double x2;
-            int i;
+            double z = 0;
+            const uint sign = 0x80000000;
+            uint r, t1, s1, ix1, q1;
+            int ix0, s0, q, m, t, i;
 
-            if (double.IsNaN(x) || x < 0)
-                return double.NaN;
+            ix0 = HighWord(x);          /* high word of x */
+            ix1 = (uint)LowWord(x);      /* low word of x */
 
-            if (double.IsPositiveInfinity(x))
-                return double.PositiveInfinity;
-
-            if (x == 0F)
-                return 0F;
-
-            // Approximating the square root value
-            // This makes use of IEEE 754 double-precision floating point format
-            // Sign: 1 bit, Exponent: 11 bits, Signficand: 52 bits
-            x1 = BitConverter.DoubleToInt64Bits(x);
-            x1 -= 1L << 53;
-            x1 >>= 1;
-            x1 += 1L << 61;
-
-            x2 = BitConverter.Int64BitsToDouble(x1);
-
-            // Use Newton's Method
-            for (i = 0; i < 5; i++)
+            /* take care of Inf and NaN */
+            if ((ix0 & 0x7ff00000) == 0x7ff00000)
+                return x * x + x;       /* sqrt(NaN)=NaN, sqrt(+inf)=+inf sqrt(-inf)=sNaN */
+            /* take care of zero */
+            if (ix0 <= 0)
             {
-                x2 = x2 - (x2 * x2 - x) / (2 * x2);
+                if (((ix0 & (~0x80000000)) | ix1) == 0)
+                    return x;/* sqrt(+-0) = +-0 */
+                else if (ix0 < 0)
+                    return (x - x) / (x - x);       /* sqrt(-ve) = sNaN */
+            }
+            /* normalize x */
+            m = (ix0 >> 20);
+            if (m == 0)
+            {               /* subnormal x */
+                while (ix0 == 0)
+                {
+                    m -= 21;
+                    ix0 |= ((int)ix1 >> 11); ix1 <<= 21;
+                }
+                for (i = 0; (ix0 & 0x00100000) == 0; i++) ix0 <<= 1;
+                m -= i - 1;
+                ix0 |= ((int)ix1 >> (32 - i));
+                ix1 <<= i;
+            }
+            m -= 1023;  /* unbias exponent */
+            ix0 = (ix0 & 0x000fffff) | 0x00100000;
+            if ((m & 1) % 2 != 0)
+            {   /* odd m, double x to make it even */
+                ix0 += ix0 + (int)((long)(ix1 & sign) >> 31);
+                ix1 += ix1;
+            }
+            m >>= 1;    /* m = [m/2] */
+
+            /* generate sqrt(x) bit by bit */
+            ix0 += ix0 + (int)((long)(ix1 & sign) >> 31);
+            ix1 += ix1;
+            s1 = 0;
+            s0 = (int)s1;
+            q1 = (uint)s0;
+            q = (int)q1;   /* [q,q1] = sqrt(x) */
+            r = 0x00200000;     /* r = moving bit from right to left */
+
+            while (r != 0)
+            {
+                t = s0 + (int)r;
+                if (t <= ix0)
+                {
+                    s0 = t + (int)r;
+                    ix0 -= t;
+                    q += (int)r;
+                }
+                ix0 += ix0 + ((int)(ix1 & sign) >> 31);
+                ix1 += ix1;
+                r >>= 1;
             }
 
-            return x2;
+            r = sign;
+            while (r != 0)
+            {
+                t1 = s1 + r;
+                t = s0;
+                if ((t < ix0) || ((t == ix0) && (t1 <= ix1)))
+                {
+                    s1 = t1 + r;
+                    if (((t1 & sign) == sign) && (s1 & sign) == 0) s0 += 1;
+                    ix0 -= t;
+                    if (ix1 < t1) ix0 -= 1;
+                    ix1 -= t1;
+                    q1 += r;
+                }
+                ix0 += ix0 + ((int)(ix1 & sign) >> 31);
+                ix1 += ix1;
+                r >>= 1;
+            }
+
+            /* use floating add to find out rounding direction */
+            if (((uint)ix0 | ix1) != 0)
+            {
+                z = 1 - 1.0e-300; /* trigger inexact flag */
+                if (z >= 1)
+                {
+                    z = 1 + 1.0e-300;
+                    if (q1 == 0xffffffff)
+                    {
+                        q1 = 0; q += 1;
+                    }
+                    else if (z > 1)
+                    {
+                        if (q1 == 0xfffffffe)
+                            q += 1;
+                        q1 += 2;
+                    }
+                    else
+                        q1 += (q1 & 1);
+                }
+            }
+            ix0 = (q >> 1) + 0x3fe00000;
+            ix1 = q1 >> 1;
+            if ((q & 1) == 1) ix1 |= sign;
+            ix0 += (m << 20);
+
+            long value = BitConverter.DoubleToInt64Bits(x);
+            Byte[] valueBytes = BitConverter.GetBytes(value);
+            int offset = BitConverter.IsLittleEndian ? 4 : 0;
+            Byte[] toAddHigher = BitConverter.GetBytes(ix0);
+            Byte[] toAddLower = BitConverter.GetBytes(ix1);
+            for (int I = 0; I < 4; I++)
+            {
+                valueBytes[I + offset] = toAddHigher[I];
+                valueBytes[I] = toAddLower[I];
+            }
+            return BitConverter.ToDouble(valueBytes, 0);
         }
 
         #endregion Sqrt
@@ -585,74 +1164,8 @@ namespace Cosmos.System_Plugs.System
 
         public static double Tan(double x)
         {
-            // First we need to anchor it to a valid range.
-            while (x > (2 * PI))
-            {
-                x -= (2 * PI);
-            }
-
-            byte octant = (byte)Floor(x * (1 / (PI / 4)));
-            switch (octant)
-            {
-                case 0:
-                    x = x * (4 / PI);
-                    break;
-
-                case 1:
-                    x = ((PI / 2) - x) * (4 / PI);
-                    break;
-
-                case 2:
-                    x = (x - (PI / 2)) * (4 / PI);
-                    break;
-
-                case 3:
-                    x = (PI - x) * (4 / PI);
-                    break;
-
-                case 4:
-                    x = (x - PI) * (4 / PI);
-                    break;
-
-                case 5:
-                    x = ((3.5 * PI) - x) * (4 / PI);
-                    break;
-
-                case 6:
-                    x = (x - (3.5 * PI)) * (4 / PI);
-                    break;
-
-                case 7:
-                    x = ((2 * PI) - x) * (4 / PI);
-                    break;
-            }
-
-            const double c1 = 4130240.588996024013440146267;
-            const double c2 = -349781.8562517381616631012487;
-            const double c3 = 6170.317758142494245331944348;
-            const double c4 = -27.94920941380194872760036319;
-            const double c5 = 0.0175143807040383602666563058;
-            const double c6 = 5258785.647179987798541780825;
-            const double c7 = -1526650.549072940686776259893;
-            const double c8 = 54962.51616062905361152230566;
-            const double c9 = -497.495460280917265024506937;
-            double x2 = x * x;
-            if (octant == 0 || octant == 4)
-            {
-                return ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2))))))));
-            }
-            else if (octant == 1 || octant == 5)
-            {
-                return (1 / ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2)))))))));
-            }
-            else if (octant == 2 || octant == 6)
-            {
-                return (-1 / ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2)))))))));
-            }
-            else // octant == 3 || octant == 7
-            {
-                return -((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2))))))));
-            }
+            if (double.IsNegativeInfinity(x) || double.IsInfinity(x)) return double.NaN;
+            return Sin(x) / Cos(x);
         }
 
         #endregion Tan
@@ -675,17 +1188,439 @@ namespace Cosmos.System_Plugs.System
 
         #endregion Truncate
 
-        //#region Factorial (only used in Sin(), not plug )
-        //public static int Factorial(int n)
-        //{
-        //    if (n == 0)
-        //        return 1;
-        //    else
-        //        return n * Factorial(n - 1);
-        //}
-        //#endregion
-
         #region Internaly used functions
+
+        private static int __ieee754_rem_pio2(double x, double[] y)
+        {
+            int highOffset = BitConverter.IsLittleEndian ? 4 : 0;
+            int lowOffset = BitConverter.IsLittleEndian ? 4 : 0;
+
+            int[] two_over_pi = {
+            0xA2F983, 0x6E4E44, 0x1529FC, 0x2757D1, 0xF534DD, 0xC0DB62,
+            0x95993C, 0x439041, 0xFE5163, 0xABDEBB, 0xC561B7, 0x246E3A,
+            0x424DD2, 0xE00649, 0x2EEA09, 0xD1921C, 0xFE1DEB, 0x1CB129,
+            0xA73EE8, 0x8235F5, 0x2EBB44, 0x84E99C, 0x7026B4, 0x5F7E41,
+            0x3991D6, 0x398353, 0x39F49C, 0x845F8B, 0xBDF928, 0x3B1FF8,
+            0x97FFDE, 0x05980F, 0xEF2F11, 0x8B5A0A, 0x6D1F6D, 0x367ECF,
+            0x27CB09, 0xB74F46, 0x3F669E, 0x5FEA2D, 0x7527BA, 0xC7EBE5,
+            0xF17B3D, 0x0739F7, 0x8A5292, 0xEA6BFB, 0x5FB11F, 0x8D5D08,
+            0x560330, 0x46FC7B, 0x6BABF0, 0xCFBC20, 0x9AF436, 0x1DA9E3,
+            0x91615E, 0xE61B08, 0x659985, 0x5F14A0, 0x68408D, 0xFFD880,
+            0x4D7327, 0x310606, 0x1556CA, 0x73A8C9, 0x60E27B, 0xC08C6B,
+            };
+
+            int[] npio2_hw = new int[]{
+            0x3FF921FB, 0x400921FB, 0x4012D97C, 0x401921FB, 0x401F6A7A, 0x4022D97C,
+            0x4025FDBB, 0x402921FB, 0x402C463A, 0x402F6A7A, 0x4031475C, 0x4032D97C,
+            0x40346B9C, 0x4035FDBB, 0x40378FDB, 0x403921FB, 0x403AB41B, 0x403C463A,
+            0x403DD85A, 0x403F6A7A, 0x40407E4C, 0x4041475C, 0x4042106C, 0x4042D97C,
+            0x4043A28C, 0x40446B9C, 0x404534AC, 0x4045FDBB, 0x4046C6CB, 0x40478FDB,
+            0x404858EB, 0x404921FB,
+            };
+
+            const double two24 = 1.67772160000000000000e+07, /* 0x41700000, 0x00000000 */
+                invpio2 = 6.36619772367581382433e-01, /* 0x3FE45F30, 0x6DC9C883 */
+                pio2_1 = 1.57079632673412561417e+00, /* 0x3FF921FB, 0x54400000 */
+                pio2_1t = 6.07710050650619224932e-11, /* 0x3DD0B461, 0x1A626331 */
+                pio2_2 = 6.07710050630396597660e-11, /* 0x3DD0B461, 0x1A600000 */
+                pio2_2t = 2.02226624879595063154e-21, /* 0x3BA3198A, 0x2E037073 */
+                pio2_3 = 2.02226624871116645580e-21, /* 0x3BA3198A, 0x2E000000 */
+                pio2_3t = 8.47842766036889956997e-32; /* 0x397B839A, 0x252049C1 */
+
+            double z = 0, w, t, r, fn;
+            double[] tx = new double[3];
+            int e0, i, j, nx, n, ix, hx;
+
+            hx = HighWord(x);       /* high word of x */
+            ix = hx & 0x7fffffff;
+            if (ix <= 0x3fe921fb)   /* |x| ~<= pi/4 , no need for reduction */
+            { y[0] = x; y[1] = 0; return 0; }
+            if (ix < 0x4002d97c)
+            {  /* |x| < 3pi/4, special case with n=+-1 */
+                if (hx > 0)
+                {
+                    z = x - pio2_1;
+                    if (ix != 0x3ff921fb)
+                    {   /* 33+53 bit pi is good enough */
+                        y[0] = z - pio2_1t;
+                        y[1] = (z - y[0]) - pio2_1t;
+                    }
+                    else
+                    {       /* near pi/2, use 33+33+53 bit pi */
+                        z -= pio2_2;
+                        y[0] = z - pio2_2t;
+                        y[1] = (z - y[0]) - pio2_2t;
+                    }
+                    return 1;
+                }
+                else
+                {   /* negative x */
+                    z = x + pio2_1;
+                    if (ix != 0x3ff921fb)
+                    {   /* 33+53 bit pi is good enough */
+                        y[0] = z + pio2_1t;
+                        y[1] = (z - y[0]) + pio2_1t;
+                    }
+                    else
+                    {       /* near pi/2, use 33+33+53 bit pi */
+                        z += pio2_2;
+                        y[0] = z + pio2_2t;
+                        y[1] = (z - y[0]) + pio2_2t;
+                    }
+                    return -1;
+                }
+            }
+            if (ix <= 0x413921fb)
+            { /* |x| ~<= 2^19*(pi/2), medium size */
+                t = Abs(x);
+                n = (int)(t * invpio2 + 0.5);
+                fn = n;
+                r = t - fn * pio2_1;
+                w = fn * pio2_1t;   /* 1st round good to 85 bit */
+                if (n < 32 && ix != npio2_hw[n - 1])
+                {
+                    y[0] = r - w;   /* quick check no cancellation */
+                }
+                else
+                {
+                    j = ix >> 20;
+                    y[0] = r - w;
+                    i = j - (((HighWord(y[0])) >> 20) & 0x7ff);
+                    if (i > 16)
+                    {  /* 2nd iteration needed, good to 118 */
+                        t = r;
+                        w = fn * pio2_2;
+                        r = t - w;
+                        w = fn * pio2_2t - ((t - r) - w);
+                        y[0] = r - w;
+                        i = j - (((HighWord(y[0])) >> 20) & 0x7ff);
+                        if (i > 49)
+                        {   /* 3rd iteration need, 151 bits acc */
+                            t = r;  /* will cover all possible cases */
+                            w = fn * pio2_3;
+                            r = t - w;
+                            w = fn * pio2_3t - ((t - r) - w);
+                            y[0] = r - w;
+                        }
+                    }
+                }
+                y[1] = (r - y[0]) - w;
+                if (hx < 0)
+                {
+                    y[0] = -y[0];
+                    y[1] = -y[1];
+                    return -n;
+                }
+                else
+                    return n;
+            }
+            /*
+             * all other (large) arguments
+             */
+            if (ix >= 0x7ff00000)
+            {       /* x is inf or NaN */
+                y[0] = y[1] = x - x;
+                return 0;
+            }
+            /* set z = scalbn(|x|,ilogb(x)-23) */
+            //__LO(z) = __LO(x);
+            //e0 = (ix >> 20) - 1046; /* e0 = ilogb(z)-23; */
+            //__HI(z) = ix - (e0 << 20);
+            e0 = (ix >> 20) - 1046; /* e0 = ilogb(z)-23; */
+
+            long lz = BitConverter.DoubleToInt64Bits(z);
+            long lx = BitConverter.DoubleToInt64Bits(x);
+            long lv = BitConverter.DoubleToInt64Bits(ix - (e0 << 20));
+            Byte[] bz = BitConverter.GetBytes(lz);
+            Byte[] bx = BitConverter.GetBytes(lx);
+            Byte[] bv = BitConverter.GetBytes(lv);
+            for (int l = 0; l < 4; l++)
+            {
+                bz[l + lowOffset] = bx[l + lowOffset];
+                bz[l + highOffset] = bv[l + highOffset];
+            }
+
+            for (i = 0; i < 2; i++)
+            {
+                tx[i] = ((int)(z));
+                z = (z - tx[i]) * two24;
+            }
+            tx[2] = z;
+            nx = 3;
+            while (tx[nx - 1] == 0)
+                nx--;    /* skip zero term */
+            n = __kernel_rem_pio2(tx, y, e0, nx, 2, two_over_pi);
+            if (hx < 0)
+            {
+                y[0] = -y[0];
+                y[1] = -y[1];
+                return -n;
+            }
+            return n;
+        }
+
+        private static int __kernel_rem_pio2(double[] x, double[] y, int e0, int nx, int prec, int[] ipio2)
+        {
+            int[] init_jk = { 2, 3, 4, 6 }; /* initial value for jk */
+            double[] PIo2 = {
+              1.57079625129699707031e+00, /* 0x3FF921FB, 0x40000000 */
+              7.54978941586159635335e-08, /* 0x3E74442D, 0x00000000 */
+              5.39030252995776476554e-15, /* 0x3CF84698, 0x80000000 */
+              3.28200341580791294123e-22, /* 0x3B78CC51, 0x60000000 */
+              1.27065575308067607349e-29, /* 0x39F01B83, 0x80000000 */
+              1.22933308981111328932e-36, /* 0x387A2520, 0x40000000 */
+              2.73370053816464559624e-44, /* 0x36E38222, 0x80000000 */
+              2.16741683877804819444e-51, /* 0x3569F31D, 0x00000000 */
+            };
+
+            double two24 = 1.67772160000000000000e+07, /* 0x41700000, 0x00000000 */
+                twon24 = 5.96046447753906250000e-08; /* 0x3E700000, 0x00000000 */
+
+            int jz, jx, jv, jp, jk, carry, n, i, j, k, m, q0, ih;
+            int[] iq = new int[20];
+            double z, fw;
+            double[] f = new double[20];
+            double[] fq = new double[20];
+            double[] q = new double[20];
+
+            /* initialize jk*/
+            jk = init_jk[prec];
+            jp = jk;
+
+            /* determine jx,jv,q0, note that 3>q0 */
+            jx = nx - 1;
+            jv = (e0 - 3) / 24; if (jv < 0) jv = 0;
+            q0 = e0 - 24 * (jv + 1);
+
+            /* set up f[0] to f[jx+jk] where f[jx+jk] = ipio2[jv+jk] */
+            j = jv - jx; m = jx + jk;
+            for (i = 0; i <= m; i++, j++)
+                f[i] = (j < 0) ? 0 : ipio2[j];
+
+            /* compute q[0],q[1],...q[jk] */
+            for (i = 0; i <= jk; i++)
+            {
+                for (j = 0, fw = 0.0; j <= jx; j++)
+                    fw += x[j] * f[jx + i - j];
+                q[i] = fw;
+            }
+
+            jz = jk;
+            recompute:
+            /* distill q[] into iq[] reversingly */
+            for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--)
+            {
+                fw = ((int)(twon24 * z));
+                iq[i] = (int)(z - two24 * fw);
+                z = q[j - 1] + fw;
+            }
+
+            /* compute n */
+            z = Scalbn(z, q0);     /* actual value of z */
+            z -= 8.0 * Floor(z * 0.125);       /* trim off integer >= 8 */
+            n = (int)z;
+            z -= n;
+            ih = 0;
+            if (q0 > 0)
+            {   /* need iq[jz-1] to determine n */
+                i = (iq[jz - 1] >> (24 - q0)); n += i;
+                iq[jz - 1] -= i << (24 - q0);
+                ih = iq[jz - 1] >> (23 - q0);
+            }
+            else if (q0 == 0) ih = iq[jz - 1] >> 23;
+            else if (z >= 0.5) ih = 2;
+
+            if (ih > 0)
+            {   /* q > 0.5 */
+                n += 1; carry = 0;
+                for (i = 0; i < jz; i++)
+                {   /* compute 1-q */
+                    j = iq[i];
+                    if (carry == 0)
+                    {
+                        if (j != 0)
+                        {
+                            carry = 1; iq[i] = 0x1000000 - j;
+                        }
+                    }
+                    else iq[i] = 0xffffff - j;
+                }
+                if (q0 > 0)
+                {       /* rare case: chance is 1 in 12 */
+                    switch (q0)
+                    {
+                        case 1:
+                            iq[jz - 1] &= 0x7fffff; break;
+                        case 2:
+                            iq[jz - 1] &= 0x3fffff; break;
+                    }
+                }
+                if (ih == 2)
+                {
+                    z = 1 - z;
+                    if (carry != 0) z -= Scalbn(1, q0);
+                }
+            }
+
+            /* check if recomputation is needed */
+            if (z == 0)
+            {
+                j = 0;
+                for (i = jz - 1; i >= jk; i--) j |= iq[i];
+                if (j == 0)
+                { /* need recomputation */
+                    for (k = 1; iq[jk - k] == 0; k++) ;   /* k = no. of terms needed */
+
+                    for (i = jz + 1; i <= jz + k; i++)
+                    {   /* add q[jz+1] to q[jz+k] */
+                        f[jx + i] = ipio2[jv + i];
+                        for (j = 0, fw = 0.0; j <= jx; j++) fw += x[j] * f[jx + i - j];
+                        q[i] = fw;
+                    }
+                    jz += k;
+                    goto recompute;
+                }
+            }
+
+            /* chop off zero terms */
+            if (z == 0.0)
+            {
+                jz -= 1; q0 -= 24;
+                while (iq[jz] == 0) { jz--; q0 -= 24; }
+            }
+            else
+            { /* break z into 24-bit if necessary */
+                z = Scalbn(z, -q0);
+                if (z >= two24)
+                {
+                    fw = ((int)(twon24 * z));
+                    iq[jz] = (int)(z - two24 * fw);
+                    jz += 1; q0 += 24;
+                    iq[jz] = (int)fw;
+                }
+                else
+                    iq[jz] = (int)z;
+            }
+
+            /* convert integer "bit" chunk to floating-point value */
+            fw = Scalbn(1, q0);
+            for (i = jz; i >= 0; i--)
+            {
+                q[i] = fw * iq[i];
+                fw *= twon24;
+            }
+
+            /* compute PIo2[0,...,jp]*q[jz,...,0] */
+            for (i = jz; i >= 0; i--)
+            {
+                for (fw = 0.0, k = 0; k <= jp && k <= jz - i; k++)
+                    fw += PIo2[k] * q[i + k];
+                fq[jz - i] = fw;
+            }
+
+            /* compress fq[] into y[] */
+            switch (prec)
+            {
+                case 0:
+                    fw = 0.0;
+                    for (i = jz; i >= 0; i--)
+                        fw += fq[i];
+                    y[0] = (ih == 0) ? fw : -fw;
+                    break;
+
+                case 1:
+                case 2:
+                    fw = 0.0;
+                    for (i = jz; i >= 0; i--)
+                        fw += fq[i];
+                    y[0] = (ih == 0) ? fw : -fw;
+                    fw = fq[0] - fw;
+                    for (i = 1; i <= jz; i++)
+                        fw += fq[i];
+                    y[1] = (ih == 0) ? fw : -fw;
+                    break;
+
+                case 3: /* painful */
+                    for (i = jz; i > 0; i--)
+                    {
+                        fw = fq[i - 1] + fq[i];
+                        fq[i] += fq[i - 1] - fw;
+                        fq[i - 1] = fw;
+                    }
+                    for (i = jz; i > 1; i--)
+                    {
+                        fw = fq[i - 1] + fq[i];
+                        fq[i] += fq[i - 1] - fw;
+                        fq[i - 1] = fw;
+                    }
+                    for (fw = 0.0, i = jz; i >= 2; i--)
+                        fw += fq[i];
+                    if (ih == 0)
+                    {
+                        y[0] = fq[0]; y[1] = fq[1];
+                        y[2] = fw;
+                    }
+                    else
+                    {
+                        y[0] = -fq[0]; y[1] = -fq[1];
+                        y[2] = -fw;
+                    }
+                    break;
+            }
+            return n & 7;
+        }
+
+        private static double Scalbn(double x, int n)
+        {
+            double two54 = 1.80143985094819840000e+16, /* 0x43500000, 0x00000000 */
+                twom54 = 5.55111512312578270212e-17, /* 0x3C900000, 0x00000000 */
+                huge = 1.0e+300,
+                tiny = 1.0e-300;
+            int k, hx, lx;
+            hx = HighWord(x);
+            lx = LowWord(x);
+            k = (hx & 0x7ff00000) >> 20;        /* extract exponent */
+            if (k == 0)
+            {               /* 0 or subnormal x */
+                if ((lx | (hx & 0x7fffffff)) == 0)
+                    return x; /* +-0 */
+                x *= two54;
+                hx = HighWord(x);
+                k = ((hx & 0x7ff00000) >> 20) - 54;
+                if (n < -50000)
+                    return tiny * x;    /*underflow*/
+            }
+            if (k == 0x7ff)
+                return x + x;       /* NaN or Inf */
+            k = k + n;
+            if (k > 0x7fe)
+                return huge * (((long)x >> 31) & 1) * huge;// copysign(huge, x); /* overflow  */
+            if (k > 0)              /* normal result */
+            {
+                //__HI(x) = (hx & 0x800fffff) | (k << 20);
+                Byte[] _bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
+                Byte[] _bv = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits((hx & 0x800) | (k << 20)));
+                for (int i = 0; i < 4; i++)
+                {
+                    _bx[i + (BitConverter.IsLittleEndian ? 4 : 0)] = _bv[i];
+                }
+                return x;
+            }
+            if (k <= -54)
+                if (n > 50000)  /* in case integer overflow in n+k */
+                    return huge * (((long)x >> 31) & 1) * huge; //copysign(huge, x);    /*overflow*/
+                else
+                    return tiny * (((long)x >> 31) & 1) * tiny;//  copysign(tiny, x);    /*underflow*/
+            k += 54;                /* subnormal result */
+            //__HI(x) = (hx & 0x800) | (k << 20);
+            Byte[] bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
+            Byte[] bv = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits((hx & 0x800) | (k << 20)));
+            for (int i = 0; i < 4; i++)
+            {
+                bx[i + (BitConverter.IsLittleEndian ? 4 : 0)] = bv[i];
+            }
+            return x * twom54;
+        }
 
         #region expm1
 
@@ -773,6 +1708,25 @@ namespace Cosmos.System_Plugs.System
         }
 
         #endregion atanx
+
+        #region Words
+
+        private static int HighWord(double x)
+        {
+            long value = BitConverter.DoubleToInt64Bits(x);
+            Byte[] valueBytes = BitConverter.GetBytes(value);
+            int offset = BitConverter.IsLittleEndian ? 4 : 0;
+            return BitConverter.ToInt32(valueBytes, offset);
+        }
+
+        private static int LowWord(double x) //Opposite of high word
+        {
+            long value = BitConverter.DoubleToInt64Bits(x);
+            Byte[] valueBytes = BitConverter.GetBytes(value);
+            return BitConverter.ToInt32(valueBytes, BitConverter.IsLittleEndian ? 0 : 4);
+        }
+
+        #endregion Words
 
         #endregion Internaly used functions
     }

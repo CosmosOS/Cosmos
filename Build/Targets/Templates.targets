@@ -1,0 +1,42 @@
+<Project>
+
+    <PropertyGroup>
+        <TargetFramework>netstandard1.0</TargetFramework>
+        <PackageOutputPath>$(ArtifactsDir)packages\</PackageOutputPath>
+        <NoBuild>True</NoBuild>
+        <IncludeBuildOutput>False</IncludeBuildOutput>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageInstallationDir>$(UserProfile)\.cosmos\packages\</PackageInstallationDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="content\**" Pack="True" PackagePath="content\" />
+    </ItemGroup>
+
+    <Target Name="InstallTemplates" DependsOnTargets="Pack">
+
+        <MakeDir Directories="$(PackageInstallationDir)" />
+
+        <MSBuild Projects="$(MSBuildProjectFullPath)"
+                 Targets="_GetOutputItemsFromPack">
+            <Output TaskParameter="TargetOutputs" ItemName="PackageFile" />
+        </MSBuild>
+
+        <ItemGroup>
+            <PackageFile Remove="@(PackageFile)" Condition="'%(Extension)' != '.nupkg'" />
+        </ItemGroup>
+        
+        <PropertyGroup>
+            <TemplatePackagePath>@(PackageFile)</TemplatePackagePath>
+        </PropertyGroup>
+
+        <Copy SourceFiles="@(TemplatePackagePath)"
+              DestinationFolder="$(PackageInstallationDir)" />
+
+        <Exec Command="dotnet new -i $(PackageInstallationDir)$([System.IO.Path]::GetFilename('$(TemplatePackagePath)'))" />
+
+    </Target>
+
+</Project>
