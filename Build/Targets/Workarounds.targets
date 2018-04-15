@@ -7,6 +7,4 @@
         </PropertyGroup>
     </Target>
 
-    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.targets" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj'" />
-
 </Project>

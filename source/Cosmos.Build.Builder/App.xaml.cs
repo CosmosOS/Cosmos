@@ -1,50 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Windows;
 
 using Cosmos.Build.Installer;
 
-namespace Cosmos.Build.Builder {
-  public partial class App : Application {
-    public static bool DoNotLaunchVS;
-    public static bool IsUserKit;
-    public static bool ResetHive;
-    public static bool StayOpen;
-    public static bool NoMSBuildClean;
-    public static bool UseVsHive;
-    public static Dictionary<string, string> mArgs = new Dictionary<string, string>();
+namespace Cosmos.Build.Builder
+{
+    public partial class App : Application
+    {
+        internal static IBuilderConfiguration BuilderConfiguration { get; private set; }
 
-    protected override void OnStartup(StartupEventArgs e) {
-      foreach (string arg in e.Args) {
-        string[] keyValue = arg.Split('=');
-        if (keyValue.Length > 0) {
-          string key = keyValue[0].ToUpper().Remove(0, 1);
-          mArgs.Add(key, "");
-          if (keyValue.Length > 1) {
-            mArgs[key] = keyValue[1];
-          }
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            if (e.Args.Length == 0)
+            {
+                ShowErrorMessageBox("Builder not meant to be called directly. Use install-VS2017.bat instead.");
+                Shutdown();
+                return;
+            }
+
+            var configuration = new CommandLineBuilderConfiguration(e.Args);
+
+            var vsPath = configuration.VsPath;
+
+            if (Directory.Exists(vsPath))
+            {
+                Paths.VSPath = vsPath;
+                Paths.UpdateVSPath();
+            }
+            else
+            {
+                // For debugging, set params to something like this:
+                // -VSPath=C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise
+
+                ShowErrorMessageBox("Visual Studio path must be provided. (-VSPATH or /VSPATH)");
+                Shutdown();
+                return;
+            }
+
+            BuilderConfiguration = configuration;
+
+            base.OnStartup(e);
         }
-      }
 
-      IsUserKit = mArgs.ContainsKey("USERKIT");
-      ResetHive = mArgs.ContainsKey("RESETHIVE");
-      StayOpen = mArgs.ContainsKey("STAYOPEN");
-      NoMSBuildClean = mArgs.ContainsKey("NOCLEAN");
-      DoNotLaunchVS = mArgs.ContainsKey("NOVSLAUNCH");
-      UseVsHive = mArgs.ContainsKey("VSEXPHIVE");
-
-      if (mArgs.ContainsKey("VSPATH")) {
-        Paths.VSPath = mArgs["VSPATH"];
-        Paths.UpdateVSPath();
-      } else {
-        throw new ArgumentNullException(nameof(e.Args), "Visual Studio path must be provided. (-VSPATH or /VSPATH)");
-      }
-
-      // For debugging, set params to something like this:
-      // -VSPath=C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise
-
-      base.OnStartup(e);
+        private void ShowErrorMessageBox(string message) =>
+            MessageBox.Show(message, "Cosmos Kit Builder", MessageBoxButton.OK, MessageBoxImage.Error);
     }
-  }
 }

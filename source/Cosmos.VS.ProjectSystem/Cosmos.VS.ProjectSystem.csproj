@@ -1,7 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.props" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj'" />
 
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
+        <RootNamespace>Cosmos.VS.ProjectSystem</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -30,22 +34,30 @@
         <XamlPropertyRule Include="BuildSystem\Rules\LaunchConfiguration.xaml" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Page Include="ProjectSystem\VS\PropertyPages\**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+        <Compile Update="ProjectSystem\VS\PropertyPages\**\*.xaml.cs" DependentUpon="%(Filename)" />
+    </ItemGroup>
+
     <!--
         WinForms
     -->
     <ItemGroup>
         <Compile Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.Designer.cs">
-          <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
+            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </Compile>
         <EmbeddedResource Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.resx">
-          <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
+            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
         <Reference Include="Microsoft.VisualBasic" />
+        <Reference Include="PresentationCore" />
+        <Reference Include="PresentationFramework" />
         <Reference Include="System.Xaml" />
         <Reference Include="System.Windows.Forms" />
+        <Reference Include="WindowsBase" />
     </ItemGroup>
 
     <ItemGroup>
@@ -62,8 +74,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\XSharp\source\VSPropertyPages\VSPropertyPages.csproj" />
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+        <ProjectReference Include="$(XSharpRepoRoot)source\VSPropertyPages\VSPropertyPages.csproj" />
     </ItemGroup>
 
     <Target Name="IncludeMissingAssemblies" AfterTargets="GetVsixSourceItems" BeforeTargets="RemoveVSSDKAssemblies">
@@ -71,5 +83,8 @@
             <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Microsoft.Win32.Registry'" />
         </ItemGroup>
     </Target>
+
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.targets" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj'" />
 
 </Project>

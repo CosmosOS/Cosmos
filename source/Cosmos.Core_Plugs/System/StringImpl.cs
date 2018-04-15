@@ -728,11 +728,19 @@ namespace Cosmos.Core_Plugs.System
 
         public static string Replace(string aThis, string oldValue, string newValue)
         {
-            while (aThis.IndexOf(oldValue) != -1)
+            int skipOffset = 0;
+
+            while (aThis.Substring(skipOffset).IndexOf(oldValue) != -1)
             {
-                int xIndex = aThis.IndexOf(oldValue);
+                int xIndex = aThis.Substring(skipOffset).IndexOf(oldValue) + skipOffset;
                 aThis = aThis.Remove(xIndex, oldValue.Length);
                 aThis = aThis.Insert(xIndex, newValue);
+
+                skipOffset = xIndex + newValue.Length;
+                if (skipOffset > aThis.Length)
+                {
+                    break;
+                }
             }
             return aThis;
         }

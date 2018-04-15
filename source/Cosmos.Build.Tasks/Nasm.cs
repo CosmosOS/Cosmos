@@ -34,6 +34,9 @@ namespace Cosmos.Build.Tasks
 
         protected override string ToolName => "nasm.exe";
 
+        protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
+        protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
+
         protected override bool ValidateParameters()
         {
             if (String.IsNullOrWhiteSpace(InputFile))

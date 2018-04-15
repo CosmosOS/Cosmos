@@ -1,7 +1,5 @@
 using System;
 using Cosmos.Common;
-using Cosmos.Debug.Kernel;
-using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
@@ -13,6 +11,8 @@ namespace Cosmos.System_Plugs.System
         {
             return StringHelper.GetNumberString(aThis);
         }
+
+        public static string ToString(ref int aThis, IFormatProvider aFormatProvider) => ToString(ref aThis);
 
         public static Int32 Parse(string s)
         {

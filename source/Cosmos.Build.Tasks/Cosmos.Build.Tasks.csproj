@@ -9,14 +9,9 @@ $(CosmosDescription)</PackageDescription>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="build\**">
-            <Pack>True</Pack>
-            <PackagePath>build\</PackagePath>
-        </Content>
-        <Content Include="tools\**">
-            <Pack>True</Pack>
-            <PackagePath>tools\</PackagePath>
-        </Content>
+        <Content Include="runtime.json" Pack="True" PackagePath="\" />
+        <Content Include="build\**" Pack="True" PackagePath="build\" />
+        <Content Include="tools\**" Pack="True" PackagePath="tools\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -25,7 +20,7 @@ $(CosmosDescription)</PackageDescription>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\IL2CPU\source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

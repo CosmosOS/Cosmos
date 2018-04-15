@@ -1,0 +1,7 @@
+{
+    "runtimes": {
+        "cosmos": {
+            "#import": [ "win-x86" ]
+        }
+    }
+}

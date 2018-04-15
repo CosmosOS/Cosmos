@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -8,7 +7,7 @@ namespace Cosmos.Build.Tasks
     public class CreateSyslinuxConfig : Task
     {
         [Required]
-        public string IsoDirectory { get; set; }
+        public string TargetDirectory { get; set; }
 
         [Required]
         public string BinName { get; set; }
@@ -17,16 +16,16 @@ namespace Cosmos.Build.Tasks
         
         public override bool Execute()
         {
-            if (String.IsNullOrWhiteSpace(IsoDirectory) || !Directory.Exists(IsoDirectory))
+            if (!Directory.Exists(TargetDirectory))
             {
-                Log.LogError($"Invalid ISO directory! ISO directory: '{IsoDirectory}'");
+                Log.LogError($"Invalid target directory! Target directory: '{TargetDirectory}'");
                 return false;
             }
 
             var xBinName = BinName;
             var xLabelName = Path.GetFileNameWithoutExtension(xBinName);
 
-            using (var xWriter = File.CreateText(Path.Combine(IsoDirectory, "syslinux.cfg")))
+            using (var xWriter = File.CreateText(Path.Combine(TargetDirectory, "syslinux.cfg")))
             {
                 xWriter.WriteLine("default " + xLabelName);
                 xWriter.WriteLine("label " + xLabelName);
