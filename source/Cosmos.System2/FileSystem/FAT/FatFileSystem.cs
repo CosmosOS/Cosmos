@@ -746,7 +746,15 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 var RootDirectory = (FatDiretoryEntry)GetRootDirectory();
                 // We do not support "user quotas" for now so this is effectively the same then mTotalFreeSpace
-                return mSize - RootDirectory.GetUsedSpace();
+
+                /* mSize is expressed in MegaByte */
+                var TotalSizeInBytes = mSize * 1024 * 1024;
+                var UsedSpace = RootDirectory.GetUsedSpace();
+
+                Global.mFileSystemDebugger.SendInternal($"TotalSizeInBytes {TotalSizeInBytes} UsedSpace {UsedSpace}");
+
+                return TotalSizeInBytes - UsedSpace;
+                //return (mSize * 1024 * 1024) - RootDirectory.GetUsedSpace();
             }
         }
 
@@ -755,7 +763,15 @@ namespace Cosmos.System.FileSystem.FAT
             get
             {
                 var RootDirectory = (FatDiretoryEntry)GetRootDirectory();
-                return mSize - RootDirectory.GetUsedSpace();
+
+                /* mSize is expressed in MegaByte */
+                var TotalSizeInBytes = mSize * 1024 * 1024;
+                var UsedSpace = RootDirectory.GetUsedSpace();
+
+                Global.mFileSystemDebugger.SendInternal($"TotalSizeInBytes {TotalSizeInBytes} UsedSpace {UsedSpace}");
+
+                return TotalSizeInBytes - UsedSpace;
+                //return (mSize * 1024 * 1024) - RootDirectory.GetUsedSpace();
             }
         }
 

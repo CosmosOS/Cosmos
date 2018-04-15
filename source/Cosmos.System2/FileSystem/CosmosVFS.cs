@@ -583,7 +583,8 @@ namespace Cosmos.System.FileSystem
         {
             var xFs = GetFileSystemFromPath(aDriveId);
 
-            return xFs.mSize;
+            /* We have to return it in bytes */
+            return xFs.mSize * 1024 * 1024;
         }
 
         public override long GetAvailableFreeSpace(string aDriveId)
