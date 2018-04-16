@@ -120,7 +120,7 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
-        public static unsafe void SetValue([ObjectPointerAccess]uint* aThis, uint aValue, int aIndex)
+        public static unsafe void SetValue([ObjectPointerAccess]uint* aThis, object aValue, int aIndex)
         {
             aThis = (uint*) aThis[0];
             aThis += 3;
@@ -166,7 +166,6 @@ namespace Cosmos.Core_Plugs.System
                 }
             }
         }
-
 
         public static bool TrySZSort(Array keys, Array items, int left, int right)
         {
