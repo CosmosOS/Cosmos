@@ -1,10 +1,6 @@
 ﻿<Project>
 
     <PropertyGroup>
-        <SelfContained>True</SelfContained>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
         <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
     </PropertyGroup>
