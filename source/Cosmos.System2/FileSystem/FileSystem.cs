@@ -11,9 +11,9 @@ namespace Cosmos.System.FileSystem
     {
         protected FileSystem(Partition aDevice, string aRootPath, long aSize)
         {
-            mDevice = aDevice;
-            mRootPath = aRootPath;
-            mSize = aSize;
+            Device = aDevice;
+            RootPath = aRootPath;
+            Size = aSize;
         }
 
         public abstract void DisplayFileSystemInfo();
@@ -30,18 +30,18 @@ namespace Cosmos.System.FileSystem
 
         public abstract void DeleteFile(DirectoryEntry aPath);
 
-        protected Partition mDevice { get; }
+        protected Partition Device { get; }
 
-        public string mRootPath { get; }
+        public string RootPath { get; }
 
-        public long mSize { get; }
+        public long Size { get; }
 
-        public abstract long mAvailableFreeSpace { get; }
+        public abstract long AvailableFreeSpace { get; }
 
-        public abstract long mTotalFreeSpace { get; }
+        public abstract long TotalFreeSpace { get; }
 
-        public abstract string mType { get; }
+        public abstract string Type { get; }
 
-        public abstract string mLabel { get; set; } 
+        public abstract string Label { get; set; } 
     }
 }

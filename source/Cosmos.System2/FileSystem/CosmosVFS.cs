@@ -417,7 +417,7 @@ namespace Cosmos.System.FileSystem
                     }
                 }
 
-                if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].mRootPath == xRootPath))
+                if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].RootPath == xRootPath))
                 {
                     string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
                     global::System.Console.WriteLine(xMessage);
@@ -454,7 +454,7 @@ namespace Cosmos.System.FileSystem
             Global.mFileSystemDebugger.SendInternal("xPath after GetPathRoot =");
             Global.mFileSystemDebugger.SendInternal(xPath);
 
-            if ((mCurrentFileSystem != null) && (xPath == mCurrentFileSystem.mRootPath))
+            if ((mCurrentFileSystem != null) && (xPath == mCurrentFileSystem.RootPath))
             {
                 Global.mFileSystemDebugger.SendInternal("Returning current file system.");
                 return mCurrentFileSystem;
@@ -462,7 +462,7 @@ namespace Cosmos.System.FileSystem
 
             for (int i = 0; i < mFileSystems.Count; i++)
             {
-                if (mFileSystems[i].mRootPath == xPath)
+                if (mFileSystems[i].RootPath == xPath)
                 {
                     Global.mFileSystemDebugger.SendInternal("Found filesystem.");
                     mCurrentFileSystem = mFileSystems[i];
@@ -584,41 +584,41 @@ namespace Cosmos.System.FileSystem
             var xFs = GetFileSystemFromPath(aDriveId);
 
             /* We have to return it in bytes */
-            return xFs.mSize * 1024 * 1024;
+            return xFs.Size * 1024 * 1024;
         }
 
         public override long GetAvailableFreeSpace(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
 
-            return xFs.mAvailableFreeSpace;
+            return xFs.AvailableFreeSpace;
         }
 
         public override long GetTotalFreeSpace(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
 
-            return xFs.mTotalFreeSpace;
+            return xFs.TotalFreeSpace;
         }
 
         public override string GetFileSystemType(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
 
-            return xFs.mType;
+            return xFs.Type;
         }
 
         public override string GetFileSystemLabel(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
 
-            return xFs.mLabel;
+            return xFs.Label;
         }
 
         public override void SetFileSystemLabel(string aDriveId, string aLabel)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
-            xFs.mLabel = aLabel;
+            xFs.Label = aLabel;
         }
     }
 }

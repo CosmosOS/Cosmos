@@ -171,7 +171,7 @@ namespace Cosmos.System.FileSystem.FAT
                 var xSector = mFatSector + aSector;
                 Global.mFileSystemDebugger.SendInternal("xSector  =");
                 Global.mFileSystemDebugger.SendInternal(xSector);
-                mFileSystem.mDevice.ReadBlock(xSector, mFileSystem.SectorsPerCluster, aData);
+                mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, aData);
             }
 
             private void WriteFatSector(ulong aSector, byte[] aData)
@@ -182,7 +182,7 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 var xSector = mFatSector + aSector;
-                mFileSystem.mDevice.WriteBlock(xSector, mFileSystem.SectorsPerCluster, aData);
+                mFileSystem.Device.WriteBlock(xSector, mFileSystem.SectorsPerCluster, aData);
             }
 
             /// <summary>
@@ -353,7 +353,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         private readonly Fat[] mFats;
 
-        public override string mType
+        public override string Type
         {
              get
             {
@@ -390,9 +390,9 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
             }
 
-            var xBPB = mDevice.NewBlockArray(1);
+            var xBPB = Device.NewBlockArray(1);
 
-            mDevice.ReadBlock(0UL, 1U, xBPB);
+            Device.ReadBlock(0UL, 1U, xBPB);
 
             ushort xSig = xBPB.ToUInt16(510);
             if (xSig != 0xAA55)
@@ -488,12 +488,12 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 aData = NewBlockArray();
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                mDevice.ReadBlock((ulong)xSector, SectorsPerCluster, aData);
+                Device.ReadBlock((ulong)xSector, SectorsPerCluster, aData);
             }
             else
             {
-                aData = mDevice.NewBlockArray(1);
-                mDevice.ReadBlock((ulong)aCluster, RootSectorCount, aData);
+                aData = Device.NewBlockArray(1);
+                Device.ReadBlock((ulong)aCluster, RootSectorCount, aData);
             }
         }
 
@@ -519,11 +519,11 @@ namespace Cosmos.System.FileSystem.FAT
             if (mFatType == FatTypeEnum.Fat32)
             {
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                mDevice.WriteBlock((ulong)xSector, SectorsPerCluster, xData);
+                Device.WriteBlock((ulong)xSector, SectorsPerCluster, xData);
             }
             else
             {
-                mDevice.WriteBlock((ulong)aCluster, RootSectorCount, xData);
+                Device.WriteBlock((ulong)aCluster, RootSectorCount, xData);
             }
         }
 
@@ -605,7 +605,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             var result = new List<DirectoryEntry>();
-            var xEntry = (FatDiretoryEntry)baseDirectory;
+            var xEntry = (FatDirectoryEntry)baseDirectory;
             var fatListing = xEntry.ReadDirectoryContents();
 
             for (int i = 0; i < fatListing.Count; i++)
@@ -619,7 +619,7 @@ namespace Cosmos.System.FileSystem.FAT
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetRootDirectory --");
 
-            var xRootEntry = new FatDiretoryEntry(this, null, mRootPath, mSize, mRootPath, RootCluster);
+            var xRootEntry = new FatDirectoryEntry(this, null, RootPath, Size, RootPath, RootCluster);
             return xRootEntry;
         }
 
@@ -641,7 +641,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(aNewDirectory));
             }
 
-            var xParentDirectory = (FatDiretoryEntry)aParentDirectory;
+            var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewDirectory, DirectoryEntryTypeEnum.Directory);
             return xDirectoryEntryToAdd;
         }
@@ -664,7 +664,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(aNewFile));
             }
 
-            var xParentDirectory = (FatDiretoryEntry)aParentDirectory;
+            var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
 
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewFile, DirectoryEntryTypeEnum.File);
             return xDirectoryEntryToAdd;
@@ -677,7 +677,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(aDirectoryEntry));
             }
 
-            var xDirectoryEntry = (FatDiretoryEntry)aDirectoryEntry;
+            var xDirectoryEntry = (FatDirectoryEntry)aDirectoryEntry;
 
             xDirectoryEntry.DeleteDirectoryEntry();
         }
@@ -689,7 +689,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(aDirectoryEntry));
             }
 
-            var xDirectoryEntry = (FatDiretoryEntry)aDirectoryEntry;
+            var xDirectoryEntry = (FatDirectoryEntry)aDirectoryEntry;
 
             var entries = xDirectoryEntry.GetFatTable();
 
@@ -701,7 +701,7 @@ namespace Cosmos.System.FileSystem.FAT
             xDirectoryEntry.DeleteDirectoryEntry();
         }
 
-        public override string mLabel
+        public override string Label
         {
             /*
              * In the FAT filesystem the name field of RootDirectory is - in reality - the Volume Label
@@ -709,7 +709,7 @@ namespace Cosmos.System.FileSystem.FAT
             get
             {
                 Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.mLabel --");
-                var RootDirectory = (FatDiretoryEntry) GetRootDirectory();
+                var RootDirectory = (FatDirectoryEntry) GetRootDirectory();
 
                 var VolumeId = RootDirectory.FindVolumeId();
                 if (VolumeId == null)
@@ -725,7 +725,7 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 Global.mFileSystemDebugger.SendInternal($"Setting Volume label to {value}");
 
-                var RootDirectory = (FatDiretoryEntry) GetRootDirectory();
+                var RootDirectory = (FatDirectoryEntry) GetRootDirectory();
 
                 var VolumeId = RootDirectory.FindVolumeId();
                 if (VolumeId != null)
@@ -740,15 +740,15 @@ namespace Cosmos.System.FileSystem.FAT
             }
         }
 
-        public override long mAvailableFreeSpace
+        public override long AvailableFreeSpace
         {
             get
             {
-                var RootDirectory = (FatDiretoryEntry)GetRootDirectory();
+                var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
                 // We do not support "user quotas" for now so this is effectively the same then mTotalFreeSpace
 
                 /* mSize is expressed in MegaByte */
-                var TotalSizeInBytes = mSize * 1024 * 1024;
+                var TotalSizeInBytes = Size * 1024 * 1024;
                 var UsedSpace = RootDirectory.GetUsedSpace();
 
                 Global.mFileSystemDebugger.SendInternal($"TotalSizeInBytes {TotalSizeInBytes} UsedSpace {UsedSpace}");
@@ -758,14 +758,14 @@ namespace Cosmos.System.FileSystem.FAT
             }
         }
 
-        public override long mTotalFreeSpace
+        public override long TotalFreeSpace
         {
             get
             {
-                var RootDirectory = (FatDiretoryEntry)GetRootDirectory();
+                var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
 
                 /* mSize is expressed in MegaByte */
-                var TotalSizeInBytes = mSize * 1024 * 1024;
+                var TotalSizeInBytes = Size * 1024 * 1024;
                 var UsedSpace = RootDirectory.GetUsedSpace();
 
                 Global.mFileSystemDebugger.SendInternal($"TotalSizeInBytes {TotalSizeInBytes} UsedSpace {UsedSpace}");
