@@ -9,7 +9,7 @@ using IL2CPU.API.Attribs;
 namespace Cosmos.System_Plugs.System.Globalization
 {
 
-    [Plug(TargetName = "System.Globalization.EncodingTable")]
+    [Plug("System.Globalization.EncodingTable, System.Private.CoreLib")]
     public static class EncodingTableImpl
     {
  

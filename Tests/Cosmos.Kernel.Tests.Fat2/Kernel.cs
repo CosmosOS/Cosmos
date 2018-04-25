@@ -42,6 +42,7 @@ namespace Cosmos.Kernel.Tests.Fat2
                 mDebugger.Send("Run");
 
                 FileTest.Execute(mDebugger);
+                DriveInfoTest.Execute(mDebugger);
 
                 TestController.Completed();
             }

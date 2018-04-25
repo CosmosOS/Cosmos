@@ -2,7 +2,7 @@
 {
     public enum FileSystemType
     {
+        Unknown = 0,
         FAT,
-        Unknown
     }
 }
