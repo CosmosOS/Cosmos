@@ -130,7 +130,9 @@
             DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets">
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)" Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'" />
+            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
+                               Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedAssembliesToPublish.Extension)' != '.pdb'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"
