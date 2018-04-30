@@ -4,8 +4,7 @@ using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.Threading
 {
-    //[Plug(Target = typeof(Thread))]
-    [Plug(TargetName = "System.Threading.Thread")]
+    [Plug("System.Threading.Thread, System.Private.CoreLib")]
     public static class ThreadImpl
     {
         public static void Sleep(TimeSpan timeout)
