@@ -44,8 +44,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(xResultArray.Length == 2, "String.Split(string[], StringSplitOptions) doesn't work.");
 
             string test = "This is a test string.";
-            Assert.IsTrue(test.Contains("test"), "string.Contains(string) doesn't find a substring that actually exists.");
-            Assert.IsFalse(test.Contains("cosmos"), "string.Contains(string) found a substring that didn't actually exist in a string.");
+            Assert.IsTrue(test.Contains("test"), "String.Contains(string) doesn't find a substring that actually exists.");
+            Assert.IsTrue(test.Contains("ing"), "String.Contains(string) doesn't find a substring that actually exists.");
+            Assert.IsFalse(test.Contains("cosmos"), "String.Contains(string) found a substring that didn't actually exist in a string.");
 
             Assert.IsTrue(test.StartsWith("This"), "string.StartsWith(string) is reporting false even though the string does start with the supplied substring.");
             Assert.IsFalse(test.StartsWith("That"), "string.StartsWith(string) is reporting true even though the string doesn't start with the supplied substring.");
