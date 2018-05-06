@@ -21,10 +21,10 @@ namespace Cosmos.HAL
 
         public enum PCIBist : byte
         {
-            CocdMask = 0x0f,
-            Start = 0x40,
-            Capable = 0x80
-        };
+            CocdMask = 0x0f,   /* Return result */
+            Start = 0x40,   /* 1 to start BIST, 2 secs or less */
+            Capable = 0x80    /* 1 if BIST capable */
+        }
 
         public enum PCIInterruptPIN : byte
         {
@@ -34,6 +34,20 @@ namespace Cosmos.HAL
             INTC = 0x03,
             INTD = 0x04
         };
+
+        public enum PCICommand : short
+        {
+            IO = 0x1,     /* Enable response in I/O space */
+            Memory = 0x2,     /* Enable response in Memory space */
+            Master = 0x4,     /* Enable bus mastering */
+            Special = 0x8,     /* Enable response to special cycles */
+            Invalidate = 0x10,    /* Use memory write and invalidate */
+            VGA_Pallete = 0x20,   /* Enable palette snooping */
+            Parity = 0x40,    /* Enable parity checking */
+            Wait = 0x80,    /* Enable address/data stepping */
+            SERR = 0x100,   /* Enable SERR */
+            Fast_Back = 0x200,   /* Enable back-to-back writes */
+        }
 
         public enum Config : byte
         {
@@ -63,7 +77,6 @@ namespace Cosmos.HAL
         public readonly ushort VendorID;
         public readonly ushort DeviceID;
 
-        public readonly ushort Command;
         public readonly ushort Status;
 
         public readonly byte RevisionID;
@@ -85,6 +98,14 @@ namespace Cosmos.HAL
 
         protected static Core.IOGroup.PCI IO = new Core.IOGroup.PCI();
 
+        public byte InterruptLine { get; private set; }
+        public PCICommand Command { get { return (PCICommand)ReadRegister16(0x04); } set { WriteRegister16(0x04, (ushort)value); } }
+
+        /// <summary>
+        /// Has this device been claimed by a driver
+        /// </summary>
+        public bool Claimed { get; set; }
+
         public PCIDevice(uint bus, uint slot, uint function)
         {
             this.bus = bus;
@@ -94,9 +115,8 @@ namespace Cosmos.HAL
             VendorID = ReadRegister16((byte)Config.VendorID);
             DeviceID = ReadRegister16((byte)Config.DeviceID);
 
-            Command = ReadRegister16((byte)Config.Command);
-            Status = ReadRegister16((byte)Config.Status);
-
+            //Command = ReadRegister16((byte)Config.Command);
+            //Status = ReadRegister16((byte)Config.Status);
 
             RevisionID = ReadRegister8((byte)Config.RevisionID);
             ProgIF = ReadRegister8((byte)Config.ProgIF);
@@ -107,6 +127,8 @@ namespace Cosmos.HAL
             HeaderType = (PCIHeaderType)ReadRegister8((byte)Config.HeaderType);
             BIST = (PCIBist)ReadRegister8((byte)Config.BIST);
             InterruptPIN = (PCIInterruptPIN)ReadRegister8((byte)Config.InterruptPIN);
+            InterruptLine = ReadRegister8((byte)Config.InterruptLine);
+
             if ((uint)VendorID == 0xFF && (uint)DeviceID == 0xFFFF)
             {
                 DeviceExists = false;
@@ -125,6 +147,11 @@ namespace Cosmos.HAL
                 BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20));
                 BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24));
             }
+        }
+
+        public void EnableDevice()
+        {
+            Command |= PCICommand.Master | PCICommand.IO | PCICommand.Memory;
         }
 
         public static ushort GetHeaderType(ushort Bus, ushort Slot, ushort Function)
@@ -240,6 +267,14 @@ namespace Cosmos.HAL
                             default:
                                 return "Mylex Unknown device";
                         }
+                    case 0x1234: //Bochs
+                        switch (device.DeviceID)
+                        {
+                            case 0x1111:
+                                return "Bochs BGA";
+                            default:
+                                return "Bochs Unknown device";
+                        }
                     case 0x1274: //Ensoniq
                         switch (device.DeviceID)
                         {
@@ -282,6 +317,16 @@ namespace Cosmos.HAL
                             default:
                                 return "Intel Unknown device";
                         }
+                    case 0x80EE: //VirtualBox
+                        switch (device.DeviceID)
+                        {
+                            case 0xBEEF:
+                                return "VirtualBox Graphics Adapter";
+                            case 0xCAFE:
+                                return "VirtualBox Guest Service";
+                            default:
+                                return "VirtualBox Unknown device";
+                        }
                     default:
                         return "Unknown device";
                 }
@@ -300,7 +345,7 @@ namespace Cosmos.HAL
                                 return "0x00 Subclass";
                         }
                     case 0x01:
-                        switch(device.Subclass)
+                        switch (device.Subclass)
                         {
                             case 0x00:
                                 return "SCSI Bus Controller";
@@ -392,7 +437,7 @@ namespace Cosmos.HAL
                                 return "Memory Controller";
                         }
                     case 0x06:
-                        switch(device.Subclass)
+                        switch (device.Subclass)
                         {
                             case 0x00:
                                 return "Host Bridge";
@@ -763,7 +808,7 @@ namespace Cosmos.HAL
             return "0x" + aNumber.ToHex(aBits / 4);
         }
     }
-    
+
     public class PCIBaseAddressBar
     {
         private uint baseAddress = 0;
