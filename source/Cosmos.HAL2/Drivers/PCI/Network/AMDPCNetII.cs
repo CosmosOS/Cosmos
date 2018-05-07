@@ -33,10 +33,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             }
 
             this.pciCard = device;
-            // this.pciCard.Claimed = true;
-            //this.pciCard.EnableDevice();
+            this.pciCard.Claimed = true;
+            this.pciCard.EnableDevice();
 
-            //this.io = new AMDPCNetIIIOGroup((ushort) this.pciCard.BaseAddresses[0].BaseAddress());
+            this.io = new AMDPCNetIIIOGroup((ushort) this.pciCard.BaseAddressBar[0].BaseAddress);
             this.io.RegisterData.DWord = 0;
 
             // Get the EEPROM MAC Address and set it as the devices MAC
@@ -97,7 +97,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             mTransmitBuffer = new Queue<byte[]>();
             mRecvBuffer = new Queue<byte[]>();
 
-            //INTs.SetIrqHandler(device.InterruptLine, HandleNetworkInterrupt);
+            INTs.SetIrqHandler(device.InterruptLine, HandleNetworkInterrupt);
         }
 
         protected void HandleNetworkInterrupt(ref INTs.IRQContext aContext)
@@ -135,16 +135,16 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static void FindAll()
         {
           Console.WriteLine("Scanning for AMD PCNetII cards...");
-          //  PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
-          //  if (device != null)
-          // {
-          //      AMDPCNetII nic = new AMDPCNetII((PCIDevice) device);
-          //
-          //      Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
-          //                        device.function);
-          //      Console.WriteLine("NIC IRQ: " + device.InterruptLine);
-          //      Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
-          //  }
+          PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+          if (device != null)
+          {
+               AMDPCNetII nic = new AMDPCNetII((PCIDevice) device);
+          
+                Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
+                                  device.function);
+                Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+                Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
+          }
         }
 
         #region Register Access Properties
