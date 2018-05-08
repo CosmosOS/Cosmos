@@ -38,6 +38,8 @@ namespace Cosmos.HAL.BlockDevice
             {
                 /*  Not sure how this would effect the Filesystem - should be fine unless drive master-slave options are changed  */
                 BlockDevice.Devices.Add(xATA);
+                ATAPI.Init();
+                ATAPI.Test();
                 Ata.AtaDebugger.Send("ATA device with speclevel ATAPI found, Support is currently WIP!");
                 return;
             }

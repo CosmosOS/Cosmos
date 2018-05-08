@@ -25,6 +25,13 @@ namespace Cosmos.HAL.BlockDevice
             IO.DeviceSelect.Byte = 0xA0;
             IO.Control.Byte = 0x00;
         }
+
+        public static void Test()
+        {
+            ReadBlock(1);
+            PrintBuffer();
+        }
+
         public static void HandleIRQ(ref Cosmos.Core.INTs.IRQContext aContext)
         {
             Console.WriteLine("IRQ15");
