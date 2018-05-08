@@ -95,8 +95,8 @@ namespace Cosmos.Core
             // set masks:
             Master.Data.Byte = masterMask;
             IOPort.Wait();
-            //Slave.Data.Byte = slaveMask;
-            //IOPort.Wait();
+            Slave.Data.Byte = slaveMask;
+            IOPort.Wait();
         }
 
         protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask)
