@@ -48,7 +48,7 @@ namespace Cosmos.System.Graphics
             mSVGAIIDebugger.SendInternal($"Drawing point to x:{x}, y:{y} with {xColor.Name} Color");
             xSVGAIIDriver.SetPixel((uint)x, (uint)y, (uint)xColor.ToArgb());
             mSVGAIIDebugger.SendInternal($"Done drawing point");
-            xSVGAIIDriver.Update(0, 0, (uint)mode.Columns, (uint)mode.Rows);
+            xSVGAIIDriver.Update((uint) x, (uint) y, (uint)mode.Columns, (uint)mode.Rows);
         }
 
         public override void DrawArray(Color[] colors, int x, int y, int width, int height)

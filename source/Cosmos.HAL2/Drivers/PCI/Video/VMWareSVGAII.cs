@@ -155,7 +155,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
 
             WriteRegister(Register.ID, (uint)ID.V2);
             if (ReadRegister(Register.ID) != (uint)ID.V2)
-                return;
+            { return; }
 
             Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
             capabilities = ReadRegister(Register.Capabilities);
@@ -217,13 +217,17 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         {
             if (((GetFIFO(FIFO.NextCmd) == GetFIFO(FIFO.Max) - 4) && GetFIFO(FIFO.Stop) == GetFIFO(FIFO.Min)) ||
                 (GetFIFO(FIFO.NextCmd) + 4 == GetFIFO(FIFO.Stop)))
+            {
                 WaitForFifo();
+            }
 
             SetFIFO((FIFO)GetFIFO(FIFO.NextCmd), value);
             SetFIFO(FIFO.NextCmd, GetFIFO(FIFO.NextCmd) + 4);
 
             if (GetFIFO(FIFO.NextCmd) == GetFIFO(FIFO.Max))
+            {
                 SetFIFO(FIFO.NextCmd, GetFIFO(FIFO.Min));
+            }
         }
 
         public void Update(uint x, uint y, uint width, uint height)
@@ -265,7 +269,9 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 WaitForFifo();
             }
             else
+            {
                 throw new NotImplementedException("VMWareSVGAII Copy()");
+            }
         }
 
         public void Fill(uint x, uint y, uint width, uint height, uint color)
@@ -327,9 +333,13 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WriteToFifo(1);
             WriteToFifo(1);
             for (int i = 0; i < 4; i++)
+            {
                 WriteToFifo(0);
+            }
             for (int i = 0; i < 4; i++)
+            {
                 WriteToFifo(0xFFFFFF);
+            }
             WaitForFifo();
         }
 

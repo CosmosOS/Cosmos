@@ -291,7 +291,10 @@ namespace Cosmos.HAL
                         //SetPixel = new SetPixelDelegate(SetPixel320x200x4);
                         //GetPixel = new GetPixelDelegate(GetPixel320x200x4);
                     }
-                    else throw new Exception("Unsupported color depth passed for specified screen size");
+                    else
+                    {
+                        throw new Exception("Unsupported color depth passed for specified screen size");
+                    }
                     break;
                 case ScreenSize.Size640x480:
                     if (aDepth == ColorDepth.BitDepth2)
@@ -314,7 +317,10 @@ namespace Cosmos.HAL
                         SetPixel = new SetPixelDelegate(SetPixel640x480x4);
                         GetPixel = new GetPixelDelegate(GetPixel640x480x4);
                     }
-                    else throw new Exception("Unsupported color depth passed for specified screen size");
+                    else
+                    {
+                        throw new Exception("Unsupported color depth passed for specified screen size");
+                    }
                     break;
                 case ScreenSize.Size720x480:
                     if (aDepth == ColorDepth.BitDepth4)
@@ -327,7 +333,10 @@ namespace Cosmos.HAL
                         SetPixel = new SetPixelDelegate(SetPixel720x480x4);
                         GetPixel = new GetPixelDelegate(GetPixel720x480x4);
                     }
-                    else throw new Exception("Unsupported color depth passed for specified screen size");
+                    else
+                    {
+                        throw new Exception("Unsupported color depth passed for specified screen size");
+                    }
                     break;
                 default:
                     throw new Exception("Unknown screen size");
@@ -515,7 +524,9 @@ namespace Cosmos.HAL
         {
             mIO.DACIndex_Write.Byte = (byte)index;
             for (int i = 0; i < pallete.Length; i++)
+            {
                 mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);
+            }
         }
 
         //public void SetPaletteEntry(int index, Color color)

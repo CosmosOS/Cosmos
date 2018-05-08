@@ -72,7 +72,10 @@
 
     <ItemGroup>
         <PackageReference Include="Cosmos.Build" Version="2018.3.26" NoWarn="NU1604" />
-        <PackageReference Include="Cosmos.System2" Version="2018.3.26" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\source\Cosmos.System2\Cosmos.System2.csproj" />
     </ItemGroup>
 
 </Project>

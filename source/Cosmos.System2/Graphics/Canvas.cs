@@ -109,7 +109,9 @@ namespace Cosmos.System.Graphics
             int i;
 
             for (i = 0; i < dx; i++)
+            {
                 DrawPoint(pen, x1 + i, y1);
+            }
         }
 
         private void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
@@ -117,7 +119,9 @@ namespace Cosmos.System.Graphics
             int i;
 
             for (i = 0; i < dy; i++)
+            {
                 DrawPoint(pen, x1, y1 + i);
+            }
         }
 
         /*
@@ -176,8 +180,9 @@ namespace Cosmos.System.Graphics
         public virtual void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             if (pen == null)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pen));
-
+            }
             ThrowIfCoordNotValid(x1, y1);
 
             ThrowIfCoordNotValid(x2, y2);
@@ -217,7 +222,9 @@ namespace Cosmos.System.Graphics
         public virtual void DrawCircle(Pen pen, int x_center, int y_center, int radius)
         {
             if (pen == null)
+            {
                 throw new ArgumentNullException(nameof(pen));
+            }
             ThrowIfCoordNotValid(x_center + radius, y_center);
             ThrowIfCoordNotValid(x_center - radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + radius);
@@ -331,7 +338,9 @@ namespace Cosmos.System.Graphics
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
             if (pen == null)
+            {
                 throw new ArgumentNullException(nameof(pen));
+            }
             ThrowIfCoordNotValid(x_center + x_radius, y_center);
             ThrowIfCoordNotValid(x_center - x_radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + y_radius);
@@ -372,7 +381,9 @@ namespace Cosmos.System.Graphics
                 for (int x = -width; x <= width; x++)
                 {
                     if (x * x * height * height + y * y * width * width <= height * height * width * width)
+                    {
                         DrawPoint(pen, point.X + x, point.Y + y);
+                    }
                 }
             }
         }
@@ -385,10 +396,13 @@ namespace Cosmos.System.Graphics
         public virtual void DrawPolygon(Pen pen, params Point[] points)
         {
             if (points.Length < 3)
+            {
                 throw new ArgumentException("A polygon requires more than 3 points.");
+            }
             if (pen == null)
+            {
                 throw new ArgumentNullException(nameof(pen));
-
+            }
             for (int i = 0; i < points.Length - 1; i++)
             {
                 DrawLine(pen, points[i], points[i + 1]);
@@ -418,8 +432,9 @@ namespace Cosmos.System.Graphics
              * vertex (we call these vertexes A, B, C, D as for geometric convention)
              */
             if (pen == null)
+            {
                 throw new ArgumentNullException(nameof(pen));
-
+            }
             /* The check of the validity of x and y are done in DrawLine() */
 
             /* The vertex A is where x,y are */
@@ -520,8 +535,9 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal($"CheckIfModeIsValid");
 
             if (mode == null)
+            {
                 return false;
-
+            }
             /* This would have been the more "modern" version but LINQ is not working
 
             if (!availableModes.Exists(element => element == mode))
