@@ -128,6 +128,31 @@ namespace Cosmos.HAL
                 CheckBus(xPCIDevice.SecondaryBusNumber);
         }
 
+        public static bool Exists(PCIDevice pciDevice)
+        {
+            if (GetDevice((VendorID) pciDevice.VendorID, (DeviceID) pciDevice.DeviceID) == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public static bool Exists(VendorID aVendorID, DeviceID aDeviceID)
+        {
+            PCIDevice aDevice = GetDevice(aVendorID, aDeviceID);
+            if (aDevice == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public static PCIDevice GetDevice(VendorID aVendorID, DeviceID aDeviceID)
         {
             for (int i = 0; i < Devices.Count; i++)

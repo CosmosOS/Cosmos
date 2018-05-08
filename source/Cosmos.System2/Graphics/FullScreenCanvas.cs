@@ -21,52 +21,57 @@ namespace Cosmos.System.Graphics
         private enum VideoDriver
         {
             VMWareSVGAIIDriver,
-            //VGADriver,
-            VBEDriver
+            VBEDriver,
+            VGADriver
         }
 
+        private static HAL.Drivers.VBEDriver VBEDriver;
         private static PCIDevice SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
-        public static bool SVGAIIExist()
+        public static bool BGAExists()
         {
-            if (SVGAIIDevice != null)
+            if (VBEDriver.Available() == false)
             {
-                if (SVGAIIDevice.DeviceExists == true)
-                {
-                    return true;
-                }
                 return false;
             }
             else
             {
-                return false;
+                return true;
             }
-
         }
-        private static VideoDriver videoDevice;
+
+        private static VideoDriver _VideoDevice;
 
         private static Canvas MyVideoDriver = null;
 
         private static Canvas GetVideoDriver()
         {
-            if (SVGAIIExist())
+            if (PCI.Exists(SVGAIIDevice))
             {
                 return new SVGAIIScreen();
             }
-            else
+            else if (BGAExists() == true)
             {
                 return new VBEScreen();
+            }
+            else
+            {
+                return new VGACanvas();
             }
         }
         private static Canvas GetVideoDriver(Mode mode)
         {
-            if (SVGAIIExist())
+            if (PCI.Exists(SVGAIIDevice) == true)
             {
                 return new SVGAIIScreen(mode);
             }
-            else
+            else if (BGAExists() == true)
             {
                 return new VBEScreen(mode);
+            }
+            else
+            {
+                return new VGACanvas(mode);
             }
         }
 
@@ -99,65 +104,3 @@ namespace Cosmos.System.Graphics
         }
     }
 }
-/*
-    if (DoesSVGAIIExist())
-    {
-        // Set videoDevice to SVGA, initialize MyVideoDriver as an SVGA display using specified mode
-        // MyVideoDriver.Mode = mode; isn't exactly needed, just done in case it doesn't set.
-        // returns MyVideoDriver as the Canvas
-        videoDevice = VideoDriver.VMWareSVGAIIDriver;
-        MyVideoDriver = new SVGAIIScreen(mode);
-        MyVideoDriver.Mode = mode;
-        return MyVideoDriver;
-    }
-    else
-    {
-        // Does the same as above, this time using VESA BIOS Extensions (supported by loads of graphics cards)
-        videoDevice = VideoDriver.VBEDriver;
-        MyVideoDriver = new VBEScreen(mode);
-        MyVideoDriver.Mode = mode;
-        return MyVideoDriver;
-    }
-}
-else
-{
-    // If MyVideoDriver has been initialized before (Graphics mode has previously been set)
-    // Change the graphics mode to the mode specified
-    MyVideoDriver.Mode = mode;
-    return MyVideoDriver;
-}
-}
-/*
-
-// If MyVideoDriver is null (hasn't checked if VMWare SVGA exists),
-// Do necessary check and set to default gfx mode
-if (MyVideoDriver == null)
-{
-if (DoesSVGAIIExist())
-{
-    // Set videoDevice to SVGA, initialize MyVideoDriver as an SVGA display using specified mode
-    // MyVideoDriver.Mode = mode; isn't exactly needed, just done in case it doesn't set.
-    // returns MyVideoDriver as the Canvas
-    videoDevice = VideoDriver.VMWareSVGAIIDriver;
-    MyVideoDriver = new SVGAIIScreen(SVGAIIScreen.defaultGraphicsMode);
-    MyVideoDriver.Mode = SVGAIIScreen.defaultGraphicsMode;
-    return MyVideoDriver;
-}
-else
-{
-    // Does the same as above, this time using VESA BIOS Extensions (supported by loads of graphics cards)
-    videoDevice = VideoDriver.VBEDriver;
-    MyVideoDriver = new VBEScreen(VBEScreen.defaultGraphicsMode);
-    MyVideoDriver.Mode = VBEScreen.defaultGraphicsMode;
-    return MyVideoDriver;
-}
-}
-// If it's not null, simply change graphics mode
-else
-{
-MyVideoDriver.Mode = MyVideoDriver.DefaultGraphicMode;
-return MyVideoDriver;
-}
-*/
-
-
