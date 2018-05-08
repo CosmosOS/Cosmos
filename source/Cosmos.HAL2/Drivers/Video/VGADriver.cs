@@ -14,7 +14,7 @@ Sets VGA-compatible video modes without using the BIOS
 
 namespace Cosmos.HAL
 {
-    public class VGAScreen
+    public class VGADriver
     {
         internal Debugger mDebugger = new Debugger("HAL", "VGA");
         private const byte NumSeqRegs = 5;
@@ -174,7 +174,7 @@ namespace Cosmos.HAL
         public SetPixelDelegate SetPixel;
         public GetPixelDelegate GetPixel;
 
-        public VGAScreen()
+        public VGADriver()
         {
             SetPixel = new SetPixelDelegate(SetPixelNoMode);
             GetPixel = new GetPixelDelegate(GetPixelNoMode);

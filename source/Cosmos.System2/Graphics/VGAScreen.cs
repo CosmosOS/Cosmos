@@ -1,5 +1,5 @@
 using System;
-using HALVGAScreen = Cosmos.HAL.VGAScreen;
+using Cosmos.HAL;
 
 namespace Cosmos.System.Graphics
 {
@@ -19,23 +19,23 @@ namespace Cosmos.System.Graphics
             BitDepth2, BitDepth4, BitDepth8, BitDepth16
         };
 
-        private static HALVGAScreen mScreen = new HALVGAScreen();
+        private static VGADriver mScreen = new VGADriver();
 
         public static void SetGraphicsMode(ScreenSize screenSize, ColorDepth colorDepth)
         {
-            HALVGAScreen.ScreenSize ScrSize = HALVGAScreen.ScreenSize.Size320x200;
-            HALVGAScreen.ColorDepth ClrDepth = HALVGAScreen.ColorDepth.BitDepth8;
+            VGADriver.ScreenSize ScrSize = VGADriver.ScreenSize.Size320x200;
+            VGADriver.ColorDepth ClrDepth = VGADriver.ColorDepth.BitDepth8;
 
             switch (screenSize)
             {
                 case ScreenSize.Size320x200:
-                    ScrSize = HALVGAScreen.ScreenSize.Size320x200;
+                    ScrSize = VGADriver.ScreenSize.Size320x200;
                     break;
                 case ScreenSize.Size640x480:
-                    ScrSize = HALVGAScreen.ScreenSize.Size640x480;
+                    ScrSize = VGADriver.ScreenSize.Size640x480;
                     break;
                 case ScreenSize.Size720x480:
-                    ScrSize = HALVGAScreen.ScreenSize.Size720x480;
+                    ScrSize = VGADriver.ScreenSize.Size720x480;
                     break;
                 default:
                     throw new Exception("This situation is not implemented!");
@@ -44,16 +44,16 @@ namespace Cosmos.System.Graphics
             switch (colorDepth)
             {
                 case ColorDepth.BitDepth2:
-                    ClrDepth = HALVGAScreen.ColorDepth.BitDepth2;
+                    ClrDepth = VGADriver.ColorDepth.BitDepth2;
                     break;
                 case ColorDepth.BitDepth4:
-                    ClrDepth = HALVGAScreen.ColorDepth.BitDepth4;
+                    ClrDepth = VGADriver.ColorDepth.BitDepth4;
                     break;
                 case ColorDepth.BitDepth8:
-                    ClrDepth = HALVGAScreen.ColorDepth.BitDepth8;
+                    ClrDepth = VGADriver.ColorDepth.BitDepth8;
                     break;
                 case ColorDepth.BitDepth16:
-                    ClrDepth = HALVGAScreen.ColorDepth.BitDepth16;
+                    ClrDepth = VGADriver.ColorDepth.BitDepth16;
                     break;
                 default:
                     throw new Exception("This situation is not implemented!");
@@ -97,22 +97,22 @@ namespace Cosmos.System.Graphics
             switch (Size)
             {
                 case TextSize.Size40x25:
-                    mScreen.SetTextMode(HALVGAScreen.TextSize.Size40x25);
+                    mScreen.SetTextMode(VGADriver.TextSize.Size40x25);
                     break;
                 case TextSize.Size40x50:
-                    mScreen.SetTextMode(HALVGAScreen.TextSize.Size40x50);
+                    mScreen.SetTextMode(VGADriver.TextSize.Size40x50);
                     break;
                 case TextSize.Size80x25:
-                    mScreen.SetTextMode(HALVGAScreen.TextSize.Size80x25);
+                    mScreen.SetTextMode(VGADriver.TextSize.Size80x25);
                     break;
                 case TextSize.Size80x50:
-                    mScreen.SetTextMode(HALVGAScreen.TextSize.Size80x50);
+                    mScreen.SetTextMode(VGADriver.TextSize.Size80x50);
                     break;
                 case TextSize.Size90x30:
-                    mScreen.SetTextMode(HALVGAScreen.TextSize.Size90x30);
+                    mScreen.SetTextMode(VGADriver.TextSize.Size90x30);
                     break;
                 case TextSize.Size90x60:
-                    mScreen.SetTextMode(HALVGAScreen.TextSize.Size90x60);
+                    mScreen.SetTextMode(VGADriver.TextSize.Size90x60);
                     break;
                 default:
                     throw new Exception("This situation is not implemented!");
