@@ -36,7 +36,9 @@ namespace Cosmos.HAL.BlockDevice
             }
             else if (xATA.DriveType == AtaPio.SpecLevel.ATAPI)
             {
-                Ata.AtaDebugger.Send("ATA device with speclevel ATAPI found, which is not supported yet!");
+                /*  Not sure how this would effect the Filesystem - should be fine unless drive master-slave options are changed  */
+                BlockDevice.Devices.Add(xATA);
+                Ata.AtaDebugger.Send("ATA device with speclevel ATAPI found, Support is currently WIP!");
                 return;
             }
             var xMbrData = new byte[512];
@@ -52,15 +54,36 @@ namespace Cosmos.HAL.BlockDevice
 
                 for (int i = 0; i < xEBR.Partitions.Count; i++)
                 {
-                    //var xPart = xEBR.Partitions[i];
-                    //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                    //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+                    //  Updated code to match new Partition class, not sure if this code works at all however,
+                    //  so I've left it commented out
+
+                    /*
+                    var xPart = xEBR.Partitions[i];
+                    var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
+                    BlockDevice.Devices.Add(xPartDevice);
+                    */
                 }
             }
 
-            // TODO Change this to foreach when foreach is supported
+            // TODO: Change this to foreach when foreach is supported
+            // Isn't it supported now?
             Ata.AtaDebugger.Send("Number of MBR partitions found:");
             Ata.AtaDebugger.SendNumber(xMBR.Partitions.Count);
+            /*
+            foreach (MBR.PartInfo partition in xMBR.Partitions)
+            {
+                if (partition == null)
+                {
+                    Ata.AtaDebugger.Send("Null partition found! " + partition);
+                }
+                else
+                {
+                    var xPartDevice = new Partition(xATA, partition.StartSector, partition.SectorCount);
+                    BlockDevice.Devices.Add(xPartDevice);
+                    Ata.AtaDebugger.Send("Found partition! " + partition);
+                }
+            }
+            */
             for(int i = 0; i < xMBR.Partitions.Count; i++)
             {
                 var xPart = xMBR.Partitions[i];

@@ -201,12 +201,7 @@ namespace Cosmos.HAL.BlockDevice
 		// Since we read status again later, we wait by reading it 4 times.
 		protected void Wait()
 		{
-			// Wait 400 ns
-			byte xVoid;
-			xVoid = IO.Status.Byte;
-			xVoid = IO.Status.Byte;
-			xVoid = IO.Status.Byte;
-			xVoid = IO.Status.Byte;
+            IO.Wait();
 		}
 
 		public void SelectDrive(byte aLbaHigh4)
@@ -309,6 +304,7 @@ namespace Cosmos.HAL.BlockDevice
 		{
 			CheckBlockNo(aSectorNo, aSectorCount);
 			//TODO: Check for 48 bit sectorno mode and select 48 bits
+            // LBA48 IOPorts now added
 			SelectDrive((byte)(aSectorNo >> 24));
 			if (LBA48Bit)
 			{
