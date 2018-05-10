@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
+        <RuntimeIdentifier>win</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
         <PackageDescription>Cosmos build system.
 $(CosmosDescription)</PackageDescription>
@@ -22,5 +23,13 @@ $(CosmosDescription)</PackageDescription>
     <ItemGroup>
         <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
     </ItemGroup>
+
+    <Target Name="IncludeDependencies" BeforeTargets="_GetPackageFiles" DependsOnTargets="PrepareForPublish;ComputeFilesToPublish">
+
+        <ItemGroup>
+            <Content Include="@(ResolvedAssembliesToPublish)" Pack="True" PackagePath="tools\" Condition="!$([System.String]::new('%(Filename)').StartsWith('Microsoft.Build'))" />
+        </ItemGroup>
+
+    </Target>
 
 </Project>
