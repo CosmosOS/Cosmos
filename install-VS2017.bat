@@ -1,6 +1,6 @@
 @echo off
 
-set DOTNET_VERSION=4.7.1
+set DOTNET_VERSION=4.7.2
 
 echo Check for installed .NET Framework %DOTNET_VERSION%
 
