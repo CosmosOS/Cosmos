@@ -45,8 +45,10 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     case FatTypeEnum.Fat32:
                         return 4;
+
                     case FatTypeEnum.Fat16:
                         return 2;
+
                     case FatTypeEnum.Fat12:
                         // TODO:
                         break;
@@ -208,7 +210,6 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal("xSector =");
                 Global.mFileSystemDebugger.SendInternal(xSector);
 
-
                 byte[] xData = mFileSystem.NewBlockArray();
                 ReadFatSector(xSector, out xData);
 
@@ -218,7 +219,7 @@ namespace Cosmos.System.FileSystem.FAT
                         // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
                         // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
                         // we want the high 12-bits of the 16-bits we fetch.
-                        uint xResult = xData.ToUInt16(xEntryOffset);
+                        uint xResult = BitConverter.ToUInt32(xData, (int)xEntryOffset);
                         if ((aEntryNumber & 0x01) == 0)
                         {
                             aValue = xResult & 0x0FFF; // Even
@@ -228,12 +229,15 @@ namespace Cosmos.System.FileSystem.FAT
                             aValue = xResult >> 4; // Odd
                         }
                         break;
+
                     case FatTypeEnum.Fat16:
-                        aValue = xData.ToUInt16(xEntryOffset);
+                        aValue = BitConverter.ToUInt16(xData, (int)xEntryOffset);
                         break;
+
                     case FatTypeEnum.Fat32:
-                        aValue = xData.ToUInt32(xEntryOffset) & 0x0FFFFFFF;
+                        aValue = BitConverter.ToUInt32(xData, (int)xEntryOffset) & 0x0FFFFFFF;
                         break;
+
                     default:
                         throw new NotSupportedException("Unknown FAT type.");
                 }
@@ -264,14 +268,20 @@ namespace Cosmos.System.FileSystem.FAT
                 switch (mFileSystem.mFatType)
                 {
                     case FatTypeEnum.Fat12:
-                        xData.SetUInt16(xEntryOffset, (ushort)aValue);
+                        byte[] data = BitConverter.GetBytes((ushort)aValue);
+                        Array.Copy(data, 0, xData, (int)xEntryOffset, data.Length);
                         break;
+
                     case FatTypeEnum.Fat16:
-                        xData.SetUInt16(xEntryOffset, (ushort)aValue);
+                        data = BitConverter.GetBytes((ushort)aValue);
+                        Array.Copy(data, 0, xData, (int)xEntryOffset, data.Length);
                         break;
+
                     case FatTypeEnum.Fat32:
-                        xData.SetUInt32(xEntryOffset, (uint)aValue);
+                        data = BitConverter.GetBytes((uint)aValue);
+                        Array.Copy(data, 0, xData, (int)xEntryOffset, data.Length); ;
                         break;
+
                     default:
                         throw new NotSupportedException("Unknown FAT type.");
                 }
@@ -291,10 +301,13 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     case FatTypeEnum.Fat12:
                         return aValue >= 0xFF8;
+
                     case FatTypeEnum.Fat16:
                         return aValue >= 0xFFF8;
+
                     case FatTypeEnum.Fat32:
                         return aValue >= 0xFFFFFF8;
+
                     default:
                         throw new Exception("Unknown file system type.");
                 }
@@ -311,10 +324,13 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     case FatTypeEnum.Fat12:
                         return 0x0FFF;
+
                     case FatTypeEnum.Fat16:
                         return 0xFFFF;
+
                     case FatTypeEnum.Fat32:
                         return 0x0FFFFFFF;
+
                     default:
                         throw new Exception("Unknown file system type.");
                 }
@@ -376,30 +392,30 @@ namespace Cosmos.System.FileSystem.FAT
 
             mDevice.ReadBlock(0UL, 1U, xBPB);
 
-            ushort xSig = xBPB.ToUInt16(510);
+            ushort xSig = BitConverter.ToUInt16(xBPB, 510);
             if (xSig != 0xAA55)
             {
                 throw new Exception("FAT signature not found.");
             }
 
-            BytesPerSector = xBPB.ToUInt16(11);
+            BytesPerSector = BitConverter.ToUInt16(xBPB, 11);
             SectorsPerCluster = xBPB[13];
             BytesPerCluster = BytesPerSector * SectorsPerCluster;
-            ReservedSectorCount = xBPB.ToUInt16(14);
+            ReservedSectorCount = BitConverter.ToUInt16(xBPB, 14);
             NumberOfFATs = xBPB[16];
-            RootEntryCount = xBPB.ToUInt16(17);
+            RootEntryCount = BitConverter.ToUInt16(xBPB, 17);
 
-            TotalSectorCount = xBPB.ToUInt16(19);
+            TotalSectorCount = BitConverter.ToUInt16(xBPB, 19);
             if (TotalSectorCount == 0)
             {
-                TotalSectorCount = xBPB.ToUInt32(32);
+                TotalSectorCount = BitConverter.ToUInt32(xBPB, 32);
             }
 
             // FATSz
-            FatSectorCount = xBPB.ToUInt16(22);
+            FatSectorCount = BitConverter.ToUInt16(xBPB, 22);
             if (FatSectorCount == 0)
             {
-                FatSectorCount = xBPB.ToUInt32(36);
+                FatSectorCount = BitConverter.ToUInt32(xBPB, 36);
             }
 
             DataSectorCount = TotalSectorCount -
@@ -426,7 +442,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             if (mFatType == FatTypeEnum.Fat32)
             {
-                RootCluster = xBPB.ToUInt32(44);
+                RootCluster = BitConverter.ToUInt32(xBPB, 44);
             }
             else
             {
@@ -518,7 +534,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             var xBPB = aDevice.NewBlockArray(1);
             aDevice.ReadBlock(0UL, 1U, xBPB);
-            ushort xSig = xBPB.ToUInt16(510);
+            ushort xSig = BitConverter.ToUInt16(xBPB, 510);
             if (xSig != 0xAA55)
             {
                 return false;
