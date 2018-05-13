@@ -429,8 +429,7 @@ namespace Cosmos.System.Graphics
         {
             Global.mDebugger.SendInternal($"CheckIfModeIsValid");
 
-            if (mode == null)
-                return false;
+            /* Mode has been changed to be a structure so it cannot be null anymore */
 
             /* This would have been the more "modern" version but LINQ is not working
 
@@ -452,12 +451,7 @@ namespace Cosmos.System.Graphics
 
         protected void ThrowIfModeIsNotValid(Mode mode)
         {
-            if (mode == null)
-            {
-                Global.mDebugger.SendInternal($"mode is null raising exception!");
-                throw new ArgumentNullException(nameof(mode));
-            }
-
+            /* Mode has been changed to be a structure so it cannot be null anymore */
             if (CheckIfModeIsValid(mode))
             {
                 return;
@@ -484,31 +478,6 @@ namespace Cosmos.System.Graphics
             {
                 throw new ArgumentOutOfRangeException(nameof(y), $"y ({y}) is not between 0 and {Mode.Rows}");
             }
-        }
-    }
-
-    public class Point
-    {
-        public Point(int x, int y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
-
-        private int x;
-
-        public int X
-        {
-            get { return x; }
-            set { x = value; }
-        }
-
-        private int y;
-
-        public int Y
-        {
-            get { return y; }
-            set { y = value; }
         }
     }
 }
