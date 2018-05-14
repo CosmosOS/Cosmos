@@ -32,7 +32,7 @@ namespace Cosmos.Build.Builder.Dependencies
             return Task.FromResult(false);
         }
 
-        public Task InstallAsync(CancellationToken cancellationToken)
+        public async Task InstallAsync(CancellationToken cancellationToken)
         {
             var vsInstallerPath = Environment.ExpandEnvironmentVariables(
                 @"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vs_installershell.exe");
@@ -41,7 +41,12 @@ namespace Cosmos.Build.Builder.Dependencies
             var args = $"update --passive --norestart --wait --installPath \"{vsInstancePath}\"";
 
             var process = Process.Start(vsInstallerPath, args);
-            return Task.Run((Action)process.WaitForExit, cancellationToken);
+            await Task.Run((Action)process.WaitForExit, cancellationToken).ConfigureAwait(false);
+
+            if (process.ExitCode != 0)
+            {
+                throw new Exception("The process failed to execute!");
+            }
         }
     }
 }

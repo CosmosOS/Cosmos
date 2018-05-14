@@ -47,6 +47,11 @@ namespace Cosmos.Build.Builder.Dependencies
 
             var process = Process.Start(setupFilePath);
             await Task.Run((Action)process.WaitForExit, cancellationToken).ConfigureAwait(false);
+
+            if (process.ExitCode != 0)
+            {
+                throw new Exception("The process failed to execute!");
+            }
         }
     }
 }

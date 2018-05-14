@@ -16,6 +16,8 @@ namespace Cosmos.Build.Builder
         private IMSBuildService _msBuildService;
         private ISetupInstance2 _visualStudioInstance;
 
+        private readonly string _cosmosDir;
+
         public CosmosBuildDefinition(
             IInnoSetupService innoSetupService,
             IMSBuildService msBuildService,
@@ -24,10 +26,18 @@ namespace Cosmos.Build.Builder
             _innoSetupService = innoSetupService;
             _msBuildService = msBuildService;
             _visualStudioInstance = visualStudioInstance;
+
+            _cosmosDir = Path.GetFullPath(Directory.GetCurrentDirectory());
+
+            if (!Directory.Exists(Path.Combine(_cosmosDir, "source", "Cosmos.Build.Builder")))
+            {
+                _cosmosDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "..", "..", "..", ".."));
+            }
         }
 
         public IEnumerable<IDependency> GetDependencies()
         {
+            yield return new ReposDependency(_cosmosDir);
             yield return new VisualStudioDependency(_visualStudioInstance);
             yield return new VisualStudioWorkloadsDependency(_visualStudioInstance);
             yield return new InnoSetupDependency(_innoSetupService);
@@ -59,24 +69,17 @@ namespace Cosmos.Build.Builder
                 }
             }
 
-            var cosmosDir = Path.GetFullPath(Directory.GetCurrentDirectory());
+            var il2cpuDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "IL2CPU"));
+            var xsharpDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "XSharp"));
 
-            if (!Directory.Exists(Path.Combine(cosmosDir, "source", "Cosmos.Build.Builder")))
-            {
-                cosmosDir = Path.GetFullPath(Path.Combine(cosmosDir, "..", "..", "..", "..", ".."));
-            }
-
-            var il2cpuDir = Path.GetFullPath(Path.Combine(cosmosDir, "..", "IL2CPU"));
-            var xsharpDir = Path.GetFullPath(Path.Combine(cosmosDir, "..", "XSharp"));
-
-            var cosmosSourceDir = Path.Combine(cosmosDir, "source");
+            var cosmosSourceDir = Path.Combine(_cosmosDir, "source");
             var il2cpuSourceDir = Path.Combine(il2cpuDir, "source");
 
-            var buildSlnPath = Path.Combine(cosmosDir, "Build.sln");
+            var buildSlnPath = Path.Combine(_cosmosDir, "Build.sln");
             var il2cpuSlnPath = Path.Combine(il2cpuDir, "IL2CPU.sln");
             var xsharpSlnPath = Path.Combine(xsharpDir, "XSharp.sln");
 
-            var vsipDir = Path.Combine(cosmosDir, "Build", "VSIP");
+            var vsipDir = Path.Combine(_cosmosDir, "Build", "VSIP");
 
             if (Directory.Exists(vsipDir))
             {
@@ -136,7 +139,7 @@ namespace Cosmos.Build.Builder
                 yield return new PackTask(_msBuildService, projectPath, packagesDir);
             }
 
-            var cosmosSetupDir = Path.Combine(cosmosDir, "setup");
+            var cosmosSetupDir = Path.Combine(_cosmosDir, "setup");
 
             // Create Setup
 
@@ -159,7 +162,7 @@ namespace Cosmos.Build.Builder
 
             using (var xKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Cosmos"))
             {
-                xKey.SetValue("DevKit", cosmosDir);
+                xKey.SetValue("DevKit", _cosmosDir);
             }
 
             // Launch VS
@@ -169,7 +172,7 @@ namespace Cosmos.Build.Builder
                 var vsInstance = _visualStudioInstance;
                 var vsPath = Path.Combine(vsInstance.GetInstallationPath(), "Common7", "IDE", "devenv.exe");
 
-                var kernelSlnPath = Path.Combine(cosmosDir, "Kernel.sln");
+                var kernelSlnPath = Path.Combine(_cosmosDir, "Kernel.sln");
 
                 yield return new StartProcessTask(vsPath, kernelSlnPath, "Visual Studio (Kernel.sln)");
             }
