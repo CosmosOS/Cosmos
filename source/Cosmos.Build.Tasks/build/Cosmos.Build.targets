@@ -33,6 +33,9 @@
         <DebugEnabled Condition="'$(DebugEnabled)' == '' AND '$(Configuration)' == 'Debug'">True</DebugEnabled>
         <DebugEnabled Condition="'$(DebugEnabled)' == ''">False</DebugEnabled>
 
+        <DebugCom Condition="'$(DebugCom)' == ''">1</DebugCom>
+        <DebugCom Condition="'$(DebugEnabled)' == 'False'">0</DebugCom>
+
         <BinFormat Condition="'$(BinFormat)' == ''">ELF</BinFormat>
         <DebugMode Condition="'$(DebugMode)' == ''">Source</DebugMode>
         <TraceMode Condition="'$(TraceMode)' == ''">User</TraceMode>
@@ -123,11 +126,13 @@
 
     <Target Name="IL2CPU"
             Inputs="$(TargetPath);@(PlugsReference)"
-            Outputs="$(Il2cpuOutput)">
+            Outputs="$(Il2cpuOutput)"
+            DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets">
 
         <ItemGroup>
-            <AssemblySearchDir Include="$(KernelAssembliesDir)" />
-            <AssemblySearchDir Include="%(ReferencePath.RootDir)%(ReferencePath.Directory)" />
+            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
+                               Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedAssembliesToPublish.Extension)' != '.pdb'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"
@@ -137,14 +142,15 @@
                 StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)"
                 TraceAssemblies="$(TraceAssemblies)"
                 IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
-                DebugCom="1"
-                References="$(TargetPath);@(PlugsReference)"
-                AssemblySearchDirs="@(AssemblySearchDir)"
+                DebugCom="$(DebugCom)"
+                TargetAssembly="$(TargetPath)"
+                References="@(_Il2cpuAssemblies)"
+                PlugsReferences="@(PlugsReference)"
                 OutputFilename="$(Il2cpuOutput)"
                 EnableLogging="True"
                 EmitDebugSymbols="$(DebugSymbols)"
                 CosmosBuildDir="$(CosmosDir)\Build"
-                WorkingDir="$(TargetDir)"/>
+                WorkingDir="$(TargetDir)" />
 
     </Target>
 

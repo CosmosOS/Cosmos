@@ -12,11 +12,15 @@ if %ERRORLEVEL% neq 0 (
   goto:eof
 )
 
+if not exist "%ProgramFiles(x86)%" (
+  set "ProgramFiles(x86)=%ProgramFiles%"
+)
+
 set "VSWhere=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 
 :MSBuild
 echo Looking for MSBuild
-for /f "usebackq delims=" %%i in (`^""%VSWhere%" -latest -version "[15.0,16.0)" -requires "Microsoft.Component.MSBuild" -property "installationPath"^"`) do (
+for /f "usebackq delims=" %%i in (`^""%VSWhere%" -latest -version "[15.0,16.0)" -products * -requires "Microsoft.Component.MSBuild" -property "installationPath"^"`) do (
   set InstallDir=%%i
 )
 

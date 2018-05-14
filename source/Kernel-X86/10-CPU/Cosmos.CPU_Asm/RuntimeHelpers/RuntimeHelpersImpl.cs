@@ -1,12 +1,15 @@
 using System;
+using System.Runtime.CompilerServices;
+
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+
 using XSharp;
 using CPUx86 = XSharp.Assembler.x86;
 
 namespace Cosmos.CPU_Asm
 {
-    [Plug(Target = typeof(global::System.Runtime.CompilerServices.RuntimeHelpers))]
+    [Plug(typeof(RuntimeHelpers))]
     public static class RuntimeHelpersImpl
     {
         [Inline(TargetPlatform = TargetPlatform.x86)]

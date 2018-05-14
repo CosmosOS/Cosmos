@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
+        <RuntimeIdentifier>win</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
         <PackageDescription>Cosmos build system.
 $(CosmosDescription)</PackageDescription>
@@ -9,14 +10,9 @@ $(CosmosDescription)</PackageDescription>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="build\**">
-            <Pack>True</Pack>
-            <PackagePath>build\</PackagePath>
-        </Content>
-        <Content Include="tools\**">
-            <Pack>True</Pack>
-            <PackagePath>tools\</PackagePath>
-        </Content>
+        <Content Include="runtime.json" Pack="True" PackagePath="\" />
+        <Content Include="build\**" Pack="True" PackagePath="build\" />
+        <Content Include="tools\**" Pack="True" PackagePath="tools\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,5 +23,13 @@ $(CosmosDescription)</PackageDescription>
     <ItemGroup>
         <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
     </ItemGroup>
+
+    <Target Name="IncludeDependencies" BeforeTargets="_GetPackageFiles" DependsOnTargets="PrepareForPublish;ComputeFilesToPublish">
+
+        <ItemGroup>
+            <Content Include="@(ResolvedAssembliesToPublish)" Pack="True" PackagePath="tools\" Condition="!$([System.String]::new('%(Filename)').StartsWith('Microsoft.Build'))" />
+        </ItemGroup>
+
+    </Target>
 
 </Project>

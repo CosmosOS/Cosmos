@@ -490,36 +490,45 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool Contains(string aThis, string value)
         {
-            Char[] di = aThis.ToCharArray();
-            Char[] ci = value.ToCharArray();
             if (value.Length == aThis.Length)
             {
                 if (value == aThis)
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+
+                return false;
             }
-            else if (!(value.Length > aThis.Length) && (value.Length != aThis.Length))
+
+            if (value.Length > aThis.Length)
             {
-                for (int i = 0; i < aThis.Length; i++)
+                return false;
+            }
+
+            var di = aThis.ToCharArray();
+            var ci = value.ToCharArray();
+
+            for (int i = 0; i + value.Length <= aThis.Length; i++)
+            {
+                if (di[i] == ci[0])
                 {
-                    if (di[i] == ci[0])
+                    var equals = true;
+
+                    for (int j = 1; j < value.Length; j++)
                     {
-                        for (int j = 1; j < value.Length; j++)
+                        if (di[i + j] != ci[j])
                         {
-                            if (di[i + j] != ci[j])
-                            {
-                                return false;
-                            }
+                            equals = false;
                         }
+                    }
+
+                    if (equals)
+                    {
                         return true;
                     }
                 }
             }
+
             return false;
         }
 
@@ -728,11 +737,19 @@ namespace Cosmos.Core_Plugs.System
 
         public static string Replace(string aThis, string oldValue, string newValue)
         {
-            while (aThis.IndexOf(oldValue) != -1)
+            int skipOffset = 0;
+
+            while (aThis.Substring(skipOffset).IndexOf(oldValue) != -1)
             {
-                int xIndex = aThis.IndexOf(oldValue);
+                int xIndex = aThis.Substring(skipOffset).IndexOf(oldValue) + skipOffset;
                 aThis = aThis.Remove(xIndex, oldValue.Length);
                 aThis = aThis.Insert(xIndex, newValue);
+
+                skipOffset = xIndex + newValue.Length;
+                if (skipOffset > aThis.Length)
+                {
+                    break;
+                }
             }
             return aThis;
         }
