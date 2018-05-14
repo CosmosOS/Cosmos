@@ -401,9 +401,9 @@ namespace Cosmos.System.Graphics
         //We are using a short term solution for bitmap
         public virtual void DrawImage(Image image, int x, int y)
         {
-            for (int imageX = 0; imageX < image.Width; imageX++)
+             for (int imageY = 0; imageY < image.Height; imageY++)           
             {
-                for (int imageY = 0; imageY < image.Height; imageY++)
+                for (int imageX = 0; imageX < image.Width; imageX++)
                 {
                     DrawPoint(new Pen(Color.FromArgb(image.rawData[imageX * image.Width + imageY])), x + imageX, y + imageY);
                 }
