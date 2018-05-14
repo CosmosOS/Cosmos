@@ -405,7 +405,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int imageY = 0; imageY < image.Height; imageY++)
                 {
-                    DrawPoint(new Pen(Color.FromArgb(image.rawData[imageX * image.Width + _y])), x + imageX, y + imageX);
+                    DrawPoint(new Pen(Color.FromArgb(image.rawData[imageX * image.Width + _y])), x + imageX, y + imageY);
                 }
             }
         }
