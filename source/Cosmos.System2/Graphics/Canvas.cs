@@ -399,7 +399,7 @@ namespace Cosmos.System.Graphics
         //Image and Font will be available in .NET Core 2.1
         // dot net core does not have Image
         //We are using a short term solution for bitmap
-        public void DrawImage(Image image, int x, int y)
+        public virtual void DrawImage(Image image, int x, int y)
         {
             for (int imageX = 0; imageX < image.Width; imageX++)
             {
