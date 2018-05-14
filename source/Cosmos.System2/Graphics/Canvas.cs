@@ -401,7 +401,7 @@ namespace Cosmos.System.Graphics
         //We are using a short term solution for bitmap
         public void DrawImage(Image image, int x, int y)
         {
-            for (int imageX = 0; imageX < image.Width; inageX++)
+            for (int imageX = 0; imageX < image.Width; imageX++)
             {
                 for (int imageY = 0; imageY < image.Height; imageY++)
                 {
