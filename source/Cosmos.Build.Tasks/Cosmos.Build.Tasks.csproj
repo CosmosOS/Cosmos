@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
-        <RuntimeIdentifier>win</RuntimeIdentifier>
+        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
         <PackageDescription>Cosmos build system.
 $(CosmosDescription)</PackageDescription>

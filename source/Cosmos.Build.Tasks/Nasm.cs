@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -84,12 +85,31 @@ namespace Cosmos.Build.Tasks
             {
                 xBuilder.AppendSwitch("-dELF_COMPILATION");
             }
+            else
+            {
+                xBuilder.AppendSwitch("-dBIN_COMPILATION");
+            }
 
             xBuilder.AppendSwitch("-O0");
 
             xBuilder.AppendFileNameIfNotNull(InputFile);
 
             return xBuilder.ToString();
+        }
+
+        public override bool Execute()
+        {
+            var xSW = Stopwatch.StartNew();
+
+            try
+            {
+                return base.Execute();
+            }
+            finally
+            {
+                xSW.Stop();
+                Log.LogMessage(MessageImportance.High, "Nasm task took {0}", xSW.Elapsed);
+            }
         }
     }
 }
