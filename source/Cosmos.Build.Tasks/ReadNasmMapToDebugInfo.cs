@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using Microsoft.Build.Framework;
@@ -19,6 +20,8 @@ namespace Cosmos.Build.Tasks
 
         public override bool Execute()
         {
+            var xSW = Stopwatch.StartNew();
+
             try
             {
                 var xSourceInfos = ParseMapFile(MapFile);
@@ -41,6 +44,11 @@ namespace Cosmos.Build.Tasks
             {
                 Log.LogErrorFromException(ex, true, true, null);
                 return false;
+            }
+            finally
+            {
+                xSW.Stop();
+                Log.LogMessage(MessageImportance.High, "ReadNasmMapToDebugInfo task took {0}", xSW.Elapsed);
             }
         }
 

@@ -1,6 +1,6 @@
 <Project>
 
-    <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.tmp_proj'">
+    <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))">
         <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
     </PropertyGroup>
 

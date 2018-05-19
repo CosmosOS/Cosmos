@@ -1,10 +1,6 @@
 ﻿<Project>
 
     <PropertyGroup>
-        <SelfContained>True</SelfContained>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
         <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
     </PropertyGroup>
@@ -24,7 +20,7 @@
         <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
 
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.exe</ObjdumpToolExe>
+        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.bat</ObjdumpToolExe>
 
         <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
         <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
@@ -51,8 +47,6 @@
 
         <NasmOutput Condition="'$(NasmOutput)' == '' AND '$(BinFormat)' == 'ELF'">$(OutputPath)$(AssemblyName).obj</NasmOutput>
         <NasmOutput Condition="'$(NasmOutput)' == ''">$(OutputPath)$(AssemblyName).bin</NasmOutput>
-
-        <_NasmMap>$([System.IO.Path]::GetDirectoryName('$(NasmOutput)'))\main.map</_NasmMap>
 
         <MapFile Condition="'$(MapFile)' == ''">$(OutputPath)$(AssemblyName).map</MapFile>
         <CosmosDebugSymbolsFile Condition="'$(CosmosDebugSymbolsFile)' == ''">$(OutputPath)$(AssemblyName).cdb</CosmosDebugSymbolsFile>
@@ -134,7 +128,9 @@
             DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets">
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)" Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'" />
+            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
+                               Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedAssembliesToPublish.Extension)' != '.pdb'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"
@@ -221,7 +217,7 @@
     -->
     <Target Name="ExtractMapFromElfFile"
             Inputs="$(BinFile)"
-            Outputs="$(CosmosDebugSymbolsPath)"
+            Outputs="$(CosmosDebugSymbolsFile)"
             Condition="'$(BinFormat)' == 'ELF'">
 
         <ExtractMapFromElfFile InputFile="$(BinFile)"
@@ -237,7 +233,7 @@
                                  ReadNasmMapToDebugInfo
 
         [IN]
-        $(_NasmMap) - a NASM map file.
+        $(MapFile) - a NASM map file.
 
         [OUT]
         $(CosmosDebugSymbolsPath) - a debug symbols file.
@@ -245,11 +241,11 @@
     ================================================================================
     -->
     <Target Name="ReadNasmMapToDebugInfo"
-            Inputs="$(_NasmMap)"
-            Outputs="$(CosmosDebugSymbolsPath)"
+            Inputs="$(MapFile)"
+            Outputs="$(CosmosDebugSymbolsFile)"
             Condition="'$(BinFormat)' != 'ELF'">
 
-        <ReadNasmMapToDebugInfo MapFile="$(_NasmMap)"
+        <ReadNasmMapToDebugInfo MapFile="$(MapFile)"
                                 DebugInfoFile="$(CosmosDebugSymbolsFile)" />
 
     </Target>
