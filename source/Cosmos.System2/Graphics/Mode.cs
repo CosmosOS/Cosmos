@@ -4,10 +4,8 @@ using System.Runtime.InteropServices;
 namespace Cosmos.System.Graphics
 {
     /*
-     * This class represents a video mode in term of its number of columns, rows and color_depth
+     * This struct represents a video mode in term of its number of columns, rows and color_depth
      */
-    //public struct Mode : IEquatable<Mode>, IComparable<Mode>
-    //[StructLayout(LayoutKind.Explicit, Size = 12)]
     public struct Mode
     {
         int columns;
@@ -32,20 +30,7 @@ namespace Cosmos.System.Graphics
             return false;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            if (!(obj is Mode))
-            {
-                return false;
-            }
-
-            return Equals((Mode)obj);
-        }
+        public override bool Equals(object obj) => obj is Mode mode && Equals(mode);
 
         /* If you ovveride Equals you should ovveride GetHashCode too! */
         public override int GetHashCode()

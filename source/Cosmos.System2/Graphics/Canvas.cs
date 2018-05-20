@@ -429,8 +429,6 @@ namespace Cosmos.System.Graphics
         {
             Global.mDebugger.SendInternal($"CheckIfModeIsValid");
 
-            /* Mode has been changed to be a structure so it cannot be null anymore */
-
             /* This would have been the more "modern" version but LINQ is not working
 
             if (!availableModes.Exists(element => element == mode))
@@ -451,7 +449,6 @@ namespace Cosmos.System.Graphics
 
         protected void ThrowIfModeIsNotValid(Mode mode)
         {
-            /* Mode has been changed to be a structure so it cannot be null anymore */
             if (CheckIfModeIsValid(mode))
             {
                 return;
