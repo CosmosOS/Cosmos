@@ -51,12 +51,12 @@ namespace Cosmos.HAL.BlockDevice
                 //DOS only knows about 05, Windows 95 introduced 0F, Linux introduced 85
                 //Search for logical volumes
                 //http://thestarman.pcministry.com/asm/mbr/PartTables2.htm
-                EBRLocation = (uint)BitConverter.ToInt32(aMBR, (int)aLoc + 8);
+                EBRLocation = BitConverter.ToUInt32(aMBR, (int)aLoc + 8);
             }
             else if (xSystemID != 0)
             {
-                UInt32 xStartSector = (uint)BitConverter.ToInt32(aMBR, (int)aLoc + 8);
-                UInt32 xSectorCount = (uint)BitConverter.ToInt32(aMBR, (int)aLoc + 12);
+                UInt32 xStartSector = BitConverter.ToUInt32(aMBR, (int)aLoc + 8);
+                UInt32 xSectorCount = BitConverter.ToUInt32(aMBR, (int)aLoc + 12);
 
                 var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
                 Partitions.Add(xPartInfo);

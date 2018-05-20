@@ -219,7 +219,7 @@ namespace Cosmos.System.FileSystem.FAT
                         // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
                         // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
                         // we want the high 12-bits of the 16-bits we fetch.
-                        uint xResult = BitConverter.ToUInt32(xData, (int)xEntryOffset);
+                        uint xResult = BitConverter.ToUInt16(xData, (int)xEntryOffset);
                         if ((aEntryNumber & 0x01) == 0)
                         {
                             aValue = xResult & 0x0FFF; // Even
@@ -371,16 +371,19 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override string Type
         {
-             get
+            get
             {
                 switch (mFatType)
                 {
                     case FatTypeEnum.Fat12:
                         return "FAT12";
+
                     case FatTypeEnum.Fat16:
                         return "FAT16";
+
                     case FatTypeEnum.Fat32:
                         return "FAT32";
+
                     default:
                         throw new Exception("Unknown FAT file system type.");
                 }
@@ -721,11 +724,11 @@ namespace Cosmos.System.FileSystem.FAT
         {
             /*
              * In the FAT filesystem the name field of RootDirectory is - in reality - the Volume Label
-             */ 
+             */
             get
             {
                 Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.mLabel --");
-                var RootDirectory = (FatDirectoryEntry) GetRootDirectory();
+                var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
 
                 var VolumeId = RootDirectory.FindVolumeId();
                 if (VolumeId == null)
@@ -741,7 +744,7 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 Global.mFileSystemDebugger.SendInternal($"Setting Volume label to {value}");
 
-                var RootDirectory = (FatDirectoryEntry) GetRootDirectory();
+                var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
 
                 var VolumeId = RootDirectory.FindVolumeId();
                 if (VolumeId != null)

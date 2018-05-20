@@ -160,10 +160,10 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
                 xFile2.Position = 0;
                 byte[] xReadBuff = new byte[xWriteBuff.Length];
                 xFile2.Read(xReadBuff, 0, xWriteBuff.Length);
-                mDebugger.Send("xWriteBuff=" + Encoding.UTF8.GetString(xWriteBuff));
-                mDebugger.Send("xReadBuff =" + Encoding.UTF8.GetString(xReadBuff));
                 string xWriteBuffAsString = Encoding.UTF8.GetString(xWriteBuff);
                 string xReadBuffAsString = Encoding.UTF8.GetString(xReadBuff);
+                mDebugger.Send("xWriteBuff=" + xWriteBuffAsString);
+                mDebugger.Send("xReadBuff =" + xReadBuffAsString);
                 mDebugger.Send("xWriteBuffAsString=" + xWriteBuffAsString);
                 mDebugger.Send("xReadBuffAsString =" + xReadBuffAsString);
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");

@@ -41,8 +41,8 @@ namespace Cosmos.HAL.BlockDevice
             }
             else if (xSystemID != 0)
             {
-                UInt32 xStartSector = (uint)BitConverter.ToInt32(aEBR, (int)aLoc + 8);
-                UInt32 xSectorCount = (uint)BitConverter.ToInt32(aEBR, (int)aLoc + 12);
+                UInt32 xStartSector = BitConverter.ToUInt32(aEBR, (int)aLoc + 8);
+                UInt32 xSectorCount = BitConverter.ToUInt32(aEBR, (int)aLoc + 12);
 
                 var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
                 Partitions.Add(xPartInfo);
