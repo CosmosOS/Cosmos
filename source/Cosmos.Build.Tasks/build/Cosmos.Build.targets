@@ -81,6 +81,7 @@
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateSyslinuxConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.Launch" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -347,6 +348,13 @@
                    FormatDrive="$(UsbPublishFormatDrive)"
                    ToolPath="$(SyslinuxToolPath)"
                    ToolExe="$(SyslinuxToolExe)" />
+
+    </Target>
+
+    <Target Name="Launch">
+
+        <Launch ConfigurationFile="$(OutputPath)Bochs.bxrc"
+                IsoFile="$(MSBuildProjectDirectory)\$(IsoFile)" />
 
     </Target>
 
