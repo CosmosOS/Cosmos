@@ -44,7 +44,7 @@ namespace Cosmos.Core
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
             //for now enable keyboard, mouse(ps2)
-            Remap(0x20, 0xF8 | 0x08, 0x28, 0xEF);
+            Remap(0x20, 0xF8 | 0x08, 0x28, 0xEB);
         }
 
         private void Remap(byte masterStart, byte masterMask, byte slaveStart, byte slaveMask)
