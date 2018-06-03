@@ -345,7 +345,7 @@ namespace Cosmos.HAL
                                 return "0x00 Subclass";
                         }
                     case 0x01:
-                        switch(device.Subclass)
+                        switch (device.Subclass)
                         {
                             case 0x00:
                                 return "SCSI Bus Controller";
@@ -437,7 +437,7 @@ namespace Cosmos.HAL
                                 return "Memory Controller";
                         }
                     case 0x06:
-                        switch(device.Subclass)
+                        switch (device.Subclass)
                         {
                             case 0x00:
                                 return "Host Bridge";
@@ -808,7 +808,7 @@ namespace Cosmos.HAL
             return "0x" + aNumber.ToHex(aBits / 4);
         }
     }
-    
+
     public class PCIBaseAddressBar
     {
         private uint baseAddress = 0;

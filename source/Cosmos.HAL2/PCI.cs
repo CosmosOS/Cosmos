@@ -31,7 +31,7 @@ namespace Cosmos.HAL
         Coprocessor = 0x40,
         Unclassified = 0xFF
     }
-    
+
     public enum SubclassID
     {
         // MassStorageController: 
@@ -46,7 +46,7 @@ namespace Cosmos.HAL
         NVMController = 0x08,
         UnknownMassStorage = 0x09,
     }
-    
+
     public enum ProgramIF
     {
         // MassStorageController:
@@ -57,7 +57,7 @@ namespace Cosmos.HAL
         NVM_NVMHCI = 0x01,
         NVM_NVMExpress = 0x02
     }
-    
+
     public enum VendorID
     {
         Intel = 0x8086,
@@ -66,7 +66,7 @@ namespace Cosmos.HAL
         Bochs = 0x1234,
         VirtualBox = 0x80EE
     }
-    
+
     public enum DeviceID
     {
         SVGAIIAdapter = 0x0405,
