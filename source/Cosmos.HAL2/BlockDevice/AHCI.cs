@@ -55,7 +55,7 @@ namespace Cosmos.HAL.BlockDevice
             get => ((byte)mGeneric.AHCIVersion >> 24) + (byte)(mGeneric.AHCIVersion >> 16) + "." + (byte)(mGeneric.AHCIVersion >> 8) + ((byte)(mGeneric.AHCIVersion) > 0 ? "." + (byte)mGeneric.AHCIVersion : "");
         }
 
-        internal static void InitDriver()
+        public static void InitDriver()
         {
 
             if (xDevice != null)

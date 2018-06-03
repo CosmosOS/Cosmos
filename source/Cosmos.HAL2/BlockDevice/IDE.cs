@@ -8,7 +8,7 @@ namespace Cosmos.HAL.BlockDevice
         private static PCIDevice xDevice = HAL.PCI.GetDeviceClass(HAL.ClassID.MassStorageController,
                                                                   HAL.SubclassID.IDEInterface);
 
-        internal static void InitDriver()
+        public static void InitDriver()
         {
             if (xDevice != null)
             {
