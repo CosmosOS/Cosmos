@@ -61,6 +61,14 @@
         <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
     </PropertyGroup>
 
+    <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
+        <Content Deploy="False" />
+    </ItemDefinitionGroup>
+
+    <ItemGroup>
+        <ContentToDeploy Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
+    </ItemGroup>
+
     <ItemGroup Condition="'$(KernelPkg)' == ''">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Plugs.dll" />
@@ -274,6 +282,7 @@
             <_IsoFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
             <_IsoFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
             <_IsoFile Include="$(BinFile)" />
+            <_IsoFile Include="@(ContentToDeploy)" />
         </ItemGroup>
 
         <RemoveDir Directories="$(IntermediateIsoDirectory)" />

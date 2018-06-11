@@ -30,6 +30,7 @@
 
     <ItemGroup>
         <XamlPropertyRule Include="BuildSystem\Rules\BootableConfiguration.xaml" />
+        <XamlPropertyRule Include="BuildSystem\Rules\Content.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\CosmosDebugger.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\LaunchConfiguration.xaml" />
     </ItemGroup>
