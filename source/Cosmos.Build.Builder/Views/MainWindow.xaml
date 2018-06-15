@@ -9,7 +9,7 @@
         MinWidth="800"
         Title="Cosmos Kit Builder"
         WindowStartupLocation="CenterScreen"
-        DataContext="{StaticResource MainWindowViewModel}">
+        WindowState="{Binding WindowState}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
@@ -35,7 +35,6 @@
         <Rectangle DockPanel.Dock="Top"
                    Height="5" />
         <TextBlock DockPanel.Dock="Top"
-                   Name="tblkTail"
                    Background="LightGray"
                    FontSize="18"
                    Foreground="Blue"
@@ -82,6 +81,7 @@
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding HasLoggedErrors}" Value="True">
                                                     <Setter Property="Foreground" Value="Red" />
+                                                    <Setter Property="IsChecked" Value="True" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
