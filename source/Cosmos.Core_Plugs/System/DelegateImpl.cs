@@ -1,6 +1,7 @@
 using System;
 using Cosmos.Core;
-using Cosmos.IL2CPU.API;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
 {
@@ -29,8 +30,8 @@ namespace Cosmos.Core_Plugs.System
             uint xNeededSize = 1024; // 24 is needed fields for Multicast Delegate
             xNeededSize += 12;
             uint xResultAddr = GCImplementation.AllocNewObject(xNeededSize);
-            byte* xResult = (byte*) xResultAddr;
-            byte* xDelegateAsByte = (byte*) aDelegate;
+            byte* xResult = (byte*)xResultAddr;
+            byte* xDelegateAsByte = (byte*)aDelegate;
             for (int i = 0; i < 1024; i++)
             {
                 xResult[i] = xDelegateAsByte[i];

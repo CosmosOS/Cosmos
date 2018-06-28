@@ -15,7 +15,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <ItemGroup>
@@ -30,9 +30,9 @@
     <Compile Include="Map.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj">
+    <ProjectReference Include="..\..\source\IL2CPU.API\IL2CPU.API.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
-      <Name>Cosmos.IL2CPU.API</Name>
+      <Name>IL2CPU.API</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>

@@ -1,25 +1,11 @@
 ﻿using System;
+
 using Cosmos.TestRunner;
-using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    class DoubleTest
+    internal static class DoubleTest
     {
-        public readonly Debugger mDebugger = new Debugger("User", "Double");
-
-        /* The double== equality operator is so imprecise to not be really ever useful we should be happy if the two values are "similar" */
-        private static bool DoublesAreEqual(double left, double right)
-        {
-            // Define the tolerance for variation in their values
-            double difference = Math.Abs(left * .00001);
-
-            if (Math.Abs(left - right) <= difference)
-                return true;
-            else
-                return false;
-        }
-
         public static void Execute()
         {
             Double value;
@@ -137,23 +123,23 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             OperationResult = value + otherValue;
 
-            Assert.IsTrue((DoublesAreEqual(OperationResult, 44.62)), "double operator+ doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(OperationResult, 44.62)), "double operator+ doesn't work");
 
             // Now test subtraction
             OperationResult = value - otherValue;
 
-            Assert.IsTrue((DoublesAreEqual(OperationResult, 40.22)), "double operator- doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(OperationResult, 40.22)), "double operator- doesn't work");
 
             // Now test multiplication
             otherValue = 2.00; // I'll change 'otherValue' to 2.00 because if not the result is too much wrong to make sense...
             OperationResult = value * otherValue;
 
-            Assert.IsTrue((DoublesAreEqual(OperationResult, 84.84)), "double operator* doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(OperationResult, 84.84)), "double operator* doesn't work");
 
             // Now test division
             OperationResult = value / otherValue;
 
-            Assert.IsTrue((DoublesAreEqual(OperationResult, 21.21)), "double operator/ doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(OperationResult, 21.21)), "double operator/ doesn't work");
 
             // Now test division again but with dividend 0 the expected result should be Double.PositiveInfinity
             OperationResult = value / 0.00;
@@ -168,36 +154,75 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 #endif
 
             // Now test some castings operations
+            sbyte valueAsSByte = (sbyte)value;
+            Assert.IsTrue((valueAsSByte == (sbyte)42), "double (sbyte) operator doesn't work");
+
             byte valueAsByte = (byte)value;
             Assert.IsTrue((valueAsByte == (byte)42), "double (byte) operator doesn't work");
 
             short valueAsShort = (short)value;
-            Assert.IsTrue((valueAsByte == (short)42), "double (short) operator doesn't work");
+            Assert.IsTrue((valueAsShort == (short)42), "double (short) operator doesn't work");
+
+            ushort valueAsUShort = (ushort)value;
+            Assert.IsTrue((valueAsUShort == (ushort)42), "double (ushort) operator doesn't work");
 
             int valueAsInt = (int)value;
             Assert.IsTrue((valueAsInt == (int)42), "double (int) operator doesn't work");
 
+            uint valueAsUInt = (uint)value;
+            Assert.IsTrue((valueAsUInt == (uint)42), "double (uint) operator doesn't work");
+
             long valueAsLong = (long)value;
             Assert.IsTrue((valueAsLong == (long)42), "double (long) operator doesn't work");
+
+            ulong valueAsULong = (ulong)value;
+            Assert.IsTrue((valueAsULong == (ulong)42), "double (ulong) operator doesn't work");
 
             // We put on anUInt a very big value Int32.MaxValue + 42. Why all this 42 :-) ?
             uint anUInt = 2147483689;
             value = (double)anUInt;
-            Assert.IsTrue((DoublesAreEqual(value, 2147483689d)), "(double) from uint operator doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(value, 2147483689d)), "(double) from uint operator doesn't work");
 
             // We put on anUlong a very big value Int64MaxValue + 42. Hmm that '42' again :-)) ?
             ulong anULong = 9223372036854775849;
             value = (double)anULong;
-            Assert.IsTrue((DoublesAreEqual(value, 9223372036854775849d)), "(double) from ulong operator doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(value, 9223372036854775849d)), "(double) from ulong operator doesn't work");
 
             value = -42.0;
             double valueNegated = -value;
-            Assert.IsTrue((DoublesAreEqual(valueNegated, 42d)), "(double) negation doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(valueNegated, 42d)), "(double) negation doesn't work");
 
             // Let's try if it works in the other way too
             value = 42.0;
             valueNegated = -value;
-            Assert.IsTrue((DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive double doesn't work");
+            Assert.IsTrue((EqualityHelper.DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive double doesn't work");
+
+            #region Parsing
+
+            value = Double.Parse("0.4");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.4), "simple parsing of double works");
+
+            value = Double.Parse("+0.3");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.3), "parsing of double with positive sign works!");
+
+            value = Double.Parse("-0.4");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, -0.4), "parsing of negative double works!");
+
+            value = Double.Parse("    0.7     ");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.7), "double parsing ignores leading and trailing whitespaces");
+
+            value = Double.Parse("0.4E1");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 4), "double parsing takes in account E");
+
+            value = Double.Parse("0.4E-1");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.04), "double parsing works with negative E");
+
+            Assert.IsFalse(Double.TryParse("asd4", out value), "double TryParse returns false when it fails");
+
+            Assert.IsTrue(Double.TryParse("2.3", out value), "double TryParse returns true when it works");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 2.3), "double TryParse returns correct result when it works");
+
+            #endregion
         }
     }
 }

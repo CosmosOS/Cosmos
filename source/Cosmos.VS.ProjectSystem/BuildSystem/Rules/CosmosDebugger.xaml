@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="CosmosDebugger"
+      DisplayName="Cosmos"
+      PageTemplate="debugger"
+      Description="Cosmos Debugger Options"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+    <Rule.DataSource>
+        <DataSource Persistence="ProjectFile"
+                    HasConfigurationCondition="False" />
+    </Rule.DataSource>
+</Rule>

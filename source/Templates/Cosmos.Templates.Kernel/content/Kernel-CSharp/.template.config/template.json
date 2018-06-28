@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Cosmos",
+    "classifications": [ "Kernel", "Cosmos" ],
+    "groupIdentity": "Cosmos.Templates.Kernel",
+    "identity": "Cosmos.Templates.Kernel.CSharp",
+    "name": "Cosmos Kernel",
+    "shortName": "cosmoskernel",
+    "tags":{
+        "language": "C#",
+        "type": "project"
+    },
+    "sourceName": "CosmosKernel"
+}

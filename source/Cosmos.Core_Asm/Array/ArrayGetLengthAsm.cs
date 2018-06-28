@@ -1,11 +1,11 @@
-using Cosmos.Assembler;
-using XSharp.Common;
+using XSharp.Assembler;
+using XSharp;
 
 namespace Cosmos.Core_Asm
 {
     public class ArrayGetLengthAsm : AssemblerMethod
     {
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             // $this   ebp+8
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);

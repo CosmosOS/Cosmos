@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.Hosts
@@ -21,7 +22,7 @@ namespace Cosmos.Debug.Hosts
                                      + "plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1\n"
                                      + "config_interface: win32config\n" + "display_library: win32" + debugGui + "\n"
                                      + "debug_symbols: file=\"%DEBUGSYMBOLSPATH%\"\n"
-                                     + "memory: host=128, guest=128\n" + "romimage: file=\"" + BochsDirectory
+                                     + "memory: host=256, guest=256\n" + "romimage: file=\"" + BochsDirectory
                                      + "/BIOS-bochs-latest\"\n" + "vgaromimage: file=\"" + BochsDirectory
                                      + "/VGABIOS-lgpl-latest\"\n" + "boot: cdrom\n"
                                      + "floppy_bootsig_check: disabled=0\n" + "# no floppya\n" + "# no floppyb\n"

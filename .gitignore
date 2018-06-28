@@ -11,8 +11,6 @@
 
 [Oo]bj/
 [Bb]in
-[Dd]ebug/
-[Rr]elease/
 [Pp]ackages/
 
 *.[Oo]bj
@@ -41,13 +39,18 @@
 Thumbs.db
 build.force
 
-Build/VSIP/
-Setup/Output/
-Build/VMWare/Workstation/Cosmos.vmsd
-Build/VMWare/Workstation/Cosmos.vmxf
+**/Build/VSIP/
+**/Setup/Output/
+**/Build/VMWare/Workstation/Cosmos.vmsd
+**/Build/VMWare/Workstation/Cosmos.vmxf
 
 Setup/Current.iss
 Cosmos.Assembler.Log
 UpgradeLog*.htm
 .sync/
 source/_ReSharper.Caches/
+*.~vsdx
+Docs/~$RingsGen2.xlsx
+source/Kernel-X86/90-Application/GuessKernelGen3.csproj
+Docs/~$RingsGen3.xlsx
+*.map

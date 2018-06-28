@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using Cosmos.Debug.Common;
 using Cosmos.VS.DebugEngine.AD7.Definitions;
 using Cosmos.VS.DebugEngine.Engine.Impl;
-using Cosmos.VS.DebugEngine.Properties;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {
@@ -34,7 +33,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         internal AD7Process mProcess;
         // A unique identifier for the program being debugged.
         Guid mProgramID;
-        public static readonly Guid EngineID = new Guid("{fa1da3a6-66ff-4c65-b077-e65f7164ef83}");
+        public static readonly Guid EngineID = new Guid("fa1da3a6-66ff-4c65-b077-e65f7164ef83");
         internal AD7Module mModule;
         internal AD7Thread mThread;
         private AD7ProgramNode mProgNode;
@@ -332,7 +331,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         {
             // Gets the name and identifier of the debug engine (DE) running this program.
 
-            engineName = Resources.EngineName;
+            engineName = "Cosmos Debug Engine";
             engineGuid = EngineID;
 
             return VSConstants.S_OK;

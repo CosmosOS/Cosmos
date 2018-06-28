@@ -1,0 +1,101 @@
+﻿<Window x:Class="Cosmos.Build.Builder.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
+        MinHeight="480"
+        MinWidth="800"
+        Title="Cosmos Kit Builder"
+        WindowStartupLocation="CenterScreen"
+        WindowState="{Binding WindowState}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <DockPanel>
+
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Command="{Binding CopyCommand}"
+                    Content="Copy" />
+
+            <CheckBox Grid.Column="2"
+                      IsChecked="{Binding CloseWhenCompleted}"
+                      Content="Close window when completed" />
+        </Grid>
+
+        <Rectangle DockPanel.Dock="Top"
+                   Height="5" />
+        <TextBlock DockPanel.Dock="Top"
+                   Background="LightGray"
+                   FontSize="18"
+                   Foreground="Blue"
+                   FontWeight="ExtraBold"
+                   Text="{Binding CurrentSection.Name, StringFormat='Current Task Log Tail - {0}', FallbackValue='Current Task Log Tail'}" />
+        <ItemsControl DockPanel.Dock="Top"
+                      Background="Black"
+                      BorderBrush="DarkGray"
+                      BorderThickness="0.5"
+                      FontSize="16"
+                      Foreground="Green"
+                      Margin="0,4"
+                      ItemsSource="{Binding TailItems}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="DarkGray"
+                            BorderThickness="0.5"
+                            Padding="4,0">
+                        <TextBlock Text="{Binding}" />
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Rectangle DockPanel.Dock="Top"
+                   Height="5"
+                   Fill="LightGray"/>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Sections}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <HeaderedContentControl>
+                            <HeaderedContentControl.Header>
+                                <ToggleButton x:Name="sectionToggleButton"
+                                              Background="LightGray"
+                                              FontSize="18"
+                                              FontWeight="Bold"
+                                              HorizontalContentAlignment="Left"
+                                              Content="{Binding Name}">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Foreground" Value="Green" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasLoggedErrors}" Value="True">
+                                                    <Setter Property="Foreground" Value="Red" />
+                                                    <Setter Property="IsChecked" Value="True" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                            </HeaderedContentControl.Header>
+                            <TextBlock Visibility="{Binding IsChecked, ElementName=sectionToggleButton, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                       Text="{Binding Log}" />
+                        </HeaderedContentControl>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </DockPanel>
+
+</Window>

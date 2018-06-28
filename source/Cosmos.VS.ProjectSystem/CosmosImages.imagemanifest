@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ImageManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns="http://schemas.microsoft.com/VisualStudio/ImageManifestSchema/2014">
+
+    <Symbols>
+        <String Name="Resources" Value="/Cosmos.VS.ProjectSystem;Component/Resources" />
+        <Guid Name="CosmosImagesGuid" Value="9feaa5d5-9298-4c74-915e-2d0ab67992f9" />
+        <ID Name="ProjectRootIcon" Value="0" />
+    </Symbols>
+
+    <Images>
+        <Image Guid="$(CosmosImagesGuid)" ID="$(ProjectRootIcon)">
+            <!--<Source Uri="$(Resources)/CosmosProjectRootIcon.xaml" />-->
+            <Source Uri="$(Resources)/CosmosProjectRootIcon.png" >
+                <Size Value="16" />
+            </Source>
+        </Image>
+    </Images>
+
+</ImageManifest>

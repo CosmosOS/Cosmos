@@ -1,14 +1,14 @@
 using System.Reflection;
-using Cosmos.Assembler;
+using XSharp.Assembler;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.IL;
-using XSharp.Common;
+using XSharp;
 
 namespace Cosmos.Core_Asm
 {
     public class DelegateCtorAsm : AssemblerMethod
     {
-        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             // method signature: $this, object @object, IntPtr method
             var xAssembler = aAssembler;

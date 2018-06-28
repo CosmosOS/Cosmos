@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 
 using Cosmos.Build.Common;
 
@@ -9,31 +9,29 @@ namespace Cosmos.TestRunner.Core
 {
     public partial class Engine
     {
+        private static readonly string WorkingDirectoryBase = Path.Combine(
+            Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
+
         // configuration: in process eases debugging, but means certain errors (like stack overflow) kill the test runner.
-        public bool DebugIL2CPU = false;
-        public bool RunWithGDB = false;
-        public bool StartBochsDebugGui = false;
-        public bool EnableStackCorruptionChecks = true;
-        public TraceAssemblies TraceAssembliesLevel = TraceAssemblies.User;
-        public StackCorruptionDetectionLevel StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
-        public List<string> References = new List<string>();
-        public List<string> AdditionalSearchDirs = new List<string>();
-        public List<string> AdditionalReferences = new List<string>();
+        protected bool DebugIL2CPU => mConfiguration.DebugIL2CPU;
+        protected string KernelPkg => mConfiguration.KernelPkg;
+        protected TraceAssemblies TraceAssembliesLevel => mConfiguration.TraceAssembliesLevel;
+        protected bool EnableStackCorruptionChecks => mConfiguration.EnableStackCorruptionChecks;
+        protected StackCorruptionDetectionLevel StackCorruptionDetectionLevel => mConfiguration.StackCorruptionDetectionLevel;
 
-        public List<string> KernelsToRun { get; } = new List<string>();
+        protected bool RunWithGDB => mConfiguration.RunWithGDB;
+        protected bool StartBochsDebugGui => mConfiguration.StartBochsDebugGUI;
 
-        public void AddKernel(string assemblyFile)
-        {
-            if (!File.Exists(assemblyFile))
-            {
-                throw new FileNotFoundException("Kernel file not found!", assemblyFile);
-            }
-            KernelsToRun.Add(assemblyFile);
-        }
+        public IEnumerable<Type> KernelsToRun => mConfiguration.KernelTypesToRun;
 
-        private string mBaseWorkingDirectory;
+        private IEngineConfiguration mConfiguration;
 
         public OutputHandlerBasic OutputHandler;
+
+        public Engine(IEngineConfiguration aEngineConfiguration)
+        {
+            mConfiguration = aEngineConfiguration;
+        }
 
         public bool Execute()
         {
@@ -42,9 +40,9 @@ namespace Cosmos.TestRunner.Core
                 throw new InvalidOperationException("No OutputHandler set!");
             }
 
-            if (RunTargets.Count == 0)
+            if (!RunTargets.Any())
             {
-                RunTargets.AddRange((RunTargetEnum[])Enum.GetValues(typeof(RunTargetEnum)));
+                throw new InvalidOperationException("No run targets were specified!");
             }
 
             OutputHandler.ExecutionStart();
@@ -56,16 +54,20 @@ namespace Cosmos.TestRunner.Core
                     OutputHandler.RunConfigurationStart(xConfig);
                     try
                     {
-                        foreach (var xAssemblyFile in KernelsToRun)
+                        foreach (var xKernelType in KernelsToRun)
                         {
-                            mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).GetTypeInfo().Assembly.Location), "WorkingDirectory");
-                            if (Directory.Exists(mBaseWorkingDirectory))
-                            {
-                                Directory.Delete(mBaseWorkingDirectory, true);
-                            }
-                            Directory.CreateDirectory(mBaseWorkingDirectory);
+                            var xAssemblyPath = xKernelType.Assembly.Location;
+                            var xWorkingDirectory = Path.Combine(
+                                WorkingDirectoryBase, Path.GetFileNameWithoutExtension(xAssemblyPath));
 
-                            xResult &= ExecuteKernel(xAssemblyFile, xConfig);
+                            if (Directory.Exists(xWorkingDirectory))
+                            {
+                                Directory.Delete(xWorkingDirectory, true);
+                            }
+
+                            Directory.CreateDirectory(xWorkingDirectory);
+
+                            xResult &= ExecuteKernel(xAssemblyPath, xWorkingDirectory, xConfig);
                         }
                     }
                     catch (Exception e)

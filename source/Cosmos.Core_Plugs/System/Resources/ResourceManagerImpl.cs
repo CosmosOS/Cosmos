@@ -1,6 +1,7 @@
 using System;
 using System.Resources;
-using Cosmos.IL2CPU.API;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Resources
 {
@@ -18,7 +19,7 @@ namespace Cosmos.Core_Plugs.System.Resources
 
         public static string GetString(string aString)
         {
-            return EnvironmentImpl.GetResourceString(aString);
+            return SRImpl.InternalGetResourceString(aString);
         }
     }
 }

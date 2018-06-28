@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MonoCecilToEcmaCil1</RootNamespace>
     <AssemblyName>MonoCecilToEcmaCil1</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -90,9 +90,9 @@
     <None Include="_QueueItems\QueuedMethod.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj">
+    <ProjectReference Include="..\IL2CPU.API\IL2CPU.API.csproj">
       <Project>{CDDAF88B-8726-469A-B906-16FD5EC99799}</Project>
-      <Name>Cosmos.IL2CPU.API</Name>
+      <Name>IL2CPU.API</Name>
     </ProjectReference>
     <ProjectReference Include="..\IRs\EcmaCil\EcmaCil.csproj">
       <Project>{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}</Project>

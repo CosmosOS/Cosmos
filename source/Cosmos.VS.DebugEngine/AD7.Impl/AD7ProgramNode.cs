@@ -1,5 +1,4 @@
 using System;
-using Cosmos.VS.DebugEngine.Properties;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -22,7 +21,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         // Gets the name and identifier of the DE running this program.
         int IDebugProgramNode2.GetEngineInfo(out string oEngineName, out Guid oEngineGuid)
         {
-            oEngineName = Resources.EngineName;
+            oEngineName = "Cosmos Debug Engine";
             oEngineGuid = AD7Engine.EngineID;
 
             return VSConstants.S_OK;

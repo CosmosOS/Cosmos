@@ -1,16 +1,19 @@
 using System;
-using System.Reflection;
-using Cosmos.Assembler;
+
+using IL2CPU.API;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.IL;
-using XSharp.Common;
+
+using XSharp;
+using XSharp.Assembler;
+using x86 = XSharp.Assembler.x86;
 
 // ReSharper disable once CheckNamespace
 namespace Cosmos.Core_Asm
 {
     public class DelegateInvokeAsm : AssemblerMethod
     {
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             var xAssembler = aAssembler;
             var xMethodInfo = (_MethodInfo) aMethodInfo;
@@ -56,7 +59,7 @@ namespace Cosmos.Core_Asm
             XS.Label(".BEGIN_OF_LOOP");
             {
                 XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
-                XS.Jump(Assembler.x86.ConditionalTestEnum.GreaterThanOrEqualTo, ".END_OF_INVOKE");
+                XS.Jump(x86.ConditionalTestEnum.GreaterThanOrEqualTo, ".END_OF_INVOKE");
 
                 XS.PushAllRegisters();
 
@@ -65,7 +68,7 @@ namespace Cosmos.Core_Asm
                 XS.Add(XSRegisters.EDI, 4);
                 XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target"));
                 XS.Compare(XSRegisters.EDI, 0);
-                XS.Jump(Assembler.x86.ConditionalTestEnum.Zero, ".NO_THIS");
+                XS.Jump(x86.ConditionalTestEnum.Zero, ".NO_THIS");
                 XS.Label(".HAS_THIS");
                 XS.Push(XSRegisters.EDI);
                 XS.Push(0);
@@ -75,7 +78,7 @@ namespace Cosmos.Core_Asm
 
                 XS.Comment("Check if delegate has args");
                 XS.Compare(XSRegisters.ECX, 0);
-                XS.Jump(Assembler.x86.ConditionalTestEnum.Zero, ".NO_ARGS");
+                XS.Jump(x86.ConditionalTestEnum.Zero, ".NO_ARGS");
                 XS.Label(".HAS_ARGS");
                 XS.Sub(XSRegisters.ESP, XSRegisters.ECX);
                 XS.Push(XSRegisters.EDI);
@@ -83,7 +86,7 @@ namespace Cosmos.Core_Asm
                 XS.Add(XSRegisters.EDI, 4);
                 XS.Set(XSRegisters.ESI, XSRegisters.EBP);
                 XS.Add(XSRegisters.ESI, 8);
-                new Assembler.x86.Movs { Size = 8, Prefixes = Assembler.x86.InstructionPrefixes.Repeat };
+                new x86.Movs { Size = 8, Prefixes = x86.InstructionPrefixes.Repeat };
                 XS.Pop(XSRegisters.EDI);
                 XS.Label(".NO_ARGS");
                 XS.Call(XSRegisters.EDI);
@@ -97,7 +100,7 @@ namespace Cosmos.Core_Asm
             XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: Ldarg.GetArgumentDisplacement(xMethodInfo, 0));
             XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$"));
             XS.Compare(XSRegisters.EDX, 0);
-            XS.Jump(Assembler.x86.ConditionalTestEnum.Equal, ".NO_RETURN");
+            XS.Jump(x86.ConditionalTestEnum.Equal, ".NO_RETURN");
 
             XS.Label(".HAS_RETURN");
             XS.Exchange(XSRegisters.EBP, XSRegisters.EDX, destinationDisplacement: 8);

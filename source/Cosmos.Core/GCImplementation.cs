@@ -3,7 +3,8 @@
 #endif
 using System;
 using System.Diagnostics;
-using Cosmos.IL2CPU.API;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
 {

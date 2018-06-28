@@ -1,6 +1,4 @@
-﻿#if SERIAL_PORT
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -322,5 +320,3 @@ namespace Cosmos.Debug.DebugConnectors
                                                           };
     }
 }
-
-#endif

@@ -46,37 +46,25 @@ namespace Cosmos.Debug.DebugConnectors
             return OK;
         }
 
-        public override bool IsConnected
-        {
-            get
-            {
-                return mStream != null;
-            }
-        }
+        public override bool IsConnected => mStream != null;
 
         // Start is not in ctor, because for servers we have to wait for the callback. This
         // however does not prevent other kind of DebugConnectorStreamWithTimeouts descendants from
         // invoking this method from their constructor.
         protected void Start(Stream aStream)
         {
-            if (aStream == null)
-            {
-                throw new ArgumentNullException("aStream");
-            }
-            mStream = aStream;
+            mStream = aStream ?? throw new ArgumentNullException("aStream");
             Start();
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            base.Dispose();
-            // do our own dispose after base, because base dispose cleans up the thread.
-            if (mStream != null)
+            base.Dispose(disposing);
+
+            if (disposing)
             {
-                //TODO: Change to mStream.Close() when Stream.Close() is supported
-                mStream.Dispose();
-                //mStream.Close();
-                mStream = null;
+                // do our own dispose after base, because base dispose cleans up the thread.
+                mStream?.Dispose();
             }
         }
     }

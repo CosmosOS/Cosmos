@@ -1,14 +1,16 @@
 using System;
 using System.Reflection;
 
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
-using XSharp.Common;
-using static XSharp.Common.XSRegisters;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
+
+using XSharp;
+using XSharp.Assembler;
+using XSharp.Assembler.x86;
+using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
 {
-    //TODO: This asm refs Hardware.. should not.. its a higher ring
     public class CPUUpdateIDTAsm : AssemblerMethod
     {
         private static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound)
@@ -31,11 +33,11 @@ namespace Cosmos.Core_Asm
 
         private static MethodBase GetInterruptHandler(byte aInterrupt)
         {
-            return GetMethodDef(typeof(Cosmos.Core.INTs).GetTypeInfo().Assembly, typeof(Cosmos.Core.INTs).FullName
+            return GetMethodDef(typeof(Cosmos.Core.INTs).Assembly, typeof(Cosmos.Core.INTs).FullName
                 , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
         }
 
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             // IDT is already initialized but just for base hooks, and asm only.
             // ie Int 1, 3 and GPF
@@ -96,7 +98,7 @@ namespace Cosmos.Core_Asm
                 MethodBase xHandler = GetInterruptHandler((byte)j);
                 if (xHandler == null)
                 {
-                    xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).GetTypeInfo().Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
+                    xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
                 }
                 XS.Call(LabelName.Get(xHandler));
                 XS.Pop(EAX);
@@ -121,7 +123,7 @@ namespace Cosmos.Core_Asm
 
             // reload interrupt list
             XS.Set(EAX, "_NATIVE_IDT_Pointer");
-            XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
+            XS.Set(AsmMarker.Labels[AsmMarker.Type.Processor_IntsEnabled], 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
             XS.LoadIdt(EAX, isIndirect: true);
             // Reenable interrupts
             XS.EnableInterrupts();

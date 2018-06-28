@@ -1,7 +1,7 @@
-using Cosmos.Assembler;
-using Cosmos.IL2CPU.API;
-using XSharp.Common;
-using CPUx86 = Cosmos.Assembler.x86;
+using XSharp.Assembler;
+using IL2CPU.API;
+using XSharp;
+using CPUx86 = XSharp.Assembler.x86;
 
 namespace Cosmos.Core_Asm
 {
@@ -14,13 +14,13 @@ namespace Cosmos.Core_Asm
         private const int CountDisplacement = 8;
 
         /*public static void BlockCopy(
-         *			Array src, [ebp + 24]
-         *			int srcOffset, [ebp + 20]
-         *			Array dst, [ebp + 16]
+         *			Array src, [ebp + 32]
+         *			int srcOffset, [ebp + 24]
+         *			Array dst, [ebp + 20]
          *			int dstOffset, [ebp + 12]
          *			int count); [ebp + 8]
          */
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             XS.Comment("Source array");
             XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);

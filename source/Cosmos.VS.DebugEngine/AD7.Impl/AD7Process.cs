@@ -12,11 +12,10 @@ using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 using Cosmos.Debug.DebugConnectors;
 using Cosmos.Debug.Hosts;
-using Cosmos.Debug.Symbols;
+using IL2CPU.Debug.Symbols;
 using Cosmos.VS.DebugEngine.Engine.Impl;
-using Cosmos.VS.DebugEngine.Properties;
 using Cosmos.VS.DebugEngine.Utilities;
-using Label = Cosmos.Debug.Symbols.Label;
+using Label = IL2CPU.Debug.Symbols.Label;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {
@@ -325,7 +324,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         mDbgConnector = new DebugConnectorPipeServer(xPortParam);
                     }
                     break;
-#if SERIAL_PORT
                 case "serial:":
                     if (xLaunch == "IntelEdison")
                     {
@@ -336,7 +334,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         mDbgConnector = new DebugConnectorSerial(xPortParam);
                     }
                     break;
-#endif
                 default:
                     throw new Exception("No debug connector found for port type '" + xPortType + "'");
 
@@ -381,6 +378,27 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         private void DbgCmdNullReferenceOccurred(uint lastEIPAddress)
         {
+            if (mDebugInfo.TryGetValue(BuildPropertyNames.DebugModeString, out var xDebugMode))
+            {
+                if (xDebugMode == "Source")
+                {
+                    try
+                    {
+                        var xMethod = mDebugInfoDb.GetMethod(lastEIPAddress);
+                        var xLabel = mDebugInfoDb.GetLabels(lastEIPAddress)[0];
+                        var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
+                        var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
+                        var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+
+                        AD7Util.MessageBox($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(xMethod.DocumentID).Pathname}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
+                        return;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                    }
+                }
+            }
+
             AD7Util.MessageBox(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
         }
 
@@ -427,7 +445,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             switch (mLaunch)
             {
                 case LaunchType.VMware:
-#region CheckIfHyperVServiceIsRunning
+                    #region CheckIfHyperVServiceIsRunning
 
                     using (System.ServiceProcess.ServiceController sc = new System.ServiceProcess.ServiceController("vmms"))
                     {
@@ -436,8 +454,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                             if (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running)
                             {
                                 AD7Util.MessageBox(
-                                    "The Hyper-V Virtual Machine Management Service will be stopped. This is needed to allow to run VMware. If you press \"No\" the debug will stop.",
-                                    "Question");
+                                    "The Hyper-V Virtual Machine Management Service will be stopped. This is needed to allow to run VMware.");
                                 sc.Stop();
                             }
                         }
@@ -447,21 +464,19 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         }
                     }
 
-#endregion CheckIfHyperVServiceIsRunning
+                    #endregion
 
                     mHost = new VMware(mDebugInfo, xUseGDB);
                     break;
-#if SERIAL_PORT
                 case LaunchType.Slave:
                     mHost = new Slave(mDebugInfo, xUseGDB);
                     break;
-#endif
                 case LaunchType.Bochs:
                     // The project has been created on another machine or Bochs has been uninstalled since the project has
                     // been created.
                     if (!BochsSupport.BochsEnabled)
                     {
-                        throw new Exception(Resources.BochsIsNotInstalled);
+                        throw new Exception("The Bochs emulator doesn't seem to be installed on this machine.");
                     }
 
                     string bochsConfigurationFileName;

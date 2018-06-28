@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using System.Globalization;
-using System.Windows.Threading;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+
+using Cosmos.VS.Windows.ToolWindows;
 
 namespace Cosmos.VS.Windows
 {
@@ -40,11 +40,7 @@ namespace Cosmos.VS.Windows
             }
         }
 
-        public static CosmosMenuCmdSet Instance
-        {
-            get;
-            private set;
-        }
+        public static CosmosMenuCmdSet Instance { get; private set; }
 
         private IServiceProvider ServiceProvider => package;
 
@@ -69,7 +65,7 @@ namespace Cosmos.VS.Windows
 
         private void ShowWindowAssembly(object aCommand, EventArgs e)
         {
-            ShowWindow(typeof(AssemblyTW));
+            ShowWindow(typeof(AssemblyToolWindow));
         }
 
         private void ShowWindowInternal(object aCommand, EventArgs e)
@@ -79,7 +75,7 @@ namespace Cosmos.VS.Windows
 
         private void ShowWindowRegisters(object aCommand, EventArgs e)
         {
-            ShowWindow(typeof(RegistersTW));
+            ShowWindow(typeof(RegistersToolWindow));
         }
 
         private void ShowWindowStack(object aCommand, EventArgs e)

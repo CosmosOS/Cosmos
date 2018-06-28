@@ -1,7 +1,7 @@
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
-using XSharp.Common;
-using static XSharp.Common.XSRegisters;
+using XSharp.Assembler;
+using XSharp.Assembler.x86;
+using XSharp;
+using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm.MemoryOperations
 {
@@ -18,7 +18,7 @@ namespace Cosmos.Core_Asm.MemoryOperations
          *                       int value, [ebp + 12]
          *                       int BlocksNum) [ebp + 16]
          */
-        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             /* First we copy dest, value and DestSize from EBP (stack) to 3 different registers */
             XS.Comment("Destination (int pointer)");
@@ -37,7 +37,7 @@ namespace Cosmos.Core_Asm.MemoryOperations
              * |value|value|value|value
              * luckily we don't need to do a loop for this there is the SSE3 instruction for this shufps
              */
-            XS.SSE2.MoveD(XMM0, EBX);
+            XS.MoveD(XMM0, EBX);
             XS.SSE.Shufps(XMM0, XMM0, 0x0000); // This broadcast the first element of XMM0 on the other 3
 
             /* Do the 'loop' */

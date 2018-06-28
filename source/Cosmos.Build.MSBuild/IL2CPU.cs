@@ -9,7 +9,7 @@ namespace Cosmos.Build.MSBuild
 {
     public class IL2CPU : BaseToolTask
     {
-        // protected CompilerEngine mTask = new CompilerEngine();
+        public string KernelPkg { get; set; }
 
         [Required]
         public string CosmosBuildDir { get; set; }
@@ -33,9 +33,6 @@ namespace Cosmos.Build.MSBuild
         public byte DebugCom { get; set; }
 
         [Required]
-        public bool UseNAsm { get; set; }
-
-        [Required]
         public ITaskItem[] References { get; set; }
 
         [Required]
@@ -45,9 +42,7 @@ namespace Cosmos.Build.MSBuild
 
         public bool EmitDebugSymbols { get; set; }
 
-        public string[] AdditionalSearchDirs { get; set; }
-
-        public string[] AdditionalReferences { get; set; }
+        public string AssemblySearchDirs { get; set; }
 
         protected void LogMessage(string aMsg)
         {
@@ -80,16 +75,15 @@ namespace Cosmos.Build.MSBuild
 
             try
             {
-                //TODO: Add AdditionalReferences and AdditionalSearchDirs here and to log messages below.
                 Dictionary<string, string> args = new Dictionary<string, string>
                 {
+                    {"KernelPkg", Convert.ToString(KernelPkg)},
                     {"DebugEnabled", Convert.ToString(DebugEnabled)},
                     {"StackCorruptionDetectionEnabled", Convert.ToString(StackCorruptionDetectionEnabled)},
                     {"StackCorruptionDetectionLevel", Convert.ToString(StackCorruptionDetectionLevel)},
                     {"DebugMode", Convert.ToString(DebugMode)},
                     {"TraceAssemblies", Convert.ToString(TraceAssemblies)},
                     {"DebugCom", Convert.ToString(DebugCom)},
-                    {"UseNAsm", Convert.ToString(UseNAsm)},
                     {"OutputFilename", Convert.ToString(OutputFilename)},
                     {"EnableLogging", Convert.ToString(EnableLogging)},
                     {"EmitDebugSymbols", Convert.ToString(EmitDebugSymbols)},
@@ -105,6 +99,7 @@ namespace Cosmos.Build.MSBuild
 
                 string Arguments = args.Aggregate("", (current, arg) => current + "\"" + arg.Key + ":" + arg.Value + "\" ");
                 Arguments = refs.Aggregate(Arguments, (current, Ref) => current + "\"References:" + Ref + "\" ");
+                Arguments = AssemblySearchDirs.Split(';').Aggregate(Arguments, (current, Dir) => current + "\"AssemblySearchDirs:" + Dir + "\" ");
 
                 Log.LogMessage(MessageImportance.High, $"Invoking il2cpu.exe {Arguments}");
                 return ExecuteTool(WorkingDir, Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"), Arguments, "IL2CPU");

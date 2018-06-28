@@ -1,17 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp1.0</TargetFramework>
-        <RuntimeIdentifiers>win7-x86</RuntimeIdentifiers>
-        <DebugType>Full</DebugType>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
         <OutputType>Exe</OutputType>
+        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <DebugType>Full</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.System2\Cosmos.System2.csproj" />
     </ItemGroup>
 
 </Project>

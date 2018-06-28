@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GeneralIntegerImpl</RootNamespace>
     <AssemblyName>GeneralIntegerImpl</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <ItemGroup>
@@ -24,9 +24,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\IL2CPU\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj">
+    <ProjectReference Include="..\..\..\..\IL2CPU\IL2CPU.API\IL2CPU.API.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
-      <Name>Cosmos.IL2CPU.API</Name>
+      <Name>IL2CPU.API</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

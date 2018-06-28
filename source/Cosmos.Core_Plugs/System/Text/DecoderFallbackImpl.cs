@@ -1,6 +1,5 @@
 using System.Text;
-
-using Cosmos.IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Text
 {

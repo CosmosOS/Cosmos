@@ -1,15 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard1.5</TargetFramework>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-        <PackageName>Cosmos.Debug.DebugConnectors</PackageName>
+        <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
         <PackageReference Include="System.IO.Pipes" Version="4.3.0" />
+        <PackageReference Include="System.IO.Ports" Version="4.4.0" />
         <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
     </ItemGroup>
 
