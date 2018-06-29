@@ -8,7 +8,7 @@ namespace Cosmos.HAL
     /// <summary>
     /// This class describes the PS/2 mouse.
     /// </summary>
-    public class PS2Mouse : MouseBase, IPS2Device
+    public class PS2Mouse : MouseBase
     {
         enum Command : byte
         {

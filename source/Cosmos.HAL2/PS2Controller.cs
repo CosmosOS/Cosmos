@@ -9,7 +9,7 @@ namespace Cosmos.HAL
 {
     public class PS2Controller : Device
     {
-        enum Command : byte
+        private enum Command : byte
         {
             GetConfigurationByte = 0x20,
             SetConfigurationByte = 0x60,
@@ -24,10 +24,21 @@ namespace Cosmos.HAL
             PulseOutputLineBase = 0xF0
         }
 
-        enum DeviceCommand : byte
+        private enum DeviceCommand : byte
         {
             IdentifyDevice = 0xF2,
             DisableScanning = 0xF5
+        }
+
+        [Flags]
+        private enum OutputLines
+        {
+            None = 0x00,
+            First = 0x01,
+            Second = 0x02,
+            Third = 0x04,
+            Fourth = 0x08,
+            All = First | Second | Third | Fourth
         }
 
         public const byte Ack = 0xFA;
@@ -37,8 +48,9 @@ namespace Cosmos.HAL
         public bool SelfTestPassed;
         public bool FirstPortTestPassed;
         public bool SecondPortTestPassed;
-        public IPS2Device FirstDevice;
-        public IPS2Device SecondDevice;
+
+        public Device FirstDevice;
+        public Device SecondDevice;
 
         private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
         private Debugger mDebugger = new Debugger("HAL", "PS2Controller");
@@ -135,7 +147,7 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aPort">The port of the PS/2 device to identify.</param>
         /// <param name="aDevice">An instance of the identified device.</param>
-        private void IdentifyDevice(byte aPort, out IPS2Device aDevice)
+        private void IdentifyDevice(byte aPort, out Device aDevice)
         {
             aDevice = null;
 
@@ -167,8 +179,10 @@ namespace Cosmos.HAL
                      */
                     if (xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04)
                     {
-                        aDevice = new PS2Mouse(aPort, xFirstByte);
-                        aDevice.Initialize();
+                        var xDevice = new PS2Mouse(aPort, xFirstByte);
+                        xDevice.Initialize();
+
+                        aDevice = xDevice;
                     }
                     /*
                      * |-----------------|----------------------------------------------------------------|
@@ -188,13 +202,17 @@ namespace Cosmos.HAL
 
                         if (xTest && aPort == 1)
                         {
-                            aDevice = new PS2Keyboard(aPort);
-                            aDevice.Initialize();
+                            var xDevice = new PS2Keyboard(aPort);
+                            xDevice.Initialize();
+
+                            aDevice = xDevice;
                         }
                         else if (xSecondByte == 0x83)
                         {
-                            aDevice = new PS2Keyboard(aPort);
-                            aDevice.Initialize();
+                            var xDevice = new PS2Keyboard(aPort);
+                            xDevice.Initialize();
+
+                            aDevice = xDevice;
                         }
                     }
                 }
@@ -208,8 +226,10 @@ namespace Cosmos.HAL
                  */
                 else if (aPort == 1)
                 {
-                    aDevice = new PS2Keyboard(aPort);
-                    aDevice.Initialize();
+                    var xDevice = new PS2Keyboard(aPort);
+                    xDevice.Initialize();
+
+                    aDevice = xDevice;
                 }
 
                 if (aDevice == null)
@@ -241,7 +261,7 @@ namespace Cosmos.HAL
                 }
                 else
                 {
-                    SendCommand(Command.TestFirstPS2Port);
+                    SendCommand(Command.TestSecondPS2Port);
                 }
 
                 var xTestByte = ReadData();
@@ -302,10 +322,9 @@ namespace Cosmos.HAL
         /// <param name="aPulseSecondLine">The second line.</param>
         /// <param name="aPulseThirdLine">The third line.</param>
         /// <param name="aPulseFourthLine">The fourth line.</param>
-        private void PulseOutputLine(bool aPulseResetLine, bool aPulseSecondLine, bool aPulseThirdLine, bool aPulseFourthLine)
+        private void PulseOutputLine(OutputLines aOutputLines)
         {
-            byte xMask = (byte)((aPulseResetLine ? 1 : 0) | ((aPulseSecondLine ? 1 : 0) << 1)
-                | ((aPulseThirdLine ? 1 : 0) << 2) | ((aPulseFourthLine ? 1 : 0) << 3));
+            byte xMask = (byte)aOutputLines;
 
             mDebugger.SendInternal("(PS/2 Controller) Pulsing output line:");
             mDebugger.SendInternal("Mask:");

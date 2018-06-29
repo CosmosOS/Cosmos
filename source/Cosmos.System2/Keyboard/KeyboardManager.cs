@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
 
@@ -14,50 +9,16 @@ namespace Cosmos.System
 {
     public static class KeyboardManager
     {
-        public static bool NumLock
-        {
-            get;
-            set;
-        }
+        public static bool NumLock { get; set; }
+        public static bool CapsLock { get; set; }
+        public static bool ScrollLock { get; set; }
 
-        public static bool CapsLock
-        {
-            get;
-            set;
-        }
+        public static bool ControlPressed { get; set; }
+        public static bool ShiftPressed { get; set; }
+        public static bool AltPressed { get; set; }
 
-        public static bool ScrollLock
-        {
-            get;
-            set;
-        }
 
-        public static bool ControlPressed
-        {
-            get;
-            set;
-        }
-
-        public static bool ShiftPressed
-        {
-            get;
-            set;
-        }
-
-        public static bool AltPressed
-        {
-            get;
-            set;
-        }
- 
- 
-        public static bool KeyAvailable
-        {
-            get
-            {
-                return mQueuedKeys.Count > 0;
-            }
-        }
+        public static bool KeyAvailable => mQueuedKeys.Count > 0;
 
         private static List<KeyboardBase> mKeyboardList = new List<KeyboardBase>();
         private static ScanMapBase mScanMap = new US_Standard();
@@ -65,8 +26,10 @@ namespace Cosmos.System
 
         static KeyboardManager()
         {
-            Global.mDebugger.Send("KeyboardManager cctor");
-            AddKeyboard((PS2Keyboard)HAL.Global.PS2Controller.FirstDevice);
+            foreach (var keyboard in HAL.Global.GetKeyboardDevices())
+            {
+                AddKeyboard(keyboard);
+            }
         }
 
         private static void Enqueue(KeyEvent keyEvent)
@@ -140,7 +103,7 @@ namespace Cosmos.System
 
         private static void UpdateLeds()
         {
-            foreach(KeyboardBase keyboard in mKeyboardList)
+            foreach (KeyboardBase keyboard in mKeyboardList)
             {
                 keyboard.UpdateLeds();
             }

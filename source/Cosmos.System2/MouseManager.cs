@@ -69,7 +69,7 @@ namespace Cosmos.System
         /// </summary>
         public static uint ScreenWidth
         {
-            get { return mScreenWidth; }
+            get => mScreenWidth;
             set
             {
                 mScreenWidth = value;
@@ -86,7 +86,7 @@ namespace Cosmos.System
         /// </summary>
         public static uint ScreenHeight
         {
-            get { return mScreenHeight; }
+            get => mScreenHeight;
             set
             {
                 mScreenHeight = value;
@@ -100,7 +100,10 @@ namespace Cosmos.System
 
         static MouseManager()
         {
-            AddMouse((PS2Mouse)HAL.Global.PS2Controller.SecondDevice);
+            foreach (var mouse in HAL.Global.GetMouseDevices())
+            {
+                AddMouse(mouse);
+            }
         }
 
         public static void HandleMouse(int aDeltaX, int aDeltaY, int aMouseState, int aScrollWheel)

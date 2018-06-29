@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
@@ -65,5 +67,39 @@ namespace Cosmos.HAL
         }
 
         public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
+
+        public static IEnumerable<KeyboardBase> GetKeyboardDevices()
+        {
+            var xKeyboardDevices = new List<KeyboardBase>();
+
+            if (PS2Controller.FirstDevice is KeyboardBase xKeyboard1)
+            {
+                xKeyboardDevices.Add(xKeyboard1);
+            }
+
+            if (PS2Controller.SecondDevice is KeyboardBase xKeyboard2)
+            {
+                xKeyboardDevices.Add(xKeyboard2);
+            }
+
+            return xKeyboardDevices;
+        }
+
+        public static IEnumerable<MouseBase> GetMouseDevices()
+        {
+            var xMouseDevices = new List<MouseBase>();
+
+            if (PS2Controller.FirstDevice is PS2Mouse xMouse1)
+            {
+                xMouseDevices.Add(xMouse1);
+            }
+
+            if (PS2Controller.SecondDevice is PS2Mouse xMouse2)
+            {
+                xMouseDevices.Add(xMouse2);
+            }
+
+            return xMouseDevices;
+        }
     }
 }

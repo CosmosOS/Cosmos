@@ -10,7 +10,7 @@ namespace Cosmos.HAL
     /// <summary>
     /// This class describes the PS/2 keyboard.
     /// </summary>
-    public class PS2Keyboard : KeyboardBase, IPS2Device
+    public class PS2Keyboard : KeyboardBase
     {
         enum Command : byte
         {
