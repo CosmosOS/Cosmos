@@ -62,7 +62,9 @@
     </PropertyGroup>
 
     <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
-        <Content Deploy="False" />
+        <Content>
+            <Deploy>False</Deploy>
+        </Content>
     </ItemDefinitionGroup>
 
     <ItemGroup>
