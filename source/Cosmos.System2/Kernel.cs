@@ -62,9 +62,6 @@ namespace Cosmos.System
                 Global.mDebugger.Send("Global Init");
                 Global.Init(GetTextScreen());
 
-                //Start with a PS2Keyboard
-                KeyboardManager.AddKeyboard(new PS2Keyboard());
-
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen)
                 {
