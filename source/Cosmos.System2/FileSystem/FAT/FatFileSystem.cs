@@ -268,18 +268,15 @@ namespace Cosmos.System.FileSystem.FAT
                 switch (mFileSystem.mFatType)
                 {
                     case FatTypeEnum.Fat12:
-                        byte[] data = BitConverter.GetBytes((ushort)aValue);
-                        Array.Copy(data, 0, xData, (int)xEntryOffset, data.Length);
+                        xData.SetUInt16(xEntryOffset, (ushort)aValue);
                         break;
 
                     case FatTypeEnum.Fat16:
-                        data = BitConverter.GetBytes((ushort)aValue);
-                        Array.Copy(data, 0, xData, (int)xEntryOffset, data.Length);
+                        xData.SetUInt16(xEntryOffset, (ushort)aValue);
                         break;
 
                     case FatTypeEnum.Fat32:
-                        data = BitConverter.GetBytes((uint)aValue);
-                        Array.Copy(data, 0, xData, (int)xEntryOffset, data.Length); ;
+                        xData.SetUInt32(xEntryOffset, (uint)aValue);
                         break;
 
                     default:
