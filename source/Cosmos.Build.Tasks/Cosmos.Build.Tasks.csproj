@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
-        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
         <PackageDescription>Cosmos build system.
 $(CosmosDescription)</PackageDescription>
@@ -10,24 +10,27 @@ $(CosmosDescription)</PackageDescription>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="runtime.json" Pack="True" PackagePath="\" />
         <Content Include="build\**" Pack="True" PackagePath="build\" />
         <Content Include="tools\**" Pack="True" PackagePath="tools\" />
+        <Content Include="runtime.json" Pack="True" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Build.Framework" Version="15.5.180" PrivateAssets="All" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180" PrivateAssets="All" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
+        <ProjectReference Include="..\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" PrivateAssets="All" />
     </ItemGroup>
 
     <Target Name="IncludeDependencies" BeforeTargets="_GetPackageFiles" DependsOnTargets="PrepareForPublish;ComputeFilesToPublish">
 
         <ItemGroup>
-            <Content Include="@(ResolvedAssembliesToPublish)" Pack="True" PackagePath="tools\" Condition="!$([System.String]::new('%(Filename)').StartsWith('Microsoft.Build'))" />
+            <Content Include="@(ResolvedAssembliesToPublish)" Pack="True" PackagePath="tools\%(ResolvedAssembliesToPublish.DestinationSubPath)" Condition="!$([System.String]::new('%(Filename)').StartsWith('Microsoft.Build'))" />
+            <Content Pack="True" PackagePath="tools\%(Content.Link)" Condition="'%(Filename)' == 'e_sqlite3'" />
         </ItemGroup>
 
     </Target>

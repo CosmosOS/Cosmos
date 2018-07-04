@@ -1,0 +1,10 @@
+<Project>
+
+    <PropertyGroup>
+        <PackageDescription Condition="'$(PackageDescription)' != ''">$(PackageDescription)
+
+$(CosmosDescription)</PackageDescription>
+        <PackageDescription Condition="'$(PackageDescription)' == ''">$(CosmosDescription)</PackageDescription>
+    </PropertyGroup>
+
+</Project>

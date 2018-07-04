@@ -61,6 +61,16 @@
         <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
     </PropertyGroup>
 
+    <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
+        <Content>
+            <Deploy>False</Deploy>
+        </Content>
+    </ItemDefinitionGroup>
+
+    <ItemGroup>
+        <ContentToDeploy Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
+    </ItemGroup>
+
     <ItemGroup Condition="'$(KernelPkg)' == ''">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Plugs.dll" />
@@ -81,6 +91,7 @@
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateSyslinuxConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.Launch" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -273,6 +284,7 @@
             <_IsoFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
             <_IsoFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
             <_IsoFile Include="$(BinFile)" />
+            <_IsoFile Include="@(ContentToDeploy)" />
         </ItemGroup>
 
         <RemoveDir Directories="$(IntermediateIsoDirectory)" />
@@ -347,6 +359,13 @@
                    FormatDrive="$(UsbPublishFormatDrive)"
                    ToolPath="$(SyslinuxToolPath)"
                    ToolExe="$(SyslinuxToolExe)" />
+
+    </Target>
+
+    <Target Name="Launch">
+
+        <Launch ConfigurationFile="$(OutputPath)Bochs.bxrc"
+                IsoFile="$(MSBuildProjectDirectory)\$(IsoFile)" />
 
     </Target>
 

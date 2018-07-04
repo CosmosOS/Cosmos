@@ -2,10 +2,7 @@
 using Cosmos.HAL.Drivers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cosmos.Common.Extensions;
+using System.Drawing;
 
 namespace Cosmos.System.Graphics
 {
