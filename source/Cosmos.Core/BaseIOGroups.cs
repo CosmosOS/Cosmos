@@ -9,8 +9,7 @@ namespace Cosmos.Core {
         // and not hardcoded like this.
         // Further more some kind of security needs to be applied to these, but even now
         // at least we have isolation between the consumers that use these.
-        public readonly IOGroup.Keyboard Keyboard = new IOGroup.Keyboard();
-        public static readonly IOGroup.Mouse Mouse = new IOGroup.Mouse();
+        public readonly IOGroup.PS2Controller PS2Controller = new IOGroup.PS2Controller();
         public static readonly IOGroup.PCSpeaker PCSpeaker = new IOGroup.PCSpeaker();
         public readonly IOGroup.PIT PIT = new IOGroup.PIT();
         public readonly IOGroup.TextScreen TextScreen = new IOGroup.TextScreen();

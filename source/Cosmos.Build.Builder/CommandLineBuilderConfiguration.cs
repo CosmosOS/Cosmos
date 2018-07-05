@@ -8,8 +8,6 @@ namespace Cosmos.Build.Builder
     {
         public bool NoVsLaunch => GetSwitch();
         public bool UserKit => GetSwitch();
-        public bool StayOpen => GetSwitch();
-        public bool NoClean => GetSwitch();
         public string VsPath => GetOption();
 
         private Dictionary<string, string> _args;
