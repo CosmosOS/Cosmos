@@ -67,9 +67,12 @@
         </Content>
     </ItemDefinitionGroup>
 
+    <!-- https://github.com/Microsoft/msbuild/issues/3479
+         if/when fixed, change MakeIso
     <ItemGroup>
         <ContentToDeploy Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
     </ItemGroup>
+    -->
 
     <ItemGroup Condition="'$(KernelPkg)' == ''">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
@@ -284,7 +287,7 @@
             <_IsoFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
             <_IsoFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
             <_IsoFile Include="$(BinFile)" />
-            <_IsoFile Include="@(ContentToDeploy)" />
+            <_IsoFile Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
         </ItemGroup>
 
         <RemoveDir Directories="$(IntermediateIsoDirectory)" />
