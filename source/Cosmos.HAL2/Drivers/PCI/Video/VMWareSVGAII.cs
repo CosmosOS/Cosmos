@@ -245,7 +245,43 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         {
             return Video_Memory[((y * width + x) * depth)];
         }
+        public void Blit(int[] srcBuffer32, //now, only 32 bits rgb
+              int srcBufferWidth,//width in **Pixel**
+              int srcX, int srcY,
+              int srcW, int srcH,
+              int dstX, int dstY)
+        {
+            //this version => only 32 bits buffer 
+            uint xTarget = (uint)(dstX + srcW);
+            uint yTarget = (uint)(dstY + srcH);
+            unsafe
+            {
+                fixed (int* head = &srcBuffer32[0])
+                {
 
+                    int* dest0 = (int*)(void*)Video_Memory.Base;
+                    //int bottom = dstY + srcH;
+                    //int right = srcX + srcW;
+                    //----------------------------------------------
+                    for (uint yTmp = (uint)dstY; yTmp < yTarget; yTmp++)
+                    {
+                        int* dest = dest0 + (yTmp * (int)this.width) + dstX;
+                        int* src = head + (srcY * srcBufferWidth) + srcX;
+
+                        for (uint xTmp = (uint)dstX; xTmp < xTarget; xTmp++)
+                        {   
+                            *dest = *src;
+                            dest++;
+                            src++;
+                        }
+                        srcY++;
+                    }
+                }
+            }
+            //---------
+            Update((uint)dstX, (uint)dstY, (uint)srcW, (uint)srcH);
+            //--------- 
+        }
         public void Clear(uint color)
         {
             Fill(0, 0, width, height, color);

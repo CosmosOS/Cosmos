@@ -28,7 +28,12 @@ namespace Cosmos.System.Graphics
                 rawData[i] = BitConverter.ToInt32(new byte[] { pixelData[(i * 4)], pixelData[(i * 4) + 1], pixelData[(i * 4) + 2], pixelData[(i * 4) + 3] }, 0);
             }
         }
-
+        public Bitmap(uint width, uint height, int[] rawBmp, ColorDepth colorDepth) : base(width, height, colorDepth)
+        {
+            this.Width = width;
+            this.Height = height;
+            this.rawData = rawBmp;
+        }
         public Bitmap(string path) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
             using (var fs = new FileStream(path, FileMode.Open))

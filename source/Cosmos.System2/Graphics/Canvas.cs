@@ -414,6 +414,14 @@ namespace Cosmos.System.Graphics
         {
             DrawImage(image, point.X, point.Y);
         }
+        public virtual void DrawImage(Image img, int srcX, int srcY, int srcW, int srcH, int destX, int destY)
+        {
+
+        }
+        //----
+        public virtual void DrawPoint(Color color, int x, int y)
+        {
+        }
 
         //public void DrawString(String str, Font aFont, Brush brush, Point point)
         //{

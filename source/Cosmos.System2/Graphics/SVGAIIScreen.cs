@@ -36,12 +36,25 @@ namespace Cosmos.System.Graphics
                 SetGraphicsMode(mode);
             }
         }
+        public override void DrawPoint(Color color, int x, int y)
+        {
 
+            //mSVGAIIDebugger.SendInternal($"Drawing point to x:{x}, y:{y} with {xColor.Name} Color");
+            xSVGAIIDriver.SetPixel((uint)x, (uint)y, (uint)color.ToArgb());
+            mSVGAIIDebugger.SendInternal($"Done drawing point");
+            /* No need to refresh all the screen to make the point appear on Screen! */
+            //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Columns, (uint)mode.Rows);
+            xSVGAIIDriver.Update((uint)x, (uint)y, 1, 1);
+        }
+        public override void DrawImage(Image img, int srcX, int srcY, int srcW, int srcH, int destX, int destY)
+        {
+            xSVGAIIDriver.Blit(img.rawData, (int)img.Width, srcX, srcY, srcW, srcH, destX, destY);
+        }
         public override void DrawPoint(Pen pen, int x, int y)
         {
             Color xColor = pen.Color;
 
-            mSVGAIIDebugger.SendInternal($"Drawing point to x:{x}, y:{y} with {xColor.Name} Color");
+            //mSVGAIIDebugger.SendInternal($"Drawing point to x:{x}, y:{y} with {xColor.Name} Color");
             xSVGAIIDriver.SetPixel((uint)x, (uint)y, (uint)xColor.ToArgb());
             mSVGAIIDebugger.SendInternal($"Done drawing point");
             /* No need to refresh all the screen to make the point appear on Screen! */

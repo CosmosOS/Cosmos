@@ -5,6 +5,10 @@
         <RootNamespace>Cosmos.HAL</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
