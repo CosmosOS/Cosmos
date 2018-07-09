@@ -71,12 +71,19 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\PixelFarm\src\x_autogen_netstandard1.3\PixelFarm.Cosmos.One\PixelFarm.Cosmos.One.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.System2\Cosmos.System2.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Cosmos.Build" Version="*" NoWarn="NU1604" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="CosmosGraphicSubsystem.map">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
