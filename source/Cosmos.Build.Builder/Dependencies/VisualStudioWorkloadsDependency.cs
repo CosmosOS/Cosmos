@@ -41,7 +41,7 @@ namespace Cosmos.Build.Builder.Dependencies
             var vsInstancePath = _visualStudioInstance.GetInstallationPath();
             var installedPackages = _visualStudioInstance.GetPackages();
 
-            var args = $"modify --passive --norestart --wait --installPath \"{vsInstancePath}\"";
+            var args = $"modify --passive --norestart --quiet --installPath \"{vsInstancePath}\"";
 
             foreach (var workload in RequiredPackages)
             {
@@ -61,6 +61,7 @@ namespace Cosmos.Build.Builder.Dependencies
         }
 
         private bool IsPackageInstalled(string packageId) =>
-            _visualStudioInstance.GetPackages().Any(p => p.GetId() == packageId);
+            _visualStudioInstance.GetPackages().Any(
+                p => String.Equals(p.GetId(), packageId, StringComparison.Ordinal));
     }
 }

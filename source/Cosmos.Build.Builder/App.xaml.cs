@@ -83,8 +83,9 @@ namespace Cosmos.Build.Builder
             
             var buildDefinition = new CosmosBuildDefinition(innoSetupService, msBuildService, visualStudioInstance);
 
-            MainWindow.DataContext = new MainWindowViewModel(dependencyInstallationDialogService, buildDefinition);
+            // show first, or setting owner on dialog windows may fail, as the main window may have not been shown yet.
             MainWindow.Show();
+            MainWindow.DataContext = new MainWindowViewModel(dependencyInstallationDialogService, buildDefinition);
 
             base.OnStartup(e);
         }
