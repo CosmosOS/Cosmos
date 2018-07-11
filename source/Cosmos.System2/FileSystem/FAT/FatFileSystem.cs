@@ -642,10 +642,8 @@ namespace Cosmos.System.FileSystem.FAT
         public override DirectoryEntry CreateDirectory(DirectoryEntry aParentDirectory, string aNewDirectory)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.CreateDirectory --");
-            Global.mFileSystemDebugger.SendInternal("aParentDirectory.Name =");
-            Global.mFileSystemDebugger.SendInternal(aParentDirectory?.mName);
-            Global.mFileSystemDebugger.SendInternal("aNewDirectory =");
-            Global.mFileSystemDebugger.SendInternal(aNewDirectory);
+            Global.mFileSystemDebugger.SendInternal("aParentDirectory.Name = " + aParentDirectory?.mName);
+            Global.mFileSystemDebugger.SendInternal("aNewDirectory = " + aNewDirectory);
 
             if (aParentDirectory == null)
             {
@@ -665,10 +663,8 @@ namespace Cosmos.System.FileSystem.FAT
         public override DirectoryEntry CreateFile(DirectoryEntry aParentDirectory, string aNewFile)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.CreateFile --");
-            Global.mFileSystemDebugger.SendInternal("aParentDirectory.Name =");
-            Global.mFileSystemDebugger.SendInternal(aParentDirectory?.mName);
-            Global.mFileSystemDebugger.SendInternal("aNewFile =");
-            Global.mFileSystemDebugger.SendInternal(aNewFile);
+            Global.mFileSystemDebugger.SendInternal("aParentDirectory.Name = " + aParentDirectory?.mName);
+            Global.mFileSystemDebugger.SendInternal("aNewFile =" + aNewFile);
 
             if (aParentDirectory == null)
             {
@@ -734,12 +730,12 @@ namespace Cosmos.System.FileSystem.FAT
                     return RootDirectory.mName;
                 }
 
-                Global.mFileSystemDebugger.SendInternal($"Volume label is {VolumeId.mName}");
-                return VolumeId.mName;
+                Global.mFileSystemDebugger.SendInternal($"Volume label is |{VolumeId.mName.TrimEnd()}|");
+                return VolumeId.mName.TrimEnd();
             }
             set
             {
-                Global.mFileSystemDebugger.SendInternal($"Setting Volume label to {value}");
+                Global.mFileSystemDebugger.SendInternal($"FatFileSystem - Setting Volume label to |{value}|");
 
                 var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
 
