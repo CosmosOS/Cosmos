@@ -3,7 +3,11 @@
     <PropertyGroup>
         <CosmosDescription>Cosmos is an operating system "construction kit". Build your own OS using managed languages such as C#, VB.NET, and more!</CosmosDescription>
     </PropertyGroup>
-    
+
+    <PropertyGroup>
+        <!-- <IsPackable>False</IsPackable> -->
+    </PropertyGroup>
+
     <PropertyGroup>
         <Authors>Cosmos</Authors>
         <Copyright>Copyright © 2007-$([System.DateTime]::Now.Year) COSMOS Project</Copyright>

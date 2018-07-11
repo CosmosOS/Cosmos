@@ -1,0 +1,58 @@
+﻿<Window x:Class="Cosmos.Build.Builder.Views.VisualStudioInstanceDialog"
+        x:Name="visualStudioInstanceDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        Title="Choose Visual Studio Instance"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="MinWidth" Value="48" />
+            <Setter Property="Padding" Value="8,3" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="8"
+          MinWidth="400">
+
+        <StackPanel Grid.Row="0"
+                    Margin="8">
+
+            <ListView MinHeight="196"
+                      MinWidth="256"
+                      ItemsSource="{Binding VisualStudioInstances}"
+                      SelectedItem="{Binding SelectedVisualStudioInstance, Mode=TwoWay}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="ID" DisplayMemberBinding="{Binding ID}" />
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                        <GridViewColumn Header="Installation Path" DisplayMemberBinding="{Binding InstallationPath}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <StackPanel Grid.Row="2"
+                        HorizontalAlignment="Right"
+                        Margin="0,8,0,0"
+                        Orientation="Horizontal">
+                <Button Command="{Binding OkCommand}"
+                        CommandParameter="{Binding ElementName=visualStudioInstanceDialog}"
+                        Content="OK" />
+                <Button Command="{Binding CancelCommand}"
+                        CommandParameter="{Binding ElementName=visualStudioInstanceDialog}"
+                        Content="Cancel" />
+            </StackPanel>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>

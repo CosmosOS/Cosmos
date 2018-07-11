@@ -26,6 +26,7 @@ namespace Cosmos.System.Graphics
         }
 
         private static HAL.Drivers.VBEDriver VBEDriver;
+
         private static PCIDevice SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
         public static bool BGAExists()
@@ -59,6 +60,7 @@ namespace Cosmos.System.Graphics
                 return new VGACanvas();
             }
         }
+
         private static Canvas GetVideoDriver(Mode mode)
         {
             if (PCI.Exists(SVGAIIDevice) == true)
@@ -87,11 +89,11 @@ namespace Cosmos.System.Graphics
                 return MyVideoDriver;
             }
         }
+
         public static Canvas GetFullScreenCanvas(Mode mode)
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);
-            // If MyVideoDriver is null (hasn't checked if VMWare SVGA exists),
-            // Do necessary check and set gfx mode as specified (mode)
+
             if (MyVideoDriver == null)
             {
                 return MyVideoDriver = GetVideoDriver(mode);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cosmos.Core;
 
 namespace Cosmos.HAL.Drivers.PCI.Video

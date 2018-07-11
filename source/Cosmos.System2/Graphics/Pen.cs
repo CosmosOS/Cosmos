@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace Cosmos.System.Graphics
 {
@@ -50,7 +51,7 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             return $"color: {color} width: {width}";
         }
