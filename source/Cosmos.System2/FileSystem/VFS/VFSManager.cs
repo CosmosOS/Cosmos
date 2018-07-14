@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
+using Cosmos.HAL;
 using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem.VFS
@@ -201,19 +201,20 @@ namespace Cosmos.System.FileSystem.VFS
             return mVFS.GetVolumes();
         }
 
+        public static void RegisterFileSystem(FileSystemFactory aFileSystemFactory)
+        {
+            mVFS.RegisterFileSystem(aFileSystemFactory);
+        }
+
         public static List<string> GetLogicalDrives()
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetLogicalDrives ---");
 
-            //TODO: Directory.GetLogicalDrives() will call this.
-            return null;
-
-            /*
             List<string> xDrives = new List<string>();
-            foreach (FilesystemEntry entry in GetVolumes())
-                xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
-            return xDrives.ToArray();
-            */
+            foreach (DirectoryEntry entry in GetVolumes())
+                xDrives.Add(entry.mName + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
+
+            return xDrives;
         }
 
         public static List<string> InternalGetFileDirectoryNames(
@@ -275,8 +276,7 @@ namespace Cosmos.System.FileSystem.VFS
             }
             catch (Exception e)
             {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(e.Message);
+                CustomConsole.WriteLineError("Exception occurred: " + e.Message);
                 return false;
             }
         }
@@ -430,6 +430,43 @@ namespace Cosmos.System.FileSystem.VFS
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFileAttributes ---");
             mVFS.SetFileAttributes(aPath, fileAttributes);
         }
+
+        public static bool IsValidDriveId(string aPath)
+        {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFileAttributes ---");
+            return mVFS.IsValidDriveId(aPath);
+        }
+
+        public static long GetTotalSize(string aDriveId)
+        {
+            return mVFS.GetTotalSize(aDriveId);
+        }
+
+        public static long GetAvailableFreeSpace(string aDriveId)
+        {
+            return mVFS.GetAvailableFreeSpace(aDriveId);
+        }
+
+        public static long GetTotalFreeSpace(string aDriveId)
+        {
+            return mVFS.GetTotalFreeSpace(aDriveId);
+        }
+
+        public static string GetFileSystemType(string aDriveId)
+        {
+            return mVFS.GetFileSystemType(aDriveId);
+        }
+
+        public static string GetFileSystemLabel(string aDriveId)
+        {
+            return mVFS.GetFileSystemLabel(aDriveId);
+        }
+
+        public static void SetFileSystemLabel(string aDriveId, string aLabel)
+        {
+            mVFS.SetFileSystemLabel(aDriveId, aLabel);
+        }
+
         #region Helpers
 
         public static char GetAltDirectorySeparatorChar()

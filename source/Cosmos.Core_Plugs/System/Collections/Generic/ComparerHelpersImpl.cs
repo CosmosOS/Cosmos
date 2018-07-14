@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Cosmos.Core_Plugs.System.Collections.Generic
 {
-    [Plug(TargetName = "System.Collections.Generic.ComparerHelpers")]
+    [Plug("System.Collections.Generic.ComparerHelpers, System.Private.CoreLib")]
     public static class ComparerHelpersImpl
     {
         private static readonly Debugger mDebugger = new Debugger("Core", "ComparerHelpersImpl");

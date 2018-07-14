@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
@@ -35,7 +36,13 @@ namespace Cosmos.Build.Tasks
         public byte DebugCom { get; set; }
 
         [Required]
+        public string TargetAssembly { get; set; }
+
+        [Required]
         public ITaskItem[] References { get; set; }
+
+        [Required]
+        public ITaskItem[] PlugsReferences { get; set; }
 
         [Required]
         public string OutputFilename { get; set; }
@@ -43,8 +50,6 @@ namespace Cosmos.Build.Tasks
         public bool EnableLogging { get; set; }
 
         public bool EmitDebugSymbols { get; set; }
-
-        public string AssemblySearchDirs { get; set; }
 
         #endregion
 
@@ -55,40 +60,51 @@ namespace Cosmos.Build.Tasks
 
         protected override string GenerateFullPathToTool() => Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe");
 
-        protected override string GenerateCommandLineCommands()
+        protected override string GenerateResponseFileCommands()
         {
-            Dictionary<string, string> args = new Dictionary<string, string>
+            var args = new Dictionary<string, string>
             {
-                {"KernelPkg", KernelPkg},
-                {"EnableDebug", DebugEnabled.ToString()},
-                {"EnableStackCorruptionDetection", StackCorruptionDetectionEnabled.ToString()},
-                {"StackCorruptionDetectionLevel", StackCorruptionDetectionLevel},
-                {"DebugMode", DebugMode},
-                {"TraceAssemblies", TraceAssemblies},
-                {"DebugCom", DebugCom.ToString()},
-                {"OutputFilename", Path.GetFullPath(OutputFilename)},
-                {"EnableLogging", EnableLogging.ToString()},
-                {"EmitDebugSymbols", EmitDebugSymbols.ToString()},
-                {"IgnoreDebugStubAttribute", IgnoreDebugStubAttribute.ToString()}
-            };
+                ["KernelPkg"] = KernelPkg,
+                ["EnableDebug"] = DebugEnabled.ToString(),
+                ["EnableStackCorruptionDetection"] = StackCorruptionDetectionEnabled.ToString(),
+                ["StackCorruptionDetectionLevel"] = StackCorruptionDetectionLevel,
+                ["DebugMode"] = DebugMode,
+                ["TraceAssemblies"] = TraceAssemblies,
+                ["DebugCom"] = DebugCom.ToString(),
+                ["TargetAssembly"] = Path.GetFullPath(TargetAssembly),
+                ["OutputFilename"] = Path.GetFullPath(OutputFilename),
+                ["EnableLogging"] = EnableLogging.ToString(),
+                ["EmitDebugSymbols"] = EmitDebugSymbols.ToString(),
+                ["IgnoreDebugStubAttribute"] = IgnoreDebugStubAttribute.ToString(),
+            }.ToList();
 
-            List<string> refs =
-                (from reference in References
-                 where reference.MetadataNames.OfType<string>().Contains("FullPath")
-                 select reference.GetMetadata("FullPath")
-                    into xFile
-                 select Convert.ToString(xFile)).ToList();
+            foreach (var reference in References)
+            {
+                args.Add(new KeyValuePair<string, string>("References", reference.ItemSpec));
+            }
 
-            string Arguments = args.Aggregate("", (current, arg) => current + "\"" + arg.Key + ":" + arg.Value + "\" ");
-            Arguments = refs.Aggregate(Arguments, (current, Ref) => current + "\"References:" + Ref + "\" ");
-            Arguments = AssemblySearchDirs.Split(';').Aggregate(Arguments, (current, Dir) => current + "\"AssemblySearchDirs:" + Dir + "\" ");
+            foreach (var plugsReference in PlugsReferences)
+            {
+                args.Add(new KeyValuePair<string, string>("PlugsReferences", plugsReference.ItemSpec));
+            }
 
-            // replace \" by \\"
-            Arguments = Arguments.Replace("\\\"", "\\\\\"");
+            return String.Join(Environment.NewLine, args.Select(a => $"{a.Key}:{a.Value}"));
+        }
 
-            Log.LogMessage(MessageImportance.High, $"Invoking IL2CPU.exe {Arguments}");
+        protected override string GetResponseFileSwitch(string responseFilePath) => $"ResponseFile:{responseFilePath}";
 
-            return Arguments;
+        public override bool Execute()
+        {
+            var xSW = Stopwatch.StartNew();
+            try
+            {
+                return base.Execute();
+            }
+            finally
+            {
+                xSW.Stop();
+                Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
+            }
         }
     }
 }

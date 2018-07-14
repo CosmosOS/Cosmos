@@ -1,0 +1,93 @@
+﻿<Window x:Class="Cosmos.Build.Builder.Views.DependencyInstallationDialog"
+        x:Name="dependencyInstallationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        Title="Cosmos Kit Builder"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="MinWidth" Value="48" />
+            <Setter Property="Padding" Value="8,3" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="8"
+          MinWidth="400">
+
+        <StackPanel Grid.Row="0"
+                    Margin="8"
+                    Visibility="{Binding IsNotInstallingYet, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+            <TextBlock Grid.Row="0"
+                       Margin="0,0,0,4"
+                       Text="{Binding Dependency.Name, StringFormat='\{0} is a dependency, but it was not found!'}" />
+            <TextBlock Grid.Row="1"
+                       Margin="0,0,0,4"
+                       Text="It will be installed now." />
+
+            <StackPanel Grid.Row="2"
+                        HorizontalAlignment="Right"
+                        Margin="0,8,0,0"
+                        Orientation="Horizontal">
+                <Button Visibility="{Binding IsNotInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Command="{Binding InstallCommand}"
+                        Content="OK" />
+                <Button Visibility="{Binding InstallationNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Command="{Binding CancelCommand}"
+                        CommandParameter="{Binding ElementName=dependencyInstallationDialog}"
+                        Content="Cancel" />
+            </StackPanel>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="0"
+                    Margin="8"
+                    Visibility="{Binding IsInstalling, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+            <TextBlock Grid.Row="0"
+                       Margin="0,0,0,4"
+                       Text="{Binding Dependency.Name, StringFormat='Installing {0}...'}" />
+
+            <ProgressBar Grid.Row="1"
+                         Height="16"
+                         Margin="0,4"
+                         IsIndeterminate="True" />
+
+            <Button Grid.Row="1"
+                    HorizontalAlignment="Right"
+                    Margin="0,8,0,0"
+                    Command="{Binding CancelInstallationCommand}"
+                    Content="Cancel" />
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="0"
+                    Margin="8"
+                    Visibility="{Binding IsInstallationCompleted, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+            <TextBlock Grid.Row="0"
+                       Margin="0,0,0,4"
+                       Text="{Binding InstallationCompletedText}" />
+
+            <Button Grid.Row="1"
+                    HorizontalAlignment="Right"
+                    Margin="0,8,0,0"
+                    Command="{Binding OkCommand}"
+                    CommandParameter="{Binding ElementName=dependencyInstallationDialog}"
+                    Content="OK" />
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>

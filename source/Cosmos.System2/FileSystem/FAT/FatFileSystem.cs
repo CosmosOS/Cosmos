@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 
 using Cosmos.Common.Extensions;
+using Cosmos.HAL;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT.Listing;
 using Cosmos.System.FileSystem.Listing;
@@ -171,7 +172,7 @@ namespace Cosmos.System.FileSystem.FAT
                 var xSector = mFatSector + aSector;
                 Global.mFileSystemDebugger.SendInternal("xSector  =");
                 Global.mFileSystemDebugger.SendInternal(xSector);
-                mFileSystem.mDevice.ReadBlock(xSector, mFileSystem.SectorsPerCluster, aData);
+                mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, aData);
             }
 
             private void WriteFatSector(ulong aSector, byte[] aData)
@@ -182,7 +183,7 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 var xSector = mFatSector + aSector;
-                mFileSystem.mDevice.WriteBlock(xSector, mFileSystem.SectorsPerCluster, aData);
+                mFileSystem.Device.WriteBlock(xSector, mFileSystem.SectorsPerCluster, aData);
             }
 
             /// <summary>
@@ -353,6 +354,24 @@ namespace Cosmos.System.FileSystem.FAT
 
         private readonly Fat[] mFats;
 
+        public override string Type
+        {
+             get
+            {
+                switch (mFatType)
+                {
+                    case FatTypeEnum.Fat12:
+                        return "FAT12";
+                    case FatTypeEnum.Fat16:
+                        return "FAT16";
+                    case FatTypeEnum.Fat32:
+                        return "FAT32";
+                    default:
+                        throw new Exception("Unknown FAT file system type.");
+                }
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FatFileSystem"/> class.
         /// </summary>
@@ -372,9 +391,9 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
             }
 
-            var xBPB = mDevice.NewBlockArray(1);
+            var xBPB = Device.NewBlockArray(1);
 
-            mDevice.ReadBlock(0UL, 1U, xBPB);
+            Device.ReadBlock(0UL, 1U, xBPB);
 
             ushort xSig = xBPB.ToUInt16(510);
             if (xSig != 0xAA55)
@@ -470,12 +489,12 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 aData = NewBlockArray();
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                mDevice.ReadBlock((ulong)xSector, SectorsPerCluster, aData);
+                Device.ReadBlock((ulong)xSector, SectorsPerCluster, aData);
             }
             else
             {
-                aData = mDevice.NewBlockArray(1);
-                mDevice.ReadBlock((ulong)aCluster, RootSectorCount, aData);
+                aData = Device.NewBlockArray(1);
+                Device.ReadBlock((ulong)aCluster, RootSectorCount, aData);
             }
         }
 
@@ -501,11 +520,11 @@ namespace Cosmos.System.FileSystem.FAT
             if (mFatType == FatTypeEnum.Fat32)
             {
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                mDevice.WriteBlock((ulong)xSector, SectorsPerCluster, xData);
+                Device.WriteBlock((ulong)xSector, SectorsPerCluster, xData);
             }
             else
             {
-                mDevice.WriteBlock((ulong)aCluster, RootSectorCount, xData);
+                Device.WriteBlock((ulong)aCluster, RootSectorCount, xData);
             }
         }
 
@@ -528,22 +547,22 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override void DisplayFileSystemInfo()
         {
-            global::System.Console.WriteLine("-------File System--------");
-            global::System.Console.WriteLine("Bytes per Cluster     = " + BytesPerCluster);
-            global::System.Console.WriteLine("Bytes per Sector      = " + BytesPerSector);
-            global::System.Console.WriteLine("Cluster Count         = " + ClusterCount);
-            global::System.Console.WriteLine("Data Sector           = " + DataSector);
-            global::System.Console.WriteLine("Data Sector Count     = " + DataSectorCount);
-            global::System.Console.WriteLine("FAT Sector Count      = " + FatSectorCount);
-            global::System.Console.WriteLine("FAT Type              = " + (uint)mFatType);
-            global::System.Console.WriteLine("Number of FATS        = " + NumberOfFATs);
-            global::System.Console.WriteLine("Reserved Sector Count = " + ReservedSectorCount);
-            global::System.Console.WriteLine("Root Cluster          = " + RootCluster);
-            global::System.Console.WriteLine("Root Entry Count      = " + RootEntryCount);
-            global::System.Console.WriteLine("Root Sector           = " + RootSector);
-            global::System.Console.WriteLine("Root Sector Count     = " + RootSectorCount);
-            global::System.Console.WriteLine("Sectors per Cluster   = " + SectorsPerCluster);
-            global::System.Console.WriteLine("Total Sector Count    = " + TotalSectorCount);
+            CustomConsole.WriteLineInfo("-------File System--------");
+            CustomConsole.WriteLineInfo("Bytes per Cluster     = " + BytesPerCluster);
+            CustomConsole.WriteLineInfo("Bytes per Sector      = " + BytesPerSector);
+            CustomConsole.WriteLineInfo("Cluster Count         = " + ClusterCount);
+            CustomConsole.WriteLineInfo("Data Sector           = " + DataSector);
+            CustomConsole.WriteLineInfo("Data Sector Count     = " + DataSectorCount);
+            CustomConsole.WriteLineInfo("FAT Sector Count      = " + FatSectorCount);
+            CustomConsole.WriteLineInfo("FAT Type              = " + (uint)mFatType);
+            CustomConsole.WriteLineInfo("Number of FATS        = " + NumberOfFATs);
+            CustomConsole.WriteLineInfo("Reserved Sector Count = " + ReservedSectorCount);
+            CustomConsole.WriteLineInfo("Root Cluster          = " + RootCluster);
+            CustomConsole.WriteLineInfo("Root Entry Count      = " + RootEntryCount);
+            CustomConsole.WriteLineInfo("Root Sector           = " + RootSector);
+            CustomConsole.WriteLineInfo("Root Sector Count     = " + RootSectorCount);
+            CustomConsole.WriteLineInfo("Sectors per Cluster   = " + SectorsPerCluster);
+            CustomConsole.WriteLineInfo("Total Sector Count    = " + TotalSectorCount);
 
             Global.mFileSystemDebugger.SendInternal("Bytes per Cluster =");
             Global.mFileSystemDebugger.SendInternal(BytesPerCluster);
@@ -601,7 +620,7 @@ namespace Cosmos.System.FileSystem.FAT
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetRootDirectory --");
 
-            var xRootEntry = new FatDirectoryEntry(this, null, mRootPath, mSize, mRootPath, RootCluster);
+            var xRootEntry = new FatDirectoryEntry(this, null, RootPath, Size, RootPath, RootCluster);
             return xRootEntry;
         }
 
@@ -647,6 +666,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
+
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewFile, DirectoryEntryTypeEnum.File);
             return xDirectoryEntryToAdd;
         }
@@ -680,6 +700,80 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             xDirectoryEntry.DeleteDirectoryEntry();
+        }
+
+        public override string Label
+        {
+            /*
+             * In the FAT filesystem the name field of RootDirectory is - in reality - the Volume Label
+             */ 
+            get
+            {
+                Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.mLabel --");
+                var RootDirectory = (FatDirectoryEntry) GetRootDirectory();
+
+                var VolumeId = RootDirectory.FindVolumeId();
+                if (VolumeId == null)
+                {
+                    Global.mFileSystemDebugger.SendInternal("No VolumeID, returning drive name");
+                    return RootDirectory.mName;
+                }
+
+                Global.mFileSystemDebugger.SendInternal($"Volume label is {VolumeId.mName}");
+                return VolumeId.mName;
+            }
+            set
+            {
+                Global.mFileSystemDebugger.SendInternal($"Setting Volume label to {value}");
+
+                var RootDirectory = (FatDirectoryEntry) GetRootDirectory();
+
+                var VolumeId = RootDirectory.FindVolumeId();
+                if (VolumeId != null)
+                {
+                    VolumeId.SetName(value);
+                    return;
+                }
+
+                Global.mFileSystemDebugger.SendInternal("No VolumeID found, let's create it!");
+
+                VolumeId = RootDirectory.CreateVolumeId(value);
+            }
+        }
+
+        public override long AvailableFreeSpace
+        {
+            get
+            {
+                var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
+                // We do not support "user quotas" for now so this is effectively the same then mTotalFreeSpace
+
+                /* mSize is expressed in MegaByte */
+                var TotalSizeInBytes = Size * 1024 * 1024;
+                var UsedSpace = RootDirectory.GetUsedSpace();
+
+                Global.mFileSystemDebugger.SendInternal($"TotalSizeInBytes {TotalSizeInBytes} UsedSpace {UsedSpace}");
+
+                return TotalSizeInBytes - UsedSpace;
+                //return (mSize * 1024 * 1024) - RootDirectory.GetUsedSpace();
+            }
+        }
+
+        public override long TotalFreeSpace
+        {
+            get
+            {
+                var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
+
+                /* mSize is expressed in MegaByte */
+                var TotalSizeInBytes = Size * 1024 * 1024;
+                var UsedSpace = RootDirectory.GetUsedSpace();
+
+                Global.mFileSystemDebugger.SendInternal($"TotalSizeInBytes {TotalSizeInBytes} UsedSpace {UsedSpace}");
+
+                return TotalSizeInBytes - UsedSpace;
+                //return (mSize * 1024 * 1024) - RootDirectory.GetUsedSpace();
+            }
         }
 
         private enum FatTypeEnum

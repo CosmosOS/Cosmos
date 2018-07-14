@@ -9,8 +9,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj" />
         <ProjectReference PrivateAssets="All" Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" />
+        <ProjectReference PrivateAssets="All" Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
     </ItemGroup>
 
 </Project>

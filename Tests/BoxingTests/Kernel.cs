@@ -17,7 +17,7 @@ namespace BoxingTests
         {
             TestBoxingChar();
             TestBoxingInt();
-            //TestBoxingColorToString();
+            TestBoxingColorToString();
 
             TestController.Completed();
         }
@@ -55,7 +55,7 @@ namespace BoxingTests
         private void TestBoxingColorToString()
         {
             object xColor = Color.Blue;
-            Assert.IsTrue(xColor.ToString() == "Color[Blue]", "Color.ToString doesn't work on boxed Color!");
+            Assert.IsTrue(xColor.ToString() == "Color [Blue]", "Color.ToString doesn't work on boxed Color!");
         }
     }
 }

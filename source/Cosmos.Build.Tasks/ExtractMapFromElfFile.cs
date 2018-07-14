@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -18,7 +19,7 @@ namespace Cosmos.Build.Tasks
         [Required]
         public string DebugInfoFile { get; set; }
 
-        protected override string ToolName => "objdump.exe";
+        protected override string ToolName => "objdump.bat";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
@@ -52,25 +53,38 @@ namespace Cosmos.Build.Tasks
         {
             var xBuilder = new CommandLineBuilder();
 
-            xBuilder.AppendSwitch("--wide");
-            xBuilder.AppendSwitch("--syms");
+            string xPathToTool = Path.GetDirectoryName(GenerateFullPathToTool());
 
-            xBuilder.AppendSwitch(">");
+            xBuilder.AppendFileNameIfNotNull(xPathToTool);
+
+            xBuilder.AppendFileNameIfNotNull(InputFile);
+
             xBuilder.AppendFileNameIfNotNull(MapFile);
-
+            
             return xBuilder.ToString();
         }
 
         public override bool Execute()
         {
-            if (!base.Execute())
+            Log.LogMessage(MessageImportance.High, "Extracting Map file...");
+
+            var xSW = Stopwatch.StartNew();
+            try
             {
-                return false;
+                if (!base.Execute())
+                {
+                    return false;
+                }
+
+                ObjDump.ExtractMapSymbolsForElfFile(DebugInfoFile, MapFile);
+
+                return true;
             }
-
-            ObjDump.ExtractMapSymbolsForElfFile(DebugInfoFile, MapFile);
-
-            return true;
+            finally
+            {
+                xSW.Stop();
+                Log.LogMessage(MessageImportance.High, "Extracting Map file took {0}", xSW.Elapsed);
+            }
         }
     }
 }

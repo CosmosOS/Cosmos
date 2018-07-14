@@ -63,7 +63,7 @@ namespace Cosmos.VS.ProjectSystem.VS
 
         private IProjectTree CreatePlugsFolder()
         {
-            var caption = "Plugs";
+            var caption = "Cosmos Plugs";
             var icon = KnownMonikers.Reference.ToProjectSystemType();
             var flags = PlugsProjectTreeFlags;
 

@@ -7,7 +7,7 @@ using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
 {
-    [Plug(Target = typeof (global::System.Console))]
+    [Plug(Target = typeof(global::System.Console))]
     public static class ConsoleImpl
     {
         private static ConsoleColor mForeground = ConsoleColor.White;
@@ -312,8 +312,11 @@ namespace Cosmos.System_Plugs.System
             WriteLine("Not implemented: set_WindowWidth");
         }
 
-        // Beep() is pure CIL
-
+        /// <summary>
+        /// The ArgumentOutOfRangeException check is now done at driver level in PCSpeaker - is it still needed here?
+        /// </summary>
+        /// <param name="aFrequency"></param>
+        /// <param name="aDuration"></param>
         public static void Beep(int aFrequency, int aDuration)
         {
             if (aFrequency < 37 || aFrequency > 32767)
@@ -326,13 +329,19 @@ namespace Cosmos.System_Plugs.System
                 throw new ArgumentOutOfRangeException("Duration must be more than 0");
             }
 
-            WriteLine("Not implemented: Beep");
+            PCSpeaker.Beep((uint) aFrequency, (uint) aDuration);
+        }
 
-            //var xPIT = Hardware.Global.PIT;
-            //xPIT.EnableSound();
-            //xPIT.T2Frequency = (uint)aFrequency;
-            //xPIT.Wait((uint)aDuration);
-            //xPIT.DisableSound();
+        /// <summary>
+        /// Beep() is pure CIL
+        /// Default implementation beeps for 200 milliseconds at 800 hertz
+        /// In Cosmos, these are Cosmos.System.Duration.Default and Cosmos.System.Notes.Default respectively,
+        /// and are used when there are no params 
+        /// https://docs.microsoft.com/en-us/dotnet/api/system.console.beep?view=netcore-2.0
+        /// </summary>
+        public static void Beep()
+        {
+            PCSpeaker.Beep();
         }
 
         //TODO: Console uses TextWriter - intercept and plug it instead
@@ -410,11 +419,11 @@ namespace Cosmos.System_Plugs.System
             }
 
             //TODO: Plug HasFlag and use the next 3 lines instead of the 3 following lines
-            
+
             //bool xShift = key.Modifiers.HasFlag(ConsoleModifiers.Shift);
             //bool xAlt = key.Modifiers.HasFlag(ConsoleModifiers.Alt);
             //bool xControl = key.Modifiers.HasFlag(ConsoleModifiers.Control);
-            
+
             bool xShift = (key.Modifiers & ConsoleModifiers.Shift) == ConsoleModifiers.Shift;
             bool xAlt = (key.Modifiers & ConsoleModifiers.Alt) == ConsoleModifiers.Alt;
             bool xControl = (key.Modifiers & ConsoleModifiers.Control) == ConsoleModifiers.Control;
@@ -433,6 +442,8 @@ namespace Cosmos.System_Plugs.System
             List<char> chars = new List<char>(32);
             KeyEvent current;
             int currentCount = 0;
+
+            string Command;
 
             while ((current = KeyboardManager.ReadKey()).Key != ConsoleKeyEx.Enter)
             {
@@ -475,6 +486,108 @@ namespace Cosmos.System_Plugs.System
                     {
                         GetConsole().X = GetConsole().X + 1;
                         currentCount++;
+                    }
+                    continue;
+                }
+                else if (current.Key == ConsoleKeyEx.UpArrow) //COMMAND HISTORY UP
+                {
+                    if (Cosmos.System.Console.writecommand) //IF SHELL
+                    {
+                        //if(Cosmos.System.Console.commandindex < 50)
+                        //{
+                        chars.Clear(); //remove chars if there were something
+                        Cosmos.System.Console.commandindex--;
+                        Command = Cosmos.System.Console.commands[Cosmos.System.Console.commandindex];
+
+                        foreach (char chr in Command)
+                        {
+                            if (currentCount == chars.Count)
+                            {
+                                chars.Add(chr);
+                                Write(chr);
+                                currentCount++;
+                            }
+                            else
+                            {
+                                //Insert the new character in the correct location
+                                //For some reason, List.Insert() doesn't work properly
+                                //so the character has to be inserted manually
+                                List<char> temp = new List<char>();
+
+                                for (int x = 0; x < chars.Count; x++)
+                                {
+                                    if (x == currentCount)
+                                    {
+                                        temp.Add(chr);
+                                    }
+
+                                    temp.Add(chars[x]);
+                                }
+
+                                chars = temp;
+
+                                //Shift the characters to the right
+                                for (int x = currentCount; x < chars.Count; x++)
+                                {
+                                    Write(chars[x]);
+                                }
+
+                                GetConsole().X -= (chars.Count - currentCount) - 1;
+                                currentCount++;
+                            }
+                        }
+                        //}                        
+                    }
+                    continue;
+                }
+                else if (current.Key == ConsoleKeyEx.RightArrow) //COMMAND HISTORY DOWN
+                {
+                    if (Cosmos.System.Console.writecommand) //IF SHELL
+                    {
+                        if (Cosmos.System.Console.commandindex < Cosmos.System.Console.commands.Count - 1)
+                        {
+                            chars.Clear(); //remove chars if there were something
+                            Cosmos.System.Console.commandindex++;
+                            Command = Cosmos.System.Console.commands[Cosmos.System.Console.commandindex];
+
+                            foreach (char chr in Command)
+                            {
+                                if (currentCount == chars.Count)
+                                {
+                                    chars.Add(chr);
+                                    Write(chr);
+                                    currentCount++;
+                                }
+                                else
+                                {
+                                    //Insert the new character in the correct location
+                                    //For some reason, List.Insert() doesn't work properly
+                                    //so the character has to be inserted manually
+                                    List<char> temp = new List<char>();
+
+                                    for (int x = 0; x < chars.Count; x++)
+                                    {
+                                        if (x == currentCount)
+                                        {
+                                            temp.Add(chr);
+                                        }
+
+                                        temp.Add(chars[x]);
+                                    }
+
+                                    chars = temp;
+
+                                    //Shift the characters to the right
+                                    for (int x = currentCount; x < chars.Count; x++)
+                                    {
+                                        Write(chars[x]);
+                                    }
+
+                                    GetConsole().X -= (chars.Count - currentCount) - 1;
+                                    currentCount++;
+                                }
+                            }
+                        }
                     }
                     continue;
                 }
@@ -648,9 +761,9 @@ namespace Cosmos.System_Plugs.System
         //    Write(aByte.ToString());
         //}
 
-#endregion
+        #endregion
 
-#region WriteLine
+        #region WriteLine
 
         public static void WriteLine() => Write(Environment.NewLine);
 
@@ -696,7 +809,7 @@ namespace Cosmos.System_Plugs.System
             WriteLine();
         }
 
-#endregion
+        #endregion
 
     }
 }

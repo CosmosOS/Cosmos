@@ -2,6 +2,8 @@
 using Sys = Cosmos.System;
 using Cosmos.TestRunner;
 using Cosmos.System.Graphics;
+using System.Drawing;
+using Point = Cosmos.System.Graphics.Point;
 
 /*
  * Please note this is an atypical TestRunner:
@@ -68,9 +70,16 @@ namespace GraphicTest
                 /* Let's try to change mode...*/
                 canvas.Mode = new Mode(800, 600, ColorDepth.ColorDepth32);
 
+                //If the background is not redrawn, it gets corrupted (this happens more in VmWare)
+                canvas.Clear(Color.Blue);
+
                 /* A LimeGreen rectangle */
                 pen.Color = Color.LimeGreen;
                 canvas.DrawRectangle(pen, 450, 450, 80, 60);
+
+                /* A filled rectange */
+                pen.Color = Color.Chocolate;
+                canvas.DrawFilledRectangle(pen, 200, 150, 400, 300);
 
                 Console.ReadKey();
 

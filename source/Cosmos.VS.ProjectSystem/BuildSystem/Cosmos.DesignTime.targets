@@ -15,6 +15,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\Content.xaml">
+            <Context>File;BrowseObject</Context>
+        </PropertyPageSchema>
         <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\CosmosDebugger.xaml">
             <Context>Project</Context>
         </PropertyPageSchema>

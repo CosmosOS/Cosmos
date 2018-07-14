@@ -13,23 +13,29 @@
     <PropertyGroup>
         <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
 
-        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)nasm\</NasmToolPath>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)nasm\win\</NasmToolPath>
         <NasmToolExe Condition = "'$(NasmToolExe)' == ''">nasm.exe</NasmToolExe>
 
-        <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\</LdToolPath>
+        <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</LdToolPath>
         <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
 
-        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\</ObjdumpToolPath>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.exe</ObjdumpToolExe>
+        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
+        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.bat</ObjdumpToolExe>
 
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\</MkisofsToolPath>
+        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
         <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
+
+        <SyslinuxToolPath Condition = "'$(SyslinuxToolPath)' == ''">$(CosmosToolsPath)syslinux\win\</SyslinuxToolPath>
+        <SyslinuxToolExe Condition = "'$(SyslinuxToolExe)' == ''">syslinux.exe</SyslinuxToolExe>
     </PropertyGroup>
 
     <PropertyGroup>
         <DebugEnabled Condition="'$(DebugEnabled)' == '' AND '$(Configuration)' == 'Debug'">True</DebugEnabled>
         <DebugEnabled Condition="'$(DebugEnabled)' == ''">False</DebugEnabled>
-        
+
+        <DebugCom Condition="'$(DebugCom)' == ''">1</DebugCom>
+        <DebugCom Condition="'$(DebugEnabled)' == 'False'">0</DebugCom>
+
         <BinFormat Condition="'$(BinFormat)' == ''">ELF</BinFormat>
         <DebugMode Condition="'$(DebugMode)' == ''">Source</DebugMode>
         <TraceMode Condition="'$(TraceMode)' == ''">User</TraceMode>
@@ -42,13 +48,11 @@
         <NasmOutput Condition="'$(NasmOutput)' == '' AND '$(BinFormat)' == 'ELF'">$(OutputPath)$(AssemblyName).obj</NasmOutput>
         <NasmOutput Condition="'$(NasmOutput)' == ''">$(OutputPath)$(AssemblyName).bin</NasmOutput>
 
-        <_NasmMap>$([System.IO.Path]::GetDirectoryName('$(NasmOutput)'))\main.map</_NasmMap>
-
         <MapFile Condition="'$(MapFile)' == ''">$(OutputPath)$(AssemblyName).map</MapFile>
         <CosmosDebugSymbolsFile Condition="'$(CosmosDebugSymbolsFile)' == ''">$(OutputPath)$(AssemblyName).cdb</CosmosDebugSymbolsFile>
 
         <IntermediateIsoDirectory Condition="'$(IntermediateIsoDirectory)' == ''">$(OutputPath)ISO\</IntermediateIsoDirectory>
-        <ISOLINUX Condition="'$(ISOLINUX)' == ''">$(CosmosToolsPath)isolinux\</ISOLINUX>
+        <SyslinuxPath Condition="'$(SyslinuxPath)' == ''">$(CosmosToolsPath)syslinux\bios\</SyslinuxPath>
 
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
     </PropertyGroup>
@@ -56,6 +60,19 @@
     <PropertyGroup>
         <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
     </PropertyGroup>
+
+    <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
+        <Content>
+            <Deploy>False</Deploy>
+        </Content>
+    </ItemDefinitionGroup>
+
+    <!-- https://github.com/Microsoft/msbuild/issues/3479
+         if/when fixed, change MakeIso
+    <ItemGroup>
+        <ContentToDeploy Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
+    </ItemGroup>
+    -->
 
     <ItemGroup Condition="'$(KernelPkg)' == ''">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
@@ -73,9 +90,11 @@
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Plugs.TapRoot.dll" />
     </ItemGroup>
 
+    <UsingTask TaskName="Cosmos.Build.Tasks.CreateMbr" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateSyslinuxConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.Launch" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -119,11 +138,13 @@
 
     <Target Name="IL2CPU"
             Inputs="$(TargetPath);@(PlugsReference)"
-            Outputs="$(Il2cpuOutput)">
+            Outputs="$(Il2cpuOutput)"
+            DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets">
 
         <ItemGroup>
-            <AssemblySearchDir Include="$(KernelAssembliesDir)" />
-            <AssemblySearchDir Include="%(ReferencePath.RootDir)%(ReferencePath.Directory)" />
+            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
+                               Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedAssembliesToPublish.Extension)' != '.pdb'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"
@@ -133,14 +154,15 @@
                 StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)"
                 TraceAssemblies="$(TraceAssemblies)"
                 IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
-                DebugCom="1"
-                References="$(TargetPath);@(PlugsReference)"
-                AssemblySearchDirs="@(AssemblySearchDir)"
+                DebugCom="$(DebugCom)"
+                TargetAssembly="$(TargetPath)"
+                References="@(_Il2cpuAssemblies)"
+                PlugsReferences="@(PlugsReference)"
                 OutputFilename="$(Il2cpuOutput)"
                 EnableLogging="True"
                 EmitDebugSymbols="$(DebugSymbols)"
                 CosmosBuildDir="$(CosmosDir)\Build"
-                WorkingDir="$(TargetDir)"/>
+                WorkingDir="$(TargetDir)" />
 
     </Target>
 
@@ -209,7 +231,7 @@
     -->
     <Target Name="ExtractMapFromElfFile"
             Inputs="$(BinFile)"
-            Outputs="$(CosmosDebugSymbolsPath)"
+            Outputs="$(CosmosDebugSymbolsFile)"
             Condition="'$(BinFormat)' == 'ELF'">
 
         <ExtractMapFromElfFile InputFile="$(BinFile)"
@@ -225,7 +247,7 @@
                                  ReadNasmMapToDebugInfo
 
         [IN]
-        $(_NasmMap) - a NASM map file.
+        $(MapFile) - a NASM map file.
 
         [OUT]
         $(CosmosDebugSymbolsPath) - a debug symbols file.
@@ -233,11 +255,11 @@
     ================================================================================
     -->
     <Target Name="ReadNasmMapToDebugInfo"
-            Inputs="$(_NasmMap)"
-            Outputs="$(CosmosDebugSymbolsPath)"
+            Inputs="$(MapFile)"
+            Outputs="$(CosmosDebugSymbolsFile)"
             Condition="'$(BinFormat)' != 'ELF'">
 
-        <ReadNasmMapToDebugInfo MapFile="$(_NasmMap)"
+        <ReadNasmMapToDebugInfo MapFile="$(MapFile)"
                                 DebugInfoFile="$(CosmosDebugSymbolsFile)" />
 
     </Target>
@@ -260,21 +282,93 @@
             Condition="'$(Deployment)' == 'ISO'">
 
         <ItemGroup>
-            <_ISOLINUX Include="$(ISOLINUX)**" />
+            <_IsoFile Include="$(SyslinuxPath)core\isolinux.bin" />
+            <_IsoFile Include="$(SyslinuxPath)com32\elflink\ldlinux\ldlinux.c32" />
+            <_IsoFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
+            <_IsoFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
+            <_IsoFile Include="$(BinFile)" />
+            <_IsoFile Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
         </ItemGroup>
 
+        <RemoveDir Directories="$(IntermediateIsoDirectory)" />
         <MakeDir Directories="$(IntermediateIsoDirectory)" />
 
-        <Copy SourceFiles="@(_ISOLINUX);$(BinFile)"
+        <Copy SourceFiles="@(_IsoFile)"
               DestinationFolder="$(IntermediateIsoDirectory)" />
 
-        <CreateSyslinuxConfig IsoDirectory="$(IntermediateIsoDirectory)"
+        <CreateSyslinuxConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
 
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
                  OutputFile="$(IsoFile)"
                  ToolPath="$(MkisofsToolPath)"
                  ToolExe="$(MkisofsToolExe)" />
+
+    </Target>
+
+    <!--
+        TODO: When this is an SDK, rename to Publish and remove BeforeTargets and the PropertyGroup.
+    -->
+    <Target Name="BootablePublish"
+            BeforeTargets="Publish"
+            DependsOnTargets="Build">
+
+        <PropertyGroup>
+            <IsPublishable>False</IsPublishable>
+        </PropertyGroup>
+
+        <Error Condition="'$(PublishType)' == ''" Text="No publish type specified!" />
+
+    </Target>
+
+    <Target Name="IsoPublish"
+            AfterTargets="Publish"
+            Condition="'$(PublishType)' == 'ISO'">
+
+        <Error Condition="'$(IsoPublishOutputPath)' == ''" Text="No ISO publish output path specified!" />
+        <Error Condition="'$(Deployment)' != 'ISO'" Text="Deployment type should be ISO!" />
+
+        <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(IsoPublishOutputPath)'))" />
+        <Copy SourceFiles="$(IsoFile)" DestinationFiles="$(IsoPublishOutputPath)" />
+
+    </Target>
+
+    <Target Name="UsbPublish"
+            AfterTargets="Publish"
+            Condition="'$(PublishType)' == 'USB'">
+
+        <Error Condition="'$(UsbPublishDrive)' == ''" Text="No USB drive specified!" />
+        <Error Condition="'$(Deployment)' != 'ISO'" Text="Deployment type should be ISO!" />
+        <Error Condition="'$(OS)' != 'Windows_NT'" Text="USB publish only works on Windows!" />
+
+        <PropertyGroup>
+            <UsbPublishFormatDrive Condition="'$(UsbPublishFormatDrive)' == ''">False</UsbPublishFormatDrive>
+        </PropertyGroup>
+
+        <ItemGroup>
+            <_UsbFile Include="$(SyslinuxPath)com32\elflink\ldlinux\ldlinux.c32" />
+            <_UsbFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
+            <_UsbFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
+            <_UsbFile Include="$(BinFile)" />
+        </ItemGroup>
+
+        <Copy SourceFiles="@(_UsbFile)"
+              DestinationFolder="$(UsbPublishDrive)" />
+
+        <CreateSyslinuxConfig TargetDirectory="$(UsbPublishDrive)"
+                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
+
+        <CreateMbr TargetDrive="$(UsbPublishDrive)"
+                   FormatDrive="$(UsbPublishFormatDrive)"
+                   ToolPath="$(SyslinuxToolPath)"
+                   ToolExe="$(SyslinuxToolExe)" />
+
+    </Target>
+
+    <Target Name="Launch">
+
+        <Launch ConfigurationFile="$(OutputPath)Bochs.bxrc"
+                IsoFile="$(MSBuildProjectDirectory)\$(IsoFile)" />
 
     </Target>
 

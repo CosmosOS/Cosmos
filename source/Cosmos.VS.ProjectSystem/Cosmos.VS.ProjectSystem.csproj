@@ -1,7 +1,7 @@
-<Project>
+﻿<Project>
 
     <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.props" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj'" />
+    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.props" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
 
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
@@ -30,20 +30,14 @@
 
     <ItemGroup>
         <XamlPropertyRule Include="BuildSystem\Rules\BootableConfiguration.xaml" />
+        <XamlPropertyRule Include="BuildSystem\Rules\Content.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\CosmosDebugger.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\LaunchConfiguration.xaml" />
     </ItemGroup>
 
     <ItemGroup>
-        <Page Include="ProjectSystem\VS\PropertyPages\**\*.xaml">
-            <SubType>Designer</SubType>
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <None Remove="Resources\Icon.png" />
-        <Compile Update="ProjectSystem\VS\PropertyPages\**\*.xaml.cs">
-            <SubType>Code</SubType>
-            <DependentUpon>%(Filename)</DependentUpon>
-        </Compile>
+        <Page Include="ProjectSystem\VS\PropertyPages\**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+        <Compile Update="ProjectSystem\VS\PropertyPages\**\*.xaml.cs" DependentUpon="%(Filename)" />
     </ItemGroup>
 
     <!--
@@ -51,10 +45,10 @@
     -->
     <ItemGroup>
         <Compile Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.Designer.cs">
-          <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
+            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </Compile>
         <EmbeddedResource Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.resx">
-          <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
+            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </EmbeddedResource>
     </ItemGroup>
 
@@ -68,21 +62,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.ImageCatalog" Version="15.5.27130" />
-        <PackageReference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime" Version="14.3.25408" />
         <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" Version="15.3.224" />
         <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" Version="15.3.224" />
-        <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.15" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.4.27004" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Framework" Version="15.5.27130" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="11.0.61030" />
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="15.5.24" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.7.27703" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="11.0.61031" />
         <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\XSharp\source\VSPropertyPages\VSPropertyPages.csproj" />
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+        <ProjectReference Include="$(XSharpRepoRoot)source\VSPropertyPages\VSPropertyPages.csproj" />
     </ItemGroup>
 
     <Target Name="IncludeMissingAssemblies" AfterTargets="GetVsixSourceItems" BeforeTargets="RemoveVSSDKAssemblies">
@@ -92,6 +81,6 @@
     </Target>
 
     <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.targets" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj'" />
+    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.targets" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
 
 </Project>
