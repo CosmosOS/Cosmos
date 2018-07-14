@@ -110,13 +110,13 @@ namespace Cosmos.HAL.BlockDevice
                         var xPart = xMBR.Partitions[i];
                         if (xPart == null)
                         {
-                            Console.WriteLine("Null partition found at idx: " + i);
+                            CustomConsole.WriteLineError("Null partition found at idx: " + i);
                         }
                         else
                         {
                             var xPartDevice = new Partition(xPort, xPart.StartSector, xPart.SectorCount);
                             BlockDevice.Devices.Add(xPartDevice);
-                            Console.WriteLine("Found partition at idx: " + i);
+                            CustomConsole.WriteLineOK("Found partition at idx: " + i);
                         }
                     }
                 }

@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
+using Cosmos.HAL;
 using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem.VFS
@@ -276,8 +276,7 @@ namespace Cosmos.System.FileSystem.VFS
             }
             catch (Exception e)
             {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(e.Message);
+                CustomConsole.WriteLineError("Exception occurred: " + e.Message);
                 return false;
             }
         }

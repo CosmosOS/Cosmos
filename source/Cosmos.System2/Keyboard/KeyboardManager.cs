@@ -85,7 +85,7 @@ namespace Cosmos.System
                 if (ControlPressed && AltPressed && mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
                 {
                     //Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                    MyConsole.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                    CustomConsole.WriteLineInfo("Detected Ctrl-Alt-Delete! Rebooting System...");
                     Power.Reboot();
                 }
 

@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
+using Cosmos.HAL;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
@@ -379,21 +379,21 @@ namespace Cosmos.System.FileSystem
                 {
                     Global.mFileSystemDebugger.SendInternal("Partition #: ");
                     Global.mFileSystemDebugger.SendInternal(i + 1);
-                    global::System.Console.WriteLine("Partition #: " + (i + 1));
+                    CustomConsole.WriteLineInfo("Partition #: " + (i + 1));
                     Global.mFileSystemDebugger.SendInternal("Block Size:");
                     Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockSize);
-                    global::System.Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes");
+                    CustomConsole.WriteLineInfo("Block Size: " + mPartitions[i].BlockSize + " bytes");
                     Global.mFileSystemDebugger.SendInternal("Block Count:");
                     Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount);
-                    global::System.Console.WriteLine("Block Count: " + mPartitions[i].BlockCount);
+                    CustomConsole.WriteLineInfo("Block Count: " + mPartitions[i].BlockCount);
                     Global.mFileSystemDebugger.SendInternal("Size:");
                     Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
-                    global::System.Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
+                    CustomConsole.WriteLineInfo("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
                 }
             }
             else
             {
-                global::System.Console.WriteLine("No partitions found!");
+                CustomConsole.WriteLineError("No partitions found!");
             }
         }
 
@@ -420,14 +420,14 @@ namespace Cosmos.System.FileSystem
                 if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].RootPath == xRootPath))
                 {
                     string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
-                    global::System.Console.WriteLine(xMessage);
+                    CustomConsole.WriteLineOK(xMessage);
                     mFileSystems[i].DisplayFileSystemInfo();
                     Directory.SetCurrentDirectory(xRootPath);
                 }
                 else
                 {
                     string xMessage = string.Concat("No filesystem found on partition #", i);
-                    global::System.Console.WriteLine(xMessage);
+                    CustomConsole.WriteLineError(xMessage);
                 }
             }
         }
