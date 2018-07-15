@@ -1,21 +1,41 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
-
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 
 namespace Cosmos.HAL
 {
-    public static class Global
+  public static class Global
+  {
+    public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
+
+    static public PIT PIT = new PIT();
+    // Must be static init, other static inits rely on it not being null
+
+    public static TextScreenBase TextScreen = new TextScreen();
+    public static PCI Pci;
+
+    static public void Init(TextScreenBase textScreen)
     {
-        public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
+      if (textScreen != null)
+      {
+        TextScreen = textScreen;
+      }
 
-        static public PIT PIT = new PIT();
-        // Must be static init, other static inits rely on it not being null
+      mDebugger.Send("Before Core.Global.Init");
+      Core.Global.Init();
 
-        public static TextScreenBase TextScreen = new TextScreen();
-        public static PCI Pci;
+      //TODO Redo this - Global init should be other.
+      // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
+      // If we let hardware do it, we need to protect it from being used by System.
+      // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
+      //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
+
+      //TODO: Since this is FCL, its "common". Otherwise it should be
+      // system level and not accessible from Core. Need to think about this
+      // for the future.
 
         public static PS2Controller PS2Controller = new PS2Controller();
 
@@ -26,22 +46,25 @@ namespace Cosmos.HAL
                 TextScreen = textScreen;
             }
 
-            mDebugger.Send("Before Core.Global.Init");
-            Core.Global.Init();
+      Console.WriteLine("Finding PCI Devices");
+      mDebugger.Send("PCI Devices");
+      PCI.Setup();
 
-            //TODO Redo this - Global init should be other.
-            // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
-            // If we let hardware do it, we need to protect it from being used by System.
-            // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
-            //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
+      Console.WriteLine("Starting ACPI");
+      mDebugger.Send("ACPI Init");
+      ACPI.Start();
+      
+      Console.WriteLine("Finding ATA Devices");
+      mDebugger.Send("ATA Devices");
+      IDE.InitDriver();
+      AHCI.InitDriver();
+      //EHCI.InitDriver();
 
-            //TODO: Since this is FCL, its "common". Otherwise it should be
-            // system level and not accessible from Core. Need to think about this
-            // for the future.
+      Console.WriteLine("Starting Processor Scheduler");
+      mDebugger.Send("Processor Scheduler");
+      Core.Processing.ProcessorScheduler.Initialize();
 
-            Console.WriteLine("Finding PCI Devices");
-            mDebugger.Send("PCI Devices");
-            PCI.Setup();
+      mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
             Console.WriteLine("Starting ACPI");
             mDebugger.Send("ACPI Init");
@@ -57,14 +80,22 @@ namespace Cosmos.HAL
             AHCI.InitDriver();
             //EHCI.InitDriver();
 
-            mDebugger.Send("Done initializing Cosmos.HAL.Global");
+    public static void EnableInterrupts()
+    {
+      CPU.EnableInterrupts();
+    }
 
-        }
+    public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
 
-        public static void EnableInterrupts()
-        {
-            CPU.EnableInterrupts();
-        }
+    public static uint SpawnThread(ThreadStart aStart)
+    {
+      return Core.Processing.ProcessContext.StartContext("", aStart, Core.Processing.ProcessContext.Context_Type.THREAD);
+    }
+
+
+    public static uint SpawnThread(ParameterizedThreadStart aStart, object param)
+    {
+      return Core.Processing.ProcessContext.StartContext("", aStart, Core.Processing.ProcessContext.Context_Type.THREAD, param);
 
         public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
 
@@ -102,4 +133,5 @@ namespace Cosmos.HAL
             return xMouseDevices;
         }
     }
+  }
 }

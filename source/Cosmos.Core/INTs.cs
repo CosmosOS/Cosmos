@@ -87,7 +87,8 @@ namespace Cosmos.Core {
         }
 
         [StructLayout(LayoutKind.Explicit, Size = 80)]
-        public struct IRQContext {
+        public struct IRQContext
+        {
             [FieldOffset(0)]
             public unsafe MMXContext* MMXContext;
 
@@ -137,6 +138,8 @@ namespace Cosmos.Core {
 
         [AsmMarker(AsmMarker.Type.Int_LastKnownAddress)]
         private static uint mLastKnownAddress;
+
+        public static uint mStackContext;
 
         private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
 
@@ -494,6 +497,7 @@ namespace Cosmos.Core {
             if (xTest) {
                 unsafe
                 {
+                    mStackContext = 0;
                     var xCtx = new IRQContext();
                     HandleInterrupt_Default(ref xCtx);
                     HandleInterrupt_00(ref xCtx);
@@ -544,6 +548,8 @@ namespace Cosmos.Core {
                     HandleInterrupt_47(ref xCtx);
                     HandleInterrupt_48(ref xCtx);
                     HandleInterrupt_49(ref xCtx);
+                    Processing.ProcessorScheduler.SwitchTask();
+                    Processing.ProcessorScheduler.EntryPoint();
                 }
             }
         }
