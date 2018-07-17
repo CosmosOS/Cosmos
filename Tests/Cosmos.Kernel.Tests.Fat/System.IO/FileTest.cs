@@ -154,16 +154,16 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             using (var xFile2 = File.Create(@"0:\testdir\file.txt"))
             {
                 string wText = "This a test";
-                byte[] xWriteBuff = wText.GetUtf8Bytes(0, (uint)wText.Length);
+                byte[] xWriteBuff = Encoding.UTF8.GetBytes(wText);
                 xFile2.Write(xWriteBuff, 0, xWriteBuff.Length);
                 mDebugger.Send("---- Data written");
                 xFile2.Position = 0;
                 byte[] xReadBuff = new byte[xWriteBuff.Length];
                 xFile2.Read(xReadBuff, 0, xWriteBuff.Length);
-                mDebugger.Send("xWriteBuff=" + xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length));
-                mDebugger.Send("xReadBuff =" + xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length));
-                string xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length);
-                string xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length);
+                string xWriteBuffAsString = Encoding.UTF8.GetString(xWriteBuff);
+                string xReadBuffAsString = Encoding.UTF8.GetString(xReadBuff);
+                mDebugger.Send("xWriteBuff=" + xWriteBuffAsString);
+                mDebugger.Send("xReadBuff =" + xReadBuffAsString);
                 mDebugger.Send("xWriteBuffAsString=" + xWriteBuffAsString);
                 mDebugger.Send("xReadBuffAsString =" + xReadBuffAsString);
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
