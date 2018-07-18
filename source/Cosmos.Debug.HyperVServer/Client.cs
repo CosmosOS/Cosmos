@@ -7,7 +7,6 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Cosmos.Debug.HyperVServer
@@ -179,7 +178,10 @@ namespace Cosmos.Debug.HyperVServer
                     _namedPipeClient.Write(buffer, 0, writtenByteCount);
                 }
 
-                await Task.Delay(100).ConfigureAwait(false);
+                if (readByteCount == 0 && writtenByteCount == 0)
+                {
+                    await Task.Delay(500).ConfigureAwait(false);
+                }
             }
         }
     }
