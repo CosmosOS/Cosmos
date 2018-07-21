@@ -1,7 +1,7 @@
 version: 0.20150918.{build}
 image: Visual Studio 2017
 configuration: Debug
-platform: AnyCPU
+platform: Any CPU
 shallow_clone: true
 clone_folder: c:\Cosmos
 

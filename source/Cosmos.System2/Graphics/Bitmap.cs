@@ -65,36 +65,36 @@ namespace Cosmos.System.Graphics
 
             //read size of BMP file - byte 2 -> 6
             stream.Read(_int, 0, 4);
-            uint fileSize = (uint)BitConverter.ToInt32(_int, 0);
+            uint fileSize = BitConverter.ToUInt32(_int, 0);
 
             stream.Position = 10;
             //read header - bytes 10 -> 14 is the offset of the bitmap image data
             stream.Read(_int, 0, 4);
-            uint pixelTableOffset = (uint)BitConverter.ToInt32(_int, 0);
+            uint pixelTableOffset = BitConverter.ToUInt32(_int, 0);
 
             //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
             stream.Read(_int, 0, 4);
-            uint infoHeaderSize = (uint)BitConverter.ToInt32(_int, 0);
+            uint infoHeaderSize = BitConverter.ToUInt32(_int, 0);
             if (infoHeaderSize != 40)
             {
                 throw new Exception("Info header size has the wrong value!");
             }
             //now reading width of image in pixels - bytes 18 -> 22
             stream.Read(_int, 0, 4);
-            uint imageWidth = (uint)BitConverter.ToInt32(_int, 0);
+            uint imageWidth = BitConverter.ToUInt32(_int, 0);
 
             //now reading height of image in pixels - byte 22 -> 26
             stream.Read(_int, 0, 4);
-            uint imageHeight = (uint)BitConverter.ToInt32(_int, 0);
+            uint imageHeight = BitConverter.ToUInt32(_int, 0);
 
             //now reading number of planes should be 1 - byte 26 -> 28
             stream.Read(_short, 0, 2);
-            ushort planes = (ushort)BitConverter.ToInt16(_short, 0);
+            ushort planes = BitConverter.ToUInt16(_short, 0);
             if (planes != 1)
                 throw new Exception("Number of planes is not 1! Can not read file!");
             //now reading size of bits per pixel (1, 4, 8, 24, 32) - bytes 28 - 30
             stream.Read(_short, 0, 2);
-            ushort pixelSize = (ushort)BitConverter.ToInt16(_short, 0);
+            ushort pixelSize = BitConverter.ToUInt16(_short, 0);
             //TODO: Be able to handle other pixel sizes
             if (!(pixelSize == 32 || pixelSize == 24))
             {
@@ -102,13 +102,13 @@ namespace Cosmos.System.Graphics
             }
             //now reading compression type - bytes 30 -> 34
             stream.Read(_int, 0, 4);
-            uint compression = (uint)BitConverter.ToInt32(_int, 0);
+            uint compression = BitConverter.ToUInt32(_int, 0);
             //TODO: Be able to handle compressed files
             if (compression != 0)
                 throw new NotImplementedException("Can only handle uncompressed files!");
             //now reading total image data size(including padding) - bytes 34 -> 38
             stream.Read(_int, 0, 4);
-            uint totalImageSize = (uint)BitConverter.ToInt32(_int, 0);
+            uint totalImageSize = BitConverter.ToUInt32(_int, 0);
 
             #endregion BMP Header
 

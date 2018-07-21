@@ -101,6 +101,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Tasks", "sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VSPropertyPages", "..\XSharp\source\VSPropertyPages\VSPropertyPages.csproj", "{3487890D-43F4-4810-9587-1F02F646915D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.HyperVServer", "source\Cosmos.Debug.HyperVServer\Cosmos.Debug.HyperVServer.csproj", "{9413B5A0-1120-43AD-8784-8A3726C1898C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -243,6 +245,10 @@ Global
 		{3487890D-43F4-4810-9587-1F02F646915D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3487890D-43F4-4810-9587-1F02F646915D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3487890D-43F4-4810-9587-1F02F646915D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9413B5A0-1120-43AD-8784-8A3726C1898C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9413B5A0-1120-43AD-8784-8A3726C1898C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9413B5A0-1120-43AD-8784-8A3726C1898C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9413B5A0-1120-43AD-8784-8A3726C1898C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -287,6 +293,7 @@ Global
 		{91442476-F818-4A7D-A3BC-2159BCDE3352} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{0BA0EC69-F124-44C1-823D-C97FE3AEC59E} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{3487890D-43F4-4810-9587-1F02F646915D} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{9413B5A0-1120-43AD-8784-8A3726C1898C} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E5429BF0-2CEE-45B0-BC73-2188A409E1D3}

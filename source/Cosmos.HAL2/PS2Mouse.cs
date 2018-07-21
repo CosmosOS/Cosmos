@@ -8,9 +8,9 @@ namespace Cosmos.HAL
     /// <summary>
     /// This class describes the PS/2 mouse.
     /// </summary>
-    public class PS2Mouse : MouseBase
+    internal class PS2Mouse : MouseBase
     {
-        enum Command : byte
+        private enum Command : byte
         {
             SetScaling1_1 = 0xE6,
             SetScaling2_1 = 0xE7,
@@ -30,25 +30,21 @@ namespace Cosmos.HAL
             Reset = 0xFF
         }
 
-        public byte PS2Port { get; }
+        private readonly PS2Controller mPS2Controller;
+        private readonly byte mPS2Port;
 
-        private bool HasScrollWheel
-        {
-            get
-            {
-                return mMouseID == 3 || mMouseID == 4;
-            }
-        }
+        private bool HasScrollWheel => mMouseID == 3 || mMouseID == 4;
 
         private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
-        private PS2Controller mPS2Controller = Global.PS2Controller;
-        private Debugger mDebugger = new Debugger("HAL", "PS2Mouse");
+        private Debugger mDebugger = new Debugger(nameof(HAL), nameof(PS2Mouse));
 
         private byte mMouseID = 0;
 
-        internal PS2Mouse(byte aPort, byte aMouseID)
+        public PS2Mouse(PS2Controller aPS2Controller, byte aPort, byte aMouseID)
         {
-            PS2Port = aPort;
+            mPS2Controller = aPS2Controller;
+            mPS2Port = aPort;
+
             mMouseID = aMouseID;
         }
 
@@ -203,7 +199,7 @@ namespace Cosmos.HAL
             mDebugger.SendInternal("Command:");
             mDebugger.SendInternal((byte)aCommand);
 
-            if (PS2Port == 2)
+            if (mPS2Port == 2)
             {
                 mPS2Controller.PrepareSecondPortWrite();
             }
@@ -221,7 +217,7 @@ namespace Cosmos.HAL
                 mDebugger.SendInternal("Byte value:");
                 mDebugger.SendInternal(aByte.Value);
 
-                if (PS2Port == 2)
+                if (mPS2Port == 2)
                 {
                     mPS2Controller.PrepareSecondPortWrite();
                 }

@@ -320,8 +320,7 @@ namespace Cosmos.System.FileSystem.VFS
 
             try
             {
-                Global.mFileSystemDebugger.SendInternal("aPath =");
-                Global.mFileSystemDebugger.SendInternal(aPath);
+                Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
                 string xPath = Path.GetFullPath(aPath);
                 Global.mFileSystemDebugger.SendInternal("After GetFullPath");
@@ -590,7 +589,7 @@ namespace Cosmos.System.FileSystem.VFS
             return new[] { GetDirectorySeparatorChar(), GetAltDirectorySeparatorChar() };
         }
 
-        #endregion
+        #endregion Helpers
 
         /// <summary>
         /// Gets the parent directory entry from the path.

@@ -46,8 +46,10 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     case FatTypeEnum.Fat32:
                         return 4;
+
                     case FatTypeEnum.Fat16:
                         return 2;
+
                     case FatTypeEnum.Fat12:
                         // TODO:
                         break;
@@ -209,7 +211,6 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal("xSector =");
                 Global.mFileSystemDebugger.SendInternal(xSector);
 
-
                 byte[] xData = mFileSystem.NewBlockArray();
                 ReadFatSector(xSector, out xData);
 
@@ -219,7 +220,7 @@ namespace Cosmos.System.FileSystem.FAT
                         // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
                         // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
                         // we want the high 12-bits of the 16-bits we fetch.
-                        uint xResult = xData.ToUInt16(xEntryOffset);
+                        uint xResult = BitConverter.ToUInt16(xData, (int)xEntryOffset);
                         if ((aEntryNumber & 0x01) == 0)
                         {
                             aValue = xResult & 0x0FFF; // Even
@@ -229,12 +230,15 @@ namespace Cosmos.System.FileSystem.FAT
                             aValue = xResult >> 4; // Odd
                         }
                         break;
+
                     case FatTypeEnum.Fat16:
-                        aValue = xData.ToUInt16(xEntryOffset);
+                        aValue = BitConverter.ToUInt16(xData, (int)xEntryOffset);
                         break;
+
                     case FatTypeEnum.Fat32:
-                        aValue = xData.ToUInt32(xEntryOffset) & 0x0FFFFFFF;
+                        aValue = BitConverter.ToUInt32(xData, (int)xEntryOffset) & 0x0FFFFFFF;
                         break;
+
                     default:
                         throw new NotSupportedException("Unknown FAT type.");
                 }
@@ -267,12 +271,15 @@ namespace Cosmos.System.FileSystem.FAT
                     case FatTypeEnum.Fat12:
                         xData.SetUInt16(xEntryOffset, (ushort)aValue);
                         break;
+
                     case FatTypeEnum.Fat16:
                         xData.SetUInt16(xEntryOffset, (ushort)aValue);
                         break;
+
                     case FatTypeEnum.Fat32:
                         xData.SetUInt32(xEntryOffset, (uint)aValue);
                         break;
+
                     default:
                         throw new NotSupportedException("Unknown FAT type.");
                 }
@@ -292,10 +299,13 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     case FatTypeEnum.Fat12:
                         return aValue >= 0xFF8;
+
                     case FatTypeEnum.Fat16:
                         return aValue >= 0xFFF8;
+
                     case FatTypeEnum.Fat32:
                         return aValue >= 0xFFFFFF8;
+
                     default:
                         throw new Exception("Unknown file system type.");
                 }
@@ -312,10 +322,13 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     case FatTypeEnum.Fat12:
                         return 0x0FFF;
+
                     case FatTypeEnum.Fat16:
                         return 0xFFFF;
+
                     case FatTypeEnum.Fat32:
                         return 0x0FFFFFFF;
+
                     default:
                         throw new Exception("Unknown file system type.");
                 }
@@ -356,16 +369,19 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override string Type
         {
-             get
+            get
             {
                 switch (mFatType)
                 {
                     case FatTypeEnum.Fat12:
                         return "FAT12";
+
                     case FatTypeEnum.Fat16:
                         return "FAT16";
+
                     case FatTypeEnum.Fat32:
                         return "FAT32";
+
                     default:
                         throw new Exception("Unknown FAT file system type.");
                 }
@@ -395,30 +411,30 @@ namespace Cosmos.System.FileSystem.FAT
 
             Device.ReadBlock(0UL, 1U, xBPB);
 
-            ushort xSig = xBPB.ToUInt16(510);
+            ushort xSig = BitConverter.ToUInt16(xBPB, 510);
             if (xSig != 0xAA55)
             {
                 throw new Exception("FAT signature not found.");
             }
 
-            BytesPerSector = xBPB.ToUInt16(11);
+            BytesPerSector = BitConverter.ToUInt16(xBPB, 11);
             SectorsPerCluster = xBPB[13];
             BytesPerCluster = BytesPerSector * SectorsPerCluster;
-            ReservedSectorCount = xBPB.ToUInt16(14);
+            ReservedSectorCount = BitConverter.ToUInt16(xBPB, 14);
             NumberOfFATs = xBPB[16];
-            RootEntryCount = xBPB.ToUInt16(17);
+            RootEntryCount = BitConverter.ToUInt16(xBPB, 17);
 
-            TotalSectorCount = xBPB.ToUInt16(19);
+            TotalSectorCount = BitConverter.ToUInt16(xBPB, 19);
             if (TotalSectorCount == 0)
             {
-                TotalSectorCount = xBPB.ToUInt32(32);
+                TotalSectorCount = BitConverter.ToUInt32(xBPB, 32);
             }
 
             // FATSz
-            FatSectorCount = xBPB.ToUInt16(22);
+            FatSectorCount = BitConverter.ToUInt16(xBPB, 22);
             if (FatSectorCount == 0)
             {
-                FatSectorCount = xBPB.ToUInt32(36);
+                FatSectorCount = BitConverter.ToUInt32(xBPB, 36);
             }
 
             DataSectorCount = TotalSectorCount -
@@ -445,7 +461,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             if (mFatType == FatTypeEnum.Fat32)
             {
-                RootCluster = xBPB.ToUInt32(44);
+                RootCluster = BitConverter.ToUInt32(xBPB, 44);
             }
             else
             {
@@ -537,7 +553,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             var xBPB = aDevice.NewBlockArray(1);
             aDevice.ReadBlock(0UL, 1U, xBPB);
-            ushort xSig = xBPB.ToUInt16(510);
+            ushort xSig = BitConverter.ToUInt16(xBPB, 510);
             if (xSig != 0xAA55)
             {
                 return false;
@@ -627,10 +643,8 @@ namespace Cosmos.System.FileSystem.FAT
         public override DirectoryEntry CreateDirectory(DirectoryEntry aParentDirectory, string aNewDirectory)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.CreateDirectory --");
-            Global.mFileSystemDebugger.SendInternal("aParentDirectory.Name =");
-            Global.mFileSystemDebugger.SendInternal(aParentDirectory?.mName);
-            Global.mFileSystemDebugger.SendInternal("aNewDirectory =");
-            Global.mFileSystemDebugger.SendInternal(aNewDirectory);
+            Global.mFileSystemDebugger.SendInternal("aParentDirectory.Name = " + aParentDirectory?.mName);
+            Global.mFileSystemDebugger.SendInternal("aNewDirectory = " + aNewDirectory);
 
             if (aParentDirectory == null)
             {
@@ -650,10 +664,8 @@ namespace Cosmos.System.FileSystem.FAT
         public override DirectoryEntry CreateFile(DirectoryEntry aParentDirectory, string aNewFile)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.CreateFile --");
-            Global.mFileSystemDebugger.SendInternal("aParentDirectory.Name =");
-            Global.mFileSystemDebugger.SendInternal(aParentDirectory?.mName);
-            Global.mFileSystemDebugger.SendInternal("aNewFile =");
-            Global.mFileSystemDebugger.SendInternal(aNewFile);
+            Global.mFileSystemDebugger.SendInternal("aParentDirectory.Name = " + aParentDirectory?.mName);
+            Global.mFileSystemDebugger.SendInternal("aNewFile =" + aNewFile);
 
             if (aParentDirectory == null)
             {
@@ -706,11 +718,11 @@ namespace Cosmos.System.FileSystem.FAT
         {
             /*
              * In the FAT filesystem the name field of RootDirectory is - in reality - the Volume Label
-             */ 
+             */
             get
             {
                 Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.mLabel --");
-                var RootDirectory = (FatDirectoryEntry) GetRootDirectory();
+                var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
 
                 var VolumeId = RootDirectory.FindVolumeId();
                 if (VolumeId == null)
@@ -719,14 +731,14 @@ namespace Cosmos.System.FileSystem.FAT
                     return RootDirectory.mName;
                 }
 
-                Global.mFileSystemDebugger.SendInternal($"Volume label is {VolumeId.mName}");
-                return VolumeId.mName;
+                Global.mFileSystemDebugger.SendInternal($"Volume label is |{VolumeId.mName.TrimEnd()}|");
+                return VolumeId.mName.TrimEnd();
             }
             set
             {
-                Global.mFileSystemDebugger.SendInternal($"Setting Volume label to {value}");
+                Global.mFileSystemDebugger.SendInternal($"FatFileSystem - Setting Volume label to |{value}|");
 
-                var RootDirectory = (FatDirectoryEntry) GetRootDirectory();
+                var RootDirectory = (FatDirectoryEntry)GetRootDirectory();
 
                 var VolumeId = RootDirectory.FindVolumeId();
                 if (VolumeId != null)
