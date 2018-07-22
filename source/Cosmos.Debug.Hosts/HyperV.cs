@@ -29,7 +29,9 @@ namespace Cosmos.Debug.Hosts
             if (Process.GetProcessesByName("Cosmos.Debug.HyperVServer").Length == 0)
             {
                 var assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                Process.Start(Path.Combine(assemblyDirectory, @"HyperVServer\Cosmos.Debug.HyperVServer.exe"));
+                var serverPath = Path.Combine(assemblyDirectory, @"HyperVServer\Cosmos.Debug.HyperVServer.exe");
+
+                Process.Start(new ProcessStartInfo(serverPath) { UseShellExecute = true });
             }
 
             _client = new TcpClient();
