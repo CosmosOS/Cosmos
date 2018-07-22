@@ -159,6 +159,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestKernels", "Tests\TestKernels\TestKernels.csproj", "{CCFD198D-4859-462B-9EF7-B305A8B4E6FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.DiskManager", "Tests\Cosmos.Kernel.Tests.DiskManager\Cosmos.Kernel.Tests.DiskManager.csproj", "{A78A8919-1B73-400B-976B-E4714302CB5A}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.HyperVServer", "source\Cosmos.Debug.HyperVServer\Cosmos.Debug.HyperVServer.csproj", "{3421E19D-16C7-4593-9F6B-291ECB86A3EB}"
 EndProject
 Global
