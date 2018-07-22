@@ -642,3 +642,4 @@ namespace Cosmos.HAL
 
         #endregion
     }
+}
