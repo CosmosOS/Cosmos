@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
@@ -92,7 +93,7 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_Object__System_Array_GetValue_System_Int32_")]
-        public static unsafe uint GetValue(uint* aThis, int aIndex)
+        public static unsafe uint GetValue([ObjectPointerAccess]uint* aThis, int aIndex)
         {
             aThis = (uint*) aThis[0];
             aThis += 3;
@@ -119,7 +120,7 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
-        public static unsafe void SetValue(uint* aThis, uint aValue, int aIndex)
+        public static unsafe void SetValue([ObjectPointerAccess]uint* aThis, object aValue, int aIndex)
         {
             aThis = (uint*) aThis[0];
             aThis += 3;
@@ -143,5 +144,117 @@ namespace Cosmos.Core_Plugs.System
             }
             throw new NotSupportedException("SetValue not supported in this situation!");
         }
+
+
+        public static void Sort(Array keys, Array items, int index, int length, IComparer comparer)
+        {
+            if (keys == null)
+            {
+                throw new ArgumentNullException("keys");
+            }
+
+            if (index < 0 || length < 0)
+            {
+                throw new ArgumentOutOfRangeException((length < 0 ? "length" : "index"));
+            }
+
+            if (keys.Length > 1) {
+                // Attempt native sort
+                bool sorted = TrySZSort(keys, items, index, index + length - 1);
+                if (!sorted) {
+                    throw new NotImplementedException("Cannot sort non primitives");
+                }
+            }
+        }
+
+        public static bool TrySZSort(Array keys, Array items, int left, int right)
+        {
+            int l = left;
+            int r = right;
+            var avg = keys.GetValue((l + r) / 2);
+            TypeCode tc = Type.GetTypeCode(avg.GetType());
+            do
+            {
+                switch (tc)
+                {
+                    case TypeCode.Byte:
+                    case TypeCode.UInt16:
+                    case TypeCode.UInt32:
+                        while ((uint)keys.GetValue(l) < (uint)avg)
+                        {
+                            ++l;
+                        }
+
+                        while ((uint)keys.GetValue(r) > (uint)avg)
+                        {
+                            --r;
+                        }
+
+                        break;
+
+                    case TypeCode.SByte:
+                    case TypeCode.Int16:
+                    case TypeCode.Int32:
+                        while ((int)keys.GetValue(l) < (int)avg)
+                        {
+                            ++l;
+                        }
+
+                        while ((int)keys.GetValue(r) > (int)avg)
+                        {
+                            --r;
+                        }
+                        break;
+
+                    case TypeCode.Single:
+                    case TypeCode.Double:
+                        while ((double)keys.GetValue(l) < (double)avg)
+                        {
+                            ++l;
+                        }
+
+                        while ((double)keys.GetValue(r) > (double)avg)
+                        {
+                            --r;
+                        }
+                        break;
+
+                    default:
+                        return false;
+                }
+
+                if (l <= r)
+                {
+                    if (l < r)
+                    {
+                        var temp = keys.GetValue(l);
+                        keys.SetValue(keys.GetValue(r), l);
+                        keys.SetValue(temp, r);
+
+                        if (items != null)
+                        {
+                            var itemp = items.GetValue(l);
+                            items.SetValue(items.GetValue(r), l);
+                            items.SetValue(itemp, r);
+                        }
+                    }
+                    ++l;
+                    --r;
+                }
+            }
+            while (l <= r);
+            if (left < r)
+            {
+                TrySZSort(keys, items, l, right);
+            }
+
+            if (l < right)
+            {
+                TrySZSort(keys, items, l, right);
+            }
+
+            return true;
+        }
+
     }
 }
