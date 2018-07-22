@@ -267,12 +267,11 @@ namespace Cosmos.System.FileSystem.FAT
 
             private void ReadFatSector(ulong aSector, out byte[] aData)
             {
-                //aData = mFileSystem.NewBlockArray();
+                aData = mFileSystem.NewBlockArray();
                 var xSector = mFatSector + aSector;
                 Global.mFileSystemDebugger.SendInternal("xSector  =");
                 Global.mFileSystemDebugger.SendInternal(xSector);
-                mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, mFileSystem.ReadBuffer);
-                aData = mFileSystem.ReadBuffer;
+                mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, aData);
             }
 
             private void WriteFatSector(ulong aSector, byte[] aData)
@@ -466,8 +465,6 @@ namespace Cosmos.System.FileSystem.FAT
 
         private readonly Fat[] mFats;
 
-        internal readonly byte[] ReadBuffer;
-
         public override string Type
         {
             get
@@ -576,10 +573,6 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 mFats[i] = new Fat(this, (ReservedSectorCount + i * FatSectorCount));
             }
-
-            Global.mFileSystemDebugger.SendInternal("Created 'global' ReadBuffer");
-            /* Create this only one time and reuse it. It is quite big (4KB) and allocating it again and again is wasteful */
-            ReadBuffer = NewBlockArray();
         }
 
         internal Fat GetFat(int aTableNumber)
