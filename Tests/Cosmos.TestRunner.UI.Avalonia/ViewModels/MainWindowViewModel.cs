@@ -12,15 +12,15 @@ namespace Cosmos.TestRunner.UI.ViewModels
 
         public MainWindowViewModel(IEngineConfiguration aEngineConfiguration)
         {
-            var xEngine = new Engine(aEngineConfiguration)
-            {
-                OutputHandler = new OutputHandler(
+            var xEngine = new Engine(aEngineConfiguration);
+
+            xEngine.SetOutputHandler(
+                new OutputHandler(
                     m =>
                     {
                         TestRunnerLog += m + Environment.NewLine;
                         OnPropertyChanged(nameof(TestRunnerLog));
-                    })
-            };
+                    }));
 
             new Thread(() => xEngine.Execute()).Start();
         }
@@ -34,7 +34,10 @@ namespace Cosmos.TestRunner.UI.ViewModels
         {
             private Action<string> mLog;
 
-            public OutputHandler(Action<string> aLog) => mLog = aLog;
+            public OutputHandler(Action<string> aLog)
+            {
+                mLog = aLog;
+            }
 
             protected override void Log(string message) => mLog(message);
         }

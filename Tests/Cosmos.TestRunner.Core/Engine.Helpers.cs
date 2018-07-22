@@ -28,13 +28,6 @@ namespace Cosmos.TestRunner.Core
             return string.Empty;
         }
 
-        private void RunDotnetPublish(string aProjectPath, string aOutputPath, string aRuntimeTarget)
-        {
-            var xArgsString = $"publish \"{aProjectPath}\" -o \"{aOutputPath}\" -r {aRuntimeTarget}";
-
-            RunProcess("dotnet", aProjectPath, xArgsString);
-        }
-
         private void RunProcess(string aProcess, string aWorkingDirectory, List<string> aArguments, bool aAttachDebugger = false)
         {
             if (string.IsNullOrWhiteSpace(aProcess))
@@ -165,7 +158,7 @@ namespace Cosmos.TestRunner.Core
 
         private void RunTheRingMaster(string kernelFileName)
         {
-            var xArgs =  new List<string>() { kernelFileName };
+            var xArgs = new List<string>() { kernelFileName };
 
             bool xUsingUserKit = false;
             string xTheRingMasterPath = Path.Combine(FindCosmosRoot(), "source", "TheRingMaster");
