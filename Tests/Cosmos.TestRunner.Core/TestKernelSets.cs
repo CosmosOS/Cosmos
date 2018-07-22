@@ -26,6 +26,7 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(Cosmos.Kernel.Tests.Fat2.Kernel);
             //yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
             yield return typeof(SimpleStructsAndArraysTest.Kernel);
+            yield return typeof(Cosmos.Kernel.Tests.DiskManager.Kernel);
 
             //yield return typeof(FrotzKernel.Kernel);
 
@@ -34,7 +35,7 @@ namespace Cosmos.TestRunner.Core
             /* Please see the notes on the kernel itself before enabling it */
             //yield return typeof(GraphicTest.Kernel);
             /* Please see the notes on the kernel itself before enabling it */
-           //yield return typeof(ConsoleTest.Kernel);
+            //yield return typeof(ConsoleTest.Kernel);
         }
     }
 }

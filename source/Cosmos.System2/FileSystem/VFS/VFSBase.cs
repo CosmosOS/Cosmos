@@ -53,5 +53,7 @@ namespace Cosmos.System.FileSystem.VFS
         public abstract string GetFileSystemLabel(string aDriveId);
 
         public abstract void SetFileSystemLabel(string aDriveId, string aLabel);
+
+        public abstract void Format(string aDriveId, string aDriveFormat, bool aQuick);
     }
 }
