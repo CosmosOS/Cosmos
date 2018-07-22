@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Cosmos.Common.Extensions;
 using Cosmos.HAL;
 using Cosmos.System.FileSystem.Listing;
+using System.Text;
 
 namespace Cosmos.System.FileSystem.FAT.Listing
 {
@@ -87,8 +88,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         public override void SetName(string aName)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetName --");
-            Global.mFileSystemDebugger.SendInternal("aName =");
-            Global.mFileSystemDebugger.SendInternal(aName);
+            Global.mFileSystemDebugger.SendInternal($"aName = {aName}");
 
             if (string.IsNullOrEmpty(aName))
             {
@@ -147,17 +147,18 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         public FatDirectoryEntry AddDirectoryEntry(string aName, DirectoryEntryTypeEnum aEntryType)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.AddDirectoryEntry --");
-            Global.mFileSystemDebugger.SendInternal("aName =");
-            Global.mFileSystemDebugger.SendInternal(aName);
-            Global.mFileSystemDebugger.SendInternal("aEntryType =");
-            Global.mFileSystemDebugger.SendInternal((uint)aEntryType);
+            Global.mFileSystemDebugger.SendInternal("aName = " + aName);
+            Global.mFileSystemDebugger.SendInternal($"aEntryType = {(uint)aEntryType}");
 
             if ((aEntryType == DirectoryEntryTypeEnum.Directory) || (aEntryType == DirectoryEntryTypeEnum.File))
             {
                 string xShortName = aName;
                 uint[] xDirectoryEntriesToAllocate = null;
 
-                //Stack corruption, just delete everything from this until commented if when it's fixed
+                // Stack corruption, just delete everything from this until commented if when it's fixed
+                //
+                // https://github.com/CosmosOS/IL2CPU/issues/8
+                //
                 var x1 = aEntryType == DirectoryEntryTypeEnum.File;
                 var x2 = aName.Contains(".");
                 var x3 = x2 ? aName.Substring(0, aName.LastIndexOf('.')).Contains(".") : false;
@@ -177,17 +178,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 {
                     string xLongName = aName;
 
-                    char[] xInvalidShortNameChars = new char[] { '"', '*', '+', ',', '.', '/', ':', ';', '<', '=', '>', '?', '[', '\\', ']', '|' };
-
                     int xLastPeriodPosition = aName.LastIndexOf('.');
 
                     string xExt = "";
 
+                    //Only take the name until the first dot
                     if (xLastPeriodPosition + 1 > 0 && xLastPeriodPosition + 1 < aName.Length)
                     {
                         xExt = xShortName.Substring(xLastPeriodPosition + 1);
                     }
 
+                    //Remove all whitespaces and dots (except final)
                     for (int i = xShortName.Length - 1; i > 0; i--)
                     {
                         char xChar = xShortName[i];
@@ -198,6 +199,9 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                         }
                     }
 
+                    char[] xInvalidShortNameChars = new char[] { '"', '*', '+', ',', '.', '/', ':', ';', '<', '=', '>', '?', '[', '\\', ']', '|' };
+
+                    //Remove all invalid characters
                     foreach (char xInvalidChar in xInvalidShortNameChars)
                     {
                         xShortName.Replace(xInvalidChar, '_');
@@ -246,7 +250,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
                     uint xChecksum = CalculateChecksum(GetShortName(xShortName));
 
-                    int xNumEntries = (int)Math.Ceiling((double)xLongName.Length / (double)13);
+                    int xNumEntries = (int)Math.Ceiling(xLongName.Length / 13d);
 
                     char[] xLongNameWithPad = new char[xNumEntries * 13];
 
@@ -263,9 +267,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                         SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.Attributes, FatDirectoryEntryAttributeConsts.LongName);
                         SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.Checksum, xChecksum);
 
-                        SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.LongName1, new string(xLongNameWithPad, i * 13, 5));
-                        SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.LongName2, new string(xLongNameWithPad, i * 13 + 5, 6));
-                        SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.LongName3, new string(xLongNameWithPad, i * 13 + 11, 2));
+                        var a1 = new string(xLongNameWithPad, i * 13, 5);
+                        var a2 = new string(xLongNameWithPad, i * 13 + 5, 6);
+                        var a3 = new string(xLongNameWithPad, i * 13 + 11, 2);
+
+                        SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.LongName1, a1);
+                        SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.LongName2, a2);
+                        SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.LongName3, a3);
                     }
                 }
 
@@ -273,12 +281,9 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 uint xFirstCluster = ((FatFileSystem)mFileSystem).GetFat(0).GetNextUnallocatedFatEntry();
                 uint xEntryHeaderDataOffset = xDirectoryEntriesToAllocate == null ? GetNextUnallocatedDirectoryEntry() : xDirectoryEntriesToAllocate[xDirectoryEntriesToAllocate.Length - 1];
 
-                Global.mFileSystemDebugger.SendInternal("xFullPath =");
-                Global.mFileSystemDebugger.SendInternal(xFullPath);
-                Global.mFileSystemDebugger.SendInternal("xFirstCluster =");
-                Global.mFileSystemDebugger.SendInternal(xFirstCluster);
-                Global.mFileSystemDebugger.SendInternal("xEntryHeaderDataOffset =");
-                Global.mFileSystemDebugger.SendInternal(xEntryHeaderDataOffset);
+                Global.mFileSystemDebugger.SendInternal("xFullPath = " + xFullPath);
+                Global.mFileSystemDebugger.SendInternal("xFirstCluster = " + xFirstCluster);
+                Global.mFileSystemDebugger.SendInternal("xEntryHeaderDataOffset = " + xEntryHeaderDataOffset);
 
                 var xNewEntry = new FatDirectoryEntry((FatFileSystem)mFileSystem, this, xFullPath, aName, 0, xFirstCluster, xEntryHeaderDataOffset, aEntryType);
 
@@ -338,7 +343,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             string xLongName = "";
             string xName = "";
 
-            for (uint i = 0; i < xData.Length; i = i + 32)
+            for (uint i = 0; i < xData.Length; i += 32)
             {
                 byte xAttrib = xData[i + 11];
                 byte xStatus = xData[i];
@@ -368,19 +373,19 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                         //TODO: Check LDIR_Ord for ordering and throw exception
                         // if entries are found out of order.
                         // Also save buffer and only copy name if a end Ord marker is found.
-                        string xLongPart = xData.GetUtf16String(i + 1, 5);
+                        string xLongPart = Encoding.Unicode.GetString(xData, (int)i + 1, 10);
 
                         // We have to check the length because 0xFFFF is a valid Unicode codepoint.
                         // So we only want to stop if the 0xFFFF is AFTER a 0x0000. We can determin
                         // this by also looking at the length. Since we short circuit the or, the length
                         // is rarely evaluated.
-                        if (xData.ToUInt16(i + 14) != 0xFFFF || xLongPart.Length == 5)
+                        if (BitConverter.ToUInt16(xData, (int)i + 14) != 0xFFFF || xLongPart.Length == 5)
                         {
-                            xLongPart = xLongPart + xData.GetUtf16String(i + 14, 6);
+                            xLongPart = xLongPart + Encoding.Unicode.GetString(xData, (int)i + 14, 12);
 
-                            if (xData.ToUInt16(i + 28) != 0xFFFF || xLongPart.Length == 11)
+                            if (BitConverter.ToUInt16(xData, (int)i + 28) != 0xFFFF || xLongPart.Length == 11)
                             {
-                                xLongPart = xLongPart + xData.GetUtf16String(i + 28, 2);
+                                xLongPart = xLongPart + Encoding.Unicode.GetString(xData, (int)i + 28, 4);
                             }
                         }
 
@@ -404,6 +409,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                         case 0x05:
                             // Japanese characters - We dont handle these
                             break;
+
                         case 0x2E:
                             // Dot entry
                             continue;
@@ -421,7 +427,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                     // Many programs (including Windows) pad trailing spaces although it
                                     // it is not required for long names.
                                     // As per spec, ignore trailing periods
-                                    xName = xLongName.Trim();
+                                    xName = xLongName.Trim(new char[] { '\0', '\uffff' }).Trim();
 
                                     //If there are trailing periods
                                     int nameIndex = xName.Length - 1;
@@ -447,7 +453,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                 {
                                     if (xTest == 0)
                                     {
-                                        string xEntry = xData.GetAsciiString(i, 11);
+                                        string xEntry = Encoding.ASCII.GetString(xData, (int)i, 11);
                                         xName = xEntry.Substring(0, 8).TrimEnd();
                                         string xExt = xEntry.Substring(8, 3).TrimEnd();
 
@@ -458,16 +464,15 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                     }
                                     else
                                     {
-                                        xName = xData.GetAsciiString(i, 11).TrimEnd();
+                                        xName = Encoding.ASCII.GetString(xData, (int)i, 11).TrimEnd();
                                     }
                                 }
                             }
 
-                            uint xFirstCluster = (uint)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
-
+                            uint xFirstCluster = (uint)(BitConverter.ToUInt16(xData, (int)i + 20) << 16 | BitConverter.ToUInt16(xData, (int)i + 26));
                             if (xTest == 0)
                             {
-                                uint xSize = xData.ToUInt32(i + 28);
+                                uint xSize = BitConverter.ToUInt32(xData, (int)i + 28);
 
                                 if (xSize == 0 && xName.Length == 0)
                                 {
@@ -482,7 +487,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                             else if (xTest == FatDirectoryEntryAttributeConsts.Directory)
                             {
                                 string xFullPath = Path.Combine(mFullPath, xName);
-                                uint xSize = xData.ToUInt32(i + 28);
+                                uint xSize = BitConverter.ToUInt32(xData, (int)i + 28);
                                 var xEntry = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
                                 Global.mFileSystemDebugger.SendInternal(xEntry.mName + " <DIR> " + xEntry.mSize + " bytes : Attrib = " + xAttrib + ", Status = " + xStatus);
                                 xResult.Add(xEntry);
@@ -526,10 +531,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
                 Global.mFileSystemDebugger.SendInternal("VolumeID Found");
                 /* The Label in FAT could be only a shortName (limited to 11 characters) so it is more easy */
-                string xName = xData.GetAsciiString(i, 11).TrimEnd();
+                string xName = Encoding.ASCII.GetString(xData, (int)i, 11);
+                xName = xName.TrimEnd();
+
                 string xFullPath = Path.Combine(mFullPath, xName);
                 /* Probably can be OK to hardcode 0 here */
-                uint xSize = xData.ToUInt32(i + 28);
+                uint xSize = BitConverter.ToUInt32(xData, (int)i + 28);
                 //uint xFirstCluster = (uint)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
                 uint xFirstCluster = xParent.mFirstClusterNum;
 
@@ -570,10 +577,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             var xData = GetDirectoryEntryData();
             for (uint i = 0; i < xData.Length; i += 32)
             {
-                uint x1 = xData.ToUInt32(i);
-                uint x2 = xData.ToUInt32(i + 8);
-                uint x3 = xData.ToUInt32(i + 16);
-                uint x4 = xData.ToUInt32(i + 24);
+                uint x1 = BitConverter.ToUInt32(xData, (int)i);
+                uint x2 = BitConverter.ToUInt32(xData, (int)i + 8);
+                uint x3 = BitConverter.ToUInt32(xData, (int)i + 16);
+                uint x4 = BitConverter.ToUInt32(xData, (int)i + 24);
                 if ((x1 == 0) && (x2 == 0) && (x3 == 0) && (x4 == 0))
                 {
                     Global.mFileSystemDebugger.SendInternal("Returning i =");
@@ -601,10 +608,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             for (uint i = 0; i < xData.Length; i += 32)
             {
-                uint x1 = xData.ToUInt32(i);
-                uint x2 = xData.ToUInt32(i + 8);
-                uint x3 = xData.ToUInt32(i + 16);
-                uint x4 = xData.ToUInt32(i + 24);
+                uint x1 = BitConverter.ToUInt32(xData, (int)i);
+                uint x2 = BitConverter.ToUInt32(xData, (int)i + 8);
+                uint x3 = BitConverter.ToUInt32(xData, (int)i + 16);
+                uint x4 = BitConverter.ToUInt32(xData, (int)i + 24);
                 if ((x1 == 0) && (x2 == 0) && (x3 == 0) && (x4 == 0))
                 {
                     xEntries[xCount] = i;
@@ -642,8 +649,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         private void SetDirectoryEntryData(byte[] aData)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryData(byte) --");
-            Global.mFileSystemDebugger.SendInternal("aData.Length =");
-            Global.mFileSystemDebugger.SendInternal(aData.Length);
+            Global.mFileSystemDebugger.SendInternal("aData.Length = " + aData.Length);
 
             if (aData == null)
             {
@@ -668,8 +674,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, uint aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
-            Global.mFileSystemDebugger.SendInternal("aValue =");
-            Global.mFileSystemDebugger.SendInternal(aValue);
+            Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
 
             if (IsRootDirectory())
             {
@@ -716,8 +721,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, string aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryMetadataValue(string) --");
-            Global.mFileSystemDebugger.SendInternal("aValue =");
-            Global.mFileSystemDebugger.SendInternal(aValue);
+            Global.mFileSystemDebugger.SendInternal($"aValue = {aValue}");
 
             if (IsRootDirectory())
             {
@@ -729,7 +733,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             if (xData.Length > 0)
             {
                 var xValue = new byte[aEntryMetadata.DataLength];
-                xValue = aValue.GetUtf8Bytes(0, aEntryMetadata.DataLength);
+                var bValue = Encoding.UTF8.GetBytes(aValue);
+
+                for (int i = 0; i < xValue.Length; i++)
+                {
+                    if (i < bValue.Length) xValue[i] = bValue[i];
+                    else xValue[i] = 32;
+                }
 
                 uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
                 Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
@@ -741,8 +751,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, uint aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(uint) --");
-            Global.mFileSystemDebugger.SendInternal("aValue =");
-            Global.mFileSystemDebugger.SendInternal(aValue);
+            Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
 
             var xData = GetDirectoryEntryData();
 
@@ -759,8 +768,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, long aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(long) --");
-            Global.mFileSystemDebugger.SendInternal("aValue =");
-            Global.mFileSystemDebugger.SendInternal(aValue);
+            Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
 
             var xData = GetDirectoryEntryData();
 
@@ -769,8 +777,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 var xValue = new byte[aEntryMetadata.DataLength];
                 xValue.SetUInt32(0, (uint)aValue);
                 uint offset = aEntryHeaderDataOffset + aEntryMetadata.DataOffset;
-                Global.mFileSystemDebugger.SendInternal("offset =");
-                Global.mFileSystemDebugger.SendInternal(offset);
+                Global.mFileSystemDebugger.SendInternal("offset = " + offset);
                 Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength);
                 SetDirectoryEntryData(xData);
             }
@@ -779,15 +786,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, string aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(string) --");
-            Global.mFileSystemDebugger.SendInternal("aValue =");
-            Global.mFileSystemDebugger.SendInternal(aValue);
+            Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
 
             var xData = GetDirectoryEntryData();
 
             if (xData.Length > 0)
             {
-                var xValue = new byte[aEntryMetadata.DataLength];
-                xValue = aValue.GetUtf16Bytes(0, aEntryMetadata.DataLength / 2);
+                var xValue = Encoding.Unicode.GetBytes(aValue);
 
                 uint offset = aEntryHeaderDataOffset + aEntryMetadata.DataOffset;
                 Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength);
@@ -893,14 +898,14 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 {
                     // Normal file
                     case 0:
-                        uint xSize = DirectoryEntryData.ToUInt32(i + 28);
+                        uint xSize = BitConverter.ToUInt32(DirectoryEntryData, (int)i + 28);
                         xResult += xSize;
                         break;
 
                     case FatDirectoryEntryAttributeConsts.Directory:
                         //Global.mFileSystemDebugger.SendInternal($"-- FatDirectoryEntry.GetDirectoryEntrySize() found directory: recursing!");
 
-                        uint xFirstCluster = (uint)(DirectoryEntryData.ToUInt16(i + 20) << 16 | DirectoryEntryData.ToUInt16(i + 26));
+                        uint xFirstCluster = (uint)(BitConverter.ToUInt16(DirectoryEntryData, (int)i + 20) << 16 | BitConverter.ToUInt16(DirectoryEntryData, (int)i + 26));
                         byte[] xDirData;
                         ((FatFileSystem)mFileSystem).Read(xFirstCluster, out xDirData);
 
@@ -931,6 +936,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
          *    In any case if one of this two methods will be used in the future when a file is removed or new data are written on it,
          *    the value on the field should be always updated.
          */
+
         public override long GetUsedSpace()
         {
             Global.mFileSystemDebugger.SendInternal($"-- FatDirectoryEntry.GetUsedSpace() on Directory {mName} ---");

@@ -5,10 +5,10 @@ namespace Cosmos.TestRunner.Console
 {
     using Console = global::System.Console;
 
-    class Program
+    internal class Program
     {
         [STAThread]
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var xEngine = new Engine(new DefaultEngineConfiguration());
 
@@ -24,18 +24,19 @@ namespace Cosmos.TestRunner.Console
             var xResult = Console.ReadLine();
             if (xResult != null && xResult.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase))
             {
-                Console.Write("Path: ");
+                Console.Write("Path to file: ");
                 xResult = Console.ReadLine();
 
                 try
                 {
                     xOutputXml.SaveToFile(xResult);
+                    Console.WriteLine("Succesfully saved output to file " + xResult);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Exception: " + ex.ToString());
                 }
-
+                Console.ReadLine();
                 //var xSaveDialog = new SaveFileDialog();
                 //xSaveDialog.Filter = "XML documents|*.xml";
                 //if (xSaveDialog.ShowDialog() != DialogResult.OK)

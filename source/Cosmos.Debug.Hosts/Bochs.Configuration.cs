@@ -41,7 +41,7 @@ namespace Cosmos.Debug.Hosts
                                      + "debug: action=ignore\n" + "info: action=report\n" + "error: action=report\n"
                                      + "panic: action=ask\n"
                                      + "keyboard: type=mf, serial_delay=250, paste_delay=100000, user_shortcut=none\n"
-                                     + "mouse: type=ps2, enabled=0, toggle=ctrl+mbutton\n"
+                                     + "mouse: type=imps2, enabled=0, toggle=ctrl+mbutton\n"
                                      + "sound: waveoutdrv=win, waveout=none, waveindrv=win, wavein=none, midioutdrv=win, midiout=none\n"
                                      + "speaker: enabled=1, mode=sound\n" + "parport1: enabled=1, file=none\n"
                                      + "parport2: enabled=0\n" + "com1: enabled=1, mode=pipe-client, dev=\""

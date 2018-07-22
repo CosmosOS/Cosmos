@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Timers;
+using System.Threading;
 using System.Windows.Threading;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+using Timer = System.Timers.Timer;
 
 using Cosmos.Debug.Common;
 using Cosmos.Debug.DebugConnectors;
@@ -16,14 +18,14 @@ using Cosmos.VS.Windows.ToolWindows;
 namespace Cosmos.VS.Windows
 {
     [Guid(Guids.PackageGuidString)]
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(AssemblyToolWindow))]
     [ProvideToolWindow(typeof(RegistersToolWindow))]
     [ProvideToolWindow(typeof(StackTW))]
     [ProvideToolWindow(typeof(InternalTW))]
     [ProvideToolWindow(typeof(ConsoleTW))]
-    public sealed class CosmosWindowsPackage: Package
+    public sealed class CosmosWindowsPackage: AsyncPackage
     {
         private readonly Queue<ushort> mCommand;
         private readonly Queue<byte[]> mMessage;
@@ -54,11 +56,15 @@ namespace Cosmos.VS.Windows
             mPipeDown.Start();
         }
 
-        protected override void Initialize()
+        protected override async Task InitializeAsync(
+            CancellationToken cancellationToken,
+            IProgress<ServiceProgressData> progress)
         {
-            base.Initialize();
+            await base.InitializeAsync(cancellationToken, progress);
 
-            var xOutputWindow = (IVsOutputWindow)GetService(typeof(SVsOutputWindow));
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            var xOutputWindow = (IVsOutputWindow)await GetServiceAsync(typeof(SVsOutputWindow));
             var xCosmosPaneGuid = Guid.NewGuid();
 
             ErrorHandler.ThrowOnFailure(

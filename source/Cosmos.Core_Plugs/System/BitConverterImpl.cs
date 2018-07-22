@@ -203,6 +203,45 @@ namespace Cosmos.Core_Plugs.System
             return *(double*)&val;
         }
 
+        public static ushort ToUInt16(byte[] value, int startIndex)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+            if ((uint)startIndex > value.Length)
+                throw new ArgumentOutOfRangeException("startIndex");
+            if (startIndex > value.Length - 2)
+                throw new ArgumentException("Array with offset is too short");
+            Contract.EndContractBlock();
+
+            return (ushort)ToInt16(value, startIndex);
+        }
+
+        public static uint ToUInt32(byte[] value, int startIndex)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+            if ((uint)startIndex > value.Length)
+                throw new ArgumentOutOfRangeException("startIndex");
+            if (startIndex > value.Length - 4)
+                throw new ArgumentException("Array with offset is too short");
+            Contract.EndContractBlock();
+
+            return (uint)ToInt32(value, startIndex);
+        }
+
+        public static ulong ToUInt64(byte[] value, int startIndex)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+            if ((uint)startIndex > value.Length)
+                throw new ArgumentOutOfRangeException("startIndex");
+            if (startIndex > value.Length - 8)
+                throw new ArgumentException("Array with offset is too short");
+            Contract.EndContractBlock();
+
+            return (ulong)ToInt64(value, startIndex);
+        }
+
         private static void ThrowValueArgumentNull()
         {
             throw new ArgumentNullException("value");
