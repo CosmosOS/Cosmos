@@ -544,23 +544,6 @@ namespace Cosmos.System.FileSystem.FAT
             }
         }
 
-        public static bool IsDeviceFat(Partition aDevice)
-        {
-            if (aDevice == null)
-            {
-                throw new ArgumentNullException(nameof(aDevice));
-            }
-
-            var xBPB = aDevice.NewBlockArray(1);
-            aDevice.ReadBlock(0UL, 1U, xBPB);
-            ushort xSig = BitConverter.ToUInt16(xBPB, 510);
-            if (xSig != 0xAA55)
-            {
-                return false;
-            }
-            return true;
-        }
-
         public override void DisplayFileSystemInfo()
         {
             CustomConsole.WriteLineInfo("-------File System--------");
