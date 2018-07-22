@@ -7,7 +7,7 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
 {
-    internal class PS2Controller : Device
+    public class PS2Controller : Device
     {
         private enum Command : byte
         {

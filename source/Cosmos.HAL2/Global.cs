@@ -28,7 +28,7 @@ namespace Cosmos.HAL
         // system level and not accessible from Core. Need to think about this
         // for the future.
 
-        private static readonly PS2Controller PS2Controller = new PS2Controller();
+        public static readonly PS2Controller PS2Controller = new PS2Controller();
 
         static public void Init(TextScreenBase textScreen)
         {
