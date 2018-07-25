@@ -8,6 +8,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
+            bool efuse;
             int value;
             string result;
             string expectedResult;
@@ -141,6 +142,32 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             ByRefTestMethod(ref value);
             Assert.IsTrue(value == 61, "Passing an Int32 by ref to a method doesn't work");
+
+            //Test StackOverflow Exceptions
+            int val3o;
+            efuse = false;
+            val3o = 10000;
+            try
+            {
+                val3o += 2147483647;
+            }
+            catch (StackOverflowException e)
+            {
+                efuse = true;
+            }
+            Assert.IsTrue(efuse == false, "Add_Ovf for Int32 doesn't work");
+
+            efuse = false;
+            val3o = -10000;
+            try
+            {
+                val3o -= 2147483647;
+            }
+            catch (StackOverflowException e)
+            {
+                efuse = true;
+            }
+            Assert.IsTrue(efuse == false, "Sub_Ovf for Int32 doesn't work");
         }
 
         public static int TestMethod(int aParam)
