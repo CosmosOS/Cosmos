@@ -155,7 +155,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             {
                 efuse = true;
             }
-            Assert.IsTrue(efuse == false, "Add_Ovf for Int32 doesn't work");
+            Assert.IsTrue(efuse, "Add_Ovf for Int32 doesn't work");
 
             efuse = false;
             val3o = -10000;
@@ -167,7 +167,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             {
                 efuse = true;
             }
-            Assert.IsTrue(efuse == false, "Sub_Ovf for Int32 doesn't work");
+            Assert.IsTrue(efuse, "Sub_Ovf for Int32 doesn't work");
         }
 
         public static int TestMethod(int aParam)
