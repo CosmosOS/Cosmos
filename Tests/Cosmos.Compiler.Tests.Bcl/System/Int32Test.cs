@@ -151,7 +151,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             {
                 val3o += 2147483647;
             }
-            catch (StackOverflowException e)
+            catch (OverflowException e)
             {
                 efuse = true;
             }
@@ -163,7 +163,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             {
                 val3o -= 2147483647;
             }
-            catch (StackOverflowException e)
+            catch (OverflowException e)
             {
                 efuse = true;
             }

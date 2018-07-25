@@ -157,7 +157,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             {
                 val3o += long.MaxValue;
             }
-            catch (StackOverflowException e)
+            catch (OverflowException e)
             {
                 efuse = true;
             }
@@ -169,7 +169,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             {
                 val3o -= long.MaxValue;
             }
-            catch (StackOverflowException e)
+            catch (OverflowException e)
             {
                 efuse = true;
             }
