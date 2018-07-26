@@ -15,7 +15,7 @@ namespace Cosmos.HAL.BlockDevice
 	// to do this as capabilities can also be detected, but all ATA devices must support PIO
 	// and thus it can also be used to read the partition table and perform other tasks before
 	// initializing another ATA class in favour of AtaPio
-	public class AtaPio : Ata
+	public class ATA_PIO : ATA
 	{
 		#region Properties
 		protected Core.IOGroup.ATA IO;
@@ -141,7 +141,7 @@ namespace Cosmos.HAL.BlockDevice
 	        mDebugger.SendNumber(number);
 	    }
 
-        public AtaPio(Core.IOGroup.ATA aIO, Ata.ControllerIdEnum aControllerId, Ata.BusPositionEnum aBusPosition)
+        public ATA_PIO(Core.IOGroup.ATA aIO, ATA.ControllerIdEnum aControllerId, ATA.BusPositionEnum aBusPosition)
 		{
 			IO = aIO;
 			mControllerID = aControllerId;

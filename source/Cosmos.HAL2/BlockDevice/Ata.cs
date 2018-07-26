@@ -6,12 +6,12 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL.BlockDevice
 {
-  public abstract class Ata : BlockDevice
+  public abstract class ATA : BlockDevice
   {
 
-    internal static Debugger AtaDebugger = new Debugger("HAL", "Ata");
+    internal static Debugger ATADebugger = new Debugger("HAL", "ATA");
 
-    protected Ata()
+    protected ATA()
     {
       mBlockSize = 512;
     }
@@ -34,7 +34,7 @@ namespace Cosmos.HAL.BlockDevice
 
     public override string ToString()
     {
-      return "Ata (Abstract)";
+      return "ATA (Abstract)";
     }
   }
 }

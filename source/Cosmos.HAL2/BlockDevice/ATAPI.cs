@@ -7,10 +7,13 @@ namespace Cosmos.HAL.BlockDevice
 {
     public class ATAPI : BlockDevice
     {
+
+        public static List<BlockDevice> ATAPIDevices = new List<BlockDevice>();
+
         class PacketCommands
         {
             public byte[] TableOfContents = { 0x43, 0, 1, 0, 0, 0, 0, 0, 12, 0x40, 0, 0 };
-            public byte[] ReadSector = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            public byte[] ReadSector = { 0xA8, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
         }
 
         /*
@@ -23,11 +26,24 @@ namespace Cosmos.HAL.BlockDevice
         private const UInt16 SectorSize = 2048;
         private const UInt32 LBA = 0;
         private static bool IRQReceived = false;
-        public static UInt16[] Buffer = new UInt16[256];
+        public UInt16[] Buffer = new UInt16[256];
 
-        public static void Init()
+        public ATAPI()
+        {
+            ATAPIDevices.Add(this);
+            Init();
+        }
+
+        public void Init()
         {
             INTs.SetIrqHandler(0x0F, HandleIRQ);
+        }
+
+        public void Test()
+        {
+            Init();
+            ReadBlock(65, 0, new byte[] { 0, 0 });
+            PrintBuffer();
         }
 
         public static void HandleIRQ(ref INTs.IRQContext aContext)
@@ -35,38 +51,62 @@ namespace Cosmos.HAL.BlockDevice
             IRQReceived = true;
         }
 
+        public void PrintBuffer()
+        {
+            for (int p = 0; p < 256; p++)
+            {
+                if (p != 255)
+                {
+                    Console.Write(Buffer[p].ToString() + ",");
+                }
+                else
+                {
+                    Console.WriteLine(Buffer[p].ToString());
+                }
+            }
+        }
+
         // Single block size = 2048 bytes for CD/DVD
         public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
         {
             IRQReceived = false;
+
             IO.DeviceSelect.Byte = (0xA0 | (1 << 4));
+            IO.Error.Byte = 0;
+
             IO.LBA1.Byte = (byte)(SectorSize & 0xFF);
             IO.LBA2.Byte = (byte)(SectorSize >> 8);
             IO.Command.Byte = 0xA0;
+
             byte status = 0;
             bool OKtoRead = false;
-            IO.Wait();
-            status = IO.Status.Byte;
 
-            if ((status & 0xFF) != 0x1)
+            for (int i = 0; i < 500; i++)
             {
-                OKtoRead = true;
+                status = IO.Status.Byte;
+                if ((status & 0xFF) != 0x1)
+                {
+                    OKtoRead = true;
+                    break;
+                }
             }
+
+
             if (OKtoRead == true)
             {
-
+                Console.WriteLine("OK to transfer!");
             }
             else
             {
-
+                Console.WriteLine("Timeout!");
             }
-            IO.Data.Byte = 0xA8;
+
             IO.Data.Byte = 0xA8;//Read Sector
             IO.Data.Byte = 0;
-            IO.Data.Byte = (byte)((LBA >> 0x18) & 0xFF);//MSB
-            IO.Data.Byte = (byte)((LBA >> 0x10) & 0xFF);
-            IO.Data.Byte = (byte)((LBA >> 0x08) & 0xFF);
-            IO.Data.Byte = (byte)((LBA >> 0x00) & 0xFF);//LSB
+            IO.Data.Byte = (byte)((aBlockNo >> 0x18) & 0xFF);//MSB
+            IO.Data.Byte = (byte)((aBlockNo >> 0x10) & 0xFF);
+            IO.Data.Byte = (byte)((aBlockNo >> 0x08) & 0xFF);
+            IO.Data.Byte = (byte)((aBlockNo >> 0x00) & 0xFF);//LSB
             IO.Data.Byte = 0;
             IO.Data.Byte = 0;
             IO.Data.Byte = 0;
@@ -74,10 +114,7 @@ namespace Cosmos.HAL.BlockDevice
             IO.Data.Byte = 0;
             IO.Data.Byte = 0;
 
-            while (IRQReceived == false)
-            {
-
-            }
+            System.Threading.Thread.Sleep(100);
 
             for (int i = 0; i < 256; i++)
             {
@@ -86,24 +123,12 @@ namespace Cosmos.HAL.BlockDevice
             IRQReceived = false;
         }
 
-        /*
-        public void ReadSector()
-        {
-            // 0xA8 is READ SECTORS command byte.
-            uint[] read_cmd = new uint[12]  { 0xA8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            uint status;
-            int size;
-            IO.Wait();
-            IO.
-        }
-        */
-
         public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
         {
             throw new NotImplementedException();
         }
 
-        public static void Eject()
+        public void Unload()
         {
 
         }

@@ -9,7 +9,7 @@ namespace Cosmos.Core.IOGroup
 {
     public class ATA : IOGroup
     {
-        public readonly IOPortRead Error; // BAR0 + 1 - read only
+        public readonly IOPort Error; // BAR0 + 1 - read only
         public readonly IOPortWrite Features; // BAR0 + 1 - write only
         public readonly IOPort Data; // BAR0
         public readonly IOPort SectorCount; // BAR0 + 2
@@ -40,7 +40,7 @@ namespace Cosmos.Core.IOGroup
 
             var xBAR0 = GetBAR0(aSecondary);
             var xBAR1 = GetBAR1(aSecondary);
-            Error = new IOPortRead(xBAR0, 1);
+            Error = new IOPort(xBAR0, 1);
             Features = new IOPortWrite(xBAR0, 1);
             Data = new IOPort(xBAR0);
             SectorCount = new IOPort(xBAR0, 2);
