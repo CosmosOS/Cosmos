@@ -21,6 +21,8 @@ namespace Cosmos.Debug.HyperVServer
         private readonly Runspace _runspace;
         private readonly TcpClient _tcpClient;
 
+        private Process _vmClientProcess;
+
         private NamedPipeClientStream _namedPipeClient;
         private NamedPipeServerStream _namedPipeServer;
 
@@ -34,7 +36,11 @@ namespace Cosmos.Debug.HyperVServer
 
         public async Task RunAsync()
         {
-            _namedPipeClient = new NamedPipeClientStream(".", "CosmosSerial1", PipeDirection.InOut);
+            _namedPipeClient = new NamedPipeClientStream(
+                ".",
+                "CosmosSerialHyperV",
+                PipeDirection.InOut,
+                PipeOptions.Asynchronous);
 
             var pipeSecurity = new PipeSecurity();
 
@@ -53,13 +59,13 @@ namespace Cosmos.Debug.HyperVServer
                 PipeDirection.InOut,
                 1,
                 PipeTransmissionMode.Byte,
-                PipeOptions.None,
+                PipeOptions.Asynchronous,
                 256,
                 256,
                 pipeSecurity,
                 HandleInheritability.None);
 
-            _ = Task.Run(WaitForNamedPipeConnections);
+            var namedPipeConnectionTask = Task.Run(WaitForNamedPipeConnections);
 
             using (var reader = new StreamReader(_tcpClient.GetStream()))
             {
@@ -94,6 +100,8 @@ namespace Cosmos.Debug.HyperVServer
                     }
                 }
             }
+
+            await namedPipeConnectionTask.ConfigureAwait(false);
         }
 
         public void Dispose()
@@ -119,17 +127,24 @@ namespace Cosmos.Debug.HyperVServer
 
         private void StartVirtualMachine(string vmName)
         {
-            Process.Start("vmconnect", $"\"localhost\" \"{vmName}\"");
+            _vmClientProcess = Process.Start("vmconnect", $"\"localhost\" \"{vmName}\"");
 
             RunScript(
                 StartVm,
                 ("vmName", vmName));
         }
 
-        private void StopVirtualMachine(string vmName) =>
+        private void StopVirtualMachine(string vmName)
+        {
+            if (!_vmClientProcess.HasExited)
+            {
+                _vmClientProcess.Kill();
+            }
+
             RunScript(
                 StopVm,
                 ("vmName", vmName));
+        }
 
         private void RunScript(string scriptName, params (string Name, object Value)[] parameters)
         {
@@ -152,33 +167,51 @@ namespace Cosmos.Debug.HyperVServer
 
         private async Task WaitForNamedPipeConnections()
         {
-            await _namedPipeServer.WaitForConnectionAsync().ConfigureAwait(false);
-            await _namedPipeClient.ConnectAsync().ConfigureAwait(false);
+            await Task.WhenAll(
+                _namedPipeServer.WaitForConnectionAsync(),
+                _namedPipeClient.ConnectAsync()
+                ).ConfigureAwait(false);
 
-            await ConnectPipesAsync().ConfigureAwait(false);
+            await Task.WhenAll(
+                Task.Run(ReadPipeAsync),
+                Task.Run(WritePipeAsync)
+                ).ConfigureAwait(false);
         }
 
-        private async Task ConnectPipesAsync()
+        private async Task ReadPipeAsync()
         {
             var buffer = new byte[256];
 
-            while (true)
+            while (_namedPipeClient.IsConnected
+                && _namedPipeServer.IsConnected)
             {
-                var readByteCount = await _namedPipeClient.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                var byteCount = await _namedPipeClient.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
-                if (readByteCount > 0)
+                if (byteCount > 0)
                 {
-                    _namedPipeServer.Write(buffer, 0, readByteCount);
+                    await _namedPipeServer.WriteAsync(buffer, 0, byteCount).ConfigureAwait(false);
                 }
-
-                var writtenByteCount = await _namedPipeServer.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
-
-                if (writtenByteCount > 0)
+                else
                 {
-                    _namedPipeClient.Write(buffer, 0, writtenByteCount);
+                    await Task.Delay(500).ConfigureAwait(false);
                 }
+            }
+        }
 
-                if (readByteCount == 0 && writtenByteCount == 0)
+        private async Task WritePipeAsync()
+        {
+            var buffer = new byte[256];
+
+            while (_namedPipeClient.IsConnected
+                && _namedPipeServer.IsConnected)
+            {
+                var byteCount = await _namedPipeServer.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+
+                if (byteCount > 0)
+                {
+                    await _namedPipeClient.WriteAsync(buffer, 0, byteCount).ConfigureAwait(false);
+                }
+                else
                 {
                     await Task.Delay(500).ConfigureAwait(false);
                 }
