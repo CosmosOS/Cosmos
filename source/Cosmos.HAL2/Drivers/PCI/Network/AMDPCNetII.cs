@@ -325,7 +325,9 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                     recv_size = (UInt16)(mRxDescriptor.Read32(xOffset + 0) & 0xFFF);
 
                     if (recv_size > 64) // remove checksum
+                    {
                         recv_size -= 4;
+                    }
 
                     recv_data = new byte[recv_size];
                     for (uint b = 0; b < recv_size; b++)

@@ -66,15 +66,11 @@ namespace Cosmos.System.Network.IPv4
                 return false;
         }
 
-        public bool IsBroadcastAddress()
-        {
-            if ((address[0] == 255) && (address[1] == 255) && (address[2] == 255) && (address[3] == 255))
-            {
-                return true;
-            }
-
-            return false;
-        }
+        public bool IsBroadcastAddress() =>
+            address[0] == 0xFF
+            && address[1] == 0xFF
+            && address[2] == 0xFF
+            && address[3] == 0xFF;
 
         public bool IsAPIPA()
         {
