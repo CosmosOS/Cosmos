@@ -22,14 +22,12 @@ namespace Cosmos.System.Network.IPv4
 
         protected override void initFields()
         {
-            Sys.Console.WriteLine("ARPPacket_Ethernet.initFields() called");
             base.initFields();
             mSenderMAC = new MACAddress(mRawData, 22);
             mSenderIP = new Address(mRawData, 28);
-            global::System.Console.WriteLine("SenderIP created");
             if (SenderIP == null)
             {
-                global::System.Console.WriteLine("But its already null again");
+                NetworkStack.debugger.Send("But its already null again");
             }
             mTargetMAC = new MACAddress(mRawData, 32);
             mTargetIP = new Address(mRawData, 38);
@@ -123,7 +121,7 @@ namespace Cosmos.System.Network.IPv4
         {
             if (SenderIP == null)
             {
-                global::System.Console.WriteLine("In ARPRequest_Ethernet, SenderIP is null!");
+                NetworkStack.debugger.Send("In ARPRequest_Ethernet, SenderIP is null!");
             }
         }
 
