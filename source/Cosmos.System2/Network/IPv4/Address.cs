@@ -82,16 +82,6 @@ namespace Cosmos.System.Network.IPv4
             return false;
         }
 
-        public bool IsAPIPA()
-        {
-            if ((address[0] == 169) && (address[1] == 254))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// Converts IP Address to String
         /// </summary>
