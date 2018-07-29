@@ -6,41 +6,74 @@ namespace Cosmos.System.Graphics
 {
     public static class FullScreenCanvas
     {
+        public static bool IsInUse = false;
+
+        public static void Disable()
+        {
+            if (IsInUse == false) { }
+            else if (IsInUse == true)
+            {
+                MyVideoDriver.Disable();
+                VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
+            }
+        }
+
+        private enum VideoDriver
+        {
+            VMWareSVGAIIDriver,
+            VBEDriver,
+            VGADriver
+        }
+
+        private static HAL.Drivers.VBEDriver VBEDriver;
+
         private static PCIDevice SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
-        public static bool SVGAIIExist()
+        public static bool BGAExists()
         {
-            if (SVGAIIDevice == null)
+            if (VBEDriver.Available() == false)
             {
                 return false;
             }
-
-            return SVGAIIDevice.DeviceExists;
+            else
+            {
+                return true;
+            }
         }
+
+        private static VideoDriver _VideoDevice;
 
         private static Canvas MyVideoDriver = null;
 
         private static Canvas GetVideoDriver()
         {
-            if (SVGAIIExist())
+            if (PCI.Exists(SVGAIIDevice))
             {
                 return new SVGAIIScreen();
             }
-            else
+            else if (BGAExists() == true)
             {
                 return new VBEScreen();
+            }
+            else
+            {
+                return new VGACanvas();
             }
         }
 
         private static Canvas GetVideoDriver(Mode mode)
         {
-            if (SVGAIIExist())
+            if (PCI.Exists(SVGAIIDevice) == true)
             {
                 return new SVGAIIScreen(mode);
             }
-            else
+            else if (BGAExists() == true)
             {
                 return new VBEScreen(mode);
+            }
+            else
+            {
+                return new VGACanvas(mode);
             }
         }
 

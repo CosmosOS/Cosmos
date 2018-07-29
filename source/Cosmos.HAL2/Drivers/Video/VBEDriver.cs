@@ -53,6 +53,10 @@ namespace Cosmos.HAL.Drivers
                 throw new NotSupportedException("No BGA adapter found..");
             }
 #endif
+            if (Available() == false)
+            {
+                throw new NotSupportedException("No BGA adapter found...");
+            }
 
             Global.mDebugger.SendInternal($"Creating VBEDriver with Mode {xres}*{yres}@{bpp}");
             VBESet(xres, yres, bpp);
@@ -64,7 +68,22 @@ namespace Cosmos.HAL.Drivers
             IO.VbeData.Word = value;
         }
 
-        private void VBEDisableDisplay()
+        private ushort VBERead(VBERegisterIndex index)
+        {
+            IO.VbeIndex.Word = (ushort) index;
+            return IO.VbeIndex.Word;
+        }
+
+        public bool Available()
+        {
+            if (VBERead(VBERegisterIndex.VBEDisplayID) == 0xB0C5)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void VBEDisableDisplay()
         {
             Global.mDebugger.SendInternal($"Disabling VBE display");
             VBEWrite(VBERegisterIndex.VBEDisplayEnable, (ushort)VBEEnableValues.VBEDisabled);

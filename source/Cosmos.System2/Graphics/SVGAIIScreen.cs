@@ -8,14 +8,18 @@ namespace Cosmos.System.Graphics
 {
     public class SVGAIIScreen : Canvas
     {
-        public VMWareSVGAII xSVGAIIDriver;
+        public override void Disable()
+        {
+            xSVGAIIDriver.Disable();
+        }
+        public SVGAIIDriver xSVGAIIDriver;
         internal Debug.Kernel.Debugger mSVGAIIDebugger = new Debug.Kernel.Debugger("System", "SVGAIIScreen");
 
         public SVGAIIScreen() : base()
         {
             mSVGAIIDebugger.SendInternal($"Creting new SVGAIIScreen with default mode {defaultGraphicMode}");
 
-            xSVGAIIDriver = new VMWareSVGAII();
+            xSVGAIIDriver = new SVGAIIDriver();
             xSVGAIIDriver.SetMode((uint)defaultGraphicMode.Columns, (uint)defaultGraphicMode.Rows, (uint)defaultGraphicMode.ColorDepth);
         }
 
@@ -23,7 +27,7 @@ namespace Cosmos.System.Graphics
         {
             ThrowIfModeIsNotValid(aMode);
 
-            xSVGAIIDriver = new VMWareSVGAII();
+            xSVGAIIDriver = new SVGAIIDriver();
             xSVGAIIDriver.SetMode((uint)aMode.Columns, (uint)aMode.Rows, (uint)aMode.ColorDepth);
         }
 
@@ -113,6 +117,7 @@ namespace Cosmos.System.Graphics
                 new Mode(640, 480, ColorDepth.ColorDepth32),
                 new Mode(720, 480, ColorDepth.ColorDepth32),
                 new Mode(800, 600, ColorDepth.ColorDepth32),
+                new Mode(1024, 768, ColorDepth.ColorDepth32),
                 new Mode(1152, 768, ColorDepth.ColorDepth32),
 
                 /* Old HD-Ready Resolutions */
@@ -143,8 +148,8 @@ namespace Cosmos.System.Graphics
                 new Mode(3840, 2400, ColorDepth.ColorDepth32), // WQUXGA
             };
         }
-        public static readonly Mode defaultGraphicsMode = new Mode(1024, 768, ColorDepth.ColorDepth16);
-        protected override Mode getDefaultGraphicMode() => new Mode(1024, 768, ColorDepth.ColorDepth16);
+        //public static readonly Mode defaultGraphicsMode = new Mode(1024, 768, ColorDepth.ColorDepth16);
+        protected override Mode getDefaultGraphicMode() => new Mode(800, 600, ColorDepth.ColorDepth32);
 
         private void SetGraphicsMode(Mode aMode)
         {
