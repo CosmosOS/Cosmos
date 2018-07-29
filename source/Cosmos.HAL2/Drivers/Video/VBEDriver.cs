@@ -48,7 +48,7 @@ namespace Cosmos.HAL.Drivers
              * tested... bah! Removing it for now.
              */
 #if false
-            if (HAL.PCI.GetDevice(1234, 1111 == null)
+            if (HAL.PCI.GetDevice(1234, 1111) == null)
             {
                 throw new NotSupportedException("No BGA adapter found..");
             }
