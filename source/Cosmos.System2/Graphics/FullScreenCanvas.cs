@@ -15,6 +15,7 @@ namespace Cosmos.System.Graphics
             {
                 MyVideoDriver.Disable();
                 VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
+                IsInUse = true;
             }
         }
 
