@@ -17,18 +17,17 @@ namespace Cosmos.TestRunner.Core
 
         private void InitializeDebugConnector(DebugConnector aDebugConnector)
         {
-            void LogKernelInformation(string aMessage, params object[] aArgs) =>
-                OutputHandler.LogMessage(String.Format(aMessage, aArgs));
+            void LogMessage(string aMessage) => OutputHandler.LogMessage(aMessage);
 
-            void AbortTestAndLogError(string aMessage, params object[] aArgs)
+            void AbortTestAndLogError(string aMessage)
             {
-                OutputHandler.LogError(String.Format(aMessage, aArgs));
+                OutputHandler.LogError(aMessage);
                 mKernelRunning = false;
             }
 
-            void AbortTestAndLogException(Exception aException, string aMessage, params object[] aArgs)
+            void AbortTestAndLogException(Exception aException, string aMessage)
             {
-                OutputHandler.LogError(String.Format(aMessage, aArgs));
+                OutputHandler.LogError(aMessage);
                 OutputHandler.UnhandledException(aException);
 
                 mKernelRunning = false;
@@ -39,7 +38,7 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException(nameof(aDebugConnector));
             }
 
-            aDebugConnector.OnDebugMsg = s => LogKernelInformation(s);
+            aDebugConnector.OnDebugMsg = s => OutputHandler.LogDebugMessage(s);
 
             aDebugConnector.ConnectionLost = e => AbortTestAndLogException(e, "DC: Connection lost.");
 
@@ -47,32 +46,32 @@ namespace Cosmos.TestRunner.Core
 
             aDebugConnector.CmdStarted = () =>
             {
-                LogKernelInformation("DC: Started");
+                LogMessage("DC: Started");
                 aDebugConnector.SendCmd(Vs2Ds.BatchEnd);
             };
 
             aDebugConnector.Error = e => AbortTestAndLogException(e, "DC Error.");
 
-            aDebugConnector.CmdText += s => LogKernelInformation("Text from kernel: " + s);
+            aDebugConnector.CmdText += s => LogMessage("Text from kernel: " + s);
 
-            aDebugConnector.CmdSimpleNumber += n => LogKernelInformation(
+            aDebugConnector.CmdSimpleNumber += n => LogMessage(
                 "Number from kernel: 0x" + n.ToString("X8").ToUpper());
 
-            aDebugConnector.CmdSimpleLongNumber += n => LogKernelInformation(
+            aDebugConnector.CmdSimpleLongNumber += n => LogMessage(
                 "Number from kernel: 0x" + n.ToString("X16").ToUpper());
 
-            aDebugConnector.CmdComplexNumber += f => LogKernelInformation(
+            aDebugConnector.CmdComplexNumber += f => LogMessage(
                 "Number from kernel: 0x" + f.ToString("X8").ToUpper());
 
-            aDebugConnector.CmdComplexLongNumber += d => LogKernelInformation(
+            aDebugConnector.CmdComplexLongNumber += d => LogMessage(
                 "Number from kernel: 0x" + d.ToString("X16").ToUpper());
 
-            aDebugConnector.CmdMessageBox = s => LogKernelInformation(
+            aDebugConnector.CmdMessageBox = s => LogMessage(
                 "MessageBox from kernel: " + s);
 
             aDebugConnector.CmdKernelPanic = n =>
             {
-                LogKernelInformation("Kernel panic! Number = " + n);
+                LogMessage("Kernel panic! Number = " + n);
                 // todo: add core dump here, call stack.
             };
 
@@ -161,7 +160,7 @@ namespace Cosmos.TestRunner.Core
             {
                 aDebugConnector.CmdInterruptOccurred = a =>
                 {
-                    OutputHandler.LogMessage("Interrupt {a} occurred");
+                    OutputHandler.LogMessage($"Interrupt {a} occurred");
                 };
             }
         }
