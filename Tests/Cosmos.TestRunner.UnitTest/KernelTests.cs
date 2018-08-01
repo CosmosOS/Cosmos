@@ -23,9 +23,9 @@ namespace Cosmos.TestRunner.UnitTest
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(typeof(KernelTests).Assembly.Location));
 
                 var xEngine = new Engine(new EngineConfiguration(aKernelType));
-                xEngine.OutputHandler = new TestOutputHandler();
+                xEngine.SetOutputHandler(new TestOutputHandler());
 
-                Assert.IsTrue(xEngine.Execute());
+                Assert.IsTrue(xEngine.Execute().KernelTestResults[0].Result);
             }
             catch (AssertionException)
             {
