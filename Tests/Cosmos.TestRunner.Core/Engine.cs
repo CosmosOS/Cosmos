@@ -82,12 +82,6 @@ namespace Cosmos.TestRunner.Core
                     xKernelTestResult.TestLog = mTestResultOutputHandler.TestLog;
 
                     xTestResult.AddKernelTestResult(xKernelTestResult);
-
-                    if (!xKernelTestResult.Result)
-                    {
-                        OutputHandler.LogMessage(xKernelTestResult.TestLog);
-                        break;
-                    }
                 }
 
                 OutputHandler.RunConfigurationEnd(xConfig);
