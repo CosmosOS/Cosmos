@@ -36,14 +36,10 @@ build_script:
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
-#test: off
-#  assemblies:
-#  - Cosmos.Core.Memory.Test.dll
-#  - DebugCompiler.dll
-#  - Cosmos.TestRunner.UnitTest.dll
-
-test_script:
-- cmd: dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
+test:
+  assemblies:
+    except:
+    - Cosmos.TestRunner.UnitTest.dll
 
 on_finish:
 - ps: |
