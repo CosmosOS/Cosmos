@@ -1,6 +1,10 @@
 <Project>
 
     <PropertyGroup>
+        <LangVersion>Latest</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
         <IL2CPURepoRoot>$(RepoRoot)..\IL2CPU\</IL2CPURepoRoot>
         <XSharpRepoRoot>$(RepoRoot)..\XSharp\</XSharpRepoRoot>
