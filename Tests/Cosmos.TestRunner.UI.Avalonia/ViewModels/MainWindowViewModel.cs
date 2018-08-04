@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Threading;
 
 using Cosmos.TestRunner.Core;
+using Cosmos.TestRunner.Full;
 
 namespace Cosmos.TestRunner.UI.ViewModels
 {
@@ -12,7 +13,7 @@ namespace Cosmos.TestRunner.UI.ViewModels
 
         public MainWindowViewModel(IEngineConfiguration aEngineConfiguration)
         {
-            var xEngine = new Engine(aEngineConfiguration);
+            var xEngine = new FullEngine(aEngineConfiguration);
 
             xEngine.SetOutputHandler(
                 new OutputHandler(

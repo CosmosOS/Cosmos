@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 
 using Cosmos.Build.Common;
+using Cosmos.TestRunner.Core;
 
-namespace Cosmos.TestRunner.Core
+namespace Cosmos.TestRunner.Full
 {
     public class DefaultEngineConfiguration : IEngineConfiguration
     {
@@ -28,6 +29,15 @@ namespace Cosmos.TestRunner.Core
         public virtual bool EnableStackCorruptionChecks => true;
         public virtual StackCorruptionDetectionLevel StackCorruptionDetectionLevel => StackCorruptionDetectionLevel.AllInstructions;
 
-        public virtual IEnumerable<Type> KernelTypesToRun => TestKernelSets.GetStableKernelTypes();
+        public virtual IEnumerable<string> KernelAssembliesToRun
+        {
+            get
+            {
+                foreach (var xKernelType in TestKernelSets.GetStableKernelTypes())
+                {
+                    yield return xKernelType.Assembly.Location;
+                }
+            }
+        }
     }
 }

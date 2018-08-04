@@ -2,6 +2,7 @@
 using System.IO;
 
 using Cosmos.TestRunner.Core;
+using Cosmos.TestRunner.Full;
 
 namespace Cosmos.TestRunner
 {
@@ -20,7 +21,7 @@ namespace Cosmos.TestRunner
             var xEngineConfiguration = new DefaultEngineConfiguration();
             var xOutputHandler = new OutputHandlerFullConsole();
 
-            var xEngine = new Engine(xEngineConfiguration);
+            var xEngine = new FullEngine(xEngineConfiguration);
             xEngine.SetOutputHandler(xOutputHandler);
 
             var xResult = xEngine.Execute();

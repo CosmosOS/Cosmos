@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Cosmos.Build.Common;
 
@@ -22,7 +23,7 @@ namespace Cosmos.TestRunner.Core
         protected bool RunWithGDB => mConfiguration.RunWithGDB;
         protected bool StartBochsDebugGui => mConfiguration.StartBochsDebugGUI;
 
-        public IEnumerable<Type> KernelsToRun => mConfiguration.KernelTypesToRun;
+        public IEnumerable<string> KernelsAssembliesToRun => mConfiguration.KernelAssembliesToRun;
 
         private IEngineConfiguration mConfiguration;
         private TestResultOutputHandler mTestResultOutputHandler;
@@ -35,8 +36,12 @@ namespace Cosmos.TestRunner.Core
             mTestResultOutputHandler = new TestResultOutputHandler();
         }
 
-        public ITestResult Execute()
+        public ITestResult Execute() => Execute(CancellationToken.None);
+
+        public ITestResult Execute(CancellationToken cancellationToken)
         {
+            // todo: implement cancellation
+
             if (!RunTargets.Any())
             {
                 throw new InvalidOperationException("No run targets were specified!");
@@ -50,9 +55,9 @@ namespace Cosmos.TestRunner.Core
             {
                 OutputHandler.RunConfigurationStart(xConfig);
 
-                foreach (var xKernelType in KernelsToRun)
+                foreach (var xKernelAssembly in KernelsAssembliesToRun)
                 {
-                    var xKernelName = xKernelType.Assembly.GetName().Name;
+                    var xKernelName = Path.GetFileNameWithoutExtension(xKernelAssembly);
                     var xKernelTestResult = new KernelTestResult(xKernelName, xConfig);
 
                     var xWorkingDirectory = Path.Combine(WorkingDirectoryBase, xKernelName);
@@ -67,7 +72,7 @@ namespace Cosmos.TestRunner.Core
                     try
                     {
                         xKernelTestResult.Result = ExecuteKernel(
-                            xKernelType.Assembly.Location, xWorkingDirectory, xConfig, xKernelTestResult);
+                            xKernelAssembly, xWorkingDirectory, xConfig, xKernelTestResult);
                     }
                     catch (Exception e)
                     {

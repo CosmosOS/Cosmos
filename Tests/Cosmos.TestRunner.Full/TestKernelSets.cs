@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Cosmos.TestRunner.Core
+namespace Cosmos.TestRunner.Full
 {
     public static class TestKernelSets
     {
@@ -34,7 +34,7 @@ namespace Cosmos.TestRunner.Core
             /* Please see the notes on the kernel itself before enabling it */
             //yield return typeof(GraphicTest.Kernel);
             /* Please see the notes on the kernel itself before enabling it */
-           //yield return typeof(ConsoleTest.Kernel);
+            //yield return typeof(ConsoleTest.Kernel);
         }
     }
 }

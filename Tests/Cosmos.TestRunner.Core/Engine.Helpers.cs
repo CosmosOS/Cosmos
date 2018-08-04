@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 
 using Cosmos.Build.Common;
-using Cosmos.IL2CPU;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -14,7 +13,7 @@ namespace Cosmos.TestRunner.Core
     {
         private string FindCosmosRoot()
         {
-            var xCurrentDirectory = AppContext.BaseDirectory;
+            var xCurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var xCurrentInfo = new DirectoryInfo(xCurrentDirectory);
             while (xCurrentInfo.Parent != null)
             {
@@ -180,6 +179,11 @@ namespace Cosmos.TestRunner.Core
             }
         }
 
+        protected virtual void RunIL2CPUInProc(
+            IEnumerable<string> args,
+            Action<string> logMessage,
+            Action<string> logError) => throw new NotSupportedException();
+
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
             var refsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".refs");
@@ -242,15 +246,12 @@ namespace Cosmos.TestRunner.Core
             {
                 if (DebugIL2CPU)
                 {
-                    if (KernelsToRun.Count() > 1)
+                    if (KernelsAssembliesToRun.Skip(1).Any())
                     {
                         throw new Exception("Cannot run multiple kernels with in-process compilation!");
                     }
 
-                    // ensure we're using the referenced (= solution) version
-                    Cosmos.IL2CPU.CosmosAssembler.ReadDebugStubFromDisk = false;
-
-                    Program.Run(xArgs.ToArray(), OutputHandler.LogMessage, OutputHandler.LogError);
+                    RunIL2CPUInProc(xArgs.ToArray(), OutputHandler.LogMessage, OutputHandler.LogError);
                 }
                 else
                 {
