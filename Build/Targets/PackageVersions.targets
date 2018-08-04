@@ -1,0 +1,11 @@
+<Project>
+
+    <PropertyGroup>
+        <MicrosoftNETTestSdkVersion>15.7.0</MicrosoftNETTestSdkVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />
+    </ItemGroup>
+
+</Project>
