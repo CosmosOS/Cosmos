@@ -76,7 +76,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Runner", "Test Runner"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{52D81759-C7CC-427F-8C96-89CA10C914B5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoxingTests", "Tests\BoxingTests\BoxingTests.csproj", "{39D2CC10-CD6B-4BC3-B42C-CA26004D38EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoxingTests", "Tests\Kernels\BoxingTests\BoxingTests.csproj", "{39D2CC10-CD6B-4BC3-B42C-CA26004D38EB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner", "Tests\Cosmos.TestRunner\Cosmos.TestRunner.csproj", "{63C45839-60B2-41BC-973E-C2EF11F33E34}"
 EndProject
@@ -84,27 +84,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.Core", "T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.TestController", "Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj", "{3402C6D1-4F86-42C4-881E-DA69FD851CD9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.Bcl", "Tests\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj", "{8CB21203-0659-473A-8C7E-D5B178F00041}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.Bcl", "Tests\Kernels\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj", "{8CB21203-0659-473A-8C7E-D5B178F00041}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.Encryption", "Tests\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj", "{8F2B0616-46D1-4BC2-95EE-AB9533E676D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.Encryption", "Tests\Kernels\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj", "{8F2B0616-46D1-4BC2-95EE-AB9533E676D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.Interfaces", "Tests\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.csproj", "{E78BE459-4E5F-4830-911A-9E23B9981410}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.Interfaces", "Tests\Kernels\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.csproj", "{E78BE459-4E5F-4830-911A-9E23B9981410}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.Exceptions", "Tests\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj", "{73BB6747-106D-44EE-BE78-21238A7510C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.Exceptions", "Tests\Kernels\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj", "{73BB6747-106D-44EE-BE78-21238A7510C1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.Fat", "Tests\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj", "{6575A354-AB4D-4BD1-989C-DAD9E725E5EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.Fat", "Tests\Kernels\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj", "{6575A354-AB4D-4BD1-989C-DAD9E725E5EB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStructsAndArraysTest", "Tests\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj", "{AD34EE2D-9665-402E-A349-554330D1A970}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStructsAndArraysTest", "Tests\Kernels\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj", "{AD34EE2D-9665-402E-A349-554330D1A970}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.MethodTests", "Tests\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj", "{D42E1F90-D9D5-4882-9103-758840382574}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.MethodTests", "Tests\Kernels\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj", "{D42E1F90-D9D5-4882-9103-758840382574}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.IO", "Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj", "{1B72C465-A0F6-4865-836B-2334E3F3376F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.IO", "Tests\Kernels\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj", "{1B72C465-A0F6-4865-836B-2334E3F3376F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.SingleEchoTest", "Tests\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj", "{361F9108-91F2-4C9F-BE90-12732DF72B8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.SingleEchoTest", "Tests\Kernels\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj", "{361F9108-91F2-4C9F-BE90-12732DF72B8D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.UnitTest", "Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj", "{6D59FC7A-6F27-4140-BA41-F89126490C4C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphicTest", "Tests\GraphicTest\GraphicTest.csproj", "{FB23BD72-AEC3-485E-B86C-8E7DB0B3BB9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphicTest", "Tests\Kernels\GraphicTest\GraphicTest.csproj", "{FB23BD72-AEC3-485E-B86C-8E7DB0B3BB9B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Memory.Test", "Tests\Cosmos.Core.Memory.Test\Cosmos.Core.Memory.Test.csproj", "{408E5ACC-EA9A-41E8-AA95-514C5F47BD34}"
 EndProject
@@ -146,11 +146,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\source\XSharp.x86\XSharp.x86.csproj", "{D0EABA08-88C9-4F7C-BCA9-361B58B20D67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.TypeSystem", "Tests\Cosmos.Compiler.Tests.TypeSystem\Cosmos.Compiler.Tests.TypeSystem.csproj", "{D21A7C6C-A696-4EC3-84EB-70700C1E3B34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.TypeSystem", "Tests\Kernels\Cosmos.Compiler.Tests.TypeSystem\Cosmos.Compiler.Tests.TypeSystem.csproj", "{D21A7C6C-A696-4EC3-84EB-70700C1E3B34}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.Fat2", "Tests\Cosmos.Kernel.Tests.Fat2\Cosmos.Kernel.Tests.Fat2.csproj", "{D4B1618A-3653-43CD-B617-20482B12712B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.Fat2", "Tests\Kernels\Cosmos.Kernel.Tests.Fat2\Cosmos.Kernel.Tests.Fat2.csproj", "{D4B1618A-3653-43CD-B617-20482B12712B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "Tests\ConsoleTest\ConsoleTest.csproj", "{0DF97CAC-220B-4DAD-B397-42E394255763}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "Tests\Kernels\ConsoleTest\ConsoleTest.csproj", "{0DF97CAC-220B-4DAD-B397-42E394255763}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.UI.Avalonia", "Tests\Cosmos.TestRunner.UI.Avalonia\Cosmos.TestRunner.UI.Avalonia.csproj", "{2992AA07-E126-4EE0-B31C-D0B2ADE3393A}"
 EndProject

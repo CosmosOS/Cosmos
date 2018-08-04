@@ -9,20 +9,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BoxingTests\BoxingTests.csproj" />
-        <ProjectReference Include="..\ConsoleTest\ConsoleTest.csproj" />
-        <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
-        <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
-        <ProjectReference Include="..\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj" />
-        <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.csproj" />
-        <ProjectReference Include="..\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj" />
-        <ProjectReference Include="..\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj" />
-        <ProjectReference Include="..\Cosmos.Compiler.Tests.TypeSystem\Cosmos.Compiler.Tests.TypeSystem.csproj" />
-        <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat2\Cosmos.Kernel.Tests.Fat2.csproj" />
-        <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
-        <ProjectReference Include="..\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
-        <ProjectReference Include="..\GraphicTest\GraphicTest.csproj" />
-        <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
+        <ProjectReference Include="..\Kernels\BoxingTests\BoxingTests.csproj" />
+        <ProjectReference Include="..\Kernels\ConsoleTest\ConsoleTest.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.TypeSystem\Cosmos.Compiler.Tests.TypeSystem.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.Fat2\Cosmos.Kernel.Tests.Fat2.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
+        <ProjectReference Include="..\Kernels\GraphicTest\GraphicTest.csproj" />
+        <ProjectReference Include="..\Kernels\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
     </ItemGroup>
 
     <ItemGroup>
