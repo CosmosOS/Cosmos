@@ -14,16 +14,12 @@ namespace Cosmos.HAL.BlockDevice
             {
                 Console.WriteLine("ATA Primary Master");
                 Initialize(ATA.ControllerIdEnum.Primary, ATA.BusPositionEnum.Master);
-                Console.ReadKey(true);
                 Console.WriteLine("ATA Primary Slave");
                 Initialize(ATA.ControllerIdEnum.Primary, ATA.BusPositionEnum.Slave);
-                Console.ReadKey(true);
                 Console.WriteLine("ATA Secondary Master");
                 Initialize(ATA.ControllerIdEnum.Secondary, ATA.BusPositionEnum.Master);
-                Console.ReadKey(true);
                 Console.WriteLine("ATA Secondary Slave");
                 Initialize(ATA.ControllerIdEnum.Secondary, ATA.BusPositionEnum.Slave);
-                Console.ReadKey(true);
             }
         }
 
@@ -33,15 +29,13 @@ namespace Cosmos.HAL.BlockDevice
             var xATA = new ATA_PIO(xIO, aControllerID, aBusPosition);
             if (xATA.DriveType == ATA_PIO.SpecLevel.Null)
             {
-                //ATA.ATADebugger.Send
-                Console.WriteLine("No ATA device found @ " + aControllerID + ", " + aBusPosition);
+                ATA.ATADebugger.Send("No ATA device found @ " + aControllerID + ", " + aBusPosition);
                 return;
             }
             else if (xATA.DriveType == ATA_PIO.SpecLevel.ATA)
             {
                 BlockDevice.Devices.Add(xATA);
-                //ATA.ATADebugger.Send
-                Console.WriteLine("ATA device with speclevel ATA found @ " + aControllerID + ", " + aBusPosition);
+                ATA.ATADebugger.Send("ATA device with speclevel ATA found @ " + aControllerID + ", " + aBusPosition);
 
                 #region ATA_MBR
                 var xMbrData = new byte[512];
@@ -86,9 +80,8 @@ namespace Cosmos.HAL.BlockDevice
             else if (xATA.DriveType == ATA_PIO.SpecLevel.ATAPI)
             {
                 BlockDevice.Devices.Add(xATA);
-                ATAPI.ATAPIDevices.Add(xATA);
-                //ATA.ATADebugger.Send
-                Console.WriteLine("ATA device with speclevel ATAPI found @ " + aControllerID + ", " + aBusPosition + ". Support WIP");
+                new ATAPI();
+                ATA.ATADebugger.Send("ATA device with speclevel ATAPI found @ " + aControllerID + ", " + aBusPosition + ". Support WIP");
             }
             
         }

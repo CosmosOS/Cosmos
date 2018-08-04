@@ -101,7 +101,8 @@ namespace Cosmos.HAL.BlockDevice
 			IdentifyPacket = 0xA1,
 			Identify = 0xEC,
 			Read = 0xA8,
-			Eject = 0x1B
+			Eject = 0x1B,
+            ReadTOC = 0x43
 		}
 
 		public enum Ident : byte

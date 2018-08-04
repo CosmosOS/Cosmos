@@ -7,13 +7,13 @@ namespace Cosmos.HAL.BlockDevice
 {
     public class ATAPI : BlockDevice
     {
-
         public static List<BlockDevice> ATAPIDevices = new List<BlockDevice>();
 
-        class PacketCommands
+        public class PacketCommands
         {
-            public byte[] TableOfContents = { 0x43, 0, 1, 0, 0, 0, 0, 0, 12, 0x40, 0, 0 };
-            public byte[] ReadSector = { 0xA8, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
+            public static byte[] TableOfContents = { (byte) ATA_PIO.Cmd.ReadTOC, 0, 1, 0, 0, 0, 0, 0, 12, 0x40, 0, 0 };
+            public static byte[] ReadSector = { (byte) ATA_PIO.Cmd.Read, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
+            public static byte[] Unload = { (byte)ATA_PIO.Cmd.Eject, 0, 0, 0, 0x02, 0, 0, 0, 0, 0, 0, 0 };
         }
 
         /*
@@ -23,6 +23,7 @@ namespace Cosmos.HAL.BlockDevice
          */
 
         protected static Core.IOGroup.ATA IO;
+        protected byte[] ATAPI_Packet;
         private const UInt16 SectorSize = 2048;
         private const UInt32 LBA = 0;
         private static bool IRQReceived = false;
@@ -30,7 +31,7 @@ namespace Cosmos.HAL.BlockDevice
 
         public ATAPI()
         {
-            ATAPIDevices.Add(this);
+            BlockDevice.Devices.Add(this);
             Init();
         }
 
@@ -69,54 +70,60 @@ namespace Cosmos.HAL.BlockDevice
         // Single block size = 2048 bytes for CD/DVD
         public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
         {
+            //IRQReceived = false;
+
+            //IO.DeviceSelect.Byte = (0xA0 | (1 << 4));
+            //IO.Error.Byte = 0;
+
+            //IO.LBA1.Byte = (byte)(SectorSize & 0xFF);
+            //IO.LBA2.Byte = (byte)(SectorSize >> 8);
+            //IO.Command.Byte = 0xA0;
+
+            //byte status = 0;
+            //bool OKtoRead = false;
+
+            //for (int i = 0; i < 500; i++)
+            //{
+            //    status = IO.Status.Byte;
+            //    if ((status & 0xFF) != 0x1)
+            //    {
+            //        OKtoRead = true;
+            //        break;
+            //    }
+            //}
+
+
+            //if (OKtoRead == true)
+            //{
+            //    Console.WriteLine("OK to transfer!");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Timeout!");
+            //}
+
+            ATAPI_Packet[0] = (byte) ATA_PIO.Cmd.Read;//Read Sector
+            ATAPI_Packet[1] = 0;
+            ATAPI_Packet[2] = (byte)((aBlockNo >> 0x18) & 0xFF);//MSB
+            ATAPI_Packet[3] = (byte)((aBlockNo >> 0x10) & 0xFF);
+            ATAPI_Packet[4] = (byte)((aBlockNo >> 0x08) & 0xFF);
+            ATAPI_Packet[5] = (byte)((aBlockNo >> 0x00) & 0xFF);//LSB
+            ATAPI_Packet[6] = 0;
+            ATAPI_Packet[7] = 0;
+            ATAPI_Packet[8] = 0;
+            ATAPI_Packet[9] = (byte) (aBlockCount & 0xFF);//Sector Count
+            ATAPI_Packet[10] = 0;
+            ATAPI_Packet[11] = 0;
+
             IRQReceived = false;
-
-            IO.DeviceSelect.Byte = (0xA0 | (1 << 4));
-            IO.Error.Byte = 0;
-
-            IO.LBA1.Byte = (byte)(SectorSize & 0xFF);
-            IO.LBA2.Byte = (byte)(SectorSize >> 8);
-            IO.Command.Byte = 0xA0;
-
-            byte status = 0;
-            bool OKtoRead = false;
-
-            for (int i = 0; i < 500; i++)
-            {
-                status = IO.Status.Byte;
-                if ((status & 0xFF) != 0x1)
-                {
-                    OKtoRead = true;
-                    break;
-                }
-            }
-
-
-            if (OKtoRead == true)
-            {
-                Console.WriteLine("OK to transfer!");
-            }
-            else
-            {
-                Console.WriteLine("Timeout!");
-            }
-
-            IO.Data.Byte = 0xA8;//Read Sector
-            IO.Data.Byte = 0;
-            IO.Data.Byte = (byte)((aBlockNo >> 0x18) & 0xFF);//MSB
-            IO.Data.Byte = (byte)((aBlockNo >> 0x10) & 0xFF);
-            IO.Data.Byte = (byte)((aBlockNo >> 0x08) & 0xFF);
-            IO.Data.Byte = (byte)((aBlockNo >> 0x00) & 0xFF);//LSB
-            IO.Data.Byte = 0;
-            IO.Data.Byte = 0;
-            IO.Data.Byte = 0;
-            IO.Data.Byte = 1;//Sector Count
-            IO.Data.Byte = 0;
-            IO.Data.Byte = 0;
-
+            IO.Control.Byte = 0x00;
+            IO.Features.Byte = 0x00;
+            IO.LBA1.Byte = (byte)((SectorSize) & 0xFF);
+            IO.LBA2.Byte = (byte)((SectorSize >> 8) & 0xFF);
+            SendCmd();
             System.Threading.Thread.Sleep(100);
 
-            for (int i = 0; i < 256; i++)
+            for (int i = 0; i < SectorSize; i++)
             {
                 Buffer[i] = IO.Data.Word;
             }
@@ -128,9 +135,64 @@ namespace Cosmos.HAL.BlockDevice
             throw new NotImplementedException();
         }
 
-        public void Unload()
+        private void SendCmd()
         {
+            IO.Command.Byte = (byte)ATA_PIO.Cmd.Packet;
+            AdvPoll();
+            foreach (byte command in ATAPI_Packet)
+            {
+                IO.Data.Byte = command;
+            }
+            IRQClear();
+            Poll();
+        }
 
+        public void Eject()
+        {
+            ATAPI_Packet = ATAPI.PacketCommands.Unload;
+            IRQReceived = false;
+            SendCmd();
+        }
+
+        private void Poll()
+        {
+            // 400ns until BSR is set
+            IO.Wait();
+
+            while ((IO.Status.Byte & (byte) ATA_PIO.Status.Busy) != 0)
+            {
+                // Wait for the ATAPI Device to no longer be busy...
+            }
+
+        }
+
+        private void AdvPoll()
+        {
+            Poll();
+            var aState = (ATA_PIO.Status)IO.Status.Byte;
+            if ((aState & ATA_PIO.Status.Error) != 0)
+            {
+                ATA.ATADebugger.Send("ATA Error");
+                throw new Exception("ATA Error occured!");
+            }
+
+            if ((aState & ATA_PIO.Status.ATA_SR_DF) != 0)
+            {
+                ATA.ATADebugger.Send("ATA Device Fault");
+                throw new Exception("ATA device fault encountered!");
+            }
+
+            if ((aState & ATA_PIO.Status.DRQ) != 0)
+            {
+                ATA.ATADebugger.Send("DRQ not set");
+                throw new Exception("ATA DRQ not set!");
+            }
+        }
+
+        private void IRQClear()
+        {
+            while (!IRQReceived) ;
+            IRQReceived = false;
         }
     }
 }
