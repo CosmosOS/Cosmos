@@ -24,7 +24,7 @@ namespace Cosmos.System
 
         public void Eject()
         {
-            Device.Unload();
+            Device.Eject();
         }
     }
 }
