@@ -1,5 +1,6 @@
 using System.Threading;
 using IL2CPU.API.Attribs;
+using Console = System.Console;
 
 namespace Cosmos.Core_Plugs.System.Threading
 {
@@ -14,6 +15,11 @@ namespace Cosmos.Core_Plugs.System.Threading
         public static void MemoryBarrier()
         {
 
+        }
+
+        public static void Ctor(ThreadStart aThis, ThreadStart aEntry)
+        {
+            Console.WriteLine("Thread started");
         }
 
         //    public static void SleepInternal(int ms)

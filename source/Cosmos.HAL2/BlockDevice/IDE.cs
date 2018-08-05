@@ -8,15 +8,15 @@ namespace Cosmos.HAL.BlockDevice
         private static PCIDevice xDevice = HAL.PCI.GetDeviceClass(HAL.ClassID.MassStorageController,
                                                                   HAL.SubclassID.IDEInterface);
 
-        internal static void InitDriver()
+        public static void InitDriver()
         {
             if (xDevice != null)
             {
-                Console.WriteLine("ATA Primary Master");
+                CustomConsole.WriteLineInfo("ATA Primary Master");
                 Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
                 //Console.WriteLine("ATA Primary Slave");
                 //Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
-                Console.WriteLine("ATA Secondary Master");
+                CustomConsole.WriteLineInfo("ATA Secondary Master");
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
                 //Console.WriteLine("ATA Secondary Slave");
                 //Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
@@ -66,13 +66,13 @@ namespace Cosmos.HAL.BlockDevice
                 var xPart = xMBR.Partitions[i];
                 if (xPart == null)
                 {
-                    Console.WriteLine("Null partition found at idx: " + i);
+                    CustomConsole.WriteLineError("Null partition found at idx: " + i);
                 }
                 else
                 {
                     var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
                     BlockDevice.Devices.Add(xPartDevice);
-                    Console.WriteLine("Found partition at idx: " + i);
+                    CustomConsole.WriteLineOK("Found partition at idx: " + i);
                 }
             }
         }

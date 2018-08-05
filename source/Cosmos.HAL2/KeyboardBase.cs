@@ -7,7 +7,10 @@
         /// </summary>
         public abstract void Initialize();
 
-        public abstract void UpdateLeds();
+        public abstract void UpdateLeds(
+            bool aScrollLock,
+            bool aNumLock,
+            bool aCapsLock);
 
         public delegate void KeyPressedEventHandler(byte ScanCode, bool Released);
         public KeyPressedEventHandler OnKeyPressed;
