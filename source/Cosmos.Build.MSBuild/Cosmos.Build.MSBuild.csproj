@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net462</TargetFramework>
+        <TargetFramework>net471</TargetFramework>
         <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
     </PropertyGroup>
 
@@ -15,18 +15,11 @@
         <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
         <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.3.409" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
-        <PackageReference Include="System.Data.Common" Version="4.1.0" />
     </ItemGroup>
   
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
         <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
     </ItemGroup>
-  
-    <Target Name="ExcludeSystemDataCommon" AfterTargets="ImplicitlyExpandNETStandardFacades">
-        <ItemGroup>
-            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'System.Data.Common'" />
-        </ItemGroup>
-    </Target>
 
 </Project>

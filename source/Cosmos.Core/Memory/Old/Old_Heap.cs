@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmos.Core;
-using Cosmos.Core.Processing;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.Memory.Old
@@ -19,8 +18,6 @@ namespace Cosmos.Core.Memory.Old
         private static uint mLastTableIndex = 0u;
 
         private static uint mLastEntryIndex = 0u;
-
-        private static Mutex mMemeoryGate = new Mutex();
 
         private static void DoInitialize(uint aEndOfRam)
         {
@@ -60,10 +57,7 @@ namespace Cosmos.Core.Memory.Old
             try
             {
                 EnsureIsInitialized();
-                if(mMemeoryGate != null)
-                {
-                    mMemeoryGate.Lock();
-                }
+
                 var xCurrentTableIdx = mLastTableIndex;
                 DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
                 DataLookupTable* xPreviousTable = null;
@@ -80,10 +74,6 @@ namespace Cosmos.Core.Memory.Old
                             while (true)
                             {
                             }
-                        }
-                        if (mMemeoryGate != null)
-                        {
-                            mMemeoryGate.Unlock();
                         }
                         return xResult;
                     }
@@ -122,10 +112,6 @@ namespace Cosmos.Core.Memory.Old
                 }
                 mLastTableIndex = xCurrentTableIdx;
                 mLastEntryIndex = 0;
-                if (mMemeoryGate != null)
-                {
-                    mMemeoryGate.Unlock();
-                }
                 return xResult;
             }
             finally
@@ -137,10 +123,6 @@ namespace Cosmos.Core.Memory.Old
                 else
                 {
                     //mDebugger.Trace("    Not enabling interrupts, because they weren't enabled yet!");
-                }
-                if (mMemeoryGate != null)
-                {
-                    mMemeoryGate.Unlock();
                 }
             }
         }

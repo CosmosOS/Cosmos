@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Cosmos.Core;
 
 namespace Cosmos.HAL.Drivers.PCI.Video
@@ -250,28 +250,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         {
             Fill(0, 0, width, height, color);
         }
-        
-        public void ScrollUp()
-        {
-            for (int i = 0; i < height; i++)
-            {
-                for (int m = 0; m < width; m++)
-                {
-                    Video_Memory[(uint)(i * width + m) * depth] = Video_Memory[(uint)((i + 16) * width + m) * depth];
 
-                }
-            }
-
-            for (int i = (int)height - 16; i < height; i++)
-            {
-                for (int m = 0; m < width; m++)
-                {
-                    Video_Memory[(uint)(i * width + m) * depth] = 0x00;
-
-                }
-            }
-        }
-        
         public void Copy(uint x, uint y, uint newX, uint newY, uint width, uint height)
         {
             if ((capabilities & (uint)Capability.RectCopy) != 0)
@@ -352,11 +331,6 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             for (int i = 0; i < 4; i++)
                 WriteToFifo(0xFFFFFF);
             WaitForFifo();
-        }
-        
-        public void Disable()
-        {
-            WriteRegister(Register.Enable, 0);
         }
 
         public void SetCursor(bool visible, uint x, uint y)
