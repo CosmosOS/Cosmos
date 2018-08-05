@@ -30,6 +30,11 @@ namespace Cosmos.System.Graphics
             VBEDriver = new VBEDriver((ushort)mode.Columns, (ushort)mode.Rows, (ushort)mode.ColorDepth);
         }
 
+        public override void Disable()
+        {
+            VBEDriver.VBEDisableDisplay();
+        }
+
         public override Mode Mode
         {
             get
