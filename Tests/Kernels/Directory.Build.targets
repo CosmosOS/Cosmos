@@ -1,0 +1,24 @@
+<Project>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(MSBuildThisFileDirectory)..\Cosmos.TestRunner.TestAdapter\Cosmos.TestRunner.TestAdapter.csproj" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PlugsProjectReference Include="$(MSBuildThisFileDirectory)..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
+        <PlugsProjectReference Include="$(MSBuildThisFileDirectory)..\..\source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj" />
+        <PlugsProjectReference Include="$(MSBuildThisFileDirectory)..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj" />
+        <PlugsProjectReference Include="$(MSBuildThisFileDirectory)..\..\source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="@(PlugsProjectReference)" PrivateAssets="All" ReferenceOutputAssembly="False" OutputItemType="Content" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <Import Project="..\..\Directory.Build.targets" />
+
+</Project>

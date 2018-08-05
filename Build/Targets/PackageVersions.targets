@@ -1,0 +1,18 @@
+<Project>
+
+    <PropertyGroup>
+        <MicrosoftNETTestSdkVersion>15.7.0</MicrosoftNETTestSdkVersion>
+        <MSTestVersion>1.3.2</MSTestVersion>
+        <NUnitVersion>3.10.1</NUnitVersion>
+        <NUnit3TestAdapterVersion>3.10.0</NUnit3TestAdapterVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />
+        <PackageReference Update="MSTest.TestAdapter" Version="$(MSTestVersion)" />
+        <PackageReference Update="MSTest.TestFramework" Version="$(MSTestVersion)" />
+        <PackageReference Update="NUnit" Version="$(NUnitVersion)" />
+        <PackageReference Update="NUnit3TestAdapter" Version="$(NUnit3TestAdapterVersion)" />
+    </ItemGroup>
+
+</Project>
