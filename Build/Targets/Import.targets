@@ -1,6 +1,10 @@
 <Project>
 
+    <Import Project="InternalsVisibleTo.targets" />
+
     <Import Project="PackageProperties.targets" />
+    
+    <Import Project="PackageVersions.targets" />
 
     <Import Project="StrongName.targets" />
 

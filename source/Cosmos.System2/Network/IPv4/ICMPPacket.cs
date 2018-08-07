@@ -7,23 +7,26 @@ namespace Cosmos.System.Network.IPv4
     {
         protected byte icmpType;
         protected byte icmpCode;
-        protected UInt16 icmpCRC;
+        protected ushort icmpCRC;
+        public static ICMPEchoReply recvd_reply;
 
         internal static void ICMPHandler(byte[] packetData)
         {
+            NetworkStack.debugger.Send("ICMP Handler called");
             ICMPPacket icmp_packet = new ICMPPacket(packetData);
             switch (icmp_packet.ICMP_Type)
             {
                 case 0:
-                    ICMPEchoReply recvd_reply = new ICMPEchoReply(packetData);
-                    Sys.Console.WriteLine("Received ICMP Echo reply from " + recvd_reply.SourceIP.ToString());
+                    recvd_reply = new ICMPEchoReply(packetData);
+                    NetworkStack.debugger.Send("Received ICMP Echo reply from " + recvd_reply.SourceIP.ToString());
                     break;
                 case 8:
                     ICMPEchoRequest request = new ICMPEchoRequest(packetData);
-                    Sys.Console.WriteLine("Received " + request.ToString());
+                    NetworkStack.debugger.Send("Received " + request.ToString());
                     ICMPEchoReply reply = new ICMPEchoReply(request);
-                    Sys.Console.WriteLine("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
+                    NetworkStack.debugger.Send("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
                     OutgoingBuffer.AddPacket(reply);
+                    NetworkStack.Update();
                     break;
             }
         }
@@ -55,7 +58,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         internal ICMPPacket(Address source, Address dest, byte type, byte code, UInt16 id, UInt16 seq, UInt16 icmpDataSize)
-            : base(icmpDataSize, 1, source, dest)
+            : base(icmpDataSize, 1, source, dest, 0x00)
         {
             mRawData[this.dataOffset] = type;
             mRawData[this.dataOffset + 1] = code;
@@ -129,9 +132,9 @@ namespace Cosmos.System.Network.IPv4
         internal ICMPEchoRequest(Address source, Address dest, UInt16 id, UInt16 sequence)
             : base(source, dest, 8, 0, id, sequence, 40)
         {
-            for (byte b = 8; b < this.ICMP_DataLength; b++)
+            for (int b = 8; b < this.ICMP_DataLength; b++)
             {
-                mRawData[this.dataOffset + b] = b;
+                mRawData[this.dataOffset + b] = (byte)b;
             }
 
             mRawData[this.dataOffset + 2] = 0x00;

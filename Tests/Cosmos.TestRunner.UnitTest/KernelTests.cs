@@ -5,6 +5,7 @@ using System.IO;
 using NUnit.Framework;
 
 using Cosmos.TestRunner.Core;
+using Cosmos.TestRunner.Full;
 
 namespace Cosmos.TestRunner.UnitTest
 {
@@ -22,10 +23,10 @@ namespace Cosmos.TestRunner.UnitTest
             {
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(typeof(KernelTests).Assembly.Location));
 
-                var xEngine = new Engine(new EngineConfiguration(aKernelType));
-                xEngine.OutputHandler = new TestOutputHandler();
+                var xEngine = new FullEngine(new EngineConfiguration(aKernelType));
+                xEngine.SetOutputHandler(new TestOutputHandler());
 
-                Assert.IsTrue(xEngine.Execute());
+                Assert.IsTrue(xEngine.Execute().KernelTestResults[0].Result);
             }
             catch (AssertionException)
             {

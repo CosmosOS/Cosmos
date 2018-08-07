@@ -155,7 +155,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 string xShortName = aName;
                 uint[] xDirectoryEntriesToAllocate = null;
 
-                //Stack corruption, just delete everything from this until commented if when it's fixed
+                // Stack corruption, just delete everything from this until commented if when it's fixed
+                //
+                // https://github.com/CosmosOS/IL2CPU/issues/8
+                //
                 var x1 = aEntryType == DirectoryEntryTypeEnum.File;
                 var x2 = aName.Contains(".");
                 var x3 = x2 ? aName.Substring(0, aName.LastIndexOf('.')).Contains(".") : false;

@@ -13,6 +13,7 @@ using Avalonia.Controls;
 
 using Cosmos.Build.Common;
 using Cosmos.TestRunner.Core;
+using Cosmos.TestRunner.Full;
 
 namespace Cosmos.TestRunner.UI.ViewModels
 {
@@ -96,7 +97,16 @@ namespace Cosmos.TestRunner.UI.ViewModels
             set => SetProperty(ref mStackCorruptionDetectionLevel, value);
         }
 
-        IEnumerable<Type> IEngineConfiguration.KernelTypesToRun => KernelTypesToRun;
+        public IEnumerable<string> KernelAssembliesToRun
+        {
+            get
+            {
+                foreach (var xKernelType in KernelTypesToRun)
+                {
+                    yield return xKernelType.Assembly.Location;
+                }
+            }
+        }
 
         #endregion
 

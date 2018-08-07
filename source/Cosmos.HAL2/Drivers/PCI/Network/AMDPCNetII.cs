@@ -103,7 +103,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             UInt32 cur_status = StatusRegister;
 
-            //Console.WriteLine("AMD PCNet IRQ raised!");
             if ((cur_status & 0x100) != 0)
             {
                 mInitDone = true;
@@ -212,6 +211,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             get { return mInitDone; }
         }
 
+        public override CardType CardType => CardType.Ethernet;
+
+        public override string Name => "PCNETII";
+
         public override bool Enable()
         {
             StatusRegister = 0x43;
@@ -275,6 +278,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
         #region Helper Functions
 
+
         protected bool SendBytes(ref byte[] aData)
         {
             int txd = mNextTXDesc++;
@@ -319,6 +323,12 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 if ((status & 0x80000000) == 0)
                 {
                     recv_size = (UInt16)(mRxDescriptor.Read32(xOffset + 0) & 0xFFF);
+
+                    if (recv_size > 64) // remove checksum
+                    {
+                        recv_size -= 4;
+                    }
+
                     recv_data = new byte[recv_size];
                     for (uint b = 0; b < recv_size; b++)
                     {

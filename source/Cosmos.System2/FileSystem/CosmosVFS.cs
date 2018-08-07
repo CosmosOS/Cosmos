@@ -410,7 +410,7 @@ namespace Cosmos.System.FileSystem
                     if (fs.IsType(mPartitions[i]))
                     {
                         Global.mFileSystemDebugger.SendInternal($"Partion {i} has a {fs.Name} filesystem");
-                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath, xSize));
+                        mFileSystems.Add(fs.Create(mPartitions[i], xRootPath, xSize));
                     }
                 }
 
