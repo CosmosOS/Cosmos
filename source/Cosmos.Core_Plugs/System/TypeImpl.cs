@@ -24,16 +24,16 @@ namespace Cosmos.Core_Plugs.System
             return xType;
         }
 
-        public static bool op_Equality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
+        public static bool op_Equality(Type aLeft, Type aRight)
         {
-            return aLeft.mTypeId == aRight.mTypeId;
+            return ((CosmosRuntimeType)aLeft).mTypeId == ((CosmosRuntimeType)aRight).mTypeId;
         }
 
-        public static bool op_Inequality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
+        public static bool op_Inequality(Type aLeft, Type aRight)
         {
             mDebugger.Send("Type.GetInequality");
 
-            return aLeft.mTypeId != aRight.mTypeId;
+            return ((CosmosRuntimeType)aLeft).mTypeId != ((CosmosRuntimeType)aRight).mTypeId;
         }
     }
 }

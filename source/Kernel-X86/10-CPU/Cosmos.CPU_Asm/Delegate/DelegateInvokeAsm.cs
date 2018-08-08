@@ -1,8 +1,11 @@
 using System;
+using System.Linq;
 
 using IL2CPU.API;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.IL;
+using IL2CPU.Reflection;
+using static Cosmos.IL2CPU.TypeRefHelper;
 
 using XSharp;
 using XSharp.Assembler;
@@ -14,8 +17,7 @@ namespace Cosmos.CPU_Asm {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo) {
             var xAssembler = aAssembler;
             var xMethodInfo = (_MethodInfo)aMethodInfo;
-            var xMethodBaseAsInfo = xMethodInfo.MethodBase as global::System.Reflection.MethodInfo;
-            if (xMethodBaseAsInfo.ReturnType != typeof(void)) {
+            if (xMethodInfo.MethodInfo.ReturnType != typeof(void)) {
                 throw new Exception("Events with return type not yet supported!");
             }
 
@@ -29,7 +31,7 @@ namespace Cosmos.CPU_Asm {
             XS.ClearInterruptFlag();
 
             XS.Comment("Get Invoke list count");
-            var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
+            var xGetInvocationListMethod = TypeOf(typeof(MulticastDelegate)).Methods.Single(m => m.Name == "GetInvocationList");
             Ldarg.DoExecute(aAssembler, xMethodInfo, 0);
             XS.Call(LabelName.Get(xGetInvocationListMethod));
             XS.Add(XSRegisters.ESP, 4);
@@ -42,7 +44,7 @@ namespace Cosmos.CPU_Asm {
             XS.Set(XSRegisters.EDI, XSRegisters.EAX, sourceIsIndirect: true, sourceDisplacement: 4);
 
             XS.Comment("Get ArgSize");
-            int xArgSizeOffset = Ldfld.GetFieldOffset(typeof(global::System.Delegate), "$$ArgSize$$");
+            int xArgSizeOffset = Ldfld.GetFieldOffset(TypeOf(BclType.Delegate), "$$ArgSize$$");
             Ldarg.DoExecute(aAssembler, xMethodInfo, 0);
             XS.Add(XSRegisters.ESP, 4);
             XS.Pop(XSRegisters.ECX);
@@ -62,7 +64,7 @@ namespace Cosmos.CPU_Asm {
                 XS.Comment("Check if delegate has $this");
                 XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: Ldarg.GetArgumentDisplacement(xMethodInfo, 0));
                 XS.Add(XSRegisters.EDI, 4);
-                XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target"));
+                XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodInfo.DeclaringType, "System.Object System.Delegate._target"));
                 XS.Compare(XSRegisters.EDI, 0);
                 XS.Jump(x86.ConditionalTestEnum.Zero, ".NO_THIS");
                 XS.Label(".HAS_THIS");
@@ -70,7 +72,7 @@ namespace Cosmos.CPU_Asm {
                 XS.Push(0);
                 XS.Label(".NO_THIS");
                 XS.Set(XSRegisters.EDI, XSRegisters.EAX, sourceIsIndirect: true, sourceDisplacement: 4);
-                XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr"));
+                XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodInfo.DeclaringType, "System.IntPtr System.Delegate._methodPtr"));
 
                 XS.Comment("Check if delegate has args");
                 XS.Compare(XSRegisters.ECX, 0);
@@ -94,7 +96,7 @@ namespace Cosmos.CPU_Asm {
 
             XS.Label(".END_OF_INVOKE");
             XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: Ldarg.GetArgumentDisplacement(xMethodInfo, 0));
-            XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$"));
+            XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodInfo.DeclaringType, "$$ReturnsValue$$"));
             XS.Compare(XSRegisters.EDX, 0);
             XS.Jump(x86.ConditionalTestEnum.Equal, ".NO_RETURN");
 

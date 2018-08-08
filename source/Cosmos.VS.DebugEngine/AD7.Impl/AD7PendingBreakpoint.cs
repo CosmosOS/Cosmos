@@ -131,7 +131,14 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                             // We have the method. Now find out what Sequence Point it belongs to.
                             var xSPs = xDebugInfo.GetSequencePoints(asm.Pathname, xMethod.MethodToken);
-                            var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
+                            var xSP = xSPs.Single(
+                                q =>
+                                {
+                                    var xLineColStart = ((long)q.StartLine << 32) | q.StartColumn;
+                                    var xLineColEnd = ((long)q.EndLine << 32) | q.EndColumn;
+
+                                    return xLineColStart <= xPos && xLineColEnd >= xPos;
+                                });
 
                             // We have the Sequence Point, find the MethodILOp
                             var xOp = xDebugInfo.GetFirstMethodIlOpByMethodIdAndILOffset(xMethod.ID, xSP.Offset);

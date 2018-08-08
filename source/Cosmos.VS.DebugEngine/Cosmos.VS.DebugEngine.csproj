@@ -46,7 +46,7 @@
     <Target Name="IncludePackageReferenceDependencies" AfterTargets="GetVsixSourceItems">
 
         <ItemGroup>
-            <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="!$([System.String]::new('%(ReferenceCopyLocalPaths.Filename)').StartsWith('Microsoft.VisualStudio')) AND !$([System.String]::new('%(ReferenceCopyLocalPaths.Filename)').StartsWith('System')) AND !$([System.String]::new('%(ReferenceCopyLocalPaths.Filename)').StartsWith('EnvDTE')) AND '%(ReferenceCopyLocalPaths.Filename)' != 'mscorlib' AND '%(ReferenceCopyLocalPaths.Filename)' != 'stdole'" />
+            <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Private)' != 'False' AND !$([System.String]::new('%(ReferenceCopyLocalPaths.Filename)').StartsWith('Microsoft.VisualStudio')) AND !$([System.String]::new('%(ReferenceCopyLocalPaths.Filename)').StartsWith('EnvDTE'))" />
         </ItemGroup>
 
     </Target>

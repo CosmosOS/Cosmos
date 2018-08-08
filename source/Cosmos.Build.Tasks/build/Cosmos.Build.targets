@@ -144,7 +144,8 @@
         <ItemGroup>
             <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
                                Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
-                                      AND '%(ResolvedAssembliesToPublish.Extension)' == '.dll'" />
+                                      AND '%(ResolvedAssembliesToPublish.Extension)' == '.dll'
+                                       OR '%(ResolvedAssembliesToPublish.Filename)' == 'System.Private.CoreLib'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"

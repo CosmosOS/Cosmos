@@ -31,6 +31,12 @@ using Cosmos.VS.DebugEngine.Commands;
     OldVersionLowerBound = "1.0.0.0",
     OldVersionUpperBound = "1.1.10.86")]
 
+[assembly: ProvideBindingRedirection(
+    AssemblyName = "System.Reflection.Metadata",
+    NewVersion = "1.4.3.0",
+    OldVersionLowerBound = "1.0.0.0",
+    OldVersionUpperBound = "1.4.3.0")]
+
 namespace Cosmos.VS.DebugEngine
 {
     [Guid(Guids.guidPackageString)]

@@ -41,7 +41,7 @@
         <Error Condition="'$(ReferencesFile)' == ''" Text="References file path is empty!" />
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)" Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'" />
+            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)" Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native' OR '%(ResolvedAssembliesToPublish.Filename)' == 'System.Private.CoreLib'" />
         </ItemGroup>
 
         <WriteLinesToFile File="$(ReferencesFile)" Lines="@(_Il2cpuAssemblies)" Overwrite="True" />

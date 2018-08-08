@@ -388,7 +388,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         var xLabel = mDebugInfoDb.GetLabels(lastEIPAddress)[0];
                         var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
                         var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
-                        var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+                        var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().StartLine;
 
                         AD7Util.MessageBox($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(xMethod.DocumentID).Pathname}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
                         return;

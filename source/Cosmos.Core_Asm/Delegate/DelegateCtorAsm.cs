@@ -1,8 +1,9 @@
-using System.Reflection;
-using XSharp.Assembler;
+using System.Linq;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.IL;
+
 using XSharp;
+using XSharp.Assembler;
 
 namespace Cosmos.Core_Asm
 {
@@ -19,19 +20,19 @@ namespace Cosmos.Core_Asm
             XS.Comment("-- ldarg 1");
             Ldarg.DoExecute(xAssembler, xMethodInfo, 1);
             XS.Comment("-- stfld _target");
-            Stfld.DoExecute(xAssembler, xMethodInfo, "System.Object System.Delegate._target", xMethodInfo.MethodBase.DeclaringType, true, false);
+            Stfld.DoExecute(xAssembler, xMethodInfo, "System.Object System.Delegate._target", xMethodInfo.MethodInfo.DeclaringType, true, false);
             XS.Comment("Save method pointer to field");
             XS.Comment("-- ldarg 0");
             Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
             XS.Comment("-- ldarg 2");
             Ldarg.DoExecute(xAssembler, xMethodInfo, 2);
             XS.Comment("-- stfld _methodPtr");
-            Stfld.DoExecute(xAssembler, xMethodInfo, "System.IntPtr System.Delegate._methodPtr", xMethodInfo.MethodBase.DeclaringType, true, false);
+            Stfld.DoExecute(xAssembler, xMethodInfo, "System.IntPtr System.Delegate._methodPtr", xMethodInfo.MethodInfo.DeclaringType, true, false);
             XS.Comment("Saving ArgSize to field");
             uint xSize = 0;
-            foreach (var xArg in xMethodInfo.MethodBase.DeclaringType.GetMethod("Invoke").GetParameters())
+            foreach (var xArg in xMethodInfo.MethodInfo.DeclaringType.Methods.Single(m => m.Name == "Invoke").ParameterTypes)
             {
-                xSize += ILOp.Align(ILOp.SizeOfType(xArg.ParameterType), 4);
+                xSize += ILOp.Align(ILOp.SizeOfType(xArg), 4);
             }
 
             XS.Comment("-- ldarg 0");
@@ -39,7 +40,7 @@ namespace Cosmos.Core_Asm
             XS.Comment("-- push argsize");
             XS.Push(xSize);
             XS.Comment("-- stfld ArgSize");
-            Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodBase.DeclaringType, true, false);
+            Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodInfo.DeclaringType, true, false);
         }
     }
 }

@@ -2,6 +2,8 @@ using Cosmos.Core;
 
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+using IL2CPU.Reflection;
+using static Cosmos.IL2CPU.TypeRefHelper;
 
 using XSharp;
 
@@ -102,7 +104,7 @@ namespace Cosmos.Core_Asm
              */
             __cyclesrdtscptr = target;
 
-            string intname = LabelName.GetStaticFieldName(typeof(CPUImpl).GetField(nameof(__cyclesrdtscptr)));
+            string intname = LabelName.GetStaticFieldName(TypeOf(typeof(CPUImpl)).GetField(nameof(__cyclesrdtscptr)));
 
             XS.Push(XSRegisters.EAX);
             XS.Push(XSRegisters.ECX);
@@ -142,7 +144,7 @@ namespace Cosmos.Core_Asm
              */
             __raterdmsrptr = target;
 
-            string intname = LabelName.GetStaticFieldName(typeof(CPUImpl).GetField(nameof(__raterdmsrptr)));
+            string intname = LabelName.GetStaticFieldName(TypeOf(typeof(CPUImpl)).GetField(nameof(__raterdmsrptr)));
 
             XS.Lea(XSRegisters.ESI, intname);
             XS.Set(XSRegisters.ECX, 0xe7);
@@ -171,7 +173,7 @@ namespace Cosmos.Core_Asm
              */
             __vendortargetptr = target;
 
-            string intname = LabelName.GetStaticFieldName(typeof(CPUImpl).GetField(nameof(__vendortargetptr)));
+            string intname = LabelName.GetStaticFieldName(TypeOf(typeof(CPUImpl)).GetField(nameof(__vendortargetptr)));
 
             XS.Lea(XSRegisters.ESI, intname); // new Lea { DestinationReg = RegistersEnum.ESI, SourceRef = ElementReference.New(intname) };
             XS.Cpuid();

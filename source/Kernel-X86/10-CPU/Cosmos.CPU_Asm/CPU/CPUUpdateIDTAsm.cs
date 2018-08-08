@@ -1,10 +1,11 @@
 using System;
-using System.Reflection;
 
 using Cosmos.CPU.x86;
 
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+using IL2CPU.Reflection;
+using static Cosmos.IL2CPU.TypeRefHelper;
 
 using XSharp;
 using XSharp.Assembler;
@@ -16,12 +17,12 @@ namespace Cosmos.CPU_Asm
     //TODO: This asm refs Hardware.. should not.. its a higher ring
     public class CPUUpdateIDTAsm : AssemblerMethod
     {
-        private static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound)
+        private static MethodInfo GetMethodDef(AssemblyInfo aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound)
         {
-            Type xType = aAssembly.GetType(aType, false);
+            var xType = aAssembly.GetType(aType);
             if (xType != null)
             {
-                MethodBase xMethod = xType.GetMethod(aMethodName);
+                var xMethod = xType.GetMethod(aMethodName);
                 if (xMethod != null)
                 {
                     return xMethod;
@@ -34,9 +35,9 @@ namespace Cosmos.CPU_Asm
             return null;
         }
 
-        private static MethodBase GetInterruptHandler(byte aInterrupt)
+        private static MethodInfo GetInterruptHandler(byte aInterrupt)
         {
-            return GetMethodDef(typeof(INTs).Assembly, typeof(INTs).FullName
+            return GetMethodDef(TypeOf(typeof(INTs)).Assembly, TypeOf(typeof(INTs)).FullName
                 , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
         }
 
@@ -98,10 +99,10 @@ namespace Cosmos.CPU_Asm
 
                 XS.JumpToSegment(8, "__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 XS.Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
-                MethodBase xHandler = GetInterruptHandler((byte)j);
+                var xHandler = GetInterruptHandler((byte)j);
                 if (xHandler == null)
                 {
-                    xHandler = GetMethodDef(typeof(INTs).Assembly, typeof(INTs).FullName, "HandleInterrupt_Default", true);
+                    xHandler = GetMethodDef(TypeOf(typeof(INTs)).Assembly, typeof(INTs).FullName, "HandleInterrupt_Default", true);
                 }
                 XS.Call(LabelName.Get(xHandler));
                 XS.Pop(EAX);
