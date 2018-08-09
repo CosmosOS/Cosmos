@@ -12,11 +12,6 @@ namespace Cosmos.System {
         private const byte Tab = (byte)'\t';
         private const byte Space = (byte)' ';
 
-        public static List<string> commands = new List<string>();
-        public static bool writecommand = false;
-        public static int commandindex = -1;
-        public static string cmd;
-
         protected int mX = 0;
         public int X {
             get { return mX; }
