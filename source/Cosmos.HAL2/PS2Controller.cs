@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 
 using System;
 
@@ -31,29 +31,32 @@ namespace Cosmos.HAL
         }
 
         [Flags]
-        private enum OutputLines
+        private enum OutputLines : byte
         {
             None = 0x00,
-            First = 0x01,
+            Reset = 0x01,
             Second = 0x02,
             Third = 0x04,
             Fourth = 0x08,
-            All = First | Second | Third | Fourth
+            All = Reset | Second | Third | Fourth
         }
 
-        public const byte Ack = 0xFA;
-        public const uint WAIT_TIMEOUT = 100000;
+        private const byte Ack = 0xFA;
+        private const byte Nak = 0xFE;
 
-        public bool IsDualChannel;
-        public bool SelfTestPassed;
-        public bool FirstPortTestPassed;
-        public bool SecondPortTestPassed;
+        private const uint ReadTimeout = 1000;
+        private const uint WaitTimeout = 100000;
 
-        public Device FirstDevice;
-        public Device SecondDevice;
+        private bool mIsDualChannel;
+        private bool mSelfTestPassed;
+        private bool mFirstPortTestPassed;
+        private bool mSecondPortTestPassed;
+
+        public Device FirstDevice { get; private set; }
+        public Device SecondDevice { get; private set; }
 
         private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
-        private Debugger mDebugger = new Debugger("HAL", "PS2Controller");
+        private Debugger mDebugger = new Debugger(nameof(HAL), nameof(PS2Controller));
 
         /// <summary>
         /// Initializes the PS/2 controller.
@@ -77,7 +80,7 @@ namespace Cosmos.HAL
 
             var xConfigurationByte = ReadData();
             // check if the controller is dual channel
-            IsDualChannel = (xConfigurationByte & (1 << 5)) != 0;
+            mIsDualChannel = (xConfigurationByte & (1 << 5)) != 0;
             // clear bits 0 and 1
             // TODO: when we support the scan code set 2, clear bit 6 too, to disable translation
             xConfigurationByte = (byte)(xConfigurationByte & ~(0b0000_0011));
@@ -86,43 +89,43 @@ namespace Cosmos.HAL
 
             // Perform Controller Self Test
             SendCommand(Command.TestPS2Controller);
-            SelfTestPassed = ReadData() == 0x55;
+            mSelfTestPassed = ReadData() == 0x55;
 
             // Determine If There Are 2 Channels
             // note: at this point, IsDualChannel may be true and the controller may not be dual channel,
             //       but false means that it's surely not dual channel
-            if (IsDualChannel)
+            if (mIsDualChannel)
             {
                 SendCommand(Command.EnableSecondPS2Port);
 
                 SendCommand(Command.GetConfigurationByte);
                 xConfigurationByte = ReadData();
 
-                IsDualChannel = (xConfigurationByte & (1 << 5)) == 0;
+                mIsDualChannel = (xConfigurationByte & (1 << 5)) == 0;
 
-                if (IsDualChannel)
+                if (mIsDualChannel)
                 {
                     SendCommand(Command.DisableSecondPS2Port);
                 }
             }
 
             // Perform Interface Tests
-            FirstPortTestPassed = TestPort(1);
+            mFirstPortTestPassed = TestPort(1);
 
-            if (IsDualChannel)
+            if (mIsDualChannel)
             {
-                SecondPortTestPassed = TestPort(2);
+                mSecondPortTestPassed = TestPort(2);
             }
 
             // Enable Devices
-            if (FirstPortTestPassed)
+            if (mFirstPortTestPassed)
             {
                 SendCommand(Command.EnableFirstPS2Port);
                 // enable interrupt
                 xConfigurationByte |= 0b01;
             }
 
-            if (SecondPortTestPassed)
+            if (mSecondPortTestPassed)
             {
                 SendCommand(Command.EnableSecondPS2Port);
                 // enable interrupt
@@ -131,14 +134,14 @@ namespace Cosmos.HAL
 
             SendCommand(Command.SetConfigurationByte, xConfigurationByte);
 
-            if (FirstPortTestPassed)
+            if (mFirstPortTestPassed)
             {
-                IdentifyDevice(1, out FirstDevice);
+                FirstDevice = IdentifyDevice(1);
             }
 
-            if (SecondPortTestPassed)
+            if (mSecondPortTestPassed)
             {
-                IdentifyDevice(2, out SecondDevice);
+                SecondDevice = IdentifyDevice(2);
             }
         }
 
@@ -147,19 +150,21 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aPort">The port of the PS/2 device to identify.</param>
         /// <param name="aDevice">An instance of the identified device.</param>
-        private void IdentifyDevice(byte aPort, out Device aDevice)
+        private Device IdentifyDevice(byte aPort)
         {
-            aDevice = null;
-
             if (aPort == 1 || aPort == 2)
             {
                 var xSecondPort = aPort == 2;
 
-                WaitToWrite();
-                SendDeviceCommand(DeviceCommand.DisableScanning, xSecondPort);
+                if (!SendDeviceCommand(DeviceCommand.DisableScanning, xSecondPort))
+                {
+                    return null;
+                }
 
-                WaitToWrite();
-                SendDeviceCommand(DeviceCommand.IdentifyDevice, xSecondPort);
+                if (!SendDeviceCommand(DeviceCommand.IdentifyDevice, xSecondPort))
+                {
+                    return null;
+                }
 
                 byte xFirstByte = 0;
                 byte xSecondByte = 0;
@@ -179,10 +184,10 @@ namespace Cosmos.HAL
                      */
                     if (xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04)
                     {
-                        var xDevice = new PS2Mouse(aPort, xFirstByte);
+                        var xDevice = new PS2Mouse(this, aPort, xFirstByte);
                         xDevice.Initialize();
 
-                        aDevice = xDevice;
+                        return xDevice;
                     }
                     /*
                      * |-----------------|----------------------------------------------------------------|
@@ -197,22 +202,25 @@ namespace Cosmos.HAL
                     else if (xFirstByte == 0xAB && ReadDataWithTimeout(ref xSecondByte))
                     {
                         // TODO: replace xTest with (xSecondByte == 0x41 || xSecondByte == 0xC1)
-                        //       when the stack corruption detection works better for complex conditions
+                        //       when the stack corruption detection works better for complex conditions.
+                        //
+                        //       https://github.com/CosmosOS/IL2CPU/issues/8
+                        //
                         var xTest = (xSecondByte == 0x41 || xSecondByte == 0xC1);
 
                         if (xTest && aPort == 1)
                         {
-                            var xDevice = new PS2Keyboard(aPort);
+                            var xDevice = new PS2Keyboard(this, aPort);
                             xDevice.Initialize();
 
-                            aDevice = xDevice;
+                            return xDevice;
                         }
                         else if (xSecondByte == 0x83)
                         {
-                            var xDevice = new PS2Keyboard(aPort);
+                            var xDevice = new PS2Keyboard(this, aPort);
                             xDevice.Initialize();
 
-                            aDevice = xDevice;
+                            return xDevice;
                         }
                     }
                 }
@@ -226,19 +234,17 @@ namespace Cosmos.HAL
                  */
                 else if (aPort == 1)
                 {
-                    var xDevice = new PS2Keyboard(aPort);
+                    var xDevice = new PS2Keyboard(this, aPort);
                     xDevice.Initialize();
 
-                    aDevice = xDevice;
+                    return xDevice;
                 }
 
-                if (aDevice == null)
-                {
-                    mDebugger.SendInternal("(PS/2 Controller) Device detection failed:");
-                    mDebugger.SendInternal("First Byte: " + xFirstByte);
-                    mDebugger.SendInternal("Second Byte: " + xSecondByte);
-                    throw new Exception("(PS/2 Controller) PS/2 device not supported");
-                }
+                mDebugger.SendInternal("(PS/2 Controller) Device detection failed:");
+                mDebugger.SendInternal("First Byte: " + xFirstByte);
+                mDebugger.SendInternal("Second Byte: " + xSecondByte);
+
+                return null;
             }
             else
             {
@@ -318,10 +324,7 @@ namespace Cosmos.HAL
         /// <summary>
         /// Pulses the PS/2 controller's output line.
         /// </summary>
-        /// <param name="aPulseResetLine">The reset line.</param>
-        /// <param name="aPulseSecondLine">The second line.</param>
-        /// <param name="aPulseThirdLine">The third line.</param>
-        /// <param name="aPulseFourthLine">The fourth line.</param>
+        /// <param name="aOutputLines">The flags which indicate the output lines to pulse.</param>
         private void PulseOutputLine(OutputLines aOutputLines)
         {
             byte xMask = (byte)aOutputLines;
@@ -348,7 +351,7 @@ namespace Cosmos.HAL
             {
                 i++;
 
-                if (i >= WAIT_TIMEOUT)
+                if (i >= WaitTimeout)
                 {
                     mDebugger.SendInternal("(PS/2 Controller) Timeout expired in PS2Controller.WaitForAck()");
                     return false;
@@ -356,6 +359,33 @@ namespace Cosmos.HAL
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Waits for a response, which can be one of the following:
+        /// Returns false if the timeout expires, true otherwise.
+        /// </summary>
+        /// <returns>Returns false if the timeout expires, true otherwise.</returns>
+        public bool WaitForResponse(byte aResponseByte)
+        {
+            int i = 0;
+            byte xByte;
+
+            do
+            {
+                xByte = IO.Data.Byte;
+
+                if (i >= WaitTimeout)
+                {
+                    xByte = Nak;
+                    break;
+                }
+
+                i++;
+            }
+            while (xByte != aResponseByte && xByte != Nak);
+
+            return xByte == aResponseByte;
         }
 
         /// <summary>
@@ -374,7 +404,7 @@ namespace Cosmos.HAL
 
                 i++;
 
-                if (i >= WAIT_TIMEOUT)
+                if (i >= WaitTimeout)
                 {
                     mDebugger.Send("(PS/2 Controller) Timeout expired in PS2Controller.ReadByteAfterAck");
                     break;
@@ -400,7 +430,7 @@ namespace Cosmos.HAL
 
                 i++;
 
-                if (i >= WAIT_TIMEOUT)
+                if (i >= WaitTimeout)
                 {
                     return false;
                 }
@@ -433,7 +463,7 @@ namespace Cosmos.HAL
 
             WaitToReadData();
 
-            byte xByte = IO.Data.Byte;
+            var xByte = IO.Data.Byte;
 
             mDebugger.SendInternal("(PS/2 Controller) Device reset reponse byte: " + xByte);
 
@@ -461,7 +491,7 @@ namespace Cosmos.HAL
             {
                 i++;
 
-                if (i >= WAIT_TIMEOUT)
+                if (i >= ReadTimeout)
                 {
                     mDebugger.SendInternal("Timeout expired in PS2Controller.WaitToReadData(), IO.Status.Byte: " + IO.Status.Byte);
                     return false;
@@ -475,22 +505,22 @@ namespace Cosmos.HAL
         /// Waits to write data.
         /// </summary>
         /// <returns>Returns false if the timeout expired, true otherwise.</returns>
-        public bool WaitToWrite()
+        public void WaitToWrite()
         {
-            int i = 0;
+            var i = 0;
 
-            while ((IO.Status.Byte & (1 << 1)) != 0)
+            while ((IO.Status.Byte & 0b10) != 0)
             {
                 i++;
 
-                if (i >= WAIT_TIMEOUT)
+                if (i >= WaitTimeout)
                 {
-                    mDebugger.SendInternal("Timeout expired in PS2Controller.WaitToWrite()");
-                    return false;
+                    // should not happen
+                    mDebugger.SendInternal("(PS/2 Controller) Timeout expired while waiting to write!");
+
+                    i = 0;
                 }
             }
-
-            return true;
         }
 
         #region IO
@@ -515,7 +545,7 @@ namespace Cosmos.HAL
             if (WaitToReadData())
             {
                 aByte = IO.Data.Byte;
-                
+
                 mDebugger.SendInternal("(PS/2 Controller) Returned byte:");
                 mDebugger.SendInternal(aByte);
 
@@ -555,7 +585,8 @@ namespace Cosmos.HAL
             }
         }
 
-        private void SendDeviceCommand(DeviceCommand aDeviceCommand, bool aSecondPS2Port, byte? aByte = null)
+        private bool SendDeviceCommand(
+            DeviceCommand aDeviceCommand, bool aSecondPS2Port, byte? aByte = null, int retries = 3)
         {
             mDebugger.SendInternal("(PS/2 Controller) Sending device command:");
             mDebugger.SendInternal("Device command:");
@@ -569,7 +600,15 @@ namespace Cosmos.HAL
             WaitToWrite();
             IO.Data.Byte = (byte)aDeviceCommand;
 
-            WaitForAck();
+            if (!WaitForResponse(Ack))
+            {
+                if (retries > 0)
+                {
+                    return SendDeviceCommand(aDeviceCommand, aSecondPS2Port, aByte, retries - 1);
+                }
+
+                return false;
+            }
 
             mDebugger.SendInternal("Device command sent.");
 
@@ -587,10 +626,20 @@ namespace Cosmos.HAL
                 WaitToWrite();
                 IO.Data.Byte = aByte.Value;
 
-                WaitForAck();
+                if (!WaitForResponse(Ack))
+                {
+                    if (retries > 0)
+                    {
+                        return SendDeviceCommand(aDeviceCommand, aSecondPS2Port, aByte, retries - 1);
+                    }
+
+                    return false;
+                }
             }
+
+            return true;
         }
-        
+
         #endregion
     }
 }

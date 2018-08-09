@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmos.Core;
+using Cosmos.Core.Processing;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.Memory.Old
@@ -19,7 +20,11 @@ namespace Cosmos.Core.Memory.Old
 
         private static uint mLastEntryIndex = 0u;
 
+<<<<<<< HEAD
         private static bool mInitialized = false;
+=======
+        private static Mutex mMemeoryGate = new Mutex();
+>>>>>>> parent of 94a6bd68a... Revert "Merge branch 'master' into master"
 
         private static void DoInitialize(uint aEndOfRam)
         {
@@ -58,7 +63,15 @@ namespace Cosmos.Core.Memory.Old
             try
             {
                 EnsureIsInitialized();
+<<<<<<< HEAD
 
+=======
+                if(mMemeoryGate != null)
+                {
+                    mMemeoryGate.Lock();
+                }
+                var xCurrentTableIdx = mLastTableIndex;
+>>>>>>> parent of 94a6bd68a... Revert "Merge branch 'master' into master"
                 DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
                 DataLookupTable* xPreviousTable = null;
                 uint xResult;
@@ -80,7 +93,14 @@ namespace Cosmos.Core.Memory.Old
                             {
                             }
                         }
+<<<<<<< HEAD
 
+=======
+                        if (mMemeoryGate != null)
+                        {
+                            mMemeoryGate.Unlock();
+                        }
+>>>>>>> parent of 94a6bd68a... Revert "Merge branch 'master' into master"
                         return xResult;
                     }
                     mLastTable = xPreviousTable;
@@ -117,6 +137,10 @@ namespace Cosmos.Core.Memory.Old
                 }
                 mLastTable = xNextTablePointer;
                 mLastEntryIndex = 0;
+                if (mMemeoryGate != null)
+                {
+                    mMemeoryGate.Unlock();
+                }
                 return xResult;
             }
             finally
@@ -128,6 +152,10 @@ namespace Cosmos.Core.Memory.Old
                 else
                 {
                     //Debugger.DoSend("    Not enabling interrupts, because they weren't enabled yet!");
+                }
+                if (mMemeoryGate != null)
+                {
+                    mMemeoryGate.Unlock();
                 }
             }
         }
