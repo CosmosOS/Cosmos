@@ -66,7 +66,7 @@ namespace Cosmos.Core.Memory.Old
                 {
                     mMemeoryGate.Lock();
                 }
-                var xCurrentTableIdx = mLastTableIndex;
+
                 DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
                 DataLookupTable* xPreviousTable = null;
                 uint xResult;
