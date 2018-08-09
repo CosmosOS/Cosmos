@@ -85,7 +85,7 @@ namespace Cosmos.System
                 if (ControlPressed && AltPressed && mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
                 {
                     //Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                    CustomConsole.WriteLineInfo("Detected Ctrl-Alt-Delete! Rebooting System...");
+                    MyConsole.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
                     Power.Reboot();
                 }
 
@@ -103,9 +103,9 @@ namespace Cosmos.System
 
         private static void UpdateLeds()
         {
-            foreach (var xKeyboard in mKeyboardList)
+            foreach (KeyboardBase keyboard in mKeyboardList)
             {
-                UpdateLeds(xKeyboard);
+                keyboard.UpdateLeds();
             }
         }
 
@@ -163,11 +163,6 @@ namespace Cosmos.System
 
             aKeyboard.OnKeyPressed = HandleScanCode;
             mKeyboardList.Add(aKeyboard);
-
-            UpdateLeds(aKeyboard);
         }
-
-        private static void UpdateLeds(KeyboardBase aKeyboard) =>
-            aKeyboard.UpdateLeds(ScrollLock, NumLock, CapsLock);
     }
 }

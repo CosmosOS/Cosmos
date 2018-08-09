@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 
 using Cosmos.Common.Extensions;
-using Cosmos.HAL;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT.Listing;
 using Cosmos.System.FileSystem.Listing;
@@ -546,22 +545,22 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override void DisplayFileSystemInfo()
         {
-            CustomConsole.WriteLineInfo("-------File System--------");
-            CustomConsole.WriteLineInfo("Bytes per Cluster     = " + BytesPerCluster);
-            CustomConsole.WriteLineInfo("Bytes per Sector      = " + BytesPerSector);
-            CustomConsole.WriteLineInfo("Cluster Count         = " + ClusterCount);
-            CustomConsole.WriteLineInfo("Data Sector           = " + DataSector);
-            CustomConsole.WriteLineInfo("Data Sector Count     = " + DataSectorCount);
-            CustomConsole.WriteLineInfo("FAT Sector Count      = " + FatSectorCount);
-            CustomConsole.WriteLineInfo("FAT Type              = " + (uint)mFatType);
-            CustomConsole.WriteLineInfo("Number of FATS        = " + NumberOfFATs);
-            CustomConsole.WriteLineInfo("Reserved Sector Count = " + ReservedSectorCount);
-            CustomConsole.WriteLineInfo("Root Cluster          = " + RootCluster);
-            CustomConsole.WriteLineInfo("Root Entry Count      = " + RootEntryCount);
-            CustomConsole.WriteLineInfo("Root Sector           = " + RootSector);
-            CustomConsole.WriteLineInfo("Root Sector Count     = " + RootSectorCount);
-            CustomConsole.WriteLineInfo("Sectors per Cluster   = " + SectorsPerCluster);
-            CustomConsole.WriteLineInfo("Total Sector Count    = " + TotalSectorCount);
+            global::System.Console.WriteLine("-------File System--------");
+            global::System.Console.WriteLine("Bytes per Cluster     = " + BytesPerCluster);
+            global::System.Console.WriteLine("Bytes per Sector      = " + BytesPerSector);
+            global::System.Console.WriteLine("Cluster Count         = " + ClusterCount);
+            global::System.Console.WriteLine("Data Sector           = " + DataSector);
+            global::System.Console.WriteLine("Data Sector Count     = " + DataSectorCount);
+            global::System.Console.WriteLine("FAT Sector Count      = " + FatSectorCount);
+            global::System.Console.WriteLine("FAT Type              = " + (uint)mFatType);
+            global::System.Console.WriteLine("Number of FATS        = " + NumberOfFATs);
+            global::System.Console.WriteLine("Reserved Sector Count = " + ReservedSectorCount);
+            global::System.Console.WriteLine("Root Cluster          = " + RootCluster);
+            global::System.Console.WriteLine("Root Entry Count      = " + RootEntryCount);
+            global::System.Console.WriteLine("Root Sector           = " + RootSector);
+            global::System.Console.WriteLine("Root Sector Count     = " + RootSectorCount);
+            global::System.Console.WriteLine("Sectors per Cluster   = " + SectorsPerCluster);
+            global::System.Console.WriteLine("Total Sector Count    = " + TotalSectorCount);
 
             Global.mFileSystemDebugger.SendInternal("Bytes per Cluster =");
             Global.mFileSystemDebugger.SendInternal(BytesPerCluster);

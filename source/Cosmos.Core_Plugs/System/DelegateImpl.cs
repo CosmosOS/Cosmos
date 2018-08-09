@@ -8,7 +8,7 @@ namespace Cosmos.Core_Plugs.System
     [Plug(Target = typeof(Delegate), Inheritable = true)]
     [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
     [PlugField(FieldType = typeof(int), FieldId = "$$ReturnsValue$$")]
-    public static unsafe class DelegateImpl
+    public static class DelegateImpl
     {
         public static bool Equals(Delegate aThis, object aThat)
         {
@@ -37,11 +37,6 @@ namespace Cosmos.Core_Plugs.System
                 xResult[i] = xDelegateAsByte[i];
             }
             return xResultAddr;
-        }
-
-        public static int GetHashCode(Delegate aThis, [FieldAccess(Name = "System.IntPtr System.Delegate._methodPtr")] ref IntPtr aAddress)
-        {
-            return (int)aAddress.ToPointer();
         }
     }
 }
