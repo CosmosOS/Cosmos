@@ -20,11 +20,9 @@ namespace Cosmos.Core.Memory.Old
 
         private static uint mLastEntryIndex = 0u;
 
-<<<<<<< HEAD
         private static bool mInitialized = false;
-=======
+
         private static Mutex mMemeoryGate = new Mutex();
->>>>>>> parent of 94a6bd68a... Revert "Merge branch 'master' into master"
 
         private static void DoInitialize(uint aEndOfRam)
         {
@@ -63,15 +61,12 @@ namespace Cosmos.Core.Memory.Old
             try
             {
                 EnsureIsInitialized();
-<<<<<<< HEAD
 
-=======
                 if(mMemeoryGate != null)
                 {
                     mMemeoryGate.Lock();
                 }
                 var xCurrentTableIdx = mLastTableIndex;
->>>>>>> parent of 94a6bd68a... Revert "Merge branch 'master' into master"
                 DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
                 DataLookupTable* xPreviousTable = null;
                 uint xResult;
@@ -93,14 +88,10 @@ namespace Cosmos.Core.Memory.Old
                             {
                             }
                         }
-<<<<<<< HEAD
-
-=======
                         if (mMemeoryGate != null)
                         {
                             mMemeoryGate.Unlock();
                         }
->>>>>>> parent of 94a6bd68a... Revert "Merge branch 'master' into master"
                         return xResult;
                     }
                     mLastTable = xPreviousTable;
