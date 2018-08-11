@@ -59,30 +59,27 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
             Assert.AreEqual(1, xList[1], "List<int>.RemoveAt: xList[1] != 1");
             Assert.AreEqual(2, xList[2], "List<int>.RemoveAt: xList[2] != 2");
 
+            xList.AddRange(new List<int>() { 3, 4, 5 });
 
-            // Commented tests depend on #583
+            Assert.AreEqual(0, xList[0], "List<int>.AddRange: xList[0] != 0");
+            Assert.AreEqual(1, xList[1], "List<int>.AddRange: xList[1] != 1");
+            Assert.AreEqual(2, xList[2], "List<int>.AddRange: xList[2] != 2");
+            Assert.AreEqual(3, xList[3], "List<int>.AddRange: xList[3] != 3");
+            Assert.AreEqual(4, xList[4], "List<int>.AddRange: xList[4] != 4");
+            Assert.AreEqual(5, xList[5], "List<int>.AddRange: xList[5] != 5");
 
-            //xList.AddRange(new List<int>() { 3, 4, 5 });
+            xList.RemoveRange(2, 2);
 
-            //Assert.AreEqual(0, xList[0], "List<int>.AddRange: xList[0] != 0");
-            //Assert.AreEqual(5, xList[1], "List<int>.AddRange: xList[1] != 5");
-            //Assert.AreEqual(2, xList[2], "List<int>.AddRange: xList[2] != 2");
-            //Assert.AreEqual(3, xList[2], "List<int>.AddRange: xList[3] != 3");
-            //Assert.AreEqual(4, xList[2], "List<int>.AddRange: xList[4] != 4");
-            //Assert.AreEqual(5, xList[2], "List<int>.AddRange: xList[5] != 5");
+            Assert.AreEqual(0, xList[0], "List<int>.RemoveRange: xList[0] != 0");
+            Assert.AreEqual(1, xList[1], "List<int>.RemoveRange: xList[1] != 1");
+            Assert.AreEqual(4, xList[2], "List<int>.RemoveRange: xList[2] != 4");
+            Assert.AreEqual(5, xList[3], "List<int>.RemoveRange: xList[3] != 5");
 
-            //xList.RemoveRange(2, 2);
+            var xRange = xList.GetRange(1, 3);
 
-            //Assert.AreEqual(0, xList[0], "List<int>.RemoveRange: xList[0] != 0");
-            //Assert.AreEqual(5, xList[1], "List<int>.RemoveRange: xList[1] != 5");
-            //Assert.AreEqual(4, xList[2], "List<int>.RemoveRange: xList[2] != 4");
-            //Assert.AreEqual(5, xList[2], "List<int>.RemoveRange: xList[3] != 5");
-
-            //var xRange = xList.GetRange(1, 3);
-
-            //Assert.AreEqual(5, xRange[0], "List<int>.GetRange: xRange[0] != 5");
-            //Assert.AreEqual(4, xRange[1], "List<int>.GetRange: xRange[1] != 4");
-            //Assert.AreEqual(5, xRange[2], "List<int>.GetRange: xRange[2] != 5");
+            Assert.AreEqual(1, xRange[0], "List<int>.GetRange: xRange[0] != 1");
+            Assert.AreEqual(4, xRange[1], "List<int>.GetRange: xRange[1] != 4");
+            Assert.AreEqual(5, xRange[2], "List<int>.GetRange: xRange[2] != 5");
         }
     }
 }
