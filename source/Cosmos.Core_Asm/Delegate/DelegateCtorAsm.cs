@@ -1,6 +1,6 @@
-using System.Linq;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.IL;
+using IL2CPU.Reflection;
 
 using XSharp;
 using XSharp.Assembler;
@@ -30,7 +30,7 @@ namespace Cosmos.Core_Asm
             Stfld.DoExecute(xAssembler, xMethodInfo, "System.IntPtr System.Delegate._methodPtr", xMethodInfo.MethodInfo.DeclaringType, true, false);
             XS.Comment("Saving ArgSize to field");
             uint xSize = 0;
-            foreach (var xArg in xMethodInfo.MethodInfo.DeclaringType.Methods.Single(m => m.Name == "Invoke").ParameterTypes)
+            foreach (var xArg in xMethodInfo.MethodInfo.DeclaringType.GetMethod("Invoke").ParameterTypes)
             {
                 xSize += ILOp.Align(ILOp.SizeOfType(xArg), 4);
             }

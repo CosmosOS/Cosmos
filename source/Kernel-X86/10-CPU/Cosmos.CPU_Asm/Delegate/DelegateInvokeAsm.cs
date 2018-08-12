@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 using IL2CPU.API;
 using Cosmos.IL2CPU;
@@ -31,7 +30,7 @@ namespace Cosmos.CPU_Asm {
             XS.ClearInterruptFlag();
 
             XS.Comment("Get Invoke list count");
-            var xGetInvocationListMethod = TypeOf(typeof(MulticastDelegate)).Methods.Single(m => m.Name == "GetInvocationList");
+            var xGetInvocationListMethod = TypeOf(typeof(MulticastDelegate)).GetMethod("GetInvocationList");
             Ldarg.DoExecute(aAssembler, xMethodInfo, 0);
             XS.Call(LabelName.Get(xGetInvocationListMethod));
             XS.Add(XSRegisters.ESP, 4);
