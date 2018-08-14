@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="@(PlugsProjectReference)" PrivateAssets="All" ReferenceOutputAssembly="False" OutputItemType="Content" CopyToOutputDirectory="PreserveNewest" />
+        <ProjectReference Include="@(PlugsProjectReference)" ExcludeAssets="Compile" />
     </ItemGroup>
 
     <Import Project="..\..\Directory.Build.targets" />
