@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <BinFormat>Bin</BinFormat>
+        <BinFormat>Elf</BinFormat>
         <DebugEnabled>True</DebugEnabled>
         <DebugMode>Source</DebugMode>
         <TraceMode>User</TraceMode>
