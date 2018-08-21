@@ -38,7 +38,7 @@ namespace Cosmos.Build.Builder.Dependencies
                 @"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vs_installershell.exe");
             var vsInstancePath = _visualStudioInstance.GetInstallationPath();
 
-            var args = $"update --passive --norestart --quiet --installPath \"{vsInstancePath}\"";
+            var args = $"update --passive --norestart --installPath \"{vsInstancePath}\"";
 
             var process = Process.Start(vsInstallerPath, args);
             await Task.Run((Action)process.WaitForExit, cancellationToken).ConfigureAwait(false);
