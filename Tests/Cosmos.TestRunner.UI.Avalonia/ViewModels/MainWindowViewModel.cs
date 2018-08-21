@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Threading;
 
 using Cosmos.TestRunner.Core;
+using Cosmos.TestRunner.Full;
 
 namespace Cosmos.TestRunner.UI.ViewModels
 {
@@ -12,15 +13,15 @@ namespace Cosmos.TestRunner.UI.ViewModels
 
         public MainWindowViewModel(IEngineConfiguration aEngineConfiguration)
         {
-            var xEngine = new Engine(aEngineConfiguration)
-            {
-                OutputHandler = new OutputHandler(
+            var xEngine = new FullEngine(aEngineConfiguration);
+
+            xEngine.SetOutputHandler(
+                new OutputHandler(
                     m =>
                     {
                         TestRunnerLog += m + Environment.NewLine;
                         OnPropertyChanged(nameof(TestRunnerLog));
-                    })
-            };
+                    }));
 
             new Thread(() => xEngine.Execute()).Start();
         }
@@ -34,7 +35,10 @@ namespace Cosmos.TestRunner.UI.ViewModels
         {
             private Action<string> mLog;
 
-            public OutputHandler(Action<string> aLog) => mLog = aLog;
+            public OutputHandler(Action<string> aLog)
+            {
+                mLog = aLog;
+            }
 
             protected override void Log(string message) => mLog(message);
         }

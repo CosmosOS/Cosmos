@@ -1,0 +1,14 @@
+<Project>
+
+    <ItemGroup Condition="'$(IncludeWpfReferences)' == 'True'">
+        <Reference Include="PresentationCore" />
+        <Reference Include="PresentationFramework" />
+        <Reference Include="System.Xaml" />
+        <Reference Include="WindowsBase" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IncludeWindowsFormsReferences)' == 'True'">
+        <Reference Include="System.Windows.Forms" />
+    </ItemGroup>
+
+</Project>

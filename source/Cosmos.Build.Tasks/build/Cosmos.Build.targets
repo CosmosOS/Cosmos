@@ -74,6 +74,12 @@
     </ItemGroup>
     -->
 
+    <ItemGroup>
+        <UpToDateCheckOutput Include="$(Il2cpuOutput)" />
+        <UpToDateCheckOutput Include="$(NasmOutput)" />
+        <UpToDateCheckOutput Include="$(IsoFile)" />
+    </ItemGroup>
+
     <ItemGroup Condition="'$(KernelPkg)' == ''">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Plugs.dll" />
@@ -102,6 +108,10 @@
     <UsingTask TaskName="Cosmos.Build.Tasks.TheRingMaster" AssemblyFile="$(CosmosBuildTasksAssembly)" />
 
     <PropertyGroup>
+        <CoreBuildDependsOn>$(CoreBuildDependsOn);CosmosBuild</CoreBuildDependsOn>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <CosmosBuildDependsOn>
             FailIfRelease;
             TheRingMaster;
@@ -114,7 +124,7 @@
         </CosmosBuildDependsOn>
     </PropertyGroup>
 
-    <Target Name="CosmosBuild" AfterTargets="Build" DependsOnTargets="$(CosmosBuildDependsOn)" />
+    <Target Name="CosmosBuild" DependsOnTargets="$(CosmosBuildDependsOn)" />
 
     <Target Name="FailIfRelease" Condition="'$(Configuration)' == 'Release'">
         <Error Text="The Release configuration isn't currently supported!" />
@@ -144,7 +154,7 @@
         <ItemGroup>
             <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
                                Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
-                                      AND '%(ResolvedAssembliesToPublish.Extension)' != '.pdb'" />
+                                      AND '%(ResolvedAssembliesToPublish.Extension)' == '.dll'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"

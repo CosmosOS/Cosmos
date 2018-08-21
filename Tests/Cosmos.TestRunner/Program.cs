@@ -1,51 +1,44 @@
 ﻿using System;
+using System.IO;
+
 using Cosmos.TestRunner.Core;
+using Cosmos.TestRunner.Full;
 
-namespace Cosmos.TestRunner.Console
+namespace Cosmos.TestRunner
 {
-    using Console = global::System.Console;
-
     internal class Program
     {
-        [STAThread]
         private static void Main(string[] args)
         {
-            var xEngine = new Engine(new DefaultEngineConfiguration());
+            var xLogPath = Path.Combine(
+                Path.GetDirectoryName(typeof(Program).Assembly.Location), "WorkingDirectory", "TestRunnerLog.xml");
 
-            var xOutputXml = new OutputHandlerXml();
-            xEngine.OutputHandler = new MultiplexingOutputHandler(
-                xOutputXml,
-                new OutputHandlerFullConsole());
-
-            xEngine.Execute();
-
-            Console.WriteLine("Do you want to save test run details?");
-            Console.Write("Type yes, or nothing to just exit: ");
-            var xResult = Console.ReadLine();
-            if (xResult != null && xResult.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase))
+            if (args.Length == 1)
             {
-                Console.Write("Path to file: ");
-                xResult = Console.ReadLine();
-
-                try
-                {
-                    xOutputXml.SaveToFile(xResult);
-                    Console.WriteLine("Succesfully saved output to file " + xResult);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Exception: " + ex.ToString());
-                }
-                Console.ReadLine();
-                //var xSaveDialog = new SaveFileDialog();
-                //xSaveDialog.Filter = "XML documents|*.xml";
-                //if (xSaveDialog.ShowDialog() != DialogResult.OK)
-                //{
-                //    return;
-                //}
-
-                //xOutputXml.SaveToFile(xSaveDialog.FileName);
+                xLogPath = args[0];
             }
+
+            var xEngineConfiguration = new DefaultEngineConfiguration();
+            var xOutputHandler = new OutputHandlerFullConsole();
+
+            var xEngine = new FullEngine(xEngineConfiguration);
+            xEngine.SetOutputHandler(xOutputHandler);
+
+            var xResult = xEngine.Execute();
+
+            try
+            {
+                xResult.SaveXmlToFile(xLogPath);
+                Console.WriteLine("Log written to '{0}'.", xLogPath);
+            }
+            catch (Exception e)
+            {
+                xOutputHandler.UnhandledException(e);
+                Console.ReadKey(true);
+            }
+
+            Console.WriteLine("Press any key to exit.");
+            Console.ReadKey(true);
         }
     }
 }
