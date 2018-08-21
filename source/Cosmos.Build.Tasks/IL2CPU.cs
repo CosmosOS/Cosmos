@@ -91,7 +91,7 @@ namespace Cosmos.Build.Tasks
             return String.Join(Environment.NewLine, args.Select(a => $"{a.Key}:{a.Value}"));
         }
 
-        protected override string GetResponseFileSwitch(string responseFilePath) => $"ResponseFile:{responseFilePath}";
+        protected override string GetResponseFileSwitch(string responseFilePath) => $"\"ResponseFile:{responseFilePath}\"";
 
         public override bool Execute()
         {

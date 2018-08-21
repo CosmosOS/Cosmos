@@ -16,6 +16,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <!-- VS 15.8+ -->
+        <!-- <ProjectReference Include="@(PlugsProjectReference)" ExcludeAssets="Compile" /> -->
         <ProjectReference Include="@(PlugsProjectReference)" PrivateAssets="All" ReferenceOutputAssembly="False" OutputItemType="Content" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 

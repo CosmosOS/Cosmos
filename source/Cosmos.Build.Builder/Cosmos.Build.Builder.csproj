@@ -4,6 +4,7 @@
         <TargetFramework>net471</TargetFramework>
         <OutputType>WinExe</OutputType>
         <ApplicationIcon>Resources\Cosmos.ico</ApplicationIcon>
+        <IncludeWpfReferences>True</IncludeWpfReferences>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,16 +18,12 @@
 
     <ItemGroup>
         <Reference Include="System.Net.Http" />
-        <Reference Include="System.Xaml" />
-        <Reference Include="WindowsBase" />
-        <Reference Include="PresentationCore" />
-        <Reference Include="PresentationFramework" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" />
-        <PackageReference Include="NuGet.Common" Version="4.2.0" />
-        <PackageReference Include="NuGet.Configuration" Version="4.2.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" />
+        <PackageReference Include="NuGet.Common" />
+        <PackageReference Include="NuGet.Configuration" />
     </ItemGroup>
 
 </Project>

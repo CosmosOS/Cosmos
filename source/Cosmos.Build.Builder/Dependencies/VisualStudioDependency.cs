@@ -8,7 +8,7 @@ namespace Cosmos.Build.Builder.Dependencies
 {
     internal class VisualStudioDependency : IDependency
     {
-        private static readonly Version MinimumVsVersion = new Version(15, 7);
+        private static readonly Version MinimumVsVersion = new Version(15, 8);
 
         public string Name => $"Visual Studio {MinimumVsVersion.Major}.{MinimumVsVersion.Minor}+";
 
