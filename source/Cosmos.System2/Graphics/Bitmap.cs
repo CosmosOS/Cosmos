@@ -56,56 +56,59 @@ namespace Cosmos.System.Graphics
 
             Byte[] _int = new byte[4];
             Byte[] _short = new byte[2];
-            //Assume that we are using the BMP (Windows) header format
-            //I am using http://www.fastgraph.com/help/bmp_header_format.html
-            //and https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png?1519566101894as as reference
+            //Assume that we are using the BMP (Windows) V3 header format
+
+            //reading magic number to identify if BMP file (BM as string - 42 4D as Hex) - bytes 0 -> 2
+            stream.Read(_short, 0, 2);
+            if (0x424d != BitConverter.ToInt16(_short, 0))
+                throw new Exception("Header is not from a BMP");
+
+            //read size of BMP file - byte 2 -> 6
+            stream.Read(_int, 0, 4);
+            uint fileSize = BitConverter.ToUInt32(_int, 0);
+
             stream.Position = 10;
             //read header - bytes 10 -> 14 is the offset of the bitmap image data
             stream.Read(_int, 0, 4);
-            uint pixelTableOffset = (uint)BitConverter.ToInt32(_int, 0);
+            uint pixelTableOffset = BitConverter.ToUInt32(_int, 0);
 
             //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
             stream.Read(_int, 0, 4);
-            uint infoHeaderSize = (uint)BitConverter.ToInt32(_int, 0);
+            uint infoHeaderSize = BitConverter.ToUInt32(_int, 0);
             if (infoHeaderSize != 40)
             {
                 throw new Exception("Info header size has the wrong value!");
             }
             //now reading width of image in pixels - bytes 18 -> 22
             stream.Read(_int, 0, 4);
-            uint imageWidth = (uint)BitConverter.ToInt32(_int, 0);
+            uint imageWidth = BitConverter.ToUInt32(_int, 0);
 
             //now reading height of image in pixels - byte 22 -> 26
             stream.Read(_int, 0, 4);
-            uint imageHeight = (uint)BitConverter.ToInt32(_int, 0);
+            uint imageHeight = BitConverter.ToUInt32(_int, 0);
 
             //now reading number of planes should be 1 - byte 26 -> 28
             stream.Read(_short, 0, 2);
-            ushort planes = (ushort)BitConverter.ToInt16(_short, 0);
+            ushort planes = BitConverter.ToUInt16(_short, 0);
             if (planes != 1)
-            {
                 throw new Exception("Number of planes is not 1! Can not read file!");
-            }
             //now reading size of bits per pixel (1, 4, 8, 24, 32) - bytes 28 - 30
             stream.Read(_short, 0, 2);
-            ushort pixelSize = (ushort)BitConverter.ToInt16(_short, 0);
+            ushort pixelSize = BitConverter.ToUInt16(_short, 0);
             //TODO: Be able to handle other pixel sizes
-            if (pixelSize != 32)
+            if (!(pixelSize == 32 || pixelSize == 24))
             {
-                throw new NotImplementedException("Can only handle 32bit pictures!");
+                throw new NotImplementedException("Can only handle 32bit or 24bit bitmaps!");
             }
             //now reading compression type - bytes 30 -> 34
             stream.Read(_int, 0, 4);
-            uint compression = (uint)BitConverter.ToInt32(_int, 0);
+            uint compression = BitConverter.ToUInt32(_int, 0);
             //TODO: Be able to handle compressed files
             if (compression != 0)
-            {
                 throw new NotImplementedException("Can only handle uncompressed files!");
-            }
             //now reading total image data size(including padding) - bytes 34 -> 38
             stream.Read(_int, 0, 4);
-            uint totalImageSize = (uint)BitConverter.ToInt32(_int, 0);
-            //Somehow this is 0 for my test bmp
+            uint totalImageSize = BitConverter.ToUInt32(_int, 0);
 
             #endregion BMP Header
 
@@ -114,7 +117,7 @@ namespace Cosmos.System.Graphics
             Height = imageHeight;
             Depth = (ColorDepth)pixelSize;
 
-            rawData = new int[Width * Height * pixelSize / 8];
+            rawData = new int[Width * Height];
 
             #region Pixel Table
 
@@ -126,6 +129,7 @@ namespace Cosmos.System.Graphics
                 int remainder = (int)totalImageSize - pureImageSize;
                 if (remainder < 0) throw new Exception("Total Image Size is smaller than pure image size");
                 paddingPerRow = remainder / (int)imageHeight;
+                pureImageSize = (int)totalImageSize;
             }
             else
             {
@@ -137,13 +141,18 @@ namespace Cosmos.System.Graphics
             int position = 0;
             Byte[] pixelData = new byte[pureImageSize];
             stream.Read(pixelData, 0, pureImageSize);
-            Byte[] pixel = new byte[pixelSize / 8]; //Pixel size is in byte
+            Byte[] pixel = new byte[4]; //All must have the same size
 
             for (int x = 0; x < imageWidth; x++)
             {
                 for (int y = 0; y < imageHeight; y++)
                 {
-                    pixel[0] = pixelData[position++];
+                    if (pixelSize == 32)
+                        pixel[0] = pixelData[position++];
+                    else
+                    {
+                        pixel[0] = 0;
+                    }
                     pixel[1] = pixelData[position++];
                     pixel[2] = pixelData[position++];
                     pixel[3] = pixelData[position++];
@@ -165,8 +174,9 @@ namespace Cosmos.System.Graphics
 
         public void Save(Stream stream, ImageFormat imageFormat)
         {
-            //What should we do when a stream has already been used ie. the position is not 0?
-            Byte[] file = new Byte[54 /*header*/ + Width * Height * (uint)Depth / 8 /*assume that it is full bytes */];
+            //Calculate padding
+            int padding = ((int)Width * (int)Depth / 8) % 4;
+            Byte[] file = new Byte[54 /*header*/ + Width * Height * (uint)Depth / 8 + padding * Height];
             //Writes all bytes at the end into the stream, rather than a few every time
 
             int position = 0;
@@ -241,7 +251,7 @@ namespace Cosmos.System.Graphics
             Array.Copy(data, 0, file, position, 0);
             position += 4;
 
-            //number of important colors in iamge / zero
+            //number of important colors in image / zero
             data = BitConverter.GetBytes(0);
             Array.Copy(data, 0, file, position, 4);
             position += 4;
@@ -250,15 +260,18 @@ namespace Cosmos.System.Graphics
 
             //Copy image data
             position = (int)offset;
-            Byte[] imageData = new Byte[Width * Height * (int)Depth / 8];
+            Byte[] imageData = new Byte[Width * Height * (int)Depth / 8 + padding * Height];
             int imageDataPoint = 0;
+            byte[] bytePadding = new byte[padding];
+            int pos = 4 - (int)Depth / 8;
+            int length = (int)Depth / 8;
             for (int x = 0; x < Width; x++)
             {
                 for (int y = 0; y < Height; y++)
                 {
                     data = BitConverter.GetBytes(rawData[x + (Height - (y + 1)) * Width]);
-                    Array.Copy(data, 0, imageData, imageDataPoint, data.Length);
-                    imageDataPoint += data.Length;
+                    Array.Copy(data, pos, imageData, imageDataPoint, length);
+                    imageDataPoint += length;
                 }
             }
             Array.Copy(imageData, 0, file, position, imageData.Length);

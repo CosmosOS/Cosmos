@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="Content"
+      DisplayName="File Properties"
+      PageTemplate="generic"
+      Description="File Properties"
+      OverrideMode="Extend"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <BoolProperty Name="Deploy"
+                  DisplayName="Deploy"
+                  Category="Advanced" />
+
+</Rule>

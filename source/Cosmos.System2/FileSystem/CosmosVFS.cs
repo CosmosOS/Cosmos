@@ -19,12 +19,9 @@ namespace Cosmos.System.FileSystem
     public class CosmosVFS : VFSBase
     {
         private List<Partition> mPartitions;
-
-
         private List<FileSystem> mFileSystems;
-
-
         private FileSystem mCurrentFileSystem;
+        private List<FileSystemFactory> mRegisteredFileSystems;
 
         /// <summary>
         /// Initializes the virtual file system.
@@ -33,12 +30,21 @@ namespace Cosmos.System.FileSystem
         {
             mPartitions = new List<Partition>();
             mFileSystems = new List<FileSystem>();
+            mRegisteredFileSystems = new List<FileSystemFactory>();
+
+            RegisterFileSystem(new FatFileSystemFactory());
 
             InitializePartitions();
             if (mPartitions.Count > 0)
             {
                 InitializeFileSystems();
             }
+        }
+
+        public override void RegisterFileSystem(FileSystemFactory aFileSystemFactory)
+        {
+            Global.mFileSystemDebugger.SendInternal($"Registering filesystem {aFileSystemFactory.Name}");
+            mRegisteredFileSystems.Add(aFileSystemFactory);
         }
 
         /// <summary>
@@ -115,8 +121,7 @@ namespace Cosmos.System.FileSystem
                 throw new ArgumentException("aPath");
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             if (Directory.Exists(aPath))
             {
@@ -130,13 +135,11 @@ namespace Cosmos.System.FileSystem
 
             string xDirectoryToCreate = Path.GetFileName(aPath);
             Global.mFileSystemDebugger.SendInternal("After GetFileName");
-            Global.mFileSystemDebugger.SendInternal("xDirectoryToCreate =");
-            Global.mFileSystemDebugger.SendInternal(xDirectoryToCreate);
+            Global.mFileSystemDebugger.SendInternal("xDirectoryToCreate = " + xDirectoryToCreate);
 
             string xParentDirectory = Path.GetDirectoryName(aPath);
             Global.mFileSystemDebugger.SendInternal("After removing last path part");
-            Global.mFileSystemDebugger.SendInternal("xParentDirectory =");
-            Global.mFileSystemDebugger.SendInternal(xParentDirectory);
+            Global.mFileSystemDebugger.SendInternal("xParentDirectory = " + xParentDirectory);
 
             DirectoryEntry xParentEntry = GetDirectory(xParentDirectory);
 
@@ -330,17 +333,17 @@ namespace Cosmos.System.FileSystem
 
             switch (xEntry.mEntryType)
             {
-                    case DirectoryEntryTypeEnum.File:
-                        Global.mFileSystemDebugger.SendInternal($"It is a File");
-                        return FileAttributes.Normal;
+                case DirectoryEntryTypeEnum.File:
+                    Global.mFileSystemDebugger.SendInternal($"It is a File");
+                    return FileAttributes.Normal;
 
-                    case DirectoryEntryTypeEnum.Directory:
-                        Global.mFileSystemDebugger.SendInternal($"It is a Directory");
-                        return FileAttributes.Directory;
+                case DirectoryEntryTypeEnum.Directory:
+                    Global.mFileSystemDebugger.SendInternal($"It is a Directory");
+                    return FileAttributes.Directory;
 
-                    case DirectoryEntryTypeEnum.Unknown:
-                    default:
-                        throw new Exception($"{aPath} is neither a file neither a directory");
+                case DirectoryEntryTypeEnum.Unknown:
+                default:
+                    throw new Exception($"{aPath} is neither a file neither a directory");
             }
         }
 
@@ -400,17 +403,18 @@ namespace Cosmos.System.FileSystem
             {
                 string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
                 var xSize = (long)(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
-                switch (FileSystem.GetFileSystemType(mPartitions[i]))
+
+                // We 'probe' the partition <i> with all the FileSystem registered until we find a Filesystem that can read / write to it
+                foreach (var fs in mRegisteredFileSystems)
                 {
-                    case FileSystemType.FAT:
-                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath, xSize));
-                        break;
-                    default:
-                        global::System.Console.WriteLine("Unknown filesystem type!");
-                        return;
+                    if (fs.IsType(mPartitions[i]))
+                    {
+                        Global.mFileSystemDebugger.SendInternal($"Partion {i} has a {fs.Name} filesystem");
+                        mFileSystems.Add(fs.Create(mPartitions[i], xRootPath, xSize));
+                    }
                 }
 
-                if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].mRootPath == xRootPath))
+                if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].RootPath == xRootPath))
                 {
                     string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
                     global::System.Console.WriteLine(xMessage);
@@ -440,14 +444,12 @@ namespace Cosmos.System.FileSystem
                 throw new ArgumentException("Argument is null or empty", nameof(aPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             string xPath = Path.GetPathRoot(aPath);
-            Global.mFileSystemDebugger.SendInternal("xPath after GetPathRoot =");
-            Global.mFileSystemDebugger.SendInternal(xPath);
+            Global.mFileSystemDebugger.SendInternal("xPath after GetPathRoot = " + xPath);
 
-            if ((mCurrentFileSystem != null) && (xPath == mCurrentFileSystem.mRootPath))
+            if ((mCurrentFileSystem != null) && (xPath == mCurrentFileSystem.RootPath))
             {
                 Global.mFileSystemDebugger.SendInternal("Returning current file system.");
                 return mCurrentFileSystem;
@@ -455,7 +457,7 @@ namespace Cosmos.System.FileSystem
 
             for (int i = 0; i < mFileSystems.Count; i++)
             {
-                if (mFileSystems[i].mRootPath == xPath)
+                if (mFileSystems[i].RootPath == xPath)
                 {
                     Global.mFileSystemDebugger.SendInternal("Found filesystem.");
                     mCurrentFileSystem = mFileSystems[i];
@@ -487,8 +489,7 @@ namespace Cosmos.System.FileSystem
                 throw new ArgumentNullException(nameof(aFS));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             string[] xPathParts = VFSManager.SplitPath(aPath);
 
@@ -546,6 +547,75 @@ namespace Cosmos.System.FileSystem
             }
 
             return aFS.GetRootDirectory();
+        }
+
+        /// <summary>
+        /// Verifies if driveId is a valid id for a drive.
+        /// </summary>
+        /// <param name="driveId">The id of the drive.</param>
+        /// <returns>true if the drive id is valid, false otherwise.</returns>
+        public override bool IsValidDriveId(string driveId)
+        {
+            Global.mFileSystemDebugger.SendInternal($"driveId is {driveId} after normalization");
+
+            /* We need to remove ':\' to get only the numeric value */
+            driveId = driveId.Remove(driveId.Length - 2);
+            Global.mFileSystemDebugger.SendInternal($"driveId is now {driveId}");
+
+            /*
+             * Cosmos Drive name is really similar to DOS / Windows but a number instead of a letter is used, it is not limited
+             * to 1 character but any number is valid
+             */
+
+            bool isOK = Int32.TryParse(driveId, out int val);
+            Global.mFileSystemDebugger.SendInternal($"isOK is {isOK}");
+
+            return isOK;
+        }
+
+        public override long GetTotalSize(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            /* We have to return it in bytes */
+            return xFs.Size * 1024 * 1024;
+        }
+
+        public override long GetAvailableFreeSpace(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.AvailableFreeSpace;
+        }
+
+        public override long GetTotalFreeSpace(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.TotalFreeSpace;
+        }
+
+        public override string GetFileSystemType(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.Type;
+        }
+
+        public override string GetFileSystemLabel(string aDriveId)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            return xFs.Label;
+        }
+
+        public override void SetFileSystemLabel(string aDriveId, string aLabel)
+        {
+            Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.SetFileSystemLabel ---");
+            Global.mFileSystemDebugger.SendInternal($"aDriveId {aDriveId} aLabel {aLabel}");
+
+            var xFs = GetFileSystemFromPath(aDriveId);
+            xFs.Label = aLabel;
         }
     }
 }

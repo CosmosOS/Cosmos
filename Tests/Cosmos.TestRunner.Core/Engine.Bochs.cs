@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 using Cosmos.Build.Common;
 using Cosmos.Debug.DebugConnectors;
@@ -41,8 +39,5 @@ namespace Cosmos.TestRunner.Core
 
             HandleRunning(xDebugConnector, xBochs);
         }
-
-        private volatile bool mKernelRunning = true;
-
     }
 }

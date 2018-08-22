@@ -30,8 +30,8 @@ namespace Cosmos.TestRunner.Core
         StackCorruptionDetectionLevel StackCorruptionDetectionLevel { get; }
 
         /// <summary>
-        /// An enumerable of kernel types which will be run.
+        /// An enumerable of kernel assemblies which will be run.
         /// </summary>
-        IEnumerable<Type> KernelTypesToRun { get; }
+        IEnumerable<string> KernelAssembliesToRun { get; }
     }
 }

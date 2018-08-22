@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Cosmos.Build.Common;
 
@@ -22,91 +23,89 @@ namespace Cosmos.TestRunner.Core
         protected bool RunWithGDB => mConfiguration.RunWithGDB;
         protected bool StartBochsDebugGui => mConfiguration.StartBochsDebugGUI;
 
-        public IEnumerable<Type> KernelsToRun => mConfiguration.KernelTypesToRun;
+        public IEnumerable<string> KernelsAssembliesToRun => mConfiguration.KernelAssembliesToRun;
 
         private IEngineConfiguration mConfiguration;
+        private TestResultOutputHandler mTestResultOutputHandler;
 
-        public OutputHandlerBasic OutputHandler;
+        public OutputHandlerBasic OutputHandler { get; private set; }
 
         public Engine(IEngineConfiguration aEngineConfiguration)
         {
             mConfiguration = aEngineConfiguration;
+            mTestResultOutputHandler = new TestResultOutputHandler();
         }
 
-        public bool Execute()
+        public ITestResult Execute() => Execute(CancellationToken.None);
+
+        public ITestResult Execute(CancellationToken cancellationToken)
         {
-            if (OutputHandler == null)
-            {
-                throw new InvalidOperationException("No OutputHandler set!");
-            }
+            // todo: implement cancellation
 
             if (!RunTargets.Any())
             {
                 throw new InvalidOperationException("No run targets were specified!");
             }
 
+            var xTestResult = new TestResult();
+
             OutputHandler.ExecutionStart();
-            try
+
+            foreach (var xConfig in GetRunConfigurations())
             {
-                var xResult = true;
-                foreach (var xConfig in GetRunConfigurations())
+                OutputHandler.RunConfigurationStart(xConfig);
+
+                foreach (var xKernelAssembly in KernelsAssembliesToRun)
                 {
-                    OutputHandler.RunConfigurationStart(xConfig);
+                    var xKernelName = Path.GetFileNameWithoutExtension(xKernelAssembly);
+                    var xKernelTestResult = new KernelTestResult(xKernelName, xConfig);
+
+                    var xWorkingDirectory = Path.Combine(WorkingDirectoryBase, xKernelName);
+
+                    if (Directory.Exists(xWorkingDirectory))
+                    {
+                        Directory.Delete(xWorkingDirectory, true);
+                    }
+
+                    Directory.CreateDirectory(xWorkingDirectory);
+
                     try
                     {
-                        foreach (var xKernelType in KernelsToRun)
-                        {
-                            var xAssemblyPath = xKernelType.Assembly.Location;
-                            var xWorkingDirectory = Path.Combine(
-                                WorkingDirectoryBase, Path.GetFileNameWithoutExtension(xAssemblyPath));
-
-                            if (Directory.Exists(xWorkingDirectory))
-                            {
-                                Directory.Delete(xWorkingDirectory, true);
-                            }
-
-                            Directory.CreateDirectory(xWorkingDirectory);
-
-                            xResult &= ExecuteKernel(xAssemblyPath, xWorkingDirectory, xConfig);
-                        }
+                        xKernelTestResult.Result = ExecuteKernel(
+                            xKernelAssembly, xWorkingDirectory, xConfig, xKernelTestResult);
                     }
                     catch (Exception e)
                     {
-                        if (!mKernelResultSet)
-                        {
-                            OutputHandler.SetKernelTestResult(false, e.ToString());
-                            mKernelResult = false;
-                            xResult = false;
-                        }
                         OutputHandler.UnhandledException(e);
                     }
-                    finally
-                    {
-                        OutputHandler.RunConfigurationEnd(xConfig);
-                    }
+
+                    xKernelTestResult.TestLog = mTestResultOutputHandler.TestLog;
+
+                    xTestResult.AddKernelTestResult(xKernelTestResult);
                 }
-                return xResult;
-            }
-            catch (Exception E)
-            {
-                OutputHandler.UnhandledException(E);
-                return false;
-            }
-            finally
-            {
-                OutputHandler.ExecutionEnd();
+
+                OutputHandler.RunConfigurationEnd(xConfig);
             }
 
-            // todo: now report summary
-            //DoLog("NotImplemented, summary?");
+            OutputHandler.ExecutionEnd();
+
+            var xPassedTestsCount = xTestResult.KernelTestResults.Count(r => r.Result);
+            var xFailedTestsCount = xTestResult.KernelTestResults.Count(r => !r.Result);
+
+            OutputHandler.LogMessage($"Done executing: {xPassedTestsCount} test(s) passed, {xFailedTestsCount} test(s) failed.");
+
+            return xTestResult;
         }
+
+        public void SetOutputHandler(OutputHandlerBasic outputHandler) =>
+            OutputHandler = new MultiplexingOutputHandler(outputHandler, mTestResultOutputHandler);
 
         private IEnumerable<RunConfiguration> GetRunConfigurations()
         {
-            foreach (RunTargetEnum xTarget in RunTargets)
+            foreach (var xTarget in RunTargets)
             {
-                yield return new RunConfiguration { IsELF = true, RunTarget = xTarget };
-                //yield return new RunConfiguration { IsELF = false, RunTarget = xTarget };
+                yield return new RunConfiguration(isElf: true, runTarget: xTarget);
+                //yield return new RunConfiguration(isElf: false, runTarget: xTarget);
             }
         }
     }

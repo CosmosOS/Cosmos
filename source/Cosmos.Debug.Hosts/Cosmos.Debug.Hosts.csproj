@@ -14,4 +14,19 @@
         <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
     </ItemGroup>
 
+    <Target Name="IncludeHyperVServer" BeforeTargets="AssignTargetPaths">
+
+        <PropertyGroup>
+            <_HyperVServerPath>$(IntermediateOutputPath)HyperVServer\</_HyperVServerPath>
+        </PropertyGroup>
+
+        <MSBuild Projects="..\Cosmos.Debug.HyperVServer\Cosmos.Debug.HyperVServer.csproj" Targets="Restore;Publish" Properties="PublishDir=$(MSBuildProjectDirectory)\$(_HyperVServerPath)" RemoveProperties="TargetFramework" />
+
+        <ItemGroup>
+            <ContentWithTargetPath Include="$(_HyperVServerPath)**" CopyToOutputDirectory="Always" />
+            <ContentWithTargetPath Update="@(ContentWithTargetPath)" TargetPath="HyperVServer\%(RecursiveDir)%(Filename)%(Extension)" />
+        </ItemGroup>
+
+    </Target>
+
 </Project>

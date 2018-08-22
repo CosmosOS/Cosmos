@@ -24,7 +24,8 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
 
-        public EBR(byte[] aEBR) {
+        public EBR(byte[] aEBR)
+        {
             ParsePartition(aEBR, 446);
             ParsePartition(aEBR, 462);
         }
@@ -40,8 +41,8 @@ namespace Cosmos.HAL.BlockDevice
             }
             else if (xSystemID != 0)
             {
-                UInt32 xStartSector = aEBR.ToUInt32(aLoc + 8);
-                UInt32 xSectorCount = aEBR.ToUInt32(aLoc + 12);
+                UInt32 xStartSector = BitConverter.ToUInt32(aEBR, (int)aLoc + 8);
+                UInt32 xSectorCount = BitConverter.ToUInt32(aEBR, (int)aLoc + 12);
 
                 var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
                 Partitions.Add(xPartInfo);

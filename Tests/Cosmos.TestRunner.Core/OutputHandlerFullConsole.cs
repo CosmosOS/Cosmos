@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -9,9 +7,8 @@ namespace Cosmos.TestRunner.Core
         protected override void Log(string message)
         {
             Console.Write(DateTime.Now.ToString("hh:mm:ss.ffffff "));
-            Console.Write(new String(' ', mLogLevel * 2));
+            Console.Write(new string(' ', mLogLevel * 2));
             Console.WriteLine(message);
         }
-
     }
 }
