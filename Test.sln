@@ -159,6 +159,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.HyperVServer", "source\Cosmos.Debug.HyperVServer\Cosmos.Debug.HyperVServer.csproj", "{3421E19D-16C7-4593-9F6B-291ECB86A3EB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemoryOperationsTest", "Tests\Kernels\MemoryOperationsTest\MemoryOperationsTest.csproj", "{FD509DE0-21DA-4C40-A5CE-767311C6F084}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.Full", "Tests\Cosmos.TestRunner.Full\Cosmos.TestRunner.Full.csproj", "{65EE0B97-D3F0-400D-B432-85FF5553C44E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.TestAdapter", "Tests\Cosmos.TestRunner.TestAdapter\Cosmos.TestRunner.TestAdapter.csproj", "{8574E797-7C48-4F12-B537-4F927BCBA93B}"
