@@ -438,32 +438,44 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static long GetTotalSize(string aDriveId)
         {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetTotalSize ---");
             return mVFS.GetTotalSize(aDriveId);
         }
 
         public static long GetAvailableFreeSpace(string aDriveId)
         {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetAvailableFreeSpace ---");
             return mVFS.GetAvailableFreeSpace(aDriveId);
         }
 
         public static long GetTotalFreeSpace(string aDriveId)
         {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetTotalFreeSpace ---");
             return mVFS.GetTotalFreeSpace(aDriveId);
         }
 
         public static string GetFileSystemType(string aDriveId)
         {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFileSystemType ---");
             return mVFS.GetFileSystemType(aDriveId);
         }
 
         public static string GetFileSystemLabel(string aDriveId)
         {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFileSystemLabel ---");
             return mVFS.GetFileSystemLabel(aDriveId);
         }
 
         public static void SetFileSystemLabel(string aDriveId, string aLabel)
         {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.SetFileSystemLabel ---");
             mVFS.SetFileSystemLabel(aDriveId, aLabel);
+        }
+
+        public static void Format(string aDriveId, string aDriveFormat, bool aQuick)
+        {
+            Global.mFileSystemDebugger.SendInternal("--- VFSManager.Format ---");
+            mVFS.Format(aDriveId, aDriveFormat, aQuick);
         }
 
         #region Helpers
