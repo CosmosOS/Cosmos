@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Cosmos.Common.Extensions;
 
 namespace Cosmos.Common.Tests
