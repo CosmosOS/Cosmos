@@ -1,8 +1,9 @@
 using Cosmos.Core;
+
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+
 using XSharp;
-using XSharp.Assembler;
 
 namespace Cosmos.Core_Asm
 {
@@ -27,7 +28,9 @@ namespace Cosmos.Core_Asm
             int[] val = new int[2];
 
             fixed (int* ptr = val)
+            {
                 __cyclesrdtsc(ptr);
+            }
 
             return ((long)val[0] << 32) | (uint)val[1];
         }
@@ -43,7 +46,9 @@ namespace Cosmos.Core_Asm
                 int[] raw = new int[4];
 
                 fixed (int* ptr = raw)
+                {
                     __raterdmsr(ptr);
+                }
 
                 ulong l1 = (ulong)__maxrate();
                 ulong l2 = ((ulong)raw[0] << 32) | (uint)raw[1];
@@ -97,7 +102,7 @@ namespace Cosmos.Core_Asm
              */
             __cyclesrdtscptr = target;
 
-            string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__cyclesrdtscptr)));
+            string intname = LabelName.GetStaticFieldName(typeof(CPUImpl).GetField(nameof(__cyclesrdtscptr)));
 
             XS.Push(XSRegisters.EAX);
             XS.Push(XSRegisters.ECX);
@@ -137,7 +142,7 @@ namespace Cosmos.Core_Asm
              */
             __raterdmsrptr = target;
 
-            string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__raterdmsrptr)));
+            string intname = LabelName.GetStaticFieldName(typeof(CPUImpl).GetField(nameof(__raterdmsrptr)));
 
             XS.Lea(XSRegisters.ESI, intname);
             XS.Set(XSRegisters.ECX, 0xe7);
@@ -166,7 +171,7 @@ namespace Cosmos.Core_Asm
              */
             __vendortargetptr = target;
 
-            string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__vendortargetptr)));
+            string intname = LabelName.GetStaticFieldName(typeof(CPUImpl).GetField(nameof(__vendortargetptr)));
 
             XS.Lea(XSRegisters.ESI, intname); // new Lea { DestinationReg = RegistersEnum.ESI, SourceRef = ElementReference.New(intname) };
             XS.Cpuid();

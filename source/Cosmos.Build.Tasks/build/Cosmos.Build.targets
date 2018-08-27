@@ -1,10 +1,6 @@
 ﻿<Project>
 
     <PropertyGroup>
-        <SelfContained>True</SelfContained>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
         <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
     </PropertyGroup>
@@ -24,7 +20,7 @@
         <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
 
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.exe</ObjdumpToolExe>
+        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.bat</ObjdumpToolExe>
 
         <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
         <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
@@ -52,8 +48,6 @@
         <NasmOutput Condition="'$(NasmOutput)' == '' AND '$(BinFormat)' == 'ELF'">$(OutputPath)$(AssemblyName).obj</NasmOutput>
         <NasmOutput Condition="'$(NasmOutput)' == ''">$(OutputPath)$(AssemblyName).bin</NasmOutput>
 
-        <_NasmMap>$([System.IO.Path]::GetDirectoryName('$(NasmOutput)'))\main.map</_NasmMap>
-
         <MapFile Condition="'$(MapFile)' == ''">$(OutputPath)$(AssemblyName).map</MapFile>
         <CosmosDebugSymbolsFile Condition="'$(CosmosDebugSymbolsFile)' == ''">$(OutputPath)$(AssemblyName).cdb</CosmosDebugSymbolsFile>
 
@@ -66,6 +60,25 @@
     <PropertyGroup>
         <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
     </PropertyGroup>
+
+    <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
+        <Content>
+            <Deploy>False</Deploy>
+        </Content>
+    </ItemDefinitionGroup>
+
+    <!-- https://github.com/Microsoft/msbuild/issues/3479
+         if/when fixed, change MakeIso
+    <ItemGroup>
+        <ContentToDeploy Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
+    </ItemGroup>
+    -->
+
+    <ItemGroup>
+        <UpToDateCheckOutput Include="$(Il2cpuOutput)" />
+        <UpToDateCheckOutput Include="$(NasmOutput)" />
+        <UpToDateCheckOutput Include="$(IsoFile)" />
+    </ItemGroup>
 
     <ItemGroup Condition="'$(KernelPkg)' == ''">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
@@ -87,11 +100,16 @@
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateSyslinuxConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.Launch" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ReadNasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.TheRingMaster" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+
+    <PropertyGroup>
+        <CoreBuildDependsOn>$(CoreBuildDependsOn);CosmosBuild</CoreBuildDependsOn>
+    </PropertyGroup>
 
     <PropertyGroup>
         <CosmosBuildDependsOn>
@@ -106,7 +124,7 @@
         </CosmosBuildDependsOn>
     </PropertyGroup>
 
-    <Target Name="CosmosBuild" AfterTargets="Build" DependsOnTargets="$(CosmosBuildDependsOn)" />
+    <Target Name="CosmosBuild" DependsOnTargets="$(CosmosBuildDependsOn)" />
 
     <Target Name="FailIfRelease" Condition="'$(Configuration)' == 'Release'">
         <Error Text="The Release configuration isn't currently supported!" />
@@ -134,7 +152,9 @@
             DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets">
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)" Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'" />
+            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
+                               Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedAssembliesToPublish.Extension)' == '.dll'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"
@@ -221,7 +241,7 @@
     -->
     <Target Name="ExtractMapFromElfFile"
             Inputs="$(BinFile)"
-            Outputs="$(CosmosDebugSymbolsPath)"
+            Outputs="$(CosmosDebugSymbolsFile)"
             Condition="'$(BinFormat)' == 'ELF'">
 
         <ExtractMapFromElfFile InputFile="$(BinFile)"
@@ -237,7 +257,7 @@
                                  ReadNasmMapToDebugInfo
 
         [IN]
-        $(_NasmMap) - a NASM map file.
+        $(MapFile) - a NASM map file.
 
         [OUT]
         $(CosmosDebugSymbolsPath) - a debug symbols file.
@@ -245,11 +265,11 @@
     ================================================================================
     -->
     <Target Name="ReadNasmMapToDebugInfo"
-            Inputs="$(_NasmMap)"
-            Outputs="$(CosmosDebugSymbolsPath)"
+            Inputs="$(MapFile)"
+            Outputs="$(CosmosDebugSymbolsFile)"
             Condition="'$(BinFormat)' != 'ELF'">
 
-        <ReadNasmMapToDebugInfo MapFile="$(_NasmMap)"
+        <ReadNasmMapToDebugInfo MapFile="$(MapFile)"
                                 DebugInfoFile="$(CosmosDebugSymbolsFile)" />
 
     </Target>
@@ -277,6 +297,7 @@
             <_IsoFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
             <_IsoFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
             <_IsoFile Include="$(BinFile)" />
+            <_IsoFile Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
         </ItemGroup>
 
         <RemoveDir Directories="$(IntermediateIsoDirectory)" />
@@ -351,6 +372,13 @@
                    FormatDrive="$(UsbPublishFormatDrive)"
                    ToolPath="$(SyslinuxToolPath)"
                    ToolExe="$(SyslinuxToolExe)" />
+
+    </Target>
+
+    <Target Name="Launch">
+
+        <Launch ConfigurationFile="$(OutputPath)Bochs.bxrc"
+                IsoFile="$(MSBuildProjectDirectory)\$(IsoFile)" />
 
     </Target>
 

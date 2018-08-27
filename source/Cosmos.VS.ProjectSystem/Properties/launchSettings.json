@@ -1,8 +1,12 @@
 {
-    "profiles": {
-        "Cosmos.VS.ProjectSystem": {
-            "executablePath": "$(DevEnvDir)devenv.exe",
-            "commandLineArgs": "/rootSuffix Exp"
-        }
+  "profiles": {
+    "Cosmos.VS.ProjectSystem": {
+      "commandName": "Executable",
+      "executablePath": "$(DevEnvDir)devenv.exe",
+      "commandLineArgs": "/rootSuffix Exp",
+      "environmentVariables": {
+        "CosmosDesignTimeTargetsPath": "$(MSBuildProjectDirectory)\\BuildSystem\\Cosmos.DesignTime.targets"
+      }
     }
+  }
 }

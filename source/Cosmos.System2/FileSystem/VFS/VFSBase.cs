@@ -8,6 +8,8 @@ namespace Cosmos.System.FileSystem.VFS
     {
         public abstract void Initialize();
 
+        public abstract void RegisterFileSystem(FileSystemFactory aFileSystemFactory);
+
         public abstract DirectoryEntry CreateFile(string aPath);
 
         public abstract DirectoryEntry CreateDirectory(string aPath);
@@ -37,5 +39,21 @@ namespace Cosmos.System.FileSystem.VFS
         public static char AltDirectorySeparatorChar { get { return '/'; } }
 
         public static char VolumeSeparatorChar { get { return ':'; } }
+
+        public abstract bool IsValidDriveId(string driveId);
+
+        public abstract long GetTotalSize(string aDriveId);
+
+        public abstract long GetAvailableFreeSpace(string aDriveId);
+
+        public abstract long GetTotalFreeSpace(string aDriveId);
+
+        public abstract string GetFileSystemType(string aDriveId);
+
+        public abstract string GetFileSystemLabel(string aDriveId);
+
+        public abstract void SetFileSystemLabel(string aDriveId, string aLabel);
+
+        public abstract void Format(string aDriveId, string aDriveFormat, bool aQuick);
     }
 }

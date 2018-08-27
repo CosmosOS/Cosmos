@@ -2,16 +2,13 @@
 {
     public class RunConfiguration
     {
-        public bool IsELF
-        {
-            get;
-            set;
-        }
+        public bool IsELF { get; }
+        public RunTargetEnum RunTarget { get; }
 
-        public RunTargetEnum RunTarget
+        public RunConfiguration(bool isElf, RunTargetEnum runTarget)
         {
-            get;
-            set;
+            IsELF = isElf;
+            RunTarget = runTarget;
         }
     }
 }

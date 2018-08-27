@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
@@ -90,6 +91,20 @@ namespace Cosmos.Build.Tasks
             return String.Join(Environment.NewLine, args.Select(a => $"{a.Key}:{a.Value}"));
         }
 
-        protected override string GetResponseFileSwitch(string responseFilePath) => $"ResponseFile:{responseFilePath}";
+        protected override string GetResponseFileSwitch(string responseFilePath) => $"\"ResponseFile:{responseFilePath}\"";
+
+        public override bool Execute()
+        {
+            var xSW = Stopwatch.StartNew();
+            try
+            {
+                return base.Execute();
+            }
+            finally
+            {
+                xSW.Stop();
+                Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
+            }
+        }
     }
 }
