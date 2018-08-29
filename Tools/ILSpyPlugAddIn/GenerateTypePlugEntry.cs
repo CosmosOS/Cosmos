@@ -58,7 +58,7 @@ namespace Cosmos.ILSpyPlugs.Plugin
             xString.AppendFormat(
                 type.IsPublic
                     ? "[Plug(Target = typeof(global::{0}))]"
-                    : "[Plug(TargetName = \"{0}\")]", Utilities.GetCSharpTypeName(type));
+                    : "[Plug(TargetName = \"{0}, {1}\")]", Utilities.GetCSharpTypeName(type), type.Module.Assembly.Name);
             xString.AppendLine();
             xString.AppendFormat("public static class {0}Impl", type.Name);
             xString.AppendLine();
