@@ -186,15 +186,14 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            var refsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".refs");
-            var workingDirectory = Path.Combine(FindCosmosRoot(), "Tests", "TestKernels");
+            var refsFilePath = kernelFileName + ".refs";
 
-            RunProcess("dotnet", workingDirectory, $"msbuild /t:Restore;WriteReferenceAssembliesToFile \"/p:ReferencesFile={refsFilePath}\" /nologo");
+            if (!File.Exists(refsFilePath))
+            {
+                throw new FileNotFoundException("References file not found!", refsFilePath);
+            }
 
             var xReferences = File.ReadAllLines(refsFilePath);
-
-            File.Delete(refsFilePath);
-
             var xPlugsReferences = new List<string>();
 
             if (KernelPkg == "X86")

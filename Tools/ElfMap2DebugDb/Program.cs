@@ -1,5 +1,6 @@
 ﻿using System;
-using Cosmos.Debug.Common;
+
+using IL2CPU.Debug.Symbols;
 
 namespace ElfMap2DebugDb
 {
