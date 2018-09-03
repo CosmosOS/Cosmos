@@ -8,9 +8,9 @@ namespace Cosmos.HAL
     /// <summary>
     /// This class describes the PS/2 mouse.
     /// </summary>
-    public class PS2Mouse : MouseBase
+    internal class PS2Mouse : MouseBase
     {
-        enum Command : byte
+        private enum Command : byte
         {
             SetScaling1_1 = 0xE6,
             SetScaling2_1 = 0xE7,
@@ -30,26 +30,22 @@ namespace Cosmos.HAL
             Reset = 0xFF
         }
 
-        public byte PS2Port { get; }
+        private readonly PS2Controller mPS2Controller;
+        private readonly byte mPS2Port;
 
-        private bool HasScrollWheel
-        {
-            get
-            {
-                return mMouseID == 3 || mMouseID == 4;
-            }
-        }
+        private bool HasScrollWheel => mMouseId == 3 || mMouseId == 4;
 
         private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
-        private PS2Controller mPS2Controller = Global.PS2Controller;
-        private Debugger mDebugger = new Debugger("HAL", "PS2Mouse");
+        private Debugger mDebugger = new Debugger(nameof(HAL), nameof(PS2Mouse));
 
-        private byte mMouseID = 0;
+        private byte mMouseId = 0;
 
-        internal PS2Mouse(byte aPort, byte aMouseID)
+        public PS2Mouse(PS2Controller aPS2Controller, byte aPort, byte aMouseID)
         {
-            PS2Port = aPort;
-            mMouseID = aMouseID;
+            mPS2Controller = aPS2Controller;
+            mPS2Port = aPort;
+
+            mMouseId = aMouseID;
         }
 
         /// <summary>
@@ -61,18 +57,18 @@ namespace Cosmos.HAL
             SendCommand(Command.Reset);
             mPS2Controller.WaitForDeviceReset();
 
-            if (mMouseID == 0)
+            if (mMouseId == 0)
             {
-                mMouseID = TryToEnableScrollWheel();
+                mMouseId = TryToEnableScrollWheel();
 
-                mDebugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mMouseID);
+                mDebugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mMouseId);
 
-                if (mMouseID == 3)
+                if (mMouseId == 3)
                 {
-                    mMouseID = TryToEnableAdditionalButtons();
+                    mMouseId = TryToEnableAdditionalButtons();
                 }
 
-                mDebugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mMouseID);
+                mDebugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mMouseId);
             }
 
             //SendCommand(Command.SetDefaults);
@@ -81,7 +77,6 @@ namespace Cosmos.HAL
             INTs.SetIrqHandler(12, HandleMouse);
 
             SendCommand(Command.EnablePacketStreaming);
-            mPS2Controller.WaitForAck();
         }
 
         /// <summary>
@@ -94,9 +89,7 @@ namespace Cosmos.HAL
             SendCommand(Command.SetSampleRate, 100);
             SendCommand(Command.SetSampleRate, 80);
 
-            SendCommand(Command.GetMouseID);
-
-            return mPS2Controller.ReadByteAfterAck();
+            return GetMouseId();
         }
 
         /// <summary>
@@ -109,9 +102,7 @@ namespace Cosmos.HAL
             SendCommand(Command.SetSampleRate, 200);
             SendCommand(Command.SetSampleRate, 80);
 
-            SendCommand(Command.GetMouseID);
-
-            return mPS2Controller.ReadByteAfterAck();
+            return GetMouseId();
         }
 
         private byte[] mMouseByte = new byte[4];
@@ -181,7 +172,7 @@ namespace Cosmos.HAL
                     var xScrollWheelByte = mMouseByte[3] & 0x0F;
                     xScrollWheel = (xScrollWheelByte & 0b1000) == 0 ? xScrollWheelByte : xScrollWheelByte | ~0x0F;
 
-                    if (mMouseID == 4)
+                    if (mMouseId == 4)
                     {
                         var xAdditionalButtonsByte = mMouseByte[3] & 0b0011_0000;
                         xMouseState |= (xAdditionalButtonsByte >> 1);
@@ -196,41 +187,14 @@ namespace Cosmos.HAL
                 mMouseCycle = 0;
             }
         }
-        
-        private void SendCommand(Command aCommand, byte? aByte = null)
+
+        private byte GetMouseId()
         {
-            mDebugger.SendInternal("(PS/2 Mouse) Sending command:");
-            mDebugger.SendInternal("Command:");
-            mDebugger.SendInternal((byte)aCommand);
-
-            if (PS2Port == 2)
-            {
-                mPS2Controller.PrepareSecondPortWrite();
-            }
-
-            mPS2Controller.WaitToWrite();
-            IO.Data.Byte = (byte)aCommand;
-
-            mPS2Controller.WaitForAck();
-
-            mDebugger.SendInternal("Command sent.");
-
-            if (aByte.HasValue)
-            {
-                mDebugger.SendInternal("(PS/2 Mouse) Sending byte after command:");
-                mDebugger.SendInternal("Byte value:");
-                mDebugger.SendInternal(aByte.Value);
-
-                if (PS2Port == 2)
-                {
-                    mPS2Controller.PrepareSecondPortWrite();
-                }
-
-                mPS2Controller.WaitToWrite();
-                IO.Data.Byte = aByte.Value;
-
-                mPS2Controller.WaitForAck();
-            }
+            SendCommand(Command.GetMouseID);
+            return mPS2Controller.Read();
         }
+
+        private void SendCommand(Command aCommand, byte? aByte = null) =>
+            mPS2Controller.SendDeviceCommand((byte)aCommand, mPS2Port == 2, aByte);
     }
 }

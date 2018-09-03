@@ -103,9 +103,9 @@ namespace Cosmos.System
 
         private static void UpdateLeds()
         {
-            foreach (KeyboardBase keyboard in mKeyboardList)
+            foreach (var xKeyboard in mKeyboardList)
             {
-                keyboard.UpdateLeds();
+                UpdateLeds(xKeyboard);
             }
         }
 
@@ -163,6 +163,11 @@ namespace Cosmos.System
 
             aKeyboard.OnKeyPressed = HandleScanCode;
             mKeyboardList.Add(aKeyboard);
+
+            UpdateLeds(aKeyboard);
         }
+
+        private static void UpdateLeds(KeyboardBase aKeyboard) =>
+            aKeyboard.UpdateLeds(ScrollLock, NumLock, CapsLock);
     }
 }
