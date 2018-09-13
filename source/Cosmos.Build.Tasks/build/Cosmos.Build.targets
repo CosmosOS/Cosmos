@@ -67,12 +67,9 @@
         </Content>
     </ItemDefinitionGroup>
 
-    <!-- https://github.com/Microsoft/msbuild/issues/3479
-         if/when fixed, change MakeIso
     <ItemGroup>
-        <ContentToDeploy Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
+        <ContentToDeploy Include="@(Content->WithMetadataValue('Deploy', 'True'))" />
     </ItemGroup>
-    -->
 
     <ItemGroup>
         <UpToDateCheckOutput Include="$(Il2cpuOutput)" />
@@ -94,6 +91,12 @@
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Debug.Kernel.Plugs.Asm.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Platform.PC.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Plugs.TapRoot.dll" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="@(PackageReference)">
+            <ExcludeAssets Condition="'%(IsPlugsReference)' == 'True'">Compile</ExcludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateMbr" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -297,7 +300,7 @@
             <_IsoFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
             <_IsoFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
             <_IsoFile Include="$(BinFile)" />
-            <_IsoFile Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
+            <_IsoFile Include="@(ContentToDeploy)" />
         </ItemGroup>
 
         <RemoveDir Directories="$(IntermediateIsoDirectory)" />
