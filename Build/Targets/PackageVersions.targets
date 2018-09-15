@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0-alpha-004</MicrosoftNETFrameworkReferenceAssembliesVersion>
-        <MicrosoftNETTestSdkVersion>15.7.0</MicrosoftNETTestSdkVersion>
+        <MicrosoftNETTestSdkVersion>15.8.0</MicrosoftNETTestSdkVersion>
         <MicrosoftVisualStudioSetupConfigurationInteropVersion>1.16.30</MicrosoftVisualStudioSetupConfigurationInteropVersion>
         <MSTestVersion>1.3.2</MSTestVersion>
         <NuGetVersion>4.8.0</NuGetVersion>
