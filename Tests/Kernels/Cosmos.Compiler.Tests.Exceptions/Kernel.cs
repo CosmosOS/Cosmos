@@ -27,7 +27,6 @@ namespace Cosmos.Compiler.Tests.Exceptions
 
             TestTryFinally.Execute();
 
-            TestThrowInUsing();
             TestSimpleException();
 
             var xFilter = false;
