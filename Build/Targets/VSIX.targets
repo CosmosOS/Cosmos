@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.VSSDK.BuildTools" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" PrivateAssets="All" />
     </ItemGroup>
 
     <Target Name="_MakeTargetVsixContainerDir"
