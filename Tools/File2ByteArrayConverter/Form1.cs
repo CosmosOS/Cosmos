@@ -13,13 +13,14 @@ namespace File2ByteArray_Converter
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 textBox2.Text = openFileDialog1.FileName;
-                FileStream strm = new FileStream(openFileDialog1.FileName, FileMode.Open);
-                StreamWriter strw = new StreamWriter(openFileDialog1.FileName + ".ByteArray.txt");
+                var strm = new FileStream(openFileDialog1.FileName, FileMode.Open);
+                var strw = new StreamWriter(openFileDialog1.FileName + ".ByteArray.txt");
                 textBox1.Text = "";
-                strw.Write("byte[] " + Path.GetFileName(openFileDialog1.FileName).Replace('.', '_') + " = new byte[] \r\n{\r\n");
+                var varName = MakeCSharpValidIdentifier(Path.GetFileName(openFileDialog1.FileName));
+                strw.Write("byte[] " + varName + " = new byte[] \r\n{\r\n");
                 int i = 0;
                 bool first = true;
                 for (int loc = 0; loc < strm.Length; loc++)
@@ -49,7 +50,7 @@ namespace File2ByteArray_Converter
                 strm.Flush();
                 strm.Close();
                 strm.Dispose();
-                StreamReader strdr = new StreamReader(openFileDialog1.FileName + ".ByteArray.txt");
+                var strdr = new StreamReader(openFileDialog1.FileName + ".ByteArray.txt");
                 textBox1.Text = strdr.ReadToEnd();
                 strdr.Close();
                 strdr.Dispose();
@@ -57,9 +58,9 @@ namespace File2ByteArray_Converter
             }
         }
 
-        private static string ConvertToHex(UInt32 num)
+        private static string ConvertToHex(uint num)
         {
-            string xHex = string.Empty;
+            string xHex = String.Empty;
 
             if (num == 0)
             {
@@ -117,7 +118,41 @@ namespace File2ByteArray_Converter
                     return "F";
             }
             return " ";
+        }
 
+        private static string MakeCSharpValidIdentifier(string rawName)
+        {
+            if (String.IsNullOrWhiteSpace(rawName))
+            {
+                return "_";
+            }
+
+            var chars = rawName.ToCharArray();
+
+            for (int i = 0; i < chars.Length; i++)
+            {
+                var c = chars[i];
+
+                if (Char.IsLetterOrDigit(c)
+                    || c == '_')
+                {
+                    continue;
+                }
+
+                chars[i] = '_';
+            }
+
+            if (Char.IsDigit(chars[0]))
+            {
+                var newChars = new char[chars.Length + 1];
+                newChars[0] = '_';
+
+                Array.Copy(chars, 0, newChars, 1, chars.Length);
+
+                chars = newChars;
+            }
+
+            return new string(chars);
         }
     }
 }

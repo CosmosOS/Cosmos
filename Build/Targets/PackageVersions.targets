@@ -2,8 +2,10 @@
 
     <PropertyGroup>
         <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0-alpha-004</MicrosoftNETFrameworkReferenceAssembliesVersion>
-        <MicrosoftNETTestSdkVersion>15.7.0</MicrosoftNETTestSdkVersion>
+        <MicrosoftNETTestSdkVersion>15.8.0</MicrosoftNETTestSdkVersion>
+        <MicrosoftVisualStudioSDKEmbedInteropTypesVersion>15.0.21</MicrosoftVisualStudioSDKEmbedInteropTypesVersion>
         <MicrosoftVisualStudioSetupConfigurationInteropVersion>1.16.30</MicrosoftVisualStudioSetupConfigurationInteropVersion>
+        <MicrosoftVSSDKBuildToolsVersion>15.7.109</MicrosoftVSSDKBuildToolsVersion>
         <MSTestVersion>1.3.2</MSTestVersion>
         <NuGetVersion>4.8.0</NuGetVersion>
         <NUnitVersion>3.10.1</NUnitVersion>
@@ -13,7 +15,9 @@
     <ItemGroup>
         <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="$(MicrosoftNETFrameworkReferenceAssembliesVersion)" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />
+        <PackageReference Update="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="$(MicrosoftVisualStudioSDKEmbedInteropTypesVersion)" />
         <PackageReference Update="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="$(MicrosoftVisualStudioSetupConfigurationInteropVersion)" />
+        <PackageReference Update="Microsoft.VSSDK.BuildTools" Version="$(MicrosoftVSSDKBuildToolsVersion)" />
         <PackageReference Update="MSTest.TestAdapter" Version="$(MSTestVersion)" />
         <PackageReference Update="MSTest.TestFramework" Version="$(MSTestVersion)" />
         <PackageReference Update="NuGet.Common" Version="$(NuGetVersion)" />
