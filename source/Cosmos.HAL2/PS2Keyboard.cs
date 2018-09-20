@@ -39,6 +39,10 @@ namespace Cosmos.HAL
             SendCommand(Command.Reset);
             mPS2Controller.WaitForDeviceReset();
 
+			if (PCI.GetDevice((VendorID)0x80EE, (DeviceID)0xBEEF) == null && PCI.GetDevice((VendorID)0x15AD, (DeviceID)0x0405) == null)
+            {
+                SetScanCodeSet(1);
+            }
             //VMware doesn't support the Get/SetScanCode command
             //mDebugger.SendInternal("(PS/2 Keyboard) Current scan code set: " + GetScanCodeSet());
             //SetScanCodeSet(1);
