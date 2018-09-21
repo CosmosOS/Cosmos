@@ -93,6 +93,12 @@
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Plugs.TapRoot.dll" />
     </ItemGroup>
 
+    <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
+        <PackageReference>
+            <IsPlugsReference>False</IsPlugsReference>
+        </PackageReference>
+    </ItemDefinitionGroup>
+
     <ItemGroup>
         <PackageReference Update="@(PackageReference)">
             <ExcludeAssets Condition="'%(IsPlugsReference)' == 'True'">Compile</ExcludeAssets>
