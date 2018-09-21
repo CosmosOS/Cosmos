@@ -25,7 +25,7 @@
         </PropertyPageSchema>
 
         <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\PackageReference.xaml">
-            <Context>Project;BrowseObject</Context>
+            <Context>ProjectSubscriptionService;BrowseObject</Context>
         </PropertyPageSchema>
         <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\ResolvedPackageReference.xaml">
             <Context>ProjectSubscriptionService;BrowseObject</Context>
