@@ -110,6 +110,18 @@ namespace Cosmos.Core
                 MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
             }
         }
+        
+        public unsafe int[] Copy(int aStart, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(Base + aStart);
+            int[] array = new int[aCount];
+            fixed (int* aArrayPtr = array)
+            {
+                MemoryOperations.Copy(aArrayPtr + aIndex, xDest, aCount);
+            }
+            return array;
+        }
 
         public void Copy(int[] aData)
         {
