@@ -3,7 +3,7 @@ using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Threading
 {
-    [Plug(Target = typeof(Thread))]
+    [Plug("System.Threading.Thread, System.Private.CoreLib")]
     public static class ThreadImpl
     {
         public static Thread GetCurrentThreadNative()

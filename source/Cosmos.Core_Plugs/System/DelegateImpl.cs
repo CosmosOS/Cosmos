@@ -5,17 +5,18 @@ using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
 {
-    [Plug(Target = typeof(Delegate), Inheritable = true)]
-    [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
-    [PlugField(FieldType = typeof(int), FieldId = "$$ReturnsValue$$")]
+    [Plug(Target = typeof(Delegate))]
     public static class DelegateImpl
     {
+        [PlugMethod(Signature = "System_Boolean__System_Delegate_Equals_System_Object_")]
         public static bool Equals(Delegate aThis, object aThat)
         {
             // todo: implement proper Delegate.Equals(object)
-            return false;
+            //return false;
+            throw new NotImplementedException();
         }
 
+        [PlugMethod(Signature = "System_Boolean__System_Delegate_InternalEqualTypes_System_Object__System_Object_")]
         public static unsafe bool InternalEqualTypes([ObjectPointerAccess] uint** a, [ObjectPointerAccess] uint** b)
         {
             var xTypeA = a[0][0];
@@ -23,7 +24,13 @@ namespace Cosmos.Core_Plugs.System
 
             return xTypeA == xTypeB;
         }
+    }
 
+    [Plug(Target = typeof(Delegate), Inheritable = true)]
+    [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
+    [PlugField(FieldType = typeof(int), FieldId = "$$ReturnsValue$$")]
+    public static class DelegateImplInherit
+    {
         [PlugMethod(Signature = "System_MulticastDelegate__System_Delegate_InternalAllocLike_System_Delegate_")]
         public static unsafe uint InternalAllocLike(uint* aDelegate)
         {
@@ -38,5 +45,14 @@ namespace Cosmos.Core_Plugs.System
             }
             return xResultAddr;
         }
+
+        [PlugMethod(Signature = "System_Boolean__System_Delegate_Equals_System_Object_")]
+        public static bool Equals(Delegate aThis, object aThat)
+        {
+            // todo: implement proper Delegate.Equals(object)
+            //return false;
+            throw new NotImplementedException();
+        }
+
     }
 }

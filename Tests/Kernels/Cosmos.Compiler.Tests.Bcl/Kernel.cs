@@ -8,6 +8,7 @@ using Cosmos.Compiler.Tests.Bcl.CSharp;
 using Cosmos.Compiler.Tests.Bcl.System;
 using Cosmos.Compiler.Tests.Bcl.System.Collections.Generic;
 using Cosmos.Compiler.Tests.Bcl.System.Text;
+using Cosmos.Compiler.Tests.Bcl.System.Collections;
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
@@ -59,11 +60,14 @@ namespace Cosmos.Compiler.Tests.Bcl
                 DelegatesTest.Execute();
                 RandomTests.Execute();
 
+                // System.Collections
+                HashtableTest.Execute();
+
                 // System.Collections.Generic
                 ListTest.Execute();
-                QueueTest.Execute();
+                QueueTest.Execute();             
                 DictionaryTest.Execute();
-
+  
                 // System.Text
                 EncodingTest.Execute();
 
