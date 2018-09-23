@@ -136,12 +136,7 @@ namespace Cosmos.Core
         {
             byte* xDest = (byte*)(Base + aDest);
             byte* xSrc = (byte*)(Base + aSrc);
-            for (int i = 0; i < aCount; i++)
-            {
-                *xDest = *xSrc;
-                xDest++;
-                xSrc++;
-            }
+            MemoryOperations.Copy(xDest, xSrc, (int)aCount);
         }
 
         public void MoveUp(uint aDest, uint aSrc, uint aCount)
