@@ -13,7 +13,7 @@ namespace Cosmos.Core_Asm
 {
     public class CPUUpdateIDTAsm : AssemblerMethod
     {
-        public static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound)
+        private static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound)
         {
             Type xType = aAssembly.GetType(aType, false);
             if (xType != null)
@@ -73,76 +73,41 @@ namespace Cosmos.Core_Asm
             {
                 XS.Label("__ISR_Handler_" + j.ToString("X2"));
                 XS.Call("__INTERRUPT_OCCURRED__");
+
                 if (Array.IndexOf(xInterruptsWithParam, j) == -1)
                 {
                     XS.Push(0);
                 }
                 XS.Push((uint)j);
-                if (j != 0x20)
+                XS.PushAllRegisters();
+
+                XS.Sub(ESP, 4);
+                XS.Set(EAX, ESP); // preserve old stack address for passing to interrupt handler
+
+                // store floating point data
+                XS.And(ESP, 0xfffffff0); // fxsave needs to be 16-byte alligned
+                XS.Sub(ESP, 512); // fxsave needs 512 bytes
+                XS.SSE.FXSave(ESP, isIndirect: true); // save the registers
+                XS.Set(EAX, ESP, destinationIsIndirect: true);
+
+                XS.Push(EAX); //
+                XS.Push(EAX); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
+
+                XS.JumpToSegment(8, "__ISR_Handler_" + j.ToString("X2") + "_SetCS");
+                XS.Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
+                MethodBase xHandler = GetInterruptHandler((byte)j);
+                if (xHandler == null)
                 {
-                    XS.PushAllRegisters();
-
-                    XS.Sub(ESP, 4);
-                    XS.Set(EAX, ESP); // preserve old stack address for passing to interrupt handler
-
-                    // store floating point data
-                    XS.And(ESP, 0xfffffff0); // fxsave needs to be 16-byte alligned
-                    XS.Sub(ESP, 512); // fxsave needs 512 bytes
-                    XS.SSE.FXSave(ESP, isIndirect: true); // save the registers
-                    XS.Set(EAX, ESP, destinationIsIndirect: true);
-
-                    XS.Push(EAX); //
-                    XS.Push(EAX); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
-
-
-                    XS.JumpToSegment(8, "__ISR_Handler_" + j.ToString("X2") + "_SetCS");
-                    XS.Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
-                    MethodBase xHandler = GetInterruptHandler((byte)j);
-                    if (xHandler == null)
-                    {
-                        xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
-                    }
-                    XS.Call(LabelName.Get(xHandler));
-
-                    XS.Pop(EAX);
-                    XS.SSE.FXRestore(ESP, isIndirect: true);
-
-                    XS.Set(ESP, EAX); // this restores the stack for the FX stuff, except the pointer to the FX data
-                    XS.Add(ESP, 4); // "pop" the pointer
-                    
-                    XS.PopAllRegisters();
+                    xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
                 }
-                else
-                {
-                    new LiteralAssemblerCode("pushad");
-                    new LiteralAssemblerCode("mov eax, ds");
-                    new LiteralAssemblerCode("push eax");
-                    new LiteralAssemblerCode("mov eax, es");
-                    new LiteralAssemblerCode("push eax");
-                    new LiteralAssemblerCode("mov eax, fs");
-                    new LiteralAssemblerCode("push eax");
-                    new LiteralAssemblerCode("mov eax, gs");
-                    new LiteralAssemblerCode("push eax");
-                    new LiteralAssemblerCode("mov ax, 0x10");
-                    new LiteralAssemblerCode("mov ds, ax");
-                    new LiteralAssemblerCode("mov es, ax");
-                    new LiteralAssemblerCode("mov fs, ax");
-                    new LiteralAssemblerCode("mov gs, ax");
-                    new LiteralAssemblerCode("mov eax, esp");
-                    XS.Set("static_field__Cosmos_Core_INTs_mStackContext", EAX, destinationIsIndirect: true);
-                    XS.Call(LabelName.Get(GetMethodDef(typeof(Cosmos.Core.Processing.ProcessorScheduler).Assembly, typeof(Cosmos.Core.Processing.ProcessorScheduler).FullName, "SwitchTask", true)));
-                    XS.Set(EAX, "static_field__Cosmos_Core_INTs_mStackContext", sourceIsIndirect: true);
-                    new LiteralAssemblerCode("mov esp, eax");
-                    new LiteralAssemblerCode("pop eax");
-                    new LiteralAssemblerCode("mov gs, eax");
-                    new LiteralAssemblerCode("pop eax");
-                    new LiteralAssemblerCode("mov fs, eax");
-                    new LiteralAssemblerCode("pop eax");
-                    new LiteralAssemblerCode("mov es, eax");
-                    new LiteralAssemblerCode("pop eax");
-                    new LiteralAssemblerCode("mov ds, eax");
-                    new LiteralAssemblerCode("popad");
-                }
+                XS.Call(LabelName.Get(xHandler));
+                XS.Pop(EAX);
+                XS.SSE.FXRestore(ESP, isIndirect: true);
+
+                XS.Set(ESP, EAX); // this restores the stack for the FX stuff, except the pointer to the FX data
+                XS.Add(ESP, 4); // "pop" the pointer
+
+                XS.PopAllRegisters();
 
                 XS.Add(ESP, 8);
                 XS.Label("__ISR_Handler_" + j.ToString("X2") + "_END");

@@ -4,7 +4,7 @@ using IL2CPU.API.Attribs;
 namespace Cosmos.Core_Asm
 {
     [Plug(Target = typeof(Delegate), Inheritable = true)]
-    public static unsafe class DelegateImpl
+    public static class DelegateImpl
     {
         [PlugMethod(Assembler = typeof(DelegateCtorAsm), IsWildcard = true, WildcardMatchParameters = true)]
         public static void Ctor(Delegate aThis, object aTarget, IntPtr aMethod)
@@ -27,11 +27,6 @@ namespace Cosmos.Core_Asm
         public static bool Equals(Delegate aThis, object aThat)
         {
             throw new NotImplementedException();
-        }
-
-        public static int GetHashCode(Delegate aThis, [FieldAccess(Name = "System.IntPtr System.Delegate._methodPtr")] ref IntPtr aAddress)
-        {
-            return (int)aAddress.ToPointer();
         }
     }
 }
