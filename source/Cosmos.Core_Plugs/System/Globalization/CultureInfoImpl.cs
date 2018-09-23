@@ -19,7 +19,12 @@ namespace Cosmos.Core_Plugs.System.Globalization
 
         public static int GetHashCode(CultureInfo aThis)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("CultureInfo.GetHashCode()");
+        }
+
+        public static bool Equals(CultureInfo aThis, object value)
+        {
+            throw new NotImplementedException("CultureInfo.Equals()");
         }
 
         public static void CCtor()

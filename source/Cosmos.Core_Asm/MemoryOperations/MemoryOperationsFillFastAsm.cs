@@ -14,9 +14,9 @@ namespace Cosmos.Core_Asm.MemoryOperations
         /*
          *
          * public static unsafe void Fill16Blocks(
-         *                       byte *dest, [ebp + 8]
+         *                       byte *dest, [ebp + 16]
          *                       int value, [ebp + 12]
-         *                       int BlocksNum) [ebp + 16]
+         *                       int BlocksNum) [ebp + 8]
          */
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {

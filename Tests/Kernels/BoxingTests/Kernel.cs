@@ -40,6 +40,10 @@ namespace BoxingTests
 
             Assert.IsTrue(xNumber.Equals(42), "Int32.Equals on boxed int doesn't work!");
             Assert.IsFalse(xNumber.Equals(5), "Int32.Equals on boxed int doesn't work!");
+
+            object xAnotherNumber = 42;
+
+            Assert.IsTrue(Object.Equals(xNumber, xAnotherNumber), "Object.Equals doesn't work!");
         }
 
         /* TODO add other tests:

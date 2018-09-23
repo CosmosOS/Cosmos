@@ -42,6 +42,8 @@ namespace Cosmos.System.FileSystem
 
         public abstract string Type { get; }
 
-        public abstract string Label { get; set; } 
+        public abstract string Label { get; set; }
+
+        public abstract void Format(string aDriveFormat, bool aQuick);
     }
 }

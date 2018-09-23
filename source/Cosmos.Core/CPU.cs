@@ -1,5 +1,3 @@
-using System;
-
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -10,47 +8,26 @@ namespace Cosmos.Core
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
         [PlugMethod(PlugRequired = true)]
-        public static uint GetAmountOfRAM()
-        {
-            throw new NotImplementedException();
-        }
+        public static uint GetAmountOfRAM() => throw null;
 
         // needs to be static, as Heap needs it before we can instantiate objects
         [PlugMethod(PlugRequired = true)]
-        public static uint GetEndOfKernel()
-        {
-            throw new NotImplementedException();
-        }
+        public static uint GetEndOfKernel() => throw null;
 
         [PlugMethod(PlugRequired = true)]
-        public void UpdateIDT(bool aEnableInterruptsImmediately)
-        {
-            throw new NotImplementedException();
-        }
+        public void UpdateIDT(bool aEnableInterruptsImmediately) => throw null;
 
         [PlugMethod(PlugRequired = true)]
-        public void InitFloat()
-        {
-            throw new NotImplementedException();
-        }
+        public void InitFloat() => throw null;
 
         [PlugMethod(PlugRequired = true)]
-        public void InitSSE()
-        {
-            throw new NotImplementedException();
-        }
+        public void InitSSE() => throw null;
 
         [PlugMethod(PlugRequired = true)]
-        public static void ZeroFill(uint aStartAddress, uint aLength)
-        {
-            throw new NotImplementedException();
-        }
+        public static void ZeroFill(uint aStartAddress, uint aLength) => throw null;
 
         [PlugMethod(PlugRequired = true)]
-        public void Halt()
-        {
-            throw new NotImplementedException();
-        }
+        public void Halt() => throw null;
 
         public void Reboot()
         {
@@ -65,15 +42,11 @@ namespace Cosmos.Core
             Halt(); // If it didn't work, Halt the CPU
         }
 
-        private static void DoEnableInterrupts()
-        {
-            throw new NotImplementedException();
-        }
+        [PlugMethod(PlugRequired = true)]
+        private static void DoEnableInterrupts() => throw null;
 
-        private static void DoDisableInterrupts()
-        {
-            throw new NotImplementedException();
-        }
+        [PlugMethod(PlugRequired = true)]
+        private static void DoDisableInterrupts() => throw null;
 
         [AsmMarker(AsmMarker.Type.Processor_IntsEnabled)]
         public static bool mInterruptsEnabled;

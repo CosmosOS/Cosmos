@@ -1,13 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Rule Name="Content"
-      DisplayName="File Properties"
       PageTemplate="generic"
       Description="File Properties"
       OverrideMode="Extend"
       xmlns="http://schemas.microsoft.com/build/2009/properties">
 
+    <Rule.Categories>
+        <Category Name="Cosmos" DisplayName="Cosmos" />
+    </Rule.Categories>
+
     <BoolProperty Name="Deploy"
                   DisplayName="Deploy"
-                  Category="Advanced" />
+                  Category="Cosmos" />
 
 </Rule>
