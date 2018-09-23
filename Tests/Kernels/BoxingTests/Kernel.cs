@@ -16,7 +16,7 @@ namespace BoxingTests
         protected override void Run()
         {
             TestBoxingChar();
-            TestBoxingInt();
+            TestBoxingInt32();
             TestBoxingColorToString();
 
             TestController.Completed();
@@ -31,16 +31,18 @@ namespace BoxingTests
             Assert.IsTrue(xChar.GetHashCode() == 0x00630063, "Char.GetHashCode on boxed Char doesn't work!");
         }
 
-        private void TestBoxingInt()
+        private void TestBoxingInt32()
         {
             object xNumber = 42;
 
             Assert.IsTrue(xNumber.ToString() == "42", "Int32.ToString on boxed Int32 doesn't work!");
             Assert.IsTrue(xNumber.GetHashCode() == 42, "Int32.GetHashCode on boxed Int32 doesn't work!");
 
+            Assert.IsTrue(xNumber.Equals(42), "Int32.Equals on boxed int doesn't work!");
+            Assert.IsFalse(xNumber.Equals(5), "Int32.Equals on boxed int doesn't work!");
+
             object xAnotherNumber = 42;
 
-            Assert.IsTrue(xNumber.Equals(42), "Int32 Equals doesn't work!");
             Assert.IsTrue(Object.Equals(xNumber, xAnotherNumber), "Object.Equals doesn't work!");
         }
 
