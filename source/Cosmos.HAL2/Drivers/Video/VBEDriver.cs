@@ -153,5 +153,15 @@ namespace Cosmos.HAL.Drivers
         {
             IO.LinearFrameBuffer.Fill(value);
         }
+
+        public void ClearVRAM(int aStart, int aCount, int value)
+        {
+            IO.LinearFrameBuffer.Fill(aStart, aCount, value);
+        }
+
+        public void CopyVRAM(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            IO.LinearFrameBuffer.Copy(aStart, aData, aIndex, aCount);
+        }
     }
 }

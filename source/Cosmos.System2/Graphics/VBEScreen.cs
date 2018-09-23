@@ -121,8 +121,6 @@ namespace Cosmos.System.Graphics
         public override void DrawPoint(Pen pen, int x, int y)
         {
             Color color = pen.Color;
-            uint pitch;
-            uint stride;
             uint offset;
             uint ColorDepthInBytes = (uint)mode.ColorDepth / 8;
 
@@ -136,11 +134,7 @@ namespace Cosmos.System.Graphics
             switch (mode.ColorDepth)
             {
                 case ColorDepth.ColorDepth32:
-                    Global.mDebugger.SendInternal("Computing offset...");
-                    pitch = (uint)mode.Columns * ColorDepthInBytes;
-                    stride = ColorDepthInBytes;
-                    //offset = ((uint)x * pitch) + ((uint)y * stride);
-                    offset = ((uint)x * stride) + ((uint)y * pitch);
+                    offset = (uint)GetPointOffset(x, y);
 
                     Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
 
@@ -149,21 +143,16 @@ namespace Cosmos.System.Graphics
                     Global.mDebugger.SendInternal("Point drawn");
                     break;
                 case ColorDepth.ColorDepth24:
-                    Global.mDebugger.SendInternal("Computing offset...");
-                    pitch = (uint)mode.Columns * ColorDepthInBytes;
-                    stride = ColorDepthInBytes;
-                    //offset = ((uint)x * pitch) + ((uint)y * stride);
-                    offset = ((uint)x * stride) + ((uint)y * pitch);
 
+                    offset = (uint)GetPointOffset(x, y);
                     Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
                     VBEDriver.SetVRAM(offset, (((uint)color.R * 1000 + color.G) * 1000 + color.B));
 
                     Global.mDebugger.SendInternal("Point drawn");
                     break;
                 default:
-                    String errorMsg = "DrawPoint() with ColorDepth " + (int)Mode.ColorDepth + " not yet supported";
+                    string errorMsg = "DrawPoint() with ColorDepth " + (int)Mode.ColorDepth + " not yet supported";
                     throw new NotImplementedException(errorMsg);
-
             }
         }
 
@@ -188,13 +177,50 @@ namespace Cosmos.System.Graphics
                     DrawPoint(new Pen(colors[i + (ii * width)]), i, ii);
 
                 }
-
             }
         }
 
-        #endregion
+        private int GetPointOffset(int x, int y)
+        {
+            Global.mDebugger.SendInternal($"Computing offset for coordinates {x},{y}");
+            int xBytePerPixel = (int)Mode.ColorDepth / 8;
+            int stride = (int)Mode.ColorDepth / 8;
+            int pitch = mode.Columns * xBytePerPixel;
 
-        #region Reading
+            return (x * stride) + (y * pitch);
+        }
+
+        public override void DrawFilledRectangle(Pen pen, int x, int y, int width, int height)
+        {
+            int xOffset = GetPointOffset(x, y);
+            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+
+            for (int i = 0; i < height; i++)
+            {
+                VBEDriver.ClearVRAM((i * xScreenWidthInPixel) + xOffset, width, pen.Color.ToArgb());
+            }
+        }
+
+        public override void DrawImage(Image image, int x, int y)
+        {
+            var xBitmap = image.rawData;
+            var xWidht = (int)image.Width;
+            var xHeight = (int)image.Height;
+
+            int xOffset = GetPointOffset(x, y);
+            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+
+            Global.mDebugger.SendInternal($"Drawing image of size {image.Width}x{image.Height} array size {image.rawData.Length}");
+            for (int i = 0; i < xHeight; i++)
+            {
+                VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
+            }
+            Global.mDebugger.SendInternal("Done");
+        }
+
+#endregion
+
+#region Reading
         public override Color GetPointColor(int x, int y)
         {
             uint pitch;
@@ -212,7 +238,7 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb(VBEDriver.GetVRAM(offset));
         }
 
-        #endregion
+#endregion
 
     }
 }

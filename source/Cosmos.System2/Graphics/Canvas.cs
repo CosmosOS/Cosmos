@@ -493,7 +493,7 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, v2x, v2y, v3x, v3y);
         }
 
-        public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
+        public virtual void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
         }
@@ -501,7 +501,7 @@ namespace Cosmos.System.Graphics
         //Image and Font will be available in .NET Core 2.1
         // dot net core does not have Image
         //We are using a short term solution for bitmap
-        public void DrawImage(Image image, int x, int y)
+        public virtual void DrawImage(Image image, int x, int y)
         {
             for (int _x = 0; _x < image.Width; _x++)
             {
