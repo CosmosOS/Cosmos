@@ -51,10 +51,6 @@ namespace Cosmos.HAL
           AHCI.InitDriver();
           //EHCI.InitDriver();
 
-          Console.WriteLine("Starting Processor Scheduler");
-          mDebugger.Send("Processor Scheduler");
-          Core.Processing.ProcessorScheduler.Initialize();
-
           mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
           Console.WriteLine("Starting ACPI");
@@ -76,18 +72,6 @@ namespace Cosmos.HAL
         public static void EnableInterrupts()
         {
           CPU.EnableInterrupts();
-        }
-
-        public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
-
-        public static uint SpawnThread(ThreadStart aStart)
-        {
-          return Core.Processing.ProcessContext.StartContext("", aStart, Core.Processing.ProcessContext.Context_Type.THREAD);
-        }
-
-        public static uint SpawnThread(ParameterizedThreadStart aStart, object param)
-        {
-          return Core.Processing.ProcessContext.StartContext("", aStart, Core.Processing.ProcessContext.Context_Type.THREAD, param);
         }
 
         public static IEnumerable<KeyboardBase> GetKeyboardDevices()
