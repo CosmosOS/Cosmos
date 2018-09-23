@@ -37,6 +37,11 @@ namespace BoxingTests
 
             Assert.IsTrue(xNumber.ToString() == "42", "Int32.ToString on boxed Int32 doesn't work!");
             Assert.IsTrue(xNumber.GetHashCode() == 42, "Int32.GetHashCode on boxed Int32 doesn't work!");
+
+            object xAnotherNumber = 42;
+
+            Assert.IsTrue(xNumber.Equals(42), "Int32 Equals doesn't work!");
+            Assert.IsTrue(Object.Equals(xNumber, xAnotherNumber), "Object.Equals doesn't work!");
         }
 
         /* TODO add other tests:
