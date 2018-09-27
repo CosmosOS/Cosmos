@@ -15,7 +15,7 @@ namespace Cosmos.HAL.BlockDevice
 	// to do this as capabilities can also be detected, but all ATA devices must support PIO
 	// and thus it can also be used to read the partition table and perform other tasks before
 	// initializing another ATA class in favour of AtaPio
-	public class AtaPio : Ata
+	public class ATA_PIO : ATA
 	{
 		#region Properties
 		protected Core.IOGroup.ATA IO;
@@ -101,7 +101,8 @@ namespace Cosmos.HAL.BlockDevice
 			IdentifyPacket = 0xA1,
 			Identify = 0xEC,
 			Read = 0xA8,
-			Eject = 0x1B
+			Eject = 0x1B,
+            ReadTOC = 0x43
 		}
 
 		public enum Ident : byte
@@ -141,7 +142,7 @@ namespace Cosmos.HAL.BlockDevice
 	        mDebugger.SendNumber(number);
 	    }
 
-        public AtaPio(Core.IOGroup.ATA aIO, Ata.ControllerIdEnum aControllerId, Ata.BusPositionEnum aBusPosition)
+        public ATA_PIO(Core.IOGroup.ATA aIO, ATA.ControllerIdEnum aControllerId, ATA.BusPositionEnum aBusPosition)
 		{
 			IO = aIO;
 			mControllerID = aControllerId;
@@ -202,11 +203,7 @@ namespace Cosmos.HAL.BlockDevice
 		protected void Wait()
 		{
 			// Wait 400 ns
-			byte xVoid;
-			xVoid = IO.Status.Byte;
-			xVoid = IO.Status.Byte;
-			xVoid = IO.Status.Byte;
-			xVoid = IO.Status.Byte;
+            IO.Wait();
 		}
 
 		public void SelectDrive(byte aLbaHigh4)
@@ -309,6 +306,7 @@ namespace Cosmos.HAL.BlockDevice
 		{
 			CheckBlockNo(aSectorNo, aSectorCount);
 			//TODO: Check for 48 bit sectorno mode and select 48 bits
+            // LBA48 IOPort now added
 			SelectDrive((byte)(aSectorNo >> 24));
 			if (LBA48Bit)
 			{

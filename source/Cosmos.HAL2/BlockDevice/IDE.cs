@@ -10,71 +10,80 @@ namespace Cosmos.HAL.BlockDevice
 
         internal static void InitDriver()
         {
-            if (xDevice != null)
+            if (xDevice.DeviceExists == true)
             {
                 Console.WriteLine("ATA Primary Master");
-                Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-                //Console.WriteLine("ATA Primary Slave");
-                //Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
+                Initialize(ATA.ControllerIdEnum.Primary, ATA.BusPositionEnum.Master);
+                Console.WriteLine("ATA Primary Slave");
+                Initialize(ATA.ControllerIdEnum.Primary, ATA.BusPositionEnum.Slave);
                 Console.WriteLine("ATA Secondary Master");
-                Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-                //Console.WriteLine("ATA Secondary Slave");
-                //Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
+                Initialize(ATA.ControllerIdEnum.Secondary, ATA.BusPositionEnum.Master);
+                Console.WriteLine("ATA Secondary Slave");
+                Initialize(ATA.ControllerIdEnum.Secondary, ATA.BusPositionEnum.Slave);
             }
         }
 
-        private static void Initialize(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
+        private static void Initialize(ATA.ControllerIdEnum aControllerID, ATA.BusPositionEnum aBusPosition)
         {
-            var xIO = aControllerID == Ata.ControllerIdEnum.Primary ? Core.Global.BaseIOGroups.ATA1 : Core.Global.BaseIOGroups.ATA2;
-            var xATA = new AtaPio(xIO, aControllerID, aBusPosition);
-            if (xATA.DriveType == AtaPio.SpecLevel.Null)
+            var xIO = aControllerID == ATA.ControllerIdEnum.Primary ? Core.Global.BaseIOGroups.ATA1 : Core.Global.BaseIOGroups.ATA2;
+            var xATA = new ATA_PIO(xIO, aControllerID, aBusPosition);
+            if (xATA.DriveType == ATA_PIO.SpecLevel.Null)
+            {
+                ATA.ATADebugger.Send("No ATA device found @ " + aControllerID + ", " + aBusPosition);
                 return;
-            else if (xATA.DriveType == AtaPio.SpecLevel.ATA)
+            }
+            else if (xATA.DriveType == ATA_PIO.SpecLevel.ATA)
             {
                 BlockDevice.Devices.Add(xATA);
-                Ata.AtaDebugger.Send("ATA device with speclevel ATA found.");
-            }
-            else if (xATA.DriveType == AtaPio.SpecLevel.ATAPI)
-            {
-                Ata.AtaDebugger.Send("ATA device with speclevel ATAPI found, which is not supported yet!");
-                return;
-            }
-            var xMbrData = new byte[512];
-            xATA.ReadBlock(0UL, 1U, xMbrData);
-            var xMBR = new MBR(xMbrData);
+                ATA.ATADebugger.Send("ATA device with speclevel ATA found @ " + aControllerID + ", " + aBusPosition);
 
-            if (xMBR.EBRLocation != 0)
-            {
-                //EBR Detected
-                var xEbrData = new byte[512];
-                xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
-                var xEBR = new EBR(xEbrData);
+                #region ATA_MBR
+                var xMbrData = new byte[512];
+                xATA.ReadBlock(0UL, 1U, xMbrData);
+                var xMBR = new MBR(xMbrData);
 
-                for (int i = 0; i < xEBR.Partitions.Count; i++)
+                if (xMBR.EBRLocation != 0)
                 {
-                    //var xPart = xEBR.Partitions[i];
-                    //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                    //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-                }
-            }
+                    //EBR Detected
+                    var xEbrData = new byte[512];
+                    xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
+                    var xEBR = new EBR(xEbrData);
 
-            // TODO Change this to foreach when foreach is supported
-            Ata.AtaDebugger.Send("Number of MBR partitions found:");
-            Ata.AtaDebugger.SendNumber(xMBR.Partitions.Count);
-            for(int i = 0; i < xMBR.Partitions.Count; i++)
-            {
-                var xPart = xMBR.Partitions[i];
-                if (xPart == null)
-                {
-                    Console.WriteLine("Null partition found at idx: " + i);
+                    for (int i = 0; i < xEBR.Partitions.Count; i++)
+                    {
+                        //var xPart = xEBR.Partitions[i];
+                        //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
+                        //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+                    }
                 }
-                else
+
+                // TODO Change this to foreach when foreach is supported
+                ATA.ATADebugger.Send("Number of MBR partitions found:");
+                ATA.ATADebugger.SendNumber(xMBR.Partitions.Count);
+                for (int i = 0; i < xMBR.Partitions.Count; i++)
                 {
-                    var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                    BlockDevice.Devices.Add(xPartDevice);
-                    Console.WriteLine("Found partition at idx: " + i);
+                    var xPart = xMBR.Partitions[i];
+                    if (xPart == null)
+                    {
+                        Console.WriteLine("Null partition found at idx: " + i);
+                    }
+                    else
+                    {
+                        var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
+                        BlockDevice.Devices.Add(xPartDevice);
+                        Console.WriteLine("Found partition at idx: " + i);
+                    }
                 }
+                #endregion
+
             }
+            else if (xATA.DriveType == ATA_PIO.SpecLevel.ATAPI)
+            {
+                BlockDevice.Devices.Add(xATA);
+                new ATAPI();
+                ATA.ATADebugger.Send("ATA device with speclevel ATAPI found @ " + aControllerID + ", " + aBusPosition + ". Support WIP");
+            }
+            
         }
     }
 }
