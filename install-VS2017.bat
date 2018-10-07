@@ -1,17 +1,5 @@
 @echo off
 
-set DOTNET_VERSION=4.7.1
-
-echo Check for installed .NET Framework %DOTNET_VERSION%
-
-reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework,Version=v%DOTNET_VERSION%" /ve >nul 2>&1
-
-if %ERRORLEVEL% neq 0 (
-  echo ".NET Framework %DOTNET_VERSION% is not installed. Please download it from https://www.microsoft.com/net/download/visual-studio-sdks"
-  pause
-  goto:eof
-)
-
 if not exist "%ProgramFiles(x86)%" (
   set "ProgramFiles(x86)=%ProgramFiles%"
 )
