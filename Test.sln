@@ -150,7 +150,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.Fat2", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "Tests\Kernels\ConsoleTest\ConsoleTest.csproj", "{0DF97CAC-220B-4DAD-B397-42E394255763}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.UI.Avalonia", "Tests\Cosmos.TestRunner.UI.Avalonia\Cosmos.TestRunner.UI.Avalonia.csproj", "{2992AA07-E126-4EE0-B31C-D0B2ADE3393A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.UI", "Tests\Cosmos.TestRunner.UI\Cosmos.TestRunner.UI.csproj", "{2992AA07-E126-4EE0-B31C-D0B2ADE3393A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.HyperVServer", "source\Cosmos.Debug.HyperVServer\Cosmos.Debug.HyperVServer.csproj", "{3421E19D-16C7-4593-9F6B-291ECB86A3EB}"
 EndProject

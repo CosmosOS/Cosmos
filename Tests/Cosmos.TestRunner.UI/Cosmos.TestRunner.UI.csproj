@@ -4,8 +4,7 @@
         <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
-        <AssemblyName>Cosmos.TestRunner.UI</AssemblyName>
-        <RootNamespace>Cosmos.TestRunner.UI</RootNamespace>
+        <SignAssembly>False</SignAssembly>
     </PropertyGroup>
 
     <ItemGroup>
