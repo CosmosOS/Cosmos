@@ -8,7 +8,7 @@ clone_folder: c:\Cosmos
 init:
 - cmd: |
     git clone https://github.com/CosmosOS/XSharp.git c:\XSharp --depth 1
-    git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
+    git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1 -b il2cpu-reflection
 
 build_script:
 - cmd: |
