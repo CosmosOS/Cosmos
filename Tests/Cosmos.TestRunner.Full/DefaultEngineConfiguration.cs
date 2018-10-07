@@ -33,7 +33,7 @@ namespace Cosmos.TestRunner.Full
         {
             get
             {
-                foreach (var xKernelType in TestKernelSets.GetStableKernelTypes())
+                foreach (var xKernelType in TestKernelSets.GetKernelTypesToRun())
                 {
                     yield return xKernelType.Assembly.Location;
                 }
