@@ -321,6 +321,8 @@ function SendStackCorruptionOccurred {
     // pointer value
     ESI = @.CallerEIP
     ComWrite32()
+
+    SendCoreDump()
 }
 
 // Input: Stack
@@ -334,6 +336,8 @@ function SendStackOverflowOccurred {
     // pointer value
     ESI = @.CallerEIP
     ComWrite32()
+
+    SendCoreDump()
 }
 
 // Input: None
@@ -361,6 +365,8 @@ function SendNullReferenceOccurred {
     // pointer value
     ESI = @.CallerEIP
     ComWrite32()
+
+    SendCoreDump()
 }
 
 // Input: Stack
@@ -405,9 +411,9 @@ function SendCoreDump {
     ECX = 36
     EAX = EBP
     while EAX != 0 {
-        EBX = EAX - 4
-        +EAX
-        ECX = ECX + 4
+        EBX = [EAX + 4]
+        +EBX
+        ECX + 4
         EAX = [EAX]
     }
 

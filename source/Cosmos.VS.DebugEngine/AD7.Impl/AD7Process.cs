@@ -359,6 +359,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mDbgConnector.CmdNullReferenceOccurred += DbgCmdNullReferenceOccurred;
             mDbgConnector.CmdMessageBox += DbgCmdMessageBox;
             mDbgConnector.CmdChannel += DbgCmdChannel;
+            mDbgConnector.CmdCoreDump += DbgCmdCoreDump;
         }
 
         private void DbgCmdChannel(byte aChannel, byte aCommand, byte[] aData)
@@ -405,6 +406,66 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         private void DbgCmdMessageBox(string message)
         {
             AD7Util.MessageBox("Message from your Cosmos operating system:\r\n\r\n" + message);
+        }
+
+        private void DbgCmdCoreDump(CoreDump dump)
+        {
+            var eax = GetRegister("EAX", dump.EAX);
+            var ebx = GetRegister("EBX", dump.EBX);
+            var ecx = GetRegister("ECX", dump.ECX);
+            var edx = GetRegister("EDX", dump.EDX);
+
+            var edi = GetRegister("EDI", dump.EDI);
+            var esi = GetRegister("ESI", dump.ESI);
+
+            var ebp = GetRegister("EBP", dump.EBP);
+            var esp = GetRegister("ESP", dump.ESP);
+            var eip = GetRegister("EIP", dump.EIP);
+
+            var message = "Core dump:" + Environment.NewLine
+                        + $"{eax}    {ebx}    {ecx}    {edx}" + Environment.NewLine
+                        + $"{edi}    {esi}" + Environment.NewLine
+                        + $"{ebp}    {esp}    {eip}" + Environment.NewLine
+                        + Environment.NewLine
+                        + "Call stack:"
+                        + Environment.NewLine;
+
+            while (dump.StackTrace.Count > 0)
+            {
+                message += GetStackTraceEntry(dump.StackTrace.Pop()) + Environment.NewLine;
+            }
+
+            AD7Util.MessageBox(message);
+
+            string GetRegister(string name, uint value) => $"{name} = 0x{value:X8}";
+
+            string GetStackTraceEntry(uint address)
+            {
+                var entry = $"at 0x{address:X8}";
+
+                if (mDebugInfo.TryGetValue(BuildPropertyNames.DebugModeString, out var xDebugMode))
+                {
+                    if (xDebugMode == "Source")
+                    {
+                        try
+                        {
+                            var xMethod = mDebugInfoDb.GetMethod(address);
+                            var xDocument = mDebugInfoDb.GetDocumentById(xMethod.DocumentID);
+                            var xLabel = mDebugInfoDb.GetLabels(address)[0];
+                            var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
+                            var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
+                            var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+
+                            entry += $"in {xDocument.Pathname}:line {xLine}";
+                        }
+                        catch (InvalidOperationException)
+                        {
+                        }
+                    }
+                }
+
+                return entry;
+            }
         }
 
         internal AD7Process(Dictionary<string, string> aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)

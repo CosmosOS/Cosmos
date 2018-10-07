@@ -88,72 +88,37 @@ namespace Cosmos.TestRunner.Core
             aDebugConnector.CmdNullReferenceOccurred = a => AbortTestAndLogError(
                 "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
 
-            aDebugConnector.CmdCoreDump = b =>
+            aDebugConnector.CmdCoreDump = dump =>
             {
-                string xCallStack = "";
-                int i = 0;
-
                 OutputHandler.LogMessage("Core dump:");
-                string eax = "EAX = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string ebx = "EBX = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string ecx = "ECX = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string edx = "EDX = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string edi = "EDI = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string esi = "ESI = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string ebp = "EBP = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string eip = "EIP = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string esp = "ESP = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
+
+                string eax = "EAX = 0x" + dump.EAX.ToString("X8");
+                string ebx = "EBX = 0x" + dump.EBX.ToString("X8");
+                string ecx = "ECX = 0x" + dump.ECX.ToString("X8");
+                string edx = "EDX = 0x" + dump.EDX.ToString("X8");
+
+                string edi = "EDI = 0x" + dump.EDI.ToString("X8");
+                string esi = "ESI = 0x" + dump.ESI.ToString("X8");
+
+                string ebp = "EBP = 0x" + dump.EBP.ToString("X8");
+                string esp = "ESP = 0x" + dump.ESP.ToString("X8");
+                string eip = "EIP = 0x" + dump.EIP.ToString("X8");
 
                 OutputHandler.LogMessage(eax + " " + ebx + " " + ecx + " " + edx);
                 OutputHandler.LogMessage(edi + " " + esi);
                 OutputHandler.LogMessage(ebp + " " + esp + " " + eip);
                 OutputHandler.LogMessage("");
 
-                while (i < b.Length)
+                OutputHandler.LogMessage("Call stack:");
+                OutputHandler.LogMessage("");
+
+                while (dump.StackTrace.Count > 0)
                 {
-                    string xAddress = "0x" +
-                                      b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                                      b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                    xCallStack += xAddress + " ";
-                    if ((i != 0) && (i % 12 == 0))
-                    {
-                        OutputHandler.LogMessage(xCallStack.Trim());
-                        xCallStack = "";
-                    }
-                    i += 4;
+                    var xAddress = "0x" + dump.StackTrace.Pop().ToString("X8");
+                    OutputHandler.LogMessage("at " + xAddress);
                 }
-                if (xCallStack != "")
-                {
-                    OutputHandler.LogMessage(xCallStack.Trim());
-                    xCallStack = "";
-                }
+
+                OutputHandler.LogMessage("");
             };
 
             if (RunWithGDB)
