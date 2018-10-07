@@ -152,29 +152,32 @@ namespace Cosmos.Build.Builder
                 App.BuilderConfiguration.UserKit ? "UserKit" : "DevKit",
                 cosmosSetupVersion);
 
-            var cosmosSetupPath = Path.Combine(cosmosSetupDir, "Output", $"CosmosUserKit-{cosmosSetupVersion}-vs2017.exe");
-
-            // Run Setup
-
-            yield return new StartProcessTask(cosmosSetupPath, "/SILENT", "Cosmos Setup", true);
-
-            // Write Dev Kit path
-
-            using (var xKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Cosmos"))
+            if (!App.BuilderConfiguration.UserKit)
             {
-                xKey.SetValue("DevKit", _cosmosDir);
-            }
+                var cosmosSetupPath = Path.Combine(cosmosSetupDir, "Output", $"CosmosUserKit-{cosmosSetupVersion}-vs2017.exe");
 
-            // Launch VS
+                // Run Setup
 
-            if (!App.BuilderConfiguration.NoVsLaunch)
-            {
-                var vsInstance = _visualStudioInstance;
-                var vsPath = Path.Combine(vsInstance.GetInstallationPath(), "Common7", "IDE", "devenv.exe");
+                yield return new StartProcessTask(cosmosSetupPath, "/SILENT", "Cosmos Setup", true);
 
-                var kernelSlnPath = Path.Combine(_cosmosDir, "Kernel.sln");
+                // Write Dev Kit path
 
-                yield return new StartProcessTask(vsPath, kernelSlnPath, "Visual Studio (Kernel.sln)");
+                using (var xKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Cosmos"))
+                {
+                    xKey.SetValue("DevKit", _cosmosDir);
+                }
+
+                // Launch VS
+
+                if (!App.BuilderConfiguration.NoVsLaunch)
+                {
+                    var vsInstance = _visualStudioInstance;
+                    var vsPath = Path.Combine(vsInstance.GetInstallationPath(), "Common7", "IDE", "devenv.exe");
+
+                    var kernelSlnPath = Path.Combine(_cosmosDir, "Kernel.sln");
+
+                    yield return new StartProcessTask(vsPath, kernelSlnPath, "Visual Studio (Kernel.sln)");
+                }
             }
         }
     }

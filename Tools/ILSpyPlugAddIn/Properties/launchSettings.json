@@ -1,0 +1,8 @@
+{
+    "profiles": {
+        "ILSpyPlugAddIn": {
+            "commandName": "Executable",
+            "executablePath": "./ILSpy.exe"
+        }
+    }
+}

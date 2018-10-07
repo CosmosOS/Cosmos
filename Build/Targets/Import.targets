@@ -4,7 +4,9 @@
 
     <Import Project="PackageProperties.targets" />
     
-    <Import Project="PackageVersions.targets" />
+    <Import Project="NETFramework.targets" Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" />
+        
+    <Import Project="References.targets" />
 
     <Import Project="StrongName.targets" />
 
@@ -13,5 +15,7 @@
     <Import Project="VSIX.targets" Condition="'$(IsVsixProject)' == 'True'" />
 
     <Import Project="Workarounds.targets" />
+
+    <Import Project="PackageVersions.targets" />
 
 </Project>

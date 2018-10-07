@@ -617,5 +617,13 @@ namespace Cosmos.System.FileSystem
             var xFs = GetFileSystemFromPath(aDriveId);
             xFs.Label = aLabel;
         }
+
+        public override void Format(string aDriveId, string aDriveFormat, bool aQuick)
+        {
+            var xFs = GetFileSystemFromPath(aDriveId);
+
+            xFs.Format(aDriveFormat, aQuick);
+        }
+
     }
 }

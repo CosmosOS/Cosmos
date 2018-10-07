@@ -43,7 +43,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
 #if false
 
-    // Now let's try ToString() again but printed in hex (this test fails for now!)
+            // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");
             expectedResult = "0x7FFFFFFFFFFFFFFF";
 
@@ -93,6 +93,43 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             val2 = value % 7;
             Assert.IsTrue(val2 == 4, "Int64 remainder doesn't work got: " + val2);
 
+            value = 1728000000000;
+
+            val2 = value + 36000000000;
+            Assert.IsTrue(val2 == 1764000000000, "Int64 addition doesn't work got " + val2);
+
+            val2 = value - 36000000000;
+            Assert.IsTrue(val2 == 1692000000000, "Int64 subtraction doesn't work got " + val2);
+
+            val2 = value * 36000000000;
+            Assert.IsTrue(val2 == 5578983451391950848, "Int64 multiplication doesn't work got " + val2);
+
+            val2 = value / 36000000000;
+            Assert.IsTrue(val2 == 48, "Int64 division doesn't work got " + val2);
+
+            val2 = value / -36000000000;
+            Assert.IsTrue(val2 == -48, "Int64 division doesn't work got " + val2);
+
+            val2 = -value / 36000000000;
+            Assert.IsTrue(val2 == -48, "Int64 division doesn't work got " + val2);
+
+            val2 = -value / -36000000000;
+            Assert.IsTrue(val2 == 48, "Int64 division doesn't work got " + val2);
+
+            value = 3200000000000;
+
+            val2 = value % 1300000000000;
+            Assert.IsTrue(val2 == 600000000000, "Int64 remainder doesn't work got " + val2);
+
+            val2 = value % -1300000000000;
+            Assert.IsTrue(val2 == 600000000000, "Int64 remainder doesn't work got " + val2);
+
+            val2 = -value % 1300000000000;
+            Assert.IsTrue(val2 == -600000000000, "Int64 remainder doesn't work got " + val2);
+
+            val2 = -value % -1300000000000;
+            Assert.IsTrue(val2 == -600000000000, "Int64 remainder doesn't work got " + val2);
+
             // Now test conversions
 
             long maxValue = Int64.MaxValue;
@@ -141,6 +178,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((double)minValue == Int64.MinValue, "Conv_R8 for Int64 doesn't work");
 
             // Test Methods
+
+            value = 60;
+
             val2 = TestMethod(value);
             Assert.IsTrue(value == 60, "Passing an Int64 as a method parameter doesn't work");
             Assert.IsTrue(val2 == 61, "Returning an Int64 value from a method doesn't work");

@@ -93,6 +93,25 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             val2 = value % 7;
             Assert.IsTrue(val2 == 4, "UInt64 remainder doesn't work got: " + val2);
 
+            value = 1728000000000;
+
+            val2 = value + 36000000000;
+            Assert.IsTrue(val2 == 1764000000000, "UInt64 addition doesn't work got " + val2);
+
+            val2 = value - 36000000000;
+            Assert.IsTrue(val2 == 1692000000000, "UInt64 subtraction doesn't work got " + val2);
+
+            val2 = value * 36000000000;
+            Assert.IsTrue(val2 == 5578983451391950848, "UInt64 multiplication doesn't work got " + val2);
+
+            val2 = value / 36000000000;
+            Assert.IsTrue(val2 == 48, "UInt64 division doesn't work got " + val2);
+
+            value = 3200000000000;
+
+            val2 = value % 1300000000000;
+            Assert.IsTrue(val2 == 600000000000, "UInt64 remainder doesn't work got " + val2);
+
             // Now test conversions
 
             ulong maxValue = UInt64.MaxValue;
@@ -141,6 +160,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((double)minValue == UInt64.MinValue, "Conv_R8 for UInt64 doesn't work");
 
             // Test Methods
+
+            value = 60;
+
             val2 = TestMethod(value);
             Assert.IsTrue(value == 60, "Passing an UInt64 as a method parameter doesn't work");
             Assert.IsTrue(val2 == 61, "Returning an UInt64 value from a method doesn't work");

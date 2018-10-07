@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
 
 using Cosmos.VS.Windows.ToolWindows;
 
@@ -16,86 +18,79 @@ namespace Cosmos.VS.Windows
         public const int CosmosInternalCmdID = 0x0103;
         public const int CosmosShowAllCmdID = 0x0104;
 
-        private readonly CosmosWindowsPackage package;
+        private readonly CosmosWindowsPackage _package;
 
         private CosmosMenuCmdSet(CosmosWindowsPackage package)
         {
-            this.package = package ?? throw new ArgumentNullException(nameof(package));
+            _package = package ?? throw new ArgumentNullException(nameof(package));
 
-            AddCommand(CosmosAssemblyCmdID, ShowWindowAssembly);
-            AddCommand(CosmosRegistersCmdID, ShowWindowRegisters);
-            AddCommand(CosmosStackCmdID, ShowWindowStack);
-            AddCommand(CosmosInternalCmdID, ShowWindowInternal);
-            AddCommand(CosmosShowAllCmdID, ShowWindowAll);
+            AddCommand(CosmosAssemblyCmdID, ShowWindowAssemblyAsync);
+            AddCommand(CosmosRegistersCmdID, ShowWindowRegistersAsync);
+            AddCommand(CosmosStackCmdID, ShowWindowStackAsync);
+            AddCommand(CosmosInternalCmdID, ShowWindowInternalAsync);
+            AddCommand(CosmosShowAllCmdID, ShowWindowAllAsync);
         }
 
         private void AddCommand(int cmdId, EventHandler handler)
         {
-            OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (commandService != null)
+            if (ServiceProvider.GetService(typeof(IMenuCommandService)) is OleMenuCommandService commandService)
             {
                 var menuCommandID = new CommandID(Guids.CosmosMenuCmdSetGuid, cmdId);
                 var menuItem = new MenuCommand(handler, menuCommandID);
+
                 commandService.AddCommand(menuItem);
             }
         }
 
+        private void AddCommand(int cmdId, AsyncEventHandler handler) =>
+            AddCommand(cmdId, (EventHandler)((sender, e) => handler?.InvokeAsync(sender, e)));
+
         public static CosmosMenuCmdSet Instance { get; private set; }
 
-        private IServiceProvider ServiceProvider => package;
+        private IServiceProvider ServiceProvider => _package;
 
         public static void Initialize(CosmosWindowsPackage package)
         {
             Instance = new CosmosMenuCmdSet(package);
         }
 
-        private void ShowWindow(Type aWindowType)
+        private async Task ShowWindowAsync(Type aWindowType)
         {
-            var xWindow = package.FindWindow(aWindowType);
+            await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var xWindow = await _package.FindWindowAsync(aWindowType);
             var xFrame = (IVsWindowFrame)xWindow.Frame;
+
             ErrorHandler.ThrowOnFailure(xFrame.Show());
         }
 
-        private void ShowChannelWindow(Type aWindowType)
+        private async Task ShowChannelWindowAsync(Type aWindowType)
         {
-            var xWindow = package.FindChannelWindow(aWindowType);
+            await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var xWindow = await _package.FindChannelWindowAsync(aWindowType);
             var xFrame = (IVsWindowFrame)xWindow.Frame;
+
             ErrorHandler.ThrowOnFailure(xFrame.Show());
         }
 
-        private void ShowWindowAssembly(object aCommand, EventArgs e)
-        {
-            ShowWindow(typeof(AssemblyToolWindow));
-        }
+        private Task ShowWindowAssemblyAsync(object sender, EventArgs e) => ShowWindowAsync(typeof(AssemblyToolWindow));
 
-        private void ShowWindowInternal(object aCommand, EventArgs e)
-        {
-            ShowWindow(typeof(InternalTW));
-        }
+        private Task ShowWindowInternalAsync(object sender, EventArgs e) => ShowWindowAsync(typeof(InternalTW));
 
-        private void ShowWindowRegisters(object aCommand, EventArgs e)
-        {
-            ShowWindow(typeof(RegistersToolWindow));
-        }
+        private Task ShowWindowRegistersAsync(object sender, EventArgs e) => ShowWindowAsync(typeof(RegistersToolWindow));
 
-        private void ShowWindowStack(object aCommand, EventArgs e)
-        {
-            ShowWindow(typeof(StackTW));
-        }
+        private Task ShowWindowStackAsync(object sender, EventArgs e) => ShowWindowAsync(typeof(StackTW));
 
-        private void ShowWindowConsole(object aCommand, EventArgs e)
-        {
-            ShowChannelWindow(typeof(ConsoleTW));
-        }
+        private Task ShowWindowConsoleAsync(object sender, EventArgs e) => ShowChannelWindowAsync(typeof(ConsoleTW));
 
-        private void ShowWindowAll(object aCommand, EventArgs e)
-        {
-            ShowWindowAssembly(aCommand, e);
-            ShowWindowRegisters(aCommand, e);
-            ShowWindowStack(aCommand, e);
-            //ShowWindowConsole(aCommand, e);
-            // Dont show Internal Window, most Cosmos users wont use it.
-        }
-
+        private Task ShowWindowAllAsync(object sender, EventArgs e) =>
+            Task.WhenAll(
+                ShowWindowAssemblyAsync(sender, e),
+                ShowWindowRegistersAsync(sender, e),
+                ShowWindowStackAsync(sender, e)
+                //ShowWindowConsole(sender, e)
+                // Dont show Internal Window, most Cosmos users wont use it.
+                );
     }
 }

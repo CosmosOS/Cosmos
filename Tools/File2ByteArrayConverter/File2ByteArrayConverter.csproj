@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net471</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
+        <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Update="Form1.cs" SubType="Form" />
+        <Compile Update="Form1.Designer.cs" DependentUpon="Form1.cs" />
+        <EmbeddedResource Update="Form1.resx" DependentUpon="Form1.cs" />
+    </ItemGroup>
+
+</Project>

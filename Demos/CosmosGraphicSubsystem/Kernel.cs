@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Drawing;
 using Cosmos.System.Graphics;
 using Sys = Cosmos.System;
+using Point = Cosmos.System.Graphics.Point;
+
 
 /*
  * Beware Demo Kernels are not recompiled when its dependencies changes!

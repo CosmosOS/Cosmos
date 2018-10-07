@@ -1,3 +1,4 @@
+//#define COSMOSDEBUG
 using System;
 using IL2CPU.API.Attribs;
 
@@ -5,14 +6,14 @@ namespace Cosmos.Core
 {
     public class MemoryBlock
     {
-        public readonly UInt32 Base;
-        public readonly UInt32 Size;
+        public readonly uint Base;
+        public readonly uint Size;
 
         public readonly MemoryBlock08 Bytes;
         public readonly MemoryBlock16 Words;
         public readonly MemoryBlock32 DWords;
 
-        public MemoryBlock(UInt32 aBase, UInt32 aSize)
+        public MemoryBlock(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
@@ -25,7 +26,7 @@ namespace Cosmos.Core
         //TODO: Make an attribute that can be applied to methods to tell the copmiler to inline them to save
         // the overhead of a call on operations like this.
         // Need to check bounds for 16 and 32 better so offset cannot be size - 1 and then the 4 bytes write past the end
-        public unsafe UInt32 this[UInt32 aByteOffset]
+        public unsafe uint this[uint aByteOffset]
         {
             get
             {
@@ -33,7 +34,7 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt32*)(Base + aByteOffset);
+                return *(uint*)(Base + aByteOffset);
             }
             set
             {
@@ -41,21 +42,29 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt32*)(Base + aByteOffset)) = value;
+                (*(uint*)(Base + aByteOffset)) = value;
             }
         }
 
-        public void Fill(UInt32 aData)
+        public void Fill(uint aData)
         {
             //Fill(0, Size / 4, aData);
             Fill(0, Size, aData);
         }
 
         [DebugStub(Off = true)]
-        public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt32 aData)
+        public unsafe void Fill(uint aStart, uint aCount, uint aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            UInt32* xDest = (UInt32*)(this.Base + aStart);
+            uint* xDest = (uint*)(Base + aStart);
+            MemoryOperations.Fill(xDest, aData, (int)aCount);
+        }
+
+        [DebugStub(Off = true)]
+        public unsafe void Fill(int aStart, int aCount, int aData)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(Base + aStart);
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
@@ -64,41 +73,73 @@ namespace Cosmos.Core
             Fill(0, Size, aData);
         }
 
-        public void Fill(UInt16 aData)
+        public void Fill(ushort aData)
         {
             Fill(0, Size, aData);
         }
 
         [DebugStub(Off = true)]
-        public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt16 aData)
+        public unsafe void Fill(uint aStart, uint aCount, ushort aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            UInt16* xDest = (UInt16*)(this.Base + aStart);
+            ushort* xDest = (ushort*)(Base + aStart);
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         [DebugStub(Off = true)]
-        public unsafe void Fill(UInt32 aStart, UInt32 aCount, byte aData)
+        public unsafe void Fill(uint aStart, uint aCount, byte aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            byte* xDest = (byte*)(this.Base + aStart);
+            byte* xDest = (byte*)(Base + aStart);
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         [DebugStub(Off = true)]
-        public unsafe void MoveDown(UInt32 aDest, UInt32 aSrc, UInt32 aCount)
+        public unsafe void Copy(uint[] aData)
         {
-            byte* xDest = (byte*)(this.Base + aDest);
-            byte* xSrc = (byte*)(this.Base + aSrc);
-            for (int i = 0; i < aCount; i++)
-            {
-                *xDest = *xSrc;
-                xDest++;
-                xSrc++;
+            Copy(0, aData, 0, aData.Length);
+        }
+
+        unsafe public void Copy(uint aStart, uint[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            uint* xDest = (uint*)(Base + aStart);
+
+            Global.mDebugger.SendInternal($"Base is {Base} xDest is {(uint)xDest}");
+            fixed (uint* aDataPtr = aData) {
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
             }
         }
 
-        public void MoveUp(UInt32 aDest, UInt32 aSrc, UInt32 aCount)
+        public void Copy(int[] aData)
+        {
+            Copy(0, aData, 0, aData.Length);
+        }
+
+        public void Copy(int []aData, int aIndex, int aCount)
+        {
+            Copy(0, aData, aIndex, aData.Length);
+        }
+
+        public unsafe void Copy(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(Base + aStart);
+            fixed (int* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
+            }
+        }
+
+        [DebugStub(Off = true)]
+        public unsafe void MoveDown(uint aDest, uint aSrc, uint aCount)
+        {
+            byte* xDest = (byte*)(Base + aDest);
+            byte* xSrc = (byte*)(Base + aSrc);
+            MemoryOperations.Copy(xDest, xSrc, (int)aCount);
+        }
+
+        public void MoveUp(uint aDest, uint aSrc, uint aCount)
         {
             throw new Exception("TODO");
         }
@@ -124,7 +165,7 @@ namespace Cosmos.Core
                 (*(Byte*)(Base + i)) = aBuffer[i];
         }
 
-        public unsafe void Read16(UInt16[] aBuffer)
+        public unsafe void Read16(ushort[] aBuffer)
         {
             if(aBuffer.Length >= Size)
             {
@@ -132,11 +173,11 @@ namespace Cosmos.Core
             }
             for (int i = 0; i < aBuffer.Length / 2; i++)
             {
-                aBuffer[i] = (*(UInt16*)(Base + i));
+                aBuffer[i] = (*(ushort*)(Base + i));
             }
         }
 
-        public unsafe void Write16(UInt16[] aBuffer)
+        public unsafe void Write16(ushort[] aBuffer)
         {
             if(aBuffer.Length >= Size)
             {
@@ -144,45 +185,61 @@ namespace Cosmos.Core
             }
             for (int i = 0; i < aBuffer.Length / sizeof(ushort); i++)
             {
-                (*(UInt16*)(Base + i)) = aBuffer[i];
+                (*(ushort*)(Base + i)) = aBuffer[i];
             }
         }
 
-        public unsafe void Read32(UInt32[] aBuffer)
+        public unsafe void Read32(uint[] aBuffer)
         {
             if(aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
             for (int i = 0; i < aBuffer.Length / sizeof(uint); i++)
-                aBuffer[i] = (*(UInt32*)(Base + i));
+                aBuffer[i] = (*(uint*)(Base + i));
         }
 
-        public unsafe void Write32(UInt32[] aBuffer)
+        public unsafe void Write32(uint[] aBuffer)
         {
             if(aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
             for (int i = 0; i < aBuffer.Length / sizeof(uint); i++)
-                (*(UInt32*)(Base + i)) = aBuffer[i];
+                (*(uint*)(Base + i)) = aBuffer[i];
         }
         #endregion ReadWrite
+            
+        public unsafe uint[] ToArray(int aStart, int aIndex, int aCount)
+        {
+            uint* xDest = (uint*)(Base + aStart);
+            uint[] array = new uint[aCount];
+            fixed (uint* aArrayPtr = array)
+            {
+                MemoryOperations.Copy(aArrayPtr + aIndex, xDest, aCount);
+            }
+            return array;
+        }
+        
+        public uint[] ToArray()
+        {
+            return ToArray(0, 0, (int)Size);
+        }
             
     }
 
     public class MemoryBlock08
     {
-        public readonly UInt32 Base;
-        public readonly UInt32 Size;
+        public readonly uint Base;
+        public readonly uint Size;
 
-        internal MemoryBlock08(UInt32 aBase, UInt32 aSize)
+        internal MemoryBlock08(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
-        public unsafe byte this[UInt32 aByteOffset]
+        public unsafe byte this[uint aByteOffset]
         {
             get
             {
@@ -206,16 +263,16 @@ namespace Cosmos.Core
 
     public class MemoryBlock16
     {
-        public readonly UInt32 Base;
-        public readonly UInt32 Size;
+        public readonly uint Base;
+        public readonly uint Size;
 
-        internal MemoryBlock16(UInt32 aBase, UInt32 aSize)
+        internal MemoryBlock16(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
-        public unsafe UInt16 this[UInt32 aByteOffset]
+        public unsafe ushort this[uint aByteOffset]
         {
             get
             {
@@ -223,7 +280,7 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt16*)(Base + aByteOffset);
+                return *(ushort*)(Base + aByteOffset);
             }
             set
             {
@@ -231,7 +288,7 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt16*)(Base + aByteOffset)) = value;
+                (*(ushort*)(Base + aByteOffset)) = value;
             }
         }
 
@@ -239,16 +296,16 @@ namespace Cosmos.Core
 
     public class MemoryBlock32
     {
-        public readonly UInt32 Base;
-        public readonly UInt32 Size;
+        public readonly uint Base;
+        public readonly uint Size;
 
-        internal MemoryBlock32(UInt32 aBase, UInt32 aSize)
+        internal MemoryBlock32(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
-        public unsafe UInt32 this[UInt32 aByteOffset]
+        public unsafe uint this[uint aByteOffset]
         {
             get
             {
@@ -256,7 +313,7 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt32*)(Base + aByteOffset);
+                return *(uint*)(Base + aByteOffset);
             }
             set
             {
@@ -264,7 +321,7 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt32*)(Base + aByteOffset)) = value;
+                (*(uint*)(Base + aByteOffset)) = value;
             }
         }
     }

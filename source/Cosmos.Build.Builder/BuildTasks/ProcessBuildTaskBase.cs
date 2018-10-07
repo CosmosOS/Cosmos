@@ -34,8 +34,8 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             processStartInfo.RedirectStandardError = true;
             processStartInfo.RedirectStandardOutput = true;
-            processStartInfo.StandardErrorEncoding = Encoding.UTF8;
-            processStartInfo.StandardOutputEncoding = Encoding.UTF8;
+            processStartInfo.StandardErrorEncoding = Encoding.GetEncoding(858);
+            processStartInfo.StandardOutputEncoding = Encoding.GetEncoding(858);
 
             process.StartInfo = processStartInfo;
             process.Start();

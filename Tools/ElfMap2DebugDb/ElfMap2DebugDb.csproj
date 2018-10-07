@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
     </ItemGroup>
 
 </Project>
