@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2041
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Beep", "Beep", "{85AD61C5-4105-4E94-9AC3-345C3744770A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Graphics", "Graphics", "{7A1220A6-511A-4552-B5F6-D6675FC21508}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guess", "Guess", "{2A48C638-F2BB-491A-A36A-B58A9697D1B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ZMachine", "ZMachine", "{39B58CD8-7147-4FF0-961C-2CA140651C34}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeepDemo", "Demos\BeepDemo\BeepDemo.csproj", "{96D8F1A6-EA27-4899-8E08-EDD86CB0370A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuessKernel", "Demos\Guess\GuessKernel.csproj", "{8E76CDF2-CBE3-4C50-B991-F9B7E3033132}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosGraphicSubsystem", "Demos\CosmosGraphicSubsystem\CosmosGraphicSubsystem.csproj", "{6F750E6B-8C93-4DE7-9FF9-3C31C5121F1E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZKernel", "Demos\ZMachine\ZKernel\ZKernel.csproj", "{04B52A1C-C57A-40C3-BED3-A97B7BA840E9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZLibrary", "Demos\ZMachine\ZLibrary\ZLibrary.csproj", "{3B661E21-F46C-4048-92BA-4BF67F7ED7D0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{96D8F1A6-EA27-4899-8E08-EDD86CB0370A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96D8F1A6-EA27-4899-8E08-EDD86CB0370A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96D8F1A6-EA27-4899-8E08-EDD86CB0370A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96D8F1A6-EA27-4899-8E08-EDD86CB0370A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E76CDF2-CBE3-4C50-B991-F9B7E3033132}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E76CDF2-CBE3-4C50-B991-F9B7E3033132}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E76CDF2-CBE3-4C50-B991-F9B7E3033132}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E76CDF2-CBE3-4C50-B991-F9B7E3033132}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F750E6B-8C93-4DE7-9FF9-3C31C5121F1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F750E6B-8C93-4DE7-9FF9-3C31C5121F1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F750E6B-8C93-4DE7-9FF9-3C31C5121F1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F750E6B-8C93-4DE7-9FF9-3C31C5121F1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04B52A1C-C57A-40C3-BED3-A97B7BA840E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04B52A1C-C57A-40C3-BED3-A97B7BA840E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04B52A1C-C57A-40C3-BED3-A97B7BA840E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04B52A1C-C57A-40C3-BED3-A97B7BA840E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B661E21-F46C-4048-92BA-4BF67F7ED7D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B661E21-F46C-4048-92BA-4BF67F7ED7D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B661E21-F46C-4048-92BA-4BF67F7ED7D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B661E21-F46C-4048-92BA-4BF67F7ED7D0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{96D8F1A6-EA27-4899-8E08-EDD86CB0370A} = {85AD61C5-4105-4E94-9AC3-345C3744770A}
+		{8E76CDF2-CBE3-4C50-B991-F9B7E3033132} = {2A48C638-F2BB-491A-A36A-B58A9697D1B0}
+		{6F750E6B-8C93-4DE7-9FF9-3C31C5121F1E} = {7A1220A6-511A-4552-B5F6-D6675FC21508}
+		{04B52A1C-C57A-40C3-BED3-A97B7BA840E9} = {39B58CD8-7147-4FF0-961C-2CA140651C34}
+		{3B661E21-F46C-4048-92BA-4BF67F7ED7D0} = {39B58CD8-7147-4FF0-961C-2CA140651C34}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {737503A6-354A-4725-8D7F-27A996161138}
+	EndGlobalSection
+EndGlobal
