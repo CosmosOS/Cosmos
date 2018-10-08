@@ -7,7 +7,7 @@
 
     <PropertyGroup>
         <BinFormat>elf</BinFormat>
-        <DebugEnabled>False</DebugEnabled>
+        <DebugEnabled>True</DebugEnabled>
         <DebugMode>Source</DebugMode>
         <TraceMode>User</TraceMode>
         <EnableGDB>False</EnableGDB>
@@ -54,8 +54,8 @@
 
     <ItemGroup>
         <PackageReference Include="Cosmos.Build" Version="*" NoWarn="NU1604" />
-        <PackageReference Include="Cosmos.System2" Version="*" NoWarn="NU1604" />
         <PackageReference Include="Cosmos.Debug.Kernel" Version="*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.System2" Version="*" NoWarn="NU1604" />
     </ItemGroup>
 
 </Project>
