@@ -141,6 +141,35 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             ByRefTestMethod(ref value);
             Assert.IsTrue(value == 61, "Passing an UInt32 by ref to a method doesn't work");
+            uint val3o = 10000;
+            bool efuse = false;
+            try
+            {
+                checked
+                {
+                    val3o += uint.MaxValue;
+                }
+            }
+            catch (OverflowException)
+            {
+                efuse = true;
+            }
+            Assert.IsTrue(efuse, "Add_Ovf for UInt32 doesn't work: " + val3o);
+
+            efuse = false;
+            val3o = 10000;
+            try
+            {
+                checked
+                {
+                    val3o -= 2147483647;
+                }
+            }
+            catch (OverflowException)
+            {
+                efuse = true;
+            }
+            Assert.IsTrue(efuse, "Sub_Ovf for UInt32 doesn't work: " + val3o);
         }
 
         public static uint TestMethod(uint aParam)

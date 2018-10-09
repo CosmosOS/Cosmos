@@ -149,31 +149,36 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             ByRefTestMethod(ref value);
             Assert.IsTrue(value == 61, "Passing an Int64 by ref to a method doesn't work");
 
-            //Test StackOverflow Exceptions
-            long val3o;
+            //Test Overflow Exceptions
+            long val3o = 1000000;
             efuse = false;
-            val3o = 1000000;
             try
             {
-                val3o += long.MaxValue;
+                checked
+                {
+                    val3o += long.MaxValue;
+                }
             }
-            catch (OverflowException e)
+            catch (OverflowException)
             {
                 efuse = true;
             }
-            Assert.IsTrue(efuse, "Add_Ovf for Int16 doesn't work");
+            Assert.IsTrue(efuse, "Add_Ovf for Int64 doesn't work");
 
             efuse = false;
             val3o = -10000;
             try
             {
-                val3o -= long.MaxValue;
+                checked
+                {
+                    val3o -= long.MaxValue;
+                }
             }
-            catch (OverflowException e)
+            catch (OverflowException)
             {
                 efuse = true;
             }
-            Assert.IsTrue(efuse, "Sub_Ovf for Int16 doesn't work");
+            Assert.IsTrue(efuse, "Sub_Ovf for Int64 doesn't work");
         }
 
         public static long TestMethod(long aParam)
