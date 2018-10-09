@@ -130,7 +130,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                                 {
                                     DebugLocalInfo inf = new DebugLocalInfo();
                                     inf.IsReference = true;
-                                    inf.Type = typeof(T).AssemblyQualifiedName;
+                                    inf.Type = typeof(T).FullName;
                                     inf.Offset = (int)(mArrayFirstElementOffset + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)) * i));
                                     inf.Pointer = (uint)(xPointer + mArrayFirstElementOffset + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)) * i));
                                     inf.Name = "[" + i.ToString() + "]";
@@ -176,7 +176,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     byte[] xData;
 
                     #region string
-                    if (mDebugInfo.TYPENAME == typeof(string).AssemblyQualifiedName)
+                    if (mDebugInfo.TYPENAME == typeof(string).FullName)
                     {
                         const uint xStringLengthOffset = 12;
                         const uint xStringFirstCharOffset = 16;
@@ -236,11 +236,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region byte
                     // Byte
-                    else if (mDebugInfo.TYPENAME == typeof(byte).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(byte).FullName)
                     {
                         ReadData<byte>(ref propertyInfo, new Func<byte[], int, byte>(delegate(byte[] barr, int ind) { return barr[ind]; }));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(byte[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(byte[]).FullName)
                     {
                         ReadDataArray<byte>(ref propertyInfo, "byte");
                     }
@@ -248,18 +248,18 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region sbyte
                     // SByte
-                    else if (mDebugInfo.TYPENAME == typeof(sbyte).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(sbyte).FullName)
                     {
                         ReadData<sbyte>(ref propertyInfo, new Func<byte[], int, sbyte>(delegate(byte[] barr, int ind) { return unchecked((sbyte)barr[ind]); }));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(sbyte[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(sbyte[]).FullName)
                     {
                         ReadDataArray<sbyte>(ref propertyInfo, "sbyte");
                     }
                     #endregion
 
                     #region char
-                    else if (mDebugInfo.TYPENAME == typeof(char).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(char).FullName)
                     {
                         xData = mProcess.mDbgConnector.GetStackData(OFFSET, 2);
                         if (xData == null)
@@ -272,7 +272,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                             propertyInfo.bstrValue = String.Format("{0} '{1}'", (ushort)xTypedCharValue, xTypedCharValue);
                         }
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(char[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(char[]).FullName)
                     {
                         // Get handle
                         xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
@@ -352,11 +352,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region short
                     // Short
-                    else if (mDebugInfo.TYPENAME == typeof(short).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(short).FullName)
                     {
                         ReadData<short>(ref propertyInfo, new Func<byte[], int, short>(BitConverter.ToInt16));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(short[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(short[]).FullName)
                     {
                         ReadDataArray<short>(ref propertyInfo, "short");
                     }
@@ -364,11 +364,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region ushort
                     // UShort
-                    else if (mDebugInfo.TYPENAME == typeof(ushort).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(ushort).FullName)
                     {
                         ReadData<ushort>(ref propertyInfo, new Func<byte[], int, ushort>(BitConverter.ToUInt16));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(ushort[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(ushort[]).FullName)
                     {
                         ReadDataArray<ushort>(ref propertyInfo, "ushort");
                     }
@@ -376,11 +376,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region int
                     // Int32
-                    else if (mDebugInfo.TYPENAME == typeof(int).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(int).FullName)
                     {
                         ReadData<int>(ref propertyInfo, new Func<byte[], int, int>(BitConverter.ToInt32));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(int[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(int[]).FullName)
                     {
                         ReadDataArray<int>(ref propertyInfo, "int");
                     }
@@ -388,11 +388,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region uint
                     // UInt32
-                    else if (mDebugInfo.TYPENAME == typeof(uint).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(uint).FullName)
                     {
                         ReadData<uint>(ref propertyInfo, new Func<byte[], int, uint>(BitConverter.ToUInt32));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(uint[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(uint[]).FullName)
                     {
                         ReadDataArray<uint>(ref propertyInfo, "uint");
                     }
@@ -400,11 +400,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region long
                     // Long
-                    else if (mDebugInfo.TYPENAME == typeof(long).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(long).FullName)
                     {
                         ReadData<long>(ref propertyInfo, new Func<byte[], int, long>(BitConverter.ToInt64));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(long[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(long[]).FullName)
                     {
                         ReadDataArray<long>(ref propertyInfo, "long");
                     }
@@ -412,11 +412,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region ulong
                     // ULong
-                    else if (mDebugInfo.TYPENAME == typeof(ulong).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(ulong).FullName)
                     {
                         ReadData<ulong>(ref propertyInfo, new Func<byte[], int, ulong>(BitConverter.ToUInt64));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(ulong[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(ulong[]).FullName)
                     {
                         ReadDataArray<ulong>(ref propertyInfo, "ulong");
                     }
@@ -424,11 +424,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region float
                     // Float
-                    else if (mDebugInfo.TYPENAME == typeof(float).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(float).FullName)
                     {
                         ReadData<float>(ref propertyInfo, new Func<byte[], int, float>(BitConverter.ToSingle));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(float[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(float[]).FullName)
                     {
                         ReadDataArray<float>(ref propertyInfo, "float");
                     }
@@ -436,11 +436,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region double
                     // Double
-                    else if (mDebugInfo.TYPENAME == typeof(double).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(double).FullName)
                     {
                         ReadData<double>(ref propertyInfo, new Func<byte[], int, double>(BitConverter.ToDouble));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(double[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(double[]).FullName)
                     {
                         ReadDataArray<double>(ref propertyInfo, "double");
                     }
@@ -448,11 +448,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     #region bool
                     // Bool
-                    else if (mDebugInfo.TYPENAME == typeof(bool).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(bool).FullName)
                     {
                         ReadData<bool>(ref propertyInfo, new Func<byte[], int, bool>(BitConverter.ToBoolean));
                     }
-                    else if (mDebugInfo.TYPENAME == typeof(bool[]).AssemblyQualifiedName)
+                    else if (mDebugInfo.TYPENAME == typeof(bool[]).FullName)
                     {
                         ReadDataArray<bool>(ref propertyInfo, "bool");
                     }
