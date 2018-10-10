@@ -41,7 +41,7 @@ namespace Cosmos.Build.Builder.Dependencies
             var vsInstancePath = _visualStudioInstance.GetInstallationPath();
             var installedPackages = _visualStudioInstance.GetPackages();
 
-            var args = $"modify --passive --norestart --quiet --installPath \"{vsInstancePath}\"";
+            var args = $"modify --passive --norestart --installPath \"{vsInstancePath}\"";
 
             foreach (var workload in RequiredPackages)
             {

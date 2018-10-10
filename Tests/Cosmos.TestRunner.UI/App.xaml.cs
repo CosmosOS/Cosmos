@@ -1,17 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Diagnostics;
+
+using Avalonia;
+using Avalonia.Logging.Serilog;
+using Avalonia.Markup.Xaml;
+
+using Serilog;
+
+using Cosmos.TestRunner.UI.Views;
 
 namespace Cosmos.TestRunner.UI
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    internal class App : Application
     {
+        public override void Initialize()
+        {
+            AvaloniaXamlLoader.Load(this);
+            base.Initialize();
+        }
+
+        static void Main(string[] args)
+        {
+            InitializeLogging();
+            AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .Start<MainWindow>();
+        }
+
+        [Conditional("DEBUG")]
+        private static void InitializeLogging()
+        {
+            SerilogLogger.Initialize(new LoggerConfiguration()
+                .MinimumLevel.Warning()
+                .WriteTo.Trace(outputTemplate: "{Area}: {Message}")
+                .CreateLogger());
+        }
     }
 }

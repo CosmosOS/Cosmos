@@ -16,5 +16,12 @@ namespace Cosmos.System_Plugs.System
         {
             throw new NotImplementedException("Decimal.ToString()");
         }
+
+        public static bool Equals(ref decimal aThis, object value)
+        {
+            throw new NotImplementedException("Decimal.Equals()");
+        }
+
+
     }
 }

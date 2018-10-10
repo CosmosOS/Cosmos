@@ -15,12 +15,22 @@
     </ItemGroup>
 
     <ItemGroup>
+
         <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\Content.xaml">
             <Context>File;BrowseObject</Context>
         </PropertyPageSchema>
+
         <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\CosmosDebugger.xaml">
             <Context>Project</Context>
         </PropertyPageSchema>
+
+        <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\PackageReference.xaml">
+            <Context>ProjectSubscriptionService;BrowseObject</Context>
+        </PropertyPageSchema>
+        <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\ResolvedPackageReference.xaml">
+            <Context>ProjectSubscriptionService;BrowseObject</Context>
+        </PropertyPageSchema>
+
     </ItemGroup>
 
 </Project>

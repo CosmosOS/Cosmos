@@ -8,10 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\TheRingMaster\TheRingMaster.csproj" />
-        <ProjectReference Include="..\..\Tools\NASM\NASM.csproj" />
-        <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
-        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU\IL2CPU.csproj" />
+        <ProjectReference Include="..\Cosmos.TestRunner.Full\Cosmos.TestRunner.Full.csproj" />
     </ItemGroup>
 
 </Project>

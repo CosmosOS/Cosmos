@@ -1,11 +1,11 @@
-using Cosmos.Build.Common;
-using IL2CPU.API.Attribs;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+
+using IL2CPU.API.Attribs;
 
 namespace TheRingMaster
 {
@@ -164,10 +164,10 @@ namespace TheRingMaster
                 return xAssembly;
             }
 
-            if (ResolveAssemblyForDir(CosmosPaths.Kernel, out xAssembly))
-            {
-                return xAssembly;
-            }
+            //if (ResolveAssemblyForDir(CosmosPaths.Kernel, out xAssembly))
+            //{
+            //    return xAssembly;
+            //}
 
             return xAssembly;
 

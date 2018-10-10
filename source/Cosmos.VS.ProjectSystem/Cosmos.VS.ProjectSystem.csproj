@@ -33,6 +33,8 @@
         <XamlPropertyRule Include="BuildSystem\Rules\Content.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\CosmosDebugger.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\LaunchConfiguration.xaml" />
+        <XamlPropertyRule Include="BuildSystem\Rules\PackageReference.xaml" />
+        <XamlPropertyRule Include="BuildSystem\Rules\ResolvedPackageReference.xaml" />
     </ItemGroup>
 
     <ItemGroup>

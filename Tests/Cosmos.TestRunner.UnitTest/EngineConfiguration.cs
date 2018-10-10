@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Cosmos.Build.Common;
 using Cosmos.TestRunner.Core;
+using Cosmos.TestRunner.Full;
 
 namespace Cosmos.TestRunner.UnitTest
 {
@@ -27,11 +28,11 @@ namespace Cosmos.TestRunner.UnitTest
 
         public override StackCorruptionDetectionLevel StackCorruptionDetectionLevel => StackCorruptionDetectionLevel.MethodFooters;
 
-        public override IEnumerable<Type> KernelTypesToRun
+        public override IEnumerable<string> KernelAssembliesToRun
         {
             get
             {
-                yield return mKernelType;
+                yield return mKernelType.Assembly.Location;
             }
         }
     }

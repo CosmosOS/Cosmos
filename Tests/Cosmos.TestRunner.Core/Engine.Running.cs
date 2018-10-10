@@ -11,137 +11,122 @@ namespace Cosmos.TestRunner.Core
         // this file contains code handling situations when a kernel is running
         // most of this is debug stub related
 
-        private void InitializeDebugConnector(DebugConnector debugConnector)
-        {
-            if (debugConnector == null)
-            {
-                throw new ArgumentNullException("debugConnector");
-            }
-            debugConnector.OnDebugMsg = s => OutputHandler.LogDebugMessage(s);
-            debugConnector.ConnectionLost = ex =>
-            {
-                OutputHandler.LogError($"DC: Connection lost. {ex.Message}");
-            };
-            debugConnector.CmdChannel = ChannelPacketReceived;
-            debugConnector.CmdStarted = () =>
-                {
-                    OutputHandler.LogMessage("DC: Started");
-                    debugConnector.SendCmd(Vs2Ds.BatchEnd);
-                };
-            debugConnector.Error = e =>
-                {
-                    OutputHandler.LogMessage("DC Error: " + e.ToString());
-                    OutputHandler.SetKernelTestResult(false, "DC Error");
-                    mKernelResultSet = true;
-                    mKernelRunning = false;
-                };
-            debugConnector.CmdText += s => OutputHandler.LogMessage("Text from kernel: " + s);
-            debugConnector.CmdSimpleNumber += n => OutputHandler.LogMessage("Number from kernel: 0x" + n.ToString("X8").ToUpper());
-            debugConnector.CmdSimpleLongNumber += n => OutputHandler.LogMessage("Number from kernel: 0x" + n.ToString("X16").ToUpper());
-            debugConnector.CmdComplexNumber += f => OutputHandler.LogMessage("Number from kernel: 0x" + f.ToString("X8").ToUpper());
-            debugConnector.CmdComplexLongNumber += d => OutputHandler.LogMessage("Number from kernel: 0x" + d.ToString("X16").ToUpper());
-            debugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
-            debugConnector.CmdKernelPanic = n =>
-                                            {
-                                                OutputHandler.LogMessage("Kernel panic! Number = " + n);
-                                                // todo: add core dump here, call stack.
-                                            };
-            debugConnector.CmdTrace = t => { };
-            debugConnector.CmdBreak = t => { };
-            debugConnector.CmdStackCorruptionOccurred = a =>
-                {
-                    OutputHandler.LogMessage("Stackcorruption occurred at: 0x" + a.ToString("X8"));
-                    OutputHandler.SetKernelTestResult(false, "Stackcorruption occurred at: 0x" + a.ToString("X8"));
-                    mKernelResultSet = true;
-                    mKernelRunning = false;
-                };
-            debugConnector.CmdStackOverflowOccurred = a =>
-                                                      {
-                                                          OutputHandler.LogMessage("Stack overflow occurred at: 0x" + a.ToString("X8"));
-                                                          OutputHandler.SetKernelTestResult(false, "Stack overflow occurred at: 0x" + a.ToString("X8"));
-                                                          mKernelResultSet = true;
-                                                          mKernelRunning = false;
-                                                      };
-            debugConnector.CmdNullReferenceOccurred = a =>
-                {
-                    OutputHandler.LogMessage("Null Reference Exception occurred at: 0x" + a.ToString("X8"));
-                    OutputHandler.SetKernelTestResult(false, "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
-                    mKernelResultSet = true;
-                    mKernelRunning = false;
-                };
-            debugConnector.CmdCoreDump = b =>
-            {
-                string xCallStack = "";
-                int i = 0;
+        private volatile bool mKernelRunning;
+        private volatile bool mKernelResult;
+        private int mSucceededAssertions;
 
+        private void InitializeDebugConnector(DebugConnector aDebugConnector)
+        {
+            void LogMessage(string aMessage) => OutputHandler.LogMessage(aMessage);
+
+            void AbortTestAndLogError(string aMessage)
+            {
+                OutputHandler.LogError(aMessage);
+                mKernelRunning = false;
+            }
+
+            void AbortTestAndLogException(Exception aException, string aMessage)
+            {
+                OutputHandler.LogError(aMessage);
+                OutputHandler.UnhandledException(aException);
+
+                mKernelRunning = false;
+            }
+
+            if (aDebugConnector == null)
+            {
+                throw new ArgumentNullException(nameof(aDebugConnector));
+            }
+
+            aDebugConnector.OnDebugMsg = s => OutputHandler.LogDebugMessage(s);
+
+            aDebugConnector.ConnectionLost = e => AbortTestAndLogException(e, "DC: Connection lost.");
+
+            aDebugConnector.CmdChannel = (a1, a2, a3) => ChannelPacketReceived(a1, a2, a3);
+
+            aDebugConnector.CmdStarted = () =>
+            {
+                LogMessage("DC: Started");
+                aDebugConnector.SendCmd(Vs2Ds.BatchEnd);
+            };
+
+            aDebugConnector.Error = e => AbortTestAndLogException(e, "DC Error.");
+
+            aDebugConnector.CmdText += s => LogMessage("Text from kernel: " + s);
+
+            aDebugConnector.CmdSimpleNumber += n => LogMessage(
+                "Number from kernel: 0x" + n.ToString("X8").ToUpper());
+
+            aDebugConnector.CmdSimpleLongNumber += n => LogMessage(
+                "Number from kernel: 0x" + n.ToString("X16").ToUpper());
+
+            aDebugConnector.CmdComplexNumber += f => LogMessage(
+                "Number from kernel: 0x" + f.ToString("X8").ToUpper());
+
+            aDebugConnector.CmdComplexLongNumber += d => LogMessage(
+                "Number from kernel: 0x" + d.ToString("X16").ToUpper());
+
+            aDebugConnector.CmdMessageBox = s => LogMessage(
+                "MessageBox from kernel: " + s);
+
+            aDebugConnector.CmdKernelPanic = n =>
+            {
+                LogMessage("Kernel panic! Number = " + n);
+                // todo: add core dump here, call stack.
+            };
+
+            aDebugConnector.CmdTrace = t => { };
+
+            aDebugConnector.CmdBreak = t => { };
+
+            aDebugConnector.CmdStackCorruptionOccurred = a => AbortTestAndLogError(
+                "Stackcorruption occurred at: 0x" + a.ToString("X8"));
+
+            aDebugConnector.CmdStackOverflowOccurred = a => AbortTestAndLogError(
+                "Stack overflow occurred at: 0x" + a.ToString("X8"));
+
+            aDebugConnector.CmdNullReferenceOccurred = a => AbortTestAndLogError(
+                "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
+
+            aDebugConnector.CmdCoreDump = dump =>
+            {
                 OutputHandler.LogMessage("Core dump:");
-                string eax = "EAX = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string ebx = "EBX = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string ecx = "ECX = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string edx = "EDX = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string edi = "EDI = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string esi = "ESI = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string ebp = "EBP = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string eip = "EIP = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
-                string esp = "ESP = 0x" +
-                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                i += 4;
+
+                string eax = "EAX = 0x" + dump.EAX.ToString("X8");
+                string ebx = "EBX = 0x" + dump.EBX.ToString("X8");
+                string ecx = "ECX = 0x" + dump.ECX.ToString("X8");
+                string edx = "EDX = 0x" + dump.EDX.ToString("X8");
+
+                string edi = "EDI = 0x" + dump.EDI.ToString("X8");
+                string esi = "ESI = 0x" + dump.ESI.ToString("X8");
+
+                string ebp = "EBP = 0x" + dump.EBP.ToString("X8");
+                string esp = "ESP = 0x" + dump.ESP.ToString("X8");
+                string eip = "EIP = 0x" + dump.EIP.ToString("X8");
+
                 OutputHandler.LogMessage(eax + " " + ebx + " " + ecx + " " + edx);
                 OutputHandler.LogMessage(edi + " " + esi);
-                OutputHandler.LogMessage(ebp+ " " + esp+ " " + eip);
+                OutputHandler.LogMessage(ebp + " " + esp + " " + eip);
                 OutputHandler.LogMessage("");
 
-                while (i < b.Length)
+                OutputHandler.LogMessage("Call stack:");
+                OutputHandler.LogMessage("");
+
+                while (dump.StackTrace.Count > 0)
                 {
-                    string xAddress = "0x" +
-                                      b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
-                                      b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
-                    xCallStack += xAddress + " ";
-                    if ((i != 0) &&(i%12 == 0))
-                    {
-                        OutputHandler.LogMessage(xCallStack.Trim());
-                        xCallStack = "";
-                    }
-                    i += 4;
+                    var xAddress = "0x" + dump.StackTrace.Pop().ToString("X8");
+                    OutputHandler.LogMessage("at " + xAddress);
                 }
-                if (xCallStack != "")
-                {
-                    OutputHandler.LogMessage(xCallStack.Trim());
-                    xCallStack = "";
-                }
+
+                OutputHandler.LogMessage("");
             };
 
             if (RunWithGDB)
             {
-                debugConnector.CmdInterruptOccurred = a =>
-                                                      {
-                                                          OutputHandler.LogMessage($"Interrupt {a} occurred");
-                                                      };
+                aDebugConnector.CmdInterruptOccurred = a =>
+                {
+                    OutputHandler.LogMessage($"Interrupt {a} occurred");
+                };
             }
         }
 
@@ -155,13 +140,13 @@ namespace Cosmos.TestRunner.Core
             {
                 throw new ArgumentNullException("host");
             }
-            mKernelRunning = true;
 
+            mKernelRunning = true;
             host.Start();
+
             try
             {
                 var xStartTime = DateTime.Now;
-                mKernelResultSet = false;
                 Interlocked.Exchange(ref mSucceededAssertions, 0);
 
                 while (mKernelRunning)
@@ -170,30 +155,17 @@ namespace Cosmos.TestRunner.Core
 
                     if (Math.Abs(DateTime.Now.Subtract(xStartTime).TotalSeconds) > AllowedSecondsInKernel)
                     {
-                        OutputHandler.SetKernelTestResult(false, "Timeout exceeded");
-                        mKernelResultSet = true;
-                        break;
+                        throw new TimeoutException("Timeout exceeded!");
                     }
-                }
-
-                if (!mKernelResultSet)
-                {
-                    OutputHandler.SetKernelTestResult(true, null);
-                    OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
                 }
             }
             finally
             {
-                Console.WriteLine("Stopping now");
                 host.Stop();
                 debugConnector.Dispose();
                 Thread.Sleep(50);
             }
         }
-
-        private volatile bool mKernelResultSet;
-        private volatile bool mKernelResult;
-        private int mSucceededAssertions;
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)
         {
@@ -219,7 +191,7 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-                OutputHandler.LogMessage(String.Format("ChannelPacketReceived, Channel = {0}, Command = {1}", arg1, arg2));
+                OutputHandler.LogMessage($"ChannelPacketReceived, Channel = {arg1}, Command = {arg2}");
             }
         }
 
@@ -231,7 +203,7 @@ namespace Cosmos.TestRunner.Core
         private void KernelTestFailed()
         {
             OutputHandler.SetKernelTestResult(false, "Test failed");
-            mKernelResultSet = true;
+
             mKernelResult = false;
             mKernelRunning = false;
         }
@@ -239,7 +211,7 @@ namespace Cosmos.TestRunner.Core
         private void KernelTestCompleted()
         {
             OutputHandler.SetKernelTestResult(true, "Test completed");
-            mKernelResultSet = true;
+
             mKernelResult = true;
             mKernelRunning = false;
         }

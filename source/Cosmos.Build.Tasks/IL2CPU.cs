@@ -58,7 +58,15 @@ namespace Cosmos.Build.Tasks
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
 
-        protected override string GenerateFullPathToTool() => Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe");
+        protected override string GenerateFullPathToTool()
+        {
+            if (String.IsNullOrWhiteSpace(ToolPath))
+            {
+                return Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe");
+            }
+
+            return Path.Combine(Path.GetFullPath(ToolPath), ToolExe);
+        }
 
         protected override string GenerateResponseFileCommands()
         {
@@ -91,7 +99,7 @@ namespace Cosmos.Build.Tasks
             return String.Join(Environment.NewLine, args.Select(a => $"{a.Key}:{a.Value}"));
         }
 
-        protected override string GetResponseFileSwitch(string responseFilePath) => $"ResponseFile:{responseFilePath}";
+        protected override string GetResponseFileSwitch(string responseFilePath) => $"\"ResponseFile:{responseFilePath}\"";
 
         public override bool Execute()
         {
