@@ -129,8 +129,8 @@ namespace ZLibrary.Machine
         public ZConsoleScreen(ZMachine aMachine)
         {
             _machine = aMachine;
-            _consoles.Add(new VirtualConsole(19, 60, 1, 0));
-            _consoles.Add(new VirtualConsole(1, 60, 0,0));
+            _consoles.Add(new VirtualConsole(19, 70, 1, 0));
+            _consoles.Add(new VirtualConsole(1, 70, 0,0));
         }
 
         public string ReadLine(string aInitialValue, int aTimeout, ushort timeoutRoutine, byte[] terminatingKeys, out byte terminator)

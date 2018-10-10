@@ -1,12 +1,13 @@
-﻿using System.Diagnostics;
+﻿#define COSMOSDEBUG
+using System.Diagnostics;
 
 namespace ZLibrary
 {
     public static class ZDebug
     {
-        public static bool Enable = true;
+        public static bool Enable = false;
 
-#if COSMOS
+#if COSMOSDEBUG
         private static Cosmos.Debug.Kernel.Debugger Debugger = new Cosmos.Debug.Kernel.Debugger("", "");
 #else
         //private static StreamWriter writer = new StreamWriter("log.txt");
@@ -20,7 +21,7 @@ namespace ZLibrary
                 Debugger.Send(s);
 #else
                 //writer.WriteLine(s);
-                Debug.WriteLine(s);
+                //Debug.WriteLine(s);
 #endif
             }
         }

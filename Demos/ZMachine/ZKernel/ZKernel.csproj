@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp2.0</TargetFramework>
         <RuntimeIdentifier>cosmos</RuntimeIdentifier>
-        <Profile>Bochs</Profile>
+        <Profile>VMware</Profile>
         <BinFormat>ELF</BinFormat>
         <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
         <StackCorruptionDetectionLevel>MethodFooters</StackCorruptionDetectionLevel>
@@ -19,11 +19,11 @@
         <_DebugMode>Source</_DebugMode>
         <_IgnoreDebugStubAttribute>False</_IgnoreDebugStubAttribute>
         <_PxeInterface>192.168.211.1</_PxeInterface>
-        <Description>Use Bochs emulator to deploy and debug.</Description>
-        <Launch>Bochs</Launch>
+        <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+        <Launch>VMware</Launch>
         <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-        <EnableGDB>True</EnableGDB>
-        <StartCosmosGDB>True</StartCosmosGDB>
+        <EnableGDB>False</EnableGDB>
+        <StartCosmosGDB>False</StartCosmosGDB>
         <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
         <VMware_StackCorruptionDetectionLevel>MethodFooters</VMware_StackCorruptionDetectionLevel>
         <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
@@ -36,6 +36,18 @@
         <VMware_PxeInterface>192.168.211.1</VMware_PxeInterface>
         <VMware_EnableGDB>True</VMware_EnableGDB>
         <VMware_StartCosmosGDB>True</VMware_StartCosmosGDB>
+        <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
+        <Bochs_StackCorruptionDetectionLevel>MethodFooters</Bochs_StackCorruptionDetectionLevel>
+        <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
+        <Bochs_Deployment>ISO</Bochs_Deployment>
+        <Bochs_Launch>Bochs</Bochs_Launch>
+        <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
+        <Bochs_DebugMode>Source</Bochs_DebugMode>
+        <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
+        <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
+        <Bochs_PxeInterface>192.168.211.1</Bochs_PxeInterface>
+        <Bochs_EnableGDB>True</Bochs_EnableGDB>
+        <Bochs_StartCosmosGDB>True</Bochs_StartCosmosGDB>
     </PropertyGroup>
 
     <ItemGroup>
