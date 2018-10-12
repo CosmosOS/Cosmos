@@ -111,7 +111,7 @@ namespace ZLibrary.Machine
 
     public class ZConsoleScreen : IZScreen
     {
-        private int _cuurentWindow;
+        private int _curentWindow;
         private readonly ConsoleColor bgupper = ConsoleColor.Black;
         private readonly ConsoleColor fgupper = ConsoleColor.Gray;
         private readonly ConsoleColor bglower = ConsoleColor.Black;
@@ -130,7 +130,7 @@ namespace ZLibrary.Machine
         {
             _machine = aMachine;
             _consoles.Add(new VirtualConsole(19, 70, 1, 0));
-            _consoles.Add(new VirtualConsole(1, 70, 0,0));
+            _consoles.Add(new VirtualConsole(1, 70, 0, 0));
         }
 
         public string ReadLine(string aInitialValue, int aTimeout, ushort timeoutRoutine, byte[] terminatingKeys, out byte terminator)
@@ -180,10 +180,10 @@ namespace ZLibrary.Machine
 
                             if (Console.CursorLeft != cx || Console.CursorTop != cy)
                             {
-                                Console.Write(sb.ToString());
+                                _consoles[_curentWindow].Write(sb.ToString());
                                 for (var i = cursor; i < sb.Length; i++)
                                 {
-                                    Console.Write('\x08');
+                                    _consoles[_curentWindow].Write('\x08');
                                 }
                             }
                         }
@@ -204,7 +204,7 @@ namespace ZLibrary.Machine
                         if (cursor > 0)
                         {
                             cursor--;
-                            Console.Write('\x08');
+                            _consoles[_curentWindow].Write('\x08');
                         }
 
                         break;
@@ -212,7 +212,7 @@ namespace ZLibrary.Machine
                     case ConsoleKey.RightArrow:
                         if (cursor < sb.Length)
                         {
-                            Console.Write(sb[cursor]);
+                            _consoles[_curentWindow].Write(sb[cursor]);
                             cursor++;
                         }
 
@@ -222,7 +222,7 @@ namespace ZLibrary.Machine
                         while (cursor > 0)
                         {
                             cursor--;
-                            Console.Write('\x08');
+                            _consoles[_curentWindow].Write('\x08');
                         }
 
                         break;
@@ -230,7 +230,7 @@ namespace ZLibrary.Machine
                     case ConsoleKey.End:
                         while (cursor < sb.Length)
                         {
-                            Console.Write(sb[cursor]);
+                            _consoles[_curentWindow].Write(sb[cursor]);
                             cursor++;
                         }
 
@@ -246,18 +246,18 @@ namespace ZLibrary.Machine
 
                             for (var i = cursor; i < sb.Length; i++)
                             {
-                                Console.Write(' ');
+                                _consoles[_curentWindow].Write(' ');
                             }
 
                             for (var i = 0; i < sb.Length; i++)
                             {
-                                Console.Write("\x08 \x08");
+                                _consoles[_curentWindow].Write("\x08 \x08");
                             }
 
                             histIdx--;
                             sb.Length = 0;
                             sb.Append(history[histIdx]);
-                            Console.Write(sb.ToString());
+                            _consoles[_curentWindow].Write(sb.ToString());
                             cursor = sb.Length;
                         }
 
@@ -268,12 +268,12 @@ namespace ZLibrary.Machine
                         {
                             for (var i = cursor; i < sb.Length; i++)
                             {
-                                Console.Write(' ');
+                                _consoles[_curentWindow].Write(' ');
                             }
 
                             for (var i = 0; i < sb.Length; i++)
                             {
-                                Console.Write("\x08 \x08");
+                                _consoles[_curentWindow].Write("\x08 \x08");
                             }
 
                             histIdx++;
@@ -287,7 +287,7 @@ namespace ZLibrary.Machine
                                 sb.Append(history[histIdx]);
                             }
 
-                            Console.Write(sb.ToString());
+                            _consoles[_curentWindow].Write(sb.ToString());
                             cursor = sb.Length;
                         }
 
@@ -298,16 +298,16 @@ namespace ZLibrary.Machine
                         {
                             cursor--;
                             sb.Remove(cursor, 1);
-                            Console.Write('\x08');
+                            _consoles[_curentWindow].Write('\x08');
                             for (var i = cursor; i < sb.Length; i++)
                             {
-                                Console.Write(sb[i]);
+                                _consoles[_curentWindow].Write(sb[i]);
                             }
 
-                            Console.Write(' ');
+                            _consoles[_curentWindow].Write(' ');
                             for (var i = cursor; i <= sb.Length; i++)
                             {
-                                Console.Write('\x08');
+                                _consoles[_curentWindow].Write('\x08');
                             }
                         }
 
@@ -319,13 +319,13 @@ namespace ZLibrary.Machine
                             sb.Remove(cursor, 1);
                             for (var i = cursor; i < sb.Length; i++)
                             {
-                                Console.Write(sb[i]);
+                                _consoles[_curentWindow].Write(sb[i]);
                             }
 
-                            Console.Write(' ');
+                            _consoles[_curentWindow].Write(' ');
                             for (var i = cursor; i <= sb.Length; i++)
                             {
-                                Console.Write('\x08');
+                                _consoles[_curentWindow].Write('\x08');
                             }
                         }
 
@@ -334,12 +334,12 @@ namespace ZLibrary.Machine
                     case ConsoleKey.Escape:
                         for (var i = cursor; i < sb.Length; i++)
                         {
-                            Console.Write(' ');
+                            _consoles[_curentWindow].Write(' ');
                         }
 
                         for (var i = 0; i < sb.Length; i++)
                         {
-                            Console.Write("\x08 \x08");
+                            _consoles[_curentWindow].Write("\x08 \x08");
                         }
 
                         sb.Length = 0;
@@ -349,16 +349,17 @@ namespace ZLibrary.Machine
                         if (info.KeyChar != '\0')
                         {
                             sb.Insert(cursor, info.KeyChar);
+                            _consoles[_curentWindow].Write(info.KeyChar);
                             Console.Write(info.KeyChar);
                             cursor++;
                             for (var i = cursor; i < sb.Length; i++)
                             {
-                                Console.Write(sb[i]);
+                                _consoles[_curentWindow].Write(sb[i]);
                             }
 
                             for (var i = cursor; i < sb.Length; i++)
                             {
-                                Console.Write('\x08');
+                                _consoles[_curentWindow].Write('\x08');
                             }
                         }
 
@@ -368,7 +369,7 @@ namespace ZLibrary.Machine
 
             if (terminator == 13)
             {
-                Console.WriteLine();
+                _consoles[_curentWindow].Write("\n");
             }
 
             var result = sb.ToString();
@@ -428,7 +429,7 @@ namespace ZLibrary.Machine
 
         public void WriteChar(char ch)
         {
-            _consoles[_cuurentWindow].Write(ch);
+            _consoles[_curentWindow].Write(ch);
             CheckMore();
         }
 
@@ -438,7 +439,7 @@ namespace ZLibrary.Machine
             {
                 WriteChar(ch);
             }
-            _consoles[_cuurentWindow].SendToScreen();
+            _consoles[_curentWindow].SendToScreen();
         }
 
         public void ShowStatus()
@@ -576,7 +577,7 @@ namespace ZLibrary.Machine
 
         private void GetConsoleColors(out ConsoleColor fg, out ConsoleColor bg)
         {
-            if (_cuurentWindow == WindowType.Status)
+            if (_curentWindow == WindowType.Status)
             {
                 bg = bgupper;
                 fg = fgupper;
@@ -637,7 +638,7 @@ namespace ZLibrary.Machine
             {
                 case 0:
                 case 1:
-                    _cuurentWindow = num;
+                    _curentWindow = num;
                     break;
                 default:
                     return;
@@ -649,35 +650,35 @@ namespace ZLibrary.Machine
 
         private void RestoreCursorPos()
         {
-            _consoles[_cuurentWindow].RestoreCursorPosition();
+            _consoles[_curentWindow].RestoreCursorPosition();
         }
 
         private void SaveCursorPos()
         {
-            _consoles[_cuurentWindow].SaveCursorPosition();
+            _consoles[_curentWindow].SaveCursorPosition();
         }
 
         private void MoveCursor(int x, int y)
         {
             // only allowed when upper window is selected
-            if (_cuurentWindow == WindowType.Status)
+            if (_curentWindow == WindowType.Status)
             {
                 if (x < 1)
                 {
                     x = 1;
                 }
-                else if (x > _consoles[_cuurentWindow].Columns + _consoles[_cuurentWindow].Left)
+                else if (x > _consoles[_curentWindow].Columns + _consoles[_curentWindow].Left)
                 {
-                    x = _consoles[_cuurentWindow].Columns + _consoles[_cuurentWindow].Left;
+                    x = _consoles[_curentWindow].Columns + _consoles[_curentWindow].Left;
                 }
 
                 if (y < 1)
                 {
                     y = 1;
                 }
-                else if (y > _consoles[_cuurentWindow].Rows + _consoles[_cuurentWindow].Top)
+                else if (y > _consoles[_curentWindow].Rows + _consoles[_curentWindow].Top)
                 {
-                    y = _consoles[_cuurentWindow].Columns + _consoles[_cuurentWindow].Left;
+                    y = _consoles[_curentWindow].Columns + _consoles[_curentWindow].Left;
                 }
 
                 Console.SetCursorPosition(x - 1, y - 1);
@@ -722,9 +723,9 @@ namespace ZLibrary.Machine
 
         private void PadStatusLine(int spacesToLeave)
         {
-            int x = _consoles[_cuurentWindow].CursorColumn;
-            int y = _consoles[_cuurentWindow].CursorRow;
-            int xWidth = _consoles[_cuurentWindow].Columns;
+            int x = _consoles[_curentWindow].CursorColumn;
+            int y = _consoles[_curentWindow].CursorRow;
+            int xWidth = _consoles[_curentWindow].Columns;
 
             while (x < xWidth - spacesToLeave)
             {
@@ -735,19 +736,19 @@ namespace ZLibrary.Machine
 
         private void CheckMore()
         {
-            if (_cuurentWindow != WindowType.Status && _consoles[_cuurentWindow].CursorRow == 0)
+            if (_curentWindow != WindowType.Status && _consoles[_curentWindow].CursorRow == 0)
             {
                 lineCount++;
-                if (lineCount >= _consoles[_cuurentWindow].Rows - 1)
+                if (lineCount >= _consoles[_curentWindow].Rows - 1)
                 {
-                    _consoles[_cuurentWindow].Write("-- more --");
+                    _consoles[_curentWindow].Write("-- more --");
                     Console.ReadKey(true);
 
                     // erase the prompt
                     // TODO: I don't think our console likes this.
-                    _consoles[_cuurentWindow].Write("\b\b\b\b\b\b\b\b\b\b");
-                    _consoles[_cuurentWindow].Write("          ");
-                    _consoles[_cuurentWindow].Write("\b\b\b\b\b\b\b\b\b\b");
+                    _consoles[_curentWindow].Write("\b\b\b\b\b\b\b\b\b\b");
+                    _consoles[_curentWindow].Write("          ");
+                    _consoles[_curentWindow].Write("\b\b\b\b\b\b\b\b\b\b");
 
                     lineCount = 0;
                 }
