@@ -163,6 +163,14 @@ namespace Cosmos.HAL.BlockDevice
 		public SpecLevel DiscoverDrive()
 		{
 			SelectDrive(0);
+
+			// Read status before sending command. If 0xFF, it's a floating
+			// bus (nothing connected)
+			if (IO.Status.Byte == 0xFF)
+			{
+				return SpecLevel.Null;
+			}
+
 			var xIdentifyStatus = SendCmd(Cmd.Identify, false);
 			// No drive found, go to next
 			if (xIdentifyStatus == Status.None)
