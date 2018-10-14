@@ -89,7 +89,7 @@ namespace ZLibrary.Machine
             OP2Opcodes = new Opcode[0x20]
             {
                 new Opcodes._2OP.ILLEGAL(_machine), // 0x00
-                new Opcodes._2OP.JE(_machine), // 0x01
+                new Opcodes.VAR.JE(_machine), // 0x01
                 new Opcodes.VAR.JL(_machine), // 0x02
                 new Opcodes.VAR.JG(_machine), // 0x03
                 new Opcodes._2OP.DEC_CHK(_machine), // 0x04
@@ -128,7 +128,7 @@ namespace ZLibrary.Machine
             VAROpcodes = new Opcode[0x40]
         {
             new Opcodes.VAR.ILLEGAL(_machine),
-            new Opcodes._2OP.JE(_machine),
+            new Opcodes.VAR.JE(_machine),
             new Opcodes.VAR.JL(_machine),
             new Opcodes.VAR.JG(_machine),
             null,
@@ -209,7 +209,7 @@ namespace ZLibrary.Machine
 
                 ZDebug.Output($"CODE: {pc - 1} -> {opcode.ToHex(2)}");
 
-                ushort xArg0 = 0, xArg1 = 0, xArg2 = 0, xArg3 = 0, xArg4 = 0, xArg5 = 0, xArg6 = 0 , xArg7 = 0;
+                ushort xArg0, xArg1, xArg2, xArg3, xArg4 = 0, xArg5 = 0, xArg6 = 0 , xArg7 = 0;
                 if (opcode < 0x80) // 2OP Opcodes
                 {
                     LoadOperand((byte)((opcode & 0x40) > 0 ? 2 : 1), out xArg0);
@@ -329,13 +329,12 @@ namespace ZLibrary.Machine
         private int LoadAllOperands(byte aSpecifier, out ushort aArg0, out ushort aArg1, out ushort aArg2, out ushort aArg3)
         {
             int xArgsCount = 0;
-            byte xType = 0;
             aArg0 = 0;
             aArg1 = 0;
             aArg2 = 0;
             aArg3 = 0;
 
-            xType = (byte)((aSpecifier >> 6) & 0x03);
+            byte xType = (byte)((aSpecifier >> 6) & 0x03);
             if (xType == 3)
             {
                 return xArgsCount;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ZLibrary.Machine.Opcodes.VAR
+﻿namespace ZLibrary.Machine.Opcodes.VAR
 {
     /// <summary>
     /// Find and store the address of a target within a table.

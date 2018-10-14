@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ZLibrary.Machine.Opcodes._1OP
+﻿namespace ZLibrary.Machine.Opcodes._1OP
 {
     /// <summary>
     /// Decrement a variable.

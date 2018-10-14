@@ -281,7 +281,7 @@ namespace ZLibrary.Machine
                     return;
                 case 5:
                     abbrevMode = 0;
-                    sb.Append(ZText.CharFromZSCII((short)((alphabet << 5) + zchar)));
+                    sb.Append(CharFromZSCII((short)((alphabet << 5) + zchar)));
                     alphabet = 0;
                     return;
             }
@@ -310,11 +310,11 @@ namespace ZLibrary.Machine
             switch (alphabet)
             {
                 case 0:
-                    sb.Append(ZText.alphabet0[zchar]);
+                    sb.Append(alphabet0[zchar]);
                     return;
 
                 case 1:
-                    sb.Append(ZText.alphabet1[zchar]);
+                    sb.Append(alphabet1[zchar]);
                     alphabet = 0;
                     return;
 
@@ -325,7 +325,7 @@ namespace ZLibrary.Machine
                     }
                     else
                     {
-                        sb.Append(ZText.alphabet2[zchar]);
+                        sb.Append(alphabet2[zchar]);
                     }
 
                     alphabet = 0;
@@ -333,7 +333,7 @@ namespace ZLibrary.Machine
             }
         }
 
-        public static string GetAbbreviation(int num)
+        private static string GetAbbreviation(int num)
         {
             ushort abbreviationsOffset = (ushort)(_machine.Story.Header.AbbreviationsOffset + num * 2);
             _machine.Memory.GetWord(abbreviationsOffset, out ushort address);

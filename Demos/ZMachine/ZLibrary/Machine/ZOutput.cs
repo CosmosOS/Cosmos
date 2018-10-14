@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace ZLibrary.Machine
 {
     public class ZOutput : IZOutput

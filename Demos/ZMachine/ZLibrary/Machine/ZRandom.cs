@@ -1,5 +1,3 @@
-using ZLibrary.Machine.Opcodes;
-
 namespace ZLibrary.Machine
 {
     public static class ZRandom

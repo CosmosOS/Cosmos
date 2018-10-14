@@ -1,5 +1,4 @@
-﻿#define COSMOSDEBUG
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace ZLibrary
 {

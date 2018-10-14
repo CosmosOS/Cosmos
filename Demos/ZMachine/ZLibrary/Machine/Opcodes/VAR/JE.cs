@@ -1,4 +1,4 @@
-﻿namespace ZLibrary.Machine.Opcodes._2OP
+﻿namespace ZLibrary.Machine.Opcodes.VAR
 {
     /// <summary>
     /// Jump if the first value is equal to the second

@@ -45,10 +45,9 @@ namespace ZLibrary.Machine.Opcodes
         /// Note:
         /// The caller may provide more or less arguments than the routine has.
         /// </summary>
-        /// <param name="routine"></param>
-        /// <param name="argc"></param>
-        /// <param name="args_offset"></param>
-        /// <param name="callType"></param>
+        /// <param name="aRoutine"></param>
+        /// <param name="aArgs"></param>
+        /// <param name="aCallType"></param>
         protected void Call(ushort aRoutine, List<ushort> aArgs, int aCallType)
         {
             ZDebug.Output($"PC = {Machine.Memory.PC}");

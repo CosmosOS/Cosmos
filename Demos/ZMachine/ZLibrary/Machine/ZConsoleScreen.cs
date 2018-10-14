@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using ZLibrary.Constants;
-using ZLibrary.Story;
 
 namespace ZLibrary.Machine
 {
@@ -724,7 +723,6 @@ namespace ZLibrary.Machine
         private void PadStatusLine(int spacesToLeave)
         {
             int x = _consoles[_curentWindow].CursorColumn;
-            int y = _consoles[_curentWindow].CursorRow;
             int xWidth = _consoles[_curentWindow].Columns;
 
             while (x < xWidth - spacesToLeave)

@@ -11,7 +11,7 @@
 
         public override void Execute(ushort aCharBufferAddress, ushort aTokenBufferAddress, ushort aTimeoutSeconds, ushort aTimeoutCallback, ushort aArg4, ushort aArg5, ushort aArg6, ushort aArg7, ushort aArgCount)
         {
-            ushort terminator = Machine.Input.Read(aCharBufferAddress, aTokenBufferAddress, aTimeoutSeconds, aTimeoutCallback);
+            Machine.Input.Read(aCharBufferAddress, aTokenBufferAddress, aTimeoutSeconds, aTimeoutCallback);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ZLibrary.Machine.Opcodes.VAR
+﻿namespace ZLibrary.Machine.Opcodes.VAR
 {
     /// <summary>
     /// Copy a table or fill it with zeroes.
