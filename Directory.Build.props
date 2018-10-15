@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <LangVersion>Latest</LangVersion>
+		<NoWarn>CA1051;CA1707;CA1711;CA1801;$(NoWarn)</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Cosmos.System</RootNamespace>
+        <NoWarn>CA1708;$(NoWarn)</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp2.0</TargetFramework>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>CA2242;$(NoWarn)</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
