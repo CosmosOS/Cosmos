@@ -5,6 +5,10 @@
 		<NoWarn>CA1051;CA1707;CA1711;CA1801;$(NoWarn)</NoWarn>
     </PropertyGroup>
 
+	<PropertyGroup>
+		<SignAssembly>True</SignAssembly>
+	</PropertyGroup>
+
     <PropertyGroup>
         <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
         <IL2CPURepoRoot>$(RepoRoot)..\IL2CPU\</IL2CPURepoRoot>

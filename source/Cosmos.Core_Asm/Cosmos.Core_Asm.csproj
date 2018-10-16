@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,6 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <UpToDateCheckInput Include="FodyWeavers.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Fody" Version="3.2.9" PrivateAssets="All" />
+        <PackageReference Include="InlineIL.Fody" Version="1.0.0" PrivateAssets="All" />
         <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
     </ItemGroup>
 
