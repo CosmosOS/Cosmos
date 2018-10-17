@@ -1,7 +1,0 @@
-; 4-column space indentation
-
-[IL2CPU.cs]
-indent_size = 2
-
-[NAsm.cs]
-indent_size = 2

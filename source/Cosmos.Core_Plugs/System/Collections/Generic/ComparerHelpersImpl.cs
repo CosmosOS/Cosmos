@@ -31,19 +31,25 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return new StringEqualityComparer();
             }
 
+            if (aType == typeof(char))
+            {
+                return new CharEqualityComparer();
+            }
+
             if (aType == typeof(int))
             {
                 return new Int32EqualityComparer();
+            }
+
+            if (aType == typeof(byte))
+            {
+                return new ByteEqualityComparer();
             }
 
             // TODO: Nullable<>
 
             // TODO: Enum (Comparer is special to avoid boxing)
 
-            //else
-            //{
-            //    xResult = new ObjectComparer<object>();
-            //}
             mDebugger.Send($"No EqualityComparer for type {aType}");
             return null;
         }
@@ -51,48 +57,60 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
 
     public class StringComparer : Comparer<string>
     {
-        private readonly Debugger mDebugger = new Debugger("Core", "String Comparer");
-
         public override int Compare(string x, string y)
         {
-            mDebugger.Send("StringComparer.Compare");
-
             throw new NotImplementedException();
         }
     }
 
     public class StringEqualityComparer : EqualityComparer<string>
     {
-        private readonly Debugger mDebugger = new Debugger("Core", "String Equality Comparer");
-
         public override bool Equals(string x, string y)
         {
-            mDebugger.Send("StringEqualityComparer.Equals");
             return String.Equals(x, y);
         }
 
         public override int GetHashCode(string obj)
         {
-            mDebugger.Send("StringEqualityComparer.GetHashCode");
-
             return obj.GetHashCode();
+        }
+    }
+
+    public class CharEqualityComparer : EqualityComparer<char>
+    {
+        public override bool Equals(char x, char y)
+        {
+            return x == y;
+        }
+
+        public override int GetHashCode(char val)
+        {
+            return val.GetHashCode();
+        }
+    }
+
+    public class ByteEqualityComparer : EqualityComparer<byte>
+    {
+        public override bool Equals(byte x, byte y)
+        {
+            return x == y;
+        }
+
+        public override int GetHashCode(byte val)
+        {
+            return val.GetHashCode();
         }
     }
 
     public class Int32EqualityComparer : EqualityComparer<int>
     {
-        private readonly Debugger mDebugger = new Debugger("Core", "Int32 Equality Comparer");
-
         public override bool Equals(int x, int y)
         {
-            mDebugger.Send("Int32EqualityComparer.Equals");
             return x == y;
         }
 
         public override int GetHashCode(int val)
         {
-            mDebugger.Send("Int32EqualityComparer.GetHashCode");
-
             return val.GetHashCode();
         }
     }

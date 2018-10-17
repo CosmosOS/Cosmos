@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <SignAssembly>False</SignAssembly>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Update="**\*.xaml.cs" DependentUpon="%(Filename)" />
+        <EmbeddedResource Include="**\*.xaml" SubType="Designer" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="0.6.1" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.6.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Cosmos.TestRunner.Full\Cosmos.TestRunner.Full.csproj" />
+    </ItemGroup>
+
+</Project>

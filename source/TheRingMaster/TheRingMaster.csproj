@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   
     <PropertyGroup>
         <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -11,7 +11,6 @@
   
     <ItemGroup>
         <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
-        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
     </ItemGroup>
 
 </Project>

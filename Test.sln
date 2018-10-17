@@ -16,8 +16,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Assembler", "..\XSha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{F74A4B2B-02DA-455A-89FB-803A442B5B2C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.MSBuild", "source\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj", "{DEA925C4-CE97-47ED-82F3-05587DC8A153}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU.API", "..\IL2CPU\source\IL2CPU.API\IL2CPU.API.csproj", "{34AEEB7C-FD5D-4B15-A830-B429681844BD}"
@@ -152,7 +150,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.Fat2", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "Tests\Kernels\ConsoleTest\ConsoleTest.csproj", "{0DF97CAC-220B-4DAD-B397-42E394255763}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.UI.Avalonia", "Tests\Cosmos.TestRunner.UI.Avalonia\Cosmos.TestRunner.UI.Avalonia.csproj", "{2992AA07-E126-4EE0-B31C-D0B2ADE3393A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.UI", "Tests\Cosmos.TestRunner.UI\Cosmos.TestRunner.UI.csproj", "{2992AA07-E126-4EE0-B31C-D0B2ADE3393A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.HyperVServer", "source\Cosmos.Debug.HyperVServer\Cosmos.Debug.HyperVServer.csproj", "{3421E19D-16C7-4593-9F6B-291ECB86A3EB}"
 EndProject
@@ -171,6 +169,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System.Tests", "Tests\Cosmos.System.Tests\Cosmos.System.Tests.csproj", "{970C5E07-5D09-4882-949C-A8E876B22732}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.DiskManager", "Tests\Kernels\Cosmos.Kernel.Tests.DiskManager\Cosmos.Kernel.Tests.DiskManager.csproj", "{BB6A5306-4C7A-4973-A48E-9FE3E683EAEC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BECB26F1-8FE4-4C62-B74A-F2292B26CA70}"
+	ProjectSection(SolutionItems) = preProject
+		Build\Cosmos.ruleset = Build\Cosmos.ruleset
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -196,14 +199,6 @@ Global
 		{F74A4B2B-02DA-455A-89FB-803A442B5B2C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F74A4B2B-02DA-455A-89FB-803A442B5B2C}.Release|x86.ActiveCfg = Release|Any CPU
 		{F74A4B2B-02DA-455A-89FB-803A442B5B2C}.Release|x86.Build.0 = Release|Any CPU
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153}.Debug|x86.Build.0 = Debug|Any CPU
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153}.Release|x86.ActiveCfg = Release|Any CPU
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153}.Release|x86.Build.0 = Release|Any CPU
 		{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -676,7 +671,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0CDB3F6E-7971-426B-81F8-38B966A54C2B} = {E9CD521E-C386-466D-B5F7-A5EB19A61625}
 		{F74A4B2B-02DA-455A-89FB-803A442B5B2C} = {DAEF99B5-22F0-4885-B45B-9B600B857E1C}
-		{DEA925C4-CE97-47ED-82F3-05587DC8A153} = {DAEF99B5-22F0-4885-B45B-9B600B857E1C}
 		{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767} = {C286932C-3F6D-47F0-BEEF-26843D1BB11B}
 		{34AEEB7C-FD5D-4B15-A830-B429681844BD} = {C286932C-3F6D-47F0-BEEF-26843D1BB11B}
 		{A97A1EF7-AEEC-43F3-8CB0-5C7269DC7E85} = {F7C6CA93-1D02-443C-9C8B-A1988DE0306B}

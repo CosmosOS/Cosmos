@@ -1,4 +1,0 @@
-ToDos for Cosmos kernel:
-
- - Get FAT working to test a Zork game with Frotz
- - Remove un-needed code (sound, graphics, etc)

@@ -9,9 +9,7 @@ namespace Cosmos.Build.Common
     {
         public static readonly string UserKit;
         public static readonly string Build;
-        public static readonly string Vsip;
         public static readonly string Tools;
-        public static readonly string Kernel;
         public static readonly string GdbClientExe;
         //
         public static readonly string DevKit = null;
@@ -33,7 +31,7 @@ namespace Cosmos.Build.Common
 
         static CosmosPaths()
         {
-            using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
             {
                 using (var xReg = baseKey.OpenSubKey(@"Software\Cosmos", false))
                 {
@@ -49,9 +47,7 @@ namespace Cosmos.Build.Common
                 }
             }
             Build = CheckPath(UserKit, @"Build");
-            Vsip = CheckPath(UserKit, @"Build\VSIP");
             Tools = CheckPath(UserKit, @"Build\Tools");
-            Kernel = CheckPath(UserKit, @"Kernel");
             GdbClientExe = CheckPath(UserKit, @"Build\VSIP\Cosmos.Debug.GDB.exe");
             DebugStubSrc = CheckPath(UserKit, @"XSharp\DebugStub");
 
