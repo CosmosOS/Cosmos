@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Text;
-using Sys = System;
 
 namespace Cosmos.System.Network.IPv4
 {
     public class UDPPacket : IPPacket
     {
-        protected UInt16 sourcePort;
-        protected UInt16 destPort;
-        protected UInt16 udpLen;
-        protected UInt16 udpCRC;
-
-        public static string DHCP;
+        private ushort udpCRC;
 
         internal static void UDPHandler(byte[] packetData)
         {
@@ -81,7 +75,7 @@ namespace Cosmos.System.Network.IPv4
 
         public static bool CheckCRC(UDPPacket packet)
         {
-            byte[] header = MakeHeader(packet.sourceIP.address, packet.destIP.address, packet.udpLen, packet.sourcePort, packet.destPort, packet.UDP_Data);
+            byte[] header = MakeHeader(packet.SourceIP.address, packet.DestinationIP.address, packet.UDP_Length, packet.SourcePort, packet.DestinationPort, packet.UDP_Data);
             UInt16 calculatedcrc = Check(header, 0, header.Length);
             //NetworkStack.debugger.Send("Calculated: 0x" + Utils.Conversion.DecToHex(calculatedcrc));
             //NetworkStack.debugger.Send("Received:  0x" + Utils.Conversion.DecToHex(packet.udpCRC));
@@ -95,17 +89,17 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
-        protected static UInt16 Check(byte[] buffer, UInt16 offset, int length)
+        protected static ushort Check(byte[] buffer, ushort offset, int length)
         {
-            UInt32 crc = 0;
+            uint crc = 0;
 
-            for (UInt16 w = offset; w < offset + length; w += 2)
+            for (ushort w = offset; w < offset + length; w += 2)
             {
-                crc += (UInt16)((buffer[w] << 8) | buffer[w + 1]);
+                crc += (ushort)((buffer[w] << 8) | buffer[w + 1]);
             }
 
             crc = (~((crc & 0xFFFF) + (crc >> 16)));
-            return (UInt16)crc;
+            return (ushort)crc;
 
         }
 
@@ -118,34 +112,35 @@ namespace Cosmos.System.Network.IPv4
         }
 
         internal UDPPacket()
-            : base()
-        { }
+        {
+        }
 
         public UDPPacket(byte[] rawData)
             : base(rawData)
-        { }
-
-        public UDPPacket(Address source, Address dest, UInt16 srcPort, UInt16 destPort, byte[] data)
-            : base((UInt16)(data.Length + 8), 17, source, dest, 0x00)
         {
-            mRawData[this.dataOffset + 0] = (byte)((srcPort >> 8) & 0xFF);
-            mRawData[this.dataOffset + 1] = (byte)((srcPort >> 0) & 0xFF);
-            mRawData[this.dataOffset + 2] = (byte)((destPort >> 8) & 0xFF);
-            mRawData[this.dataOffset + 3] = (byte)((destPort >> 0) & 0xFF);
-            udpLen = (UInt16)(data.Length + 8);
+        }
 
-            mRawData[this.dataOffset + 4] = (byte)((udpLen >> 8) & 0xFF);
-            mRawData[this.dataOffset + 5] = (byte)((udpLen >> 0) & 0xFF);
+        public UDPPacket(Address source, Address dest, ushort srcPort, ushort destPort, byte[] data)
+            : base((ushort)(data.Length + 8), 17, source, dest, 0x00)
+        {
+            RawData[DataOffset + 0] = (byte)((srcPort >> 8) & 0xFF);
+            RawData[DataOffset + 1] = (byte)((srcPort >> 0) & 0xFF);
+            RawData[DataOffset + 2] = (byte)((destPort >> 8) & 0xFF);
+            RawData[DataOffset + 3] = (byte)((destPort >> 0) & 0xFF);
+            UDP_Length = (ushort)(data.Length + 8);
 
-            byte[] header = MakeHeader(source.address, dest.address, udpLen, srcPort, destPort, data);
+            RawData[DataOffset + 4] = (byte)((UDP_Length >> 8) & 0xFF);
+            RawData[DataOffset + 5] = (byte)((UDP_Length >> 0) & 0xFF);
+
+            byte[] header = MakeHeader(source.address, dest.address, UDP_Length, srcPort, destPort, data);
             UInt16 calculatedcrc = Check(header, 0, header.Length);
 
-            mRawData[this.dataOffset + 6] = (byte)((calculatedcrc >> 8) & 0xFF);
-            mRawData[this.dataOffset + 7] = (byte)((calculatedcrc >> 0) & 0xFF);
+            RawData[DataOffset + 6] = (byte)((calculatedcrc >> 8) & 0xFF);
+            RawData[DataOffset + 7] = (byte)((calculatedcrc >> 0) & 0xFF);
 
             for (int b = 0; b < data.Length; b++)
             {
-                mRawData[this.dataOffset + 8 + b] = data[b];
+                RawData[DataOffset + 8 + b] = data[b];
             }
 
             initFields();
@@ -154,37 +149,26 @@ namespace Cosmos.System.Network.IPv4
         protected override void initFields()
         {
             base.initFields();
-            sourcePort = (UInt16)((mRawData[this.dataOffset] << 8) | mRawData[this.dataOffset + 1]);
-            destPort = (UInt16)((mRawData[this.dataOffset + 2] << 8) | mRawData[this.dataOffset + 3]);
-            udpLen = (UInt16)((mRawData[this.dataOffset + 4] << 8) | mRawData[this.dataOffset + 5]);
-            udpCRC = (UInt16)((mRawData[this.dataOffset + 6] << 8) | mRawData[this.dataOffset + 7]);
+            SourcePort = (ushort)((RawData[DataOffset] << 8) | RawData[DataOffset + 1]);
+            DestinationPort = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
+            UDP_Length = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
+            udpCRC = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
         }
 
-        internal UInt16 DestinationPort
-        {
-            get { return this.destPort; }
-        }
-        internal UInt16 SourcePort
-        {
-            get { return this.sourcePort; }
-        }
-        internal UInt16 UDP_Length
-        {
-            get { return this.udpLen; }
-        }
-        internal UInt16 UDP_DataLength
-        {
-            get { return (UInt16)(this.udpLen - 8); }
-        }
+        public ushort DestinationPort { get; private set; }
+        public ushort SourcePort { get; private set; }
+        public ushort UDP_Length { get; private set; }
+        public ushort UDP_DataLength => (ushort)(UDP_Length - 8);
+
         internal byte[] UDP_Data
         {
             get
             {
-                byte[] data = new byte[this.udpLen - 8];
+                byte[] data = new byte[UDP_DataLength];
 
                 for (int b = 0; b < data.Length; b++)
                 {
-                    data[b] = this.mRawData[this.dataOffset + 8 + b];
+                    data[b] = RawData[DataOffset + 8 + b];
                 }
 
                 return data;
@@ -193,7 +177,8 @@ namespace Cosmos.System.Network.IPv4
 
         public override string ToString()
         {
-            return "UDP Packet Src=" + sourceIP + ":" + sourcePort + ", Dest=" + destIP + ":" + destPort + ", DataLen=" + UDP_DataLength;
+            return "UDP Packet Src=" + SourceIP + ":" + SourcePort + "," +
+                   "Dest=" + DestinationIP + ":" + DestinationPort + ", DataLen=" + UDP_DataLength;
         }
     }
 }
