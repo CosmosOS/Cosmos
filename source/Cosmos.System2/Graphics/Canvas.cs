@@ -7,56 +7,21 @@ namespace Cosmos.System.Graphics
 {
     public abstract class Canvas
     {
-        protected Mode mode;
-        protected List<Mode> availableModes;
-        static protected Mode defaultGraphicMode;
-
         protected Canvas(Mode mode)
         {
             //Global.mDebugger.SendInternal($"Creating a new Canvas with Mode ${mode}");
-
-            availableModes = getAvailableModes();
-            defaultGraphicMode = getDefaultGraphicMode();
-            this.mode = mode;
+            Mode = mode;
         }
 
-        protected Canvas()
-        {
-            Global.mDebugger.SendInternal($"Creating a new Canvas with default graphic Mode");
+        public abstract IReadOnlyList<Mode> AvailableModes { get; }
 
-            availableModes = getAvailableModes();
-            defaultGraphicMode = getDefaultGraphicMode();
-            this.mode = defaultGraphicMode;
-        }
+        public abstract Mode DefaultGraphicMode { get; }
 
-        abstract public List<Mode> getAvailableModes();
-
-        abstract protected Mode getDefaultGraphicMode();
-
-        public List<Mode> AvailableModes
-        {
-            get
-            {
-                return availableModes;
-            }
-        }
-
-        public Mode DefaultGraphicMode
-        {
-            get
-            {
-                return defaultGraphicMode;
-            }
-        }
-
-        public abstract Mode Mode
-        {
-            get;
-            set;
-        }
-
-        /* Clear all the Canvas with the Black color */
-
+        public abstract Mode Mode { get; set; }
+        
+        /// <summary>
+        /// Clear all the Canvas with the Black color.
+        /// </summary>
         public void Clear()
         {
             Clear(Color.Black);
@@ -75,9 +40,9 @@ namespace Cosmos.System.Graphics
 
             Pen pen = new Pen(color);
 
-            for (int x = 0; x < mode.Rows; x++)
+            for (int x = 0; x < Mode.Rows; x++)
             {
-                for (int y = 0; y < mode.Columns; y++)
+                for (int y = 0; y < Mode.Columns; y++)
                 {
                     DrawPoint(pen, x, y);
                 }
@@ -436,7 +401,7 @@ namespace Cosmos.System.Graphics
 
             */
 
-            foreach (var elem in availableModes)
+            foreach (var elem in AvailableModes)
             {
                 if (elem == mode)
                 {
