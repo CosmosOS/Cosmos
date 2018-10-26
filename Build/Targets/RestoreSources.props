@@ -9,7 +9,8 @@
             https://dotnet.myget.org/F/roslyn-tools/api/v3/index.json
         </RestoreSources>
 
-        <RestoreSources Condition="Exists('$(_CosmosLocalPackageFeed)')">$(RestoreSources);$(_CosmosLocalPackageFeed)</RestoreSources>
+		<RestoreSources Condition="Exists($(DefaultPackageOutputPath)">$(RestoreSources);$(DefaultPackageOutputPath)</PackageOutputPath>
+        <RestoreSources Condition="Exists($(_CosmosLocalPackageFeed))">$(RestoreSources);$(_CosmosLocalPackageFeed)</RestoreSources>
     </PropertyGroup>
 
 </Project>
