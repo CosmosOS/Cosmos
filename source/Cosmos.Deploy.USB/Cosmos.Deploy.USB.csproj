@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+        <PackageReference Include="Cosmos.Build.Common" />
     </ItemGroup>
 
 </Project>

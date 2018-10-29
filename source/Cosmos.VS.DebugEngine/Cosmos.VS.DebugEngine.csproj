@@ -12,7 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" />
@@ -25,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Cosmos.Build.Common" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Debugger.Interop.15.0" Version="15.7.27703" />
         <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.7.27703" />

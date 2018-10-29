@@ -1,0 +1,25 @@
+<Project>
+
+	<ItemGroup>
+		<CommonPackage Include="Cosmos.Build.Common" ProjectPath="source\Cosmos.Build.Common1\Cosmos.Build.Common.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalPackage Include="@(CommonPackage)" Version="$(CommonVersion)" RepoRoot="$(CommonRepoRoot)" />
+	</ItemGroup>
+
+    <ItemGroup>
+        <_InternalPackageToExclude Include="@(InternalPackage)" Exclude="@(PackageReference)" />
+        <_InternalPackage Include="@(InternalPackage)" Exclude="@(_InternalPackageToExclude)" />
+        <_InternalPackage Update="@(_InternalPackage)" ProjectPath="$([System.IO.Path]::Combine(%(RepoRoot), %(ProjectPath)))">
+            <ProjectExists Condition="Exists(%(ProjectPath))">True</ProjectExists>
+        </_InternalPackage>
+        <_InternalPackageToReplace Include="@(_InternalPackage->WithMetadataValue('ProjectExists', 'True'))" />
+        <!-- next 3 lines: hack to move metadata from _InternalPackage to PackageReference -->
+        <_InternalPackageToKeep Include="@(_InternalPackage)" Exclude="@(_InternalPackageToReplace)" />
+        <PackageReference Remove="@(_InternalPackage)" />
+        <PackageReference Include="@(_InternalPackageToKeep)" />
+        <ProjectReference Include="@(_InternalPackageToReplace->'%(ProjectPath)')" />
+    </ItemGroup>
+
+</Project>
