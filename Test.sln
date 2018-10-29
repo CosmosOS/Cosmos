@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1A46752C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Assembler", "..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj", "{0CDB3F6E-7971-426B-81F8-38B966A54C2B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{F74A4B2B-02DA-455A-89FB-803A442B5B2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "..\Common\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{F74A4B2B-02DA-455A-89FB-803A442B5B2C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.IL2CPU", "..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{4F903492-CCA6-4FD9-A1B6-5E4CC0CE7767}"
 EndProject

@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{F7C6CA93
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Assembler", "..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj", "{0CDB3F6E-7971-426B-81F8-38B966A54C2B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{F74A4B2B-02DA-455A-89FB-803A442B5B2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "..\Common\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{F74A4B2B-02DA-455A-89FB-803A442B5B2C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Common", "source\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj", "{A97A1EF7-AEEC-43F3-8CB0-5C7269DC7E85}"
 EndProject

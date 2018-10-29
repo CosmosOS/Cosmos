@@ -1,7 +1,7 @@
 <Project>
 
 	<ItemGroup>
-		<CommonPackage Include="Cosmos.Build.Common" ProjectPath="source\Cosmos.Build.Common1\Cosmos.Build.Common.csproj" />
+		<CommonPackage Include="Cosmos.Build.Common" ProjectPath="source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
