@@ -10,7 +10,7 @@
 
     <PropertyGroup>
         <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
-        <ExtensionInstallationFolder>Cosmos\ProjectSystem\</ExtensionInstallationFolder>
+        <ExtensionInstallationFolder>Cosmos\ProjectSystem</ExtensionInstallationFolder>
     </PropertyGroup>
 
     <ItemGroup>
