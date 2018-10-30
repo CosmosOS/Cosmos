@@ -50,7 +50,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU.API", "..\IL2CPU\sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel.Plugs.Asm", "source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj", "{6C770E55-8EED-444C-AD4E-017E823E5BA3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "source\Cosmos.Core.DebugStub\Cosmos.Core.DebugStub.csproj", "{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "..\IL2CPU\source\Cosmos.Core.DebugStub\Cosmos.Core.DebugStub.csproj", "{9BDA0399-0CFD-42E8-8CF4-3DDE16122A82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.CPU.x86", "source\Kernel-X86\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj", "{FC65D765-990D-4F00-B240-8DD17FA91EA9}"
 EndProject
