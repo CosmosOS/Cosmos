@@ -12,7 +12,7 @@ namespace Cosmos.Build.Builder.Dependencies
 {
     internal class ReposDependency : IDependency
     {
-        public string Name => "Repos: IL2CPU";
+        public string Name => "Repos: IL2CPU, XSharp and Common";
 
         private readonly string _cosmosDir;
         private readonly IEnumerable<Repo> _repos;
@@ -25,7 +25,13 @@ namespace Cosmos.Build.Builder.Dependencies
             {
                 new Repo(
                     Path.GetFullPath(Path.Combine(cosmosDir, "..", "IL2CPU")),
-                    "https://github.com/CosmosOS/IL2CPU")
+                    "https://github.com/CosmosOS/IL2CPU"),
+                new Repo(
+                    Path.GetFullPath(Path.Combine(cosmosDir, "..", "XSharp")),
+                    "https://github.com/CosmosOS/XSharp"),
+                new Repo(
+                    Path.GetFullPath(Path.Combine(cosmosDir, "..", "Common")),
+                    "https://github.com/CosmosOS/Common")
             };
         }
 
