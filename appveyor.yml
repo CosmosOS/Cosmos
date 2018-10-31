@@ -31,7 +31,7 @@ build_script:
     xcopy /Y "Build\syslinux\*.*" "c:\CosmosRun\Build\ISO\"
     xcopy /Y /S "Build\VMware\*" "c:\CosmosRun\Build\VMware\"
     xcopy /Y /S "Build\Tools" "c:\CosmosRun\Build\Tools\"
-    xcopy /Y "..\Common\source\Cosmos.Core.DebugStub\*.xs" "c:\CosmosRun\XSharp\DebugStub\"
+    xcopy /Y "..\IL2CPU\source\Cosmos.Core.DebugStub\*.xs" "c:\CosmosRun\XSharp\DebugStub\"
     xcopy /Y /S "Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
