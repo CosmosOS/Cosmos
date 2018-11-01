@@ -2,21 +2,21 @@
 
     <PropertyGroup>
         <LangVersion>Latest</LangVersion>
-		<NoWarn>CA1051;CA1707;CA1711;CA1801;$(NoWarn)</NoWarn>
+        <NoWarn>CA1051;CA1707;CA1711;CA1801;$(NoWarn)</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
         <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
-		<CommonRepoRoot>$(RepoRoot)..\Common\</CommonRepoRoot>
+        <CommonRepoRoot>$(RepoRoot)..\Common\</CommonRepoRoot>
         <IL2CPURepoRoot>$(RepoRoot)..\IL2CPU\</IL2CPURepoRoot>
         <XSharpRepoRoot>$(RepoRoot)..\XSharp\</XSharpRepoRoot>
     </PropertyGroup>
 
-	<PropertyGroup>
-		<CommonVersion>0.1.0-build5</CommonVersion>
-		<IL2CPUVersion>0.1.0-build328</IL2CPUVersion>
-		<XSharpVersion>0.1.0-build521</XSharpVersion>
-	</PropertyGroup>
+    <PropertyGroup>
+        <CommonVersion>0.1.0-build5</CommonVersion>
+        <IL2CPUVersion>0.1.0-build328</IL2CPUVersion>
+        <XSharpVersion>0.1.0-build534</XSharpVersion>
+    </PropertyGroup>
 
     <Import Project="build\Targets\Import.props" />
 

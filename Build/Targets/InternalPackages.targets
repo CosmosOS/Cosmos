@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <XSharpPackage Include="VSPropertyPages" ProjectPath="source\VSPropertyPages\VSPropertyPages.csproj" />
         <XSharpPackage Include="XSharp" ProjectPath="source\XSharp\XSharp.csproj" />
         <XSharpPackage Include="XSharp.Assembler" ProjectPath="source\XSharp.Assembler\XSharp.Assembler.csproj" />
     </ItemGroup>
