@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -14,12 +14,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference PrivateAssets="All" Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
-        <ProjectReference PrivateAssets="All" Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
-        <ProjectReference PrivateAssets="All" Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
-        <ProjectReference PrivateAssets="All" Include="$(XSharpRepoRoot)source\XSharp\XSharp.csproj" />
-        <ProjectReference PrivateAssets="All" Include="$(XSharpRepoRoot)source\XSharp.Assembler\XSharp.Assembler.csproj" />
+        <ProjectReference Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" PrivateAssets="All" />
+        <ProjectReference Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" PrivateAssets="All" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

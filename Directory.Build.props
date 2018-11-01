@@ -14,6 +14,8 @@
 
 	<PropertyGroup>
 		<CommonVersion>0.1.0-build5</CommonVersion>
+		<IL2CPUVersion>0.1.0-build328</IL2CPUVersion>
+		<XSharpVersion>0.1.0-build521</XSharpVersion>
 	</PropertyGroup>
 
     <Import Project="build\Targets\Import.props" />

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -13,9 +13,6 @@
         <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
         <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
-        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
-        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp.Assembler\XSharp.Assembler.csproj" />
-        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp\XSharp.csproj" />
     </ItemGroup>
 
 </Project>

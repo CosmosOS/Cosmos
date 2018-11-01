@@ -1,12 +1,30 @@
 <Project>
 
-	<ItemGroup>
-		<CommonPackage Include="Cosmos.Build.Common" ProjectPath="source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <CommonPackage Include="Cosmos.Build.Common" ProjectPath="source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<InternalPackage Include="@(CommonPackage)" Version="$(CommonVersion)" RepoRoot="$(CommonRepoRoot)" />
-	</ItemGroup>
+    <ItemGroup>
+        <InternalPackage Include="@(CommonPackage)" Version="$(CommonVersion)" RepoRoot="$(CommonRepoRoot)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <IL2CPUPackage Include="IL2CPU.API" ProjectPath="source\IL2CPU.API\IL2CPU.API.csproj" />
+        <IL2CPUPackage Include="IL2CPU.Debug.Symbols" ProjectPath="source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalPackage Include="@(IL2CPUPackage)" Version="$(IL2CPUVersion)" RepoRoot="$(IL2CPURepoRoot)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <XSharpPackage Include="XSharp" ProjectPath="source\XSharp\XSharp.csproj" />
+        <XSharpPackage Include="XSharp.Assembler" ProjectPath="source\XSharp.Assembler\XSharp.Assembler.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalPackage Include="@(XSharpPackage)" Version="$(XSharpVersion)" RepoRoot="$(XSharpRepoRoot)" />
+    </ItemGroup>
 
     <ItemGroup>
         <_InternalPackageToExclude Include="@(InternalPackage)" Exclude="@(PackageReference)" />
