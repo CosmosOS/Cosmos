@@ -2,6 +2,7 @@
 
     <ItemGroup>
         <ProjectsToExclude Include="..\source\Archive\**" />
+        <ProjectsToExclude Include="..\source\Tools\**" />
         <ProjectsToExclude Include="..\source\**\*Templates*\**" />
         <ProjectsToExclude Include="..\source\Kernel-TapRoot\Demo\**" />
         <ProjectsToExclude Include="..\source\Kernel-X86\50-Application\**" />
