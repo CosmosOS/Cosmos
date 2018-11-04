@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <CommonVersion>0.1.0-build7</CommonVersion>
+        <CommonVersion>0.1.0-build8</CommonVersion>
         <IL2CPUVersion>0.1.0-build328</IL2CPUVersion>
         <XSharpVersion>0.1.0-build534</XSharpVersion>
     </PropertyGroup>
