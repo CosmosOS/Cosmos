@@ -97,7 +97,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Tasks", "source\Cosmos.Build.Tasks\Cosmos.Build.Tasks.csproj", "{0BA0EC69-F124-44C1-823D-C97FE3AEC59E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VSPropertyPages", "..\XSharp\source\VSPropertyPages\VSPropertyPages.csproj", "{3487890D-43F4-4810-9587-1F02F646915D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VSPropertyPages", "..\Common\source\VSPropertyPages\VSPropertyPages.csproj", "{3487890D-43F4-4810-9587-1F02F646915D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.HyperVServer", "source\Cosmos.Debug.HyperVServer\Cosmos.Debug.HyperVServer.csproj", "{9413B5A0-1120-43AD-8784-8A3726C1898C}"
 EndProject
