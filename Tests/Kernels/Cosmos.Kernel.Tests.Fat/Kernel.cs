@@ -43,7 +43,9 @@ namespace Cosmos.Kernel.Tests.Fat
                 StreamWriterStreamReaderTest.Execute(mDebugger);
                 BinaryWriterBinaryReaderTest.Execute(mDebugger);
                 FileInfoTest.Execute(mDebugger);
-
+                DriveInfoTest.Execute(mDebugger);
+                FileTest.Execute(mDebugger);
+                
                 TestController.Completed();
             }
             catch (Exception e)

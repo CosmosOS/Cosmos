@@ -65,10 +65,11 @@ namespace Cosmos.Compiler.Tests.Bcl
 
                 // System.Collections.Generic
                 ListTest.Execute();
-                QueueTest.Execute();             
+                QueueTest.Execute();       
                 DictionaryTest.Execute();
-  
+
                 // System.Text
+                StringBuilderTest.Execute();
                 EncodingTest.Execute();
 
                 TestController.Completed();
