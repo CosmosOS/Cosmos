@@ -1,4 +1,8 @@
-DS to VS:
+# Debug Commands
+
+## DS to VS
+
+```cs
 Noop = 0;
 TracePoint = 1;
 Message = 2;
@@ -17,8 +21,11 @@ Frame = 11;
 Stack = 12;
 Pong = 13;
 BreakPointAsm = 14;
+```
 
-VS to DS:
+## VS to DS
+
+```cs
 Noop = 0;
 
 TraceOff = 1; // Dont think currently used
@@ -49,6 +56,7 @@ SetAsmBreak = 16;
 Ping = 17;
     // Make sure this is always the last entry. Used by DebugStub to verify commands.
 Max = 18;
+```
 
-Debug channel:
+## Debug channel
 We support channels, which are prefixed with anything prefixed with 192 and up. 192 is used for a debug view.
