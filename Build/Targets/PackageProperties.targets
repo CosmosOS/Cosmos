@@ -1,6 +1,7 @@
 <Project>
 
     <PropertyGroup>
+        <PackageVersion Condition="'$(PackageVersionSuffix)' != ''">$(PackageVersion)$(PackageVersionSuffix)</PackageVersion>
         <PackageDescription Condition="'$(PackageDescription)' != ''">$(PackageDescription)
 
 $(CosmosDescription)</PackageDescription>
