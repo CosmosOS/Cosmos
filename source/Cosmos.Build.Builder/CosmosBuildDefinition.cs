@@ -76,9 +76,7 @@ namespace Cosmos.Build.Builder
             var il2cpuSourceDir = Path.Combine(il2cpuDir, "source");
 
             var buildSlnPath = Path.Combine(_cosmosDir, "Build.sln");
-            var il2cpuSlnPath = Path.Combine(il2cpuDir, "IL2CPU.sln");
-            var xsharpSlnPath = Path.Combine(xsharpDir, "XSharp.sln");
-
+            
             var vsipDir = Path.Combine(_cosmosDir, "Build", "VSIP");
 
             if (Directory.Exists(vsipDir))
@@ -86,10 +84,8 @@ namespace Cosmos.Build.Builder
                 Directory.Delete(vsipDir, true);
             }
 
-            // Restore XSharp.sln, IL2CPU.sln and Build.sln
-
-            yield return new RestoreTask(_msBuildService, xsharpSlnPath);
-            yield return new RestoreTask(_msBuildService, il2cpuSlnPath);
+            // Restore Build.sln
+            
             yield return new RestoreTask(_msBuildService, buildSlnPath);
 
             // Build Build.sln

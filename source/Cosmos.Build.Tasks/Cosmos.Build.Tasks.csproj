@@ -16,13 +16,13 @@ $(CosmosDescription)</PackageDescription>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Build.Framework" Version="15.5.180" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180" PrivateAssets="All" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" PrivateAssets="All" />
+        <PackageReference Include="IL2CPU.Debug.Symbols" />
+        <PackageReference Include="Microsoft.Build.Framework" Version="15.8.166" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.8.166" PrivateAssets="All" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.10" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" PrivateAssets="All" />
         <ProjectReference Include="..\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" PrivateAssets="All" />
     </ItemGroup>
 

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
+        <PackageReference Include="IL2CPU.API" />
     </ItemGroup>
 
 </Project>

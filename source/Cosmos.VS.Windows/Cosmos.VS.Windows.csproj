@@ -3,29 +3,19 @@
     <PropertyGroup>
         <TargetFramework>net471</TargetFramework>
         <RootNamespace>Cosmos.VS.Windows</RootNamespace>
+        <IncludeWpfReferences>True</IncludeWpfReferences>
         <CreateVsixContainer>False</CreateVsixContainer>
+        <DeployExtension>False</DeployExtension>
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Update="VSPackage.resx">
-            <MergeWithCTO>True</MergeWithCTO>
-            <ManifestResourceName>VSPackage</ManifestResourceName>
-        </EmbeddedResource>
-        <VSCTCompile Include="VSPackage.vsct">
-            <ResourceName>Menus.ctmenu</ResourceName>
-            <SubType>Designer</SubType>
-        </VSCTCompile>
+        <EmbeddedResource Update="VSPackage.resx" MergeWithCTO="True" ManifestResourceName="VSPackage" />        
+        <VSCTCompile Include="VSPackage.vsct" ResourceName="Menus.ctmenu" SubType="Designer" />        
     </ItemGroup>
 
     <ItemGroup>
-        <Page Include="**\*.xaml">
-            <SubType>Designer</SubType>
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Compile Update="**\*.xaml.cs">
-            <SubType>Code</SubType>
-            <DependentUpon>%(Filename)</DependentUpon>
-        </Compile>
+        <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+        <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -38,11 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="PresentationCore" />
-        <Reference Include="PresentationFramework" />
         <Reference Include="System.Design" />
-        <Reference Include="System.Xaml" />
-        <Reference Include="WindowsBase" />
     </ItemGroup>
 
     <ItemGroup>

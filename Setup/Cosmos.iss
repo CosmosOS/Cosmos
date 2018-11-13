@@ -99,7 +99,7 @@ Source: ".\Build\VSIP\Packages\*.nupkg"; DestDir: "{app}\packages\"; Flags: igno
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 ; XSharp
 Source: ".\Artwork\XSharp\XSharp.ico"; DestDir: "{app}\XSharp\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\source\Cosmos.Core.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
+Source: "..\IL2CPU\source\Cosmos.Core.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
 ; VMware
 Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; VMware

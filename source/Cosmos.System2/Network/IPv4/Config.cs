@@ -9,12 +9,7 @@ namespace Cosmos.System.Network.IPv4
     /// </summary>
     public class Config
     {
-        internal static List<Config> ipConfigs;
-
-        static Config()
-        {
-            ipConfigs = new List<Config>();
-        }
+        private static readonly List<Config> ipConfigs = new List<Config>();
 
         internal static void Add(Config config)
         {
@@ -73,10 +68,6 @@ namespace Cosmos.System.Network.IPv4
             return null;
         }
 
-        protected Address address;
-        protected Address defaultGateway;
-        protected Address subnetMask;
-
         /// <summary>
         /// Create a IPv4 Configuration with no default gateway
         /// </summary>
@@ -84,7 +75,8 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="subnet">Subnet Mask</param>
         public Config(Address ip, Address subnet)
             : this(ip, subnet, Address.Zero)
-        { }
+        {
+        }
 
         /// <summary>
         /// Create a IPv4 Configuration
@@ -94,22 +86,13 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="gw">Default gateway</param>
         public Config(Address ip, Address subnet, Address gw)
         {
-            this.address = ip;
-            this.subnetMask = subnet;
-            this.defaultGateway = gw;
+            IPAddress = ip;
+            SubnetMask = subnet;
+            DefaultGateway = gw;
         }
 
-        public Address IPAddress
-        {
-            get { return this.address; }
-        }
-        public Address SubnetMask
-        {
-            get { return this.subnetMask; }
-        }
-        public Address DefaultGateway
-        {
-            get { return this.defaultGateway; }
-        }
+        public Address IPAddress { get; }
+        public Address SubnetMask { get; }
+        public Address DefaultGateway { get; }
     }
 }

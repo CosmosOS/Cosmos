@@ -1,7 +1,9 @@
 <Project>
 
     <PropertyGroup>
-        <ArtifactsDir Condition="'$(ArtifactsDir)' == ''">$(RepoRoot)artifacts\</ArtifactsDir>
+        <ArtifactsDir Condition="'$(ArtifactsDir)' == ''">$(RepoRoot)artifacts\$(Configuration)\</ArtifactsDir>
+		<DefaultPackageOutputPath>$(ArtifactsDir)nupkg\</DefaultPackageOutputPath>
+        <!--<PackageOutputPath>$(DefaultPackageOutputPath)</PackageOutputPath>-->
         <VsixOutputPath>$(ArtifactsDir)VSIX\</VsixOutputPath>
     </PropertyGroup>
 

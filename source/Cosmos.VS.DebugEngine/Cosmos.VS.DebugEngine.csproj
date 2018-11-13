@@ -12,7 +12,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+        <PackageReference Include="Cosmos.Build.Common" />
+        <PackageReference Include="IL2CPU.Debug.Symbols" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Debugger.Interop.15.0" Version="15.7.27703" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.7.27703" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="11.0.61031" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.10" />
+        <PackageReference Include="System.ServiceProcess.ServiceController" Version="4.4.1" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" />
@@ -21,16 +31,6 @@
             <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;SatelliteDllsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
             <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
         </ProjectReference>
-        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0" />
-        <PackageReference Include="Microsoft.VisualStudio.Debugger.Interop.15.0" Version="15.7.27703" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.7.27703" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="11.0.61031" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.10" />
-        <PackageReference Include="System.ServiceProcess.ServiceController" Version="4.4.1" />
     </ItemGroup>
 
     <Target Name="IncludeESqliteInVsix" BeforeTargets="ResolveAssemblyReferences" AfterTargets="InjectReference_fe7f61ec-723c-48c6-a80d-1e957cf2feaf">

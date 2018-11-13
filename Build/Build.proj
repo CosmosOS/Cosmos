@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.Build.Traversal">
+
+    <ItemGroup>
+        <ProjectsToExclude Include="..\source\Archive\**" />
+        <ProjectsToExclude Include="..\source\Tools\**" />
+        <ProjectsToExclude Include="..\source\**\*Templates*\**" />
+        <ProjectsToExclude Include="..\source\Kernel-TapRoot\Demo\**" />
+        <ProjectsToExclude Include="..\source\Kernel-X86\50-Application\**" />
+        <ProjectsToExclude Include="..\tests\Cosmos.VS.Windows.Test\Cosmos.VS.Windows.Test.csproj" />
+        <ProjectReference Include="..\source\**\*.*proj;..\tests\**\*.*proj" Exclude="@(ProjectsToExclude)" />
+    </ItemGroup>
+
+</Project>

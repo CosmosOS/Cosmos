@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -9,9 +9,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference PrivateAssets="All" Include="..\..\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" />
-        <ProjectReference PrivateAssets="All" Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" />
-        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
+        <PackageReference Include="IL2CPU.API" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\10-CPU\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" PrivateAssets="All" />
+        <ProjectReference Include="..\..\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

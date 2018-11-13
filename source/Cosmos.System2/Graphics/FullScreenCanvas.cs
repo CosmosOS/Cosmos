@@ -1,5 +1,4 @@
 //#define COSMOSDEBUG
-using Cosmos.System.Graphics;
 using Cosmos.HAL;
 
 namespace Cosmos.System.Graphics
