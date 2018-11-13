@@ -5,75 +5,41 @@ namespace Cosmos.System.Graphics
 {
     public static class FullScreenCanvas
     {
-        public static bool IsInUse = false;
-
-        public static void Disable()
-        {
-            if (IsInUse == false) { }
-            else if (IsInUse == true)
-            {
-                MyVideoDriver.Disable();
-                VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
-                IsInUse = true;
-            }
-        }
-
-        private enum VideoDriver
-        {
-            VMWareSVGAIIDriver,
-            VBEDriver,
-            VGADriver
-        }
-
-        private static HAL.Drivers.VBEDriver VBEDriver;
-
         private static PCIDevice SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
-        public static bool BGAExists()
+        public static bool SVGAIIExist()
         {
-            if (VBEDriver.Available() == false)
+            if (SVGAIIDevice == null)
             {
                 return false;
             }
-            else
-            {
-                return true;
-            }
-        }
 
-        private static VideoDriver _VideoDevice;
+            return SVGAIIDevice.DeviceExists;
+        }
 
         private static Canvas MyVideoDriver = null;
 
         private static Canvas GetVideoDriver()
         {
-            if (PCI.Exists(SVGAIIDevice))
+            if (SVGAIIExist())
             {
                 return new SVGAIIScreen();
             }
-            else if (BGAExists() == true)
-            {
-                return new VBEScreen();
-            }
             else
             {
-                return new VGACanvas();
+                return new VBEScreen();
             }
         }
 
         private static Canvas GetVideoDriver(Mode mode)
         {
-            if (PCI.Exists(SVGAIIDevice) == true)
+            if (SVGAIIExist())
             {
                 return new SVGAIIScreen(mode);
             }
-            else if (BGAExists() == true)
-            {
-                return new VBEScreen(mode);
-            }
             else
             {
-                return new VGACanvas(mode);
+                return new VBEScreen(mode);
             }
         }
 
