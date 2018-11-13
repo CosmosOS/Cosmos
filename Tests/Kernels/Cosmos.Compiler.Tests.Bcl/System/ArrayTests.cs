@@ -15,6 +15,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             byte[] xByteExpectedResult = { 1, 2, 3, 4, 5, 6, 7, 1 };
             byte[] xByteSource = { 1 };
 
+            Assert.IsTrue(xByteResult.Length == 8, "Array.Length doesn't work!");
+
             Array.Copy(xByteSource, 0, xByteResult, 7, 1);
 
             Assert.IsTrue((xByteResult[7] == xByteExpectedResult[7]), "Array.Copy doesn't work: xResult[7] =  " + (uint)xByteResult[7] + " != " + (uint)xByteExpectedResult[7]);

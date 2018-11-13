@@ -8,10 +8,6 @@
         <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' != ''">$(PackageVersionPrefix)-$(VersionSuffix)</PackageVersion>
         <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' == ''">$(PackageVersionPrefix)</PackageVersion>
     </PropertyGroup>
-    
-    <PropertyGroup>
-        <SignAssembly>True</SignAssembly>
-    </PropertyGroup>
 
     <PropertyGroup>
         <CodeAnalysisRuleSet>$(RepoRoot)build\Cosmos.ruleset</CodeAnalysisRuleSet>
