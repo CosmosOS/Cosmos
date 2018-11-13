@@ -18,7 +18,7 @@ namespace Cosmos.System.Graphics
         public abstract Mode DefaultGraphicMode { get; }
 
         public abstract Mode Mode { get; set; }
-        
+
         /// <summary>
         /// Clear all the Canvas with the Black color.
         /// </summary>
@@ -49,8 +49,6 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public abstract void Disable();
-
         public void DrawPoint(Pen pen, Point point)
         {
             DrawPoint(pen, point.X, point.Y);
@@ -74,9 +72,7 @@ namespace Cosmos.System.Graphics
             int i;
 
             for (i = 0; i < dx; i++)
-            {
                 DrawPoint(pen, x1 + i, y1);
-            }
         }
 
         private void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
@@ -84,9 +80,7 @@ namespace Cosmos.System.Graphics
             int i;
 
             for (i = 0; i < dy; i++)
-            {
                 DrawPoint(pen, x1, y1 + i);
-            }
         }
 
         /*
@@ -145,9 +139,8 @@ namespace Cosmos.System.Graphics
         public virtual void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             if (pen == null)
-            {
                 throw new ArgumentOutOfRangeException(nameof(pen));
-            }
+
             ThrowIfCoordNotValid(x1, y1);
 
             ThrowIfCoordNotValid(x2, y2);
@@ -187,9 +180,7 @@ namespace Cosmos.System.Graphics
         public virtual void DrawCircle(Pen pen, int x_center, int y_center, int radius)
         {
             if (pen == null)
-            {
                 throw new ArgumentNullException(nameof(pen));
-            }
             ThrowIfCoordNotValid(x_center + radius, y_center);
             ThrowIfCoordNotValid(x_center - radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + radius);
@@ -228,81 +219,11 @@ namespace Cosmos.System.Graphics
             DrawCircle(pen, point.X, point.Y, radius);
         }
 
-        public virtual void DrawFilledCircle(Pen pen, int x0, int y0, int radius)
-        {
-
-            int x = radius;
-            int y = 0;
-            int xChange = 1 - (radius << 1);
-            int yChange = 0;
-            int radiusError = 0;
-
-            while (x >= y)
-            {
-                for (int i = x0 - x; i <= x0 + x; i++)
-                {
-
-                    DrawPoint(pen, i, y0 + y);
-                    DrawPoint(pen, i, y0 - y);
-                }
-                for (int i = x0 - y; i <= x0 + y; i++)
-                {
-                    DrawPoint(pen, i, y0 + x);
-                    DrawPoint(pen, i, y0 - x);
-                }
-
-                y++;
-                radiusError += yChange;
-                yChange += 2;
-                if (((radiusError << 1) + xChange) > 0)
-                {
-                    x--;
-                    radiusError += xChange;
-                    xChange += 2;
-                }
-            }
-
-            /*
-            for (int y = -radius; y <= radius; y++)
-                for (int x = -radius; x <= radius; x++)
-                    if (x * x + y * y <= radius * radius)
-                        (origin.x + x, origin.y + y);
-            if (pen == null)
-                throw new ArgumentNullException(nameof(pen));
-            ThrowIfCoordNotValid(x_center + radius, y_center);
-            ThrowIfCoordNotValid(x_center - radius, y_center);
-            ThrowIfCoordNotValid(x_center, y_center + radius);
-            ThrowIfCoordNotValid(x_center, y_center - radius);
-            int x = radius;
-            int y = 0;
-            int e = 0;
-            while (x >= y)
-            {
-                DrawLine(pen, x_center - x, y_center + y, x_center + x, y_center + y);
-                y++;
-                if (e <= 0)
-                {
-                    e += 2 * y + 1;
-                }
-                if (e > 0)
-                {
-                    x--;
-                    e -= 2 * x + 1;
-                }
-            }*/
-        }
-        public virtual void DrawFilledCircle(Pen pen, Point point, int radius)
-        {
-            DrawFilledCircle(pen, point.X, point.Y, radius);
-        }
-
         //http://members.chello.at/~easyfilter/bresenham.html
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
             if (pen == null)
-            {
                 throw new ArgumentNullException(nameof(pen));
-            }
             ThrowIfCoordNotValid(x_center + x_radius, y_center);
             ThrowIfCoordNotValid(x_center - x_radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + y_radius);
@@ -336,35 +257,13 @@ namespace Cosmos.System.Graphics
             DrawEllipse(pen, point.X, point.Y, x_radius, y_radius);
         }
 
-        public virtual void DrawFilledEllipse(Pen pen, Point point, int height, int width)
-        {
-            for (int y = -height; y <= height; y++)
-            {
-                for (int x = -width; x <= width; x++)
-                {
-                    if (x * x * height * height + y * y * width * width <= height * height * width * width)
-                    {
-                        DrawPoint(pen, point.X + x, point.Y + y);
-                    }
-                }
-            }
-        }
-
-        public virtual void DrawFilledEllipse(Pen pen, int x, int y, int height, int width)
-        {
-            DrawFilledEllipse(pen, new Point(x, y), height, width);
-        }
-
         public virtual void DrawPolygon(Pen pen, params Point[] points)
         {
             if (points.Length < 3)
-            {
                 throw new ArgumentException("A polygon requires more than 3 points.");
-            }
             if (pen == null)
-            {
                 throw new ArgumentNullException(nameof(pen));
-            }
+
             for (int i = 0; i < points.Length - 1; i++)
             {
                 DrawLine(pen, points[i], points[i + 1]);
@@ -394,9 +293,8 @@ namespace Cosmos.System.Graphics
              * vertex (we call these vertexes A, B, C, D as for geometric convention)
              */
             if (pen == null)
-            {
                 throw new ArgumentNullException(nameof(pen));
-            }
+
             /* The check of the validity of x and y are done in DrawLine() */
 
             /* The vertex A is where x,y are */
@@ -496,16 +394,11 @@ namespace Cosmos.System.Graphics
         {
             Global.mDebugger.SendInternal($"CheckIfModeIsValid");
 
-            /* To keep or not to keep, that is the question~
-            if (mode == null)
-            {
-                return false;
-            }
-            */
-
             /* This would have been the more "modern" version but LINQ is not working
+
             if (!availableModes.Exists(element => element == mode))
                 return true;
+
             */
 
             foreach (var elem in AvailableModes)
