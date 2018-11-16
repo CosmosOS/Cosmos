@@ -4,13 +4,11 @@
         <UseCodebase>True</UseCodebase>
     </PropertyGroup>
 
-    <!--
     <PropertyGroup>
         <_TargetVsixContainerDir>$(VsixOutputPath)</_TargetVsixContainerDir>
         <TargetVsixContainerName Condition="'$(TargetVsixContainerName)' == ''">$(TargetName).vsix</TargetVsixContainerName>
         <TargetVsixContainer Condition="'$(TargetVsixContainer)' == ''">$(_TargetVsixContainerDir)$(TargetVsixContainerName)</TargetVsixContainer>
     </PropertyGroup>
-    -->
 
     <ItemGroup>
         <PackageReference Include="Microsoft.VSSDK.BuildTools" PrivateAssets="All" />
