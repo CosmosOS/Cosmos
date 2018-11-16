@@ -1,6 +1,6 @@
 version: 0.20150918.{build}
 image: Visual Studio 2017
-configuration: Debug
+configuration: Debug-CI
 platform: Any CPU
 shallow_clone: true
 clone_folder: c:\Cosmos
@@ -13,7 +13,7 @@ build_script:
 - cmd: |
     rem %APPVEYOR_BUILD_FOLDER%
 
-    msbuild build\Build.proj /t:Restore;Build /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+    msbuild Build.sln /t:Restore;Build /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
     dotnet publish ..\IL2CPU\source\IL2CPU -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
 
