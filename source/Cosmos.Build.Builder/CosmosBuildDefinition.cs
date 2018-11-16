@@ -70,14 +70,13 @@ namespace Cosmos.Build.Builder
             }
 
             var il2cpuDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "IL2CPU"));
-            var xsharpDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "XSharp"));
 
             var cosmosSourceDir = Path.Combine(_cosmosDir, "source");
             var il2cpuSourceDir = Path.Combine(il2cpuDir, "source");
 
             var buildSlnPath = Path.Combine(_cosmosDir, "Build.sln");
             
-            var vsipDir = Path.Combine(_cosmosDir, "Build", "VSIP");
+            var vsipDir = Path.Combine(_cosmosDir, "Build", "VSIP") + '\\';
 
             if (Directory.Exists(vsipDir))
             {
@@ -90,7 +89,7 @@ namespace Cosmos.Build.Builder
 
             // Build Build.sln
 
-            yield return new BuildTask(_msBuildService, buildSlnPath, vsipDir);
+            yield return new BuildTask(_msBuildService, buildSlnPath, vsipDir, vsipDir);
 
             // Publish IL2CPU
 

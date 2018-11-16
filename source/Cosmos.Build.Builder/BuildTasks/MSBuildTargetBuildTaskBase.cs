@@ -35,7 +35,14 @@ namespace Cosmos.Build.Builder.BuildTasks
             {
                 foreach (var property in Properties)
                 {
-                    args += $" /p:\"{property.Key}={property.Value}\"";
+                    var value = property.Value;
+
+                    if (value.EndsWith("\\"))
+                    {
+                        value += '\\';
+                    }
+
+                    args += $" /p:\"{property.Key}={value}\"";
                 }
             }
 

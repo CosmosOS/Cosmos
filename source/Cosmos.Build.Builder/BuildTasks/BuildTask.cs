@@ -22,13 +22,15 @@ namespace Cosmos.Build.Builder.BuildTasks
         public BuildTask(
             IMSBuildService msBuildService,
             string projectFilePath,
-            string outputPath)
+            string outputPath,
+            string vsixOutputPath)
             : base(msBuildService)
         {
             ProjectFilePath = projectFilePath;
 
             _properties = new Dictionary<string, string>();
             _properties.Add("OutputPath", outputPath);
+            _properties.Add("VsixOutputPath", vsixOutputPath);
         }
     }
 }
