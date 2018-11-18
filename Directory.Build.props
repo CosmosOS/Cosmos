@@ -22,7 +22,7 @@
             resolved version will be the stable one, i.e. without the
             -localbuildyyyyMMddhhmmss suffix.
         -->
-        <PackageVersionSuffix Condition="'$(PackageVersionSuffix)' == '' AND '$(DesignTimeBuild)' != 'True'">-localbuild$([System.DateTime]::Now.ToString("yyyyMMdd"))</PackageVersionSuffix>
+        <PackageVersionSuffix Condition="'$(PackageVersionSuffix)' == '' AND '$(DesignTimeBuild)' != 'True'">-localbuild$([System.IO.File]::ReadAllText('$(RepoRoot)build\local_build_id.txt'))</PackageVersionSuffix>
         <PackageVersionSuffix Condition="'$(APPVEYOR_REPO_TAG)' == 'True'"></PackageVersionSuffix>
     </PropertyGroup>
 
