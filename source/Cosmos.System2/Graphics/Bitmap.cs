@@ -60,7 +60,7 @@ namespace Cosmos.System.Graphics
 
             //reading magic number to identify if BMP file (BM as string - 42 4D as Hex) - bytes 0 -> 2
             stream.Read(_short, 0, 2);
-            if (0x424d != BitConverter.ToInt16(_short, 0))
+            if ("42-4D" != BitConverter.ToString(_short))
                 throw new Exception("Header is not from a BMP");
 
             //read size of BMP file - byte 2 -> 6
