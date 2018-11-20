@@ -19,7 +19,7 @@ $(CosmosDescription)</PackageDescription>
         <PackageReference Include="IL2CPU.Debug.Symbols" />
         <PackageReference Include="Microsoft.Build.Framework" Version="15.8.166" PrivateAssets="All" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.8.166" PrivateAssets="All" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.10" PrivateAssets="All" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
