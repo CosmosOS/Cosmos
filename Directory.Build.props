@@ -24,14 +24,7 @@
     <PropertyGroup>
         <PackageVersion>0.1.0</PackageVersion>
         <PackageVersionSuffix Condition="'$(APPVEYOR)' == 'True'">-build$(APPVEYOR_BUILD_NUMBER)+$(APPVEYOR_REPO_COMMIT.Substring(0, 7))</PackageVersionSuffix>
-        <!--
-            If it's a design-time build, we can't use current time, because it can
-            cause an infinite restore loop, as the property is always changing.
-            This means that, for project references in VS (and other IDEs), the
-            resolved version will be the stable one, i.e. without the
-            -localbuildyyyyMMddhhmmss suffix.
-        -->
-        <PackageVersionSuffix Condition="'$(PackageVersionSuffix)' == '' AND '$(DesignTimeBuild)' != 'True'">-localbuild$(PackageVersionLocalBuildSuffix)</PackageVersionSuffix>
+        <PackageVersionSuffix Condition="'$(PackageVersionSuffix)' == ''">-localbuild$(PackageVersionLocalBuildSuffix)</PackageVersionSuffix>
         <PackageVersionSuffix Condition="'$(APPVEYOR_REPO_TAG)' == 'True'"></PackageVersionSuffix>
     </PropertyGroup>
 
