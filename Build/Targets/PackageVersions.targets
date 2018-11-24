@@ -5,7 +5,7 @@
         <MicrosoftNETTestSdkVersion>15.8.0</MicrosoftNETTestSdkVersion>
         <MicrosoftVisualStudioSDKEmbedInteropTypesVersion>15.0.27</MicrosoftVisualStudioSDKEmbedInteropTypesVersion>
         <MicrosoftVisualStudioSetupConfigurationInteropVersion>1.16.30</MicrosoftVisualStudioSetupConfigurationInteropVersion>
-        <MicrosoftVSSDKBuildToolsVersion>15.8.3252</MicrosoftVSSDKBuildToolsVersion>
+        <MicrosoftVSSDKBuildToolsVersion>15.9.3032</MicrosoftVSSDKBuildToolsVersion>
         <MSTestVersion>1.3.2</MSTestVersion>
         <NuGetVersion>4.8.0</NuGetVersion>
         <NUnitVersion>3.10.1</NUnitVersion>
