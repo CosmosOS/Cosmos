@@ -22,13 +22,17 @@ namespace Cosmos.Build.Builder.BuildTasks
         public PackTask(
             IMSBuildService msBuildService,
             string projectFilePath,
-            string packageOutputPath)
+            string packageOutputPath,
+            string packageVersionLocalBuildSuffix)
             : base(msBuildService)
         {
             ProjectFilePath = projectFilePath;
 
-            _properties = new Dictionary<string, string>();
-            _properties.Add("PackageOutputPath", packageOutputPath);
+            _properties = new Dictionary<string, string>
+            {
+                ["PackageOutputPath"] = packageOutputPath,
+                ["PackageVersionLocalBuildSuffix"] = packageVersionLocalBuildSuffix
+            };
         }
     }
 }

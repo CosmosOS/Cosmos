@@ -128,10 +128,11 @@ namespace Cosmos.Build.Builder
             packageProjectPaths = packageProjectPaths.Concat(il2cpuPackageProjects.Select(p => Path.Combine(il2cpuSourceDir, p)));
 
             var packagesDir = Path.Combine(vsipDir, "packages");
+            var packageVersionLocalBuildSuffix = DateTime.Now.ToString("yyyyMMddhhmmss");
 
             foreach (var projectPath in packageProjectPaths)
             {
-                yield return new PackTask(_msBuildService, projectPath, packagesDir);
+                yield return new PackTask(_msBuildService, projectPath, packagesDir, packageVersionLocalBuildSuffix);
             }
 
             var cosmosSetupDir = Path.Combine(_cosmosDir, "setup");
