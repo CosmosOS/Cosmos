@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -24,8 +25,7 @@ namespace Cosmos.VS.DebugEngine.Commands
                 return VSConstants.S_OK;
             }
 
-            string arguments;
-            hr = EnsureString(pvaIn, out arguments);
+            hr = EnsureString(pvaIn, out var arguments);
 
             if (hr != VSConstants.S_OK)
             {
@@ -47,6 +47,7 @@ namespace Cosmos.VS.DebugEngine.Commands
             ThreadHelper.ThrowIfNotOnUIThread();
 
             var commandWindow = (IVsCommandWindow)serviceProvider.GetService(typeof(SVsCommandWindow));
+            Assumes.Present(commandWindow);
             var atBreak = false;
             if (serviceProvider.GetService(typeof(SVsShellDebugger)) is IVsDebugger debugger)
             {
