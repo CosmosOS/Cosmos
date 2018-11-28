@@ -8,6 +8,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
+            bool efuse;
             long value;
             string result;
             string expectedResult;
@@ -187,6 +188,37 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             ByRefTestMethod(ref value);
             Assert.IsTrue(value == 61, "Passing an Int64 by ref to a method doesn't work");
+
+            //Test Overflow Exceptions
+            long val3o = 1000000;
+            efuse = false;
+            try
+            {
+                checked
+                {
+                    val3o += long.MaxValue;
+                }
+            }
+            catch (OverflowException)
+            {
+                efuse = true;
+            }
+            Assert.IsTrue(efuse, "Add_Ovf for Int64 doesn't work");
+
+            efuse = false;
+            val3o = -10000;
+            try
+            {
+                checked
+                {
+                    val3o -= long.MaxValue;
+                }
+            }
+            catch (OverflowException)
+            {
+                efuse = true;
+            }
+            Assert.IsTrue(efuse, "Sub_Ovf for Int64 doesn't work");
         }
 
         public static long TestMethod(long aParam)
