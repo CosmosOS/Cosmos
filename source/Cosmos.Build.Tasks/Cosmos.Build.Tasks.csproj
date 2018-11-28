@@ -4,8 +4,7 @@
         <TargetFramework>net471</TargetFramework>
         <RuntimeIdentifier>win</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
-        <PackageDescription>Cosmos build system.
-$(CosmosDescription)</PackageDescription>
+        <PackageDescription>Cosmos build system.</PackageDescription>
         <IsTool>True</IsTool>
     </PropertyGroup>
 
@@ -17,8 +16,8 @@ $(CosmosDescription)</PackageDescription>
 
     <ItemGroup>
         <PackageReference Include="IL2CPU.Debug.Symbols" />
-        <PackageReference Include="Microsoft.Build.Framework" Version="15.8.166" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.8.166" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Build.Framework" Version="15.8.166" PrivateAssets="All" ExcludeAssets="Runtime" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.8.166" PrivateAssets="All" ExcludeAssets="Runtime" />
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" PrivateAssets="All" />
     </ItemGroup>
 

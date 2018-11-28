@@ -22,7 +22,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="$(RepoRoot)LICENSE.txt" Pack="True" PackagePath="$(PackageLicenseFile)" />
+        <None Include="$(RepoRoot)LICENSE.txt" Pack="True" PackagePath="$(PackageLicenseFile)" Visible="False" />
     </ItemGroup>
 
 </Project>
