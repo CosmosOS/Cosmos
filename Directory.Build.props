@@ -34,6 +34,10 @@
         <XSharpVersion>0.1.0-build534</XSharpVersion>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <DeployExtension Condition="'$(CI)' == 'True'">False</DeployExtension>
+    </PropertyGroup>
+
     <Import Project="build\Targets\Import.props" />
 
 </Project>
