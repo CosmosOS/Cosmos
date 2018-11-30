@@ -1,4 +1,5 @@
 ﻿#define COSMOSDEBUG
+using System.Collections;
 using System.Text;
 using Cosmos.Debug.Kernel;
 
@@ -11,50 +12,66 @@ namespace Cosmos.System.ExtendedASCII
     internal static class EncodingTable
     {
         private static Debugger mDebugger = new Debugger("System", "EncodingTable");
+        private static Hashtable CodepageCache = new Hashtable();
+        private static Hashtable NamesCache = new Hashtable();
 
         static EncodingTable()
         {
             mDebugger.SendInternal("Inizializing Encoding Table");
 
             Add(437, "IBM437", new CP437Enconding());
-            Add(858, "IBM0858", new CP858Enconding());
+            Add(858, "IBM00858", new CP858Enconding());
         }
 
-        private struct values
+        //[StructLayout(LayoutKind.Sequential, Pack = 1)]
+        /*
+         * TODO restore as struct when unbox is really fixed...
+         */
+        // private struct Values
+        private class Values
         {
             public string   desc;
             public Encoding encoding;
 
-            public values(string desc, Encoding encoding)
+            public Values(string desc, Encoding encoding)
             {
                 this.desc = desc;
                 this.encoding = encoding;
             }
-        };
+        }
 
         const int MaxCodepageChacheSize = 2048;
-        static values[] CodepageCache = new values[MaxCodepageChacheSize];
+        //static values[] CodepageCache = new values[MaxCodepageChacheSize];
 
         public static void Add(int codepage, string desc, Encoding encoding)
         {
             mDebugger.SendInternal($"Adding codepage {codepage} desc {desc}");
-            CodepageCache[codepage] = new values(desc, encoding);
+            CodepageCache[codepage] = new Values(desc, encoding);
+            NamesCache[desc] = codepage;
+            //CodepageCache[codepage] = new values(desc, encoding);
+            mDebugger.SendInternal("Done");
         }
 
-        public static string GetDescription(int codepage) => CodepageCache[codepage].desc;
+        public static string GetDescription(int codepage)
+        {
+            mDebugger.SendInternal($"Getting description for codepage {codepage}");
+            return ((Values)CodepageCache[codepage]).desc;
+        }
 
-        public static Encoding GetEncoding(int codepage) => CodepageCache[codepage].encoding;
+        public static Encoding GetEncoding(int codepage)
+        {
+            mDebugger.SendInternal($"Getting encoding for codepage {codepage}");
+            return ((Values)CodepageCache[codepage]).encoding;
+        }
 
         public static int GetCodePageFromDesc(string desc)
         {
-            for (int idx = 0; idx < MaxCodepageChacheSize; idx++)
-            {
-                if (CodepageCache[idx].desc == desc)
-                    return idx;
-            }
+            mDebugger.SendInternal($"Getting codepage for desc {desc}");
 
-            /* Not found! */
-            return -1;
+            // This will be nicer if we could use Nullable<int> here 
+            object val = NamesCache[desc];
+
+            return val != null ? (int)val : -1;
         }
     }
 }

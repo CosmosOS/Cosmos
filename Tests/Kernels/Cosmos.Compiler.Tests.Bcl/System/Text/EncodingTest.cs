@@ -57,29 +57,47 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Text
                                                        0x3F, 0x3F, 0x3F, 0x21 };
 
         private static byte[] CP437GothicText = new byte[] { 0x3F, 0x3F };
-        private static byte[] CP858EnglishText = CP437EnglishText;
-        private static byte[] CP858ItalianText = CP437ItalianText;
-        private static byte[] CP858SpanishText = CP437SpanishText;
-        private static byte[] CP858GermanicText = CP437GermanicText;
-        /* CP858 has no Greek characters they are all replaced by '?' (0x3F) */
 
+        private static byte[] CP858EnglishText = CP437EnglishText;
+
+        private static byte[] CP858ItalianText = CP437ItalianText;
+
+        private static byte[] CP858SpanishText = CP437SpanishText;
+
+        private static byte[] CP858GermanicText = CP437GermanicText;
+
+        /* CP858 has no Greek characters they are all replaced by '?' (0x3F) */
         private static byte[] CP858GreekText = new byte[]   { 0x43, 0x6F, 0x73, 0x6D, 0x6F, 0x73, 0x20, 0x3F, 0x3F, 0x3F, 0x3F,
                                                       0x3F, 0x20, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x21 };
 
         private static byte[] CP858JapanaseText = CP437JapanaseText;
+
         private static byte[] CP858GothicText = CP437GothicText;
+
+        private static byte[] UnicodeEnglishText = new byte[] { 0x43, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x6D, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x20, 0x00, 0x69, 0x00, 0x73, 0x00, 0x20, 0x00,
+                                                      0x77, 0x00, 0x6F, 0x00, 0x6E, 0x00, 0x64, 0x00, 0x65, 0x00, 0x72, 0x00, 0x66, 0x00, 0x75, 0x00, 0x6C, 0x00, 0x21, 0x00 };
+
+        private static byte[] UnicodeItalianText = new byte[] { 0x43, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x6d, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x20, 0x00, 0xe8, 0x00, 0x20, 0x00,
+                                                      0x66, 0x00, 0x61, 0x00, 0x6e, 0x00, 0x74, 0x00, 0x61, 0x00, 0x73, 0x00, 0x74, 0x00, 0x69, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x21, 0x00 };
+
+        private static byte[] UnicodeSpanishText = new byte[] { 0x43, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x6d, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x20, 0x00, 0x65, 0x00, 0x73, 0x00,
+                                                      0x20, 0x00, 0x67, 0x00, 0x65, 0x00, 0x6e, 0x00, 0x69, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x21, 0x00  };
+
+        private static byte[] UnicodeGermanicText = new byte[] { 0x43, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x6d, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x20, 0x00, 0x69, 0x00,
+                                                      0x73, 0x00, 0x74, 0x00, 0x20, 0x00, 0x67, 0x00, 0x72, 0x00, 0x6f, 0x00, 0xdf, 0x00, 0x61, 0x00, 0x72, 0x00, 0x74, 0x00, 0x69, 0x00, 0x67, 0x00, 0x21, 0x00  };
+
+        private static byte[] UnicodeGreekText = new byte[] { 0x43, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x6d, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x20, 0x00, 0xb5, 0x03, 0xaf,
+                                                      0x03, 0xbd, 0x03, 0xb1, 0x03, 0xb9, 0x03, 0x20, 0x00, 0xc5, 0x03, 0xc0, 0x03, 0xad, 0x03, 0xc1, 0x03, 0xbf, 0x03, 0xc7, 0x03, 0xbf, 0x03, 0xc2, 0x03, 0x21, 0x00 };
+
+        private static byte[] UnicodeJapaneseText = new byte[] { 0x43, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x6d, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x20, 0x00, 0x20, 0x7d, 0x74, 0x66, 0x89, 0x30, 0x57, 0x30, 0x44, 0x30, 0x67, 0x30, 0x59, 0x30, 0x21, 0x00 };
+
+        private static byte[] UnicodeGothicText = new byte[] { 0x00, 0xd8, 0x48, 0xdf };
 
         private static void TestGetBytes(Encoding xEncoding, string xName, string text, byte[] expectedResult, string desc)
         {
             byte[] result;
 
             result = xEncoding.GetBytes(text);
-            if (result.Length != expectedResult.Length) mDebugger.SendInternal($"The two byte arrays have a different length : {result.Length} vs {expectedResult.Length}");
-
-            for (int i = 0; i < result.Length; i++)
-            {
-                if (result[i] != expectedResult[i]) mDebugger.SendInternal($"Difference in byte {i} between {result[i]} and {expectedResult[i]}");
-            }
 
             Assert.IsTrue(EqualityHelper.ByteArrayAreEquals(result, expectedResult), $"{xName} Encoding of {desc} text failed byte arrays different");
         }
@@ -133,28 +151,21 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Text
             string BodyName = xEncoding.BodyName;
             Assert.IsTrue(BodyName == "utf-16", "UTF16 BodyName failed not utf-16");
 
-            byte[] english = new byte[] { 67, 0, 111, 0, 115, 0, 109, 0, 111, 0, 115, 0, 32, 0, 105, 0, 115, 0, 32, 0, 119, 0, 111, 0, 110, 0, 100, 0, 101, 0, 114, 0, 102, 0, 117, 0, 108, 0, 33, 0 };
-            TestGetBytes(xEncoding, BodyName, "Cosmos is wonderful!", english, "English");
-            byte[] italian = new byte[] { 67, 0, 111, 0, 115, 0, 109, 0, 111, 0, 115, 0, 32, 0, 232, 0, 32, 0, 102, 0, 97, 0, 110, 0, 116, 0, 97, 0, 115, 0, 116, 0, 105, 0, 99, 0, 111, 0, 33, 0 };
-            TestGetBytes(xEncoding, BodyName, "Cosmos è fantastico!", italian, "Italian");
-            byte[] spanish = new byte[] { 67, 0, 111, 0, 115, 0, 109, 0, 111, 0, 115, 0, 32, 0, 101, 0, 115, 0, 32, 0, 103, 0, 101, 0, 110, 0, 105, 0, 97, 0, 108, 0, 33, 0 };
-            TestGetBytes(xEncoding, BodyName, "Cosmos es genial!", spanish, "Spanish");
-            byte[] german = new byte[] { 67, 0, 111, 0, 115, 0, 109, 0, 111, 0, 115, 0, 32, 0, 105, 0, 115, 0, 116, 0, 32, 0, 103, 0, 114, 0, 111, 0, 223, 0, 97, 0, 114, 0, 116, 0, 105, 0, 103, 0, 33, 0 };
-            TestGetBytes(xEncoding, BodyName, "Cosmos ist großartig!", german, "Germanic");
-            byte[] greek = new byte[] { 67, 0, 111, 0, 115, 0, 109, 0, 111, 0, 115, 0, 32, 0, 181, 3, 175, 3, 189, 3, 177, 3, 185, 3, 32, 0, 197, 3, 192, 3, 173, 3, 193, 3, 191, 3, 199, 3, 191, 3, 194, 3, 33, 0 };
-            TestGetBytes(xEncoding, BodyName, "Cosmos είναι υπέροχος!", greek, "Greek");
-            byte[] japanese = new byte[] { 67, 0, 111, 0, 115, 0, 109, 0, 111, 0, 115, 0, 32, 0, 32, 125, 116, 102, 137, 48, 87, 48, 68, 48, 103, 48, 89, 48, 33, 0 };
-            TestGetBytes(xEncoding, BodyName, "Cosmos 素晴らしいです!", japanese, "Japanese");
-            byte[] gothic = new byte[] { 0, 216, 72, 223 };
-            TestGetBytes(xEncoding, BodyName, "𐍈", gothic, "Gothic");
+            TestGetBytes(xEncoding, BodyName, "Cosmos is wonderful!", UnicodeEnglishText, "English");
+            TestGetBytes(xEncoding, BodyName, "Cosmos è fantastico!", UnicodeItalianText, "Italian");
+            TestGetBytes(xEncoding, BodyName, "Cosmos es genial!", UnicodeSpanishText, "Spanish");
+            TestGetBytes(xEncoding, BodyName, "Cosmos ist großartig!", UnicodeGermanicText, "Germanic");
+            TestGetBytes(xEncoding, BodyName, "Cosmos είναι υπέροχος!", UnicodeGreekText, "Greek");
+            TestGetBytes(xEncoding, BodyName, "Cosmos 素晴らしいです!", UnicodeJapaneseText, "Japanese");
+            TestGetBytes(xEncoding, BodyName, "𐍈", UnicodeGothicText, "Gothic");
 
-            TestGetString(xEncoding, BodyName, english, "Cosmos is wonderful!", "English");
-            TestGetString(xEncoding, BodyName, italian, "Cosmos è fantastico!", "Italian");
-            TestGetString(xEncoding, BodyName, spanish, "Cosmos es genial!", "Spanish");
-            TestGetString(xEncoding, BodyName, german, "Cosmos ist großartig!", "Germanic");
-            TestGetString(xEncoding, BodyName, greek, "Cosmos είναι υπέροχος!", "Greek");
-            TestGetString(xEncoding, BodyName, japanese, "Cosmos 素晴らしいです!", "Japanese");
-            TestGetString(xEncoding, BodyName, gothic, "𐍈", "Gothic");
+            TestGetString(xEncoding, BodyName, UnicodeEnglishText, "Cosmos is wonderful!", "English");
+            TestGetString(xEncoding, BodyName, UnicodeItalianText, "Cosmos è fantastico!", "Italian");
+            TestGetString(xEncoding, BodyName, UnicodeSpanishText, "Cosmos es genial!", "Spanish");
+            TestGetString(xEncoding, BodyName, UnicodeGermanicText, "Cosmos ist großartig!", "Germanic");
+            TestGetString(xEncoding, BodyName, UnicodeGreekText, "Cosmos είναι υπέροχος!", "Greek");
+            TestGetString(xEncoding, BodyName, UnicodeJapaneseText, "Cosmos 素晴らしいです!", "Japanese");
+            TestGetString(xEncoding, BodyName, UnicodeGothicText, "𐍈", "Gothic");
 
             mDebugger.SendInternal($"Finished Test {BodyName} Encoding / Decoding");
         }
@@ -169,6 +180,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Text
 
             string BodyName = xEncoding.BodyName;
             Assert.IsTrue(BodyName == "IBM437", "437 BodyName failed not 'IBM437");
+
+            Assert.IsTrue(xEncoding == Encoding.GetEncoding(BodyName), $"Getting Encoding from name {BodyName} does not work");
 
             TestGetBytes(xEncoding, BodyName, "Cosmos is wonderful!", CP437EnglishText, "English");
             TestGetBytes(xEncoding, BodyName, "Cosmos è fantastico!", CP437ItalianText, "Italian");
@@ -204,6 +217,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Text
 
             string BodyName = xEncoding.BodyName;
             Assert.IsTrue(BodyName == "IBM00858", "858 BodyName failed not 'IBM00858");
+            Assert.IsTrue(xEncoding == Encoding.GetEncoding(BodyName), $"Getting Encoding from name {BodyName} does not work");
 
             TestGetBytes(xEncoding, BodyName, "Cosmos è fantastico!", CP858ItalianText, "Italian");
             TestGetBytes(xEncoding, BodyName, "Cosmos es genial!", CP858SpanishText, "Spanish");
