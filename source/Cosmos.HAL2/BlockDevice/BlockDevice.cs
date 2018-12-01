@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL.BlockDevice
 {
@@ -23,21 +20,15 @@ namespace Cosmos.HAL.BlockDevice
 		}
 
 		protected UInt64 mBlockCount = 0;
-		public UInt64 BlockCount
-		{
-			get { return mBlockCount; }
-		}
+        public UInt64 BlockCount => mBlockCount;
 
-		protected UInt64 mBlockSize = 0;
-		public UInt64 BlockSize
-		{
-			get { return mBlockSize; }
-		}
+        protected UInt64 mBlockSize = 0;
+        public UInt64 BlockSize => mBlockSize;
 
-		// Only allow reading and writing whole blocks because many of the hardware
-		// command work that way and we dont want to add complexity at the BlockDevice level.
-		// public abstract void ReadBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData);
-		public abstract void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData);
+        // Only allow reading and writing whole blocks because many of the hardware
+        // command work that way and we dont want to add complexity at the BlockDevice level.
+        // public abstract void ReadBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData);
+        public abstract void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData);
 		public abstract void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData);
 
 		protected void CheckDataSize(byte[] aData, UInt64 aBlockCount)

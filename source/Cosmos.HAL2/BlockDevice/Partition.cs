@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Cosmos.HAL.BlockDevice
 {
 	public class Partition : BlockDevice
 	{
-		BlockDevice mHost;
-		UInt64 mStartingSector;
+		private readonly BlockDevice mHost;
+		private readonly UInt64 mStartingSector;
 
 		public Partition(BlockDevice aHost, UInt64 aStartingSector, UInt64 aSectorCount)
 		{
