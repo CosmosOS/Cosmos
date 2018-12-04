@@ -1,4 +1,6 @@
-﻿using Cosmos.HAL.BlockDevice;
+﻿using System;
+
+using Cosmos.HAL.BlockDevice;
 
 namespace Cosmos.System.FileSystem
 {
@@ -15,6 +17,7 @@ namespace Cosmos.System.FileSystem
         /// <param name="aDevice">The partition.</param>
         /// <returns>Returns true if the file system can handle the partition, false otherwise.</returns>
         public abstract bool IsType(Partition aDevice);
+
         /// <summary>
         /// Creates a new <see cref="FileSystem"/> object for the given partition, root path, and size.
         /// </summary>
@@ -23,5 +26,7 @@ namespace Cosmos.System.FileSystem
         /// <param name="aSize">The size, in MB.</param>
         /// <returns></returns>
         public abstract FileSystem Create(Partition aDevice, string aRootPath, long aSize);
+
+        public virtual void Format(Partition partition) => throw new NotImplementedException();
     }
 }

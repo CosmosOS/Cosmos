@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+
 using Cosmos.HAL.BlockDevice;
-using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem
@@ -11,8 +10,8 @@ namespace Cosmos.System.FileSystem
     {
         protected FileSystem(Partition aDevice, string aRootPath, long aSize)
         {
-            Device = aDevice;
-            RootPath = aRootPath;
+            Device = aDevice ?? throw new ArgumentNullException(nameof(aDevice));
+            RootPath = aRootPath ?? throw new ArgumentNullException(nameof(aRootPath));
             Size = aSize;
         }
 
