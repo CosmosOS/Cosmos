@@ -28,7 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <_InternalPackageToExclude Include="@(InternalPackage)" Exclude="@(PackageReference)" />
+        <_InternalPackageToExclude Include="@(InternalPackage)" Exclude="@(PackageReference->WithMetadataValue('Version', ''))" />
         <_InternalPackage Include="@(InternalPackage)" Exclude="@(_InternalPackageToExclude)" />
         <_InternalPackage Update="@(_InternalPackage)" ProjectPath="$([System.IO.Path]::Combine(%(RepoRoot), %(ProjectPath)))">
             <ProjectExists Condition="Exists(%(ProjectPath))">True</ProjectExists>
