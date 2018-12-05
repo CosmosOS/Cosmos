@@ -57,7 +57,7 @@
             Outputs="$(_ReferencesFile)">
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedFileToPublish)"
+            <_Il2cpuAssemblies Include="@(ResolvedFileToPublish->'%(FullPath)')"
                                Condition="'%(ResolvedFileToPublish.AssetType)' != 'native'
                                       AND '%(ResolvedFileToPublish.Extension)' == '.dll'" />
         </ItemGroup>
