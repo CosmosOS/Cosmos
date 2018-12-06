@@ -17,7 +17,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
         protected override IReadOnlyDictionary<string, string> Properties => _properties;
 
-        private Dictionary<string, string> _properties;
+        private readonly Dictionary<string, string> _properties;
 
         public PublishTask(
             IMSBuildService msBuildService,
@@ -27,8 +27,10 @@ namespace Cosmos.Build.Builder.BuildTasks
         {
             ProjectFilePath = projectFilePath;
 
-            _properties = new Dictionary<string, string>();
-            _properties.Add("PublishDir", publishOutputPath);
+            _properties = new Dictionary<string, string>()
+            {
+                ["PublishDir"] = publishOutputPath
+            };
         }
     }
 }

@@ -12,9 +12,9 @@ namespace Cosmos.Build.Builder
 {
     internal class CosmosBuildDefinition : IBuildDefinition
     {
-        private IInnoSetupService _innoSetupService;
-        private IMSBuildService _msBuildService;
-        private ISetupInstance2 _visualStudioInstance;
+        private readonly IInnoSetupService _innoSetupService;
+        private readonly IMSBuildService _msBuildService;
+        private readonly ISetupInstance2 _visualStudioInstance;
 
         private readonly string _cosmosDir;
 
