@@ -17,7 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="IL2CPU.Debug.Symbols" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" PrivateAssets="All" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" />
     </ItemGroup>
 
     <ItemGroup>
