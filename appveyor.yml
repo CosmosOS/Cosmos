@@ -52,3 +52,5 @@ matrix:
 
 artifacts:
   - path: '**\TestResult.xml'
+  - path: 'artifacts\Debug\nupkg\*.nupkg'
+  - path: 'artifacts\Debug\VSIX\*.vsix'
