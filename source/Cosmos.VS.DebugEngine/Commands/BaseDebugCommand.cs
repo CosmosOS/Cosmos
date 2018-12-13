@@ -40,9 +40,9 @@ namespace Cosmos.VS.DebugEngine.Commands
             return VSConstants.S_OK;
         }
 
-        protected static bool IsQueryParameterList(System.IntPtr pvaIn, System.IntPtr pvaOut, uint nCmdexecopt)
+        protected static bool IsQueryParameterList(IntPtr pvaIn, IntPtr pvaOut, uint nCmdexecopt)
         {
-            ushort lo = (ushort)(nCmdexecopt & (uint)0xffff);
+            ushort lo = (ushort)(nCmdexecopt & 0xffff);
             ushort hi = (ushort)(nCmdexecopt >> 16);
             if (lo == (ushort)OLECMDEXECOPT.OLECMDEXECOPT_SHOWHELP)
             {
