@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ApprovalTestsVersion>3.0.18</ApprovalTestsVersion>
         <AvaloniaVersion>0.7.0</AvaloniaVersion>
-        <MicrosoftBuildVersion>15.8.166</MicrosoftBuildVersion>
+        <MicrosoftBuildVersion>15.9.20</MicrosoftBuildVersion>
         <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0-alpha-004</MicrosoftNETFrameworkReferenceAssembliesVersion>
         <MicrosoftNETTestSdkVersion>15.9.0</MicrosoftNETTestSdkVersion>
         <MicrosoftVisualStudioSDKEmbedInteropTypesVersion>15.0.27</MicrosoftVisualStudioSDKEmbedInteropTypesVersion>
@@ -13,7 +13,7 @@
         <NuGetVersion>4.8.0</NuGetVersion>
         <NUnitVersion>3.11.0</NUnitVersion>
         <NUnit3TestAdapterVersion>3.11.2</NUnit3TestAdapterVersion>
-		<RoslynAnalyzersVersion>2.6.2</RoslynAnalyzersVersion>
+        <RoslynAnalyzersVersion>2.6.2</RoslynAnalyzersVersion>
     </PropertyGroup>
 
     <ItemGroup>
