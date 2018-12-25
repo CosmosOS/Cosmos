@@ -6,13 +6,14 @@
         <MicrosoftBuildVersion>15.9.20</MicrosoftBuildVersion>
         <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0-alpha-004</MicrosoftNETFrameworkReferenceAssembliesVersion>
         <MicrosoftNETTestSdkVersion>15.9.0</MicrosoftNETTestSdkVersion>
+        <MicrosoftTestPlatformObjectModelVersion>15.9.0</MicrosoftTestPlatformObjectModelVersion>
         <MicrosoftVisualStudioSDKEmbedInteropTypesVersion>15.0.27</MicrosoftVisualStudioSDKEmbedInteropTypesVersion>
         <MicrosoftVisualStudioSetupConfigurationInteropVersion>1.16.30</MicrosoftVisualStudioSetupConfigurationInteropVersion>
         <MicrosoftVSSDKBuildToolsVersion>15.9.3032</MicrosoftVSSDKBuildToolsVersion>
         <MSTestVersion>1.4.0</MSTestVersion>
         <NuGetVersion>4.8.0</NuGetVersion>
         <NUnitVersion>3.11.0</NUnitVersion>
-        <NUnit3TestAdapterVersion>3.11.2</NUnit3TestAdapterVersion>
+        <NUnit3TestAdapterVersion>3.12.0</NUnit3TestAdapterVersion>
         <RoslynAnalyzersVersion>2.6.2</RoslynAnalyzersVersion>
     </PropertyGroup>
 
@@ -26,6 +27,7 @@
         <PackageReference Update="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildVersion)" />
         <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="$(MicrosoftNETFrameworkReferenceAssembliesVersion)" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />
+        <PackageReference Update="Microsoft.TestPlatform.ObjectModel" Version="$(MicrosoftTestPlatformObjectModelVersion)" />
         <PackageReference Update="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="$(MicrosoftVisualStudioSDKEmbedInteropTypesVersion)" />
         <PackageReference Update="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="$(MicrosoftVisualStudioSetupConfigurationInteropVersion)" />
         <PackageReference Update="Microsoft.VSSDK.BuildTools" Version="$(MicrosoftVSSDKBuildToolsVersion)" />
