@@ -61,7 +61,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
 
             var xDi = MyDrive.RootDirectory;
 
-            Assert.IsTrue(xDi.Name == MyDrive.Name, "RootDirectory failed");
+            Assert.IsTrue(xDi.Name == MyDrive.Name, $"RootDirectory failed");
             mDebugger.Send("END TEST");
 
             mDebugger.Send("START TEST: Get DriveFormat");

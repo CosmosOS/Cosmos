@@ -18,7 +18,7 @@ using Cosmos.System.FileSystem.VFS;
  */
 namespace Cosmos.System_Plugs.System.IO
 {
-    [Plug(TargetName = "System.IO.FileSystem, System.IO.FileSystem", Inheritable = true)]
+    [Plug(TargetName = "System.IO.FileSystem, System.IO.FileSystem")]
     public static class CosmosFileSystem
     {
         /*
@@ -27,10 +27,10 @@ namespace Cosmos.System_Plugs.System.IO
          */
         private static string mCurrentDirectory = string.Empty;
 
-        public static void CreateDirectory(object aThis, string fullPath)
+        public static void CreateDirectory(string fullPath)
         {
             // If 'fullPath' exists already we return already without dealing with VFSManager
-            if (DirectoryExists(aThis, fullPath))
+            if (DirectoryExists(fullPath))
                 return;
  
             var xEntry = VFSManager.CreateDirectory(fullPath);
@@ -42,7 +42,7 @@ namespace Cosmos.System_Plugs.System.IO
         }
 
         // Never called? Cosmos goes in StackOverflow... ILCPU gets lost and do not find this native method
-        public static bool DirectoryExists(object aThis, string fullPath)
+        public static bool DirectoryExists(string fullPath)
         {
             if (fullPath == null)
             {
@@ -53,7 +53,7 @@ namespace Cosmos.System_Plugs.System.IO
             return VFSManager.DirectoryExists(fullPath);
         }
 
-        public static bool FileExists(object aThis, string fullPath)
+        public static bool FileExists(string fullPath)
         {
             if (fullPath == null)
             {
@@ -64,30 +64,30 @@ namespace Cosmos.System_Plugs.System.IO
             return VFSManager.FileExists(fullPath);
         }
 
-        public static void RemoveDirectory(object aThis, string fullPath, bool recursive)
+        public static void RemoveDirectory(string fullPath, bool recursive)
         {
             Global.mFileSystemDebugger.SendInternal($"RemoveDirectory : fullPath = {fullPath}");
             VFSManager.DeleteDirectory(fullPath, recursive);
         }
 
-        public static void MoveDirectory(object aThis, string sourceFullPath, string destFullPath)
+        public static void MoveDirectory(string sourceFullPath, string destFullPath)
         {
             throw new NotImplementedException("MoveDirectory not implemented");
         }
 
-        public static string GetCurrentDirectory(object aThis)
+        public static string GetCurrentDirectory()
         {
             Global.mFileSystemDebugger.SendInternal($"Directory.GetCurrentDirectory : mCurrentDirectory = {mCurrentDirectory}");
             return mCurrentDirectory;
         }
 
-        public static void SetCurrentDirectory(object aThis, string fullPath)
+        public static void SetCurrentDirectory(string fullPath)
         {
             Global.mFileSystemDebugger.SendInternal($"Directory.SetCurrentDirectory : aPath = {fullPath}");
             mCurrentDirectory = fullPath;
         }
 
-        public static object /* FileStreamBase */ Open(object aThis, string fullPath, FileMode mode, FileAccess access, FileShare share, int bufferSize, FileOptions options, FileStream parent)
+        public static object /* FileStreamBase */ Open(string fullPath, FileMode mode, FileAccess access, FileShare share, int bufferSize, FileOptions options, FileStream parent)
         {
             Global.mFileSystemDebugger.SendInternal("In CosmosFileSystem.Open");
             if (fullPath == null)
@@ -198,15 +198,9 @@ namespace Cosmos.System_Plugs.System.IO
 
             return aStream;
         }
-
-        public static FileSystem Current([FieldAccess(Name = "System.IO.FileSystem System.IO.Win32FileSystem.this")]
-        ref FileSystem aThis)
-        {
-            return aThis;
-        }
-
+        
         /* Other bug of IL2CPU that does not permit to use this, IEnumerableToArray() does not work :-( */
-        public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(object aThis, string aPath, string searchPattern,
+        public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(string aPath, string searchPattern,
         SearchOption searchOption, [FieldType(Name = "System.IO.SearchTarget, System.IO.FileSystem")] int searchTarget)
         {
             // TODO only for directories for now, searchPath is ignored for now
@@ -226,13 +220,13 @@ namespace Cosmos.System_Plugs.System.IO
             }
         }
 
-        public static void DeleteFile(object aThis, string fullPath)
+        public static void DeleteFile(string fullPath)
         {
             Global.mFileSystemDebugger.SendInternal($"DeleteFile : fullPath = {fullPath}");
             VFSManager.DeleteFile(fullPath);
         }
 
-        public static void CopyFile(object aThis, string sourceFullPath, string destFullPath, bool overwrite)
+        public static void CopyFile(string sourceFullPath, string destFullPath, bool overwrite)
         {
             Global.mFileSystemDebugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath} with overwrite {overwrite}");
 

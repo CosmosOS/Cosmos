@@ -10,10 +10,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" PrivateAssets="All" />
         <ProjectReference Include="..\Cosmos.CPU.x86\Cosmos.CPU.x86.csproj" PrivateAssets="All" />
         <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" PrivateAssets="All" />

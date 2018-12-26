@@ -42,11 +42,15 @@ namespace Cosmos.System_Plugs.System.IO
         }
 
         public static int Read(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream) =>
+            aThis.Read(aBuffer.AsSpan().Slice(aOffset, aCount));
+
+        public static int Read(FileStream aThis, Span<byte> aBuffer,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             Global.mFileSystemDebugger.SendInternal("FileStream.Read:");
 
-            return innerStream.Read(aBuffer, aOffset, aCount);
+            return innerStream.Read(aBuffer);
         }
 
         public static int ReadByte(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
@@ -55,11 +59,15 @@ namespace Cosmos.System_Plugs.System.IO
         }
 
         public static void Write(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream) =>
+            aThis.Write(aBuffer.AsSpan().Slice(aOffset, aCount));
+
+        public static void Write(FileStream aThis, ReadOnlySpan<byte> aBuffer,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
-            Global.mFileSystemDebugger.SendInternal($"FileStream.Write: aOffset {aOffset} aCount {aCount}");
+            Global.mFileSystemDebugger.SendInternal($"FileStream.Write:");
 
-            innerStream.Write(aBuffer, aOffset, aCount);
+            innerStream.Write(aBuffer);
         }
 
         public static long get_Length(FileStream aThis,

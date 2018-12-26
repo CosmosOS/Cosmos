@@ -33,5 +33,7 @@ namespace Cosmos.System_Plugs.System
                    aThis.Minute.ToString().PadLeft(2, '0') + ":" +
                    aThis.Second.ToString().PadLeft(2, '0');
         }
+
+        public static string ToString(ref DateTime aThis, string format, IFormatProvider provider) => aThis.ToString();
     }
 }

@@ -1,5 +1,5 @@
 using System;
-using IL2CPU.API;
+
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
@@ -18,12 +18,9 @@ namespace Cosmos.System_Plugs.System
             throw new NotSupportedException("Enum.Equals not supported yet!");
         }
 
-        //[PlugMethod(Signature = "System_String___System_Enum_ToString____")]
-        public static string ToString(Enum aThis)
-        {
-            return "<Enum.ToString> not implemented";
-            //			return UInt32Impl.ToString(ref aThis);
-        }
+        public static string ToString(Enum aThis) => "<Enum.ToString> not implemented";
+
+        public static string ToString(Enum aThis, string format) => aThis.ToString();
 
         public static int GetHashCode(Enum aThis)
         {

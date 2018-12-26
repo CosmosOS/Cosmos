@@ -17,8 +17,8 @@ namespace Cosmos.Core_Plugs.System
             string aThis,
             char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
             mDebugger.SendInternal("String.Ctor(string, char*)");
 
@@ -40,8 +40,8 @@ namespace Cosmos.Core_Plugs.System
             int start,
             int length,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
             aStringEmpty = "";
             aStringLength = length;
@@ -55,8 +55,8 @@ namespace Cosmos.Core_Plugs.System
             string aThis,
             char[] aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
             aStringEmpty = "";
             aStringLength = aChars.Length;
@@ -72,8 +72,8 @@ namespace Cosmos.Core_Plugs.System
             int start,
             int length,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
             aStringEmpty = "";
             aStringLength = length;
@@ -88,8 +88,8 @@ namespace Cosmos.Core_Plugs.System
             char aChar,
             int aLength,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
             aStringEmpty = "";
             aStringLength = aLength;
@@ -113,9 +113,24 @@ namespace Cosmos.Core_Plugs.System
             throw new NotImplementedException("String Ctor(sbyte ptr with lenght)");
         }
 
+        public static unsafe void Ctor(
+            string aThis,
+            ReadOnlySpan<char> value,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
+        {
+            aStringEmpty = "";
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                aFirstChar[i] = value[i];
+            }
+        }
+
         public static unsafe int get_Length(
             [ObjectPointerAccess] uint* aThis,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aLength)
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aLength)
         {
             return aLength;
         }
@@ -123,7 +138,7 @@ namespace Cosmos.Core_Plugs.System
         public static unsafe char get_Chars(
             [ObjectPointerAccess] uint* aThis,
             int aIndex,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
             return *(aFirstChar + aIndex);
         }
@@ -306,8 +321,8 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool StartsWith(string aThis, string aSubstring, StringComparison aComparison)
         {
-            char[] di = aThis.ToCharArray();
-            char[] ci = aSubstring.ToCharArray();
+            var di = aThis.AsSpan();
+            var ci = aSubstring.AsSpan();
             if (aSubstring.Length > aThis.Length)
             {
                 return false;
@@ -431,11 +446,6 @@ namespace Cosmos.Core_Plugs.System
         {
             return 0;
         }
-
-        //[PlugMethod(Enabled = false)]
-        //public static char[] GetStorageArray(string aString) {
-        //  return null;
-        //}
 
         private static int[] BuildBadCharTable(char[] needle)
         {
@@ -711,29 +721,8 @@ namespace Cosmos.Core_Plugs.System
             return xResult;
         }
 
-        public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture)
-        {
-            char[] di = aThis.ToCharArray();
-            char[] ci = aSubStr.ToCharArray();
-            if (aSubStr.Length > aThis.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < ci.Length; i++)
-            {
-                if (di[i] != ci[i])
-                {
-                    return false;
-
-                }
-            }
-            return true;
-        }
-
-        //public static string Remove(string aThis, int aStart, int aCount)
-        //{
-        //    return aThis.Substring(0, aStart) + aThis.Substring(aStart + aCount, aThis.Length - (aStart + aCount));
-        //}
+        public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture) =>
+            aThis.StartsWith(aSubStr, aIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 
         public static string Replace(string aThis, string oldValue, string newValue)
         {
@@ -754,20 +743,17 @@ namespace Cosmos.Core_Plugs.System
             return aThis;
         }
 
-        public static string ToLower(string aThis, CultureInfo aCulture)
-        {
-            return ChangeCasing(aThis, 65, 90, 32);
-        }
+        public static string ToLower(string aThis) => ToLowerInvariant(aThis);
 
-        public static string ToUpper(string aThis, CultureInfo aCulture)
-        {
-            return ChangeCasing(aThis, 97, 122, -32);
-        }
+        public static string ToUpper(string aThis) => ToUpperInvariant(aThis);
 
-        public static string ToUpper(string aThis)
-        {
-            return ChangeCasing(aThis, 97, 122, -32);
-        }
+        public static string ToLower(string aThis, CultureInfo aCulture) => ToLowerInvariant(aThis);
+
+        public static string ToUpper(string aThis, CultureInfo aCulture) => ToUpperInvariant(aThis);
+
+        public static string ToLowerInvariant(string aThis) => ChangeCasing(aThis, 65, 90, 32);
+
+        public static string ToUpperInvariant(string aThis) => ChangeCasing(aThis, 97, 122, -32);
 
         private static string ChangeCasing(string aValue, int lowerAscii, int upperAscii, int offset)
         {
@@ -1009,21 +995,6 @@ namespace Cosmos.Core_Plugs.System
             return CompareOrdinalHelper(strA.ToLower(), indexA, countA, strB.ToLower(), indexB, countB);
         }
 
-        /*
-         * This disables Marvin Hashing end enable the legacy not randomized version of String HashCode.
-         * We could have ported Marvin to Cosmos as in CoreRt does exists a managed implementation but it will be used
-         * by String.GetHashCode() directly in Net Core 2.1 so better to wait. The only problem is that it needs Unsafe to work.
-         */
-        public static bool InternalUseRandomizedHashing()
-        {
-            return false;
-        }
-
-        public static int InternalMarvin32HashString(string s, int strLen, long additionalEntropy)
-        {
-            throw new NotImplementedException("String.InternalMarvin32HashString()");
-        }
-
         /* It is not really needed to plug GetHashCode! */
 
         public static int Compare(string strA, int indexA, string strB, int indexB, int length, StringComparison comparisonType)
@@ -1051,7 +1022,5 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException("nativeCompareOrdinalIgnoreCaseWC");
         }
-
-
     }
 }

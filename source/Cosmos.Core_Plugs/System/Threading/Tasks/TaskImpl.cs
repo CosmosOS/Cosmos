@@ -1,8 +1,9 @@
 ﻿using System.Threading;
-using IL2CPU.API.Attribs;
 using System.Threading.Tasks;
 
-namespace Cosmos.Core_Plugs.System.Threading
+using IL2CPU.API.Attribs;
+
+namespace Cosmos.Core_Plugs.System.Threading.Tasks
 {
     [Plug(Target = typeof(Task))]
     public static class TaskImpl

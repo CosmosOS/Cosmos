@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
-using System.Threading.Tasks;
-using Cosmos.Debug.Kernel;
+
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -38,7 +37,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             sb.Clear();
 
             // Capacity does not change after Clear
-            Assert.IsTrue(sb.Capacity == 32, "StringBuilder.Capacity after Clear is wrong)");
+            Assert.IsTrue(sb.Capacity == 26, "StringBuilder.Capacity after Clear is wrong");
 
             // ... but Lenght should be 0 again
             Assert.IsTrue(sb.Length == 0, "After Clear StringBuilder.Lenght is wrong");
