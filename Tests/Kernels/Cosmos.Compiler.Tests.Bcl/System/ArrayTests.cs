@@ -54,7 +54,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             {
                 error = true;
             }
-            Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too large positions: " + 2);
+            Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too large positions.");
             error = false;
             try
             {
@@ -64,7 +64,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             {
                 error = true;
             }
-            Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too small positions: " +  y);
+            Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too small positions.");
 
         }
     }
