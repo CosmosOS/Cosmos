@@ -17,7 +17,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
         protected override IReadOnlyDictionary<string, string> Properties => _properties;
 
-        private Dictionary<string, string> _properties;
+        private readonly Dictionary<string, string> _properties;
 
         public PackTask(
             IMSBuildService msBuildService,

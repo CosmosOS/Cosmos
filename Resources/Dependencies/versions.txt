@@ -1,2 +1,0 @@
-mono.cecil	0.9.4 built from source for .net 4
-SQLite		1.0.84.0

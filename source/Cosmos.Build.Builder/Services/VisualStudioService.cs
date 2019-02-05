@@ -8,7 +8,7 @@ namespace Cosmos.Build.Builder.Services
 {
     internal class VisualStudioService : IVisualStudioService
     {
-        private Lazy<IReadOnlyList<ISetupInstance2>> _instances;
+        private readonly Lazy<IReadOnlyList<ISetupInstance2>> _instances;
 
         public VisualStudioService()
         {

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -43,6 +44,8 @@ namespace Cosmos.VS.DebugEngine.Commands
             }
 
             var parseCommandLine = (IVsParseCommandLine)serviceProvider.GetService(typeof(SVsParseCommandLine));
+            Assumes.Present(parseCommandLine);
+
             hr = parseCommandLine.ParseCommandTail(arguments, iMaxParams: -1);
 
             if (ErrorHandler.Failed(hr))
@@ -119,6 +122,8 @@ namespace Cosmos.VS.DebugEngine.Commands
             ThreadHelper.ThrowIfNotOnUIThread();
 
             var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(IVsDebugger));
+            Assumes.Present(debugger);
+
             var debugTargets = new VsDebugTargetInfo4[1];
             debugTargets[0].dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
             debugTargets[0].bstrExe = filePath;

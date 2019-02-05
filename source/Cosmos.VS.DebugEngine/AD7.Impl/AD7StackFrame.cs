@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
+
 using Cosmos.VS.DebugEngine.AD7.Definitions;
 using Cosmos.VS.DebugEngine.Engine.Impl;
-using Microsoft.VisualStudio.Debugger.Interop;
 using IL2CPU.Debug.Symbols;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {
@@ -24,8 +24,8 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
     // Must have empty holders, some code looks at length and can run
     // before we set them.
-    internal LOCAL_ARGUMENT_INFO[] mLocalInfos = new LOCAL_ARGUMENT_INFO[] { };
-    internal LOCAL_ARGUMENT_INFO[] mArgumentInfos = new LOCAL_ARGUMENT_INFO[] { };
+    internal LOCAL_ARGUMENT_INFO[] mLocalInfos = Array.Empty<LOCAL_ARGUMENT_INFO>();
+    internal LOCAL_ARGUMENT_INFO[] mArgumentInfos = Array.Empty<LOCAL_ARGUMENT_INFO>();
 
     // An array of this frame's parameters
     private DebugLocalInfo[] mParams;
@@ -42,7 +42,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
       var xProcess = mEngine.mProcess;
       if (mHasSource = xProcess.mCurrentAddress.HasValue)
       {
-        UInt32 xAddress = xProcess.mCurrentAddress.Value;
+        var xAddress = xProcess.mCurrentAddress.Value;
         var xSourceInfos = xProcess.mDebugInfoDb.GetSourceInfos(xAddress);
         if (!xSourceInfos.ContainsKey(xAddress))
         {
@@ -293,7 +293,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
       {
         for (int i = 0; i < mLocals.Length; i++)
         {
-          AD7Property property = new AD7Property(mLocals[i], this.mProcess, this);
+          var property = new AD7Property(mLocals[i], mProcess, this);
           propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
         }
       }
@@ -302,7 +302,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
       {
         for (int i = 0; i < mParams.Length; i++)
         {
-          AD7Property property = new AD7Property(mParams[i], this.mProcess, this);
+          var property = new AD7Property(mParams[i], mProcess, this);
           propInfo[localsLength + i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
         }
       }
@@ -335,7 +335,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
       for (int i = 0; i < propInfo.Length; i++)
       {
-        AD7Property property = new AD7Property(mParams[i], mProcess, this);
+        var property = new AD7Property(mParams[i], mProcess, this);
         propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
       }
 
@@ -459,7 +459,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
     // or IDebugExpression2::EvaluateAsync methods to evaluate the parsed expression.
     int IDebugStackFrame2.GetExpressionContext(out IDebugExpressionContext2 ppExprCxt)
     {
-      ppExprCxt = (IDebugExpressionContext2)this;
+      ppExprCxt = this;
       return VSConstants.S_OK;
     }
 
@@ -468,7 +468,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
     {
       try
       {
-        SetFrameInfo((enum_FRAMEINFO_FLAGS)dwFieldSpec, out pFrameInfo[0]);
+        SetFrameInfo(dwFieldSpec, out pFrameInfo[0]);
 
         return VSConstants.S_OK;
       }

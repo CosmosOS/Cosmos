@@ -31,12 +31,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         public FatStream(FatDirectoryEntry aEntry)
         {
-            if (aEntry == null)
-            {
-                throw new ArgumentNullException(nameof(aEntry));
-            }
-
-            mDirectoryEntry = aEntry;
+            mDirectoryEntry = aEntry ?? throw new ArgumentNullException(nameof(aEntry));
             mFS = aEntry.GetFileSystem();
             mFatTable = aEntry.GetFatTable();
             mSize = aEntry.mSize;
@@ -47,29 +42,11 @@ namespace Cosmos.System.FileSystem.FAT
             }
         }
 
-        public override bool CanSeek
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanSeek => true;
 
-        public override bool CanRead
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanWrite
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanWrite => true;
 
         public sealed override long Length
         {
@@ -78,7 +55,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal("-- FatStream.get_Length --");
                 Global.mFileSystemDebugger.SendInternal("Length =");
                 Global.mFileSystemDebugger.SendInternal(mSize);
-                return (long)mSize;
+                return mSize;
             }
         }
 
@@ -89,7 +66,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal("-- FatStream.get_Position --");
                 Global.mFileSystemDebugger.SendInternal("Position =");
                 Global.mFileSystemDebugger.SendInternal(mPosition);
-                return (long)mPosition;
+                return mPosition;
             }
             set
             {

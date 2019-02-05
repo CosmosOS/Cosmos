@@ -12,7 +12,7 @@ namespace Cosmos.VS.DebugEngine.Utilities
         {
             if (aMethod == null)
             {
-                throw new ArgumentNullException("aMethod");
+                throw new ArgumentNullException(nameof(aMethod));
             }
             var xBuilder = new StringBuilder(256);
             var xParts = aMethod.ToString().Split(' ');

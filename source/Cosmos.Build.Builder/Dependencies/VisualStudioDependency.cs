@@ -12,7 +12,7 @@ namespace Cosmos.Build.Builder.Dependencies
 
         public string Name => $"Visual Studio {MinimumVsVersion.Major}.{MinimumVsVersion.Minor}+";
 
-        private ISetupInstance2 _visualStudioInstance;
+        private readonly ISetupInstance2 _visualStudioInstance;
 
         public VisualStudioDependency(ISetupInstance2 visualStudioInstance)
         {
@@ -41,7 +41,7 @@ namespace Cosmos.Build.Builder.Dependencies
             var args = $"update --passive --norestart --installPath \"{vsInstancePath}\"";
 
             var process = Process.Start(vsInstallerPath, args);
-            await Task.Run((Action)process.WaitForExit, cancellationToken).ConfigureAwait(false);
+            await Task.Run(process.WaitForExit, cancellationToken).ConfigureAwait(false);
 
             if (process.ExitCode != 0)
             {

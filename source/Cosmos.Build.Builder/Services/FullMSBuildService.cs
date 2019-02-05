@@ -5,7 +5,7 @@ namespace Cosmos.Build.Builder.Services
 {
     internal class FullMSBuildService : IMSBuildService
     {
-        private ISetupInstance2 _visualStudioInstance;
+        private readonly ISetupInstance2 _visualStudioInstance;
 
         public FullMSBuildService(ISetupInstance2 visualStudioInstance)
         {
@@ -14,8 +14,14 @@ namespace Cosmos.Build.Builder.Services
 
         public string GetMSBuildExePath()
         {
-            var msBuildExePath = Path.Combine(
-                _visualStudioInstance.GetInstallationPath(), "MSBuild", "15.0", "Bin", "MSBuild.exe");
+            var msBuildExePath = GetMSBuildExePathForVersion("15.0");
+
+            if (File.Exists(msBuildExePath))
+            {
+                return msBuildExePath;
+            }
+
+            msBuildExePath = GetMSBuildExePathForVersion("Current");
 
             if (File.Exists(msBuildExePath))
             {
@@ -24,5 +30,8 @@ namespace Cosmos.Build.Builder.Services
 
             return null;
         }
+
+        private string GetMSBuildExePathForVersion(string version) =>
+            Path.Combine(_visualStudioInstance.GetInstallationPath(), "MSBuild", version, "Bin", "MSBuild.exe");
     }
 }

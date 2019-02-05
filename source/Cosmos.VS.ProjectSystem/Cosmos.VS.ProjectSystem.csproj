@@ -37,6 +37,7 @@
         <XamlPropertyRule Include="BuildSystem\Rules\LaunchConfiguration.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\PackageReference.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\ResolvedPackageReference.xaml" />
+        <XamlPropertyRule Update="@(XamlPropertyRule)" ConfiguredProjectTypeName="Cosmos.VS.ProjectSystem.CompatMocks.ConfiguredProjectMock" />
     </ItemGroup>
 
     <ItemGroup>
