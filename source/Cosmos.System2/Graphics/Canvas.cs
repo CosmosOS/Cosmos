@@ -7,18 +7,16 @@ namespace Cosmos.System.Graphics
 {
     public abstract class Canvas
     {
-        protected Canvas(Mode mode)
-        {
-            //Global.mDebugger.SendInternal($"Creating a new Canvas with Mode ${mode}");
-            Mode = mode;
-        }
-
-        public abstract IReadOnlyList<Mode> AvailableModes { get; }
+        /*
+         * IReadOnlyList<T> is not working, the Modes inside it become corrupted and then you get Stack Overflow
+         */
+        //public abstract IReadOnlyList<Mode> AvailableModes { get; }
+        public abstract List<Mode> AvailableModes { get; }
 
         public abstract Mode DefaultGraphicMode { get; }
 
         public abstract Mode Mode { get; set; }
-        
+
         /// <summary>
         /// Clear all the Canvas with the Black color.
         /// </summary>
@@ -403,12 +401,15 @@ namespace Cosmos.System.Graphics
 
             foreach (var elem in AvailableModes)
             {
+                Global.mDebugger.SendInternal($"elem is {elem} mode is {mode}");
                 if (elem == mode)
                 {
+                    Global.mDebugger.SendInternal($"Mode {mode} found");
                     return true; // All OK mode does exists in availableModes
                 }
             }
 
+            Global.mDebugger.SendInternal($"Mode {mode} found");
             return false;
         }
 
@@ -419,7 +420,7 @@ namespace Cosmos.System.Graphics
                 return;
             }
 
-            Global.mDebugger.SendInternal($"mode is not found! Raising exception...");
+            Global.mDebugger.SendInternal($"Mode {mode} is not found! Raising exception...");
             /* 'mode' was not in the 'availableModes' List ==> 'mode' in NOT Valid */
             throw new ArgumentOutOfRangeException(nameof(mode), $"Mode {mode} is not supported by this Driver");
         }

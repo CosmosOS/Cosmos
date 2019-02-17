@@ -24,13 +24,13 @@ namespace Cosmos.System.Graphics
         }
 
         public VBEScreen(Mode mode)
-            : base(mode)
         {
             Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {mode.Columns}x{mode.Rows}x{(uint)mode.ColorDepth}");
 
             ThrowIfModeIsNotValid(mode);
 
             VBEDriver = new VBEDriver((ushort)mode.Columns, (ushort)mode.Rows, (ushort)mode.ColorDepth);
+            Mode = mode;
         }
 
         public override Mode Mode
@@ -43,14 +43,15 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        #region Display
+#region Display
 
         /// <summary>
         /// All the available screen modes VBE supports, I would like to query the hardware and obtain from it the list but I have
         /// not yet find how to do it! For now I hardcode the most used VESA modes, VBE seems to support until HDTV resolution
         /// without problems that is well... excellent :-)
         /// </summary>
-        public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
+        //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
+        public override List<Mode> AvailableModes { get; } = new List<Mode>
         {
             new Mode(320, 240, ColorDepth.ColorDepth32),
             new Mode(640, 480, ColorDepth.ColorDepth32),
@@ -85,9 +86,9 @@ namespace Cosmos.System.Graphics
             //set the screen
            VBEDriver.VBESet(xres, yres, bpp);
         }
-        #endregion
+#endregion
 
-        #region Drawing
+#region Drawing
 
         public override void Clear(Color color)
         {
@@ -211,7 +212,7 @@ namespace Cosmos.System.Graphics
 
 #endregion
 
-        #region Reading
+#region Reading
 
         public override Color GetPointColor(int x, int y)
         {
@@ -230,7 +231,7 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb(VBEDriver.GetVRAM(offset));
         }
 
-        #endregion
+#endregion
 
     }
 }
