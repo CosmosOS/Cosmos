@@ -14,7 +14,6 @@
         <NuGetVersion>4.9.3</NuGetVersion>
         <NUnitVersion>3.11.0</NUnitVersion>
         <NUnit3TestAdapterVersion>3.13.0</NUnit3TestAdapterVersion>
-        <RoslynAnalyzersVersion>2.6.3</RoslynAnalyzersVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -37,10 +36,6 @@
         <PackageReference Update="NuGet.Configuration" Version="$(NuGetVersion)" />
         <PackageReference Update="NUnit" Version="$(NUnitVersion)" />
         <PackageReference Update="NUnit3TestAdapter" Version="$(NUnit3TestAdapterVersion)" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Update="@(RoslynAnalyzer)" Version="$(RoslynAnalyzersVersion)" />
     </ItemGroup>
 
 </Project>
