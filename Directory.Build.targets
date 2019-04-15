@@ -1,9 +1,5 @@
 <Project>
 
-    <PropertyGroup>
-        <SignAssembly>True</SignAssembly>
-    </PropertyGroup>
-
     <Import Project="build\Targets\Import.targets" />
 
 </Project>
