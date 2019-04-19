@@ -17,7 +17,7 @@ namespace Cosmos.System.FileSystem
             }
 
             var xBPB = aDevice.NewBlockArray(1);
-            aDevice.ReadBlock(0UL, 1U, xBPB);
+            aDevice.ReadBlock(0UL, 1U, ref xBPB);
 
             var xSig = BitConverter.ToUInt16(xBPB, 510);
             return xSig == 0xAA55;

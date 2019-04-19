@@ -62,7 +62,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             var xDirs = xDi.GetDirectories();
             Assert.IsTrue(xDirs != null, "GetDirectories() failed it returns null array");
             Assert.IsTrue(xDirs.Length != 0, "GetDirectories() failed it returns empty array");
-            Assert.IsTrue(xDirs[0].FullName == xSubDi.FullName, "GetDirectories() does not return the expected directories");
+            Assert.AreEqual(xDirs[0].FullName, xSubDi.FullName, "GetDirectories() failed");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
