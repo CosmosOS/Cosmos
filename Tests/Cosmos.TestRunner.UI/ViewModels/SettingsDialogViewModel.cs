@@ -2,14 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 
 using Avalonia.Controls;
+
+using ReactiveUI;
 
 using Cosmos.Build.Common;
 using Cosmos.TestRunner.Core;
@@ -17,17 +16,18 @@ using Cosmos.TestRunner.Full;
 
 namespace Cosmos.TestRunner.UI.ViewModels
 {
-    internal class SettingsDialogViewModel : IEngineConfiguration, INotifyPropertyChanged
+    internal class SettingsDialogViewModel : ReactiveObject, IEngineConfiguration
     {
         private static IEngineConfiguration defaultEngineConfiguration = new DefaultEngineConfiguration();
         private static IEnumerable<Type> stableKernelTypes = TestKernelSets.GetStableKernelTypes();
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public SettingsDialogViewModel(Window aWindow)
         {
             KernelTypesToRun = new ObservableCollection<Type>(stableKernelTypes);
-            RunTests = new RunTestsCommand(aWindow, this);
+
+            RunTestsCommand = ReactiveCommand.Create(
+                () => RunTests(aWindow),
+                this.WhenAny(v => v.KernelTypesToRun, c => c.Value.Any()));
         }
 
         #region Engine Configuration
@@ -128,41 +128,17 @@ namespace Cosmos.TestRunner.UI.ViewModels
 
         #endregion
 
-        public ICommand RunTests { get; set; }
+        public ICommand RunTestsCommand { get; set; }
+
+        private void RunTests(Window aWindow) => aWindow.Close(this);
 
         private void SetProperty<T>(ref T aProperty, T aValue, [CallerMemberName]string aPropertyName = null)
         {
             if (!EqualityComparer<T>.Default.Equals(aProperty, aValue))
             {
                 aProperty = aValue;
-                OnPropertyChanged(aPropertyName);
+                this.RaisePropertyChanged(aPropertyName);
             }
-        }
-
-        private void OnPropertyChanged(string aPropertyName) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(aPropertyName));
-
-        internal class RunTestsCommand : ICommand
-        {
-            private Window mWindow;
-            private SettingsDialogViewModel mViewModel;
-
-            public RunTestsCommand(Window aWindow, SettingsDialogViewModel aViewModel)
-            {
-                mWindow = aWindow;
-                mViewModel = aViewModel;
-
-                mViewModel.KernelTypesToRun.CollectionChanged += KernelTypesToRun_CollectionChanged;
-            }
-
-            public event EventHandler CanExecuteChanged;
-
-            public bool CanExecute(object parameter) => mViewModel.KernelTypesToRun.Any();
-
-            public void Execute(object parameter) => mWindow.Close(mViewModel);
-
-            private void KernelTypesToRun_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) =>
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

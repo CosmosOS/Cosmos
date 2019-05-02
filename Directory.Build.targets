@@ -1,24 +1,5 @@
 <Project>
 
-    <PropertyGroup>
-        <SignAssembly>True</SignAssembly>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <CodeAnalysisRuleSet>$(RepoRoot)build\Cosmos.ruleset</CodeAnalysisRuleSet>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <RoslynAnalyzer Include="Microsoft.CodeAnalysis.Analyzers" />
-        <RoslynAnalyzer Include="Microsoft.CodeQuality.Analyzers" />
-        <RoslynAnalyzer Include="Microsoft.NetCore.Analyzers" />
-        <RoslynAnalyzer Include="Microsoft.NetFramework.Analyzers" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="@(RoslynAnalyzer)" PrivateAssets="All" />
-    </ItemGroup>
-
     <Import Project="build\Targets\Import.targets" />
 
 </Project>

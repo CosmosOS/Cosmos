@@ -342,7 +342,7 @@ namespace Cosmos.HAL.BlockDevice
 			//TODO LBA3  ...
 		}
 
-		public override void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData)
+		public override void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
 		{
 			CheckDataSize(aData, aBlockCount);
 			SelectSector(aBlockNo, aBlockCount);
@@ -350,7 +350,7 @@ namespace Cosmos.HAL.BlockDevice
 			IO.Data.Read8(aData);
 		}
 
-		public override void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData)
+		public override void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
 		{
             CheckDataSize(aData, aBlockCount);
             SelectSector(aBlockNo, aBlockCount);
