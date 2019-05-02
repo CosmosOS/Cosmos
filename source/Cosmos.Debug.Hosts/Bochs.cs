@@ -43,8 +43,8 @@ namespace Cosmos.Debug.Hosts
 
       InitializeKeyValues();
       //If appveyor build, we set display_library to nogui
-      Object isAppVeyorBuild = Registry.LocalMachine.GetValue("SOFTWARE\\WOW6432Node\\Cosmos\\AppVeyorBuild");
-      if(int.TryParse(isAppVeyorBuild as string, out int val))
+      string isAppVeyorBuild = Registry.LocalMachine.GetValue("SOFTWARE\\WOW6432Node\\Cosmos\\BochsNoGui") as string;
+      if(int.TryParse(isAppVeyorBuild, out int val))
       {
         if(val == 1)
         {
