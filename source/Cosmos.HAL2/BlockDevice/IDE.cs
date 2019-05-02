@@ -40,14 +40,14 @@ namespace Cosmos.HAL.BlockDevice
                 return;
             }
             var xMbrData = new byte[512];
-            xATA.ReadBlock(0UL, 1U, xMbrData);
+            xATA.ReadBlock(0UL, 1U, ref xMbrData);
             var xMBR = new MBR(xMbrData);
 
             if (xMBR.EBRLocation != 0)
             {
                 //EBR Detected
                 var xEbrData = new byte[512];
-                xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
+                xATA.ReadBlock(xMBR.EBRLocation, 1U, ref xEbrData);
                 var xEBR = new EBR(xEbrData);
 
                 for (int i = 0; i < xEBR.Partitions.Count; i++)

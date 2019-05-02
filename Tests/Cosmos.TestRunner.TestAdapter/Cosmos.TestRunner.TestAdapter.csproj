@@ -3,40 +3,17 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp2.0</TargetFramework>
         <PackageDescription>Test adapter for Cosmos kernels.</PackageDescription>
-        <DevelopmentDependency>True</DevelopmentDependency>
+        <IsToolProject>True</IsToolProject>
+        <AppendTargetFrameworkToToolsPackageFolder>False</AppendTargetFrameworkToToolsPackageFolder>
         <NoWarn>NU5111;$(NoWarn)</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="15.7.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
     </ItemGroup>
-
-    <PropertyGroup>
-        <IncludeBuildOutput>False</IncludeBuildOutput>
-        <!-- NuGet 4.8+ -->
-        <SuppressDependenciesWhenPacking>True</SuppressDependenciesWhenPacking>
-        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackTestAdapter</TargetsForTfmSpecificContentInPackage>
-    </PropertyGroup>
-
-    <Target Name="PackTestAdapter" DependsOnTargets="Publish">
-
-        <ItemGroup>
-            <_GeneratedFiles Include="$(PublishDepsFilePath)" />
-        </ItemGroup>
-        
-        <ItemGroup>
-            <TfmSpecificPackageFile Include="@(_GeneratedFiles)">
-                <PackagePath>tools\%(_GeneratedFiles.RecursiveDir)%(_GeneratedFiles.Filename)%(_GeneratedFiles.Extension)</PackagePath>
-            </TfmSpecificPackageFile>
-            <TfmSpecificPackageFile Include="@(ResolvedFileToPublish->'$([MSBuild]::NormalizeDirectory($(PublishDir)))%(RelativePath)')">
-                <PackagePath>tools\%(ResolvedFileToPublish.RelativePath)</PackagePath>
-            </TfmSpecificPackageFile>
-        </ItemGroup>
-    
-    </Target>
 
 </Project>

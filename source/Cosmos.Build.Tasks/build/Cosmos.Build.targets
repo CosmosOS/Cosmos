@@ -158,12 +158,12 @@
     <Target Name="IL2CPU"
             Inputs="$(TargetPath);@(PlugsReference)"
             Outputs="$(Il2cpuOutput)"
-            DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets">
+            DependsOnTargets="ResolveReferences;ComputeFilesToPublish">
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
-                               Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
-                                      AND '%(ResolvedAssembliesToPublish.Extension)' == '.dll'" />
+            <_Il2cpuAssemblies Include="@(ResolvedFileToPublish->'%(FullPath)')"
+                               Condition="'%(ResolvedFileToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedFileToPublish.Extension)' == '.dll'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"

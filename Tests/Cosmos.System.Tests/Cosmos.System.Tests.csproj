@@ -5,11 +5,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ApprovalTests" Version="3.0.15" NoWarn="NU1701" />
-        <PackageReference Include="ApprovalUtilities" Version="3.0.15" NoWarn="NU1701" />
+        <PackageReference Include="ApprovalTests" NoWarn="NU1701" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="MSTest.TestAdapter" />
         <PackageReference Include="MSTest.TestFramework" />
+        <PackageReference Include="NSubstitute" Version="4.0.0" />
+        <PackageReference Include="NUnit" Version="3.11.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
     </ItemGroup>
 
     <ItemGroup>

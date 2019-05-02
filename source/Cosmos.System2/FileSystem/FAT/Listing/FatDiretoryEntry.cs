@@ -127,18 +127,19 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.Attributes, FatDirectoryEntryAttributeConsts.Directory);
             }
 
+            // TODO: Add a define for COSMOS so we can skip blocks when running outside.
             // Date and Time
-            uint xDate = ((((uint)RTC.Century * 100 + (uint)RTC.Year) - 1980) << 9) | (uint)RTC.Month << 5 | (uint)RTC.DayOfTheMonth;
-            uint xTime = (uint)RTC.Hour << 11 | (uint)RTC.Minute << 5 | ((uint)RTC.Second / 2);
+            //uint xDate = ((((uint)RTC.Century * 100 + (uint)RTC.Year) - 1980) << 9) | (uint)RTC.Month << 5 | (uint)RTC.DayOfTheMonth;
+            //uint xTime = (uint)RTC.Hour << 11 | (uint)RTC.Minute << 5 | ((uint)RTC.Second / 2);
 
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.CreationDate, xDate);
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ModifiedDate, xDate);
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.CreationTime, xTime);
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ModifiedTime, xTime);
+            //SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.CreationDate, xDate);
+            //SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ModifiedDate, xDate);
+            //SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.CreationTime, xTime);
+            //SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ModifiedTime, xTime);
 
             //First cluster
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterHigh, (uint)(mFirstClusterNum >> 16));
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterLow, (uint)(mFirstClusterNum & 0xFFFF));
+            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterHigh, (ushort)(mFirstClusterNum >> 16));
+            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterLow, (ushort)(mFirstClusterNum & 0xFFFF));
 
             // GetFatTable calls GetFatChain, which "refreshes" the FAT table and clusters
             GetFatTable();
@@ -668,6 +669,48 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             else
             {
                 throw new Exception("Invalid directory entry type");
+            }
+        }
+
+        internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, byte aValue)
+        {
+            Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
+            Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
+
+            if (IsRootDirectory())
+            {
+                throw new Exception("Root directory metadata can not be changed using the file stream.");
+            }
+
+            var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+
+            if (xData.Length > 0)
+            {
+                uint xOffset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
+                xData[xOffset] = aValue;
+                ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
+            }
+        }
+
+        internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, ushort aValue)
+        {
+            Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
+            Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
+
+            if (IsRootDirectory())
+            {
+                throw new Exception("Root directory metadata can not be changed using the file stream.");
+            }
+
+            var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+
+            if (xData.Length > 0)
+            {
+                var xValue = new byte[aEntryMetadata.DataLength];
+                xValue.SetUInt16(0, aValue);
+                uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
+                Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
             }
         }
 

@@ -4,7 +4,7 @@
     <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.props" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
 
     <PropertyGroup>
-        <TargetFramework>net471</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <RootNamespace>Cosmos.VS.ProjectSystem</RootNamespace>
         <IncludeWpfReferences>True</IncludeWpfReferences>
         <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
@@ -62,10 +62,10 @@
 
     <ItemGroup>
         <PackageReference Include="Cosmos.Build.Common" />
-        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" Version="15.3.224" />
-        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" Version="15.3.224" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.7.27703" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="11.0.61031" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" />
         <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
         <PackageReference Include="VSPropertyPages" />
     </ItemGroup>

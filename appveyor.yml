@@ -1,5 +1,5 @@
 version: 0.20150918.{build}
-image: Visual Studio 2017
+image: Visual Studio 2019 Preview
 configuration: Debug-CI
 platform: Any CPU
 shallow_clone: true
@@ -51,4 +51,6 @@ matrix:
   fast_finish: true
 
 artifacts:
-  - path: '**\TestResult.xml'
+  - path: 'artifacts\Debug\nupkg\*.nupkg'
+  - path: 'artifacts\Debug\VSIX\*.vsix'
+  - path: 'TestResult.xml'

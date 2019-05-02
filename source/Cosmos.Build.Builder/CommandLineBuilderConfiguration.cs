@@ -10,7 +10,7 @@ namespace Cosmos.Build.Builder
         public bool UserKit => GetSwitch();
         public string VsPath => GetOption();
 
-        private Dictionary<string, string> _args;
+        private readonly Dictionary<string, string> _args;
 
         public CommandLineBuilderConfiguration(string[] args)
         {

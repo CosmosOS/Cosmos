@@ -2,7 +2,8 @@
 
     <PropertyGroup>
         <LangVersion>Latest</LangVersion>
-        <NoWarn>CA1051;CA1707;CA1711;CA1801;$(NoWarn)</NoWarn>
+        <NoWarn>CA1051;CA1501;CA1707;CA1711;CA1801;$(NoWarn)</NoWarn>
+        <SignAssembly>True</SignAssembly>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -29,9 +30,13 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <CommonVersion>0.1.0-build8</CommonVersion>
-        <IL2CPUVersion>0.1.0-build328</IL2CPUVersion>
-        <XSharpVersion>0.1.0-build534</XSharpVersion>
+        <CommonVersion>0.1.0-build18</CommonVersion>
+        <IL2CPUVersion>0.1.0-build355</IL2CPUVersion>
+        <XSharpVersion>0.1.0-build562</XSharpVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DeployExtension Condition="'$(CI)' == 'True'">False</DeployExtension>
     </PropertyGroup>
 
     <Import Project="build\Targets\Import.props" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -23,13 +24,13 @@ namespace Cosmos.VS.DebugEngine.Commands
         {
         }
 
-        public override int Execute(uint nCmdLogOpt, IntPtr pvaIn, IntPtr pvaOut)
+        public override int Execute(uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             int hr;
 
-            if (IsQueryParameterList(pvaIn, pvaOut, nCmdLogOpt))
+            if (IsQueryParameterList(pvaIn, pvaOut, nCmdExecOpt))
             {
                 Marshal.GetNativeVariantForObject("$ /switchdefs:\"" + DebugLogCommandSyntax + "\"", pvaOut);
                 return VSConstants.S_OK;
@@ -43,6 +44,8 @@ namespace Cosmos.VS.DebugEngine.Commands
             }
 
             var parseCommandLine = (IVsParseCommandLine)serviceProvider.GetService(typeof(SVsParseCommandLine));
+            Assumes.Present(parseCommandLine);
+
             hr = parseCommandLine.ParseCommandTail(arguments, iMaxParams: -1);
 
             if (ErrorHandler.Failed(hr))
@@ -106,6 +109,8 @@ namespace Cosmos.VS.DebugEngine.Commands
             catch (Exception e)
             {
                 var commandWindow = (IVsCommandWindow)serviceProvider.GetService(typeof(SVsCommandWindow));
+                Assumes.Present(commandWindow);
+
                 commandWindow.Print(String.Format(CultureInfo.CurrentCulture, "Error: {0}\r\n", e.Message));
             }
         }

@@ -48,12 +48,12 @@ namespace Cosmos.Build.Builder.Dependencies
                 .Select(r => DownloadRepoAsync(r, usesGit, cancellationToken)));
         }
 
-        private async Task DownloadRepoAsync(Repo repo, bool useGit, CancellationToken cancellationToken)
+        private static async Task DownloadRepoAsync(Repo repo, bool useGit, CancellationToken cancellationToken)
         {
             if (useGit)
             {
                 var process = Process.Start("git", $"clone \"{repo.Url}.git\" \"{repo.LocalPath}\"");
-                await Task.Run((Action)process.WaitForExit).ConfigureAwait(false);
+                await Task.Run(process.WaitForExit).ConfigureAwait(false);
 
                 if (process.ExitCode != 0)
                 {

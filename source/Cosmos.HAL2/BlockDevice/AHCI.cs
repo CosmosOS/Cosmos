@@ -85,7 +85,7 @@ namespace Cosmos.HAL.BlockDevice
                 {
                     mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
                     var xMBRData = new byte[512];
-                    xPort.ReadBlock(0UL, 1U, xMBRData);
+                    xPort.ReadBlock(0UL, 1U, ref xMBRData);
                     var xMBR = new MBR(xMBRData);
                     
                     if (xMBR.EBRLocation != 0)
@@ -93,7 +93,7 @@ namespace Cosmos.HAL.BlockDevice
                         // EBR Detected!
                         mAHCIDebugger.Send("EBR Detected within MBR code");
                         var xEBRData = new byte[512];
-                        xPort.ReadBlock(xMBR.EBRLocation, 1U, xEBRData);
+                        xPort.ReadBlock(xMBR.EBRLocation, 1U, ref xEBRData);
                         var xEBR = new EBR(xEBRData);
                         for (int i = 0; i < xEBR.Partitions.Count; i++)
                         {

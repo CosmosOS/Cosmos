@@ -17,18 +17,22 @@ namespace Cosmos.Build.Builder.BuildTasks
 
         protected override IReadOnlyDictionary<string, string> Properties => _properties;
 
-        private Dictionary<string, string> _properties;
+        private readonly Dictionary<string, string> _properties;
 
         public PackTask(
             IMSBuildService msBuildService,
             string projectFilePath,
-            string packageOutputPath)
+            string packageOutputPath,
+            string packageVersionLocalBuildSuffix)
             : base(msBuildService)
         {
             ProjectFilePath = projectFilePath;
 
-            _properties = new Dictionary<string, string>();
-            _properties.Add("PackageOutputPath", packageOutputPath);
+            _properties = new Dictionary<string, string>
+            {
+                ["PackageOutputPath"] = packageOutputPath,
+                ["PackageVersionLocalBuildSuffix"] = packageVersionLocalBuildSuffix
+            };
         }
     }
 }

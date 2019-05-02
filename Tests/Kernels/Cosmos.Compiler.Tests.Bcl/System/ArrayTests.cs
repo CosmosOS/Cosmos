@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -11,6 +8,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
+            byte[] xEmptyByteArray = Array.Empty<byte>();
+            object[] xEmptyObjectArray = Array.Empty<object>();
+
+            Assert.IsTrue(xEmptyByteArray.Length == 0, "Array.Empty<byte> should return an empty array!");
+            Assert.IsTrue(xEmptyObjectArray.Length == 0, "Array.Empty<object> should return an empty array!");
+
             byte[] xByteResult = { 1, 2, 3, 4, 5, 6, 7, 8 };
             byte[] xByteExpectedResult = { 1, 2, 3, 4, 5, 6, 7, 1 };
             byte[] xByteSource = { 1 };

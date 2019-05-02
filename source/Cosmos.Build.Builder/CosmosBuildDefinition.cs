@@ -12,9 +12,9 @@ namespace Cosmos.Build.Builder
 {
     internal class CosmosBuildDefinition : IBuildDefinition
     {
-        private IInnoSetupService _innoSetupService;
-        private IMSBuildService _msBuildService;
-        private ISetupInstance2 _visualStudioInstance;
+        private readonly IInnoSetupService _innoSetupService;
+        private readonly IMSBuildService _msBuildService;
+        private readonly ISetupInstance2 _visualStudioInstance;
 
         private readonly string _cosmosDir;
 
@@ -128,10 +128,11 @@ namespace Cosmos.Build.Builder
             packageProjectPaths = packageProjectPaths.Concat(il2cpuPackageProjects.Select(p => Path.Combine(il2cpuSourceDir, p)));
 
             var packagesDir = Path.Combine(vsipDir, "packages");
+            var packageVersionLocalBuildSuffix = DateTime.Now.ToString("yyyyMMddhhmmss");
 
             foreach (var projectPath in packageProjectPaths)
             {
-                yield return new PackTask(_msBuildService, projectPath, packagesDir);
+                yield return new PackTask(_msBuildService, projectPath, packagesDir, packageVersionLocalBuildSuffix);
             }
 
             var cosmosSetupDir = Path.Combine(_cosmosDir, "setup");

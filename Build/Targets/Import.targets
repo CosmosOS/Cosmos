@@ -1,5 +1,9 @@
 <Project>
 
+    <PropertyGroup>
+        <IsToolProject Condition="'$(IsMSBuildExtensionProject)' == 'True'">True</IsToolProject>
+    </PropertyGroup>
+
     <Import Project="InternalsVisibleTo.targets" />
 
     <Import Project="PackageProperties.targets" />
@@ -10,8 +14,11 @@
 
     <Import Project="StrongName.targets" />
 
+    <!-- Project types -->
+    <Import Project="MSBuildExtension.targets" Condition="'$(IsMSBuildExtensionProject)' == 'True'" />
     <Import Project="Templates.targets" Condition="'$(IsTemplatesProject)' == 'True'" />
     <Import Project="Tests.targets" Condition="'$(IsTestProject)' == 'True'" />
+    <Import Project="Tool.targets" Condition="'$(IsToolProject)' == 'True'" />
     <Import Project="VSIX.targets" Condition="'$(IsVsixProject)' == 'True'" />
 
     <Import Project="Workarounds.targets" />

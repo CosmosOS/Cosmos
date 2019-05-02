@@ -1,16 +1,15 @@
 //#define COSMOSDEBUG
 using System;
-using System.Runtime.CompilerServices;
+
 using Cosmos.Core;
 using Cosmos.Core_Asm.MemoryOperations;
-using IL2CPU.API;
+
 using IL2CPU.API.Attribs;
-//using Cosmos.Core.MemoryOperations;
 
 namespace Cosmos.Core_Plugs.MemoryOperations
 {
     [Plug(Target = typeof(Cosmos.Core.MemoryOperations))]
-    public unsafe class MemoryOperationsImpl
+    public static unsafe class MemoryOperationsImpl
     {
         [PlugMethod(Assembler = typeof(MemoryOperationsFill16BlocksAsm))]
         private static unsafe void Fill16Blocks(byte* dest, int value, int BlocksNum)

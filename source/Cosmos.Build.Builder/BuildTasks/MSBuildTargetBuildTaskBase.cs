@@ -12,7 +12,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
         protected abstract IReadOnlyDictionary<string, string> Properties { get; }
 
-        private IMSBuildService _msBuildService;
+        private readonly IMSBuildService _msBuildService;
 
         protected MSBuildTargetBuildTaskBase(IMSBuildService msBuildService)
             : base(true, false)

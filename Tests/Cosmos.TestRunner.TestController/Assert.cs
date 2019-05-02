@@ -46,5 +46,19 @@ namespace Cosmos.TestRunner
             }
             IsTrue(xResult, message, file, line);
         }
+
+        public static void AreEqual(string expected, string actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            var xResult = expected == actual;
+            if (!xResult)
+            {
+                TestController.Debugger.Send("Expected value");
+                TestController.Debugger.Send(expected);
+                TestController.Debugger.Send("Actual value");
+                TestController.Debugger.Send(actual);
+            }
+            IsTrue(xResult, message, file, line);
+        }
+
     }
 }
