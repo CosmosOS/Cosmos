@@ -11,7 +11,7 @@ namespace Cosmos.Build.Builder.Dependencies
 {
     internal class InnoSetupDependency : IDependency
     {
-        private const string InnoSetupInstallerUrl = "http://www.jrsoftware.org/download.php/is.exe"
+        private const string InnoSetupInstallerUrl = "http://www.jrsoftware.org/download.php/is.exe";
 
         public string Name => "Inno Setup";
 
