@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 
 using Cosmos.Build.Common;
-using Cosmos.Debug.Common;
-using Microsoft.Win32;
 
 namespace Cosmos.Debug.Hosts
 {
@@ -42,17 +40,6 @@ namespace Cosmos.Debug.Hosts
       }
 
       InitializeKeyValues();
-      //If appveyor build, we set display_library to nogui
-      string isAppVeyorBuild = Registry.LocalMachine.GetValue("SOFTWARE\\WOW6432Node\\Cosmos\\BochsNoGui") as string;
-      if(int.TryParse(isAppVeyorBuild, out int val))
-      {
-        if(val == 1)
-        {
-          string debugGui = startDebugGui ? ", options=\"gui_debug\"" : string.Empty;
-          defaultConfigs["display_library"] = "nogui" + debugGui;
-        }
-      }
-
       GenerateConfiguration(configurationFile.FullName);
       _bochsConfigurationFile = configurationFile;
     }

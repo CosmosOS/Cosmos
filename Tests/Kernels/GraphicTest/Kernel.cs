@@ -94,12 +94,12 @@ namespace GraphicTest
                 mDebugger.Send("Run");
 
                 /* First test with the DefaulMode */
-                //DoTest(canvas);
+                DoTest(canvas);
 
-                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
-                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
-                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1366, 768, ColorDepth.ColorDepth32)));
-                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1366, 768, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
 
                 TestController.Completed();
             }
