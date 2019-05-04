@@ -45,12 +45,15 @@ namespace Cosmos.System.Graphics
 
         public static Canvas GetFullScreenCanvas()
         {
+            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
             if (MyVideoDriver == null)
             {
+                Global.mDebugger.SendInternal($"MyVideoDriver is null creating new object");
                 return MyVideoDriver = GetVideoDriver();
             }
             else
             {
+                Global.mDebugger.SendInternal($"MyVideoDriver is NOT null using the old one changing mode to DefaulMode");
                 MyVideoDriver.Mode = MyVideoDriver.DefaultGraphicMode;
                 return MyVideoDriver;
             }
