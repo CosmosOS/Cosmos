@@ -40,6 +40,11 @@ namespace Cosmos.Debug.Hosts
       }
 
       InitializeKeyValues();
+      if (Environment.GetEnvironmentVariable("CI") == "True")
+      {
+        string debugGui = startDebugGui ? ", options=\"gui_debug\"" : "";
+        defaultConfigs["display_library"] = "nogui " + debugGui;
+      }
       GenerateConfiguration(configurationFile.FullName);
       _bochsConfigurationFile = configurationFile;
     }
