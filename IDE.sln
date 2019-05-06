@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{BDFC9BA8-F528-43B5-92D0-497579E55065}"
 EndProject
@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Common", "sour
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.DebugConnectors", "source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj", "{BA661F30-9F3B-4356-B47B-D9C9375A473B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "source\Cosmos.Core.DebugStub\Cosmos.Core.DebugStub.csproj", "{5049175E-F1EE-4D8F-8354-F547444B8F10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.DebugStub", "..\IL2CPU\source\Cosmos.Core.DebugStub\Cosmos.Core.DebugStub.csproj", "{5049175E-F1EE-4D8F-8354-F547444B8F10}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.GDB", "source\Cosmos.Debug.GDB\Cosmos.Debug.GDB.csproj", "{3370FC04-B669-46A4-A4AA-A89540318F8D}"
 EndProject
@@ -46,7 +46,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\Spruce\Spruce.csproj", "{449E143F-3E7F-46DC-8E65-F1555FB55FAD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VSPropertyPages", "..\XSharp\source\VSPropertyPages\VSPropertyPages.csproj", "{45028B2F-66EA-4BA6-841E-F339CF54B8A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VSPropertyPages", "..\Common\source\VSPropertyPages\VSPropertyPages.csproj", "{45028B2F-66EA-4BA6-841E-F339CF54B8A3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Tasks", "source\Cosmos.Build.Tasks\Cosmos.Build.Tasks.csproj", "{D761BA74-7CB9-4C7F-BD5F-5893A69743C9}"
 EndProject
