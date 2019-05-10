@@ -127,14 +127,64 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((ulong)minValue == 0x0000000000000000, "Conv_U8 for UInt32 doesn't work");
 
             // Test Conv_R4
-            Assert.IsTrue((float)maxValue == UInt32.MaxValue, "Conv_R4 for UInt32 doesn't work");
-            Assert.IsTrue((float)minValue == UInt32.MinValue, "Conv_R4 for UInt32 doesn't work");
+            Assert.IsTrue((float)maxValue == uint.MaxValue, "Conv_R4 for UInt32 doesn't work");
+            Assert.IsTrue((float)minValue == uint.MinValue, "Conv_R4 for UInt32 doesn't work");
 
             // Test Conv_R8
-            Assert.IsTrue((double)maxValue == UInt32.MaxValue, "Conv_R8 for UInt32 doesn't work");
-            Assert.IsTrue((double)minValue == UInt32.MinValue, "Conv_R8 for UInt32 doesn't work");
+            Assert.IsTrue((double)maxValue == uint.MaxValue, "Conv_R8 for UInt32 doesn't work");
+            Assert.IsTrue((double)minValue == uint.MinValue, "Conv_R8 for UInt32 doesn't work");
 
-            // Test Methods
+            //Test checked conversions
+            long val = 1;
+
+            // Test Conv_Ovf_U4
+            checked
+            {
+                Assert.IsTrue((uint)(long)125 == 0x7D, "Conv_Ovf_U4 doesn't work(throws incorrectly)");
+                uint x = 0;
+                bool error = false;
+                try
+                {
+                    x = (uint)(uint.MaxValue + val);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U4 doesn't work(error was not thrown): " + x);
+                try
+                {
+                    int y = 1;
+                    x = (uint)(-80 + y);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U4 doesn't work for negative integers(error was not thrown): " + x);
+            }
+
+
+            // Test Conv_Ovf_U4_Un
+            checked
+            {
+                Assert.IsTrue((uint)(ulong)125 == 0x7D, "Conv_Ovf_U4_Un doesn't work(throws incorrectly)");
+                long max = uint.MaxValue;
+                Assert.IsTrue((uint)(ulong)max == uint.MaxValue, "Conv_Ovf_U4_Un doesn't work(throws incorrectly)");
+                uint x = 0;
+                bool error = false;
+                try
+                {
+                    x = (uint)(ulong)(val + uint.MaxValue);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U4_Un doesn't work(error was not thrown): " + x);
+            }
+
+            //Test Methods
             val2 = TestMethod(value);
             Assert.IsTrue(value == 60, "Passing an UInt32 as a method parameter doesn't work");
             Assert.IsTrue(val2 == 61, "Returning an UInt32 value from a method doesn't work");

@@ -135,6 +135,56 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((double)maxValue == Int32.MaxValue, "Conv_R8 for Int32 doesn't work");
             Assert.IsTrue((double)minValue == Int32.MinValue, "Conv_R8 for Int32 doesn't work");
 
+            //Test checked conversions
+            long val = 1;
+            long test = 125;
+            // Test Conv_Ovf_I4
+            checked
+            {
+                Assert.IsTrue((int)test == 0x7D, "Conv_Ovf_I4 doesn't work(throws incorrectly)");
+                Assert.IsTrue((int)(test - 1) == 124, "Conv_Ovf_I4 doesn't work(throws incorrectly)");
+                Assert.IsTrue((int)val == 1, "Conv_Ovf_I4 doesn't work(throws incorrectly)");
+                Assert.IsTrue((int)(2 * val) == 2, "Conv_Ovf_I4 doesn't work(throws incorrectly)");
+                long x = 0;
+                bool error = false;
+                try
+                {
+                    x = (int)(val + int.MaxValue);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_I4 doesn't work(error was not thrown): " + x);
+                try
+                {
+                    x = (int)(val + int.MinValue - 2);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_I4 doesn't work(error was not thrown): " + x);
+            }
+
+
+            // Test Conv_Ovf_I4_Un
+            checked
+            {
+                Assert.IsTrue((int)(uint)test == 0x7D, "Conv_Ovf_I4_Un doesn't work(throws incorrectly)");
+                int x = 0;
+                bool error = false;
+                try
+                {
+                    x = (int)(uint)(val + int.MaxValue);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_I4_Un doesn't work(error was not thrown): " + x);
+            }
+
             // Test Methods
             val2 = TestMethod(value);
             Assert.IsTrue(value == 60, "Passing an Int32 as a method parameter doesn't work");
@@ -173,7 +223,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 efuse = true;
             }
             Assert.IsTrue(efuse, "Sub_Ovf for Int32 doesn't work: " + val3o);
-            Console.WriteLine("Finished Int32 Tests!");
         }
 
         public static int TestMethod(int aParam)
