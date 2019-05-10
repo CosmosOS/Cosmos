@@ -166,11 +166,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System.Tests", "Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.DiskManager", "Tests\Kernels\Cosmos.Kernel.Tests.DiskManager\Cosmos.Kernel.Tests.DiskManager.csproj", "{BB6A5306-4C7A-4973-A48E-9FE3E683EAEC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BECB26F1-8FE4-4C62-B74A-F2292B26CA70}"
-	ProjectSection(SolutionItems) = preProject
-		Build\Cosmos.ruleset = Build\Cosmos.ruleset
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

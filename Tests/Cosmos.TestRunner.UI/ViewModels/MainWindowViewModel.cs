@@ -1,15 +1,16 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading;
+
+using ReactiveUI;
 
 using Cosmos.TestRunner.Core;
 using Cosmos.TestRunner.Full;
 
 namespace Cosmos.TestRunner.UI.ViewModels
 {
-    internal class MainWindowViewModel : INotifyPropertyChanged
+    internal class MainWindowViewModel : ReactiveObject
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        private string _log;
 
         public MainWindowViewModel(IEngineConfiguration aEngineConfiguration)
         {
@@ -17,20 +18,17 @@ namespace Cosmos.TestRunner.UI.ViewModels
 
             xEngine.SetOutputHandler(
                 new OutputHandler(
-                    m =>
-                    {
-                        TestRunnerLog += m + Environment.NewLine;
-                        OnPropertyChanged(nameof(TestRunnerLog));
-                    }));
+                    m => TestRunnerLog += m + Environment.NewLine));
 
             new Thread(() => xEngine.Execute()).Start();
         }
 
-        public string TestRunnerLog { get; set; }
-
-        private void OnPropertyChanged(string aPropertyName) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(aPropertyName));
-
+        public string TestRunnerLog
+        {
+            get => _log;
+            set => this.RaiseAndSetIfChanged(ref _log, value);
+        }
+        
         internal class OutputHandler : OutputHandlerFullTextBase
         {
             private Action<string> mLog;

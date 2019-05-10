@@ -28,8 +28,8 @@ namespace Cosmos.HAL.BlockDevice
         // Only allow reading and writing whole blocks because many of the hardware
         // command work that way and we dont want to add complexity at the BlockDevice level.
         // public abstract void ReadBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData);
-        public abstract void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData);
-		public abstract void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData);
+        public abstract void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData);
+		public abstract void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData);
 
 		protected void CheckDataSize(byte[] aData, UInt64 aBlockCount)
 		{
