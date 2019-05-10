@@ -159,6 +159,21 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((double)maxValue == UInt64.MaxValue, "Conv_R8 for UInt64 doesn't work");
             Assert.IsTrue((double)minValue == UInt64.MinValue, "Conv_R8 for UInt64 doesn't work");
 
+            //Test checked conversions
+
+            // Test for Conv_Ovf_U8
+            checked
+            {
+                Assert.IsTrue((ulong)125 == 0x7D, "Conv_Ovf_U8 doesn't work(throws incorrectly)");
+            }
+
+            checked
+            {
+                uint t = 125;
+                Assert.IsTrue((ulong)t == 0x7D, "Conv_Ovf_U8 doesn't work(throws incorrectly)");
+            }
+            // TODO: If possible, somehow add tests for Conv_Ovf_I8_Un
+
             // Test Methods
 
             value = 60;
