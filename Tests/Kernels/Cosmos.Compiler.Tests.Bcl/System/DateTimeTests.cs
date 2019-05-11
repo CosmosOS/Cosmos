@@ -17,10 +17,19 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(someDateTime.Minute == 47, "DateTime.Minute is not working");
             Assert.IsTrue(someDateTime.Second == 32, "DateTime.Second is not working");
             Assert.IsTrue(someDateTime.Millisecond == 462, "DateTime.Millisecond is not working");
+            // Not works: DayOfWeek is an Enum and Enum.ToString() is yet not implemented
+            //Assert.IsTrue(someDateTime.DayOfWeek.ToString() == "Friday", "DateTime.DayOfWeek is not working " + someDateTime.DayOfWeek.ToString());
+            Assert.IsTrue(someDateTime.DayOfYear == 97, "DateTime.DayOfYear is not working");
 
             Assert.IsTrue(DateTime.Now.Year >= 2018, "DateTime.Now is returning an year lower than 2018");
 
-            Assert.IsTrue(someDateTime.ToString() == "2017-04-07 16:47:32", "DateTime.ToString() is not working");
+            // We assume that Cosmos uses Invariant Culture to display dates
+            //Assert.IsTrue(someDateTime.ToString() == "2017-04-07 16:47:32", "DateTime.ToString() is not working");
+            Assert.IsTrue(someDateTime.ToString() == "04/07/2017 16:47:32", "DateTime.ToString() is not working");
+            Assert.IsTrue(someDateTime.ToLongDateString() == "Friday, 07 April 2017", "DateTime.ToLongDateString() is not working");
+            Assert.IsTrue(someDateTime.ToShortDateString() == "04/07/2017", "DateTime.ToShortDateString() is not working");
+            Assert.IsTrue(someDateTime.ToLongTimeString() == "16:47:32", "DateTime.ToLongTimeString() is not working");
+            Assert.IsTrue(someDateTime.ToShortTimeString() == "16:47", "DateTime.ToShortTimeString() is not working");
 
             TimeSpan twoDaysTimeSpan = TimeSpan.FromDays(2);
 
