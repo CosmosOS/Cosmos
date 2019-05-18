@@ -5,6 +5,7 @@
         <OutputType>WinExe</OutputType>
         <ApplicationIcon>Resources\Cosmos.ico</ApplicationIcon>
         <IncludeWpfReferences>True</IncludeWpfReferences>
+        <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
