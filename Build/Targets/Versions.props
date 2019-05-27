@@ -4,7 +4,7 @@
         <ApprovalTestsVersion>3.0.22</ApprovalTestsVersion>
         <AvaloniaVersion>0.7.0</AvaloniaVersion>
         <MicrosoftBuildVersion>16.0.461</MicrosoftBuildVersion>
-        <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0-preview.1</MicrosoftNETFrameworkReferenceAssembliesVersion>
+        <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0-preview.2</MicrosoftNETFrameworkReferenceAssembliesVersion>
         <MicrosoftNETTestSdkVersion>16.0.1</MicrosoftNETTestSdkVersion>
         <MicrosoftTestPlatformObjectModelVersion>16.0.1</MicrosoftTestPlatformObjectModelVersion>
         <MicrosoftVisualStudioProjectSystemVersion>16.0.374-pre</MicrosoftVisualStudioProjectSystemVersion>
