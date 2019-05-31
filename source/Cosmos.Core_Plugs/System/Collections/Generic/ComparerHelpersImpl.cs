@@ -14,12 +14,141 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
         {
             Debugger.DoBochsBreak();
 
+            //TODO: Do application level testing to determine the most frequent comparisons and do those type checks first.
+
+            if (aType == typeof(Byte))
+            {
+                return new ByteComparer();
+            }
+
+            if (aType == typeof(Byte?))
+            {
+                return new NullableByteComparer();
+            }
+
+            if (aType == typeof(SByte))
+            {
+                return new SByteComparer();
+            }
+
+            if (aType == typeof(SByte?))
+            {
+                return new NullableSByteComparer();
+            }
+
             if (aType == typeof(string))
             {
                 return new StringComparer();
             }
 
-            return null;
+            if (aType == typeof(Int32))
+            {
+                return new Int32Comparer();
+            }
+
+            if (aType == typeof(Int32?))
+            {
+                return new NullableInt32Comparer();
+            }
+
+            if (aType == typeof(UInt32))
+            {
+                return new UInt32Comparer();
+            }
+
+            if (aType == typeof(UInt32?))
+            {
+                return new NullableUInt32Comparer();
+            }
+
+            if (aType == typeof(Int64))
+            {
+                return new Int64Comparer();
+            }
+
+            if (aType == typeof(Int64?))
+            {
+                return new NullableInt64Comparer();
+            }
+
+            if (aType == typeof(UInt64))
+            {
+                return new UInt64Comparer();
+            }
+
+            if (aType == typeof(UInt64?))
+            {
+                return new NullableUInt64Comparer();
+            }
+
+            if (aType == typeof(Char))
+            {
+                return new CharComparer();
+            }
+
+            if (aType == typeof(Char?))
+            {
+                return new NullableCharComparer();
+            }
+
+            if (aType == typeof(Int16))
+            {
+                return new Int16Comparer();
+            }
+
+            if (aType == typeof(Int16?))
+            {
+                return new NullableInt16Comparer();
+            }
+
+            if (aType == typeof(UInt16))
+            {
+                return new UInt16Comparer();
+            }
+
+            if (aType == typeof(UInt16?))
+            {
+                return new NullableUInt16Comparer();
+            }
+
+            if (aType == typeof(Guid))
+            {
+                return new GuidComparer();
+            }
+
+            if (aType == typeof(Guid?))
+            {
+                return new NullableGuidComparer();
+            }
+
+            if (aType.IsEnum)
+            {
+                switch (Type.GetTypeCode(Enum.GetUnderlyingType(aType)))
+                {
+                    case TypeCode.SByte:
+                        return new SByteComparer();
+                    case TypeCode.Byte:
+                        return new ByteComparer();
+                    case TypeCode.Int16:
+                        return new Int16Comparer();
+                    case TypeCode.UInt16:
+                        return new UInt16Comparer();
+                    case TypeCode.Int32:
+                        return new Int32Comparer();
+                    case TypeCode.UInt32:
+                        return new UInt32Comparer();
+                    case TypeCode.Int64:
+                        return new Int64Comparer();
+                    case TypeCode.UInt64:
+                        return new UInt64Comparer();
+                    default:
+                        return null;
+                }
+            }
+
+            //MS framework falls back to address compare so we'll do the same.
+            //mDebugger.Send($"No Comparer for type {aType}");
+            return new ObjectComparer();
         }
 
         public static object CreateDefaultEqualityComparer(Type aType)
@@ -27,16 +156,6 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             Debugger.DoBochsBreak();
 
             //TODO: Do application level testing to determine the most frequent comparisons and do those type checks first.
-
-            /*
-             * For now I've made some assumptions about how common each type is.
-             * Strings are very common for controls, messages, console input/output, etc.
-             * Bytes will be used for binary operations and protocols.
-             * Int I believe will be used for return codes and 32 registers (which I expect to be common with x86 and ARM).
-             * Long should be semi-unique identifiers.
-             * I don't except Char to be as common as string but I expect to be used in roughly the same way.
-             * The only use case I see for short off-hand is PCM data but that might be more useful for audio support at a later date.
-             */
 
             if (aType == typeof(Byte))
             {
@@ -174,13 +293,257 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
         }
     }
 
+    #region "Comparer"
+
     public class StringComparer : Comparer<string>
     {
         public override int Compare(string x, string y)
         {
+            return String.Compare(x, y);
+        }
+    }
+
+    public class CharComparer : Comparer<Char>
+    {
+        public override int Compare(char x, char y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableCharComparer : Comparer<Char?>
+    {
+        public override int Compare(Char? x, Char? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class ByteComparer : Comparer<Byte>
+    {
+        public override int Compare(Byte x, Byte y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableByteComparer : Comparer<Byte?>
+    {
+        public override int Compare(Byte? x, Byte? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class SByteComparer : Comparer<SByte>
+    {
+        public override int Compare(SByte x, SByte y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableSByteComparer : Comparer<SByte?>
+    {
+        public override int Compare(SByte? x, SByte? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class Int16Comparer : Comparer<Int16>
+    {
+        public override int Compare(Int16 x, Int16 y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableInt16Comparer : Comparer<Int16?>
+    {
+        public override int Compare(Int16? x, Int16? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class UInt16Comparer : Comparer<UInt16>
+    {
+        public override int Compare(UInt16 x, UInt16 y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableUInt16Comparer : Comparer<UInt16?>
+    {
+        public override int Compare(UInt16? x, UInt16? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class Int32Comparer : Comparer<Int32>
+    {
+        public override int Compare(Int32 x, Int32 y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableInt32Comparer : Comparer<Int32?>
+    {
+        public override int Compare(Int32? x, Int32? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class UInt32Comparer : Comparer<UInt32>
+    {
+        public override int Compare(UInt32 x, UInt32 y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableUInt32Comparer : Comparer<UInt32?>
+    {
+        public override int Compare(UInt32? x, UInt32? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class Int64Comparer : Comparer<Int64>
+    {
+        public override int Compare(Int64 x, Int64 y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableInt64Comparer : Comparer<Int64?>
+    {
+        public override int Compare(Int64? x, Int64? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class UInt64Comparer : Comparer<UInt64>
+    {
+        public override int Compare(UInt64 x, UInt64 y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableUInt64Comparer : Comparer<UInt64?>
+    {
+        public override int Compare(UInt64? x, UInt64? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class GuidComparer : Comparer<Guid>
+    {
+        public override int Compare(Guid x, Guid y)
+        {
+            return x.CompareTo(y);
+        }
+    }
+
+    public class NullableGuidComparer : Comparer<Guid?>
+    {
+        public override int Compare(Guid? x, Guid? y)
+        {
+            if (x.HasValue && y.HasValue)
+            {
+                return x.Value.CompareTo(y.Value);
+            }
+
+            return 0;
+        }
+    }
+
+    public class ObjectComparer : Comparer<Object>
+    {
+        public override int Compare(Object x, Object y)
+        {
+            string text = x as string;
+            string text2 = y as string;
+            if (text != null && text2 != null)
+            {
+                return String.Compare(text, text2);
+            }
+
+            IComparable comparable = x as IComparable;
+            if (comparable != null)
+            {
+                return comparable.CompareTo(y);
+            }
+
+            IComparable comparable2 = y as IComparable;
+            if (comparable2 != null)
+            {
+                return -comparable2.CompareTo(x);
+            }
+
             throw new NotImplementedException();
         }
     }
+
+    #endregion
+
+    #region "EqualityComparer"
+
 
     public class StringEqualityComparer : EqualityComparer<string>
     {
@@ -599,5 +962,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             return val?.GetHashCode() ?? 0;
         }
     }
+
+    #endregion
 
 }
