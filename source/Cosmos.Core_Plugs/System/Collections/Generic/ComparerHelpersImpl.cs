@@ -177,7 +177,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return new NullableSByteEqualityComparer();
             }
 
-            if (aType == typeof(string))
+            if (aType == typeof(String))
             {
                 return new StringEqualityComparer();
             }
@@ -562,7 +562,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(char x, char y)
         {
-            return x == y;
+            return Char.Equals(x, y);
         }
 
         public override int GetHashCode(char val)
@@ -579,7 +579,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return Char.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -600,7 +600,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(Byte x, Byte y)
         {
-            return x == y;
+            return Byte.Equals(x, y);
         }
 
         public override int GetHashCode(Byte val)
@@ -617,7 +617,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return Byte.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -638,7 +638,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(SByte x, SByte y)
         {
-            return x == y;
+            return SByte.Equals(x, y);
         }
 
         public override int GetHashCode(SByte val)
@@ -655,7 +655,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return SByte.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -676,7 +676,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(Int16 x, Int16 y)
         {
-            return x == y;
+            return Int16.Equals(x, y);
         }
 
         public override int GetHashCode(Int16 val)
@@ -693,7 +693,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return Int16.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -714,7 +714,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(UInt16 x, UInt16 y)
         {
-            return x == y;
+            return UInt16.Equals(x, y);
         }
 
         public override int GetHashCode(UInt16 val)
@@ -731,7 +731,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return UInt16.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -752,7 +752,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(Int32 x, Int32 y)
         {
-            return x == y;
+            return Int32.Equals(x, y);
         }
 
         public override int GetHashCode(Int32 val)
@@ -769,7 +769,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return Int32.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -790,7 +790,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(UInt32 x, UInt32 y)
         {
-            return x == y;
+            return UInt32.Equals(x, y);
         }
 
         public override int GetHashCode(UInt32 val)
@@ -807,7 +807,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return UInt32.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -828,7 +828,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(Int64 x, Int64 y)
         {
-            return x == y;
+            return Int64.Equals(x, y);
         }
 
         public override int GetHashCode(Int64 val)
@@ -845,7 +845,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return Int64.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -866,7 +866,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(UInt64 x, UInt64 y)
         {
-            return x == y;
+            return UInt64.Equals(x, y);
         }
 
         public override int GetHashCode(UInt64 val)
@@ -883,7 +883,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return UInt64.Equals(x.Value, y.Value);
                 }
                 return false;
             }
@@ -904,7 +904,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override bool Equals(Guid x, Guid y)
         {
-            return x == y;
+            return Guid.Equals(x, y);
         }
 
         public override int GetHashCode(Guid val)
@@ -921,7 +921,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             {
                 if (y.HasValue)
                 {
-                    return x.Value.Equals(y.Value);
+                    return Guid.Equals(x.Value, y.Value);
                 }
                 return false;
             }
