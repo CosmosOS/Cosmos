@@ -289,6 +289,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
 
             //MS framework falls back to address compare so we'll do the same.
             //mDebugger.Send($"No EqualityComparer for type {aType}");
+            //return null;
             return new ObjectEqualityComparer();
         }
     }
