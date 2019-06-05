@@ -150,5 +150,27 @@ namespace Cosmos.HAL.Network
             PutByte(xChars, 15, bytes[5]);
             return new String(xChars);
         }
+        public UInt32 to32BitNumber()
+        {
+            return (UInt32)((bytes[0] << 40) | (bytes[1] << 32) | (bytes[2] << 24) | (bytes[3] << 16) |
+                (bytes[4] << 8) | (bytes[5] << 0));
+        }
+
+        private UInt32 hash;
+        /// <summary>
+        /// Hash value for this mac. Used to uniquely identify each mac
+        /// </summary>
+        public UInt32 Hash
+        {
+            get
+            {
+                if (hash == 0)
+                {
+                    hash = to32BitNumber();
+                }
+
+                return hash;
+            }
+        }
     }
 }

@@ -58,7 +58,7 @@ namespace Cosmos.System
             NumLock = false;
             CapsLock = false;
             ScrollLock = false;
-            //Network.NetworkStack.Init();
+            Network.NetworkStack.Init();
         }
 
         public static void ChangeKeyLayout(ScanMapBase scanMap)

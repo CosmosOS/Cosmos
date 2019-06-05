@@ -66,7 +66,7 @@ namespace Cosmos.System.Network.IPv4
             int _deltaT = 0;
             int second = 0;
 
-            while (queue.Count > 0)
+            while (!(queue.Count < 1))
             {
                 if (_deltaT != Cosmos.HAL.RTC.Second)
                 {

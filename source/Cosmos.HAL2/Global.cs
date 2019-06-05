@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Drivers.PCI.Network;
 
 namespace Cosmos.HAL
 {
@@ -18,6 +19,8 @@ namespace Cosmos.HAL
         public static PCI Pci;
 
         public static readonly PS2Controller PS2Controller = new PS2Controller();
+
+        public static AMDPCNetII AMDPCNETII;
 
         static public void Init(TextScreenBase textScreen)
         {
@@ -56,6 +59,16 @@ namespace Cosmos.HAL
             IDE.InitDriver();
             AHCI.InitDriver();
             //EHCI.InitDriver();
+
+            var AMDPCNETII_PCI = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+            if (AMDPCNETII_PCI != null)
+            {
+                Console.WriteLine("Found AMDPCNETII NIC on PCI " + AMDPCNETII_PCI.bus + ":" + AMDPCNETII_PCI.slot + ":" + AMDPCNETII_PCI.function);
+                Console.WriteLine("NIC IRQ: " + AMDPCNETII_PCI.InterruptLine);
+                AMDPCNETII = new AMDPCNetII(AMDPCNETII_PCI);
+                Console.WriteLine("NIC MAC Address: " + AMDPCNETII.MACAddress.ToString());
+                AMDPCNETII.Enable();
+            }
 
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 

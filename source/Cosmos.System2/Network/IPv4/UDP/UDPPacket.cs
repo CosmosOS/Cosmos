@@ -21,6 +21,11 @@ namespace Cosmos.System.Network.IPv4
                     //Network.DHCP.DHCPPacket.DHCPHandler(packetData);
                     return;
                 }
+                else if (udp_packet.SourcePort == 53)
+                {
+                    //DNS.DNSPacket.DNSHandler(packetData);
+                    return;
+                }
 
                 NetworkStack.debugger.Send("Content: " + Encoding.ASCII.GetString(udp_packet.UDP_Data));
                 UdpClient receiver = UdpClient.Client(udp_packet.DestinationPort);
