@@ -321,6 +321,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return x.Value.CompareTo(y.Value);
             }
 
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
+            }
+
             return 0;
         }
     }
@@ -340,6 +350,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             if (x.HasValue && y.HasValue)
             {
                 return x.Value.CompareTo(y.Value);
+            }
+
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
             }
 
             return 0;
@@ -363,6 +383,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return x.Value.CompareTo(y.Value);
             }
 
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
+            }
+
             return 0;
         }
     }
@@ -382,6 +412,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             if (x.HasValue && y.HasValue)
             {
                 return x.Value.CompareTo(y.Value);
+            }
+
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
             }
 
             return 0;
@@ -405,6 +445,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return x.Value.CompareTo(y.Value);
             }
 
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
+            }
+
             return 0;
         }
     }
@@ -424,6 +474,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             if (x.HasValue && y.HasValue)
             {
                 return x.Value.CompareTo(y.Value);
+            }
+
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
             }
 
             return 0;
@@ -447,6 +507,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return x.Value.CompareTo(y.Value);
             }
 
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
+            }
+
             return 0;
         }
     }
@@ -466,6 +536,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             if (x.HasValue && y.HasValue)
             {
                 return x.Value.CompareTo(y.Value);
+            }
+
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
             }
 
             return 0;
@@ -489,6 +569,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return x.Value.CompareTo(y.Value);
             }
 
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
+            }
+
             return 0;
         }
     }
@@ -510,6 +600,16 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return x.Value.CompareTo(y.Value);
             }
 
+            if (!x.HasValue)
+            {
+                return -1;
+            }
+
+            if (!y.HasValue)
+            {
+                return 1;
+            }
+
             return 0;
         }
     }
@@ -518,6 +618,11 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     {
         public override int Compare(Object x, Object y)
         {
+            if (x == null && y == null)
+            {
+                return 0;
+            }
+
             string text = x as string;
             string text2 = y as string;
             if (text != null && text2 != null)
