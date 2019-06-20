@@ -61,7 +61,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core", "source\Cosmo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL2", "source\Cosmos.HAL2\Cosmos.HAL2.csproj", "{DE4F000A-B65C-4395-B066-891B7423E9EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp", "..\XSharp\source\XSharp\XSharp.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp", "..\XSharp\source\XSharp\XSharp\XSharp.csproj", "{12B1AAA1-14DE-4B85-8C33-B32EA3A95B82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj", "{89DB6325-2C81-467D-BE8A-C4AEBB6540A5}"
 EndProject
@@ -70,8 +70,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System2_Plugs", "source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj", "{9A327DB7-42E2-4C82-9537-0D995B9171FF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel.Plugs.Asm", "source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj", "{7549D7F8-58A3-4F4F-8544-DEF2ABF79A0B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Assembler", "..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj", "{E1AC1E9B-27EA-4AE0-8C83-328BD96F978A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Common", "..\Common\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{CB20F8F9-8C1D-43A6-96EA-89FEC2512C99}"
 EndProject
@@ -92,8 +90,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NASM", "Tools\NASM\NASM.csproj", "{A7C295D2-8DEA-4CAE-A8CB-44CD0529EC65}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\Spruce\Spruce.csproj", "{C984AF76-66C2-4A5F-A3DC-9F8FE0CD4D2F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\source\XSharp.x86\XSharp.x86.csproj", "{91442476-F818-4A7D-A3BC-2159BCDE3352}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Tasks", "source\Cosmos.Build.Tasks\Cosmos.Build.Tasks.csproj", "{0BA0EC69-F124-44C1-823D-C97FE3AEC59E}"
 EndProject
