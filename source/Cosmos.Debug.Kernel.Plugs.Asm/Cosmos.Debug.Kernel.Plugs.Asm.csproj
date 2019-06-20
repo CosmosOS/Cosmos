@@ -8,7 +8,6 @@
     <ItemGroup>
         <PackageReference Include="IL2CPU.API" />
         <PackageReference Include="XSharp" />
-        <PackageReference Include="XSharp.Assembler" />
     </ItemGroup>
 
     <ItemGroup>
