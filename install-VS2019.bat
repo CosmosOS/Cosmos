@@ -1,5 +1,7 @@
 @echo off
 
+cd /D "%~dp0"
+
 if not exist "%ProgramFiles(x86)%" (
   set "ProgramFiles(x86)=%ProgramFiles%"
 )
