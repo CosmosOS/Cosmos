@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp2.0</TargetFramework>
         <RuntimeIdentifier>cosmos</RuntimeIdentifier>
-        <Profile>VMware</Profile>
+        <Profile>Bochs</Profile>
         <BinFormat>ELF</BinFormat>
         <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
         <StackCorruptionDetectionLevel>MethodFooters</StackCorruptionDetectionLevel>
@@ -19,11 +19,11 @@
         <_DebugMode>Source</_DebugMode>
         <_IgnoreDebugStubAttribute>False</_IgnoreDebugStubAttribute>
         <_PxeInterface>192.168.211.1</_PxeInterface>
-        <Description>Use VMware Player or Workstation to deploy and debug.</Description>
-        <Launch>VMware</Launch>
+        <Description>Use Bochs emulator to deploy and debug.</Description>
+        <Launch>Bochs</Launch>
         <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-        <EnableGDB>False</EnableGDB>
-        <StartCosmosGDB>False</StartCosmosGDB>
+        <EnableGDB>True</EnableGDB>
+        <StartCosmosGDB>True</StartCosmosGDB>
         <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
         <VMware_StackCorruptionDetectionLevel>MethodFooters</VMware_StackCorruptionDetectionLevel>
         <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
@@ -34,8 +34,8 @@
         <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
         <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
         <VMware_PxeInterface>192.168.211.1</VMware_PxeInterface>
-        <VMware_EnableGDB>True</VMware_EnableGDB>
-        <VMware_StartCosmosGDB>True</VMware_StartCosmosGDB>
+        <VMware_EnableGDB>False</VMware_EnableGDB>
+        <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
         <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
         <Bochs_StackCorruptionDetectionLevel>MethodFooters</Bochs_StackCorruptionDetectionLevel>
         <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
