@@ -54,7 +54,7 @@ namespace Cosmos.System
         /// <summary>
         /// The Point of the mouse.
         /// </summary>
-        public static Point GetPoint() {return new Point((int)MouseManager.X, (int)MouseManager.Y);}
+        // public static Point GetPoint() {return new Point((int)MouseManager.X, (int)MouseManager.Y);}
 
         /// <summary>
         /// The state the mouse is currently in.
