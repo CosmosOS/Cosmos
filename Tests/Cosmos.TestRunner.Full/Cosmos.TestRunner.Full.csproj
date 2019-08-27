@@ -29,9 +29,7 @@
         <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
         <ProjectReference Include="..\Kernels\GraphicTest\GraphicTest.csproj" />
         <ProjectReference Include="..\Kernels\MemoryOperationsTest\MemoryOperationsTest.csproj" />
-        <ProjectReference Include="..\Kernels\ProcessorTests\ProcessorTests.csproj" />
         <ProjectReference Include="..\Kernels\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
-        <ProjectReference Include="..\Kernels\GuiCsKernel\GuiCsKernel.csproj" />
     </ItemGroup>
 
 </Project>

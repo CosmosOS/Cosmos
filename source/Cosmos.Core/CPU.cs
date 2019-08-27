@@ -1,4 +1,3 @@
-using System;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -69,35 +68,5 @@ namespace Cosmos.Core
             mInterruptsEnabled = false;
             return xResult;
         }
-
-        public static string GetCPUVendorName()
-        {
-            // TODO Call cpuid and parse response
-            int[] value = ReadCPUID(0); // 0 is vendor name
-            return "";
-        }
-
-        public static long GetCPUUptime()
-        {
-            // TODO Call read timestamp counter and parse response
-            int[] value = ReadTimestampCounter();
-            //  ((long)val[0] << 32) | (uint)val[1];
-            return 0;
-        }
-
-        public static long GetCPUCycleSpeed()
-        {
-            // TODO read cpuid response and do a bitwise and 0x0000ffff
-            int[] value = ReadCPUID(16); // 16 is max cycle rate
-            return 0;
-        }
-
-        internal static int CarReadCPUID() => throw new NotImplementedException();
-
-        internal static int[] ReadCPUID(int type) => throw new NotImplementedException();
-
-        internal static int[] ReadTimestampCounter() => throw new NotImplementedException();
-
-        internal static int[] ReadFromModelSpecificRegister() => throw new NotImplementedException();
     }
 }

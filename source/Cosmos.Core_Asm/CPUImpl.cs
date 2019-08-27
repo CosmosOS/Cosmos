@@ -1,4 +1,3 @@
-using System;
 using Cosmos.Core;
 
 using IL2CPU.API.Attribs;
@@ -35,17 +34,5 @@ namespace Cosmos.Core_Asm
 
         [PlugMethod(Assembler = typeof(CPUEnableINTsAsm))]
         public static void DoEnableInterrupts() => throw null;
-
-        [PlugMethod(Assembler = typeof(CPUCanReadCPUIDAsm))]
-        public static int CanReadCPUID() => throw new NotImplementedException();
-
-        [PlugMethod(Assembler = typeof(CPUReadCPUIDAsm))]
-        public static int[] ReadCPUID(int type) => throw new NotImplementedException();
-
-        [PlugMethod(Assembler = typeof(CPUReadTimestampCounterAsm))]
-        public static int[] ReadTimestampCounter() => throw new NotImplementedException();
-
-        [PlugMethod(Assembler = typeof(CPUReadModelSpecificRegisterAsm))]
-        public static int[] ReadFromModelSpecificRegister() => throw new NotImplementedException();
     }
 }
