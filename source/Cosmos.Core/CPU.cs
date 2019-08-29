@@ -72,9 +72,14 @@ namespace Cosmos.Core
 
         public static string GetCPUVendorName()
         {
-            // TODO Call cpuid and parse response
-            int[] value = ReadCPUID(0); // 0 is vendor name
-            return "";
+            if (CanReadCPUID() != 0)
+            {
+                // TODO Call cpuid and parse response
+                int[] value = ReadCPUID(0); // 0 is vendor name
+                return "";
+            }
+
+            throw new NotSupportedException();
         }
 
         public static long GetCPUUptime()
@@ -87,12 +92,17 @@ namespace Cosmos.Core
 
         public static long GetCPUCycleSpeed()
         {
-            // TODO read cpuid response and do a bitwise and 0x0000ffff
-            int[] value = ReadCPUID(16); // 16 is max cycle rate
-            return 0;
+            if (CanReadCPUID() != 0)
+            {
+                // TODO read cpuid response and do a bitwise and 0x0000ffff
+                int[] value = ReadCPUID(16); // 16 is max cycle rate
+                return 0;
+            }
+
+            throw new NotSupportedException();
         }
 
-        internal static int CarReadCPUID() => throw new NotImplementedException();
+        internal static int CanReadCPUID() => throw new NotImplementedException();
 
         internal static int[] ReadCPUID(int type) => throw new NotImplementedException();
 

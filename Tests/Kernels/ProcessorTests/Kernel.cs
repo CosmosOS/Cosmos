@@ -38,9 +38,9 @@ namespace ProcessorTests
 
         public void TestVendorNameIsNotBlank()
         {
-            //string vendorName = CPU.GetCPUVendorName();
-            //bool isVendorNameBlank = string.IsNullOrWhiteSpace(vendorName);
-            //Assert.IsFalse(isVendorNameBlank, "Processor vendor name is blank.");
+            string vendorName = CPU.GetCPUVendorName();
+            bool isVendorNameBlank = string.IsNullOrWhiteSpace(vendorName);
+            Assert.IsFalse(isVendorNameBlank, "Processor vendor name is blank.");
         }
 
         public void TestCycleCountIsNotZero()
@@ -52,9 +52,9 @@ namespace ProcessorTests
 
         public void TestCycleRateIsNotZero()
         {
-            //long cycleRate = CPU.GetCPUCycleSpeed();
-            //bool isCycleRateZero = cycleRate == 0;
-            //Assert.IsFalse(isCycleRateZero, "Processor cycle rate is zero.");
+            long cycleRate = CPU.GetCPUCycleSpeed();
+            bool isCycleRateZero = cycleRate == 0;
+            Assert.IsFalse(isCycleRateZero, "Processor cycle rate is zero.");
         }
     }
 }
