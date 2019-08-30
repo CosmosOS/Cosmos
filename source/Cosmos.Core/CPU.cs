@@ -99,12 +99,10 @@ namespace Cosmos.Core
             throw new NotSupportedException();
         }
 
-        public static long GetCPUUptime()
+        public static ulong GetCPUUptime()
         {
-            // TODO Call read timestamp counter and parse response
-            int[] value = ReadTimestampCounter();
-            //  ((long)val[0] << 32) | (uint)val[1];
-            return 0;
+            // TODO Divide by cpu clock speed
+            return ReadTimestampCounter();
         }
 
         public static long GetCPUCycleSpeed()
@@ -132,7 +130,7 @@ namespace Cosmos.Core
 
         internal static void ReadCPUID(int type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
 
-        internal static int[] ReadTimestampCounter() => throw new NotImplementedException();
+        internal static ulong ReadTimestampCounter() => throw new NotImplementedException();
 
         internal static int[] ReadFromModelSpecificRegister() => throw new NotImplementedException();
     }

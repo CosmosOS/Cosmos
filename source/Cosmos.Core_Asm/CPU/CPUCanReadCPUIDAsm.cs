@@ -22,13 +22,13 @@ namespace Cosmos.Core_Asm
              */
             XS.Pushfd();
             XS.Pushfd();
-            XS.Xor(XSRegisters.ESP, 0x00200000, destinationIsIndirect: true);
+            XS.Xor(ESP, 0x00200000, destinationIsIndirect: true);
             XS.Popfd();
             XS.Pushfd();
-            XS.Pop(XSRegisters.EAX);
-            XS.Xor(XSRegisters.EAX, XSRegisters.ESP, destinationIsIndirect: true);
+            XS.Pop(EAX);
+            XS.Xor(EAX, ESP, destinationIsIndirect: true);
             XS.Popfd();
-            XS.And(XSRegisters.EAX, 0x00200000);
+            XS.And(EAX, 0x00200000);
             XS.Push(EAX);
         }
     }
