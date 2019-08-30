@@ -74,18 +74,26 @@ namespace Cosmos.Core
         {
             if (CanReadCPUID() != 0)
             {
-                // TODO Call cpuid and parse response
                 int eax = 0;
                 int ebx = 0;
                 int ecx = 0;
                 int edx = 0;
                 ReadCPUID(0, ref eax, ref ebx, ref ecx, ref edx); // 0 is vendor name
-                Global.mDebugger.Send("GetCPUVendorName Registers");
-                Global.mDebugger.SendNumber(eax);
-                Global.mDebugger.SendNumber(ebx);
-                Global.mDebugger.SendNumber(ecx);
-                Global.mDebugger.SendNumber(edx);
-                return "";
+
+                string s = "";
+                s += (char)(ebx);
+                s += (char)(ebx >> 8);
+                s += (char)(ebx >> 16);
+                s += (char)(ebx >> 24);
+                s += (char)(ecx);
+                s += (char)(ecx >> 8);
+                s += (char)(ecx >> 16);
+                s += (char)(ecx >> 24);
+                s += (char)(edx);
+                s += (char)(edx >> 8);
+                s += (char)(edx >> 16);
+                s += (char)(edx >> 24);
+                return s;
             }
 
             throw new NotSupportedException();
