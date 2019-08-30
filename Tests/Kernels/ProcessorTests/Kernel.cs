@@ -22,9 +22,9 @@ namespace ProcessorTests
         {
             try
             {
-                TestVendorNameIsNotBlank();
-                TestCycleCountIsNotZero();
-                TestCycleRateIsNotZero();
+                //TestVendorNameIsNotBlank();
+                TestCycleCount();
+                //TestCycleRateIsNotZero();
                 
                 TestController.Completed();
             }
@@ -43,11 +43,17 @@ namespace ProcessorTests
             Assert.IsFalse(isVendorNameBlank, "Processor vendor name is blank.");
         }
 
-        public void TestCycleCountIsNotZero()
+        public void TestCycleCount()
         {
-            long cycleCount = CPU.GetCPUUptime();
+            ulong cycleCount = CPU.GetCPUUptime();
+            mDebugger.Send("Cycle count: " + cycleCount);
+            mDebugger.SendNumber(cycleCount);
             bool isCycleCountZero = cycleCount == 0;
             Assert.IsFalse(isCycleCountZero, "Processor cycle count is zero.");
+            ulong secondCount = CPU.GetCPUUptime();
+            mDebugger.Send("Cycle count: " + secondCount);
+            mDebugger.SendNumber(secondCount);
+            Assert.IsTrue(secondCount > cycleCount, "Processor cycle count is increasing");
         }
 
         public void TestCycleRateIsNotZero()
