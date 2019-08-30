@@ -75,7 +75,16 @@ namespace Cosmos.Core
             if (CanReadCPUID() != 0)
             {
                 // TODO Call cpuid and parse response
-                int[] value = ReadCPUID(0); // 0 is vendor name
+                int eax = 0;
+                int ebx = 0;
+                int ecx = 0;
+                int edx = 0;
+                ReadCPUID(0, ref eax, ref ebx, ref ecx, ref edx); // 0 is vendor name
+                Global.mDebugger.Send("GetCPUVendorName Registers");
+                Global.mDebugger.SendNumber(eax);
+                Global.mDebugger.SendNumber(ebx);
+                Global.mDebugger.SendNumber(ecx);
+                Global.mDebugger.SendNumber(edx);
                 return "";
             }
 
@@ -95,7 +104,16 @@ namespace Cosmos.Core
             if (CanReadCPUID() != 0)
             {
                 // TODO read cpuid response and do a bitwise and 0x0000ffff
-                int[] value = ReadCPUID(16); // 16 is max cycle rate
+                int eax = 0;
+                int ebx = 0;
+                int ecx = 0;
+                int edx = 0;
+                ReadCPUID(16, ref eax, ref ebx, ref ecx, ref edx); // 16 is max cycle rate
+                Global.mDebugger.Send("GetCPUCycleSpeed Registers");
+                Global.mDebugger.SendNumber(eax);
+                Global.mDebugger.SendNumber(ebx);
+                Global.mDebugger.SendNumber(ecx);
+                Global.mDebugger.SendNumber(edx);
                 return 0;
             }
 
@@ -104,7 +122,7 @@ namespace Cosmos.Core
 
         internal static int CanReadCPUID() => throw new NotImplementedException();
 
-        internal static int[] ReadCPUID(int type) => throw new NotImplementedException();
+        internal static void ReadCPUID(int type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
 
         internal static int[] ReadTimestampCounter() => throw new NotImplementedException();
 
