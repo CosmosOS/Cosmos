@@ -35,7 +35,7 @@ namespace Cosmos.System.Graphics
 
         public override void Disable()
         {
-            VBEDriver.VBEDisableDisplay();
+            VBEDriver.DisableDisplay();
         }
 
         public override Mode Mode
@@ -48,7 +48,7 @@ namespace Cosmos.System.Graphics
             }
         }
 
-#region Display
+        #region Display
 
         /// <summary>
         /// All the available screen modes VBE supports, I would like to query the hardware and obtain from it the list but I have
@@ -58,8 +58,7 @@ namespace Cosmos.System.Graphics
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
         public override List<Mode> AvailableModes { get; } = new List<Mode>
         {
-            return new List<Mode>
-                {
+
                   new Mode(320, 240, ColorDepth.ColorDepth32),
                   new Mode(640, 480, ColorDepth.ColorDepth32),
                   new Mode(800, 600, ColorDepth.ColorDepth32),
@@ -74,11 +73,7 @@ namespace Cosmos.System.Graphics
                   new Mode(1920, 1080, ColorDepth.ColorDepth32),
                   /* HDTV resolution (16:10 AR) */
                   new Mode(1920, 1200, ColorDepth.ColorDepth32),
-            };
-        }
-
-        protected override Mode getDefaultGraphicMode() => new Mode(1024, 768, ColorDepth.ColorDepth32);
-        // public static readonly Mode defaultGraphicsMode = new Mode(1024, 768, ColorDepth.ColorDepth32);   
+        };
 
         public override Mode DefaultGraphicMode => DefaultMode;
        
