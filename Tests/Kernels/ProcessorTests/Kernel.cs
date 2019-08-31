@@ -39,7 +39,10 @@ namespace ProcessorTests
         public void TestVendorNameIsNotBlank()
         {
             string vendorName = CPU.GetCPUVendorName();
+            mDebugger.Send(vendorName);
             bool isVendorNameBlank = string.IsNullOrWhiteSpace(vendorName);
+            mDebugger.Send("Vendor name: ");
+            mDebugger.Send(vendorName);
             Assert.IsFalse(isVendorNameBlank, "Processor vendor name is blank.");
         }
 

@@ -85,14 +85,15 @@ namespace Cosmos.Core
                 s += (char)(ebx >> 8);
                 s += (char)(ebx >> 16);
                 s += (char)(ebx >> 24);
-                s += (char)(ecx);
-                s += (char)(ecx >> 8);
-                s += (char)(ecx >> 16);
-                s += (char)(ecx >> 24);
                 s += (char)(edx);
                 s += (char)(edx >> 8);
                 s += (char)(edx >> 16);
                 s += (char)(edx >> 24);
+                s += (char)(ecx);
+                s += (char)(ecx >> 8);
+                s += (char)(ecx >> 16);
+                s += (char)(ecx >> 24);
+
                 return s;
             }
 
