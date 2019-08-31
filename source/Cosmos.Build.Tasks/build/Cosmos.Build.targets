@@ -67,12 +67,15 @@
         </Content>
     </ItemDefinitionGroup>
 
-    <!-- https://github.com/Microsoft/msbuild/issues/3479
-         if/when fixed, change MakeIso
     <ItemGroup>
-        <ContentToDeploy Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
+        <ContentToDeploy Include="@(Content->WithMetadataValue('Deploy', 'True'))" />
     </ItemGroup>
-    -->
+
+    <ItemGroup>
+        <UpToDateCheckOutput Include="$(Il2cpuOutput)" />
+        <UpToDateCheckOutput Include="$(NasmOutput)" />
+        <UpToDateCheckOutput Include="$(IsoFile)" />
+    </ItemGroup>
 
     <ItemGroup Condition="'$(KernelPkg)' == ''">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
@@ -90,6 +93,18 @@
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Plugs.TapRoot.dll" />
     </ItemGroup>
 
+    <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
+        <PackageReference>
+            <IsPlugsReference>False</IsPlugsReference>
+        </PackageReference>
+    </ItemDefinitionGroup>
+
+    <ItemGroup>
+        <PackageReference Update="@(PackageReference)">
+            <ExcludeAssets Condition="'%(IsPlugsReference)' == 'True'">Compile</ExcludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateMbr" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateSyslinuxConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -100,6 +115,10 @@
     <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ReadNasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.TheRingMaster" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+
+    <PropertyGroup>
+        <CoreBuildDependsOn>$(CoreBuildDependsOn);CosmosBuild</CoreBuildDependsOn>
+    </PropertyGroup>
 
     <PropertyGroup>
         <CosmosBuildDependsOn>
@@ -114,7 +133,7 @@
         </CosmosBuildDependsOn>
     </PropertyGroup>
 
-    <Target Name="CosmosBuild" AfterTargets="Build" DependsOnTargets="$(CosmosBuildDependsOn)" />
+    <Target Name="CosmosBuild" DependsOnTargets="$(CosmosBuildDependsOn)" />
 
     <Target Name="FailIfRelease" Condition="'$(Configuration)' == 'Release'">
         <Error Text="The Release configuration isn't currently supported!" />
@@ -139,12 +158,12 @@
     <Target Name="IL2CPU"
             Inputs="$(TargetPath);@(PlugsReference)"
             Outputs="$(Il2cpuOutput)"
-            DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets">
+            DependsOnTargets="ResolveReferences;ComputeFilesToPublish">
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
-                               Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
-                                      AND '%(ResolvedAssembliesToPublish.Extension)' != '.pdb'" />
+            <_Il2cpuAssemblies Include="@(ResolvedFileToPublish->'%(FullPath)')"
+                               Condition="'%(ResolvedFileToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedFileToPublish.Extension)' == '.dll'" />
         </ItemGroup>
 
         <IL2CPU KernelPkg="$(KernelPkg)"
@@ -162,7 +181,9 @@
                 EnableLogging="True"
                 EmitDebugSymbols="$(DebugSymbols)"
                 CosmosBuildDir="$(CosmosDir)\Build"
-                WorkingDir="$(TargetDir)" />
+                WorkingDir="$(TargetDir)"
+				ToolPath="$(Il2cpuToolPath)"
+				ToolExe="$(Il2cpuToolExe)" />
 
     </Target>
 
@@ -287,7 +308,7 @@
             <_IsoFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
             <_IsoFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
             <_IsoFile Include="$(BinFile)" />
-            <_IsoFile Include="@(Content)" Condition="'%(Content.Deploy)' == 'True'" />
+            <_IsoFile Include="@(ContentToDeploy)" />
         </ItemGroup>
 
         <RemoveDir Directories="$(IntermediateIsoDirectory)" />

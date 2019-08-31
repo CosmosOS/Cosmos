@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using Microsoft;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Cosmos.VS.DebugEngine.Commands
@@ -23,27 +25,33 @@ namespace Cosmos.VS.DebugEngine.Commands
                 return VSConstants.S_OK;
             }
 
-            string arguments;
-            hr = EnsureString(pvaIn, out arguments);
-            if (hr != VSConstants.S_OK)
-                return hr;
+            hr = EnsureString(pvaIn, out var arguments);
 
-            if (string.IsNullOrWhiteSpace(arguments))
+            if (hr != VSConstants.S_OK)
+            {
+                return hr;
+            }
+
+            if (String.IsNullOrWhiteSpace(arguments))
+            {
                 throw new ArgumentException("Expected a Cosmos command to execute (ex: Debug.CosmosDebugExec info sharedlibrary)");
+            }
 
             DebugExec(arguments);
 
             return VSConstants.S_OK;
         }
 
-        private void  DebugExec(string command)
+        private void DebugExec(string command)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var commandWindow = (IVsCommandWindow)serviceProvider.GetService(typeof(SVsCommandWindow));
-            bool atBreak = false;
-            var debugger = serviceProvider.GetService(typeof(SVsShellDebugger)) as IVsDebugger;
-            if (debugger != null)
+            Assumes.Present(commandWindow);
+            var atBreak = false;
+            if (serviceProvider.GetService(typeof(SVsShellDebugger)) is IVsDebugger debugger)
             {
-                DBGMODE[] mode = new DBGMODE[1];
+                var mode = new DBGMODE[1];
                 if (debugger.GetMode(mode) == VSConstants.S_OK)
                 {
                     atBreak = mode[0] == DBGMODE.DBGMODE_Break;

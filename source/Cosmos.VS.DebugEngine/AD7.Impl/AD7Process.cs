@@ -5,16 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+
 using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 using Cosmos.Debug.DebugConnectors;
 using Cosmos.Debug.Hosts;
-using IL2CPU.Debug.Symbols;
 using Cosmos.VS.DebugEngine.Engine.Impl;
 using Cosmos.VS.DebugEngine.Utilities;
+
+using IL2CPU.Debug.Symbols;
 using Label = IL2CPU.Debug.Symbols.Label;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
@@ -280,9 +281,8 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         private void CreateDebugConnector()
         {
             mDbgConnector = null;
-
-            string xPort;
-            mDebugInfo.TryGetValue(BuildPropertyNames.VisualStudioDebugPortString, out xPort);
+            
+            mDebugInfo.TryGetValue(BuildPropertyNames.VisualStudioDebugPortString, out var xPort);
 
             // using (var xDebug = new StreamWriter(@"e:\debug.info", false))
             // {
@@ -298,10 +298,10 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 mDebugInfo.TryGetValue(BuildPropertyNames.CosmosDebugPortString, out xPort);
             }
 
-            var xParts = (null == xPort) ? null : xPort.Split(' ');
+            var xParts = xPort?.Split(' ');
             if ((null == xParts) || (2 > xParts.Length))
             {
-                throw new Exception(string.Format("Unable to parse VS debug port: '{0}'", xPort));
+                throw new Exception(String.Format("Unable to parse VS debug port: '{0}'", xPort));
                 //throw new Exception(string.Format(
                 //    "The '{0}' Cosmos project file property is either ill-formed or missing.",
                 //    BuildProperties.VisualStudioDebugPortString));
@@ -359,6 +359,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mDbgConnector.CmdNullReferenceOccurred += DbgCmdNullReferenceOccurred;
             mDbgConnector.CmdMessageBox += DbgCmdMessageBox;
             mDbgConnector.CmdChannel += DbgCmdChannel;
+            mDbgConnector.CmdCoreDump += DbgCmdCoreDump;
         }
 
         private void DbgCmdChannel(byte aChannel, byte aCommand, byte[] aData)
@@ -407,6 +408,66 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             AD7Util.MessageBox("Message from your Cosmos operating system:\r\n\r\n" + message);
         }
 
+        private void DbgCmdCoreDump(CoreDump dump)
+        {
+            var eax = GetRegister("EAX", dump.EAX);
+            var ebx = GetRegister("EBX", dump.EBX);
+            var ecx = GetRegister("ECX", dump.ECX);
+            var edx = GetRegister("EDX", dump.EDX);
+
+            var edi = GetRegister("EDI", dump.EDI);
+            var esi = GetRegister("ESI", dump.ESI);
+
+            var ebp = GetRegister("EBP", dump.EBP);
+            var esp = GetRegister("ESP", dump.ESP);
+            var eip = GetRegister("EIP", dump.EIP);
+
+            var message = "Core dump:" + Environment.NewLine
+                        + $"{eax}    {ebx}    {ecx}    {edx}" + Environment.NewLine
+                        + $"{edi}    {esi}" + Environment.NewLine
+                        + $"{ebp}    {esp}    {eip}" + Environment.NewLine
+                        + Environment.NewLine
+                        + "Call stack:"
+                        + Environment.NewLine;
+
+            while (dump.StackTrace.Count > 0)
+            {
+                message += GetStackTraceEntry(dump.StackTrace.Pop()) + Environment.NewLine;
+            }
+
+            AD7Util.MessageBox(message);
+
+            string GetRegister(string name, uint value) => $"{name} = 0x{value:X8}";
+
+            string GetStackTraceEntry(uint address)
+            {
+                var entry = $"at 0x{address:X8}";
+
+                if (mDebugInfo.TryGetValue(BuildPropertyNames.DebugModeString, out var xDebugMode))
+                {
+                    if (xDebugMode == "Source")
+                    {
+                        try
+                        {
+                            var xMethod = mDebugInfoDb.GetMethod(address);
+                            var xDocument = mDebugInfoDb.GetDocumentById(xMethod.DocumentID);
+                            var xLabel = mDebugInfoDb.GetLabels(address)[0];
+                            var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
+                            var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
+                            var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+
+                            entry += $"in {xDocument.Pathname}:line {xLine}";
+                        }
+                        catch (InvalidOperationException)
+                        {
+                        }
+                    }
+                }
+
+                return entry;
+            }
+        }
+
         internal AD7Process(Dictionary<string, string> aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
             mCallback = aCallback;
@@ -436,11 +497,10 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             OutputText("Using ISO file " + mISO + ".");
             mProjectFile = mDebugInfo["ProjectFile"];
             //
-            bool xUseGDB = string.Equals(mDebugInfo[BuildPropertyNames.EnableGDBString], "true", StringComparison.InvariantCultureIgnoreCase);
+            bool xUseGDB = String.Equals(mDebugInfo[BuildPropertyNames.EnableGDBString], "true", StringComparison.InvariantCultureIgnoreCase);
             OutputText("GDB " + (xUseGDB ? "Enabled" : "Disabled") + ".");
             //
-            var xGDBClient = false;
-            Boolean.TryParse(mDebugInfo[BuildPropertyNames.StartCosmosGDBString], out xGDBClient);
+            Boolean.TryParse(mDebugInfo[BuildPropertyNames.StartCosmosGDBString], out var xGDBClient);
 
             switch (mLaunch)
             {
@@ -482,7 +542,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     string bochsConfigurationFileName;
                     mDebugInfo.TryGetValue(BuildProperties.BochsEmulatorConfigurationFileString, out bochsConfigurationFileName);
 
-                    if (string.IsNullOrEmpty(bochsConfigurationFileName))
+                    if (String.IsNullOrEmpty(bochsConfigurationFileName))
                     {
                         bochsConfigurationFileName = BuildProperties.BochsDefaultConfigurationFileName;
                     }
@@ -537,9 +597,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         protected void LaunchGdbClient()
         {
             OutputText("Launching GDB client.");
-            if (File.Exists(Cosmos.Build.Common.CosmosPaths.GdbClientExe))
+            if (File.Exists(CosmosPaths.GdbClientExe))
             {
-                var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GdbClientExe);
+                var xPSInfo = new ProcessStartInfo(CosmosPaths.GdbClientExe);
                 xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
                 xPSInfo.UseShellExecute = false;
                 xPSInfo.RedirectStandardInput = false;
@@ -550,9 +610,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             }
             else
             {
-                AD7Util.MessageBox(string.Format(
+                AD7Util.MessageBox(String.Format(
                     "The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
-                    Cosmos.Build.Common.CosmosPaths.GdbClientExe), "GDB-Client");
+                    CosmosPaths.GdbClientExe), "GDB-Client");
             }
         }
 
@@ -625,13 +685,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mCallback.OnOutputStringUser(obj + "\r\n");
         }
 
-        internal AD7Thread Thread
-        {
-            get
-            {
-                return mThread;
-            }
-        }
+        internal AD7Thread Thread => mThread;
 
         void DbgCmdTrace(uint aAddress)
         {
@@ -1112,7 +1166,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
             string currentASMLine = mCurrentASMLine;
 
-            if (string.IsNullOrEmpty(currentASMLine))
+            if (String.IsNullOrEmpty(currentASMLine))
             {
                 mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
             }
@@ -1125,7 +1179,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     //Get the line after the call
                     string nextASMLine = mNextASMLine1;
                     uint? nextAddress = mNextAddress1;
-                    if (string.IsNullOrEmpty(nextASMLine) || !nextAddress.HasValue)
+                    if (String.IsNullOrEmpty(nextASMLine) || !nextAddress.HasValue)
                     {
                         mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
                     }
@@ -1215,7 +1269,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 {
                     xCurrentLabel = xCurrentLabels.OrderBy(q => q.Length).Last();
                 }
-                if (string.IsNullOrEmpty(xCurrentLabel))
+                if (String.IsNullOrEmpty(xCurrentLabel))
                 {
                     xCurrentLabel = "NO_METHOD_LABEL_FOUND";
                 }

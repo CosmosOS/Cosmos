@@ -18,6 +18,14 @@ namespace Cosmos.Core.Memory.Old
             }
         }
 
+        public static uint TotalDataLookupTableSize
+        {
+            get
+            {
+                return (uint)(sizeof(DataLookupTable) + (DataLookupTable.EntriesPerTable * sizeof(DataLookupEntry)));
+            }
+        }
+
         internal static unsafe void EnsureInitialized()
         {
             if (mGlobalInformationTable == null)
@@ -34,14 +42,6 @@ namespace Cosmos.Core.Memory.Old
                 mGlobalInformationTable->FirstDataLookupTable = (DataLookupTable*)xFirstDataLookupLocation;
                 Debugger.DoSend("FirstDataLookupTable was set to ");
                 Debugger.DoSendNumber((uint)mGlobalInformationTable->FirstDataLookupTable);
-            }
-        }
-
-        public static uint TotalDataLookupTableSize
-        {
-            get
-            {
-                return (uint)(sizeof(DataLookupTable) + (DataLookupTable.EntriesPerTable * sizeof(DataLookupEntry)));
             }
         }
     }

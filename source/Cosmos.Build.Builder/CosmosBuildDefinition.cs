@@ -12,9 +12,9 @@ namespace Cosmos.Build.Builder
 {
     internal class CosmosBuildDefinition : IBuildDefinition
     {
-        private IInnoSetupService _innoSetupService;
-        private IMSBuildService _msBuildService;
-        private ISetupInstance2 _visualStudioInstance;
+        private readonly IInnoSetupService _innoSetupService;
+        private readonly IMSBuildService _msBuildService;
+        private readonly ISetupInstance2 _visualStudioInstance;
 
         private readonly string _cosmosDir;
 
@@ -70,31 +70,26 @@ namespace Cosmos.Build.Builder
             }
 
             var il2cpuDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "IL2CPU"));
-            var xsharpDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "XSharp"));
 
             var cosmosSourceDir = Path.Combine(_cosmosDir, "source");
             var il2cpuSourceDir = Path.Combine(il2cpuDir, "source");
 
             var buildSlnPath = Path.Combine(_cosmosDir, "Build.sln");
-            var il2cpuSlnPath = Path.Combine(il2cpuDir, "IL2CPU.sln");
-            var xsharpSlnPath = Path.Combine(xsharpDir, "XSharp.sln");
 
-            var vsipDir = Path.Combine(_cosmosDir, "Build", "VSIP");
+            var vsipDir = Path.Combine(_cosmosDir, "Build", "VSIP") + '\\';
 
             if (Directory.Exists(vsipDir))
             {
                 Directory.Delete(vsipDir, true);
             }
 
-            // Restore XSharp.sln, IL2CPU.sln and Build.sln
+            // Restore Build.sln
 
-            yield return new RestoreTask(_msBuildService, xsharpSlnPath);
-            yield return new RestoreTask(_msBuildService, il2cpuSlnPath);
             yield return new RestoreTask(_msBuildService, buildSlnPath);
 
             // Build Build.sln
 
-            yield return new BuildTask(_msBuildService, buildSlnPath, vsipDir);
+            yield return new BuildTask(_msBuildService, buildSlnPath, vsipDir, vsipDir);
 
             // Publish IL2CPU
 
@@ -133,10 +128,11 @@ namespace Cosmos.Build.Builder
             packageProjectPaths = packageProjectPaths.Concat(il2cpuPackageProjects.Select(p => Path.Combine(il2cpuSourceDir, p)));
 
             var packagesDir = Path.Combine(vsipDir, "packages");
+            var packageVersionLocalBuildSuffix = DateTime.Now.ToString("yyyyMMddhhmmss");
 
             foreach (var projectPath in packageProjectPaths)
             {
-                yield return new PackTask(_msBuildService, projectPath, packagesDir);
+                yield return new PackTask(_msBuildService, projectPath, packagesDir, packageVersionLocalBuildSuffix);
             }
 
             var cosmosSetupDir = Path.Combine(_cosmosDir, "setup");
@@ -152,29 +148,32 @@ namespace Cosmos.Build.Builder
                 App.BuilderConfiguration.UserKit ? "UserKit" : "DevKit",
                 cosmosSetupVersion);
 
-            var cosmosSetupPath = Path.Combine(cosmosSetupDir, "Output", $"CosmosUserKit-{cosmosSetupVersion}-vs2017.exe");
-
-            // Run Setup
-
-            yield return new StartProcessTask(cosmosSetupPath, "/SILENT", "Cosmos Setup", true);
-
-            // Write Dev Kit path
-
-            using (var xKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Cosmos"))
+            if (!App.BuilderConfiguration.UserKit)
             {
-                xKey.SetValue("DevKit", _cosmosDir);
-            }
+                var cosmosSetupPath = Path.Combine(cosmosSetupDir, "Output", $"CosmosUserKit-{cosmosSetupVersion}-vs2019.exe");
 
-            // Launch VS
+                // Run Setup
 
-            if (!App.BuilderConfiguration.NoVsLaunch)
-            {
-                var vsInstance = _visualStudioInstance;
-                var vsPath = Path.Combine(vsInstance.GetInstallationPath(), "Common7", "IDE", "devenv.exe");
+                yield return new StartProcessTask(cosmosSetupPath, "/SILENT", "Cosmos Setup", true);
 
-                var kernelSlnPath = Path.Combine(_cosmosDir, "Kernel.sln");
+                // Write Dev Kit path
 
-                yield return new StartProcessTask(vsPath, kernelSlnPath, "Visual Studio (Kernel.sln)");
+                using (var xKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Cosmos"))
+                {
+                    xKey.SetValue("DevKit", _cosmosDir);
+                }
+
+                // Launch VS
+
+                if (!App.BuilderConfiguration.NoVsLaunch)
+                {
+                    var vsInstance = _visualStudioInstance;
+                    var vsPath = Path.Combine(vsInstance.GetInstallationPath(), "Common7", "IDE", "devenv.exe");
+
+                    var kernelSlnPath = Path.Combine(_cosmosDir, "Kernel.sln");
+
+                    yield return new StartProcessTask(vsPath, kernelSlnPath, "Visual Studio (Kernel.sln)");
+                }
             }
         }
     }

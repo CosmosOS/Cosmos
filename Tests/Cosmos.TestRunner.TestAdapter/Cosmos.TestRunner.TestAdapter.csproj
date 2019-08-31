@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <PackageDescription>Test adapter for Cosmos kernels.</PackageDescription>
+        <IsToolProject>True</IsToolProject>
+        <AppendTargetFrameworkToToolsPackageFolder>False</AppendTargetFrameworkToToolsPackageFolder>
+        <NoWarn>NU5111;$(NoWarn)</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
+    </ItemGroup>
+
+</Project>

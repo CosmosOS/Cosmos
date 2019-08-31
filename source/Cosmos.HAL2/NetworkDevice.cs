@@ -9,7 +9,13 @@ namespace Cosmos.HAL
 {
     public delegate void DataReceivedHandler(byte[] packetData);
 
-    public abstract class NetworkDevice : Device
+    public enum CardType
+    {
+        Ethernet,
+        Wireless
+    }
+
+    public abstract class NetworkDevice
     {
         public static List<NetworkDevice> Devices { get; private set; }
 
@@ -26,7 +32,17 @@ namespace Cosmos.HAL
             Devices.Add(this);
         }
 
+        public abstract CardType CardType
+        {
+            get;
+        }
+
         public abstract MACAddress MACAddress
+        {
+            get;
+        }
+
+        public abstract string Name
         {
             get;
         }
@@ -35,8 +51,6 @@ namespace Cosmos.HAL
         {
             get;
         }
-
-        //public DataReceivedHandler DataReceived;
 
         public virtual bool QueueBytes(byte[] buffer)
         {

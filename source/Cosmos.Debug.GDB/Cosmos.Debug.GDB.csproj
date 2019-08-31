@@ -1,188 +1,65 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">Any CPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3370FC04-B669-46A4-A4AA-A89540318F8D}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Debug.GDB</RootNamespace>
-    <AssemblyName>Cosmos.Debug.GDB</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AsmFile.cs" />
-    <Compile Include="AsmLine.cs" />
-    <Compile Include="BreakpointUC.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="BreakpointUC.Designer.cs">
-      <DependentUpon>BreakpointUC.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ToolTipListBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="WatchUC.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="WatchUC.Designer.cs">
-      <DependentUpon>WatchUC.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormBreakpoints.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormBreakpoints.Designer.cs">
-      <DependentUpon>FormBreakpoints.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormCallStack.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormCallStack.Designer.cs">
-      <DependentUpon>FormCallStack.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormLog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormLog.Designer.cs">
-      <DependentUpon>FormLog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormMain.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormMain.Designer.cs">
-      <DependentUpon>FormMain.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormRegisters.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormRegisters.Designer.cs">
-      <DependentUpon>FormRegisters.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormWatches.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormWatches.Designer.cs">
-      <DependentUpon>FormWatches.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GDB.cs" />
-    <Compile Include="Global.cs" />
-    <Compile Include="FormHistory.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormHistory.Designer.cs">
-      <DependentUpon>FormHistory.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormSettings.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormSettings.Designer.cs">
-      <DependentUpon>FormSettings.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Windows.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="BreakpointUC.resx">
-      <DependentUpon>BreakpointUC.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="WatchUC.resx">
-      <DependentUpon>WatchUC.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormBreakpoints.resx">
-      <DependentUpon>FormBreakpoints.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormCallStack.resx">
-      <DependentUpon>FormCallStack.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormLog.resx">
-      <DependentUpon>FormLog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormMain.resx">
-      <DependentUpon>FormMain.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormRegisters.resx">
-      <DependentUpon>FormRegisters.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormWatches.resx">
-      <DependentUpon>FormWatches.cs</DependentUpon>
-    </EmbeddedResource>
-    <None Include="app.config" />
-    <None Include="SettingsDS.xsc">
-      <DependentUpon>SettingsDS.xsd</DependentUpon>
-    </None>
-    <None Include="SettingsDS.xsd">
-      <SubType>Designer</SubType>
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>SettingsDS.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="SettingsDS.xss">
-      <DependentUpon>SettingsDS.xsd</DependentUpon>
-    </None>
-    <Compile Include="Settings.cs" />
-    <Compile Include="SettingsDS.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SettingsDS.xsd</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Docs\index.html" />
-    <Content Include="ReadMe.html" />
-    <Content Include="ToDo.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
-      <Project>{0462e82b-8c29-41a9-8265-9c89038adb29}</Project>
-      <Name>Cosmos.Build.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <InstallPath>$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos)</InstallPath>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>-->
-  <Target Name="AfterBuild" Condition="$(InstallPath) != ''">
-    <!--<Copy SourceFiles="$(TargetPath)" DestinationFolder="$([System.IO.Path]::Combine($(InstallPath), Build\VSIP))" />-->
-  </Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
+    </PropertyGroup>
+
+    <ItemGroup>
+
+        <Compile Update="BreakpointUC.cs" SubType="UserControl" />
+        <Compile Update="BreakpointUC.Designer.cs" DependentUpon="BreakpointUC.cs" />
+
+        <Compile Update="ToolTipListBox.cs" SubType="Component" />
+
+        <Compile Update="WatchUC.cs" SubType="UserControl" />
+        <Compile Update="WatchUC.Designer.cs" DependentUpon="WatchUC.cs" />
+
+        <Compile Update="FormBreakpoints.cs" SubType="Form" />
+        <Compile Update="FormBreakpoints.Designer.cs" DependentUpon="FormBreakpoints.cs" />
+
+        <Compile Update="FormCallStack.cs" SubType="Form" />
+        <Compile Update="FormCallStack.Designer.cs" DependentUpon="FormCallStack.cs" />
+
+        <Compile Update="FormLog.cs" SubType="Form" />
+        <Compile Update="FormLog.Designer.cs" DependentUpon="FormLog.cs" />
+
+        <Compile Update="FormMain.cs" SubType="Form" />
+        <Compile Update="FormMain.Designer.cs" DependentUpon="FormMain.cs" />
+
+        <Compile Update="FormRegisters.cs" SubType="Form" />
+        <Compile Update="FormRegisters.Designer.cs" DependentUpon="FormRegisters.cs" />
+
+        <Compile Update="FormWatches.cs" SubType="Form" />
+        <Compile Update="FormWatches.Designer.cs" DependentUpon="FormWatches.cs" />
+
+        <Compile Update="FormHistory.cs" SubType="Form" />
+        <Compile Update="FormHistory.Designer.cs" DependentUpon="FormHistory.cs" />
+
+        <Compile Update="FormSettings.cs" SubType="Form" />
+        <Compile Update="FormSettings.Designer.cs" DependentUpon="FormSettings.cs" />
+
+        <EmbeddedResource Update="**" DependentUpon="%(Filename).cs" />
+
+        <None Update="SettingsDS.xsc" DependentUpon="SettingsDS.xsd" />
+        <None Update="SettingsDS.xsd" SubType="Designer" Generator="MSDataSetGenerator" LastGenOutput="SettingsDS.Designer.cs" />
+        <None Update="SettingsDS.xss" DependentUpon="SettingsDS.xsd" />
+
+        <Compile Update="SettingsDS.Designer.cs" AutoGen="True" DesignTime="True" DependentUpon="SettingsDS.xsd" />
+
+        <Content Include="Docs\index.html" />
+        <Content Include="ReadMe.html" />
+        <Content Include="ToDo.html" />
+
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="System.Data.DataSetExtensions" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Cosmos.Build.Common" />
+    </ItemGroup>
+
 </Project>

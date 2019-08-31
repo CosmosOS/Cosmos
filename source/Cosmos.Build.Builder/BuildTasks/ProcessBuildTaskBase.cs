@@ -10,8 +10,8 @@ namespace Cosmos.Build.Builder.BuildTasks
     {
         public abstract string Name { get; }
 
-        private bool _waitForExit;
-        private bool _createWindow;
+        private readonly bool _waitForExit;
+        private readonly bool _createWindow;
 
         protected ProcessBuildTaskBase(bool waitForExit, bool createWindow)
         {
@@ -34,8 +34,8 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             processStartInfo.RedirectStandardError = true;
             processStartInfo.RedirectStandardOutput = true;
-            processStartInfo.StandardErrorEncoding = Encoding.UTF8;
-            processStartInfo.StandardOutputEncoding = Encoding.UTF8;
+            processStartInfo.StandardErrorEncoding = Encoding.GetEncoding(858);
+            processStartInfo.StandardOutputEncoding = Encoding.GetEncoding(858);
 
             process.StartInfo = processStartInfo;
             process.Start();
@@ -56,7 +56,7 @@ namespace Cosmos.Build.Builder.BuildTasks
         protected abstract string GetExePath();
         protected abstract string GetArguments();
 
-        private void WaitForExit(Process process)
+        private static void WaitForExit(Process process)
         {
             process.WaitForExit();
 
@@ -66,7 +66,7 @@ namespace Cosmos.Build.Builder.BuildTasks
             }
         }
 
-        private async Task ReadOutputAsync(StreamReader reader, ILogger logger)
+        private static async Task ReadOutputAsync(StreamReader reader, ILogger logger)
         {
             while (true)
             {

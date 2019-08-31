@@ -271,6 +271,12 @@ namespace Cosmos.System_Plugs.System.IO
         {
             return innerStream.CanRead;
         }
+
+        public static void WriteByte(FileStream aThis, byte aByte)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
 

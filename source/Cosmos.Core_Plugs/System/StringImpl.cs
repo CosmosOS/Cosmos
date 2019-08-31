@@ -306,8 +306,8 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool StartsWith(string aThis, string aSubstring, StringComparison aComparison)
         {
-            Char[] di = aThis.ToCharArray();
-            Char[] ci = aSubstring.ToCharArray();
+            char[] di = aThis.ToCharArray();
+            char[] ci = aSubstring.ToCharArray();
             if (aSubstring.Length > aThis.Length)
             {
                 return false;
@@ -539,8 +539,8 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool EndsWith(string aThis, string aSubStr, StringComparison aComparison)
         {
-            Char[] di = aThis.ToCharArray();
-            Char[] ci = aSubStr.ToCharArray();
+            char[] di = aThis.ToCharArray();
+            char[] ci = aSubStr.ToCharArray();
             if (aThis.Length == aSubStr.Length)
             {
                 if (aThis == aSubStr)
@@ -604,7 +604,7 @@ namespace Cosmos.Core_Plugs.System
         {
             if (aSeparators == null)
             {
-                throw new ArgumentNullException("aSeparators");
+                throw new ArgumentNullException(nameof(aSeparators));
             }
 
             int xResult = -1;
@@ -646,17 +646,17 @@ namespace Cosmos.Core_Plugs.System
             mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrA|aIndexA = {aStrA}|{aIndexA}, aStrB|aIndexB = {aStrB}|{aIndexB}, aCount = {aCount}");
             if (aCount < 0)
             {
-                throw new ArgumentOutOfRangeException("aCount");
+                throw new ArgumentOutOfRangeException(nameof(aCount));
             }
 
             if (aIndexA < 0 || aIndexA > aStrA.Length)
             {
-                throw new ArgumentOutOfRangeException("aIndexA");
+                throw new ArgumentOutOfRangeException(nameof(aIndexA));
             }
 
             if (aIndexB < 0 || aIndexB > aStrB.Length)
             {
-                throw new ArgumentOutOfRangeException("aIndexB");
+                throw new ArgumentOutOfRangeException(nameof(aIndexB));
             }
 
             if (aStrA == null)
@@ -713,8 +713,8 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture)
         {
-            Char[] di = aThis.ToCharArray();
-            Char[] ci = aSubStr.ToCharArray();
+            char[] di = aThis.ToCharArray();
+            char[] ci = aSubStr.ToCharArray();
             if (aSubStr.Length > aThis.Length)
             {
                 return false;
@@ -983,7 +983,9 @@ namespace Cosmos.Core_Plugs.System
                 return 0;
             }
             else
+            {
                 mDebugger.SendInternal($"strA ({strA}) is NOT the same object of StrB ({strB})");
+            }
 
             for (int i = 0; i < count; i++)
             {
@@ -993,7 +995,9 @@ namespace Cosmos.Core_Plugs.System
                 xResult = a - b;
                 // Different characters we have finished
                 if (xResult != 0)
+                {
                     break;
+                }
             }
 
             return xResult;

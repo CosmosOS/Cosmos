@@ -9,9 +9,10 @@
 
 # Build results
 
-[Oo]bj/
+[Aa]rtifacts
 [Bb]in
 [Pp]ackages/
+[Oo]bj/
 
 *.[Oo]bj
 *.suo

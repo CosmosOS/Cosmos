@@ -1,29 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.HAL.Network;
+﻿using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
 
 namespace Cosmos.System.Network.IPv4
 {
     public class IPPacket : EthernetPacket
     {
-        protected byte ipVersion;
         protected byte ipHeaderLength;
-        protected byte tos;
-        protected UInt16 ipLength;
-        protected UInt16 fragmentID;
-        protected UInt16 fragmentOffset;
-        protected byte flags;
-        protected byte ttl;
-        protected byte proto;
-        protected UInt16 ipCRC;
-        protected Address sourceIP;
-        protected Address destIP;
-        protected UInt16 dataOffset;
 
-        private static UInt16 sNextFragmentID;
+        private static ushort sNextFragmentID;
 
         internal static void IPv4Handler(byte[] packetData)
         {
@@ -32,7 +16,7 @@ namespace Cosmos.System.Network.IPv4
             //Sys.Console.WriteLine(ip_packet.ToString());
             if (ip_packet.SourceIP == null)
             {
-                global::System.Console.WriteLine("SourceIP null in IPv4Handler!");
+                NetworkStack.debugger.Send("SourceIP null in IPv4Handler!");
             }
             ARPCache.Update(ip_packet.SourceIP, ip_packet.SourceMAC);
 
@@ -44,9 +28,9 @@ namespace Cosmos.System.Network.IPv4
                     case 1:
                         ICMPPacket.ICMPHandler(packetData);
                         break;
-                    //case 6:
-                    //    IPv4_TCPHandler(packetData);
-                    //    break;
+                    case 6:
+                        //TCPPacket.TCPHandler(packetData);
+                        break;
                     case 17:
                         UDPPacket.UDPHandler(packetData);
                         break;
@@ -54,155 +38,113 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
-        public static UInt16 NextIPFragmentID
-        {
-            get
-            {
-                return sNextFragmentID++;
-            }
-        }
+        public static ushort NextIPFragmentID => sNextFragmentID++;
 
         internal IPPacket()
-            : base()
-        { }
+        {
+        }
 
         internal IPPacket(byte[] rawData)
             : base(rawData)
-        { }
+        {
+        }
 
         protected override void initFields()
         {
             base.initFields();
-            ipVersion = (byte)((mRawData[14] & 0xF0) >> 4);
-            ipHeaderLength = (byte)(mRawData[14] & 0x0F);
-            tos = mRawData[15];
-            ipLength = (UInt16)((mRawData[16] << 8) | mRawData[17]);
-            fragmentID = (UInt16)((mRawData[18] << 8) | mRawData[19]);
-            flags = (byte)((mRawData[20] & 0xE0) >> 5);
-            fragmentOffset = (UInt16)(((mRawData[20] & 0x1F) << 8) | mRawData[21]);
-            ttl = mRawData[22];
-            proto = mRawData[23];
-            ipCRC = (UInt16)((mRawData[24] << 8) | mRawData[25]);
-            sourceIP = new Address(mRawData, 26);
-            destIP = new Address(mRawData, 30);
-            dataOffset = (UInt16)(14 + HeaderLength);
+            IPVersion = (byte)((RawData[14] & 0xF0) >> 4);
+            ipHeaderLength = (byte)(RawData[14] & 0x0F);
+            TypeOfService = RawData[15];
+            IPLength = (ushort)((RawData[16] << 8) | RawData[17]);
+            FragmentID = (ushort)((RawData[18] << 8) | RawData[19]);
+            Flags = (byte)((RawData[20] & 0xE0) >> 5);
+            FragmentOffset = (ushort)(((RawData[20] & 0x1F) << 8) | RawData[21]);
+            TTL = RawData[22];
+            Protocol = RawData[23];
+            IPCRC = (ushort)((RawData[24] << 8) | RawData[25]);
+            SourceIP = new Address(RawData, 26);
+            DestinationIP = new Address(RawData, 30);
+            DataOffset = (ushort)(14 + HeaderLength);
         }
 
-        protected IPPacket(UInt16 dataLength, byte protocol, Address source, Address dest)
-            : this(MACAddress.None, MACAddress.None, dataLength, protocol, source, dest)
+        protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte Flags)
+            : this(MACAddress.None, MACAddress.None, dataLength, protocol, source, dest, Flags)
         { }
 
-        private IPPacket(MACAddress srcMAC, MACAddress destMAC, UInt16 dataLength, byte protocol,
-            Address source, Address dest)
+        public IPPacket(MACAddress srcMAC, MACAddress destMAC, ushort dataLength, byte protocol,
+            Address source, Address dest, byte Flags)
             : base(destMAC, srcMAC, 0x0800, dataLength + 14 + 20)
         {
-            mRawData[14] = 0x45;
-            mRawData[15] = 0;
-            ipLength = (UInt16)(dataLength + 20);
+            RawData[14] = 0x45;
+            RawData[15] = 0;
+            IPLength = (ushort)(dataLength + 20);
             ipHeaderLength = 5;
-            mRawData[16] = (byte)((ipLength >> 8) & 0xFF);
-            mRawData[17] = (byte)((ipLength >> 0) & 0xFF);
-            fragmentID = NextIPFragmentID;
-            mRawData[18] = (byte)((fragmentID >> 8) & 0xFF);
-            mRawData[19] = (byte)((fragmentID >> 0) & 0xFF);
-            mRawData[20] = 0x00;
-            mRawData[21] = 0x00;
-            mRawData[22] = 0x80;
-            mRawData[23] = protocol;
-            mRawData[24] = 0x00;
-            mRawData[25] = 0x00;
+
+            RawData[16] = (byte)((IPLength >> 8) & 0xFF);
+            RawData[17] = (byte)((IPLength >> 0) & 0xFF);
+            FragmentID = NextIPFragmentID;
+            RawData[18] = (byte)((FragmentID >> 8) & 0xFF);
+            RawData[19] = (byte)((FragmentID >> 0) & 0xFF);
+            RawData[20] = Flags;
+            RawData[21] = 0x00;
+            RawData[22] = 0x80;
+            RawData[23] = protocol;
+            RawData[24] = 0x00;
+            RawData[25] = 0x00;
             for (int b = 0; b < 4; b++)
             {
-                mRawData[26 + b] = source.address[b];
-                mRawData[30 + b] = dest.address[b];
+                RawData[26 + b] = source.address[b];
+                RawData[30 + b] = dest.address[b];
             }
-            ipCRC = CalcIPCRC(20);
-            mRawData[24] = (byte)((ipCRC >> 8) & 0xFF);
-            mRawData[25] = (byte)((ipCRC >> 0) & 0xFF);
+            IPCRC = CalcIPCRC(20);
+            RawData[24] = (byte)((IPCRC >> 8) & 0xFF);
+            RawData[25] = (byte)((IPCRC >> 0) & 0xFF);
 
             initFields();
         }
 
-        protected UInt16 CalcOcCRC(UInt16 offset, UInt16 length)
-        {
-            return IPPacket.CalcOcCRC(this.RawData, offset, length);
-        }
+        protected ushort CalcOcCRC(ushort offset, ushort length) => CalcOcCRC(RawData, offset, length);
 
-        protected static UInt16 CalcOcCRC(byte[] buffer, UInt16 offset, int length)
+        protected static ushort CalcOcCRC(byte[] buffer, ushort offset, int length)
         {
-            UInt32 crc = 0;
+            uint crc = 0;
 
-            for (UInt16 w = offset; w < offset + length; w += 2)
+            for (ushort w = offset; w < offset + length; w += 2)
             {
-                crc += (UInt16)((buffer[w] << 8) | buffer[w + 1]);
+                crc += (ushort)((buffer[w] << 8) | buffer[w + 1]);
             }
 
             crc = (~((crc & 0xFFFF) + (crc >> 16)));
 
-            return (UInt16)crc;
+            return (ushort)crc;
         }
 
-        protected UInt16 CalcIPCRC(UInt16 headerLength)
+        protected ushort CalcIPCRC(ushort headerLength)
         {
             return CalcOcCRC(14, headerLength);
         }
 
-        internal byte IPVersion
-        {
-            get { return this.ipVersion; }
-        }
-        internal UInt16 HeaderLength
-        {
-            get { return (UInt16)(this.ipHeaderLength * 4); }
-        }
-        internal byte TypeOfService
-        {
-            get { return this.tos; }
-        }
-        internal UInt16 IPLength
-        {
-            get { return this.ipLength; }
-        }
-        internal UInt16 FragmentID
-        {
-            get { return this.fragmentID; }
-        }
-        internal UInt16 FragmentOffset
-        {
-            get { return this.fragmentOffset; }
-        }
-        internal byte Flags
-        {
-            get { return this.flags; }
-        }
-        internal byte TTL
-        {
-            get { return this.ttl; }
-        }
-        internal byte Protocol
-        {
-            get { return this.proto; }
-        }
-        internal UInt16 IPCRC
-        {
-            get { return this.ipCRC; }
-        }
-        internal Address SourceIP
-        {
-            get { return this.sourceIP; }
-        }
-        internal Address DestinationIP
-        {
-            get { return this.destIP; }
-        }
-        internal UInt16 DataLength
-        {
-            get { return (UInt16)(this.ipLength - this.HeaderLength); }
-        }
+        internal byte IPVersion { get; private set; }
+        internal ushort HeaderLength => (ushort)(ipHeaderLength * 4);
+
+        internal byte TypeOfService { get; private set; }
+
+        internal ushort IPLength { get; private set; }
+        internal ushort FragmentID { get; private set; }
+        internal byte Flags { get; private set; }
+        internal ushort FragmentOffset { get; private set; }
+        internal byte TTL { get; private set; }
+        internal byte Protocol { get; private set; }
+        internal ushort IPCRC { get; private set; }
+        internal Address SourceIP { get; private set; }
+        internal Address DestinationIP { get; private set; }
+        internal ushort DataOffset { get; private set; }
+
+        internal ushort DataLength => (ushort)(IPLength - HeaderLength);
 
         public override string ToString()
         {
-            return "IP Packet Src=" + sourceIP + ", Dest=" + destIP + ", Protocol=" + proto + ", TTL=" + ttl + ", DataLen=" + DataLength;
+            return "IP Packet Src=" + SourceIP + ", Dest=" + DestinationIP + ", Protocol=" + Protocol + ", TTL=" + TTL + ", DataLen=" + DataLength;
         }
     }
 }

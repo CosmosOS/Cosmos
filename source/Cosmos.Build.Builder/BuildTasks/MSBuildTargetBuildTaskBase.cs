@@ -12,7 +12,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
         protected abstract IReadOnlyDictionary<string, string> Properties { get; }
 
-        private IMSBuildService _msBuildService;
+        private readonly IMSBuildService _msBuildService;
 
         protected MSBuildTargetBuildTaskBase(IMSBuildService msBuildService)
             : base(true, false)
@@ -35,7 +35,14 @@ namespace Cosmos.Build.Builder.BuildTasks
             {
                 foreach (var property in Properties)
                 {
-                    args += $" /p:\"{property.Key}={property.Value}\"";
+                    var value = property.Value;
+
+                    if (value.EndsWith("\\"))
+                    {
+                        value += '\\';
+                    }
+
+                    args += $" /p:\"{property.Key}={value}\"";
                 }
             }
 

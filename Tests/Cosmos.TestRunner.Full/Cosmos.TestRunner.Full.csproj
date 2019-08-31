@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <TargetLatestRuntimePatch>True</TargetLatestRuntimePatch>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\source\TheRingMaster\TheRingMaster.csproj" ReferenceOutputAssembly="False" />
+        <ProjectReference Include="..\..\Tools\NASM\NASM.csproj" ReferenceOutputAssembly="False" />
+        <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU\IL2CPU.csproj" ReferenceOutputAssembly="False" />
+        <ProjectReference Include="..\Kernels\MemoryOperationsTest\MemoryOperationsTest.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Kernels\BoxingTests\BoxingTests.csproj" />
+        <ProjectReference Include="..\Kernels\ConsoleTest\ConsoleTest.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.TypeSystem\Cosmos.Compiler.Tests.TypeSystem.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.DiskManager\Cosmos.Kernel.Tests.DiskManager.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
+        <ProjectReference Include="..\Kernels\GraphicTest\GraphicTest.csproj" />
+        <ProjectReference Include="..\Kernels\MemoryOperationsTest\MemoryOperationsTest.csproj" />
+        <ProjectReference Include="..\Kernels\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
+    </ItemGroup>
+
+</Project>

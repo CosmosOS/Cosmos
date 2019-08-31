@@ -1,0 +1,71 @@
+<Project>
+
+    <PropertyGroup>
+        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+        <SelfContained>True</SelfContained>
+        <_UsingDefaultForHasRuntimeOutput>False</_UsingDefaultForHasRuntimeOutput>
+        <HasRuntimeOutput>False</HasRuntimeOutput>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(MSBuildThisFileDirectory)..\Cosmos.TestRunner.TestAdapter\Cosmos.TestRunner.TestAdapter.csproj" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" IsPlugsReference="True" />
+        <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj" IsPlugsReference="True" />
+        <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj" IsPlugsReference="True" />
+        <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj" IsPlugsReference="True" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Update="@(ProjectReference)">
+            <!-- https://github.com/dotnet/sdk/issues/952 -->
+            <!--<ExcludeAssets Condition="'%(IsPlugsReference)' == 'True'">Compile</ExcludeAssets>-->
+        </ProjectReference>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <_ReferencesFile Condition="'$(_ReferencesFile)' == ''">$(TargetPath).refs</_ReferencesFile>
+        <AssignTargetPathsDependsOn>
+            $(AssignTargetPathsDependsOn);
+            _AddReferencesFileToContent
+        </AssignTargetPathsDependsOn>
+    </PropertyGroup>
+
+    <Target Name="_AddReferencesFileToContent">
+        <ItemGroup>
+            <AllItemsFullPathWithTargetPath Include="$(_ReferencesFile)" CopyToOutputDirectory="Always" />
+            <AllItemsFullPathWithTargetPath Update="$(_ReferencesFile)" TargetPath="%(Filename)%(Extension)" />
+        </ItemGroup>
+    </Target>
+
+    <PropertyGroup>
+        <BuildDependsOn>
+            $(BuildDependsOn);
+            WriteReferenceAssembliesToFile
+        </BuildDependsOn>
+    </PropertyGroup>
+
+    <Target Name="WriteReferenceAssembliesToFile"
+            DependsOnTargets="ResolveReferences;ComputeFilesToPublish"
+            Inputs="$(TargetPath)"
+            Outputs="$(_ReferencesFile)">
+
+        <ItemGroup>
+            <_Il2cpuAssemblies Include="@(ResolvedFileToPublish->'%(FullPath)')"
+                               Condition="'%(ResolvedFileToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedFileToPublish.Extension)' == '.dll'" />
+        </ItemGroup>
+
+        <WriteLinesToFile File="$(_ReferencesFile)" Lines="@(_Il2cpuAssemblies)" Overwrite="True" />
+
+    </Target>
+
+    <Import Project="..\..\Directory.Build.targets" />
+
+</Project>

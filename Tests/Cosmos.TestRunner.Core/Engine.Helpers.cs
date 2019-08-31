@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 
 using Cosmos.Build.Common;
-using Cosmos.IL2CPU;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -14,7 +13,7 @@ namespace Cosmos.TestRunner.Core
     {
         private string FindCosmosRoot()
         {
-            var xCurrentDirectory = AppContext.BaseDirectory;
+            var xCurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var xCurrentInfo = new DirectoryInfo(xCurrentDirectory);
             while (xCurrentInfo.Parent != null)
             {
@@ -26,13 +25,6 @@ namespace Cosmos.TestRunner.Core
                 xCurrentDirectory = xCurrentInfo.FullName;
             }
             return string.Empty;
-        }
-
-        private void RunDotnetPublish(string aProjectPath, string aOutputPath, string aRuntimeTarget)
-        {
-            var xArgsString = $"publish \"{aProjectPath}\" -o \"{aOutputPath}\" -r {aRuntimeTarget}";
-
-            RunProcess("dotnet", aProjectPath, xArgsString);
         }
 
         private void RunProcess(string aProcess, string aWorkingDirectory, List<string> aArguments, bool aAttachDebugger = false)
@@ -165,7 +157,7 @@ namespace Cosmos.TestRunner.Core
 
         private void RunTheRingMaster(string kernelFileName)
         {
-            var xArgs =  new List<string>() { kernelFileName };
+            var xArgs = new List<string>() { kernelFileName };
 
             bool xUsingUserKit = false;
             string xTheRingMasterPath = Path.Combine(FindCosmosRoot(), "source", "TheRingMaster");
@@ -187,17 +179,21 @@ namespace Cosmos.TestRunner.Core
             }
         }
 
+        protected virtual void RunIL2CPUInProc(
+            IEnumerable<string> args,
+            Action<string> logMessage,
+            Action<string> logError) => throw new NotSupportedException();
+
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            var refsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".refs");
-            var workingDirectory = Path.Combine(FindCosmosRoot(), "Tests", "TestKernels");
+            var refsFilePath = kernelFileName + ".refs";
 
-            RunProcess("dotnet", workingDirectory, $"msbuild /t:Restore;WriteReferenceAssembliesToFile \"/p:ReferencesFile={refsFilePath}\" /nologo");
+            if (!File.Exists(refsFilePath))
+            {
+                throw new FileNotFoundException("References file not found!", refsFilePath);
+            }
 
             var xReferences = File.ReadAllLines(refsFilePath);
-
-            File.Delete(refsFilePath);
-
             var xPlugsReferences = new List<string>();
 
             if (KernelPkg == "X86")
@@ -249,15 +245,12 @@ namespace Cosmos.TestRunner.Core
             {
                 if (DebugIL2CPU)
                 {
-                    if (KernelsToRun.Count() > 1)
+                    if (KernelsAssembliesToRun.Skip(1).Any())
                     {
                         throw new Exception("Cannot run multiple kernels with in-process compilation!");
                     }
 
-                    // ensure we're using the referenced (= solution) version
-                    Cosmos.IL2CPU.CosmosAssembler.ReadDebugStubFromDisk = false;
-
-                    Program.Run(xArgs.ToArray(), OutputHandler.LogMessage, OutputHandler.LogError);
+                    RunIL2CPUInProc(xArgs.ToArray(), OutputHandler.LogMessage, OutputHandler.LogError);
                 }
                 else
                 {

@@ -11,13 +11,13 @@ namespace Cosmos.HAL
     {
         public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
 
-        static public PIT PIT = new PIT();
+        public static PIT PIT = new PIT();
         // Must be static init, other static inits rely on it not being null
 
         public static TextScreenBase TextScreen = new TextScreen();
         public static PCI Pci;
 
-        public static PS2Controller PS2Controller = new PS2Controller();
+        public static readonly PS2Controller PS2Controller = new PS2Controller();
 
         static public void Init(TextScreenBase textScreen)
         {

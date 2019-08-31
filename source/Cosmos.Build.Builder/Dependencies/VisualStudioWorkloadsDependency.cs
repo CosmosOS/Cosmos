@@ -20,7 +20,7 @@ namespace Cosmos.Build.Builder.Dependencies
 
         public string Name => "Visual Studio Workloads";
 
-        private ISetupInstance2 _visualStudioInstance;
+        private readonly ISetupInstance2 _visualStudioInstance;
 
         public VisualStudioWorkloadsDependency(ISetupInstance2 visualStudioInstance)
         {
@@ -41,7 +41,7 @@ namespace Cosmos.Build.Builder.Dependencies
             var vsInstancePath = _visualStudioInstance.GetInstallationPath();
             var installedPackages = _visualStudioInstance.GetPackages();
 
-            var args = $"modify --passive --norestart --quiet --installPath \"{vsInstancePath}\"";
+            var args = $"modify --passive --norestart --installPath \"{vsInstancePath}\"";
 
             foreach (var workload in RequiredPackages)
             {
@@ -52,7 +52,7 @@ namespace Cosmos.Build.Builder.Dependencies
             }
 
             var process = Process.Start(vsInstallerPath, args);
-            await Task.Run((Action)process.WaitForExit, cancellationToken).ConfigureAwait(false);
+            await Task.Run(process.WaitForExit, cancellationToken).ConfigureAwait(false);
 
             if (process.ExitCode != 0)
             {

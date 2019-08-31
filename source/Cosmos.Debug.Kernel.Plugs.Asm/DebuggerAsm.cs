@@ -1,18 +1,16 @@
-using XSharp.Assembler;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+
 using XSharp;
+using XSharp.Assembler;
 
 namespace Cosmos.Debug.Kernel.Plugs.Asm
 {
-  [Plug(Target = typeof(Cosmos.Debug.Kernel.Debugger))]
-  public static class Debugger
+  [Plug(Target = typeof(Debugger))]
+  public static class DebuggerAsm
   {
     [PlugMethod(Assembler = typeof(DebugBreak))]
-    public static void Break(Cosmos.Debug.Kernel.Debugger aThis) { }
-
-    //[PlugMethod(Assembler = typeof(DebugActualSend))]
-    //public static unsafe void ActualSend(int aLength, char* aText) { }
+    public static void Break(Debugger aThis) { }
 
     [PlugMethod(Assembler = typeof(DebugDoSend))]
     public static void DoSend(string aText) { }
@@ -36,10 +34,10 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
     public static void DoSendNumber(double aNumber) { }
 
     [PlugMethod(Assembler = typeof(DebugSendMessageBox))]
-    public static unsafe void SendMessageBox(Kernel.Debugger aThis, int aLength, char* aText) { }
+    public static unsafe void SendMessageBox(Debugger aThis, int aLength, char* aText) { }
 
     [PlugMethod(Assembler = typeof(DebugSendPtr))]
-    public static unsafe void SendPtr(Kernel.Debugger aThis, object aPtr) { }
+    public static unsafe void SendPtr(Debugger aThis, object aPtr) { }
 
     [PlugMethod(Assembler = typeof(DebugSendChannelCommand))]
     public static unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData) { }
@@ -48,9 +46,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
     public static unsafe void SendChannelCommand(byte aChannel, byte aCommand) { }
 
     [PlugMethod(Assembler = typeof(DoBochsBreak))]
-    public static void DoBochsBreak()
-    {
-    }
+    public static void DoBochsBreak() { }
 
     [Inline]
     public static void SendKernelPanic(uint id)
@@ -63,9 +59,8 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
     }
 
     [PlugMethod(Assembler = typeof(DoRealHalt))]
-    public static void DoRealHalt()
-    {
-    }
+    public static void DoRealHalt() { }
+
     //[PlugMethod(Assembler = typeof(DebugTraceOff))]
     //public static void TraceOff() { }
 
@@ -78,7 +73,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
   // Maybe could merge this into the same unit as the plug
   public class DebugTraceOff : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");
@@ -90,7 +85,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugTraceOn : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");
@@ -111,7 +106,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
   /// </remarks>
   public class DebugSendChannelCommand : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("mov AL, [EBP + 20]");
@@ -134,7 +129,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
   /// </remarks>
   public class DebugSendChannelCommandNoData : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("mov AL, [EBP + 12]");
@@ -148,7 +143,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugBreak : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("mov dword [DebugStub_DebugBreakOnNextTrace], 1");
@@ -165,7 +160,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
   /// </remarks>
   public class DebugDoSend : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       XS.Label(".BeforeArgumentsPrepare");
@@ -182,7 +177,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugDoSendNumber : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 8]");
@@ -194,7 +189,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugDoSendLongNumber : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 12]");
@@ -207,7 +202,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugDoSendComplexNumber : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 8]");
@@ -219,7 +214,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugDoSendComplexLongNumber : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 12]");
@@ -232,7 +227,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugSendMessageBox : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");
@@ -244,7 +239,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
 
   public class DebugSendPtr : AssemblerMethod
   {
-    public override void AssembleNew(XSharp.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");

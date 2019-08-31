@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace Cosmos.Build.Builder.ViewModels
 {
-    internal class DependencyInstallationDialogViewModel : ViewModelBase
+    internal sealed class DependencyInstallationDialogViewModel : ViewModelBase, IDisposable
     {
         private const string InstallationSucceededText = "{0} installed successfully!";
         private const string InstallationFailedText = "{0} failed to install!";
@@ -68,10 +68,16 @@ namespace Cosmos.Build.Builder.ViewModels
             OkCommand = new RelayCommand(p => Close(p as Window, true));
         }
 
+        public void Dispose()
+        {
+            _installTask.Dispose();
+            _installTaskCancellationTokenSource.Dispose();
+        }
+
         private void Install(object parameter) => _installTask = InstallAsync();
         private void CancelInstallation(object parameter) => _installTaskCancellationTokenSource.Cancel();
 
-        private void Close(Window window, bool? dialogResult)
+        private static void Close(Window window, bool? dialogResult)
         {
 #if DEBUG
             if (window == null)

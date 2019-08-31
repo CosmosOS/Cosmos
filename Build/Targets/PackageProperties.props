@@ -14,11 +14,15 @@
         <PackageDescription>$(CosmosDescription)</PackageDescription>
         <PackageIconUrl>https://github.com/CosmosOS/Cosmos/raw/master/Artwork/Cosmos.ico</PackageIconUrl>
         <PackageProjectUrl>https://www.gocosmos.org</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/CosmosOS/Cosmos/raw/master/LICENSE.txt</PackageLicenseUrl>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
         <PackageTags>Cosmos OS Operating System .NET C# VB VB.NET F#</PackageTags>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/CosmosOS/Cosmos</RepositoryUrl>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(RepoRoot)LICENSE.txt" Pack="True" PackagePath="$(PackageLicenseFile)" Visible="False" />
+    </ItemGroup>
 
 </Project>

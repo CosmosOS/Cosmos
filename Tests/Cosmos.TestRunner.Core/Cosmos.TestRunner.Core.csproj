@@ -1,39 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <IsTestRunnerProject>True</IsTestRunnerProject>
     </PropertyGroup>
 
-    <Import Project="..\TestKernels\TestKernels.csproj" />
-
     <ItemGroup>
-        <Compile Update="Engine.*.cs">
-            <DependentUpon>Engine.cs</DependentUpon>
-        </Compile>
+        <Compile Update="Engine.*.cs" DependentUpon="Engine.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
-        <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
-        <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Cosmos.Build.Common" />
+	</ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj" />
-        <ProjectReference Include="..\..\source\Kernel-X86\10-CPU\Cosmos.CPU_Asm\Cosmos.CPU_Asm.csproj" />
-        <ProjectReference Include="..\..\source\Kernel-X86\10-CPU\Cosmos.CPU_Plugs\Cosmos.CPU_Plugs.csproj" />
-        <ProjectReference Include="..\..\source\Kernel-X86\20-Platform\Cosmos.Platform.PC\Cosmos.Platform.PC.csproj" />
-        <ProjectReference Include="..\..\source\Kernel-X86\91-Plugs\Cosmos.Plugs.TapRoot\Cosmos.Plugs.TapRoot.csproj" />
-        <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
-        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
-        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp.Assembler\XSharp.Assembler.csproj" />
+        <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
     </ItemGroup>
 
 </Project>
