@@ -66,7 +66,7 @@ namespace Cosmos.HAL.Drivers
         }
         public bool Available()
         {
-            if (VBERead(VBERegisterIndex.VBEDisplayID) == 0xB0C5)
+            if (VBERead(RegisterIndex.VBEDisplayID) == 0xB0C5)
             {
                 return true;
             }
