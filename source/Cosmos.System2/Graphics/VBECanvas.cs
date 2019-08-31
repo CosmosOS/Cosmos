@@ -7,7 +7,7 @@ using Cosmos.HAL.Drivers;
 
 namespace Cosmos.System.Graphics
 {
-   public class VBEScreen : Canvas
+    public class VBECanvas : Canvas
     {
         private static readonly Mode DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
 
@@ -18,12 +18,11 @@ namespace Cosmos.System.Graphics
 
         private Mode _mode;
 
-        public VBEScreen()
-            : this(DefaultMode)
+        public VBECanvas() : this(DefaultMode)
         {
         }
 
-        public VBEScreen(Mode mode)
+        public VBECanvas(Mode mode)
         {
             Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {mode.Columns}x{mode.Rows}x{(uint)mode.ColorDepth}");
 
@@ -76,7 +75,7 @@ namespace Cosmos.System.Graphics
         };
 
         public override Mode DefaultGraphicMode => DefaultMode;
-       
+
         /// <summary>
         /// Use this to setup the screen, this will disable the console.
         /// </summary>
@@ -90,11 +89,11 @@ namespace Cosmos.System.Graphics
             ushort bpp = (ushort)Mode.ColorDepth;
 
             //set the screen
-           VBEDriver.VBESet(xres, yres, bpp);
+            VBEDriver.VBESet(xres, yres, bpp);
         }
-#endregion
+        #endregion
 
-#region Drawing
+        #region Drawing
 
         public override void Clear(Color color)
         {
@@ -115,7 +114,7 @@ namespace Cosmos.System.Graphics
          * As DrawPoint() is the basic block of DrawLine() and DrawRect() and in theory of all the future other methods that will
          * be implemented is better to not check the validity of the arguments here or it will repeat the check for any point
          * to be drawn slowing down all.
-         */ 
+         */
         public override void DrawPoint(Pen pen, int x, int y)
         {
             Color color = pen.Color;
@@ -163,7 +162,7 @@ namespace Cosmos.System.Graphics
         public override void DrawArray(Color[] colors, int x, int y, int width, int height)
         {
             ThrowIfCoordNotValid(x, y);
-            
+
             ThrowIfCoordNotValid(x + width, y + height);
 
             for (int i = 0; i < x; i++)
@@ -216,9 +215,9 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal("Done");
         }
 
-#endregion
+        #endregion
 
-#region Reading
+        #region Reading
 
         public override Color GetPointColor(int x, int y)
         {
@@ -237,7 +236,7 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb(VBEDriver.GetVRAM(offset));
         }
 
-#endregion
+        #endregion
 
     }
 }

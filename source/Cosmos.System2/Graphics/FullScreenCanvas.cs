@@ -48,11 +48,11 @@ namespace Cosmos.System.Graphics
         {
             if (PCI.Exists(SVGAIIDevice))
             {
-                return new SVGAIIScreen();
+                return new SVGAIICanvas();
             }
             else if (BGAExists() == true)
             {
-                return new VBEScreen();
+                return new VBECanvas();
             }
             else
             {
@@ -64,11 +64,11 @@ namespace Cosmos.System.Graphics
         {
             if (PCI.Exists(SVGAIIDevice) == true)
             {
-                return new SVGAIIScreen(mode);
+                return new SVGAIICanvas(mode);
             }
             else if (BGAExists() == true)
             {
-                return new VBEScreen(mode);
+                return new VBECanvas(mode);
             }
             else
             {

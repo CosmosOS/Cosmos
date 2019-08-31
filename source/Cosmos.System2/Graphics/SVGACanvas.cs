@@ -8,11 +8,11 @@ using Cosmos.HAL.Drivers.PCI.Video;
 
 namespace Cosmos.System.Graphics
 {
-    public class SVGAIIScreen : Canvas
+    public class SVGAIICanvas : Canvas
     {
         public override void Disable()
         {
-            xSVGAIIDriver.Disable();
+            CanvasSVGADriver.Disable();
         }
 
         public VMWareSVGAII xSVGAIIDriver;
@@ -24,19 +24,19 @@ namespace Cosmos.System.Graphics
 
         private Mode _mode;
 
-        private readonly VMWareSVGAII xSVGAIIDriver;
+        private readonly VMWareSVGAII CanvasSVGADriver;
 
-        public SVGAIIScreen()
+        public SVGAIICanvas()
             : this(DefaultMode)
         {
         }
 
-        public SVGAIIScreen(Mode aMode)
+        public SVGAIICanvas(Mode aMode)
         {
             Debugger.SendInternal($"Called ctor with mode {aMode}");
             ThrowIfModeIsNotValid(aMode);
 
-            xSVGAIIDriver = new VMWareSVGAII();
+            CanvasSVGADriver = new VMWareSVGAII();
             Mode = aMode;
         }
 
@@ -78,7 +78,7 @@ namespace Cosmos.System.Graphics
 
         public override void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
         {
-            xSVGAIIDriver.Fill((uint)x_start, (uint)y_start, (uint)width, (uint)height, (uint)pen.Color.ToArgb());
+            CanvasSVGADriver.Fill((uint)x_start, (uint)y_start, (uint)width, (uint)height, (uint)pen.Color.ToArgb());
         }
 
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
@@ -162,8 +162,6 @@ namespace Cosmos.System.Graphics
                 new Mode(3840, 2400, ColorDepth.ColorDepth32), // WQUXGA
         };
         
-        protected override Mode getDefaultGraphicMode() => new Mode(1024, 768, ColorDepth.ColorDepth32);
- 
         private void SetGraphicsMode(Mode aMode)
         {
             ThrowIfModeIsNotValid(aMode);

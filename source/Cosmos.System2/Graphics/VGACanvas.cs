@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.HAL;
+using System.Drawing;
 
 namespace Cosmos.System.Graphics
 {
@@ -9,7 +10,7 @@ namespace Cosmos.System.Graphics
     {
         private VGADriver VGADriver;
 
-        public VGACanvas(Mode mode) : base(mode)
+        public VGACanvas(Mode mode) : base()
         {
 
         }
@@ -28,7 +29,8 @@ namespace Cosmos.System.Graphics
 
         public override void Disable()
         {
-            throw new NotImplementedException();
+            Clear();
+            VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
         }
 
         public override void DrawArray(Color[] colors, Point point, int width, int height)
@@ -141,9 +143,12 @@ namespace Cosmos.System.Graphics
             base.DrawTriangle(pen, v1x, v1y, v2x, v2y, v3x, v3y);
         }
 
-        public override List<Mode> getAvailableModes()
+        public override List<Mode> AvailableModes
         {
-            throw new NotImplementedException();
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public override Color GetPointColor(int x, int y)
@@ -151,9 +156,12 @@ namespace Cosmos.System.Graphics
             throw new NotImplementedException();
         }
 
-        protected override Mode getDefaultGraphicMode()
+        public override Mode DefaultGraphicMode
         {
-            throw new NotImplementedException();
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
