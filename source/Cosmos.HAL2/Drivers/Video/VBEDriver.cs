@@ -59,7 +59,7 @@ namespace Cosmos.HAL.Drivers
             IO.VbeData.Word = value;
         }
 
-        private ushort VBERead(VBERegisterIndex index)
+        private ushort VBERead(RegisterIndex index)
         {
             IO.VbeIndex.Word = (ushort)index;
             return IO.VbeIndex.Word;
