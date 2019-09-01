@@ -566,6 +566,13 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 case LaunchType.HyperV:
                     mHost = new HyperV(mDebugInfo, false);
                     break;
+                case LaunchType.Qemu:
+                    if (!QemuSupport.QemuEnabled)
+                    {
+                        throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
+                    }
+                    mHost = new Qemu(mDebugInfo, xUseGDB);
+                    break;
                 default:
                     throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
             }

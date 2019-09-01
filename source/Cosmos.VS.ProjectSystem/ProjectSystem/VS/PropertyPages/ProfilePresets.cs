@@ -17,6 +17,10 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             }
             Add("IntelEdison", "Intel Edison Serial boot");
             Add("HyperV", "Hyper-V");
+            if (QemuSupport.QemuEnabled)
+            {
+                Add("Qemu", "Qemu");
+            }
         }
     }
 }
