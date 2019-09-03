@@ -11,7 +11,11 @@ namespace Cosmos.Debug.Hosts
   {
     private static Process qemuProcess;
 
-    private string harddiskFile;
+    private string _harddiskFile;
+
+    private string _isoFile;
+
+    private string _debugPortString;
 
     public bool RedirectOutput = false;
 
@@ -24,25 +28,43 @@ namespace Cosmos.Debug.Hosts
     {
       if (String.IsNullOrWhiteSpace(aHarddisk))
       {
-        harddiskFile = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\Filesystem.vmdk");
+        _harddiskFile = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\Filesystem.vmdk");
       }
       else
       {
-        harddiskFile = aHarddisk;
+        _harddiskFile = aHarddisk;
       }
+
+      if (aParams.ContainsKey(BuildPropertyNames.IsoFileString))
+      {
+        _isoFile = aParams[BuildPropertyNames.IsoFileString];
+      }
+
+      _debugPortString = "Cosmos\\Serial";
     }
 
     public override void Start()
     {
       qemuProcess = new Process();
-      ProcessStartInfo qemuStartInfo = qemuProcess.StartInfo;
+      var qemuStartInfo = qemuProcess.StartInfo;
       qemuStartInfo.FileName = QemuSupport.QemuExe.FullName;
 
-      string biosPath = ".";
-      string isoPath = "";
-      int memorySize = 32;
-      qemuStartInfo.Arguments = $"-L {biosPath} -cdrom {isoPath} -m {memorySize}";
-      qemuStartInfo.CreateNoWindow = true;
+      string xQemuArguments = "-m 128";
+      xQemuArguments += $" -cdrom {_isoFile}";
+
+      if (!string.IsNullOrWhiteSpace(_harddiskFile))
+      {
+        xQemuArguments += $" -hda {_harddiskFile}";
+      }
+
+      if (!string.IsNullOrWhiteSpace(_debugPortString))
+      {
+        xQemuArguments += $" -chardev pipe,path=\\\\Cosmos\\Serial,id=Cosmos -device isa-serial,chardev=Cosmos";
+      }
+
+      xQemuArguments += " -boot d";
+
+      qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)
       {
         if (LogOutput == null)
@@ -82,7 +104,7 @@ namespace Cosmos.Debug.Hosts
 
     public override void Stop()
     {
-      if (null != qemuProcess)
+      if (qemuProcess != null)
       {
         try
         {

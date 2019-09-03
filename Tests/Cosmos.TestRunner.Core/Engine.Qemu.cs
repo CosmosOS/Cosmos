@@ -17,13 +17,12 @@ namespace Cosmos.TestRunner.Core
                 throw new FileNotFoundException("Harddisk file not found!", harddisk);
             }
 
-            var xBochsConfig = Path.Combine(workingDir, "Kernel.bochsrc");
-            var xParams = new Dictionary<string, string>();
+            var xParams = new Dictionary<string, string>
+            {
+                {BuildPropertyNames.IsoFileString, iso}
+            };
 
-            xParams.Add("ISOFile", iso);
-            xParams.Add(BuildPropertyNames.VisualStudioDebugPortString, @"Pipe: Cosmos\Serial");
-            xParams.Add(BuildPropertyNames.EnableBochsDebugString, RunWithGDB.ToString());
-            var xDebugConnector = new DebugConnectorPipeServer(DebugConnectorPipeServer.DefaultCosmosPipeName);
+            var xDebugConnector = new DebugConnectorPipeClient("Cosmos\\Serial");
             InitializeDebugConnector(xDebugConnector);
 
             var xQemu = new Qemu(xParams, RunWithGDB, harddisk)
