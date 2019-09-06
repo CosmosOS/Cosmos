@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using System.Windows.Input;
 using Cosmos.Build.Builder.Collections;
 using Cosmos.Build.Builder.Models;
 using Cosmos.Build.Builder.Services;
+using Microsoft.Win32;
 
 namespace Cosmos.Build.Builder.ViewModels
 {
@@ -93,10 +95,47 @@ namespace Cosmos.Build.Builder.ViewModels
             return log;
         }
 
+        internal static string GetVisualStudioInstalledPath()
+        {
+            var visualStudioInstalledPath = string.Empty;
+            var visualStudioRegistryPath = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7");
+            if (visualStudioRegistryPath != null)
+            {
+                //Check for the latest version if there is one
+                string[] subkeynames = visualStudioRegistryPath.GetSubKeyNames();
+                double versionnumb = 0.0;
+                foreach (string m in subkeynames)
+                {
+                    double versionnumber = Double.Parse(m);
+                    if(versionnumber > versionnumb) { versionnumb = versionnumber; }
+                }
+                visualStudioInstalledPath = visualStudioRegistryPath.GetValue(versionnumb.ToString(), string.Empty) as string;
+            }
+
+            return visualStudioInstalledPath;
+        }
+
         private async Task BuildAsync()
         {
             try
             {
+                _logger.NewSection("Checking right paths");
+                string vspath = GetVisualStudioInstalledPath();
+                //This can help remedy problems with newer versions
+                if(vspath == string.Empty && System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") != "x64") { _logger.LogMessage("Using Program Files (x64) as a reg key couldnt be found."); vspath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles); } else if
+                    (vspath == string.Empty && System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") != "x86") { _logger.LogMessage("Using Program Files (x86) as a reg key couldnt be found."); vspath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86); } else
+                { _logger.LogMessage("Visual Studio regkey path found: " + vspath); }
+
+                //Checking if vspath drive letter matches the executable path and if it doesnt throw an exception
+                if(Path.GetPathRoot(vspath) != Path.GetPathRoot(System.Reflection.Assembly.GetExecutingAssembly().Location))
+                {
+                    throw new Exception("Dependency installation failed as the install location must be on the same drive as the install of VS");
+                }
+                else
+                {
+                    _logger.LogMessage("Cosmos is on the correct drive!");
+                }
+
                 _logger.NewSection("Checking Dependencies");
 
                 foreach (var dependency in _buildDefinition.GetDependencies())
