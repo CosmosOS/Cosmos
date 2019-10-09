@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using Cosmos.HAL;
 using Cosmos.System;
 
+// Coded By Ali Can GÖNÜLLÜ
+// alicangonullu.biz | alicangonullu@yahoo.com
+// Thanks Support by Berke Kırbaş @iSnowBoy7
+
 namespace Cosmos.System.ScanMaps
 {
     public class TR_StandardQ : ScanMapBase
