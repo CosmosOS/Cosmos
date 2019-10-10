@@ -14,12 +14,18 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
         public static void Execute(Debugger mDebugger)
         {
             var xPath = @"0:\DiTest";
-            var xDi = new DirectoryInfo(xPath);
 
             mDebugger.Send("START TEST: Create");
-            xDi.Create();
 
-            Assert.IsTrue(xDi.Exists == true, "DirectoryInfo.Create failed: directory does not exists");
+            var xDi = new DirectoryInfo(xPath);
+            Assert.IsFalse(xDi.Exists, "DirectoryInfo.Exists should be false when directory doesn't exist");
+
+            xDi.Create();
+            //TODO: 
+            //Assert.IsFalse(xDi.Exists, "DirectoryInfo.Create should not modify DirectoryInfo.Exists");
+
+            xDi = new DirectoryInfo(xPath);
+            Assert.IsTrue(xDi.Exists, "DirectoryInfo.Create failed: directory does not exist");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
@@ -121,9 +127,10 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
 #endif
             mDebugger.Send("START TEST: Delete");
             xDi.Delete(recursive: true);
+            Assert.IsTrue(xDi.Exists, "DirectoryInfo.Delete should not modify DirectoryInfo.Exists");
 
-            /* This is working OK, finally */
-            Assert.IsTrue(xDi.Exists == false, "DirectoryInfo.Delete failed: directory continues exists");
+            xDi = new DirectoryInfo(xPath);
+            Assert.IsFalse(xDi.Exists, "DirectoryInfo.Delete failed: directory continues exists");
             mDebugger.Send("END TEST");
 
             // DateTime is broken see: https://github.com/CosmosOS/Cosmos/pull/553/files for some fixes
