@@ -19,7 +19,7 @@ using Cosmos.System.FileSystem.VFS;
 namespace Cosmos.System_Plugs.System.IO
 {
     [Plug(TargetName = "System.IO.FileSystem, System.IO.FileSystem", Inheritable = true)]
-    public static class CosmosFileSystem
+    public static class FileSystemImpl
     {
         /*
          * This "trick" will work until we have not multi threading / multi process then you must do in the correct
