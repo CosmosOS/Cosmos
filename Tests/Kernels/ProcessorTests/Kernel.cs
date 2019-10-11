@@ -24,8 +24,8 @@ namespace ProcessorTests
             {
                 //TestVendorNameIsNotBlank();
                 TestCycleCount();
-                //TestCycleRateIsNotZero();
-                
+                TestCycleRateIsNotZero();
+
                 TestController.Completed();
             }
             catch (Exception e)
@@ -39,7 +39,7 @@ namespace ProcessorTests
         public void TestVendorNameIsNotBlank()
         {
             string vendorName = CPU.GetCPUVendorName();
-            mDebugger.Send(vendorName);
+            mDebugger.Send("Vendor name: " + vendorName);
             bool isVendorNameBlank = string.IsNullOrWhiteSpace(vendorName);
             mDebugger.Send("Vendor name: ");
             mDebugger.Send(vendorName);
@@ -49,13 +49,9 @@ namespace ProcessorTests
         public void TestCycleCount()
         {
             ulong cycleCount = CPU.GetCPUUptime();
-            mDebugger.Send("Cycle count: " + cycleCount);
-            mDebugger.SendNumber(cycleCount);
             bool isCycleCountZero = cycleCount == 0;
-            Assert.IsFalse(isCycleCountZero, "Processor cycle count is zero.");
+            Assert.IsFalse(isCycleCountZero, "Processor cycle count is not zero.");
             ulong secondCount = CPU.GetCPUUptime();
-            mDebugger.Send("Cycle count: " + secondCount);
-            mDebugger.SendNumber(secondCount);
             Assert.IsTrue(secondCount > cycleCount, "Processor cycle count is increasing");
         }
 
@@ -63,7 +59,8 @@ namespace ProcessorTests
         {
             long cycleRate = CPU.GetCPUCycleSpeed();
             bool isCycleRateZero = cycleRate == 0;
-            Assert.IsFalse(isCycleRateZero, "Processor cycle rate is zero.");
+            Assert.IsFalse(isCycleRateZero, "Processor cycle rate is not zero.");
+            Assert.IsTrue(CPU.GetCPUCycleSpeed() == cycleRate, "Processor cycle speed is not constant");
         }
     }
 }
