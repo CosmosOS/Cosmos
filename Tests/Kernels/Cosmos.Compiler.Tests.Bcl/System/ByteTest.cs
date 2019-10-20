@@ -127,12 +127,71 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((ulong)minValue == 0x0000000000000000, "Conv_U8 for Byte doesn't work");
 
             // Test Conv_R4
-            Assert.IsTrue((float)maxValue == Byte.MaxValue, "Conv_R4 for Byte doesn't work" + (float)maxValue);
+            Assert.IsTrue((float)maxValue == Byte.MaxValue, "Conv_R4 for Byte doesn't work");
             Assert.IsTrue((float)minValue == Byte.MinValue, "Conv_R4 for Byte doesn't work");
 
             // Test Conv_R8
             Assert.IsTrue((double)maxValue == Byte.MaxValue, "Conv_R8 for Byte doesn't work");
             Assert.IsTrue((double)minValue == Byte.MinValue, "Conv_R8 for Byte doesn't work");
+
+            // Test checked conversions to bytes
+            int val = 1;
+            int test = 125;
+            // Test Conv_Ovf_U1
+            checked
+            {
+                Assert.IsTrue((byte)test == 0x7D, "Conv_Ovf_U1 for Byte doesn't work(throws incorrectly)");
+                byte x = 0;
+                bool error = false;
+                try
+                {
+                    x = (byte)(val + 255);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U1 for Byte doesn't work(error was not thrown)");
+                Assert.IsTrue((byte)(long)125 == 0x7D, "Conv_Ovf_U1 for long to Byte doesn't work(throws incorrectly)");
+                error = false;
+                try
+                {
+                    x = (byte)(val + 0x8_0000_0000);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U1 for from positive Long to Byte doesn't work(error was not thrown)");
+                error = false;
+                try
+                {
+                    x = (byte)(val + -0x8_0000_0001);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U1 for from negative Long to Byte doesn't work(error was not thrown)");
+            }
+            
+
+            // Test Conv_Ovf_U1_Un
+            checked
+            {
+                Assert.IsTrue((byte)(uint)125 == 0x7D, "Conv_Ovf_U1_Un for Byte doesn't work(throws incorrectly)");
+                byte x = 0;
+                bool error = false;
+                try
+                {
+                    x = (byte)(uint)(val + 300);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U1_Un for Byte doesn't work(error was not thrown): ");
+            }
 
             // Test Methods
             val2 = TestMethod(value);
