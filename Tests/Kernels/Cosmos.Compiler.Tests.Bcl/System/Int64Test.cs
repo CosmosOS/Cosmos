@@ -13,11 +13,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             string result;
             string expectedResult;
 
-            value = Int64.MaxValue;
+            value = long.MaxValue;
 
             result = value.ToString();
             expectedResult = "9223372036854775807";
-
             Assert.IsTrue((result == expectedResult), "Int64.ToString doesn't work");
 
             // Now let's try to concat to a String using '+' operator
@@ -177,6 +176,27 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Test Conv_R8
             Assert.IsTrue((double)maxValue == Int64.MaxValue, "Conv_R8 for Int64 doesn't work");
             Assert.IsTrue((double)minValue == Int64.MinValue, "Conv_R8 for Int64 doesn't work");
+
+            //Test checked conversions
+            long val = 1;
+
+            // Test Conv_Ovf_I8_Un
+            checked
+            {
+                Assert.IsTrue((long)(ulong)125 == 0x7D, "Conv_Ovf_I8_Un doesn't work(throws incorrectly)");
+                long x = 0;
+                bool error = false;
+                try
+                {
+                    x = (long)((ulong)val + ulong.MaxValue - 1);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_I8_Un doesn't work(error was not thrown): " + x);
+            }
+
 
             // Test Methods
 
