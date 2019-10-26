@@ -485,6 +485,10 @@ namespace Cosmos.Core_Plugs.System
 
         public static int IndexOf(string aThis, string aSubstring, int aIdx, int aLength, StringComparison aComparison)
         {
+            if (aSubstring == String.Empty)
+            {
+                return aIdx;
+            }
             return boyerMooreHorsepool(aSubstring, aThis.Substring(aIdx, aLength));
         }
 
@@ -622,6 +626,31 @@ namespace Cosmos.Core_Plugs.System
         public static string Insert(string aThis, int aStartPos, string aValue)
         {
             return aThis.Substring(0, aStartPos) + aValue + aThis.Substring(aStartPos);
+        }
+
+        public static int LastIndexOf(string aThis, string aString, int aIndex)
+        {
+            return LastIndexOf(aThis, aString, aIndex, aThis.Length - aIndex);
+        }
+
+        public static int LastIndexOf(string aThis, string aString, int aIndex, int aCount)
+        {
+            if (aString == String.Empty)
+            {
+                return aIndex;
+            }
+
+            string curr = "";
+            char[] chars = aString.ToCharArray();
+            for (int i = 0; i < aCount; i++)
+            {
+                curr += chars[aThis.Length - i];
+                if (curr.StartsWith(aString))
+                {
+                    return aThis.Length - 1;
+                }
+            }
+            return -1;
         }
 
         public static int LastIndexOf(string aThis, char aChar, int aStartIndex, int aCount)
