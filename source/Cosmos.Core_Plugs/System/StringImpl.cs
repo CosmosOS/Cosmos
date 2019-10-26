@@ -489,7 +489,15 @@ namespace Cosmos.Core_Plugs.System
             {
                 return aIdx;
             }
-            return boyerMooreHorsepool(aSubstring, aThis.Substring(aIdx, aLength));
+            int pos = boyerMooreHorsepool(aSubstring, aThis.Substring(aIdx, aLength));
+            if (pos == -1)
+            {
+                return pos;
+            }
+            else
+            {
+                return pos + aIdx; //To account for offset
+            }
         }
 
         public static bool Contains(string aThis, string value)
@@ -637,17 +645,21 @@ namespace Cosmos.Core_Plugs.System
         {
             if (aString == String.Empty)
             {
+                if (aIndex > aThis.Length)
+                {
+                    return aThis.Length;
+                }
                 return aIndex;
             }
 
             string curr = "";
-            char[] chars = aString.ToCharArray();
+            char[] chars = aThis.ToCharArray();
             for (int i = 0; i < aCount; i++)
             {
-                curr += chars[aThis.Length - i];
+                curr = chars[aThis.Length - i - 1] + curr;
                 if (curr.StartsWith(aString))
                 {
-                    return aThis.Length - 1;
+                    return aThis.Length - i - 1;
                 }
             }
             return -1;
@@ -655,7 +667,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static int LastIndexOf(string aThis, char aChar, int aStartIndex, int aCount)
         {
-            return LastIndexOfAny(aThis, new[] { aChar }, aStartIndex, aCount);
+            return LastIndexOf(aThis, new string(aChar, 1), aStartIndex, aCount);
         }
 
         public static int LastIndexOfAny(string aThis, char[] aChars, int aStartIndex, int aCount)
@@ -1005,7 +1017,7 @@ namespace Cosmos.Core_Plugs.System
 
             /*
              * This optimization is not taking effect yet in Cosmos as String.Intern() is not implemented
-             */ 
+             */
             if (ReferenceEquals(strA, strB))
             {
                 mDebugger.SendInternal($"strA ({strA}) is the same object of strB ({strB}) returning 0");
