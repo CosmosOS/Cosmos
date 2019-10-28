@@ -6,6 +6,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Cosmos.Compiler.Tests.Bcl.System\Cosmos.Compiler.Tests.BclSystem.csproj">
+          <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+        </ProjectReference>
         <ProjectReference Include="..\..\source\TheRingMaster\TheRingMaster.csproj" ReferenceOutputAssembly="False" />
         <ProjectReference Include="..\..\Tools\NASM\NASM.csproj" ReferenceOutputAssembly="False" />
         <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
