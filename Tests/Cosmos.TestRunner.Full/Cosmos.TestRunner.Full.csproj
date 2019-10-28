@@ -6,9 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Cosmos.Compiler.Tests.Bcl.System\Cosmos.Compiler.Tests.BclSystem.csproj">
-          <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-        </ProjectReference>
         <ProjectReference Include="..\..\source\TheRingMaster\TheRingMaster.csproj" ReferenceOutputAssembly="False" />
         <ProjectReference Include="..\..\Tools\NASM\NASM.csproj" ReferenceOutputAssembly="False" />
         <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
@@ -21,6 +18,7 @@
         <ProjectReference Include="..\Kernels\BoxingTests\BoxingTests.csproj" />
         <ProjectReference Include="..\Kernels\ConsoleTest\ConsoleTest.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Bcl.System\Cosmos.Compiler.Tests.BclSystem.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.csproj" />

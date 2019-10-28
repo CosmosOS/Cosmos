@@ -19,7 +19,7 @@ namespace Cosmos.TestRunner.Full
             yield return typeof(Cosmos.Compiler.Tests.TypeSystem.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.Bcl.System.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
+            //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.Exceptions.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.MethodTests.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel);
