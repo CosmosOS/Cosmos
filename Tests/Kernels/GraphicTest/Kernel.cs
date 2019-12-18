@@ -4,6 +4,8 @@ using Cosmos.TestRunner;
 using Cosmos.System.Graphics;
 using System.Drawing;
 using Point = Cosmos.System.Graphics.Point;
+using System.IO;
+using Cosmos.Compiler.Tests.Bcl;
 
 /*
  * It is impossible to make assertions here but it is useful in any case to have it runs automatically
@@ -31,6 +33,9 @@ namespace GraphicTest
                     243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148,
                     255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
                     0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, }, ColorDepth.ColorDepth32);
+        private static byte[] letterData = Convert.FromBase64String("Qk12AgAAAAAAADYAAAAoAAAACQAAABAAAAABACAAAAAAAEACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+/dP//////////////////////AHS//wAAAAAAAAAAAAAAAEgAAP+/4Jz/AAB0/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcSAD/nODg/wAASP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3QA/0ic4P8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOCcSP8AdL//AAAAAAAAAAAAAAAAAAAAAP+/dP/////////////////g////AEic/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        private Bitmap letter = new Bitmap(letterData);
+
 
         protected override void BeforeRun()
         {
@@ -39,7 +44,7 @@ namespace GraphicTest
             canvas = FullScreenCanvas.GetFullScreenCanvas();
         }
 
-        private void DoTest (Canvas aCanvas)
+        private void DoTest(Canvas aCanvas)
         {
             mDebugger.Send($"Testing Canvas with mode {aCanvas.Mode}");
             aCanvas.Clear(Color.Blue);
@@ -82,7 +87,8 @@ namespace GraphicTest
             aCanvas.DrawFilledRectangle(pen, 200, 150, 400, 300);
 
             /* A Bitmpap image */
-            aCanvas.DrawImage(bitmap, new Point(0, 0));
+            aCanvas.DrawImage(bitmap, new Point(10, 10));
+            aCanvas.DrawImage(letter, new Point(50, 10));
 
             mDebugger.Send($"Test of Canvas with mode {aCanvas.Mode} executed successfully");
         }
@@ -92,6 +98,8 @@ namespace GraphicTest
             try
             {
                 mDebugger.Send("Run");
+
+                TestBitmaps();
 
                 /* First test with the DefaulMode */
                 DoTest(canvas);
@@ -109,6 +117,18 @@ namespace GraphicTest
                 mDebugger.Send(e.Message);
                 TestController.Failed();
             }
+        }
+
+        private void TestBitmaps()
+        {
+            Assert.IsTrue(bitmap.Width == 10 && bitmap.Height == 10, "Bitmap width and height set correctly");
+            Assert.IsTrue(bitmap.rawData.Length == 100, "Bitmap data size makes sense");
+            MemoryStream savedBitmap = new MemoryStream();
+            letter.Save(savedBitmap, ImageFormat.bmp);
+            var bitmapData = savedBitmap.ToArray();
+            Assert.IsTrue(EqualityHelper.ByteArrayAreEquals(bitmapData, letterData), "Saving a bitmap creates the same data as used to create it");
+            Bitmap letter2 = new Bitmap(bitmapData);
+            Assert.IsTrue(EqualityHelper.IntArrayAreEquals(letter2.rawData, letter.rawData), "Creating a new bitmap from saved bitmap creates same bitmap");
         }
     }
 }
