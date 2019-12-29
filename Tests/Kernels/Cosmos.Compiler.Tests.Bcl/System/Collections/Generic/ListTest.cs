@@ -9,6 +9,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 {
     public static class ListTest
     {
+        public enum Test
+        {
+            E1,
+            E2
+        }
         public static void Execute()
         {
             var xList = new List<int>();
@@ -83,6 +88,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
             //Assert.AreEqual(5, xRange[0], "List<int>.GetRange: xRange[0] != 5");
             //Assert.AreEqual(4, xRange[1], "List<int>.GetRange: xRange[1] != 4");
             //Assert.AreEqual(5, xRange[2], "List<int>.GetRange: xRange[2] != 5");
+
+            //Test enums with lists
+            List<Test> list = new List<Test>();
+            list.Add(Test.E2);
+            Assert.IsTrue(list[0] == Test.E2, "IL2CPU does not handle lists with Enums correctly");
+
         }
     }
 }
