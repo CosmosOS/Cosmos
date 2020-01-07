@@ -58,9 +58,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Platform.PC", "sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System", "source\Kernel-X86\40-System\Cosmos.System\Cosmos.System.csproj", "{F8BF6943-B69D-4549-9C16-75146616E19C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Assembler", "..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj", "{F0860B7D-3FF7-4E2A-AC10-18E87ADD62A3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp", "..\XSharp\source\XSharp\XSharp.csproj", "{F785B091-7E4D-4D2E-A310-B18690623F74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp", "..\XSharp\source\XSharp\XSharp\XSharp.csproj", "{F785B091-7E4D-4D2E-A310-B18690623F74}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.HAL", "source\Kernel-X86\30-HAL\Cosmos.HAL\Cosmos.HAL.csproj", "{3F8EDE0E-61BD-4D01-95F5-4A5A17F6221E}"
 EndProject
@@ -81,8 +79,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRKernel", "source\Kernel-TapRoot\Demo\TRKernel.csproj", "{F614D199-03E6-4CBD-836C-EDB769B025A3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\Spruce\Spruce.csproj", "{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.x86", "..\XSharp\source\XSharp.x86\XSharp.x86.csproj", "{7370A62F-12DA-4181-BE3B-009D0926CA7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

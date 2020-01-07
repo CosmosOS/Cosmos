@@ -134,6 +134,66 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((double)maxValue == UInt16.MaxValue, "Conv_R8 for UInt16 doesn't work");
             Assert.IsTrue((double)minValue == UInt16.MinValue, "Conv_R8 for UInt16 doesn't work");
 
+            //Test checked conversions
+            int val = 1;
+            int test = 125;
+
+            // Test Conv_Ovf_U2
+            checked
+            {
+                Assert.IsTrue((ushort)test == 0x7D, "Conv_Ovf_U2 doesn't work(throws incorrectly)");
+                ushort x = 0;
+                bool error = false;
+                try
+                {
+                    x = (ushort)(ushort.MaxValue + val);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U2 doesn't work(error was not thrown): " + x);
+                Assert.IsTrue((uint)(long)125 == 0x7D, "Conv_Ovf_U2 for long to ushort doesn't work(throws incorrectly)");
+                error = false;
+                try
+                {
+                    x = (ushort)(val + 0x8_0000_0000);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U2 for from positive long to ushort doesn't work(error was not thrown): " + x);
+                error = false;
+                try
+                {
+                    x = (ushort)(val + -0x8_0000_0001);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U2 for from negative long to ushort doesn't work(error was not thrown): " + x);
+            }
+
+
+            // Test Conv_Ovf_U2_Un
+            checked
+            {
+                Assert.IsTrue((ushort)(uint)125 == 0x7D, "Conv_Ovf_U2_Un doesn't work(throws incorrectly)");
+                ushort x = 0;
+                bool error = false;
+                try
+                {
+                    x = (ushort)(uint)(val + ushort.MaxValue);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_U2_Un doesn't work(error was not thrown): " + x);
+            }
+
             // Test Methods
             val2 = TestMethod(value);
             Assert.IsTrue(value == 60, "Passing an UInt16 as a method parameter doesn't work");

@@ -1,25 +1,5 @@
 <Project>
 
-    <PropertyGroup>
-        <ApprovalTestsVersion>3.0.22</ApprovalTestsVersion>
-        <AvaloniaVersion>0.7.0</AvaloniaVersion>
-        <MicrosoftBuildVersion>16.0.461</MicrosoftBuildVersion>
-        <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0-alpha-5</MicrosoftNETFrameworkReferenceAssembliesVersion>
-        <MicrosoftNETTestSdkVersion>16.0.1</MicrosoftNETTestSdkVersion>
-        <MicrosoftTestPlatformObjectModelVersion>16.0.1</MicrosoftTestPlatformObjectModelVersion>
-        <MicrosoftVisualStudioProjectSystemVersion>16.0.374-pre</MicrosoftVisualStudioProjectSystemVersion>
-        <MicrosoftVisualStudioSDKEmbedInteropTypesVersion>15.0.27</MicrosoftVisualStudioSDKEmbedInteropTypesVersion>
-        <MicrosoftVisualStudioSetupConfigurationInteropVersion>1.16.30</MicrosoftVisualStudioSetupConfigurationInteropVersion>
-        <MicrosoftVisualStudioShell150Version>16.0.28729</MicrosoftVisualStudioShell150Version>
-        <MicrosoftVisualStudioShellInterop110Version>11.0.61031</MicrosoftVisualStudioShellInterop110Version>
-        <MicrosoftVSSDKBuildToolsVersion>16.0.2264</MicrosoftVSSDKBuildToolsVersion>
-        <MSTestVersion>1.4.0</MSTestVersion>
-        <NuGetVersion>5.0.0</NuGetVersion>
-        <NUnitVersion>3.11.0</NUnitVersion>
-        <NUnit3TestAdapterVersion>3.13.0</NUnit3TestAdapterVersion>
-        <ReactiveUIVersion>9.12.1</ReactiveUIVersion>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Update="ApprovalTests" Version="$(ApprovalTestsVersion)" />
         <PackageReference Update="Avalonia" Version="$(AvaloniaVersion)" />
@@ -33,7 +13,7 @@
         <PackageReference Update="Microsoft.TestPlatform.ObjectModel" Version="$(MicrosoftTestPlatformObjectModelVersion)" />
         <PackageReference Update="Microsoft.VisualStudio.ProjectSystem.Analyzers" Version="$(MicrosoftVisualStudioProjectSystemVersion)" />
         <PackageReference Update="Microsoft.VisualStudio.ProjectSystem.Sdk" Version="$(MicrosoftVisualStudioProjectSystemVersion)" />
-        <PackageReference Update="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="$(MicrosoftVisualStudioSDKEmbedInteropTypesVersion)" />
+        <PackageReference Update="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="$(MicrosoftVisualStudioSdkEmbedInteropTypesVersion)" />
         <PackageReference Update="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="$(MicrosoftVisualStudioSetupConfigurationInteropVersion)" />
         <PackageReference Update="Microsoft.VisualStudio.Shell.15.0" Version="$(MicrosoftVisualStudioShell150Version)" />
         <PackageReference Update="Microsoft.VisualStudio.Shell.Interop.11.0" Version="$(MicrosoftVisualStudioShellInterop110Version)" />

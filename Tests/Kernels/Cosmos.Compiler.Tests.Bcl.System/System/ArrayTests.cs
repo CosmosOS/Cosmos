@@ -40,6 +40,32 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             xDoubleResult[3] = xDoubleSource[0];
             
             Assert.IsTrue(xDoubleResult[3] == xDoubleExpectedResult[3], "Assinging values to double array elements doesn't work: xResult[1] =  " + (uint)xDoubleResult[3] + " != " + (uint)xDoubleExpectedResult[3]);
+
+            //Test array indexes
+            int y = 0;
+            int[] x = new int[5] { 1, 2, 3, 4, 5 };
+            bool error = false;
+            try
+            {
+                y = x[1];
+                y = x[7];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                error = true;
+            }
+            Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too large positions.");
+            error = false;
+            try
+            {
+                y = x[-1];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                error = true;
+            }
+            Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too small positions.");
+
         }
     }
 }

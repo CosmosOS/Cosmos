@@ -137,6 +137,64 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((double)maxValue == SByte.MaxValue, "Conv_R8 for SByte doesn't work");
             Assert.IsTrue((double)minValue == SByte.MinValue, "Conv_R8 for SByte doesn't work");
 
+            //Now test checked conversions
+            int val = 1;
+            int test = 125;
+
+            // Test Conv_Ovf_I1
+            checked
+            {
+                Assert.IsTrue((sbyte)test == 0x7D, "Conv_Ovf_I1 for SByte doesn't work(throws incorrectly)");
+                sbyte x = 0;
+                bool error = false;
+                try
+                {
+                    x = (sbyte)(val + 127);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_I1 for SByte doesn't work(error was not thrown)");
+                error = false;
+                try
+                {
+                    x = (sbyte)(val + 0x8_0000_0000);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_I1 for from positive Long to SByte doesn't work(error was not thrown)");
+                error = false;
+                try
+                {
+                    x = (sbyte)(val + -0x8_0000_0001);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_I1 for from negative Long to SByte doesn't work(error was not thrown)");
+            }
+
+            // Test Conv_Ovf_I1_Un
+            checked
+            {
+                Assert.IsTrue((sbyte)(uint)125 == 0x7D, "Conv_Ovf_I1_Un for SByte doesn't work(throws incorrectly)");
+                sbyte x = 0;
+                bool error = false;
+                try
+                {
+                    x = (sbyte)(uint)(val + 127);
+                }
+                catch (Exception)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Conv_Ovf_I1_Un for SByte doesn't work(error was not thrown)");
+            }
+
             // Test Methods
             val2 = TestMethod(value);
             Assert.IsTrue(value == 60, "Passing an SByte as a method parameter doesn't work");

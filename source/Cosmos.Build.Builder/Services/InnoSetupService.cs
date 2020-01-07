@@ -5,7 +5,7 @@ namespace Cosmos.Build.Builder.Services
 {
     internal class InnoSetupService : IInnoSetupService
     {
-        private const string InnoSetupRegistryKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1";
+        private const string InnoSetupRegistryKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 6_is1";
 
         public string GetInnoSetupInstallationPath()
         {

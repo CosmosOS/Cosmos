@@ -1,3 +1,4 @@
+//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,13 +10,13 @@ namespace Cosmos.System.Graphics
 {
     public class SVGAIIScreen : Canvas
     {
-        private static readonly Mode DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth16);
+        private static readonly Mode DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
 
         private static readonly Debugger Debugger = new Debugger("System", "SVGAIIScreen");
 
         private Mode _mode;
 
-        public VMWareSVGAII xSVGAIIDriver;
+        private readonly VMWareSVGAII xSVGAIIDriver;
 
         public SVGAIIScreen()
             : this(DefaultMode)
@@ -23,12 +24,12 @@ namespace Cosmos.System.Graphics
         }
 
         public SVGAIIScreen(Mode aMode)
-            : base(aMode)
         {
+            Debugger.SendInternal($"Called ctor with mode {aMode}");
             ThrowIfModeIsNotValid(aMode);
 
             xSVGAIIDriver = new VMWareSVGAII();
-            xSVGAIIDriver.SetMode((uint)aMode.Columns, (uint)aMode.Rows, (uint)aMode.ColorDepth);
+            Mode = aMode;
         }
 
         public override Mode Mode
@@ -37,6 +38,7 @@ namespace Cosmos.System.Graphics
             set
             {
                 _mode = value;
+                Debugger.SendInternal($"Called Mode set property with mode {_mode}");
                 SetGraphicsMode(_mode);
             }
         }
@@ -71,8 +73,11 @@ namespace Cosmos.System.Graphics
             xSVGAIIDriver.Fill((uint)x_start, (uint)y_start, (uint)width, (uint)height, (uint)pen.Color.ToArgb());
         }
 
-        public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
+        //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
+        public override List<Mode> AvailableModes { get; } = new List<Mode>
         {
+            /*  VmWare maybe supports 16 bit resolutions but CGS not yet (we should need to do RGB32->RGB16 conversion) */
+#if false
             /* 16-bit Depth Resolutions*/
 
             /* SD Resolutions */
@@ -81,6 +86,7 @@ namespace Cosmos.System.Graphics
             new Mode(640, 480, ColorDepth.ColorDepth16),
             new Mode(720, 480, ColorDepth.ColorDepth16),
             new Mode(800, 600, ColorDepth.ColorDepth16),
+            new Mode(1024, 768, ColorDepth.ColorDepth16),
             new Mode(1152, 768, ColorDepth.ColorDepth16),
 
             /* Old HD-Ready Resolutions */
@@ -109,6 +115,7 @@ namespace Cosmos.System.Graphics
             new Mode(3200, 2048, ColorDepth.ColorDepth16), // WQXGA+
             new Mode(3200, 2400, ColorDepth.ColorDepth16), // QUXGA
             new Mode(3840, 2400, ColorDepth.ColorDepth16), // WQUXGA
+#endif
             
             /* 32-bit Depth Resolutions*/
             /* SD Resolutions */
@@ -117,6 +124,7 @@ namespace Cosmos.System.Graphics
             new Mode(640, 480, ColorDepth.ColorDepth32),
             new Mode(720, 480, ColorDepth.ColorDepth32),
             new Mode(800, 600, ColorDepth.ColorDepth32),
+            new Mode(1024, 768, ColorDepth.ColorDepth32),
             new Mode(1152, 768, ColorDepth.ColorDepth32),
 
             /* Old HD-Ready Resolutions */

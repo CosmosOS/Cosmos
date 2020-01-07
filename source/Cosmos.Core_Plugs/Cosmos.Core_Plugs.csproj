@@ -10,6 +10,7 @@
         <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
         <ProjectReference Include="..\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp\XSharp\XSharp.csproj" />
     </ItemGroup>
 
 </Project>

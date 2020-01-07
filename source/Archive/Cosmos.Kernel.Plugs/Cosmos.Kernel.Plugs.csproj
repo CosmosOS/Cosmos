@@ -69,7 +69,7 @@
     <Compile Include="ThreadImpl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj">
+    <ProjectReference Include="..\..\..\..\XSharp\source\XSharp\XSharp\XSharp.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>XSharp.Assembler</Name>
     </ProjectReference>
