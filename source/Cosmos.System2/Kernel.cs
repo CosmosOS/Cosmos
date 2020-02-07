@@ -143,12 +143,5 @@ namespace Cosmos.System
             Global.mDebugger.Send(message);
         }
 
-        public static bool InterruptsEnabled
-        {
-            get
-            {
-                return HAL.Global.InterruptsEnabled;
-            }
-        }
     }
 }

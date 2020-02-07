@@ -10,26 +10,28 @@ namespace Cosmos.HAL
     /// <summary>
     /// This class describes the PS/2 keyboard.
     /// </summary>
-    public class PS2Keyboard : KeyboardBase
+    internal class PS2Keyboard : KeyboardBase
     {
-        enum Command : byte
+        private enum Command : byte
         {
             SetLEDs = 0xED,
+            Echo = 0xEE,
             GetOrSetScanCodeSet = 0xF0,
             EnableScanning = 0xF4,
             DisableScanning = 0xF5,
             Reset = 0xFF
         }
 
-        public byte PS2Port { get; }
+        private readonly PS2Controller mPS2Controller;
+        private readonly byte mPS2Port;
 
         private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
-        private PS2Controller mPS2Controller = Global.PS2Controller;
-        private Debugger mDebugger = new Debugger("HAL", "PS2Keyboard");
+        private Debugger mDebugger = new Debugger(nameof(HAL), nameof(PS2Keyboard));
 
-        internal PS2Keyboard(byte aPort)
+        public PS2Keyboard(PS2Controller aPS2Controller, byte aPort)
         {
-            PS2Port = aPort;
+            mPS2Controller = aPS2Controller;
+            mPS2Port = aPort;
         }
 
         public override void Initialize()
@@ -37,7 +39,11 @@ namespace Cosmos.HAL
             SendCommand(Command.Reset);
             mPS2Controller.WaitForDeviceReset();
 
-            //VMWare doesn't support the Get/SetScanCode command
+			if (PCI.GetDevice((VendorID)0x80EE, (DeviceID)0xBEEF) == null && PCI.GetDevice((VendorID)0x15AD, (DeviceID)0x0405) == null)
+            {
+                SetScanCodeSet(1);
+            }
+            //VMware doesn't support the Get/SetScanCode command
             //mDebugger.SendInternal("(PS/2 Keyboard) Current scan code set: " + GetScanCodeSet());
             //SetScanCodeSet(1);
             //mDebugger.SendInternal("(PS/2 Keyboard) Current scan code set: " + GetScanCodeSet());
@@ -47,15 +53,12 @@ namespace Cosmos.HAL
             SendCommand(Command.EnableScanning);
 
             Global.mDebugger.SendInternal("(PS/2 Keyboard) Initialized");
-
-            UpdateLeds();
-            Global.mDebugger.SendInternal("(PS/2 Keyboard) Leds updated");
         }
 
         private void HandleIRQ(ref INTs.IRQContext aContext)
         {
-            byte xScanCode = IO.Data.Byte;
-            bool xReleased = (xScanCode & 0x80) == 0x80;
+            var xScanCode = IO.Data.Byte;
+            var xReleased = (xScanCode & 0x80) == 0x80;
 
             if (xReleased)
             {
@@ -65,22 +68,32 @@ namespace Cosmos.HAL
             OnKeyPressed?.Invoke(xScanCode, xReleased);
         }
 
-        public override void UpdateLeds()
+        public override void UpdateLeds(
+            bool aScrollLock,
+            bool aNumLock,
+            bool aCapsLock)
         {
-            // for now, lets not do this..
-            //IO.Port60.Byte = 0xED;
-            //while ((new IOPort(0x64).Byte & 2) != 0)
-            //{
-            //}
-            //var led_status = (Global.ScrollLock ? 1 : 0) | ((Global.NumLock ? 1 : 0) << 1) | ((Global.CapsLock ? 1 : 0) << 2);
-            //IO.Port60.Byte = (byte)led_status;
-            //while ((new IOPort(0x64).Byte & 2) != 0)
-            //{
-            //}
+            byte xByte = 0;
 
-            // Updated Code (not tested):
-            //var xLEDs = (byte)(Global.ScrollLock ? 1 : 0) | ((Global.NumLock ? 1 : 0) << 1) | ((Global.CapsLock ? 1 : 0) << 2);
-            //SendCommand(Command.SetLEDs, xLEDs);
+            if (aScrollLock)
+            {
+                xByte |= 0b0001;
+            }
+
+            if (aNumLock)
+            {
+                xByte |= 0b0010;
+            }
+
+            if (aCapsLock)
+            {
+                xByte |= 0b0100;
+            }
+
+            // needs testing
+            //SendCommand(Command.SetLEDs, xByte);
+
+            Global.mDebugger.SendInternal("(PS/2 Keyboard) Leds updated");
         }
 
         /// <summary>
@@ -99,13 +112,15 @@ namespace Cosmos.HAL
         /// <param name="aScanCodeSet">The scan code set to set. Can be 1, 2 or 3.</param>
         private void SetScanCodeSet(byte aScanCodeSet)
         {
-            if (aScanCodeSet == 1 || aScanCodeSet == 2 || aScanCodeSet == 3)
+            switch (aScanCodeSet)
             {
-                SendCommand(Command.GetOrSetScanCodeSet, aScanCodeSet);
-            }
-            else
-            {
-                throw new Exception("(PS/2 Keyboard) Scan code set '" + aScanCodeSet + "' doesn't exist");
+                case 1:
+                case 2:
+                case 3:
+                    SendCommand(Command.GetOrSetScanCodeSet, aScanCodeSet);
+                    return;
+                default:
+                    throw new Exception("(PS/2 Keyboard) Scan code set '" + aScanCodeSet + "' doesn't exist");
             }
         }
 
@@ -115,7 +130,7 @@ namespace Cosmos.HAL
             mDebugger.SendInternal("Command:");
             mDebugger.SendInternal((byte)aCommand);
 
-            if (PS2Port == 2)
+            if (mPS2Port == 2)
             {
                 mPS2Controller.PrepareSecondPortWrite();
             }
@@ -133,7 +148,7 @@ namespace Cosmos.HAL
                 mDebugger.SendInternal("Byte value:");
                 mDebugger.SendInternal(aByte.Value);
 
-                if (PS2Port == 2)
+                if (mPS2Port == 2)
                 {
                     mPS2Controller.PrepareSecondPortWrite();
                 }

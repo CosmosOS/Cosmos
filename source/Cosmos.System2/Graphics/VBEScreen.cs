@@ -7,7 +7,7 @@ using Cosmos.HAL.Drivers;
 
 namespace Cosmos.System.Graphics
 {
-   public class VBEScreen : Canvas
+    public class VBEScreen : Canvas
     {
         private static readonly Mode DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
 
@@ -70,7 +70,7 @@ namespace Cosmos.System.Graphics
         };
 
         public override Mode DefaultGraphicMode => DefaultMode;
-        
+
         /// <summary>
         /// Use this to setup the screen, this will disable the console.
         /// </summary>
@@ -84,7 +84,7 @@ namespace Cosmos.System.Graphics
             ushort bpp = (ushort)Mode.ColorDepth;
 
             //set the screen
-           VBEDriver.VBESet(xres, yres, bpp);
+            VBEDriver.VBESet(xres, yres, bpp);
         }
 #endregion
 
@@ -109,7 +109,7 @@ namespace Cosmos.System.Graphics
          * As DrawPoint() is the basic block of DrawLine() and DrawRect() and in theory of all the future other methods that will
          * be implemented is better to not check the validity of the arguments here or it will repeat the check for any point
          * to be drawn slowing down all.
-         */ 
+         */
         public override void DrawPoint(Pen pen, int x, int y)
         {
             Color color = pen.Color;
@@ -157,7 +157,7 @@ namespace Cosmos.System.Graphics
         public override void DrawArray(Color[] colors, int x, int y, int width, int height)
         {
             ThrowIfCoordNotValid(x, y);
-            
+
             ThrowIfCoordNotValid(x + width, y + height);
 
             for (int i = 0; i < x; i++)
@@ -210,7 +210,7 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal("Done");
         }
 
-#endregion
+        #endregion
 
 #region Reading
 

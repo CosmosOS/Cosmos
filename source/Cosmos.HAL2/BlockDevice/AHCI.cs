@@ -55,7 +55,7 @@ namespace Cosmos.HAL.BlockDevice
             get => ((byte)mGeneric.AHCIVersion >> 24) + (byte)(mGeneric.AHCIVersion >> 16) + "." + (byte)(mGeneric.AHCIVersion >> 8) + ((byte)(mGeneric.AHCIVersion) > 0 ? "." + (byte)mGeneric.AHCIVersion : "");
         }
 
-        internal static void InitDriver()
+        public static void InitDriver()
         {
 
             if (xDevice != null)
@@ -110,13 +110,13 @@ namespace Cosmos.HAL.BlockDevice
                         var xPart = xMBR.Partitions[i];
                         if (xPart == null)
                         {
-                            Console.WriteLine("Null partition found at idx: " + i);
+                            CustomConsole.WriteLineError("Null partition found at idx: " + i);
                         }
                         else
                         {
                             var xPartDevice = new Partition(xPort, xPart.StartSector, xPart.SectorCount);
                             BlockDevice.Devices.Add(xPartDevice);
-                            Console.WriteLine("Found partition at idx: " + i);
+                            CustomConsole.WriteLineOK("Found partition at idx: " + i);
                         }
                     }
                 }

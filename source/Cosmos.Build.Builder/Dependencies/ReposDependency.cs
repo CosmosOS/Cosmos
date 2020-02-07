@@ -25,13 +25,13 @@ namespace Cosmos.Build.Builder.Dependencies
             {
                 new Repo(
                     Path.GetFullPath(Path.Combine(cosmosDir, "..", "IL2CPU")),
-                    "https://github.com/CosmosOS/IL2CPU"),
+                    "https://github.com/aura-systems/IL2CPU"),
                 new Repo(
                     Path.GetFullPath(Path.Combine(cosmosDir, "..", "XSharp")),
-                    "https://github.com/CosmosOS/XSharp"),
+                    "https://github.com/aura-systems/XSharp"),
                 new Repo(
                     Path.GetFullPath(Path.Combine(cosmosDir, "..", "Common")),
-                    "https://github.com/CosmosOS/Common")
+                    "https://github.com/aura-systems/Common")
             };
         }
 
