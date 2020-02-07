@@ -54,6 +54,50 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(test.EndsWith("string."), "string.EndsWith(string) is not reporting false even though the string actually does end with the substring.");
             Assert.IsFalse(test.EndsWith("sentence."), "string.EndsWith(string) is not reporting true even though the string actually doesn't end with the substring.");
 
+            Assert.IsTrue(test.IndexOf(string.Empty, 10) == 10, "string.IndexOf currectly returns for empty string with start index");
+            Assert.IsTrue(test.IndexOf(string.Empty, 10, 10) == 10, "string.IndexOf currectly returns for empty string with start index and count");
+            Assert.IsTrue(test.IndexOf('T') == 0, "string.IndexOf finds the only occurance of a letter");
+            Assert.IsTrue(test.IndexOf('A') == -1, "string.IndexOf correctly returns when it does not find something");
+            Assert.IsTrue(test.IndexOf("ABCDE") == -1, "string.IndexOf correctly returns when it does not find something");
+            Assert.IsTrue(test.IndexOf('.') == test.Length - 1, "string.IndexOf finds the only occurance of a letter at the end of the string");
+            Assert.IsTrue(test.IndexOf('i') == 2, "string.IndexOf finds the first of multiple occurances of a letter");
+            Assert.IsTrue(test.IndexOf('i', 8) == 18, "string.IndexOf with start point finds the first of multiple occurances of a letter");
+            Assert.IsTrue(test.IndexOf("is") == 2, "string.IndexOf finds the first of multiple occurances of a string");
+            Assert.IsTrue(test.IndexOf("is", 3) == 5, "string.IndexOf with start point finds the first of multiple occurances of a string");
+            Assert.IsTrue(test.IndexOf("is", 3, 5) == 5, "string.IndexOf with start point and count finds the first of multiple occurances of a string");
+            Assert.IsTrue(test.IndexOf("is", 3, 1) == -1, "string.IndexOf with start point and count correctly returns if it does not find something");
+
+            Assert.IsTrue(test.IndexOfAny(new[] { 'T', 'h', 'i', 's' }) == 0, "string.IndexOfAny finds the first one");
+            Assert.IsTrue(test.IndexOfAny(new[] { 'A', 'B', 'C' }) == -1, "string.IndexOfAny finds none if none are present");
+
+            Assert.IsTrue(test.LastIndexOf(string.Empty, 100) == test.Length, "string.LastIndexOf handles empty correctly");
+            Assert.IsTrue(test.LastIndexOf('T') == 0, "string.LastIndexOf finds the only occurance of a letter");
+            Assert.IsTrue(test.LastIndexOf('.') == test.Length - 1, "string.LastIndexOf finds the only occurance of a letter at the end of the string");
+            Assert.IsTrue(test.LastIndexOf('i') == test.Length - 4, "string.IndexOf finds the last of multiple occurances of a letter");
+
+            Assert.IsTrue(test.LastIndexOfAny(new[] { 'T', 'h', 'i', 's' }) == 18, "string.LastIndexOfAny finds the first one");
+            Assert.IsTrue(test.LastIndexOfAny(new[] { 'A', 'B', 'C' }) == -1, "string.LastIndexOfAny finds none if none are present");
+
+
+            Assert.IsTrue(test.Insert(0, "A") != test, "string.Insert creates a new instance");
+            Assert.IsTrue(test.Insert(1, "A") == "TAhis is a test string.", "string.Insert correctly inserts a single character");
+            Assert.IsTrue(test.Insert(2, "ABCDE F") == "ThABCDE Fis is a test string.", "string.Insert correctly adds multiple characters");
+            Assert.IsTrue(test.Insert(test.Length, "END") == "This is a test string.END", "string.Insert correctly inserts at the end of the string");
+
+            Assert.IsTrue(test.Remove(1) == "T", "string.Remove correctly removes all other characters");
+            Assert.IsTrue(test.Remove(0) == "", "string.Remove correctly removes all characters");
+            Assert.IsTrue(test.Remove(0, 2) == "is is a test string.", "string.Remove works with count");
+
+            Assert.IsTrue("    a     ".Trim() == "a", "string.Trim trims both front and back");
+            Assert.IsTrue("abababababa".Trim(new[] { 'a', 'b' }) == "", "string.Trim works with custom chars");
+            Assert.IsTrue("abCababababa".Trim(new[] { 'a', 'b' }) == "C", "string.Trim works with custom chars");
+            Assert.IsTrue("a".Trim() == "a", "string.Trim trims both front and back");
+            Assert.IsTrue("  a     ".TrimStart() == "a     ", "string.TrimStart trims front");
+            Assert.IsTrue("a".TrimStart() == "a", "string.Trim trims front");
+            Assert.IsTrue("    a     ".TrimEnd() == "    a", "string.TrimEnd trims back");
+            Assert.IsTrue("a".TrimEnd() == "a", "string.TrimEnd trims back");
+
+
             string lower_expected = "this is a test string.";
             string upper_expected = "THIS IS A TEST STRING.";
             Assert.IsTrue((test.ToLower() == lower_expected), "string.ToLower() does not work.");

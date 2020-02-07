@@ -2,7 +2,7 @@
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
-    internal static class EqualityHelper
+    public static class EqualityHelper
     {
         public static bool SinglesAreEqual(float left, float right)
         {
