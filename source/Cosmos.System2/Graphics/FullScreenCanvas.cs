@@ -43,13 +43,16 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public static Canvas GetFullScreenCanvas()
+        public static Canvas GetFullScreenCanvas(bool buffered = false)
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
             if (MyVideoDriver == null)
             {
                 Global.mDebugger.SendInternal($"MyVideoDriver is null creating new object");
-                return MyVideoDriver = GetVideoDriver();
+                if (buffered)
+                    return MyVideoDriver = new BasicBufferScreen(GetVideoDriver());
+                else
+                    return MyVideoDriver = GetVideoDriver();
             }
             else
             {
@@ -59,13 +62,16 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public static Canvas GetFullScreenCanvas(Mode mode)
+        public static Canvas GetFullScreenCanvas(Mode mode, bool buffered = false)
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);
 
             if (MyVideoDriver == null)
             {
-                return MyVideoDriver = GetVideoDriver(mode);
+                if (buffered)
+                    return MyVideoDriver = new BasicBufferScreen(GetVideoDriver(mode));
+                else
+                    return MyVideoDriver = GetVideoDriver(mode);
             }
             else
             {
