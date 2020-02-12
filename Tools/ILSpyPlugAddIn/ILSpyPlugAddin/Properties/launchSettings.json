@@ -1,6 +1,6 @@
 {
     "profiles": {
-        "ILSpyPlugAddIn": {
+        "ILSpyPlugAddin": {
             "commandName": "Executable",
             "executablePath": "./ILSpy.exe"
         }

@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpy;
-using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
 {
     public static class Utilities
     {
-        public static string GenerateTypePlugEntry(TypeDefinition type)
+        public static string GenerateTypePlugEntry(ITypeDefinition type)
         {
-            var xString = new StringBuilder();
-            xString.AppendFormat(
-                type.IsPublic
+            var xSB = new StringBuilder();
+            xSB.AppendFormat(
+                type.Accessibility == Accessibility.Public
                     ? "[Plug(Target = typeof(global::{0}))]"
-                    : "[Plug(TargetName = \"{0}, {1}\")]", Utilities.GetCSharpTypeName(type), type.Module.Assembly.Name);
-            xString.AppendLine();
-            xString.AppendFormat("public static class {0}Impl", type.Name);
-            xString.AppendLine();
-            xString.AppendLine("{");
-            xString.AppendLine("}");
-            return xString.ToString();
+                    : "[Plug(TargetName = \"{0}, {1}\")]", Utilities.GetCSharpTypeName(type), type.ParentModule.AssemblyName);
+            xSB.AppendLine();
+            xSB.AppendFormat("public static class {0}Impl", type.Name);
+            xSB.AppendLine();
+            xSB.AppendLine("{");
+            xSB.AppendLine("}");
+            return xSB.ToString();
         }
 
-        public static string GenerateMethodPlugEntry(MethodDefinition method)
+        public static string GenerateMethodPlugEntry(IMethod method)
         {
             var xSB = new StringBuilder();
 
@@ -34,11 +34,11 @@ namespace Cosmos.ILSpyPlugs.Plugin
 
             if (!method.IsStatic)
             {
-                if (method.DeclaringType.IsValueType)
+                if (method.DeclaringType.IsReferenceType ?? false)
                 {
                     xSB.Append("ref ");
                 }
-                if (method.DeclaringType.IsPublic)
+                if (method.DeclaringType.GetDefinition().Accessibility == Accessibility.Public)
                 {
                     xSB.Append(Utilities.GetCSharpTypeName(method.DeclaringType));
                 }
@@ -58,11 +58,11 @@ namespace Cosmos.ILSpyPlugs.Plugin
                     xSB.Append(", ");
                 }
                 xAddComma = true;
-                var xParameterTypeDef = xParameter.ParameterType as TypeDefinition;
+                var xParameterTypeDef = xParameter.Type.GetDefinition();
                 if (xParameterTypeDef != null
-                    && xParameterTypeDef.IsPublic)
+                    && xParameterTypeDef.Accessibility == Accessibility.Public)
                 {
-                    xSB.Append(Utilities.GetCSharpTypeName(xParameter.ParameterType));
+                    xSB.Append(Utilities.GetCSharpTypeName(xParameter.Type));
                 }
                 else
                 {
@@ -78,21 +78,37 @@ namespace Cosmos.ILSpyPlugs.Plugin
             return xSB.ToString();
         }
 
-        public static string GenerateFieldAccessPlugEntry(FieldDefinition field)
+        public static string GenerateFieldAccessPlugEntry(IField field)
         {
-            StringBuilder xString = new StringBuilder();
-            xString.Append($"[FieldAccess(Name = \"{field.FieldType.FullName} {field.DeclaringType.FullName}.{field.Name}\")] ref {Utilities.GetCSharpTypeName(field.FieldType)} field{field.Name}");
-            return xString.ToString();
+            var xSB = new StringBuilder();
+            xSB.Append($"[FieldAccess(Name = \"{field.Type.FullName} {field.DeclaringType.FullName}.{field.Name}\")] ref {Utilities.GetCSharpTypeName(field.Type)} field{field.Name}");
+            return xSB.ToString();
         }
 
-        public static string GetCSharpTypeName(TypeReference reference)
+        public static string GeneratePropertyPlugEntry(IProperty property)
+        {
+            var xSB = new StringBuilder();
+            if (property.Getter != null)
+            {
+                xSB.AppendLine(GenerateMethodPlugEntry(property.Getter));
+                xSB.AppendLine();
+            }
+            if (property.Setter != null)
+            {
+                xSB.AppendLine(GenerateMethodPlugEntry(property.Setter));
+                xSB.AppendLine();
+            }
+            return xSB.ToString();
+        }
+
+        private static string GetCSharpTypeName(IType type)
         {
             var xCSharp = Languages.GetLanguage("C#");
 
-            return xCSharp.TypeToString(reference, true);
+            return xCSharp.TypeToString(type, true);
         }
 
-        public static string GetMethodName(MethodDefinition method)
+        private static string GetMethodName(IMethod method)
         {
             if (method.IsConstructor)
             {

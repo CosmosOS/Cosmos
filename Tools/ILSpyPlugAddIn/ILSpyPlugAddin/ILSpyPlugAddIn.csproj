@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net46</TargetFramework>
+        <TargetFramework>net462</TargetFramework>
         <RootNamespace>Cosmos.ILSpyPlugs.Plugin</RootNamespace>
         <AssemblyName>Cosmos.ILSpyPlugs.Plugin</AssemblyName>
         <IncludeWpfReferences>True</IncludeWpfReferences>
@@ -9,8 +9,8 @@
 
     <ItemGroup>
         <ILSpyReference Include="ICSharpCode.TreeView.dll" />
+        <ILSpyReference Include="ICSharpCode.Decompiler.dll" />
         <ILSpyReference Include="ILSpy.exe" />
-        <ILSpyReference Include="Mono.Cecil.dll" />
     </ItemGroup>
 
     <ItemGroup>

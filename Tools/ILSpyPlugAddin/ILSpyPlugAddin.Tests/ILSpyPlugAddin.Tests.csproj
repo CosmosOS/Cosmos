@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net46</TargetFramework>
+        <TargetFramework>net462</TargetFramework>
 
         <IsPackable>false</IsPackable>
     </PropertyGroup>
@@ -13,13 +13,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ILSpyReference Include="ICSharpCode.TreeView.dll" />
-        <ILSpyReference Include="ILSpy.exe" />
-        <ILSpyReference Include="Mono.Cecil.dll" />
+        <ProjectReference Include="..\ILSpyPlugAddin\ILSpyPlugAddin.csproj" />
+        <ProjectReference Include="..\TestAssembly\TestAssembly.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\ILSpyPlugAddIn\ILSpyPlugAddIn.csproj" />
+        <ILSpyReference Include="ICSharpCode.TreeView.dll" />
+        <ILSpyReference Include="ICSharpCode.Decompiler.dll" />
+        <ILSpyReference Include="ILSpy.exe" />
     </ItemGroup>
 
     <ItemGroup>
