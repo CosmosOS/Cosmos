@@ -57,12 +57,12 @@ namespace Cosmos.ILSpyPlugs.Plugin
             StringBuilder xString = new StringBuilder();
             if (property.GetMethod != null)
             {
-                xString.AppendLine(GenerateMethodPlugEntry.GenerateMethod(property.GetMethod));
+                xString.AppendLine(Utilities.GenerateMethodPlugEntry(property.GetMethod));
                 xString.AppendLine();
             }
             if (property.SetMethod != null)
             {
-                xString.AppendLine(GenerateMethodPlugEntry.GenerateMethod(property.SetMethod));
+                xString.AppendLine(Utilities.GenerateMethodPlugEntry(property.SetMethod));
                 xString.AppendLine();
             }
             return xString.ToString();

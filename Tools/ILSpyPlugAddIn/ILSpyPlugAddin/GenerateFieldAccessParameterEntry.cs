@@ -42,7 +42,7 @@ namespace Cosmos.ILSpyPlugs.Plugin
                 var xCurrentField = node as FieldTreeNode;
                 if (xCurrentField != null)
                 {
-                    xString.Append(GenerateField(xCurrentField.FieldDefinition));
+                    xString.Append(Utilities.GenerateFieldAccessPlugEntry(xCurrentField.FieldDefinition));
                     xString.AppendLine();
                 }
             }
@@ -50,13 +50,6 @@ namespace Cosmos.ILSpyPlugs.Plugin
             Clipboard.SetText(xString.ToString());
 
             MessageBox.Show("Done", "Cosmos Plug tool");
-        }
-
-        public string GenerateField(FieldDefinition field)
-        {
-            StringBuilder xString = new StringBuilder();
-            xString.Append($"[FieldAccess(Name = \"{field.FieldType.FullName} {field.DeclaringType.FullName}.{field.Name}\")] ref {Utilities.GetCSharpTypeName(field.FieldType)} field{field.Name}");
-            return xString.ToString();
         }
     }
 }

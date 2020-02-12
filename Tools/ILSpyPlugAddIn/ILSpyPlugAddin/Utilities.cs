@@ -1,59 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using ICSharpCode.ILSpy;
-using ICSharpCode.ILSpy.TreeNodes;
 using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
 {
-    [ExportContextMenuEntry(Header = "Cosmos Plug: Generate method plug")]
-    public class GenerateMethodPlugEntry: BaseContextMenuEntry
+    public static class Utilities
     {
-        public override bool IsVisible(TextViewContext context)
+        public static string GenerateTypePlugEntry(TypeDefinition type)
         {
-            if (context?.SelectedTreeNodes != null)
-            {
-                foreach (var node in context.SelectedTreeNodes)
-                {
-                    var xCurrentMethod = node as MethodTreeNode;
-                    if (xCurrentMethod != null)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            var xString = new StringBuilder();
+            xString.AppendFormat(
+                type.IsPublic
+                    ? "[Plug(Target = typeof(global::{0}))]"
+                    : "[Plug(TargetName = \"{0}, {1}\")]", Utilities.GetCSharpTypeName(type), type.Module.Assembly.Name);
+            xString.AppendLine();
+            xString.AppendFormat("public static class {0}Impl", type.Name);
+            xString.AppendLine();
+            xString.AppendLine("{");
+            xString.AppendLine("}");
+            return xString.ToString();
         }
 
-        public override void Execute(TextViewContext context)
-        {
-            if (MessageBox.Show("Do you want to generate plug code to your clipboard?", "Cosmos Plug tool", MessageBoxButton.YesNo) == MessageBoxResult.No)
-            {
-                return;
-            }
-
-            StringBuilder xString = new StringBuilder();
-            foreach (var node in context.SelectedTreeNodes)
-            {
-                var xCurrentMethod = node as MethodTreeNode;
-                xString.Append(GenerateMethod(xCurrentMethod.MethodDefinition));
-                xString.AppendLine();
-            }
-
-            Clipboard.SetText(xString.ToString());
-
-            MessageBox.Show("Done", "Cosmos Plug tool");
-        }
-
-        public static string GenerateMethod(MethodDefinition method)
+        public static string GenerateMethodPlugEntry(MethodDefinition method)
         {
             var xSB = new StringBuilder();
-            
+
             xSB.Append($"public static {Utilities.GetCSharpTypeName(method.ReturnType)} {Utilities.GetMethodName(method)}(");
             var xAddComma = false;
 
@@ -101,6 +76,36 @@ namespace Cosmos.ILSpyPlugs.Plugin
             xSB.AppendLine("{");
             xSB.AppendLine("}");
             return xSB.ToString();
+        }
+
+        public static string GenerateFieldAccessPlugEntry(FieldDefinition field)
+        {
+            StringBuilder xString = new StringBuilder();
+            xString.Append($"[FieldAccess(Name = \"{field.FieldType.FullName} {field.DeclaringType.FullName}.{field.Name}\")] ref {Utilities.GetCSharpTypeName(field.FieldType)} field{field.Name}");
+            return xString.ToString();
+        }
+
+        public static string GetCSharpTypeName(TypeReference reference)
+        {
+            var xCSharp = Languages.GetLanguage("C#");
+
+            return xCSharp.TypeToString(reference, true);
+        }
+
+        public static string GetMethodName(MethodDefinition method)
+        {
+            if (method.IsConstructor)
+            {
+                if (method.IsStatic)
+                {
+                    return "Cctor";
+                }
+                else
+                {
+                    return "Ctor";
+                }
+            }
+            return method.Name;
         }
     }
 }
