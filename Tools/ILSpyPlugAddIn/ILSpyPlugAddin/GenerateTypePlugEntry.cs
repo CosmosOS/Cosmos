@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.Windows;
 using ICSharpCode.ILSpy;
 using ICSharpCode.ILSpy.TreeNodes;
-using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
 {
@@ -42,7 +37,7 @@ namespace Cosmos.ILSpyPlugs.Plugin
                 var xCurrentType = node as TypeTreeNode;
                 if (xCurrentType != null)
                 {
-                    xString.Append(GenerateType(xCurrentType.TypeDefinition));
+                    xString.Append(Utilities.GenerateTypePlugEntry(xCurrentType.TypeDefinition));
                     xString.AppendLine();
                 }
             }
@@ -50,21 +45,6 @@ namespace Cosmos.ILSpyPlugs.Plugin
             Clipboard.SetText(xString.ToString());
 
             MessageBox.Show("Done", "Cosmos Plug tool");
-        }
-
-        public string GenerateType(TypeDefinition type)
-        {
-            var xString = new StringBuilder();
-            xString.AppendFormat(
-                type.IsPublic
-                    ? "[Plug(Target = typeof(global::{0}))]"
-                    : "[Plug(TargetName = \"{0}, {1}\")]", Utilities.GetCSharpTypeName(type), type.Module.Assembly.Name);
-            xString.AppendLine();
-            xString.AppendFormat("public static class {0}Impl", type.Name);
-            xString.AppendLine();
-            xString.AppendLine("{");
-            xString.AppendLine("}");
-            return xString.ToString();
         }
     }
 }

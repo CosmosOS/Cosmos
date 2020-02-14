@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.Windows;
 using ICSharpCode.ILSpy;
 using ICSharpCode.ILSpy.TreeNodes;
-using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
 {
@@ -20,7 +15,7 @@ namespace Cosmos.ILSpyPlugs.Plugin
                 foreach (var node in context.SelectedTreeNodes)
                 {
                     var xCurrentField = node as FieldTreeNode;
-                    if ((xCurrentField != null) && !xCurrentField.FieldDefinition.HasConstant)
+                    if ((xCurrentField != null) && !xCurrentField.FieldDefinition.IsConst)
                     {
                         return true;
                     }
@@ -42,7 +37,7 @@ namespace Cosmos.ILSpyPlugs.Plugin
                 var xCurrentField = node as FieldTreeNode;
                 if (xCurrentField != null)
                 {
-                    xString.Append(GenerateField(xCurrentField.FieldDefinition));
+                    xString.Append(Utilities.GenerateFieldAccessPlugEntry(xCurrentField.FieldDefinition));
                     xString.AppendLine();
                 }
             }
@@ -50,13 +45,6 @@ namespace Cosmos.ILSpyPlugs.Plugin
             Clipboard.SetText(xString.ToString());
 
             MessageBox.Show("Done", "Cosmos Plug tool");
-        }
-
-        public string GenerateField(FieldDefinition field)
-        {
-            StringBuilder xString = new StringBuilder();
-            xString.Append($"[FieldAccess(Name = \"{field.FieldType.FullName} {field.DeclaringType.FullName}.{field.Name}\")] ref {Utilities.GetCSharpTypeName(field.FieldType)} field{field.Name}");
-            return xString.ToString();
         }
     }
 }

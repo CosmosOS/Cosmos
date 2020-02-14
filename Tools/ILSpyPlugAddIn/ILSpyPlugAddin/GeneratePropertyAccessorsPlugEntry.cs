@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.Windows;
 using ICSharpCode.ILSpy;
 using ICSharpCode.ILSpy.TreeNodes;
-using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
 {
@@ -42,7 +37,7 @@ namespace Cosmos.ILSpyPlugs.Plugin
                 var xCurrentProperty = node as PropertyTreeNode;
                 if (node != null)
                 {
-                    xString.Append(GenerateProperty(xCurrentProperty.PropertyDefinition));
+                    xString.Append(Utilities.GeneratePropertyPlugEntry(xCurrentProperty.PropertyDefinition));
                     xString.AppendLine();
                 }
             }
@@ -50,22 +45,6 @@ namespace Cosmos.ILSpyPlugs.Plugin
             Clipboard.SetText(xString.ToString().Trim());
 
             MessageBox.Show("Done", "Cosmos Plug tool");
-        }
-
-        public string GenerateProperty(PropertyDefinition property)
-        {
-            StringBuilder xString = new StringBuilder();
-            if (property.GetMethod != null)
-            {
-                xString.AppendLine(GenerateMethodPlugEntry.GenerateMethod(property.GetMethod));
-                xString.AppendLine();
-            }
-            if (property.SetMethod != null)
-            {
-                xString.AppendLine(GenerateMethodPlugEntry.GenerateMethod(property.SetMethod));
-                xString.AppendLine();
-            }
-            return xString.ToString();
         }
     }
 }
