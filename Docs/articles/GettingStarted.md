@@ -1,6 +1,6 @@
-﻿
+﻿# Getting Started
 
-###  Introducing Cosmos
+##  Introducing Cosmos
 
 Cosmos (C# Open Source Managed Operating System) is an operating system
 development kit which uses Visual Studio as its development environment.
@@ -25,22 +25,22 @@ operating system and doing some Cosmos work. The dev kit might be thought of
 as the Cosmos SDK. Most users should start off with the user kit as it is not
 so overwhelming like the dev kit. This article focuses on the user kit.
 
-###  Writing your first Operating System
+##  Writing your first Operating System
 
 Create a new project as you would any C# project, but select Cosmos as the
 project type.
 
-![](CosmosMS5/SNAG-0000.png)
+![](images/SNAG-0000.png)
 
 A starter project will be created. It looks very much like a standard C#
 console application.
 
-![](CosmosMS5/SNAG-0001.png)
+![](images/SNAG-0001.png)
 
 Program.cs contains the boot and execution code. Instead of seeing a Windows
 console window, you will see the following:
 
-![](CosmosMS5/SNAG-0003.png)
+![](images/SNAG-0003.png)
 
 This is your operating system running in VMWare Player! Cosmos can of course
 also be booted in VMWare Workstation, Hyper-V, Virtual PC, Bochs, or on real
@@ -48,7 +48,7 @@ hardware. But by default Cosmos uses VMWare Player because it is both free,
 and reliable. Cosmos can even debug in Visual Studio, even when running on
 another machine.
 
-###  Integrated Debugging
+##  Integrated Debugging
 
 Debugging is a major issue with operating system development. The Cosmos team
 was not content enough to simply conquer building and deployment, we want to
@@ -56,11 +56,11 @@ make developing operating system as easy as developing Windows applications.
 Debugging a Cosmos based operating system should feel very familiar to you.
 Lets modify our project a little bit to show the effect, and set a breakpoint.
 
-![](CosmosMS5/SNAG-0005.png)
+![](images/SNAG-0005.png)
 
 Now run the project again.
 
-![](CosmosMS5/SNAG-0007.png)
+![](images/SNAG-0007.png)
 
 Note that the execution stopped at "One"? That is becuase in Visual Studio our
 project has stopped on a breakpoint. Simply press F5 to continue just as you
@@ -69,7 +69,7 @@ would in a normal application!
 In addition to breakpoints Cosmos also supports step into (F11) as well. Trace
 over (F10) is not supported yet.
 
-###  Debugger Communication
+##  Debugger Communication
 
 The debugger uses the serial port to communicate. Because of this, debugging
 only works wtih virtualization environments that support serial ports such as
@@ -78,14 +78,14 @@ is seriously broken on Windows and makes debugging impossible using QEMU. To
 debug on real hardware, you must use a physical serial cable. In the future
 Cosmos will also support debugging over Ethernet.
 
-###  Extra Debugging
+##  Extra Debugging
 
 Cosmos supports some explicit methods that can be used to communicate with the
 debugger and use additional functionality. It is accessed using the Debugger
 class in the Cosmos.Debug namespace in the Cosmos.Kernel assembly. This
 assembly is used by all Cosmos projects.
 
-###  Code Based Breakpoints
+##  Code Based Breakpoints
 
     
     Debugger.Break();
@@ -93,7 +93,7 @@ assembly is used by all Cosmos projects.
 Break can be used to issue a code based break. Visual Studio will break on the
 line after this statement.
 
-![](CosmosMS5/SNAG-0006.png)
+![](images/SNAG-0006.png)
 
 Since Cosmos does not support conditional breakpoints in the IDE yet, code
 base breaks are very useful for implementing such. For example:
@@ -110,7 +110,7 @@ Alternatively you can call the .NET class libary break:
 
 Both functions will produce the same result.
 
-###  Debug Output
+##  Debug Output
 
 Debug strings can be output to the debug window of the host. Because Cosmos
 does not support watches yet, this functionality can be very useful for
@@ -122,9 +122,9 @@ watching variable values and for performing tracing without breakpoints.
 When this line is executed, it will send a message over the debugging channel
 and it will appear in the Visual Studio output window.
 
-![](CosmosMS5/SNAG-0008.png)
+![](images/SNAG-0008.png)
 
-###  What's the catch?
+##  What's the catch?
 
 There really is no catch. Everything We've shown here is functioning as seen.
 No mockups were used. However we still have a lot of work to go. Items of
@@ -133,13 +133,13 @@ foreach loops), file systems (partial support exists), threads, networking, and
 graphics. We have prototypes and experimentation for each, but none have been
 rolled into the mainline Cosmos development as of yet.
 
-###  What was that Syslinux thing I saw on boot?
+##  What was that Syslinux thing I saw on boot?
 
 Cosmos does not run on Linux. A boot loader called Syslinux is used to boot
 Cosmos. After booting, Syslinux is not used. Syslinux is a bootloader and is
 not a Linux distro. Syslinux simplifies the booting process by doing tasks such as enabline the A20 gate, initializing hardware, and switching to real mode (all of which are required by modern operating systems).
 
-###  Obtaining Cosmos
+##  Obtaining Cosmos
 
   * Cosmos Website - [http://www.GoCosmos.org](http://www.GoCosmos.org)
   * Source Code - Both dev kit and user kit - [http://github.com/CosmosOS/Cosmos/](http://github.com/CosmosOS/Cosmos/)
