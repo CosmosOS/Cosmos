@@ -22,7 +22,7 @@ namespace ProcessorTests
         {
             try
             {
-                //TestVendorNameIsNotBlank();
+                TestVendorNameIsNotBlank();
                 TestCycleCount();
                 TestCycleRateIsNotZero();
 
@@ -49,6 +49,7 @@ namespace ProcessorTests
         public void TestCycleCount()
         {
             ulong cycleCount = CPU.GetCPUUptime();
+            mDebugger.Send($"CycleCount: {cycleCount}");
             bool isCycleCountZero = cycleCount == 0;
             Assert.IsFalse(isCycleCountZero, "Processor cycle count is not zero.");
             ulong secondCount = CPU.GetCPUUptime();
@@ -58,6 +59,7 @@ namespace ProcessorTests
         public void TestCycleRateIsNotZero()
         {
             long cycleRate = CPU.GetCPUCycleSpeed();
+            mDebugger.Send($"CycleRate: {cycleRate}");
             bool isCycleRateZero = cycleRate == 0;
             Assert.IsFalse(isCycleRateZero, "Processor cycle rate is not zero.");
             Assert.IsTrue(CPU.GetCPUCycleSpeed() == cycleRate, "Processor cycle speed is not constant");

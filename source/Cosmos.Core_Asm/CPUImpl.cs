@@ -40,7 +40,7 @@ namespace Cosmos.Core_Asm
         public static int CanReadCPUID() => throw new NotImplementedException();
 
         [PlugMethod(Assembler = typeof(CPUReadCPUIDAsm))]
-        public static void ReadCPUID(int type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
+        public static void ReadCPUID(uint type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
 
         [PlugMethod(Assembler = typeof(CPUReadTimestampCounterAsm))]
         public static ulong ReadTimestampCounter() => throw new NotImplementedException();
