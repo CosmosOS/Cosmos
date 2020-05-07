@@ -14,6 +14,8 @@
 [Pp]ackages/
 [Oo]bj/
 
+Docs/log.txt
+
 *.[Oo]bj
 *.suo
 *.ncb
