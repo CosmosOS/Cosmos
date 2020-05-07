@@ -368,6 +368,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
+                    Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
                     DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])), x + _x, y + _y);
                 }
             }
