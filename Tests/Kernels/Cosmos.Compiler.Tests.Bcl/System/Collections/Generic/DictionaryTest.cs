@@ -54,6 +54,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue("a", out string val), "Dictionary<string, string>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue("f", out string val2), "Dictionary<string, string>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<string, string>().Clear does not work");
+                Assert.IsFalse(dictionary.ContainsKey("a"), "Dictionary<string, string>().Clear does not work");
+
+                dictionary.Add("b", "basds");
+                Assert.IsTrue(dictionary.Count == 1, "Dictionary<string, string>().Clear prevents correctly adding values again");
+                Assert.IsTrue(dictionary["b"] == "basds", "Dictionary<string, string>().Clear prevents correctly adding values again");
             }
 
             {
@@ -98,6 +107,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary2.TryGetValue("One", out int val3), "Dictionary<string, int>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary2.TryGetValue("Six", out int val4), "Dictionary<string, int>.TryGetValue() of not existing key does not work");
+
+                dictionary2.Clear();
+
+                Assert.IsTrue(dictionary2.Count == 0, "Dictionary<string, int>().Clear does not work");
+                Assert.IsFalse(dictionary2.ContainsKey("Five"), "Dictionary<string, int>().Clear does not work");
+
+                dictionary2.Add("b", 9);
+                Assert.IsTrue(dictionary2.Count == 1, "Dictionary<string, int>().Clear prevents correctly adding values again");
+                Assert.IsTrue(dictionary2["b"] == 9, "Dictionary<string, int>().Clear prevents correctly adding values again");
             }
 
             //#region "Dictionary<char, char> Tests"
@@ -189,6 +207,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue(1, out sbyte val1), "Dictionary<sbyte, sbyte>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue(6, out sbyte val2), "Dictionary<sbyte, sbyte>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<sbyte, sbyte>().Clear does not work");
             }
             #endregion
 
@@ -235,6 +257,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue(1, out byte val1), "Dictionary<byte, byte>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue(6, out byte val2), "Dictionary<byte, byte>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<byte, byte>().Clear does not work");
             }
             #endregion
 
@@ -281,6 +307,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue(1, out short val1), "Dictionary<short, short>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue(6, out short val2), "Dictionary<short, short>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<short, short>().Clear does not work");
             }
             #endregion
 
@@ -327,6 +357,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue(1, out ushort val1), "Dictionary<ushort, ushort>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue(6, out ushort val2), "Dictionary<ushort, ushort>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<ushort, ushort>().Clear does not work");
             }
             #endregion
 
@@ -373,6 +407,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue(1, out int val1), "Dictionary<int, int>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue(6, out int val2), "Dictionary<int, int>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<int, int>().Clear does not work");
             }
             #endregion
 
@@ -419,6 +457,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue(1, out uint val1), "Dictionary<uint, uint>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue(6, out uint val2), "Dictionary<uint, uint>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<uint, uint>().Clear does not work");
             }
             #endregion
 
@@ -465,6 +507,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue(1, out long val1), "Dictionary<long, long>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue(6, out long val2), "Dictionary<long, long>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<long, long>().Clear does not work");
             }
             #endregion
 
@@ -511,6 +557,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
                 Assert.IsTrue(dictionary.TryGetValue(1, out ulong val1), "Dictionary<ulong, ulong>.TryGetValue() of existing key does not work");
                 Assert.IsFalse(dictionary.TryGetValue(6, out ulong val2), "Dictionary<ulong, ulong>.TryGetValue() of not existing key does not work");
+
+                dictionary.Clear();
+
+                Assert.IsTrue(dictionary.Count == 0, "Dictionary<ulong, ulong>().Clear does not work");
             }
             #endregion
 

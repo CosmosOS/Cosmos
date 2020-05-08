@@ -18,10 +18,24 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             byte[] xByteExpectedResult = { 1, 2, 3, 4, 5, 6, 7, 1 };
             byte[] xByteSource = { 1 };
 
+            Assert.IsTrue(xByteExpectedResult.Length == 8, "Array length is stored correctly");
+            Assert.IsTrue(xByteResult.GetLowerBound(0) == 0, "Array.GetLowerBound works");
+            //xByteResult.SetValue(1, 0);
+            Assert.IsTrue((int)xByteResult.GetValue(0) == 1, "Array.GetValue works for first element");
+            Assert.IsTrue((int)xByteResult.GetValue(1) == 2, "Array.GetValue works for element in middle");
+            Assert.IsTrue((int)xByteResult.GetValue(7) == 8, "Array.GetValue works at end");
+
             Array.Copy(xByteSource, 0, xByteResult, 7, 1);
 
             Assert.IsTrue((xByteResult[7] == xByteExpectedResult[7]), "Array.Copy doesn't work: xResult[7] =  " + (uint)xByteResult[7] + " != " + (uint)xByteExpectedResult[7]);
-            
+            Array.Clear(xByteResult, 0, xByteResult.Length);
+            for (int i = 0; i < 8; i++)
+            {
+                Assert.IsTrue(xByteResult[i] == 0, "Array.Clear works");
+            }
+            xByteResult[1] = 1;
+            Assert.IsTrue(xByteResult[1] == 1, "Array.Clear does not break the array");
+
             // Single[] Test
             float[] xSingleResult = { 1.25f, 2.50f, 3.51f, 4.31f, 9.28f, 18.56f };
             float[] xSingleExpectedResult = { 1.25f, 2.598f, 5.39f, 4.31f, 9.28f, 18.56f };
