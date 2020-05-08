@@ -1,0 +1,7 @@
+- name: Articles
+  href: articles/
+- name: Cosmos Website
+  href: https://gocosmos.org
+#- name: API Documentation
+#  href: api/
+#  topicHref: api/index.md

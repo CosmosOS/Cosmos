@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+using System;
 using System.IO;
 
 namespace Cosmos.System.Graphics
@@ -59,6 +60,8 @@ namespace Cosmos.System.Graphics
             }
         }
 
+
+        // For more information about the format: https://docs.microsoft.com/en-us/previous-versions/ms969901(v=msdn.10)?redirectedfrom=MSDN
         private void CreateBitmap(Stream stream)
         {
             #region BMP Header
@@ -124,6 +127,11 @@ namespace Cosmos.System.Graphics
             //now reading total image data size(including padding) - bytes 34 -> 38
             stream.Read(_int, 0, 4);
             uint totalImageSize = BitConverter.ToUInt32(_int, 0);
+            if (totalImageSize == 0)
+            {
+                totalImageSize = (uint)((((imageWidth * pixelSize) + 31) & ~31) >> 3) * imageHeight; // Look at the link above for the explanation
+                Global.mDebugger.SendInternal("Calcualted image size: " + totalImageSize);
+            }
 
             #endregion BMP Header
 
@@ -131,6 +139,9 @@ namespace Cosmos.System.Graphics
             Width = imageWidth;
             Height = imageHeight;
             Depth = (ColorDepth)pixelSize;
+            Global.mDebugger.SendInternal("Width: " + Width);
+            Global.mDebugger.SendInternal("Height: " + Height);
+            Global.mDebugger.SendInternal("Depth: " + pixelSize);
 
             rawData = new int[Width * Height];
 
@@ -166,15 +177,20 @@ namespace Cosmos.System.Graphics
                 for (int x = 0; x < imageWidth; x++)
                 {
                     if (pixelSize == 32)
+                    {
                         pixel[0] = pixelData[position++];
+                        pixel[1] = pixelData[position++];
+                        pixel[2] = pixelData[position++];
+                        pixel[3] = pixelData[position++];
+                    }
                     else
                     {
-                        pixel[0] = 0;
+                        pixel[0] = pixelData[position++];
+                        pixel[1] = pixelData[position++];
+                        pixel[2] = pixelData[position++];
+                        pixel[3] = 0;
                     }
-                    pixel[1] = pixelData[position++];
-                    pixel[2] = pixelData[position++];
-                    pixel[3] = pixelData[position++];
-                    rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0);
+                    rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0); //This bits should be A, R, G, B but order is switched
                 }
                 position += paddingPerRow;
             }
