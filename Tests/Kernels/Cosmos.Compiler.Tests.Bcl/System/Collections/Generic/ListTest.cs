@@ -14,6 +14,13 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
             E1,
             E2
         }
+
+        public enum LongTest : long
+        {
+            L1 = long.MaxValue - 1,
+            L2 = long.MaxValue - 2,
+            L3 = 0
+        }
         public static void Execute()
         {
             var xList = new List<int>();
@@ -93,6 +100,13 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
             List<Test> list = new List<Test>();
             list.Add(Test.E2);
             Assert.IsTrue(list[0] == Test.E2, "IL2CPU does not handle lists with Enums correctly");
+
+            List<LongTest> list2 = new List<LongTest>();
+            list2.Add(LongTest.L3);
+            list2.Add(LongTest.L2);
+            list2.Add(LongTest.L1);
+            Assert.IsTrue(list2[2] == LongTest.L1, "Enums with underlying long type work");
+            Assert.IsTrue(list2[1] == LongTest.L2, "Enums with underlying long type work");
 
         }
     }
