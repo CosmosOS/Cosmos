@@ -55,5 +55,43 @@ namespace Cosmos.Compiler.Tests.Bcl
 
             return true;
         }
+
+        /// <summary>
+        /// Utility method to test int[] equality.
+        /// </summary>
+        /// <param name="a1">int array.</param>
+        /// <param name="a2">int array.</param>
+        /// <returns>True if the elements in the arrays are equal otherwise false.</returns>
+        public static bool IntArrayAreEquals(int[] a1, int[] a2)
+        {
+            if (ReferenceEquals(a1, a2))
+            {
+                //mDebugger.Send("a1 and a2 are the same Object");
+                return true;
+            }
+
+            if (a1 == null || a2 == null)
+            {
+                //mDebugger.Send("a1 or a2 is null so are different");
+                return false;
+            }
+
+            if (a1.Length != a2.Length)
+            {
+                //mDebugger.Send("a1.Length != a2.Length so are different");
+                return false;
+            }
+
+            for (int i = 0; i < a1.Length; i++)
+            {
+                if (a1[i] != a2[i])
+                {
+                    //mDebugger.Send("In position " + i + " a byte is different");
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
