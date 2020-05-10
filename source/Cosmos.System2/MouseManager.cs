@@ -96,9 +96,9 @@ namespace Cosmos.System
             {
                 mScreenHeight = value;
 
-                if (X >= mScreenHeight)
+                if (Y >= mScreenHeight)
                 {
-                    X = mScreenHeight - 1;
+                    Y = mScreenHeight - 1;
                 }
             }
         }
