@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.Build.NoTargets">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard1.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="docfx.console" Version="2.48.1" PrivateAssets="All" />
+    </ItemGroup>
+
+</Project>
