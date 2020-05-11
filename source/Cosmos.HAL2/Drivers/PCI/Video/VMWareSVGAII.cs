@@ -24,7 +24,6 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             FrameBufferOffset = 14,
             VRamSize = 15,
             FrameBufferSize = 16,
-
             Capabilities = 17,
             MemStart = 18,
             MemSize = 19,

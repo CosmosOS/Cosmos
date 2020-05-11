@@ -15,12 +15,9 @@ namespace Cosmos.System.Graphics
             CanvasSVGADriver.Disable();
         }
 
-        public VMWareSVGAII xSVGAIIDriver;
-        internal Debug.Kernel.Debugger mSVGAIIDebugger = new Debug.Kernel.Debugger("System", "SVGAIIScreen");
+        internal Debugger mSVGAIIDebugger = new Debugger("System", "SVGAIIScreen");
         
         private static readonly Mode DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
-
-        private static readonly Debugger Debugger = new Debugger("System", "SVGAIIScreen");
 
         private Mode _mode;
 
@@ -33,7 +30,7 @@ namespace Cosmos.System.Graphics
 
         public SVGAIICanvas(Mode aMode)
         {
-            Debugger.SendInternal($"Called ctor with mode {aMode}");
+            mSVGAIIDebugger.SendInternal($"Called ctor with mode {aMode}");
             ThrowIfModeIsNotValid(aMode);
 
             CanvasSVGADriver = new VMWareSVGAII();
@@ -46,7 +43,7 @@ namespace Cosmos.System.Graphics
             set
             {
                 _mode = value;
-                Debugger.SendInternal($"Called Mode set property with mode {_mode}");
+                mSVGAIIDebugger.SendInternal($"Called Mode set property with mode {_mode}");
                 SetGraphicsMode(_mode);
             }
         }
@@ -57,12 +54,12 @@ namespace Cosmos.System.Graphics
         {
             Color xColor = pen.Color;
 
-            Debugger.SendInternal($"Drawing point to x:{x}, y:{y} with {xColor.Name} Color");
-            xSVGAIIDriver.SetPixel((uint)x, (uint)y, (uint)xColor.ToArgb());
-            Debugger.SendInternal($"Done drawing point");
+            mSVGAIIDebugger.SendInternal($"Drawing point to x:{x}, y:{y} with {xColor.Name} Color");
+            CanvasSVGADriver.SetPixel((uint)x, (uint)y, (uint)xColor.ToArgb());
+            mSVGAIIDebugger.SendInternal($"Done drawing point");
             /* No need to refresh all the screen to make the point appear on Screen! */
             //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Columns, (uint)mode.Rows);
-            xSVGAIIDriver.Update((uint)x, (uint)y, 1, 1);
+            CanvasSVGADriver.Update((uint)x, (uint)y, 1, 1);
         }
 
         public override void DrawArray(Color[] colors, int x, int y, int width, int height)
@@ -170,45 +167,44 @@ namespace Cosmos.System.Graphics
             var xHeight = (uint)aMode.Rows;
             var xColorDepth = (uint)aMode.ColorDepth;
 
-            xSVGAIIDriver.SetMode(xWidth, xHeight, xColorDepth);
+            CanvasSVGADriver.SetMode(xWidth, xHeight, xColorDepth);
         }
 
         public override void Clear(Color color)
         {
-            xSVGAIIDriver.Fill(0, 0, (uint)Mode.Columns, (uint)Mode.Rows, (uint)color.ToArgb());
+            CanvasSVGADriver.Fill(0, 0, (uint)Mode.Columns, (uint)Mode.Rows, (uint)color.ToArgb());
         }
 
         public Color GetPixel(int aX, int aY)
         {
-            var xColorARGB = xSVGAIIDriver.GetPixel((uint)aX, (uint)aX);
-            var xColor = Color.FromArgb((int)xColorARGB);
-            return xColor;
+            var xColorARGB = CanvasSVGADriver.GetPixel((uint)aX, (uint)aX);
+            return Color.FromArgb((int)xColorARGB);
         }
 
         public void SetCursor(bool aVisible, int aX, int aY)
         {
-            xSVGAIIDriver.SetCursor(aVisible, (uint)aX, (uint)aY);
+            CanvasSVGADriver.SetCursor(aVisible, (uint)aX, (uint)aY);
         }
 
         public void CreateCursor()
         {
-            xSVGAIIDriver.DefineCursor();
+            CanvasSVGADriver.DefineCursor();
         }
 
         public void CopyPixel(int aX, int aY, int aNewX, int aNewY, int aWidth = 1, int aHeight = 1)
         {
-            xSVGAIIDriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, (uint)aWidth, (uint)aHeight);
+            CanvasSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, (uint)aWidth, (uint)aHeight);
         }
 
         public void MovePixel(int aX, int aY, int aNewX, int aNewY)
         {
-            xSVGAIIDriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, 1, 1);
-            xSVGAIIDriver.SetPixel((uint)aX, (uint)aY, 0);
+            CanvasSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, 1, 1);
+            CanvasSVGADriver.SetPixel((uint)aX, (uint)aY, 0);
         }
 
         public override Color GetPointColor(int x, int y)
         {
-            return Color.FromArgb((int)xSVGAIIDriver.GetPixel((uint)x, (uint)y));
+            return Color.FromArgb((int)CanvasSVGADriver.GetPixel((uint)x, (uint)y));
         }
     }
 }

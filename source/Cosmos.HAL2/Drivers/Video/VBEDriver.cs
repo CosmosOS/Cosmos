@@ -1,6 +1,7 @@
 ﻿//#define COSMOSDEBUG
 
 using System;
+using Cosmos.Core.IOGroup;
 
 namespace Cosmos.HAL.Drivers
 {
@@ -34,21 +35,11 @@ namespace Cosmos.HAL.Drivers
 
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
-            /*
-             * XXX Why this simple test is killing the CPU? It is not working in Bochs too... probably it was neither
-             * tested... bah! Removing it for now.
-             */
-#if false
-            if (HAL.PCI.GetDevice(1234, 1111) == null)
+            if (!Available())
             {
-                throw new NotSupportedException("No BGA adapter found..");
-            }
-#endif
-            if (Available() == false)
-            {
+                Global.mDebugger.SendInternal("No Bochs Graphics Adapter found...");
                 throw new NotSupportedException("No Bochs Graphics Adapter found...");
             }
-
             Global.mDebugger.SendInternal($"Creating VBEDriver with Mode {xres}*{yres}@{bpp}");
             VBESet(xres, yres, bpp);
         }
@@ -59,18 +50,21 @@ namespace Cosmos.HAL.Drivers
             IO.VbeData.Word = value;
         }
 
-        private ushort VBERead(RegisterIndex index)
+        private static ushort VBERead(RegisterIndex index)
         {
-            IO.VbeIndex.Word = (ushort)index;
-            return IO.VbeIndex.Word;
+            VBE io = Core.Global.BaseIOGroups.VBE;
+
+            io.VbeIndex.Word = (ushort)index;
+            return io.VbeIndex.Word;
         }
-        public bool Available()
+        public static bool Available()
         {
-            if (VBERead(RegisterIndex.DisplayID) == 0xB0C5)
-            {
-                return true;
-            }
-            return false;
+            //This code wont work as long as Bochs uses BGA ISA, since it wont discover it in PCI
+#if false
+            return HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA) != null;
+#endif
+            return true;
+            // return VBERead(RegisterIndex.DisplayID) == 0xB0C5; - this is also not working. The same problem?
         }
         
         public void DisableDisplay()

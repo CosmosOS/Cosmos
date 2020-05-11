@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 using System;
 using System.IO;
 
@@ -23,7 +23,8 @@ namespace Cosmos.System.Graphics
             rawData = new int[Width * Height];
             if (colorDepth != ColorDepth.ColorDepth32 && colorDepth != ColorDepth.ColorDepth24)
             {
-                throw new NotImplementedException("Only a color depth of 32 is supported!");
+                Global.mDebugger.Send("Only color depths 24 and 32 are supported!");
+                throw new NotImplementedException("Only color depths 24 and 32 are supported!");
             }
 
             for (int i = 0; i < rawData.Length; i++)
@@ -122,6 +123,7 @@ namespace Cosmos.System.Graphics
             //TODO: Be able to handle compressed files
             if (compression != 0)
             {
+                Global.mDebugger.Send("Can only handle uncompressed files!");
                 throw new NotImplementedException("Can only handle uncompressed files!");
             }
             //now reading total image data size(including padding) - bytes 34 -> 38
