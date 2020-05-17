@@ -1,128 +1,84 @@
 using System;
 using Cosmos.HAL;
+using static Cosmos.HAL.VGADriver;
 
 namespace Cosmos.System.Graphics
 {
     public class VGAScreen
     {
-        public enum TextSize { Size40x25, Size40x50, Size80x25, Size80x50, Size90x30, Size90x60 };
 
-        public enum ScreenSize
+        private static readonly VGADriver _Screen = new VGADriver();
+
+        public static void SetGraphicsMode(ScreenSize aScreenSize, ColorDepth aColorDepth)
         {
-            Size640x480,
-            Size720x480,
-            Size320x200
-        };
-
-        public enum ColorDepth
-        {
-            BitDepth2, BitDepth4, BitDepth8, BitDepth16
-        };
-
-        private static VGADriver mScreen = new VGADriver();
-
-        public static void SetGraphicsMode(ScreenSize screenSize, ColorDepth colorDepth)
-        {
-            VGADriver.ScreenSize ScrSize = VGADriver.ScreenSize.Size320x200;
-            VGADriver.ColorDepth ClrDepth = VGADriver.ColorDepth.BitDepth8;
-
-            switch (screenSize)
+            var vgaColorDepth = aColorDepth switch
             {
-                case ScreenSize.Size320x200:
-                    ScrSize = VGADriver.ScreenSize.Size320x200;
-                    break;
-                case ScreenSize.Size640x480:
-                    ScrSize = VGADriver.ScreenSize.Size640x480;
-                    break;
-                case ScreenSize.Size720x480:
-                    ScrSize = VGADriver.ScreenSize.Size720x480;
-                    break;
-                default:
-                    throw new Exception("This situation is not implemented!");
-            }
-
-            switch (colorDepth)
-            {
-                case ColorDepth.BitDepth2:
-                    ClrDepth = VGADriver.ColorDepth.BitDepth2;
-                    break;
-                case ColorDepth.BitDepth4:
-                    ClrDepth = VGADriver.ColorDepth.BitDepth4;
-                    break;
-                case ColorDepth.BitDepth8:
-                    ClrDepth = VGADriver.ColorDepth.BitDepth8;
-                    break;
-                case ColorDepth.BitDepth16:
-                    ClrDepth = VGADriver.ColorDepth.BitDepth16;
-                    break;
-                default:
-                    throw new Exception("This situation is not implemented!");
-            }
-
-            mScreen.SetGraphicsMode(ScrSize, ClrDepth);
+                ColorDepth.ColorDepth4 => VGADriver.ColorDepth.BitDepth4,
+                ColorDepth.ColorDepth8 => VGADriver.ColorDepth.BitDepth8,
+                ColorDepth.ColorDepth16 => VGADriver.ColorDepth.BitDepth16,
+                ColorDepth.ColorDepth24 => throw new NotImplementedException(),
+                ColorDepth.ColorDepth32 => throw new NotImplementedException(),
+                _ => throw new NotImplementedException(),
+            };
+            _Screen.SetGraphicsMode(aScreenSize, vgaColorDepth);
         }
 
-        public static void SetPixel(uint X, uint Y, uint Color)
+        public static void SetPixel(uint aX, uint aY, uint aColor)
         {
-            mScreen.SetPixel(X, Y, Color);
+            _Screen.SetPixel(aX, aY, aColor);
         }
 
-        public static void Clear(int Color)
+        public static void Clear(int aColor)
         {
-            mScreen.Clear(Color);
+            _Screen.Clear(aColor);
         }
 
         public static void TestMode320x200x8()
         {
-            mScreen.TestMode320x200x8();
+            _Screen.TestMode320x200x8();
         }
 
-        public static void SetPalette(int Index, byte[] Palette)
+        public static void SetPaletteEntry(int aIndex, byte aR, byte aG, byte aB)
         {
-            mScreen.SetPalette(Index, Palette);
+            _Screen.SetPaletteEntry(aIndex, aR, aG, aB);
         }
 
-        public static void SetPaletteEntry(int Index, byte R, byte G, byte B)
+        public static uint GetPixel(uint aX, uint aY)
         {
-            mScreen.SetPaletteEntry(Index, R, G, B);
+            return _Screen.GetPixel(aX, aY);
         }
 
-        public static uint GetPixel(uint X, uint Y)
+        public static void SetTextMode(TextSize aSize)
         {
-            return mScreen.GetPixel(X, Y);
-        }
-
-        public static void SetTextMode(TextSize Size)
-        {
-            switch (Size)
+            switch (aSize)
             {
                 case TextSize.Size40x25:
-                    mScreen.SetTextMode(VGADriver.TextSize.Size40x25);
+                    _Screen.SetTextMode(TextSize.Size40x25);
                     break;
                 case TextSize.Size40x50:
-                    mScreen.SetTextMode(VGADriver.TextSize.Size40x50);
+                    _Screen.SetTextMode(TextSize.Size40x50);
                     break;
                 case TextSize.Size80x25:
-                    mScreen.SetTextMode(VGADriver.TextSize.Size80x25);
+                    _Screen.SetTextMode(TextSize.Size80x25);
                     break;
                 case TextSize.Size80x50:
-                    mScreen.SetTextMode(VGADriver.TextSize.Size80x50);
+                    _Screen.SetTextMode(TextSize.Size80x50);
                     break;
                 case TextSize.Size90x30:
-                    mScreen.SetTextMode(VGADriver.TextSize.Size90x30);
+                    _Screen.SetTextMode(TextSize.Size90x30);
                     break;
                 case TextSize.Size90x60:
-                    mScreen.SetTextMode(VGADriver.TextSize.Size90x60);
+                    _Screen.SetTextMode(TextSize.Size90x60);
                     break;
                 default:
                     throw new Exception("This situation is not implemented!");
             }
         }
 
-        public static int PixelHeight = mScreen.PixelHeight;
+        public static int PixelHeight = _Screen.PixelHeight;
 
-        public static int PixelWidth = mScreen.PixelWidth;
+        public static int PixelWidth = _Screen.PixelWidth;
 
-        public static int Colors = mScreen.Colors;
+        public static int Colors = _Screen.Colors;
     }
 }

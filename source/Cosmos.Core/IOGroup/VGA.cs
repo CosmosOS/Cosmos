@@ -23,9 +23,9 @@ namespace Cosmos.Core.IOGroup
         public readonly IOPortRead Instat_Read = new IOPortRead(0x3DA);
 
         /// <summary>
-        /// 64KB at 0xA0000
+        /// 256KB at 0xA0000
         /// </summary>
-        public readonly MemoryBlock08 VGAMemoryBlock = new MemoryBlock08(0xA0000, 1024 * 64);
+        public readonly MemoryBlock08 VGAMemoryBlock = new MemoryBlock08(0xA0000, 1024 * 256);
 
         /// <summary>
         /// 32KB at 0xB0000

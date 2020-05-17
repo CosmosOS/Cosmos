@@ -39,9 +39,6 @@ namespace GraphicTest
 
         protected override void BeforeRun()
         {
-            Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
-
-            canvas = FullScreenCanvas.GetFullScreenCanvas();
         }
 
         private void DoTest(Canvas aCanvas)
@@ -113,7 +110,7 @@ namespace GraphicTest
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
 
             aCanvas.Disable();
-
+            Console.WriteLine("Back in text mode");
 
             mDebugger.Send($"Test of Canvas with mode {aCanvas.Mode} executed successfully");
         }
@@ -126,7 +123,15 @@ namespace GraphicTest
 
                 TestBitmaps();
 
+                VGACanvas vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
+                DoTest(vGACanvas);
+                vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
+                DoTest(vGACanvas);
+                vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
+                DoTest(vGACanvas);
+
                 /* First test with the DefaultMode */
+                canvas = FullScreenCanvas.GetFullScreenCanvas();
                 DoTest(canvas);
 
                 DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
@@ -142,6 +147,36 @@ namespace GraphicTest
                 mDebugger.Send(e.Message);
                 TestController.Failed();
             }
+        }
+
+        private void DoTest(VGACanvas vGACanvas)
+        {
+            mDebugger.Send($"Testing VGA Canvas with mode {vGACanvas.Mode}");
+            vGACanvas.Clear();
+            vGACanvas.Clear(Color.Blue);
+            for (int x = 0; x < 20; x++)
+            {
+                for (int y = 0; y < 20; y++)
+                {
+                    vGACanvas.DrawPoint((uint)(x % (int)vGACanvas.Mode.ColorDepth), 5 + x, 5 + y);
+                }
+            }
+
+            for (int x = 0; x < 20; x++)
+            {
+                for (int y = 0; y < 20; y++)
+                {
+                    vGACanvas.DrawPoint((uint)((x + 1) % (int)vGACanvas.Mode.ColorDepth), 5 + x, 5 + y);
+                }
+            }
+
+            vGACanvas.Disable();
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine("Back in text mode");
+            }
+
+            mDebugger.Send($"Test of Canvas with mode {vGACanvas.Mode} executed successfully");
         }
 
         private void TestBitmaps()

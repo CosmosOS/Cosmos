@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using Cosmos.Core.IOGroup;
@@ -8,7 +8,7 @@ namespace Cosmos.HAL.Drivers
     public class VBEDriver
     {
 
-        private readonly Core.IOGroup.VBE IO = Core.Global.BaseIOGroups.VBE;
+        private static readonly VBE IO = Core.Global.BaseIOGroups.VBE;
 
         private enum RegisterIndex
         {
@@ -44,7 +44,7 @@ namespace Cosmos.HAL.Drivers
             VBESet(xres, yres, bpp);
         }
 
-        private void Write(RegisterIndex index, ushort value)
+        private static void VBEWrite(RegisterIndex index, ushort value)
         {
             IO.VbeIndex.Word = (ushort) index;
             IO.VbeData.Word = value;
@@ -52,10 +52,8 @@ namespace Cosmos.HAL.Drivers
 
         private static ushort VBERead(RegisterIndex index)
         {
-            VBE io = Core.Global.BaseIOGroups.VBE;
-
-            io.VbeIndex.Word = (ushort)index;
-            return io.VbeIndex.Word;
+            IO.VbeIndex.Word = (ushort)index;
+            return IO.VbeData.Word;
         }
         public static bool Available()
         {
@@ -63,38 +61,37 @@ namespace Cosmos.HAL.Drivers
 #if false
             return HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA) != null;
 #endif
-            return true;
-            // return VBERead(RegisterIndex.DisplayID) == 0xB0C5; - this is also not working. The same problem?
+            return VBERead(RegisterIndex.DisplayID) == 0xB0C5;
         }
         
         public void DisableDisplay()
         {
             Global.mDebugger.SendInternal($"Disabling VBE display");
-            Write(RegisterIndex.DisplayEnable, (ushort)EnableValues.Disabled);
+            VBEWrite(RegisterIndex.DisplayEnable, (ushort)EnableValues.Disabled);
         }
 
         private void SetXResolution(ushort xres)
         {
             Global.mDebugger.SendInternal($"VBE Setting X resolution to {xres}");
-            Write(RegisterIndex.DisplayXResolution, xres);
+            VBEWrite(RegisterIndex.DisplayXResolution, xres);
         }
 
         private void SetYResolution(ushort yres)
         {
             Global.mDebugger.SendInternal($"VBE Setting Y resolution to {yres}");
-            Write(RegisterIndex.DisplayYResolution, yres);
+            VBEWrite(RegisterIndex.DisplayYResolution, yres);
         }
 
         private void SetDisplayBPP(ushort bpp)
         {
             Global.mDebugger.SendInternal($"VBE Setting BPP to {bpp}");
-            Write(RegisterIndex.DisplayBPP, bpp);
+            VBEWrite(RegisterIndex.DisplayBPP, bpp);
         }
 
         private void EnableDisplay(EnableValues EnableFlags)
         {
             //Global.mDebugger.SendInternal($"VBE Enabling display with EnableFlags (ushort){EnableFlags}");
-            Write(RegisterIndex.DisplayEnable, (ushort)EnableFlags);
+            VBEWrite(RegisterIndex.DisplayEnable, (ushort)EnableFlags);
         }
 
         public void VBESet(ushort xres, ushort yres, ushort bpp)

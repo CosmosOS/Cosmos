@@ -133,27 +133,12 @@ namespace Cosmos.HAL
 
         public static bool Exists(PCIDevice pciDevice)
         {
-            if (GetDevice((VendorID) pciDevice.VendorID, (DeviceID) pciDevice.DeviceID) == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return GetDevice((VendorID)pciDevice.VendorID, (DeviceID)pciDevice.DeviceID) != null;
         }
 
         public static bool Exists(VendorID aVendorID, DeviceID aDeviceID)
         {
-            PCIDevice aDevice = GetDevice(aVendorID, aDeviceID);
-            if (aDevice == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return GetDevice(aVendorID, aDeviceID) != null;
         }
 
         public static PCIDevice GetDevice(VendorID aVendorID, DeviceID aDeviceID)

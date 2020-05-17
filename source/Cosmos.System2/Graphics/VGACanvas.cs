@@ -3,162 +3,189 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.HAL;
 using System.Drawing;
+using static Cosmos.HAL.VGADriver;
 
 namespace Cosmos.System.Graphics
 {
-    class VGACanvas : Canvas
+    public class VGACanvas : Canvas
     {
-        private VGADriver VGADriver;
+        private readonly VGADriver _VGADriver;
 
-        public VGACanvas(Mode mode) : base()
+        public VGACanvas(Mode aMode) : base()
         {
-
+            Global.mDebugger.Send("Creating VGACanvas with mode");
+            _VGADriver = new VGADriver();
+            _VGADriver.SetGraphicsMode(ModeToScreenSize(aMode), (VGADriver.ColorDepth)(int)aMode.ColorDepth);
+            Mode = aMode;
         }
 
         public VGACanvas() : base()
         {
-
+            Mode = DefaultGraphicMode;
+            Global.mDebugger.Send("Creating VGACanvas with standard mode");
+            _VGADriver = new VGADriver();
+            _VGADriver.SetGraphicsMode(ModeToScreenSize(DefaultGraphicMode), (VGADriver.ColorDepth)(int)DefaultGraphicMode.ColorDepth);
         }
 
-        public override Mode Mode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override Mode Mode { get; set; }
 
-        public override void Clear(Color color)
+        public override void Clear(Color aColor)
         {
-            base.Clear(color);
+            base.Clear(aColor);
         }
 
         public override void Disable()
         {
             Clear();
-            VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
+            VGAScreen.SetTextMode(TextSize.Size80x25);
         }
 
-        public override void DrawArray(Color[] colors, Point point, int width, int height)
+        public override void DrawArray(Color[] aColors, Point aPoint, int aWidth, int aHeight)
         {
-            base.DrawArray(colors, point, width, height);
+            base.DrawArray(aColors, aPoint, aWidth, aHeight);
         }
 
-        public override void DrawArray(Color[] colors, int x, int y, int width, int height)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void DrawCircle(Pen pen, int x_center, int y_center, int radius)
-        {
-            base.DrawCircle(pen, x_center, y_center, radius);
-        }
-
-        public override void DrawCircle(Pen pen, Point point, int radius)
-        {
-            base.DrawCircle(pen, point, radius);
-        }
-
-        public override void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
-        {
-            base.DrawEllipse(pen, x_center, y_center, x_radius, y_radius);
-        }
-
-        public override void DrawEllipse(Pen pen, Point point, int x_radius, int y_radius)
-        {
-            base.DrawEllipse(pen, point, x_radius, y_radius);
-        }
-
-        public override void DrawFilledCircle(Pen pen, int x0, int y0, int radius)
-        {
-            base.DrawFilledCircle(pen, x0, y0, radius);
-        }
-
-        public override void DrawFilledCircle(Pen pen, Point point, int radius)
-        {
-            base.DrawFilledCircle(pen, point, radius);
-        }
-
-        public override void DrawFilledEllipse(Pen pen, Point point, int height, int width)
-        {
-            base.DrawFilledEllipse(pen, point, height, width);
-        }
-
-        public override void DrawFilledEllipse(Pen pen, int x, int y, int height, int width)
-        {
-            base.DrawFilledEllipse(pen, x, y, height, width);
-        }
-
-        public override void DrawFilledRectangle(Pen pen, Point point, int width, int height)
-        {
-            base.DrawFilledRectangle(pen, point, width, height);
-        }
-
-        public override void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
-        {
-            base.DrawFilledRectangle(pen, x_start, y_start, width, height);
-        }
-
-        public override void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
-        {
-            base.DrawLine(pen, x1, y1, x2, y2);
-        }
-
-        public override void DrawPoint(Pen pen, int x, int y)
+        public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
         {
             throw new NotImplementedException();
         }
 
-        public override void DrawPoint(Pen pen, float x, float y)
+        public override void DrawCircle(Pen aPen, int aXCenter, int aYCenter, int aRadius)
+        {
+            base.DrawCircle(aPen, aXCenter, aYCenter, aRadius);
+        }
+
+        public override void DrawCircle(Pen aPen, Point aPoint, int aRadius)
+        {
+            base.DrawCircle(aPen, aPoint, aRadius);
+        }
+
+        public override void DrawEllipse(Pen aPen, int aXCenter, int aYCenter, int aXRadius, int aYRadius)
+        {
+            base.DrawEllipse(aPen, aXCenter, aYCenter, aXRadius, aYRadius);
+        }
+
+        public override void DrawEllipse(Pen aPen, Point aPoint, int aXRadius, int aYRadius)
+        {
+            base.DrawEllipse(aPen, aPoint, aXRadius, aYRadius);
+        }
+
+        public override void DrawFilledCircle(Pen aPen, int aX0, int aY0, int aRadius)
+        {
+            base.DrawFilledCircle(aPen, aX0, aY0, aRadius);
+        }
+
+        public override void DrawFilledCircle(Pen aPen, Point aPoint, int aRadius)
+        {
+            base.DrawFilledCircle(aPen, aPoint, aRadius);
+        }
+
+        public override void DrawFilledEllipse(Pen aPen, Point aPoint, int aHeight, int aWidth)
+        {
+            base.DrawFilledEllipse(aPen, aPoint, aHeight, aWidth);
+        }
+
+        public override void DrawFilledEllipse(Pen aPen, int aX, int aY, int aHeight, int aWidth)
+        {
+            base.DrawFilledEllipse(aPen, aX, aY, aHeight, aWidth);
+        }
+
+        public override void DrawFilledRectangle(Pen aPen, Point aPoint, int aWidth, int aHeight)
+        {
+            base.DrawFilledRectangle(aPen, aPoint, aWidth, aHeight);
+        }
+
+        public override void DrawFilledRectangle(Pen aPen, int aXStart, int aYStart, int aWidth, int aHeight)
+        {
+            base.DrawFilledRectangle(aPen, aXStart, aYStart, aWidth, aHeight);
+        }
+
+        public override void DrawLine(Pen aPen, int aX1, int aY1, int aX2, int aY2)
+        {
+            base.DrawLine(aPen, aX1, aY1, aX2, aY2);
+        }
+
+        public override void DrawPoint(Pen aPen, int aX, int aY)
+        {
+            DrawPoint((uint)aPen.Color.ToArgb(), aX, aY);
+        }
+
+        public void DrawPoint(uint aColor, int aX, int aY)
+        {
+            _VGADriver.SetPixel((uint)aX, (uint)aY, aColor);
+        }
+
+        public override void DrawPoint(Pen aPen, float aX, float aY)
         {
             throw new NotImplementedException();
         }
 
-        public override void DrawPolygon(Pen pen, params Point[] points)
+        public override void DrawPolygon(Pen aPen, params Point[] aPoints)
         {
-            base.DrawPolygon(pen, points);
+            base.DrawPolygon(aPen, aPoints);
         }
 
-        public override void DrawRectangle(Pen pen, Point point, int width, int height)
+        public override void DrawRectangle(Pen aPen, Point aPoint, int aWidth, int aHeight)
         {
-            base.DrawRectangle(pen, point, width, height);
+            base.DrawRectangle(aPen, aPoint, aWidth, aHeight);
         }
 
-        public override void DrawRectangle(Pen pen, int x, int y, int width, int height)
+        public override void DrawRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
         {
-            base.DrawRectangle(pen, x, y, width, height);
+            base.DrawRectangle(aPen, aX, aY, aWidth, aHeight);
         }
 
-        public override void DrawSquare(Pen pen, Point point, int size)
+        public override void DrawSquare(Pen aPen, Point aPoint, int aSize)
         {
-            base.DrawSquare(pen, point, size);
+            base.DrawSquare(aPen, aPoint, aSize);
         }
 
-        public override void DrawSquare(Pen pen, int x, int y, int size)
+        public override void DrawSquare(Pen aPen, int aX, int aY, int aSize)
         {
-            base.DrawSquare(pen, x, y, size);
+            base.DrawSquare(aPen, aX, aY, aSize);
         }
 
-        public override void DrawTriangle(Pen pen, Point point0, Point point1, Point point2)
+        public override void DrawTriangle(Pen aPen, Point aPoint0, Point aPoint1, Point aPoint2)
         {
-            base.DrawTriangle(pen, point0, point1, point2);
+            base.DrawTriangle(aPen, aPoint0, aPoint1, aPoint2);
         }
 
-        public override void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
+        public override void DrawTriangle(Pen aPen, int aV1x, int aV1y, int aV2x, int aV2y, int aV3x, int aV3y)
         {
-            base.DrawTriangle(pen, v1x, v1y, v2x, v2y, v3x, v3y);
+            base.DrawTriangle(aPen, aV1x, aV1y, aV2x, aV2y, aV3x, aV3y);
         }
 
-        public override List<Mode> AvailableModes
+        private static readonly List<Mode> _AvailableModes = new List<Mode>
         {
-            get
+            new Mode(640, 480, ColorDepth.ColorDepth4),
+            new Mode(720, 480, ColorDepth.ColorDepth4),
+            new Mode(320, 200, ColorDepth.ColorDepth8)
+        };
+
+        public override List<Mode> AvailableModes => _AvailableModes;
+
+        public override Color GetPointColor(int aX, int aY)
+        {
+            return Color.FromArgb((int)(_VGADriver.GetPixel((uint)aX, (uint)aY)));
+        }
+
+        public override Mode DefaultGraphicMode => new Mode(640, 480, ColorDepth.ColorDepth4);
+
+        private ScreenSize ModeToScreenSize(Mode aMode)
+        {
+            if (aMode.Columns == 320 && aMode.Rows == 200)
             {
-                throw new NotImplementedException();
+                return ScreenSize.Size320x200;
             }
-        }
-
-        public override Color GetPointColor(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Mode DefaultGraphicMode
-        {
-            get
+            else if (aMode.Columns == 640 && aMode.Rows == 200)
+            {
+                return ScreenSize.Size640x480;
+            }
+            else if (aMode.Columns == 720 && aMode.Rows == 480)
+            {
+                return ScreenSize.Size720x480;
+            }
+            else
             {
                 throw new NotImplementedException();
             }

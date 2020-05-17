@@ -17,84 +17,89 @@ namespace Cosmos.HAL
     public class VGADriver
     {
         internal Debugger mDebugger = new Debugger("HAL", "VGA");
-        private const byte NumSeqRegs = 5;
-        private const byte NumCRTCRegs = 25;
-        private const byte NumGCRegs = 9;
-        private const byte NumACRegs = 21;
+        private const byte _NumSeqRegs = 5;
+        private const byte _NumCRTCRegs = 25;
+        private const byte _NumGCRegs = 9;
+        private const byte _NumACRegs = 21;
 
-        private readonly Core.IOGroup.VGA mIO = new Core.IOGroup.VGA();
+        Mode _Mode;
+        ScreenSize _ScreenSize;
+        ColorDepth _ColorDepth;
 
-        private void WriteVGARegisters(byte[] registers)
+        private readonly Core.IOGroup.VGA _MIO = new Core.IOGroup.VGA();
+
+        private void WriteVGARegisters(byte[] aRegisters)
         {
             int xIdx = 0;
             byte i;
 
             /* write MISCELLANEOUS reg */
-            mIO.MiscellaneousOutput_Write.Byte = registers[xIdx];
+            _MIO.MiscellaneousOutput_Write.Byte = aRegisters[xIdx];
             xIdx++;
             /* write SEQUENCER regs */
-            for (i = 0; i < NumSeqRegs; i++)
+            for (i = 0; i < _NumSeqRegs; i++)
             {
-                mIO.Sequencer_Index.Byte = i;
-                mIO.Sequencer_Data.Byte = registers[xIdx];
+                _MIO.Sequencer_Index.Byte = i;
+                _MIO.Sequencer_Data.Byte = aRegisters[xIdx];
                 xIdx++;
             }
             /* unlock CRTC registers */
-            mIO.CRTController_Index.Byte = 0x03;
-            mIO.CRTController_Data.Byte = (byte)(mIO.CRTController_Data.Byte | 0x80);
-            mIO.CRTController_Index.Byte = 0x11;
-            mIO.CRTController_Data.Byte = (byte)(mIO.CRTController_Data.Byte & 0x7F);
+            _MIO.CRTController_Index.Byte = 0x03;
+            _MIO.CRTController_Data.Byte = (byte)(_MIO.CRTController_Data.Byte | 0x80);
+            _MIO.CRTController_Index.Byte = 0x11;
+            _MIO.CRTController_Data.Byte = (byte)(_MIO.CRTController_Data.Byte & 0x7F);
 
             /* make sure they remain unlocked */
-            registers[0x03] |= 0x80;
-            registers[0x11] &= 0x7f;
+            aRegisters[0x03] |= 0x80;
+            aRegisters[0x11] &= 0x7f;
 
             /* write CRTC regs */
-            for (i = 0; i < NumCRTCRegs; i++)
+            for (i = 0; i < _NumCRTCRegs; i++)
             {
-                mIO.CRTController_Index.Byte = i;
-                mIO.CRTController_Data.Byte = registers[xIdx];
+                _MIO.CRTController_Index.Byte = i;
+                _MIO.CRTController_Data.Byte = aRegisters[xIdx];
                 xIdx++;
             }
             /* write GRAPHICS CONTROLLER regs */
-            for (i = 0; i < NumGCRegs; i++)
+            for (i = 0; i < _NumGCRegs; i++)
             {
-                mIO.GraphicsController_Index.Byte = i;
-                mIO.GraphicsController_Data.Byte = registers[xIdx];
+                _MIO.GraphicsController_Index.Byte = i;
+                _MIO.GraphicsController_Data.Byte = aRegisters[xIdx];
                 xIdx++;
             }
             /* write ATTRIBUTE CONTROLLER regs */
-            for (i = 0; i < NumACRegs; i++)
+            for (i = 0; i < _NumACRegs; i++)
             {
-                var xDoSomething = mIO.Instat_Read.Byte;
-                mIO.AttributeController_Index.Byte = i;
-                mIO.AttributeController_Write.Byte = registers[xIdx];
+                var _ = _MIO.Instat_Read.Byte;
+                _MIO.AttributeController_Index.Byte = i;
+                _MIO.AttributeController_Write.Byte = aRegisters[xIdx];
                 xIdx++;
             }
             /* lock 16-color palette and unblank display */
-            var xNothing = mIO.Instat_Read.Byte;
-            mIO.AttributeController_Index.Byte = 0x20;
+            _ = _MIO.Instat_Read.Byte;
+            _MIO.AttributeController_Index.Byte = 0x20;
+            mDebugger.Send("Finished writing VGA registers");
         }
 
-        private void SetPlane(byte p)
+        private void SetPlane(byte aP)
         {
             byte pmask;
 
-            p &= 3;
-            pmask = (byte)(1 << p);
+            aP &= 3;
+            pmask = (byte)(1 << aP);
             /* set read plane */
-            mIO.GraphicsController_Index.Byte = 4;
-            mIO.GraphicsController_Data.Byte = p;
+            _MIO.GraphicsController_Index.Byte = 4;
+            _MIO.GraphicsController_Data.Byte = aP;
             /* set write plane */
-            mIO.Sequencer_Index.Byte = 2;
-            mIO.Sequencer_Data.Byte = pmask;
+            _MIO.Sequencer_Index.Byte = 2;
+            _MIO.Sequencer_Data.Byte = pmask;
         }
 
         //int offset = 0xb8000;
         private MemoryBlock08 GetFramebufferSegment()
         {
-            mIO.GraphicsController_Index.Byte = 6;
-            int seg = mIO.GraphicsController_Data.Byte;
+            _MIO.GraphicsController_Index.Byte = 6;
+            int seg = _MIO.GraphicsController_Data.Byte;
             mDebugger.Send($"VGA: raw seg value: {seg}");
             seg >>= 2;
 
@@ -103,45 +108,45 @@ namespace Cosmos.HAL
             {
                 case 0:
                 case 1:
-                    return mIO.VGAMemoryBlock;
+                    return _MIO.VGAMemoryBlock;
                 case 2:
-                    return mIO.MonochromeTextMemoryBlock;
+                    return _MIO.MonochromeTextMemoryBlock;
                 case 3:
-                    return mIO.CGATextMemoryBlock;
+                    return _MIO.CGATextMemoryBlock;
             }
             throw new Exception("Unable to determine memory segment!");
         }
 
-        private void WriteFont(byte[] font, byte font_height)
+        private void WriteFont(byte[] aFont, byte aFontHeight)
         {
             byte seq2, seq4, gc4, gc5, gc6;
 
             /* save registers
                 set_plane() modifies GC 4 and SEQ 2, so save them as well */
-            mIO.Sequencer_Index.Byte = 2;
-            seq2 = mIO.Sequencer_Data.Byte;
+            _MIO.Sequencer_Index.Byte = 2;
+            seq2 = _MIO.Sequencer_Data.Byte;
 
-            mIO.Sequencer_Index.Byte = 4;
-            seq4 = mIO.Sequencer_Data.Byte;
+            _MIO.Sequencer_Index.Byte = 4;
+            seq4 = _MIO.Sequencer_Data.Byte;
 
             /* turn off even-odd addressing (set flat addressing)
             assume: chain-4 addressing already off */
-            mIO.Sequencer_Data.Byte = (byte)(seq4 | 0x04);
+            _MIO.Sequencer_Data.Byte = (byte)(seq4 | 0x04);
 
-            mIO.GraphicsController_Index.Byte = 4;
-            gc4 = mIO.GraphicsController_Data.Byte;
+            _MIO.GraphicsController_Index.Byte = 4;
+            gc4 = _MIO.GraphicsController_Data.Byte;
 
-            mIO.GraphicsController_Index.Byte = 5;
-            gc5 = mIO.GraphicsController_Data.Byte;
-
-            /* turn off even-odd addressing */
-            mIO.GraphicsController_Data.Byte = (byte)(gc5 & ~0x10);
-
-            mIO.GraphicsController_Index.Byte = 6;
-            gc6 = mIO.GraphicsController_Data.Byte;
+            _MIO.GraphicsController_Index.Byte = 5;
+            gc5 = _MIO.GraphicsController_Data.Byte;
 
             /* turn off even-odd addressing */
-            mIO.GraphicsController_Data.Byte = (byte)(gc6 & ~0x02);
+            _MIO.GraphicsController_Data.Byte = (byte)(gc5 & ~0x10);
+
+            _MIO.GraphicsController_Index.Byte = 6;
+            gc6 = _MIO.GraphicsController_Data.Byte;
+
+            /* turn off even-odd addressing */
+            _MIO.GraphicsController_Data.Byte = (byte)(gc6 & ~0x02);
 
             /* write font to plane P4 */
             SetPlane(2);
@@ -152,48 +157,126 @@ namespace Cosmos.HAL
 
             for (uint i = 0; i < 256; i++)
             {
-                for (uint j = 0; j < font_height; j++)
+                for (uint j = 0; j < aFontHeight; j++)
                 {
-                    seg[(i * 32) + j] = font[(i * font_height) + j];
+                    seg[(i * 32) + j] = aFont[(i * aFontHeight) + j];
                 }
             }
 
             /* restore registers */
-            mIO.Sequencer_Index.Byte = 2;
-            mIO.Sequencer_Data.Byte = seq2;
-            mIO.Sequencer_Index.Byte = 4;
-            mIO.Sequencer_Data.Byte = seq4;
-            mIO.GraphicsController_Index.Byte = 4;
-            mIO.GraphicsController_Data.Byte = gc4;
-            mIO.GraphicsController_Index.Byte = 5;
-            mIO.GraphicsController_Data.Byte = gc5;
-            mIO.GraphicsController_Index.Byte = 6;
-            mIO.GraphicsController_Data.Byte = gc6;
+            _MIO.Sequencer_Index.Byte = 2;
+            _MIO.Sequencer_Data.Byte = seq2;
+            _MIO.Sequencer_Index.Byte = 4;
+            _MIO.Sequencer_Data.Byte = seq4;
+            _MIO.GraphicsController_Index.Byte = 4;
+            _MIO.GraphicsController_Data.Byte = gc4;
+            _MIO.GraphicsController_Index.Byte = 5;
+            _MIO.GraphicsController_Data.Byte = gc5;
+            _MIO.GraphicsController_Index.Byte = 6;
+            _MIO.GraphicsController_Data.Byte = gc6;
         }
-
-        public SetPixelDelegate SetPixel;
-        public GetPixelDelegate GetPixel;
 
         public VGADriver()
         {
-            SetPixel = new SetPixelDelegate(SetPixelNoMode);
-            GetPixel = new GetPixelDelegate(GetPixelNoMode);
         }
 
-        public delegate void SetPixelDelegate(uint x, uint y, uint c);
-
-        public delegate uint GetPixelDelegate(uint x, uint y);
-
-        public uint this[uint x, uint y]
+        public void SetPixel(uint aX, uint aY, uint aColor)
         {
-            get
+            //Global.mDebugger.Send($"Setting pixel: ({x}, {y}) to {color}");
+            if(_Mode == Mode.Text)
             {
-                return GetPixel(x, y);
+                throw new Exception("Cannot set pixel in text mode");
             }
-            set
+            switch (_ScreenSize)
             {
-                SetPixel(x, y, value);
+                case ScreenSize.Size640x480:
+                    switch (_ColorDepth)
+                    {
+                        case ColorDepth.BitDepth2:
+                            throw new NotImplementedException();
+                        case ColorDepth.BitDepth4:
+                            SetPixel640x480x4(aX, aY, aColor);
+                            break;
+                        case ColorDepth.BitDepth8:
+                            throw new NotImplementedException();
+                        case ColorDepth.BitDepth16:
+                            throw new NotImplementedException();
+                        default:
+                            throw new NotImplementedException();
+                    }
+                    break;
+                case ScreenSize.Size720x480:
+                    switch (_ColorDepth)
+                    {
+                        case ColorDepth.BitDepth2:
+                            throw new NotImplementedException();
+                        case ColorDepth.BitDepth4:
+                            SetPixel720x480x4(aX, aY, aColor);
+                            break;
+                        case ColorDepth.BitDepth8:
+                            throw new NotImplementedException();
+                        case ColorDepth.BitDepth16:
+                            throw new NotImplementedException();
+                        default:
+                            throw new NotImplementedException();
+                    }
+                    break;
+                case ScreenSize.Size320x200:
+                    switch (_ColorDepth)
+                    {
+                        case ColorDepth.BitDepth2:
+                            throw new NotImplementedException();
+                        case ColorDepth.BitDepth4:
+                            throw new NotImplementedException();
+                        case ColorDepth.BitDepth8:
+                            SetPixel320x200x8(aX, aY, aColor);
+                            break;
+                        case ColorDepth.BitDepth16:
+                            throw new NotImplementedException();
+                        default:
+                            throw new NotImplementedException();
+                    }
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
+        }
+
+        public uint GetPixel(uint aX, uint aY)
+        {
+            Global.mDebugger.Send($"GetPixel: ({aX},{aY})");
+            if (_Mode == Mode.Text)
+            {
+                throw new Exception("Cannot get pixel in text mode");
+            }
+            return _ScreenSize switch
+            {
+                ScreenSize.Size640x480 => _ColorDepth switch
+                {
+                    ColorDepth.BitDepth2 => throw new NotImplementedException(),
+                    ColorDepth.BitDepth4 => GetPixel640x480x4(aX, aY),
+                    ColorDepth.BitDepth8 => throw new NotImplementedException(),
+                    ColorDepth.BitDepth16 => throw new NotImplementedException(),
+                    _ => throw new NotImplementedException(),
+                },
+                ScreenSize.Size720x480 => _ColorDepth switch
+                {
+                    ColorDepth.BitDepth2 => throw new NotImplementedException(),
+                    ColorDepth.BitDepth4 => GetPixel720x480x4(aX, aY),
+                    ColorDepth.BitDepth8 => throw new NotImplementedException(),
+                    ColorDepth.BitDepth16 => throw new NotImplementedException(),
+                    _ => throw new NotImplementedException(),
+                },
+                ScreenSize.Size320x200 => _ColorDepth switch
+                {
+                    ColorDepth.BitDepth2 => throw new NotImplementedException(),
+                    ColorDepth.BitDepth4 => throw new NotImplementedException(),
+                    ColorDepth.BitDepth8 => GetPixel320x200x8(aX, aY),
+                    ColorDepth.BitDepth16 => throw new NotImplementedException(),
+                    _ => throw new NotImplementedException(),
+                },
+                _ => throw new NotImplementedException(),
+            };
         }
 
         public enum TextSize
@@ -226,39 +309,41 @@ namespace Cosmos.HAL
 
         public enum ColorDepth
         {
-            BitDepth2,
-            BitDepth4,
-            BitDepth8,
-            BitDepth16
+            BitDepth2=2,
+            BitDepth4=4,
+            BitDepth8=8,
+            BitDepth16=16
         };
 
         public void SetTextMode(TextSize aSize)
         {
+            mDebugger.Send("Setting TextMode:" + aSize.ToString());
+            _Mode = Mode.Text;
             switch (aSize)
             {
                 case TextSize.Size40x25:
-                    WriteVGARegisters(g_40x25_text);
-                    WriteFont(g_8x16_font, 16);
+                    WriteVGARegisters(_G_40x25_text);
+                    WriteFont(_G_8x16_font, 16);
                     break;
                 case TextSize.Size40x50:
-                    WriteVGARegisters(g_40x50_text);
-                    WriteFont(g_8x8_font, 8);
+                    WriteVGARegisters(_G_40x50_text);
+                    WriteFont(_G_8x8_font, 8);
                     break;
                 case TextSize.Size80x25:
-                    WriteVGARegisters(g_80x25_text);
-                    WriteFont(g_8x16_font, 16);
+                    WriteVGARegisters(_G_80x25_text);
+                    WriteFont(_G_8x16_font, 16);
                     break;
                 case TextSize.Size80x50:
-                    WriteVGARegisters(g_80x50_text);
-                    WriteFont(g_8x8_font, 8);
+                    WriteVGARegisters(_G_80x50_text);
+                    WriteFont(_G_8x8_font, 8);
                     break;
                 case TextSize.Size90x30:
-                    WriteVGARegisters(g_90x30_text);
-                    WriteFont(g_8x16_font, 16);
+                    WriteVGARegisters(_G_90x30_text);
+                    WriteFont(_G_8x16_font, 16);
                     break;
                 case TextSize.Size90x60:
-                    WriteVGARegisters(g_90x60_text);
-                    WriteFont(g_8x8_font, 8);
+                    WriteVGARegisters(_G_90x60_text);
+                    WriteFont(_G_8x8_font, 8);
                     break;
                 default:
                     throw new Exception("Invalid text size.");
@@ -267,75 +352,74 @@ namespace Cosmos.HAL
 
         public void SetGraphicsMode(ScreenSize aSize, ColorDepth aDepth)
         {
+            mDebugger.Send("Setting GraphicsMode:" + ((int)aSize).ToString() + " - " + ((int)aDepth).ToString());
+            _ScreenSize = aSize;
+            _ColorDepth = aDepth;
+            _Mode = Mode.Graphical;
             switch (aSize)
             {
                 case ScreenSize.Size320x200:
                     if (aDepth == ColorDepth.BitDepth8)
                     {
                         mDebugger.Send("Setting graphic mode to 320x200@256");
-                        WriteVGARegisters(g_320x200x8);
+                        WriteVGARegisters(_G_320x200x8);
 
                         PixelWidth = 320;
                         PixelHeight = 200;
                         Colors = 256;
-                        SetPixel = new SetPixelDelegate(SetPixel320x200x8);
-                        GetPixel = new GetPixelDelegate(GetPixel320x200x8);
                     }
                     else if (aDepth == ColorDepth.BitDepth4)
                     {
-                        WriteVGARegisters(g_320x200x4);
+                        mDebugger.Send("Setting graphic mode to 320x200@16");
+                        WriteVGARegisters(_G_320x200x4);
 
                         PixelWidth = 320;
                         PixelHeight = 200;
                         Colors = 16;
-                        //SetPixel = new SetPixelDelegate(SetPixel320x200x4);
-                        //GetPixel = new GetPixelDelegate(GetPixel320x200x4);
                     }
                     else
                     {
-                        throw new Exception("Unsupported color depth passed for specified screen size");
+                        throw new Exception($"Unsupported color depth {aDepth} passed for specified screen size");
                     }
                     break;
                 case ScreenSize.Size640x480:
                     if (aDepth == ColorDepth.BitDepth2)
                     {
-                        WriteVGARegisters(g_640x480x2);
+                        mDebugger.Send("Setting graphic mode to 640x480@4");
+                        WriteVGARegisters(_G_640x480x2);
 
                         PixelWidth = 640;
                         PixelHeight = 480;
                         Colors = 4;
-                        //SetPixel = new SetPixelDelegate(SetPixel640x480x2);
-                        //GetPixel = new GetPixelDelegate(GetPixel640x480x2);
                     }
                     else if (aDepth == ColorDepth.BitDepth4)
                     {
-                        WriteVGARegisters(g_640x480x4);
+                        mDebugger.Send("Setting graphic mode to 640x480@16");
+
+                        WriteVGARegisters(_G_640x480x4);
 
                         PixelWidth = 640;
                         PixelHeight = 480;
                         Colors = 16;
-                        SetPixel = new SetPixelDelegate(SetPixel640x480x4);
-                        GetPixel = new GetPixelDelegate(GetPixel640x480x4);
                     }
                     else
                     {
-                        throw new Exception("Unsupported color depth passed for specified screen size");
+                        throw new Exception($"Unsupported color depth {aDepth} passed for specified screen size");
                     }
                     break;
                 case ScreenSize.Size720x480:
                     if (aDepth == ColorDepth.BitDepth4)
                     {
-                        WriteVGARegisters(g_720x480x4);
+                        mDebugger.Send("Setting graphic mode to 720x480@16");
+                        WriteVGARegisters(_G_720x480x4);
 
                         PixelWidth = 720;
                         PixelHeight = 480;
                         Colors = 16;
-                        SetPixel = new SetPixelDelegate(SetPixel720x480x4);
-                        GetPixel = new GetPixelDelegate(GetPixel720x480x4);
                     }
                     else
                     {
-                        throw new Exception("Unsupported color depth passed for specified screen size");
+                        throw new Exception($"Unsupported color depth {aDepth} passed for specified screen size");
                     }
                     break;
                 default:
@@ -343,56 +427,52 @@ namespace Cosmos.HAL
             }
         }
 
-        //public void SetPixel320x200x4(uint x, uint y, uint c);
-        //public uint GetPixel320x200x4(uint x, uint y);
-        public void SetPixel320x200x8(uint x, uint y, uint c)
+        public void SetPixel320x200x8(uint aX, uint aY, uint aC)
         {
-            uint where = (y * 320) + x;
-            byte color = (byte)(c & 0xFF);
+            uint where = (aY * 320) + aX;
+            byte color = (byte)(aC & 0xFF);
 
-            mDebugger.Send($"Drawing pixel at {where}, with color {color}");
-            mIO.VGAMemoryBlock[where] = color;
-            mDebugger.Send($"Pixel drawn but you cannot see it!");
+            _MIO.VGAMemoryBlock[where] = color;
         }
 
-        public uint GetPixel320x200x8(uint x, uint y)
+        public uint GetPixel320x200x8(uint aX, uint aY)
         {
-            return mIO.VGAMemoryBlock[(y * 320) + x];
+            mDebugger.Send($"GetPixel320x200x8({aX},{aY})");
+            return _MIO.VGAMemoryBlock[(aY * 320) + aX];
         }
 
-        //public void SetPixel640x480x2(uint x, uint y, uint c);
-        //public uint GetPixel640x480x2(uint x, uint y);
 
-        public void SetPixel640x480x4(uint x, uint y, uint c)
+        public void SetPixel640x480x4(uint aX, uint aY, uint aC)
         {
-            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
+            uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
 
-            x = (x & 7) * 1;
+            aX = (aX & 7) * 1;
 
-            uint mask = (byte)(0x80 >> (int)x);
+            uint mask = (byte)(0x80 >> (int)aX);
             uint pmask = 1;
 
             for (byte p = 0; p < 4; p++)
             {
                 SetPlane(p);
 
-                if ((pmask & c) != 0)
+                if ((pmask & aC) != 0)
                 {
-                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] | mask);
+                    _MIO.VGAMemoryBlock[offset] = (byte)(_MIO.VGAMemoryBlock[offset] | mask);
                 }
 
                 else
                 {
-                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] & ~mask);
+                    _MIO.VGAMemoryBlock[offset] = (byte)(_MIO.VGAMemoryBlock[offset] & ~mask);
                 }
 
                 pmask <<= 1;
             }
         }
 
-        public uint GetPixel640x480x4(uint x, uint y)
+        public uint GetPixel640x480x4(uint aX, uint aY)
         {
-            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
+            mDebugger.Send($"GetPixel640x480x4({aX},{aY})");
+            uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
 
             uint pmask = 1;
 
@@ -402,7 +482,7 @@ namespace Cosmos.HAL
             {
                 SetPlane(p);
 
-                if (mIO.VGAMemoryBlock[offset] == 255)
+                if (_MIO.VGAMemoryBlock[offset] == 255)
                 {
                     color += pmask;
                 }
@@ -413,36 +493,38 @@ namespace Cosmos.HAL
             return color;
         }
 
-        public void SetPixel720x480x4(uint x, uint y, uint c)
+        public void SetPixel720x480x4(uint aX, uint aY, uint aC)
         {
-            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
+            uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
 
-            x = (x & 7) * 1;
+            aX = (aX & 7) * 1;
 
-            uint mask = (byte)(0x80 >> (int)x);
+            uint mask = (byte)(0x80 >> (int)aX);
             uint pmask = 1;
 
             for (byte p = 0; p < 4; p++)
             {
                 SetPlane(p);
 
-                if ((pmask & c) != 0)
+                if ((pmask & aC) != 0)
                 {
-                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] | mask);
+                    _MIO.VGAMemoryBlock[offset] = (byte)(_MIO.VGAMemoryBlock[offset] | mask);
                 }
 
                 else
                 {
-                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] & ~mask);
+                    _MIO.VGAMemoryBlock[offset] = (byte)(_MIO.VGAMemoryBlock[offset] & ~mask);
                 }
 
                 pmask <<= 1;
             }
         }
 
-        public uint GetPixel720x480x4(uint x, uint y)
+        public uint GetPixel720x480x4(uint aX, uint aY)
         {
-            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
+            mDebugger.Send($"GetPixel720x480x4({aX},{aY})");
+
+            uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
 
             uint pmask = 1;
 
@@ -452,7 +534,7 @@ namespace Cosmos.HAL
             {
                 SetPlane(p);
 
-                if (mIO.VGAMemoryBlock[offset] == 255)
+                if (_MIO.VGAMemoryBlock[offset] == 255)
                 {
                     color += pmask;
                 }
@@ -461,16 +543,6 @@ namespace Cosmos.HAL
             }
 
             return color;
-        }
-
-        private void SetPixelNoMode(uint x, uint y, uint c)
-        {
-            throw new Exception("No video mode set!");
-        }
-
-        private uint GetPixelNoMode(uint x, uint y)
-        {
-            throw new Exception("No video mode set!");
         }
 
         public int PixelWidth { private set; get; }
@@ -500,52 +572,43 @@ namespace Cosmos.HAL
             }
         }
 
-        public void Clear(int color)
+        public void Clear(int aColor)
         {
+            //TODO: Copy more memory at once
             for (int y = 0; y < PixelHeight; y++)
             {
                 for (int x = 0; x < PixelWidth; x++)
                 {
-                    SetPixel((uint)x, (uint)y, (uint)color);
+                    SetPixel((uint)x, (uint)y, (uint)aColor);
                 }
             }
         }
 
-        // TODO: Enable code that uses Color when we move to .NET Core 2.1 (plug won't be needed)
+        private readonly Color[] _Palette = new Color[256];
 
-        //private Color[] _Palette = new Color[256];
-
-        //public Color GetPaletteEntry(int index)
-        //{
-        //    return _Palette[index];
-        //}
-
-        public void SetPalette(int index, byte[] pallete)
+        public Color GetPaletteEntry(int aIndex)
         {
-            mIO.DACIndex_Write.Byte = (byte)index;
-            for (int i = 0; i < pallete.Length; i++)
-            {
-                mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);
-            }
+            return _Palette[aIndex];
         }
 
-        //public void SetPaletteEntry(int index, Color color)
-        //{
-        //    SetPaletteEntry(index, color.R, color.G, color.B);
-        //}
-
-        public void SetPaletteEntry(int index, byte r, byte g, byte b)
+        public void SetPaletteEntry(int aIndex, Color aColor)
         {
-            mIO.DACIndex_Write.Byte = (byte)index;
-            mIO.DAC_Data.Byte = (byte)(r >> 2);
-            mIO.DAC_Data.Byte = (byte)(g >> 2);
-            mIO.DAC_Data.Byte = (byte)(b >> 2);
+            _Palette[aIndex] = aColor;
+            SetPaletteEntry(aIndex, aColor.R, aColor.G, aColor.B);
+        }
+
+        public void SetPaletteEntry(int aIndex, byte aR, byte aG, byte aB)
+        {
+            _MIO.DACIndex_Write.Byte = (byte)aIndex;
+            _MIO.DAC_Data.Byte = (byte)(aR >> 2);
+            _MIO.DAC_Data.Byte = (byte)(aG >> 2);
+            _MIO.DAC_Data.Byte = (byte)(aB >> 2);
         }
 
 
         #region FONTS
 
-        private static byte[] g_8x8_font = new byte[]
+        private static readonly byte[] _G_8x8_font = new byte[]
                                            {
                                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                0x7E, 0x81, 0xA5, 0x81, 0xBD, 0x99, 0x81, 0x7E,
@@ -805,7 +868,7 @@ namespace Cosmos.HAL
                                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
                                            };
 
-        private static byte[] g_8x16_font = new byte[]
+        private static readonly byte[] _G_8x16_font = new byte[]
                                             {
 
                                                 // juptitor
@@ -1078,7 +1141,7 @@ namespace Cosmos.HAL
 
         #region MODES
 
-        private static byte[] g_640x480x4 = new byte[]
+        private static readonly byte[] _G_640x480x4 = new byte[]
                                             {
                                                 /* MISC */
                                                 0xE3,
@@ -1098,7 +1161,7 @@ namespace Cosmos.HAL
                                                 0x01, 0x00, 0x0F, 0x00, 0x00
                                             };
 
-        private static byte[] g_320x200x8 = new byte[]
+        private static readonly byte[] _G_320x200x8 = new byte[]
                                             {
                                                 /* MISC */
                                                 0x63,
@@ -1118,7 +1181,7 @@ namespace Cosmos.HAL
                                                 0x41, 0x00, 0x0F, 0x00, 0x00
                                             };
 
-        private static byte[] g_80x50_text = new byte[]
+        private static readonly byte[] _G_80x50_text = new byte[]
                                              {
                                                  /* MISC */
                                                  0x67,
@@ -1138,7 +1201,7 @@ namespace Cosmos.HAL
                                                  0x0C, 0x00, 0x0F, 0x08, 0x00,
                                              };
 
-        private static byte[] g_720x480x4 = new byte[]
+        private static readonly byte[] _G_720x480x4 = new byte[]
                                             {
                                                 /* MISC */
                                                 0xE7,
@@ -1158,7 +1221,7 @@ namespace Cosmos.HAL
                                                 0x01, 0x00, 0x0F, 0x00, 0x00,
                                             };
 
-        private static byte[] g_90x30_text = new byte[]
+        private static readonly byte[] _G_90x30_text = new byte[]
                                              {
                                                  /* MISC */
                                                  0xE7,
@@ -1178,7 +1241,7 @@ namespace Cosmos.HAL
                                                  0x0C, 0x00, 0x0F, 0x08, 0x00,
                                              };
 
-        private static byte[] g_90x60_text = new byte[]
+        private static readonly byte[] _G_90x60_text = new byte[]
                                              {
                                                  /* MISC */
                                                  0xE7,
@@ -1198,7 +1261,7 @@ namespace Cosmos.HAL
                                                  0x0C, 0x00, 0x0F, 0x08, 0x00,
                                              };
 
-        private static byte[] g_40x25_text = new byte[]
+        private static readonly byte[] _G_40x25_text = new byte[]
                                              {
                                                  /* MISC */
                                                  0x67,
@@ -1218,7 +1281,7 @@ namespace Cosmos.HAL
                                                  0x0C, 0x00, 0x0F, 0x08, 0x00,
                                              };
 
-        private static byte[] g_40x50_text = new byte[]
+        private static readonly byte[] _G_40x50_text = new byte[]
                                              {
                                                  /* MISC */
                                                  0x67,
@@ -1238,7 +1301,7 @@ namespace Cosmos.HAL
                                                  0x0C, 0x00, 0x0F, 0x08, 0x00,
                                              };
 
-        private static byte[] g_80x25_text = new byte[]
+        private static readonly byte[] _G_80x25_text = new byte[]
                                              {
                                                  /* MISC */
                                                  0x67,
@@ -1258,7 +1321,7 @@ namespace Cosmos.HAL
                                                  0x0C, 0x00, 0x0F, 0x08, 0x00
                                              };
 
-        private static byte[] g_320x200x4 = new byte[]
+        private static readonly byte[] _G_320x200x4 = new byte[]
                                             {
                                                 /* MISC */
                                                 0x63,
@@ -1278,7 +1341,7 @@ namespace Cosmos.HAL
                                                 0x01, 0x00, 0x03, 0x00, 0x00
                                             };
 
-        private static byte[] g_640x480x2 = new byte[]
+        private static readonly byte[] _G_640x480x2 = new byte[]
                                             {
                                                 /* MISC */
                                                 0xE3,
@@ -1299,5 +1362,7 @@ namespace Cosmos.HAL
                                             };
 
         #endregion
+
+        private enum Mode { Text, Graphical}
     }
 }
