@@ -124,18 +124,18 @@ namespace GraphicTest
                 TestBitmaps();
 
                 /* First test with the DefaultMode */
-                //canvas = FullScreenCanvas.GetFullScreenCanvas();
-                //DoTest(canvas);
+                canvas = FullScreenCanvas.GetFullScreenCanvas();
+                DoTest(canvas);
 
-                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
-                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
-                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1366, 768, ColorDepth.ColorDepth32)));
-                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1366, 768, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
 
                 VGACanvas vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
-                //DoTest(vGACanvas);
-                //vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
-                //DoTest(vGACanvas);
+                DoTest(vGACanvas);
+                vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
+                DoTest(vGACanvas);
                 vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
                 DoTest((Canvas)vGACanvas);
                 vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
