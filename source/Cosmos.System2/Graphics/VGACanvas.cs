@@ -31,7 +31,8 @@ namespace Cosmos.System.Graphics
 
         public override void Clear(Color aColor)
         {
-            base.Clear(aColor);
+            var paletteIndex = _VGADriver.GetClosestColorInPalette(aColor);
+            _VGADriver.DrawFilledRectangle(0,0, _VGADriver.PixelWidth, _VGADriver.PixelHeight, paletteIndex);
         }
 
         public override void Disable()
@@ -92,12 +93,12 @@ namespace Cosmos.System.Graphics
 
         public override void DrawFilledRectangle(Pen aPen, Point aPoint, int aWidth, int aHeight)
         {
-            base.DrawFilledRectangle(aPen, aPoint, aWidth, aHeight);
+            DrawFilledRectangle(aPen, aPoint.X, aPoint.Y, aWidth, aHeight);
         }
 
         public override void DrawFilledRectangle(Pen aPen, int aXStart, int aYStart, int aWidth, int aHeight)
         {
-            base.DrawFilledRectangle(aPen, aXStart, aYStart, aWidth, aHeight);
+            _VGADriver.DrawFilledRectangle(aXStart, aYStart, aWidth, aHeight, _VGADriver.GetClosestColorInPalette(aPen.Color));
         }
 
         public override void DrawLine(Pen aPen, int aX1, int aY1, int aX2, int aY2)
@@ -107,7 +108,7 @@ namespace Cosmos.System.Graphics
 
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
-            DrawPoint((uint)aPen.Color.ToArgb(), aX, aY);
+            _VGADriver.SetPixel((uint)aX, (uint)aY, aPen.Color);
         }
 
         public void DrawPoint(uint aColor, int aX, int aY)
@@ -162,7 +163,13 @@ namespace Cosmos.System.Graphics
             new Mode(320, 200, ColorDepth.ColorDepth8)
         };
 
-        public override List<Mode> AvailableModes => _AvailableModes;
+        public override List<Mode> AvailableModes
+        {
+            get
+            {
+                return _AvailableModes;
+            }
+        }
 
         public override Color GetPointColor(int aX, int aY)
         {

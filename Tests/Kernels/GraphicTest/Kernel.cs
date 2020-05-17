@@ -80,7 +80,7 @@ namespace GraphicTest
 
             /* A LimeGreen rectangle */
             pen.Color = Color.LimeGreen;
-            aCanvas.DrawRectangle(pen, 450, 450, 80, 60);
+            aCanvas.DrawRectangle(pen, 450, 300, 80, 60);
 
             /* A filled rectange */
             pen.Color = Color.Chocolate;
@@ -123,21 +123,23 @@ namespace GraphicTest
 
                 TestBitmaps();
 
+                /* First test with the DefaultMode */
+                //canvas = FullScreenCanvas.GetFullScreenCanvas();
+                //DoTest(canvas);
+
+                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
+                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
+                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1366, 768, ColorDepth.ColorDepth32)));
+                //DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
+
                 VGACanvas vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
-                DoTest(vGACanvas);
+                //DoTest(vGACanvas);
+                //vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
+                //DoTest(vGACanvas);
                 vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
-                DoTest(vGACanvas);
+                DoTest((Canvas)vGACanvas);
                 vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
                 DoTest(vGACanvas);
-
-                /* First test with the DefaultMode */
-                canvas = FullScreenCanvas.GetFullScreenCanvas();
-                DoTest(canvas);
-
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1366, 768, ColorDepth.ColorDepth32)));
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
 
                 TestController.Completed();
             }
@@ -152,13 +154,12 @@ namespace GraphicTest
         private void DoTest(VGACanvas vGACanvas)
         {
             mDebugger.Send($"Testing VGA Canvas with mode {vGACanvas.Mode}");
-            vGACanvas.Clear();
             vGACanvas.Clear(Color.Blue);
             for (int x = 0; x < 20; x++)
             {
                 for (int y = 0; y < 20; y++)
                 {
-                    vGACanvas.DrawPoint((uint)(x % (int)vGACanvas.Mode.ColorDepth), 5 + x, 5 + y);
+                    vGACanvas.DrawPoint((uint)(x % (2 << ((int)vGACanvas.Mode.ColorDepth - 1))), 5 + x, 5 + y);
                 }
             }
 
@@ -166,7 +167,7 @@ namespace GraphicTest
             {
                 for (int y = 0; y < 20; y++)
                 {
-                    vGACanvas.DrawPoint((uint)((x + 1) % (int)vGACanvas.Mode.ColorDepth), 5 + x, 5 + y);
+                    vGACanvas.DrawPoint((uint)(x % (2 << ((int)vGACanvas.Mode.ColorDepth - 1))), 25 + x, 5 + y);
                 }
             }
 

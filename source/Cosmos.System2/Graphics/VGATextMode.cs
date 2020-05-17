@@ -30,12 +30,7 @@ namespace Cosmos.System.Graphics
 
         public static void Clear(int aColor)
         {
-            _Screen.Clear(aColor);
-        }
-
-        public static void TestMode320x200x8()
-        {
-            _Screen.TestMode320x200x8();
+            _Screen.DrawFilledRectangle(0,0, _Screen.PixelWidth, _Screen.PixelHeight, (uint)aColor);
         }
 
         public static void SetPaletteEntry(int aIndex, byte aR, byte aG, byte aB)
