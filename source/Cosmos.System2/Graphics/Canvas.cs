@@ -135,20 +135,15 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        /*
-         * DrawLine throw if the line goes out of the boundary of the Canvas, probably will be better to draw only the part
-         * of line visibile. This is too "smart" to do here better do it in a future Window Manager.
-         */
-
         public virtual void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             if (pen == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(pen));
             }
-            ThrowIfCoordNotValid(x1, y1);
 
-            ThrowIfCoordNotValid(x2, y2);
+            // trim the given line to fit inside the canvas boundries
+            TrimLine(ref x1, ref y1, ref x2, ref y2);
 
             int dx, dy;
 
@@ -555,5 +550,94 @@ namespace Cosmos.System.Graphics
                 throw new ArgumentOutOfRangeException(nameof(y), $"y ({y}) is not between 0 and {Mode.Rows}");
             }
         }
+
+        protected void TrimLine(ref int x1, ref int y1, ref int x2, ref int y2)
+        {
+            // in case of vertical lines, no need to perform complex operations
+            if (x1 == x2)
+            {
+                x1 = Math.Min(Mode.Columns - 1, Math.Max(0, x1));
+                x2 = x1;
+                y1 = Math.Min(Mode.Rows - 1, Math.Max(0, y1));
+                y2 = Math.Min(Mode.Rows - 1, Math.Max(0, y2));
+
+                return;
+            }
+
+            // never attempt to remove this part,
+            // if we didn't calculate our new values as floats, we would end up with inaccurate output
+            float x1_out = x1, y1_out = y1;
+            float x2_out = x2, y2_out = y2;
+
+            // calculate the line slope, and the entercepted part of the y axis
+            float m = (y2_out - y1_out) / (x2_out - x1_out);
+            float c = y1_out - m * x1_out;
+
+            // handle x1
+            if (x1_out < 0)
+            {
+                x1_out = 0;
+                y1_out = c;
+            }
+            else if (x1_out >= Mode.Columns)
+            {
+                x1_out = Mode.Columns - 1;
+                y1_out = (Mode.Columns - 1) * m + c;
+            }
+
+            // handle x2
+            if (x2_out < 0)
+            {
+                x2_out = 0;
+                y2_out = c;
+            }
+            else if (x2_out >= Mode.Columns)
+            {
+                x2_out = Mode.Columns - 1;
+                y2_out = (Mode.Columns - 1) * m + c;
+            }
+
+            // handle y1
+            if (y1_out < 0)
+            {
+                x1_out = -c / m;
+                y1_out = 0;
+            }
+            else if (y1_out >= Mode.Rows)
+            {
+                x1_out = (Mode.Rows - 1 - c) / m;
+                y1_out = Mode.Rows - 1;
+            }
+
+            // handle y2
+            if (y2_out < 0)
+            {
+                x2_out = -c / m;
+                y2_out = 0;
+            }
+            else if (y2_out >= Mode.Rows)
+            {
+                x2_out = (Mode.Rows - 1 - c) / m;
+                y2_out = Mode.Rows - 1;
+            }
+
+            // final check, to avoid lines that are totally outside bounds
+            if (x1_out < 0 || x1_out >= Mode.Columns || y1_out < 0 || y1_out >= Mode.Rows)
+            {
+                x1_out = 0; x2_out = 0;
+                y1_out = 0; y2_out = 0;
+            }
+
+            if (x2_out < 0 || x2_out >= Mode.Columns || y2_out < 0 || y2_out >= Mode.Rows)
+            {
+                x1_out = 0; x2_out = 0;
+                y1_out = 0; y2_out = 0;
+            }
+
+            // replace inputs with new values
+            x1 = (int)x1_out; y1 = (int)y1_out;
+            x2 = (int)x2_out; y2 = (int)y2_out;
+        }
+
     }
 }
