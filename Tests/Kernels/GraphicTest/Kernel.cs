@@ -57,6 +57,11 @@ namespace GraphicTest
             pen.Color = Color.GreenYellow;
             aCanvas.DrawLine(pen, 250, 100, 400, 100);
 
+            /* A Black Lines larger than the canvas */
+            pen.Color = Color.Black;
+            aCanvas.DrawLine(pen, -20, 100, aCanvas.Mode.Columns + 20, 100);
+            aCanvas.DrawLine(pen, -20, -20, aCanvas.Mode.Columns + 20, aCanvas.Mode.Rows + 20);
+
             /* An IndianRed vertical line */
             pen.Color = Color.IndianRed;
             aCanvas.DrawLine(pen, 350, 150, 350, 250);
