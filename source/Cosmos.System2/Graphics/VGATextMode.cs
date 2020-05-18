@@ -23,26 +23,6 @@ namespace Cosmos.System.Graphics
             _Screen.SetGraphicsMode(aScreenSize, vgaColorDepth);
         }
 
-        public static void SetPixel(uint aX, uint aY, uint aColor)
-        {
-            _Screen.SetPixel(aX, aY, aColor);
-        }
-
-        public static void Clear(int aColor)
-        {
-            _Screen.DrawFilledRectangle(0,0, _Screen.PixelWidth, _Screen.PixelHeight, (uint)aColor);
-        }
-
-        public static void SetPaletteEntry(int aIndex, byte aR, byte aG, byte aB)
-        {
-            _Screen.SetPaletteEntry(aIndex, aR, aG, aB);
-        }
-
-        public static uint GetPixel(uint aX, uint aY)
-        {
-            return _Screen.GetPixel(aX, aY);
-        }
-
         public static void SetTextMode(TextSize aSize)
         {
             switch (aSize)

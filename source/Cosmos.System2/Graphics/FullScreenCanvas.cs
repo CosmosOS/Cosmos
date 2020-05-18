@@ -13,7 +13,7 @@ namespace Cosmos.System.Graphics
             if (IsInUse)
             {
                 _VideoDriver.Disable();
-                VGAScreen.SetTextMode(VGADriver.TextSize.Size80x25);
+                VGADriver.SetTextMode(VGADriver.TextSize.Size80x25);
             }
         }
 

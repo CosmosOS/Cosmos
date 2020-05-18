@@ -23,9 +23,9 @@ namespace Cosmos.Core.IOGroup
         public readonly IOPortRead Instat_Read = new IOPortRead(0x3DA);
 
         /// <summary>
-        /// 256KB at 0xA0000
+        /// 128KB at 0xA0000 - This was originally 64KB which is stated in the documentation but when you increase it, you can draw larger vga screens
         /// </summary>
-        public readonly MemoryBlock08 VGAMemoryBlock = new MemoryBlock08(0xA0000, 1024 * 256);
+        public readonly MemoryBlock08 VGAMemoryBlock = new MemoryBlock08(0xA0000, 1024 * 128);
 
         /// <summary>
         /// 32KB at 0xB0000
