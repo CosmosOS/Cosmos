@@ -126,6 +126,15 @@ namespace GraphicTest
             {
                 mDebugger.Send("Run");
 
+
+                //Test fonts in VGA
+                Console.WriteLine("ABAKDSKDNKSNJNFJGNFLPÜQOJOPJD");
+                Console.WriteLine("I(39u0pwoejJIosjfppkspjfsdjfp");
+                PCScreenFont screenFont = new PCScreenFont();
+                VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.CharHeight);
+                Console.WriteLine("ABAKDSKDNKSNJNFJGNFLPÜQOJOPJD");
+                Console.WriteLine("I(39u0pwoejJIosjfppkspjfsdjfp");
+
                 TestBitmaps();
 
                 /* First test with the DefaultMode */
@@ -143,8 +152,15 @@ namespace GraphicTest
                 DoTest(vGACanvas);
                 vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
                 DoTest((Canvas)vGACanvas);
-                vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
+                vGACanvas = new VGACanvas(new Mode(640, 480, ColorDepth.ColorDepth4));
                 DoTest(vGACanvas);
+                Console.BackgroundColor= ConsoleColor.Black;
+                for (int i = 0; i < 16; i++)
+                {
+                    Console.ForegroundColor = (ConsoleColor)i; //Ensure that the correct coloures are used
+                    Console.WriteLine("Back in text mode 2");
+                }
+                Console.ForegroundColor = ConsoleColor.White;
 
                 TestController.Completed();
             }
@@ -159,7 +175,6 @@ namespace GraphicTest
         private void DoTest(VGACanvas vGACanvas)
         {
             mDebugger.Send($"Testing VGA Canvas with mode {vGACanvas.Mode}");
-            vGACanvas.Clear(Color.Blue);
             for (int x = 0; x < 20; x++)
             {
                 for (int y = 0; y < 20; y++)

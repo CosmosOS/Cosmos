@@ -25,29 +25,7 @@ namespace Cosmos.System.Graphics
 
         public static void SetTextMode(TextSize aSize)
         {
-            switch (aSize)
-            {
-                case TextSize.Size40x25:
-                    _Screen.SetTextMode(TextSize.Size40x25);
-                    break;
-                case TextSize.Size40x50:
-                    _Screen.SetTextMode(TextSize.Size40x50);
-                    break;
-                case TextSize.Size80x25:
-                    _Screen.SetTextMode(TextSize.Size80x25);
-                    break;
-                case TextSize.Size80x50:
-                    _Screen.SetTextMode(TextSize.Size80x50);
-                    break;
-                case TextSize.Size90x30:
-                    _Screen.SetTextMode(TextSize.Size90x30);
-                    break;
-                case TextSize.Size90x60:
-                    _Screen.SetTextMode(TextSize.Size90x60);
-                    break;
-                default:
-                    throw new Exception("This situation is not implemented!");
-            }
+            _Screen.SetTextMode(aSize);
         }
 
         public static int PixelHeight = _Screen.PixelHeight;
@@ -55,5 +33,14 @@ namespace Cosmos.System.Graphics
         public static int PixelWidth = _Screen.PixelWidth;
 
         public static int Colors = _Screen.Colors;
+
+        public static void SetFont(byte[] fontData, int fontHeight)
+        {
+            if(fontHeight > 32)
+            {
+                throw new ArgumentOutOfRangeException("fontHeight");
+            }
+            _Screen.WriteFont(fontData, (byte)fontHeight);
+        }
     }
 }

@@ -13,9 +13,9 @@ namespace Cosmos.Core.IOGroup
         public readonly IOPortWrite MiscellaneousOutput_Write = new IOPortWrite(0x3C2);
         public readonly IOPortWrite Sequencer_Index = new IOPortWrite(0x3C4);
         public readonly IOPort Sequencer_Data = new IOPort(0x3C5);
-        public readonly IOPortRead DACIndex_Read = new IOPortRead(0x3C7);
+        public readonly IOPortWrite DACIndex_Read = new IOPortWrite(0x3C7);
         public readonly IOPortWrite DACIndex_Write = new IOPortWrite(0x3C8);
-        public readonly IOPortWrite DAC_Data = new IOPortWrite(0x3C9);
+        public readonly IOPort DAC_Data = new IOPort(0x3C9);
         public readonly IOPortWrite GraphicsController_Index = new IOPortWrite(0x3CE);
         public readonly IOPort GraphicsController_Data = new IOPort(0x3CF);
         public readonly IOPortWrite CRTController_Index = new IOPortWrite(0x3D4);
@@ -23,7 +23,7 @@ namespace Cosmos.Core.IOGroup
         public readonly IOPortRead Instat_Read = new IOPortRead(0x3DA);
 
         /// <summary>
-        /// 128KB at 0xA0000 - This was originally 64KB which is stated in the documentation but when you increase it, you can draw larger vga screens
+        /// 128KB at 0xA0000
         /// </summary>
         public readonly MemoryBlock08 VGAMemoryBlock = new MemoryBlock08(0xA0000, 1024 * 128);
 

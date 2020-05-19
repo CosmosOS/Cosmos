@@ -184,7 +184,7 @@ namespace Cosmos.System.Graphics
             {
                 return ScreenSize.Size320x200;
             }
-            else if (aMode.Columns == 640 && aMode.Rows == 200)
+            else if (aMode.Columns == 640 && aMode.Rows == 480)
             {
                 return ScreenSize.Size640x480;
             }
