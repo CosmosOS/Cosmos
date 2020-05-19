@@ -25,16 +25,16 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// 128KB at 0xA0000
         /// </summary>
-        public readonly MemoryBlock08 VGAMemoryBlock = new MemoryBlock08(0xA0000, 1024 * 128);
+        public readonly MemoryBlock VGAMemoryBlock = new MemoryBlock(0xA0000, 1024 * 128);
 
         /// <summary>
         /// 32KB at 0xB0000
         /// </summary>
-        public readonly MemoryBlock08 MonochromeTextMemoryBlock = new MemoryBlock08(0xB0000, 1024 * 32);
+        public readonly MemoryBlock MonochromeTextMemoryBlock = new MemoryBlock(0xB0000, 1024 * 32);
 
         /// <summary>
         /// 32KB at 0xB8000
         /// </summary>
-        public readonly MemoryBlock08 CGATextMemoryBlock = new MemoryBlock08(0xB8000, 1024 * 32);
+        public readonly MemoryBlock CGATextMemoryBlock = new MemoryBlock(0xB8000, 1024 * 32);
     }
 }

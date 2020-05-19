@@ -92,7 +92,7 @@ namespace Cosmos.HAL
         }
 
         //int offset = 0xb8000;
-        private MemoryBlock08 GetFramebufferSegment()
+        private MemoryBlock GetFramebufferSegment()
         {
             _IO.GraphicsController_Index.Byte = 6;
             int seg = _IO.GraphicsController_Data.Byte;
@@ -399,6 +399,9 @@ namespace Cosmos.HAL
                 default:
                     throw new Exception("Invalid text size.");
             }
+
+            //Clear the memory
+            _IO.CGATextMemoryBlock.Fill(0);
 
             int[] colors = new int[]
             {

@@ -9,6 +9,7 @@ namespace Cosmos.System.Graphics
 {
     public class VGACanvas : Canvas
     {
+        bool enabled;
         private readonly VGADriver _VGADriver;
 
         public VGACanvas(Mode aMode) : base()
@@ -17,10 +18,12 @@ namespace Cosmos.System.Graphics
             _VGADriver = new VGADriver();
             _VGADriver.SetGraphicsMode(ModeToScreenSize(aMode), (VGADriver.ColorDepth)(int)aMode.ColorDepth);
             Mode = aMode;
+            enabled = true;
         }
 
         public VGACanvas() : base()
         {
+            enabled = true;
             Mode = DefaultGraphicMode;
             Global.mDebugger.Send("Creating VGACanvas with standard mode");
             _VGADriver = new VGADriver();
@@ -37,8 +40,11 @@ namespace Cosmos.System.Graphics
 
         public override void Disable()
         {
-            Clear();
-            VGAScreen.SetTextMode(TextSize.Size80x25);
+            if (enabled)
+            {
+                VGAScreen.SetTextMode(TextSize.Size80x25);
+                enabled = false;
+            }
         }
 
         public override void DrawArray(Color[] aColors, Point aPoint, int aWidth, int aHeight)
