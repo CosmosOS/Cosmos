@@ -139,7 +139,7 @@ namespace Cosmos.System.Graphics
 
                 /* Better HD-Ready Resolutions */
                 new Mode(1360, 768, ColorDepth.ColorDepth32),
-                new Mode(1366, 768, ColorDepth.ColorDepth32),  // Original Laptop Resolution
+                //new Mode(1366, 768, ColorDepth.ColorDepth32),  // Original Laptop Resolution - this one is for some reason broken in vmware
                 new Mode(1440, 900, ColorDepth.ColorDepth32),  // WXGA+
                 new Mode(1400, 1050, ColorDepth.ColorDepth32), // SXGA+
                 new Mode(1600, 1200, ColorDepth.ColorDepth32), // UXGA

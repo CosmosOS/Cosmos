@@ -574,13 +574,13 @@ namespace Cosmos.HAL
             uint where = (aY * 320) + aX;
             byte color = (byte)(aC & 0xFF);
 
-            _IO.VGAMemoryBlock[where] = color;
+            _IO.VGAMemoryBlock.Bytes[where] = color;
         }
 
         public uint GetPixel320x200x8(uint aX, uint aY)
         {
             mDebugger.Send($"GetPixel320x200x8({aX},{aY})");
-            return _IO.VGAMemoryBlock[(aY * 320) + aX];
+            return _IO.VGAMemoryBlock.Bytes[(aY * 320) + aX];
         }
 
 
@@ -599,12 +599,12 @@ namespace Cosmos.HAL
 
                 if ((pmask & aC) != 0)
                 {
-                    _IO.VGAMemoryBlock[offset] = (byte)(_IO.VGAMemoryBlock[offset] | mask);
+                    _IO.VGAMemoryBlock.Bytes[offset] = (byte)(_IO.VGAMemoryBlock.Bytes[offset] | mask);
                 }
 
                 else
                 {
-                    _IO.VGAMemoryBlock[offset] = (byte)(_IO.VGAMemoryBlock[offset] & ~mask);
+                    _IO.VGAMemoryBlock.Bytes[offset] = (byte)(_IO.VGAMemoryBlock.Bytes[offset] & ~mask);
                 }
 
                 pmask <<= 1;
@@ -624,7 +624,7 @@ namespace Cosmos.HAL
             {
                 SetPlane(p);
 
-                if (_IO.VGAMemoryBlock[offset] == 255)
+                if (_IO.VGAMemoryBlock.Bytes[offset] == 255)
                 {
                     color += pmask;
                 }
@@ -650,12 +650,12 @@ namespace Cosmos.HAL
 
                 if ((pmask & aC) != 0)
                 {
-                    _IO.VGAMemoryBlock[offset] = (byte)(_IO.VGAMemoryBlock[offset] | mask);
+                    _IO.VGAMemoryBlock.Bytes[offset] = (byte)(_IO.VGAMemoryBlock.Bytes[offset] | mask);
                 }
 
                 else
                 {
-                    _IO.VGAMemoryBlock[offset] = (byte)(_IO.VGAMemoryBlock[offset] & ~mask);
+                    _IO.VGAMemoryBlock.Bytes[offset] = (byte)(_IO.VGAMemoryBlock.Bytes[offset] & ~mask);
                 }
 
                 pmask <<= 1;
@@ -676,7 +676,7 @@ namespace Cosmos.HAL
             {
                 SetPlane(p);
 
-                if (_IO.VGAMemoryBlock[offset] == 255)
+                if (_IO.VGAMemoryBlock.Bytes[offset] == 255)
                 {
                     color += pmask;
                 }

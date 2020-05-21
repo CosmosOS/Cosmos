@@ -15,8 +15,7 @@ namespace GraphicTest
 {
     public class Kernel : Sys.Kernel
     {
-        Canvas canvas;
-        private Bitmap bitmap = new Bitmap(10, 10,
+        private readonly Bitmap bitmap = new Bitmap(10, 10,
                 new byte[] { 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0,
                     255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
                     0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
@@ -33,8 +32,8 @@ namespace GraphicTest
                     243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148,
                     255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
                     0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, }, ColorDepth.ColorDepth32);
-        private static byte[] letterData = Convert.FromBase64String("Qk12AgAAAAAAADYAAAAoAAAACQAAABAAAAABACAAAAAAAEACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+/dP//////////////////////AHS//wAAAAAAAAAAAAAAAEgAAP+/4Jz/AAB0/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcSAD/nODg/wAASP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3QA/0ic4P8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOCcSP8AdL//AAAAAAAAAAAAAAAAAAAAAP+/dP/////////////////g////AEic/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        private Bitmap letter = new Bitmap(letterData);
+        private static readonly byte[] letterData = Convert.FromBase64String("Qk12AgAAAAAAADYAAAAoAAAACQAAABAAAAABACAAAAAAAEACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+/dP//////////////////////AHS//wAAAAAAAAAAAAAAAEgAAP+/4Jz/AAB0/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcSAD/nODg/wAASP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3QA/0ic4P8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOCcSP8AdL//AAAAAAAAAAAAAAAAAAAAAP+/dP/////////////////g////AEic/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        private readonly Bitmap letter = new Bitmap(letterData);
 
 
         protected override void BeforeRun()
@@ -127,9 +126,7 @@ namespace GraphicTest
                 mDebugger.Send("Run");
 
 
-                //Test fonts in VGA
-                Console.WriteLine("ABAKDSKDNKSNJNFJGNFLPÜQOJOPJD");
-                Console.WriteLine("I(39u0pwoejJIosjfppkspjfsdjfp");
+                //Test changing font
                 PCScreenFont screenFont = new PCScreenFont();
                 VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.CharHeight);
                 Console.WriteLine("ABAKDSKDNKSNJNFJGNFLPÜQOJOPJD");
@@ -143,7 +140,7 @@ namespace GraphicTest
 
                 DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
                 DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1366, 768, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 1024, ColorDepth.ColorDepth32)));
                 DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
 
                 VGACanvas vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
@@ -154,7 +151,7 @@ namespace GraphicTest
                 DoTest((Canvas)vGACanvas);
                 vGACanvas = new VGACanvas(new Mode(640, 480, ColorDepth.ColorDepth4));
                 DoTest(vGACanvas);
-                Console.BackgroundColor= ConsoleColor.Black;
+                Console.BackgroundColor = ConsoleColor.Black;
                 for (int i = 0; i < 16; i++)
                 {
                     Console.ForegroundColor = (ConsoleColor)i; //Ensure that the correct coloures are used
@@ -175,6 +172,7 @@ namespace GraphicTest
         private void DoTest(VGACanvas vGACanvas)
         {
             mDebugger.Send($"Testing VGA Canvas with mode {vGACanvas.Mode}");
+            vGACanvas.Clear();
             for (int x = 0; x < 20; x++)
             {
                 for (int y = 0; y < 20; y++)
