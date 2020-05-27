@@ -1,4 +1,4 @@
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers;
 

@@ -135,7 +135,7 @@ namespace GraphicTest
                 TestBitmaps();
 
                 /* First test with the DefaultMode */
-                canvas = FullScreenCanvas.GetFullScreenCanvas();
+                Canvas canvas = FullScreenCanvas.GetFullScreenCanvas();
                 DoTest(canvas);
 
                 DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
@@ -158,7 +158,7 @@ namespace GraphicTest
                     Console.WriteLine("Back in text mode 2");
                 }
                 Console.ForegroundColor = ConsoleColor.White;
-
+                
                 TestController.Completed();
             }
             catch (Exception e)
@@ -172,7 +172,7 @@ namespace GraphicTest
         private void DoTest(VGACanvas vGACanvas)
         {
             mDebugger.Send($"Testing VGA Canvas with mode {vGACanvas.Mode}");
-            vGACanvas.Clear();
+            vGACanvas.Clear(Color.Wheat);
             for (int x = 0; x < 20; x++)
             {
                 for (int y = 0; y < 20; y++)
@@ -188,6 +188,8 @@ namespace GraphicTest
                     vGACanvas.DrawPoint((uint)(x % (2 << ((int)vGACanvas.Mode.ColorDepth - 1))), 25 + x, 5 + y);
                 }
             }
+
+            vGACanvas.DrawLine(new Pen(Color.Red), 10, 10, 10, 50);
 
             vGACanvas.Disable();
             for (int i = 0; i < 10; i++)
