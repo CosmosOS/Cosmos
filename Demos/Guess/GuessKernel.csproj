@@ -7,7 +7,7 @@
 
     <PropertyGroup>
         <BinFormat>elf</BinFormat>
-        <DebugEnabled>False</DebugEnabled>
+        <DebugEnabled>True</DebugEnabled>
         <DebugMode>Source</DebugMode>
         <TraceMode>User</TraceMode>
         <EnableGDB>False</EnableGDB>
@@ -53,12 +53,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\Cosmos.System2\Cosmos.System2.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Cosmos.Build" Version="*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.Build" Version="0-*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.Debug.Kernel" Version="0-*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.System2" Version="0-*" NoWarn="NU1604" />
     </ItemGroup>
 
 </Project>

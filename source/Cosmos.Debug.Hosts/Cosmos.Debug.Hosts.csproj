@@ -5,12 +5,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Cosmos.Build.Common" />
         <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
         <PackageReference Include="System.IO.Ports" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
     </ItemGroup>
 

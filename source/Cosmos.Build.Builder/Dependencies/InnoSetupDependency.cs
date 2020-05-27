@@ -12,9 +12,10 @@ namespace Cosmos.Build.Builder.Dependencies
     internal class InnoSetupDependency : IDependency
     {
         private const string InnoSetupInstallerUrl = "http://www.jrsoftware.org/download.php/is.exe";
+
         public string Name => "Inno Setup";
 
-        private IInnoSetupService _innoSetupService;
+        private readonly IInnoSetupService _innoSetupService;
 
         public InnoSetupDependency(IInnoSetupService innoSetupService)
         {
@@ -46,7 +47,7 @@ namespace Cosmos.Build.Builder.Dependencies
             }
 
             var process = Process.Start(setupFilePath);
-            await Task.Run((Action)process.WaitForExit, cancellationToken).ConfigureAwait(false);
+            await Task.Run(process.WaitForExit, cancellationToken).ConfigureAwait(false);
 
             if (process.ExitCode != 0)
             {

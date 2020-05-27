@@ -6,9 +6,11 @@
 
     <Import Project="Workarounds.props" />
 
-    <Import Project="RestoreSources.props" />
     <Import Project="RepoLayout.props" />
+    <Import Project="RestoreSources.props" />
 
     <Import Project="PackageProperties.props" />
+
+    <Import Project="Versions.props" />
 
 </Project>

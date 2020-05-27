@@ -12,7 +12,7 @@ namespace Cosmos.Build.Builder.Dependencies
 {
     internal class ReposDependency : IDependency
     {
-        public string Name => "Repos: IL2CPU and XSharp";
+        public string Name => "Repos: IL2CPU, XSharp and Common";
 
         private readonly string _cosmosDir;
         private readonly IEnumerable<Repo> _repos;
@@ -28,7 +28,10 @@ namespace Cosmos.Build.Builder.Dependencies
                     "https://github.com/CosmosOS/IL2CPU"),
                 new Repo(
                     Path.GetFullPath(Path.Combine(cosmosDir, "..", "XSharp")),
-                    "https://github.com/CosmosOS/XSharp")
+                    "https://github.com/CosmosOS/XSharp"),
+                new Repo(
+                    Path.GetFullPath(Path.Combine(cosmosDir, "..", "Common")),
+                    "https://github.com/CosmosOS/Common")
             };
         }
 
@@ -45,12 +48,12 @@ namespace Cosmos.Build.Builder.Dependencies
                 .Select(r => DownloadRepoAsync(r, usesGit, cancellationToken)));
         }
 
-        private async Task DownloadRepoAsync(Repo repo, bool useGit, CancellationToken cancellationToken)
+        private static async Task DownloadRepoAsync(Repo repo, bool useGit, CancellationToken cancellationToken)
         {
             if (useGit)
             {
                 var process = Process.Start("git", $"clone \"{repo.Url}.git\" \"{repo.LocalPath}\"");
-                await Task.Run((Action)process.WaitForExit).ConfigureAwait(false);
+                await Task.Run(process.WaitForExit).ConfigureAwait(false);
 
                 if (process.ExitCode != 0)
                 {

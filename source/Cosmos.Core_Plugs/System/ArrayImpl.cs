@@ -1,22 +1,22 @@
 using System;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
 {
     [Plug(Target = typeof(Array))]
-    public class ArrayImpl
+    public static class ArrayImpl
     {
         [PlugMethod(Signature = "System_Void__System_Array_Clear_System_Array__System_Int32__System_Int32_")]
         public static unsafe void Clear([ObjectPointerAccess] uint* aArray, uint aIndex, uint aLength)
         {
-            aArray = (uint*) aArray[0];
-            aArray += 3;
-            uint xElementSize = *aArray;
-            aArray += 1;
+            uint xElementSize = aArray[3];
+            aArray += 4;
             byte* xBytes = (byte*) aArray;
-            for (uint i = aIndex * xElementSize; i < ((aIndex + aLength) * xElementSize); i++)
+            for (uint i = aIndex * xElementSize; i < (aIndex + aLength) * xElementSize; i++)
             {
+
                 xBytes[i] = 0;
             }
         }
@@ -36,14 +36,14 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
-        public static unsafe bool TrySZBinarySearch(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
+        public static unsafe bool TrySZBinarySearch([ObjectPointerAccess] uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
             aArray = (uint*) aArray[0];
             return TrySZIndexOf(aArray, sourceIndex, count, value, out retVal);
         }
 
         [PlugMethod(Signature = "System_Boolean__System_Array_TrySZLastIndexOf_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
-        public static unsafe bool TrySZLastIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
+        public static unsafe bool TrySZLastIndexOf([ObjectPointerAccess] uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
             aArray = (uint*) aArray[0];
             aArray += 4;
@@ -60,7 +60,7 @@ namespace Cosmos.Core_Plugs.System
         }
 
         //[PlugMethod(Signature = "System_Boolean__System_Array_TrySZIndexOf_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
-        private static unsafe bool TrySZIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
+        private static unsafe bool TrySZIndexOf([ObjectPointerAccess] uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
             aArray = (uint*) aArray[0];
             aArray += 4;
@@ -92,23 +92,22 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_Object__System_Array_GetValue_System_Int32_")]
-        public static unsafe uint GetValue(uint* aThis, int aIndex)
+        public static unsafe object GetValue([ObjectPointerAccess]uint* aThis, int aIndex)
         {
-            aThis = (uint*) aThis[0];
-            aThis += 3;
-            uint xElementSize = *aThis;
-            aThis += 1;
-            aThis = ((uint*) (((byte*) aThis) + aIndex * xElementSize));
+            uint xElementSize = aThis[3];
+            aThis += 4;
+            byte* aArray = (byte*)aThis;
+            aArray += aIndex * xElementSize;
             switch (xElementSize)
             {
                 case 1:
-                    return *((byte*) aThis);
+                    return *(aArray);
                 case 2:
-                    return *((ushort*) aThis);
+                    return *((ushort*)aArray);
                 case 3:
-                    return (*aThis) & 0x0FFFFFFF;
+                    return (*(uint*)aArray) & 0x0FFFFFFF;
                 case 4:
-                    return *aThis;
+                    return *aArray;
             }
             throw new NotSupportedException("GetValue not supported in this situation!");
         }
@@ -119,7 +118,7 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
-        public static unsafe void SetValue(uint* aThis, uint aValue, int aIndex)
+        public static unsafe void SetValue([ObjectPointerAccess] uint* aThis, uint aValue, int aIndex)
         {
             aThis = (uint*) aThis[0];
             aThis += 3;

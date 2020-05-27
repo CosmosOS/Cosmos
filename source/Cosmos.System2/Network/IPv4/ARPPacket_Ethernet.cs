@@ -23,14 +23,14 @@ namespace Cosmos.System.Network.IPv4
         protected override void initFields()
         {
             base.initFields();
-            mSenderMAC = new MACAddress(mRawData, 22);
-            mSenderIP = new Address(mRawData, 28);
+            mSenderMAC = new MACAddress(RawData, 22);
+            mSenderIP = new Address(RawData, 28);
             if (SenderIP == null)
             {
                 NetworkStack.debugger.Send("But its already null again");
             }
-            mTargetMAC = new MACAddress(mRawData, 32);
-            mTargetIP = new Address(mRawData, 38);
+            mTargetMAC = new MACAddress(RawData, 32);
+            mTargetIP = new Address(RawData, 38);
         }
 
         protected ARPPacket_Ethernet(UInt16 operation, MACAddress senderMAC, Address senderIP,
@@ -39,13 +39,13 @@ namespace Cosmos.System.Network.IPv4
         {
             for (int i = 0; i < 6; i++)
             {
-                mRawData[22 + i] = senderMAC.bytes[i];
-                mRawData[32 + i] = arpTargetMAC.bytes[i];
+                RawData[22 + i] = senderMAC.bytes[i];
+                RawData[32 + i] = arpTargetMAC.bytes[i];
             }
             for (int i = 0; i < 4; i++)
             {
-                mRawData[28 + i] = senderIP.address[i];
-                mRawData[38 + i] = targetIP.address[i];
+                RawData[28 + i] = senderIP.address[i];
+                RawData[38 + i] = targetIP.address[i];
             }
 
             initFields();

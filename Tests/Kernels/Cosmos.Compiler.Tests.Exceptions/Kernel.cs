@@ -6,6 +6,14 @@ namespace Cosmos.Compiler.Tests.Exceptions
 {
     using Cosmos.TestRunner;
 
+    class DisposeTest : IDisposable
+    {
+        public void Dispose()
+        {
+
+        }
+    }
+
     public class Kernel : Sys.Kernel
     {
         protected override void BeforeRun()
@@ -151,7 +159,26 @@ namespace Cosmos.Compiler.Tests.Exceptions
             //Assert.IsTrue(xFilter, "Did not reach filter block (5)");
             //Assert.IsTrue(xInFinally, "Did not reach finally block (5)");
 
+            //TestThrowInUsing(); - the test will work when nested exceptions work
+
             TestController.Completed();
+        }
+
+        void TestThrowInUsing()
+        {
+            mDebugger.Send("Start: Test throwing exceptions in using blocks");
+            try
+            {
+                using (var t = new DisposeTest())
+                {
+                    throw new Exception("Custom Exception in Using block");
+                }
+            }
+            catch (Exception e)
+            {
+                mDebugger.Send("Exception: " + e.Message);
+            }
+            mDebugger.Send("End");
         }
 
         private void TestSimpleException()

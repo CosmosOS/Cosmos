@@ -7,56 +7,19 @@ namespace Cosmos.System.Graphics
 {
     public abstract class Canvas
     {
-        protected Mode mode;
-        protected List<Mode> availableModes;
-        static protected Mode defaultGraphicMode;
+        /*
+         * IReadOnlyList<T> is not working, the Modes inside it become corrupted and then you get Stack Overflow
+         */
+        //public abstract IReadOnlyList<Mode> AvailableModes { get; }
+        public abstract List<Mode> AvailableModes { get; }
 
-        protected Canvas(Mode mode)
-        {
-            //Global.mDebugger.SendInternal($"Creating a new Canvas with Mode ${mode}");
+        public abstract Mode DefaultGraphicMode { get; }
 
-            availableModes = getAvailableModes();
-            defaultGraphicMode = getDefaultGraphicMode();
-            this.mode = mode;
-        }
+        public abstract Mode Mode { get; set; }
 
-        protected Canvas()
-        {
-            Global.mDebugger.SendInternal($"Creating a new Canvas with default graphic Mode");
-
-            availableModes = getAvailableModes();
-            defaultGraphicMode = getDefaultGraphicMode();
-            this.mode = defaultGraphicMode;
-        }
-
-        abstract public List<Mode> getAvailableModes();
-
-        abstract protected Mode getDefaultGraphicMode();
-
-        public List<Mode> AvailableModes
-        {
-            get
-            {
-                return availableModes;
-            }
-        }
-
-        public Mode DefaultGraphicMode
-        {
-            get
-            {
-                return defaultGraphicMode;
-            }
-        }
-
-        public abstract Mode Mode
-        {
-            get;
-            set;
-        }
-
-        /* Clear all the Canvas with the Black color */
-
+        /// <summary>
+        /// Clear all the Canvas with the Black color.
+        /// </summary>
         public void Clear()
         {
             Clear(Color.Black);
@@ -75,9 +38,9 @@ namespace Cosmos.System.Graphics
 
             Pen pen = new Pen(color);
 
-            for (int x = 0; x < mode.Rows; x++)
+            for (int x = 0; x < Mode.Rows; x++)
             {
-                for (int y = 0; y < mode.Columns; y++)
+                for (int y = 0; y < Mode.Columns; y++)
                 {
                     DrawPoint(pen, x, y);
                 }
@@ -391,7 +354,7 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, v2x, v2y, v3x, v3y);
         }
 
-        public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
+        public virtual void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
         }
@@ -399,12 +362,13 @@ namespace Cosmos.System.Graphics
         //Image and Font will be available in .NET Core 2.1
         // dot net core does not have Image
         //We are using a short term solution for bitmap
-        public void DrawImage(Image image, int x, int y)
+        public virtual void DrawImage(Image image, int x, int y)
         {
             for (int _x = 0; _x < image.Width; _x++)
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
+                    Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
                     DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])), x + _x, y + _y);
                 }
             }
@@ -436,14 +400,17 @@ namespace Cosmos.System.Graphics
 
             */
 
-            foreach (var elem in availableModes)
+            foreach (var elem in AvailableModes)
             {
+                Global.mDebugger.SendInternal($"elem is {elem} mode is {mode}");
                 if (elem == mode)
                 {
+                    Global.mDebugger.SendInternal($"Mode {mode} found");
                     return true; // All OK mode does exists in availableModes
                 }
             }
 
+            Global.mDebugger.SendInternal($"Mode {mode} found");
             return false;
         }
 
@@ -454,7 +421,7 @@ namespace Cosmos.System.Graphics
                 return;
             }
 
-            Global.mDebugger.SendInternal($"mode is not found! Raising exception...");
+            Global.mDebugger.SendInternal($"Mode {mode} is not found! Raising exception...");
             /* 'mode' was not in the 'availableModes' List ==> 'mode' in NOT Valid */
             throw new ArgumentOutOfRangeException(nameof(mode), $"Mode {mode} is not supported by this Driver");
         }

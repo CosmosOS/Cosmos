@@ -1,14 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net471</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <OutputType>WinExe</OutputType>
+        <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Reference Include="System.Data.DataSetExtensions" />
-        <Reference Include="System.Windows.Forms" />
-    </ItemGroup>
 
     <ItemGroup>
 
@@ -59,7 +55,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+        <Reference Include="System.Data.DataSetExtensions" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Cosmos.Build.Common" />
     </ItemGroup>
 
 </Project>

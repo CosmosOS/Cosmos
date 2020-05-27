@@ -32,7 +32,7 @@ namespace Cosmos.Debug.DebugConnectors
         public Action<byte[]> CmdStack;
         public Action<byte[]> CmdPong;
         public Action<byte, byte, byte[]> CmdChannel;
-        public Action<byte[]> CmdCoreDump;
+        public Action<CoreDump> CmdCoreDump;
         public Action<UInt32> CmdStackCorruptionOccurred;
         public Action<UInt32> CmdStackOverflowOccurred;
         public Action<UInt32> CmdInterruptOccurred;

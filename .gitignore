@@ -9,9 +9,12 @@
 
 # Build results
 
-[Oo]bj/
+[Aa]rtifacts
 [Bb]in
 [Pp]ackages/
+[Oo]bj/
+
+Docs/log.txt
 
 *.[Oo]bj
 *.suo

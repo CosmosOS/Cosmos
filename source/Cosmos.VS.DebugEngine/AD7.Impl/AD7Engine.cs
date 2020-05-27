@@ -42,23 +42,14 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         // This object facilitates calling from this thread into the worker thread of the engine. This is necessary because the Win32 debugging
         // api requires thread affinity to several operations.
         // This object manages breakpoints in the sample engine.
-        protected BreakpointManager mBPMgr;
-        public BreakpointManager BPMgr
-        {
-            get { return mBPMgr; }
-        }
+        public BreakpointManager BPMgr { get; }
 
         public AD7Engine()
         {
-            mBPMgr = new BreakpointManager(this);
+            BPMgr = new BreakpointManager(this);
         }
 
-        // Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
-        EngineCallback mEngineCallback;
-        internal EngineCallback Callback
-        {
-            get { return mEngineCallback; }
-        }
+        internal EngineCallback Callback { get; private set; }
 
         #region Startup Methods
         // During startup these methods are called in this order:
@@ -81,7 +72,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             oProcess = null;
             try
             {
-                mEngineCallback = new EngineCallback(this, aAD7Callback);
+                Callback = new EngineCallback(this, aAD7Callback);
 
                 var xDebugInfo = new Dictionary<string, string>();
                 DictionaryHelper.LoadFromString(xDebugInfo, aDebugInfo);
@@ -91,7 +82,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 //var processLaunchInfo = new ProcessLaunchInfo(exe, xCmdLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
 
                 AD7EngineCreateEvent.Send(this);
-                oProcess = mProcess = new AD7Process(xDebugInfo, mEngineCallback, this, aPort);
+                oProcess = mProcess = new AD7Process(xDebugInfo, Callback, this, aPort);
                 // We only support one process, so just use its ID for the program ID
                 mProgramID = mProcess.ID;
                 //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
@@ -121,7 +112,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             if (aCeltPrograms != 1)
             {
                 System.Diagnostics.Debug.Fail("Cosmos Debugger only supports one debug target at a time.");
-                throw new ArgumentException();
+                throw new InvalidOperationException();
             }
 
             try
@@ -153,16 +144,15 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             {
                 // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
                 // which will complete the hookup with AD7
-                var xProcess = aProcess as AD7Process;
-                if (xProcess == null)
+                if (!(aProcess is AD7Process xProcess))
                 {
                     return VSConstants.E_INVALIDARG;
                 }
-                IDebugPort2 xPort;
-                EngineUtils.RequireOk(aProcess.GetPort(out xPort));
+
+                EngineUtils.RequireOk(aProcess.GetPort(out var xPort));
+
                 var xDefPort = (IDebugDefaultPort2)xPort;
-                IDebugPortNotify2 xNotify;
-                EngineUtils.RequireOk(xDefPort.GetPortNotify(out xNotify));
+                EngineUtils.RequireOk(xDefPort.GetPortNotify(out var xNotify));
 
                 // This triggers Attach
                 EngineUtils.RequireOk(xNotify.AddProgramNode(mProgNode));
@@ -208,7 +198,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             {
                 if (aEvent is AD7ProgramDestroyEvent)
                 {
-                    mEngineCallback = null;
+                    Callback = null;
                     mProgramID = Guid.Empty;
                     mThread = null;
                     mProgNode = null;
@@ -268,7 +258,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             {
                 mProcess.Terminate();
 
-                mEngineCallback.OnProcessExit(0);
+                Callback.OnProcessExit(0);
                 mProgram = null;
             }
             catch (Exception e)
@@ -278,7 +268,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             return VSConstants.S_OK;
         }
 
-        public int Continue(IDebugThread2 aThread)
+        public int Continue(IDebugThread2 pThread)
         {
             // We don't appear to use or support this currently.
 
@@ -286,7 +276,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             // but have stepping state remain. An example is when a tracepoint is executed,
             // and the debugger does not want to actually enter break mode.
 
-            var xThread = (AD7Thread)aThread;
+            var xThread = (AD7Thread)pThread;
             //if (AfterBreak) {
             //Callback.OnBreak(xThread);
             //}
@@ -327,22 +317,22 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             return VSConstants.S_OK;
         }
 
-        public int GetEngineInfo(out string engineName, out Guid engineGuid)
+        public int GetEngineInfo(out string pbstrEngine, out Guid pguidEngine)
         {
             // Gets the name and identifier of the debug engine (DE) running this program.
 
-            engineName = "Cosmos Debug Engine";
-            engineGuid = EngineID;
+            pbstrEngine = "Cosmos Debug Engine";
+            pguidEngine = EngineID;
 
             return VSConstants.S_OK;
         }
 
-        public int GetProgramId(out Guid aGuidProgramId)
+        public int GetProgramId(out Guid pguidProgramId)
         {
             // Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the IDebugProgramNodeAttach2::OnAttach
             // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
 
-            aGuidProgramId = mProgramID;
+            pguidProgramId = mProgramID;
             return VSConstants.S_OK;
         }
 
@@ -350,7 +340,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         {
             // This method is deprecated. Use the IDebugProcess3::Step method instead.
 
-            mProcess.Step((enum_STEPKIND)sk);
+            mProcess.Step(sk);
             return VSConstants.S_OK;
         }
 
@@ -368,19 +358,19 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         // Gets the name of the program.
         // The name returned by this method is always a friendly, user-displayable name that describes the program.
-        public int GetName(out string programName)
+        public int GetName(out string pbstrName)
         {
             // The Sample engine uses default transport and doesn't need to customize the name of the program,
             // so return NULL.
-            programName = null;
+            pbstrName = null;
             return VSConstants.S_OK;
         }
 
         // This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
-        public int GetENCUpdate(out object update)
+        public int GetENCUpdate(out object ppUpdate)
         {
             // The sample engine does not participate in managed edit & continue.
-            update = null;
+            ppUpdate = null;
 
             return VSConstants.S_OK;
         }
@@ -445,17 +435,14 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         // The debugger calls CauseBreak when the user clicks on the pause button in VS. The debugger should respond by entering
         // breakmode.
-        public int CauseBreak()
-        {
-            return this.mProcess.CauseBreak();
-        }
+        public int CauseBreak() => mProcess.CauseBreak();
 
         // EnumCodePaths is used for the step-into specific feature -- right click on the current statment and decide which
         // function to step into. This is not something that the SampleEngine supports.
-        public int EnumCodePaths(string hint, IDebugCodeContext2 start, IDebugStackFrame2 frame, int fSource, out IEnumCodePaths2 pathEnum, out IDebugCodeContext2 safetyContext)
+        public int EnumCodePaths(string pszHint, IDebugCodeContext2 pStart, IDebugStackFrame2 pFrame, int fSource, out IEnumCodePaths2 ppEnum, out IDebugCodeContext2 ppSafety)
         {
-            pathEnum = null;
-            safetyContext = null;
+            ppEnum = null;
+            ppSafety = null;
             return VSConstants.E_NOTIMPL;
         }
 
@@ -472,9 +459,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         // The debugger calls this when it needs to obtain the IDebugDisassemblyStream2 for a particular code-context.
         // The sample engine does not support dissassembly so it returns E_NOTIMPL
-        public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
+        public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE dwScope, IDebugCodeContext2 pCodeContext, out IDebugDisassemblyStream2 ppDisassemblyStream)
         {
-            disassemblyStream = null;
+            ppDisassemblyStream = null;
             return VSConstants.E_NOTIMPL;
         }
 
@@ -583,11 +570,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             return VSConstants.E_NOTIMPL;
         }
 
-        public int GetProcess(out IDebugProcess2 process)
+        public int GetProcess(out IDebugProcess2 ppProcess)
         {
             System.Diagnostics.Debug.Fail("This function is not called by the debugger");
 
-            process = null;
+            ppProcess = null;
             return VSConstants.E_NOTIMPL;
         }
 

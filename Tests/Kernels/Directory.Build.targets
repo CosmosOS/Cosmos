@@ -52,14 +52,14 @@
     </PropertyGroup>
 
     <Target Name="WriteReferenceAssembliesToFile"
-            DependsOnTargets="ResolveReferences;_ComputeNetPublishAssets"
+            DependsOnTargets="ResolveReferences;ComputeFilesToPublish"
             Inputs="$(TargetPath)"
             Outputs="$(_ReferencesFile)">
 
         <ItemGroup>
-            <_Il2cpuAssemblies Include="@(ResolvedAssembliesToPublish)"
-                               Condition="'%(ResolvedAssembliesToPublish.AssetType)' != 'native'
-                                      AND '%(ResolvedAssembliesToPublish.Extension)' == '.dll'" />
+            <_Il2cpuAssemblies Include="@(ResolvedFileToPublish->'%(FullPath)')"
+                               Condition="'%(ResolvedFileToPublish.AssetType)' != 'native'
+                                      AND '%(ResolvedFileToPublish.Extension)' == '.dll'" />
         </ItemGroup>
 
         <WriteLinesToFile File="$(_ReferencesFile)" Lines="@(_Il2cpuAssemblies)" Overwrite="True" />

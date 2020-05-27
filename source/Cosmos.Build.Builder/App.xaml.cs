@@ -90,7 +90,7 @@ namespace Cosmos.Build.Builder
             base.OnStartup(e);
         }
 
-        private void ShowErrorMessageBox(string message) =>
+        private static void ShowErrorMessageBox(string message) =>
             MessageBox.Show(message, "Cosmos Kit Builder", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }

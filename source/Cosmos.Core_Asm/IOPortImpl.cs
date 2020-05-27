@@ -1,9 +1,9 @@
-using System;
-using XSharp.Assembler;
 using Cosmos.Core;
-using IL2CPU.API;
+
 using IL2CPU.API.Attribs;
+
 using XSharp;
+using XSharp.Assembler;
 
 namespace Cosmos.Core_Asm
 {
@@ -27,9 +27,7 @@ namespace Cosmos.Core_Asm
         }
 
         [PlugMethod(Assembler = typeof(Write8Assembler))]
-        public static void Write8(UInt16 aPort, byte aData)
-        {
-        }
+        public static void Write8(ushort aPort, byte aData) => throw null;
 
         #endregion
 
@@ -46,9 +44,7 @@ namespace Cosmos.Core_Asm
         }
 
         [PlugMethod(Assembler = typeof(Write16Assembler))]
-        public static void Write16(UInt16 aPort, UInt16 aData)
-        {
-        }
+        public static void Write16(ushort aPort, ushort aData) => throw null;
 
         #endregion
 
@@ -65,9 +61,7 @@ namespace Cosmos.Core_Asm
         }
 
         [PlugMethod(Assembler = typeof(Write32Assembler))]
-        public static void Write32(UInt16 aPort, UInt32 aData)
-        {
-        }
+        public static void Write32(ushort aPort, uint aData) => throw null;
 
         #endregion
 
@@ -87,10 +81,7 @@ namespace Cosmos.Core_Asm
         }
 
         [PlugMethod(Assembler = typeof(Read8Assembler))]
-        public static byte Read8(UInt16 aPort)
-        {
-            return 0;
-        }
+        public static byte Read8(ushort aPort) => throw null;
 
         #endregion
 
@@ -108,10 +99,7 @@ namespace Cosmos.Core_Asm
         }
 
         [PlugMethod(Assembler = typeof(Read16Assembler))]
-        public static UInt16 Read16(UInt16 aPort)
-        {
-            return 0;
-        }
+        public static ushort Read16(ushort aPort) => throw null;
 
         #endregion
 
@@ -128,10 +116,7 @@ namespace Cosmos.Core_Asm
         }
 
         [PlugMethod(Assembler = typeof(Read32Assembler))]
-        public static UInt32 Read32(UInt16 aPort)
-        {
-            return 0;
-        }
+        public static uint Read32(ushort aPort) => throw null;
 
         #endregion
 

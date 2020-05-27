@@ -1,0 +1,49 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        Title="Cosmos Test Runner Settings"
+        SizeToContent="WidthAndHeight">
+
+    <StackPanel Spacing="8"
+                Margin="16">
+
+        <StackPanel Orientation="Horizontal"
+                    Spacing="16">
+
+            <StackPanel Spacing="8">
+
+                <TextBlock>Allowed seconds in kernel:</TextBlock>
+                <TextBox Text="{Binding AllowedSecondsInKernel}" />
+                <CheckBox IsChecked="{Binding RunWithGDB}">Run with GDB</CheckBox>
+                <CheckBox IsChecked="{Binding StartBochsDebugGUI}">Start Bochs debug GUI</CheckBox>
+                <TextBlock>Run target:</TextBlock>
+                <DropDown Items="{Binding RunTargetItems}"
+                          SelectedItem="{Binding RunTarget}" />
+
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+
+                <CheckBox IsChecked="{Binding DebugIL2CPU}">Debug IL2CPU</CheckBox>
+                <TextBlock>Kernel package:</TextBlock>
+                <TextBox Text="{Binding KernelPkg}" />
+                <TextBlock>Trace assemblies level:</TextBlock>
+                <DropDown Items="{Binding TraceAssembliesLevelItems}"
+                          SelectedItem="{Binding TraceAssembliesLevel}" />
+                <CheckBox IsChecked="{Binding EnableStackCorruptionChecks}">Enable stack corruption checks</CheckBox>
+                <TextBlock>Stack corruption detection level:</TextBlock>
+                <DropDown Items="{Binding StackCorruptionDetectionLevelItems}"
+                          SelectedItem="{Binding StackCorruptionDetectionLevel}" />
+
+            </StackPanel>
+            
+        </StackPanel>
+
+        <ListBox Items="{Binding TestKernels}"
+                 Padding="8"
+                 SelectedItems="{Binding KernelTypesToRun}"
+                 SelectionMode="Multiple" />
+
+        <Button Command="{Binding RunTestsCommand}">Run Tests</Button>
+
+    </StackPanel>
+
+</Window>

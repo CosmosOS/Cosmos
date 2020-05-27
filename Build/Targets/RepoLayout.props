@@ -1,7 +1,15 @@
 <Project>
 
     <PropertyGroup>
-        <ArtifactsDir Condition="'$(ArtifactsDir)' == ''">$(RepoRoot)artifacts\</ArtifactsDir>
+        <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+        <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+        <PlatformName Condition="'$(PlatformName)' == ''">$(Platform)</PlatformName>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <ArtifactsDir Condition="'$(ArtifactsDir)' == ''">$(RepoRoot)artifacts\$(Configuration)\</ArtifactsDir>
+        <DefaultPackageOutputPath>$(ArtifactsDir)nupkg\</DefaultPackageOutputPath>
+        <PackageOutputPath>$(DefaultPackageOutputPath)</PackageOutputPath>
         <VsixOutputPath>$(ArtifactsDir)VSIX\</VsixOutputPath>
     </PropertyGroup>
 

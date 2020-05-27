@@ -14,10 +14,9 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
     }
 
     public void Send(IDebugEvent2 eventObject, string iidEvent, IDebugProgram2 program, IDebugThread2 thread) {
-      uint attributes;
       var riidEvent = new Guid(iidEvent);
 
-      EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
+      EngineUtils.RequireOk(eventObject.GetAttributes(out var attributes));
       EngineUtils.RequireOk(m_ad7Callback.Event(m_engine, null, program, thread, eventObject, ref riidEvent, attributes));
     }
 
@@ -39,7 +38,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
       //    System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
       //}
 
-      AD7ModuleLoadEvent eventObject = new AD7ModuleLoadEvent(aModule, true /* this is a module load */);
+      var eventObject = new AD7ModuleLoadEvent(aModule, true /* this is a module load */);
       Send(eventObject, AD7ModuleLoadEvent.IID, null);
     }
 
@@ -74,7 +73,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
     public void OnProcessExit(uint exitCode) {
       //System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
 
-      AD7ProgramDestroyEvent eventObject = new AD7ProgramDestroyEvent(exitCode);
+      var eventObject = new AD7ProgramDestroyEvent(exitCode);
 
       Send(eventObject, AD7ProgramDestroyEvent.IID, null);
     }
@@ -98,7 +97,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
       //    System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
       //}
 
-      AD7ThreadCreateEvent eventObject = new AD7ThreadCreateEvent();
+      var eventObject = new AD7ThreadCreateEvent();
       Send(eventObject, AD7ThreadCreateEvent.IID, debuggedThread);
     }
 
@@ -120,8 +119,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
       // The sample engine does not support these features.
       var boundBreakpointsEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
       var eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);
-      var ad7Thread = (AD7Thread)thread;
-      Send(eventObject, AD7BreakpointEvent.IID, ad7Thread);
+      Send(eventObject, AD7BreakpointEvent.IID, thread);
     }
 
     public void OnException() { //DebuggedThread thread, uint code)
@@ -155,7 +153,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
     }
 
     public void OnProgramDestroy(uint exitCode) {
-      AD7ProgramDestroyEvent eventObject = new AD7ProgramDestroyEvent(exitCode);
+      var eventObject = new AD7ProgramDestroyEvent(exitCode);
       Send(eventObject, AD7ProgramDestroyEvent.IID, null);
     }
 
@@ -163,17 +161,16 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
     public void OnSymbolSearch(AD7Module module, string status, enum_MODULE_INFO_FLAGS dwStatusFlags) {
       string statusString = (dwStatusFlags == enum_MODULE_INFO_FLAGS.MIF_SYMBOLS_LOADED ? "Symbols Loaded - " : "No symbols loaded") + status;
 
-      AD7SymbolSearchEvent eventObject = new AD7SymbolSearchEvent(module, statusString, dwStatusFlags);
+      var eventObject = new AD7SymbolSearchEvent(module, statusString, dwStatusFlags);
       Send(eventObject, AD7SymbolSearchEvent.IID, null);
     }
 
     // Engines notify the debugger that a breakpoint has bound through the breakpoint bound event.
     public void OnBreakpointBound(object objBoundBreakpoint, uint address) {
-      AD7BoundBreakpoint boundBreakpoint = (AD7BoundBreakpoint)objBoundBreakpoint;
-      IDebugPendingBreakpoint2 pendingBreakpoint;
-      ((IDebugBoundBreakpoint2)boundBreakpoint).GetPendingBreakpoint(out pendingBreakpoint);
+      var boundBreakpoint = (AD7BoundBreakpoint)objBoundBreakpoint;
+      ((IDebugBoundBreakpoint2)boundBreakpoint).GetPendingBreakpoint(out var pendingBreakpoint);
 
-      AD7BreakpointBoundEvent eventObject = new AD7BreakpointBoundEvent((AD7PendingBreakpoint)pendingBreakpoint, boundBreakpoint);
+      var eventObject = new AD7BreakpointBoundEvent((AD7PendingBreakpoint)pendingBreakpoint, boundBreakpoint);
       Send(eventObject, AD7BreakpointBoundEvent.IID, null);
     }
 

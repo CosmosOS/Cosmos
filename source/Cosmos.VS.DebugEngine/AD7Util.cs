@@ -14,6 +14,8 @@ namespace Cosmos.VS.DebugEngine
 
         public static void MessageBox(string message, string title = "Cosmos Debug Engine")
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, message, title,
                 OLEMSGICON.OLEMSGICON_NOICON, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }

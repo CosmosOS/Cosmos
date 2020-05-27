@@ -8,8 +8,11 @@
         <Compile Update="Engine.*.cs" DependentUpon="Engine.cs" />
     </ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Cosmos.Build.Common" />
+	</ItemGroup>
+
     <ItemGroup>
-        <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" />
         <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />

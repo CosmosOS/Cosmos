@@ -22,18 +22,23 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
     {
         private static readonly Guid CosmosDebugEngineGuid = new Guid("fa1da3a6-66ff-4c65-b077-e65f7164ef83");
 
-        private ProjectProperties _projectProperties;
-        private IBootableProperties _bootableProperties;
+        private readonly ProjectProperties _projectProperties;
+        private readonly IBootableProperties _bootableProperties;
+
+        private readonly IProjectLockService _projectLockService;
 
         [ImportingConstructor]
         public DebugLaunchProvider(
             ConfiguredProject configuredProject,
             ProjectProperties projectProperties,
-            IBootableProperties bootableProperties)
+            IBootableProperties bootableProperties,
+            IProjectLockService projectLockService)
             : base(configuredProject)
         {
             _projectProperties = projectProperties;
             _bootableProperties = bootableProperties;
+
+            _projectLockService = projectLockService;
         }
 
         public override Task<bool> CanLaunchAsync(DebugLaunchOptions aLaunchOptions) => TplExtensions.TrueTask;
@@ -110,9 +115,7 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
         
         private async Task<string> GetPropertyAsync(string propertyName)
         {
-            var projectLockService = ConfiguredProject.UnconfiguredProject.ProjectService.Services.ProjectLockService;
-
-            using (var projectReadLock = await projectLockService.ReadLockAsync())
+            using (var projectReadLock = await _projectLockService.ReadLockAsync())
             {
                 var project = await projectReadLock.GetProjectAsync(ConfiguredProject);
                 return project.GetPropertyValue(propertyName);

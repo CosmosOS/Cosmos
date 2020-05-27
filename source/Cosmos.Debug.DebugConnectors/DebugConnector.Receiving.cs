@@ -165,7 +165,7 @@ namespace Cosmos.Debug.DebugConnectors
 
         protected void PacketCoreDump(byte[] aPacket)
         {
-            CmdCoreDump?.Invoke(aPacket.ToArray());
+            CmdCoreDump?.Invoke(CoreDump.FromStackArray(aPacket));
             WaitForMessage();
         }
 

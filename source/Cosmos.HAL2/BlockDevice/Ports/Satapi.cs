@@ -129,7 +129,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             return -1;
         }
 
-        public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
+        public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             SendSATAPICommand(ATACommands.Read, (uint)aBlockNo, (uint)aBlockCount);
             byte[] xByte = new byte[512];
@@ -140,7 +140,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             }
         }
 
-        public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
+        public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             // To be implemented!
         }

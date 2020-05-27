@@ -17,14 +17,18 @@ namespace Cosmos.VS.ProjectSystem.VS
         private static readonly ProjectTreeFlags PlugsProjectTreeFlags = ProjectTreeFlags.Create(
             ProjectTreeFlags.Common.BubbleUp | ProjectTreeFlags.Common.VirtualFolder);
 
+        private readonly IActiveConfiguredProjectSubscriptionService _activeConfiguredProjectSubscriptionService;
+
         private IDisposable _itemsSubscriptionLink;
 
         [ImportingConstructor]
         protected PlugsProjectTreeProvider(
             IProjectThreadingService threadingService,
-            UnconfiguredProject unconfiguredProject)
+            UnconfiguredProject unconfiguredProject,
+            IActiveConfiguredProjectSubscriptionService activeConfiguredProjectSubscriptionService)
             : base(threadingService, unconfiguredProject)
         {
+            _activeConfiguredProjectSubscriptionService = activeConfiguredProjectSubscriptionService;
         }
 
         protected override void Initialize()
@@ -37,8 +41,7 @@ namespace Cosmos.VS.ProjectSystem.VS
                     return Task.FromResult(new TreeUpdateResult(CreatePlugsFolder(), true));
                 });
 
-            var subscriptionService = UnconfiguredProject.Services.ActiveConfiguredProjectSubscription;
-            var itemsBlock = subscriptionService.ProjectCatalogSource.SourceBlock;
+            var itemsBlock = _activeConfiguredProjectSubscriptionService.ProjectCatalogSource.SourceBlock;
             var targetBlock = new ActionBlock<IProjectVersionedValue<IProjectCatalogSnapshot>>(ItemsChangedAsync);
 
             _itemsSubscriptionLink = itemsBlock.LinkTo(
@@ -95,7 +98,7 @@ namespace Cosmos.VS.ProjectSystem.VS
         {
             var tree = oldTree.ClearChildren();
 
-            foreach (var reference in snapshot.Project.Value.GetItems("PlugsReference"))
+            foreach (var reference in snapshot.Project.ProjectInstance.GetItems("PlugsReference"))
             {
                 if (cancellationToken.IsCancellationRequested)
                 {

@@ -29,7 +29,7 @@ namespace Cosmos.Core.Memory {
     }
 
     // Used to bypass certain checks that will fail during tests and debugging.
-    static public bool Debug = false;
+    static internal bool Debug = false;
 
     // Native Intel page size
     // x86 Page Size: 4k, 2m (PAE only), 4m
@@ -50,7 +50,9 @@ namespace Cosmos.Core.Memory {
     static public void Init(byte* aStartPtr, Native aSize) {
       if ((Native)aStartPtr % PageSize != 0 && !Debug) {
         throw new Exception("RAM start must be page aligned.");
-      } else if (aSize % PageSize != 0) {
+      }
+
+      if (aSize % PageSize != 0) {
         throw new Exception("RAM size must be page aligned.");
       }
 

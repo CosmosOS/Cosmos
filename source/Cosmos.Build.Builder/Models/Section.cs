@@ -11,7 +11,7 @@ namespace Cosmos.Build.Builder.Models
         public string Log => _logBuilder.ToString();
         public bool HasLoggedErrors { get; private set; }
 
-        private StringBuilder _logBuilder;
+        private readonly StringBuilder _logBuilder;
 
         public Section(string name)
         {

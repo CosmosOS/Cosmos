@@ -1,45 +1,36 @@
 ﻿//#define COSMOSDEBUG
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cosmos.HAL.Drivers
 {
     public class VBEDriver
     {
 
-        private Core.IOGroup.VBE IO = Core.Global.BaseIOGroups.VBE;
+        private readonly Core.IOGroup.VBE IO = Core.Global.BaseIOGroups.VBE;
 
-        private enum VBERegisterIndex {
-            VBEDisplayID = 0x00,
-            VBEDisplayXResolution,
-            VBEDisplayYResolution,
-            VBEDisplayBPP,
-            VBEDisplayEnable,
-            VBEDisplayBankMode,
-            VBEDisplayVirtualWidth,
-            VBEDisplayVirtualHeight,
-            VBEDisplayXOffset,
-            VBEDisplayYOffset
+        private enum RegisterIndex
+        {
+            DisplayID = 0x00,
+            DisplayXResolution,
+            DisplayYResolution,
+            DisplayBPP,
+            DisplayEnable,
+            DisplayBankMode,
+            DisplayVirtualWidth,
+            DisplayVirtualHeight,
+            DisplayXOffset,
+            DisplayYOffset
         };
 
         [Flags]
-        private enum VBEEnableValues
+        private enum EnableValues
         {
-            VBEDisabled = 0x00,
-            VBEEnabled,
-            VBEUseLinearFrameBuffer = 0x40,
-            VBENoClearMemory = 0x80,
+            Disabled = 0x00,
+            Enabled,
+            UseLinearFrameBuffer = 0x40,
+            NoClearMemory = 0x80,
         };
-
-        /* We never want that the default empty constructor is used to create a VBEDriver */
-        private VBEDriver()
-        {
-
-        }
 
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
@@ -58,53 +49,53 @@ namespace Cosmos.HAL.Drivers
             VBESet(xres, yres, bpp);
         }
 
-        private void VBEWrite(VBERegisterIndex index, ushort value)
+        private void Write(RegisterIndex index, ushort value)
         {
             IO.VbeIndex.Word = (ushort) index;
             IO.VbeData.Word = value;
         }
 
-        private void VBEDisableDisplay()
+        private void DisableDisplay()
         {
             Global.mDebugger.SendInternal($"Disabling VBE display");
-            VBEWrite(VBERegisterIndex.VBEDisplayEnable, (ushort)VBEEnableValues.VBEDisabled);
+            Write(RegisterIndex.DisplayEnable, (ushort)EnableValues.Disabled);
         }
 
-        private void VBESetXResolution(ushort xres)
+        private void SetXResolution(ushort xres)
         {
             Global.mDebugger.SendInternal($"VBE Setting X resolution to {xres}");
-            VBEWrite(VBERegisterIndex.VBEDisplayXResolution, xres);
+            Write(RegisterIndex.DisplayXResolution, xres);
         }
 
-        private void VBESetYResolution(ushort yres)
+        private void SetYResolution(ushort yres)
         {
             Global.mDebugger.SendInternal($"VBE Setting Y resolution to {yres}");
-            VBEWrite(VBERegisterIndex.VBEDisplayYResolution, yres);
+            Write(RegisterIndex.DisplayYResolution, yres);
         }
 
-        private void VBESetDisplayBPP(ushort bpp)
+        private void SetDisplayBPP(ushort bpp)
         {
             Global.mDebugger.SendInternal($"VBE Setting BPP to {bpp}");
-            VBEWrite(VBERegisterIndex.VBEDisplayBPP, bpp);
+            Write(RegisterIndex.DisplayBPP, bpp);
         }
 
-        private void VBEEnableDisplay(VBEEnableValues EnableFlags)
+        private void EnableDisplay(EnableValues EnableFlags)
         {
             //Global.mDebugger.SendInternal($"VBE Enabling display with EnableFlags (ushort){EnableFlags}");
-            VBEWrite(VBERegisterIndex.VBEDisplayEnable, (ushort)EnableFlags);
+            Write(RegisterIndex.DisplayEnable, (ushort)EnableFlags);
         }
 
         public void VBESet(ushort xres, ushort yres, ushort bpp)
         {
-            VBEDisableDisplay();
-            VBESetXResolution(xres);
-            VBESetYResolution(yres);
-            VBESetDisplayBPP(bpp);
+            DisableDisplay();
+            SetXResolution(xres);
+            SetYResolution(yres);
+            SetDisplayBPP(bpp);
             /*
              * Re-enable the Display with LinearFrameBuffer and without clearing video memory of previous value 
              * (this permits to change Mode without losing the previous datas)
              */ 
-            VBEEnableDisplay(VBEEnableValues.VBEEnabled | VBEEnableValues.VBEUseLinearFrameBuffer | VBEEnableValues.VBENoClearMemory);
+            EnableDisplay(EnableValues.Enabled | EnableValues.UseLinearFrameBuffer | EnableValues.NoClearMemory);
         }
 
         public void SetVRAM(uint index, byte value)
@@ -133,6 +124,16 @@ namespace Cosmos.HAL.Drivers
         public void ClearVRAM(uint value)
         {
             IO.LinearFrameBuffer.Fill(value);
+        }
+
+        public void ClearVRAM(int aStart, int aCount, int value)
+        {
+            IO.LinearFrameBuffer.Fill(aStart, aCount, value);
+        }
+
+        public void CopyVRAM(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            IO.LinearFrameBuffer.Copy(aStart, aData, aIndex, aCount);
         }
     }
 }
