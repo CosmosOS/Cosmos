@@ -8,7 +8,7 @@ namespace Cosmos.Common
     {
         public static byte[] StrToByteArray(string str)
         {
-            if (str.Length == 0)
+            if (str.Length == 0 || !StringHelper.IsNumeric(str) || str.Length % 3 != 0)
                 throw new Exception("Invalid string value in StrToByteArray");
 
             byte val;

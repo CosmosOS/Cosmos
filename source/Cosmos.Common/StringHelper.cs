@@ -410,6 +410,20 @@ namespace Cosmos.Common {
             }
             return (int)StringComparisonResultEnum.Equal;
         }
+
+        /// <summary>
+        /// Check if string is numeric.
+        /// </summary>
+        /// <param name="aString">A string to check if numeric.</param>
+        /// <returns>Returns TRUE if string is numeric.</returns>
+        public static bool IsNumeric(string aString) {
+            for (int i = 0; i < aString.Length; i++) {
+                if (!char.IsDigit(aString[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }
 
