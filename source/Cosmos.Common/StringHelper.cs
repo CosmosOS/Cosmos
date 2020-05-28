@@ -419,9 +419,6 @@ namespace Cosmos.Common {
         public static bool IsNumeric(string aString) {
             for (int i = 0; i < aString.Length; i++) {
                 if (!char.IsDigit(aString[i])) {
-                    if (i == 0 && aString[i].Equals('-')) {
-                        continue;
-                    }
                     return false;
                 }
             }
