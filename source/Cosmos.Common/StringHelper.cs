@@ -427,6 +427,18 @@ namespace Cosmos.Common {
             }
             return true;
         }
+
+        /// <summary>
+        /// Check if string lenght is divisible by a given number.
+        /// </summary>
+        /// <param name="aString">A string to check if it's length is divisible.</param>
+        /// <param name="aNum">A denominator</param>
+        /// <returns>Returns TRUE if string length divisible by the given number.</returns>
+        public static bool IsLengthDivisible(string aString, int aNum) {
+            if (aNum != 0 && aString.Length % aNum == 0) {
+                return true;
+            }
+            return false;
         }
     }
 }
