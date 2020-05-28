@@ -417,8 +417,16 @@ namespace Cosmos.Common {
         /// <param name="aString">A string to check if numeric.</param>
         /// <returns>Returns TRUE if string is numeric.</returns>
         public static bool IsNumeric(string aString) {
-            int i = 0;
-            return int.TryParse(aString, out i);
+            for (int i = 0; i < aString.Length; i++) {
+                if (!char.IsDigit(aString[i])) {
+                    if (i == 0 && aString[i].Equals('-')) {
+                        continue;
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
         }
     }
 }
