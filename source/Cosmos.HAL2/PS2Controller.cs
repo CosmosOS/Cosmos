@@ -225,8 +225,10 @@ namespace Cosmos.HAL
                      * |--------|---------------------------|
                      * |  0x04  |  5-button mouse           |
                      * |--------|---------------------------|
+                     * |  0x50  |  Multitouchpad            |
+                     * |--------|---------------------------|
                      */
-                    if (xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04)
+                    if (xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04 || xFirstByte == 0x50)
                     {
                         var xDevice = new PS2Mouse(this, aPort, xFirstByte);
                         xDevice.Initialize();
