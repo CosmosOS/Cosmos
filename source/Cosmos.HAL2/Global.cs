@@ -38,7 +38,7 @@ namespace Cosmos.HAL
             //TODO: Since this is FCL, its "common". Otherwise it should be
             // system level and not accessible from Core. Need to think about this
             // for the future.
-
+            Console.Clear();
             Console.WriteLine("Finding PCI Devices");
             mDebugger.Send("PCI Devices");
             PCI.Setup();
