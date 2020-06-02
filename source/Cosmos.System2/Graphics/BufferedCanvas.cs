@@ -63,12 +63,6 @@ namespace Cosmos.System.Graphics
             }
         }
 
-
-        public override void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
-        {
-            Backend.DrawRectangle(pen, x_start, y_start, width, height);
-        }
-
         public override void DrawArray(Color[] colors, int x, int y, int width, int height)
         {
             Backend.DrawArray(colors, x, y, width, height);
@@ -111,8 +105,7 @@ namespace Cosmos.System.Graphics
 
         public void Clear(Color? color = null, bool direct = false)
         {
-            try
-            {
+
 
                 Color DefaultColor = color ?? Color.Black;
 
@@ -133,10 +126,6 @@ namespace Cosmos.System.Graphics
                 }
 
             }
-            catch (Exception e)
-            {
-                Global.mDebugger.Send("Crashed while clearing screen: " + e.Message);
-            }
         }
         public override void Disable()
         {
@@ -144,7 +133,6 @@ namespace Cosmos.System.Graphics
         }
         public void Render()
         {
-            int c = 0;
             for (int by = 0; by < Backend.Mode.Rows / 10; by++)
             {
                 for (int bx = 0; bx < Backend.Mode.Columns / 10; bx++)
