@@ -62,10 +62,17 @@ namespace Cosmos.System.Graphics
                 Backend.Clear();
             }
         }
-
         public override void DrawArray(Color[] colors, int x, int y, int width, int height)
         {
-            Backend.DrawArray(colors, x, y, width, height);
+            for (int _y = 0; _y < height; _y++)
+            {
+                for (int _x = 0; _x < width; _x++)
+                {
+
+                    DrawPoint(new Pen(colors[_y * width + _x + x]), _x+x, _y+y);
+
+                }
+            }
 
         }
         public override void DrawPoint(Pen pen, int x, int y)
