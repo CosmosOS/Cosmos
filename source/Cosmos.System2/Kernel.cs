@@ -11,6 +11,9 @@ namespace Cosmos.System
     /// </summary>
     public abstract class Kernel
     {
+        /// <summary>
+        /// User ring debugger instance, with the tag "Kernel".
+        /// </summary>
         public readonly Debugger mDebugger = new Debugger("User", "Kernel");
 
         public bool ClearScreen = true;
@@ -20,17 +23,29 @@ namespace Cosmos.System
         // Set to signal stopped
         protected bool mStopped = false;
 
+        /// <summary>
+        /// Get text screen device.
+        /// </summary>
+        /// <returns>null</returns>
         protected virtual TextScreenBase GetTextScreen()
         {
             // null means use default
             return null;
         }
 
+        /// <summary>
+        /// Get keyboard key layout.
+        /// </summary>
+        /// <returns>Keyboard key layout.</returns>
         protected ScanMapBase GetKeyboardScanMap()
         {
             return KeyboardManager.GetKeyLayout();
         }
 
+        /// <summary>
+        /// Set keyboard key layout.
+        /// </summary>
+        /// <param name="ScanMap">Keyboard key layout.</param>
         protected void SetKeyboardScanMap(ScanMapBase ScanMap)
         {
             KeyboardManager.SetKeyLayout(ScanMap);
@@ -128,21 +143,34 @@ namespace Cosmos.System
             mStopped = true;
         }
 
+        /// <summary>
+        /// Kernal object constructor.
+        /// </summary>
         public Kernel()
         {
             Global.mDebugger.Send("In Cosmos.System.Kernel..ctor");
         }
 
         // Shutdown and restart
+        /// <summary>
+        /// Shutdown and restart.
+        /// </summary>
         public void Restart()
         {
         }
 
+        /// <summary>
+        /// Print message to the debbuger at system ring with "Global"-tag.
+        /// </summary>
+        /// <param name="message">A message to print.</param>
         public static void PrintDebug(string message)
         {
             Global.mDebugger.Send(message);
         }
 
+        /// <summary>
+        /// Get interrupts status.
+        /// </summary>
         public static bool InterruptsEnabled
         {
             get
