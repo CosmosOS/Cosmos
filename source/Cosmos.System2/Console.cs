@@ -6,6 +6,9 @@ using System.Text;
 using Cosmos.HAL;
 
 namespace Cosmos.System {
+    /// <summary>
+    /// Standard output stream.
+    /// </summary>
     public class Console {
         private const byte LineFeed = (byte)'\n';
         private const byte CarriageReturn = (byte)'\r';
@@ -13,6 +16,9 @@ namespace Cosmos.System {
         private const byte Space = (byte)' ';
 
         protected int mX = 0;
+        /// <summary>
+        /// Cursor location on X axis.
+        /// </summary>
         public int X {
             get { return mX; }
             set {
@@ -22,6 +28,9 @@ namespace Cosmos.System {
         }
 
         protected int mY = 0;
+        /// <summary>
+        /// Cursor location on Y axis.
+        /// </summary>
         public int Y {
             get { return mY; }
             set {
@@ -30,16 +39,26 @@ namespace Cosmos.System {
             }
         }
 
+        /// <summary>
+        /// Window width.
+        /// </summary>
         public int Cols {
             get { return mText.Cols; }
         }
 
+        /// <summary>
+        /// Window height.
+        /// </summary>
         public int Rows {
             get { return mText.Rows; }
         }
 
         protected HAL.TextScreenBase mText;
 
+        /// <summary>
+        /// Console object constructor.
+        /// </summary>
+        /// <param name="textScreen">Output device.</param>
         public Console(TextScreenBase textScreen)
         {
             if (textScreen == null)
@@ -52,6 +71,9 @@ namespace Cosmos.System {
             }
         }
 
+        /// <summary>
+        /// Clear console and return cursor to (0,0).
+        /// </summary>
         public void Clear() {
             mText.Clear();
             mX = 0;
@@ -60,10 +82,16 @@ namespace Cosmos.System {
         }
 
         //TODO: This is slow, batch it and only do it at end of updates
+        /// <summary>
+        /// Update cursor position.
+        /// </summary>
         protected void UpdateCursor() {
             mText.SetCursorPos(mX, mY);
         }
 
+        /// <summary>
+        /// Scroll the console up and move crusor to the start of the line.
+        /// </summary>
         private void DoLineFeed() {
             mY++;
             mX = 0;
@@ -74,12 +102,18 @@ namespace Cosmos.System {
             UpdateCursor();
         }
 
+        /// <summary>
+        /// Move cursor to the start of the line.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DoCarriageReturn() {
             mX = 0;
             UpdateCursor();
         }
 
+        /// <summary>
+        /// Print tab to the console.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DoTab()
         {
@@ -89,6 +123,10 @@ namespace Cosmos.System {
             Write(Space);
         }
 
+        /// <summary>
+        /// Write char to the console.
+        /// </summary>
+        /// <param name="aChar">A char to write</param>
         public void Write(byte aChar)
         {
             mText[mX, mY] = aChar;
@@ -101,6 +139,10 @@ namespace Cosmos.System {
         }
 
         //TODO: Optimize this
+        /// <summary>
+        /// Write byte array to the console.
+        /// </summary>
+        /// <param name="aText">A byte array to write to the console.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(byte[] aText)
         {
@@ -133,17 +175,29 @@ namespace Cosmos.System {
             }
         }
 
+        /// <summary>
+        /// Get and set console foreground color.
+        /// </summary>
         public ConsoleColor Foreground
         {
             get { return (ConsoleColor)(mText.GetColor() ^ (byte)((byte)Background << 4)); }
             set { mText.SetColors(value, Background); }
         }
+
+        /// <summary>
+        /// Get and set console background color.
+        /// </summary>
         public ConsoleColor Background
         {
             get { return (ConsoleColor)(mText.GetColor() >> 4); }
             set { mText.SetColors(Foreground, value); }
         }
 
+        /// <summary>
+        /// Get and set cursor size.
+        /// The value is percentage in the range 1-100.
+        /// ArgumentOutOfRangeException thrown when trying to set value out of range.
+        /// </summary>
         public int CursorSize
         {
             get { return mText.GetCursorSize(); }
@@ -156,6 +210,9 @@ namespace Cosmos.System {
             }
         }
 
+        /// <summary>
+        /// Get and set cursor visiblty.
+        /// </summary>
         public bool CursorVisible {
             get { return mText.GetCursorVisible(); }
             set { mText.SetCursorVisible(value);  }
