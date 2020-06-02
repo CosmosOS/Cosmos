@@ -16,34 +16,33 @@ namespace Cosmos.System.Graphics
         public BufferedCanvas(Mode mode, Color? color = null)
         {
             Color bufferColor = color ?? Color.Black;
-                Backend = FullScreenCanvas.GetFullScreenCanvas(mode);
+            Backend = FullScreenCanvas.GetFullScreenCanvas(mode);
 
-                Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
-                changed = new bool[Backend.Mode.Columns / 10 * Backend.Mode.Rows / 10];
-                Clear(bufferColor);
-                for (int i = 0; i < changed.Length; i++)
-                {
-                    changed[i] = false;
-                }
-                Global.mDebugger.Send("DEBUG Rows: " + Backend.Mode.Rows + " Columns: " + Backend.Mode.Columns + " Color: " + Buffer.ToString());
+            Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
+            changed = new bool[Backend.Mode.Columns / 10 * Backend.Mode.Rows / 10];
+            Clear(bufferColor);
+            for (int i = 0; i < changed.Length; i++)
+            {
+                changed[i] = false;
+            }
+            Global.mDebugger.Send("DEBUG Rows: " + Backend.Mode.Rows + " Columns: " + Backend.Mode.Columns + " Color: " + Buffer.ToString());
         }
+
         public BufferedCanvas(Color? color = null)
         {
             Color bufferColor = color ?? Color.Black;
 
-                Backend = FullScreenCanvas.GetFullScreenCanvas();
-                Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
-                changed = new bool[Backend.Mode.Columns / 10 * Backend.Mode.Rows / 10];
-                Clear(bufferColor);
-                for (int i = 0; i < changed.Length; i++)
-                {
-                    changed[i] = false;
-                }
+            Backend = FullScreenCanvas.GetFullScreenCanvas();
+            Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
+            changed = new bool[Backend.Mode.Columns / 10 * Backend.Mode.Rows / 10];
+            Clear(bufferColor);
+            for (int i = 0; i < changed.Length; i++)
+            {
+                changed[i] = false;
+            }
         }
 
-
         public override List<Mode> AvailableModes => Backend.AvailableModes;
-
         public override Mode DefaultGraphicMode => Backend.DefaultGraphicMode;
 
         public override Mode Mode
@@ -62,6 +61,7 @@ namespace Cosmos.System.Graphics
                 Backend.Clear();
             }
         }
+
         public override void DrawArray(Color[] colors, int x, int y, int width, int height)
         {
             for (int _y = 0; _y < height; _y++)
@@ -69,18 +69,18 @@ namespace Cosmos.System.Graphics
                 for (int _x = 0; _x < width; _x++)
                 {
 
-                    DrawPoint(new Pen(colors[_y * width + _x + x]), _x+x, _y+y);
+                    DrawPoint(new Pen(colors[_y * width + _x + x]), _x + x, _y + y);
 
                 }
             }
 
         }
+
         public override void DrawPoint(Pen pen, int x, int y)
         {
             Buffer[(y * Backend.Mode.Columns) + x] = pen.Color;
             changed[(y / 10 * Backend.Mode.Columns / 10) + x / 10] = true;
         }
-
 
         public override void DrawPoint(Pen pen, float x, float y)
         {
@@ -93,51 +93,52 @@ namespace Cosmos.System.Graphics
             return Buffer[(y * Backend.Mode.Columns) + x];
 
         }
+
         public void Clear(Color? color = null)
         {
-                Color DefaultColor = color ?? Color.Black;
+            Color DefaultColor = color ?? Color.Black;
 
-                for (int i = 0; i < Buffer.Length; i++)
-                {
-                    Buffer[i] = DefaultColor;
-                }
-
-                for (int i = 0; i < changed.Length; i++)
-                {
-                    changed[i] = true;
-                }
-
+            for (int i = 0; i < Buffer.Length; i++)
+            {
+                Buffer[i] = DefaultColor;
             }
+
+            for (int i = 0; i < changed.Length; i++)
+            {
+                changed[i] = true;
+            }
+
         }
 
         public void Clear(Color? color = null, bool direct = false)
         {
 
 
-                Color DefaultColor = color ?? Color.Black;
+            Color DefaultColor = color ?? Color.Black;
 
-                for (int i = 0; i < Buffer.Length; i++)
-                {
-                    Buffer[i] = DefaultColor;
-                }
-                if (direct)
-                {
-                    Backend.Clear(DefaultColor);
-                }
-                else
-                {
-                    for (int i = 0; i < changed.Length; i++)
-                    {
-                        changed[i] = true;
-                    }
-                }
-
+            for (int i = 0; i < Buffer.Length; i++)
+            {
+                Buffer[i] = DefaultColor;
             }
+            if (direct)
+            {
+                Backend.Clear(DefaultColor);
+            }
+            else
+            {
+                for (int i = 0; i < changed.Length; i++)
+                {
+                    changed[i] = true;
+                }
+            }
+
         }
+
         public override void Disable()
         {
             Backend.Disable();
         }
+
         public void Render()
         {
             for (int by = 0; by < Backend.Mode.Rows / 10; by++)
