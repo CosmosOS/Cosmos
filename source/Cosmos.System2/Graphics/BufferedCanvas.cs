@@ -1,3 +1,4 @@
+//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Drawing;
