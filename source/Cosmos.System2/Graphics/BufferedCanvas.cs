@@ -16,9 +16,6 @@ namespace Cosmos.System.Graphics
         public BufferedCanvas(Mode mode, Color? color = null)
         {
             Color bufferColor = color ?? Color.Black;
-            try
-            {
-
                 Backend = FullScreenCanvas.GetFullScreenCanvas(mode);
 
                 Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
@@ -29,18 +26,11 @@ namespace Cosmos.System.Graphics
                     changed[i] = false;
                 }
                 Global.mDebugger.Send("DEBUG Rows: " + Backend.Mode.Rows + " Columns: " + Backend.Mode.Columns + " Color: " + Buffer.ToString());
-            }
-            catch (Exception e)
-            {
-                Global.mDebugger.Send("CGS Crash: " + e.Message);
-                throw new Exception(e.Message);
-            }
         }
         public BufferedCanvas(Color? color = null)
         {
             Color bufferColor = color ?? Color.Black;
-            try
-            {
+
                 Backend = FullScreenCanvas.GetFullScreenCanvas();
                 Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
                 changed = new bool[Backend.Mode.Columns / 10 * Backend.Mode.Rows / 10];
@@ -49,12 +39,6 @@ namespace Cosmos.System.Graphics
                 {
                     changed[i] = false;
                 }
-            }
-            catch (Exception e)
-            {
-                Global.mDebugger.Send("CGS Crash: " + e.Message);
-                throw new Exception(e.Message);
-            }
         }
 
 
@@ -110,9 +94,6 @@ namespace Cosmos.System.Graphics
         }
         public void Clear(Color? color = null)
         {
-            try
-            {
-
                 Color DefaultColor = color ?? Color.Black;
 
                 for (int i = 0; i < Buffer.Length; i++)
@@ -125,10 +106,6 @@ namespace Cosmos.System.Graphics
                     changed[i] = true;
                 }
 
-            }
-            catch (Exception e)
-            {
-                Global.mDebugger.Send("Crashed while clearing screen: " + e.Message);
             }
         }
 
