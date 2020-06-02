@@ -3,8 +3,17 @@
 namespace Cosmos.System
 {
     // This class exists purely for testing purposes.
+    /// <summary>
+    /// Testing helpers class.
+    /// </summary>
     internal static class TestingHelpers
     {
+        /// <summary>
+        /// Add fake scan codes to the keyboard, fake pressing keys.
+        /// Used to test kernals.
+        /// </summary>
+        /// <param name="aScanCode">A key code.</param>
+        /// <param name="aReleased">Is key pressed.</param>
         internal static void KeyboardAddFakeScanCode(byte aScanCode, bool aReleased)
         {
             Global.mDebugger.Send("Before HandleFakeScanCode");
