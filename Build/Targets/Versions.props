@@ -12,7 +12,7 @@
         <MicrosoftVisualStudioSetupConfigurationInteropVersion>1.16.30</MicrosoftVisualStudioSetupConfigurationInteropVersion>
         <MicrosoftVisualStudioShell150Version>16.1.28917.181</MicrosoftVisualStudioShell150Version>
         <MicrosoftVisualStudioShellInterop110Version>11.0.61031</MicrosoftVisualStudioShellInterop110Version>
-        <MicrosoftVSSDKBuildToolsVersion>16.1.42</MicrosoftVSSDKBuildToolsVersion>
+        <MicrosoftVSSDKBuildToolsVersion>16.6.2051</MicrosoftVSSDKBuildToolsVersion>
         <MSTestVersion>1.4.0</MSTestVersion>
         <NuGetVersion>5.1.0</NuGetVersion>
         <NUnitVersion>3.11.0</NUnitVersion>
