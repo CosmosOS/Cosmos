@@ -11,6 +11,9 @@ using System.Text;
 
 namespace Cosmos.System.FileSystem.FAT.Listing
 {
+    /// <summary>
+    /// FatDirectoryEntry class. Represent directory/file.
+    /// </summary>
     internal class FatDirectoryEntry : DirectoryEntry
     {
         private readonly uint mEntryHeaderDataOffset;
@@ -19,6 +22,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         // Size is UInt32 because FAT doesn't support bigger.
         // Don't change to UInt64
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FatDirectoryEntry"/> class.
+        /// </summary>
+        /// <param name="aFileSystem">The file system that contains the directory entry.</param>
+        /// <param name="aParent">The parent directory entry or null if the current entry is the root.</param>
+        /// <param name="aFullPath">The full path to the entry.</param>
+        /// <param name="aName">The entry name.</param>
+        /// <param name="aSize">The size of the entry.</param>
+        /// <param name="aFirstCluster">The first cluster of the entry.</param>
+        /// <param name="aEntryHeaderDataOffset">The entry header data offset.</param>
+        /// <param name="aEntryType">The entry type.</param>
         public FatDirectoryEntry(
             FatFileSystem aFileSystem,
             FatDirectoryEntry aParent,
