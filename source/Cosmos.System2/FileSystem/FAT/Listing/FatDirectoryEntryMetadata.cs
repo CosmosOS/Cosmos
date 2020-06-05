@@ -21,19 +21,20 @@
         }
 
         /// <summary>
-        /// Directory entry first byte matadata.
+        /// Directory entry first byte matadata. This is filename first byte.
         /// </summary>
         public static readonly FatDirectoryEntryMetadata FirstByte = new FatDirectoryEntryMetadata(0x00, 1);
         /// <summary>
-        /// Directory entry short name matadata.
+        /// Directory entry short name matadata. This is the filename + filename extension. 
+        /// The dot '.' separate filename and filename extention is implied.
         /// </summary>
         public static readonly FatDirectoryEntryMetadata ShortName = new FatDirectoryEntryMetadata(0x00, 11);
         /// <summary>
-        /// Directory entry attributes matadata.
+        /// Directory entry attributes matadata. This contains information about the directory.
         /// </summary>
         public static readonly FatDirectoryEntryMetadata Attributes = new FatDirectoryEntryMetadata(0x0B, 1);
         /// <summary>
-        /// Directory entry NTReserved matadata.
+        /// Directory entry reserved matadata.
         /// </summary>
         public static readonly FatDirectoryEntryMetadata NTReserved = new FatDirectoryEntryMetadata(0x0C, 1);
         /// <summary>
@@ -57,11 +58,11 @@
         /// </summary>
         public static readonly FatDirectoryEntryMetadata FirstClusterHigh = new FatDirectoryEntryMetadata(0x14, 2);
         /// <summary>
-        /// Directory entry modified time matadata.
+        /// Directory entry last modified time matadata.
         /// </summary>
         public static readonly FatDirectoryEntryMetadata ModifiedTime = new FatDirectoryEntryMetadata(0x16, 2);
         /// <summary>
-        /// Directory entry modified date matadata.
+        /// Directory entry last modified date matadata.
         /// </summary>
         public static readonly FatDirectoryEntryMetadata ModifiedDate = new FatDirectoryEntryMetadata(0x18, 2);
         /// <summary>
@@ -69,7 +70,7 @@
         /// </summary>
         public static readonly FatDirectoryEntryMetadata FirstClusterLow = new FatDirectoryEntryMetadata(0x1A, 2);
         /// <summary>
-        /// Directory entry size matadata.
+        /// Directory entry drectory size matadata.
         /// </summary>
         public static readonly FatDirectoryEntryMetadata Size = new FatDirectoryEntryMetadata(0x1C, 4);
 
