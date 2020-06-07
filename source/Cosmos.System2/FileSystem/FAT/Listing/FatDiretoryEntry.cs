@@ -22,6 +22,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         // Size is UInt32 because FAT doesn't support bigger.
         // Don't change to UInt64
+        // TODO: Catch all the possible exceptions.
         /// <summary>
         /// Initializes a new instance of the <see cref="FatDirectoryEntry"/> class.
         /// </summary>
@@ -33,6 +34,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// <param name="aFirstCluster">The first cluster of the entry.</param>
         /// <param name="aEntryHeaderDataOffset">The entry header data offset.</param>
         /// <param name="aEntryType">The entry type.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when first cluster smaller then file system root cluster.</exception>
         public FatDirectoryEntry(
             FatFileSystem aFileSystem,
             FatDirectoryEntry aParent,
@@ -54,6 +56,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             mEntryHeaderDataOffset = aEntryHeaderDataOffset;
         }
 
+        // TODO: Catch all the possible exceptions.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FatDirectoryEntry"/> class.
+        /// </summary>
+        /// <param name="aFileSystem">The file system that contains the directory entry.</param>
+        /// <param name="aParent">The parent directory entry or null if the current entry is the root.</param>
+        /// <param name="aFullPath">The full path to the entry.</param>
+        /// <param name="aName">The entry name.</param>
+        /// <param name="aSize">The size of the entry.</param>
+        /// <param name="aFirstCluster">The first cluster of the entry.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when first cluster smaller then file system root cluster.</exception>
         public FatDirectoryEntry(
             FatFileSystem aFileSystem,
             FatDirectoryEntry aParent,
@@ -72,6 +85,11 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             mEntryHeaderDataOffset = 0;
         }
 
+        // TODO: Catch ArgumentOutOfRangeException exception.
+        /// <summary>
+        /// Get FAT table.
+        /// </summary>
+        /// <returns>An array of cluster numbers for the FAT chain.</returns>
         public uint[] GetFatTable()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFatTable --");
@@ -80,6 +98,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return xFat?.GetFatChain(mFirstClusterNum, mSize);
         }
 
+        /// <summary>
+        /// Get file system.
+        /// </summary>
+        /// <returns>File system.</returns>
         public FatFileSystem GetFileSystem()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFileSystem --");
@@ -87,6 +109,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return ((FatFileSystem)mFileSystem);
         }
 
+        /// <summary>
+        /// Get file stream.
+        /// </summary>
+        /// <returns>File stream. null if object is not a file.</returns>
         public override Stream GetFileStream()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFileStream --");
@@ -99,6 +125,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return null;
         }
 
+        // TODO: Catch all the possible exceptions.
+        /// <summary>
+        /// Set name.
+        /// </summary>
+        /// <param name="aName">A name to set to the entry.</param>
+        /// <exception cref="ArgumentException">Thrown when aName is null or empty string.</exception>
         public override void SetName(string aName)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetName --");
@@ -113,6 +145,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             mName = aName;
         }
 
+        // TODO: Catch all the possible exceptions.
+        /// <summary>
+        /// Set the size of the entry.
+        /// </summary>
+        /// <param name="aSize">The size of the entry.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when aSize is < 0.</exception>
         public override void SetSize(long aSize)
         {
             Global.mFileSystemDebugger.SendInternal("FatDirectoryEntry.SetSize:");
@@ -128,6 +166,11 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             mSize = aSize;
         }
 
+        // TODO: Catch all the possible exceptions.
+        /// <summary>
+        /// Allocate directory entry.
+        /// </summary>
+        /// <param name="aShortName">A short name to set to the entry.</param>
         private void AllocateDirectoryEntry(string aShortName)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.AllocateDirectoryEntry --");
@@ -159,6 +202,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             GetFatTable();
         }
 
+        /// <summary>
+        /// Add directory entry.
+        /// </summary>
+        /// <param name="aName">A name of the directory entry.</param>
+        /// <param name="aEntryType">A type of the directory entry.</param>
+        /// <returns>FatDirectoryEntry.</returns>
         public FatDirectoryEntry AddDirectoryEntry(string aName, DirectoryEntryTypeEnum aEntryType)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.AddDirectoryEntry --");
@@ -310,8 +359,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             throw new ArgumentOutOfRangeException(nameof(aEntryType), "Unknown directory entry type.");
         }
 
+        /// <summary>
+        /// Check if given entry is a root directory.
+        /// </summary>
+        /// <returns>True if it is root directory.</returns>
         private bool IsRootDirectory() => (mParent == null) ? true : false;
 
+        /// <summary>
+        /// Delete directory entry.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Thrown when given entry type is unknown.</exception>
+        /// <exception cref="Exception">Thrown when tring to delete root directory.</exception
         public void DeleteDirectoryEntry()
         {
             if (mEntryType == DirectoryEntryTypeEnum.Unknown)
@@ -342,6 +400,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             GetFatTable();
         }
 
+        //TODO: Catch all the exceptions.
         /// <summary>
         /// Retrieves a <see cref="List{T}"/> of <see cref="FatDirectoryEntry"/> objects that represent the Directory Entries inside this Directory
         /// </summary>
@@ -523,6 +582,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return xResult;
         }
 
+        //TODO: Catch all the exceptions.
+        /// <summary>
+        /// Get volume id
+        /// </summary>
+        /// <returns>FatDirectoryEntry.</returns>
+        /// <exception cref="Exception">Thrown when trying to access VolumeId out of Root Directory.</exception>
         public FatDirectoryEntry FindVolumeId()
         {
             if (!IsRootDirectory())
@@ -567,6 +632,11 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return xResult;
         }
 
+        /// <summary>
+        /// Create volume id.
+        /// </summary>
+        /// <param name="name">A name of the entry.</param>
+        /// <returns>Volume ID.</returns>
         public FatDirectoryEntry CreateVolumeId(string name)
         {
             if (!IsRootDirectory())
@@ -686,6 +756,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        //TODO: catch all the exceptions.
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A byte value</param>
+        /// <exception cref="Exception">Thrown when trying to change root directory matadata.</exception>
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, byte aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
@@ -706,6 +783,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        //TODO: catch all the exceptions.
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A ushort value</param>
+        /// <exception cref="Exception">Thrown when trying to change root directory matadata.</exception>
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, ushort aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
@@ -728,6 +812,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        //TODO: catch all the exceptions.
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A uint value</param>
+        /// <exception cref="Exception">Thrown when trying to change root directory matadata.</exception>
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, uint aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
@@ -750,6 +841,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        //TODO: catch all the exceptions.
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A long value</param>
+        /// <exception cref="Exception">Thrown when trying to change root directory matadata.</exception>
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, long aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryMetadataValue(long) --");
@@ -775,6 +873,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        //TODO: catch all the exceptions.
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A string value</param>
+        /// <exception cref="Exception">Thrown when trying to change root directory matadata.</exception>
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, string aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryMetadataValue(string) --");
@@ -805,6 +910,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set long filename entry metadata value.
+        /// </summary>
+        /// <param name="aEntryHeaderDataOffset">A entry header data offset.</param>
+        /// <param name="aEntryMetadata">A matadata object.</param>
+        /// <param name="aValue">A uint value to set.</param>
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, uint aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(uint) --");
@@ -822,6 +933,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set long filename entry metadata value.
+        /// </summary>
+        /// <param name="aEntryHeaderDataOffset">A entry header data offset.</param>
+        /// <param name="aEntryMetadata">A matadata object.</param>
+        /// <param name="aValue">A long value to set.</param>
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, long aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(long) --");
@@ -840,6 +957,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set long filename entry metadata value.
+        /// </summary>
+        /// <param name="aEntryHeaderDataOffset">A entry header data offset.</param>
+        /// <param name="aEntryMetadata">A matadata object.</param>
+        /// <param name="aValue">A string value to set.</param>
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, string aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(string) --");
@@ -994,6 +1117,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
          *    the value on the field should be always updated.
          */
 
+        /// <summary>
+        /// Get used space on directory.
+        /// </summary>
+        /// <returns>long value, space used (bytes)</returns>
         public override long GetUsedSpace()
         {
             Global.mFileSystemDebugger.SendInternal($"-- FatDirectoryEntry.GetUsedSpace() on Directory {mName} ---");
