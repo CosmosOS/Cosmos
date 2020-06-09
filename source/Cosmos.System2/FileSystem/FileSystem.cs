@@ -9,6 +9,12 @@ namespace Cosmos.System.FileSystem
 {
     public abstract class FileSystem
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileSystem"/> class.
+        /// </summary>
+        /// <param name="aDevice">A partiton managed by the filesystem.</param>
+        /// <param name="aRootPath">A root path.</param>
+        /// <param name="aSize">A partition size.</param>
         protected FileSystem(Partition aDevice, string aRootPath, long aSize)
         {
             Device = aDevice;
