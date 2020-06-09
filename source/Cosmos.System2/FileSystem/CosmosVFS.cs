@@ -26,6 +26,16 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Initializes the virtual file system.
         /// </summary>
+        /// <exception cref="IOException">Thrown on I/O exception.</exception>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown on memory error.</exception>
+        /// <exception cref="Exception">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="PathTooLongException">Thrown on fatal error.</exception>
+        /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
+        /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
+        /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
         public override void Initialize()
         {
             mPartitions = new List<Partition>();
@@ -41,6 +51,10 @@ namespace Cosmos.System.FileSystem
             }
         }
 
+        /// <summary>
+        /// Register file system.
+        /// </summary>
+        /// <param name="aFileSystemFactory">A file system to register.</param>
         public override void RegisterFileSystem(FileSystemFactory aFileSystemFactory)
         {
             Global.mFileSystemDebugger.SendInternal($"Registering filesystem {aFileSystemFactory.Name}");
@@ -51,9 +65,16 @@ namespace Cosmos.System.FileSystem
         /// Creates a new file.
         /// </summary>
         /// <param name="aPath">The full path including the file to create.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException">aPath</exception>
+        /// <returns>DirectoryEntry value.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if aPath is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if aPath is empty or contains invalid chars.</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when the entry at aPath is not a file.</item>
+        /// <item>Thrown when the parent directory of aPath is not a directory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="PathTooLongException">Thrown when aPath is longer than the system defined max lenght.</exception>
         public override DirectoryEntry CreateFile(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.CreateFile ---");
@@ -65,7 +86,7 @@ namespace Cosmos.System.FileSystem
 
             if (aPath.Length == 0)
             {
-                throw new ArgumentException("aPath");
+                throw new ArgumentException("aPath is empty");
             }
 
             Global.mFileSystemDebugger.SendInternal("aPath =");
@@ -230,7 +251,7 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aPath">The full path path.</param>
         /// <returns>A directory entry for the directory.</returns>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="Exception">Thrown when the entry at aPath is not a directory.</exception>
         public override DirectoryEntry GetDirectory(string aPath)
         {
             try
@@ -255,7 +276,7 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aPath">The full path.</param>
         /// <returns>A directory entry for the file.</returns>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="Exception">Thrown when the entry at aPath is not a file.</exception>
         public override DirectoryEntry GetFile(string aPath)
         {
             try
@@ -349,9 +370,11 @@ namespace Cosmos.System.FileSystem
 
         /// <summary>
         /// Sets the attributes for a File / Directory.
+        /// Not implemented.
         /// </summary>
         /// <param name="aPath">The path of the File / Directory.</param>
         /// <param name="fileAttributes">The attributes of the File / Directory.</param>
+        /// <exception cref="NotImplementedException">Thrown always</exception>
         public override void SetFileAttributes(string aPath, FileAttributes fileAttributes)
         {
             throw new NotImplementedException("SetFileAttributes not implemented");
@@ -360,6 +383,7 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Initializes the partitions for all block devices.
         /// </summary>
+        /// <exception cref="IOException">Thrown on I/O exception.</exception>
         protected virtual void InitializePartitions()
         {
             for (int i = 0; i < BlockDevice.Devices.Count; i++)
@@ -397,6 +421,16 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Initializes the file system for all partitions.
         /// </summary>
+        /// <exception cref="ArgumentNullException">Thrown if null partition exists.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="IOException">Thrown on I/O exception.</exception>
+        /// <exception cref="PathTooLongException">Thrown on fatal error.</exception>
+        /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
+        /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
+        /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
         protected virtual void InitializeFileSystems()
         {
             for (int i = 0; i < mPartitions.Count; i++)

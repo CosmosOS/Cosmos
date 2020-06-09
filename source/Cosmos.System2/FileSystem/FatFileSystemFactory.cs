@@ -9,6 +9,16 @@ namespace Cosmos.System.FileSystem
     {
         public override string Name => "FAT";
 
+        /// <summary>
+        /// Checks if the file system can handle the partition.
+        /// </summary>
+        /// <param name="aDevice">The partition.</param>
+        /// <returns>Returns true if the file system can handle the partition, false otherwise.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if partition is null.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
         public override bool IsType(Partition aDevice)
         {
             if (aDevice == null)

@@ -6,6 +6,9 @@ using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
 {
+    /// <summary>
+    /// DiskManager class.
+    /// </summary>
     public class DiskManager
     {
         public string Name {get; }

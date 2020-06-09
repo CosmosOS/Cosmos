@@ -22,6 +22,10 @@ namespace Cosmos.System.FileSystem
             Size = aSize;
         }
 
+        /// <summary>
+        /// Print filesystem info.
+        /// </summary>
+        /// <exception cref="IOException">Thrown on I/O error.</exception>
         public abstract void DisplayFileSystemInfo();
 
         public abstract List<DirectoryEntry> GetDirectoryListing(DirectoryEntry baseDirectory);

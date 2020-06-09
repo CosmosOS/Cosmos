@@ -8,10 +8,18 @@ using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem.VFS
 {
+    /// <summary>
+    /// VFSManager (Virtual File System Manager) class. Used to manage files and directories.
+    /// </summary>
     public static class VFSManager
     {
         private static VFSBase mVFS;
 
+        /// <summary>
+        /// Register VFS. Initialize the VFS.
+        /// </summary>
+        /// <param name="aVFS">A VFS to register.</param>
+        /// <exception cref="Exception">Thrown if VFS already registered.</exception>
         public static void RegisterVFS(VFSBase aVFS)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.RegisterVFS ---");
