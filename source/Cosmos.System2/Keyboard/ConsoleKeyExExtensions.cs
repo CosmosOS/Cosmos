@@ -2,8 +2,17 @@ using System;
 
 namespace Cosmos.System
 {
+    /// <summary>
+    /// ConsoleKeyEx extensions class.
+    /// </summary>
     public static class ConsoleKeyExExtensions
     {
+        /// <summary>
+        /// Convert ConsoleKeyEx to ConsoleKey.
+        /// </summary>
+        /// <param name="keyEx">KeyEx to convert.</param>
+        /// <returns>ConsoleKey value.</returns>
+        /// <exception cref="Exception">Thorwn if KeyEx not implemented.</exception>
         public static ConsoleKey ToConsoleKey(this ConsoleKeyEx keyEx)
         {
             switch (keyEx)
