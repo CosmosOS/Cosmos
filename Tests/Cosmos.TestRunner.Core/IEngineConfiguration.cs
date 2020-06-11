@@ -28,6 +28,7 @@ namespace Cosmos.TestRunner.Core
         TraceAssemblies TraceAssembliesLevel { get; }
         bool EnableStackCorruptionChecks { get; }
         StackCorruptionDetectionLevel StackCorruptionDetectionLevel { get; }
+        DebugMode DebugMode { get; }
 
         /// <summary>
         /// An enumerable of kernel assemblies which will be run.
