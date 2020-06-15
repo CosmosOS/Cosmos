@@ -7,8 +7,14 @@ using Cosmos.HAL.Drivers;
 
 namespace Cosmos.System.Graphics
 {
-   public class VBEScreen : Canvas
+    /// <summary>
+    /// VBEScreen class. Used to control screen, by VBE (VESA BIOS Extensions) standard. See also: <seealso cref="Canvas"/>.
+    /// </summary>
+    public class VBEScreen : Canvas
     {
+        /// <summary>
+        /// Default video mode. 1024x768x32.
+        /// </summary>
         private static readonly Mode DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
 
         /// <summary>
@@ -16,13 +22,25 @@ namespace Cosmos.System.Graphics
         /// </summary>
         private readonly VBEDriver VBEDriver;
 
+        /// <summary>
+        /// Video mode.
+        /// </summary>
         private Mode _mode;
 
+        /// <summary>
+        /// Create new instance of the <see cref="VBEScreen"/> class.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if default mode (1024x768x32) is not suppoted.</exception>
         public VBEScreen()
             : this(DefaultMode)
         {
         }
 
+        /// <summary>
+        /// Create new instance of the <see cref="VBEScreen"/> class.
+        /// </summary>
+        /// <param name="mode">VBE mode.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
         public VBEScreen(Mode mode)
         {
             Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {mode.Columns}x{mode.Rows}x{(uint)mode.ColorDepth}");
@@ -33,6 +51,10 @@ namespace Cosmos.System.Graphics
             Mode = mode;
         }
 
+        /// <summary>
+        /// Get and set video mode.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">(set) Thrown if mode is not suppoted.</exception>
         public override Mode Mode
         {
             get => _mode;
@@ -43,14 +65,48 @@ namespace Cosmos.System.Graphics
             }
         }
 
-#region Display
+        #region Display
 
-        /// <summary>
+        /*/// <summary>
         /// All the available screen modes VBE supports, I would like to query the hardware and obtain from it the list but I have
         /// not yet find how to do it! For now I hardcode the most used VESA modes, VBE seems to support until HDTV resolution
         /// without problems that is well... excellent :-)
-        /// </summary>
+        /// </summary>*/
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
+
+        /// <summary>
+        /// Available VBE supported video modes.
+        /// <para>
+        /// Low res:
+        /// <list type="bullet">
+        /// <item>320x240x32.</item>
+        /// <item>640x480x32.</item>
+        /// <item>800x600x32.</item>
+        /// <item>1024x768x32.</item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// HD:
+        /// <list type="bullet">
+        /// <item>1280x720x32.</item>
+        /// <item>1280x1024x32.</item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// HDR:
+        /// <list type="bullet">
+        /// <item>1366x768x32.</item>
+        /// <item>1680x1050x32.</item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// HDTV:
+        /// <list type="bullet">
+        /// <item>1920x1080x32.</item>
+        /// <item>1920x1200x32.</item>
+        /// </list>
+        /// </para>
+        /// </summary>
         public override List<Mode> AvailableModes { get; } = new List<Mode>
         {
             new Mode(320, 240, ColorDepth.ColorDepth32),
@@ -69,12 +125,16 @@ namespace Cosmos.System.Graphics
             new Mode(1920, 1200, ColorDepth.ColorDepth32),
         };
 
+        /// <summary>
+        /// Override Canvas default graphics mode.
+        /// </summary>
         public override Mode DefaultGraphicMode => DefaultMode;
-        
+
         /// <summary>
         /// Use this to setup the screen, this will disable the console.
         /// </summary>
         /// <param name="Mode">The desired Mode resolution</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
         private void SetMode(Mode mode)
         {
             ThrowIfModeIsNotValid(mode);
@@ -90,6 +150,10 @@ namespace Cosmos.System.Graphics
 
 #region Drawing
 
+        /// <summary>
+        /// Clear screen to specified color.
+        /// </summary>
+        /// <param name="color">Color.</param>
         public override void Clear(Color color)
         {
             Global.mDebugger.SendInternal($"Clearing the Screen with Color {color}");
@@ -109,7 +173,14 @@ namespace Cosmos.System.Graphics
          * As DrawPoint() is the basic block of DrawLine() and DrawRect() and in theory of all the future other methods that will
          * be implemented is better to not check the validity of the arguments here or it will repeat the check for any point
          * to be drawn slowing down all.
-         */ 
+         */
+        /// <summary>
+        /// Draw point to the screen.
+        /// </summary>
+        /// <param name="pen">Pen to draw the point with.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <exception cref="NotImplementedException">Thrown if color depth is not supported (currently only 32 is supported).</exception>
         public override void DrawPoint(Pen pen, int x, int y)
         {
             Color color = pen.Color;
@@ -148,12 +219,30 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Draw point to the screen. 
+        /// Not implemented.
+        /// </summary>
+        /// <param name="pen">Pen to draw the point with.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <exception cref="NotImplementedException">Thrown always (only int coordinats supported).</exception>
         public override void DrawPoint(Pen pen, float x, float y)
         {
             throw new NotImplementedException();
         }
 
         /* This is just temp */
+        /// <summary>
+        /// Draw array of colors.
+        /// </summary>
+        /// <param name="colors">Colors array.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="width">Width.</param>
+        /// <param name="height">unused.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if coordinates are invalid, or width is less than 0.</exception>
+        /// <exception cref="NotImplementedException">Thrown if color depth is not supported.</exception>
         public override void DrawArray(Color[] colors, int x, int y, int width, int height)
         {
             ThrowIfCoordNotValid(x, y);
@@ -172,6 +261,12 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Get point offset.
+        /// </summary>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <returns>int value.</returns>
         private int GetPointOffset(int x, int y)
         {
             Global.mDebugger.SendInternal($"Computing offset for coordinates {x},{y}");
@@ -182,6 +277,14 @@ namespace Cosmos.System.Graphics
             return (x * stride) + (y * pitch);
         }
 
+        /// <summary>
+        /// Draw filled rectangle.
+        /// </summary>
+        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="width">Width.</param>
+        /// <param name="height">Height.</param>
         public override void DrawFilledRectangle(Pen pen, int x, int y, int width, int height)
         {
             int xOffset = GetPointOffset(x, y);
@@ -193,6 +296,12 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Draw image.
+        /// </summary>
+        /// <param name="image">Image.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
         public override void DrawImage(Image image, int x, int y)
         {
             var xBitmap = image.rawData;
@@ -210,10 +319,16 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal("Done");
         }
 
-#endregion
+        #endregion
 
-#region Reading
+        #region Reading
 
+        /// <summary>
+        /// Get point color.
+        /// </summary>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <returns>Color value.</returns>
         public override Color GetPointColor(int x, int y)
         {
             uint pitch;
