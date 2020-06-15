@@ -4,8 +4,17 @@ using System.IO;
 
 namespace Cosmos.System.Graphics
 {
+    /// <summary>
+    /// Bitmap class, used to represent image of the type of Bitmap. See also: <seealso cref="Image"/>.
+    /// </summary>
     public class Bitmap : Image
     {
+        /// <summary>
+        /// Create new instance of <see cref="Bitmap"/> class.
+        /// </summary>
+        /// <param name="Width">Image width (greater then 0).</param>
+        /// <param name="Height">Image height (greater then 0).</param>
+        /// <param name="colorDepth">Color depth.</param>
         public Bitmap(uint Width, uint Height, ColorDepth colorDepth) : base(Width, Height, colorDepth)
         {
             rawData = new int[Width * Height];
@@ -62,6 +71,30 @@ namespace Cosmos.System.Graphics
 
 
         // For more information about the format: https://docs.microsoft.com/en-us/previous-versions/ms969901(v=msdn.10)?redirectedfrom=MSDN
+        /// <summary>
+        /// Create bitmap from stream.
+        /// </summary>
+        /// <param name="stream">Stream.</param>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="IOException">Thrown on IO error.</exception>
+        /// <exception cref="NotSupportedException">
+        /// <list type="bullet">
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>The stream does not support seeking.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">Thrown if the stream is closed.</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown if header is not from a BMP.</item>
+        /// <item>Info header size has the wrong value.</item>
+        /// <item>Number of planes is not 1. Can not read file.</item>
+        /// <item>Total Image Size is smaller than pure image size.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
         private void CreateBitmap(Stream stream)
         {
             #region BMP Header
@@ -198,6 +231,20 @@ namespace Cosmos.System.Graphics
             #endregion Pixel Table
         }
 
+        /// <summary>
+        /// Save image as bmp file.
+        /// </summary>
+        /// <param name="path">Path to the file.</param>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown on memory error.</exception>
+        /// <exception cref="IOException">Thrown on IO error.</exception>
+        /// <exception cref="NotSupportedException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ObjectDisposedException">Thrown on fatal error (contact support).</exception>
         public void Save(string path)
         {
             using (FileStream fs = File.Open(path, FileMode.Create))
@@ -206,6 +253,21 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Save image to stream.
+        /// </summary>
+        /// <param name="stream">Stream.</param>
+        /// <param name="imageFormat">Image format.</param>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown on memory error.</exception>
+        /// <exception cref="IOException">Thrown on IO error.</exception>
+        /// <exception cref="NotSupportedException">Thrown if the stream does not support writing.</exception>
+        /// <exception cref="ObjectDisposedException">Thrown if the stream is closed.</exception>
         public void Save(Stream stream, ImageFormat imageFormat)
         {
             //Calculate padding
