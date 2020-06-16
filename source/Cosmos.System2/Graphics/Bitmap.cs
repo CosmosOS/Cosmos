@@ -1,6 +1,7 @@
 ﻿//#define COSMOSDEBUG
 using System;
 using System.IO;
+using System.Security;
 
 namespace Cosmos.System.Graphics
 {
@@ -23,10 +24,15 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Create a bitmap from a byte array representing the pixels.
         /// </summary>
-        /// <param name="Width">Width of the bitmap</param>
-        /// <param name="Height">Height of the bitmap</param>
-        /// <param name="pixelData">Byte array which includes the values for each pixel</param>
-        /// <param name="colorDepth">Format of pixel data</param>
+        /// <param name="Width">Width of the bitmap.</param>
+        /// <param name="Height">Height of the bitmap.</param>
+        /// <param name="pixelData">Byte array which includes the values for each pixel.</param>
+        /// <param name="colorDepth">Format of pixel data.</param>
+        /// <exception cref="NotImplementedException">Thrwon if color depth is not 32.</exception>
+        /// <exception cref="OverflowException">Thrown if bitmap size is bigger than Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         public Bitmap(uint Width, uint Height, byte[] pixelData, ColorDepth colorDepth) : base(Width, Height, colorDepth)
         {
             rawData = new int[Width * Height];
@@ -48,6 +54,44 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
+        /// </summary>
+        /// <param name="path">Path to file.</param>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if path is invalid.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown if path is null.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="IOException">Thrown on IO error.</exception>
+        /// <exception cref="NotSupportedException">
+        /// <list type="bullet">
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>The path refers to non-file.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">Thrown if the stream is closed.</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown if header is not from a BMP.</item>
+        /// <item>Info header size has the wrong value.</item>
+        /// <item>Number of planes is not 1. Can not read file.</item>
+        /// <item>Total Image Size is smaller than pure image size.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
+        /// <exception cref="SecurityException">Thrown if the caller does not have permissions to read / write the file.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file cannot be found.</exception>
+        /// <exception cref="DirectoryNotFoundException">Thrown if the specified path is invalid.</exception>
+        /// <exception cref="PathTooLongException">Thrown if the specified path is exceed the system-defined max length.</exception>
         public Bitmap(string path) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
             using (var fs = new FileStream(path, FileMode.Open))
@@ -57,10 +101,25 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Creates a bitmaps from a byte array in the format of a bitmap file.
+        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
         /// WARNING: Unitl IL2CPU problems have been fixed, Memory Streams do not work
         /// </summary>
-        /// <param name="imageData"></param>
+        /// <param name="imageData">byte array.</param>
+        /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="IOException">Thrown on IO error.</exception>
+        /// <exception cref="NotSupportedException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ObjectDisposedException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown if header is not from a BMP.</item>
+        /// <item>Info header size has the wrong value.</item>
+        /// <item>Number of planes is not 1.</item>
+        /// <item>Total Image Size is smaller than pure image size.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
         public Bitmap(byte[] imageData) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
             using (var ms = new MemoryStream(imageData))
