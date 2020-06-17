@@ -13,9 +13,9 @@ namespace Cosmos.Core.IOGroup
         public readonly IOPortWrite MiscellaneousOutput_Write = new IOPortWrite(0x3C2);
         public readonly IOPortWrite Sequencer_Index = new IOPortWrite(0x3C4);
         public readonly IOPort Sequencer_Data = new IOPort(0x3C5);
-        public readonly IOPortRead DACIndex_Read = new IOPortRead(0x3C7);
+        public readonly IOPortWrite DACIndex_Read = new IOPortWrite(0x3C7);
         public readonly IOPortWrite DACIndex_Write = new IOPortWrite(0x3C8);
-        public readonly IOPortWrite DAC_Data = new IOPortWrite(0x3C9);
+        public readonly IOPort DAC_Data = new IOPort(0x3C9);
         public readonly IOPortWrite GraphicsController_Index = new IOPortWrite(0x3CE);
         public readonly IOPort GraphicsController_Data = new IOPort(0x3CF);
         public readonly IOPortWrite CRTController_Index = new IOPortWrite(0x3D4);
@@ -23,18 +23,18 @@ namespace Cosmos.Core.IOGroup
         public readonly IOPortRead Instat_Read = new IOPortRead(0x3DA);
 
         /// <summary>
-        /// 64KB at 0xA0000
+        /// 128KB at 0xA0000
         /// </summary>
-        public readonly MemoryBlock08 VGAMemoryBlock = new MemoryBlock08(0xA0000, 1024 * 64);
+        public readonly MemoryBlock VGAMemoryBlock = new MemoryBlock(0xA0000, 1024 * 128);
 
         /// <summary>
         /// 32KB at 0xB0000
         /// </summary>
-        public readonly MemoryBlock08 MonochromeTextMemoryBlock = new MemoryBlock08(0xB0000, 1024 * 32);
+        public readonly MemoryBlock MonochromeTextMemoryBlock = new MemoryBlock(0xB0000, 1024 * 32);
 
         /// <summary>
         /// 32KB at 0xB8000
         /// </summary>
-        public readonly MemoryBlock08 CGATextMemoryBlock = new MemoryBlock08(0xB8000, 1024 * 32);
+        public readonly MemoryBlock CGATextMemoryBlock = new MemoryBlock(0xB8000, 1024 * 32);
     }
 }

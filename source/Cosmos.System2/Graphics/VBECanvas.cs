@@ -7,43 +7,47 @@ using Cosmos.HAL.Drivers;
 
 namespace Cosmos.System.Graphics
 {
-   public class VBEScreen : Canvas
+    public class VBECanvas : Canvas
     {
-        private static readonly Mode DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
+        private static readonly Mode _DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
 
         /// <summary>
         /// Driver for Setting vbe modes and ploting/getting pixels
         /// </summary>
-        private readonly VBEDriver VBEDriver;
+        private readonly VBEDriver _VBEDriver;
 
-        private Mode _mode;
+        private Mode _Mode;
 
-        public VBEScreen()
-            : this(DefaultMode)
+        public VBECanvas() : this(_DefaultMode)
         {
         }
 
-        public VBEScreen(Mode mode)
+        public VBECanvas(Mode aMode)
         {
-            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {mode.Columns}x{mode.Rows}x{(uint)mode.ColorDepth}");
+            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
 
-            ThrowIfModeIsNotValid(mode);
+            ThrowIfModeIsNotValid(aMode);
 
-            VBEDriver = new VBEDriver((ushort)mode.Columns, (ushort)mode.Rows, (ushort)mode.ColorDepth);
-            Mode = mode;
+            _VBEDriver = new VBEDriver((ushort)aMode.Columns, (ushort)aMode.Rows, (ushort)aMode.ColorDepth);
+            Mode = aMode;
+        }
+
+        public override void Disable()
+        {
+            _VBEDriver.DisableDisplay();
         }
 
         public override Mode Mode
         {
-            get => _mode;
+            get => _Mode;
             set
             {
-                _mode = value;
-                SetMode(_mode);
+                _Mode = value;
+                SetMode(_Mode);
             }
         }
 
-#region Display
+        #region Display
 
         /// <summary>
         /// All the available screen modes VBE supports, I would like to query the hardware and obtain from it the list but I have
@@ -69,30 +73,30 @@ namespace Cosmos.System.Graphics
             new Mode(1920, 1200, ColorDepth.ColorDepth32),
         };
 
-        public override Mode DefaultGraphicMode => DefaultMode;
-        
+        public override Mode DefaultGraphicMode => _DefaultMode;
+
         /// <summary>
         /// Use this to setup the screen, this will disable the console.
         /// </summary>
         /// <param name="Mode">The desired Mode resolution</param>
-        private void SetMode(Mode mode)
+        private void SetMode(Mode aMode)
         {
-            ThrowIfModeIsNotValid(mode);
+            ThrowIfModeIsNotValid(aMode);
 
             ushort xres = (ushort)Mode.Columns;
             ushort yres = (ushort)Mode.Rows;
             ushort bpp = (ushort)Mode.ColorDepth;
 
             //set the screen
-           VBEDriver.VBESet(xres, yres, bpp);
+            _VBEDriver.VBESet(xres, yres, bpp);
         }
-#endregion
+        #endregion
 
-#region Drawing
+        #region Drawing
 
-        public override void Clear(Color color)
+        public override void Clear(Color aColor)
         {
-            Global.mDebugger.SendInternal($"Clearing the Screen with Color {color}");
+            Global.mDebugger.SendInternal($"Clearing the Screen with Color {aColor}");
             //if (color == null)
             //   throw new ArgumentNullException(nameof(color));
 
@@ -102,19 +106,33 @@ namespace Cosmos.System.Graphics
              * (the one that takes ushort for ColorDepth.ColorDepth16 and the one that takes byte for ColorDepth.ColorDepth8)
              * For ColorDepth.ColorDepth24 you should mask the Alpha byte.
              */
-            VBEDriver.ClearVRAM((uint)color.ToArgb());
+            switch (_Mode.ColorDepth)
+            {
+                case ColorDepth.ColorDepth4:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth8:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth16:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth24:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth32:
+                    _VBEDriver.ClearVRAM((uint)aColor.ToArgb());
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         /*
          * As DrawPoint() is the basic block of DrawLine() and DrawRect() and in theory of all the future other methods that will
          * be implemented is better to not check the validity of the arguments here or it will repeat the check for any point
          * to be drawn slowing down all.
-         */ 
-        public override void DrawPoint(Pen pen, int x, int y)
+         */
+        public override void DrawPoint(Pen aPen, int aX, int aY)
         {
-            Color color = pen.Color;
+            Color color = aPen.Color;
             uint offset;
-            uint ColorDepthInBytes = (uint)Mode.ColorDepth / 8;
 
             /*
              * For now we can Draw only if the ColorDepth is 32 bit, we will throw otherwise.
@@ -126,19 +144,21 @@ namespace Cosmos.System.Graphics
             switch (Mode.ColorDepth)
             {
                 case ColorDepth.ColorDepth32:
-                    offset = (uint)GetPointOffset(x, y);
+                    offset = (uint)GetPointOffset(aX, aY);
 
                     Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
 
-                    VBEDriver.SetVRAM(offset, (uint)color.ToArgb());
+                    _VBEDriver.SetVRAM(offset, (uint)color.ToArgb());
 
                     Global.mDebugger.SendInternal("Point drawn");
                     break;
                 case ColorDepth.ColorDepth24:
 
-                    offset = (uint)GetPointOffset(x, y);
+                    offset = (uint)GetPointOffset(aX, aY);
                     Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
-                    VBEDriver.SetVRAM(offset, (((uint)color.R * 1000 + color.G) * 1000 + color.B));
+                    _VBEDriver.SetVRAM(offset, color.B);
+                    _VBEDriver.SetVRAM(offset + 1, color.G);
+                    _VBEDriver.SetVRAM(offset + 2, color.R);
 
                     Global.mDebugger.SendInternal("Point drawn");
                     break;
@@ -148,73 +168,73 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override void DrawPoint(Pen pen, float x, float y)
+        public override void DrawPoint(Pen aPen, float aX, float aY)
         {
             throw new NotImplementedException();
         }
 
         /* This is just temp */
-        public override void DrawArray(Color[] colors, int x, int y, int width, int height)
+        public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
         {
-            ThrowIfCoordNotValid(x, y);
-            
-            ThrowIfCoordNotValid(x + width, y + height);
+            ThrowIfCoordNotValid(aX, aY);
 
-            for (int i = 0; i < x; i++)
+            ThrowIfCoordNotValid(aX + aWidth, aY + aHeight);
+
+            for (int i = 0; i < aX; i++)
             {
 
-                for (int ii = 0; ii < y; ii++)
+                for (int ii = 0; ii < aY; ii++)
                 {
 
-                    DrawPoint(new Pen(colors[i + (ii * width)]), i, ii);
+                    DrawPoint(new Pen(aColors[i + (ii * aWidth)]), i, ii);
 
                 }
             }
         }
 
-        private int GetPointOffset(int x, int y)
+        private int GetPointOffset(int aX, int aY)
         {
-            Global.mDebugger.SendInternal($"Computing offset for coordinates {x},{y}");
+            Global.mDebugger.SendInternal($"Computing offset for coordinates {aX},{aY}");
             int xBytePerPixel = (int)Mode.ColorDepth / 8;
             int stride = (int)Mode.ColorDepth / 8;
             int pitch = Mode.Columns * xBytePerPixel;
 
-            return (x * stride) + (y * pitch);
+            return (aX * stride) + (aY * pitch);
         }
 
-        public override void DrawFilledRectangle(Pen pen, int x, int y, int width, int height)
+        public override void DrawFilledRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
         {
-            int xOffset = GetPointOffset(x, y);
+            int xOffset = GetPointOffset(aX, aY);
             int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
 
-            for (int i = 0; i < height; i++)
+            for (int i = 0; i < aHeight; i++)
             {
-                VBEDriver.ClearVRAM((i * xScreenWidthInPixel) + xOffset, width, pen.Color.ToArgb());
+                _VBEDriver.ClearVRAM((i * xScreenWidthInPixel) + xOffset, aWidth, aPen.Color.ToArgb());
             }
         }
 
-        public override void DrawImage(Image image, int x, int y)
+        public override void DrawImage(Image aImage, int aX, int aY)
         {
-            var xBitmap = image.rawData;
-            var xWidht = (int)image.Width;
-            var xHeight = (int)image.Height;
+            var xBitmap = aImage.rawData;
+            var xWidht = (int)aImage.Width;
+            var xHeight = (int)aImage.Height;
 
-            int xOffset = GetPointOffset(x, y);
+            int xOffset = GetPointOffset(aX, aY);
             int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
 
-            Global.mDebugger.SendInternal($"Drawing image of size {image.Width}x{image.Height} array size {image.rawData.Length}");
+            Global.mDebugger.SendInternal($"Drawing image of size {aImage.Width}x{aImage.Height} array size {aImage.rawData.Length}");
             for (int i = 0; i < xHeight; i++)
             {
-                VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
+                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
             }
             Global.mDebugger.SendInternal("Done");
         }
 
-#endregion
+        #endregion
 
-#region Reading
+        #region Reading
 
-        public override Color GetPointColor(int x, int y)
+        public override Color GetPointColor(int aX, int aY)
         {
             uint pitch;
             uint stride;
@@ -225,13 +245,13 @@ namespace Cosmos.System.Graphics
             pitch = (uint)Mode.Columns * ColorDepthInBytes;
             stride = ColorDepthInBytes;
             //offset = ((uint)x * pitch) + ((uint)y * stride);
-            offset = ((uint)x * stride) + ((uint)y * pitch);
+            offset = ((uint)aX * stride) + ((uint)aY * pitch);
 
             Global.mDebugger.SendInternal($"Getting color from point at offset {offset}");
-            return Color.FromArgb(VBEDriver.GetVRAM(offset));
+            return Color.FromArgb(_VBEDriver.GetVRAM(offset));
         }
 
-#endregion
+        #endregion
 
     }
 }

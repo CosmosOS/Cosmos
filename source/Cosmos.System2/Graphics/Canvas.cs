@@ -47,6 +47,8 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public abstract void Disable();
+
         public void DrawPoint(Pen pen, Point point)
         {
             DrawPoint(pen, point.X, point.Y);
@@ -70,7 +72,9 @@ namespace Cosmos.System.Graphics
             int i;
 
             for (i = 0; i < dx; i++)
+            {
                 DrawPoint(pen, x1 + i, y1);
+            }
         }
 
         private void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
@@ -78,7 +82,9 @@ namespace Cosmos.System.Graphics
             int i;
 
             for (i = 0; i < dy; i++)
+            {
                 DrawPoint(pen, x1, y1 + i);
+            }
         }
 
         /*
@@ -129,19 +135,15 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        /*
-         * DrawLine throw if the line goes out of the boundary of the Canvas, probably will be better to draw only the part
-         * of line visibile. This is too "smart" to do here better do it in a future Window Manager.
-         */
-
         public virtual void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             if (pen == null)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pen));
+            }
 
-            ThrowIfCoordNotValid(x1, y1);
-
-            ThrowIfCoordNotValid(x2, y2);
+            // trim the given line to fit inside the canvas boundries
+            TrimLine(ref x1, ref y1, ref x2, ref y2);
 
             int dx, dy;
 
@@ -178,7 +180,9 @@ namespace Cosmos.System.Graphics
         public virtual void DrawCircle(Pen pen, int x_center, int y_center, int radius)
         {
             if (pen == null)
+            {
                 throw new ArgumentNullException(nameof(pen));
+            }
             ThrowIfCoordNotValid(x_center + radius, y_center);
             ThrowIfCoordNotValid(x_center - radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + radius);
@@ -217,11 +221,84 @@ namespace Cosmos.System.Graphics
             DrawCircle(pen, point.X, point.Y, radius);
         }
 
+        public virtual void DrawFilledCircle(Pen pen, int x0, int y0, int radius)
+        {
+
+            int x = radius;
+            int y = 0;
+            int xChange = 1 - (radius << 1);
+            int yChange = 0;
+            int radiusError = 0;
+
+            while (x >= y)
+            {
+                for (int i = x0 - x; i <= x0 + x; i++)
+                {
+                    
+                    DrawPoint(pen, i, y0 + y);
+                    DrawPoint(pen, i, y0 - y);
+                }
+                for (int i = x0 - y; i <= x0 + y; i++)
+                {
+                    DrawPoint(pen, i, y0 + x);
+                    DrawPoint(pen, i, y0 - x);
+                }
+
+                y++;
+                radiusError += yChange;
+                yChange += 2;
+                if (((radiusError << 1) + xChange) > 0)
+                {
+                    x--;
+                    radiusError += xChange;
+                    xChange += 2;
+                }
+            }
+
+            /*
+            for (int y = -radius; y <= radius; y++)
+                for (int x = -radius; x <= radius; x++)
+                    if (x * x + y * y <= radius * radius)
+                        (origin.x + x, origin.y + y);
+
+
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+            ThrowIfCoordNotValid(x_center + radius, y_center);
+            ThrowIfCoordNotValid(x_center - radius, y_center);
+            ThrowIfCoordNotValid(x_center, y_center + radius);
+            ThrowIfCoordNotValid(x_center, y_center - radius);
+            int x = radius;
+            int y = 0;
+            int e = 0;
+
+            while (x >= y)
+            {
+                DrawLine(pen, x_center - x, y_center + y, x_center + x, y_center + y);
+                y++;
+                if (e <= 0)
+                {
+                    e += 2 * y + 1;
+                }
+                if (e > 0)
+                {
+                    x--;
+                    e -= 2 * x + 1;
+                }
+            }*/
+        }
+        public virtual void DrawFilledCircle(Pen pen, Point point, int radius)
+        {
+            DrawFilledCircle(pen, point.X, point.Y, radius);
+        }
+
         //http://members.chello.at/~easyfilter/bresenham.html
         public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
             if (pen == null)
+            {
                 throw new ArgumentNullException(nameof(pen));
+            }
             ThrowIfCoordNotValid(x_center + x_radius, y_center);
             ThrowIfCoordNotValid(x_center - x_radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + y_radius);
@@ -255,13 +332,35 @@ namespace Cosmos.System.Graphics
             DrawEllipse(pen, point.X, point.Y, x_radius, y_radius);
         }
 
+        public virtual void DrawFilledEllipse(Pen pen, Point point, int height, int width)
+        {
+            for (int y = -height; y <= height; y++)
+            {
+                for (int x = -width; x <= width; x++)
+                {
+                    if (x * x * height * height + y * y * width * width <= height * height * width * width)
+                    {
+                        DrawPoint(pen, point.X + x, point.Y + y);
+                    }
+                }
+            }
+        }
+
+        public virtual void DrawFilledEllipse(Pen pen, int x, int y, int height, int width)
+        {
+            DrawFilledEllipse(pen, new Point(x, y), height, width);
+        }
+
         public virtual void DrawPolygon(Pen pen, params Point[] points)
         {
             if (points.Length < 3)
+            {
                 throw new ArgumentException("A polygon requires more than 3 points.");
+            }
             if (pen == null)
+            {
                 throw new ArgumentNullException(nameof(pen));
-
+            }
             for (int i = 0; i < points.Length - 1; i++)
             {
                 DrawLine(pen, points[i], points[i + 1]);
@@ -291,8 +390,9 @@ namespace Cosmos.System.Graphics
              * vertex (we call these vertexes A, B, C, D as for geometric convention)
              */
             if (pen == null)
+            {
                 throw new ArgumentNullException(nameof(pen));
-
+            }
             /* The check of the validity of x and y are done in DrawLine() */
 
             /* The vertex A is where x,y are */
@@ -393,6 +493,13 @@ namespace Cosmos.System.Graphics
         {
             Global.mDebugger.SendInternal($"CheckIfModeIsValid");
 
+            /* To keep or not to keep, that is the question~
+            if (mode == null)
+            {
+                return false;
+            }
+            */
+          
             /* This would have been the more "modern" version but LINQ is not working
 
             if (!availableModes.Exists(element => element == mode))
@@ -443,5 +550,94 @@ namespace Cosmos.System.Graphics
                 throw new ArgumentOutOfRangeException(nameof(y), $"y ({y}) is not between 0 and {Mode.Rows}");
             }
         }
+
+        protected void TrimLine(ref int x1, ref int y1, ref int x2, ref int y2)
+        {
+            // in case of vertical lines, no need to perform complex operations
+            if (x1 == x2)
+            {
+                x1 = Math.Min(Mode.Columns - 1, Math.Max(0, x1));
+                x2 = x1;
+                y1 = Math.Min(Mode.Rows - 1, Math.Max(0, y1));
+                y2 = Math.Min(Mode.Rows - 1, Math.Max(0, y2));
+
+                return;
+            }
+
+            // never attempt to remove this part,
+            // if we didn't calculate our new values as floats, we would end up with inaccurate output
+            float x1_out = x1, y1_out = y1;
+            float x2_out = x2, y2_out = y2;
+
+            // calculate the line slope, and the entercepted part of the y axis
+            float m = (y2_out - y1_out) / (x2_out - x1_out);
+            float c = y1_out - m * x1_out;
+
+            // handle x1
+            if (x1_out < 0)
+            {
+                x1_out = 0;
+                y1_out = c;
+            }
+            else if (x1_out >= Mode.Columns)
+            {
+                x1_out = Mode.Columns - 1;
+                y1_out = (Mode.Columns - 1) * m + c;
+            }
+
+            // handle x2
+            if (x2_out < 0)
+            {
+                x2_out = 0;
+                y2_out = c;
+            }
+            else if (x2_out >= Mode.Columns)
+            {
+                x2_out = Mode.Columns - 1;
+                y2_out = (Mode.Columns - 1) * m + c;
+            }
+
+            // handle y1
+            if (y1_out < 0)
+            {
+                x1_out = -c / m;
+                y1_out = 0;
+            }
+            else if (y1_out >= Mode.Rows)
+            {
+                x1_out = (Mode.Rows - 1 - c) / m;
+                y1_out = Mode.Rows - 1;
+            }
+
+            // handle y2
+            if (y2_out < 0)
+            {
+                x2_out = -c / m;
+                y2_out = 0;
+            }
+            else if (y2_out >= Mode.Rows)
+            {
+                x2_out = (Mode.Rows - 1 - c) / m;
+                y2_out = Mode.Rows - 1;
+            }
+
+            // final check, to avoid lines that are totally outside bounds
+            if (x1_out < 0 || x1_out >= Mode.Columns || y1_out < 0 || y1_out >= Mode.Rows)
+            {
+                x1_out = 0; x2_out = 0;
+                y1_out = 0; y2_out = 0;
+            }
+
+            if (x2_out < 0 || x2_out >= Mode.Columns || y2_out < 0 || y2_out >= Mode.Rows)
+            {
+                x1_out = 0; x2_out = 0;
+                y1_out = 0; y2_out = 0;
+            }
+
+            // replace inputs with new values
+            x1 = (int)x1_out; y1 = (int)y1_out;
+            x2 = (int)x2_out; y2 = (int)y2_out;
+        }
+
     }
 }
