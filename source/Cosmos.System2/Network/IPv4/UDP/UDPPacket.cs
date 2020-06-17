@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Text;
+using sysIO = System.IO;
 
 namespace Cosmos.System.Network.IPv4
 {
+    /// <summary>
+    /// UDPPacket class.
+    /// </summary>
     public class UDPPacket : IPPacket
     {
+        /// <summary>
+        /// UDP CRC.
+        /// </summary>
         private ushort udpCRC;
 
         /// <summary>
@@ -12,6 +19,7 @@ namespace Cosmos.System.Network.IPv4
         /// </summary>
         /// <param name="packetData">Packet data.</param>
         /// <exception cref="OverflowException">Thrown if UDP_Data array length is greater than Int32.MaxValue.</exception>
+        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
         internal static void UDPHandler(byte[] packetData)
         {
             UDPPacket udp_packet = new UDPPacket(packetData);
