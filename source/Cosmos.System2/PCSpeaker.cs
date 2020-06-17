@@ -114,11 +114,13 @@ namespace Cosmos.System
          Default = 800,
     }
 
+    // TODO: continue exception list, once HAL is documented.
     /// <summary>
     /// PC speaker class.
     /// </summary>
     public class PCSpeaker
     {
+        // TODO: continue exception list, once HAL is documented.
         /// <summary>
         /// Play beep sound, at 800hz for one eighth.
         /// </summary>
@@ -127,6 +129,7 @@ namespace Cosmos.System
             Beep((uint) Notes.Default, (uint) Durations.Default);
         }
 
+        // TODO: continue exception list, once HAL is documented.
         /// <summary>
         /// Play beep sound, at a specified frequency for one eighth.
         /// </summary>
@@ -136,6 +139,7 @@ namespace Cosmos.System
             Beep(frequency, (uint) Durations.Default);
         }
 
+        // TODO: continue exception list, once HAL is documented.
         /// <summary>
         /// Play beep sound, at a specified frequency for a specified duration.
         /// </summary>
@@ -146,6 +150,7 @@ namespace Cosmos.System
             HAL.PCSpeaker.Beep(frequency, duration);
         }
 
+        // TODO: continue exception list, once HAL is documented.
         /// <summary>
         /// Play beep sound, at a specified note for a specified duration.
         /// </summary>
