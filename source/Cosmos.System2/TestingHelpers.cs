@@ -1,4 +1,5 @@
-﻿using Cosmos.Debug.Kernel;
+﻿using sysIO = System.IO;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System
 {
@@ -14,6 +15,7 @@ namespace Cosmos.System
         /// </summary>
         /// <param name="aScanCode">A key code.</param>
         /// <param name="aReleased">Is key pressed.</param>
+        /// <exception cref="sysIO.IOException">An I/O error occurred.</exception>
         internal static void KeyboardAddFakeScanCode(byte aScanCode, bool aReleased)
         {
             Global.mDebugger.Send("Before HandleFakeScanCode");
