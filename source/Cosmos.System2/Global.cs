@@ -17,6 +17,9 @@ namespace Cosmos.System
     /// </summary>
     public static class Global
     {
+        /// <summary>
+        /// Create new inctanse of the <see cref="Global"/> class.
+        /// </summary>
         static Global()
         {
 
@@ -64,6 +67,7 @@ namespace Cosmos.System
             set { KeyboardManager.ScrollLock = value; }
         }
 
+        // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
         /// Init console, screen and keyboard.
         /// </summary>
