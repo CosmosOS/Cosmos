@@ -12,6 +12,9 @@ namespace Cosmos.Core
         // These are used by Bootstrap.. but also called to signal end of interrupt etc...
         // Need to chagne this.. I dont like how this is.. maybe isolate or split into to classes... one for boostrap one for
         // later user
+        /// <summary>
+        /// Get PIC.
+        /// </summary>
         static public PIC PIC
         {
             get
@@ -20,6 +23,9 @@ namespace Cosmos.Core
             }
         }
 
+        /// <summary>
+        /// Get CPU.
+        /// </summary>
         static public CPU CPU
         {
             get
@@ -28,6 +34,9 @@ namespace Cosmos.Core
             }
         }
 
+        /// <summary>
+        /// Init <see cref="Global"/> inctanse.
+        /// </summary>
         static public void Init()
         {
             // See note in Bootstrap about these
