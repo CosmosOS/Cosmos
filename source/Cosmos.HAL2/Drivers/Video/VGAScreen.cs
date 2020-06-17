@@ -24,6 +24,10 @@ namespace Cosmos.HAL
 
         private readonly Core.IOGroup.VGA mIO = new Core.IOGroup.VGA();
 
+        /// <summary>
+        /// Write VGA registers.
+        /// </summary>
+        /// <param name="registers">Registers to write.</param>
         private void WriteVGARegisters(byte[] registers)
         {
             int xIdx = 0;
@@ -76,6 +80,10 @@ namespace Cosmos.HAL
             mIO.AttributeController_Index.Byte = 0x20;
         }
 
+        /// <summary>
+        /// Set plane.
+        /// </summary>
+        /// <param name="p">p to set.</param>
         private void SetPlane(byte p)
         {
             byte pmask;
@@ -91,6 +99,11 @@ namespace Cosmos.HAL
         }
 
         //int offset = 0xb8000;
+        /// <summary>
+        /// Get frame buffer segment.
+        /// </summary>
+        /// <returns>MemoryBlock08 value.</returns>
+        /// <exception cref="Exception">Thrown when unable to determine memory segment.</exception>
         private MemoryBlock08 GetFramebufferSegment()
         {
             mIO.GraphicsController_Index.Byte = 6;
@@ -112,6 +125,12 @@ namespace Cosmos.HAL
             throw new Exception("Unable to determine memory segment!");
         }
 
+        /// <summary>
+        /// Write font.
+        /// </summary>
+        /// <param name="font">Font.</param>
+        /// <param name="font_height">Font height.</param>
+        /// <exception cref="Exception">Thrown when unable to determine memory segment.</exception>
         private void WriteFont(byte[] font, byte font_height)
         {
             byte seq2, seq4, gc4, gc5, gc6;
@@ -209,17 +228,17 @@ namespace Cosmos.HAL
         public enum ScreenSize
         {
             /// <summary>
-            /// 640x480 graphics mode  - 2 and 4 bit color depth avaible
+            /// 640x480 graphics mode  - 2 and 4 bit color depth available
             /// </summary>
             Size640x480,
 
             /// <summary>
-            /// 720x480 graphics mode  - 16 bit color depth avaible
+            /// 720x480 graphics mode  - 16 bit color depth available
             /// </summary>
             Size720x480,
 
             /// <summary>
-            /// 320x200 graphics mode  - 4 and 8 bit color depth avaible
+            /// 320x200 graphics mode  - 4 and 8 bit color depth available
             /// </summary>
             Size320x200
         };
@@ -232,6 +251,11 @@ namespace Cosmos.HAL
             BitDepth16
         };
 
+        /// <summary>
+        /// Set text size.
+        /// </summary>
+        /// <param name="aSize">A size to set.</param>
+        /// <exception cref="Exception">Thrown when text size invalid / unable to determine memory segment.</exception>
         public void SetTextMode(TextSize aSize)
         {
             switch (aSize)
@@ -265,6 +289,12 @@ namespace Cosmos.HAL
             }
         }
 
+        /// <summary>
+        /// Set graphics mode.
+        /// </summary>
+        /// <param name="aSize">A screen size.</param>
+        /// <param name="aDepth">A color depth.</param>
+        /// <exception cref="Exception">Thrown when aDepth not supported for the aSize / unknown screen size.</exception>
         public void SetGraphicsMode(ScreenSize aSize, ColorDepth aDepth)
         {
             switch (aSize)
@@ -464,10 +494,31 @@ namespace Cosmos.HAL
             throw new Exception("No video mode set!");
         }
 
+        /// <summary>
+        /// Get and set pixel width.
+        /// </summary>
         public int PixelWidth { private set; get; }
+
+        /// <summary>
+        /// Get and set pixel height.
+        /// </summary>
         public int PixelHeight { private set; get; }
+
+        /// <summary>
+        /// Get and set colors.
+        /// </summary>
         public int Colors { private set; get; }
 
+        /// <summary>
+        /// Test mode 320x200x8
+        /// </summary>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when color depth not supported for the size.</item>
+        /// <item>Unknown screen size.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
         public void TestMode320x200x8()
         {
             SetGraphicsMode(ScreenSize.Size320x200, ColorDepth.BitDepth8);
@@ -491,6 +542,10 @@ namespace Cosmos.HAL
             }
         }
 
+        /// <summary>
+        /// Clear screen, and show one color on it.
+        /// </summary>
+        /// <param name="color">Color to set the screen to.</param>
         public void Clear(int color)
         {
             for (int y = 0; y < PixelHeight; y++)
@@ -511,6 +566,12 @@ namespace Cosmos.HAL
         //    return _Palette[index];
         //}
 
+        /// <summary>
+        /// Set palette.
+        /// </summary>
+        /// <param name="index">Index.</param>
+        /// <param name="pallete">Palette.</param>
+        /// <exception cref="OverflowException">The array contains more than Int32.MaxValue elements.</exception>
         public void SetPalette(int index, byte[] pallete)
         {
             mIO.DACIndex_Write.Byte = (byte)index;
@@ -523,6 +584,13 @@ namespace Cosmos.HAL
         //    SetPaletteEntry(index, color.R, color.G, color.B);
         //}
 
+        /// <summary>
+        /// Set palette entry.
+        /// </summary>
+        /// <param name="index">Index.</param>
+        /// <param name="r">Red.</param>
+        /// <param name="g">Green.</param>
+        /// <param name="b">Blue.</param>
         public void SetPaletteEntry(int index, byte r, byte g, byte b)
         {
             mIO.DACIndex_Write.Byte = (byte)index;
