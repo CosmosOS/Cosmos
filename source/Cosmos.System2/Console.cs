@@ -10,14 +10,30 @@ namespace Cosmos.System {
     /// Standard output stream.
     /// </summary>
     public class Console {
+        /// <summary>
+        /// Line feed.
+        /// </summary>
         private const byte LineFeed = (byte)'\n';
+        /// <summary>
+        /// Carriage return.
+        /// </summary>
         private const byte CarriageReturn = (byte)'\r';
+        /// <summary>
+        /// Tab.
+        /// </summary>
         private const byte Tab = (byte)'\t';
+        /// <summary>
+        /// Space.
+        /// </summary>
         private const byte Space = (byte)' ';
 
-        protected int mX = 0;
         /// <summary>
         /// Cursor location on X axis.
+        /// </summary>
+        protected int mX = 0;
+
+        /// <summary>
+        /// Get and set cursor location on X axis.
         /// </summary>
         public int X {
             get { return mX; }
@@ -27,9 +43,13 @@ namespace Cosmos.System {
             }
         }
 
-        protected int mY = 0;
         /// <summary>
         /// Cursor location on Y axis.
+        /// </summary>
+        protected int mY = 0;
+
+        /// <summary>
+        /// Get and set cursor location on Y axis.
         /// </summary>
         public int Y {
             get { return mY; }
@@ -40,19 +60,22 @@ namespace Cosmos.System {
         }
 
         /// <summary>
-        /// Window width.
+        /// Get window width.
         /// </summary>
         public int Cols {
             get { return mText.Cols; }
         }
 
         /// <summary>
-        /// Window height.
+        /// Get window height.
         /// </summary>
         public int Rows {
             get { return mText.Rows; }
         }
 
+        /// <summary>
+        /// Text screen.
+        /// </summary>
         protected HAL.TextScreenBase mText;
 
         /// <summary>
@@ -196,8 +219,8 @@ namespace Cosmos.System {
         /// <summary>
         /// Get and set cursor size.
         /// The value is percentage in the range 1-100.
-        /// ArgumentOutOfRangeException thrown when trying to set value out of range.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when trying to set value out of range.</exception>
         public int CursorSize
         {
             get { return mText.GetCursorSize(); }
