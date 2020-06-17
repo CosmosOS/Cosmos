@@ -111,6 +111,11 @@ namespace Cosmos.Core
         }
 
         // Reboot
+        /// <summary>
+        /// Reboot ACPI.
+        /// Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
         public static void Reboot()
         {
             throw new NotImplementedException("ACPI Reset not implemented yet."); //TODO
