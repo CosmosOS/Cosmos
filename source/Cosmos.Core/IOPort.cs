@@ -89,6 +89,9 @@ namespace Cosmos.Core
         {
         }
 
+        /// <summary>
+        /// Wait for the previous IO read/write to complete.
+        /// </summary>
         static public void Wait()
         {
             // Write to an unused port. This assures whatever we were waiting on for a previous
@@ -100,18 +103,27 @@ namespace Cosmos.Core
             Write8(0x80, 0x22);
         }
 
+        /// <summary>
+        /// Get and set Byte value in IO port.
+        /// </summary>
         public byte Byte
         {
             get => Read8(Port);
             set => Write8(Port, value);
         }
 
+        /// <summary>
+        /// Get and set Word value in IO port.
+        /// </summary>
         public ushort Word
         {
             get => Read16(Port);
             set => Write16(Port, value);
         }
 
+        /// <summary>
+        /// Get and set DWord value in IO port.
+        /// </summary>
         public uint DWord
         {
             get => Read32(Port);
