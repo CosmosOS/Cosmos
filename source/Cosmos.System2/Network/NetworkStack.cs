@@ -13,14 +13,20 @@ namespace Cosmos.System.Network
     /// </summary>
     public static class NetworkStack
     {
-
+        /// <summary>
+        /// Debugger inctanse of the "System" ring, with the "NetworkStack" tag.
+        /// </summary>
         public static Debugger debugger = new Debugger("System", "NetworkStack");
 
+        /// <summary>
+        /// Get address dictionary.
+        /// </summary>
         internal static TempDictionary<NetworkDevice> AddressMap { get; private set; }
 
         /// <summary>
-        /// Initialize the Network Stack to prepare it for operation
+        /// Initialize the Network Stack to prepare it for operation.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         public static void Init()
         {
             AddressMap = new TempDictionary<NetworkDevice>();
@@ -42,8 +48,17 @@ namespace Cosmos.System.Network
         /// <remarks>Multiple IP Configurations can be made, like *nix environments</remarks>
         /// </summary>
         /// <param name="nic"><see cref="NetworkDevice"/> that will have the assigned configuration</param>
-        /// <param name="config"><see cref="IPV4.Config"/> instance that defines the IP Address, Subnet
+        /// <param name="config"><see cref="Config"/> instance that defines the IP Address, Subnet
         /// Mask and Default Gateway for the device</param>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if configuration with the given config.IPAddress.Hash already exists.</item>
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         public static void ConfigIP(NetworkDevice nic, Config config)
         {
             AddressMap.Add(config.IPAddress.Hash, nic);
@@ -51,6 +66,14 @@ namespace Cosmos.System.Network
             nic.DataReceived = HandlePacket;
         }
 
+        /// <summary>
+        /// Handle packet.
+        /// </summary>
+        /// <param name="packetData">Packet data array.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         internal static void HandlePacket(byte[] packetData)
         {
             debugger.Send("Packet Received Length=" + packetData.Length.ToString());
@@ -75,6 +98,9 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Called continously to keep the Network Stack going.
         /// </summary>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown if data length of any packet in the queue is bigger than Int32.MaxValue.</exception>
         public static void Update()
         {
             OutgoingBuffer.Send();
