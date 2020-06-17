@@ -1,4 +1,5 @@
-﻿namespace Cosmos.System
+﻿using sysIO = System.IO;
+namespace Cosmos.System
 {
     /// <summary>
     /// Power class.
@@ -14,8 +15,9 @@
         }
 
         /// <summary>
-        /// Shutdown with ACPI.
+        /// Shutdown the ACPI.
         /// </summary>
+        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
         public static void Shutdown()
         {
             HAL.Power.ACPIShutdown();
