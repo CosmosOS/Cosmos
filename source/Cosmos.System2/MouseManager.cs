@@ -54,9 +54,9 @@ namespace Cosmos.System
         /// </summary>
         public static uint Y;
 
-        /// <summary>
-        /// The Point of the mouse.
-        /// </summary>
+        // /// <summary>
+        // /// The Point of the mouse.
+        // /// </summary>
         // public static Point GetPoint() {return new Point((int)MouseManager.X, (int)MouseManager.Y);}
 
         /// <summary>
@@ -157,6 +157,10 @@ namespace Cosmos.System
             }
         }
 
+        /// <summary>
+        /// Add mouse to the mouse list.
+        /// </summary>
+        /// <param name="aMouse">A mouse to add.</param>
         private static void AddMouse(MouseBase aMouse)
         {
             aMouse.OnMouseChanged = HandleMouse;
