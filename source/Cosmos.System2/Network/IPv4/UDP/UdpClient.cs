@@ -33,6 +33,11 @@ namespace Cosmos.System.Network
             clients = new TempDictionary<UdpClient>();
         }
 
+        /// <summary>
+        /// Get client.
+        /// </summary>
+        /// <param name="destPort">Destination port.</param>
+        /// <returns>UdpClient</returns>
         internal static UdpClient Client(ushort destPort)
         {
             if (clients.ContainsKey((UInt32)destPort) == true)
@@ -113,6 +118,11 @@ namespace Cosmos.System.Network
             return packet.data;
         }
 
+        /// <summary>
+        /// Receive data.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         internal void receiveData(IPv4.UDPPacket packet)
         {
             byte[] data = packet.UDP_Data;
