@@ -14,7 +14,7 @@ namespace Cosmos.System.ExtendedASCII
         /// </summary>
         private static readonly EncodingProvider s_singleton = new CosmosEncodingProvider();
         /// <summary>
-        /// Debugger inctanse of the "System" with the "CosmosEncodingProvider" tag.
+        /// Debugger inctanse of the "System" ring with the "CosmosEncodingProvider" tag.
         /// </summary>
         private static Debugger myDebugger = new Debugger("System", "CosmosEncodingProvider");
 

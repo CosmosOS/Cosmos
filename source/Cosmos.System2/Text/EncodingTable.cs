@@ -14,7 +14,7 @@ namespace Cosmos.System.ExtendedASCII
     internal static class EncodingTable
     {
         /// <summary>
-        /// Debugger inctanse of the "System" with the "EncodingTable" tag.
+        /// Debugger inctanse of the "System" ring with the "EncodingTable" tag.
         /// </summary>
         private static Debugger mDebugger = new Debugger("System", "EncodingTable");
 
