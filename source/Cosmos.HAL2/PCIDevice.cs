@@ -154,6 +154,13 @@ namespace Cosmos.HAL
             Command |= PCICommand.Master | PCICommand.IO | PCICommand.Memory;
         }
 
+        /// <summary>
+        /// Get header type.
+        /// </summary>
+        /// <param name="Bus">A bus.</param>
+        /// <param name="Slot">A slot.</param>
+        /// <param name="Function">A function.</param>
+        /// <returns>ushort value.</returns>
         public static ushort GetHeaderType(ushort Bus, ushort Slot, ushort Function)
         {
             UInt32 xAddr = GetAddressBase(Bus, Slot, Function) | 0xE & 0xFC;
@@ -161,6 +168,13 @@ namespace Cosmos.HAL
             return (byte)(IO.ConfigDataPort.DWord >> ((0xE % 4) * 8) & 0xFF);
         }
 
+        /// <summary>
+        /// Get vendor ID.
+        /// </summary>
+        /// <param name="Bus">A bus.</param>
+        /// <param name="Slot">A slot.</param>
+        /// <param name="Function">A function.</param>
+        /// <returns>UInt16 value.</returns>
         public static UInt16 GetVendorID(ushort Bus, ushort Slot, ushort Function)
         {
             UInt32 xAddr = GetAddressBase(Bus, Slot, Function) | 0x0 & 0xFC;
@@ -169,6 +183,11 @@ namespace Cosmos.HAL
         }
 
         #region IOReadWrite
+        /// <summary>
+        /// Read register - 8-bit.
+        /// </summary>
+        /// <param name="aRegister">A register to read.</param>
+        /// <returns>byte value.</returns>
         protected byte ReadRegister8(byte aRegister)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
@@ -183,6 +202,11 @@ namespace Cosmos.HAL
             IO.ConfigDataPort.Byte = value;
         }
 
+        /// <summary>
+        /// Read register 16.
+        /// </summary>
+        /// <param name="aRegister">A register.</param>
+        /// <returns>UInt16 value.</returns>
         protected UInt16 ReadRegister16(byte aRegister)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
@@ -190,6 +214,11 @@ namespace Cosmos.HAL
             return (UInt16)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFFFF);
         }
 
+        /// <summary>
+        /// Write register 16.
+        /// </summary>
+        /// <param name="aRegister">A register.</param>
+        /// <param name="value">A value.</param>
         protected void WriteRegister16(byte aRegister, ushort value)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
@@ -212,11 +241,22 @@ namespace Cosmos.HAL
         }
         #endregion
 
+        /// <summary>
+        /// Get address base.
+        /// </summary>
+        /// <param name="aBus">A bus.</param>
+        /// <param name="aSlot">A slot.</param>
+        /// <param name="aFunction">A function.</param>
+        /// <returns>UInt32 value.</returns>
         protected static UInt32 GetAddressBase(uint aBus, uint aSlot, uint aFunction)
         {
             return 0x80000000 | (aBus << 16) | ((aSlot & 0x1F) << 11) | ((aFunction & 0x07) << 8);
         }
 
+        /// <summary>
+        /// Enable memory.
+        /// </summary>
+        /// <param name="enable">bool value.</param>
         public void EnableMemory(bool enable)
         {
             UInt16 command = ReadRegister16(0x04);
