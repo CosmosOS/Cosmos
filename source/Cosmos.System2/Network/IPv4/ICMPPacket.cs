@@ -127,11 +127,27 @@ namespace Cosmos.System.Network.IPv4
             return CalcOcCRC(DataOffset, length);
         }
 
+        /// <summary>
+        /// Get ICMP type.
+        /// </summary>
         internal byte ICMP_Type => icmpType;
+        /// <summary>
+        /// Get ICMP code.
+        /// </summary>
         internal byte ICMP_Code => icmpCode;
+        /// <summary>
+        /// Get ICMP CRC.
+        /// </summary>
         internal ushort ICMP_CRC => icmpCRC;
+        /// <summary>
+        /// Get ICMP data length.
+        /// </summary>
         internal ushort ICMP_DataLength => (ushort)(DataLength - 8);
 
+        /// <summary>
+        /// Get ICMP data.
+        /// </summary>
+        /// <returns>byte array value.</returns>
         internal byte[] GetICMPData()
         {
             byte[] data = new byte[ICMP_DataLength];
@@ -144,12 +160,19 @@ namespace Cosmos.System.Network.IPv4
             return data;
         }
 
+        /// <summary>
+        /// To string.
+        /// </summary>
+        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "ICMP Packet Src=" + SourceIP + ", Dest=" + DestinationIP + ", Type=" + icmpType + ", Code=" + icmpCode;
         }
     }
 
+    /// <summary>
+    /// ICMPEchoRequest class. See also: <seealso cref="ICMPPacket"/>.
+    /// </summary>
     internal class ICMPEchoRequest : ICMPPacket
     {
         protected ushort icmpID;
