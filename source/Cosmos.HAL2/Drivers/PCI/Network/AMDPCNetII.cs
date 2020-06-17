@@ -222,6 +222,15 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             return true;
         }
 
+        /// <summary>
+        /// Add bytes to the transmit buffer queue.
+        /// </summary>
+        /// <param name="buffer">bytes array to queue.</param>
+        /// <param name="offset">Offset of the data in the buffer.</param>
+        /// <param name="length">Data length.</param>
+        /// <returns>TRUE on success.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown if length is bigger than Int32.MaxValue.</exception>
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {
             byte[] data = new byte[length];
@@ -278,7 +287,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
         #region Helper Functions
 
-
+        /// <summary>
+        /// Send bytes to memory block.
+        /// </summary>
+        /// <param name="aData">A data to send.</param>
+        /// <returns>TRUE on success.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown if aData length is bigger than Int32.MaxValue.</exception>
         protected bool SendBytes(ref byte[] aData)
         {
             int txd = mNextTXDesc++;
