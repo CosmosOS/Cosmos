@@ -63,33 +63,33 @@ namespace Cosmos.System
                 Global.Init(GetTextScreen());
 
                 // Provide the user with a clear screen if they requested it
-                if (ClearScreen)
-                {
-                    Global.mDebugger.Send("Cls");
-                    //Global.Console.Clear();
-                }
+                // if (ClearScreen)
+                // {
+                    // Global.mDebugger.Send("Cls");
+                    // //Global.Console.Clear();
+                // }
 
-                Global.mDebugger.Send("Before Run");
+                //Global.mDebugger.Send("Before Run");
                 BeforeRun();
 
                 // now enable interrupts:
                 HAL.Global.EnableInterrupts();
 
-                Global.mDebugger.Send("Run");
-                if (mStopped)
-                {
-                    Global.mDebugger.Send("Already stopped");
-                }
-                else
-                {
-                    Global.mDebugger.Send("Not yet stopped");
-                }
+                //Global.mDebugger.Send("Run");
+                // if (mStopped)
+                // {
+                    // Global.mDebugger.Send("Already stopped");
+                // }
+                // else
+                // {
+                    // Global.mDebugger.Send("Not yet stopped");
+                // }
                 while (!mStopped)
                 {
                     //Network.NetworkStack.Update();
-                    Global.mDebugger.Send("Really before Run");
+                    //Global.mDebugger.Send("Really before Run");
                     Run();
-                    Global.mDebugger.Send("Really after Run");
+                    //Global.mDebugger.Send("Really after Run");
                 }
                 Global.mDebugger.Send("AfterRun");
                 AfterRun();
