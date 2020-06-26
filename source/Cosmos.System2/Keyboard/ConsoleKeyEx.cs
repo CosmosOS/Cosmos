@@ -1,5 +1,8 @@
 namespace Cosmos.System
 {
+    /// <summary>
+    /// ConsoleKeyEx enum.
+    /// </summary>
     public enum ConsoleKeyEx
     {
         NoName,

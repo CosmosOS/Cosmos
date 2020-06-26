@@ -19,6 +19,12 @@ namespace Cosmos.HAL
 
         public static readonly PS2Controller PS2Controller = new PS2Controller();
 
+        // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
+        /// <summary>
+        /// Init <see cref="Global"/> inctanse.
+        /// </summary>
+        /// <param name="textScreen">Text screen.</param>
+        /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
         static public void Init(TextScreenBase textScreen)
         {
             if (textScreen != null)
@@ -66,6 +72,9 @@ namespace Cosmos.HAL
             CPU.EnableInterrupts();
         }
 
+        /// <summary>
+        /// Check if CPU interrupts are enabled.
+        /// </summary>
         public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
 
         public static IEnumerable<KeyboardBase> GetKeyboardDevices()

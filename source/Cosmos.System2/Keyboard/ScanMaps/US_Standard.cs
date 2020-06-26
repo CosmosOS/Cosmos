@@ -6,12 +6,21 @@ using Cosmos.HAL;
 
 namespace Cosmos.System.ScanMaps
 {
+    /// <summary>
+    /// US_Standard class. Represent US_Standard keyboard layout.
+    /// </summary>
     public class US_Standard : ScanMapBase
     {
+        /// <summary>
+        /// Create new instance of the <see cref="US_Standard"/> class.
+        /// </summary>
         public US_Standard()
         {
         }
 
+        /// <summary>
+        /// Init key list.
+        /// </summary>
         protected override void InitKeys()
         {
             _keys = new List<KeyMapping>(100);
