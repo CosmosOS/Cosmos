@@ -19,34 +19,34 @@ Builder
 -C.B.Builder - 基本上是用户工具包。一个C#程序，通过图形用户界面自动建立和安装Cosmos。
 -C.B.Insaller - 这是给UAC的解决方案？
 
-******* Add C.B.Common & C.B.MSBuild or to compiler??
+******* 添加C.B.Common&C.B.MSBuild到编译器？
 
 --------------------------------------------
-Compiler
+编译
 
 部分:
--Assembler
--Compiler
+-汇编器
+-编译器
 -XSharp (编译组件)
 -Tools (编译组件)
 
-Notes:
--In future XSharp may be separated or a SLN with only XSharp parts in it. But it is needed often when using compiler.
+注意:
+-XSharp在将来可能会被分离，也可能是只有XSharp的SLN，但编译器经常要使用它。
 
-Bin Cache Dependencies:
+Bin 缓存依赖:
 
 
 --------------------------------------------
 IDE
 
-TODO Exists, but needs cleaned up still a lot.
+TODO 存在，但是依然需要清理。
 
-Debug, Deploy, Visual Studio, XSharp (IDE Parts), Tools (IDE Parts)
+调试, 部署, Visual Studio, XSharp (IDE部分), Tools (IDE部分)
 
 --------------------------------------------
 Kernel
 
--Kernel, Demos (not  User), Tests
+-Kernel, 演示 (非用户), 一些测试
 
 --------------------------------------------
 Test
@@ -56,7 +56,7 @@ Test
 --------------------------------------------
 Tools
 
--Misc Tools
+-其他工具
 
 --------------------------------------------
 
