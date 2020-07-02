@@ -13,7 +13,7 @@ This is essential for using the VFS.
 
 Right after this lines is done, an message looking like this will apper on your screen:
 
-![Alt text](System/images/File%20System%20Initialize.PNG?raw=true "Initialize")
+![Alt text](images/File%20System%20Initialize.PNG?raw=true "Initialize")
 
 This message is printed by the initialize method and it provide info about the file system.
 
@@ -29,7 +29,7 @@ We use this function to get the size of the available free space in our file sys
 You have probably noticed the "0:/" argument passed to this function, this is the id of the drive we want to get available free space of.
 Cosmos using DOS drive naming system and this is why we use "0".
 
-![Alt text](System/images/File%20System%20Free%20Space.PNG?raw=true "Free Space")
+![Alt text](images/File%20System%20Free%20Space.PNG?raw=true "Free Space")
 
 ## Get file system type.
 
@@ -39,7 +39,7 @@ Console.WriteLine("File System Type: " + fs_type);
 ```
 This will let us know what the file system type.
 
-![Alt text](System/images/File%20System%20Type.PNG?raw=true "Type")
+![Alt text](images/File%20System%20Type.PNG?raw=true "Type")
 
 ## Get files list.
 
@@ -55,7 +55,7 @@ foreach (var directoryEntry in directory_list)
 }
 ```
 
-![Alt text](System/images/File%20System%20Files%20List.PNG?raw=true "Files List")
+![Alt text](images/File%20System%20Files%20List.PNG?raw=true "Files List")
 
 ## Read files.
 
@@ -96,4 +96,4 @@ catch(Exception e)
 ```
 You must have noticed the try-catch block have been added here, you can find out more about the exception types each function in the api docs.
 
-![Alt text](System/images/File%20System%20Read%20File.PNG?raw=true "Files List")
+![Alt text](images/File%20System%20Read%20File.PNG?raw=true "Files List")
