@@ -35,11 +35,6 @@ namespace Cosmos.HAL.Drivers
 
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
-            if (!Available())
-            {
-                Global.mDebugger.SendInternal("No Bochs Graphics Adapter found...");
-                throw new NotSupportedException("No Bochs Graphics Adapter found...");
-            }
             Global.mDebugger.SendInternal($"Creating VBEDriver with Mode {xres}*{yres}@{bpp}");
             VBESet(xres, yres, bpp);
         }
