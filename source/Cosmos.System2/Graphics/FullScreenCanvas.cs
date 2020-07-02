@@ -39,7 +39,7 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas();
             }
-            else if (BGAExists())
+            else if (BGAExists() || PCI.GetDevice((VendorID)0x80EE, (DeviceID)0xBEEF) != null)
             {
                 return new VBECanvas();
             }
@@ -55,7 +55,7 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas(mode);
             }
-            else if (BGAExists())
+            else if (BGAExists() || PCI.GetDevice((VendorID)0x80EE, (DeviceID)0xBEEF) != null)
             {
                 return new VBECanvas(mode);
             }
