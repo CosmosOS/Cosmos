@@ -94,6 +94,6 @@ catch(Exception e)
     Console.WriteLine(e.ToString());
 }
 ```
-You must have noticed the try-catch block have been added here, you can find out more about the exception types each function in the api docs.
+You must have noticed the try-catch block have been added here, you can find out more about the exception types each function might throw in the api docs.
 
 ![Alt text](images/File%20System%20Read%20File.PNG?raw=true "Files List")
