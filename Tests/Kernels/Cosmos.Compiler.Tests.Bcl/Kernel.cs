@@ -50,6 +50,9 @@ namespace Cosmos.Compiler.Tests.Bcl
                 // System.Text
                 StringBuilderTest.Execute();
                 EncodingTest.Execute();
+				
+				// Disable the failing test for now...
+                //GuidTest.Execute();
 
                 TestController.Completed();
             }
