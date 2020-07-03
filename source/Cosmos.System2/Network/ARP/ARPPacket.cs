@@ -1,17 +1,44 @@
-﻿using Cosmos.HAL;
+﻿using sys = System;
+using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.IPv4;
 
 namespace Cosmos.System.Network.ARP
 {
+    /// <summary>
+    /// ARPPacket class. See also: <seealso cref="EthernetPacket"/>.
+    /// </summary>
     internal class ARPPacket : EthernetPacket
     {
+        /// <summary>
+        /// Hardware type.
+        /// </summary>
         protected ushort aHardwareType;
+        /// <summary>
+        /// Protocol type.
+        /// </summary>
         protected ushort aProtocolType;
+        /// <summary>
+        /// Hardware address length.
+        /// </summary>
         protected byte aHardwareLen;
+        /// <summary>
+        /// Protocol address length.
+        /// </summary>
         protected byte aProtocolLen;
+        /// <summary>
+        /// Operation code.
+        /// </summary>
         protected ushort aOperation;
 
+        /// <summary>
+        /// ARP handler.
+        /// </summary>
+        /// <param name="packetData">Packet data.</param>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="sys.ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="sys.OverflowException">Thrown on fatal error (contact support).</exception>
         internal static void ARPHandler(byte[] packetData)
         {
             ARPPacket arp_packet = new ARPPacket(packetData);
@@ -65,14 +92,24 @@ namespace Cosmos.System.Network.ARP
             new ARPPacket();
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// </summary>
         internal ARPPacket()
             : base()
         { }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// </summary>
+        /// <param name="rawData">Raw data.</param>
         internal ARPPacket(byte[] rawData)
             : base(rawData)
         { }
 
+        /// <summary>
+        /// Init ARPPacket fields.
+        /// </summary>
         protected override void initFields()
         {
             base.initFields();
@@ -83,6 +120,17 @@ namespace Cosmos.System.Network.ARP
             aOperation = (ushort)((RawData[20] << 8) | RawData[21]);
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// </summary>
+        /// <param name="dest">Destination MAC address.</param>
+        /// <param name="src">Source MAC address.</param>
+        /// <param name="hwType">Hardware type.</param>
+        /// <param name="protoType">Protocol type.</param>
+        /// <param name="hwLen">Hardware address length.</param>
+        /// <param name="protoLen">Protocol length.</param>
+        /// <param name="operation">Operation.</param>
+        /// <param name="packet_size">Packet size.</param>
         protected ARPPacket(MACAddress dest, MACAddress src, ushort hwType, ushort protoType,
             byte hwLen, byte protoLen, ushort operation, int packet_size)
             : base(dest, src, 0x0806, packet_size)
@@ -99,10 +147,23 @@ namespace Cosmos.System.Network.ARP
             initFields();
         }
 
+        /// <summary>
+        /// Get operation.
+        /// </summary>
         internal ushort Operation => aOperation;
+        /// <summary>
+        /// Get hardware type.
+        /// </summary>
         internal ushort HardwareType => aHardwareType;
+        /// <summary>
+        /// Get protocol type.
+        /// </summary>
         internal ushort ProtocolType => aProtocolType;
 
+        /// <summary>
+        /// To string.
+        /// </summary>
+        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "ARP Packet Src=" + srcMAC + ", Dest=" + destMAC + ", HWType=" + aHardwareType + ", Protocol=" + aProtocolType +

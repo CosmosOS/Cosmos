@@ -6,17 +6,36 @@ using Cosmos.HAL;
 
 namespace Cosmos.System
 {
+    /// <summary>
+    /// PC speaker helper class.
+    /// </summary>
     public static class PCSExtensions
     {
+        /// <summary>
+        /// Convert milliseconds (ms) to hertz (Hz).
+        /// </summary>
+        /// <param name="ms">A milliseconds value, must be > 0.</param>
+        /// <returns>integer value.</returns>
         public static uint MsToHz(this int ms)
         {
-            return (uint)(1000 / ms);
+            return (uint)(1000 / ms); //TODO: maybe throw exception on <= 0 ms value
         }
+
+        /// <summary>
+        /// Convert milliseconds (ms) to hertz (Hz).
+        /// </summary>
+        /// <param name="ms">A milliseconds value, must be > 0.</param>
+        /// <returns>integer value.</returns>
         public static uint MsToHz(this uint ms)
         {
             return (uint)(1000 / ms);
         }
     }
+
+    /// <summary>
+    /// Possible duration types.
+    /// <seealso cref="https://en.wikipedia.org/wiki/Duration_(music)"/>
+    /// </summary>
     public enum Durations
     {
          Whole = 1600,
@@ -27,6 +46,12 @@ namespace Cosmos.System
 
          Default = 200,
     }
+
+    /// <summary>
+    /// Possible note types.
+    /// <seealso cref="https://en.wikipedia.org/wiki/Musical_note"/>
+    /// <seealso cref="https://en.wikipedia.org/wiki/Audio_frequency"/>
+    /// </summary>
     public enum Notes
     {
          A0 = 28, // Exactly 27.500
@@ -88,20 +113,49 @@ namespace Cosmos.System
 
          Default = 800,
     }
+
+    // TODO: continue exception list, once HAL is documented.
+    /// <summary>
+    /// PC speaker class.
+    /// </summary>
     public class PCSpeaker
     {
+        // TODO: continue exception list, once HAL is documented.
+        /// <summary>
+        /// Play beep sound, at 800hz for one eighth.
+        /// </summary>
         public static void Beep()
         {
             Beep((uint) Notes.Default, (uint) Durations.Default);
         }
+
+        // TODO: continue exception list, once HAL is documented.
+        /// <summary>
+        /// Play beep sound, at a specified frequency for one eighth.
+        /// </summary>
+        /// <param name="frequency">Audio frequency in Hz, must be between 37 and 32767Hz.</param>
         public static void Beep(uint frequency)
         {
             Beep(frequency, (uint) Durations.Default);
         }
+
+        // TODO: continue exception list, once HAL is documented.
+        /// <summary>
+        /// Play beep sound, at a specified frequency for a specified duration.
+        /// </summary>
+        /// <param name="frequency">Audio frequency in Hz, must be between 37 and 32767Hz.</param>
+        /// <param name="duration">Beep duration, must be > 0.</param>
         public static void Beep(uint frequency, uint duration)
         {
             HAL.PCSpeaker.Beep(frequency, duration);
         }
+
+        // TODO: continue exception list, once HAL is documented.
+        /// <summary>
+        /// Play beep sound, at a specified note for a specified duration.
+        /// </summary>
+        /// <param name="note">A note to play.</param>
+        /// <param name="duration">Beep duration, must be > 0.</param>
         public static void Beep(Notes note, Durations duration)
         {
             Beep((uint)note, (uint) duration);
