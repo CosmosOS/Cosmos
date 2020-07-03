@@ -42,7 +42,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 ConvertTests.Execute();
                 DateTimeTests.Execute();
                 TimeSpanTests.Execute();
-
+                GuidTest.Execute();
 
                 TestController.Completed();
             }

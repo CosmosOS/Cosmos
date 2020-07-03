@@ -5,7 +5,7 @@ using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    class GuidTest
+    internal static class GuidTest
     {
 
         public static void Execute()
