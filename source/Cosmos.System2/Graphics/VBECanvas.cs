@@ -232,6 +232,11 @@ namespace Cosmos.System.Graphics
 
         #endregion
 
+        public override void Display()
+        {
+            _VBEDriver.Swap();
+        }
+
         #region Reading
 
         public override Color GetPointColor(int aX, int aY)

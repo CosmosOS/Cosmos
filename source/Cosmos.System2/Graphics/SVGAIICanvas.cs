@@ -206,5 +206,10 @@ namespace Cosmos.System.Graphics
         {
             return Color.FromArgb((int)_CanvasSVGADriver.GetPixel((uint)aX, (uint)aY));
         }
+
+        public override void Display()
+        {
+            
+        }
     }
 }

@@ -158,6 +158,21 @@ namespace Cosmos.Core
             }
         }
 
+        public void Copy(byte[] aData)
+        {
+            Copy(0, aData, 0, aData.Length);
+        }
+
+        public unsafe void Copy(int aStart, byte[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(Base + aStart);
+            fixed (byte* aDataPtr = aData)
+            {
+                MemoryOperations.Copy((byte*)xDest, aDataPtr + aIndex, aCount);
+            }
+        }
+
         public void Copy(int[] aData)
         {
             Copy(0, aData, 0, aData.Length);
@@ -273,7 +288,7 @@ namespace Cosmos.Core
             }
             return array;
         }
-        
+
         public uint[] ToArray()
         {
             return ToArray(0, 0, (int)Size);

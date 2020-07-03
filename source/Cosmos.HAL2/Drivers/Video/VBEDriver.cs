@@ -1,6 +1,7 @@
 ﻿#define COSMOSDEBUG
 
 using System;
+using Cosmos.Core;
 using Cosmos.Core.IOGroup;
 
 namespace Cosmos.HAL.Drivers
@@ -8,10 +9,11 @@ namespace Cosmos.HAL.Drivers
     /// <summary>
     /// VBEDriver class. Used to directly write registers values to the port.
     /// </summary>
-    public class VBEDriver
+    public unsafe class VBEDriver
     {
 
         private static readonly VBE IO = Core.Global.BaseIOGroups.VBE;
+        static byte[] lastbuffer;
 
         /// <summary>
         /// Register index.
@@ -66,6 +68,10 @@ namespace Cosmos.HAL.Drivers
             NoClearMemory = 0x80,
         };
 
+        int xRes;
+        int yRes;
+        int Bpp;
+
         /// <summary>
         /// Create new instance of the <see cref="VBEDriver"/> class.
         /// </summary>
@@ -75,6 +81,11 @@ namespace Cosmos.HAL.Drivers
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
             Global.mDebugger.SendInternal($"Creating VBEDriver with Mode {xres}*{yres}@{bpp}");
+            xRes = xres;
+            yRes = yres;
+            Bpp = bpp;
+            IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, (uint)xres * yres * 4);
+            lastbuffer = new byte[xres * yres * 4];
             VBESet(xres, yres, bpp);
         }
 
@@ -178,7 +189,7 @@ namespace Cosmos.HAL.Drivers
         public void SetVRAM(uint index, byte value)
         {
             Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as byte)");
-            IO.LinearFrameBuffer.Bytes[index] = value;
+            lastbuffer[index] = value;
         }
 
         /// <summary>
@@ -188,8 +199,9 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value to set.</param>
         public void SetVRAM(uint index, ushort value)
         {
-            Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as ushort)");
-            IO.LinearFrameBuffer.Words[index] = value;
+            //Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as ushort)");
+            lastbuffer[index] = (byte)((value >> 8) & 0xFF);
+            lastbuffer[index + 1] = (byte)((value >> 0) & 0xFF);
         }
 
         /// <summary>
@@ -200,7 +212,10 @@ namespace Cosmos.HAL.Drivers
         public void SetVRAM(uint index, uint value)
         {
             //Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as uint)");
-            IO.LinearFrameBuffer.DWords[index] = value;
+            lastbuffer[index] = (byte)((value >> 24) & 0xFF);
+            lastbuffer[index + 1] = (byte)((value >> 16) & 0xFF);
+            lastbuffer[index + 2] = (byte)((value >> 8) & 0xFF);
+            lastbuffer[index + 3] = (byte)((value >> 0) & 0xFF);
         }
 
         /// <summary>
@@ -210,7 +225,8 @@ namespace Cosmos.HAL.Drivers
         /// <returns>byte value.</returns>
         public byte GetVRAM(uint index)
         {
-            return IO.LinearFrameBuffer.Bytes[index];
+            return (lastbuffer[index]);
+            //return IO.LinearFrameBuffer.Bytes[index];
         }
 
         /// <summary>
@@ -219,7 +235,10 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value of fill with.</param>
         public void ClearVRAM(uint value)
         {
-            IO.LinearFrameBuffer.Fill(value);
+            fixed (byte* destPtr = lastbuffer)
+            {
+                MemoryOperations.Fill(destPtr, (int)value, xRes * yRes * 4);
+            }
         }
 
         /// <summary>
@@ -230,7 +249,10 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">A volum.</param>
         public void ClearVRAM(int aStart, int aCount, int value)
         {
-            IO.LinearFrameBuffer.Fill(aStart, aCount, value);
+            fixed (byte* aArrayPtr = lastbuffer)
+            {
+                MemoryOperations.Fill(aArrayPtr + aStart, value, (int)aCount);
+            }
         }
 
         /// <summary>
@@ -242,7 +264,25 @@ namespace Cosmos.HAL.Drivers
         /// <param name="aCount">A count.</param>
         public void CopyVRAM(int aStart, int[] aData, int aIndex, int aCount)
         {
-            IO.LinearFrameBuffer.Copy(aStart, aData, aIndex, aCount);
+            int* xDest;
+            fixed (byte* aArrayPtr = lastbuffer)
+            {
+                xDest = (int*)(aArrayPtr + aStart);
+            }
+            fixed (int* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
+            }
+        }
+
+        /// <summary>
+        /// Swap buffers
+        /// </summary>
+        /// <param name="index">Index to get.</param>
+        /// <returns>byte value.</returns>
+        public void Swap()
+        {
+            IO.LinearFrameBuffer.Copy(lastbuffer);
         }
     }
 }
