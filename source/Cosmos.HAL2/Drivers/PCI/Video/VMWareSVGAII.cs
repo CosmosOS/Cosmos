@@ -753,6 +753,11 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 WriteToFifo(0xFFFFFF);
             WaitForFifo();
         }
+        
+        public void Disable()
+        {
+            WriteRegister(Register.Enable, 0);
+        }
 
         /// <summary>
         /// Set cursor.
