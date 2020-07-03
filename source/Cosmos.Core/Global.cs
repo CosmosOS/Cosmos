@@ -5,8 +5,14 @@ namespace Cosmos.Core
 {
     public static class Global
     {
+        /// <summary>
+        /// Core ring debugger instance, with the Global tag.
+        /// </summary>
         public static readonly Debugger mDebugger = new Debugger("Core", "Global");
 
+        /// <summary>
+        /// Base IO gruops.
+        /// </summary>
         public static BaseIOGroups BaseIOGroups = new BaseIOGroups();
 
         // These are used by Bootstrap.. but also called to signal end of interrupt etc...
