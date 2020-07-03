@@ -1,7 +1,7 @@
 ﻿namespace Cosmos.Core.IOGroup
 {
     /// <summary>
-    /// PS2 Controller.
+    /// PS/2 controller.
     /// </summary>
     public class PS2Controller
     {
