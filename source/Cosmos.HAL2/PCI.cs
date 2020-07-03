@@ -131,15 +131,24 @@ namespace Cosmos.HAL
                 CheckBus(xPCIDevice.SecondaryBusNumber);
         }
 
+        public static bool Exists(PCIDevice pciDevice)
+        {
+            return GetDevice((VendorID)pciDevice.VendorID, (DeviceID)pciDevice.DeviceID) != null;
+        }
+
+        public static bool Exists(VendorID aVendorID, DeviceID aDeviceID)
+        {
+            return GetDevice(aVendorID, aDeviceID) != null;
+        }
+
         public static PCIDevice GetDevice(VendorID aVendorID, DeviceID aDeviceID)
         {
-            for (int i = 0; i < Devices.Count; i++)
+            foreach (var xDevice in Devices)
             {
-                var xDevice = Devices[i];
                 if ((VendorID)xDevice.VendorID == aVendorID &&
                     (DeviceID)xDevice.DeviceID == aDeviceID)
                 {
-                    return Devices[i];
+                    return xDevice;
                 }
             }
             return null;
@@ -147,13 +156,12 @@ namespace Cosmos.HAL
 
         public static PCIDevice GetDeviceClass(ClassID Class, SubclassID SubClass)
         {
-            for (int i = 0; i < Devices.Count; i++)
+            foreach (var xDevice in Devices)
             {
-                var xDevice = Devices[i];
                 if ((ClassID)xDevice.ClassCode == Class &&
                     (SubclassID)xDevice.Subclass == SubClass)
                 {
-                    return Devices[i];
+                    return xDevice;
                 }
             }
             return null;
@@ -161,14 +169,13 @@ namespace Cosmos.HAL
 
         public static PCIDevice GetDeviceClass(ClassID aClass, SubclassID aSubClass, ProgramIF aProgIF)
         {
-            for (int i = 0; i < Devices.Count; i++)
+            foreach (var xDevice in Devices)
             {
-                var xDevice = Devices[i];
                 if ((ClassID)xDevice.ClassCode == aClass &&
                     (SubclassID)xDevice.Subclass == aSubClass &&
                     (ProgramIF)xDevice.ProgIF == aProgIF)
                 {
-                    return Devices[i];
+                    return xDevice;
                 }
             }
             return null;

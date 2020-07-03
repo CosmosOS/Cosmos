@@ -15,8 +15,7 @@ namespace GraphicTest
 {
     public class Kernel : Sys.Kernel
     {
-        Canvas canvas;
-        private Bitmap bitmap = new Bitmap(10, 10,
+        private readonly Bitmap bitmap = new Bitmap(10, 10,
                 new byte[] { 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0,
                     255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
                     0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
@@ -33,15 +32,12 @@ namespace GraphicTest
                     243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148,
                     255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
                     0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, }, ColorDepth.ColorDepth32);
-        private static byte[] letterData = Convert.FromBase64String("Qk12AgAAAAAAADYAAAAoAAAACQAAABAAAAABACAAAAAAAEACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+/dP//////////////////////AHS//wAAAAAAAAAAAAAAAEgAAP+/4Jz/AAB0/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcSAD/nODg/wAASP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3QA/0ic4P8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOCcSP8AdL//AAAAAAAAAAAAAAAAAAAAAP+/dP/////////////////g////AEic/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        private Bitmap letter = new Bitmap(letterData);
+        private static readonly byte[] letterData = Convert.FromBase64String("Qk12AgAAAAAAADYAAAAoAAAACQAAABAAAAABACAAAAAAAEACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+/dP//////////////////////AHS//wAAAAAAAAAAAAAAAEgAAP+/4Jz/AAB0/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcSAD/nODg/wAASP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3QA/0ic4P8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOCcSP8AdL//AAAAAAAAAAAAAAAAAAAAAP+/dP/////////////////g////AEic/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        private readonly Bitmap letter = new Bitmap(letterData);
 
 
         protected override void BeforeRun()
         {
-            Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
-
-            canvas = FullScreenCanvas.GetFullScreenCanvas();
         }
 
         private void DoTest(Canvas aCanvas)
@@ -59,6 +55,11 @@ namespace GraphicTest
             /* A GreenYellow horizontal line */
             pen.Color = Color.GreenYellow;
             aCanvas.DrawLine(pen, 250, 100, 400, 100);
+
+            /* A Black Lines larger than the canvas */
+            pen.Color = Color.Black;
+            aCanvas.DrawLine(pen, -20, 100, aCanvas.Mode.Columns + 20, 100);
+            aCanvas.DrawLine(pen, -20, -20, aCanvas.Mode.Columns + 20, aCanvas.Mode.Rows + 20);
 
             /* An IndianRed vertical line */
             pen.Color = Color.IndianRed;
@@ -83,7 +84,7 @@ namespace GraphicTest
 
             /* A LimeGreen rectangle */
             pen.Color = Color.LimeGreen;
-            aCanvas.DrawRectangle(pen, 450, 450, 80, 60);
+            aCanvas.DrawRectangle(pen, 450, 300, 80, 60);
 
             /* A filled rectange */
             pen.Color = Color.Chocolate;
@@ -92,7 +93,7 @@ namespace GraphicTest
             /* A Bitmpap image */
             aCanvas.DrawImage(bitmap, new Point(10, 10));
             aCanvas.DrawImage(letter, new Point(50, 10));
-            
+
             /* Drawing two bitmap images */
             // Image Credit chathurax
             Bitmap bitmap2 = new Bitmap(Convert.FromBase64String("Qk2W8wAAAAAAADYAAAAoAAAAsAAAAHYAAAABABgAAAAAAGDzAAAEAAAAAAAAAAAAAAAAAAAA/f39/f39/f39/f398vLy7e3t7u7u7u7u9PT0/f39/f39/f39+/v77u7u7u7u7u7u7u7u+/v7/f39/v7+/f399fX17u7u7u7u7u7u8vLy/f39/f39/f39/f397u7u7u7u7u7u7u7u+Pj4/f39/f39/f399/f37u7u7u7u7u7u7+/v/f39/f39/f39/f398fHx7u7u7u7u7u7u9fX1/v7+/f39/f39+vr67u7u7e3t7u7u7u7u/Pz8/f39/f39/v7+9PT07u7u7u7u7u7u8/Pz/Pz8/f39/v7+/f397e3t7e3t7e3t7u7u+fn5/f39/v7+/f399/f37e3t7u7u7u7u8PDw/f39/f39/v7+/f398PDw7u7u7u7u7u7u9vb2/f39/f39/v7++fn57e3t7e3t7e3t7e3t/f39/f39/v7+/v7+8/Pz7u7u7u7u7u7u9PT0/f39/f39/f39/Pz87e3t7u7u7u7u7u7u+/v7/v7+/f39/f399fX17u7u7u7u7u7u8fHx/v7+/f39/Pz8/f397u7u7u7u7u7u7u7u+Pj4/f39/f39/f39+Pj47e3t7e3t7e3t7u7u/Pz8/Pz8/f39/f398vLy7u7u7u7u7u7u9fX1/v7+/f39/f39+/v77u7u7u7u7u7u7u7u/Pz8/f39/f39/f399PT07u7u7u7u7u7u8vLy/f39/f39/f39/Pz8/f39/f39/f39/f398vLy7u7u7u7u7+/v9PT0/v7+/f39/f39/Pz87u7u7u7u7u7u7+/v+/v7/v7+/v7+/v7+9vb27u7u7u7u7u7u8vLy/v7+/f39/v7+/v7+7u7u7u7u7u7u7+/v+fn5/v7+/v7+/f39+Pj47u7u7u7u7+/v7+/v/v7+/v7+/f39/f398vLy7u7u7u7u7u7u9vb2/v7+/f39/f39+vr67u7u7e3t7u7u7u7u/Pz8/v7+/v7+/v7+9PT07+/v7+/v7+/v8/Pz/f39/f39/v7+/f397u7u7e3t7u7u7u7u+fn5/v7+/v7+/v7+9vb27u7u7u7u7u7u8PDw/v7+/f39/v7+/v7+8PDw7u7u7u7u7u7u9/f3/v7+/f39/f39+fn57u7u7e3t7u7u7e3t/f39/v7+/v7+/v7+8/Pz7+/v7+/v7+/v9fX1/v7+/v7+/v7+/Pz87u7u7u7u7u7u7+/v+/v7/v7+/v7+/v7+9fX17u7u7u7u7u7u8vLy/v7+/f39/f39/v7+7+/v7+/v7u7u7u7u+Pj4/v7+/f39/f39+Pj47e3t7e3t7e3t7u7u/f39/f39/v7+/v7+8vLy7u7u7u7u7+/v9fX1/v7+/f39/v7++/v77u7u7u7u7u7u7+/v/Pz8/v7+/f39/v7+9PT07u7u7u7u7u7u8/Pz/f39/f39/f39/f39/f39/f39/f39/f398vLy7u7u7u7u7u7u9PT0/f39/f39/f39+/v77u7u7u7u7u7u7+/v+vr6/f39/f39/f399fX17u7u7u7u7u7u8vLy/f39/f39/f39/f397+/v7u7u7u7u7u7u+Pj4/Pz8/f39/f399/f37u7u7u7u7u7u7+/v/f39/f39/f39/f398fHx7u7u7+/v7u7u9vb2/f39/f39/f39+vr67u7u7u7u7u7u7+/v/Pz8/f39/f39/f399PT07+/v7u7u7+/v8/Pz/f39/f39/f39/f397u7u7u7u7u7u7+/v+fn5/f39/v7+/f399/f37+/v7+/v7u7u8PDw/Pz8/Pz8/Pz8/Pz87+/v7u7u7+/v7u7u9/f3/f39/f39/f39+fn57u7u7u7u7u7u7u7u/f39/f39/v7+/f398/Pz7+/v7u7u7u7u9PT0/f39/f39/f39+/v77u7u7+/v7u7u7u7u+vr6/f39/f39/f399fX17u7u7u7u7u7u8fHx/f39/f39/f39/f397+/v7+/v7u7u7+/v9/f3/f39/f39/f399/f37u7u7u7u7u7u7+/v/f39/Pz8/f39/f398vLy7u7u7+/v7+/v9fX1/f39/f39/f39+/v77u7u7+/v7+/v7u7u+/v7/f39/f39/f399PT07u7u7u7u7u7u8vLy/f39/f39/f39/f397u7u7u7u7u7u7u7u+Pj4/f39/f39/v7+9/f37e3t7u7u7u7u7+/v/f39/f39/f39/f398fHx7u7u7e3t7e3t9vb2/f39/v7+/v7++vr67u7u7u7u7u7u7u7u/Pz8/f39/f39/f398/Pz7u7u7e3t7u7u8/Pz/f39/v7+/v7+/Pz87u7u7u7u7e3t7u7u+vr6/f39/f39/f399fX17u7u7u7u7u7u8fHx/f39/f39/f39/f398PDw7u7u7u7u7u7u9/f3/f39/f39/f39+Pj47u7u7u7u7u7u7u7u/f39/f39/f39/f398vLy7u7u7e3t7u7u9fX1/f39/f397+/vxsbGtbW17u7u5OTkfHx8fHx8sbGx39/f+/v79PT07u7u7u7u7e3t8vLy/f39/f39/f39/f397u7u7u7u7e3t7u7u+Pj4/f39/f39/v7+9/f37e3t7u7u7e3t8PDw/f39/f39/f39/f398fHx7u7u7u7u7u7u9vb2/f39/f39/f39+vr67u7u7u7u7e3t7u7u/Pz8/f39/f39/f399PT07u7u7u7u7u7u8/Pz/f39/f39/f39/Pz87u7u7u7u7u7u7e3t+fn5/f39/f39/f399vb27u7u7u7u7e3t8PDw/f39/f39/f39/f398PDw7u7u7u7u7u7u9/f3/f39/f39/v7++fn57u7u7e3t7e3t7u7u7u7u7e3t7u7u7u7u+fn5/v7+/v7+/v7+9/f37u7u7+/v7u7u8PDw/v7+/v7+/v7+/v7+8fHx7u7u7u7u7u7u9vb2/f39/v7+/v7++vr67u7u7u7u7+/v7u7u/f39/v7+/v7+/v7+8/Pz7u7u7u7u7u7u8/Pz/v7+/f39/v7+/Pz87+/v7u7u7u7u7u7u+vr6/v7+/v7+/v7+9vb27u7u7u7u7u7u8fHx/v7+/v7+/f39/v7+8PDw7u7u7u7u7u7u+Pj4/v7+/v7+/v7++fn57u7u7u7u7u7u7+/v/v7+/v7+/v7+/v7+8vLy7u7u6+vrzs7On5+fbGxsNjY2EBAQS0tL29vblpaWuLi44+PjV1dXAgICCAgIJCQkWFhYjo6Ox8fH6urq8vLy/f39/v7+/v7+/v7+7+/v7u7u7u7u7u7u+fn5/v7+/f39/f39+Pj47u7u7u7u7u7u8PDw/v7+/v7+/v7+/v7+8vLy7u7u7+/v7u7u9vb2/v7+/v7+/v7++/v77u7u7u7u7u7u7u7u/Pz8/v7+/f39/v7+9PT07u7u7u7u7u7u9PT0/v7+/v7+/v7+/f397u7u7+/v7u7u7u7u+fn5/v7+/v7+/v7+9vb27u7u7u7u7u7u8fHx/v7+/v7+/v7+/v7+8PDw7+/v7u7u7u7u+Pj4/v7+/v7+/v7++fn57u7u7u7u7u7u7u7u7u7u7u7u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7u7u7u7u7u7u8vLy/f39/f39/f39/f397u7u7u7u7e3t7e3t+Pj4/f39/f39/f399/f37e3t7u7u7u7u7+/v/f39/f39/f39/f398fHx7e3t7e3t7u7u9fX1/f39/f39/f39+vr67e3t7u7u7u7u7u7u/Pz8/f39/f39/Pz88/Pz0dHRWVlZBQUFAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQk4uLi19fXGxsbAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPDw87Ozs39/fIiIiAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBMjIysbGx8vLy4uLi/Pz8/Pz8/Pz87u7u7u7u7u7u7u7u+vr6/f39/f39/f399fX17u7u7e3t7u7u8fHx/f39/f39/f39/f397+/v7u7u7u7u7u7u9/f3/f39/v7+/v7++Pj47u7u7e3t7u7u7+/v/f39/f39/v7+/f398vLy7e3t7e3t7e3t9fX1/f39/f39/f39+vr67u7u7u7u7u7u7u7u+/v7/f39/f39/f399PT07u7u7u7u7e3t8vLy/f39/f39/f39/f399vb29vb29fX19vb29vb29fX19fX19vb29vb29fX19vb29vb29vb29fX19vb29fX19fX19fX19vb29vb29fX19fX19vb29fX19vb29vb29vb29vb29fX19fX19fX19fX19fX19fX19fX19vb29fX19fX19fX19fX19fX19vb29fX19vb29vb29vb29fX19fX19fX19fX19fX19vb29vb29vb29vb29fX19fX19fX19fX19vb29PT06OjoioqKjo6OgICAEBAQAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBEhISyMjI4uLiLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgICV1dX8fHxxcXFEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQUFV1dXOjo6WFhYz8/P9fX19fX19fX19fX19fX19vb29fX19vb29fX19fX19vb29vb29fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19vb29fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19vb29fX19vb29fX19fX19vb29vb29vb29fX19vb29vb29fX19fX19fX19fX19vb29fX19fX19fX19fX19vb29fX19vb29fX19fX19fX19fX17u7u7u7u7e3t7u7u+Pj4/v7+/f39/f399/f37u7u7u7u7+/v8PDw/v7+/v7+/f39/f398fHx7u7u7u7u7u7u9vb2/v7+/v7+/v7++vr67u7u7u7u7u7u7u7u/f39/f39/v7+/v7+8/Pz7u7u7u7u7u7u8/Pz/v7+/v7+/v7+/Pz87u7u7u7u7u7u7u7u+vr6/v7+/v7+/f399vb27u7u7u7u7u7u8fHx/f39/f39/f39+vr6mJiYHBwcAQEBFRUVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwcHp6en6OjoREREAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBdHR07u7uoaGhBgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAAAACQkJcXFx8vLy/Pz8/f399PT08fHx7u7u7+/v7u7u9vb2/v7+/v7+/v7++/v77u7u7u7u7u7u7u7u/Pz8/f39/v7+/v7+9PT07u7u7u7u7u7u8/Pz/v7+/v7+/v7+/f397e3t7u7u7u7u7u7u+fn5/v7+/v7+/v7+9/f37u7u7u7u7u7u8fHx/v7+/v7+/v7+/v7+8PDw7+/v7u7u7u7u9/f3/v7+/v7+/v7++fn57u7u7u7u7u7u7u7u7+/v7u7u7e3t7u7u+fn5/v7+/v7+/v7+9/f37u7u7u7u7u7u7+/v/f39/f39/v7+/v7+8fHx7u7u7+/v7u7u9vb2/v7+/f39/v7++vr67u7u7u7u7u7u7u7u/Pz8/Pz8/f39/v7+8/Pz7u7u7u7u7u7u8/Pz/v7+/v7+/v7+/Pz87+/v7u7u7u7u7u7u+vr6/v7+/v7+/f399vb27u7u7u7u7u7uu7u71dXV/f395ubmTExMAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDhISE7e3tcHBwAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQUFm5ub7u7ufHx8AQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBNjY22tra/Pz8jIyMvLy87u7u7u7u7u7u9vb2/v7+/v7+/v7++vr67u7u7u7u7u7u7u7u/Pz8/f39/v7+/v7+9PT07+/v7u7u7u7u8/Pz/v7+/f39/v7+/Pz87u7u7u7u7u7u7u7u+fn5/v7+/v7+/v7+9/f37u7u7u7u7u7u8PDw/f39/v7+/f39/f398PDw7u7u7u7u7u7u9/f3/f39/f39/f39+fn57u7u7+/" +
@@ -112,6 +113,8 @@ namespace GraphicTest
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
 
+            aCanvas.Disable();
+            Console.WriteLine("Back in text mode");
 
             mDebugger.Send($"Test of Canvas with mode {aCanvas.Mode} executed successfully");
         }
@@ -122,16 +125,40 @@ namespace GraphicTest
             {
                 mDebugger.Send("Run");
 
+
+                //Test changing font
+                PCScreenFont screenFont = new PCScreenFont();
+                VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.CharHeight);
+                Console.WriteLine("ABAKDSKDNKSNJNFJGNFLPÜQOJOPJD");
+                Console.WriteLine("I(39u0pwoejJIosjfppkspjfsdjfp");
+
                 TestBitmaps();
 
-                /* First test with the DefaulMode */
+                /* First test with the DefaultMode */
+                Canvas canvas = FullScreenCanvas.GetFullScreenCanvas();
                 DoTest(canvas);
 
                 DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
                 DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1366, 768, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 1024, ColorDepth.ColorDepth32)));
                 DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
 
+                VGACanvas vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
+                DoTest(vGACanvas);
+                vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
+                DoTest(vGACanvas);
+                vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
+                DoTest((Canvas)vGACanvas);
+                vGACanvas = new VGACanvas(new Mode(640, 480, ColorDepth.ColorDepth4));
+                DoTest(vGACanvas);
+                Console.BackgroundColor = ConsoleColor.Black;
+                for (int i = 0; i < 16; i++)
+                {
+                    Console.ForegroundColor = (ConsoleColor)i; //Ensure that the correct coloures are used
+                    Console.WriteLine("Back in text mode 2");
+                }
+                Console.ForegroundColor = ConsoleColor.White;
+                
                 TestController.Completed();
             }
             catch (Exception e)
@@ -140,6 +167,37 @@ namespace GraphicTest
                 mDebugger.Send(e.Message);
                 TestController.Failed();
             }
+        }
+
+        private void DoTest(VGACanvas vGACanvas)
+        {
+            mDebugger.Send($"Testing VGA Canvas with mode {vGACanvas.Mode}");
+            vGACanvas.Clear(Color.Wheat);
+            for (int x = 0; x < 20; x++)
+            {
+                for (int y = 0; y < 20; y++)
+                {
+                    vGACanvas.DrawPoint((uint)(x % (2 << ((int)vGACanvas.Mode.ColorDepth - 1))), 5 + x, 5 + y);
+                }
+            }
+
+            for (int x = 0; x < 20; x++)
+            {
+                for (int y = 0; y < 20; y++)
+                {
+                    vGACanvas.DrawPoint((uint)(x % (2 << ((int)vGACanvas.Mode.ColorDepth - 1))), 25 + x, 5 + y);
+                }
+            }
+
+            vGACanvas.DrawLine(new Pen(Color.Red), 10, 10, 10, 50);
+
+            vGACanvas.Disable();
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine("Back in text mode");
+            }
+
+            mDebugger.Send($"Test of Canvas with mode {vGACanvas.Mode} executed successfully");
         }
 
         private void TestBitmaps()
