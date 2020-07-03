@@ -13,6 +13,11 @@ namespace Cosmos.Core
         public readonly MemoryBlock16 Words;
         public readonly MemoryBlock32 DWords;
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="MemoryBlock"/> class.
+        /// </summary>
+        /// <param name="aBase">A base.</param>
+        /// <param name="aSize">A size.</param>
         public MemoryBlock(uint aBase, uint aSize)
         {
             Base = aBase;
@@ -26,6 +31,12 @@ namespace Cosmos.Core
         //TODO: Make an attribute that can be applied to methods to tell the copmiler to inline them to save
         // the overhead of a call on operations like this.
         // Need to check bounds for 16 and 32 better so offset cannot be size - 1 and then the 4 bytes write past the end
+        /// <summary>
+        /// Get and set memory block.
+        /// </summary>
+        /// <param name="aByteOffset">A byte offset.</param>
+        /// <returns>uint value.</returns>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe uint this[uint aByteOffset]
         {
             get
@@ -46,12 +57,22 @@ namespace Cosmos.Core
             }
         }
 
+        /// <summary>
+        /// Fill memory block.
+        /// </summary>
+        /// <param name="aData">A data to fill.</param>
         public void Fill(uint aData)
         {
             //Fill(0, Size / 4, aData);
             Fill(0, Size, aData);
         }
 
+        /// <summary>
+        /// Fill memory block.
+        /// </summary>
+        /// <param name="aStart">A start.</param>
+        /// <param name="aCount">A count.</param>
+        /// <param name="aData">A data.</param>
         [DebugStub(Off = true)]
         public unsafe void Fill(uint aStart, uint aCount, uint aData)
         {
@@ -60,6 +81,12 @@ namespace Cosmos.Core
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aCount">Data size.</param>
+        /// <param name="aData">A data to fill memory block with.</param>
         [DebugStub(Off = true)]
         public unsafe void Fill(int aStart, int aCount, int aData)
         {
@@ -68,16 +95,30 @@ namespace Cosmos.Core
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aData">Data to fill the memory block with.</param>
         public void Fill(byte aData)
         {
             Fill(0, Size, aData);
         }
 
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aData">Data to fill the memory block with.</param>
         public void Fill(ushort aData)
         {
             Fill(0, Size, aData);
         }
 
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aCount">Data size.</param>
+        /// <param name="aData">A data to fill memory block with.</param>
         [DebugStub(Off = true)]
         public unsafe void Fill(uint aStart, uint aCount, ushort aData)
         {
@@ -86,6 +127,12 @@ namespace Cosmos.Core
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aCount">Data size.</param>
+        /// <param name="aData">A data to fill memory block with.</param>
         [DebugStub(Off = true)]
         public unsafe void Fill(uint aStart, uint aCount, byte aData)
         {
@@ -131,6 +178,12 @@ namespace Cosmos.Core
             }
         }
 
+        /// <summary>
+        /// Move bytes array down the memory block.
+        /// </summary>
+        /// <param name="aDest">Destination location.</param>
+        /// <param name="aSrc">Sourcs location.</param>
+        /// <param name="aCount">Number of bytes to move.</param>
         [DebugStub(Off = true)]
         public unsafe void MoveDown(uint aDest, uint aSrc, uint aCount)
         {
@@ -228,17 +281,37 @@ namespace Cosmos.Core
             
     }
 
+    /// <summary>
+    /// MemoryBlock08 class.
+    /// </summary>
     public class MemoryBlock08
     {
+        /// <summary>
+        /// Base.
+        /// </summary>
         public readonly uint Base;
+        /// <summary>
+        /// Size.
+        /// </summary>
         public readonly uint Size;
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="MemoryBlock08"/> class.
+        /// </summary>
+        /// <param name="aBase">A base.</param>
+        /// <param name="aSize">A size.</param>
         internal MemoryBlock08(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
+        /// <summary>
+        /// Get and set memory block.
+        /// </summary>
+        /// <param name="aByteOffset">A byte offset.</param>
+        /// <returns>byte value.</returns>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe byte this[uint aByteOffset]
         {
             get
@@ -261,17 +334,37 @@ namespace Cosmos.Core
         }
     }
 
+    /// <summary>
+    /// MemoryBlock16 class.
+    /// </summary>
     public class MemoryBlock16
     {
+        /// <summary>
+        /// Base.
+        /// </summary>
         public readonly uint Base;
+        /// <summary>
+        /// Size.
+        /// </summary>
         public readonly uint Size;
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="MemoryBlock16"/> class.
+        /// </summary>
+        /// <param name="aBase">A base.</param>
+        /// <param name="aSize">A size.</param>
         internal MemoryBlock16(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
+        /// <summary>
+        /// Get and set memory block.
+        /// </summary>
+        /// <param name="aByteOffset">A byte offset.</param>
+        /// <returns>ushort value.</returns>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe ushort this[uint aByteOffset]
         {
             get
@@ -294,17 +387,37 @@ namespace Cosmos.Core
 
     }
 
+    /// <summary>
+    /// MemoryBlock32 class.
+    /// </summary>
     public class MemoryBlock32
     {
+        /// <summary>
+        /// Base.
+        /// </summary>
         public readonly uint Base;
+        /// <summary>
+        /// Size.
+        /// </summary>
         public readonly uint Size;
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="MemoryBlock32"/> class.
+        /// </summary>
+        /// <param name="aBase">A base.</param>
+        /// <param name="aSize">A size.</param>
         internal MemoryBlock32(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
+        /// <summary>
+        /// Get and set memory block.
+        /// </summary>
+        /// <param name="aByteOffset">A byte offset.</param>
+        /// <returns>uint value.</returns>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe uint this[uint aByteOffset]
         {
             get

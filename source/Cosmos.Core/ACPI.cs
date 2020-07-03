@@ -96,6 +96,10 @@ namespace Cosmos.Core
         }
 
         // Shutdown
+        /// <summary>
+        /// Shutdown the ACPI.
+        /// </summary>
+        /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
         public static void Shutdown()
         {
             Console.Clear();

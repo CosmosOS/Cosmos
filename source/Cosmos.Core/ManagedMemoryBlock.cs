@@ -2,11 +2,20 @@
 
 namespace Cosmos.Core
 {
+    /// <summary>
+    /// ManagedMemoryBlock class. Used to read and write a managed memory block.
+    /// </summary>
     public unsafe class ManagedMemoryBlock
     {
         private byte[] memory;
 
+        /// <summary>
+        /// Offset.
+        /// </summary>
         public UInt32 Offset;
+        /// <summary>
+        /// Size.
+        /// </summary>
         public UInt32 Size;
 
         /// <summary>
@@ -54,6 +63,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="offset">Address Offset</param>
         /// <returns>Byte value at given offset</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on invalid offset.</exception>
         public byte this[uint offset]
         {
             get
@@ -69,6 +79,13 @@ namespace Cosmos.Core
                 (*(byte*)(this.Offset + offset)) = value;
             }
         }
+
+        /// <summary>
+        /// Read 16-bit from the memory block.
+        /// </summary>
+        /// <param name="offset">Data offset.</param>
+        /// <returns>UInt16 value.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size.</exception>
         public UInt16 Read16(uint offset)
         {
             if (offset > Size)
@@ -76,18 +93,38 @@ namespace Cosmos.Core
             return *(UInt16*)(this.Offset + offset);
         }
 
+        /// <summary>
+        /// Write 16-bit to the memory block.
+        /// </summary>
+        /// <param name="offset">Data offset.</param>
+        /// <param name="value">Value to write.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
         public void Write16(uint offset, UInt16 value)
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
             (*(UInt16*)(this.Offset + offset)) = value;
         }
+
+        /// <summary>
+        /// Read 32-bit from the memory block.
+        /// </summary>
+        /// <param name="offset">Data offset.</param>
+        /// <returns>UInt32 value.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size.</exception>
         public UInt32 Read32(uint offset)
         {
             if (offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
             return *(UInt32*)(this.Offset + offset);
         }
+
+        /// <summary>
+        /// Write 32-bit to the memory block.
+        /// </summary>
+        /// <param name="offset">Data offset.</param>
+        /// <param name="value">Value to write.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
         public void Write32(uint offset, UInt32 value)
         {
             if (offset < 0 || offset > Size)
