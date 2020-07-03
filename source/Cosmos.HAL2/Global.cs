@@ -67,6 +67,9 @@ namespace Cosmos.HAL
 
         }
 
+        /// <summary>
+        /// Enable interrupts.
+        /// </summary>
         public static void EnableInterrupts()
         {
             CPU.EnableInterrupts();
@@ -77,6 +80,10 @@ namespace Cosmos.HAL
         /// </summary>
         public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
 
+        /// <summary>
+        /// Get keyboard devices.
+        /// </summary>
+        /// <returns>IEnumerable{KeyboardBase} value.</returns>
         public static IEnumerable<KeyboardBase> GetKeyboardDevices()
         {
             var xKeyboardDevices = new List<KeyboardBase>();
@@ -94,6 +101,10 @@ namespace Cosmos.HAL
             return xKeyboardDevices;
         }
 
+        /// <summary>
+        /// Get mouse devices.
+        /// </summary>
+        /// <returns>IEnumerable{MouseBase} value.</returns>
         public static IEnumerable<MouseBase> GetMouseDevices()
         {
             var xMouseDevices = new List<MouseBase>();
