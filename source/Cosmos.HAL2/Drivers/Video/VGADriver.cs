@@ -817,7 +817,7 @@ namespace Cosmos.HAL
             }
         }
 
-		private readonly Color[] _Palette = new Color[256];
+        private readonly Color[] _Palette = new Color[256];
 
         //Get all the colors from the palette
         public void ReadPalette()
@@ -839,6 +839,12 @@ namespace Cosmos.HAL
         {
             return _Palette[aIndex];
         }
+        
+        public void SetPaletteEntry(int aIndex, Color aColor)
+        {
+            _Palette[aIndex] = aColor;
+            SetPaletteEntry(aIndex, aColor.R, aColor.G, aColor.B);
+        }
 
         /// <summary>
         /// Set palette entry.
@@ -855,7 +861,6 @@ namespace Cosmos.HAL
             _IO.DAC_Data.Byte = (byte)(aG >> 2);
             _IO.DAC_Data.Byte = (byte)(aB >> 2);
         }
-
 
         #region FONTS
 
