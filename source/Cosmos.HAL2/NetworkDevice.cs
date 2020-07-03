@@ -52,11 +52,27 @@ namespace Cosmos.HAL
             get;
         }
 
+        /// <summary>
+        /// Add bytes to the transmit buffer queue.
+        /// </summary>
+        /// <param name="buffer">bytes array to queue.</param>
+        /// <returns>TRUE on success.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown if buffer length is bigger than Int32.MaxValue.</exception>
         public virtual bool QueueBytes(byte[] buffer)
         {
             return QueueBytes(buffer, 0, buffer.Length);
         }
 
+        /// <summary>
+        /// Add bytes to the transmit buffer queue.
+        /// </summary>
+        /// <param name="buffer">bytes array to queue.</param>
+        /// <param name="offset">Offset of the data in the buffer.</param>
+        /// <param name="length">Data length.</param>
+        /// <returns>TRUE on success.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown if length is bigger than Int32.MaxValue.</exception>
         public abstract bool QueueBytes(byte[] buffer, int offset, int length);
 
         public abstract bool ReceiveBytes(byte[] buffer, int offset, int max);

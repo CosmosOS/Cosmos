@@ -104,6 +104,10 @@ namespace Cosmos.HAL
             }
         }
 
+        /// <summary>
+        /// Check bus.
+        /// </summary>
+        /// <param name="xBus">A bus to check.</param>
         private static void CheckBus(ushort xBus)
         {
             for (ushort device = 0; device < 32; device++)
@@ -141,6 +145,12 @@ namespace Cosmos.HAL
             return GetDevice(aVendorID, aDeviceID) != null;
         }
 
+        /// <summary>
+        /// Get device.
+        /// </summary>
+        /// <param name="aVendorID">A vendor ID.</param>
+        /// <param name="aDeviceID">A device ID.</param>
+        /// <returns></returns>
         public static PCIDevice GetDevice(VendorID aVendorID, DeviceID aDeviceID)
         {
             foreach (var xDevice in Devices)
