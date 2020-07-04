@@ -208,9 +208,9 @@ namespace Cosmos.HAL.Drivers
         /// </summary>
         /// <param name="index">Index to get.</param>
         /// <returns>byte value.</returns>
-        public byte GetVRAM(uint index)
+        public uint GetVRAM(uint index)
         {
-            return IO.LinearFrameBuffer.Bytes[index];
+            return IO.LinearFrameBuffer.DWords[index];
         }
 
         /// <summary>

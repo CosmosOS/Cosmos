@@ -236,19 +236,9 @@ namespace Cosmos.System.Graphics
 
         public override Color GetPointColor(int aX, int aY)
         {
-            uint pitch;
-            uint stride;
-            uint offset;
-            uint ColorDepthInBytes = (uint)Mode.ColorDepth / 8;
+            uint offset = (uint)GetPointOffset(aX, aY);
 
-            Global.mDebugger.SendInternal("Computing offset...");
-            pitch = (uint)Mode.Columns * ColorDepthInBytes;
-            stride = ColorDepthInBytes;
-            //offset = ((uint)x * pitch) + ((uint)y * stride);
-            offset = ((uint)aX * stride) + ((uint)aY * pitch);
-
-            Global.mDebugger.SendInternal($"Getting color from point at offset {offset}");
-            return Color.FromArgb(_VBEDriver.GetVRAM(offset));
+            return Color.FromArgb((int)_VBEDriver.GetVRAM(offset));
         }
 
         #endregion
