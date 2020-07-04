@@ -102,8 +102,10 @@ namespace Cosmos.Core
         public unsafe void Fill(int aStart, int aCount, int aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            int* xDest = (int*)(this.Offset + aStart);
-            MemoryOperations.Fill(xDest, aData, (int)aCount);
+            fixed (byte* aArrayPtr = this.memory)
+            {
+                MemoryOperations.Fill(aArrayPtr + aStart, aData, (int)aCount);
+            }
         }
 
         /// <summary>
@@ -112,13 +114,20 @@ namespace Cosmos.Core
         /// <param name="aData">A data to fill.</param>
         public void Fill(uint aData)
         {
-            Fill(0, Size, aData);
+            fixed (byte* destPtr = this.memory)
+            {
+                MemoryOperations.Fill(destPtr, (int)aData, (int)this.Size);
+            }
         }
 
         public unsafe void Copy(int aStart, int[] aData, int aIndex, int aCount)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            int* xDest = (int*)(this.Offset + aStart);
+            int* xDest;
+            fixed (byte* aArrayPtr = this.memory)
+            {
+                xDest = (int*)(aArrayPtr + aStart);
+            }
             fixed (int* aDataPtr = aData)
             {
                 MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
