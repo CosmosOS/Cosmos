@@ -4,10 +4,19 @@ using Cosmos.HAL.Drivers;
 
 namespace Cosmos.System.Graphics
 {
+    /// <summary>
+    /// FullScreenCanvas class. Used to set and get full screen canvas.
+    /// </summary>
     public static class FullScreenCanvas
     {
+        /// <summary>
+        /// Boolean value whether CGS is in use or not
+        /// </summary>
         public static bool IsInUse = false;
 
+        /// <summary>
+        /// Disables the specified Graphics Driver used and returns to VGA text mode 80x25
+        /// </summary>
         public static void Disable()
         {
             if (IsInUse)
@@ -17,6 +26,9 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// List of all video drivers (BGA, 
+        /// </summary>
         private enum VideoDriver
         {
             VMWareSVGAIIDriver,
@@ -24,15 +36,30 @@ namespace Cosmos.System.Graphics
             VGADriver
         }
 
+        /// <summary>
+        /// SVGA 2 device.
+        /// </summary>
         private static PCIDevice _SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
+        /// <summary>
+        /// Checks whether the Bochs Graphics Adapter exists (not limited to Bochs)
+        /// </summary>
+        /// <returns></returns>
         public static bool BGAExists()
         {
             return VBEDriver.Available();
         }
 
+        /// <summary>
+        /// Video driver.
+        /// </summary>
         private static Canvas _VideoDriver = null;
 
+        /// <summary>
+        /// Get video driver.
+        /// </summary>
+        /// <returns>Canvas value.</returns>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
         private static Canvas GetVideoDriver()
         {
             if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
@@ -49,6 +76,12 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Get video driver.
+        /// </summary>
+        /// <param name="mode">Mode.</param>
+        /// <returns>Canvas value.</returns>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
         private static Canvas GetVideoDriver(Mode mode)
         {
             if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
@@ -65,6 +98,11 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Get full screen canvas.
+        /// </summary>
+        /// <returns>Canvas value.</returns>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
         public static Canvas GetFullScreenCanvas()
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
@@ -81,6 +119,12 @@ namespace Cosmos.System.Graphics
             return _VideoDriver;
         }
 
+        /// <summary>
+        /// Get full screen canvas.
+        /// </summary>
+        /// <param name="mode">Mode.</param>
+        /// <returns>Canvas value.</returns>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
         public static Canvas GetFullScreenCanvas(Mode mode)
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);

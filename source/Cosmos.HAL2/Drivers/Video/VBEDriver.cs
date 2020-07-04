@@ -223,10 +223,11 @@ namespace Cosmos.HAL.Drivers
         /// </summary>
         /// <param name="index">Index to get.</param>
         /// <returns>byte value.</returns>
-        public byte GetVRAM(uint index)
+        public uint GetVRAM(uint index)
         {
-            return (lastbuffer[index]);
-            //return IO.LinearFrameBuffer.Bytes[index];
+            int pixel = (lastbuffer[index] << 24) | (lastbuffer[index + 1] << 16) | (lastbuffer[index + 2] << 8) | lastbuffer[index + 3];
+
+            return (uint)pixel;
         }
 
         /// <summary>
