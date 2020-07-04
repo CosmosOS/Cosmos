@@ -68,10 +68,6 @@ namespace Cosmos.HAL.Drivers
             NoClearMemory = 0x80,
         };
 
-        int xRes;
-        int yRes;
-        int Bpp;
-
         /// <summary>
         /// Create new instance of the <see cref="VBEDriver"/> class.
         /// </summary>
@@ -81,9 +77,6 @@ namespace Cosmos.HAL.Drivers
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
             Global.mDebugger.SendInternal($"Creating VBEDriver with Mode {xres}*{yres}@{bpp}");
-            xRes = xres;
-            yRes = yres;
-            Bpp = bpp;
             IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, (uint)xres * yres * (uint)(bpp / 8));
             lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
             VBESet(xres, yres, bpp);
