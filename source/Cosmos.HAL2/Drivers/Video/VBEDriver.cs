@@ -225,7 +225,7 @@ namespace Cosmos.HAL.Drivers
         /// <returns>byte value.</returns>
         public uint GetVRAM(uint index)
         {
-            int pixel = (lastbuffer[index] << 24) | (lastbuffer[index + 1] << 16) | (lastbuffer[index + 2] << 8) | lastbuffer[index + 3];
+            int pixel = (lastbuffer[index + 3] | (lastbuffer[index + 2] << 8) | (lastbuffer[index + 1] << 16) | lastbuffer[index] << 24);
 
             return (uint)pixel;
         }
