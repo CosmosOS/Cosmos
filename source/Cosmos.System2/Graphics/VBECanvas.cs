@@ -222,7 +222,10 @@ namespace Cosmos.System.Graphics
 
                     Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
 
-                    _VBEDriver.SetVRAM(offset, (uint)color.ToArgb());
+                    _VBEDriver.SetVRAM(offset, color.B);
+                    _VBEDriver.SetVRAM(offset + 1, color.G);
+                    _VBEDriver.SetVRAM(offset + 2, color.R);
+                    _VBEDriver.SetVRAM(offset + 3, color.A);
 
                     Global.mDebugger.SendInternal("Point drawn");
                     break;
@@ -312,6 +315,7 @@ namespace Cosmos.System.Graphics
         {
             int xOffset = GetPointOffset(aX, aY);
             int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+            aWidth *= (int)Mode.ColorDepth / 8;
 
             for (int i = 0; i < aHeight; i++)
             {
@@ -343,6 +347,11 @@ namespace Cosmos.System.Graphics
         }
 
         #endregion
+
+        public override void Display()
+        {
+            _VBEDriver.Swap();
+        }
 
         #region Reading
 

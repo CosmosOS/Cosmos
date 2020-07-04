@@ -408,5 +408,10 @@ namespace Cosmos.System.Graphics
                 throw new NotImplementedException();
             }
         }
+
+        public override void Display()
+        {
+            
+        }
     }
 }

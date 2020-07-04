@@ -58,6 +58,8 @@ namespace Cosmos.System.Graphics
 
         public abstract void DrawPoint(Pen pen, float x, float y);
 
+        public abstract void Display();
+
         public abstract Color GetPointColor(int x, int y);
 
         public virtual void DrawArray(Color[] colors, Point point, int width, int height)
