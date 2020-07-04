@@ -148,7 +148,10 @@ namespace Cosmos.System.Graphics
 
                     Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
 
-                    _VBEDriver.SetVRAM(offset, (uint)color.ToArgb());
+                    _VBEDriver.SetVRAM(offset, color.B);
+                    _VBEDriver.SetVRAM(offset + 1, color.G);
+                    _VBEDriver.SetVRAM(offset + 2, color.R);
+                    _VBEDriver.SetVRAM(offset + 3, color.A);
 
                     Global.mDebugger.SendInternal("Point drawn");
                     break;
