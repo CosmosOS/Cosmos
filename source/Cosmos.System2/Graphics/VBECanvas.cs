@@ -315,6 +315,7 @@ namespace Cosmos.System.Graphics
         {
             int xOffset = GetPointOffset(aX, aY);
             int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+            aWidth *= (int)Mode.ColorDepth / 8;
 
             for (int i = 0; i < aHeight; i++)
             {
