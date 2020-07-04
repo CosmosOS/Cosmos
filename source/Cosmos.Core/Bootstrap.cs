@@ -1,6 +1,8 @@
-﻿namespace Cosmos.Core
+﻿using static Cosmos.Core.Multiboot.MultiBoot;
+
+namespace Cosmos.Core
 {
-    public static class Bootstrap
+    public unsafe static class Bootstrap
     {
         // See note in Global - these are a "hack" for now so
         // we dont force static init of Global, and it "pulls" these later till
@@ -8,6 +10,8 @@
         static public PIC PIC;
         // Has to be static for now, ZeroFill gets called before the Init.
         static public readonly CPU CPU = new CPU();
+
+        static public MemoryBlock header;
 
         // Bootstrap is a class designed only to get the essentials done.
         // ie the stuff needed to "pre boot". Do only the very minimal here.
@@ -31,6 +35,8 @@
              * definively this problem.
              */
             CPU.InitFloat();
+
+            header = new MemoryBlock(Multiboot.GetMBI.GetMBIAddress(), (uint)sizeof(Header));
 
             // Managed_Memory_System.ManagedMemory.Initialize();
             // Managed_Memory_System.ManagedMemory.SetUpMemoryArea();
