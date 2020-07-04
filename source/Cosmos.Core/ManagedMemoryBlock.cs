@@ -125,9 +125,16 @@ namespace Cosmos.Core
             }
         }
 
-        public unsafe void Copy(MemoryBlock lastbuffer)
+        /// <summary>
+        /// Copy MemoryBlock into ManagedMemoryBlock
+        /// </summary>
+        /// <param name="block">MemoryBlock to copy.</param>
+        public unsafe void Copy(MemoryBlock block)
         {
-            //Copy(lastbuffer.ToArray());
+            byte* xDest = (byte*)(this.Offset);
+            byte* aDataPtr = (byte*)block.Base;
+
+            MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
         }
 
         /// <summary>

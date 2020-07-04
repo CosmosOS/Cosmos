@@ -262,10 +262,8 @@ namespace Cosmos.HAL.Drivers
         }
 
         /// <summary>
-        /// Swap buffers
+        /// Swap back buffer to video memory
         /// </summary>
-        /// <param name="index">Index to get.</param>
-        /// <returns>byte value.</returns>
         public void Swap()
         {
             IO.LinearFrameBuffer.Copy(lastbuffer);
