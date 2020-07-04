@@ -193,6 +193,15 @@ namespace Cosmos.Core
             }
         }
 
+        public unsafe void Copy(ManagedMemoryBlock lastbuffer)
+        {
+            byte* xDest = (byte*)(Base);
+
+            byte* aDataPtr = (byte*)lastbuffer.Offset;
+
+            MemoryOperations.Copy(xDest, aDataPtr, (int)lastbuffer.Size);
+        }
+
         /// <summary>
         /// Move bytes array down the memory block.
         /// </summary>

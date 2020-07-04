@@ -9,11 +9,11 @@ namespace Cosmos.HAL.Drivers
     /// <summary>
     /// VBEDriver class. Used to directly write registers values to the port.
     /// </summary>
-    public unsafe class VBEDriver
+    public class VBEDriver
     {
 
         private static readonly VBE IO = Core.Global.BaseIOGroups.VBE;
-        static byte[] lastbuffer;
+        ManagedMemoryBlock lastbuffer;
 
         /// <summary>
         /// Register index.
@@ -84,8 +84,8 @@ namespace Cosmos.HAL.Drivers
             xRes = xres;
             yRes = yres;
             Bpp = bpp;
-            IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, (uint)xres * yres * 4);
-            lastbuffer = new byte[xres * yres * 4];
+            IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, (uint)xres * yres * (uint)(bpp / 8));
+            lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
             VBESet(xres, yres, bpp);
         }
 
@@ -235,10 +235,7 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value of fill with.</param>
         public void ClearVRAM(uint value)
         {
-            fixed (byte* destPtr = lastbuffer)
-            {
-                MemoryOperations.Fill(destPtr, (int)value, xRes * yRes * 4);
-            }
+            lastbuffer.Fill(value);
         }
 
         /// <summary>
@@ -249,10 +246,7 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">A volum.</param>
         public void ClearVRAM(int aStart, int aCount, int value)
         {
-            fixed (byte* aArrayPtr = lastbuffer)
-            {
-                MemoryOperations.Fill(aArrayPtr + aStart, value, (int)aCount);
-            }
+            lastbuffer.Fill(aStart, aCount, value);
         }
 
         /// <summary>
@@ -264,15 +258,7 @@ namespace Cosmos.HAL.Drivers
         /// <param name="aCount">A count.</param>
         public void CopyVRAM(int aStart, int[] aData, int aIndex, int aCount)
         {
-            int* xDest;
-            fixed (byte* aArrayPtr = lastbuffer)
-            {
-                xDest = (int*)(aArrayPtr + aStart);
-            }
-            fixed (int* aDataPtr = aData)
-            {
-                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
-            }
+            lastbuffer.Copy(aStart, aData, aIndex, aCount);
         }
 
         /// <summary>

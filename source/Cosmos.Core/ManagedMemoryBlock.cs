@@ -81,6 +81,56 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Fill memory block.
+        /// </summary>
+        /// <param name="aStart">A start.</param>
+        /// <param name="aCount">A count.</param>
+        /// <param name="aData">A data.</param>
+        public unsafe void Fill(uint aStart, uint aCount, uint aData)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            uint* xDest = (uint*)(this.Offset + aStart);
+            MemoryOperations.Fill(xDest, aData, (int)aCount);
+        }
+
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aCount">Data size.</param>
+        /// <param name="aData">A data to fill memory block with.</param>
+        public unsafe void Fill(int aStart, int aCount, int aData)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(this.Offset + aStart);
+            MemoryOperations.Fill(xDest, aData, (int)aCount);
+        }
+
+        /// <summary>
+        /// Fill memory block.
+        /// </summary>
+        /// <param name="aData">A data to fill.</param>
+        public void Fill(uint aData)
+        {
+            Fill(0, Size, aData);
+        }
+
+        public unsafe void Copy(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(this.Offset + aStart);
+            fixed (int* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
+            }
+        }
+
+        public unsafe void Copy(MemoryBlock lastbuffer)
+        {
+            //Copy(lastbuffer.ToArray());
+        }
+
+        /// <summary>
         /// Read 16-bit from the memory block.
         /// </summary>
         /// <param name="offset">Data offset.</param>
