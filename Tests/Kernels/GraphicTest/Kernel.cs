@@ -112,6 +112,8 @@ namespace GraphicTest
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
+            
+            aCanvas.Display();
 
             aCanvas.Disable();
             Console.WriteLine("Back in text mode");
