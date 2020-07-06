@@ -76,18 +76,19 @@ namespace Cosmos.HAL.Drivers
         /// <param name="bpp">BPP (color depth).</param>
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
-            Global.mDebugger.SendInternal($"Creating VBEDriver with Mode {xres}*{yres}@{bpp}");
-            if (VBE.IsAvailable() == true)
+            if (VBE.IsAvailable())
             {
+                Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {xres}*{yres}@{bpp}");
                 IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
                 lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
             }
             else
             {
+                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}");
                 IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
                 lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
+                VBESet(xres, yres, bpp);
             }
-            VBESet(xres, yres, bpp);
         }
 
 		/// <summary>

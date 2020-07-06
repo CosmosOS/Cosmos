@@ -116,7 +116,6 @@ namespace Cosmos.Core
             [FieldOffset(18)]
             public ushort totalmemory;
             [FieldOffset(20)]
-
             public ushort oemSoftwareRev;
             [FieldOffset(24)]
             public uint oemVendorNamePtr;
