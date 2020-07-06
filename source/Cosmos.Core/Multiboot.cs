@@ -9,9 +9,10 @@ namespace Cosmos.Core
     /// </summary>
     public class Multiboot
     {
-        /// <summary>
+        /// /// <summary>
         /// Get Multiboot address. Plugged.
         /// </summary>
+        /// <returns>The Multiboot Address</returns>
         [PlugMethod(PlugRequired = true)]
         public static uint GetMBIAddress() => throw null;
 
@@ -66,6 +67,10 @@ namespace Cosmos.Core
 
         static uint VBEINFO_PRESENT = (1 << 11);
 
+        /// /// <summary>
+        /// Check in Multiboot if VBE is available
+        /// </summary>
+        /// <returns>True if is available, false if not</returns>
         public static bool IsAvailable()
         {
             if ((Bootstrap.header->Flags & VBEINFO_PRESENT) == 0)
@@ -78,11 +83,18 @@ namespace Cosmos.Core
             }
         }
 
+        /// /// <summary>
+        /// Get VBE Modeinfo structure
+        /// </summary>
         public static ModeInfo getModeInfo()
         {
             return *Bootstrap.modeinfo;
         }
 
+        /// /// <summary>
+        /// Get the linear frame buffer address from VBE ModeInfo structure
+        /// </summary>
+        /// <returns>the offset in an uint</returns>
         public static uint getLfbOffset()
         {
             return Bootstrap.modeinfo->framebuffer;
