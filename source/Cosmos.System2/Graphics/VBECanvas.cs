@@ -48,6 +48,7 @@ namespace Cosmos.System.Graphics
             {
                 Core.VBE.ModeInfo ModeInfo = Core.VBE.getModeInfo();
                 aMode = new Mode(ModeInfo.width, ModeInfo.height, (ColorDepth)ModeInfo.bpp);
+                Global.mDebugger.SendInternal($"Detected VBE VESA with {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
             }
 
             ThrowIfModeIsNotValid(aMode);

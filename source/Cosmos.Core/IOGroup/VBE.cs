@@ -27,7 +27,7 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Frame buffer memory block.
         /// </summary>
-        public MemoryBlock LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
+        public MemoryBlock LinearFrameBuffer;
         //public MemoryBlock LinearFrameBuffer = new MemoryBlock(0xE0000000, 1024 * 768 * 4);
     }
 }

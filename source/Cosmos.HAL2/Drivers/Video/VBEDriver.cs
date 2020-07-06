@@ -77,8 +77,16 @@ namespace Cosmos.HAL.Drivers
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
             Global.mDebugger.SendInternal($"Creating VBEDriver with Mode {xres}*{yres}@{bpp}");
-            //IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, (uint)xres * yres * (uint)(bpp / 8));
-            lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
+            if (VBE.IsAvailable() == true)
+            {
+                IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
+                lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
+            }
+            else
+            {
+                IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
+                lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
+            }
             VBESet(xres, yres, bpp);
         }
 

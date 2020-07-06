@@ -83,6 +83,11 @@ namespace Cosmos.Core
             return *Bootstrap.modeinfo;
         }
 
+        public static uint getLfbOffset()
+        {
+            return Bootstrap.modeinfo->framebuffer;
+        }
+
         [StructLayout(LayoutKind.Explicit, Size = 36)]
         public struct ControllerInfo
         {
