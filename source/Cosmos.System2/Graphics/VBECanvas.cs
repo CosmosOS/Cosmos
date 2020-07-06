@@ -44,6 +44,12 @@ namespace Cosmos.System.Graphics
         {
             Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
 
+            if (Core.VBE.IsAvailable())
+            {
+                Core.VBE.ModeInfo ModeInfo = Core.VBE.getModeInfo();
+                aMode = new Mode(ModeInfo.width, ModeInfo.height, (ColorDepth)ModeInfo.bpp);
+            }
+
             ThrowIfModeIsNotValid(aMode);
 
             _VBEDriver = new VBEDriver((ushort)aMode.Columns, (ushort)aMode.Rows, (ushort)aMode.ColorDepth);

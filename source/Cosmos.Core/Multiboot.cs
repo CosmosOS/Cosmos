@@ -64,6 +64,25 @@ namespace Cosmos.Core
     public unsafe static class VBE
     {
 
+        static uint VBEINFO_PRESENT = (1 << 11);
+
+        public static bool IsAvailable()
+        {
+            if ((Bootstrap.header->Flags & VBEINFO_PRESENT) == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public static ModeInfo getModeInfo()
+        {
+            return *Bootstrap.modeinfo;
+        }
+
         [StructLayout(LayoutKind.Explicit, Size = 36)]
         public struct ControllerInfo
         {
