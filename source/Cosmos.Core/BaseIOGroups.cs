@@ -43,6 +43,6 @@ namespace Cosmos.Core {
         /// <summary>
         /// VBE.
         /// </summary>
-        public readonly IOGroup.VBE VBE = new IOGroup.VBE();
+        public readonly IOGroup.VBEIOGroup VBE = new IOGroup.VBEIOGroup();
     }
 }

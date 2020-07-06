@@ -12,7 +12,7 @@ namespace Cosmos.HAL.Drivers
     public class VBEDriver
     {
 
-        private static readonly VBE IO = Core.Global.BaseIOGroups.VBE;
+        private static readonly VBEIOGroup IO = Core.Global.BaseIOGroups.VBE;
         ManagedMemoryBlock lastbuffer;
 
         /// <summary>

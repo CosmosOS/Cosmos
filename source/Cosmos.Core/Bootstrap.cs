@@ -1,6 +1,4 @@
-﻿using static Cosmos.Core.Multiboot.MultiBoot;
-
-namespace Cosmos.Core
+﻿namespace Cosmos.Core
 {
     public unsafe static class Bootstrap
     {
@@ -11,7 +9,10 @@ namespace Cosmos.Core
         // Has to be static for now, ZeroFill gets called before the Init.
         static public readonly CPU CPU = new CPU();
 
-        static public MemoryBlock header;
+        public static Multiboot.Header* header;
+
+        public static VBE.ModeInfo* modeinfo;
+        public static VBE.ControllerInfo* controllerinfo;
 
         // Bootstrap is a class designed only to get the essentials done.
         // ie the stuff needed to "pre boot". Do only the very minimal here.
@@ -36,7 +37,10 @@ namespace Cosmos.Core
              */
             CPU.InitFloat();
 
-            header = new MemoryBlock(Multiboot.GetMBI.GetMBIAddress(), (uint)sizeof(Header));
+            header = (Multiboot.Header*)Multiboot.GetMBIAddress();
+
+            modeinfo = (Core.VBE.ModeInfo*)header->vbeModeInfo;
+            controllerinfo = (Core.VBE.ControllerInfo*)header->vbeControlInfo;
 
             // Managed_Memory_System.ManagedMemory.Initialize();
             // Managed_Memory_System.ManagedMemory.SetUpMemoryArea();

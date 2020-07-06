@@ -10,7 +10,7 @@ namespace Cosmos.Core.IOGroup
     /// <summary>
     /// VBE class.
     /// </summary>
-    public class VBE : IOGroup
+    public class VBEIOGroup : IOGroup
     {
         /// <summary>
         /// Index IOPort.

@@ -1,19 +1,20 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          Multiboot struct
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   https://www.gnu.org/software/grub/manual/multiboot/multiboot.html
-*                   https://wiki.osdev.org/User:Omarrx024/VESA_Tutorial
-*                   http://www.phatcode.net/res/221/files/vbe20.pdf
-*/
-
+﻿using IL2CPU.API.Attribs;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Core.Multiboot
+namespace Cosmos.Core
 {
-    public static class MultiBoot
+    /// <summary>
+    /// Used for Multiboot parsing
+    /// </summary>
+    public class Multiboot
     {
+        /// <summary>
+        /// Get Multiboot address. Plugged.
+        /// </summary>
+        [PlugMethod(PlugRequired = true)]
+        public static uint GetMBIAddress() => throw null;
+
         [StructLayout(LayoutKind.Explicit, Size = 88)]
         public unsafe struct Header
         {
