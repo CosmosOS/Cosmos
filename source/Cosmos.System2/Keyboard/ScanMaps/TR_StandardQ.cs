@@ -11,12 +11,21 @@ using Cosmos.System;
 
 namespace Cosmos.System.ScanMaps
 {
+    /// <summary>
+    /// TR_StandardQ class. Represent TR_StandardQ keyboard layout.
+    /// </summary>
     public class TR_StandardQ : ScanMapBase
     {
+        /// <summary>
+        /// Create new instance of the <see cref="TR_StandardQ"/> class.
+        /// </summary>
         public TR_StandardQ()
         {
         }
 
+        /// <summary>
+        /// Init key list.
+        /// </summary>
         protected override void InitKeys()
         {
             _keys = new List<KeyMapping>(100);
