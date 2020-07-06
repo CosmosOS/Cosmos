@@ -129,6 +129,7 @@ namespace Cosmos.System.Graphics
             new Mode(1024, 768, ColorDepth.ColorDepth32),
             /* The so called HD-Ready resolution */
             new Mode(1280, 720, ColorDepth.ColorDepth32),
+            new Mode(1280, 768, ColorDepth.ColorDepth32),
             new Mode(1280, 1024, ColorDepth.ColorDepth32),
             /* A lot of HD-Ready screen uses this instead of 1280x720 */
             new Mode(1366, 768, ColorDepth.ColorDepth32),
