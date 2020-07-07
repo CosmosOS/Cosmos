@@ -65,7 +65,7 @@ This directory contains the low-level plugs for Cosmos.Core.
 #### \Source\Cosmos.Debug
 
 This directory contains the Debug Engine and Connector code and also, it's gives the possibility to
-work with GDB. For more informations about debugging see the [Debugger](debugger.htm) page
+work with GDB. For more informations about debugging see the [Debugger](Debugger/DebugCommands.md) page
 
 #### \Source\Cosmos.Deploy
 
