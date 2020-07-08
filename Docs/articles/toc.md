@@ -17,6 +17,7 @@
 ## [Memory](Kernel/Memory.md)
 ## [Plugs](Kernel/Plugs.md)
 ## [Startup](Kernel/Startup.md)
+## [Graphics](Kernel/CGS.md)
 
 # Reference
 ## [x86](Reference/x86.md)
