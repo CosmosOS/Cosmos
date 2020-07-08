@@ -21,3 +21,4 @@ jobs:
       env:
         BUILD_DIR: ./Docs/_site
         GH_PAT: ${{ secrets.GH_PAGES }}
+        GITHUB_REPOSITORY: CosmosOS/cosmosos.github.io
