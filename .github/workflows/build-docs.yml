@@ -10,15 +10,20 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.101
+    # - name: Setup dotnet
+    #   uses: actions/setup-dotnet@v1
+    #   with:
+    #     dotnet-version: 3.1.101
+    # - name: Build docs
+    #   run: dotnet build ./Docs/Cosmos.Docs.csproj
     - name: Build docs
-      run: dotnet build ./Docs/Cosmos.Docs.csproj
+      uses: nikeee/docfx-action@v1.0.0
+      with:
+        args: ./Docs/docfx.json
     - name: Publish to GitHub Pages
-      uses: maxheld83/ghpages@master
-      env:
-        BUILD_DIR: ./Docs/_site
-        GH_PAT: ${{ secrets.GH_PAGES }}
-        GITHUB_REPOSITORY: CosmosOS/cosmosos.github.io
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        personal_token: ${{ secrets.GH_PAGES }}
+        external_repository: CosmosOS/cosmosos.github.io
+        publish_branch: master
+        publish_dir: ./Docs/_site
