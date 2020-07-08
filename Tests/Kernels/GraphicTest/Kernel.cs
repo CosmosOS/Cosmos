@@ -49,8 +49,8 @@ namespace GraphicTest
             Pen pen = new Pen(Color.Red);
             aCanvas.DrawPoint(pen, 69, 69);
 
-            //Color color = aCanvas.GetPointColor(69, 69);
-            //Assert.AreEqual(color.ToArgb(), Color.Red.ToArgb(), "GetPointColor returns correct value");
+            Color color = aCanvas.GetPointColor(69, 69);
+            Assert.AreEqual(color.ToArgb(), Color.Red.ToArgb(), "GetPointColor returns correct value");
 
             /* A GreenYellow horizontal line */
             pen.Color = Color.GreenYellow;
