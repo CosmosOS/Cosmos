@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.System.Graphics
+namespace Cosmos.System.Graphics.Fonts
 {
-    public class PCScreenFont
+    public class PCScreenFont : Font
     {
 
         #region DefaultFontData
@@ -65,13 +65,23 @@ namespace Cosmos.System.Graphics
             MAXMODE = 5
         }
 
-        readonly byte[] _FontData; // Has all the data to display the letters
-        readonly List<UnicodeMapping> _UnicodeMappings; // Maps the fonts to the corresponding unicode characters
+        private byte[] _FontData; // Has all the data to display the letters
+        public override byte[] Data
+        {
+            get => _FontData;
+        }
 
-        public readonly byte CharHeight;
-        public readonly byte CharWidth;
+        private List<UnicodeMapping> _UnicodeMappings; // Maps the fonts to the corresponding unicode characters
+
+        public byte CharHeight;
+        public byte CharWidth;
 
         public PCScreenFont(byte[] aFileData)
+        {
+            SetFont(aFileData);
+        }
+
+        public override void SetFont(byte[] aFileData)
         {
             bool version1 = aFileData[0] == 0x36 && aFileData[1] == 0x04;
             bool version2 = BitConverter.ToUInt32(aFileData, 0) == 0x864ab572;
@@ -232,6 +242,8 @@ namespace Cosmos.System.Graphics
 
             return offset;
         }
+
+        
     }
 
     struct UnicodeMapping

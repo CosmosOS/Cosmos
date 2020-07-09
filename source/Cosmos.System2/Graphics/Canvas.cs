@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using Cosmos.System.Graphics.Fonts;
 
 namespace Cosmos.System.Graphics
 {
@@ -481,15 +482,35 @@ namespace Cosmos.System.Graphics
             DrawImage(image, point.X, point.Y);
         }
 
-        //public void DrawString(String str, Font aFont, Brush brush, Point point)
-        //{
-        //    DrawString(str, aFont, brush, point.X, point.Y);
-        //}
+        public void DrawString(string str, Font aFont, Pen pen, Point point)
+        {
+            DrawString(str, aFont, pen, point.X, point.Y);
+        }
 
-        //public void DrawString(String str, Font aFont, Brush brush, int x, int y)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        {
+            foreach (char c in str)
+            {
+                DrawChar(c, aFont, pen, x, y);;
+                x += 9;
+            }
+        }
+
+        public void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        {
+            int p = 16 * c;
+
+            for (int cy = 0; cy < 16; cy++)
+            {
+                for (byte cx = 0; cx < 8; cx++)
+                {
+                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
+                    {
+                        DrawPoint(pen, (ushort)((x) + (9 - cx)), (ushort)((y) + cy));
+                    }
+                }
+            }
+        }
 
         protected bool CheckIfModeIsValid(Mode mode)
         {
