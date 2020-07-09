@@ -498,7 +498,7 @@ namespace Cosmos.System.Graphics
 
         public void DrawChar(char c, Font aFont, Pen pen, int x, int y)
         {
-            int p = aFont.Height * c;
+            int p = aFont.Height * (byte)c;
 
             for (int cy = 0; cy < aFont.Height; cy++)
             {
