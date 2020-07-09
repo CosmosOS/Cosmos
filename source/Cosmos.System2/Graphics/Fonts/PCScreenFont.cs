@@ -74,7 +74,16 @@ namespace Cosmos.System.Graphics.Fonts
         private List<UnicodeMapping> _UnicodeMappings; // Maps the fonts to the corresponding unicode characters
 
         public byte CharHeight;
+        public override byte Height
+        {
+            get => CharHeight;
+        }
+
         public byte CharWidth;
+        public override byte Width
+        {
+            get => CharWidth;
+        }
 
         public PCScreenFont(byte[] aFileData)
         {

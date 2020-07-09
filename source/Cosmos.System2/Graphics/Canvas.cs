@@ -492,21 +492,21 @@ namespace Cosmos.System.Graphics
             foreach (char c in str)
             {
                 DrawChar(c, aFont, pen, x, y);;
-                x += 9;
+                x += aFont.Width;
             }
         }
 
         public void DrawChar(char c, Font aFont, Pen pen, int x, int y)
         {
-            int p = 16 * c;
+            int p = aFont.Height * c;
 
-            for (int cy = 0; cy < 16; cy++)
+            for (int cy = 0; cy < aFont.Height; cy++)
             {
-                for (byte cx = 0; cx < 8; cx++)
+                for (byte cx = 0; cx < aFont.Width; cx++)
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        DrawPoint(pen, (ushort)((x) + (9 - cx)), (ushort)((y) + cy));
+                        DrawPoint(pen, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
                     }
                 }
             }

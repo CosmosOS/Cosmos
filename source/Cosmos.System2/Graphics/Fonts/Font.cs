@@ -9,6 +9,10 @@ namespace Cosmos.System.Graphics.Fonts
 
         public abstract byte[] Data { get; }
 
+        public abstract byte Height { get; }
+
+        public abstract byte Width { get; }
+
         public abstract void SetFont(byte[] aFileData);
 
         public bool ConvertByteToBitAddres(byte byteToConvert, int bitToReturn)
