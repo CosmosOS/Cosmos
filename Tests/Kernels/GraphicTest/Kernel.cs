@@ -116,7 +116,7 @@ namespace GraphicTest
 
             /* Create a PC Screen Font */
             pen = new Pen(Color.White);
-            Font font = new PCScreenFont();
+            Font font = PCScreenFont.Default;
 
             /* Draw text */
             aCanvas.DrawString("Hello Cosmos World!", font, pen, 0, 16 * 5);
