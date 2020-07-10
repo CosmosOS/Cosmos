@@ -92,6 +92,15 @@ namespace Cosmos.System.Graphics
         {
             Color xColor = aPen.Color;
 
+            if (xColor.A == 0)
+            {
+                return;
+            }
+            else if (xColor.A < 255)
+            {
+                xColor = AlphaBlend(xColor, GetPointColor(aX, aY), xColor.A);
+            }
+
             mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {xColor.Name} Color");
             _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
             mSVGAIIDebugger.SendInternal($"Done drawing point");
