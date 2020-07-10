@@ -169,7 +169,7 @@ namespace Cosmos.System.Graphics
             {
                 throw new Exception("Header is not from a BMP");
             }
-
+            
             //read size of BMP file - byte 2 -> 6
             stream.Read(_int, 0, 4);
             uint fileSize = BitConverter.ToUInt32(_int, 0);
@@ -182,7 +182,7 @@ namespace Cosmos.System.Graphics
             //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
             stream.Read(_int, 0, 4);
             uint infoHeaderSize = BitConverter.ToUInt32(_int, 0);
-            if (infoHeaderSize != 40)
+            if (infoHeaderSize != 40 && infoHeaderSize != 56) // 56 - is BITMAPV3INFOHEADER, where we ignore the additional values see https://web.archive.org/web/20150127132443/https://forums.adobe.com/message/3272950
             {
                 throw new Exception("Info header size has the wrong value!");
             }
@@ -201,6 +201,7 @@ namespace Cosmos.System.Graphics
             {
                 throw new Exception("Number of planes is not 1! Can not read file!");
             }
+            
             //now reading size of bits per pixel (1, 4, 8, 24, 32) - bytes 28 - 30
             stream.Read(_short, 0, 2);
             ushort pixelSize = BitConverter.ToUInt16(_short, 0);
@@ -213,7 +214,7 @@ namespace Cosmos.System.Graphics
             stream.Read(_int, 0, 4);
             uint compression = BitConverter.ToUInt32(_int, 0);
             //TODO: Be able to handle compressed files
-            if (compression != 0)
+            if (compression != 0 && compression != 3) //3 is BI_BITFIELDS again ignore for now is for Adobe Images
             {
                 Global.mDebugger.Send("Can only handle uncompressed files!");
                 throw new NotImplementedException("Can only handle uncompressed files!");
@@ -226,7 +227,7 @@ namespace Cosmos.System.Graphics
                 totalImageSize = (uint)((((imageWidth * pixelSize) + 31) & ~31) >> 3) * imageHeight; // Look at the link above for the explanation
                 Global.mDebugger.SendInternal("Calcualted image size: " + totalImageSize);
             }
-
+            
             #endregion BMP Header
 
             //Set the bitmap to have the correct values
