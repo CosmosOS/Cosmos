@@ -1021,7 +1021,7 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="x1">X coordinate.</param>
         /// <param name="y1">Y coordinate.</param>
-        /// /// <param name="x2">X coordinate.</param>
+        /// <param name="x2">X coordinate.</param>
         /// <param name="y2">Y coordinate.</param>
         protected void TrimLine(ref int x1, ref int y1, ref int x2, ref int y2)
         {
@@ -1109,6 +1109,20 @@ namespace Cosmos.System.Graphics
             // replace inputs with new values
             x1 = (int)x1_out; y1 = (int)y1_out;
             x2 = (int)x2_out; y2 = (int)y2_out;
+        }
+
+        /// <summary>
+        /// Calculate new Color from back Color with alpha
+        /// </summary>
+        /// <param name="to">Color to calculate.</param>
+        /// <param name="from">Color used to calculate.</param>
+        /// <param name="alpha">Alpha amount.</param>
+        public Color AlphaBlend(Color to, Color from, float alpha)
+        {
+            byte R = (byte)((to.R * alpha) + from.R * (1 - alpha));
+            byte G = (byte)((to.G * alpha) + from.G * (1 - alpha));
+            byte B = (byte)((to.B * alpha) + from.B * (1 - alpha));
+            return Color.FromArgb(R, G, B);
         }
 
     }
