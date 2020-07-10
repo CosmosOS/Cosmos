@@ -857,6 +857,26 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Draw image with alpha channel.
+        /// </summary>
+        /// <param name="image">Image to draw.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        public void DrawImageAlpha(Image image, int x, int y)
+        {
+            for (int _x = 0; _x < image.Width; _x++)
+            {
+                for (int _y = 0; _y < image.Height; _y++)
+                {
+                    Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
+                    DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])), x + _x, y + _y);
+                }
+            }
+        }
+
+        /// <summary>
         /// Draw image.
         /// </summary>
         /// <param name="image">Image to draw.</param>
@@ -866,6 +886,18 @@ namespace Cosmos.System.Graphics
         public void DrawImage(Image image, Point point)
         {
             DrawImage(image, point.X, point.Y);
+        }
+
+        /// <summary>
+        /// Draw image with alpha channel.
+        /// </summary>
+        /// <param name="image">Image to draw.</param>
+        /// <param name="point">Point of the top left corner of the image.</param>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        public void DrawImageAlpha(Image image, Point point)
+        {
+            DrawImageAlpha(image, point.X, point.Y);
         }
 
         /// <summary>
@@ -1117,11 +1149,11 @@ namespace Cosmos.System.Graphics
         /// <param name="to">Color to calculate.</param>
         /// <param name="from">Color used to calculate.</param>
         /// <param name="alpha">Alpha amount.</param>
-        public Color AlphaBlend(Color to, Color from, float alpha)
+        public Color AlphaBlend(Color to, Color from, byte alpha)
         {
-            byte R = (byte)((to.R * alpha) + from.R * (1 - alpha));
-            byte G = (byte)((to.G * alpha) + from.G * (1 - alpha));
-            byte B = (byte)((to.B * alpha) + from.B * (1 - alpha));
+            byte R = (byte)((to.R * alpha + from.R * (255 - alpha)) >> 8);
+            byte G = (byte)((to.G * alpha + from.G * (255 - alpha)) >> 8);
+            byte B = (byte)((to.B * alpha + from.B * (255 - alpha)) >> 8);
             return Color.FromArgb(R, G, B);
         }
 
