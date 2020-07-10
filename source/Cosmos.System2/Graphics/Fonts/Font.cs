@@ -9,7 +9,6 @@ namespace Cosmos.System.Graphics.Fonts
     /// </summary>
     public abstract class Font
     {
-
         /// <summary>
         /// Get font pure data.
         /// </summary>
