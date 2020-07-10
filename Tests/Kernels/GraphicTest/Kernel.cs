@@ -6,6 +6,7 @@ using System.Drawing;
 using Point = Cosmos.System.Graphics.Point;
 using System.IO;
 using Cosmos.Compiler.Tests.Bcl;
+using Cosmos.System.Graphics.Fonts;
 
 /*
  * It is impossible to make assertions here but it is useful in any case to have it runs automatically
@@ -112,7 +113,18 @@ namespace GraphicTest
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
-            
+
+            /* Create a PC Screen Font */
+            pen = new Pen(Color.White);
+            Font font = new PCScreenFont();
+
+            /* Draw text */
+            aCanvas.DrawString("Hello Cosmos World!", font, pen, 0, 16 * 5);
+            aCanvas.DrawString("font data test=" + font.Width + "x" + font.Height, font, pen, 0, 16 * 6);
+
+            /* Draw char */
+            aCanvas.DrawChar('A', font, pen, 0, 16 * 7);
+
             aCanvas.Display();
 
             aCanvas.Disable();
