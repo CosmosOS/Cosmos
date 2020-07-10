@@ -226,14 +226,32 @@ namespace Cosmos.System.Graphics
             switch (Mode.ColorDepth)
             {
                 case ColorDepth.ColorDepth32:
+
+                    if (color.A == 0)
+                        return;
+
                     offset = (uint)GetPointOffset(aX, aY);
 
                     Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
 
-                    _VBEDriver.SetVRAM(offset, color.B);
-                    _VBEDriver.SetVRAM(offset + 1, color.G);
-                    _VBEDriver.SetVRAM(offset + 2, color.R);
-                    _VBEDriver.SetVRAM(offset + 3, color.A);
+                    if (color.A == 255)
+                    {
+                        _VBEDriver.SetVRAM(offset, color.B);
+                        _VBEDriver.SetVRAM(offset + 1, color.G);
+                        _VBEDriver.SetVRAM(offset + 2, color.R);
+                        _VBEDriver.SetVRAM(offset + 3, color.A);
+                    }
+                    else
+                    {
+                        byte R = (byte)((color.R * color.A + GetPointColor(aX, aY).R * (255 - color.A)) >> 8);
+                        byte G = (byte)((color.G * color.A + GetPointColor(aX, aY).G * (255 - color.A)) >> 8);
+                        byte B = (byte)((color.B * color.A + GetPointColor(aX, aY).B * (255 - color.A)) >> 8);
+
+                        _VBEDriver.SetVRAM(offset, B);
+                        _VBEDriver.SetVRAM(offset + 1, G);
+                        _VBEDriver.SetVRAM(offset + 2, R);
+                        _VBEDriver.SetVRAM(offset + 3, color.A);
+                    }
 
                     Global.mDebugger.SendInternal("Point drawn");
                     break;
