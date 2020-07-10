@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using Cosmos.System.Graphics.Fonts;
 
 namespace Cosmos.System.Graphics
 {
@@ -867,15 +868,70 @@ namespace Cosmos.System.Graphics
             DrawImage(image, point.X, point.Y);
         }
 
-        //public void DrawString(String str, Font aFont, Brush brush, Point point)
-        //{
-        //    DrawString(str, aFont, brush, point.X, point.Y);
-        //}
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="str">string to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="point">Point of the top left corner of the string.</param>
+        public void DrawString(string str, Font aFont, Pen pen, Point point)
+        {
+            DrawString(str, aFont, pen, point.X, point.Y);
+        }
 
-        //public void DrawString(String str, Font aFont, Brush brush, int x, int y)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="str">string to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        {
+            foreach (char c in str)
+            {
+                DrawChar(c, aFont, pen, x, y);;
+                x += aFont.Width;
+            }
+        }
+
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="str">char to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="point">Point of the top left corner of the char.</param>
+        public void DrawChar(char c, Font aFont, Pen pen, Point point)
+        {
+            DrawChar(c, aFont, pen, point.X, point.Y);
+        }
+
+        /// <summary>
+        /// Draw char.
+        /// </summary>
+        /// <param name="str">char to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        {
+            int p = aFont.Height * (byte)c;
+
+            for (int cy = 0; cy < aFont.Height; cy++)
+            {
+                for (byte cx = 0; cx < aFont.Width; cx++)
+                {
+                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
+                    {
+                        DrawPoint(pen, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Check if video mode is valid.

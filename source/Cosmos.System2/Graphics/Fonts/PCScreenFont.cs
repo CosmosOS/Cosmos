@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.System.Graphics
+namespace Cosmos.System.Graphics.Fonts
 {
-    public class PCScreenFont
+    public class PCScreenFont : Font
     {
 
         #region DefaultFontData
@@ -36,7 +36,7 @@ namespace Cosmos.System.Graphics
         //POSSIBILITY OF SUCH DAMAGE.
 
 
-        public PCScreenFont() : this(Convert.FromBase64String("NgQDEAAAAAAAZjxmZmY8ZgAAAAAAABgYGBgYAAAYGBgYGAAAAABsbAAAAAAAAAAAAAAAAAAAAHyCmqKiopqCfAAAAAAAAAB8grqqsqqqgnwAAAAAAHwAAAAAAAAAAAAAAAAAAAAcJgwGJhwAAAAAAAAAAAAAAAAAAAAYPDwYAAAAAAAAAAwYMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYMAAAGDgYGBg8AAAAAAAAAAAAAGCQIBKWbBgwcNSUHgQEADAYAHzGxsb+xsbGxgAAAAAYMAB8xsbG/sbGxsYAAAAAOGwAfMbGxv7GxsbGAAAAADJMAHzGxsb+xsbGxgAAAAAwGAB+wMDA+MDAwH4AAAAAOGwAfsDAwPjAwMB+AAAAAGxsAH7AwMD4wMDAfgAAAAAwGAB+GBgYGBgYGH4AAAAAAAB+1tbWdhYWFhYWAAAAAAA8ZmAwPGZmZmY8DAZmPAAMGAB+GBgYGBgYGH4AAAAAOGwAfhgYGBgYGBh+AAAAAGZmAH4YGBgYGBgYfgAAAAAAAHxmZmb2ZmZmZnwAAAAAMBgAfMbGxsbGxsZ8AAAAABgwAHzGxsbGxsbGfAAAAAA4bAB8xsbGxsbGxnwAAAAAMkwAfMbGxsbGxsZ8AAAAAAAAAAAAxmw4OGzGAAAAAAAAAnzGzs7W1ubmxnyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBgYGBgYGAAYGAAAAAAAZmZmZgAAAAAAAAAAAAAAAABsbP5sbGxs/mxsAAAAAAAQftDQ0HwWFhYW/BAAAAAAAAZmbAwYGDA2ZmAAAAAAAAA4bGxsOHDazMx6AAAAAAAYGBgYAAAAAAAAAAAAAAAADhgwMGBgYGBgYDAwGA4AAHAYDAwGBgYGBgYMDBhwAAAAAABmPBj/" +
+        public static PCScreenFont Default => LoadFont(Convert.FromBase64String("NgQDEAAAAAAAZjxmZmY8ZgAAAAAAABgYGBgYAAAYGBgYGAAAAABsbAAAAAAAAAAAAAAAAAAAAHyCmqKiopqCfAAAAAAAAAB8grqqsqqqgnwAAAAAAHwAAAAAAAAAAAAAAAAAAAAcJgwGJhwAAAAAAAAAAAAAAAAAAAAYPDwYAAAAAAAAAAwYMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYMAAAGDgYGBg8AAAAAAAAAAAAAGCQIBKWbBgwcNSUHgQEADAYAHzGxsb+xsbGxgAAAAAYMAB8xsbG/sbGxsYAAAAAOGwAfMbGxv7GxsbGAAAAADJMAHzGxsb+xsbGxgAAAAAwGAB+wMDA+MDAwH4AAAAAOGwAfsDAwPjAwMB+AAAAAGxsAH7AwMD4wMDAfgAAAAAwGAB+GBgYGBgYGH4AAAAAAAB+1tbWdhYWFhYWAAAAAAA8ZmAwPGZmZmY8DAZmPAAMGAB+GBgYGBgYGH4AAAAAOGwAfhgYGBgYGBh+AAAAAGZmAH4YGBgYGBgYfgAAAAAAAHxmZmb2ZmZmZnwAAAAAMBgAfMbGxsbGxsZ8AAAAABgwAHzGxsbGxsbGfAAAAAA4bAB8xsbGxsbGxnwAAAAAMkwAfMbGxsbGxsZ8AAAAAAAAAAAAxmw4OGzGAAAAAAAAAnzGzs7W1ubmxnyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBgYGBgYGAAYGAAAAAAAZmZmZgAAAAAAAAAAAAAAAABsbP5sbGxs/mxsAAAAAAAQftDQ0HwWFhYW/BAAAAAAAAZmbAwYGDA2ZmAAAAAAAAA4bGxsOHDazMx6AAAAAAAYGBgYAAAAAAAAAAAAAAAADhgwMGBgYGBgYDAwGA4AAHAYDAwGBgYGBgYMDBhwAAAAAABmPBj/" +
             "GDxmAAAAAAAAAAAAABgYfhgYAAAAAAAAAAAAAAAAAAAAABgYMAAAAAAAAAAAAAB+AAAAAAAAAAAAAAAAAAAAAAAAGBgAAAAAAAMDBgYMDBgYMDBgYMDAAAAAfMbGzt725sbGfAAAAAAAABg4eFgYGBgYGH4AAAAAAAB8xgYGDBgwYMb+AAAAAAAAfMYGBjwGBgbGfAAAAAAAAMDAzMzMzP4MDAwAAAAAAAD+xsDA/AYGBsZ8AAAAAAAAfMbAwPzGxsbGfAAAAAAAAP7GBgYMGDAwMDAAAAAAAAB8xsbGfMbGxsZ8AAAAAAAAfMbGxsZ+BgbGfAAAAAAAAAAAABgYAAAAGBgAAAAAAAAAAAAYGAAAABgYMAAAAAAABgwYMGBgMBgMBgAAAAAAAAAAAH4AAH4AAAAAAAAAAABgMBgMBgYMGDBgAAAAAAAAfMYGDBgwMAAwMAAAAAAAAAB8wtra2trewHwAAAAAAAB8xsbG/sbGxsbGAAAAAAAA/MbGxvzGxsbG/AAAAAAAAH7AwMDAwMDAwH4AAAAAAAD8xsbGxsbGxsb8AAAAAAAAfsDAwPjAwMDAfgAAAAAAAH7AwMD4wMDAwMAAAAAAAAB+wMDA3sbGxsZ+AAAAAAAAxsbGxv7GxsbGxgAAAAAAAH4YGBgYGBgYGH4AAAAAAAB+GBgYGBgYGBjwAAAAAAAAxsbGzPjMxsbGxgAAAAAAAMDAwMDAwMDAwH4AAAAAAADG7v7WxsbGxsbGAAAAAAAAxsbm5tbWzs7GxgAAAAAAAHzGxsbGxsbGxnwAAAAAAAD8xsbG/MDAwMDAAAAAAAAAfMbGxsbGxtbWfBgMAAAAAPzGxsb8xsbGxsYAAAAAAAB+wMDAfAYGBgb8AAAAAAAA/xgYGBgYGBgYGAAAAAAAAMbGxsbGxsbGxn4AAAAAAADGxsbGxsbGbDgQAAAAAAAAxsbGxsbG1v7u" +
             "xgAAAAAAAMbGxmw4bMbGxsYAAAAAAADGxsbGfgYGBgb8AAAAAAAA/gYGDBgwYMDA/gAAAAAAPjAwMDAwMDAwMDAwMD4AAMDAYGAwMBgYDAwGBgMDAAB8DAwMDAwMDAwMDAwMfAAAEDhsxgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AAAwGAwAAAAAAAAAAAAAAAAAAAAAAHwGfsbGxn4AAAAAAADAwMD8xsbGxsb8AAAAAAAAAAAAfsDAwMDAfgAAAAAAAAYGBn7GxsbGxn4AAAAAAAAAAAB+xsb+wMB+AAAAAAAAHjAwMHwwMDAwMAAAAAAAAAAAAH7GxsbGxnwGBvwAAADAwMD8xsbGxsbGAAAAAAAAGBgAOBgYGBgYHAAAAAAAABgYABgYGBgYGBgYGHAAAADAwMDM2PDw2MzGAAAAAAAAMDAwMDAwMDAwHAAAAAAAAAAAAOzW1tbWxsYAAAAAAAAAAAD8xsbGxsbGAAAAAAAAAAAAfMbGxsbGfAAAAAAAAAAAAPzGxsbGxvzAwMAAAAAAAAB+xsbGxsZ+BgYGAAAAAAAAfsbAwMDAwAAAAAAAAAAAAH7AwHwGBvwAAAAAAAAwMDB8MDAwMDAeAAAAAAAAAAAAxsbGxsbGfgAAAAAAAAAAAMbGxsZsOBAAAAAAAAAAAADGxtbW1tZuAAAAAAAAAAAAxmw4OGzGxgAAAAAAAAAAAMbGxsbGxn4GBvwAAAAAAAD+BgwYMGD+AAAAAAAOGBgYGBhwcBgYGBgYDgAAABgYGBgYGBgYGBgYGAAAAHAYGBgYGA4OGBgYGBhwAAAyfkwAAAAAAAAAAAAAAAAwGADGxsbGxsbGxn4AAAAAAAB+wMDAwMDAwMB+GBgwAAAAbGwAxsbGxsbGfgAAAAAADBgwAH7Gxv7AwH4AAAAAABA4bAB8Bn7GxsZ+AAAAAAAAbGwAfAZ+xsbGfgAA" +
             "AAAAYDAYAHwGfsbGxn4AAAAAADhsOAB8Bn7GxsZ+AAAAAAAAAAAAfsDAwMDAfhgYMAAAEDhsAH7Gxv7AwH4AAAAAAABsbAB+xsb+wMB+AAAAAABgMBgAfsbG/sDAfgAAAAAAAGZmADgYGBgYGBwAAAAAABg8ZgA4GBgYGBgcAAAAAAAwGAwAOBgYGBgYHAAAAABsbAB8xsbG/sbGxsYAAAAAOGw4fMbGxv7GxsbGAAAAABgwAH7AwMD4wMDAfgAAAAAAAAAAAG4WFn7Q0G4AAAAAAAB+2NjY/tjY2NjeAAAAAAAQOGwAfMbGxsbGfAAAAAAAAGxsAHzGxsbGxnwAAAAAAGAwGAB8xsbGxsZ8AAAAAAAQOGwAxsbGxsbGfgAAAAAAYDAYAMbGxsbGxn4AAAAAAABsbADGxsbGxsZ+Bgb8AGxsAHzGxsbGxsbGfAAAAABsbADGxsbGxsbGxn4AAAAAAAAAAAh+yMjIyMh+CAAAAAAAOGxgYGD4YGDA/gAAAAAAAMPDZjwYPBg8GBgAAAAAGDAAxsbGxsbGxsZ+AAAAADhsAMbGxsbGxsbGfgAAAAAADBgwAHwGfsbGxn4AAAAAAAwYMAA4GBgYGBgcAAAAAAAMGDAAfMbGxsbGfAAAAAAADBgwAMbGxsbGxn4AAAAAADJ+TAD8xsbGxsbGAAAAADJMAMbm5tbWzs7GxgAAAAAAOAw8TDwAfAAAAAAAAAAAADhsbDgAAHwAAAAAAAAAAAAAGBgAGBgwYMDGfAAAAAAYMADGxsbGfgYGBvwAAAAAAAAAAAAA/gYGBgAAAAAAAABAwEBCRuwYMGzSggwQHgAAQMBAQkbsGDBw1JQeBAQAAAAYGAAYGBgYGBgYAAAAAAAAAAAAADNmzGYzAAAAAAAAAAAAAADMZjNmzAAAAAAAEUQRRBFEEUQRRBFEEUQRRFWqVapVqlWqVapVqlWqVardd9" +
@@ -50,10 +50,7 @@ namespace Cosmos.System.Graphics
             "KRSshOrdJLg1yKrhAauURGUsfdrBcOEwHiUQwTSOAiniMZiJsldA/eLHbQlXhnhhod3xINcXu2Ny0rahC55PLsvF2yrtim9vsNaqDI00XCJOl0WgT5lWaBLVM6WVftM1nyJlhDiG6hu8q+sxomTAnOUmIn7FM4pYIvgEMHjzKuB2Eh5oJG/U2UwAD+L0xSGSZaM0v1yOA9J18W2szttu2ESjcalC104DzkVeKUjiSCVtuYX5ws+UQXtzjn2d2u5mEGlQCxi14BgMHYXIe/6/X7IJxs4m0ebagyG1giOo8W6NeZagr5W8br84fNR1dvSdEJ7FmaStMsw6kocGEkHopjjSNqL9KGcJmapAD//6YA//+oAP//qQD//64A//+vAMkC//+zAP//IiDPJf//tAD//7gA//+5AP//vgD//8AA///BAP//wgD//8MA///IAP//ygD//8sAAQT//8wA//+2AP//pwD//80A///OAP//zwAHBP//0AAQAf//0gD//9MA///UAP//1QD//9cA///YAP//IACgAAAgASACIAMgBCAFIAYgByAIIAkgCiAvIP//IQD//yIA//8jAP//JAD//yUAlSL//yYA//8nAP//KAD//ykA//8qAJsi//8rAP//LAD//y0AEiATIBIirQAQIBEgliL//y4AmSL//y8AmCL//zAA6iT//zEAYCT//zIAYST//zMAYiT//zQAYyT//zUAZCT//zYAZST//zcAZiT//zgAZyT//zkAaCT//zoA//87AP//PAD//z0AnCL//z4A//8/AP//QAD//0EAEASRA7Yk//9CABIEkgO3JP//QwAhBLgk//9EALkk//9FABUElQO6JP//RgC7JP//RwC8JP//SAAdBJcDvST//0kABgSZA74k//9KAAgEvyT//0sAGgSaAyohwCT//0wAwST//00AHAScA8Ik//9OAJ0DwyT//0" +
             "8AHgSfA8Qk//9QACAEoQPFJP//UQDGJP//UgDHJP//UwAFBMgk//9UACIEpAPJJP//VQDKJP//VgDLJP//VwDMJP//WAAlBKcDzST//1kArgTOJP//WgCWA88k//9bAP//XAD//10A//9eAP//XwD//2AA//9hADAE0CT//2IA0ST//2MAQQTSJP//ZADTJP//ZQA1BNQk//9mANUk//9nANYk//9oANck//9pAFYE2CT//2oAWATZJP//awDaJP//bADbJP//bQDcJP//bgDdJP//bwA+BN4k//9wAEAE3yT//3EA4CT//3IA4ST//3MAVQRzAOIk//90AOMk//91AOQk//92AOUk//93AOYk//94AEUE5yT//3kAQwToJP//egDpJP//ewD//3wA//99AP//fgD//9kA///HAP///AD//+kA///iAP//5AD//+AA///lAP//5wD//+oA///rAFEE///oAP//7wBXBP//7gD//+wA///EAP//xQArIf//yQD//+YA///GAP//9AD///YA///yAP//+wD///kA////AP//1gD//9wA//+iAP//owD//6UA///aAP//2wD//+EA///tAP//8wD///oA///xAP//0QD//6oA//+6AP//vwD//90A//+sAP//vQD//7wA//+hAP//qwBqIv//uwBrIv//kSX//5Il//+TJf//AiUDJX8lfSV7JXcleSV1Jf//JCUrJSolKSUoJSclJiUlJf//YSX//2Il//9WJf//VSX//2Ml//9RJf//VyX//10l//9cJf//WyX//xAlEyUSJREl//8UJRclFiUVJf//NCU7JTolOSU4JTclNiU1Jf//LCUzJTIlMSUwJS8lLiUtJf//HCUjJSIlISUgJR8lHiUdJf//ACUBJX4lfCV6JXYleCV0Jf//PCVLJUolSSVIJUclRiVFJUQlQyVCJUElQCU/JT4" +
             "lPSX//14l//9fJf//WiX//1Ql//9pJf//ZiX//2Al//9QJf//bCX//2cl//9oJf//ZCX//2Ul//9ZJf//WCX//1Il//9TJf//ayX//2ol//8YJRslGiUZJf//DCUPJQ4lDSX//4gl//+EJf//jCX//5Al//+AJf//3gD//98A///jAP//8AD///UA///4AP//tQC8A////QD///4A//8AAf//AQH//wIB0AT//wMB0QT//wQB//8FAf//BgH//wcB//+xAP//CAH//wkB//8KAf//CwH///cA//8MAf//sAD//w0B//+3AP//DgH//w8B//+yAP//EQH//xIB//8TAf//FgH//xcB//8YAf//GQH//xoB//8bAf//HAH//x0B//8eAf//HwH//yAB//8hAf//IgH//yMB//8kAf//JQH//yYB//8nAf//KAH//ykB//8qAf//KwH//y4B//8vAf//MAH//zEB//80Af//NQH//zYB//83Af//OAH//zkB//86Af//OwH//zwB//89Af//PgH//0EB//9CAf//QwH//0QB//9FAf//RgH//0cB//9IAf//SgH//0sB//9MAf//TQH//1AB//9RAf//UgH//1MB//9UAf//VQH//1YB//9XAf//WAH//1kB//9aAf//WwH//1wB//9dAf//XgH//18B//9gAf//YQH//2IB//9jAf//ZAH//2UB//9mAf//ZwH//2gB//9pAf//agH//2sB//9sAf//bQH//24B//9vAf//cAH//3EB//9yAf//cwH//3gB//95Af//egH//3sB//98Af//fQH//34B//8YIP//GSD//xwg//8dIP//rCD//yYg/////////////////////////////////////////////////////////////////////////////////////////////////////////" +
-            "////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////w=="))
-        {
-
-        }
+            "////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////w=="));
 
         #endregion
 
@@ -65,51 +62,57 @@ namespace Cosmos.System.Graphics
             MAXMODE = 5
         }
 
-        readonly byte[] _FontData; // Has all the data to display the letters
-        readonly List<UnicodeMapping> _UnicodeMappings; // Maps the fonts to the corresponding unicode characters
+        private readonly List<UnicodeMapping> _UnicodeMappings; // Maps the fonts to the corresponding unicode characters
 
-        public readonly byte CharHeight;
-        public readonly byte CharWidth;
-
-        public PCScreenFont(byte[] aFileData)
+        public PCScreenFont(byte aWidth, byte aHeight, byte[] aData, List<UnicodeMapping> aUnicodeMappings) : base(aWidth, aHeight, aData)
         {
-            bool version1 = aFileData[0] == 0x36 && aFileData[1] == 0x04;
-            bool version2 = BitConverter.ToUInt32(aFileData, 0) == 0x864ab572;
+            _UnicodeMappings = aUnicodeMappings;
+        }
+
+        public static PCScreenFont LoadFont(byte[] aFontData)
+        {
+            byte CharHeight;
+            byte CharWidth;
+            byte[] FontData;
+            var UnicodeMappings = new List<UnicodeMapping>();
+
+            bool version1 = aFontData[0] == 0x36 && aFontData[1] == 0x04;
+            bool version2 = BitConverter.ToUInt32(aFontData, 0) == 0x864ab572;
             //Check the header
             if (!version1 && !version2)
             {
-                Global.mDebugger.Send($"Invalid magic {aFileData[0]} {aFileData[1]} {aFileData[2]} {aFileData[3]}");
-                throw new Exception($"Invalid magic {aFileData[0]} {aFileData[1]} {aFileData[2]} {aFileData[3]}");
+                Global.mDebugger.Send($"Invalid magic {aFontData[0]} {aFontData[1]} {aFontData[2]} {aFontData[3]}");
+                throw new Exception($"Invalid magic {aFontData[0]} {aFontData[1]} {aFontData[2]} {aFontData[3]}");
             }
             if (version1)
             {
-                byte mode = aFileData[2];
-                CharHeight = aFileData[3];
+                byte mode = aFontData[2];
+                CharHeight = aFontData[3];
                 CharWidth = 8; //Always 8 in this case
                 int length = (mode & (int)PSFVersion1Mode.MODE512) == 1 ? 512 : 256;
                 bool hasUnicodeTable = (mode & (int)PSFVersion1Mode.HASTAB) > 0;
                 ushort seperator = 0xFFFF;
                 ushort sequenceStart = 0xFFFE;
-                _FontData = new byte[length * CharHeight]; //Every row is one byte
+                FontData = new byte[length * CharHeight]; //Every row is one byte
                 for (int i = 0; i < length; i++)
                 {
                     for (int k = 0; k < CharHeight; k++)
                     {
-                        _FontData[i * CharHeight + k] = aFileData[4 + i * CharHeight + k];
+                        FontData[i * CharHeight + k] = aFontData[4 + i * CharHeight + k];
                     }
                 }
                 int position = 4 + length * CharHeight;
                 if (hasUnicodeTable)
                 {
-                    _UnicodeMappings = new List<UnicodeMapping>();
+                    UnicodeMappings = new List<UnicodeMapping>();
                     var currentEntry = new List<byte>();
-                    while (position < aFileData.Length)
+                    while (position < aFontData.Length)
                     {
-                        if (BitConverter.ToUInt16(aFileData, position) == seperator)
+                        if (BitConverter.ToUInt16(aFontData, position) == seperator)
                         {
                             var mapping = new UnicodeMapping
                             {
-                                FontPosition = _UnicodeMappings.Count,
+                                FontPosition = UnicodeMappings.Count,
                                 UnicodeCharacters = new List<ushort>(),
                                 UnicodeCharactersWithModifiers = new List<ushort[]>(),
                                 ASCIICharacters = new List<byte>()
@@ -166,22 +169,24 @@ namespace Cosmos.System.Graphics
                                 }
                             }
 
-                            _UnicodeMappings.Add(mapping);
+                            UnicodeMappings.Add(mapping);
                             currentEntry.Clear();
                             position++; //Skip the second seperator character as well
                         }
                         else
                         {
-                            currentEntry.Add(aFileData[position]);
+                            currentEntry.Add(aFontData[position]);
                         }
                         position++;
                     }
                 }
+                return new PCScreenFont(CharWidth, CharHeight, FontData, UnicodeMappings);
             }
             if (version2)
             {
                 throw new NotImplementedException();
             }
+            throw new ArgumentException(nameof(aFontData));
         }
 
         /// <summary>
@@ -190,7 +195,7 @@ namespace Cosmos.System.Graphics
         /// <returns></returns>
         public byte[] CreateVGAFont()
         {
-            byte[] font = new byte[256 * CharHeight * CharWidth / 8];
+            byte[] font = new byte[256 * Height * Width / 8];
             //Find ' ' and ? char to use index if nothing is found
             int emptyOffset = FindASCIIOffset((byte)' ');
             int questionMarkOffset = FindASCIIOffset((byte)'?');
@@ -210,21 +215,21 @@ namespace Cosmos.System.Graphics
                         offset = questionMarkOffset;
                     }
                 }
-                for (int k = 0; k < CharHeight; k++)
+                for (int k = 0; k < Height; k++)
                 {
-                    font[i * CharHeight + k] = _FontData[offset * CharHeight + k];
+                    font[i * Height + k] = Data[offset * Height + k];
                 }
             }
             return font;
         }
 
-        private int FindASCIIOffset(byte i)
+        private int FindASCIIOffset(byte aI)
         {
             int offset;
             for (offset = 0; offset < _UnicodeMappings.Count; offset++)
             {
                 UnicodeMapping mapping = _UnicodeMappings[offset];
-                if (mapping.ASCIICharacters.Contains(i))
+                if (mapping.ASCIICharacters.Contains(aI))
                 {
                     break;
                 }
@@ -234,7 +239,7 @@ namespace Cosmos.System.Graphics
         }
     }
 
-    struct UnicodeMapping
+    public struct UnicodeMapping
     {
         public int FontPosition;
         public List<ushort> UnicodeCharacters;
