@@ -141,8 +141,8 @@ namespace GraphicTest
 
 
                 //Test changing font
-                PCScreenFont screenFont = new PCScreenFont();
-                VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.CharHeight);
+                PCScreenFont screenFont = PCScreenFont.Default;
+                VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.Height);
                 Console.WriteLine("ABAKDSKDNKSNJNFJGNFLPÜQOJOPJD");
                 Console.WriteLine("I(39u0pwoejJIosjfppkspjfsdjfp");
 

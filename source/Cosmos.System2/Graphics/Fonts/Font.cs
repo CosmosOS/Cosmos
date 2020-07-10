@@ -12,23 +12,17 @@ namespace Cosmos.System.Graphics.Fonts
         /// <summary>
         /// Get font pure data.
         /// </summary>
-        public abstract byte[] Data { get; }
+        public byte[] Data { get; }
 
         /// <summary>
         /// Get font height.
         /// </summary>
-        public abstract byte Height { get; }
+        public byte Height { get; }
 
         /// <summary>
         /// Get font Width.
         /// </summary>
-        public abstract byte Width { get; }
-
-        /// <summary>
-        /// Set font file.
-        /// </summary>
-        /// <param name="aFileData">Font file.</param>
-        public abstract void SetFont(byte[] aFileData);
+        public byte Width { get; }
 
         /// <summary>
         /// Used to draw font.
@@ -39,6 +33,13 @@ namespace Cosmos.System.Graphics.Fonts
         {
             int mask = 1 << (bitToReturn - 1);
             return (byteToConvert & mask) != 0;
+        }
+
+        public Font(byte aWidth, byte aHeight, byte[] aData)
+        {
+            Width = aWidth;
+            Height = aHeight;
+            Data = aData;
         }
     }
 }
