@@ -9,13 +9,26 @@ namespace Cosmos.System.Network.IPv4
     /// </summary>
     public class Config
     {
+        /// <summary>
+        /// IPv4 configurations list.
+        /// </summary>
         private static readonly List<Config> ipConfigs = new List<Config>();
 
+        /// <summary>
+        /// Add IPv4 configuration.
+        /// </summary>
+        /// <param name="config"></param>
         internal static void Add(Config config)
         {
             ipConfigs.Add(config);
         }
 
+        /// <summary>
+        /// Find network.
+        /// </summary>
+        /// <param name="destIP">Destination IP address.</param>
+        /// <returns>Address value.</returns>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
         internal static Address FindNetwork(Address destIP)
         {
             Address default_gw = null;
@@ -36,6 +49,11 @@ namespace Cosmos.System.Network.IPv4
             return default_gw;
         }
 
+        /// <summary>
+        /// Check if address is local address.
+        /// </summary>
+        /// <param name="destIP">Address to check.</param>
+        /// <returns>bool value.</returns>
         internal static bool IsLocalAddress(Address destIP)
         {
             for (int c = 0; c < ipConfigs.Count; c++)
@@ -50,11 +68,22 @@ namespace Cosmos.System.Network.IPv4
             return false;
         }
 
+        /// <summary>
+        /// Find interface.
+        /// </summary>
+        /// <param name="sourceIP">Source IP.</param>
+        /// <returns>NetworkDevice value.</returns>
         internal static NetworkDevice FindInterface(Address sourceIP)
         {
             return NetworkStack.AddressMap[sourceIP.Hash];
         }
 
+        /// <summary>
+        /// Find route to address.
+        /// </summary>
+        /// <param name="destIP">Destination IP.</param>
+        /// <returns>Address value.</returns>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
         internal static Address FindRoute(Address destIP)
         {
             for (int c = 0; c < ipConfigs.Count; c++)
@@ -91,8 +120,17 @@ namespace Cosmos.System.Network.IPv4
             DefaultGateway = gw;
         }
 
+        /// <summary>
+        /// Get IP address.
+        /// </summary>
         public Address IPAddress { get; }
+        /// <summary>
+        /// Get subnet mask.
+        /// </summary>
         public Address SubnetMask { get; }
+        /// <summary>
+        /// Get default gateway.
+        /// </summary>
         public Address DefaultGateway { get; }
     }
 }

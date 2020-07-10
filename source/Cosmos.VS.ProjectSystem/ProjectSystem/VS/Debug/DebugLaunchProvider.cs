@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -64,6 +64,8 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
             }
             else if (deploymentType == DeploymentValues.PXE)
             {
+                string projectPath = Path.GetDirectoryName(ConfiguredProject.UnconfiguredProject.FullPath);
+                binFile = Path.Combine(projectPath, binFile);
                 string pxePath = Path.Combine(CosmosPaths.Build, "PXE");
                 string pxeIntf = await GetPropertyAsync(BuildPropertyNames.PxeInterfaceString);
                 File.Copy(binFile, Path.Combine(pxePath, "Cosmos.bin"), true);
@@ -82,6 +84,9 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
                 && deploymentType == DeploymentValues.ISO)
             {
                 Process.Start(Path.GetDirectoryName(isoFile));
+            } else if(launchType == LaunchValues.None && deploymentType == DeploymentValues.PXE)
+            {
+
             }
             else
             {

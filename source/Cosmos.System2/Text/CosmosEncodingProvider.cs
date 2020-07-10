@@ -4,18 +4,38 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.ExtendedASCII
 {
+    /// <summary>
+    /// CosmosEncodingProvider class. Used to provide <see cref="Encoder"/>, by using its name or codepage. See also: <seealso cref="EncodingProvider"/>.
+    /// </summary>
     public class CosmosEncodingProvider : EncodingProvider
     {
+        /// <summary>
+        /// Encoding provider.
+        /// </summary>
         private static readonly EncodingProvider s_singleton = new CosmosEncodingProvider();
+        /// <summary>
+        /// Debugger inctanse of the "System" ring with the "CosmosEncodingProvider" tag.
+        /// </summary>
         private static Debugger myDebugger = new Debugger("System", "CosmosEncodingProvider");
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="CosmosEncodingProvider"/> class.
+        /// </summary>
         internal CosmosEncodingProvider() { }
 
+        /// <summary>
+        /// Get CosmosEncodingProvider instance. Returns EncodingProvider.
+        /// </summary>
         public static EncodingProvider Instance
         {
             get { return s_singleton; }
         }
 
+        /// <summary>
+        /// Get encoding, using its codepage.
+        /// </summary>
+        /// <param name="codepage">Codepage.</param>
+        /// <returns>Encoding value.</returns>
         public override Encoding GetEncoding(int codepage)
         {
             myDebugger.SendInternal($"Getting Encoding for codepage {codepage}");
@@ -26,6 +46,11 @@ namespace Cosmos.System.ExtendedASCII
             return EncodingTable.GetEncoding(codepage);
         }
 
+        /// <summary>
+        /// Get encoding, using its name.
+        /// </summary>
+        /// <param name="name">Name.</param>
+        /// <returns>Encoding value.</returns>
         public override Encoding GetEncoding(string name)
         {
             myDebugger.SendInternal($"Getting Encoding for codepage with name {name}");
