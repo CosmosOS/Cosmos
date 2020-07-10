@@ -6,6 +6,7 @@ using System.Drawing;
 using Point = Cosmos.System.Graphics.Point;
 using System.IO;
 using Cosmos.Compiler.Tests.Bcl;
+using Cosmos.System.Graphics.Fonts;
 
 /*
  * It is impossible to make assertions here but it is useful in any case to have it runs automatically
@@ -129,8 +130,8 @@ namespace GraphicTest
 
 
                 //Test changing font
-                PCScreenFont screenFont = new PCScreenFont();
-                VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.CharHeight);
+                PCScreenFont screenFont = PCScreenFont.Default;
+                VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.Height);
                 Console.WriteLine("ABAKDSKDNKSNJNFJGNFLPÜQOJOPJD");
                 Console.WriteLine("I(39u0pwoejJIosjfppkspjfsdjfp");
 
