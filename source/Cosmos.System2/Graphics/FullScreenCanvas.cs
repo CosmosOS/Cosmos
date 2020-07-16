@@ -48,7 +48,7 @@ namespace Cosmos.System.Graphics
         /// <returns></returns>
         public static bool BGAExists()
         {
-            return VBEDriver.Available();
+            return VBEDriver.ISAModeAvailable();
         }
 
         /// <summary>
