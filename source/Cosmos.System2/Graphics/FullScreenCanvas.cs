@@ -117,7 +117,7 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas(mode);
             }
-            else if (BGAExists() || PCI.GetDevice((VendorID)0x80EE, (DeviceID)0xBEEF) != null || Core.VBE.IsAvailable())
+            if (VBEAvailable())
             {
                 return new VBECanvas(mode);
             }
