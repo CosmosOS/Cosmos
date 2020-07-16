@@ -5,6 +5,7 @@ using System.Text;
 using Cosmos.Core.IOGroup;
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
+using System.Threading;
 
 namespace Cosmos.HAL
 {
@@ -74,6 +75,8 @@ namespace Cosmos.HAL
         public readonly uint slot;
         public readonly uint function;
 
+        public readonly uint BAR0;
+
         public readonly ushort VendorID;
         public readonly ushort DeviceID;
 
@@ -114,6 +117,8 @@ namespace Cosmos.HAL
 
             VendorID = ReadRegister16((byte)Config.VendorID);
             DeviceID = ReadRegister16((byte)Config.DeviceID);
+
+            BAR0 = ReadRegister32((byte)Config.BAR0);
 
             //Command = ReadRegister16((byte)Config.Command);
             //Status = ReadRegister16((byte)Config.Status);

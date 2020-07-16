@@ -76,18 +76,34 @@ namespace Cosmos.HAL.Drivers
         /// <param name="bpp">BPP (color depth).</param>
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
-            if (VBE.IsAvailable())
+            PCIDevice videocard;
+
+            if (VBE.IsAvailable()) //VBE VESA Enabled Mulitboot Parsing
             {
                 Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {xres}*{yres}@{bpp}");
                 IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
                 lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
             }
-            else
+            else if (Available()) //Bochs Graphics Adaptor ISA Mode
             {
-                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}");
+                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}.");
+
                 IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
                 lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
                 VBESet(xres, yres, bpp);
+            }
+            else if (((videocard = HAL.PCI.GetDevice(VendorID.VirtualBox, DeviceID.VBVGA)) != null) || //VirtualBox Video Adapter PCI Mode
+            ((videocard = HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA)) != null)) // Bochs Graphics Adaptor PCI Mode
+            {
+                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}. Framebuffer address=" + videocard.BAR0);
+
+                IO.LinearFrameBuffer = new MemoryBlock(videocard.BAR0, 1920 * 1200 * 4);
+                lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
+                VBESet(xres, yres, bpp);
+            }
+            else
+            {
+                throw new Exception("No supported VBE device found.");
             }
         }
 
