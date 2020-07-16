@@ -84,7 +84,7 @@ namespace Cosmos.HAL.Drivers
                 IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
                 lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
             }
-            else if (Available()) //Bochs Graphics Adaptor ISA Mode
+            else if (AvailableISAMode()) //Bochs Graphics Adaptor ISA Mode
             {
                 Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}.");
 
@@ -123,7 +123,7 @@ namespace Cosmos.HAL.Drivers
             IO.VbeIndex.Word = (ushort)index;
             return IO.VbeData.Word;
         }
-        public static bool Available()
+        public static bool AvailableISAMode()
         {
             //This code wont work as long as Bochs uses BGA ISA, since it wont discover it in PCI
 #if false

@@ -5,7 +5,6 @@ using System.Text;
 using Cosmos.Core.IOGroup;
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
-using System.Threading;
 
 namespace Cosmos.HAL
 {
