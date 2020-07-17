@@ -226,9 +226,19 @@ namespace Cosmos.System.Graphics
             switch (Mode.ColorDepth)
             {
                 case ColorDepth.ColorDepth32:
+
                     offset = (uint)GetPointOffset(aX, aY);
 
                     Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
+
+                    if (color.A == 0)
+                    {
+                        return;
+                    }
+                    else if (color.A < 255)
+                    {
+                        color = AlphaBlend(color, GetPointColor(aX, aY), color.A);
+                    }
 
                     _VBEDriver.SetVRAM(offset, color.B);
                     _VBEDriver.SetVRAM(offset + 1, color.G);
