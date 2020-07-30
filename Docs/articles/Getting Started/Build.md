@@ -1,6 +1,8 @@
 ## Prerequisites
 If you don't have Cosmos installed yet, first go to this [installation guide](https://cosmosos.github.io/articles/Installation/DevKit.html) and make sure you install Cosmos.
 
+## Getting Started
+
 Click on the following image (goes to linkedin post) to watch video tutorial:  
 [![header image](https://raw.githubusercontent.com/EliaSulimanov/Cosmos/Getting-Started-article/Docs/articles/Getting%20Started/images/Video.PNG)](https://www.linkedin.com/posts/elia-sulimanov_cosmos-os-c-activity-6694501374610288640-GYO8)
 
