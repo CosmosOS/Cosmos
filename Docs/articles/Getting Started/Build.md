@@ -1,7 +1,7 @@
 ## Prerequisites
 If you don't have Cosmos installed yet, first go to this [installation guide](https://cosmosos.github.io/articles/Installation/DevKit.html) and make sure you install Cosmos.
 
-Click on the following image (opens new linkedin tab) to watch video tutorial:  
+Click on the following image (goes to linkedin post) to watch video tutorial:  
 [![header image](https://raw.githubusercontent.com/EliaSulimanov/Cosmos/Getting-Started-article/Docs/articles/Getting%20Started/images/Video.PNG)](https://www.linkedin.com/posts/elia-sulimanov_cosmos-os-c-activity-6694501374610288640-GYO8)
 
  1. Start Visual Studio 2019 and create a new project with the type of "Cosmos Kernel". Make sure to select your preferred coding language (C# / VB.Net / F#).
