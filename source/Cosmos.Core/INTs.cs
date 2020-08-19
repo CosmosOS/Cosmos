@@ -3,43 +3,112 @@ using System.Runtime.InteropServices;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core {
+    /// <summary>
+    /// INTs (INTerruptS) class.
+    /// </summary>
     public class INTs {
         #region Enums
         // TODO: Protect IRQs like memory and ports are
         // TODO: Make IRQs so they are not hookable, and instead release high priority threads like FreeBSD (When we get threading)
+        /// <summary>
+        /// EFlags Enum.
+        /// </summary>
         public enum EFlagsEnum : uint {
+            /// <summary>
+            /// Set by arithmetic instructions, can be carry or borrow.
+            /// </summary>
             Carry = 1,
+            /// <summary>
+            ///  Set by most CPU instructions if the LSB of the destination operand contain an even number of 1's.
+            /// </summary>
             Parity = 1 << 2,
+            /// <summary>
+            /// Set when an arithmetic carry or borrow has been generated out of the four LSBs.
+            /// </summary>
             AuxilliaryCarry = 1 << 4,
+            /// <summary>
+            /// Set to 1 if an arithmetic result is zero, and reset otherwise.
+            /// </summary>
             Zero = 1 << 6,
+            /// <summary>
+            /// Set to 1 if the last arithmetic result was positive, and reset otherwise.
+            /// </summary>
             Sign = 1 << 7,
+            /// <summary>
+            /// When set to 1, permits single step operations.
+            /// </summary>
             Trap = 1 << 8,
+            /// <summary>
+            /// When set to 1, maskable hardware interrupts will be handled, and ignored otherwise.
+            /// </summary>
             InterruptEnable = 1 << 9,
+            /// <summary>
+            /// When set to 1, strings is processed from highest address to lowest, and from lowest to highest otherwise.
+            /// </summary>
             Direction = 1 << 10,
+            /// <summary>
+            /// Set to 1 if arithmetic overflow has occurred in the last operation.
+            /// </summary>
             Overflow = 1 << 11,
+            /// <summary>
+            /// Set to 1 when one system task invoke another by CALL instruction.
+            /// </summary>
             NestedTag = 1 << 14,
+            /// <summary>
+            /// When set to 1, enables the option turn off certain exceptions while debugging.
+            /// </summary>
             Resume = 1 << 16,
+            /// <summary>
+            /// When set to 1, Virtual8086Mode is enabled.
+            /// </summary>
             Virtual8086Mode = 1 << 17,
+            /// <summary>
+            /// When set to 1, enables alignment check.
+            /// </summary>
             AlignmentCheck = 1 << 18,
+            /// <summary>
+            /// When set, the program will receive hardware interrupts.
+            /// </summary>
             VirtualInterrupt = 1 << 19,
+            /// <summary>
+            /// When set, indicate that there is deferred interrupt pending.
+            /// </summary>
             VirtualInterruptPending = 1 << 20,
+            /// <summary>
+            /// When set, indicate that CPUID instruction is available.
+            /// </summary>
             ID = 1 << 21
         }
 
+        /// <summary>
+        /// TSS (Task State Segment) struct.
+        /// </summary>
         [StructLayout(LayoutKind.Explicit, Size = 0x68)]
         public struct TSS {
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(0)]
             public ushort Link;
             [FieldOffset(4)]
             public uint ESP0;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(8)]
             public ushort SS0;
             [FieldOffset(12)]
             public uint ESP1;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(16)]
             public ushort SS1;
             [FieldOffset(20)]
             public uint ESP2;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(24)]
             public ushort SS2;
             [FieldOffset(28)]
@@ -64,20 +133,44 @@ namespace Cosmos.Core {
             public uint ESI;
             [FieldOffset(68)]
             public uint EDI;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(72)]
             public ushort ES;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(76)]
             public ushort CS;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(80)]
             public ushort SS;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(84)]
             public ushort DS;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(88)]
             public ushort FS;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(92)]
             public ushort GS;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(96)]
             public ushort LDTR;
+            /// <summary>
+            /// Reserved.
+            /// </summary>
             [FieldOffset(102)]
             public ushort IOPBOffset;
         }
@@ -158,6 +251,10 @@ namespace Cosmos.Core {
             }
         }
 
+        /// <summary>
+        /// Handle default interrupt.
+        /// </summary>
+        /// <param name="aContext">A IEQ context.</param>
         public static void HandleInterrupt_Default(ref IRQContext aContext) {
             if (aContext.Interrupt >= 0x20 && aContext.Interrupt <= 0x2F) {
                 if (aContext.Interrupt >= 0x28) {
@@ -406,6 +503,16 @@ namespace Cosmos.Core {
 
         #endregion
 
+        /// <summary>
+        /// Handle exception.
+        /// </summary>
+        /// <param name="aEIP">Unused.</param>
+        /// <param name="aDescription">Unused.</param>
+        /// <param name="aName">Unused.</param>
+        /// <param name="ctx">IRQ context.</param>
+        /// <param name="lastKnownAddressValue">Last known address value. (default = 0)</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx, uint lastKnownAddressValue = 0) {
             // At this point we are in a very unstable state.
             // Try not to use any Cosmos routines, just
@@ -467,6 +574,12 @@ namespace Cosmos.Core {
             }
         }
 
+        /// <summary>
+        /// Put error char.
+        /// </summary>
+        /// <param name="line">Line to put the error char at.</param>
+        /// <param name="col">Column to put the error char at.</param>
+        /// <param name="c">Char to put.</param>
         private static void PutErrorChar(int line, int col, char c) {
             unsafe
             {
@@ -479,6 +592,13 @@ namespace Cosmos.Core {
             }
         }
 
+        /// <summary>
+        /// Put error string.
+        /// </summary>
+        /// <param name="line">Line to put the error string at.</param>
+        /// <param name="startCol">Starting column to put the error string at.</param>
+        /// <param name="error">Error string to put.</param>
+        /// <exception cref="System.OverflowException">Thrown if error length in greater then Int32.MaxValue.</exception>
         private static void PutErrorString(int line, int startCol, string error) {
             for (int i = 0; i < error.Length; i++) {
                 PutErrorChar(line, startCol + i, error[i]);
