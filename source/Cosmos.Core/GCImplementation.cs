@@ -44,20 +44,20 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Increase reference count of an given object. Not implemented.
+        /// Increase reference count of an given object. Plugged.
         /// </summary>
         /// <param name="aObject">An object to increase to reference count of.</param>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         public static unsafe void IncRefCount(uint aObject)
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Decrease reference count of an given object. Not implemented.
+        /// Decrease reference count of an given object. Plugged.
         /// </summary>
         /// <param name="aObject">An object to decrease to reference count of.</param>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         public static unsafe void DecRefCount(uint aObject)
         {
             throw new NotImplementedException();
