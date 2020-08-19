@@ -110,6 +110,13 @@ namespace Cosmos.Core
             return xResult;
         }
 
+        /// <summary>
+        /// Get CPU vendor name.
+        /// </summary>
+        /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
+        /// <returns>string value.</returns>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotSupportedException">Thrown if can not read CPU vendor name.</exception>
         public static string GetCPUVendorName()
         {
             if (CanReadCPUID() != 0)
@@ -140,12 +147,25 @@ namespace Cosmos.Core
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Get CPU up time. 
+        /// </summary>
+        /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
+        /// <returns>ulong value.</returns>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
         public static ulong GetCPUUptime()
         {
             // TODO Divide by cpu clock speed
             return ReadTimestampCounter();
         }
 
+        /// <summary>
+        /// Get CPU cycle speed.
+        /// </summary>
+        /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
+        /// <returns>long value.</returns>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotSupportedException">Thrown if can not read CPU ID.</exception>
         public static long GetCPUCycleSpeed()
         {
             if (CanReadCPUID() != 0)
@@ -230,12 +250,36 @@ namespace Cosmos.Core
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Check if can read CPU ID. Not implemented.
+        /// </summary>
+        /// <returns>non-zero if can read.</returns>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
         internal static int CanReadCPUID() => throw new NotImplementedException();
 
+        /// <summary>
+        /// Read CPU ID. Not implemented.
+        /// </summary>
+        /// <param name="type">Unused.</param>
+        /// <param name="eax">Unused.</param>
+        /// <param name="ebx">Unused.</param>
+        /// <param name="ecx">Unused.</param>
+        /// <param name="edx">Unused.</param>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
         internal static void ReadCPUID(uint type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
 
+        /// <summary>
+        /// Read timestamp counter. Not implemented.
+        /// </summary>
+        /// <returns>ulong value.</returns>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
         internal static ulong ReadTimestampCounter() => throw new NotImplementedException();
 
+        /// <summary>
+        /// Read from mode specific register. Not implemented.
+        /// </summary>
+        /// <returns>ulong value.</returns>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
     }
 }
