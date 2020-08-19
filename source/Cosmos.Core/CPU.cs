@@ -115,7 +115,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
         /// <returns>string value.</returns>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="NotSupportedException">Thrown if can not read CPU vendor name.</exception>
         public static string GetCPUVendorName()
         {
@@ -152,7 +152,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
         /// <returns>ulong value.</returns>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         public static ulong GetCPUUptime()
         {
             // TODO Divide by cpu clock speed
@@ -164,7 +164,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
         /// <returns>long value.</returns>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="NotSupportedException">Thrown if can not read CPU ID.</exception>
         public static long GetCPUCycleSpeed()
         {
@@ -251,35 +251,35 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Check if can read CPU ID. Not implemented.
+        /// Check if can read CPU ID. Plugged.
         /// </summary>
         /// <returns>non-zero if can read.</returns>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static int CanReadCPUID() => throw new NotImplementedException();
 
         /// <summary>
-        /// Read CPU ID. Not implemented.
+        /// Read CPU ID. Plugged.
         /// </summary>
-        /// <param name="type">Unused.</param>
-        /// <param name="eax">Unused.</param>
-        /// <param name="ebx">Unused.</param>
-        /// <param name="ecx">Unused.</param>
-        /// <param name="edx">Unused.</param>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <param name="type">type.</param>
+        /// <param name="eax">eax.</param>
+        /// <param name="ebx">ebx.</param>
+        /// <param name="ecx">ecx.</param>
+        /// <param name="edx">edx.</param>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static void ReadCPUID(uint type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
 
         /// <summary>
-        /// Read timestamp counter. Not implemented.
+        /// Read timestamp counter. Plugged.
         /// </summary>
         /// <returns>ulong value.</returns>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadTimestampCounter() => throw new NotImplementedException();
 
         /// <summary>
-        /// Read from mode specific register. Not implemented.
+        /// Read from mode specific register. Plugged.
         /// </summary>
         /// <returns>ulong value.</returns>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
     }
 }
