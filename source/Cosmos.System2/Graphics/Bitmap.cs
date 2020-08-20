@@ -38,7 +38,7 @@ namespace Cosmos.System.Graphics
             rawData = new int[Width * Height];
             if (colorDepth != ColorDepth.ColorDepth32 && colorDepth != ColorDepth.ColorDepth24)
             {
-                Global.mDebugger.Send("Only color depths 24 and 32 are supported!");
+                //Global.mDebugger.Send("Only color depths 24 and 32 are supported!");
                 throw new NotImplementedException("Only color depths 24 and 32 are supported!");
             }
 
@@ -56,9 +56,10 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
         /// </summary>
         /// <param name="path">Path to file.</param>
+        /// <param name="colorOrder">Order of colors in each pixel.</param>
         /// <exception cref="ArgumentException">
         /// <list type="bullet">
         /// <item>Thrown if path is invalid.</item>
@@ -93,19 +94,19 @@ namespace Cosmos.System.Graphics
         /// <exception cref="FileNotFoundException">Thrown if the file cannot be found.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown if the specified path is invalid.</exception>
         /// <exception cref="PathTooLongException">Thrown if the specified path is exceed the system-defined max length.</exception>
-        public Bitmap(string path) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
+        public Bitmap(string path, ColorOrder colorOrder = ColorOrder.BGR) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
             using (var fs = new FileStream(path, FileMode.Open))
             {
-                CreateBitmap(fs);
+                CreateBitmap(fs, colorOrder);
             }
         }
 
         /// <summary>
         /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
-        /// WARNING: Unitl IL2CPU problems have been fixed, Memory Streams do not work
         /// </summary>
         /// <param name="imageData">byte array.</param>
+        /// <param name="colorOrder">Order of colors in each pixel.</param>
         /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
         /// <exception cref="ArgumentException">Thrown on memory error.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
@@ -121,11 +122,11 @@ namespace Cosmos.System.Graphics
         /// </list>
         /// </exception>
         /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
-        public Bitmap(byte[] imageData) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
+        public Bitmap(byte[] imageData, ColorOrder colorOrder = ColorOrder.BGR) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
             using (var ms = new MemoryStream(imageData))
             {
-                CreateBitmap(ms);
+                CreateBitmap(ms, colorOrder);
             }
         }
 
@@ -135,6 +136,7 @@ namespace Cosmos.System.Graphics
         /// Create bitmap from stream.
         /// </summary>
         /// <param name="stream">Stream.</param>
+        /// <param name="colorOrder">Order of colors in each pixel.</param>
         /// <exception cref="ArgumentException">Thrown on memory error.</exception>
         /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
@@ -155,7 +157,7 @@ namespace Cosmos.System.Graphics
         /// </list>
         /// </exception>
         /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
-        private void CreateBitmap(Stream stream)
+        private void CreateBitmap(Stream stream, ColorOrder colorOrder)
         {
             #region BMP Header
 
@@ -169,7 +171,7 @@ namespace Cosmos.System.Graphics
             {
                 throw new Exception("Header is not from a BMP");
             }
-            
+
             //read size of BMP file - byte 2 -> 6
             stream.Read(_int, 0, 4);
             uint fileSize = BitConverter.ToUInt32(_int, 0);
@@ -201,7 +203,7 @@ namespace Cosmos.System.Graphics
             {
                 throw new Exception("Number of planes is not 1! Can not read file!");
             }
-            
+
             //now reading size of bits per pixel (1, 4, 8, 24, 32) - bytes 28 - 30
             stream.Read(_short, 0, 2);
             ushort pixelSize = BitConverter.ToUInt16(_short, 0);
@@ -216,7 +218,7 @@ namespace Cosmos.System.Graphics
             //TODO: Be able to handle compressed files
             if (compression != 0 && compression != 3) //3 is BI_BITFIELDS again ignore for now is for Adobe Images
             {
-                Global.mDebugger.Send("Can only handle uncompressed files!");
+                //Global.mDebugger.Send("Can only handle uncompressed files!");
                 throw new NotImplementedException("Can only handle uncompressed files!");
             }
             //now reading total image data size(including padding) - bytes 34 -> 38
@@ -225,18 +227,18 @@ namespace Cosmos.System.Graphics
             if (totalImageSize == 0)
             {
                 totalImageSize = (uint)((((imageWidth * pixelSize) + 31) & ~31) >> 3) * imageHeight; // Look at the link above for the explanation
-                Global.mDebugger.SendInternal("Calcualted image size: " + totalImageSize);
+                //Global.mDebugger.SendInternal("Calcualted image size: " + totalImageSize);
             }
-            
+
             #endregion BMP Header
 
             //Set the bitmap to have the correct values
             Width = imageWidth;
             Height = imageHeight;
             Depth = (ColorDepth)pixelSize;
-            Global.mDebugger.SendInternal("Width: " + Width);
-            Global.mDebugger.SendInternal("Height: " + Height);
-            Global.mDebugger.SendInternal("Depth: " + pixelSize);
+            //Global.mDebugger.SendInternal("Width: " + Width);
+            //Global.mDebugger.SendInternal("Height: " + Height);
+            //Global.mDebugger.SendInternal("Depth: " + pixelSize);
 
             rawData = new int[Width * Height];
 
@@ -280,10 +282,20 @@ namespace Cosmos.System.Graphics
                     }
                     else
                     {
-                        pixel[0] = pixelData[position++];
-                        pixel[1] = pixelData[position++];
-                        pixel[2] = pixelData[position++];
-                        pixel[3] = 0;
+                        if(colorOrder == ColorOrder.BGR)
+                        {
+                            pixel[3] = pixelData[position++];
+                            pixel[2] = pixelData[position++];
+                            pixel[1] = pixelData[position++];
+                            pixel[0] = 0;
+                        }
+                        else
+                        {
+                            pixel[0] = pixelData[position++];
+                            pixel[1] = pixelData[position++];
+                            pixel[2] = pixelData[position++];
+                            pixel[3] = 0;
+                        }
                     }
                     rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0); //This bits should be A, R, G, B but order is switched
                 }
@@ -357,7 +369,7 @@ namespace Cosmos.System.Graphics
             Array.Copy(data, 0, file, position, 4);
             position += 4;
 
-            //Offset to start of iamge data
+            //Offset to start of image data
             uint offset = 54;
             data = BitConverter.GetBytes(offset);
             Array.Copy(data, 0, file, position, 4);
