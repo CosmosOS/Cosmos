@@ -113,7 +113,6 @@ namespace Cosmos.Core
         /// <summary>
         /// Get CPU vendor name.
         /// </summary>
-        /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
         /// <returns>string value.</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="NotSupportedException">Thrown if can not read CPU vendor name.</exception>
@@ -150,7 +149,6 @@ namespace Cosmos.Core
         /// <summary>
         /// Get CPU up time. 
         /// </summary>
-        /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
         /// <returns>ulong value.</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         public static ulong GetCPUUptime()
@@ -162,7 +160,6 @@ namespace Cosmos.Core
         /// <summary>
         /// Get CPU cycle speed.
         /// </summary>
-        /// <remarks>Not all of the dependencies been implemented, therefore <see cref="NotImplementedException"/> will be thrown on every call.</remarks>
         /// <returns>long value.</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="NotSupportedException">Thrown if can not read CPU ID.</exception>
