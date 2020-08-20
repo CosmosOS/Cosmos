@@ -228,22 +228,44 @@ namespace Cosmos.Core {
         }
         #endregion
 
+        /// <summary>
+        /// Last known address.
+        /// </summary>
         [AsmMarker(AsmMarker.Type.Int_LastKnownAddress)]
         private static uint mLastKnownAddress;
 
+        /// <summary>
+        /// IRQ handlers.
+        /// </summary>
         private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
 
         // We used to use:
         //Interrupts.IRQ01 += HandleKeyboardInterrupt;
         // But at one point we had issues with multi cast delegates, so we changed to this single cast option.
         // [1:48:37 PM] Matthijs ter Woord: the issues were: "they didn't work, would crash kernel". not sure if we still have them..
+        /// <summary>
+        /// Set interrupt handler.
+        /// </summary>
+        /// <param name="aIntNo">Interrupt index.</param>
+        /// <param name="aHandler">IRQ handler.</param>
         public static void SetIntHandler(byte aIntNo, IRQDelegate aHandler) {
             mIRQ_Handlers[aIntNo] = aHandler;
         }
+
+        /// <summary>
+        /// Set IRQ handler.
+        /// </summary>
+        /// <param name="aIrqNo">IRQ index.</param>
+        /// <param name="aHandler">IRQ handler.</param>
         public static void SetIrqHandler(byte aIrqNo, IRQDelegate aHandler) {
             SetIntHandler((byte)(0x20 + aIrqNo), aHandler);
         }
 
+        /// <summary>
+        /// Set IRQ context to IRQ handler.
+        /// </summary>
+        /// <param name="irq">IRQ handler index.</param>
+        /// <param name="aContext">IRQ context.</param>
         private static void IRQ(uint irq, ref IRQContext aContext) {
             var xCallback = mIRQ_Handlers[irq];
             if (xCallback != null) {
@@ -265,24 +287,40 @@ namespace Cosmos.Core {
             }
         }
 
+        /// <summary>
+        /// IRQ delegate.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public delegate void IRQDelegate(ref IRQContext aContext);
+        /// <summary>
+        /// Exception interrupt delegate.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <param name="aHandled">True if handled.</param>
         public delegate void ExceptionInterruptDelegate(ref IRQContext aContext, ref bool aHandled);
 
         #region Default Interrupt Handlers
 
-        //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
+        /// <summary>
+        /// IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_20(ref IRQContext aContext) {
             IRQ(0x20, ref aContext);
             Global.PIC.EoiMaster();
         }
 
         //public static IRQDelegate IRQ01;
-        //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
+        /// <summary>
+        /// IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_21(ref IRQContext aContext) {
 
             IRQ(0x21, ref aContext);
             Global.PIC.EoiMaster();
         }
+
         public static void HandleInterrupt_22(ref IRQContext aContext) {
 
             IRQ(0x22, ref aContext);
@@ -318,25 +356,29 @@ namespace Cosmos.Core {
             IRQ(0x28, ref aContext);
             Global.PIC.EoiSlave();
         }
-        //IRQ 09 - (Added for AMD PCNet network card)
-        //public static IRQDelegate IRQ09;
 
+        /// <summary>
+        /// IRQ 09 - (Added for AMD PCNet network card).
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_29(ref IRQContext aContext) {
             IRQ(0x29, ref aContext);
             Global.PIC.EoiSlave();
         }
 
-        //IRQ 10 - (Added for VIA Rhine network card)
-        //public static IRQDelegate IRQ10;
-
+        /// <summary>
+        /// IRQ 10 - (Added for VIA Rhine network card).
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2A(ref IRQContext aContext) {
             IRQ(0x2A, ref aContext);
             Global.PIC.EoiSlave();
         }
 
-        //IRQ 11 - (Added for RTL8139 network card)
-        //public static IRQDelegate IRQ11;
-
+        /// <summary>
+        /// IRQ 11 - (Added for RTL8139 network card).
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2B(ref IRQContext aContext) {
             IRQ(0x2B, ref aContext);
             Global.PIC.EoiSlave();
@@ -353,12 +395,20 @@ namespace Cosmos.Core {
             IRQ(0x2D, ref aContext);
             Global.PIC.EoiSlave();
         }
-        //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
+
+        /// <summary>
+        /// IRQ 14 - Primary IDE. If no Primary IDE this can be changed.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2E(ref IRQContext aContext) {
             IRQ(0x2E, ref aContext);
             Global.PIC.EoiSlave();
         }
-        //IRQ 15 - Secondary IDE
+
+        /// <summary>
+        /// IRQ 15 - Secondary IDE.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2F(ref IRQContext aContext) {
             IRQ(0x2F, ref aContext);
             Global.PIC.EoiSlave();
@@ -414,61 +464,149 @@ namespace Cosmos.Core {
 
         #region CPU Exceptions
 
+        /// <summary>
+        /// General protection fault IRQ delegate.
+        /// </summary>
         public static IRQDelegate GeneralProtectionFault;
 
+        /// <summary>
+        /// Divide By Zero Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_00(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Divide by zero", "EDivideByZero", ref aContext, aContext.EIP);
         }
 
+        /// <summary>
+        /// Debug Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_01(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Debug Exception", "Debug Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Non Maskable Interrupt Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_02(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Non Maskable Interrupt Exception", "Non Maskable Interrupt Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Breakpoint Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_03(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Breakpoint Exception", "Breakpoint Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Into Detected Overflow Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_04(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Into Detected Overflow Exception", "Into Detected Overflow Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Out of Bounds Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_05(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Out of Bounds Exception", "Out of Bounds Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Invalid Opcode.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_06(ref IRQContext aContext) {
             // although mLastKnownAddress is a static, we need to get it here, any subsequent calls will change the value!!!
             var xLastKnownAddress = mLastKnownAddress;
             HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext, xLastKnownAddress);
         }
 
+        /// <summary>
+        /// No Coprocessor Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_07(ref IRQContext aContext) {
             HandleException(aContext.EIP, "No Coprocessor Exception", "No Coprocessor Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Double Fault Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_08(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Double Fault Exception", "Double Fault Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Coprocessor Segment Overrun Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_09(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Coprocessor Segment Overrun Exception", "Coprocessor Segment Overrun Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Bad TSS Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0A(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Bad TSS Exception", "Bad TSS Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Segment Not Present.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0B(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Segment Not Present", "Segment Not Present", ref aContext);
         }
 
+        /// <summary>
+        /// Stack Fault Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0C(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Stack Fault Exception", "Stack Fault Exception", ref aContext);
         }
+
+        /// <summary>
+        /// General Protection Fault.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0D(ref IRQContext aContext) {
             if (GeneralProtectionFault != null) {
                 GeneralProtectionFault(ref aContext);
@@ -477,25 +615,62 @@ namespace Cosmos.Core {
             }
         }
 
+        /// <summary>
+        /// Page Fault Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0E(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Page Fault Exception", "Page Fault Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Unknown Interrupt Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0F(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Unknown Interrupt Exception", "Unknown Interrupt Exception", ref aContext);
         }
 
+        /// <summary>
+        /// x87 Floating Point Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_10(ref IRQContext aContext) {
             HandleException(aContext.EIP, "x87 Floating Point Exception", "Coprocessor Fault Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Alignment Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_11(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Alignment Exception", "Alignment Exception", ref aContext);
         }
 
+        /// <summary>
+        /// Machine Check Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_12(ref IRQContext aContext) {
             HandleException(aContext.EIP, "Machine Check Exception", "Machine Check Exception", ref aContext);
         }
+
+        /// <summary>
+        /// SIMD Floating Point Exception.
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_13(ref IRQContext aContext) {
             HandleException(aContext.EIP, "SIMD Floating Point Exception", "SIMD Floating Point Exception", ref aContext);
         }
@@ -608,6 +783,12 @@ namespace Cosmos.Core {
         // This is to trick IL2CPU to compile it in
         //TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this.
         // We dont actually need to call this method
+        /// <summary>
+        /// Dummy function, used by the bootstrap.
+        /// </summary>
+        /// <remarks>This is to trick IL2CPU to compile it in.</remarks>
+        /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void Dummy() {
             // Compiler magic
             bool xTest = false;
