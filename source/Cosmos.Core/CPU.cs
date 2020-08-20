@@ -121,17 +121,17 @@ namespace Cosmos.Core
                 ReadCPUID(0, ref eax, ref ebx, ref ecx, ref edx); // 0 is vendor name
 
                 string s = "";
-                s += (char)(ebx);
-                s += (char)(ebx >> 8);
-                s += (char)(ebx >> 16);
+                s += (char)(ebx & 0xff);
+                s += (char)((ebx >> 8) & 0xff);
+                s += (char)((ebx >> 16) & 0xff);
                 s += (char)(ebx >> 24);
-                s += (char)(edx);
-                s += (char)(edx >> 8);
-                s += (char)(edx >> 16);
+                s += (char)((edx) & 0xff);
+                s += (char)((edx >> 8) & 0xff);
+                s += (char)((edx >> 16) & 0xff);
                 s += (char)(edx >> 24);
-                s += (char)(ecx);
-                s += (char)(ecx >> 8);
-                s += (char)(ecx >> 16);
+                s += (char)((ecx) & 0xff);
+                s += (char)((ecx >> 8) & 0xff);
+                s += (char)((ecx >> 16) & 0xff);
                 s += (char)(ecx >> 24);
 
                 return s;
