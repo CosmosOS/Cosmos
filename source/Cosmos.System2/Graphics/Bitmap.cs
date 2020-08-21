@@ -54,6 +54,48 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
+        
+        /// <summary>
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
+        /// </summary>
+        /// <param name="path">Path to file.</param>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if path is invalid.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown if path is null.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="IOException">Thrown on IO error.</exception>
+        /// <exception cref="NotSupportedException">
+        /// <list type="bullet">
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>The path refers to non-file.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">Thrown if the stream is closed.</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown if header is not from a BMP.</item>
+        /// <item>Info header size has the wrong value.</item>
+        /// <item>Number of planes is not 1. Can not read file.</item>
+        /// <item>Total Image Size is smaller than pure image size.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
+        /// <exception cref="SecurityException">Thrown if the caller does not have permissions to read / write the file.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the file cannot be found.</exception>
+        /// <exception cref="DirectoryNotFoundException">Thrown if the specified path is invalid.</exception>
+        /// <exception cref="PathTooLongException">Thrown if the specified path is exceed the system-defined max length.</exception>
+        public Bitmap(string path) : this(path, ColorOrder.BGR)
+        {
+        }
 
         /// <summary>
         /// Create new instance of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
@@ -100,6 +142,29 @@ namespace Cosmos.System.Graphics
             {
                 CreateBitmap(fs, colorOrder);
             }
+        }
+        
+        /// <summary>
+        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// </summary>
+        /// <param name="imageData">byte array.</param>
+        /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="IOException">Thrown on IO error.</exception>
+        /// <exception cref="NotSupportedException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ObjectDisposedException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown if header is not from a BMP.</item>
+        /// <item>Info header size has the wrong value.</item>
+        /// <item>Number of planes is not 1.</item>
+        /// <item>Total Image Size is smaller than pure image size.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
+        public Bitmap(byte[] imageData) : this(imageData, ColorOrder.BGR) //Call the image constructor with wrong values
+        {
         }
 
         /// <summary>
