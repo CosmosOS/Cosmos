@@ -269,13 +269,31 @@ namespace Cosmos.System.Graphics
 
             if (dy == 0) /* The line is horizontal */
             {
-                DrawHorizontalLine(pen, dx, x1, y1);
+                //DrawHorizontalLine(pen, dx, x1, y1);
+                
+                int minx = Math.Min(x1, x2);
+                int maxx = Math.Max(x1, x2);
+
+                for (int i = minx; i < maxx; i++)
+                {
+                    DrawPoint(i, y1, color);
+                }
+                
                 return;
             }
 
             if (dx == 0) /* the line is vertical */
             {
                 DrawVerticalLine(pen, dy, x1, y1);
+                
+                int miny = Math.Min(y1, y2);
+                int maxy = Math.Max(y1, y2);
+
+                for (int i = miny; i < maxy; i++)
+                {
+                    DrawPoint(x1, i, color);
+                }
+                
                 return;
             }
 
