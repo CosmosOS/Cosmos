@@ -276,7 +276,7 @@ namespace Cosmos.System.Graphics
 
                 for (int i = minx; i < maxx; i++)
                 {
-                    DrawPoint(i, y1, color);
+                    DrawPoint(pen, i, y1);
                 }
                 
                 return;
@@ -284,14 +284,14 @@ namespace Cosmos.System.Graphics
 
             if (dx == 0) /* the line is vertical */
             {
-                DrawVerticalLine(pen, dy, x1, y1);
+                //DrawVerticalLine(pen, dy, x1, y1);
                 
                 int miny = Math.Min(y1, y2);
                 int maxy = Math.Max(y1, y2);
 
                 for (int i = miny; i < maxy; i++)
                 {
-                    DrawPoint(x1, i, color);
+                    DrawPoint(pen, x1, i);
                 }
                 
                 return;
