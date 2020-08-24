@@ -110,6 +110,12 @@ namespace Cosmos.Core
             return xResult;
         }
 
+        /// <summary>
+        /// Get CPU vendor name.
+        /// </summary>
+        /// <returns>string value.</returns>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="NotSupportedException">Thrown if can not read CPU vendor name.</exception>
         public static string GetCPUVendorName()
         {
             if (CanReadCPUID() != 0)
@@ -121,17 +127,17 @@ namespace Cosmos.Core
                 ReadCPUID(0, ref eax, ref ebx, ref ecx, ref edx); // 0 is vendor name
 
                 string s = "";
-                s += (char)(ebx);
-                s += (char)(ebx >> 8);
-                s += (char)(ebx >> 16);
+                s += (char)(ebx & 0xff);
+                s += (char)((ebx >> 8) & 0xff);
+                s += (char)((ebx >> 16) & 0xff);
                 s += (char)(ebx >> 24);
-                s += (char)(edx);
-                s += (char)(edx >> 8);
-                s += (char)(edx >> 16);
+                s += (char)((edx) & 0xff);
+                s += (char)((edx >> 8) & 0xff);
+                s += (char)((edx >> 16) & 0xff);
                 s += (char)(edx >> 24);
-                s += (char)(ecx);
-                s += (char)(ecx >> 8);
-                s += (char)(ecx >> 16);
+                s += (char)((ecx) & 0xff);
+                s += (char)((ecx >> 8) & 0xff);
+                s += (char)((ecx >> 16) & 0xff);
                 s += (char)(ecx >> 24);
 
                 return s;
@@ -140,12 +146,23 @@ namespace Cosmos.Core
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Get CPU up time. 
+        /// </summary>
+        /// <returns>ulong value.</returns>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         public static ulong GetCPUUptime()
         {
             // TODO Divide by cpu clock speed
             return ReadTimestampCounter();
         }
 
+        /// <summary>
+        /// Get CPU cycle speed.
+        /// </summary>
+        /// <returns>long value.</returns>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="NotSupportedException">Thrown if can not read CPU ID.</exception>
         public static long GetCPUCycleSpeed()
         {
             if (CanReadCPUID() != 0)
@@ -230,12 +247,36 @@ namespace Cosmos.Core
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Check if can read CPU ID. Plugged.
+        /// </summary>
+        /// <returns>non-zero if can read.</returns>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static int CanReadCPUID() => throw new NotImplementedException();
 
+        /// <summary>
+        /// Read CPU ID. Plugged.
+        /// </summary>
+        /// <param name="type">type.</param>
+        /// <param name="eax">eax.</param>
+        /// <param name="ebx">ebx.</param>
+        /// <param name="ecx">ecx.</param>
+        /// <param name="edx">edx.</param>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static void ReadCPUID(uint type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
 
+        /// <summary>
+        /// Read timestamp counter. Plugged.
+        /// </summary>
+        /// <returns>ulong value.</returns>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadTimestampCounter() => throw new NotImplementedException();
 
+        /// <summary>
+        /// Read from mode specific register. Plugged.
+        /// </summary>
+        /// <returns>ulong value.</returns>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
     }
 }
