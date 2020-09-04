@@ -1,4 +1,5 @@
 //#define COSMOSDEBUG
+using Cosmos.Core;
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers;
 
@@ -47,7 +48,7 @@ namespace Cosmos.System.Graphics
         /// <returns></returns>
         public static bool BGAExists()
         {
-            return VBEDriver.Available();
+            return VBEDriver.ISAModeAvailable();
         }
 
         /// <summary>
@@ -66,13 +67,41 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas();
             }
-            else if (BGAExists() || PCI.GetDevice((VendorID)0x80EE, (DeviceID)0xBEEF) != null || Core.VBE.IsAvailable())
+            if (VBEAvailable())
             {
                 return new VBECanvas();
             }
             else
             {
                 return new VGACanvas();
+            }
+        }
+
+        /// <summary>
+        /// Checks is VBE is supported exists
+        /// </summary>
+        /// <returns></returns>
+        private static bool VBEAvailable()
+        {
+            if (BGAExists())
+            {
+                return true;
+            }
+            else if (PCI.Exists(VendorID.VirtualBox, DeviceID.VBVGA))
+            {
+                return true;
+            }
+            else if (PCI.Exists(VendorID.Bochs, DeviceID.BGA))
+            {
+                return true;
+            }
+            else if (VBE.IsAvailable())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -88,7 +117,7 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas(mode);
             }
-            else if (BGAExists() || PCI.GetDevice((VendorID)0x80EE, (DeviceID)0xBEEF) != null || Core.VBE.IsAvailable())
+            if (VBEAvailable())
             {
                 return new VBECanvas(mode);
             }

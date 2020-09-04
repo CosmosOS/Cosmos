@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -694,7 +694,7 @@ namespace Cosmos.HAL
             mDebugger.Send($"GetPixel720x480x4({aX},{aY})");
 
             uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
-
+            int pixelOffset = (int)(7 - aX % 8);
             uint pmask = 1;
 
             uint color = 0;
@@ -703,7 +703,8 @@ namespace Cosmos.HAL
             {
                 SetPlane(p);
 
-                if (_IO.VGAMemoryBlock.Bytes[offset] == 255)
+                var v = _IO.VGAMemoryBlock.Bytes[offset];
+                if ((v & (1 << pixelOffset)) != 0)
                 {
                     color += pmask;
                 }
@@ -711,7 +712,7 @@ namespace Cosmos.HAL
                 pmask <<= 1;
             }
 
-            return color;
+            return (uint)_Palette[color].ToArgb();
         }
 
         /// <summary>
