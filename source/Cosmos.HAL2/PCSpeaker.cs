@@ -22,16 +22,27 @@ namespace Cosmos.HAL
         protected static Core.IOGroup.PCSpeaker IO = BaseIOGroups.PCSpeaker;
         private static PIT SpeakerPIT = new PIT();
 
+        /// <summary>
+        /// Enable sound.
+        /// </summary>
         private static void EnableSound()
         {
             IO.Gate.Byte = (byte)(IO.Gate.Byte | 0x03);
         }
+        /// <summary>
+        /// Disable sound.
+        /// </summary>
         private static void DisableSound()
         {
             IO.Gate.Byte = (byte)(IO.Gate.Byte & ~3);
             //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
         }
 
+        /// <summary>
+        /// Play beep sound, at a specified frequency for a specified duration.
+        /// </summary>
+        /// <param name="frequency">Audio frequency in Hz, must be between 37 and 32767Hz.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if frequency is invalid.</exception>
         public static void Beep(uint frequency)
         {
             if (frequency < 37 || frequency > 32767)
@@ -51,6 +62,14 @@ namespace Cosmos.HAL
             }
             EnableSound();
         }
+
+        // TODO: continue exception list, once HAL is documented.
+        /// <summary>
+        /// Play beep sound, at a specified frequency for a specified duration.
+        /// </summary>
+        /// <param name="frequency">Audio frequency in Hz, must be between 37 and 32767Hz.</param>
+        /// <param name="duration">Beep duration, must be > 0.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if duration or frequency invalid.</exception>
         public static void Beep(uint frequency, uint duration)
         {
             if (duration <= 0)

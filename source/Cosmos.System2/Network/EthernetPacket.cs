@@ -4,21 +4,40 @@ using Cosmos.HAL.Network;
 namespace Cosmos.System.Network
 {
     // for more info, http://standards.ieee.org/about/get/802/802.3.html
+    /// <summary>
+    /// EthernetPacket class.
+    /// </summary>
     public class EthernetPacket
     {
+        /// <summary>
+        /// Source MAC address.
+        /// </summary>
         protected MACAddress srcMAC;
+        /// <summary>
+        /// Destination MAC address.
+        /// </summary>
         protected MACAddress destMAC;
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="EthernetPacket"/> class.
+        /// </summary>
         protected EthernetPacket()
         {
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified raw data.
+        /// </summary>
+        /// <param name="rawData">Raw data.</param>
         protected EthernetPacket(byte[] rawData)
         {
             RawData = rawData;
             initFields();
         }
 
+        /// <summary>
+        /// Init EthernetPacket fields.
+        /// </summary>
         protected virtual void initFields()
         {
             destMAC = new MACAddress(RawData, 0);
@@ -26,11 +45,23 @@ namespace Cosmos.System.Network
             EthernetType = (ushort)((RawData[12] << 8) | RawData[13]);
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified type and size.
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <param name="packet_size">Size.</param>
         protected EthernetPacket(ushort type, int packet_size)
             : this(MACAddress.None, MACAddress.None, type, packet_size)
         {
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified dsetination, source, type and size.
+        /// </summary>
+        /// <param name="dest">Destination.</param>
+        /// <param name="src">Source.</param>
+        /// <param name="type">Type.</param>
+        /// <param name="packet_size">Size.</param>
         protected EthernetPacket(MACAddress dest, MACAddress src, ushort type, int packet_size)
         {
             RawData = new byte[packet_size];
@@ -45,8 +76,14 @@ namespace Cosmos.System.Network
             initFields();
         }
 
+        /// <summary>
+        /// Get raw data byte array.
+        /// </summary>
         internal byte[] RawData { get; }
 
+        /// <summary>
+        /// Get and set source MAC address.
+        /// </summary>
         internal MACAddress SourceMAC
         {
             get => srcMAC;
@@ -59,6 +96,10 @@ namespace Cosmos.System.Network
                 initFields();
             }
         }
+
+        /// <summary>
+        /// Get and set destination MAC address.
+        /// </summary>
         internal MACAddress DestinationMAC
         {
             get => destMAC;
@@ -72,10 +113,14 @@ namespace Cosmos.System.Network
             }
         }
 
+        /// <summary>
+        /// Get packet type.
+        /// </summary>
         internal ushort EthernetType { get; private set; }
 
         /// <summary>
-        /// Calculate any checksums
+        /// Prepare packet for sending.
+        /// Not implemented.
         /// </summary>
         public virtual void PrepareForSending()
         {
@@ -83,6 +128,10 @@ namespace Cosmos.System.Network
             
         }
 
+        /// <summary>
+        /// To string.
+        /// </summary>
+        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "Ethernet Packet : Src=" + srcMAC + ", Dest=" + destMAC + ", Type=" + EthernetType;
