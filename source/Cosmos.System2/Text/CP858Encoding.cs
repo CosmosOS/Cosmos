@@ -3,10 +3,19 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.ExtendedASCII
 {
+    /// <summary>
+    /// CP858Enconding class, represent CP858 encoding. See also: <seealso cref="SingleByteEncoding"/>.
+    /// </summary>
     internal class CP858Enconding : SingleByteEncoding
     {
+        /// <summary>
+        /// Debugger inctanse of the "System" ring with the "CP858 Encoding" tag.
+        /// </summary>
         private static Debugger myDebugger = new Debugger("System", "CP858 Encoding");
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="CP858Enconding"/> class.
+        /// </summary>
         internal CP858Enconding()
         {
             myDebugger.SendInternal($"CP858Enconding Setting CodePageTable only one time...");
@@ -24,8 +33,14 @@ namespace Cosmos.System.ExtendedASCII
             };
         }
 
+        /// <summary>
+        /// Get encoding body name.
+        /// </summary>
         public override string BodyName => "IBM00858";
 
+        /// <summary>
+        /// Get encoding codepage.
+        /// </summary>
         public override int CodePage => 858;
     }
 }
