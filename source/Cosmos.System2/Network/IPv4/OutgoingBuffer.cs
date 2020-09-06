@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using sys = System;
+using System.Collections.Generic;
 
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
@@ -7,18 +8,67 @@ using Cosmos.System.Network.ARP;
 
 namespace Cosmos.System.Network.IPv4
 {
+    /// <summary>
+    /// OutgoingBuffer class.
+    /// </summary>
     internal static class OutgoingBuffer
     {
-
+        /// <summary>
+        /// BufferEntry class.
+        /// </summary>
         private class BufferEntry
         {
-            public enum EntryStatus { ADDED, ARP_SENT, ROUTE_ARP_SENT, JUST_SEND, DONE, DHCP_REQUEST };
+            /// <summary>
+            /// Entry status.
+            /// </summary>
+            public enum EntryStatus {
+                /// <summary>
+                /// Added.
+                /// </summary>
+                ADDED,
+                /// <summary>
+                /// ARP sent.
+                /// </summary>
+                ARP_SENT,
+                /// <summary>
+                /// Route ARP sent.
+                /// </summary>
+                ROUTE_ARP_SENT,
+                /// <summary>
+                /// Just send.
+                /// </summary>
+                JUST_SEND,
+                /// <summary>
+                /// Done.
+                /// </summary>
+                DONE,
+                /// <summary>
+                /// DHCP request.
+                /// </summary>
+                DHCP_REQUEST };
 
+            /// <summary>
+            /// Network Interface Controller.
+            /// </summary>
             public NetworkDevice NIC;
+            /// <summary>
+            /// IP packet.
+            /// </summary>
             public IPPacket Packet;
+            /// <summary>
+            /// Entry status
+            /// </summary>
             public EntryStatus Status;
+            /// <summary>
+            /// Next hop.
+            /// </summary>
             public Address nextHop;
 
+            /// <summary>
+            /// Create new inctanse of the <see cref="BufferEntry"/> class.
+            /// </summary>
+            /// <param name="nic">Network device.</param>
+            /// <param name="packet">IP packet.</param>
             public BufferEntry(NetworkDevice nic, IPPacket packet)
             {
                 this.NIC = nic;
@@ -35,8 +85,14 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
+        /// <summary>
+        /// Buffer queue.
+        /// </summary>
         private static List<BufferEntry> queue;
 
+        /// <summary>
+        /// Ensure queue exists.
+        /// </summary>
         private static void ensureQueueExists()
         {
             if (queue == null)
@@ -45,6 +101,10 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
+        /// <summary>
+        /// Add packet.
+        /// </summary>
+        /// <param name="packet">IP packet.</param>
         internal static void AddPacket(IPPacket packet)
         {
             ensureQueueExists();
@@ -53,6 +113,11 @@ namespace Cosmos.System.Network.IPv4
             queue.Add(new BufferEntry(nic, packet));
         }
 
+        /// <summary>
+        /// Add packet.
+        /// </summary>
+        /// <param name="packet">IP packet.</param>
+        /// <param name="device">Network Interface Controller.</param>
         internal static void AddPacket(IPPacket packet, NetworkDevice device)
         {
             ensureQueueExists();
@@ -60,6 +125,12 @@ namespace Cosmos.System.Network.IPv4
             queue.Add(new BufferEntry(device, packet));
         }
 
+        /// <summary>
+        /// Send packet.
+        /// </summary>
+        /// <exception cref="sys.ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="sys.OverflowException">Thrown if RawData length is bigger than Int32.MaxValue.</exception>
         internal static void Send()
         {
             ensureQueueExists();
@@ -161,6 +232,11 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
+        /// <summary>
+        /// ARP cache update.
+        /// </summary>
+        /// <param name="arp_reply">ARP reply.</param>
+        /// <exception cref="sys.ArgumentException">Thrown if arp_reply.SenderIP is not a IPv4Address.</exception>
         internal static void ARPCache_Update(ARPReply_Ethernet arp_reply)
         {
             ensureQueueExists();

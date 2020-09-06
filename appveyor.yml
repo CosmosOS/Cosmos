@@ -49,6 +49,10 @@ notifications:
 
 matrix:
   fast_finish: true
+  
+branches:
+  only:
+    - master
 
 artifacts:
   - path: 'artifacts\Debug\nupkg\*.nupkg'

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <LangVersion>Latest</LangVersion>
-        <NoWarn>CA1051;CA1501;CA1707;CA1711;CA1801;$(NoWarn)</NoWarn>
+        <NoWarn>CA1051;CA1501;CA1707;CA1711;CA1801;CS1572;CS1573;CS1574;CS1591;$(NoWarn)</NoWarn>
         <SignAssembly>True</SignAssembly>
     </PropertyGroup>
 
