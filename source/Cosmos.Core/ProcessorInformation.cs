@@ -1,5 +1,8 @@
 ﻿namespace Cosmos.Core
 {
+    /// <summary>
+    /// ProcessorInformation class. Used to get vendor information from the CPU.
+    /// </summary>
     public unsafe class ProcessorInformation
     {
         /// <summary>
@@ -34,8 +37,16 @@
                 return "\0";
         }
 
+        /// <summary>
+        /// Check if can read CPU ID.
+        /// </summary>
+        /// <returns>int value.</returns>
         internal static int CanReadCPUID() => 0; //plugged
 
+        /// <summary>
+        /// Fetch CPU vendor.
+        /// </summary>
+        /// <param name="target">pointer to target.</param>
         internal static void FetchCPUVendor(int* target) { } //plugged
 
         /// <summary>

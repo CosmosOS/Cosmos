@@ -5,15 +5,39 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.ExtendedASCII
 {
+    /// <summary>
+    /// SingleByteEncoding class. Used to represent a single byte encoding.
+    /// </summary>
     internal class SingleByteEncoding : Encoding
     {
+        /// <summary>
+        /// Debugger inctanse of the "System" ring with the "SingleByteEncoding" tag.
+        /// </summary>
         private static Debugger mDebugger = new Debugger("System", "SingleByteEncoding");
 
+        /// <summary>
+        /// Get and set codepage table.
+        /// </summary>
         internal char[] CodePageTable { get; set; }
+        /// <summary>
+        /// Replacement char.
+        /// </summary>
         private const byte ReplacementChar = (byte)'?';
 
+        /// <summary>
+        /// Check if this is single byte.
+        /// </summary>
         public override bool IsSingleByte => true;
 
+        /// <summary>
+        /// Get count of bytes in chars array.
+        /// </summary>
+        /// <param name="chars">Chars array.</param>
+        /// <param name="index">Starting index in chars array.</param>
+        /// <param name="count">Number of chars to check.</param>
+        /// <returns>int value.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if chars is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if index or count are invalid.</exception>
         public override int GetByteCount(char[] chars, int index, int count)
         {
             mDebugger.SendInternal($"GetByteCount of chars {new string(chars)} index {index} count {count}");
@@ -39,6 +63,12 @@ namespace Cosmos.System.ExtendedASCII
             return count - index;
         }
 
+        /// <summary>
+        /// Get codepage index relative to given char.
+        /// </summary>
+        /// <param name="ch">Char to get the codepage of.</param>
+        /// <returns>int value.</returns>
+        /// <exception cref="OverflowException">Thrown if number of entrys in the codepage table is greater than Int32.MaxValue.</exception>
         private int GetCodePageIdxFromChr(char ch)
         {
             int idx;
@@ -59,6 +89,12 @@ namespace Cosmos.System.ExtendedASCII
             return idx + 128;
         }
 
+        /// <summary>
+        /// Convert char to byte.
+        /// </summary>
+        /// <param name="ch">Char to convert.</param>
+        /// <returns>byte value.</returns>
+        /// <exception cref="OverflowException">Thrown if number of entrys in the codepage table is greater than Int32.MaxValue.</exception>
         private byte GetByte(char ch)
         {
             /* ch is in reality an ASCII character? */
@@ -79,6 +115,18 @@ namespace Cosmos.System.ExtendedASCII
             return (byte)idx;
         }
 
+        /// <summary>
+        /// Get bytes array out of chars array, and bytes count.
+        /// </summary>
+        /// <param name="chars">Chars array.</param>
+        /// <param name="charIndex">Stating index in chars array.</param>
+        /// <param name="charCount">Number of chars to convert.</param>
+        /// <param name="bytes">Output bytes array.</param>
+        /// <param name="byteIndex">Starting index in bytes array.</param>
+        /// <returns>int value.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if chars or bytes is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if charIndex or charCount are invalid.</exception>
+        /// <exception cref="OverflowException">Thrown if bytes array length or codepage table length is greater than Int32.MaxValue.</exception>
         public override int GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex)
         {
             mDebugger.SendInternal($"GetBytes of chars {new string(chars)} index {charIndex} count {charCount}");
@@ -103,6 +151,16 @@ namespace Cosmos.System.ExtendedASCII
             return bytes.Length;
         }
 
+        /// <summary>
+        /// Get char count in bytes array.
+        /// </summary>
+        /// <param name="bytes">Bytes array to count the chars in.</param>
+        /// <param name="index">Starting index.</param>
+        /// <param name="count">Number of bytes to check.</param>
+        /// <returns>int value.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if bytes is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if index or count are invalid.</exception>
+        /// <exception cref="OverflowException">Thrown if bytes array length is greater than Int32.MaxValue.</exception>
         public override int GetCharCount(byte[] bytes, int index, int count)
         {
             mDebugger.SendInternal($"GetCharCount of bytes {BitConverter.ToString(bytes)} index {index} count {count}");
@@ -123,6 +181,11 @@ namespace Cosmos.System.ExtendedASCII
             return count - index;
         }
 
+        /// <summary>
+        /// Convert byte to char.
+        /// </summary>
+        /// <param name="b">byte to convert.</param>
+        /// <returns>char value.</returns>
         private char GetChar(byte b)
         {
             mDebugger.SendInternal($"Converting to UTF16: {b}...");
@@ -137,6 +200,18 @@ namespace Cosmos.System.ExtendedASCII
             return CodePageTable[b - 128];
         }
 
+        /// <summary>
+        /// Convert bytes array to chars array, and get number of chars in bytes array.
+        /// </summary>
+        /// <param name="bytes">Bytes array to count chars in.</param>
+        /// <param name="byteIndex">Starting index in bytes array.</param>
+        /// <param name="byteCount">Number of bytes to convert.</param>
+        /// <param name="chars">Output array, in which the bytes that are char would be stored in.</param>
+        /// <param name="charIndex">Starting index in chars array</param>
+        /// <returns>int value.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if bytes is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if byteCount or byteIndex are invalid</exception>
+        /// <exception cref="OverflowException">Thrown if number of chars is greater than Int32.MaxValue.</exception>
         public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex)
         {
             mDebugger.SendInternal($"Converting to UTF16: {BitConverter.ToString(bytes)}...");
@@ -164,6 +239,12 @@ namespace Cosmos.System.ExtendedASCII
             return chars.Length;
         }
 
+        /// <summary>
+        /// Get max char count.
+        /// </summary>
+        /// <param name="charCount">char count.</param>
+        /// <returns>int value.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if charCount is less than 0.</exception>
         public override int GetMaxByteCount(int charCount)
         {
             if (charCount < 0)
@@ -173,6 +254,12 @@ namespace Cosmos.System.ExtendedASCII
             return charCount + 1;
         }
 
+        /// <summary>
+        /// Get max char count.
+        /// </summary>
+        /// <remarks>returns byteCount.</remarks>
+        /// <param name="byteCount">byte count</param>
+        /// <returns>int value.</returns>
         public override int GetMaxCharCount(int byteCount)
         {
             // Just return length, SBCS stay the same length because they don't map to surrogate

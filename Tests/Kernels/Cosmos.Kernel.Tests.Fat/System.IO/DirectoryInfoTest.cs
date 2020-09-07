@@ -131,6 +131,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
 
             xDi = new DirectoryInfo(xPath);
             Assert.IsFalse(xDi.Exists, "DirectoryInfo.Delete failed: directory continues exists");
+          
             mDebugger.Send("END TEST");
 
             // DateTime is broken see: https://github.com/CosmosOS/Cosmos/pull/553/files for some fixes
