@@ -1,72 +1,74 @@
 {
-  "metadata": [
-    {
-      "src": [
-        //{
-        //  "files": [
-        //    "**.csproj"
-        //  ],
-        //  "src": ""
-        //}
-      ],
-      "dest": "api",
-      "disableGitFeatures": false,
-      "disableDefaultFilter": false
-    }
-  ],
-  "build": {
-    "content": [
-      {
-        "files": [
-          "api/**.yml",
-          "api/index.md"
-        ]
-      },
-      {
-        "files": [
-          "**/*.md",
-          "**/toc.yml",
-          "toc.yml",
-          "*.md"
-        ]
-      }
+    "metadata": [
+        {
+            "src": [
+                {
+                    "files": [
+                        "Build.sln"
+                    ],
+                    "exclude": [
+                        "**/bin/**",
+                        "**/obj/**"
+                    ],
+                    "src": "../"
+                }
+            ],
+            "dest": "obj/api"
+        }
     ],
-    "resource": [
-      {
-        "files": [
-            "favicon.ico",
-            "images/**",
-            "articles/images/**"
-        ]
-      }
-    ],
-    "overwrite": [
-      {
-        "files": [
-          "apidoc/**.md"
+    "build": {
+        "content": [
+            {
+                "files": [
+                    "**/*.yml"
+                ],
+                "src": "obj/api",
+                "dest": "api"
+            },
+            {
+                "files": [
+                    "**/*.md",
+                    "*.md",
+                    "toc.yml"
+                ]
+            }
         ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
-      }
-    ],
-    "dest": "_site",
-    "globalMetadata": {
-        "_appFooter": "<span></span>",
-        "_appLogoPath": "images/logo.png",
-        "_enableNewTab": true
-    },
-    "globalMetadataFiles": [],
-    "fileMetadataFiles": [],
-    "template": [
-      "default"
-    ],
-    "postProcessors": [],
-    "markdownEngineName": "markdig",
-    "noLangKeyword": false,
-    "keepFileLink": false,
-    "cleanupCacheHistory": false,
-    "disableGitFeatures": false
-  }
+        "resource": [
+            {
+                "files": [
+                    "favicon.ico",
+                    "images/**",
+                    "articles/images/**"
+                ]
+            }
+        ],
+        "overwrite": [
+            {
+                "files": [
+                    "apidoc/**.md"
+                ],
+                "exclude": [
+                    "obj/**",
+                    "_site/**"
+                ]
+            }
+        ],
+        "dest": "_site",
+        "globalMetadata": {
+            "_appFooter": "<span></span>",
+            "_appLogoPath": "images/logo.png",
+            "_enableNewTab": true
+        },
+        "globalMetadataFiles": [],
+        "fileMetadataFiles": [],
+        "template": [
+            "statictoc"
+        ],
+        "postProcessors": [],
+        "markdownEngineName": "markdig",
+        "noLangKeyword": false,
+        "keepFileLink": false,
+        "cleanupCacheHistory": false,
+        "disableGitFeatures": false
+    }
 }

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.28922.388
+VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DAEF99B5-22F0-4885-B45B-9B600B857E1C}"
 EndProject
@@ -161,6 +161,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System.Tests", "Tests\Cosmos.System.Tests\Cosmos.System.Tests.csproj", "{970C5E07-5D09-4882-949C-A8E876B22732}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.DiskManager", "Tests\Kernels\Cosmos.Kernel.Tests.DiskManager\Cosmos.Kernel.Tests.DiskManager.csproj", "{BB6A5306-4C7A-4973-A48E-9FE3E683EAEC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessorTests", "Tests\Kernels\ProcessorTests\ProcessorTests.csproj", "{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Compiler.Tests.BclSystem", "Tests\Kernels\Cosmos.Compiler.Tests.Bcl.System\Cosmos.Compiler.Tests.BclSystem.csproj", "{30D9FA9C-0B4D-40FF-8903-6B9E9C825729}"
 EndProject
@@ -621,6 +623,14 @@ Global
 		{BB6A5306-4C7A-4973-A48E-9FE3E683EAEC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BB6A5306-4C7A-4973-A48E-9FE3E683EAEC}.Release|x86.ActiveCfg = Release|Any CPU
 		{BB6A5306-4C7A-4973-A48E-9FE3E683EAEC}.Release|x86.Build.0 = Release|Any CPU
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}.Debug|x86.Build.0 = Debug|Any CPU
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}.Release|x86.ActiveCfg = Release|Any CPU
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B}.Release|x86.Build.0 = Release|Any CPU
 		{30D9FA9C-0B4D-40FF-8903-6B9E9C825729}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30D9FA9C-0B4D-40FF-8903-6B9E9C825729}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30D9FA9C-0B4D-40FF-8903-6B9E9C825729}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -706,6 +716,7 @@ Global
 		{99E24E61-0743-47FF-AB0A-55A36C5E184C} = {52D81759-C7CC-427F-8C96-89CA10C914B5}
 		{970C5E07-5D09-4882-949C-A8E876B22732} = {52D81759-C7CC-427F-8C96-89CA10C914B5}
 		{BB6A5306-4C7A-4973-A48E-9FE3E683EAEC} = {29EEC029-6A2B-478A-B6E5-D63A91388ABA}
+		{3F28939D-5E06-44AC-8FC6-ADBBB89AC97B} = {ECEA7778-E786-4317-90B9-A2D4427CB91C}
 		{30D9FA9C-0B4D-40FF-8903-6B9E9C825729} = {ECEA7778-E786-4317-90B9-A2D4427CB91C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

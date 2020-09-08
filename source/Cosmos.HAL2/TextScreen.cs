@@ -22,6 +22,9 @@ namespace Cosmos.HAL
         protected Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
         protected readonly MemoryBlock08 mRAM;
 
+        /// <summary>
+        /// Creat new inctanse of the <see cref="TextScreen"/> class.
+        /// </summary>
         public TextScreen()
         {
             if (this is TextScreen)
@@ -46,6 +49,9 @@ namespace Cosmos.HAL
         public override UInt16 Rows { get { return 25; } }
         public override UInt16 Cols { get { return 80; } }
 
+        /// <summary>
+        /// Clear text screen.
+        /// </summary>
         public override void Clear()
         {
             TextScreenHelpers.Debug("Clearing screen with value ");
@@ -54,6 +60,9 @@ namespace Cosmos.HAL
             mBackgroundClearCellValue = mTextClearCellValue;
         }
 
+        /// <summary>
+        /// Scroll screen up.
+        /// </summary>
         public override void ScrollUp()
         {
             IO.Memory.MoveDown(0, mRow2Addr, mScrollSize);
@@ -76,6 +85,11 @@ namespace Cosmos.HAL
             }
         }
 
+        /// <summary>
+        /// Set screen foreground and background colors.
+        /// </summary>
+        /// <param name="aForeground">Foreground color.</param>
+        /// <param name="aBackground">Background color.</param>
         public override void SetColors(ConsoleColor aForeground, ConsoleColor aBackground)
         {
             //Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
@@ -88,6 +102,11 @@ namespace Cosmos.HAL
             mTextClearCellValue = (UInt16)(Color << 8 | 0x00);
         }
 
+        /// <summary>
+        /// Set cursor position.
+        /// </summary>
+        /// <param name="aX">A position on X axis.</param>
+        /// <param name="aY">A position on Y axis.</param>
         public override void SetCursorPos(int aX, int aY)
         {
             char xPos = (char)((aY * Cols) + aX);
@@ -98,15 +117,29 @@ namespace Cosmos.HAL
             IO.Idx3.Byte = 0x0E;
             IO.Data3.Byte = (byte)(xPos >> 8);
         }
+
+        /// <summary>
+        /// Get screen color.
+        /// </summary>
+        /// <returns>byte value.</returns>
         public override byte GetColor()
         {
             return Color;
         }
 
+        /// <summary>
+        /// Get cursor size.
+        /// </summary>
+        /// <returns>int value.</returns>
         public override int GetCursorSize()
         {
             return mCursorSize;
         }
+
+        /// <summary>
+        /// Set cursor size.
+        /// </summary>
+        /// <param name="value">Size value.</param>
         public override void SetCursorSize(int value)
         {
             mCursorSize = value;
@@ -125,11 +158,19 @@ namespace Cosmos.HAL
             IO.Data3.Byte = 0x0F;
         }
 
+        /// <summary>
+        /// Check if cursor is visible.
+        /// </summary>
+        /// <returns>bool value.</returns>
         public override bool GetCursorVisible()
         {
             return mCursorVisible;
         }
 
+        /// <summary>
+        /// Set cursor visibilty.
+        /// </summary>
+        /// <param name="value">TRUE - visible.</param>
         public override void SetCursorVisible(bool value)
         {
             byte cursorDisable;

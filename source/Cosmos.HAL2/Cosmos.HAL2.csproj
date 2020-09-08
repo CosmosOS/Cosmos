@@ -6,6 +6,10 @@
         <RootNamespace>Cosmos.HAL</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="IL2CPU.API" />
     </ItemGroup>
