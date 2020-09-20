@@ -25,6 +25,7 @@ namespace ProcessorTests
                 TestVendorNameIsNotBlank();
                 TestCycleCount();
                 TestCycleRateIsNotZero();
+                TestMultiboot();
 
                 TestController.Completed();
             }
@@ -34,6 +35,11 @@ namespace ProcessorTests
                 mDebugger.Send(e.Message);
                 TestController.Failed();
             }
+        }
+
+        public void TestMultiboot()
+        {
+            Assert.IsTrue(Multiboot.GetMBIAddress() != 0, $"Multiboot.GetMBIAddress works {Multiboot.GetMBIAddress()}");
         }
 
         public void TestVendorNameIsNotBlank()
