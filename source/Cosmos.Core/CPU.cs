@@ -296,9 +296,15 @@ namespace Cosmos.Core
                     }
                     rs += (char)s[i];
                 }
-                return rs;
-            }
 
+                if (!(rs == ""))
+                {
+                    return rs;
+                } else
+                {
+                    throw new NotSupportedException();
+                }
+            }
             throw new NotSupportedException();
         }
 
