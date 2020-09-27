@@ -252,7 +252,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <returns>non-zero if can read.</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        internal static int CanReadCPUID() => throw new NotImplementedException();
+        public static int CanReadCPUID() => throw new NotImplementedException();
 
         /// <summary>
         /// Read CPU ID. Plugged.
@@ -263,7 +263,7 @@ namespace Cosmos.Core
         /// <param name="ecx">ecx.</param>
         /// <param name="edx">edx.</param>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        internal static void ReadCPUID(uint type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
+        public static void ReadCPUID(uint type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
 
         /// <summary>
         /// Read timestamp counter. Plugged.
