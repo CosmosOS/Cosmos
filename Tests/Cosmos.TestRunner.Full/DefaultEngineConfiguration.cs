@@ -28,6 +28,7 @@ namespace Cosmos.TestRunner.Full
         public virtual TraceAssemblies TraceAssembliesLevel => TraceAssemblies.User;
         public virtual bool EnableStackCorruptionChecks => true;
         public virtual StackCorruptionDetectionLevel StackCorruptionDetectionLevel => StackCorruptionDetectionLevel.AllInstructions;
+        public virtual DebugMode DebugMode => DebugMode.Source;
 
         public virtual IEnumerable<string> KernelAssembliesToRun
         {
