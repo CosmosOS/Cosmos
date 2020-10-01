@@ -20,6 +20,7 @@ namespace Cosmos.TestRunner.TestAdapter
         public TraceAssemblies TraceAssembliesLevel { get; }
         public bool EnableStackCorruptionChecks { get; }
         public StackCorruptionDetectionLevel StackCorruptionDetectionLevel { get; }
+        public DebugMode DebugMode { get; }
 
         public IEnumerable<string> KernelAssembliesToRun { get; }
 
