@@ -41,6 +41,14 @@ namespace ProcessorTests
         {
             Assert.IsTrue(Multiboot.GetMBIAddress() != 0, $"Multiboot.GetMBIAddress works {Multiboot.GetMBIAddress()}");
         }
+         
+        public void TestBrandStringBlank()
+        {
+            string brandString = CPU.GetCPUBrandString();
+            mDebugger.Send("Brand String: " + brandString);
+            bool isBrandStringBlank = string.IsNullOrWhiteSpace(brandString);
+            Assert.IsFalse(isBrandStringBlank, "Processor brand string is blank.");
+        }
 
         public void TestVendorNameIsNotBlank()
         {
