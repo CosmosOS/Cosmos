@@ -18,6 +18,7 @@
         <ProjectReference Include="..\Kernels\BoxingTests\BoxingTests.csproj" />
         <ProjectReference Include="..\Kernels\ConsoleTest\ConsoleTest.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
+        <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Bcl.System\Cosmos.Compiler.Tests.BclSystem.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.csproj" />
@@ -28,6 +29,7 @@
         <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
         <ProjectReference Include="..\Kernels\GraphicTest\GraphicTest.csproj" />
+        <ProjectReference Include="..\Kernels\ProcessorTests\ProcessorTests.csproj" />
         <ProjectReference Include="..\Kernels\MemoryOperationsTest\MemoryOperationsTest.csproj" />
         <ProjectReference Include="..\Kernels\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
     </ItemGroup>

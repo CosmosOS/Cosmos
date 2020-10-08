@@ -9,6 +9,16 @@ namespace Cosmos.System.FileSystem
     {
         public override string Name => "FAT";
 
+        /// <summary>
+        /// Checks if the file system can handle the partition.
+        /// </summary>
+        /// <param name="aDevice">The partition.</param>
+        /// <returns>Returns true if the file system can handle the partition, false otherwise.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if partition is null.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
         public override bool IsType(Partition aDevice)
         {
             if (aDevice == null)
@@ -28,7 +38,27 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aDevice">The partition.</param>
         /// <param name="aRootPath">The root path.</param>
-        /// <exception cref="Exception">FAT signature not found.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aDevice is null.</item>
+        /// <item>Thrown when FatFileSystem is null.</item>
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aRootPath is null.</item>
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>>FAT signature not found.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         public override FileSystem Create(Partition aDevice, string aRootPath, long aSize) => new FatFileSystem(aDevice, aRootPath, aSize);
     }
 }

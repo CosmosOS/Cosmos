@@ -216,7 +216,7 @@ namespace Cosmos.TestRunner.Core
                 "EnableDebug:True",
                 "EnableStackCorruptionDetection:" + EnableStackCorruptionChecks,
                 "StackCorruptionDetectionLevel:" + StackCorruptionDetectionLevel,
-                "DebugMode:Source",
+                "DebugMode:" + DebugMode,
                 "TraceAssemblies:" + TraceAssembliesLevel,
                 "DebugCom:1",
                 "TargetAssembly:" + kernelFileName,

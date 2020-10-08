@@ -32,7 +32,7 @@ namespace Cosmos.Debug.Hosts
                                      + "ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15\n"
                                      + "ata1-master: type=disk, path=\"%HARDDISKPATH%\", mode=vmware4, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n"
                                      + "ata2: enabled=0\n" + "ata3: enabled=0\n" + "pci: enabled=1, chipset=i440fx\n"
-                                     + "vga: extension=vbe, update_freq=5, realtime=1\n"
+                                     + "vga: extension=vbe, update_freq=20, realtime=1\n"
                                      //+ "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
                                      + "cpu: count=1, ips=40000000, model=p4_prescott_celeron_336, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
                                      + "print_timestamps: enabled=0\n" + "port_e9_hack: enabled=0\n"

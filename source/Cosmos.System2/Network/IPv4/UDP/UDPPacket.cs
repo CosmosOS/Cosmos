@@ -1,12 +1,25 @@
 ﻿using System;
 using System.Text;
+using sysIO = System.IO;
 
 namespace Cosmos.System.Network.IPv4
 {
+    /// <summary>
+    /// UDPPacket class.
+    /// </summary>
     public class UDPPacket : IPPacket
     {
+        /// <summary>
+        /// UDP CRC.
+        /// </summary>
         private ushort udpCRC;
 
+        /// <summary>
+        /// UDP handler.
+        /// </summary>
+        /// <param name="packetData">Packet data.</param>
+        /// <exception cref="OverflowException">Thrown if UDP_Data array length is greater than Int32.MaxValue.</exception>
+        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
         internal static void UDPHandler(byte[] packetData)
         {
             UDPPacket udp_packet = new UDPPacket(packetData);
@@ -35,6 +48,17 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
+        /// <summary>
+        /// Make header.
+        /// </summary>
+        /// <param name="sourceIP">Source IP.</param>
+        /// <param name="destIP">Destination IP.</param>
+        /// <param name="udpLen">UDP length.</param>
+        /// <param name="sourcePort">Source port.</param>
+        /// <param name="destPort">Destination port.</param>
+        /// <param name="UDP_Data">UDP data.</param>
+        /// <returns>byte array value.</returns>
+        /// <exception cref="OverflowException">Thrown if UDP_Data array length is greater than Int32.MaxValue.</exception>
         public static byte[] MakeHeader(byte[] sourceIP, byte[] destIP, UInt16 udpLen, UInt16 sourcePort, UInt16 destPort, byte[] UDP_Data)
         {
             byte[] header = new byte[18 + UDP_Data.Length];
@@ -73,6 +97,12 @@ namespace Cosmos.System.Network.IPv4
             return header;
         }
 
+        /// <summary>
+        /// Check CRC.
+        /// </summary>
+        /// <param name="packet">Packer to be checked.</param>
+        /// <returns>bool value.</returns>
+        /// <exception cref="OverflowException">Thrown if packet.UDP_Data lenght if greater than Int32.MaxValue.</exception>
         public static bool CheckCRC(UDPPacket packet)
         {
             byte[] header = MakeHeader(packet.SourceIP.address, packet.DestinationIP.address, packet.UDP_Length, packet.SourcePort, packet.DestinationPort, packet.UDP_Data);
@@ -89,6 +119,13 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
+        /// <summary>
+        /// Calculate CRC.
+        /// </summary>
+        /// <param name="buffer">Buffer.</param>
+        /// <param name="offset">Offset.</param>
+        /// <param name="length">Length.</param>
+        /// <returns>ushort value.</returns>
         protected static ushort Check(byte[] buffer, ushort offset, int length)
         {
             uint crc = 0;
@@ -111,15 +148,32 @@ namespace Cosmos.System.Network.IPv4
             new UDPPacket();
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="UDPPacket"/> class.
+        /// </summary>
         internal UDPPacket()
         {
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="UDPPacket"/> class.
+        /// </summary>
+        /// <param name="rawData">Raw data.</param>
         public UDPPacket(byte[] rawData)
             : base(rawData)
         {
         }
 
+        /// <summary>
+        /// Create new inctanse of the <see cref="UDPPacket"/> class.
+        /// </summary>
+        /// <param name="source">Source address.</param>
+        /// <param name="dest">Destination address.</param>
+        /// <param name="srcPort">Source port.</param>
+        /// <param name="destPort">Destination port.</param>
+        /// <param name="data">Data array.</param>
+        /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         public UDPPacket(Address source, Address dest, ushort srcPort, ushort destPort, byte[] data)
             : base((ushort)(data.Length + 8), 17, source, dest, 0x00)
         {
@@ -146,6 +200,10 @@ namespace Cosmos.System.Network.IPv4
             initFields();
         }
 
+        /// <summary>
+        /// Init UDPPacket fields.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         protected override void initFields()
         {
             base.initFields();
@@ -155,11 +213,27 @@ namespace Cosmos.System.Network.IPv4
             udpCRC = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
         }
 
+        /// <summary>
+        /// Get destination port.
+        /// </summary>
         public ushort DestinationPort { get; private set; }
+        /// <summary>
+        /// Get source port.
+        /// </summary>
         public ushort SourcePort { get; private set; }
+        /// <summary>
+        /// Get UDP length.
+        /// </summary>
         public ushort UDP_Length { get; private set; }
+        /// <summary>
+        /// Get UDP data lenght.
+        /// </summary>
         public ushort UDP_DataLength => (ushort)(UDP_Length - 8);
 
+        /// <summary>
+        /// Get UDP data.
+        /// </summary>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         internal byte[] UDP_Data
         {
             get
@@ -175,6 +249,10 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
+        /// <summary>
+        /// To string.
+        /// </summary>
+        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "UDP Packet Src=" + SourceIP + ":" + SourcePort + "," +

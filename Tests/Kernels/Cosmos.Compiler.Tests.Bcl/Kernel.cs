@@ -29,27 +29,6 @@ namespace Cosmos.Compiler.Tests.Bcl
                 WhileLoopTests.Execute();
                 ForeachLoopTests.Execute();
 
-                // System
-                ObjectTests.Execute();
-                ArrayTests.Execute();
-                StringTest.Execute();
-                ByteTest.Execute();
-                SByteTest.Execute();
-                Int16Test.Execute();
-                UInt16Test.Execute();
-                Int32Test.Execute();
-                UInt32Test.Execute();
-                Int64Test.Execute();
-                UInt64Test.Execute();
-                CharTest.Execute();
-                BooleanTest.Execute();
-                SingleTest.Execute();
-                DoubleTest.Execute();
-                MathTest.Execute();
-                ConvertTests.Execute();
-                DateTimeTests.Execute();
-                TimeSpanTests.Execute();
-
                 //mDebugger.Send("Thread test start of 500 ms");
                 //ThreadTest.Execute();
                 //mDebugger.Send("Thread test end");
@@ -58,6 +37,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
+                EventsTest.Execute();
                 RandomTests.Execute();
 
                 // System.Collections
@@ -65,7 +45,7 @@ namespace Cosmos.Compiler.Tests.Bcl
 
                 // System.Collections.Generic
                 ListTest.Execute();
-                QueueTest.Execute();       
+                QueueTest.Execute();
                 DictionaryTest.Execute();
 
                 // System.Text

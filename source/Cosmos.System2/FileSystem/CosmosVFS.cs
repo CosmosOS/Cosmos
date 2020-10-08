@@ -26,6 +26,16 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Initializes the virtual file system.
         /// </summary>
+        /// <exception cref="IOException">Thrown on I/O exception.</exception>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown on memory error.</exception>
+        /// <exception cref="Exception">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="PathTooLongException">Thrown on fatal error.</exception>
+        /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
+        /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
+        /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
         public override void Initialize()
         {
             mPartitions = new List<Partition>();
@@ -41,6 +51,10 @@ namespace Cosmos.System.FileSystem
             }
         }
 
+        /// <summary>
+        /// Register file system.
+        /// </summary>
+        /// <param name="aFileSystemFactory">A file system to register.</param>
         public override void RegisterFileSystem(FileSystemFactory aFileSystemFactory)
         {
             Global.mFileSystemDebugger.SendInternal($"Registering filesystem {aFileSystemFactory.Name}");
@@ -51,9 +65,37 @@ namespace Cosmos.System.FileSystem
         /// Creates a new file.
         /// </summary>
         /// <param name="aPath">The full path including the file to create.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException">aPath</exception>
+        /// <returns>DirectoryEntry value.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown if aPath is null.</item>
+        /// <item>aNewDirectory is null or empty.</item>
+        /// <item>memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error / unknown directory entry type.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// <item>the entry at aPath is not a file.</item>
+        /// <item>Thrown when the parent directory of aPath is not a directory.</item>
+        /// <item>memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if aPath length is zero.</item>
+        /// <item>Thrown if aPath is invalid.</item>
+        /// <item>memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
+        /// <exception cref="PathTooLongException">Thrown when The aPath is longer than the system defined maximum length.</exception>
         public override DirectoryEntry CreateFile(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.CreateFile ---");
@@ -65,7 +107,7 @@ namespace Cosmos.System.FileSystem
 
             if (aPath.Length == 0)
             {
-                throw new ArgumentException("aPath");
+                throw new ArgumentException("aPath is empty");
             }
 
             Global.mFileSystemDebugger.SendInternal("aPath =");
@@ -104,9 +146,36 @@ namespace Cosmos.System.FileSystem
         /// Creates a directory.
         /// </summary>
         /// <param name="aPath">The full path including the directory to create.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException">aPath</exception>
+        /// <returns>DirectoryEntry value.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown if aPath is null.</item>
+        /// <item>aNewDirectory is null or empty.</item>
+        /// <item>memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error / unknown directory entry type.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// <item>the entry at aPath is not a directory.</item>
+        /// <item>memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if aPath length is zero.</item>
+        /// <item>Thrown if aPath is invalid.</item>
+        /// <item>memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
+        /// <exception cref="PathTooLongException">Thrown when The aPath is longer than the system defined maximum length.</exception>
         public override DirectoryEntry CreateDirectory(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("-- CosmosVFS.CreateDirectory ---");
@@ -118,7 +187,7 @@ namespace Cosmos.System.FileSystem
 
             if (aPath.Length == 0)
             {
-                throw new ArgumentException("aPath");
+                throw new ArgumentException("aPath length is zero");
             }
 
             Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
@@ -159,7 +228,7 @@ namespace Cosmos.System.FileSystem
         /// Deletes a file.
         /// </summary>
         /// <param name="aPath">The full path.</param>
-        /// <returns></returns>
+        /// <returns>TRUE on success.</returns>
         public override bool DeleteFile(DirectoryEntry aPath)
         {
             try
@@ -178,7 +247,7 @@ namespace Cosmos.System.FileSystem
         /// Deletes an empty directory.
         /// </summary>
         /// <param name="aPath">The full path.</param>
-        /// <returns></returns>
+        /// <returns>TRUE on success.</returns>
         public override bool DeleteDirectory(DirectoryEntry aPath)
         {
             try
@@ -202,7 +271,43 @@ namespace Cosmos.System.FileSystem
         /// Gets the directory listing for a path.
         /// </summary>
         /// <param name="aPath">The full path.</param>
-        /// <returns></returns>
+        /// <returns>DirectoryEntry list value.</returns>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if aPath is null or empty.</item>
+        /// <item>Root path is null or empty.</item>
+        /// <item>Memory error.</item>
+        /// <item>Fatal error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown if aFS is null.</item>
+        /// <item>Root directory is null.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type="bullet">
+        /// <item>Thrown when root directory address is smaller then root directory address.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// <list type="bullet">
+        /// <item>Thrown when aPath is too deep.</item>
+        /// <item>Data lenght is greater then Int32.MaxValue.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when unable to determine filesystem for path:  + aPath.</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// <item>path not found.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public override List<DirectoryEntry> GetDirectoryListing(string aPath)
         {
             var xFS = GetFileSystemFromPath(aPath);
@@ -214,7 +319,43 @@ namespace Cosmos.System.FileSystem
         /// Gets the directory listing for a directory entry.
         /// </summary>
         /// <param name="aDirectory">The directory entry.</param>
-        /// <returns></returns>
+        /// <returns>DirectoryEntry type list value.</returns>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if aDirectory is null or empty.</item>
+        /// <item>aDirectory.mFullPath is null or empty.</item>
+        /// <item>Memory error.</item>
+        /// <item>Fatal error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown if aFS is null.</item>
+        /// <item>Root directory is null.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type="bullet">
+        /// <item>Thrown when root directory address is smaller then root directory address.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// <list type="bullet">
+        /// <item>Thrown when aDirectory.mFullPath is too deep.</item>
+        /// <item>Data lenght is greater then Int32.MaxValue.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when unable to determine filesystem for path:  + aDirectory.mFullPath.</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// <item>path not found.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry aDirectory)
         {
             if (aDirectory == null || String.IsNullOrEmpty(aDirectory.mFullPath))
@@ -230,7 +371,7 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aPath">The full path path.</param>
         /// <returns>A directory entry for the directory.</returns>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="Exception">Thrown when the entry at aPath is not a directory.</exception>
         public override DirectoryEntry GetDirectory(string aPath)
         {
             try
@@ -255,7 +396,7 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aPath">The full path.</param>
         /// <returns>A directory entry for the file.</returns>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="Exception">Thrown when the entry at aPath is not a file.</exception>
         public override DirectoryEntry GetFile(string aPath)
         {
             try
@@ -279,6 +420,9 @@ namespace Cosmos.System.FileSystem
         /// Gets the volumes for all registered file systems.
         /// </summary>
         /// <returns>A list of directory entries for all volumes.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if filesystem is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when root directory address is smaller then root directory address.</exception>
+        /// <exception cref="ArgumentException">Thrown when root path is null or empty.</exception>
         public override List<DirectoryEntry> GetVolumes()
         {
             List<DirectoryEntry> xVolumes = new List<DirectoryEntry>();
@@ -296,6 +440,10 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aPath">The volume root path.</param>
         /// <returns>A directory entry for the volume.</returns>
+        /// <exception cref="ArgumentException">Thrown when aPath is null or empty.</exception>
+        /// <exception cref="Exception">Unable to determine filesystem for path:  + aPath</exception>
+        /// <exception cref="ArgumentNullException">Thrown if filesystem is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when root directory address is smaller then root directory address.</exception>
         public override DirectoryEntry GetVolume(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
@@ -317,6 +465,43 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aPath">The path of the File / Directory.</param>
         /// <returns>The File / Directory attributes.</returns>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if aPath is null or empty.</item>
+        /// <item>Thrown when aFS root path is null or empty.</item>
+        /// <item>Thrown on memory error.</item>
+        /// <item>Fatal error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown if aFS is null.</item>
+        /// <item>Thrown when root directory is null.</item>
+        /// <item>Thrown on memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type="bullet">
+        /// <item>Thrown when root directory address is smaller then root directory address.</item>
+        /// <item>Thrown on memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// <list type="bullet">
+        /// <item>Thrown when aPath is too deep.</item>
+        /// <item>Thrown when data lenght is greater then Int32.MaxValue.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when data size invalid.</item>
+        /// <item>Thrown on invalid directory entry type.</item>
+        /// <item>Thrown when aPath entry not found.</item>
+        /// <item>Thrown when unable to determine filesystem for path:  + aPath.</item>
+        /// <item>Thrown aPath is neither a file neither a directory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public override FileAttributes GetFileAttributes(string aPath)
         {
             /*
@@ -349,9 +534,11 @@ namespace Cosmos.System.FileSystem
 
         /// <summary>
         /// Sets the attributes for a File / Directory.
+        /// Not implemented.
         /// </summary>
         /// <param name="aPath">The path of the File / Directory.</param>
         /// <param name="fileAttributes">The attributes of the File / Directory.</param>
+        /// <exception cref="NotImplementedException">Thrown always</exception>
         public override void SetFileAttributes(string aPath, FileAttributes fileAttributes)
         {
             throw new NotImplementedException("SetFileAttributes not implemented");
@@ -360,6 +547,7 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Initializes the partitions for all block devices.
         /// </summary>
+        /// <exception cref="IOException">Thrown on I/O exception.</exception>
         protected virtual void InitializePartitions()
         {
             for (int i = 0; i < BlockDevice.Devices.Count; i++)
@@ -397,6 +585,16 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Initializes the file system for all partitions.
         /// </summary>
+        /// <exception cref="ArgumentNullException">Thrown if null partition exists.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="IOException">Thrown on I/O exception.</exception>
+        /// <exception cref="PathTooLongException">Thrown on fatal error.</exception>
+        /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
+        /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
+        /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
         protected virtual void InitializeFileSystems()
         {
             for (int i = 0; i < mPartitions.Count; i++)
@@ -434,6 +632,7 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aPath">The path.</param>
         /// <returns>The file system for the path.</returns>
+        /// <exception cref="ArgumentException">Thrown when aPath is null or empty.</exception>
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aPath</exception>
         private FileSystem GetFileSystemFromPath(string aPath)
         {
@@ -473,8 +672,41 @@ namespace Cosmos.System.FileSystem
         /// <param name="aPath">The path.</param>
         /// <param name="aFS">The file system.</param>
         /// <returns>A directory entry for the path.</returns>
-        /// <exception cref="ArgumentNullException">aFS</exception>
-        /// <exception cref="Exception">Path part ' + xPathPart + ' not found!</exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown if aPath is null or empty.</item>
+        /// <item>Thrown when aFS root path is null or empty.</item>
+        /// <item>Thrown on memory error.</item>
+        /// <item>Fatal error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown if aFS is null.</item>
+        /// <item>Thrown when root directory is null.</item>
+        /// <item>Thrown on memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type="bullet">
+        /// <item>Thrown when root directory address is smaller then root directory address.</item>
+        /// <item>Thrown on memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// <list type="bullet">
+        /// <item>Thrown when aPath is too deep.</item>
+        /// <item>Thrown when data lenght is greater then Int32.MaxValue.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when data size invalid.</item>
+        /// <item>Thrown on invalid directory entry type.</item>
+        /// <item>Thrown when aPath entry not found.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         private DirectoryEntry DoGetDirectoryEntry(string aPath, FileSystem aFS)
         {
             Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.DoGetDirectoryEntry ---");
@@ -536,6 +768,9 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aFS">The file system containing the volume.</param>
         /// <returns>A directory entry for the volume.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if aFS is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when root directory address is smaller then root directory address.</exception>
+        /// <exception cref="ArgumentException">Thrown when root path is null or empty.</exception>
         private DirectoryEntry GetVolume(FileSystem aFS)
         {
             Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.GetVolume ---");
@@ -554,6 +789,7 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="driveId">The id of the drive.</param>
         /// <returns>true if the drive id is valid, false otherwise.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if driveId length is smaller then 2, or greater than Int32.MaxValue.</exception>
         public override bool IsValidDriveId(string driveId)
         {
             Global.mFileSystemDebugger.SendInternal($"driveId is {driveId} after normalization");
@@ -573,6 +809,13 @@ namespace Cosmos.System.FileSystem
             return isOK;
         }
 
+        /// <summary>
+        /// Get total size in bytes.
+        /// </summary>
+        /// <param name="aDriveId">A drive id to get the size of.</param>
+        /// <returns>long value.</returns>
+        /// <exception cref="ArgumentException">Thrown when aDriveId is null or empty.</exception>
+        /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetTotalSize(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
@@ -581,6 +824,13 @@ namespace Cosmos.System.FileSystem
             return xFs.Size * 1024 * 1024;
         }
 
+        /// <summary>
+        /// Get available free space.
+        /// </summary>
+        /// <param name="aDriveId">A drive id to get the size of.</param>
+        /// <returns>long value.</returns>
+        /// <exception cref="ArgumentException">Thrown when aDriveId is null or empty.</exception>
+        /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetAvailableFreeSpace(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
@@ -588,6 +838,13 @@ namespace Cosmos.System.FileSystem
             return xFs.AvailableFreeSpace;
         }
 
+        /// <summary>
+        /// Get total free space.
+        /// </summary>
+        /// <param name="aDriveId">A drive id to get the size of.</param>
+        /// <returns>long value.</returns>
+        /// <exception cref="ArgumentException">Thrown when aDriveId is null or empty.</exception>
+        /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetTotalFreeSpace(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
@@ -595,6 +852,13 @@ namespace Cosmos.System.FileSystem
             return xFs.TotalFreeSpace;
         }
 
+        /// <summary>
+        /// Get file system type.
+        /// </summary>
+        /// <param name="aDriveId">A drive id.</param>
+        /// <returns>string value.</returns>
+        /// <exception cref="ArgumentException">Thrown when aDriveId is null or empty.</exception>
+        /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override string GetFileSystemType(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
@@ -602,6 +866,13 @@ namespace Cosmos.System.FileSystem
             return xFs.Type;
         }
 
+        /// <summary>
+        /// Get file system label.
+        /// </summary>
+        /// <param name="aDriveId">A drive id.</param>
+        /// <returns>string value.</returns>
+        /// <exception cref="ArgumentException">Thrown when aDriveId is null or empty.</exception>
+        /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override string GetFileSystemLabel(string aDriveId)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
@@ -609,6 +880,13 @@ namespace Cosmos.System.FileSystem
             return xFs.Label;
         }
 
+        /// <summary>
+        /// Set file system type.
+        /// </summary>
+        /// <param name="aDriveId">A drive id.</param>
+        /// <param name="aLabel">A label to be set.</param>
+        /// <exception cref="ArgumentException">Thrown when aDriveId is null or empty.</exception>
+        /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override void SetFileSystemLabel(string aDriveId, string aLabel)
         {
             Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.SetFileSystemLabel ---");
@@ -618,6 +896,43 @@ namespace Cosmos.System.FileSystem
             xFs.Label = aLabel;
         }
 
+        /// <summary>
+        /// Format partition.
+        /// </summary>
+        /// <param name="aDriveId">A drive id.</param>
+        /// <param name="aDriveFormat">A drive format.</param>
+        /// <param name="aQuick">Quick format.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// <item>Fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when filesystem is null / memory error.</exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aDriveId is null or empty.</item>
+        /// <item>Data length is 0.</item>
+        /// <item>Root path is null or empty.</item>
+        /// <item>Memory error.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Unable to determine filesystem for path:  + aDriveId.</item>
+        /// <item>Thrown when data size invalid.</item>
+        /// <item>Thrown on unknown file system type.</item>
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
+        /// <exception cref="NotImplementedException">Thrown when FAT type is unknown.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
+        /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Format(string aDriveId, string aDriveFormat, bool aQuick)
         {
             var xFs = GetFileSystemFromPath(aDriveId);
