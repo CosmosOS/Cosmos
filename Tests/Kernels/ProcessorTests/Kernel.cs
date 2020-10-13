@@ -36,6 +36,14 @@ namespace ProcessorTests
             }
         }
 
+        public void TestBrandStringBlank()
+        {
+            string brandString = CPU.GetCPUBrandString();
+            mDebugger.Send("Brand String: " + brandString);
+            bool isBrandStringBlank = string.IsNullOrWhiteSpace(brandString);
+            Assert.IsFalse(isBrandStringBlank, "Processor brand string is blank.");
+        }
+
         public void TestVendorNameIsNotBlank()
         {
             string vendorName = CPU.GetCPUVendorName();

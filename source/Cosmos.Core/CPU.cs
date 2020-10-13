@@ -110,6 +110,8 @@ namespace Cosmos.Core
             return xResult;
         }
 
+
+
         /// <summary>
         /// Get CPU vendor name.
         /// </summary>
@@ -179,15 +181,15 @@ namespace Cosmos.Core
                 {
                     ReadCPUID(0x80000002 + i, ref eax, ref ebx, ref ecx, ref edx);
                     s += (char)(ebx % 256);
-                    s += (char)((ebx >> 8)  % 256);
-                    s += (char)((ebx>> 16)  % 256);
-                    s += (char)((ebx >> 24)  % 256);
+                    s += (char)((ebx >> 8) % 256);
+                    s += (char)((ebx >> 16) % 256);
+                    s += (char)((ebx >> 24) % 256);
                     s += (char)(edx % 256);
-                    s += (char)((edx >> 8)  % 256);
-                    s += (char)((edx >> 16)  % 256);
-                    s += (char)((edx >> 24)  % 256);
+                    s += (char)((edx >> 8) % 256);
+                    s += (char)((edx >> 16) % 256);
+                    s += (char)((edx >> 24) % 256);
                     s += (char)(ecx % 256);
-                    s += (char)((ecx >> 8)  % 256);
+                    s += (char)((ecx >> 8) % 256);
                     s += (char)((ecx >> 16) % 256);
                     s += (char)((ecx >> 24) % 256);
                 }
@@ -246,6 +248,67 @@ namespace Cosmos.Core
 
             throw new NotSupportedException();
         }
+
+        /// <summary>
+        /// Get CPU cycle speed.
+        /// </summary>
+        /// <returns>long value.</returns>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="NotSupportedException">Thrown if can not read CPU ID.</exception>
+        public static string GetCPUBrandString()
+        {
+            if (CanReadCPUID() != 0)
+            {
+                // See https://c9x.me/x86/html/file_module_x86_id_45.html
+
+                int eax = 0;
+                int ebx = 0;
+                int ecx = 0;
+                int edx = 0;
+                int[] s = new int[64];
+                string rs = "";
+
+                for (uint i = 0; i < 3; i++)
+                {
+                    ReadCPUID(0x80000002 + i, ref eax, ref ebx, ref ecx, ref edx);
+                    s[(i * 16) + 0] = (eax % 256);
+                    s[(i * 16) + 1] = ((eax >> 8) % 256);
+                    s[(i * 16) + 2] = ((eax >> 16) % 256);
+                    s[(i * 16) + 3] = ((eax >> 24) % 256);
+                    s[(i * 16) + 4] = (ebx % 256);
+                    s[(i * 16) + 5] = ((ebx >> 8) % 256);
+                    s[(i * 16) + 6] = ((ebx >> 16) % 256);
+                    s[(i * 16) + 7] = ((ebx >> 24) % 256);
+                    s[(i * 16) + 8] = (ecx % 256);
+                    s[(i * 16) + 9] = ((ecx >> 8) % 256);
+                    s[(i * 16) + 10] = ((ecx >> 16) % 256);
+                    s[(i * 16) + 11] = ((ecx >> 24) % 256);
+                    s[(i * 16) + 12] = (edx % 256);
+                    s[(i * 16) + 13] = ((edx >> 8) % 256);
+                    s[(i * 16) + 14] = ((edx >> 16) % 256);
+                    s[(i * 16) + 15] = ((edx >> 24) % 256);
+                }
+                for (int i = 0; i < s.Length; i++)
+                {
+                    if (s[i] == 0x00)
+                    {
+                        continue;
+                    }
+                    rs += (char)s[i];
+                }
+
+                if (!(rs == ""))
+                {
+                    return rs;
+                } else
+                {
+                    throw new NotSupportedException();
+                }
+            }
+            throw new NotSupportedException();
+        }
+
+
 
         /// <summary>
         /// Check if can read CPU ID. Plugged.
