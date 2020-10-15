@@ -5,8 +5,8 @@ namespace Cosmos.Build.Builder.Services
 {
     internal class DialogService<TView, TViewModel> : IDialogService<TViewModel> where TView : Window
     {
-        private Func<TView> _dialogFactory;
-        private Window _owner;
+        private readonly Func<TView> _dialogFactory;
+        private readonly Window _owner;
 
         public DialogService(Func<TView> dialogFactory, Window owner = null)
         {

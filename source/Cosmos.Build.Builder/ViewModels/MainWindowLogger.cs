@@ -9,7 +9,7 @@ namespace Cosmos.Build.Builder.ViewModels
     {
         private static readonly string[] NewLineStringArray = new string[] { Environment.NewLine };
 
-        private MainWindowViewModel _viewModel;
+        private readonly MainWindowViewModel _viewModel;
 
         public MainWindowLogger(MainWindowViewModel viewModel)
         {

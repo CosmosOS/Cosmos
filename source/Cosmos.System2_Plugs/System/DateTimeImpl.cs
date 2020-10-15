@@ -23,15 +23,42 @@ namespace Cosmos.System_Plugs.System
 
         public static long GetSystemTimeAsFileTime() => Now.Ticks;
 
-        public static string ToString(ref DateTime aThis)
+        private static readonly string[] DaysOfWeekStrings = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        private static readonly string[] MonthsStrings = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+
+        // The following code is assuming the INVARIANT culture for the strings conversions
+        public static string ToLongDateString(ref DateTime aThis)
         {
-            // TODO: use current culture for string representation of DateTime
-            return aThis.Year.ToString().PadLeft(4, '0') + "-" +
-                   aThis.Month.ToString().PadLeft(2, '0') + "-" +
+            return DaysOfWeekStrings[(int)aThis.DayOfWeek] + ", " +
                    aThis.Day.ToString().PadLeft(2, '0') + " " +
-                   aThis.Hour.ToString().PadLeft(2, '0') + ":" +
+                   MonthsStrings[aThis.Month - 1] + " " +
+                   aThis.Year.ToString().PadLeft(4, '0');
+        }
+
+        public static string ToShortDateString(ref DateTime aThis)
+        {
+            return aThis.Month.ToString().PadLeft(2, '0') + '/' +
+                   aThis.Day.ToString().PadLeft(2, '0') + '/' +
+                   aThis.Year.ToString().PadLeft(4, '0');
+        }
+
+        public static string ToLongTimeString(ref DateTime aThis)
+        {
+            return aThis.Hour.ToString().PadLeft(2, '0') + ":" +
                    aThis.Minute.ToString().PadLeft(2, '0') + ":" +
                    aThis.Second.ToString().PadLeft(2, '0');
+        }
+
+        public static string ToShortTimeString(ref DateTime aThis)
+        {
+            return aThis.Hour.ToString().PadLeft(2, '0') + ":" +
+                   aThis.Minute.ToString().PadLeft(2, '0');
+        }
+
+        public static string ToString(ref DateTime aThis)
+        {
+            
+            return aThis.ToShortDateString() + " " + aThis.ToLongTimeString();
         }
     }
 }

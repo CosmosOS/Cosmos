@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net471</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <RuntimeIdentifier>win</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
-        <PackageDescription>Cosmos build system.
-$(CosmosDescription)</PackageDescription>
-        <IsTool>True</IsTool>
+        <PackageDescription>Cosmos build system.</PackageDescription>
+        <IsMSBuildExtensionProject>True</IsMSBuildExtensionProject>
+        <AppendTargetFrameworkToToolsPackageFolder>False</AppendTargetFrameworkToToolsPackageFolder>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,22 +17,11 @@ $(CosmosDescription)</PackageDescription>
 
     <ItemGroup>
         <PackageReference Include="IL2CPU.Debug.Symbols" />
-        <PackageReference Include="Microsoft.Build.Framework" Version="15.5.180" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.5.180" PrivateAssets="All" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" PrivateAssets="All" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" PrivateAssets="All" />
     </ItemGroup>
-
-    <Target Name="IncludeDependencies" BeforeTargets="_GetPackageFiles" DependsOnTargets="PrepareForPublish;ComputeFilesToPublish">
-
-        <ItemGroup>
-            <Content Include="@(ResolvedAssembliesToPublish)" Pack="True" PackagePath="tools\%(ResolvedAssembliesToPublish.DestinationSubPath)" Condition="!$([System.String]::new('%(Filename)').StartsWith('Microsoft.Build'))" />
-            <Content Pack="True" PackagePath="tools\%(Content.Link)" Condition="'%(Filename)' == 'e_sqlite3'" />
-        </ItemGroup>
-
-    </Target>
 
 </Project>

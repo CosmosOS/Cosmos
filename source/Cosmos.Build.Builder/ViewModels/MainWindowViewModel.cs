@@ -12,7 +12,7 @@ using Cosmos.Build.Builder.Services;
 
 namespace Cosmos.Build.Builder.ViewModels
 {
-    internal class MainWindowViewModel : ViewModelBase
+    internal sealed class MainWindowViewModel : ViewModelBase
     {
         private const int TailItemCount = 10;
 
@@ -35,12 +35,12 @@ namespace Cosmos.Build.Builder.ViewModels
             set => SetAndRaiseIfChanged(ref _windowState, value);
         }
 
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
-        private IDialogService<DependencyInstallationDialogViewModel> _dependencyInstallationDialogService;
+        private readonly IDialogService<DependencyInstallationDialogViewModel> _dependencyInstallationDialogService;
 
-        private IBuildDefinition _buildDefinition;
-        private Task _buildTask;
+        private readonly IBuildDefinition _buildDefinition;
+        private readonly Task _buildTask;
 
         private bool _closeWhenCompleted;
 
@@ -109,12 +109,14 @@ namespace Cosmos.Build.Builder.ViewModels
                     {
                         _logger.LogMessage($"{dependency.Name} not found.");
 
-                        var viewModel = new DependencyInstallationDialogViewModel(dependency);
-                        _dependencyInstallationDialogService.ShowDialog(viewModel);
-
-                        if (!viewModel.InstallationSucceeded)
+                        using (var viewModel = new DependencyInstallationDialogViewModel(dependency))
                         {
-                            throw new Exception($"Dependency installation failed! Dependency name: {dependency.Name}");
+                            _dependencyInstallationDialogService.ShowDialog(viewModel);
+
+                            if (!viewModel.InstallationSucceeded)
+                            {
+                                throw new Exception($"Dependency installation failed! Dependency name: {dependency.Name}");
+                            }
                         }
                     }
                 }

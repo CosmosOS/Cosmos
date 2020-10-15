@@ -9,7 +9,7 @@ using Cosmos.Build.Builder.Services;
 
 namespace Cosmos.Build.Builder.ViewModels
 {
-    internal class VisualStudioInstanceDialogViewModel : ViewModelBase
+    internal sealed class VisualStudioInstanceDialogViewModel : ViewModelBase
     {
         public IEnumerable<VisualStudioInstance> VisualStudioInstances { get; }
 
@@ -22,7 +22,7 @@ namespace Cosmos.Build.Builder.ViewModels
         public ICommand OkCommand { get; }
         public ICommand CancelCommand { get; }
 
-        private IVisualStudioService _visualStudioService;
+        private readonly IVisualStudioService _visualStudioService;
 
         private VisualStudioInstance _selectedVisualStudioInstance;
 
@@ -37,7 +37,7 @@ namespace Cosmos.Build.Builder.ViewModels
             CancelCommand = new RelayCommand(p => Close(p as Window, false));
         }
 
-        private void Close(Window window, bool? dialogResult)
+        private static void Close(Window window, bool? dialogResult)
         {
 #if DEBUG
             if (window == null)

@@ -1,0 +1,74 @@
+<Project>
+
+    <PropertyGroup>
+        <DevelopmentDependency Condition="'$(DevelopmentDependency)' == ''">True</DevelopmentDependency>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <AppendTargetFrameworkToToolsPackageFolder Condition="'$(AppendTargetFrameworkToToolsPackageFolder)' == ''">True</AppendTargetFrameworkToToolsPackageFolder>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IncludeBuildOutput>False</IncludeBuildOutput>
+        <SuppressDependenciesWhenPacking>True</SuppressDependenciesWhenPacking>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackToolProject</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <Target Name="PackToolProject"
+            DependsOnTargets="Publish">
+
+        <PropertyGroup>
+            <ToolPackagePath>$([MSBuild]::EnsureTrailingSlash($(ToolPackagePath)))</ToolPackagePath>
+            <ToolPackagePath Condition="'$(AppendTargetFrameworkToToolsPackageFolder)' == 'True'">$(ToolPackagePath)$(TargetFramework)\</ToolPackagePath>
+        </PropertyGroup>
+
+        <ItemGroup>
+            <GeneratedToolFiles Include="$(PublishDepsFilePath)" />
+            <GeneratedToolFiles Include="$(PublishRuntimeConfigFilePath)" Condition="'$(GenerateRuntimeConfigurationFiles)' == 'True'" />
+        </ItemGroup>
+
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="@(GeneratedToolFiles)">
+                <PackagePath>tools\$(ToolPackagePath)%(GeneratedToolFiles.RecursiveDir)</PackagePath>
+            </TfmSpecificPackageFile>
+            <TfmSpecificPackageFile Include="@(ResolvedFileToPublish->'$([MSBuild]::NormalizeDirectory($(PublishDir)))%(RelativePath)')">
+                <PackagePath>tools\$(ToolPackagePath)%(ResolvedFileToPublish.RelativePath)</PackagePath>
+            </TfmSpecificPackageFile>
+        </ItemGroup>
+
+    </Target>
+
+    <PropertyGroup>
+        <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);_GetProjectReferencesContentToPack</GenerateNuspecDependsOn>
+    </PropertyGroup>
+
+    <Target Name="_GetProjectReferencesContentToPack"
+            Condition="'@(ProjectReference)' != ''">
+        <MSBuild Projects="@(ProjectReference)"
+                 Targets="GetNupkgContent"
+                 BuildInParallel="$(BuildInParallel)"
+                 Properties="_NupkgContentPath=%(ProjectReference.PackagePath);Configuration=$(Configuration);Platform=$(Platform)"
+                 Condition="'%(ProjectReference.Pack)' == 'True'"
+                 RemoveProperties="TargetFramework;%(ProjectReference.GlobalPropertiesToRemove)">
+            <Output TaskParameter="TargetOutputs" ItemName="_PackageFiles" />
+        </MSBuild>
+    </Target>
+
+    <ItemGroup>
+        <ProjectReference Update="@(ProjectReference)">
+            <ReferenceOutputAssembly Condition="'%(ProjectReference.Pack)' == 'True'">False</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
+    <Target Name="GetNupkgContent"
+            Returns="@(_NupkgContent)"
+            DependsOnTargets="$(GenerateNuspecDependsOn)">
+
+        <ItemGroup>
+            <_NupkgContent Include="@(_PackageFiles->'%(FullPath)')"
+                           PackagePath="$([MSBuild]::EnsureTrailingSlash($(_NupkgContentPath)))%(_PackageFiles.PackagePath)" />
+        </ItemGroup>
+
+    </Target>
+
+</Project>

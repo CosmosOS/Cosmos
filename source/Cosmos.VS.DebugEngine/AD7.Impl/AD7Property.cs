@@ -26,13 +26,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         const uint mArrayFirstElementOffset = 16;
         private const string NULL = "null";
 
-        protected Int32 OFFSET
-        {
-            get
-            {
-                return mDebugInfo.OFFSET;
-            }
-        }
+        protected int OFFSET => mDebugInfo.OFFSET;
 
         public AD7Property(DebugLocalInfo localInfo, AD7Process process, AD7StackFrame stackFrame)
         {
@@ -124,17 +118,17 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         }
                         if (xDataLength > 0)
                         {
-                            if (this.m_variableInformation.Children.Count == 0)
+                            if (m_variableInformation.Children.Count == 0)
                             {
                                 for (int i = 0; i < xDataLength; i++)
                                 {
-                                    DebugLocalInfo inf = new DebugLocalInfo();
+                                    var inf = new DebugLocalInfo();
                                     inf.IsReference = true;
                                     inf.Type = typeof(T).FullName;
                                     inf.Offset = (int)(mArrayFirstElementOffset + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)) * i));
                                     inf.Pointer = (uint)(xPointer + mArrayFirstElementOffset + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)) * i));
                                     inf.Name = "[" + i.ToString() + "]";
-                                    this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
+                                    m_variableInformation.Children.Add(new AD7Property(inf, mProcess, mStackFrame));
                                 }
                             }
                         }
@@ -149,7 +143,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         // Construct a DEBUG_PROPERTY_INFO representing this local or parameter.
         public DEBUG_PROPERTY_INFO ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS dwFields)
         {
-            DEBUG_PROPERTY_INFO propertyInfo = new DEBUG_PROPERTY_INFO();
+            var propertyInfo = new DEBUG_PROPERTY_INFO();
 
             try
             {
@@ -320,9 +314,13 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                                             for (int i = 0; (i / 2) < xDataLength; i += 2)
                                             {
                                                 if (!first)
+                                                {
                                                     xSB.Append(", ");
+                                                }
+
                                                 char c = BitConverter.ToChar(xData, i);
                                                 xSB.Append('\'');
+
                                                 if (c == '\0')
                                                 {
                                                     xSB.Append("\\0");
@@ -331,6 +329,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                                                 {
                                                     xSB.Append(c);
                                                 }
+
                                                 xSB.Append('\'');
 
                                                 first = false;
@@ -494,7 +493,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                                         inf.Offset = xFieldInfo.OFFSET;
                                         inf.Pointer = (uint)(xPointer + xFieldInfo.OFFSET + 12);
                                         inf.Name = GetFieldName(xFieldInfo);
-                                        this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
+                                        m_variableInformation.Children.Add(new AD7Property(inf, mProcess, mStackFrame));
                                     }
                                     propertyInfo.bstrValue = String.Format("{0} (0x{1})", xPointer, xPointer.ToString("X").ToUpper());
                                 }
@@ -521,7 +520,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     // The sample does not support writing of values displayed in the debugger, so mark them all as read-only.
                     propertyInfo.dwAttrib = enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
 
-                    if (this.m_variableInformation.Children.Count > 0)
+                    if (m_variableInformation.Children.Count > 0)
                     {
                         propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
                     }
@@ -565,9 +564,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         {
             ppEnum = null;
 
-            if (this.m_variableInformation.Children.Count > 0)
+            if (m_variableInformation.Children.Count > 0)
             {
-                List<DEBUG_PROPERTY_INFO> infs = new List<DEBUG_PROPERTY_INFO>();
+                var infs = new List<DEBUG_PROPERTY_INFO>();
                 foreach (AD7Property dp in m_variableInformation.Children)
                 {
                     infs.Add(dp.ConstructDebugPropertyInfo(dwFields));

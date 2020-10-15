@@ -6,10 +6,10 @@ namespace Cosmos.Build.Builder.BuildTasks
     {
         public override string Name => $"Run Process - {_processName ?? Path.GetFileNameWithoutExtension(_exePath)}";
 
-        private string _exePath;
-        private string _args;
+        private readonly string _exePath;
+        private readonly string _args;
 
-        private string _processName;
+        private readonly string _processName;
 
         public StartProcessTask(
             string exePath,

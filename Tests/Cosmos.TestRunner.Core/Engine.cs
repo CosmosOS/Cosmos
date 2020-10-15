@@ -19,6 +19,7 @@ namespace Cosmos.TestRunner.Core
         protected TraceAssemblies TraceAssembliesLevel => mConfiguration.TraceAssembliesLevel;
         protected bool EnableStackCorruptionChecks => mConfiguration.EnableStackCorruptionChecks;
         protected StackCorruptionDetectionLevel StackCorruptionDetectionLevel => mConfiguration.StackCorruptionDetectionLevel;
+        protected DebugMode DebugMode => mConfiguration.DebugMode;
 
         protected bool RunWithGDB => mConfiguration.RunWithGDB;
         protected bool StartBochsDebugGui => mConfiguration.StartBochsDebugGUI;

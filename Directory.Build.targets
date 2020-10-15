@@ -1,33 +1,5 @@
 <Project>
 
-    <PropertyGroup>
-        <!--
-            This property should exist, according to the docs, but it has no effect on pack.
-        -->
-        <PackageVersionPrefix>$([System.DateTime]::Now.ToString("yyyy.MM.dd"))</PackageVersionPrefix>
-        <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' != ''">$(PackageVersionPrefix)-$(VersionSuffix)</PackageVersion>
-        <PackageVersion Condition="'$(PackageVersionPrefix)' != '' AND '$(VersionSuffix)' == ''">$(PackageVersionPrefix)</PackageVersion>
-    </PropertyGroup>
-    
-    <PropertyGroup>
-        <SignAssembly>True</SignAssembly>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <CodeAnalysisRuleSet>$(RepoRoot)build\Cosmos.ruleset</CodeAnalysisRuleSet>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <RoslynAnalyzer Include="Microsoft.CodeAnalysis.Analyzers" />
-        <RoslynAnalyzer Include="Microsoft.CodeQuality.Analyzers" />
-        <RoslynAnalyzer Include="Microsoft.NetCore.Analyzers" />
-        <RoslynAnalyzer Include="Microsoft.NetFramework.Analyzers" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="@(RoslynAnalyzer)" PrivateAssets="All" />
-    </ItemGroup>
-
     <Import Project="build\Targets\Import.targets" />
 
 </Project>

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 
 using Cosmos.Build.Common;
-using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.Hosts
 {
@@ -41,6 +40,11 @@ namespace Cosmos.Debug.Hosts
       }
 
       InitializeKeyValues();
+      if (Environment.GetEnvironmentVariable("CI") == "True")
+      {
+        string debugGui = startDebugGui ? ", options=\"gui_debug\"" : "";
+        defaultConfigs["display_library"] = "nogui " + debugGui;
+      }
       GenerateConfiguration(configurationFile.FullName);
       _bochsConfigurationFile = configurationFile;
     }

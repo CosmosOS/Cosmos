@@ -24,7 +24,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
         // A helper method used to construct a new pending breakpoint.
         public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
             var pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, mEngine, this);
-            ppPendingBP = (IDebugPendingBreakpoint2)pendingBreakpoint;
+            ppPendingBP = pendingBreakpoint;
             mPendingBPs.Add(pendingBreakpoint);
         }
 

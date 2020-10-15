@@ -12,7 +12,7 @@
 #endif
 
 #ifndef VSVersion
-  #define VSVersion "vs2017"
+  #define VSVersion "vs2019"
 #endif
 
 #if BuildConfiguration == "DevKit"
@@ -29,7 +29,7 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright (c) 2007-2017 The Cosmos Project
+AppCopyright=Copyright (c) 2007-2019 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/

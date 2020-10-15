@@ -27,67 +27,64 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         }
 
         // Adds a specified value to the current context's address to create a new context.
-        public int Add(ulong dwCount, out IDebugMemoryContext2 newAddress)
+        public int Add(ulong dwCount, out IDebugMemoryContext2 ppMemCxt)
         {
-            newAddress = new AD7MemoryAddress(m_engine, (uint)dwCount + m_address);
+            ppMemCxt = new AD7MemoryAddress(m_engine, (uint)dwCount + m_address);
             return VSConstants.S_OK;
         }
 
         // Compares the memory context to each context in the given array in the manner indicated by compare flags, 
         // returning an index of the first context that matches.
-        public int Compare(enum_CONTEXT_COMPARE uContextCompare, IDebugMemoryContext2[] compareToItems, uint compareToLength, out uint foundIndex)
+        public int Compare(enum_CONTEXT_COMPARE Compare, IDebugMemoryContext2[] rgpMemoryContextSet, uint dwMemoryContextSetLen, out uint pdwMemoryContext)
         {
-            foundIndex = uint.MaxValue;
+            pdwMemoryContext = UInt32.MaxValue;
 
             try
             {
-                enum_CONTEXT_COMPARE contextCompare = (enum_CONTEXT_COMPARE)uContextCompare;
-
-                for (uint c = 0; c < compareToLength; c++)
+                for (uint c = 0; c < dwMemoryContextSetLen; c++)
                 {
-                    AD7MemoryAddress compareTo = compareToItems[c] as AD7MemoryAddress;
-                    if (compareTo == null)
+                    if (!(rgpMemoryContextSet[c] is AD7MemoryAddress compareTo))
                     {
                         continue;
                     }
 
-                    if (!AD7Engine.ReferenceEquals(this.m_engine, compareTo.m_engine))
+                    if (!ReferenceEquals(m_engine, compareTo.m_engine))
                     {
                         continue;
                     }
 
                     bool result;
 
-                    switch (contextCompare)
+                    switch (Compare)
                     {
                         case enum_CONTEXT_COMPARE.CONTEXT_EQUAL:
-                            result = (this.m_address == compareTo.m_address);
+                            result = (m_address == compareTo.m_address);
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN:
-                            result = (this.m_address < compareTo.m_address);
+                            result = (m_address < compareTo.m_address);
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN:
-                            result = (this.m_address > compareTo.m_address);
+                            result = (m_address > compareTo.m_address);
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN_OR_EQUAL:
-                            result = (this.m_address <= compareTo.m_address);
+                            result = (m_address <= compareTo.m_address);
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN_OR_EQUAL:
-                            result = (this.m_address >= compareTo.m_address);
+                            result = (m_address >= compareTo.m_address);
                             break;
 
                         // The sample debug engine doesn't understand scopes or functions
                         case enum_CONTEXT_COMPARE.CONTEXT_SAME_SCOPE:
                         case enum_CONTEXT_COMPARE.CONTEXT_SAME_FUNCTION:
-                            result = (this.m_address == compareTo.m_address);
+                            result = (m_address == compareTo.m_address);
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_SAME_MODULE:
-                            result = (this.m_address == compareTo.m_address);
+                            result = (m_address == compareTo.m_address);
                             if (result == false)
                             {
                                 //DebuggedModule module = m_engine.DebuggedProcess.ResolveAddress(m_address);
@@ -111,7 +108,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     if (result)
                     {
-                        foundIndex = c;
+                        pdwMemoryContext = c;
                         return VSConstants.S_OK;
                     }
                 }

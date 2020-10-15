@@ -37,6 +37,9 @@ namespace Cosmos.System
         FifthButton = 0b0001_0000
     }
 
+    /// <summary>
+    /// Mouse manager class.
+    /// </summary>
     public static class MouseManager
     {
         private static List<MouseBase> mMouseList = new List<MouseBase>();
@@ -50,6 +53,11 @@ namespace Cosmos.System
         /// The Y location of the mouse.
         /// </summary>
         public static uint Y;
+
+        // /// <summary>
+        // /// The Point of the mouse.
+        // /// </summary>
+        // public static Point GetPoint() {return new Point((int)MouseManager.X, (int)MouseManager.Y);}
 
         /// <summary>
         /// The state the mouse is currently in.
@@ -91,13 +99,16 @@ namespace Cosmos.System
             {
                 mScreenHeight = value;
 
-                if (X >= mScreenHeight)
+                if (Y >= mScreenHeight)
                 {
-                    X = mScreenHeight - 1;
+                    Y = mScreenHeight - 1;
                 }
             }
         }
 
+        /// <summary>
+        /// Mouse manager constructor.
+        /// </summary>
         static MouseManager()
         {
             foreach (var mouse in HAL.Global.GetMouseDevices())
@@ -106,6 +117,13 @@ namespace Cosmos.System
             }
         }
 
+        /// <summary>
+        /// Mouse handler.
+        /// </summary>
+        /// <param name="aDeltaX">Mouse location change on X axis.</param>
+        /// <param name="aDeltaY">Mouse location change on Y axis.</param>
+        /// <param name="aMouseState">Mouse pressed button state</param>
+        /// <param name="aScrollWheel">unused</param>
         public static void HandleMouse(int aDeltaX, int aDeltaY, int aMouseState, int aScrollWheel)
         {
             int x = (int)(X + MouseSensitivity * aDeltaX);
@@ -139,6 +157,10 @@ namespace Cosmos.System
             }
         }
 
+        /// <summary>
+        /// Add mouse to the mouse list.
+        /// </summary>
+        /// <param name="aMouse">A mouse to add.</param>
         private static void AddMouse(MouseBase aMouse)
         {
             aMouse.OnMouseChanged = HandleMouse;

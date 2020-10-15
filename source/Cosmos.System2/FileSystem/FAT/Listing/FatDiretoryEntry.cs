@@ -11,6 +11,9 @@ using System.Text;
 
 namespace Cosmos.System.FileSystem.FAT.Listing
 {
+    /// <summary>
+    /// FatDirectoryEntry class. Represent directory/file.
+    /// </summary>
     internal class FatDirectoryEntry : DirectoryEntry
     {
         private readonly uint mEntryHeaderDataOffset;
@@ -19,6 +22,20 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         // Size is UInt32 because FAT doesn't support bigger.
         // Don't change to UInt64
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FatDirectoryEntry"/> class.
+        /// </summary>
+        /// <param name="aFileSystem">The file system that contains the directory entry.</param>
+        /// <param name="aParent">The parent directory entry or null if the current entry is the root.</param>
+        /// <param name="aFullPath">The full path to the entry.</param>
+        /// <param name="aName">The entry name.</param>
+        /// <param name="aSize">The size of the entry.</param>
+        /// <param name="aFirstCluster">The first cluster of the entry.</param>
+        /// <param name="aEntryHeaderDataOffset">The entry header data offset.</param>
+        /// <param name="aEntryType">The entry type.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when first cluster smaller then file system root cluster.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when aFileSystem is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when aFullPath or aName is null or empty.</exception>
         public FatDirectoryEntry(
             FatFileSystem aFileSystem,
             FatDirectoryEntry aParent,
@@ -40,6 +57,18 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             mEntryHeaderDataOffset = aEntryHeaderDataOffset;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FatDirectoryEntry"/> class.
+        /// </summary>
+        /// <param name="aFileSystem">The file system that contains the directory entry.</param>
+        /// <param name="aParent">The parent directory entry or null if the current entry is the root.</param>
+        /// <param name="aFullPath">The full path to the entry.</param>
+        /// <param name="aName">The entry name.</param>
+        /// <param name="aSize">The size of the entry.</param>
+        /// <param name="aFirstCluster">The first cluster of the entry.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when first cluster smaller then file system root cluster.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when aFileSystem is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when aFullPath or aName is null or empty.</exception>
         public FatDirectoryEntry(
             FatFileSystem aFileSystem,
             FatDirectoryEntry aParent,
@@ -58,6 +87,16 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             mEntryHeaderDataOffset = 0;
         }
 
+        /// <summary>
+        /// Get FAT table.
+        /// </summary>
+        /// <returns>An array of cluster numbers for the FAT chain.</returns>
+        /// <exception cref="Exception">Thrown when FAT table not found / out of memory / invalid aData size.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the size of the chain is less then zero.</exception>
+        /// <exception cref="OverflowException">Thrown when the number of clusters in the FAT entry is greater than Int32.MaxValue</exception>
+        /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
+        /// <exception cref="ArgumentException">Thrown when FAT type is unknown.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when aData is null.</exception>
         public uint[] GetFatTable()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFatTable --");
@@ -66,6 +105,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return xFat?.GetFatChain(mFirstClusterNum, mSize);
         }
 
+        /// <summary>
+        /// Get file system.
+        /// </summary>
+        /// <returns>File system.</returns>
         public FatFileSystem GetFileSystem()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFileSystem --");
@@ -73,6 +116,14 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return ((FatFileSystem)mFileSystem);
         }
 
+        /// <summary>
+        /// Get file stream.
+        /// </summary>
+        /// <returns>File stream. null if object is not a file.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when this object is null.</exception>
+        /// <exception cref="Exception">Thrown when FAT table not found / out of memory.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the size of the chain is less then zero. (Never thrown)</exception>
+        /// <exception cref="OverflowException">Thrown when the number of clusters in the FAT entry is greater than Int32.MaxValue</exception>
         public override Stream GetFileStream()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFileStream --");
@@ -85,6 +136,41 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return null;
         }
 
+        /// <summary>
+        /// Set name.
+        /// </summary>
+        /// <param name="aName">A name to set to the entry.</param>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aName is null or empty string.</item>
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when entry metadata could not be changed.</item>
+        /// <item>Invalid entry type.</item>
+        /// <item>Invalid entry data size.</item>
+        /// <item>Invalid directory entry type.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when entrys aValue is null.</item>
+        /// <item>Thrown when entrys aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="EncoderFallbackException">Thrown when encoder fallback operation on aValue fails.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
         public override void SetName(string aName)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetName --");
@@ -99,6 +185,41 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             mName = aName;
         }
 
+        /// <summary>
+        /// Set the size of the entry.
+        /// </summary>
+        /// <param name="aSize">The size of the entry.</param>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when trying to change root directory matadata.</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when entrys aValue is null.</item>
+        /// <item>Thrown when entrys aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// <item>Thrown when aSize is smaller than 0.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aName is null or empty string.</item>
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
         public override void SetSize(long aSize)
         {
             Global.mFileSystemDebugger.SendInternal("FatDirectoryEntry.SetSize:");
@@ -114,6 +235,43 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             mSize = aSize;
         }
 
+        /// <summary>
+        /// Allocate directory entry.
+        /// </summary>
+        /// <param name="aShortName">A short name to set to the entry.</param>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when trying to change root directory matadata.</item>
+        /// <item>FAT table not found</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="EncoderFallbackException">Thrown when encoder fallback operation on aValue fails.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when entrys aValue is null.</item>
+        /// <item>Thrown when entrys aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aName is null or empty string.</item>
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         private void AllocateDirectoryEntry(string aShortName)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.AllocateDirectoryEntry --");
@@ -127,23 +285,39 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.Attributes, FatDirectoryEntryAttributeConsts.Directory);
             }
 
+            // TODO: Add a define for COSMOS so we can skip blocks when running outside.
             // Date and Time
-            uint xDate = ((((uint)RTC.Century * 100 + (uint)RTC.Year) - 1980) << 9) | (uint)RTC.Month << 5 | (uint)RTC.DayOfTheMonth;
-            uint xTime = (uint)RTC.Hour << 11 | (uint)RTC.Minute << 5 | ((uint)RTC.Second / 2);
+            //uint xDate = ((((uint)RTC.Century * 100 + (uint)RTC.Year) - 1980) << 9) | (uint)RTC.Month << 5 | (uint)RTC.DayOfTheMonth;
+            //uint xTime = (uint)RTC.Hour << 11 | (uint)RTC.Minute << 5 | ((uint)RTC.Second / 2);
 
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.CreationDate, xDate);
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ModifiedDate, xDate);
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.CreationTime, xTime);
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ModifiedTime, xTime);
+            //SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.CreationDate, xDate);
+            //SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ModifiedDate, xDate);
+            //SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.CreationTime, xTime);
+            //SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ModifiedTime, xTime);
 
             //First cluster
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterHigh, (uint)(mFirstClusterNum >> 16));
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterLow, (uint)(mFirstClusterNum & 0xFFFF));
+            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterHigh, (ushort)(mFirstClusterNum >> 16));
+            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterLow, (ushort)(mFirstClusterNum & 0xFFFF));
 
             // GetFatTable calls GetFatChain, which "refreshes" the FAT table and clusters
             GetFatTable();
         }
 
+        /// <summary>
+        /// Add directory entry.
+        /// </summary>
+        /// <param name="aName">A name of the directory entry.</param>
+        /// <param name="aEntryType">A type of the directory entry.</param>
+        /// <returns>FatDirectoryEntry.</returns>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error / unknown directory entry type.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type / memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         public FatDirectoryEntry AddDirectoryEntry(string aName, DirectoryEntryTypeEnum aEntryType)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.AddDirectoryEntry --");
@@ -295,10 +469,51 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             throw new ArgumentOutOfRangeException(nameof(aEntryType), "Unknown directory entry type.");
         }
 
+        /// <summary>
+        /// Check if given entry is a root directory.
+        /// </summary>
+        /// <returns>True if it is root directory.</returns>
         private bool IsRootDirectory() => (mParent == null) ? true : false;
 
+        /// <summary>
+        /// Delete directory entry.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Thrown when given entry type is unknown.</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when tring to delete root directory.</item>
+        /// <item>directory entry type is invalid.</item>
+        /// <item>data size invalid.</item>
+        /// <item>FAT table not found.</item>
+        /// <item>out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public void DeleteDirectoryEntry()
         {
+            Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.DeleteDirectoryEntry --");
+
             if (mEntryType == DirectoryEntryTypeEnum.Unknown)
             {
                 throw new NotImplementedException();
@@ -311,12 +526,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
 
-            var xEntryOffset = mEntryHeaderDataOffset - 32;
-
-            while (xData[xEntryOffset + 11] == FatDirectoryEntryAttributeConsts.LongName)
+            if(mEntryHeaderDataOffset > 32)
             {
-                xData[xEntryOffset] = FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry;
-                xEntryOffset -= 32;
+                var xEntryOffset = mEntryHeaderDataOffset - 32;
+
+                Global.mFileSystemDebugger.SendInternal("xEntryOffset: " + xEntryOffset);
+
+                while (xData[xEntryOffset + 11] == FatDirectoryEntryAttributeConsts.LongName)
+                {
+                    xData[xEntryOffset] = FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry;
+                    xEntryOffset -= 32;
+                }
             }
 
             ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
@@ -331,6 +551,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// Retrieves a <see cref="List{T}"/> of <see cref="FatDirectoryEntry"/> objects that represent the Directory Entries inside this Directory
         /// </summary>
         /// <returns>Returns a <see cref="List{T}"/> of the Directory Entries inside this Directory</returns>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public List<FatDirectoryEntry> ReadDirectoryContents(bool aReturnShortFilenames = false)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.ReadDirectoryContents --");
@@ -508,6 +734,16 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return xResult;
         }
 
+        /// <summary>
+        /// Get volume id
+        /// </summary>
+        /// <returns>FatDirectoryEntry.</returns>
+        /// <exception cref="Exception">Thrown when trying to access VolumeId out of Root Directory / data size invalid / invalid directory entry type.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentNullException">Thrown on memory error / FileSystem is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
         public FatDirectoryEntry FindVolumeId()
         {
             if (!IsRootDirectory())
@@ -552,6 +788,20 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return xResult;
         }
 
+        /// <summary>
+        /// Create volume id.
+        /// </summary>
+        /// <param name="name">A name of the entry.</param>
+        /// <returns>Volume ID.</returns>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error / unknown directory entry type.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when called on a directory other then root / data size invalid / invalid directory entry type / memory error.</exception>
+        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
+        /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         public FatDirectoryEntry CreateVolumeId(string name)
         {
             if (!IsRootDirectory())
@@ -570,6 +820,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// Tries to find an empty space for a directory entry and returns the offset to that space if successful, otherwise throws an exception.
         /// </summary>
         /// <returns>Returns the offset to the next unallocated directory entry.</returns>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when unallocated memory block not found / invalid directory entry type.</exception>
         private uint GetNextUnallocatedDirectoryEntry()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetNextUnallocatedDirectoryEntry --");
@@ -598,6 +850,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// </summary>
         /// <param name="aEntryCount">The number of entried to allocate.</param>
         /// <returns>Returns an array of offsets to the next unallocated directory entries.</returns>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when requested memory block of the size of aEntryCount not found / invalid directory entry type.</exception>
         private uint[] GetNextUnallocatedDirectoryEntries(int aEntryCount)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetNextUnallocatedDirectoryEntry --");
@@ -632,6 +886,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             throw new Exception($"Failed to find {aEntryCount} unallocated directory entries.");
         }
 
+        /// <summary>
+        /// Get directory entry data.
+        /// </summary>
+        /// <returns>byte array.</returns>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type.</exception>
         private byte[] GetDirectoryEntryData()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetDirectoryEntryData --");
@@ -646,6 +906,32 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             throw new Exception("Invalid directory entry type");
         }
 
+        /// <summary>
+        /// Set directory entry data.
+        /// </summary>
+        /// <param name="aData">A data to set to the directory entry.</param>
+        /// <exception cref="Exception">Thrown when directory entry type is invalid.</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
         private void SetDirectoryEntryData(byte[] aData)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryData(byte) --");
@@ -671,9 +957,160 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A byte value</param>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when trying to change root directory matadata.</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when entrys aValue is null.</item>
+        /// <item>Thrown when entrys aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aName is null or empty string.</item>
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
+        internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, byte aValue)
+        {
+            Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
+            Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
+
+            if (IsRootDirectory())
+            {
+                throw new Exception("Root directory metadata can not be changed using the file stream.");
+            }
+
+            var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+
+            if (xData.Length > 0)
+            {
+                uint xOffset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
+                xData[xOffset] = aValue;
+                ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
+            }
+        }
+
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A ushort value</param>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when trying to change root directory matadata.</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when entrys aValue is null.</item>
+        /// <item>Thrown when entrys aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aName is null or empty string.</item>
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
+        internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, ushort aValue)
+        {
+            Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
+            Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
+
+            if (IsRootDirectory())
+            {
+                throw new Exception("Root directory metadata can not be changed using the file stream.");
+            }
+
+            var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+
+            if (xData.Length > 0)
+            {
+                Global.mFileSystemDebugger.SendInternal("mEntryHeaderDataOffset = " + mEntryHeaderDataOffset);
+                var xValue = new byte[aEntryMetadata.DataLength];
+                xValue.SetUInt16(0, aValue);
+                uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
+                Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
+            }
+        }
+
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A uint value</param>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when trying to change root directory matadata.</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when entrys aValue is null.</item>
+        /// <item>Thrown when entrys aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aName is null or empty string.</item>
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, uint aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
             Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
 
             if (IsRootDirectory())
@@ -693,9 +1130,45 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A long value</param>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when trying to change root directory matadata.</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when entrys aValue is null.</item>
+        /// <item>Thrown when entrys aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aName is null or empty string.</item>
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, long aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryMetadataValue(long) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
             Global.mFileSystemDebugger.SendInternal("aValue =");
             Global.mFileSystemDebugger.SendInternal(aValue);
 
@@ -718,9 +1191,46 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set directory entry metadata value.
+        /// </summary>
+        /// <param name="aEntryMetadata">A entry metadata</param>
+        /// <param name="aValue">A string value</param>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown when trying to change root directory matadata.</item>
+        /// <item>data size invalid.</item>
+        /// <item>invalid directory entry type.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="EncoderFallbackException">Thrown when encoder fallback operation on aValue fails.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when entrys aValue is null.</item>
+        /// <item>Thrown when entrys aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aName is null or empty string.</item>
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, string aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryMetadataValue(string) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
             Global.mFileSystemDebugger.SendInternal($"aValue = {aValue}");
 
             if (IsRootDirectory())
@@ -748,6 +1258,34 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set long filename entry metadata value.
+        /// </summary>
+        /// <param name="aEntryHeaderDataOffset">A entry header data offset.</param>
+        /// <param name="aEntryMetadata">A matadata object.</param>
+        /// <param name="aValue">A uint value to set.</param>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, uint aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(uint) --");
@@ -765,6 +1303,34 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set long filename entry metadata value.
+        /// </summary>
+        /// <param name="aEntryHeaderDataOffset">A entry header data offset.</param>
+        /// <param name="aEntryMetadata">A matadata object.</param>
+        /// <param name="aValue">A long value to set.</param>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, long aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(long) --");
@@ -783,6 +1349,35 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
         }
 
+        /// <summary>
+        /// Set long filename entry metadata value.
+        /// </summary>
+        /// <param name="aEntryHeaderDataOffset">A entry header data offset.</param>
+        /// <param name="aEntryMetadata">A matadata object.</param>
+        /// <param name="aValue">A string value to set.</param>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aData is null.</item>
+        /// <item>Out of memory.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="EncoderFallbackException">Thrown when encoder fallback operation on aValue fails.</exception>
+        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type = "bullet" >
+        /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
+        /// <item>Entrys matadata offset value is invalid.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>aData length is 0.</item>
+        /// </list>
+        /// </exception>
         internal void SetLongFilenameEntryMetadataValue(uint aEntryHeaderDataOffset, FatDirectoryEntryMetadata aEntryMetadata, string aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetLongFilenameEntryMetadataValue(string) --");
@@ -806,6 +1401,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// </summary>
         /// <param name="aShortName">The short filename.</param>
         /// <returns>Returns the short filename to be written to the FAT directory entry.</returns>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         internal static string GetShortName(string aShortName)
         {
             char[] xName = new char[11];
@@ -855,6 +1451,16 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             return xChecksum;
         }
 
+        /// <summary>
+        /// Get directory entry size.
+        /// </summary>
+        /// <param name="DirectoryEntryData">Directory entry data.</param>
+        /// <returns>long value.</returns>
+        /// <exception cref="ArgumentException">Thrown when DirectoryEntryData array is too short.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when DirectoryEntryData array is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when data size invalid.</exception>
         private long GetDirectoryEntrySize(byte[] DirectoryEntryData)
         {
             long xResult = 0;
@@ -937,6 +1543,15 @@ namespace Cosmos.System.FileSystem.FAT.Listing
          *    the value on the field should be always updated.
          */
 
+        /// <summary>
+        /// Get used space on directory.
+        /// </summary>
+        /// <returns>long value, space used (bytes)</returns>
+        /// <exception cref="ArgumentException">Thrown when directory entry data corrupted.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when directory entry data is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown when data size invalid.</exception>
         public override long GetUsedSpace()
         {
             Global.mFileSystemDebugger.SendInternal($"-- FatDirectoryEntry.GetUsedSpace() on Directory {mName} ---");

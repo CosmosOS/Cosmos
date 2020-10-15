@@ -10,11 +10,10 @@ namespace Cosmos.Build.Builder.BuildTasks
     {
         public override string Name => "Create Setup";
 
-        private IInnoSetupService _innoSetupService;
+        private readonly IInnoSetupService _innoSetupService;
 
-        private string _scriptFilePath;
-
-        private Dictionary<string, string> _defines;
+        private readonly string _scriptFilePath;
+        private readonly Dictionary<string, string> _defines;
 
         public CreateSetupTask(
             IInnoSetupService innoSetupService,
@@ -27,10 +26,11 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             _scriptFilePath = scriptFilePath;
 
-            _defines = new Dictionary<string, string>();
-
-            _defines.Add("BuildConfiguration", configuration);
-            _defines.Add("ChangeSetVersion", releaseVersion);
+            _defines = new Dictionary<string, string>()
+            {
+                ["BuildConfiguration"] = configuration,
+                ["ChangeSetVersion"] = releaseVersion
+            };
         }
 
         protected override string GetExePath()

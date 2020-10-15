@@ -350,7 +350,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
         }
 
         // BlockDevice Methods
-        public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
+        public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             //CheckDataSize(aData, aBlockCount);
             //CheckBlockNo(aBlockNo, aBlockCount);
@@ -358,7 +358,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             Mem.DataBlock.Read8(aData);
         }
 
-        public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
+        public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             Mem.DataBlock.Write8(aData);
             SendSATA48Command(ATACommands.WriteDmaExt, (uint)(aBlockNo), (uint)aBlockCount);
