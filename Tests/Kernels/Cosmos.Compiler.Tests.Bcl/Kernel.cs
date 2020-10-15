@@ -39,6 +39,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 DelegatesTest.Execute();
                 EventsTest.Execute();
                 RandomTests.Execute();
+                ConvertTests.Execute();
 
                 // System.Collections
                 HashtableTest.Execute();
