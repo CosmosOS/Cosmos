@@ -25,6 +25,7 @@ namespace ProcessorTests
                 TestVendorNameIsNotBlank();
                 TestCycleCount();
                 TestCycleRateIsNotZero();
+                TestMultiboot();
 
                 TestController.Completed();
             }
@@ -36,6 +37,11 @@ namespace ProcessorTests
             }
         }
 
+        public void TestMultiboot()
+        {
+            Assert.IsTrue(Multiboot.GetMBIAddress() != 0, $"Multiboot.GetMBIAddress works {Multiboot.GetMBIAddress()}");
+        }
+         
         public void TestBrandStringBlank()
         {
             string brandString = CPU.GetCPUBrandString();
