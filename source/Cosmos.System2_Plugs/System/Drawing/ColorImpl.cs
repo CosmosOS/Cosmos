@@ -173,7 +173,7 @@ namespace Cosmos.System_Plugs.System.Drawing
                     return Color.HotPink;
                     break;
                 case "":
-                    throw new Exception("Color Name must be passed to FromName");
+                    throw new ArgumentException("Color Name must be passed to FromName");
                     break;
                 default:
                     return Color.Black;
