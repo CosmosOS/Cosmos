@@ -12,5 +12,21 @@ namespace Cosmos.System_Plugs.System
         {
             return StringHelper.GetNumberString(aThis);
         }
+        
+        public static string ToString(ref ulong aThis, string formating)
+        {
+            if(formating == "X")
+            {
+                return ToHexString.ToHex(aThis, false);
+            }
+            else if(formating == "G")
+            {
+                return ToString(ref aThis);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
