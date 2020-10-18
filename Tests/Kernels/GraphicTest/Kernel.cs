@@ -86,7 +86,9 @@ namespace GraphicTest
             /* A LimeGreen rectangle */
             pen.Color = Color.LimeGreen;
             aCanvas.DrawRectangle(pen, 450, 300, 80, 60);
-
+            
+            /* Change Background using Color.FromName */
+            aCanvas.Clear(Color.FromName("OrangeRed"));
             /* A filled rectange */
             pen.Color = Color.Chocolate;
             aCanvas.DrawFilledRectangle(pen, 200, 150, 400, 300);
