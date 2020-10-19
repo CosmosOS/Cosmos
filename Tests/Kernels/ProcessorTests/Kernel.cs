@@ -23,7 +23,7 @@ namespace ProcessorTests
             try
             {
                 TestMultibootMemoryMap();
-                TetsGetRam();
+                TestGetRam();
                 TestVendorNameIsNotBlank();
                 TestCycleCount();
                 TestCycleRateIsNotZero();
@@ -39,7 +39,7 @@ namespace ProcessorTests
             }
         }
 
-        public void TetsGetRam()
+        public void TestGetRam()
         {
             Assert.IsTrue(CPU.GetAmountOfRAM() > 0, "CPU.GetAmountOfRAM() returns a positive value: " + CPU.GetAmountOfRAM());
         }
