@@ -54,14 +54,14 @@ namespace Cosmos.TestRunner.Core
                 case RunTargetEnum.Bochs:
                     RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath, workingDirectory));
                     break;
+                case RunTargetEnum.Qemu:
+                    RunTask("RunISO", () => RunIsoInQemu(xIsoFile, xHarddiskPath, workingDirectory));
+                    break;
                 case RunTargetEnum.VMware:
                     RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
                     break;
                 case RunTargetEnum.HyperV:
                     RunTask("RunISO", () => RunIsoInHyperV(xIsoFile, xHarddiskPath));
-                    break;
-                case RunTargetEnum.Qemu:
-                    RunTask("RunISO", () => RunIsoInQemu(xIsoFile, xHarddiskPath, workingDirectory));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");

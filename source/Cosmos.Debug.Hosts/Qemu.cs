@@ -35,9 +35,9 @@ namespace Cosmos.Debug.Hosts
         _harddiskFile = aHarddisk;
       }
 
-      if (aParams.ContainsKey(BuildPropertyNames.IsoFileString))
+      if (aParams.ContainsKey("ISOFile"))
       {
-        _isoFile = aParams[BuildPropertyNames.IsoFileString];
+        _isoFile = aParams["IOSFile"];
       }
 
       _debugPortString = "Cosmos\\Serial";

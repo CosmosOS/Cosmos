@@ -281,7 +281,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         private void CreateDebugConnector()
         {
             mDbgConnector = null;
-            
+
             mDebugInfo.TryGetValue(BuildPropertyNames.VisualStudioDebugPortString, out var xPort);
 
             // using (var xDebug = new StreamWriter(@"e:\debug.info", false))
@@ -557,18 +557,18 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     //((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
                     break;
-                case LaunchType.IntelEdison:
-                    mHost = new IntelEdison(mDebugInfo, false);
-                    break;
-                case LaunchType.HyperV:
-                    mHost = new HyperV(mDebugInfo, false);
-                    break;
                 case LaunchType.Qemu:
                     if (!QemuSupport.QemuEnabled)
                     {
                         throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
                     }
                     mHost = new Qemu(mDebugInfo, xUseGDB);
+                    break;
+                case LaunchType.IntelEdison:
+                    mHost = new IntelEdison(mDebugInfo, false);
+                    break;
+                case LaunchType.HyperV:
+                    mHost = new HyperV(mDebugInfo, false);
                     break;
                 default:
                     throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
