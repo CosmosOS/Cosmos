@@ -1,5 +1,4 @@
 ﻿using Cosmos.Debug.Kernel;
-using XSharp;
 
 namespace Cosmos.Core
 {
