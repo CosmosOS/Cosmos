@@ -16,46 +16,73 @@ namespace Cosmos.Core.IOGroup
         /// Data IOPort.
         /// </summary>
         public readonly IOPort Data;
-        //* Error Register: BAR0 + 1; // Read Only
-        //* Features Register: BAR0 + 1; // Write Only
+
+        /// <summary>
+        /// Error IOPort.
+        /// </summary>
+        public readonly IOPortRead Error;
+
+        /// <summary>
+        /// Features IOPort.
+        /// </summary>
+        public readonly IOPortWrite Features;
+
         /// <summary>
         /// Sector count IOPort.
         /// </summary>
-        public readonly IOPortWrite SectorCount;
-        // ATA_REG_SECCOUNT1  0x08 - HOB
+        public readonly IOPort SectorCount;
+
         /// <summary>
-        /// LBA0 IOPort.
+        /// Sector number IOPort.
         /// </summary>
-        public readonly IOPort LBA0;
+        public readonly IOPort SectorNumber;
         /// <summary>
-        /// LBA1 IOPort.
+        /// LBA low IOPort.
         /// </summary>
-        public readonly IOPort LBA1;
+        public readonly IOPort LBALow;
+
         /// <summary>
-        /// LBA2 IOPort.
+        /// Cylinder low IOPort.
         /// </summary>
-        public readonly IOPort LBA2;
-        // ATA_REG_LBA3       0x09 - HOB
-        // ATA_REG_LBA4       0x0A - HOB
-        // ATA_REG_LBA5       0x0B - HOB
+        public readonly IOPort CylinderLow;
         /// <summary>
-        /// Device select IOPort.
+        /// LBA mid IOPort.
         /// </summary>
-        public readonly IOPortWrite DeviceSelect;
+        public readonly IOPort LBAMid;
+
+        /// <summary>
+        /// Cylinder high IOPort.
+        /// </summary>
+        public readonly IOPort CylinderHigh;
+        /// <summary>
+        /// LBA high IOPort.
+        /// </summary>
+        public readonly IOPort LBAHigh;
+
+        /// <summary>
+        /// Drive/Head select IOPort.
+        /// </summary>
+        public readonly IOPortWrite DriveSelect;
+
         /// <summary>
         /// Command IOPort.
         /// </summary>
         public readonly IOPortWrite Command;
+
         /// <summary>
         /// Status IOPort.
         /// </summary>
         public readonly IOPortRead Status;
-        //* Alternate Status Register: BAR1 + 2; // Read Only.
+
         /// <summary>
         /// Control IOPort.
         /// </summary>
         public readonly IOPortWrite Control;
-        //* DEVADDRESS: BAR1 + 2; // I don't know what is the benefit from this register
+
+        /// <summary>
+        /// Alternate status IOPort.
+        /// </summary>
+        public readonly IOPortRead AlternateStatus;
 
         /// <summary>
         /// Create new instance of the <see cref="ATA"/> class.
@@ -73,16 +100,23 @@ namespace Cosmos.Core.IOGroup
             }
 
             var xBAR0 = GetBAR0(aSecondary);
-            var xBAR1 = GetBAR1(aSecondary);
             Data = new IOPort(xBAR0);
-            SectorCount = new IOPortWrite(xBAR0, 2);
-            LBA0 = new IOPort(xBAR0, 3);
-            LBA1 = new IOPort(xBAR0, 4);
-            LBA2 = new IOPort(xBAR0, 5);
-            Command = new IOPortWrite(xBAR0, 7);
+            Error = new IOPortRead(xBAR0, 1);
+            Features = new IOPortWrite(xBAR0, 1);
+            SectorCount = new IOPort(xBAR0, 2);
+            SectorNumber = new IOPort(xBAR0, 3);
+            LBALow = new IOPort(xBAR0, 3);
+            CylinderLow = new IOPort(xBAR0, 4);
+            LBAMid = new IOPort(xBAR0, 4);
+            CylinderHigh = new IOPort(xBAR0, 5);
+            LBAHigh = new IOPort(xBAR0, 5);
+            DriveSelect = new IOPortWrite(xBAR0, 6);
             Status = new IOPortRead(xBAR0, 7);
-            DeviceSelect = new IOPortWrite(xBAR0, 6);
+            Command = new IOPortWrite(xBAR0, 7);
+
+            var xBAR1 = GetBAR1(aSecondary);
             Control = new IOPortWrite(xBAR1, 2);
+            AlternateStatus = new IOPortRead(xBAR1, 2);
         }
 
         /// <summary>
