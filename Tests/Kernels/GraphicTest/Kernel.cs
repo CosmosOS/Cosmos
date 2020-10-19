@@ -83,6 +83,9 @@ namespace GraphicTest
             pen.Color = Color.MediumPurple;
             aCanvas.DrawPolygon(pen, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
 
+            /* Color.FromName */
+            aCanvas.Clear(Color.FromName("Navy"));
+            
             /* A LimeGreen rectangle */
             pen.Color = Color.LimeGreen;
             aCanvas.DrawRectangle(pen, 450, 300, 80, 60);
