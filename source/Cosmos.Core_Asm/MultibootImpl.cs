@@ -19,7 +19,7 @@ namespace Cosmos.Core_Asm
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.Push("MultibootSignature");
+            XS.Push("MultiBootInfo_Structure", isIndirect: true);
         }
     }
 }

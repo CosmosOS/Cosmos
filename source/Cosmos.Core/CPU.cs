@@ -1,5 +1,7 @@
+#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -109,8 +111,6 @@ namespace Cosmos.Core
             mInterruptsEnabled = false;
             return xResult;
         }
-
-
 
         /// <summary>
         /// Get CPU vendor name.
@@ -300,15 +300,14 @@ namespace Cosmos.Core
                 if (!(rs == ""))
                 {
                     return rs;
-                } else
+                }
+                else
                 {
                     throw new NotSupportedException();
                 }
             }
             throw new NotSupportedException();
         }
-
-
 
         /// <summary>
         /// Check if can read CPU ID. Plugged.
@@ -341,5 +340,107 @@ namespace Cosmos.Core
         /// <returns>ulong value.</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Checks if Multiboot returned a memory map
+        /// </summary>
+        /// <returns></returns>
+        public static unsafe bool MemoryMapExists()
+        {
+            return (Bootstrap.MultibootHeader->Flags & 1 << 6) == 64;
+        }
+
+        /// <summary>
+        /// Get the Memory Map Information from Multiboot
+        /// </summary>
+        /// <returns>Returns an array of MemoryMaps containing the Multiboot Memory Map information. The array may have empty values at the end.</returns>
+        public static unsafe MemoryMap[] GetMemoryMap()
+        {
+            if (!MemoryMapExists())
+            {
+                throw new Exception("No Memory Map was returned by Multiboot");
+            }
+            var rawMap = new RawMemoryMap[64];
+            var currentMap = (RawMemoryMap*)Bootstrap.MultibootHeader->memMapAddress;
+            int counter = 0;
+            while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength) && counter < 64)
+            {
+                rawMap[counter++] = *currentMap;
+                currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes
+                if (currentMap->Size == 0)
+                {
+                    break;
+                }
+            }
+
+            if (counter >= 64)
+            {
+                throw new Exception("Memory Map returned too many segments");
+            }
+
+            var entireMap = new MemoryMap[counter];
+            for (int i = 0; i < counter; i++)
+            {
+                var rawMemoryMap = rawMap[i];
+                entireMap[i] = new MemoryMap
+                {
+                    Address = (ulong)rawMemoryMap.HighBaseAddr << 32 | rawMemoryMap.LowBaseAddr,
+                    Length = (ulong)rawMemoryMap.HighLength << 32 | rawMemoryMap.LowLength,
+                    Type = rawMemoryMap.Type
+                };
+            }
+            return entireMap;
+        }
+    }
+
+    public class MemoryMap
+    {
+        /// <summary>
+        /// Base Address of the memory region
+        /// </summary>
+        public ulong Address;
+        /// <summary>
+        /// Length in bytes of the region
+        /// </summary>
+        public ulong Length;
+        /// <summary>
+        /// Type of RAM in region. 1 is available. 3 is for ACPI. All other is unavailable
+        /// </summary>
+        public uint Type;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 24)]
+    public struct RawMemoryMap
+    {
+        /// <summary>
+        /// Size of this entry
+        /// </summary>
+        [FieldOffset(0)]
+        public uint Size;
+        /// <summary>
+        /// Low 32 bits of the base address
+        /// </summary>
+        [FieldOffset(4)]
+        public uint LowBaseAddr;
+        /// <summary>
+        /// High 32 bits of the base address
+        /// </summary>
+        [FieldOffset(8)]
+        public uint HighBaseAddr;
+        /// <summary>
+        /// Low 32 bits of the length of memory block in bytes
+        /// </summary>
+        [FieldOffset(12)]
+        public uint LowLength;
+        /// <summary>
+        /// High 32 bits of the length of memory block in bytes
+        /// </summary>
+        [FieldOffset(16)]
+        public uint HighLength;
+        /// <summary>
+        /// Type of memory area, 1 if usable RAM, everything else unusable.
+        /// </summary>
+        [FieldOffset(20)]
+        public uint Type;
     }
 }
