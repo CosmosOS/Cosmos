@@ -8,6 +8,7 @@ namespace Cosmos.Core
     /// </summary>
     public unsafe class MemoryOperations
     {
+        #region Fill
         /// <summary>
         /// Fill memory block. Plugged.
         /// </summary>
@@ -184,6 +185,23 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Fill source to destination.
+        /// </summary>
+        /// <param name="dest">Destination.</param>
+        /// <param name="src">Source.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Fill(sbyte[] dest, sbyte[] src)
+        {
+            fixed (sbyte* destPtr = dest)
+            fixed (sbyte* srcPtr = src)
+            {
+                Copy(destPtr, srcPtr, dest.Length);
+            }
+        }
+        #endregion Fill
+
+        #region Copy
+        /// <summary>
         /// Copy source to destination.
         /// plugged.
         /// </summary>
@@ -329,19 +347,6 @@ namespace Cosmos.Core
             }
         }
 
-        /// <summary>
-        /// Fill source to destination.
-        /// </summary>
-        /// <param name="dest">Destination.</param>
-        /// <param name="src">Source.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Fill(sbyte[] dest, sbyte[] src)
-        {
-            fixed (sbyte* destPtr = dest)
-            fixed (sbyte* srcPtr = src)
-            {
-                Copy(destPtr, srcPtr, dest.Length);
-            }
-        }
+        #endregion Copy
     }
 }
