@@ -856,14 +856,6 @@ namespace Cosmos.System.Graphics
             }
         }
         
-        /// <summary>
-        /// Draw a Scaled Bitmap.
-        /// </summary>
-        /// <param name="image">Image to Scale.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="w">Desired Width.</param>
-        /// <param name="h">Desired Height.</param>
         private int[] scaleImage(Image image, int newWidth, int newHeight)
         {
             int[] pixels = image.rawData;
@@ -884,7 +876,15 @@ namespace Cosmos.System.Graphics
             }
             return temp;
         }
-        public virtual void DrawScaledImage(Image image, int x, int y,int w,int h)
+                /// <summary>
+        /// Draw a Scaled Bitmap.
+        /// </summary>
+        /// <param name="image">Image to Scale.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="w">Desired Width.</param>
+        /// <param name="h">Desired Height.</param>
+        public virtual void DrawImage(Image image, int x, int y,int w,int h)
         {
             int[] pixels = scaleImage(image, w, h);
             for (int _x = 0; _x < w; _x++)
