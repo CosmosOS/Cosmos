@@ -117,7 +117,9 @@ namespace GraphicTest
 
             aCanvas.DrawImage(bitmap, new Point(0, 0));
             aCanvas.DrawImage(bitmap2, new Point(200, 0));
-
+            //Scale Bitmap
+            aCanvas.DrawImage(bitmap,0,0,50,50);
+            
             aCanvas.DrawImageAlpha(bitmap3, new Point(0, 300));
 
             /* Drawing ellipses */
