@@ -12,7 +12,6 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
         /// </summary>
         public static void Execute(Debugger mDebugger)
         {
-
             mDebugger.Send("START TEST: Delete a directory:");
             Directory.CreateDirectory(@"0:\TestDir1");
             Assert.IsTrue(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't created!");
@@ -97,22 +96,20 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
 
             mDebugger.Send("");
 
-#if false
-            mDebugger.Send("START TEST: Delete a file with Directory.Delete:");
-            File.Create(@"0:\file1.txt");
+            mDebugger.Send("START TEST: Creating a subdirecty with Directory.CreateDirectory:");
 
-            try
-            {
-                Directory.Delete(@"0:\file1.txt");
-            }
-            catch (Exception e)
-            {
-                Assert.IsTrue(File.Exists(@"0:\file1.txt"), "The file was deleted by Directory.Delete.");
-            }
+            Directory.CreateDirectory(@"0:\TestDir1");
+            Assert.IsTrue(Directory.Exists(@"0:\TestDir1"), "TestDir1 was created!");
+            Directory.CreateDirectory(@"0:\TestDir1\test");
+            Assert.IsTrue(Directory.Exists(@"0:\TestDir1\test"), "test subdirectory was created!");
+            Directory.Delete(@"0:\TestDir1\test");
+            Assert.IsFalse(Directory.Exists(@"0:\TestDir1\test"), "test subdirectory was deleted!");
+            Directory.Delete(@"0:\TestDir1");
+            Assert.IsFalse(Directory.Exists(@"0:\TestDir1"), "TestDir1 was deleted!");
 
             mDebugger.Send("END TEST");
             mDebugger.Send("");
-#endif
+
 
             mDebugger.Send("START TEST: Create a directory with a Long Filename:");
             Directory.CreateDirectory(@"0:\TestDir1");

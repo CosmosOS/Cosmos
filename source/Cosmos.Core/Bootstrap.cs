@@ -1,4 +1,6 @@
-﻿namespace Cosmos.Core
+﻿using Cosmos.Debug.Kernel;
+
+namespace Cosmos.Core
 {
     /// <summary>
     /// Bootstrap class. Used to invoke pre-boot methods.
@@ -22,7 +24,7 @@
         /// <summary>
         /// Multiboot header pointer.
         /// </summary>
-        public static Multiboot.Header* header;
+        public static Multiboot.Header* MultibootHeader;
 
         /// <summary>
         /// VBE mode info pointer.
@@ -59,13 +61,10 @@
              */
             CPU.InitFloat();
 
-            header = (Multiboot.Header*)Multiboot.GetMBIAddress();
+            MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
 
-            modeinfo = (Core.VBE.ModeInfo*)header->vbeModeInfo;
-            controllerinfo = (Core.VBE.ControllerInfo*)header->vbeControlInfo;
-
-            // Managed_Memory_System.ManagedMemory.Initialize();
-            // Managed_Memory_System.ManagedMemory.SetUpMemoryArea();
+            modeinfo = (Core.VBE.ModeInfo*)MultibootHeader->vbeModeInfo;
+            controllerinfo = (Core.VBE.ControllerInfo*)MultibootHeader->vbeControlInfo;
         }
     }
 }

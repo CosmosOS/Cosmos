@@ -281,7 +281,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         private void CreateDebugConnector()
         {
             mDbgConnector = null;
-            
+
             mDebugInfo.TryGetValue(BuildPropertyNames.VisualStudioDebugPortString, out var xPort);
 
             // using (var xDebug = new StreamWriter(@"e:\debug.info", false))
@@ -309,13 +309,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             string xPortType = xParts[0].ToLower();
             string xPortParam = xParts[1].ToLower();
 
-            var xLaunch = mDebugInfo[BuildPropertyNames.LaunchString];
-
             OutputText("Starting debug connector.");
             switch (xPortType)
             {
                 case "pipe:":
-                    if (xLaunch == "HyperV")
+                    if (mLaunch == LaunchType.HyperV || mLaunch == LaunchType.Qemu)
                     {
                         mDbgConnector = new DebugConnectorPipeClient(xPortParam);
                     }
@@ -325,7 +323,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     }
                     break;
                 case "serial:":
-                    if (xLaunch == "IntelEdison")
+                    if (mLaunch == LaunchType.IntelEdison)
                     {
                         mDbgConnector = new DebugConnectorEdison(xPortParam, Path.ChangeExtension(mDebugInfo["ISOFile"], ".bin"));
                     }
@@ -336,7 +334,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     break;
                 default:
                     throw new Exception("No debug connector found for port type '" + xPortType + "'");
-
             }
             mDbgConnector.SetConnectionHandler(DebugConnectorConnected);
             mDbgConnector.CmdBreak += new Action<uint>(DbgCmdBreak);
@@ -559,6 +556,13 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     mHost = new Bochs(mDebugInfo, xUseGDB, bochsConfigurationFile);
 
                     //((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
+                    break;
+                case LaunchType.Qemu:
+                    if (!QemuSupport.QemuEnabled)
+                    {
+                        throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
+                    }
+                    mHost = new Qemu(mDebugInfo, xUseGDB);
                     break;
                 case LaunchType.IntelEdison:
                     mHost = new IntelEdison(mDebugInfo, false);

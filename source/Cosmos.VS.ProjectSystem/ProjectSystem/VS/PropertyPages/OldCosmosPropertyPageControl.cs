@@ -36,6 +36,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
         protected int mHyperVDebugPipe;
 
         protected bool mShowTabBochs;
+        protected bool mShowTabQemu;
         protected bool mShowTabDebug;
         protected bool mShowTabDeployment;
         protected bool mShowTabLaunch;
@@ -98,8 +99,8 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 if (xValue != mViewModel.BuildProperties.Launch)
                 {
                     mViewModel.BuildProperties.Launch = xValue;
-                    // Bochs requires an ISO. Force Deployment property.
-                    if (LaunchType.Bochs == xValue)
+                    // Bochs and Qemu requires an ISO. Force Deployment property.
+                    if (xValue == LaunchType.Bochs)
                     {
                         if (DeploymentType.ISO != mViewModel.BuildProperties.Deployment)
                         {
@@ -329,6 +330,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             RemoveTab(tabISO);
             RemoveTab(tabSlave);
             RemoveTab(tabBochs);
+            RemoveTab(tabQemu);
 
             if (mShowTabDebug)
             {
@@ -371,6 +373,10 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             if (mShowTabBochs)
             {
                 TabControl1.TabPages.Add(tabBochs);
+            }
+            if (mShowTabQemu)
+            {
+                TabControl1.TabPages.Add(tabQemu);
             }
 
             if (TabControl1.TabPages.Contains(xTab))
@@ -429,6 +435,15 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             else if (mViewModel.BuildProperties.Profile == "Bochs")
             {
                 mShowTabBochs = true;
+                chckEnableDebugStub.Checked = true;
+                chkEnableStackCorruptionDetection.Checked = true;
+                cmboCosmosDebugPort.Enabled = false;
+                cmboVisualStudioDebugPort.Enabled = false;
+                cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
+            }
+            else if (mViewModel.BuildProperties.Profile == "Qemu")
+            {
+                mShowTabQemu = true;
                 chckEnableDebugStub.Checked = true;
                 chkEnableStackCorruptionDetection.Checked = true;
                 cmboCosmosDebugPort.Enabled = false;
@@ -513,7 +528,8 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             mShowTabVMware = mViewModel.BuildProperties.Launch == LaunchType.VMware;
             mShowTabHyperV = mViewModel.BuildProperties.Launch == LaunchType.HyperV;
             mShowTabSlave = mViewModel.BuildProperties.Launch == LaunchType.Slave;
-            mShowTabBochs = (LaunchType.Bochs == mViewModel.BuildProperties.Launch);
+            mShowTabBochs = mViewModel.BuildProperties.Launch == LaunchType.Bochs;
+            mShowTabQemu = mViewModel.BuildProperties.Launch == LaunchType.Qemu;
             //
             UpdateTabs();
         }
