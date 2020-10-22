@@ -52,7 +52,7 @@ namespace Cosmos.Core
         public static void ZeroFill(uint aStartAddress, uint aLength) => throw null;
 
         /// <summary>
-        /// Hult the CPU. Plugged.
+        /// Halt the CPU. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
         public void Halt() => throw null;
