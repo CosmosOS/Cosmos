@@ -490,6 +490,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             OutputClear();
             OutputText("Debugger process initialized.");
 
+            mDebugInfo["ISOFile"] = Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), mDebugInfo["ISOFile"]);
             mISO = mDebugInfo["ISOFile"];
             OutputText("Using ISO file " + mISO + ".");
             mProjectFile = mDebugInfo["ProjectFile"];
@@ -576,12 +577,12 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mHost.OnShutDown += HostShutdown;
 
             string xDbPath = Path.ChangeExtension(mISO, "cdb");
-            if (!File.Exists(xDbPath))
+            if (!File.Exists(Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), xDbPath)))
             {
                 throw new Exception("Debug data file " + xDbPath + " not found. Could be a omitted build process of Cosmos project so that not created.");
             }
 
-            mDebugInfoDb = new DebugInfo(xDbPath);
+            mDebugInfoDb = new DebugInfo(Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), xDbPath));
             mDebugInfoDb.LoadLookups();
 
             CreateDebugConnector();
