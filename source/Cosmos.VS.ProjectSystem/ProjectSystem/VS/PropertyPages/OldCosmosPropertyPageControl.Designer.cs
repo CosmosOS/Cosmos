@@ -451,7 +451,7 @@
             this.chkEnableStackCorruptionDetection.TabIndex = 8;
             this.chkEnableStackCorruptionDetection.Text = "Enable Stack Corruption Detection";
             this.chkEnableStackCorruptionDetection.UseVisualStyleBackColor = true;
-            this.chkEnableStackCorruptionDetection.CheckedChanged += new System.EventHandler(this.chkEnableStacckCorruptionDetection_CheckedChanged);
+            this.chkEnableStackCorruptionDetection.CheckedChanged += new System.EventHandler(this.chkEnableStackCorruptionDetection_CheckedChanged);
             //
             // debugLevelGroupBox
             //
