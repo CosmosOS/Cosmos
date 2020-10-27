@@ -5,6 +5,7 @@ using System.Text;
 using Cosmos.Core.IOGroup;
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
+using Cosmos.Core;
 
 namespace Cosmos.HAL
 {
@@ -859,6 +860,8 @@ namespace Cosmos.HAL
         private ushort prefetchable = 0;
         private ushort type = 0;
         private bool isIO = false;
+        public MemoryBlock memoryBlock;
+        public IOPort port;
 
         public PCIBaseAddressBar(uint raw)
         {
@@ -883,7 +886,31 @@ namespace Cosmos.HAL
                 }
             }
         }
+        public uint Read(uint address)
+        {
+            if (isIO)
+            {
+                port.DWord = address;
+                return port.DWord;
+            }
 
+
+            else
+            {
+                return memoryBlock[address];
+            }
+        }
+        public void Write(uint address,uint value)
+        {
+            if(isIO)
+            {
+                port.DWord = value;
+            }
+            else
+            {
+                memoryBlock[address] = value;
+            }
+        }
         public uint BaseAddress
         {
             get { return baseAddress; }

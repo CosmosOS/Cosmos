@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.USB;
 
 namespace Cosmos.HAL
 {
@@ -62,6 +63,8 @@ namespace Cosmos.HAL
             IDE.InitDriver();
             AHCI.InitDriver();
             //EHCI.InitDriver();
+            USBHostOHCI.ScanDevices();
+            USBHostUHCI.ScanDevices();
 
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
