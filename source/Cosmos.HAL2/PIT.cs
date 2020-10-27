@@ -168,9 +168,11 @@ namespace Cosmos.HAL
 			}
 		}
 
-		//TODO: Why is sound in PIT? Is it a function of the PIT?
-		//Channel 3 is for the pc speaker ^
-		public void EnableSound()
+        public override string Name => throw new NotImplementedException();
+
+        //TODO: Why is sound in PIT? Is it a function of the PIT?
+        //Channel 3 is for the pc speaker ^
+        public void EnableSound()
 		{
 			//IO.Port61.Byte = (byte)(IO.Port61.Byte | 0x03);
 		}

@@ -4,6 +4,7 @@ using System;
 
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
+using Cosmos.HAL.USB;
 
 namespace Cosmos.HAL
 {
@@ -54,6 +55,8 @@ namespace Cosmos.HAL
 
         private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
         private Debugger mDebugger = new Debugger("HAL", "PS2Controller");
+
+        public override string Name => throw new NotImplementedException();
 
         /// <summary>
         /// Initializes the PS/2 controller.
@@ -236,10 +239,21 @@ namespace Cosmos.HAL
 
                 if (aDevice == null)
                 {
-                    mDebugger.SendInternal("(PS/2 Controller) Device detection failed:");
-                    mDebugger.SendInternal("First Byte: " + xFirstByte);
-                    mDebugger.SendInternal("Second Byte: " + xSecondByte);
-                    throw new Exception("(PS/2 Controller) PS/2 device not supported");
+                    foreach (Cosmos.HAL.USB.PCIDevice pci in Cosmos.HAL.USB.PCIBus.Devices)
+                    {
+                        ///According to PCI Specs for USB Proc IF
+                        ///0x00 = USB  (Universal Host Controller Spec) ,
+                        ///0x10 = USB (Open Host Controller Spec)
+                        ///0x20 = USB2 Host Controller (Intel Enhanced Host Controller Interface)
+                        ///0x30 = USB3 XHCI Controller
+                        if (pci.ClassCode == 0x0c &&
+                            pci.SubClass == 0x03
+                            && pci.ProgIF != 0x10)
+                        {
+                            throw new Exception("No Keyboard or Mousedriver is Currently Supported.\r\n For USB please make sure you have an OHCI Compatible Bus");
+                        }
+                    }
+                          
                 }
             }
             else

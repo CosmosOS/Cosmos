@@ -41,6 +41,8 @@ namespace Cosmos.HAL
             }
         }
 
+        public override string Name => throw new NotImplementedException();
+
         private void SendChar(char[] aData)
         {
             var xBytes = new byte[aData.Length];

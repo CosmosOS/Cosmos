@@ -43,9 +43,11 @@ namespace Cosmos.HAL.BlockDevice
 		{
 			get { return mModelNo; }
 		}
-		#endregion
-		#region Enums
-		[Flags]
+
+        public override string Name => throw new NotImplementedException();
+        #endregion
+        #region Enums
+        [Flags]
 		public enum Status : byte
 		{
 			None = 0x00,

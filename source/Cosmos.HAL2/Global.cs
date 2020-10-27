@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.USB;
+using USBHost = Cosmos.HAL.USB;
 
 namespace Cosmos.HAL
 {
@@ -56,6 +58,17 @@ namespace Cosmos.HAL
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
+            try
+            {
+                Console.WriteLine("Starting USB OHCI");
+                USBHostOHCI.ScanDevices();
+               
+             
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             mDebugger.Send("PS/2 Controller Init");
             PS2Controller.Initialize();
 

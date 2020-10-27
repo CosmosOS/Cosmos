@@ -23,6 +23,8 @@ namespace Cosmos.HAL
 
         public byte PS2Port { get; }
 
+        public override string Name => throw new NotImplementedException();
+
         private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
         private PS2Controller mPS2Controller = Global.PS2Controller;
         private Debugger mDebugger = new Debugger("HAL", "PS2Keyboard");

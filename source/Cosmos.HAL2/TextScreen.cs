@@ -49,6 +49,8 @@ namespace Cosmos.HAL
         public override UInt16 Rows { get { return 25; } }
         public override UInt16 Cols { get { return 80; } }
 
+        public override string Name => throw new NotImplementedException();
+
         /// <summary>
         /// Clear text screen.
         /// </summary>

@@ -18,6 +18,8 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public override string mPortName => "SATAPI";
         public override uint mPortNumber => mPortReg.mPortNumber;
 
+        public override string Name => throw new NotImplementedException();
+
         public SATAPI(PortRegisters aSATAPIPort)
         {
 
