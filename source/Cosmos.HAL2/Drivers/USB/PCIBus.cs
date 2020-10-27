@@ -38,8 +38,8 @@ namespace Cosmos.HAL.USB
         // all the time.
         public class DeviceIDs
         {
-            protected TempDictionary<String> mVendors = new TempDictionary<String>();
-            protected TempDictionary<String> mDevices = new TempDictionary<String>();
+            protected Dictionary<UInt32,String> mVendors = new Dictionary<UInt32,String>();
+            protected Dictionary<UInt32,String> mDevices = new Dictionary<UInt32,String>();
 
             public DeviceIDs()
             {
