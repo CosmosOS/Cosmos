@@ -886,8 +886,8 @@ namespace Cosmos.HAL
 
             if (isIO)
             {
-                port = new IOPort((ushort)raw);
                 baseAddress = raw & 0xFFFFFFFC;
+                port = new IOPort((ushort)baseAddress);
             }
             else
             {
