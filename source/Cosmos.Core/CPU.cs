@@ -1,5 +1,7 @@
+#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -50,7 +52,7 @@ namespace Cosmos.Core
         public static void ZeroFill(uint aStartAddress, uint aLength) => throw null;
 
         /// <summary>
-        /// Hult the CPU. Plugged.
+        /// Halt the CPU. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
         public void Halt() => throw null;
@@ -179,15 +181,15 @@ namespace Cosmos.Core
                 {
                     ReadCPUID(0x80000002 + i, ref eax, ref ebx, ref ecx, ref edx);
                     s += (char)(ebx % 256);
-                    s += (char)((ebx >> 8)  % 256);
-                    s += (char)((ebx>> 16)  % 256);
-                    s += (char)((ebx >> 24)  % 256);
+                    s += (char)((ebx >> 8) % 256);
+                    s += (char)((ebx >> 16) % 256);
+                    s += (char)((ebx >> 24) % 256);
                     s += (char)(edx % 256);
-                    s += (char)((edx >> 8)  % 256);
-                    s += (char)((edx >> 16)  % 256);
-                    s += (char)((edx >> 24)  % 256);
+                    s += (char)((edx >> 8) % 256);
+                    s += (char)((edx >> 16) % 256);
+                    s += (char)((edx >> 24) % 256);
                     s += (char)(ecx % 256);
-                    s += (char)((ecx >> 8)  % 256);
+                    s += (char)((ecx >> 8) % 256);
                     s += (char)((ecx >> 16) % 256);
                     s += (char)((ecx >> 24) % 256);
                 }
@@ -248,11 +250,71 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Get CPU cycle speed.
+        /// </summary>
+        /// <returns>long value.</returns>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
+        /// <exception cref="NotSupportedException">Thrown if can not read CPU ID.</exception>
+        public static string GetCPUBrandString()
+        {
+            if (CanReadCPUID() != 0)
+            {
+                // See https://c9x.me/x86/html/file_module_x86_id_45.html
+
+                int eax = 0;
+                int ebx = 0;
+                int ecx = 0;
+                int edx = 0;
+                int[] s = new int[64];
+                string rs = "";
+
+                for (uint i = 0; i < 3; i++)
+                {
+                    ReadCPUID(0x80000002 + i, ref eax, ref ebx, ref ecx, ref edx);
+                    s[(i * 16) + 0] = (eax % 256);
+                    s[(i * 16) + 1] = ((eax >> 8) % 256);
+                    s[(i * 16) + 2] = ((eax >> 16) % 256);
+                    s[(i * 16) + 3] = ((eax >> 24) % 256);
+                    s[(i * 16) + 4] = (ebx % 256);
+                    s[(i * 16) + 5] = ((ebx >> 8) % 256);
+                    s[(i * 16) + 6] = ((ebx >> 16) % 256);
+                    s[(i * 16) + 7] = ((ebx >> 24) % 256);
+                    s[(i * 16) + 8] = (ecx % 256);
+                    s[(i * 16) + 9] = ((ecx >> 8) % 256);
+                    s[(i * 16) + 10] = ((ecx >> 16) % 256);
+                    s[(i * 16) + 11] = ((ecx >> 24) % 256);
+                    s[(i * 16) + 12] = (edx % 256);
+                    s[(i * 16) + 13] = ((edx >> 8) % 256);
+                    s[(i * 16) + 14] = ((edx >> 16) % 256);
+                    s[(i * 16) + 15] = ((edx >> 24) % 256);
+                }
+                for (int i = 0; i < s.Length; i++)
+                {
+                    if (s[i] == 0x00)
+                    {
+                        continue;
+                    }
+                    rs += (char)s[i];
+                }
+
+                if (!(rs == ""))
+                {
+                    return rs;
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+            }
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
         /// Check if can read CPU ID. Plugged.
         /// </summary>
         /// <returns>non-zero if can read.</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        internal static int CanReadCPUID() => throw new NotImplementedException();
+        public static int CanReadCPUID() => throw new NotImplementedException();
 
         /// <summary>
         /// Read CPU ID. Plugged.
@@ -263,7 +325,7 @@ namespace Cosmos.Core
         /// <param name="ecx">ecx.</param>
         /// <param name="edx">edx.</param>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        internal static void ReadCPUID(uint type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
+        public static void ReadCPUID(uint type, ref int eax, ref int ebx, ref int ecx, ref int edx) => throw new NotImplementedException();
 
         /// <summary>
         /// Read timestamp counter. Plugged.
@@ -278,5 +340,107 @@ namespace Cosmos.Core
         /// <returns>ulong value.</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Checks if Multiboot returned a memory map
+        /// </summary>
+        /// <returns></returns>
+        public static unsafe bool MemoryMapExists()
+        {
+            return (Bootstrap.MultibootHeader->Flags & 1 << 6) == 64;
+        }
+
+        /// <summary>
+        /// Get the Memory Map Information from Multiboot
+        /// </summary>
+        /// <returns>Returns an array of MemoryMaps containing the Multiboot Memory Map information. The array may have empty values at the end.</returns>
+        public static unsafe MemoryMap[] GetMemoryMap()
+        {
+            if (!MemoryMapExists())
+            {
+                throw new Exception("No Memory Map was returned by Multiboot");
+            }
+            var rawMap = new RawMemoryMap[64];
+            var currentMap = (RawMemoryMap*)Bootstrap.MultibootHeader->memMapAddress;
+            int counter = 0;
+            while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength) && counter < 64)
+            {
+                rawMap[counter++] = *currentMap;
+                currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes
+                if (currentMap->Size == 0)
+                {
+                    break;
+                }
+            }
+
+            if (counter >= 64)
+            {
+                throw new Exception("Memory Map returned too many segments");
+            }
+
+            var entireMap = new MemoryMap[counter];
+            for (int i = 0; i < counter; i++)
+            {
+                var rawMemoryMap = rawMap[i];
+                entireMap[i] = new MemoryMap
+                {
+                    Address = (ulong)rawMemoryMap.HighBaseAddr << 32 | rawMemoryMap.LowBaseAddr,
+                    Length = (ulong)rawMemoryMap.HighLength << 32 | rawMemoryMap.LowLength,
+                    Type = rawMemoryMap.Type
+                };
+            }
+            return entireMap;
+        }
+    }
+
+    public class MemoryMap
+    {
+        /// <summary>
+        /// Base Address of the memory region
+        /// </summary>
+        public ulong Address;
+        /// <summary>
+        /// Length in bytes of the region
+        /// </summary>
+        public ulong Length;
+        /// <summary>
+        /// Type of RAM in region. 1 is available. 3 is for ACPI. All other is unavailable
+        /// </summary>
+        public uint Type;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 24)]
+    public struct RawMemoryMap
+    {
+        /// <summary>
+        /// Size of this entry
+        /// </summary>
+        [FieldOffset(0)]
+        public uint Size;
+        /// <summary>
+        /// Low 32 bits of the base address
+        /// </summary>
+        [FieldOffset(4)]
+        public uint LowBaseAddr;
+        /// <summary>
+        /// High 32 bits of the base address
+        /// </summary>
+        [FieldOffset(8)]
+        public uint HighBaseAddr;
+        /// <summary>
+        /// Low 32 bits of the length of memory block in bytes
+        /// </summary>
+        [FieldOffset(12)]
+        public uint LowLength;
+        /// <summary>
+        /// High 32 bits of the length of memory block in bytes
+        /// </summary>
+        [FieldOffset(16)]
+        public uint HighLength;
+        /// <summary>
+        /// Type of memory area, 1 if usable RAM, everything else unusable.
+        /// </summary>
+        [FieldOffset(20)]
+        public uint Type;
     }
 }

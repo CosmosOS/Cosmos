@@ -97,6 +97,13 @@ namespace Cosmos.TestRunner.UI.ViewModels
             set => SetProperty(ref mStackCorruptionDetectionLevel, value);
         }
 
+        private DebugMode mDebugMode = defaultEngineConfiguration.DebugMode;
+        public DebugMode DebugMode
+        {
+            get => mDebugMode;
+            set => SetProperty(ref mDebugMode, value);
+        }
+
         public IEnumerable<string> KernelAssembliesToRun
         {
             get

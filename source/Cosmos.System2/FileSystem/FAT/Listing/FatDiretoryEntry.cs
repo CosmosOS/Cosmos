@@ -512,6 +512,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public void DeleteDirectoryEntry()
         {
+            Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.DeleteDirectoryEntry --");
+
             if (mEntryType == DirectoryEntryTypeEnum.Unknown)
             {
                 throw new NotImplementedException();
@@ -524,12 +526,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
 
-            var xEntryOffset = mEntryHeaderDataOffset - 32;
-
-            while (xData[xEntryOffset + 11] == FatDirectoryEntryAttributeConsts.LongName)
+            if(mEntryHeaderDataOffset > 32)
             {
-                xData[xEntryOffset] = FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry;
-                xEntryOffset -= 32;
+                var xEntryOffset = mEntryHeaderDataOffset - 32;
+
+                Global.mFileSystemDebugger.SendInternal("xEntryOffset: " + xEntryOffset);
+
+                while (xData[xEntryOffset + 11] == FatDirectoryEntryAttributeConsts.LongName)
+                {
+                    xData[xEntryOffset] = FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry;
+                    xEntryOffset -= 32;
+                }
             }
 
             ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
@@ -988,6 +995,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, byte aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
             Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
 
             if (IsRootDirectory())
@@ -1043,6 +1051,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, ushort aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
             Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
 
             if (IsRootDirectory())
@@ -1054,6 +1063,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             if (xData.Length > 0)
             {
+                Global.mFileSystemDebugger.SendInternal("mEntryHeaderDataOffset = " + mEntryHeaderDataOffset);
                 var xValue = new byte[aEntryMetadata.DataLength];
                 xValue.SetUInt16(0, aValue);
                 uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
@@ -1100,6 +1110,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, uint aValue)
         {
             Global.mFileSystemDebugger.SendInternal(" -- FatDirectoryEntry.SetDirectoryEntryMetadataValue(uint) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
             Global.mFileSystemDebugger.SendInternal("aValue = " + aValue);
 
             if (IsRootDirectory())
@@ -1157,6 +1168,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, long aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryMetadataValue(long) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
             Global.mFileSystemDebugger.SendInternal("aValue =");
             Global.mFileSystemDebugger.SendInternal(aValue);
 
@@ -1218,6 +1230,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, string aValue)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.SetDirectoryEntryMetadataValue(string) --");
+            Global.mFileSystemDebugger.SendInternal("aEntryMetadata = " + aEntryMetadata.DataOffset);
             Global.mFileSystemDebugger.SendInternal($"aValue = {aValue}");
 
             if (IsRootDirectory())
@@ -1282,10 +1295,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             if (xData.Length > 0)
             {
-                var xValue = new byte[aEntryMetadata.DataLength];
+                var xValue = new byte[aEntryMetadata.DataLength * 4];
                 xValue.SetUInt32(0, aValue);
                 uint offset = aEntryHeaderDataOffset + aEntryMetadata.DataOffset;
-                Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength);
+                Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength * 4);
                 SetDirectoryEntryData(xData);
             }
         }
@@ -1327,11 +1340,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             if (xData.Length > 0)
             {
-                var xValue = new byte[aEntryMetadata.DataLength];
+                Global.mFileSystemDebugger.SendInternal("length = " + aEntryMetadata.DataLength);
+                var xValue = new byte[aEntryMetadata.DataLength * 4];
                 xValue.SetUInt32(0, (uint)aValue);
                 uint offset = aEntryHeaderDataOffset + aEntryMetadata.DataOffset;
                 Global.mFileSystemDebugger.SendInternal("offset = " + offset);
-                Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength);
+                Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength * 4);
                 SetDirectoryEntryData(xData);
             }
         }

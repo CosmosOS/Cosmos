@@ -855,7 +855,48 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
-
+        
+        private int[] scaleImage(Image image, int newWidth, int newHeight)
+        {
+            int[] pixels = image.rawData;
+            int w1 = (int)image.Width;
+            int h1 = (int)image.Height;
+            int[] temp = new int[newWidth * newHeight];
+            int x_ratio = (int)((w1 << 16) / newWidth) + 1;
+            int y_ratio = (int)((h1 << 16) / newHeight) + 1;
+            int x2, y2;
+            for (int i = 0; i < newHeight; i++)
+            {
+                for (int j = 0; j < newWidth; j++)
+                {
+                    x2 = ((j * x_ratio) >> 16);
+                    y2 = ((i * y_ratio) >> 16);
+                    temp[(i * newWidth) + j] = pixels[(y2 * w1) + x2];
+                }
+            }
+            return temp;
+        }
+                /// <summary>
+        /// Draw a Scaled Bitmap.
+        /// </summary>
+        /// <param name="image">Image to Scale.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="w">Desired Width.</param>
+        /// <param name="h">Desired Height.</param>
+        public virtual void DrawImage(Image image, int x, int y,int w,int h)
+        {
+            int[] pixels = scaleImage(image, w, h);
+            for (int _x = 0; _x < w; _x++)
+            {
+                for (int _y = 0; _y < h; _y++)
+                {
+                    Global.mDebugger.SendInternal(pixels[_x + _y * w]);
+                    DrawPoint(new Pen(Color.FromArgb(pixels[_x + _y * w])), x + _x, y + _y);
+                }
+            }
+        }
+        
         /// <summary>
         /// Draw image with alpha channel.
         /// </summary>
