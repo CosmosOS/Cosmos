@@ -17,7 +17,8 @@ namespace Cosmos.HAL
         {
             Normal = 0x00,
             Bridge = 0x01,
-            Cardbus = 0x02
+            Cardbus = 0x02,
+            Multifunctional = 0x80
         };
 
         public enum PCIBist : byte
@@ -154,6 +155,16 @@ namespace Cosmos.HAL
                 BaseAddressBar[3] = new PCIBaseAddressBar(ReadRegister32(0x1C),this, 0x1C);
                 BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20),this, 0x20);
                 BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24),this, 0x1C);
+            }
+            else if(HeaderType == PCIHeaderType.Multifunctional)
+            {
+                BaseAddressBar = new PCIBaseAddressBar[6];
+                BaseAddressBar[0] = new PCIBaseAddressBar(ReadRegister32(0x10), this, 0x10);
+                BaseAddressBar[1] = new PCIBaseAddressBar(ReadRegister32(0x14), this, 0x14);
+                BaseAddressBar[2] = new PCIBaseAddressBar(ReadRegister32(0x18), this, 0x14);
+                BaseAddressBar[3] = new PCIBaseAddressBar(ReadRegister32(0x1C), this, 0x1C);
+                BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20), this, 0x20);
+                BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24), this, 0x1C);
             }
         }
 

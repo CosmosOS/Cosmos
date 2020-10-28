@@ -59,7 +59,6 @@ namespace Cosmos.HAL
             {
                 throw new ArgumentNullException("aDevice");
             }
-            Console.WriteLine("Adding device");
             mDevices.Add(aDevice);
         }
 

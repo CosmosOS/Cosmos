@@ -14,6 +14,10 @@ namespace Cosmos.HAL.USB
         public static bool USBDeviceFound = false;
         public static void ScanDevices()
         {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("[PCI] ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Scanning USB Root hosts");
             foreach (PCIDevice pci in PCI.Devices)
             {
                 ///According to PCI Specs for USB
@@ -25,9 +29,10 @@ namespace Cosmos.HAL.USB
                     pci.Subclass == 0x03 &&
                     pci.ProgIF == 0x00)
                 {
-                    Console.WriteLine("Adding USB Device: 0x" + pci.VendorID.ToHex() + " : 0x" + pci.DeviceID.ToHex());
-                    USBDeviceFound = true;
-                    Device.Add(new USBHostUHCI(pci));
+
+                        Console.WriteLine("Adding USB Device: 0x" + pci.VendorID.ToHex() + " : 0x" + pci.DeviceID.ToHex());
+                        USBDeviceFound = true;
+                        Device.Add(new USBHostUHCI(pci));
                 }
             }
         }
@@ -36,8 +41,15 @@ namespace Cosmos.HAL.USB
         public USBHostUHCI(PCIDevice pcidev)
         {
 
-            regs = new USBHostUHCIRegisters(pcidev.BaseAddressBar[3]);
+                regs = new USBHostUHCIRegisters(pcidev.BaseAddressBar[4]);
 
         }
+        public enum USBHeaderType : byte
+        {
+            Normal = 0x00,
+            Bridge = 0x01,
+            Cardbus = 0x02,
+            MultiFunctional = 0x80
+        };
     }
 }
