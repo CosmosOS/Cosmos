@@ -28,14 +28,14 @@ namespace Cosmos.HAL.USB
             regs = reqs;
 
         }
-        public UInt32 USBCMD { get { return regs.Read(0x00); } set { regs.Write(0x00, value); } }
-        public UInt32 USBSTS { get { return regs.Read(0x02); } set { regs.Write(0x02, value); } }
-        public UInt32  USBINTR { get { return regs.Read(0x04); } set { regs.Write(0x04, value); } }
-        public UInt32 FRNUM { get { return regs.Read(0x06); } set { regs.Write(0x06, value); } }
-        public UInt32 FRBASEADD { get { return regs.Read(0x08); } set { regs.Write(0x08, value); } }
-        public UInt32 SOFMOD { get { return regs.Read(0x0C); } set { regs.Write(0x0C, value); } }
-        public UInt32 PORTSC1 { get { return regs.Read(0x10); } set { regs.Write(0x10, value); } }
-        public UInt32 PORTSC2 { get { return regs.Read(0x12); } set { regs.Write(0x12, value); } }
+        public ushort USBCMD { get { return regs.Read16(0x00); } set { regs.Write16(0x00, (ushort)value); } }
+        public ushort USBSTS { get { return regs.Read16(0x02); } set { regs.Write16(0x02, (ushort)value); } }
+        public ushort  USBINTR { get { return regs.Read16(0x04); } set { regs.Write16(0x04, (ushort)value); } }
+        public ushort FRNUM { get { return regs.Read16(0x06); } set { regs.Write16(0x06, (ushort)value); } }
+        public ushort FRBASEADD { get { return regs.Read16(0x08); } set { regs.Write16(0x08, (ushort)value); } }
+        public ushort SOFMOD { get { return regs.Read16(0x0C); } set { regs.Write16(0x0C, (ushort)value); } }
+        public ushort PORTSC1 { get { return regs.Read16(0x10); } set { regs.Write16(0x10, (ushort)value); } }
+        public ushort PORTSC2 { get { return regs.Read16(0x12); } set { regs.Write16(0x12, (ushort)value); } }
     }
 
 

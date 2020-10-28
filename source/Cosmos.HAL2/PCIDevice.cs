@@ -151,20 +151,20 @@ namespace Cosmos.HAL
                 BaseAddressBar = new PCIBaseAddressBar[6];
                 BaseAddressBar[0] = new PCIBaseAddressBar(ReadRegister32(0x10),this,0x10);
                 BaseAddressBar[1] = new PCIBaseAddressBar(ReadRegister32(0x14),this,0x14);
-                BaseAddressBar[2] = new PCIBaseAddressBar(ReadRegister32(0x18),this,0x14);
+                BaseAddressBar[2] = new PCIBaseAddressBar(ReadRegister32(0x18),this,0x18);
                 BaseAddressBar[3] = new PCIBaseAddressBar(ReadRegister32(0x1C),this, 0x1C);
                 BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20),this, 0x20);
-                BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24),this, 0x1C);
+                BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24),this, 0x24);
             }
             else if(HeaderType == PCIHeaderType.Multifunctional)
             {
                 BaseAddressBar = new PCIBaseAddressBar[6];
                 BaseAddressBar[0] = new PCIBaseAddressBar(ReadRegister32(0x10), this, 0x10);
                 BaseAddressBar[1] = new PCIBaseAddressBar(ReadRegister32(0x14), this, 0x14);
-                BaseAddressBar[2] = new PCIBaseAddressBar(ReadRegister32(0x18), this, 0x14);
+                BaseAddressBar[2] = new PCIBaseAddressBar(ReadRegister32(0x18), this, 0x18);
                 BaseAddressBar[3] = new PCIBaseAddressBar(ReadRegister32(0x1C), this, 0x1C);
                 BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20), this, 0x20);
-                BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24), this, 0x1C);
+                BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24), this, 0x24);
             }
         }
 
@@ -907,30 +907,73 @@ namespace Cosmos.HAL
                 }
             }
         }
-        public uint Read(uint address)
+        public uint Read32(uint address)
         {
             if (isIO)
             {
                 port.DWord = address;
                 return port.DWord;
             }
-
-
             else
             {
                 return memoryBlock[address];
             }
         }
-
-        public void Write(uint address,uint value)
+        public void Write32(uint address, uint value)
         {
-            if(isIO)
+            if (isIO)
             {
                 port.DWord = value;
             }
             else
             {
                 memoryBlock[address] = value;
+            }
+        }
+        public ushort Read16(uint address)
+        {
+            if (isIO)
+            {
+                port.Word = (ushort)address;
+                return port.Word;
+            }
+            else
+            {
+                return memoryBlock.Words[address];
+            }
+        }
+        public void Write16(uint address, ushort value)
+        {
+            if (isIO)
+            {
+                port.Word = value;
+            }
+            else
+            {
+                memoryBlock.Words[address] = value;
+            }
+        }
+        public byte Read8(uint address)
+        {
+            if (isIO)
+            {
+                port.Byte = (byte)address;
+                return port.Byte;
+            }
+            else
+            {
+                return memoryBlock.Bytes[address];
+            }
+        }
+        public void Write8(uint address, byte value)
+        {
+            if (isIO)
+            {
+                port.Byte = value;
+            }
+            else
+            {
+                memoryBlock.Bytes[address] = value;
             }
         }
         // ToDo: Write the right methods and dont be lazy

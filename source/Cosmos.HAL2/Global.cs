@@ -17,9 +17,9 @@ namespace Cosmos.HAL
 
         public static TextScreenBase TextScreen = new TextScreen();
         public static PCI Pci;
+        public static USBHostUHCIRegisters uhci;
 
         public static readonly PS2Controller PS2Controller = new PS2Controller();
-        public static USBHostUHCIRegisters uhci;
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
         /// Init <see cref="Global"/> inctanse.
@@ -74,17 +74,8 @@ namespace Cosmos.HAL
                     {
                         Console.WriteLine("(hex)BAR4:" + pci.BAR4.ToHex());
                         Console.WriteLine("(uint)BAR4:" + pci.BAR4);
-                        Console.WriteLine("(string)BAR4:" + pci.BAR4.ToString()); var val = uhci.USBCMD;
-                        uhci.USBCMD = 0x01;
-                        Console.WriteLine("USBCMD Before: " + val);
-                        Console.WriteLine("USBCMD After: " + uhci.USBCMD);
-                        Console.WriteLine("FRBASEADD: " + uhci.FRBASEADD);
-                        Console.WriteLine("FRNUM: " + uhci.FRNUM);
-                        Console.WriteLine("POSTSC1: " + uhci.PORTSC1);
-                        Console.WriteLine("POSTSC2: " + uhci.PORTSC2);
-                        Console.WriteLine("SOFMOD: " + uhci.SOFMOD);
-                        Console.WriteLine("USBINTR: " + uhci.USBINTR);
-                        Console.WriteLine("USBSTS: " + uhci.USBSTS);
+                        Console.WriteLine("(string)BAR4:" + pci.BAR4.ToString());
+
                     }
                 }
 
