@@ -28,6 +28,7 @@
         <EnumValue Name="VMware" DisplayName="VMware" />
         <EnumValue Name="Slave" DisplayName="Attached Slave (CanaKit)" />
         <EnumValue Name="Bochs" DisplayName="Bochs" />
+        <EnumValue Name="Qemu" DisplayName="Qemu" />
         <EnumValue Name="IntelEdison" DisplayName="Intel Edison" />
         <EnumValue Name="HyperV" DisplayName="Hyper-V" />
     </EnumProperty>

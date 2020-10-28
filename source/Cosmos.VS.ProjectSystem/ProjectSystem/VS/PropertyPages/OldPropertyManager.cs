@@ -11,9 +11,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 {
     internal class OldPropertyManager : IPropertyManager
     {
-        private BuildProperties mBuildProperties;
-
-        public BuildProperties BuildProperties => mBuildProperties;
+        public BuildProperties BuildProperties { get; }
 
         public string ProjectPath => mUnconfiguredProject.FullPath;
 
@@ -28,14 +26,14 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
         public OldPropertyManager(UnconfiguredProject unconfiguredProject)
         {
-            mBuildProperties = new BuildProperties();
+            BuildProperties = new BuildProperties();
 
-            mBuildProperties.PropertyChanged += delegate (object sender, PropertyChangedEventArgs e)
+            BuildProperties.PropertyChanged += delegate (object sender, PropertyChangedEventArgs e)
             {
                 PropertyChanged?.Invoke(this, new ProjectPropertyChangedEventArgs(e.PropertyName, e.OldValue, e.NewValue));
             };
 
-            mBuildProperties.PropertyChanging += delegate (object sender, PropertyChangingEventArgs e)
+            BuildProperties.PropertyChanging += delegate (object sender, PropertyChangingEventArgs e)
             {
                 PropertyChanging?.Invoke(this, new ProjectPropertyChangingEventArgs(e.PropertyName));
             };
@@ -59,7 +57,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
         }
 
         public Task<string> GetPropertyAsync(string propertyName) =>
-            Task.FromResult(mBuildProperties.GetProperty(propertyName));
+            Task.FromResult(BuildProperties.GetProperty(propertyName));
 
         public async Task SetPathPropertyAsync(string propertyName, string value, bool isRelative)
         {
@@ -77,11 +75,11 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
         {
             PropertyChanging?.Invoke(this, new ProjectPropertyChangingEventArgs(propertyName));
 
-            var oldValue = mBuildProperties.GetProperty(propertyName);
-            mBuildProperties.SetProperty(propertyName, value);
+            var oldValue = BuildProperties.GetProperty(propertyName);
+            BuildProperties.SetProperty(propertyName, value);
 
             PropertyChanged?.Invoke(this, new ProjectPropertyChangedEventArgs(
-                propertyName, oldValue, mBuildProperties.GetProperty(propertyName)));
+                propertyName, oldValue, BuildProperties.GetProperty(propertyName)));
 
             mIsDirty = true;
 
@@ -99,7 +97,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 var project = await projectWriteLock.GetProjectAsync(configuredProject);
                 await projectWriteLock.CheckoutAsync(mUnconfiguredProject.FullPath);
 
-                foreach (var property in mBuildProperties.GetProperties())
+                foreach (var property in BuildProperties.GetProperties())
                 {
                     project.SetProperty(property.Key, property.Value);
                 }
