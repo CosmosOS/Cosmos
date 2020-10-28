@@ -34,7 +34,7 @@ namespace Cosmos.HAL.USB
         public UInt32 HcRhDescriptorA { get { return regs.Read(0x48); } set { regs.Write(0x48, value); } }
         public UInt32 HcRhDescriptorB { get { return regs.Read(0x4C); } set { regs.Write(0x4C, value); } }
         public UInt32 HcRhStatus { get { return regs.Read(0x50); } set { regs.Write(0x50, value); } }
-                
+
     }
 
     public struct HcRevisionReg

@@ -16,13 +16,14 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
 		private readonly UInt64 mStartingSector;
 
+
         /// <summary>
         /// Create new inctanse of the <see cref="Partition"/> class.
         /// </summary>
         /// <param name="aHost">A hosting device.</param>
         /// <param name="aStartingSector">A starting sector.</param>
         /// <param name="aSectorCount">A sector count.</param>
-		public Partition(BlockDevice aHost, UInt64 aStartingSector, UInt64 aSectorCount)
+        public Partition(BlockDevice aHost, UInt64 aStartingSector, UInt64 aSectorCount)
 		{
 			mHost = aHost;
 			mStartingSector = aStartingSector;

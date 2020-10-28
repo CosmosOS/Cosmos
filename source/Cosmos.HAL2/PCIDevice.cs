@@ -58,6 +58,7 @@ namespace Cosmos.HAL
             CacheLineSize = 12, LatencyTimer = 13, HeaderType = 14, BIST = 15,
             BAR0 = 16,
             BAR1 = 20,
+            BAR4 = 14,
             PrimaryBusNo = 24, SecondaryBusNo = 25, SubBusNo = 26, SecondarLT = 27,
             IOBase = 28, IOLimit = 29, SecondaryStatus = 30,
             MemoryBase = 32, MemoryLimit = 34,
@@ -76,6 +77,7 @@ namespace Cosmos.HAL
         public readonly uint function;
 
         public readonly uint BAR0;
+        public readonly uint BAR4;
 
         public readonly ushort VendorID;
         public readonly ushort DeviceID;
@@ -119,6 +121,7 @@ namespace Cosmos.HAL
             DeviceID = ReadRegister16((byte)Config.DeviceID);
 
             BAR0 = ReadRegister32((byte)Config.BAR0);
+            BAR4 = ReadRegister32((byte)Config.BAR4);
 
             //Command = ReadRegister16((byte)Config.Command);
             //Status = ReadRegister16((byte)Config.Status);
@@ -145,12 +148,12 @@ namespace Cosmos.HAL
             if (HeaderType == PCIHeaderType.Normal)
             {
                 BaseAddressBar = new PCIBaseAddressBar[6];
-                BaseAddressBar[0] = new PCIBaseAddressBar(ReadRegister32(0x10));
-                BaseAddressBar[1] = new PCIBaseAddressBar(ReadRegister32(0x14));
-                BaseAddressBar[2] = new PCIBaseAddressBar(ReadRegister32(0x18));
-                BaseAddressBar[3] = new PCIBaseAddressBar(ReadRegister32(0x1C));
-                BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20));
-                BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24));
+                BaseAddressBar[0] = new PCIBaseAddressBar(ReadRegister32(0x10),this,0x10);
+                BaseAddressBar[1] = new PCIBaseAddressBar(ReadRegister32(0x14),this,0x14);
+                BaseAddressBar[2] = new PCIBaseAddressBar(ReadRegister32(0x18),this,0x14);
+                BaseAddressBar[3] = new PCIBaseAddressBar(ReadRegister32(0x1C),this, 0x1C);
+                BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20),this, 0x20);
+                BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24),this, 0x1C);
             }
         }
 
@@ -193,14 +196,14 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aRegister">A register to read.</param>
         /// <returns>byte value.</returns>
-        protected byte ReadRegister8(byte aRegister)
+        public byte ReadRegister8(byte aRegister)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             return (byte)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFF);
         }
 
-        protected void WriteRegister8(byte aRegister, byte value)
+        public void WriteRegister8(byte aRegister, byte value)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
@@ -212,7 +215,7 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aRegister">A register.</param>
         /// <returns>UInt16 value.</returns>
-        protected UInt16 ReadRegister16(byte aRegister)
+        public UInt16 ReadRegister16(byte aRegister)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
@@ -224,21 +227,21 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aRegister">A register.</param>
         /// <param name="value">A value.</param>
-        protected void WriteRegister16(byte aRegister, ushort value)
+        public void WriteRegister16(byte aRegister, ushort value)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             IO.ConfigDataPort.Word = value;
         }
 
-        protected UInt32 ReadRegister32(byte aRegister)
+        public UInt32 ReadRegister32(byte aRegister)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             return IO.ConfigDataPort.DWord;
         }
 
-        protected void WriteRegister32(byte aRegister, uint value)
+        public void WriteRegister32(byte aRegister, uint value)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
@@ -856,6 +859,7 @@ namespace Cosmos.HAL
 
     public class PCIBaseAddressBar
     {
+        public const uint _PCI_BASE_ADDRESS_MEM_MASK = ~(uint)0x0F;
         private uint baseAddress = 0;
         private ushort prefetchable = 0;
         private ushort type = 0;
@@ -863,26 +867,32 @@ namespace Cosmos.HAL
         public MemoryBlock memoryBlock;
         public IOPort port;
 
-        public PCIBaseAddressBar(uint raw)
+        public PCIBaseAddressBar(uint raw, PCIDevice aPCIDevice, byte aRegister)
         {
+
+
             isIO = (raw & 0x01) == 1;
 
             if (isIO)
             {
+                port = new IOPort((ushort)raw);
                 baseAddress = raw & 0xFFFFFFFC;
             }
             else
             {
+                uint size = 0;
                 type = (ushort)((raw >> 1) & 0x03);
                 prefetchable = (ushort)((raw >> 3) & 0x01);
                 switch (type)
                 {
                     case 0x00:
                         baseAddress = raw & 0xFFFFFFF0;
+                        uint val = aPCIDevice.ReadRegister32(aRegister);
+                        size = ~(val & _PCI_BASE_ADDRESS_MEM_MASK) + 1;
+                        memoryBlock = new MemoryBlock(raw, size);
                         break;
                     case 0x01:
-                        baseAddress = raw & 0xFFFFFFF0;
-                        break;
+                        throw new NotImplementedException();
                 }
             }
         }
@@ -900,6 +910,7 @@ namespace Cosmos.HAL
                 return memoryBlock[address];
             }
         }
+
         public void Write(uint address,uint value)
         {
             if(isIO)
@@ -911,10 +922,36 @@ namespace Cosmos.HAL
                 memoryBlock[address] = value;
             }
         }
+        // ToDo: Write the right methods and dont be lazy
+        /*
+        public uint Read32(uint address)
+        {
+            return Read(address);
+        }
+        public void Write32(uint address,uint value)
+        {
+            Write(address,value);
+        }
+        public uint Read16(uint address)
+        {
+            return Read(address);
+        }
+        public void Write16(uint address, uint value)
+        {
+            Write(address, value);
+        }
+        public uint Read8(uint address)
+        {
+            return Read(address);
+        }
+        public void Write8(uint address, uint value)
+        {
+            Write(address, value);
+        }*/
         public uint BaseAddress
         {
             get { return baseAddress; }
-        }
+        } 
 
         public bool IsIO
         {

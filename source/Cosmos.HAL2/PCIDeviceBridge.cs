@@ -41,8 +41,8 @@ namespace Cosmos.HAL
             : base(bus, slot, function)
         {
             BaseAddresses = new PCIBaseAddressBar[2];
-            BaseAddresses[0] = new PCIBaseAddressBar(ReadRegister32(0x10));
-            BaseAddresses[1] = new PCIBaseAddressBar(ReadRegister32(0x14));
+            BaseAddresses[0] = new PCIBaseAddressBar(ReadRegister32(0x10),this,0x10);
+            BaseAddresses[1] = new PCIBaseAddressBar(ReadRegister32(0x14),this,0x14);
 
             PrimaryBusNumber = ReadRegister8(0x18);
             SecondaryBusNumber = ReadRegister8(0x19);

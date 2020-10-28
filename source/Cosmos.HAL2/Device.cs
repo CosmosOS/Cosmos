@@ -119,7 +119,6 @@ namespace Cosmos.HAL
                 return mType;
             }
         }
-
         private bool _Enabled = false;
         public bool IsEnabled
         {

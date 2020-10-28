@@ -57,14 +57,25 @@ namespace Cosmos.HAL
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
+            try
+            {
+                Console.WriteLine("Starting USB OHCI");
+                USBHost.ScanDevices();
+
+
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Message: ");
+                Console.WriteLine(e.ToString());
+            }
             mDebugger.Send("PS/2 Controller Init");
             PS2Controller.Initialize();
 
             IDE.InitDriver();
             AHCI.InitDriver();
             //EHCI.InitDriver();
-            USBHostOHCI.ScanDevices();
-            USBHostUHCI.ScanDevices();
+
 
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 

@@ -4,6 +4,7 @@ using System;
 
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
+using Cosmos.HAL.USB;
 
 namespace Cosmos.HAL
 {
@@ -236,10 +237,12 @@ namespace Cosmos.HAL
 
                 if (aDevice == null)
                 {
-                    mDebugger.SendInternal("(PS/2 Controller) Device detection failed:");
-                    mDebugger.SendInternal("First Byte: " + xFirstByte);
-                    mDebugger.SendInternal("Second Byte: " + xSecondByte);
-                    throw new Exception("(PS/2 Controller) PS/2 device not supported");
+                     if(!USBHost.USBEnabled())
+                        {
+                            throw new Exception("No Keyboard or Mousedriver is Currently Supported.\r\n For USB please make sure you have an OHCI Compatible Bus");
+                        }
+                    
+                          
                 }
             }
             else
