@@ -11,7 +11,16 @@ namespace Cosmos.HAL.USB
 {
     public class USBHostUHCIRegisters
     {
-
+        /* Command Register */
+        public const uint _USBCMD = 0;
+        public const uint _USBCMD_RS = 0x01; /* Run/Stop */
+        public const uint _USBCMD_HCRESET = 0x02; /* Host Reset */
+        public const uint _USBCMD_GRESET = 0x04; /* Global Reset */
+        public const uint _USBCMD_EGSM = 0x08; /* Global Suspend Mode */
+        public const uint _USBCMD_FGR = 0x010; /* Force Global Resume */
+        public const uint _USBCMD_SWDBG = 0x20; /* SW Debug Mode */
+        public const uint _USBCMD_CF = 0x40; /* Config Flag (sw only) */
+        public const uint _USBCMD_MAXP = 0x80; /* Max Packet (0 = 32 , 1 = 64) */
         private PCIBaseAddressBar regs;
 
         public USBHostUHCIRegisters(PCIBaseAddressBar reqs)

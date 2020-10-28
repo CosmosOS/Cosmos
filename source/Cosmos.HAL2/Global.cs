@@ -20,7 +20,6 @@ namespace Cosmos.HAL
 
         public static readonly PS2Controller PS2Controller = new PS2Controller();
         public static USBHostUHCIRegisters uhci;
-        public static PCIDevice aDevice;
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
         /// Init <see cref="Global"/> inctanse.
@@ -62,20 +61,32 @@ namespace Cosmos.HAL
             {
                 Console.WriteLine("Starting USB OHCI");
                 USBHost.ScanDevices();
-                Console.WriteLine("(hex)BAR4:" + aDevice.BAR4.ToHex());
-                Console.WriteLine("(uint)BAR4:" + aDevice.BAR4);
-                Console.WriteLine("(string)BAR4:" + aDevice.BAR4.ToString());
-                var val = uhci.USBCMD;
-                uhci.USBCMD = 1;
-                Console.WriteLine("USBCMD Before: " + val);
-                Console.WriteLine("USBCMD After: " + uhci.USBCMD);
-                Console.WriteLine("FRBASEADD: " + uhci.FRBASEADD);
-                Console.WriteLine("FRNUM: " + uhci.FRNUM);
-                Console.WriteLine("POSTSC1: " + uhci.PORTSC1);
-                Console.WriteLine("POSTSC2: " + uhci.PORTSC2);
-                Console.WriteLine("SOFMOD: " + uhci.SOFMOD);
-                Console.WriteLine("USBINTR: " + uhci.USBINTR);
-                Console.WriteLine("USBSTS: " + uhci.USBSTS);
+                foreach (PCIDevice pci in PCI.Devices)
+                {
+                    ///According to PCI Specs for USB
+                    ///0x00 = USB  (Universal Host Controller Spec) ,
+                    ///0x10 = USB (Open Host Controller Spec)
+                    ///0x20 = USB2 Host Controller (Intel Enhanced Host Controller Interface)
+                    ///0x30 = USB3 XHCI Controller
+                    if (pci.ClassCode == 0x0c &&
+                        pci.Subclass == 0x03 &&
+                        pci.ProgIF == 0x00)
+                    {
+                        Console.WriteLine("(hex)BAR4:" + pci.BAR4.ToHex());
+                        Console.WriteLine("(uint)BAR4:" + pci.BAR4);
+                        Console.WriteLine("(string)BAR4:" + pci.BAR4.ToString()); var val = uhci.USBCMD;
+                        uhci.USBCMD = 0x01;
+                        Console.WriteLine("USBCMD Before: " + val);
+                        Console.WriteLine("USBCMD After: " + uhci.USBCMD);
+                        Console.WriteLine("FRBASEADD: " + uhci.FRBASEADD);
+                        Console.WriteLine("FRNUM: " + uhci.FRNUM);
+                        Console.WriteLine("POSTSC1: " + uhci.PORTSC1);
+                        Console.WriteLine("POSTSC2: " + uhci.PORTSC2);
+                        Console.WriteLine("SOFMOD: " + uhci.SOFMOD);
+                        Console.WriteLine("USBINTR: " + uhci.USBINTR);
+                        Console.WriteLine("USBSTS: " + uhci.USBSTS);
+                    }
+                }
 
 
             }
