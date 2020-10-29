@@ -310,6 +310,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public override List<DirectoryEntry> GetDirectoryListing(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal("-- CosmosVFS.GetDirectoryListing --");
             var xFS = GetFileSystemFromPath(aPath);
             var xDirectory = DoGetDirectoryEntry(aPath, xFS);
             return xFS.GetDirectoryListing(xDirectory);
@@ -750,6 +751,7 @@ namespace Cosmos.System.FileSystem
                     if (xListingItemName == xPathPart)
                     {
                         xBaseDirectory = xListingItem;
+                        Global.mFileSystemDebugger.SendInternal("Now checking: " + xBaseDirectory.mFullPath);
                         xPartFound = true;
                         break;
                     }
@@ -760,6 +762,8 @@ namespace Cosmos.System.FileSystem
                     throw new Exception("Path part '" + xPathPart + "' not found!");
                 }
             }
+
+            Global.mFileSystemDebugger.SendInternal("Returning: " + xBaseDirectory.mFullPath);
             return xBaseDirectory;
         }
 

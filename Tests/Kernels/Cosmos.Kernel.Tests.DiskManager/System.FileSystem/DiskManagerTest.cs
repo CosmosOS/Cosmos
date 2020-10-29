@@ -3,6 +3,8 @@ using Cosmos.TestRunner;
 using Cosmos.Debug.Kernel;
 using System;
 using Cosmos.System.FileSystem;
+using System.Collections.Generic;
+using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.Kernel.Tests.DiskManager
 {
@@ -39,6 +41,13 @@ namespace Cosmos.Kernel.Tests.DiskManager
             File.Create("newFile.txt");
 
             Assert.IsTrue(File.Exists("newFile.txt") == true, "Failed to create new file after disk format");
+
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("Testing if you can create directories");
+
+            Directory.CreateDirectory(@"0:\SYS\");
+            Assert.IsTrue(Directory.GetDirectories(@"0:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
 
             mDebugger.Send("END TEST");
 

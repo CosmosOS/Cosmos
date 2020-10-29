@@ -36,24 +36,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// <exception cref="ArgumentOutOfRangeException">Thrown when first cluster smaller then file system root cluster.</exception>
         /// <exception cref="ArgumentNullException">Thrown when aFileSystem is null.</exception>
         /// <exception cref="ArgumentException">Thrown when aFullPath or aName is null or empty.</exception>
-        public FatDirectoryEntry(
-            FatFileSystem aFileSystem,
-            FatDirectoryEntry aParent,
-            string aFullPath,
-            string aName,
-            long aSize,
-            uint aFirstCluster,
-            uint aEntryHeaderDataOffset,
-            DirectoryEntryTypeEnum aEntryType)
-            : base(aFileSystem, aParent, aFullPath, aName, aSize, aEntryType)
+        public FatDirectoryEntry(FatFileSystem aFileSystem, FatDirectoryEntry aParent, string aFullPath, string aName, long aSize,
+            uint aFirstCluster, uint aEntryHeaderDataOffset, DirectoryEntryTypeEnum aEntryType) : base(aFileSystem, aParent, aFullPath, aName, aSize, aEntryType)
         {
             if (aFirstCluster < aFileSystem.RootCluster)
             {
                 Global.mFileSystemDebugger.SendInternal($"aFirstCluster {aFirstCluster} < aFileSystem.RootCluster {aFileSystem.RootCluster}");
                 throw new ArgumentOutOfRangeException(nameof(aFirstCluster));
             }
-
+            Global.mFileSystemDebugger.SendInternal("FatDirectoryEntry.ctor");
             mFirstClusterNum = aFirstCluster;
+            Global.mFileSystemDebugger.SendInternal("mFirstClusterNum: " + mFirstClusterNum);
             mEntryHeaderDataOffset = aEntryHeaderDataOffset;
         }
 
@@ -69,21 +62,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// <exception cref="ArgumentOutOfRangeException">Thrown when first cluster smaller then file system root cluster.</exception>
         /// <exception cref="ArgumentNullException">Thrown when aFileSystem is null.</exception>
         /// <exception cref="ArgumentException">Thrown when aFullPath or aName is null or empty.</exception>
-        public FatDirectoryEntry(
-            FatFileSystem aFileSystem,
-            FatDirectoryEntry aParent,
-            string aFullPath,
-            long aSize,
-            string aName,
-            uint aFirstCluster)
+        public FatDirectoryEntry(FatFileSystem aFileSystem, FatDirectoryEntry aParent, string aFullPath, long aSize, string aName, uint aFirstCluster)
             : base(aFileSystem, aParent, aFullPath, aName, aSize, DirectoryEntryTypeEnum.Directory)
         {
             if (aFirstCluster < aFileSystem.RootCluster)
             {
                 throw new ArgumentOutOfRangeException(nameof(aFirstCluster));
             }
+            Global.mFileSystemDebugger.SendInternal("FatDirectoryEntry.ctor");
 
             mFirstClusterNum = aFirstCluster;
+            Global.mFileSystemDebugger.SendInternal("mFirstClusterNum: " + mFirstClusterNum);
             mEntryHeaderDataOffset = 0;
         }
 
@@ -462,6 +451,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 var xNewEntry = new FatDirectoryEntry((FatFileSystem)mFileSystem, this, xFullPath, aName, 0, xFirstCluster, xEntryHeaderDataOffset, aEntryType);
 
                 xNewEntry.AllocateDirectoryEntry(xShortName);
+
+                // We need to clear the cluster in case there is some data left over (currently happens when we reformat the fs)
+                var bytesPerCluster = ((FatFileSystem)mFileSystem).BytesPerCluster;
+                ((FatFileSystem)mFileSystem).Write(xFirstCluster, new byte[bytesPerCluster], bytesPerCluster, 0);
 
                 return xNewEntry;
             }
@@ -895,6 +888,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         private byte[] GetDirectoryEntryData()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetDirectoryEntryData --");
+            Global.mFileSystemDebugger.SendInternal("mFirstClusterNum:" +  mFirstClusterNum);
 
             if (mEntryType != DirectoryEntryTypeEnum.Unknown)
             {

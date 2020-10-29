@@ -829,6 +829,7 @@ namespace Cosmos.System.FileSystem.FAT
         internal void Read(long aCluster, out byte[] aData, long aSize = 0, long aOffset = 0)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Read --");
+            Global.mFileSystemDebugger.SendInternal("aCluster: " + aCluster);
 
             if (aSize == 0)
             {
@@ -839,6 +840,7 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 aData = NewBlockArray();
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
+                Global.mFileSystemDebugger.SendInternal("aSector: " + aCluster);
                 Device.ReadBlock((ulong)xSector, SectorsPerCluster, ref aData);
             }
             else
@@ -976,6 +978,7 @@ namespace Cosmos.System.FileSystem.FAT
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry baseDirectory)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetDirectoryListing --");
+            Global.mFileSystemDebugger.SendInternal("baseDirectory: " + baseDirectory.mFullPath);
 
             if (baseDirectory == null)
             {
