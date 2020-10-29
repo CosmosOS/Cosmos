@@ -876,7 +876,7 @@ namespace Cosmos.HAL
         private ushort type = 0;
         private bool isIO = false;
         public MemoryBlock memoryBlock;
-        public IOPort[] port;
+        public IOPortBlock port;
         public uint size = 0;
 
         public PCIBaseAddressBar(uint raw, PCIDevice aPCIDevice, byte aRegister)
@@ -884,20 +884,18 @@ namespace Cosmos.HAL
 
 
             isIO = (raw & 0x01) == 1;
-            baseAddress = raw & 0xFFFFFFF0;
-            uint val = aPCIDevice.ReadRegister32(aRegister);
-            size = ~(val & _PCI_BASE_ADDRESS_MEM_MASK) + 1;
+
+ 
+                baseAddress = raw & 0xFFFFFFF0;
+                uint val = aPCIDevice.ReadRegister32(aRegister);
+                size = ~(val & _PCI_BASE_ADDRESS_MEM_MASK) + 1;
+            
             if (isIO)
             {
 
                     baseAddress = raw & 0xFFFFFFFC;
-                    port = new IOPort[size / 4];
-                    for (int i = 0; i <= size / 4; i++)
-                    {
-
-                    Console.WriteLine("Setting IOPort: " + (ushort)(baseAddress + 4 * (uint)i));
-                        port[i] = new IOPort((ushort)(baseAddress + 4 * (uint)i));
-                    }
+                    port = new IOPortBlock((ushort)(baseAddress), (ushort)size);
+                
             }
             else
             {
@@ -918,7 +916,7 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                return port[address / 4].DWord;
+                return port.ReadDWord((ushort)address);
             }
             else
             {
@@ -929,7 +927,7 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port[address / 4].DWord = value;
+                port.WriteDWord((ushort)address,value);
             }
             else
             {
@@ -940,8 +938,7 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                Console.WriteLine((ushort)(port[(ushort)address / 4].Word >> ((ushort)address % 4) * 8));
-                return (ushort)(port[(ushort)address / 4].Word >> ((ushort)address % 4) * 8);
+                return port.ReadWord((ushort)address);
             }
             else
             {
@@ -952,7 +949,7 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port[address / 4].Word = value;
+                port.ReadWord(value);
             }
             else
             {
@@ -964,7 +961,7 @@ namespace Cosmos.HAL
             if (isIO)
             {
                 
-                return (byte)(port[(byte)address /4].Byte >> ((byte)address % 4) * 8);
+                return (byte)port.ReadByte((ushort)address);
             }
             else
             {
@@ -975,39 +972,13 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port[address / 4].Byte = value;
+                port.WriteByte((ushort)address,value);
             }
             else
             {
                 memoryBlock.Bytes[address] = value;
             }
         }
-        // ToDo: Write the right methods and dont be lazy
-        /*
-        public uint Read32(uint address)
-        {
-            return Read(address);
-        }
-        public void Write32(uint address,uint value)
-        {
-            Write(address,value);
-        }
-        public uint Read16(uint address)
-        {
-            return Read(address);
-        }
-        public void Write16(uint address, uint value)
-        {
-            Write(address, value);
-        }
-        public uint Read8(uint address)
-        {
-            return Read(address);
-        }
-        public void Write8(uint address, uint value)
-        {
-            Write(address, value);
-        }*/
         public uint BaseAddress
         {
             get { return baseAddress; }
