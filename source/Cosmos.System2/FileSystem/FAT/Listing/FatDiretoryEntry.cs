@@ -452,9 +452,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
                 xNewEntry.AllocateDirectoryEntry(xShortName);
 
-                // We need to clear the cluster in case there is some data left over (currently happens when we reformat the fs)
-                var bytesPerCluster = ((FatFileSystem)mFileSystem).BytesPerCluster;
-                ((FatFileSystem)mFileSystem).Write(xFirstCluster, new byte[bytesPerCluster], bytesPerCluster, 0);
+                ((FatFileSystem)mFileSystem).Write(xFirstCluster, new byte[32], 32, 0); //Clear the next entry to ensure that it is detected as end of directory
 
                 return xNewEntry;
             }

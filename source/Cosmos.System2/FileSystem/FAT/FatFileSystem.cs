@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -826,25 +826,20 @@ namespace Cosmos.System.FileSystem.FAT
         /// <param name="aOffset">unused.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        internal void Read(long aCluster, out byte[] aData, long aSize = 0, long aOffset = 0)
+        internal void Read(long aCluster, out byte[] aData)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Read --");
-            Global.mFileSystemDebugger.SendInternal("aCluster: " + aCluster);
-
-            if (aSize == 0)
-            {
-                aSize = BytesPerCluster;
-            }
 
             if (mFatType == FatTypeEnum.Fat32)
             {
                 aData = NewBlockArray();
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                Global.mFileSystemDebugger.SendInternal("aSector: " + aCluster);
+                Global.mFileSystemDebugger.SendInternal("xSector: " + aCluster);
                 Device.ReadBlock((ulong)xSector, SectorsPerCluster, ref aData);
             }
             else
             {
+                Global.mFileSystemDebugger.SendInternal("aCluster: " + aCluster);
                 aData = Device.NewBlockArray(1);
                 Device.ReadBlock((ulong)aCluster, RootSectorCount, ref aData);
             }
@@ -894,9 +889,10 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             byte[] xData;
-
             Read(aCluster, out xData);
-            Array.Copy(aData, 0, xData, aOffset, aData.Length);
+
+
+            Array.Copy(aData, 0, xData, aOffset, aSize);
 
             if (mFatType == FatTypeEnum.Fat32)
             {
