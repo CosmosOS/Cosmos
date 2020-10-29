@@ -61,6 +61,8 @@ namespace Cosmos.HAL
             {
                 Console.WriteLine("Starting USB OHCI");
                 USBHost.ScanDevices();
+                USBHost.InitUSB(0x10);
+                USBHost.ScanUHCIUSB();
                 foreach (PCIDevice pci in PCI.Devices)
                 {
                     ///According to PCI Specs for USB

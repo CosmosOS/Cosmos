@@ -41,7 +41,9 @@ namespace Cosmos.HAL.USB
         public USBHostUHCI(PCIDevice pcidev)
         {
 
+            Console.WriteLine("Setting IO Registers");
                 regs = new USBHostUHCIRegisters(pcidev.BaseAddressBar[4]);
+            Console.WriteLine("IO Registers Set");
 
         }
         public enum USBHeaderType : byte

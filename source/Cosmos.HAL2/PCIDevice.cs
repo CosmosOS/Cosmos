@@ -876,31 +876,38 @@ namespace Cosmos.HAL
         private ushort type = 0;
         private bool isIO = false;
         public MemoryBlock memoryBlock;
-        public IOPort port;
+        public IOPort[] port;
+        public uint size = 0;
 
         public PCIBaseAddressBar(uint raw, PCIDevice aPCIDevice, byte aRegister)
         {
 
 
             isIO = (raw & 0x01) == 1;
-
+            baseAddress = raw & 0xFFFFFFF0;
+            uint val = aPCIDevice.ReadRegister32(aRegister);
+            size = ~(val & _PCI_BASE_ADDRESS_MEM_MASK) + 1;
             if (isIO)
             {
-                baseAddress = raw & 0xFFFFFFFC;
-                port = new IOPort((ushort)baseAddress);
+
+                    baseAddress = raw & 0xFFFFFFFC;
+                    port = new IOPort[size / 4];
+                    for (int i = 0; i <= size / 4; i++)
+                    {
+
+                    Console.WriteLine("Setting IOPort: " + (ushort)(baseAddress + 4 * (uint)i));
+                        port[i] = new IOPort((ushort)(baseAddress + 4 * (uint)i));
+                    }
             }
             else
             {
-                uint size = 0;
                 type = (ushort)((raw >> 1) & 0x03);
                 prefetchable = (ushort)((raw >> 3) & 0x01);
                 switch (type)
                 {
                     case 0x00:
                         baseAddress = raw & 0xFFFFFFF0;
-                        uint val = aPCIDevice.ReadRegister32(aRegister);
-                        size = ~(val & _PCI_BASE_ADDRESS_MEM_MASK) + 1;
-                        memoryBlock = new MemoryBlock(raw, size);
+                        memoryBlock = new MemoryBlock(baseAddress, size);
                         break;
                     case 0x01:
                         throw new NotImplementedException();
@@ -911,8 +918,7 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port.DWord = address;
-                return port.DWord;
+                return port[address / 4].DWord;
             }
             else
             {
@@ -923,7 +929,7 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port.DWord = value;
+                port[address / 4].DWord = value;
             }
             else
             {
@@ -934,8 +940,8 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port.Word = (ushort)address;
-                return port.Word;
+                Console.WriteLine((ushort)(port[(ushort)address / 4].Word >> ((ushort)address % 4) * 8));
+                return (ushort)(port[(ushort)address / 4].Word >> ((ushort)address % 4) * 8);
             }
             else
             {
@@ -946,7 +952,7 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port.Word = value;
+                port[address / 4].Word = value;
             }
             else
             {
@@ -957,8 +963,8 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port.Byte = (byte)address;
-                return port.Byte;
+                
+                return (byte)(port[(byte)address /4].Byte >> ((byte)address % 4) * 8);
             }
             else
             {
@@ -969,7 +975,7 @@ namespace Cosmos.HAL
         {
             if (isIO)
             {
-                port.Byte = value;
+                port[address / 4].Byte = value;
             }
             else
             {
