@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -173,7 +173,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal("-- Fat.GetNextUnallocatedFatEntry --");
 
                 uint xTotalEntries = mFileSystem.FatSectorCount * mFileSystem.BytesPerSector / GetFatEntrySizeInBytes();
-                for (uint i = mFileSystem.RootCluster; i < xTotalEntries; i++)
+                for (uint i = mFileSystem.RootCluster + 1; i < xTotalEntries; i++)
                 {
                     GetFatEntry(i, out uint xEntryValue);
                     if (FatEntryIsFree(xEntryValue))
@@ -1003,7 +1003,7 @@ namespace Cosmos.System.FileSystem.FAT
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetRootDirectory --");
 
-            var xRootEntry = new FatDirectoryEntry(this, null, RootPath, Size, RootPath, RootCluster);
+            var xRootEntry = new FatDirectoryEntry(this, null, RootPath, RootPath, Size, RootCluster);
             return xRootEntry;
         }
 
