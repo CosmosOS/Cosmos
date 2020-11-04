@@ -90,6 +90,11 @@ namespace Cosmos.TestRunner.Core
 
             aDebugConnector.CmdCoreDump = dump =>
             {
+                if(dump == null)
+                {
+                    OutputHandler.LogMessage("Attempted to dump core but didnt get enough data;");
+                    return;
+                }
                 OutputHandler.LogMessage("Core dump:");
 
                 string eax = "EAX = 0x" + dump.EAX.ToString("X8");
