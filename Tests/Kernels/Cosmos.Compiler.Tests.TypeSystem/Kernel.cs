@@ -38,6 +38,13 @@ namespace Cosmos.Compiler.Tests.TypeSystem
                 Assert.IsTrue(xEnumerable is IEnumerable, "isinst isn't working for interfaces on generic reference types!");
                 Assert.IsTrue(xEnumerable is IList<string>, "isinst isn't working for generic interfaces on generic reference types!");
 
+                ThreeBytes[] array = new ThreeBytes[1];
+                array[0] = new ThreeBytes(17, 254, 77);
+                Assert.AreEqual(array[0].A, 17, "Three byte struct in array first value read correctly");
+                Assert.AreEqual(array[0].B, 254, "Three byte struct in array second value read correctly");
+                var local = array[0];
+                Assert.AreEqual(local.C, 77, "Three byte struct third value read correctly");
+
                 TestController.Completed();
             }
             catch (Exception e)
@@ -50,6 +57,20 @@ namespace Cosmos.Compiler.Tests.TypeSystem
 
                 TestController.Failed();
             }
+        }
+    }
+
+    public struct ThreeBytes
+    {
+        public byte A;
+        public byte B;
+        public byte C;
+
+        public ThreeBytes(byte a, byte b, byte c)
+        {
+            A = a;
+            B = b;
+            C = c;
         }
     }
 }
