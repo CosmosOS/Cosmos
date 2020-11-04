@@ -82,9 +82,6 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         private void InitialiseNewDirectory(FatFileSystem aFileSystem)
         {
-            var bytesPerCluster = ((FatFileSystem)mFileSystem).BytesPerCluster;
-            ((FatFileSystem)mFileSystem).Write(mFirstClusterNum, new byte[bytesPerCluster], bytesPerCluster, 0); //As stated in the MS documentation, clear cluster to ensure that it is clear and correct end of directory is detected
-
             //Now add the . and .. directory entries
             var dot = new FatDirectoryEntry(aFileSystem, this, mFullPath + "\\.", ".", 0, mFirstClusterNum);
             dot.AllocateDirectoryEntry(".          ", true);

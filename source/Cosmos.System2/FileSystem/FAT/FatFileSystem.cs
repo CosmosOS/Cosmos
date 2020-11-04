@@ -95,7 +95,7 @@ namespace Cosmos.System.FileSystem.FAT
                 uint xCurrentEntry = aFirstEntry;
                 uint xValue;
 
-                long xEntriesRequired = aDataSize / mFileSystem.BytesPerCluster;
+                long xEntriesRequired = aDataSize / mFileSystem.BytesPerCluster + 1;
                 if (aDataSize % mFileSystem.BytesPerCluster != 0)
                 {
                     xEntriesRequired++;
@@ -114,16 +114,19 @@ namespace Cosmos.System.FileSystem.FAT
 
                 if (xEntriesRequired > 0)
                 {
-                    while (!FatEntryIsEof(xValue))
+                    if(xValue != 0)
                     {
-                        xCurrentEntry = xValue;
+                        ClearFatEntry(xCurrentEntry);
                         GetFatEntry(xCurrentEntry, out xValue);
-                        Array.Resize(ref xReturn, xReturn.Length + 1);
-                        xReturn[xReturn.Length - 1] = xCurrentEntry;
                         Global.mFileSystemDebugger.SendInternal("xCurrentEntry =");
                         Global.mFileSystemDebugger.SendInternal(xCurrentEntry);
                         Global.mFileSystemDebugger.SendInternal("xReturn.Length =");
                         Global.mFileSystemDebugger.SendInternal(xReturn.Length);
+                        if(xValue != 0)
+                        {
+                            Global.mFileSystemDebugger.SendInternal("Failed to clear current entry");
+                            throw new Exception("Failed to clear current entry");
+                        }
                     }
 
                     if (xEntriesRequired > xReturn.Length)
@@ -132,11 +135,9 @@ namespace Cosmos.System.FileSystem.FAT
                         for (int i = 0; i < xNewClusters; i++)
                         {
                             xCurrentEntry = GetNextUnallocatedFatEntry();
-                            uint xLastFatEntry = xReturn[xReturn.Length - 1];
-                            SetFatEntry(xLastFatEntry, xCurrentEntry);
-                            SetFatEntry(xCurrentEntry, FatEntryEofValue());
-                            Array.Resize(ref xReturn, xReturn.Length + 1);
-                            xReturn[xReturn.Length - 1] = xCurrentEntry;
+                            ReadFatSector(xCurrentEntry, out var values);
+                            Array.Copy(new byte[mFileSystem.BytesPerCluster], values, mFileSystem.BytesPerCluster);
+                            WriteFatSector(xCurrentEntry, values);
                         }
                     }
                 }
@@ -201,13 +202,13 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Set FAT entry.
+            /// Set a value in aData corresponding to the type of Fat Filesystem currently in use
             /// </summary>
-            /// <param name="aData">A data array to be set.</param>
             /// <param name="aEntryNumber">A entry number to set.</param>
             /// <param name="aValue">A value to set.</param>
+            /// <param name="aData">A data array in which the value should be set</param>
             /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
-            private void SetFatEntry(byte[] aData, ulong aEntryNumber, ulong aValue)
+            private void SetValueInFat(ulong aEntryNumber, ulong aValue, byte[] aData)
             {
                 uint xEntrySize = GetFatEntrySizeInBytes();
                 ulong xEntryOffset = aEntryNumber * xEntrySize;
@@ -222,48 +223,6 @@ namespace Cosmos.System.FileSystem.FAT
                         break;
                     case FatTypeEnum.Fat32:
                         aData.SetUInt32(xEntryOffset, (uint)aValue);
-                        break;
-                    default:
-                        throw new NotSupportedException("Unknown FAT type.");
-                }
-            }
-
-            /// <summary>
-            /// Get FAT entry.
-            /// </summary>
-            /// <param name="aData">A data array to read from.</param>
-            /// <param name="aEntryNumber">A entry number to get.</param>
-            /// <param name="aValue">Output the data to aValue.</param>
-            /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
-            /// <exception cref="ArgumentException">Thrown when aEntryNumber invalid.</exception>
-            /// <exception cref="ArgumentNullException">Thrown when aData is null.</exception>
-            /// <exception cref="ArgumentOutOfRangeException">Thrown when aEntryNumber invalid.</exception>
-            private void GetFatEntry(byte[] aData, uint aEntryNumber, out uint aValue)
-            {
-                uint xEntrySize = GetFatEntrySizeInBytes();
-                ulong xEntryOffset = aEntryNumber * xEntrySize;
-
-                switch (mFileSystem.mFatType)
-                {
-                    case FatTypeEnum.Fat12:
-                        // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
-                        // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
-                        // we want the high 12-bits of the 16-bits we fetch.
-                        uint xResult = BitConverter.ToUInt16(aData, (int)xEntryOffset);
-                        if ((aEntryNumber & 0x01) == 0)
-                        {
-                            aValue = xResult & 0x0FFF; // Even
-                        }
-                        else
-                        {
-                            aValue = xResult >> 4; // Odd
-                        }
-                        break;
-                    case FatTypeEnum.Fat16:
-                        aValue = BitConverter.ToUInt16(aData, (int)xEntryOffset);
-                        break;
-                    case FatTypeEnum.Fat32:
-                        aValue = BitConverter.ToUInt32(aData, (int)xEntryOffset) & 0x0FFFFFFF;
                         break;
                     default:
                         throw new NotSupportedException("Unknown FAT type.");
@@ -306,14 +265,14 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal($"RootCluster is {mFileSystem.RootCluster}");
                 Global.mFileSystemDebugger.SendInternal("Clearing all Fat Table");
 
-                byte[] xFatTableFistSector;
-                ReadFatSector(0, out xFatTableFistSector);
+                byte[] xFatTableFirstSector;
+                ReadFatSector(0, out xFatTableFirstSector);
 
                 /* Change 3rd entry (RootDirectory) to be EOC */
-                SetFatEntry(xFatTableFistSector, 2, FatEntryEofValue());
+                SetValueInFat(2, FatEntryEofValue(), xFatTableFirstSector);
 
                 /* Copy first three elements on xFatTable */
-                Array.Copy(xFatTableFistSector, xFatTable, 12);
+                Array.Copy(xFatTableFirstSector, xFatTable, 12);
 
                 Global.mFileSystemDebugger.SendInternal($"Clearing First sector...");
                 /* The rest of 'xFatTable' should be all 0s as new does this internally */
@@ -437,7 +396,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /// <summary>
-            /// Sets a FAT entry.
+            /// Sets value in a FAT entry.
             /// </summary>
             /// <param name="aEntryNumber">The entry number.</param>
             /// <param name="aValue">The value.</param>
@@ -479,6 +438,47 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 WriteFatSector(xSector, xData);
+            }
+
+            /// <summary>
+            /// Sets an array of values in a FAT entry.
+            /// </summary>
+            /// <param name="aEntryNumber">The entry number.</param>
+            /// <param name="aData">The value.</param>
+            /// <param name="aOffset">The offset in the sector to write the value to</param>
+            /// <param name="aLength">The length of data to write</param>
+            /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
+            /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
+            /// <exception cref="Exception">Thrown when data size invalid.</exception>
+            /// <exception cref="ArgumentNullException">Thrown when FAT sector data is null.</exception>
+            internal void SetFatEntry(ulong aEntryNumber, byte[] aData, uint aOffset, uint aLength)
+            {
+                Global.mFileSystemDebugger.SendInternal("--- Fat.SetFatEntry ---");
+                Global.mFileSystemDebugger.SendInternal("aEntryNumber =");
+                Global.mFileSystemDebugger.SendInternal(aEntryNumber);
+
+                uint xEntrySize = GetFatEntrySizeInBytes();
+                ulong xEntryOffset = aEntryNumber * xEntrySize;
+
+                ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
+                ulong xSectorOffset = (xSector * mFileSystem.BytesPerSector) - xEntryOffset;
+
+                byte[] xData;
+                ReadFatSector(xSectorOffset, out xData);
+
+                switch (mFileSystem.mFatType)
+                {
+                    case FatTypeEnum.Fat12:
+                    case FatTypeEnum.Fat16:
+                    case FatTypeEnum.Fat32:
+                        Array.Copy(aData, 0, xData, aOffset, aLength);
+                        break;
+
+                    default:
+                        throw new NotSupportedException("Unknown FAT type.");
+                }
+
+                WriteFatSector(xSectorOffset, xData);
             }
 
             /// <summary>

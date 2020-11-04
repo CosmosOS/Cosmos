@@ -69,10 +69,13 @@ namespace Cosmos.System.Tests
             mFS.CreateDirectory(root[0], "Sub");
             Assert.AreEqual(mFS.GetDirectoryListing(root[0]).Count, 1);
             var dir = root[0];
+            Assert.AreEqual("First", dir.mName);
             mFS.CreateFile(dir, "test.txt");
             Assert.AreEqual(mFS.GetDirectoryListing(dir).Count, 2);
             mFS.CreateFile(dir, "test2.txt");
             Assert.AreEqual(mFS.GetDirectoryListing(dir).Count, 3);
+            Assert.AreEqual("test.txt", mFS.GetDirectoryListing(dir)[1].mName);
+            Assert.AreEqual(@"0:\First\test.txt", mFS.GetDirectoryListing(dir)[1].mFullPath);
         }
     }
 }
