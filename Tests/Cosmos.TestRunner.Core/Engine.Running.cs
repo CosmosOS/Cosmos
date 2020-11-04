@@ -90,7 +90,7 @@ namespace Cosmos.TestRunner.Core
 
             aDebugConnector.CmdCoreDump = dump =>
             {
-                if(dump is null)
+                if(dump == null)
                 {
                     OutputHandler.LogMessage("Attempted to dump core but didnt get enough data;");
                     return;
