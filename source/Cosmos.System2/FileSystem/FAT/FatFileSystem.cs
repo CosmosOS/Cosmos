@@ -95,7 +95,7 @@ namespace Cosmos.System.FileSystem.FAT
                 uint xCurrentEntry = aFirstEntry;
                 uint xValue;
 
-                long xEntriesRequired = aDataSize / mFileSystem.BytesPerCluster + 1;
+                long xEntriesRequired = aDataSize / mFileSystem.BytesPerCluster;
                 if (aDataSize % mFileSystem.BytesPerCluster != 0)
                 {
                     xEntriesRequired++;
@@ -114,19 +114,16 @@ namespace Cosmos.System.FileSystem.FAT
 
                 if (xEntriesRequired > 0)
                 {
-                    if(xValue != 0)
+                    while (!FatEntryIsEof(xValue))
                     {
-                        ClearFatEntry(xCurrentEntry);
+                        xCurrentEntry = xValue;
                         GetFatEntry(xCurrentEntry, out xValue);
+                        Array.Resize(ref xReturn, xReturn.Length + 1);
+                        xReturn[xReturn.Length - 1] = xCurrentEntry;
                         Global.mFileSystemDebugger.SendInternal("xCurrentEntry =");
                         Global.mFileSystemDebugger.SendInternal(xCurrentEntry);
                         Global.mFileSystemDebugger.SendInternal("xReturn.Length =");
                         Global.mFileSystemDebugger.SendInternal(xReturn.Length);
-                        if(xValue != 0)
-                        {
-                            Global.mFileSystemDebugger.SendInternal("Failed to clear current entry");
-                            throw new Exception("Failed to clear current entry");
-                        }
                     }
 
                     if (xEntriesRequired > xReturn.Length)
@@ -135,9 +132,11 @@ namespace Cosmos.System.FileSystem.FAT
                         for (int i = 0; i < xNewClusters; i++)
                         {
                             xCurrentEntry = GetNextUnallocatedFatEntry();
-                            ReadFatSector(xCurrentEntry, out var values);
-                            Array.Copy(new byte[mFileSystem.BytesPerCluster], values, mFileSystem.BytesPerCluster);
-                            WriteFatSector(xCurrentEntry, values);
+                            uint xLastFatEntry = xReturn[xReturn.Length - 1];
+                            SetFatEntry(xLastFatEntry, xCurrentEntry);
+                            SetFatEntry(xCurrentEntry, FatEntryEofValue());
+                            Array.Resize(ref xReturn, xReturn.Length + 1);
+                            xReturn[xReturn.Length - 1] = xCurrentEntry;
                         }
                     }
                 }
@@ -905,6 +904,43 @@ namespace Cosmos.System.FileSystem.FAT
             }
         }
 
+        internal uint GetNextFreeCluster()
+        {
+            Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetNextFreeCluster --");
+
+            var toCheck = new List<FatDirectoryEntry> { (FatDirectoryEntry)GetRootDirectory() };
+            var inUse = new List<uint>();
+
+            while (toCheck.Count != 0)
+            {
+                var checking = toCheck[0];
+                toCheck.RemoveAt(0);
+
+                foreach (var clusters in checking.GetFatTable())
+                {
+                    inUse.Add(clusters);
+                }
+
+                if(checking.mEntryType == DirectoryEntryTypeEnum.Directory)
+                {
+                    foreach (var entry in GetDirectoryListing(checking))
+                    {
+                        toCheck.Add((FatDirectoryEntry)entry);
+                    }
+                }
+            }
+
+            for (uint i = RootCluster; true; i++)
+            {
+                if (!inUse.Contains(i))
+                {
+                    Global.mFileSystemDebugger.SendInternal("Found: " + i);
+                    Write(i, new byte[BytesPerCluster]); //Clearing the new sector
+                    return i;
+                }
+            }
+        }
+
         /// <summary>
         /// Print filesystem info.
         /// </summary>
@@ -961,7 +997,7 @@ namespace Cosmos.System.FileSystem.FAT
         }
 
         /// <summary>
-        /// Get list of sub-directories in a directory.
+        /// Get list of entries of a directory.
         /// </summary>
         /// <param name="baseDirectory">A base directory.</param>
         /// <returns>DirectoryEntry list.</returns>

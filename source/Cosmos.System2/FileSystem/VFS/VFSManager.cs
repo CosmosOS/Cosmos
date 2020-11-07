@@ -29,10 +29,10 @@ namespace Cosmos.System.FileSystem.VFS
         /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
         /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
-        public static void RegisterVFS(VFSBase aVFS)
+        public static void RegisterVFS(VFSBase aVFS, bool aAllowReinitialise = false)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.RegisterVFS ---");
-            if (mVFS != null)
+            if (!aAllowReinitialise && mVFS != null)
             {
                 throw new Exception("Virtual File System Manager already initialized!");
             }
@@ -486,53 +486,6 @@ namespace Cosmos.System.FileSystem.VFS
                 xDrives.Add(entry.mName + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
 
             return xDrives;
-        }
-
-        /// <summary>
-        /// Get file directory names.
-        /// Not implemented.
-        /// </summary>
-        /// <param name="path">unused.</param>
-        /// <param name="userPathOriginal">unused.</param>
-        /// <param name="searchPattern">unused.</param>
-        /// <param name="includeFiles">unused.</param>
-        /// <param name="includeDirs">unused.</param>
-        /// <param name="searchOption">unused.</param>
-        /// <returns>null.</returns>
-        public static List<string> InternalGetFileDirectoryNames(
-            string path,
-            string userPathOriginal,
-            string searchPattern,
-            bool includeFiles,
-            bool includeDirs,
-            SearchOption searchOption)
-        {
-            Global.mFileSystemDebugger.SendInternal("--- VFSManager.InternalGetFileDirectoryNames ---");
-
-            return null;
-
-            /*
-            //TODO: Add SearchOption functionality
-            //TODO: What is userPathOriginal?
-            //TODO: Add SearchPattern functionality
-            List<string> xFileAndDirectoryNames = new List<string>();
-            //Validate input arguments
-            if ((searchOption != SearchOption.TopDirectoryOnly) && (searchOption != SearchOption.AllDirectories))
-                throw new ArgumentOutOfRangeException("searchOption");
-            searchPattern = searchPattern.TrimEnd(new char[0]);
-            if (searchPattern.Length == 0)
-                return new string[0];
-            //Perform search in filesystem
-            FilesystemEntry[] xEntries = GetDirectoryListing(path);
-            foreach (FilesystemEntry xEntry in xEntries)
-            {
-                if (xEntry.IsDirectory && includeDirs)
-                    xFileAndDirectoryNames.Add(xEntry.Name);
-                else if (!xEntry.IsDirectory && includeFiles)
-                    xFileAndDirectoryNames.Add(xEntry.Name);
-            }
-            return xFileAndDirectoryNames.ToArray();
-             */
         }
 
         /// <summary>

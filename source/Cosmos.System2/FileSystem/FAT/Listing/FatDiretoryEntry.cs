@@ -458,7 +458,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 }
 
                 string xFullPath = Path.Combine(mFullPath, aName);
-                uint xFirstCluster = ((FatFileSystem)mFileSystem).GetFat(0).GetNextUnallocatedFatEntry();
+                uint xFirstCluster = ((FatFileSystem)mFileSystem).GetNextFreeCluster();
                 uint xEntryHeaderDataOffset = xDirectoryEntriesToAllocate == null ? GetNextUnallocatedDirectoryEntry() : xDirectoryEntriesToAllocate[xDirectoryEntriesToAllocate.Length - 1];
 
                 Global.mFileSystemDebugger.SendInternal("xFullPath = " + xFullPath);
