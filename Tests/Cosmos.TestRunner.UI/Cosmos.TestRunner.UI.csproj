@@ -5,6 +5,7 @@
         <OutputType>Exe</OutputType>
         <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
         <SignAssembly>False</SignAssembly>
+        <Configurations>Debug;Release;UnitTest</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

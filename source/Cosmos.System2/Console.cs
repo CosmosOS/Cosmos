@@ -84,6 +84,8 @@ namespace Cosmos.System {
         /// <param name="textScreen">Output device.</param>
         public Console(TextScreenBase textScreen)
         {
+#if UNITTEST
+#else
             if (textScreen == null)
             {
                 mText = new TextScreen();
@@ -92,6 +94,7 @@ namespace Cosmos.System {
             {
                 mText = textScreen;
             }
+#endif
         }
 
         /// <summary>

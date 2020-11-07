@@ -65,7 +65,29 @@ namespace Cosmos.Debug.Kernel
         public static void SendKernelPanic(uint id) { }
 
         public void Send(string aText) => DoSend(aText);
-        
+
+#if UNITTEST
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(string aText) => global::System.Console.WriteLine(aText);
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(uint aNumber) => global::System.Console.WriteLine(aNumber);
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(int aNumber) => global::System.Console.WriteLine(aNumber);
+
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(ulong aNumber) => global::System.Console.WriteLine(aNumber);
+
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(long aNumber) => global::System.Console.WriteLine(aNumber);
+
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(float aNumber) => global::System.Console.WriteLine(aNumber);
+
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(double aNumber) => global::System.Console.WriteLine(aNumber);
+
+#else
+
         [Conditional("COSMOSDEBUG")]
         public void SendInternal(string aText) => DoSend(aText);
         
@@ -86,7 +108,8 @@ namespace Cosmos.Debug.Kernel
 
         [Conditional("COSMOSDEBUG")]
         public void SendInternal(double aNumber) => DoSendNumber(aNumber);
-        
+#endif
+
         //public void OldSend(string aText) {
         //    // TODO: Need to fix this so it can send empty strings.
         //    // Sending empty strings locks it up right now

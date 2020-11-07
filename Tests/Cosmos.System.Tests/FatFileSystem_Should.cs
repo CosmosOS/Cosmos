@@ -3,6 +3,7 @@ using System.Text;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.FAT;
+using Cosmos.System.FileSystem.VFS;
 using NUnit.Framework;
 
 namespace Cosmos.System.Tests

@@ -4,6 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>Cosmos.System_Plugs</RootNamespace>
+        <Configurations>Debug;Release;UnitTest</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

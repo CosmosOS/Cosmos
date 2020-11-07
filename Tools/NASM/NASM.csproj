@@ -4,6 +4,7 @@
         <TargetFramework>netcoreapp2.0</TargetFramework>
         <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
         <OutputType>Exe</OutputType>
+        <Configurations>Debug;Release;UnitTest</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

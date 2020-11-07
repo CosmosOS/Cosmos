@@ -38,9 +38,9 @@ namespace Cosmos.Kernel.Tests.DiskManager
             Assert.IsTrue(xDi.TotalSize == xDi.TotalFreeSpace, "DiskManager.Format (quick) failed TotalFreeSpace is not the same of TotalSize");
 
             /* Let's try to create a new file on the Root Directory */
-            File.Create("newFile.txt");
+            File.Create(@"0:\newFile.txt");
 
-            Assert.IsTrue(File.Exists("newFile.txt") == true, "Failed to create new file after disk format");
+            Assert.IsTrue(File.Exists(@"0:\newFile.txt") == true, "Failed to create new file after disk format");
 
             mDebugger.Send("END TEST");
 

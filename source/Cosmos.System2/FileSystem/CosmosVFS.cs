@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -618,7 +618,6 @@ namespace Cosmos.System.FileSystem
                     string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
                     global::System.Console.WriteLine(xMessage);
                     mFileSystems[i].DisplayFileSystemInfo();
-                    Directory.SetCurrentDirectory(xRootPath);
                 }
                 else
                 {
