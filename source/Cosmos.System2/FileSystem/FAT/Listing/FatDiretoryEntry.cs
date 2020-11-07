@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -458,12 +458,14 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 }
 
                 string xFullPath = Path.Combine(mFullPath, aName);
-                uint xFirstCluster = ((FatFileSystem)mFileSystem).GetNextFreeCluster();
+                uint xFirstCluster = ((FatFileSystem)mFileSystem).GetFat(0).GetNextUnallocatedFatEntry();
                 uint xEntryHeaderDataOffset = xDirectoryEntriesToAllocate == null ? GetNextUnallocatedDirectoryEntry() : xDirectoryEntriesToAllocate[xDirectoryEntriesToAllocate.Length - 1];
 
                 Global.mFileSystemDebugger.SendInternal("xFullPath = " + xFullPath);
                 Global.mFileSystemDebugger.SendInternal("xFirstCluster = " + xFirstCluster);
                 Global.mFileSystemDebugger.SendInternal("xEntryHeaderDataOffset = " + xEntryHeaderDataOffset);
+
+                ((FatFileSystem)mFileSystem).Write(xFirstCluster, new byte[((FatFileSystem)mFileSystem).BytesPerCluster]);
 
                 var xNewEntry = new FatDirectoryEntry((FatFileSystem)mFileSystem, this, xFullPath, aName, 0, xFirstCluster, xEntryHeaderDataOffset, aEntryType, true);
 

@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -132,6 +132,7 @@ namespace Cosmos.System.FileSystem.FAT
                         for (int i = 0; i < xNewClusters; i++)
                         {
                             xCurrentEntry = GetNextUnallocatedFatEntry();
+                            mFileSystem.Write(xCurrentEntry, new byte[mFileSystem.BytesPerCluster]);
                             uint xLastFatEntry = xReturn[xReturn.Length - 1];
                             SetFatEntry(xLastFatEntry, xCurrentEntry);
                             SetFatEntry(xCurrentEntry, FatEntryEofValue());
@@ -901,43 +902,6 @@ namespace Cosmos.System.FileSystem.FAT
             else
             {
                 Device.WriteBlock((ulong)aCluster, RootSectorCount, ref xData);
-            }
-        }
-
-        internal uint GetNextFreeCluster()
-        {
-            Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetNextFreeCluster --");
-
-            var toCheck = new List<FatDirectoryEntry> { (FatDirectoryEntry)GetRootDirectory() };
-            var inUse = new List<uint>();
-
-            while (toCheck.Count != 0)
-            {
-                var checking = toCheck[0];
-                toCheck.RemoveAt(0);
-
-                foreach (var clusters in checking.GetFatTable())
-                {
-                    inUse.Add(clusters);
-                }
-
-                if(checking.mEntryType == DirectoryEntryTypeEnum.Directory)
-                {
-                    foreach (var entry in GetDirectoryListing(checking))
-                    {
-                        toCheck.Add((FatDirectoryEntry)entry);
-                    }
-                }
-            }
-
-            for (uint i = RootCluster; true; i++)
-            {
-                if (!inUse.Contains(i))
-                {
-                    Global.mFileSystemDebugger.SendInternal("Found: " + i);
-                    Write(i, new byte[BytesPerCluster]); //Clearing the new sector
-                    return i;
-                }
             }
         }
 

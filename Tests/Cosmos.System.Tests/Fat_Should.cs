@@ -40,10 +40,10 @@ namespace Cosmos.System.Tests
             xChain = mFat.GetFatChain(xStartCluster, mFS.BytesPerCluster * 5);
             Assert.AreEqual(5, xChain.Length);
             Assert.AreEqual(2, xChain[0]);
-            Assert.AreEqual(6, xChain[1]);
-            Assert.AreEqual(8, xChain[2]);
-            Assert.AreEqual(9, xChain[3]);
-            Assert.AreEqual(10, xChain[4]);
+            Assert.AreEqual(3, xChain[1]);
+            Assert.AreEqual(5, xChain[2]);
+            Assert.AreEqual(6, xChain[3]);
+            Assert.AreEqual(8, xChain[4]);
         }
     }
 }
