@@ -558,7 +558,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             for (int i = 1; i < 100; i++)
             {
-                if (!string.IsNullOrEmpty(mViewModel.BuildProperties.GetProperty("User" + i.ToString("000") + "_Name")))
+                if (!String.IsNullOrEmpty(mViewModel.BuildProperties.GetProperty("User" + i.ToString("000") + "_Name")))
                 {
                     FillProfile(i);
                 }
@@ -669,7 +669,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 {
                     string xValue = mViewModel.GetProjectProperty(xPrefix + xName);
                     // This is important that we dont copy empty values, so instead the defaults will be used.
-                    if (!string.IsNullOrWhiteSpace(xValue))
+                    if (!String.IsNullOrWhiteSpace(xValue))
                     {
                         mViewModel.BuildProperties.SetProperty(xPrefix + xName, xValue);
                     }
@@ -694,6 +694,11 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             foreach (var xPreset in mPresets)
             {
                 LoadProfileProps(xPreset.Key);
+            }
+            for (int id = 1; id < 100; id++)
+            {
+                var xPrefix = "User" + id.ToString("000");
+                LoadProfileProps(xPrefix);
             }
         }
 
@@ -786,7 +791,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
         protected List<string> GetNetworkInterfaces()
         {
             NetworkInterface[] nInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-            List<string> interfaces_list = new List<string>();
+            var interfaces_list = new List<string>();
 
             foreach (NetworkInterface nInterface in nInterfaces)
             {
@@ -807,7 +812,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             return interfaces_list;
         }
 
-        private void chkEnableStacckCorruptionDetection_CheckedChanged(object sender, EventArgs e)
+        private void chkEnableStackCorruptionDetection_CheckedChanged(object sender, EventArgs e)
         {
             if (!FreezeEvents)
             {
