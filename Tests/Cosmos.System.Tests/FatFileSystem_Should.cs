@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.FAT;
@@ -15,6 +16,7 @@ namespace Cosmos.System.Tests
         [SetUp]
         public void Setup()
         {
+            DebuggerFactory.WriteToConsole = true;
             var xDevice = new TestBlockDevice();
             var xPartition = new Partition(xDevice, 0, xDevice.BlockCount);
             var xFactory = new FatFileSystemFactory();

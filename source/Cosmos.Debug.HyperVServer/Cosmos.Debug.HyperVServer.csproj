@@ -5,7 +5,7 @@
         <OutputType>WinExe</OutputType>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <LangVersion>Latest</LangVersion>
-        <Configurations>Debug;Release;UnitTest</Configurations>
+
     </PropertyGroup>
 
     <ItemGroup>

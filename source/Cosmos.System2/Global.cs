@@ -28,17 +28,17 @@ namespace Cosmos.System
         /// <summary>
         /// System ring debugger instance, with the tag "Global".
         /// </summary>
-        public static readonly Debugger mDebugger = new Debugger("System", "Global");
+        public static readonly Debugger mDebugger = DebuggerFactory.CreateDebugger("System", "Global");
 
         /// <summary>
         /// System ring debugger instance, with the tag "FileSystem".
         /// </summary>
-        public static readonly Debugger mFileSystemDebugger = new Debugger("System", "FileSystem");
+        public static readonly Debugger mFileSystemDebugger = DebuggerFactory.CreateDebugger("System", "FileSystem");
 
         /// <summary>
         /// Console instance.
         /// </summary>
-        public static Console Console = new Console(null);
+        public static Console Console;
 
         /// <summary>
         /// Get and set keyboard NumLock value.

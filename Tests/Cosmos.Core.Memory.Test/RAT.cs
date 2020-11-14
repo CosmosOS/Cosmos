@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.ing;
 using Native = System.UInt32;
 
 namespace Cosmos.Core.Memory.Test
@@ -7,16 +7,6 @@ namespace Cosmos.Core.Memory.Test
     [TestClass]
     public class MemoryTests
     {
-        [TestMethod]
-        public unsafe void OldHeapTest()
-        {
-            var xRAM = new byte[128 * 1024 * 1024]; // 128 MB
-            xRAM[0] = 1;
-            fixed (byte* xPtr = xRAM)
-            {
-            }
-            Assert.IsTrue(true);
-        }
 
         [TestMethod]
         public unsafe void RATTest()

@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 using System.Runtime.CompilerServices;
 
 namespace Cosmos.Core

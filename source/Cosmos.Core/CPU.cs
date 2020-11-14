@@ -1,7 +1,8 @@
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -169,30 +170,7 @@ namespace Cosmos.Core
         {
             if (CanReadCPUID() != 0)
             {
-                // See https://c9x.me/x86/html/file_module_x86_id_45.html
-
-                int eax = 0;
-                int ebx = 0;
-                int ecx = 0;
-                int edx = 0;
-                string s = "";
-
-                for (uint i = 0; i < 3; i++)
-                {
-                    ReadCPUID(0x80000002 + i, ref eax, ref ebx, ref ecx, ref edx);
-                    s += (char)(ebx % 256);
-                    s += (char)((ebx >> 8) % 256);
-                    s += (char)((ebx >> 16) % 256);
-                    s += (char)((ebx >> 24) % 256);
-                    s += (char)(edx % 256);
-                    s += (char)((edx >> 8) % 256);
-                    s += (char)((edx >> 16) % 256);
-                    s += (char)((edx >> 24) % 256);
-                    s += (char)(ecx % 256);
-                    s += (char)((ecx >> 8) % 256);
-                    s += (char)((ecx >> 16) % 256);
-                    s += (char)((ecx >> 24) % 256);
-                }
+                string s = GetCPUBrandString();
                 var _words = new List<string>();
                 string curr = "";
                 for (int i = 0; i < s.Length; i++)
@@ -213,7 +191,7 @@ namespace Cosmos.Core
                 _words.Add(curr);
                 string[] words = _words.ToArray();
                 string[] w = new string[words.Length];
-                for (int i = 0; i < words.Length; i++)
+                for (int i = 0; i < words.Length; i++) // Switch order
                 {
                     w[i] = words[words.Length - i - 1];
                 }
@@ -243,6 +221,11 @@ namespace Cosmos.Core
                     }
                 }
                 value *= multiplier;
+                if((long)value == 0)
+                {
+                    Global.mDebugger.Send("Unable to calculate cycle speed from " + s);
+                    throw new NotSupportedException("Unable to calculate cycle speed from " + s);
+                }
                 return (long)value;
             }
 
