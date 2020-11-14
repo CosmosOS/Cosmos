@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net471</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <RootNamespace>Cosmos.VS.Windows</RootNamespace>
         <IncludeWpfReferences>True</IncludeWpfReferences>
         <CreateVsixContainer>False</CreateVsixContainer>

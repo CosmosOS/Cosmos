@@ -1,5 +1,7 @@
 @echo off
 
+cd /D "%~dp0"
+
 if not exist "%ProgramFiles(x86)%" (
   set "ProgramFiles(x86)=%ProgramFiles%"
 )
@@ -23,4 +25,4 @@ if not exist "%MSBuild%" (
 echo Building Builder.sln
 "%MSBuild%" Builder.sln /nologo /maxcpucount /nodeReuse:false /verbosity:minimal /t:Restore;Build
 
-start "Cosmos Builder" "source\Cosmos.Build.Builder\bin\Debug\net471\Cosmos.Build.Builder.exe" "-VSPATH=%InstallDir%" %*
+start "Cosmos Builder" "source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-VSPATH=%InstallDir%" %*

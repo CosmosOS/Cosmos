@@ -1,5 +1,5 @@
 version: 0.20150918.{build}
-image: Visual Studio 2017
+image: Visual Studio 2019 Preview
 configuration: Debug-CI
 platform: Any CPU
 shallow_clone: true
@@ -49,6 +49,10 @@ notifications:
 
 matrix:
   fast_finish: true
+  
+branches:
+  only:
+    - master
 
 artifacts:
   - path: 'artifacts\Debug\nupkg\*.nupkg'

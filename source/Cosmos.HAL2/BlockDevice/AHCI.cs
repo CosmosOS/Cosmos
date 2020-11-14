@@ -79,44 +79,69 @@ namespace Cosmos.HAL.BlockDevice
             mPorts.Capacity = (int)NumOfPorts;
             GetPorts();
 
-            foreach(StoragePort xPort in mPorts)
+            foreach (StoragePort xPort in mPorts)
             {
-                if(xPort.mPortType == PortType.SATA)
+                if (xPort.mPortType == PortType.SATA)
                 {
                     mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
-                    var xMBRData = new byte[512];
-                    xPort.ReadBlock(0UL, 1U, xMBRData);
-                    var xMBR = new MBR(xMBRData);
-                    
-                    if (xMBR.EBRLocation != 0)
+
+                    if (GPT.IsGPTPartition(xPort))
                     {
-                        // EBR Detected!
-                        mAHCIDebugger.Send("EBR Detected within MBR code");
-                        var xEBRData = new byte[512];
-                        xPort.ReadBlock(xMBR.EBRLocation, 1U, xEBRData);
-                        var xEBR = new EBR(xEBRData);
-                        for (int i = 0; i < xEBR.Partitions.Count; i++)
+                        var xGPT = new GPT(xPort);
+
+                        mAHCIDebugger.Send($"Number of GPT partitions found on port 0:{xPort.mPortNumber} ");
+                        mAHCIDebugger.SendNumber(xGPT.Partitions.Count);
+                        for (int i = 0; i < xGPT.Partitions.Count; i++)
                         {
-                            //var xPart = xEBR.Partitions[i];
-                            //var xPartDevice = new Partition(xSATA, xPart.StartSector, xPart.SectorCount);
-                            //Devices.Add(xPartDevice);
+                            var xPart = xGPT.Partitions[i];
+                            if (xPart == null)
+                            {
+                                Console.WriteLine("Null partition found at idx: " + i);
+                            }
+                            else
+                            {
+                                var xPartDevice = new Partition(xPort, xPart.StartSector, xPart.SectorCount);
+                                BlockDevice.Devices.Add(xPartDevice);
+                                Console.WriteLine("Found partition at idx: " + i);
+                            }
                         }
                     }
-                    
-                    mAHCIDebugger.Send($"Number of MBR partitions found on port 0:{xPort.mPortNumber} ");
-                    mAHCIDebugger.SendNumber(xMBR.Partitions.Count);
-                    for (int i = 0; i < xMBR.Partitions.Count; i++)
+                    else
                     {
-                        var xPart = xMBR.Partitions[i];
-                        if (xPart == null)
+                        var xMBRData = new byte[512];
+                        xPort.ReadBlock(0UL, 1U, ref xMBRData);
+                        var xMBR = new MBR(xMBRData);
+
+                        if (xMBR.EBRLocation != 0)
                         {
-                            Console.WriteLine("Null partition found at idx: " + i);
+                            // EBR Detected!
+                            mAHCIDebugger.Send("EBR Detected within MBR code");
+                            var xEBRData = new byte[512];
+                            xPort.ReadBlock(xMBR.EBRLocation, 1U, ref xEBRData);
+                            var xEBR = new EBR(xEBRData);
+                            for (int i = 0; i < xEBR.Partitions.Count; i++)
+                            {
+                                //var xPart = xEBR.Partitions[i];
+                                //var xPartDevice = new Partition(xSATA, xPart.StartSector, xPart.SectorCount);
+                                //Devices.Add(xPartDevice);
+                            }
                         }
-                        else
+
+                        mAHCIDebugger.Send($"Number of MBR partitions found on port 0:{xPort.mPortNumber} ");
+                        mAHCIDebugger.SendNumber(xMBR.Partitions.Count);
+                        for (int i = 0; i < xMBR.Partitions.Count; i++)
                         {
-                            var xPartDevice = new Partition(xPort, xPart.StartSector, xPart.SectorCount);
-                            BlockDevice.Devices.Add(xPartDevice);
-                            Console.WriteLine("Found partition at idx: " + i);
+                            var xPart = xMBR.Partitions[i];
+                            if (xPart == null)
+                            {
+                                Console.WriteLine("Null partition found at idx: " + i);
+                            }
+                            else
+                            {
+                                var xPartDevice = new Partition(xPort, xPart.StartSector, xPart.SectorCount);
+                                BlockDevice.Devices.Add(xPartDevice);
+                                Console.WriteLine("Found partition at idx: " + i);
+                            }
                         }
                     }
                 }
@@ -125,7 +150,7 @@ namespace Cosmos.HAL.BlockDevice
                     mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
 
                     // Just to test Read Sector!
-                    
+
                     //byte[] xMBRData = new byte[512];
                     //xPort.ReadBlock(0UL, 1U, xMBRData);
                     //MBR xMBR = new MBR(xMBRData);
@@ -182,26 +207,26 @@ namespace Cosmos.HAL.BlockDevice
 
         private void GetCapabilities()
         {
-            NumOfPorts                            = mGeneric.Capabilities & 0x1F;
-            SupportsExternalSATA                  = (mGeneric.Capabilities >> 5 & 1) == 1;
-            EnclosureManagementSupported          = (mGeneric.Capabilities >> 6 & 1) == 1;
-            CommandCompletionCoalsecingSupported  = (mGeneric.Capabilities >> 7 & 1) == 1;
-            NumOfCommandSlots                     = mGeneric.Capabilities >> 8 & 0x1F;
-            PartialStateCapable                   = (mGeneric.Capabilities >> 13 & 1) == 1;
-            SlumberStateCapable                   = (mGeneric.Capabilities >> 14 & 1) == 1;
-            PIOMultipleDRQBlock                   = (mGeneric.Capabilities >> 15 & 1) == 1;
-            FISBasedSwitchingSupported            = (mGeneric.Capabilities >> 16 & 1) == 1;
-            SupportsPortMutliplier                = (mGeneric.Capabilities >> 17 & 1) == 1;
-            SupportsAHCIModeOnly                  = (mGeneric.Capabilities >> 18 & 1) == 1;
-            InterfaceSpeedSupport                 = mGeneric.Capabilities >> 20 & 0x0F;
-            SupportsCommandListOverride           = (mGeneric.Capabilities >> 24 & 1) == 1;
-            SupportsActivityLED                   = (mGeneric.Capabilities >> 25 & 1) == 1;
+            NumOfPorts = mGeneric.Capabilities & 0x1F;
+            SupportsExternalSATA = (mGeneric.Capabilities >> 5 & 1) == 1;
+            EnclosureManagementSupported = (mGeneric.Capabilities >> 6 & 1) == 1;
+            CommandCompletionCoalsecingSupported = (mGeneric.Capabilities >> 7 & 1) == 1;
+            NumOfCommandSlots = mGeneric.Capabilities >> 8 & 0x1F;
+            PartialStateCapable = (mGeneric.Capabilities >> 13 & 1) == 1;
+            SlumberStateCapable = (mGeneric.Capabilities >> 14 & 1) == 1;
+            PIOMultipleDRQBlock = (mGeneric.Capabilities >> 15 & 1) == 1;
+            FISBasedSwitchingSupported = (mGeneric.Capabilities >> 16 & 1) == 1;
+            SupportsPortMutliplier = (mGeneric.Capabilities >> 17 & 1) == 1;
+            SupportsAHCIModeOnly = (mGeneric.Capabilities >> 18 & 1) == 1;
+            InterfaceSpeedSupport = mGeneric.Capabilities >> 20 & 0x0F;
+            SupportsCommandListOverride = (mGeneric.Capabilities >> 24 & 1) == 1;
+            SupportsActivityLED = (mGeneric.Capabilities >> 25 & 1) == 1;
             SupportsAggressiveLinkPowerManagement = (mGeneric.Capabilities >> 26 & 1) == 1;
-            SupportsStaggeredSpinup               = (mGeneric.Capabilities >> 27 & 1) == 1;
-            SupportsMechanicalPresenceSwitch      = (mGeneric.Capabilities >> 28 & 1) == 1;
-            SupportsSNotificationRegister         = (mGeneric.Capabilities >> 29 & 1) == 1;
-            SupportsNativeCommandQueuing          = (mGeneric.Capabilities >> 30 & 1) == 1;
-            Supports64bitAddressing               = (mGeneric.Capabilities >> 31 & 1) == 1;
+            SupportsStaggeredSpinup = (mGeneric.Capabilities >> 27 & 1) == 1;
+            SupportsMechanicalPresenceSwitch = (mGeneric.Capabilities >> 28 & 1) == 1;
+            SupportsSNotificationRegister = (mGeneric.Capabilities >> 29 & 1) == 1;
+            SupportsNativeCommandQueuing = (mGeneric.Capabilities >> 30 & 1) == 1;
+            Supports64bitAddressing = (mGeneric.Capabilities >> 31 & 1) == 1;
         }
 
         private void GetPorts()
@@ -209,7 +234,7 @@ namespace Cosmos.HAL.BlockDevice
             // Search for disks
             var xImplementedPort = mGeneric.ImplementedPorts;
             var xPort = 0;
-            for(; xPort < 32; xPort++)
+            for (; xPort < 32; xPort++)
             {
                 if ((xImplementedPort & 1) != 0)
                 {
@@ -260,7 +285,7 @@ namespace Cosmos.HAL.BlockDevice
                 return PortType.Nothing;
 
             xSignature >>= 16;
-            
+
             switch ((AHCISignature)xSignature)
             {
                 case AHCISignature.SATA: return PortType.SATA;
@@ -268,7 +293,7 @@ namespace Cosmos.HAL.BlockDevice
                 case AHCISignature.SEMB: return PortType.SEMB;
                 case AHCISignature.PortMultiplier: return PortType.PM;
                 case AHCISignature.Nothing: return PortType.Nothing;
-                default: throw new Exception("SATA Error: Unknown drive found at port: " + aPort.mPortNumber);;
+                default: throw new Exception("SATA Error: Unknown drive found at port: " + aPort.mPortNumber); ;
             }
         }
 
@@ -288,7 +313,7 @@ namespace Cosmos.HAL.BlockDevice
             new MemoryBlock(aPort.FB, 256).Fill(0);
 
             GetCommandHeader(aPort); // Rebase Command header
-            
+
             if (!StartCMD(aPort)) SATA.PortReset(aPort);
 
             aPort.IS = 0;
@@ -304,8 +329,8 @@ namespace Cosmos.HAL.BlockDevice
             {
                 xCMDHeader[i] = new HBACommandHeader(aPort.CLB, i)
                 {
-                    PRDTL = 8, 
-                    
+                    PRDTL = 8,
+
                     CTBA = (uint)(Base.AHCI + 0xA000) + (0x2000 * aPort.mPortNumber) + (0x100 * i),
 
                     CTBAU = 0

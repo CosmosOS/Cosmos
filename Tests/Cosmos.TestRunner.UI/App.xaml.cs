@@ -15,16 +15,18 @@ namespace Cosmos.TestRunner.UI
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
-            base.Initialize();
         }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             InitializeLogging();
+            BuildAvaloniaApp().Start<MainWindow>();
+        }
+
+        private static AppBuilder BuildAvaloniaApp() =>
             AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .Start<MainWindow>();
-        }
+                .UseReactiveUI();
 
         [Conditional("DEBUG")]
         private static void InitializeLogging()

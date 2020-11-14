@@ -75,7 +75,7 @@ namespace Cosmos.Build.Builder
             var il2cpuSourceDir = Path.Combine(il2cpuDir, "source");
 
             var buildSlnPath = Path.Combine(_cosmosDir, "Build.sln");
-            
+
             var vsipDir = Path.Combine(_cosmosDir, "Build", "VSIP") + '\\';
 
             if (Directory.Exists(vsipDir))
@@ -84,7 +84,7 @@ namespace Cosmos.Build.Builder
             }
 
             // Restore Build.sln
-            
+
             yield return new RestoreTask(_msBuildService, buildSlnPath);
 
             // Build Build.sln
@@ -150,7 +150,7 @@ namespace Cosmos.Build.Builder
 
             if (!App.BuilderConfiguration.UserKit)
             {
-                var cosmosSetupPath = Path.Combine(cosmosSetupDir, "Output", $"CosmosUserKit-{cosmosSetupVersion}-vs2017.exe");
+                var cosmosSetupPath = Path.Combine(cosmosSetupDir, "Output", $"CosmosUserKit-{cosmosSetupVersion}-vs2019.exe");
 
                 // Run Setup
 

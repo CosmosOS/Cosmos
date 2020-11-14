@@ -2,13 +2,13 @@
         Title="Cosmos Test Runner Settings"
         SizeToContent="WidthAndHeight">
 
-    <StackPanel Gap="8"
+    <StackPanel Spacing="8"
                 Margin="16">
 
         <StackPanel Orientation="Horizontal"
-                    Gap="16">
+                    Spacing="16">
 
-            <StackPanel Gap="8">
+            <StackPanel Spacing="8">
 
                 <TextBlock>Allowed seconds in kernel:</TextBlock>
                 <TextBox Text="{Binding AllowedSecondsInKernel}" />
@@ -20,7 +20,7 @@
 
             </StackPanel>
 
-            <StackPanel Gap="8">
+            <StackPanel Spacing="8">
 
                 <CheckBox IsChecked="{Binding DebugIL2CPU}">Debug IL2CPU</CheckBox>
                 <TextBlock>Kernel package:</TextBlock>
@@ -42,7 +42,7 @@
                  SelectedItems="{Binding KernelTypesToRun}"
                  SelectionMode="Multiple" />
 
-        <Button Command="{Binding RunTests}">Run Tests</Button>
+        <Button Command="{Binding RunTestsCommand}">Run Tests</Button>
 
     </StackPanel>
 

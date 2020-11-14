@@ -1,0 +1,19 @@
+<Project>
+
+    <PropertyGroup>
+        <_CosmosLocalPackageFeed>$(AppData)\Cosmos User Kit\packages\</_CosmosLocalPackageFeed>
+
+        <RestoreSources>
+            https://api.nuget.org/v3/index.json;
+            https://www.myget.org/F/cosmos/api/v3/index.json;
+            https://ci.appveyor.com/nuget/cosmos-common;
+            https://ci.appveyor.com/nuget/il2cpu;
+            https://ci.appveyor.com/nuget/xsharp;
+            https://dotnet.myget.org/F/roslyn-tools/api/v3/index.json
+        </RestoreSources>
+
+		<RestoreSources Condition="Exists($(DefaultPackageOutputPath))">$(RestoreSources);$(DefaultPackageOutputPath)</RestoreSources>
+        <RestoreSources Condition="Exists($(_CosmosLocalPackageFeed))">$(RestoreSources);$(_CosmosLocalPackageFeed)</RestoreSources>
+    </PropertyGroup>
+
+</Project>
