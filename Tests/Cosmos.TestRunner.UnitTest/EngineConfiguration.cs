@@ -5,7 +5,7 @@ using Cosmos.Build.Common;
 using Cosmos.TestRunner.Core;
 using Cosmos.TestRunner.Full;
 
-namespace Cosmos.TestRunner.
+namespace Cosmos.TestRunner.UnitTest
 {
     internal class EngineConfiguration : DefaultEngineConfiguration
     {

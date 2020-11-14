@@ -7,7 +7,7 @@ using NUnit.Framework;
 using Cosmos.TestRunner.Core;
 using Cosmos.TestRunner.Full;
 
-namespace Cosmos.TestRunner.
+namespace Cosmos.TestRunner.UnitTest
 {
     using Assert = NUnit.Framework.Assert;
 
