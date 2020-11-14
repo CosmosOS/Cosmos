@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.ing;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Cosmos.Common.Extensions;
 

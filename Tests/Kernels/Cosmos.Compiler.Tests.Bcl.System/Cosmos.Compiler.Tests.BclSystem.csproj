@@ -5,7 +5,6 @@
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <NoWarn>CA2242;$(NoWarn)</NoWarn>
         <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
-
     </PropertyGroup>
 
     <ItemGroup>

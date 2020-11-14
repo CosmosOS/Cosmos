@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.ing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Native = System.UInt32;
 
 namespace Cosmos.Core.Memory.Test
