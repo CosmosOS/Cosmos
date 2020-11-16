@@ -8,9 +8,9 @@
         <Compile Update="Engine.*.cs" DependentUpon="Engine.cs" />
     </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Cosmos.Build.Common" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Cosmos.Build.Common" />
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
