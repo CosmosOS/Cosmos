@@ -36,6 +36,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
         protected int mHyperVDebugPipe;
 
         protected bool mShowTabBochs;
+        protected bool mShowTabQemu;
         protected bool mShowTabDebug;
         protected bool mShowTabDeployment;
         protected bool mShowTabLaunch;
@@ -98,8 +99,8 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 if (xValue != mViewModel.BuildProperties.Launch)
                 {
                     mViewModel.BuildProperties.Launch = xValue;
-                    // Bochs requires an ISO. Force Deployment property.
-                    if (LaunchType.Bochs == xValue)
+                    // Bochs and Qemu requires an ISO. Force Deployment property.
+                    if (xValue == LaunchType.Bochs)
                     {
                         if (DeploymentType.ISO != mViewModel.BuildProperties.Deployment)
                         {
@@ -329,6 +330,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             RemoveTab(tabISO);
             RemoveTab(tabSlave);
             RemoveTab(tabBochs);
+            RemoveTab(tabQemu);
 
             if (mShowTabDebug)
             {
@@ -371,6 +373,10 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             if (mShowTabBochs)
             {
                 TabControl1.TabPages.Add(tabBochs);
+            }
+            if (mShowTabQemu)
+            {
+                TabControl1.TabPages.Add(tabQemu);
             }
 
             if (TabControl1.TabPages.Contains(xTab))
@@ -429,6 +435,15 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             else if (mViewModel.BuildProperties.Profile == "Bochs")
             {
                 mShowTabBochs = true;
+                chckEnableDebugStub.Checked = true;
+                chkEnableStackCorruptionDetection.Checked = true;
+                cmboCosmosDebugPort.Enabled = false;
+                cmboVisualStudioDebugPort.Enabled = false;
+                cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
+            }
+            else if (mViewModel.BuildProperties.Profile == "Qemu")
+            {
+                mShowTabQemu = true;
                 chckEnableDebugStub.Checked = true;
                 chkEnableStackCorruptionDetection.Checked = true;
                 cmboCosmosDebugPort.Enabled = false;
@@ -513,7 +528,8 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             mShowTabVMware = mViewModel.BuildProperties.Launch == LaunchType.VMware;
             mShowTabHyperV = mViewModel.BuildProperties.Launch == LaunchType.HyperV;
             mShowTabSlave = mViewModel.BuildProperties.Launch == LaunchType.Slave;
-            mShowTabBochs = (LaunchType.Bochs == mViewModel.BuildProperties.Launch);
+            mShowTabBochs = mViewModel.BuildProperties.Launch == LaunchType.Bochs;
+            mShowTabQemu = mViewModel.BuildProperties.Launch == LaunchType.Qemu;
             //
             UpdateTabs();
         }
@@ -542,7 +558,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             for (int i = 1; i < 100; i++)
             {
-                if (!string.IsNullOrEmpty(mViewModel.BuildProperties.GetProperty("User" + i.ToString("000") + "_Name")))
+                if (!String.IsNullOrEmpty(mViewModel.BuildProperties.GetProperty("User" + i.ToString("000") + "_Name")))
                 {
                     FillProfile(i);
                 }
@@ -653,7 +669,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 {
                     string xValue = mViewModel.GetProjectProperty(xPrefix + xName);
                     // This is important that we dont copy empty values, so instead the defaults will be used.
-                    if (!string.IsNullOrWhiteSpace(xValue))
+                    if (!String.IsNullOrWhiteSpace(xValue))
                     {
                         mViewModel.BuildProperties.SetProperty(xPrefix + xName, xValue);
                     }
@@ -678,6 +694,11 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             foreach (var xPreset in mPresets)
             {
                 LoadProfileProps(xPreset.Key);
+            }
+            for (int id = 1; id < 100; id++)
+            {
+                var xPrefix = "User" + id.ToString("000");
+                LoadProfileProps(xPrefix);
             }
         }
 
@@ -770,7 +791,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
         protected List<string> GetNetworkInterfaces()
         {
             NetworkInterface[] nInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-            List<string> interfaces_list = new List<string>();
+            var interfaces_list = new List<string>();
 
             foreach (NetworkInterface nInterface in nInterfaces)
             {
@@ -791,7 +812,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             return interfaces_list;
         }
 
-        private void chkEnableStacckCorruptionDetection_CheckedChanged(object sender, EventArgs e)
+        private void chkEnableStackCorruptionDetection_CheckedChanged(object sender, EventArgs e)
         {
             if (!FreezeEvents)
             {

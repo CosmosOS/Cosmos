@@ -9,6 +9,11 @@
         {
             IsELF = isElf;
             RunTarget = runTarget;
+
+            if (runTarget == RunTargetEnum.Qemu)
+            {
+                IsELF = false;
+            }
         }
     }
 }

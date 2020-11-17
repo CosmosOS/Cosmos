@@ -54,6 +54,9 @@ namespace Cosmos.TestRunner.Core
                 case RunTargetEnum.Bochs:
                     RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath, workingDirectory));
                     break;
+                case RunTargetEnum.Qemu:
+                    RunTask("RunISO", () => RunIsoInQemu(xIsoFile, xHarddiskPath, workingDirectory));
+                    break;
                 case RunTargetEnum.VMware:
                     RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
                     break;
