@@ -139,7 +139,7 @@ namespace Cosmos.Core
         /// <returns>True if is available, false if not</returns>
         public static bool IsAvailable()
         {
-            if ((Bootstrap.header->Flags & VBEINFO_PRESENT) == 0)
+            if ((Bootstrap.MultibootHeader->Flags & VBEINFO_PRESENT) == 0)
             {
                 return false;
             }
