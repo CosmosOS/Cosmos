@@ -1,7 +1,8 @@
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -169,84 +170,78 @@ namespace Cosmos.Core
         {
             if (CanReadCPUID() != 0)
             {
-                // See https://c9x.me/x86/html/file_module_x86_id_45.html
-
-                int eax = 0;
-                int ebx = 0;
-                int ecx = 0;
-                int edx = 0;
-                string s = "";
-
-                for (uint i = 0; i < 3; i++)
-                {
-                    ReadCPUID(0x80000002 + i, ref eax, ref ebx, ref ecx, ref edx);
-                    s += (char)(ebx % 256);
-                    s += (char)((ebx >> 8) % 256);
-                    s += (char)((ebx >> 16) % 256);
-                    s += (char)((ebx >> 24) % 256);
-                    s += (char)(edx % 256);
-                    s += (char)((edx >> 8) % 256);
-                    s += (char)((edx >> 16) % 256);
-                    s += (char)((edx >> 24) % 256);
-                    s += (char)(ecx % 256);
-                    s += (char)((ecx >> 8) % 256);
-                    s += (char)((ecx >> 16) % 256);
-                    s += (char)((ecx >> 24) % 256);
-                }
-                var _words = new List<string>();
-                string curr = "";
-                for (int i = 0; i < s.Length; i++)
-                {
-                    if (s[i] == ' ' || (byte)s[i] == 0)
-                    {
-                        if (curr != "")
-                        {
-                            _words.Add(curr);
-                        }
-                        curr = "";
-                    }
-                    else
-                    {
-                        curr += s[i];
-                    }
-                }
-                _words.Add(curr);
-                string[] words = _words.ToArray();
-                string[] w = new string[words.Length];
-                for (int i = 0; i < words.Length; i++)
-                {
-                    w[i] = words[words.Length - i - 1];
-                }
-                words = w;
-                double multiplier = 0;
-                double value = 0;
-                for (int i = 0; i < words.Length; i++)
-                {
-                    if (words[i] == "MHz")
-                    {
-                        multiplier = 10e6;
-                        break;
-                    }
-                    else if (words[i] == "GHz")
-                    {
-                        multiplier = 10e9;
-                        break;
-                    }
-                    else if (words[i] == "THz")
-                    {
-                        multiplier = 10e12;
-                        break;
-                    }
-                    else if (value == 0)
-                    {
-                        Double.TryParse(words[i], out value);
-                    }
-                }
-                value *= multiplier;
-                return (long)value;
+                string s = GetCPUBrandString();
+                return EstimateCPUSpeedFromName(s);
             }
 
             throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// This is only public for testing purposes
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static long EstimateCPUSpeedFromName(string s)
+        {
+            var _words = new List<string>();
+            string curr = "";
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (s[i] == ' ' || (byte)s[i] == 0)
+                {
+                    if (curr != "")
+                    {
+                        _words.Add(curr);
+                    }
+                    curr = "";
+                }
+                else
+                {
+                    curr += s[i];
+                }
+            }
+            _words.Add(curr);
+            string[] words = _words.ToArray();
+            string[] w = new string[words.Length];
+            for (int i = 0; i < words.Length; i++) // Switch order
+            {
+                w[i] = words[words.Length - i - 1];
+            }
+            words = w;
+            double multiplier = 0;
+            double value = 0;
+            for (int i = 0; i < words.Length; i++)
+            {
+                var word = words[i];
+                var wordEnd = word.Substring(word.Length - 3, 3);
+                if (word == "MHz" || wordEnd == "MHz")
+                {
+                    multiplier = 1e6;
+                }
+                else if (word == "GHz" || wordEnd == "GHz")
+                {
+                    multiplier = 1e9;
+                }
+                else if (word == "THz" || wordEnd == "THz")
+                {
+                    multiplier = 1e12;
+                }
+                if (value == 0)
+                {
+                    if (Double.TryParse(word, out value) || Double.TryParse(word.Substring(0, word.Length - 3), out value))
+                    {
+                        break;
+                    }
+                }
+            }
+            value *= multiplier;
+            if ((long)value == 0)
+            {
+                Global.mDebugger.Send("Unable to calculate cycle speed from " + s);
+                throw new NotSupportedException("Unable to calculate cycle speed from " + s);
+            }
+            return (long)value;
         }
 
         /// <summary>
