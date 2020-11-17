@@ -106,7 +106,6 @@ namespace Cosmos.TestRunner.Core
             foreach (var xTarget in RunTargets)
             {
                 yield return new RunConfiguration(isElf: true, runTarget: xTarget);
-                //yield return new RunConfiguration(isElf: false, runTarget: xTarget);
             }
         }
     }

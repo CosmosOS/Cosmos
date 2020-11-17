@@ -22,9 +22,12 @@ namespace ProcessorTests
         {
             try
             {
+                TestMultibootMemoryMap();
+                TestGetRam();
                 TestVendorNameIsNotBlank();
                 TestCycleCount();
                 TestCycleRateIsNotZero();
+                TestMultiboot();
 
                 TestController.Completed();
             }
@@ -36,6 +39,27 @@ namespace ProcessorTests
             }
         }
 
+        public void TestGetRam()
+        {
+            Assert.IsTrue(CPU.GetAmountOfRAM() > 0, "CPU.GetAmountOfRAM() returns a positive value: " + CPU.GetAmountOfRAM());
+        }
+
+        public void TestMultibootMemoryMap()
+        {
+            var memoryMap = CPU.GetMemoryMap();
+            for (int i = 0; i < memoryMap.Length; i++)
+            {
+                mDebugger.Send($"Memory Map: {memoryMap[i].Address} " +
+                    $"Length: {memoryMap[i].Length} Type: {memoryMap[i].Type}");
+            }
+            Assert.IsTrue(memoryMap.Length != 0, "Memory Map is not empty! Length " + memoryMap.Length);
+        }
+
+        public void TestMultiboot()
+        {
+            Assert.IsTrue(Multiboot.GetMBIAddress() != 0, $"Multiboot.GetMBIAddress works {Multiboot.GetMBIAddress()}");
+        }
+         
         public void TestBrandStringBlank()
         {
             string brandString = CPU.GetCPUBrandString();
