@@ -13,8 +13,8 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Create new instance of <see cref="Bitmap"/> class.
         /// </summary>
-        /// <param name="Width">Image width (greater then 0).</param>
-        /// <param name="Height">Image height (greater then 0).</param>
+        /// <param name="Width">Image width (greater than 0).</param>
+        /// <param name="Height">Image height (greater than 0).</param>
         /// <param name="colorDepth">Color depth.</param>
         public Bitmap(uint Width, uint Height, ColorDepth colorDepth) : base(Width, Height, colorDepth)
         {
@@ -145,7 +145,7 @@ namespace Cosmos.System.Graphics
         }
         
         /// <summary>
-        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
         /// </summary>
         /// <param name="imageData">byte array.</param>
         /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
@@ -168,7 +168,7 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
         /// </summary>
         /// <param name="imageData">byte array.</param>
         /// <param name="colorOrder">Order of colors in each pixel.</param>
@@ -347,19 +347,19 @@ namespace Cosmos.System.Graphics
                     }
                     else
                     {
-                        if(colorOrder == ColorOrder.BGR)
+                        if (colorOrder == ColorOrder.BGR)
                         {
-                            pixel[3] = pixelData[position++];
+                            pixel[3] = 255;
                             pixel[2] = pixelData[position++];
                             pixel[1] = pixelData[position++];
-                            pixel[0] = 0;
+                            pixel[0] = pixelData[position++];
                         }
                         else
                         {
                             pixel[0] = pixelData[position++];
                             pixel[1] = pixelData[position++];
                             pixel[2] = pixelData[position++];
-                            pixel[3] = 0;
+                            pixel[3] = 255;
                         }
                     }
                     rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0); //This bits should be A, R, G, B but order is switched
@@ -510,7 +510,7 @@ namespace Cosmos.System.Graphics
                     data = BitConverter.GetBytes(rawData[x + (Height - (y + 1)) * Width]);
                     for (int i = 0; i < byteNum; i++)
                     {
-                        imageData[imageDataPoint++] = data[i + cOffset];
+                        imageData[imageDataPoint++] = data[byteNum - i];
                     }
                 }
                 imageDataPoint += padding;
