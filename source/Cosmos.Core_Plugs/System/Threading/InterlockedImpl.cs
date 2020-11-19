@@ -10,5 +10,9 @@ namespace Cosmos.Core_Plugs.System.Threading
         {
             return aData -= 1;
         }
+        public static int Increment(ref int aData)
+        {
+            return aData += 1;
+        }
     }
 }
