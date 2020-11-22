@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyOriginatorKeyFile>C:\Users\Jasper\Desktop\RandomProgrammieren\COSMOS\Cosmos\build\Targets\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
