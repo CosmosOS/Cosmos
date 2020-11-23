@@ -8,8 +8,6 @@ namespace Cosmos.Core_Plugs.System
     [Plug(Target = typeof(Type))]
     public unsafe class TypeImpl
     {
-        private static Debugger mDebugger = new Debugger("Core", "Type Plug");
-
         public static void CCtor()
         {
         }
@@ -26,13 +24,35 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool op_Equality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
         {
+            if (aLeft == null)
+            {
+                if (aRight == null)
+                {
+                    return true;
+                }
+                return false;
+            }
+            if (aRight == null)
+            {
+                return false;
+            }
             return aLeft.mTypeId == aRight.mTypeId;
         }
 
         public static bool op_Inequality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
         {
-            mDebugger.Send("Type.GetInequality");
-
+            if(aLeft == null)
+            {
+                if(aRight == null)
+                {
+                    return true;
+                }
+                return false;
+            }
+            if(aRight == null)
+            {
+                return false;
+            }
             return aLeft.mTypeId != aRight.mTypeId;
         }
 
