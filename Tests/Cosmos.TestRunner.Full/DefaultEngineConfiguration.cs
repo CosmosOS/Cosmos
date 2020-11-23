@@ -14,8 +14,8 @@ namespace Cosmos.TestRunner.Full
         {
             get
             {
-                //yield return RunTargetEnum.Bochs;
-                yield return RunTargetEnum.VMware;
+                yield return RunTargetEnum.Bochs;
+                //yield return RunTargetEnum.VMware;
                 //yield return RunTargetEnum.HyperV;
                 //yield return RunTargetEnum.Qemu;
             }
@@ -24,7 +24,7 @@ namespace Cosmos.TestRunner.Full
         public virtual bool RunWithGDB => false;
         public virtual bool StartBochsDebugGUI => false;
 
-        public virtual bool DebugIL2CPU => false;
+        public virtual bool DebugIL2CPU => true;
         public virtual string KernelPkg => String.Empty;
         public virtual TraceAssemblies TraceAssembliesLevel => TraceAssemblies.User;
         public virtual bool EnableStackCorruptionChecks => true;

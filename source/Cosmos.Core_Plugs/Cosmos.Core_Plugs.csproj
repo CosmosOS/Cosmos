@@ -14,4 +14,8 @@
         <ProjectReference Include="$(XSharpRepoRoot)source\XSharp\XSharp\XSharp.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="System\Runtime\InteropServices\NewFolder\" />
+    </ItemGroup>
+
 </Project>

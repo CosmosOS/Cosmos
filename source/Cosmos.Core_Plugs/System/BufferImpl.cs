@@ -15,7 +15,7 @@ namespace Cosmos.Core_Plugs.System
         /// <param name="dest">Destination address to copy data into.</param>
         /// <param name="src">Source address from where copy data.</param>
         /// <param name="count">Count of bytes to copy.</param>
-        [PlugMethod(IsOptional = true)]
+        [PlugMethod(IsOptional = true, Signature = "System_Void__System_Buffer___Memmove_System_Byte___System_Byte___System_UIntPtr_")]
         public static unsafe void __Memmove(byte* dest, byte* src, uint count)
         {
             uint t;
@@ -152,6 +152,21 @@ namespace Cosmos.Core_Plugs.System
         public static void InternalBlockCopy(Array src, int srcOffset, Array dst, int dstOffset, int count)
         {
             Buffer.BlockCopy(src, srcOffset, dst, dstOffset, count);
+        }
+
+        [PlugMethod(Signature = "System_Void__System_Buffer___BulkMoveWithWriteBarrier__System_Byte___System_Byte__System_UIntPtr_")]
+        public static unsafe void __BulkMoveWithWriteBarrier(ref byte destination, ref byte source, uint byteCount)
+        {
+            fixed (byte* srcPtr = &source)
+            fixed (byte* dstPtr = &destination)
+            {
+                for (int i = 0; i < byteCount; i++)
+                {
+                    dstPtr[i] = srcPtr[i];
+                }
+            }
+
+            // Unsafe.CopyBlock(ref destination, ref source, byteCount);
         }
     }
 }

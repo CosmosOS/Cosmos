@@ -35,5 +35,11 @@ namespace Cosmos.Core_Plugs.System
 
             return aLeft.mTypeId != aRight.mTypeId;
         }
+
+        [PlugMethod(Signature ="System_Type__System_Type_get_BaseType", IsOptional = false)]
+        public static Type get_BaseType(Type aThis)
+        {
+            return typeof(object);
+        }
     }
 }

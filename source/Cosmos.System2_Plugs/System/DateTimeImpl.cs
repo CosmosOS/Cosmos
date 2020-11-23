@@ -60,5 +60,10 @@ namespace Cosmos.System_Plugs.System
         {
             return aThis.ToShortDateString() + " " + aThis.ToLongTimeString();
         }
+
+        public static bool SystemSupportsLeapSeconds()
+        {
+            return false;
+        }
     }
 }

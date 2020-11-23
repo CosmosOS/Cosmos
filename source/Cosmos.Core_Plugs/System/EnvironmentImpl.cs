@@ -18,6 +18,11 @@ namespace Cosmos.Core_Plugs.System
         public static int get_ProcessorCount() => 1;
 
         public static string GetEnvironmentVariable(string variable) => null;
+
+        public static void FailFast(string aString)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     // System.Runtime.Extensions, public
