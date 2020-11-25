@@ -35,7 +35,6 @@ namespace Cosmos.Compiler.Tests.Bcl
 
                 SpanTest.Execute();
                 //DecimalTest.Execute();
-                StandardMethodTest.Execute();
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
@@ -44,16 +43,16 @@ namespace Cosmos.Compiler.Tests.Bcl
                 ConvertTests.Execute();
 
                 // System.Collections
-                //HashtableTest.Execute();
+                HashtableTest.Execute();
 
-                //// System.Collections.Generic
-                //ListTest.Execute();
-                //QueueTest.Execute();
-                //DictionaryTest.Execute();
+                // System.Collections.Generic
+                ListTest.Execute();
+                QueueTest.Execute();
+                DictionaryTest.Execute();
 
-                //// System.Text
-                //StringBuilderTest.Execute();
-                //EncodingTest.Execute();
+                // System.Text
+                StringBuilderTest.Execute();
+                EncodingTest.Execute();
 
                 TestController.Completed();
             }

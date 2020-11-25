@@ -6,6 +6,7 @@
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
 
+
     <ItemGroup>
         <InternalsVisibleTo Include="Cosmos.Core.Tests" Key="Cosmos" />
         <InternalsVisibleTo Include="Cosmos.Core.Memory.Test" Key="Cosmos" />

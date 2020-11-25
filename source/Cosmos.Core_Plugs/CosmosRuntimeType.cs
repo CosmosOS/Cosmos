@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Globalization;
 using System.Reflection;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.Core
 {
     public class CosmosRuntimeType : Type
     {
-        internal uint mTypeId;
+        public uint mTypeId;
 
         public CosmosRuntimeType(uint aTypeId)
             : this()
@@ -24,7 +25,6 @@ namespace Cosmos.Core
             Module = null;
             Assembly = null;
             UnderlyingSystemType = null;
-            BaseType = null;
         }
 
         public override string Name { get; }
@@ -35,7 +35,15 @@ namespace Cosmos.Core
         public override Module Module { get; }
         public override Assembly Assembly { get; }
         public override Type UnderlyingSystemType { get; }
-        public override Type BaseType { get; }
+        public override Type BaseType { get {
+                var aTypeId = VTablesImpl.GetBaseType(mTypeId);
+                if(mTypeId == aTypeId) // BaseType of object is null
+                {
+                    return null;
+                }
+                return new CosmosRuntimeType(aTypeId);
+            }
+        }
 
         protected override bool IsArrayImpl()
         {

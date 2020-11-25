@@ -1,5 +1,4 @@
 using Cosmos.Core;
-using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 using System;
 
@@ -24,15 +23,11 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool op_Equality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
         {
-            if (aLeft == null)
+            if (aLeft is null) //Compare with null without equality check, since that causes stack overflow
             {
-                if (aRight == null)
-                {
-                    return true;
-                }
-                return false;
+                return aRight is null;
             }
-            if (aRight == null)
+            if(aRight is null)
             {
                 return false;
             }
@@ -41,25 +36,21 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool op_Inequality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
         {
-            if(aLeft == null)
+            if (aLeft is null)
             {
-                if(aRight == null)
-                {
-                    return true;
-                }
-                return false;
+                return !(aRight is null);
             }
-            if(aRight == null)
+            if (aRight is null)
             {
-                return false;
+                return true;
             }
             return aLeft.mTypeId != aRight.mTypeId;
         }
 
         [PlugMethod(Signature ="System_Type__System_Type_get_BaseType", IsOptional = false)]
-        public static Type get_BaseType(Type aThis)
+        public static Type get_BaseType(CosmosRuntimeType aThis)
         {
-            return typeof(object);
+            return aThis.BaseType;
         }
     }
 }
