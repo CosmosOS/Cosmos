@@ -308,7 +308,7 @@ namespace Cosmos.System_Plugs.System.IO
             return false;
         }
 
-        public static bool IsDirectorySeparator(char aC)
+        static bool IsDirectorySeparator(char aC)
         {
             if (aC == Path.DirectorySeparatorChar)
             {
@@ -479,7 +479,7 @@ namespace Cosmos.System_Plugs.System.IO
             return i;
         }
 
-        public static string NormalizePath(string aPath, bool aFullCheck)
+        static string NormalizePath(string aPath, bool aFullCheck)
         {
             Global.mFileSystemDebugger.SendInternal("Path.NormalizePath");
 

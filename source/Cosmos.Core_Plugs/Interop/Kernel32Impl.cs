@@ -47,5 +47,17 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Kernel32_FindNLSStringEx_System_Char___System_UInt32__System_Char___System_Int32__System_Char___System_Int32__System_Int32___System_Void___System_Void___System_IntPtr_")]
+        public static unsafe int FindNLSStringEx(char* aCharPtr, uint aUint, char* aCharPtr2, int aInt, char* aCharPtr3, int aInt2, int* aIntPtr, void* aVoidPtr, void* aVoidPtr2, IntPtr aInPtr2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IntPtr LocalFree(IntPtr aInt)
+        {
+            throw new NotImplementedException();
+        }
     }
+
 }

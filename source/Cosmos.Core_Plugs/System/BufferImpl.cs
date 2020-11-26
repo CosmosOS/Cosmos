@@ -149,11 +149,6 @@ namespace Cosmos.Core_Plugs.System
             __Memmove(dest, src, (uint)count);
         }
 
-        public static void InternalBlockCopy(Array src, int srcOffset, Array dst, int dstOffset, int count)
-        {
-            Buffer.BlockCopy(src, srcOffset, dst, dstOffset, count);
-        }
-
         [PlugMethod(Signature = "System_Void__System_Buffer___BulkMoveWithWriteBarrier__System_Byte___System_Byte__System_UIntPtr_")]
         public static unsafe void __BulkMoveWithWriteBarrier(ref byte destination, ref byte source, uint byteCount)
         {

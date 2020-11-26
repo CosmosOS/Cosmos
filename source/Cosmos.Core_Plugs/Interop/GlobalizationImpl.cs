@@ -38,7 +38,9 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
-        public static unsafe int CompareString(IntPtr aIntPtr, char* aChar, int aInt, char* aChar1, int aInt2, CompareOptions aCompareOptions)
+
+        [PlugMethod(Signature = "System_Boolean__Interop_Globalization_StartsWith_System_IntPtr__System_Char___System_Int32__System_Char___System_Int32__System_Globalization_CompareOptions__System_Int32__")]
+        public static unsafe bool StartsWith(IntPtr aIntPtr, char* aCharPtr, int aInt, char* aCharPtr2, int aInt2, CompareOptions aCompareOptions, int* aIntPtr2)
         {
             throw new NotImplementedException();
         }

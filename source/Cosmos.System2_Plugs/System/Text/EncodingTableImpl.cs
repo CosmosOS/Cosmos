@@ -33,10 +33,5 @@ namespace Cosmos.System_Plugs.System.Globalization
             mDebugger.SendInternal($"GetCodePageFromName for name {name}");
             return -1;
         }
-
-        public static int GetNumEncodingItems()
-        {
-            throw new NotImplementedException("GetNumEncodingItems");
-        }
     }
 }

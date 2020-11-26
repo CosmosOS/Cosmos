@@ -65,5 +65,10 @@ namespace Cosmos.System_Plugs.System
         {
             return false;
         }
+        [PlugMethod(Signature = "System_Boolean__System_DateTime_ValidateSystemTime_Interop_Kernel32_SYSTEMTIME___System_Boolean_")]
+        public static bool ValidateSystemTime(object aSystemTime, bool aBoolean)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

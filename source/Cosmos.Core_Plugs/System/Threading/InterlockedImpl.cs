@@ -44,6 +44,27 @@ namespace Cosmos.Core_Plugs.System.Threading
             return original;
         }
 
+        public static long Exchange(ref long aLocation1, long aValue)
+        {
+            var original = aLocation1;
+            aLocation1 = aValue;
+
+            return original;
+        }
+        public static object Exchange(ref object aObject, object aValue)
+        {
+            var toReturn = aObject;
+            aObject = aValue;
+            return toReturn;
+        }
+
+        public static int ExchangeAdd(ref int aLocation, int aValue)
+        {
+            var toReturn = aLocation;
+            aLocation += aValue;
+            return toReturn;
+        }
+
         public static void MemoryBarrier() { }
     }
 }

@@ -26,5 +26,10 @@ namespace Cosmos.System_Plugs.System.Threading
         {
             throw new NotImplementedException("Thread.SpinWaitInternal()");
         }
+
+        public static int get_ManagedThreadId(object aItem)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

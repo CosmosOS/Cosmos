@@ -32,10 +32,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now let's Get the HashCode of a value
             int resultAsInt = value.GetHashCode();
-            // actually the Hash Code of a Int16 is some strange XOR trick
-            int expectedResultAsInt = ((int)((ushort)value) | (((int)value) << 16));
 
-            Assert.IsTrue((resultAsInt == expectedResultAsInt), "Int16.GetHashCode() doesn't work");
+            Assert.IsTrue((resultAsInt == value), "Int16.GetHashCode() doesn't work");
 
 #if false
             // Now let's try ToString() again but printed in hex (this test fails for now!)
