@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using IL2CPU.API.Attribs;
 
@@ -17,6 +18,11 @@ namespace Cosmos.Core_Plugs.System.Threading
         public static void ReliableEnter(object aObj, ref bool aTookLock)
         {
             aTookLock = true;
+        }
+
+        public static void ObjPulseAll(object aObject)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -85,9 +85,72 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException();
         }
+        [PlugMethod(Signature = "System_Boolean__System_RuntimeTypeHandle_CanCastTo_System_RuntimeType__System_RuntimeType_")]
+        public static bool CanCastTo(object aRuntimeType, object aRuntimeType2)
+        {
+            throw new NotImplementedException();
+        }
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_GetGenericTypeDefinition_System_Runtime_CompilerServices_QCallTypeHandle__System_Runtime_CompilerServices_ObjectHandleOnStack_")]
+        public static void GetGenericTypeDefinition(object aQCallTypeHandle, object aObjectHandleOnStack)
+        {
+            throw new NotImplementedException();
+        }
         public static void Cctor()
         {
             //
+        }
+
+        [PlugMethod(Signature = "System_Boolean__System_RuntimeTypeHandle_IsEquivalentTo_System_RuntimeType__System_RuntimeType_")]
+        public static bool IsEquivalentTo(object aRuntimeType, object aRuntimeType2)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Reflection_RuntimeModule__System_RuntimeTypeHandle_GetModule_System_RuntimeType_")]
+        public static object GetModule(object aRuntimeType)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_RuntimeType__System_RuntimeTypeHandle_GetDeclaringType_System_RuntimeType_")]
+        public static object GetDeclaringType(object aRuntimeType)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Object__System_RuntimeTypeHandle_Allocate_System_RuntimeType_")]
+        public static object Allocate(object aRuntimeType)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_GetTypeByNameUsingCARules_System_String__System_Runtime_CompilerServices_QCallModule__System_Runtime_CompilerServices_ObjectHandleOnStack_")]
+        public static void GetTypeByNameUsingCARules(string aString, object aQCallModule, object aObjectHandleOnStack)
+        {
+            throw new NotImplementedException();
+        }
+        [PlugMethod(Signature = "System_Boolean__System_RuntimeTypeHandle_IsComObject_System_RuntimeType__System_Boolean_")]
+        public static bool IsComObject(object aRuntimeType, bool aBool)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_Instantiate_System_Runtime_CompilerServices_QCallTypeHandle__System_IntPtr___System_Int32__System_Runtime_CompilerServices_ObjectHandleOnStack_")]
+        public static unsafe void Instantiate(object aQCallTypeHandle, IntPtr* aIntPtrPtr, int aInt, object aObjectHandleOnStack)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Int32__System_RuntimeTypeHandle_GetArrayRank_System_RuntimeType_")]
+        public static int GetArrayRank(object aRuntimeType)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_MakeSZArray_System_Runtime_CompilerServices_QCallTypeHandle__System_Runtime_CompilerServices_ObjectHandleOnStack_")]
+        public static void MakeSZArray(object aQCallTypeHandle, object aObjectHandleOnStack)
+        {
+            throw new NotImplementedException();
         }
     }
 }

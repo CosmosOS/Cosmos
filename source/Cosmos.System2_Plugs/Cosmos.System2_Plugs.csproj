@@ -18,4 +18,8 @@
         <ProjectReference Include="..\Cosmos.System2\Cosmos.System2.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="NewFolder\" />
+    </ItemGroup>
+
 </Project>

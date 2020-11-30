@@ -44,5 +44,58 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        public static bool GetLocaleInfoInt(string aString, uint aUint, ref int aInt){
+            throw new NotImplementedException();
+        }
+
+        public static unsafe bool GetLocaleInfoString(string aString, uint aUint, char* aCharPtr, int aInt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool GetLocaleInfoGroupingSizes(string aString, uint aUint, ref int aInt, ref int aInt2)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Globalization_GetCalendars_System_String__System_Globalization_CalendarId____System_Int32_")]
+        public static int GetCalendars(string aString, ushort[] aCalendarIds, int aInt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe bool GetLocaleTimeFormat(string aString, bool aBool, char* aCharPtr, int aInt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static int GetLatestJapaneseEra()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static int GetJapaneseEraStartDate(int aInt, ref int aInt2, ref int aInt3, ref int aInt4)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Globalization_CompareString_System_IntPtr__System_Char___System_Int32__System_Char___System_Int32__System_Globalization_CompareOptions_")]
+        public static unsafe int CompareString(IntPtr aIntPtr, char* aCharPtr, int aInt, char* aCharPtr2, int aInt2, object aCompareOptions)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Boolean__Interop_Globalization_EnumCalendarInfo_System_IntPtr__System_String__System_Globalization_CalendarId__System_Globalization_CalendarDataType__System_IntPtr_")]
+        public static bool EnumCalendarInfo(IntPtr aIntPtr, string aString, object aCalendarId, object aCalendarDataType, IntPtr aIntPtr1)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "Interop_Globalization_ResultCode__Interop_Globalization_GetCalendarInfo_System_String__System_Globalization_CalendarId__System_Globalization_CalendarDataType__System_Char___System_Int32_")]
+        public static unsafe object GetCalendarInfo(string aString, object aCalendarId, object aCalendarDataType, char* aCharPtr, int aInt)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

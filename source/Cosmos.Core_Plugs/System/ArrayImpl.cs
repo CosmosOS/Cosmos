@@ -142,5 +142,10 @@ namespace Cosmos.Core_Plugs.System
             }
             throw new NotSupportedException("SetValue not supported in this situation!");
         }
+
+        public static unsafe Array InternalCreate(void* aObject, int aInt, int* aIntPtr, int* aIntPtr1)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

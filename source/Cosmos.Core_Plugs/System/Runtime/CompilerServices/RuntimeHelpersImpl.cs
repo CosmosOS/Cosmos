@@ -44,5 +44,10 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         {
             return false;
         }
+
+        public static bool TryEnsureSufficientExecutionStack()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

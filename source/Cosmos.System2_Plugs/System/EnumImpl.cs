@@ -26,5 +26,27 @@ namespace Cosmos.System_Plugs.System
         {
             throw new NotImplementedException("Enum.GetHashCode()");
         }
+        [PlugMethod(Signature = "System_RuntimeType__System_Enum_InternalGetUnderlyingType_System_RuntimeType_")]
+        public static object InternalGetUnderlyingType(object aRuntimeType)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Reflection_CorElementType__System_Enum_InternalGetCorElementType__")]
+        public static object InternalGetCorElementType(object aThis)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Object__System_Enum_InternalBoxEnum_System_RuntimeType__System_Int64_")]
+        public static object InternalBoxEnum(object aRuntimeType, long aLong)
+        {
+            throw new NotImplementedException();
+        }
+        [PlugMethod(Signature = "System_Void__System_Enum_GetEnumValuesAndNames_System_Runtime_CompilerServices_QCallTypeHandle__System_Runtime_CompilerServices_ObjectHandleOnStack__System_Runtime_CompilerServices_ObjectHandleOnStack__Interop_BOOL_")]
+        public static void GetEnumValuesAndNames(object aQCallTypeHandle, object aObjectHandleOnStack, object aObjectHandleOnStack1, bool aBool)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

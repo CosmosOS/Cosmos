@@ -23,6 +23,25 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException();
         }
+
+        public static void FailFast(string aString, Exception aException)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static long get_TickCount64()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [Plug(TargetName = "System.Environment+WindowsVersion, System.Private.CoreLib")]
+    public static class WindowsVersionImpl
+    {
+        public static bool GetIsWindows8OrAbove()
+        {
+            return false;
+        }
     }
 
     // System.Runtime.Extensions, public

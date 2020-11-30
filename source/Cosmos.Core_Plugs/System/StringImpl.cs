@@ -338,7 +338,7 @@ namespace Cosmos.Core_Plugs.System
             return true;
         }
 
-        public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
+        private static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
         {
             var cs = new char[totalWidth];
 
@@ -692,75 +692,75 @@ namespace Cosmos.Core_Plugs.System
             return -1;
         }
 
-        public static int nativeCompareOrdinalEx(string aStrA, int aIndexA, string aStrB, int aIndexB, int aCount)
-        {
-            mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrA|aIndexA = {aStrA}|{aIndexA}, aStrB|aIndexB = {aStrB}|{aIndexB}, aCount = {aCount}");
-            if (aCount < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(aCount));
-            }
+        //public static int nativeCompareOrdinalEx(string aStrA, int aIndexA, string aStrB, int aIndexB, int aCount)
+        //{
+        //    mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrA|aIndexA = {aStrA}|{aIndexA}, aStrB|aIndexB = {aStrB}|{aIndexB}, aCount = {aCount}");
+        //    if (aCount < 0)
+        //    {
+        //        throw new ArgumentOutOfRangeException(nameof(aCount));
+        //    }
 
-            if (aIndexA < 0 || aIndexA > aStrA.Length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(aIndexA));
-            }
+        //    if (aIndexA < 0 || aIndexA > aStrA.Length)
+        //    {
+        //        throw new ArgumentOutOfRangeException(nameof(aIndexA));
+        //    }
 
-            if (aIndexB < 0 || aIndexB > aStrB.Length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(aIndexB));
-            }
+        //    if (aIndexB < 0 || aIndexB > aStrB.Length)
+        //    {
+        //        throw new ArgumentOutOfRangeException(nameof(aIndexB));
+        //    }
 
-            if (aStrA == null)
-            {
-                mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is null");
-                if (aStrB == null)
-                {
-                    mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is null");
-                    mDebugger.SendInternal($"nativeCompareOrdinalEx : returning 0");
-                    return 0;
-                }
-                mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is not null");
-                mDebugger.SendInternal($"nativeCompareOrdinalEx : returning -1");
-                return -1;
-            }
-            if (aStrB == null)
-            {
-                mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is not null");
-                mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is null");
-                mDebugger.SendInternal($"nativeCompareOrdinalEx : returning 1");
-                return 1;
-            }
-            int xLengthA = Math.Min(aStrA.Length, aCount - aIndexA);
-            int xLengthB = Math.Min(aStrB.Length, aCount - aIndexB);
-            //mDebugger.SendInternal($"nativeCompareOrdinalEx : xLengthA = {xLengthA}");
-            //mDebugger.SendInternal($"nativeCompareOrdinalEx : xLengthB = {xLengthB}");
+        //    if (aStrA == null)
+        //    {
+        //        mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is null");
+        //        if (aStrB == null)
+        //        {
+        //            mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is null");
+        //            mDebugger.SendInternal($"nativeCompareOrdinalEx : returning 0");
+        //            return 0;
+        //        }
+        //        mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is not null");
+        //        mDebugger.SendInternal($"nativeCompareOrdinalEx : returning -1");
+        //        return -1;
+        //    }
+        //    if (aStrB == null)
+        //    {
+        //        mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is not null");
+        //        mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is null");
+        //        mDebugger.SendInternal($"nativeCompareOrdinalEx : returning 1");
+        //        return 1;
+        //    }
+        //    int xLengthA = Math.Min(aStrA.Length, aCount - aIndexA);
+        //    int xLengthB = Math.Min(aStrB.Length, aCount - aIndexB);
+        //    //mDebugger.SendInternal($"nativeCompareOrdinalEx : xLengthA = {xLengthA}");
+        //    //mDebugger.SendInternal($"nativeCompareOrdinalEx : xLengthB = {xLengthB}");
 
-            if (xLengthA == xLengthB && aIndexA == aIndexB && ReferenceEquals(aStrA, aStrB))
-            {
-                mDebugger.SendInternal("nativeCompareOrdinalEx : xLengthA == xLengthB && aIndexA == aIndexB && aStrA is the same object asaStrB, returning 0");
-                return 0;
-            }
+        //    if (xLengthA == xLengthB && aIndexA == aIndexB && ReferenceEquals(aStrA, aStrB))
+        //    {
+        //        mDebugger.SendInternal("nativeCompareOrdinalEx : xLengthA == xLengthB && aIndexA == aIndexB && aStrA is the same object asaStrB, returning 0");
+        //        return 0;
+        //    }
 
-            int xResult = 0;
-            if (xLengthA != xLengthB)
-            {
-                xResult = xLengthA - xLengthB;
-                mDebugger.SendInternal("nativeCompareOrdinalEx : xLengthA != xLengthB, returning " + xResult);
-            }
+        //    int xResult = 0;
+        //    if (xLengthA != xLengthB)
+        //    {
+        //        xResult = xLengthA - xLengthB;
+        //        mDebugger.SendInternal("nativeCompareOrdinalEx : xLengthA != xLengthB, returning " + xResult);
+        //    }
 
-            for (int i = 0; i < xLengthA; i++)
-            {
-                if (aStrA != aStrB)
-                {
-                    xResult = (byte)aStrA[i] - (byte)aStrB[i];
-                    mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA[i] != aStrB[i], returning " + xResult);
-                    return xResult;
-                }
-            }
+        //    for (int i = 0; i < xLengthA; i++)
+        //    {
+        //        if (aStrA != aStrB)
+        //        {
+        //            xResult = (byte)aStrA[i] - (byte)aStrB[i];
+        //            mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA[i] != aStrB[i], returning " + xResult);
+        //            return xResult;
+        //        }
+        //    }
 
-            mDebugger.SendInternal("nativeCompareOrdinalEx (end of func) : aStrA[i] != aStrB[i], returning " + xResult);
-            return xResult;
-        }
+        //    mDebugger.SendInternal("nativeCompareOrdinalEx (end of func) : aStrA[i] != aStrB[i], returning " + xResult);
+        //    return xResult;
+        //}
 
         public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture) =>
             aThis.StartsWith(aSubStr, aIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
@@ -1031,7 +1031,7 @@ namespace Cosmos.Core_Plugs.System
 #endif
         }
 
-        public static int CompareOrdinalHelperIgnoreCase(string strA, int indexA, int countA, string strB, int indexB, int countB)
+        private static int CompareOrdinalHelperIgnoreCase(string strA, int indexA, int countA, string strB, int indexB, int countB)
         {
             return CompareOrdinalHelper(strA.ToLower(), indexA, countA, strB.ToLower(), indexB, countB);
         }
@@ -1056,12 +1056,6 @@ namespace Cosmos.Core_Plugs.System
                 default:
                     throw new ArgumentException("Not Supported StringComparison");
             }
-        }
-
-
-        public unsafe static int nativeCompareOrdinalIgnoreCaseWC(string strA, sbyte* strBBytes)
-        {
-            throw new NotImplementedException("nativeCompareOrdinalIgnoreCaseWC");
         }
     }
 }

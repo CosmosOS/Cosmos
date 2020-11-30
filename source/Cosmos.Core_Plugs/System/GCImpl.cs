@@ -15,5 +15,10 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException();
         }
+
+        public static void _ReRegisterForFinalize(object aObject)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

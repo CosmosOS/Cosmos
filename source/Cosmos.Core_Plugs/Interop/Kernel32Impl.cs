@@ -58,6 +58,76 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Boolean__Interop_Kernel32_QueryUnbiasedInterruptTime__System_UInt64_")]
+        public static bool QueryUnbiasedInterruptTime(ulong aULong)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static int GetCurrentProcessId()
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature ="Interop_BOOL__Interop_Kernel32_QueryPerformanceFrequency_System_Int64__")]
+        public static unsafe bool QueryPerformanceFrequency(long* aLongPtr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static long VerSetConditionMask(ulong aUlong, uint aUint, byte aByte)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe int GetLocaleInfoEx(string aString, uint aUint, void* aVoidPtr, int aInt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe bool EnumCalendarInfoExEx(IntPtr aIntPtr, string aString, uint aUint, string aString2, uint aUint2, void* aVoidPtr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe bool EnumTimeFormatsEx(IntPtr aIntPtr, string aString, uint aUint, void* aVoidPtr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe int GetCalendarInfoEx(string aString, uint aUint, IntPtr aIntPtr, uint aUint2, IntPtr aIntPtr1,
+            int aInt, ref int aInt2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe IntPtr LocalAlloc(uint aUint, UIntPtr aUIntPtr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe uint ExpandEnvironmentStrings(string aString, ref char aChar, uint aUint)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_UInt32__Interop_Kernel32_GetDynamicTimeZoneInformation__Interop_Kernel32_TIME_DYNAMIC_ZONE_INFORMATION_")]
+        public static unsafe uint GetDynamicTimeZoneInformation(ref object aTIME_DYNAMIC_ZONE_INFORMATION)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "Interop_BOOL__Interop_Kernel32_GetUserPreferredUILanguages_System_UInt32__System_UInt32___System_Char___System_UInt32__")]
+        public static unsafe bool GetUserPreferredUILanguages(uint aUint, uint* aUintPtr, char* aCharPtr, uint* aUintPtr2)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Kernel32_GetCalendarInfoEx_System_String__System_UInt32__System_IntPtr__System_UInt32__System_IntPtr__System_Int32__System_IntPtr_")]
+        public static unsafe int GetCalendarInfoEx(string aString, uint aUint, IntPtr aIntPtr, uint aUint2, IntPtr aIntPtr1, int aInt, IntPtr aIntPtr2) {
+            throw new NotImplementedException();
+        }
     }
 
 }

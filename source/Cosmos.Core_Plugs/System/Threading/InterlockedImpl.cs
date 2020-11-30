@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 
 using IL2CPU.API.Attribs;
@@ -20,6 +21,18 @@ namespace Cosmos.Core_Plugs.System.Threading
         }
 
         public static int CompareExchange(ref int location1, int value, int comparand)
+        {
+            var original = location1;
+
+            if (location1 == comparand)
+            {
+                location1 = value;
+            }
+
+            return original;
+        }
+
+        public static long CompareExchange(ref long location1, long value, long comparand)
         {
             var original = location1;
 
@@ -65,6 +78,19 @@ namespace Cosmos.Core_Plugs.System.Threading
             return toReturn;
         }
 
+        public static IntPtr Exchange(ref IntPtr aLocation, IntPtr aValue)
+        {
+            IntPtr toReturn = aLocation;
+            aLocation = aValue;
+            return toReturn;
+        }
+
+        public static long ExchangeAdd(ref long aLocation, long aValue)
+        {
+            long toReturn = aLocation;
+            aLocation += aValue;
+            return toReturn;
+        }
         public static void MemoryBarrier() { }
     }
 }

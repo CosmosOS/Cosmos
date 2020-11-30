@@ -19,5 +19,20 @@ namespace Cosmos.Core_Plugs.Runtime.InteropServices
         {
             throw new NotImplementedException();
         }
+
+        public static void SetLastWin32Error(int aInt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static int SizeOfHelper(Type aType, bool aBool)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool IsPinnable(object aObject)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

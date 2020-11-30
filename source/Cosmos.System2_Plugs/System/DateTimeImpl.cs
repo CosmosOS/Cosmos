@@ -70,5 +70,21 @@ namespace Cosmos.System_Plugs.System
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System.DateTime+FullSystemTime*)(Plug Signature: System_Boolean__System_DateTime_FileTimeToSystemTime_System_Int64__System_DateTime_FullSystemTime__")]
+        public static bool FileTimeToSystemTime(long aLong, object aFulSystemTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static long ToFileTimeLeapSecondsAware(long aLong)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static DateTime ToUniversalTime(DateTime aThis)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -163,5 +163,10 @@ namespace Cosmos.Core_Plugs.System
 
             // Unsafe.CopyBlock(ref destination, ref source, byteCount);
         }
+
+        public static unsafe void __ZeroMemory(void* aVoidPtr, UIntPtr aUIntPtr)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
