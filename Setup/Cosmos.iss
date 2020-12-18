@@ -15,6 +15,10 @@
   #define VSVersion "vs2019"
 #endif
 
+#ifndef RealPath
+  #define RealPath {userappdata}
+#endif
+
 #if BuildConfiguration == "DevKit"
 	; devkit releases are not compressed
 	#pragma warning "Building Dev Kit release"
@@ -36,7 +40,8 @@ AppSupportURL=http://www.goCosmos.org/
 AppUpdatesURL=http://www.goCosmos.org/
 AppVersion={#ChangeSetVersion}
 SetupMutex=CosmosSetupMutexName,Global\CosmoSetupMutexName
-DefaultDirName={userappdata}\Cosmos User Kit
+UsePreviousAppDir=false
+DefaultDirName={#RealPath}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup\Output
 OutputBaseFilename=CosmosUserKit-{#ChangeSetVersion}-{#VSVersion}
