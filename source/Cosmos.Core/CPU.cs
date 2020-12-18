@@ -294,7 +294,7 @@ namespace Cosmos.Core
 
                 if (!(rs == ""))
                 {
-                    return rs;
+                    return rs.Trim();
                 }
                 else
                 {
