@@ -249,7 +249,7 @@ namespace Cosmos.System.Graphics
             //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
             stream.Read(_int, 0, 4);
             uint infoHeaderSize = BitConverter.ToUInt32(_int, 0);
-            if (infoHeaderSize != 40 && infoHeaderSize != 56) // 56 - is BITMAPV3INFOHEADER, where we ignore the additional values see https://web.archive.org/web/20150127132443/https://forums.adobe.com/message/3272950
+            if (infoHeaderSize != 40 && infoHeaderSize != 56 && infoHeaderSize != 124) // 124 - is BITMAPV5INFOHEADER, 56 - is BITMAPV3INFOHEADER, where we ignore the additional values see https://web.archive.org/web/20150127132443/https://forums.adobe.com/message/3272950
             {
                 throw new Exception("Info header size has the wrong value!");
             }
