@@ -112,13 +112,22 @@
         }
 
         /// <summary>
-        /// Convert 64-bit unsigned int to 16 characters long hexadecimal string, padded with '0's.
+        /// Convert 64-bit unsigned int to 16 characters long hexadecimal string, optionally padded with '0's.
         /// </summary>
         /// <param name="aValue">A 64-bit unsigned int to be converted to hexadecimal string.</param>
-        /// <returns>16 characters long string value, padded with '0's.</returns>
-        public static string ToHex(this ulong aValue)
+        /// <param name="withPadding">Determines if a left padding should be applied</param>
+        /// <returns>16 characters long string value, optionally padded with '0's.</returns>
+        public static string ToHex(this ulong aValue, bool withPadding = true)
         {
-            return ConvertToHex(aValue).PadLeft(16, '0');
+            var hex = ConvertToHex(aValue);
+            if (withPadding)
+            {
+                return hex.PadLeft(16, '0');
+            }
+            else
+            {
+                return hex;
+            }
         }
 
         /// <summary>
