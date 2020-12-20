@@ -2,6 +2,23 @@
 
 namespace Cosmos.Debug.Kernel
 {
+    public class DebuggerFactory
+    {
+        public static bool WriteToConsole = false;
+
+        public static Debugger CreateDebugger(string aRing = "", string aSection = "")
+        {
+            if (WriteToConsole)
+            {
+                return new ConsoleDebugger(aRing, aSection);
+            }
+            else
+            {
+                return new Debugger(aRing, aSection);
+            }
+        }
+    }
+
     public class Debugger
     {
         public Debugger(string aRing, string aSection)
@@ -65,28 +82,28 @@ namespace Cosmos.Debug.Kernel
         public static void SendKernelPanic(uint id) { }
 
         public void Send(string aText) => DoSend(aText);
-        
-        [Conditional("COSMOSDEBUG")]
-        public void SendInternal(string aText) => DoSend(aText);
-        
-        [Conditional("COSMOSDEBUG")]
-        public void SendInternal(uint aNumber) => DoSendNumber(aNumber);
-        
-        [Conditional("COSMOSDEBUG")]
-        public void SendInternal(int aNumber) => DoSendNumber(aNumber);
 
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(ulong aNumber) => DoSendNumber(aNumber);
+        public virtual void SendInternal(string aText) => DoSend(aText);
         
         [Conditional("COSMOSDEBUG")]
-        public void SendInternal(long aNumber) => DoSendNumber(aNumber);
-
-        [Conditional("COSMOSDEBUG")]
-        public void SendInternal(float aNumber)  => DoSendNumber(aNumber);
-
-        [Conditional("COSMOSDEBUG")]
-        public void SendInternal(double aNumber) => DoSendNumber(aNumber);
+        public virtual void SendInternal(uint aNumber) => DoSendNumber(aNumber);
         
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(int aNumber) => DoSendNumber(aNumber);
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(ulong aNumber) => DoSendNumber(aNumber);
+        
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(long aNumber) => DoSendNumber(aNumber);
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(float aNumber)  => DoSendNumber(aNumber);
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(double aNumber) => DoSendNumber(aNumber);
+
         //public void OldSend(string aText) {
         //    // TODO: Need to fix this so it can send empty strings.
         //    // Sending empty strings locks it up right now

@@ -18,6 +18,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             expectedResult = "18446744073709551615";
 
             Assert.IsTrue((result == expectedResult), "UInt64.ToString doesn't work");
+            Assert.IsTrue(value.ToString("X") == "FFFFFFFFFFFFFFFF", "UInt64.ToString(X) doesn't work");
+            Assert.IsTrue(((ulong)0x121411443).ToString("X") == "121411443", "UInt64.ToString(X) doesn't work");
 
             // Now let's try to concat to a String using '+' operator
             result = "The Maximum value of an UInt64 is " + value;
