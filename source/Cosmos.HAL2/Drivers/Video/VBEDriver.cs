@@ -81,8 +81,21 @@ namespace Cosmos.HAL.Drivers
             if (VBE.IsAvailable()) //VBE VESA Enabled Mulitboot Parsing
             {
                 Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {xres}*{yres}@{bpp}");
-                IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
-                lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
+
+                var ModeInfo = VBE.getModeInfo();
+
+                if ((ModeInfo.pitch / 4) == ModeInfo.width) //linear framebuffer detection
+                {
+                    IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
+                    lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
+                }
+                else
+                {
+                    uint OffScreenSize = (ModeInfo.pitch / (uint)(bpp / 8)) - ModeInfo.width;
+
+                    IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)(xres * yres * (uint)(bpp / 8)) + (OffScreenSize * yres * (uint)(bpp / 8)));
+                    lastbuffer = new ManagedMemoryBlock((uint)(xres * yres * (uint)(bpp / 8)) + (OffScreenSize * yres * (uint)(bpp / 8)));
+                }
             }
             else if (ISAModeAvailable()) //Bochs Graphics Adaptor ISA Mode
             {
