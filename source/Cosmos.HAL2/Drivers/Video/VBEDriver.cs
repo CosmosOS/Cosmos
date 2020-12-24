@@ -84,7 +84,7 @@ namespace Cosmos.HAL.Drivers
 
                 var ModeInfo = VBE.getModeInfo();
 
-                if ((ModeInfo.pitch / 4) == ModeInfo.width) //linear framebuffer detection
+                if ((ModeInfo.pitch / (bpp / 8)) == ModeInfo.width) //linear framebuffer detection
                 {
                     IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
                     lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
