@@ -64,7 +64,7 @@ namespace Cosmos.Core_Plugs.Interop
         }
 
         [PlugMethod(Signature = "System_Int32__Interop_Advapi32_RegOpenKeyEx_Internal_Win32_SafeHandles_SafeRegistryHandle__System_String__System_Int32__System_Int32___Internal_Win32_SafeHandles_SafeRegistryHandle_")]
-        public static unsafe int RegOpenKeyEx(IntPtr hKey, string lpSubKey, int ulOptions, int samDesired, out object hkResult)
+        public static unsafe int RegOpenKeyEx(object aSafeHandle, string lpSubKey, int ulOptions, int samDesired, out object hkResult)
         {
             throw new NotImplementedException();
         }

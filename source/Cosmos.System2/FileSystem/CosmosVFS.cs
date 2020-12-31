@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -741,11 +741,15 @@ namespace Cosmos.System.FileSystem
                 var xPartFound = false;
                 var xListing = aFS.GetDirectoryListing(xBaseDirectory);
 
+                Global.mFileSystemDebugger.SendInternal("xPathPart: " + xPathPart);
+
                 for (int j = 0; j < xListing.Count; j++)
                 {
                     var xListingItem = xListing[j];
                     string xListingItemName = xListingItem.mName.ToLower();
                     xPathPart = xPathPart.ToLower();
+
+                    Global.mFileSystemDebugger.SendInternal(xListingItemName);
 
                     if (xListingItemName == xPathPart)
                     {

@@ -23,5 +23,10 @@ namespace Cosmos.Core_Plugs.System
         {
             //
         }
+
+        public static Type[] GetInterfaces(object aThis)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

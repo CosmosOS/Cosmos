@@ -52,13 +52,45 @@ namespace Cosmos.TestRunner
             var xResult = expected == actual;
             if (!xResult)
             {
-                TestController.Debugger.Send("Expected value");
-                TestController.Debugger.Send(expected);
-                TestController.Debugger.Send("Actual value");
-                TestController.Debugger.Send(actual);
+                TestController.Debugger.Send($"Expected value: '{expected}'");
+                TestController.Debugger.Send($"Actual value: '{actual}'");
             }
             IsTrue(xResult, message, file, line);
         }
 
+        public static void AreEqual(string[] expected, string[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            if(expected.Length != actual.Length)
+            {
+                TestController.Debugger.Send($"Array lengths differ: Expected: {expected.Length} Actual: {actual.Length}");
+                if (actual.Length < 32 && expected.Length < 32)
+                {
+                    TestController.Debugger.Send("Values in Expected:");
+                    for (int i = 0; i < expected.Length; i++)
+                    {
+                        TestController.Debugger.Send(expected[i]);
+                    }
+                    TestController.Debugger.Send("Values in Actual:");
+                    for (int i = 0; i < actual.Length; i++)
+                    {
+                        TestController.Debugger.Send(actual[i]);
+                    }
+                }
+                IsTrue(false, message, file, line);
+                return;
+            }
+            for (int i = 0; i < expected.Length; i++)
+            {
+                if(expected[i] != actual[i])
+                {
+                    TestController.Debugger.Send($"Values differ in row {i}");
+                    TestController.Debugger.Send($"Expected value: '{expected[i]}'");
+                    TestController.Debugger.Send($"Actual value: '{actual[i]}'");
+                    IsTrue(false, message, file, line);
+                    return;
+                }
+            }
+            IsTrue(true, message, file, line);
+        }
     }
 }

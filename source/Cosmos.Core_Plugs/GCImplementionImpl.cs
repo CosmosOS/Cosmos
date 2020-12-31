@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Cosmos.Core.Memory.Old;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
@@ -17,6 +18,10 @@ namespace Cosmos.Core_Plugs {
             //    return Managed_Memory_System.ManagedMemory.KernelMemAlloc(aSize);
             //}
             GlobalSystemInfo.EnsureInitialized();
+            if(aSize == 0xE001FEB6)
+            {
+                Debugger.DoBochsBreak();
+            }
             return Heap.MemAlloc(aSize);
         }
 

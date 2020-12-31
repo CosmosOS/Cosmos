@@ -2,6 +2,7 @@
 using System.IO;
 using Cosmos.TestRunner;
 using Cosmos.Debug.Kernel;
+using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.Kernel.Tests.Fat.System.IO
 {
@@ -376,6 +377,17 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
 
             mDebugger.Send("");
 
+            mDebugger.Send("START TEST");
+            var parts = VFSManager.SplitPath(@"0:\TestDir1");
+            Assert.AreEqual("0:", parts[0], "SplitPath works part 0");
+            Assert.AreEqual("TestDir1", parts[1], "SplitPath works part 1");
+            parts = VFSManager.SplitPath(@"0:\test\12");
+            Assert.AreEqual("0:", parts[0], "SplitPath works part 0");
+            Assert.AreEqual("test", parts[1], "SplitPath works part 1");
+            Assert.AreEqual("12", parts[1], "SplitPath works part 2");
+
+
+            mDebugger.Send("END TEST");
             // Path.IsPathRooted(string)
         }
     }

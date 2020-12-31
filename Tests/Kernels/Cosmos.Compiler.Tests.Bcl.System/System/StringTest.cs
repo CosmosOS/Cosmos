@@ -6,8 +6,25 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 {
     public static class StringTest
     {
-        public static void Execute()
+        public static unsafe void Execute()
         {
+            #region ctors
+
+            char[] charArray ={ 'h', 'e', 'l', 'l', 'o', '\u0000' };
+            string aString = new string(charArray);
+            Assert.AreEqual("hello\u0000", aString, "String can be created from char array");
+            Assert.AreEqual(6, aString.Length, "Length of string from char array is correct");
+
+            fixed(char* ptr = charArray)
+            {
+                aString = new string(ptr);
+                Assert.AreEqual("hello", aString, "String can be created from char ptr");
+                Assert.AreEqual(5, aString.Length, "Length of string from char ptr is correct");
+            }
+
+            #endregion
+
+
             string xTestStr = "Test";
             int xExpectedLength = 4;
             int xLength = xTestStr.Length;
@@ -41,6 +58,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             xResultArray = split_in.Split(new[] { "B" }, StringSplitOptions.None);
             Assert.IsTrue(xResultArray.Length == 2, "String.Split(string[], StringSplitOptions) doesn't work.");
+
+            string to_split = "AAABACADADBCA";
+
+            xResultArray = to_split.Split(new[] { "B", "C" }, StringSplitOptions.RemoveEmptyEntries);
+            Assert.AreEqual(new[] { "AAA", "A", "ADAD","A" }, xResultArray, "Splitting works with RemoveEmptyEntries");
 
             string test = "This is a test string.";
             Assert.IsTrue(test.Contains("test"), "String.Contains(string) doesn't find a substring that actually exists.");

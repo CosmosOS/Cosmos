@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>net5.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
-        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win10-x86</RuntimeIdentifier>
         <SignAssembly>False</SignAssembly>
     </PropertyGroup>
 

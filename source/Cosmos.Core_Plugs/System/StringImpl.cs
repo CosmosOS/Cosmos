@@ -1,4 +1,4 @@
-//#define COSMOSDEBUG
+#define COSMOSDEBUG
 using System;
 using System.Globalization;
 using Cosmos.Common;
@@ -13,25 +13,21 @@ namespace Cosmos.Core_Plugs.System
     {
         internal static Debugger mDebugger = new Debugger("Core", "String Plugs");
 
-        public static unsafe void Ctor(
-            string aThis,
-            char* aChars,
+        public static unsafe void Ctor(string aThis, char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
             mDebugger.SendInternal("String.Ctor(string, char*)");
-
             aStringEmpty = "";
             while (*aChars != '\0')
             {
-                aChars++;
+                mDebugger.SendInternal(*aChars);
+                aFirstChar[aStringLength] = *aChars;
                 aStringLength++;
+                aChars++;
             }
-            for (int i = 0; i < aStringLength; i++)
-            {
-                aFirstChar[i] = aChars[i];
-            }
+            mDebugger.SendInternal(aStringLength);
         }
 
         public static unsafe void Ctor(
@@ -132,6 +128,10 @@ namespace Cosmos.Core_Plugs.System
             [ObjectPointerAccess] uint* aThis,
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aLength)
         {
+            if(aLength < 0 || aLength > 1000)
+            {
+                Debugger.DoBochsBreak();
+            }
             return aLength;
         }
 
