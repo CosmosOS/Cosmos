@@ -17,7 +17,7 @@ namespace Cosmos.Build.Builder.Dependencies
             NetCoreToolsWorkload,
             VisualStudioExtensionsWorkload
         };
-
+        public bool ShouldInstallByDefault => false;
         public string Name => "Visual Studio Workloads";
 
         private readonly ISetupInstance2 _visualStudioInstance;

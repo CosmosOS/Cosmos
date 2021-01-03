@@ -13,6 +13,7 @@ namespace Cosmos.Build.Builder.Dependencies
     internal class ReposDependency : IDependency
     {
         public string Name => "Repos: IL2CPU, XSharp and Common";
+        public bool ShouldInstallByDefault => true;
 
         private readonly string _cosmosDir;
         private readonly IEnumerable<Repo> _repos;

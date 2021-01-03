@@ -109,14 +109,26 @@ namespace Cosmos.Build.Builder.ViewModels
                     {
                         _logger.LogMessage($"{dependency.Name} not found.");
 
-                        using (var viewModel = new DependencyInstallationDialogViewModel(dependency))
+                        if (dependency.ShouldInstallByDefault)
                         {
-                            _dependencyInstallationDialogService.ShowDialog(viewModel);
-
-                            if (!viewModel.InstallationSucceeded)
+                            using (var viewModel = new DependencyInstallationDialogViewModel(dependency))
                             {
-                                throw new Exception($"Dependency installation failed! Dependency name: {dependency.Name}");
+                                _dependencyInstallationDialogService.ShowDialog(viewModel);
+
+                                if (!viewModel.InstallationSucceeded)
+                                {
+                                    throw new Exception($"Dependency installation failed! Dependency name: {dependency.Name}");
+                                }
                             }
+                        }
+                        else
+                        {
+                            MessageBox.Show($"{dependency.Name} is not installed. Please install {dependency.Name}");
+                            _logger.SetError();
+                            _logger.NewSection("Error");
+                            _logger.LogMessage($"{dependency.Name} not found.");
+                            _logger.SetError();
+                            return;
                         }
                     }
                 }

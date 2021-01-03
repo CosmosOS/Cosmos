@@ -14,6 +14,7 @@ namespace Cosmos.Build.Builder.Dependencies
         private const string InnoSetupInstallerUrl = "http://www.jrsoftware.org/download.php/is.exe";
 
         public string Name => "Inno Setup";
+        public bool ShouldInstallByDefault => true;
 
         private readonly IInnoSetupService _innoSetupService;
 
