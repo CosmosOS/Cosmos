@@ -431,8 +431,23 @@ namespace Cosmos.System_Plugs.System
             return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), xShift, xAlt, xControl);
         }
 
+        /// <summary>
+        /// This will contain the context that locked the Console for the ReadLine()
+        /// </summary>
+        private static Core.Processing.ProcessContext.Context LockContext = null;
+        /// <summary>
+        /// This will contain the queue where threads have to wait before accessing the ReadLine method
+        /// </summary>
+        private static List<Core.Processing.ProcessContext.Context> queue = new List<Core.Processing.ProcessContext.Context>();
+        private static List<Core.Processing.ProcessContext.Context> old = null;
         public static String ReadLine()
         {
+            if (LockContext is null) LockContext = Core.Processing.ProcessContext.m_CurrentContext; //if nobody locked the Console, just lock it
+            else if (LockContext != Core.Processing.ProcessContext.m_CurrentContext)
+            {
+                queue.Add(Core.Processing.ProcessContext.m_CurrentContext);
+                while (LockContext != Core.Processing.ProcessContext.m_CurrentContext) ;
+            }
             var xConsole = GetConsole();
             if (xConsole == null)
             {
@@ -529,6 +544,19 @@ namespace Cosmos.System_Plugs.System
             WriteLine();
 
             char[] final = chars.ToArray();
+            //if there's some process queued, we just set the first as the main and queue the otherones
+            if (queue.Count > 0)
+            {
+                Cosmos.HAL.Global.mDebugger.Send($"Dequeuing {queue[0].name} and locking console to it");
+                LockContext = queue[0];
+                old = queue;
+                queue = new List<Core.Processing.ProcessContext.Context>();
+                foreach (Core.Processing.ProcessContext.Context context in old)
+                {
+                    if (context != LockContext)
+                        queue.Add(context);
+                }
+            }
             return new string(final);
         }
 
