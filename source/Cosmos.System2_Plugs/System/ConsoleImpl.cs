@@ -431,24 +431,26 @@ namespace Cosmos.System_Plugs.System
             return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), xShift, xAlt, xControl);
         }
 
-        private static Core.Processing.ProcessContext.Context LockContext = null;
-        private static List<Core.Processing.ProcessContext.Context> queue = new List<Core.Processing.ProcessContext.Context>();
+        private static LockSystem.Lock _lock = LockSystem.DefineLock("Console");
+        private static List<char> chars = new List<char>(32);
+
         private static List<Core.Processing.ProcessContext.Context> old = null;
         public static String ReadLine()
         {
-            if (LockContext == null) LockContext = Core.Processing.ProcessContext.m_CurrentContext; //if nobody locked the Console, just lock it
-            else if (LockContext != Core.Processing.ProcessContext.m_CurrentContext)
+            if (_lock.LockContext == null) _lock.LockContext = Core.Processing.ProcessContext.m_CurrentContext; //if nobody locked the Console, just lock it
+            else if (_lock.LockContext != Core.Processing.ProcessContext.m_CurrentContext)
             {
-                queue.Add(Core.Processing.ProcessContext.m_CurrentContext);
-                while (LockContext != Core.Processing.ProcessContext.m_CurrentContext) ;
+                _lock.queue.Add(Core.Processing.ProcessContext.m_CurrentContext);
+                while (_lock.LockContext != Core.Processing.ProcessContext.m_CurrentContext) ;
             }
+            LockSystem.definedLocks["Console"] = _lock;
+            chars = new List<char>(32);
             var xConsole = GetConsole();
             if (xConsole == null)
             {
                 // for now:
                 return null;
             }
-            List<char> chars = new List<char>(32);
             KeyEvent current;
             int currentCount = 0;
 
@@ -537,18 +539,20 @@ namespace Cosmos.System_Plugs.System
             }
             WriteLine();
 
+            while (_lock.LockContext != Core.Processing.ProcessContext.m_CurrentContext) ; //let's wait until we go back to the lock thread
+
             char[] final = chars.ToArray();
-            //if there's some process queued, we just set the first as the main and queue the otherones
-            if (queue.Count > 0)
+            //if there's some process queued, we just set the first as the main and queue the other ones
+            if (_lock.queue.Count > 0)
             {
-                Cosmos.HAL.Global.mDebugger.Send($"Removing {queue[0].name} from Queue and locking console to it");
-                LockContext = queue[0];
-                old = queue;
-                queue = new List<Core.Processing.ProcessContext.Context>();
+                HAL.Global.mDebugger.Send($"Removing {_lock.queue[0].name} from Queue and locking console to it");
+                _lock.LockContext = _lock.queue[0];
+                old = _lock.queue;
+                _lock.queue = new List<Core.Processing.ProcessContext.Context>();
                 foreach (Core.Processing.ProcessContext.Context context in old)
                 {
-                    if (context != LockContext)
-                        queue.Add(context);
+                    if (context != _lock.LockContext)
+                        _lock.queue.Add(context);
                 }
             }
             return new string(final);
@@ -623,9 +627,20 @@ namespace Cosmos.System_Plugs.System
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
         public static void Write(object value) => Write((value ?? String.Empty));
 
+        private static Cosmos.System.Console xConsole = null;
+
+        private static List<Core.Processing.ProcessContext.Context> WOld = null;
+        private static LockSystem.Lock _Wlock = LockSystem.DefineLock("Console.Write");
         public static void Write(string aText)
         {
-            var xConsole = GetConsole();
+            if (_Wlock.LockContext == null) _Wlock.LockContext = Core.Processing.ProcessContext.m_CurrentContext; //if nobody locked the Console, just lock it
+            else if (_Wlock.LockContext != Core.Processing.ProcessContext.m_CurrentContext)
+            {
+                _Wlock.queue.Add(Core.Processing.ProcessContext.m_CurrentContext);
+                while (_Wlock.LockContext != Core.Processing.ProcessContext.m_CurrentContext) ;
+            }
+            LockSystem.definedLocks["Console"] = _Wlock;
+            xConsole = GetConsole();
             if (xConsole == null)
             {
                 // for now:
@@ -634,6 +649,19 @@ namespace Cosmos.System_Plugs.System
 
             byte[] aTextEncoded = ConsoleOutputEncoding.GetBytes(aText);
             GetConsole().Write(aTextEncoded);
+            //if there's some process queued, we just set the first as the main and queue the other ones
+            if (_Wlock.queue.Count > 0)
+            {
+                HAL.Global.mDebugger.Send($"Removing {_Wlock.queue[0].name} from Queue and locking console to it");
+                _Wlock.LockContext = _Wlock.queue[0];
+                WOld = _Wlock.queue;
+                _Wlock.queue = new List<Core.Processing.ProcessContext.Context>();
+                foreach (Core.Processing.ProcessContext.Context context in WOld)
+                {
+                    if (context != _Wlock.LockContext)
+                        _Wlock.queue.Add(context);
+                }
+            }
         }
 
         public static void Write(uint aInt) => Write(aInt.ToString());
