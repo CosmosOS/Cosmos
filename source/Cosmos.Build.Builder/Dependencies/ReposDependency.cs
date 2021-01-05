@@ -30,7 +30,7 @@ namespace Cosmos.Build.Builder.Dependencies
                 }
                 if (!Directory.Exists(Path.GetFullPath(Path.Combine(_cosmosDir, "..", "Common"))))
                 {
-                    result += "Common Repo, ";
+                    result += "Common Repo";
                 }
                 return result;
             }
