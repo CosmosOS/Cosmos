@@ -109,19 +109,22 @@ namespace Cosmos.Core_Plugs.System
             throw new NotImplementedException("String Ctor(sbyte ptr with lenght)");
         }
 
-        public static unsafe void Ctor(
-            string aThis,
-            ReadOnlySpan<char> value,
+        public static unsafe void Ctor(string aThis, ReadOnlySpan<char> value,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
+            mDebugger.Send("String.Ctor ReadonlySpan");
+            mDebugger.SendInternal(value[0]);
+            mDebugger.SendInternal(value.Length);
             aStringEmpty = "";
-
+            aStringLength = value.Length;
             for (int i = 0; i < value.Length; i++)
             {
+                mDebugger.SendInternal(value[i]);
                 aFirstChar[i] = value[i];
             }
+            mDebugger.Send(aThis);
         }
 
         public static unsafe int get_Length(

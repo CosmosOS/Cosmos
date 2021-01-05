@@ -111,6 +111,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 Assert.AreEqual('l', val[4], "Accessing values using pointer works at offset 4");
             }
 
+            string[] stringArray = new string[] { "ABC", "BAB", "TAT", "A", "", "LA" };
+            Array.Resize(ref stringArray, 3);
+            Assert.AreEqual(new string[] { "ABC", "BAB", "TAT" }, stringArray, "Array.Resize works");
+
         }
     }
 }

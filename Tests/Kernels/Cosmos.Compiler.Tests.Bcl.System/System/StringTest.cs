@@ -1,29 +1,65 @@
 ﻿using System;
-
+using System.Buffers;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    public static class StringTest
+    class StringTest
     {
+
         public static unsafe void Execute()
         {
             #region ctors
 
-            char[] charArray ={ 'h', 'e', 'l', 'l', 'o', '\u0000' };
+            char[] charArray = { 'h', 'e', 'l', 'l', 'o', '\u0000' };
             string aString = new string(charArray);
             Assert.AreEqual("hello\u0000", aString, "String can be created from char array");
             Assert.AreEqual(6, aString.Length, "Length of string from char array is correct");
 
-            fixed(char* ptr = charArray)
+            fixed (char* ptr = charArray)
             {
                 aString = new string(ptr);
                 Assert.AreEqual("hello", aString, "String can be created from char ptr");
                 Assert.AreEqual(5, aString.Length, "Length of string from char ptr is correct");
             }
 
-            #endregion
+            charArray = new []{ 'h', 'e', 'l', 'l', 'o'};
+            ReadOnlySpan<char> span = new ReadOnlySpan<char>(charArray);
+            Assert.AreEqual(charArray.Length, span.Length, "Array and Span have the same length");
+            Assert.AreEqual(charArray[0], span[0], "Array and span have same value at index 0");
+            Assert.AreEqual(charArray[2], charArray[2], "Array and span have same value at index 2");
 
+            Assert.AreEqual("hello", new string(span), "Creating string from span works");
+
+            Assert.AreEqual("hello", span.ToString(), "span.ToString works");
+
+
+
+            string test = "123456";
+            span = test.AsSpan(0, 2);
+            Assert.AreEqual("12", span.ToString(), "AsSpan works 0-2");
+
+            span = test.AsSpan(0, 6);
+            Assert.AreEqual("123456", span.ToString(), "AsSpan works 0-6");
+
+            span = test.AsSpan(1, 3);
+            Assert.AreEqual("234", span.ToString(), "AsSpan works 1-3");
+
+            span = test.AsSpan(1, 5);
+            Assert.AreEqual("23456", span.ToString(), "AsSpan works 1-5");
+
+            span = test.AsSpan(2);
+            Assert.AreEqual("3456", span.ToString(), "AsSpan works 2-");
+
+            span = "AAABACADADBCA".AsSpan(0, 3);
+            Assert.AreEqual("AAA", span.ToString(), "What breaks for Split, works directly...");
+
+            string whiteSpaceText = "  1  2  ";
+            span = whiteSpaceText.AsSpan();
+            Assert.AreEqual("1  2", span.Trim().ToString(), "Span.Trim works");
+            Assert.IsFalse(span.IsEmpty, "span.IsEmpty works");
+
+            #endregion
 
             string xTestStr = "Test";
             int xExpectedLength = 4;
@@ -61,10 +97,16 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             string to_split = "AAABACADADBCA";
 
+            xResultArray = to_split.Split(new[] { "B", "C" }, StringSplitOptions.None);
+            Assert.AreEqual(new[] { "AAA", "A", "ADAD", "", "A" }, xResultArray, "Splitting works with multiple things to split by");
             xResultArray = to_split.Split(new[] { "B", "C" }, StringSplitOptions.RemoveEmptyEntries);
-            Assert.AreEqual(new[] { "AAA", "A", "ADAD","A" }, xResultArray, "Splitting works with RemoveEmptyEntries");
+            for (int i = 0; i < xResultArray.Length; i++)
+            {
+                Assert.IsTrue(true, xResultArray[i]);
+            }
+            Assert.AreEqual(new[] { "AAA", "A", "ADAD", "A" }, xResultArray, "Splitting works with RemoveEmptyEntries");
 
-            string test = "This is a test string.";
+            test = "This is a test string.";
             Assert.IsTrue(test.Contains("test"), "String.Contains(string) doesn't find a substring that actually exists.");
             Assert.IsTrue(test.Contains("ing"), "String.Contains(string) doesn't find a substring that actually exists.");
             Assert.IsFalse(test.Contains("cosmos"), "String.Contains(string) found a substring that didn't actually exist in a string.");
