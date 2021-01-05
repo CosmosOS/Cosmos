@@ -16,6 +16,11 @@ namespace Cosmos.Build.Builder.Dependencies
         public string Name => "Inno Setup";
         public bool ShouldInstallByDefault => true;
 
+        public string OtherDependencysThatAreMissing
+        {
+            get { return Name; }
+        }
+
         private readonly IInnoSetupService _innoSetupService;
 
         public InnoSetupDependency(IInnoSetupService innoSetupService)

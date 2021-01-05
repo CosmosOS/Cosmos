@@ -107,7 +107,7 @@ namespace Cosmos.Build.Builder.ViewModels
                     }
                     else
                     {
-                        _logger.LogMessage($"{dependency.Name} not found.");
+                        _logger.LogMessage($"{dependency.Name} not found. Install {dependency.OtherDependencysThatAreMissing}");
 
                         if (dependency.ShouldInstallByDefault)
                         {
@@ -123,7 +123,7 @@ namespace Cosmos.Build.Builder.ViewModels
                         }
                         else
                         {
-                            MessageBox.Show($"{dependency.Name} is not installed. Please install {dependency.Name}");
+                            MessageBox.Show($"{dependency.Name} is not installed. Please install {dependency.OtherDependencysThatAreMissing}");
                             _logger.SetError();
                             _logger.NewSection("Error");
                             _logger.LogMessage($"{dependency.Name} not found.");

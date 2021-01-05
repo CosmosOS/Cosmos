@@ -11,6 +11,10 @@ namespace Cosmos.Build.Builder.Dependencies
         private static readonly Version MinimumVsVersion = new Version(15, 9);
         public bool ShouldInstallByDefault => true;
         public string Name => $"Visual Studio {MinimumVsVersion.Major}.{MinimumVsVersion.Minor}+";
+        public string OtherDependencysThatAreMissing
+        {
+            get { return Name+"+"; }
+        }
 
         private readonly ISetupInstance2 _visualStudioInstance;
 
