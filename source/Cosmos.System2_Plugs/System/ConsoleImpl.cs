@@ -14,6 +14,8 @@ namespace Cosmos.System_Plugs.System
         private static ConsoleColor mBackground = ConsoleColor.Black;
         private static Encoding ConsoleInputEncoding = Encoding.ASCII;
         private static Encoding ConsoleOutputEncoding = Encoding.ASCII;
+        private static Core.Processing.Mutex mConsoleGateRead = new Core.Processing.Mutex();
+        private static Core.Processing.Mutex mConsoleGateWrite = new Core.Processing.Mutex();
 
         private static readonly Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
 
@@ -431,15 +433,18 @@ namespace Cosmos.System_Plugs.System
             return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), xShift, xAlt, xControl);
         }
 
+        private static List<char> chars = new List<char>(32);
         public static String ReadLine()
         {
+            if (mConsoleGateRead != null)
+                mConsoleGateRead.Lock();
+            chars = new List<char>(32);
             var xConsole = GetConsole();
             if (xConsole == null)
             {
                 // for now:
                 return null;
             }
-            List<char> chars = new List<char>(32);
             KeyEvent current;
             int currentCount = 0;
 
@@ -529,6 +534,8 @@ namespace Cosmos.System_Plugs.System
             WriteLine();
 
             char[] final = chars.ToArray();
+            if (mConsoleGateRead != null)
+                mConsoleGateRead.Unlock();
             return new string(final);
         }
 
@@ -601,17 +608,21 @@ namespace Cosmos.System_Plugs.System
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
         public static void Write(object value) => Write((value ?? String.Empty));
 
+        private static Cosmos.System.Console xConsole = null;
+
         public static void Write(string aText)
         {
-            var xConsole = GetConsole();
-            if (xConsole == null)
+            if (mConsoleGateWrite != null)
             {
-                // for now:
-                return;
+                mConsoleGateWrite.Lock();
             }
-
             byte[] aTextEncoded = ConsoleOutputEncoding.GetBytes(aText);
             GetConsole().Write(aTextEncoded);
+            //if there's some process queued, we just set the first as the main and queue the other ones
+            if (mConsoleGateWrite != null)
+            {
+                mConsoleGateWrite.Unlock();
+            }
         }
 
         public static void Write(uint aInt) => Write(aInt.ToString());
