@@ -31,7 +31,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.AreEqual("hello", new string(span), "Creating string from span works");
 
-            Assert.AreEqual("hello", span.ToString(), "span.ToString works");
+            string spanString = span.ToString();
+            Assert.AreEqual("hello", spanString, "span.ToString works");
 
 
 
@@ -217,6 +218,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             //int hashCode = stringToHash.GetHashCode();
 
             //Assert.IsTrue(hashCode == -871206010, "String.GetHashCode() not working!");
+
+            // we test if the strigns allocted at the beginning are still correct to ensure that the memory they were allocated in was not incorrectly overwritten
+            // we need to test all of the ctors since we have custom code in the NewObj.cs to calculate the correct length for the string to be allocated
+            Assert.AreEqual("hello", aString, "aString is still correct");
+            Assert.AreEqual("hello", spanString, "spanString is still correct");
         }
     }
 }

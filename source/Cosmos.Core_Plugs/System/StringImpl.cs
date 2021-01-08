@@ -30,11 +30,7 @@ namespace Cosmos.Core_Plugs.System
             mDebugger.SendInternal(aStringLength);
         }
 
-        public static unsafe void Ctor(
-            string aThis,
-            char* aChars,
-            int start,
-            int length,
+        public static unsafe void Ctor(string aThis, char* aChars, int start, int length,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
@@ -47,9 +43,7 @@ namespace Cosmos.Core_Plugs.System
             }
         }
 
-        public static unsafe void Ctor(
-            string aThis,
-            char[] aChars,
+        public static unsafe void Ctor(string aThis, char[] aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
@@ -62,11 +56,7 @@ namespace Cosmos.Core_Plugs.System
             }
         }
 
-        public static unsafe void Ctor(
-            string aThis,
-            char[] aChars,
-            int start,
-            int length,
+        public static unsafe void Ctor(string aThis, char[] aChars, int start, int length,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
@@ -79,10 +69,7 @@ namespace Cosmos.Core_Plugs.System
             }
         }
 
-        public static unsafe void Ctor(
-            string aThis,
-            char aChar,
-            int aLength,
+        public static unsafe void Ctor(string aThis, char aChar, int aLength,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
@@ -124,6 +111,7 @@ namespace Cosmos.Core_Plugs.System
                 mDebugger.SendInternal(value[i]);
                 aFirstChar[i] = value[i];
             }
+            //Debugger.DoBochsBreak();
             mDebugger.Send(aThis);
         }
 
