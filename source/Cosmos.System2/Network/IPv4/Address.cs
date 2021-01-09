@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          IP Address
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -69,14 +76,38 @@ namespace Cosmos.System.Network.IPv4
             string[] fragments = adr.Split('.');
             if (fragments.Length == 4)
             {
-                byte first = byte.Parse(fragments[0]);
-                byte second = byte.Parse(fragments[1]);
-                byte third = byte.Parse(fragments[2]);
-                byte fourth = byte.Parse(fragments[3]);
-
-                return new Address(first, second, third, fourth);
+                try
+                {
+                    byte first = byte.Parse(fragments[0]);
+                    byte second = byte.Parse(fragments[1]);
+                    byte third = byte.Parse(fragments[2]);
+                    byte fourth = byte.Parse(fragments[3]);
+                    return new Address(first, second, third, fourth);
+                }
+                catch
+                {
+                    return null;
+                }
             }
             else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Convert CIDR number to IPv4 Address
+        /// </summary>
+        /// <param name="cidr">CIDR number.</param>
+        /// <returns></returns>
+        public static Address CIDRToAddress(int cidr)
+        {
+            try
+            {
+                uint mask = 0xffffffff << (32 - cidr);
+                return new Address((byte)(mask >> 24), (byte)(mask >> 16 & 0xff), (byte)(mask >> 8 & 0xff), (byte)(mask & 0xff));
+            }
+            catch
             {
                 return null;
             }

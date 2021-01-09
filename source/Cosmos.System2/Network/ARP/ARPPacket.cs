@@ -1,4 +1,11 @@
-﻿using sys = System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          ARP Packet
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.IPv4;

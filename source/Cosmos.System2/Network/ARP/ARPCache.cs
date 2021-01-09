@@ -1,5 +1,11 @@
-﻿using System;
-using sysIO = System.IO;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          ARP Cache (Contains MAC/IP)
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network.ARP
@@ -12,7 +18,7 @@ namespace Cosmos.System.Network.ARP
         /// <summary>
         /// Cache.
         /// </summary>
-        private static TempDictionary<MACAddress> cache;
+        private static TempDictionary<uint, MACAddress> cache;
 
         /// <summary>
         /// Ensure cache exists.
@@ -22,7 +28,7 @@ namespace Cosmos.System.Network.ARP
         {
             if (cache == null)
             {
-                cache = new TempDictionary<MACAddress>();
+                cache = new TempDictionary<uint, MACAddress>();
             }
         }
 
@@ -50,7 +56,7 @@ namespace Cosmos.System.Network.ARP
             ensureCacheExists();
             if (ipAddress == null)
             {
-              global::System.Console.Write("");
+                global::System.Console.Write("");
             }
             UInt32 ip_hash = ipAddress.Hash;
             if (ip_hash == 0)

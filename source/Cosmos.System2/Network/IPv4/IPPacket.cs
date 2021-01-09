@@ -1,6 +1,16 @@
-﻿using sys = System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          IPv4 Packet
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
+using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
+using Cosmos.System.Network.IPv4.UDP;
+using Cosmos.System.Network.IPv4.UDP.DHCP;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -47,6 +57,10 @@ namespace Cosmos.System.Network.IPv4
                         UDPPacket.UDPHandler(packetData);
                         break;
                 }
+            }
+            else if (NetworkStack.MACMap.ContainsKey(ip_packet.DestinationMAC.Hash))
+            {
+                DHCPPacket.DHCPHandler(packetData);
             }
         }
 
@@ -103,6 +117,19 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="Flags">Flags.</param>
         protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte Flags)
             : this(MACAddress.None, MACAddress.None, dataLength, protocol, source, dest, Flags)
+        { }
+
+        /// <summary>
+        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// </summary>
+        /// <param name="dataLength">Data length.</param>
+        /// <param name="protocol">Protocol.</param>
+        /// <param name="source">Source address.</param>
+        /// <param name="dest">Destionation address.</param>
+        /// <param name="Flags">Flags.</param>
+        /// /// <param name="broadcast">Mac address</param>
+        protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte Flags, MACAddress broadcast)
+            : this(MACAddress.None, broadcast, dataLength, protocol, source, dest, Flags)
         { }
 
         /// <summary>

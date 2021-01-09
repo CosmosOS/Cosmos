@@ -63,6 +63,8 @@ namespace Cosmos.HAL
             AHCI.InitDriver();
             //EHCI.InitDriver();
 
+            Network.NetworkInit.Init();
+
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
         }

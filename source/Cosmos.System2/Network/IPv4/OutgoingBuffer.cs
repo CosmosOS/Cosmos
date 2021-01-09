@@ -1,10 +1,18 @@
-﻿using sys = System;
-using System.Collections.Generic;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          To send packets
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Alexy Da Cruz <dacruzalexy@gmail.com>
+*                   Port of Cosmos Code.
+*/
 
-using Cosmos.Debug.Kernel;
+using System.Collections.Generic;
 using Cosmos.HAL;
-using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
+using System;
+using Cosmos.Debug.Kernel;
+using Cosmos.System.Network.Config;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -21,7 +29,8 @@ namespace Cosmos.System.Network.IPv4
             /// <summary>
             /// Entry status.
             /// </summary>
-            public enum EntryStatus {
+            public enum EntryStatus
+            {
                 /// <summary>
                 /// Added.
                 /// </summary>
@@ -45,7 +54,8 @@ namespace Cosmos.System.Network.IPv4
                 /// <summary>
                 /// DHCP request.
                 /// </summary>
-                DHCP_REQUEST };
+                DHCP_REQUEST
+            };
 
             /// <summary>
             /// Network Interface Controller.
@@ -108,7 +118,7 @@ namespace Cosmos.System.Network.IPv4
         internal static void AddPacket(IPPacket packet)
         {
             ensureQueueExists();
-            NetworkDevice nic = Config.FindInterface(packet.SourceIP);
+            NetworkDevice nic = IPConfig.FindInterface(packet.SourceIP);
             packet.SourceMAC = nic.MACAddress;
             queue.Add(new BufferEntry(nic, packet));
         }
@@ -157,9 +167,9 @@ namespace Cosmos.System.Network.IPv4
                     BufferEntry entry = queue[e];
                     if (entry.Status == BufferEntry.EntryStatus.ADDED)
                     {
-                        if (Config.IsLocalAddress(entry.Packet.DestinationIP) == false)
+                        if (IPConfig.IsLocalAddress(entry.Packet.DestinationIP) == false)
                         {
-                            entry.nextHop = Config.FindRoute(entry.Packet.DestinationIP);
+                            entry.nextHop = IPConfig.FindRoute(entry.Packet.DestinationIP);
                             if (entry.nextHop == null)
                             {
                                 entry.Status = BufferEntry.EntryStatus.DONE;

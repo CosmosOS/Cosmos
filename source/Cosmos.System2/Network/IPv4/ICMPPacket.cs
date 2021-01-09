@@ -1,11 +1,18 @@
-﻿using System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          ICMP Packet (to ping for exemple)
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 
 namespace Cosmos.System.Network.IPv4
 {
     /// <summary>
     /// ICMPPacket class. See also: <seealso cref="IPPacket"/>.
     /// </summary>
-    internal class ICMPPacket : IPPacket
+    public class ICMPPacket : IPPacket
     {
         /// <summary>
         /// Packet type.
@@ -22,7 +29,6 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Received reply.
         /// </summary>
-        public static ICMPEchoReply recvd_reply;
 
         /// <summary>
         /// Create new inctanse of the <see cref="ICMPPacket"/> class.
@@ -36,12 +42,15 @@ namespace Cosmos.System.Network.IPv4
             switch (icmp_packet.ICMP_Type)
             {
                 case 0:
-                    recvd_reply = new ICMPEchoReply(packetData);
-                    NetworkStack.debugger.Send("Received ICMP Echo reply from " + recvd_reply.SourceIP.ToString());
+                    ICMPClient receiver = ICMPClient.Client(icmp_packet.SourceIP.Hash);
+                    if (receiver != null)
+                    {
+                        receiver.receiveData(icmp_packet);
+                    }
+                    NetworkStack.debugger.Send("Received ICMP Echo reply from " + icmp_packet.SourceIP.ToString());
                     break;
                 case 8:
                     ICMPEchoRequest request = new ICMPEchoRequest(packetData);
-                    NetworkStack.debugger.Send("Received " + request.ToString());
                     ICMPEchoReply reply = new ICMPEchoReply(request);
                     NetworkStack.debugger.Send("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
                     OutgoingBuffer.AddPacket(reply);
@@ -63,8 +72,7 @@ namespace Cosmos.System.Network.IPv4
         /// </summary>
         internal ICMPPacket()
             : base()
-        {
-        }
+        { }
 
         /// <summary>
         /// Create new inctanse of the <see cref="ICMPPacket"/> class.
@@ -111,7 +119,8 @@ namespace Cosmos.System.Network.IPv4
             RawData[DataOffset + 6] = (byte)((seq >> 8) & 0xFF);
             RawData[DataOffset + 7] = (byte)((seq >> 0) & 0xFF);
 
-            icmpCRC = CalcICMPCRC((ushort)(icmpDataSize + 8));
+            icmpCRC = CalcICMPCRC((ushort)(icmpDataSize));
+
             RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
             initFields();
@@ -130,19 +139,31 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Get ICMP type.
         /// </summary>
-        internal byte ICMP_Type => icmpType;
+        internal byte ICMP_Type
+        {
+            get { return icmpType; }
+        }
         /// <summary>
         /// Get ICMP code.
         /// </summary>
-        internal byte ICMP_Code => icmpCode;
+        internal byte ICMP_Code
+        {
+            get { return icmpCode; }
+        }
         /// <summary>
         /// Get ICMP CRC.
         /// </summary>
-        internal ushort ICMP_CRC => icmpCRC;
+        internal ushort ICMP_CRC
+        {
+            get { return icmpCRC; }
+        }
         /// <summary>
         /// Get ICMP data length.
         /// </summary>
-        internal ushort ICMP_DataLength => (ushort)(DataLength - 8);
+        internal ushort ICMP_DataLength
+        {
+            get { return (ushort)(DataLength - 8); }
+        }
 
         /// <summary>
         /// Get ICMP data.
@@ -182,8 +203,8 @@ namespace Cosmos.System.Network.IPv4
         /// Create new inctanse of the <see cref="ICMPEchoRequest"/> class.
         /// </summary>
         internal ICMPEchoRequest()
-        {
-        }
+            : base()
+        { }
 
         /// <summary>
         /// Create new inctanse of the <see cref="ICMPEchoRequest"/> class.
@@ -225,8 +246,14 @@ namespace Cosmos.System.Network.IPv4
             icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
         }
 
-        internal ushort ICMP_ID => icmpID;
-        internal ushort ICMP_Sequence => icmpSequence;
+        internal ushort ICMP_ID
+        {
+            get { return icmpID; }
+        }
+        internal ushort ICMP_Sequence
+        {
+            get { return icmpSequence; }
+        }
 
         /// <summary>
         /// To string.
@@ -237,6 +264,7 @@ namespace Cosmos.System.Network.IPv4
             return "ICMP Echo Request Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + icmpID + ", Sequence=" + icmpSequence;
         }
     }
+
     /// <summary>
     /// ICMPEchoReply class. See also: <seealso cref="ICMPPacket"/>.
     /// </summary>
@@ -249,8 +277,8 @@ namespace Cosmos.System.Network.IPv4
         /// Create new inctanse of the <see cref="ICMPEchoReply"/> class.
         /// </summary>
         internal ICMPEchoReply()
-        {
-        }
+            : base()
+        { }
 
         /// <summary>
         /// Create new inctanse of the <see cref="ICMPEchoReply"/> class.
@@ -287,8 +315,7 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="request">ICMP echo request.</param>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         internal ICMPEchoReply(ICMPEchoRequest request)
-            : base(request.DestinationIP, request.SourceIP, 0, 0,
-                    request.ICMP_ID, request.ICMP_Sequence, (ushort)(request.ICMP_DataLength + 8))
+            : base(request.DestinationIP, request.SourceIP, 0, 0, request.ICMP_ID, request.ICMP_Sequence, (ushort)(request.ICMP_DataLength))
         {
             for (int b = 0; b < ICMP_DataLength; b++)
             {
@@ -305,11 +332,17 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Get ICMP ID.
         /// </summary>
-        internal UInt16 ICMP_ID => icmpID;
+        internal ushort ICMP_ID
+        {
+            get { return icmpID; }
+        }
         /// <summary>
         /// Get ICMP sequence.
         /// </summary>
-        internal UInt16 ICMP_Sequence => icmpSequence;
+        internal ushort ICMP_Sequence
+        {
+            get { return icmpSequence; }
+        }
 
         /// <summary>
         /// To string.

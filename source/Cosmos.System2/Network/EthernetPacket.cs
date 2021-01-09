@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          Ethernet frame
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network
@@ -125,7 +132,7 @@ namespace Cosmos.System.Network
         public virtual void PrepareForSending()
         {
 
-            
+
         }
 
         /// <summary>

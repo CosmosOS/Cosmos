@@ -133,6 +133,29 @@ namespace Cosmos.HAL.Network
             aChars[aIndex + 1] = xChars[aByte & 0xF];
         }
 
+        public UInt32 to32BitNumber()
+        {
+            return (UInt32)((bytes[0] << 40) | (bytes[1] << 32) | (bytes[2] << 24) | (bytes[3] << 16) |
+                (bytes[4] << 8) | (bytes[5] << 0));
+        }
+
+        private UInt32 hash;
+        /// <summary>
+        /// Hash value for this mac. Used to uniquely identify each mac
+        /// </summary>
+        public UInt32 Hash
+        {
+            get
+            {
+                if (hash == 0)
+                {
+                    hash = to32BitNumber();
+                }
+
+                return hash;
+            }
+        }
+
         public override string ToString()
         {
             // mac address consists of 6 2chars pairs, delimited by :

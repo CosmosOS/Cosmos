@@ -1,10 +1,18 @@
-﻿using System;
-using Sys = System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          Network Intialization + Packet Handler
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 using System.Collections.Generic;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.Network.ARP;
+using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4;
-using Cosmos.Debug.Kernel;
+using Cosmos.System.Network.IPv4.UDP;
 
 namespace Cosmos.System.Network
 {
@@ -21,7 +29,11 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Get address dictionary.
         /// </summary>
-        internal static TempDictionary<NetworkDevice> AddressMap { get; private set; }
+        internal static TempDictionary<uint, NetworkDevice> AddressMap { get; private set; }
+        /// <summary>
+        /// Get address dictionary.
+        /// </summary>
+        internal static TempDictionary<uint, NetworkDevice> MACMap { get; private set; }
 
         /// <summary>
         /// Initialize the Network Stack to prepare it for operation.
@@ -29,7 +41,8 @@ namespace Cosmos.System.Network
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         public static void Init()
         {
-            AddressMap = new TempDictionary<NetworkDevice>();
+            AddressMap = new TempDictionary<uint, NetworkDevice>();
+            MACMap = new TempDictionary<uint, NetworkDevice>();
 
             // VMT Scanner issue workaround
             ARPPacket.VMTInclude();
@@ -41,6 +54,20 @@ namespace Cosmos.System.Network
             ICMPEchoRequest.VMTInclude();
             UDPPacket.VMTInclude();
             //TCPPacket.VMTInclude();
+        }
+
+        /// <summary>
+        /// Set ConfigIP for NetworkDevice
+        /// </summary>
+        /// <param name="nic">Network device.</param>
+        ///  /// <param name="config">IP Config</param>
+        private static void SetConfigIP(NetworkDevice nic, IPConfig config)
+        {
+            NetworkConfig.Add(nic, config);
+            AddressMap.Add(config.IPAddress.Hash, nic);
+            MACMap.Add(nic.MACAddress.Hash, nic);
+            IPConfig.Add(config);
+            nic.DataReceived = HandlePacket;
         }
 
         /// <summary>
@@ -59,11 +86,64 @@ namespace Cosmos.System.Network
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
-        public static void ConfigIP(NetworkDevice nic, Config config)
+        public static void ConfigIP(NetworkDevice nic, IPConfig config)
         {
-            AddressMap.Add(config.IPAddress.Hash, nic);
-            Config.Add(config);
-            nic.DataReceived = HandlePacket;
+            if (NetworkConfig.ContainsKey(nic))
+            {
+                RemoveIPConfig(nic);
+                SetConfigIP(nic, config);
+            }
+            else
+            {
+                SetConfigIP(nic, config);
+            }
+            NetworkConfig.CurrentConfig = new KeyValuePair<NetworkDevice, IPConfig>(nic, config);
+        }
+
+        /// <summary>
+        /// Check if Config is empty
+        /// <returns>bool value.</returns>
+        /// </summary>
+        public static bool ConfigEmpty()
+        {
+            int counter = 0;
+
+            foreach (NetworkDevice device in NetworkConfig.Keys)
+            {
+                counter++;
+            }
+            if (counter == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Remove All IPConfig
+        /// </summary>
+        public static void RemoveAllConfigIP()
+        {
+            AddressMap.Clear();
+            MACMap.Clear();
+            IPConfig.RemoveAll();
+            NetworkConfig.Clear();
+        }
+
+        /// <summary>
+        /// Remove IPConfig
+        /// </summary>
+        /// <param name="nic">Network device.</param>
+        public static void RemoveIPConfig(NetworkDevice nic)
+        {
+            IPConfig config = NetworkConfig.Get(nic);
+            AddressMap.Remove(config.IPAddress.Hash);
+            MACMap.Remove(nic.MACAddress.Hash);
+            IPConfig.Remove(config);
+            NetworkConfig.Remove(nic);
         }
 
         /// <summary>
