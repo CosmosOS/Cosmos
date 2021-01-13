@@ -8,6 +8,7 @@ using IL2CPU.API;
 using IL2CPU.API.Attribs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
+using System.Text;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -342,17 +343,24 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static bool IsRelative(string aPath)
         {
+            Global.mFileSystemDebugger.Send("-- Path.IsRelative -- aPath = " + aPath);
+            Global.mFileSystemDebugger.Send(BitConverter.ToString(Encoding.ASCII.GetBytes(aPath)));
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
             }
 
-            if (aPath.Length < 3)
+            if (aPath.Length < 2) // We have to do in two steps so we dont parse '0:' as a path incorrectly
             {
                 return true;
             }
 
-            if (aPath[1] != Path.VolumeSeparatorChar)
+            if (aPath[1] == Path.VolumeSeparatorChar)
+            {
+                return false;
+            }
+
+            if (aPath.Length < 3)
             {
                 return true;
             }
@@ -481,7 +489,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         static string NormalizePath(string aPath, bool aFullCheck)
         {
-            Global.mFileSystemDebugger.SendInternal("Path.NormalizePath");
+            Global.mFileSystemDebugger.SendInternal("-- Path.NormalizePath -- aPath = " + aPath);
 
             if (aPath == null)
             {
@@ -493,11 +501,9 @@ namespace Cosmos.System_Plugs.System.IO
             if (IsRelative(result))
             {
                 result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + result;
-                Global.mFileSystemDebugger.SendInternal("aPath is relative");
-                Global.mFileSystemDebugger.SendInternal("aPath =");
-                Global.mFileSystemDebugger.SendInternal(aPath);
-                Global.mFileSystemDebugger.SendInternal("result =");
-                Global.mFileSystemDebugger.SendInternal(result);
+                Global.mFileSystemDebugger.Send("aPath is relative");
+                Global.mFileSystemDebugger.Send("aPath =" + aPath);
+                Global.mFileSystemDebugger.Send("result = " + result);
             }
 
             if (IsDirectorySeparator(result[result.Length - 1]))
@@ -509,10 +515,8 @@ namespace Cosmos.System_Plugs.System.IO
                 }
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
-            Global.mFileSystemDebugger.SendInternal("result =");
-            Global.mFileSystemDebugger.SendInternal(result);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
+            Global.mFileSystemDebugger.SendInternal("result = " + result);
             return result;
         }
     }

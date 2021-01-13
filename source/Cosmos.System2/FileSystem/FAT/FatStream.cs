@@ -232,12 +232,9 @@ namespace Cosmos.System.FileSystem.FAT
         public override int Read(byte[] aBuffer, int aOffset, int aCount)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatStream.Read --");
-            Global.mFileSystemDebugger.SendInternal("aBuffer.Length =");
-            Global.mFileSystemDebugger.SendInternal(aBuffer.Length);
-            Global.mFileSystemDebugger.SendInternal("aOffset =");
-            Global.mFileSystemDebugger.SendInternal(aOffset);
-            Global.mFileSystemDebugger.SendInternal("aCount =");
-            Global.mFileSystemDebugger.SendInternal(aCount);
+            Global.mFileSystemDebugger.SendInternal("aBuffer.Length = " + aBuffer.Length);
+            Global.mFileSystemDebugger.SendInternal("aOffset = " + aOffset);
+            Global.mFileSystemDebugger.SendInternal("aCount = " + aCount);
 
             if (aCount < 0)
             {
@@ -290,12 +287,9 @@ namespace Cosmos.System.FileSystem.FAT
                     xReadSize = xCount;
                 }
 
-                Global.mFileSystemDebugger.SendInternal("xClusterIdx =");
-                Global.mFileSystemDebugger.SendInternal(xClusterIdx);
-                Global.mFileSystemDebugger.SendInternal("xPosInCluster =");
-                Global.mFileSystemDebugger.SendInternal(xPosInCluster);
-                Global.mFileSystemDebugger.SendInternal("xReadSize =");
-                Global.mFileSystemDebugger.SendInternal(xReadSize);
+                Global.mFileSystemDebugger.SendInternal("xClusterIdx = " + xClusterIdx);
+                Global.mFileSystemDebugger.SendInternal("xPosInCluster = " + xPosInCluster);
+                Global.mFileSystemDebugger.SendInternal("xReadSize = " + xReadSize);
 
                 Array.Copy(xCluster, xPosInCluster, aBuffer, xOffset, xReadSize);
 

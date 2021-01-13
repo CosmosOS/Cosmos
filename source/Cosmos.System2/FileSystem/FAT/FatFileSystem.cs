@@ -389,19 +389,15 @@ namespace Cosmos.System.FileSystem.FAT
             internal void GetFatEntry(uint aEntryNumber, out uint aValue)
             {
                 Global.mFileSystemDebugger.SendInternal("-- Fat.GetFatEntry --");
-                Global.mFileSystemDebugger.SendInternal("aEntryNumber =");
-                Global.mFileSystemDebugger.SendInternal(aEntryNumber);
+                Global.mFileSystemDebugger.SendInternal("aEntryNumber = " + aEntryNumber);
 
                 uint xEntrySize = GetFatEntrySizeInBytes();
                 ulong xEntryOffset = aEntryNumber * xEntrySize;
-                Global.mFileSystemDebugger.SendInternal("xEntrySize =");
-                Global.mFileSystemDebugger.SendInternal(xEntrySize);
-                Global.mFileSystemDebugger.SendInternal("xEntryOffset =");
-                Global.mFileSystemDebugger.SendInternal(xEntryOffset);
+                Global.mFileSystemDebugger.SendInternal("xEntrySize = " + xEntrySize);
+                Global.mFileSystemDebugger.SendInternal("xEntryOffset = " + xEntryOffset);
 
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
-                Global.mFileSystemDebugger.SendInternal("xSector =");
-                Global.mFileSystemDebugger.SendInternal(xSector);
+                Global.mFileSystemDebugger.SendInternal("xSector = " + xSector);
 
                 ReadFatSector(xSector, out byte[] xData);
 

@@ -60,7 +60,7 @@ namespace Cosmos.System_Plugs.System.IO
                 return false;
             }
 
-            Global.mFileSystemDebugger.SendInternal($"FileExists : fullPath = {fullPath}");
+            Global.mFileSystemDebugger.SendInternal($"-- CosmosFileSystem.FileExists -- : fullPath = {fullPath}");
             return VFSManager.FileExists(fullPath);
         }
 

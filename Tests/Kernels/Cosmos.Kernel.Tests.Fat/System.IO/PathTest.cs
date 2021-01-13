@@ -384,10 +384,17 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             parts = VFSManager.SplitPath(@"0:\test\12");
             Assert.AreEqual("0:", parts[0], "SplitPath works part 0");
             Assert.AreEqual("test", parts[1], "SplitPath works part 1");
-            Assert.AreEqual("12", parts[1], "SplitPath works part 2");
+            Assert.AreEqual("12", parts[2], "SplitPath works part 2");
 
 
             mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            Assert.AreEqual(@"0:\TestDir1", Path.GetFullPath(@"0:\TestDir1"), "Get Full path works for already full path");
+            mDebugger.Send("END TEST");
+
             // Path.IsPathRooted(string)
         }
     }

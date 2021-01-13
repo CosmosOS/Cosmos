@@ -101,18 +101,12 @@ namespace Cosmos.Core_Plugs.System
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
-            mDebugger.Send("String.Ctor ReadonlySpan");
-            mDebugger.SendInternal(value[0]);
-            mDebugger.SendInternal(value.Length);
             aStringEmpty = "";
             aStringLength = value.Length;
             for (int i = 0; i < value.Length; i++)
             {
-                mDebugger.SendInternal(value[i]);
                 aFirstChar[i] = value[i];
             }
-            //Debugger.DoBochsBreak();
-            mDebugger.Send(aThis);
         }
 
         public static unsafe int get_Length(
@@ -121,14 +115,14 @@ namespace Cosmos.Core_Plugs.System
         {
             if(aLength < 0 || aLength > 1000)
             {
+                mDebugger.Send("Length is: " + aLength);
                 Debugger.DoBochsBreak();
             }
             return aLength;
         }
 
         public static unsafe char get_Chars(
-            [ObjectPointerAccess] uint* aThis,
-            int aIndex,
+            [ObjectPointerAccess] uint* aThis, int aIndex,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
             return *(aFirstChar + aIndex);
