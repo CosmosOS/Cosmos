@@ -9,7 +9,7 @@
         <MicrosoftTestPlatformObjectModelVersion>15.9.0</MicrosoftTestPlatformObjectModelVersion>
         <MicrosoftVisualStudioSDKEmbedInteropTypesVersion>15.0.27</MicrosoftVisualStudioSDKEmbedInteropTypesVersion>
         <MicrosoftVisualStudioSetupConfigurationInteropVersion>1.16.30</MicrosoftVisualStudioSetupConfigurationInteropVersion>
-        <MicrosoftVSSDKBuildToolsVersion>15.9.3032</MicrosoftVSSDKBuildToolsVersion>
+        <MicrosoftVSSDKBuildToolsVersion>16.8.3038</MicrosoftVSSDKBuildToolsVersion>
         <MSTestVersion>1.4.0</MSTestVersion>
         <NuGetVersion>4.8.0</NuGetVersion>
         <NUnitVersion>3.11.0</NUnitVersion>

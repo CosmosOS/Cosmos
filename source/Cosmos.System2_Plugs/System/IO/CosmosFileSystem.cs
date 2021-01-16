@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -29,16 +29,24 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void CreateDirectory(string fullPath)
         {
+            Global.mFileSystemDebugger.Send("-- CosmosFileSystem.CreateDirectory -- fullPath = " + fullPath);
             // If 'fullPath' exists already we return already without dealing with VFSManager
             if (DirectoryExists(fullPath))
                 return;
- 
+
             var xEntry = VFSManager.CreateDirectory(fullPath);
 
             if (xEntry == null)
             {
                 throw new IOException("VFSManager.CreateDirectory() returns null");
             }
+        }
+
+        public static void CreateDirectory(string aPath, byte[] securityDescriptor = null)
+        {
+            Global.mFileSystemDebugger.Send("-- CosmosFileSystem.CreateDirectory(string, byte[]) -- ");
+            Global.mFileSystemDebugger.Send("aPath = " + aPath);
+            CreateDirectory(aPath);
         }
 
         // Never called? Cosmos goes in StackOverflow... ILCPU gets lost and do not find this native method

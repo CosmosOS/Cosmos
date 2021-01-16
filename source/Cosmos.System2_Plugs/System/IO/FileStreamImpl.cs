@@ -122,7 +122,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream CreateNewFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.CreateNewFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.CreateNewFile -- aPath = {aPath} existing = {aPathExists}");
           
             if (aPathExists)
             {
@@ -142,7 +142,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream TruncateFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.TruncateFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.TruncateFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (!aPathExists)
             {
@@ -160,7 +160,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream CreateFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.CreateFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.CreateFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (aPathExists == false)
             {

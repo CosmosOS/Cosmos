@@ -208,14 +208,13 @@ namespace Cosmos.System.FileSystem.VFS
         /// <exception cref="PathTooLongException">Thrown when The aPath is longer than the system defined maximum length.</exception>
         public static DirectoryEntry CreateDirectory(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("--- VFSManager.CreateDirectory ---");
+            Global.mFileSystemDebugger.SendInternal("-- VFSManager.CreateDirectory -- " + aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             if (string.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentNullException(nameof(aPath));
             }
-
-            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             return mVFS.CreateDirectory(aPath);
         }
@@ -356,8 +355,7 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new ArgumentNullException(nameof(aPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             return mVFS.GetDirectory(aPath);
         }
@@ -600,17 +598,18 @@ namespace Cosmos.System.FileSystem.VFS
             }
 
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.DirectoryExists ---");
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             try
             {
-                Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
                 string xPath = Path.GetFullPath(aPath);
                 Global.mFileSystemDebugger.SendInternal("After GetFullPath");
-                Global.mFileSystemDebugger.SendInternal("xPath =");
-                Global.mFileSystemDebugger.SendInternal(xPath);
+                Global.mFileSystemDebugger.SendInternal("xPath = " + xPath);
 
-                return GetDirectory(xPath) != null;
+                var result = GetDirectory(xPath) != null;
+                Global.mFileSystemDebugger.SendInternal("--- VFSManager.DirectoryExists --- Returns: " + result);
+                return result;
             }
             catch
             {

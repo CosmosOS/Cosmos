@@ -344,7 +344,6 @@ namespace Cosmos.System_Plugs.System.IO
         private static bool IsRelative(string aPath)
         {
             Global.mFileSystemDebugger.Send("-- Path.IsRelative -- aPath = " + aPath);
-            Global.mFileSystemDebugger.Send(BitConverter.ToString(Encoding.ASCII.GetBytes(aPath)));
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");

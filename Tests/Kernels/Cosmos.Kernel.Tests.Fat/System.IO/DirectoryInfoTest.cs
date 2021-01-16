@@ -19,7 +19,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             mDebugger.Send("START TEST: Create");
             xDi.Create();
 
-            Assert.IsTrue(xDi.Exists == true, "DirectoryInfo.Create failed: directory does not exists");
+            Assert.IsTrue(xDi.Exists, "DirectoryInfo.Create failed: directory does not exists");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 

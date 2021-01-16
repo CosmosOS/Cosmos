@@ -86,5 +86,10 @@ namespace Cosmos.System_Plugs.System
         {
             throw new NotImplementedException();
         }
+
+        public static bool TryFormat(DateTime aThis, Span<char> aCharSpan, ref int aInt, ReadOnlySpan<char> aReadOnlySpan, IFormatProvider aFormatProvider)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
