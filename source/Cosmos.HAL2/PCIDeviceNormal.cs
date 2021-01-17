@@ -25,12 +25,12 @@ namespace Cosmos.HAL
             : base(bus, slot, function)
         {
             BaseAddresses = new PCIBaseAddressBar[6];
-            BaseAddresses[0] = new PCIBaseAddressBar(ReadRegister32(0x10));
-            BaseAddresses[1] = new PCIBaseAddressBar(ReadRegister32(0x14));
-            BaseAddresses[2] = new PCIBaseAddressBar(ReadRegister32(0x18));
-            BaseAddresses[3] = new PCIBaseAddressBar(ReadRegister32(0x1C));
-            BaseAddresses[4] = new PCIBaseAddressBar(ReadRegister32(0x20));
-            BaseAddresses[5] = new PCIBaseAddressBar(ReadRegister32(0x24));
+            BaseAddresses[0] = new PCIBaseAddressBar(ReadRegister32(0x10),this,0x10);
+            BaseAddresses[1] = new PCIBaseAddressBar(ReadRegister32(0x14),this,0x14);
+            BaseAddresses[2] = new PCIBaseAddressBar(ReadRegister32(0x18),this,0x18);
+            BaseAddresses[3] = new PCIBaseAddressBar(ReadRegister32(0x1C),this,0x1C);
+            BaseAddresses[4] = new PCIBaseAddressBar(ReadRegister32(0x20),this,0x20);
+            BaseAddresses[5] = new PCIBaseAddressBar(ReadRegister32(0x24),this,0x24);
 
             CardbusCISPointer = ReadRegister32(0x28);
 

@@ -30,6 +30,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public string FirmwareRev { get => mFirmwareRev; }
         public string ModelNo { get => mModelNo; }
 
+
         public SATA(PortRegisters aSATAPort)
         {
             // Check if it is really a SATA Port!

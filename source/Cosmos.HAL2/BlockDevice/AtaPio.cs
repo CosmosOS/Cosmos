@@ -43,9 +43,9 @@ namespace Cosmos.HAL.BlockDevice
 		{
 			get { return mModelNo; }
 		}
-		#endregion
-		#region Enums
-		[Flags]
+        #endregion
+        #region Enums
+        [Flags]
 		public enum Status : byte
 		{
 			None = 0x00,

@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-
+using Cosmos.Common.Extensions;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.USB;
 
 namespace Cosmos.HAL
 {
@@ -16,9 +17,9 @@ namespace Cosmos.HAL
 
         public static TextScreenBase TextScreen = new TextScreen();
         public static PCI Pci;
+        public static USBHostUHCIRegisters uhci;
 
         public static readonly PS2Controller PS2Controller = new PS2Controller();
-
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
         /// Init <see cref="Global"/> inctanse.
@@ -56,12 +57,44 @@ namespace Cosmos.HAL
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
+            try
+            {
+                Console.WriteLine("Starting USB OHCI");
+                USBHost.ScanDevices();
+                USBHost.InitUSB(0x10);
+                USBHost.ScanUHCIUSB();
+                foreach (PCIDevice pci in PCI.Devices)
+                {
+                    ///According to PCI Specs for USB
+                    ///0x00 = USB  (Universal Host Controller Spec) ,
+                    ///0x10 = USB (Open Host Controller Spec)
+                    ///0x20 = USB2 Host Controller (Intel Enhanced Host Controller Interface)
+                    ///0x30 = USB3 XHCI Controller
+                    if (pci.ClassCode == 0x0c &&
+                        pci.Subclass == 0x03 &&
+                        pci.ProgIF == 0x00)
+                    {
+                        Console.WriteLine("(hex)BAR4:" + pci.BAR4.ToHex());
+                        Console.WriteLine("(uint)BAR4:" + pci.BAR4);
+                        Console.WriteLine("(string)BAR4:" + pci.BAR4.ToString());
+
+                    }
+                }
+
+
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Message: ");
+                Console.WriteLine(e.ToString());
+            }
             mDebugger.Send("PS/2 Controller Init");
             PS2Controller.Initialize();
 
             IDE.InitDriver();
             AHCI.InitDriver();
             //EHCI.InitDriver();
+
 
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
