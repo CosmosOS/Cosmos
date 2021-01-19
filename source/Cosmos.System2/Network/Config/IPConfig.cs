@@ -90,7 +90,7 @@ namespace Cosmos.System.Network.Config
             return default_gw;
         }
 
-        internal static bool Enable(NetworkDevice device, Address ip, Address subnet, Address gw)
+        public static bool Enable(NetworkDevice device, Address ip, Address subnet, Address gw)
         {
             if (device != null)
             {
