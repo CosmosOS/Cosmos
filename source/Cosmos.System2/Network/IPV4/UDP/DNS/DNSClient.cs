@@ -23,7 +23,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         private string queryurl;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DnsClient"/> class.
+        /// Create new instance of the <see cref="DnsClient"/> class.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 53 exists.</exception>

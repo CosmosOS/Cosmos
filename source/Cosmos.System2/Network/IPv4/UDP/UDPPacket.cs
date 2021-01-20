@@ -73,14 +73,14 @@ namespace Cosmos.System.Network.IPv4.UDP
             : base((ushort)(datalength + 8), 17, source, dest, 0x00)
         {
             MakePacket(srcport, destport, datalength);
-            initFields();
+            InitFields();
         }
 
         public UDPPacket(Address source, Address dest, UInt16 srcport, UInt16 destport, UInt16 datalength, MACAddress destmac)
             : base((ushort)(datalength + 8), 17, source, dest, 0x00, destmac)
         {
             MakePacket(srcport, destport, datalength);
-            initFields();
+            InitFields();
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Cosmos.System.Network.IPv4.UDP
                 RawData[this.DataOffset + 8 + b] = data[b];
             }
 
-            initFields();
+            InitFields();
         }
 
         private void MakePacket(ushort srcport, ushort destport, ushort length)
@@ -125,9 +125,9 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// Init UDPPacket fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
             SourcePort = (ushort)((RawData[DataOffset] << 8) | RawData[DataOffset + 1]);
             DestinationPort = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
             UDP_Length = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);

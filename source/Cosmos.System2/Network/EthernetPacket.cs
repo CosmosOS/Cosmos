@@ -39,13 +39,13 @@ namespace Cosmos.System.Network
         protected EthernetPacket(byte[] rawData)
         {
             RawData = rawData;
-            initFields();
+            InitFields();
         }
 
         /// <summary>
         /// Init EthernetPacket fields.
         /// </summary>
-        protected virtual void initFields()
+        protected virtual void InitFields()
         {
             destMAC = new MACAddress(RawData, 0);
             srcMAC = new MACAddress(RawData, 6);
@@ -80,7 +80,7 @@ namespace Cosmos.System.Network
 
             RawData[12] = (byte)(type >> 8);
             RawData[13] = (byte)(type >> 0);
-            initFields();
+            InitFields();
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Cosmos.System.Network
                 {
                     RawData[6 + i] = value.bytes[i];
                 }
-                initFields();
+                InitFields();
             }
         }
 
@@ -116,7 +116,7 @@ namespace Cosmos.System.Network
                 {
                     RawData[i] = value.bytes[i];
                 }
-                initFields();
+                InitFields();
             }
         }
 

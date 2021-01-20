@@ -26,9 +26,9 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// Init DHCPAck fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
 
             foreach (var option in Options)
             {

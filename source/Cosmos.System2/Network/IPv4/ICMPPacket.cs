@@ -79,10 +79,10 @@ namespace Cosmos.System.Network.IPv4
         /// Init ICMPPacket fields.1
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            //Sys.Console.WriteLine("ICMPPacket.initFields() called;");
-            base.initFields();
+            //Sys.Console.WriteLine("ICMPPacket.InitFields() called;");
+            base.InitFields();
             icmpType = RawData[DataOffset];
             icmpCode = RawData[DataOffset + 1];
             icmpCRC = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
@@ -115,7 +115,7 @@ namespace Cosmos.System.Network.IPv4
 
             RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
-            initFields();
+            InitFields();
         }
 
         /// <summary>
@@ -222,10 +222,10 @@ namespace Cosmos.System.Network.IPv4
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
         }
 
-        protected override void initFields()
+        protected override void InitFields()
         {
-            //Sys.Console.WriteLine("ICMPEchoRequest.initFields() called;");
-            base.initFields();
+            //Sys.Console.WriteLine("ICMPEchoRequest.InitFields() called;");
+            base.InitFields();
             icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
             icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
         }
@@ -277,10 +277,10 @@ namespace Cosmos.System.Network.IPv4
         /// Init ICMPEchoReply fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            //Sys.Console.WriteLine("ICMPEchoReply.initFields() called;");
-            base.initFields();
+            //Sys.Console.WriteLine("ICMPEchoReply.InitFields() called;");
+            base.InitFields();
             icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
             icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
         }

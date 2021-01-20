@@ -55,9 +55,9 @@ namespace Cosmos.System.Network.ARP
         /// Init ARPPacket_Ethernet fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
             mSenderMAC = new MACAddress(RawData, 22);
             mSenderIP = new Address(RawData, 28);
             if (SenderIP == null)
@@ -94,7 +94,7 @@ namespace Cosmos.System.Network.ARP
                 RawData[38 + i] = targetIP.address[i];
             }
 
-            initFields();
+            InitFields();
         }
 
         /// <summary>

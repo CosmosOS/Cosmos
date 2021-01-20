@@ -153,16 +153,16 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             RawData[280] = 0x53;
             RawData[281] = 0x63;
 
-            initFields();
+            InitFields();
         }
 
         /// <summary>
         /// Init DHCPPacket fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
             MessageType = RawData[42];
             Client = new Address(RawData, 58);
             Server = new Address(RawData, 62);

@@ -139,7 +139,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         {
             if ((destination == null) || (destinationPort == 0))
             {
-                throw new Exception("Must establish a default remote host by calling Connect() before using this Send() overload");
+                throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
 
             Send(data, destination, destinationPort);

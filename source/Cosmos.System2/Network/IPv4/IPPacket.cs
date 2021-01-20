@@ -89,9 +89,9 @@ namespace Cosmos.System.Network.IPv4
         /// Init IPPacket fields.
         /// </summary>
         /// <exception cref="sys.ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
             IPVersion = (byte)((RawData[14] & 0xF0) >> 4);
             ipHeaderLength = (byte)(RawData[14] & 0x0F);
             TypeOfService = RawData[15];
@@ -172,7 +172,7 @@ namespace Cosmos.System.Network.IPv4
             RawData[24] = (byte)((IPCRC >> 8) & 0xFF);
             RawData[25] = (byte)((IPCRC >> 0) & 0xFF);
 
-            initFields();
+            InitFields();
         }
 
         /// <summary>

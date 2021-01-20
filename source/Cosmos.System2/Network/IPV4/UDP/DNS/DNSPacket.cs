@@ -115,16 +115,16 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
             RawData[this.DataOffset + 18] = (byte)((0 >> 8) & 0xFF);
             RawData[this.DataOffset + 19] = (byte)((0 >> 0) & 0xFF);
 
-            initFields();
+            InitFields();
         }
 
         /// <summary>
         /// Init DNSPacket fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
             TransactionID = (UInt16)((RawData[this.DataOffset + 8] << 8) | RawData[this.DataOffset + 9]);
             DNSFlags = (UInt16)((RawData[this.DataOffset + 10] << 8) | RawData[this.DataOffset + 11]);
             Questions = (UInt16)((RawData[this.DataOffset + 12] << 8) | RawData[this.DataOffset + 13]);
@@ -269,9 +269,9 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         /// Init DNSPacketAsk fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
         }
     }
 
@@ -299,9 +299,9 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         /// Init DNSPacketAnswer fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
 
             if ((ushort)(DNSFlags & 0x0F) != (ushort)ReplyCode.OK)
             {

@@ -97,13 +97,7 @@ namespace Cosmos.System.Network
         /// </summary>
         public static bool ConfigEmpty()
         {
-            int counter = 0;
-
-            foreach (NetworkDevice device in NetworkConfig.Keys)
-            {
-                counter++;
-            }
-            if (counter == 0)
+            if (NetworkConfig.Keys.Count == 0)
             {
                 return true;
             }
