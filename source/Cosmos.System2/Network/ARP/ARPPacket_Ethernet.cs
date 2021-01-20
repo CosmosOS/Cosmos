@@ -37,14 +37,14 @@ namespace Cosmos.System.Network.ARP
         protected Address mTargetIP;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPRequest_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPRequest_Ethernet"/> class.
         /// </summary>
         internal ARPPacket_Ethernet()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPRequest_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPRequest_Ethernet"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ARPPacket_Ethernet(byte[] rawData)
@@ -69,7 +69,7 @@ namespace Cosmos.System.Network.ARP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPRequest_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPRequest_Ethernet"/> class.
         /// </summary>
         /// <param name="operation">Operation.</param>
         /// <param name="senderMAC">Source MAC address.</param>
@@ -146,14 +146,14 @@ namespace Cosmos.System.Network.ARP
     internal class ARPReply_Ethernet : ARPPacket_Ethernet
     {
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPReply_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPReply_Ethernet"/> class.
         /// </summary>
         internal ARPReply_Ethernet()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPReply_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPReply_Ethernet"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ARPReply_Ethernet(byte[] rawData)
@@ -161,7 +161,7 @@ namespace Cosmos.System.Network.ARP
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPReply_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPReply_Ethernet"/> class.
         /// </summary>
         /// <param name="ourMAC">Source MAC address.</param>
         /// <param name="ourIP">Source IP address.</param>
@@ -188,14 +188,14 @@ namespace Cosmos.System.Network.ARP
     internal class ARPRequest_Ethernet : ARPPacket_Ethernet
     {
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPRequest_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPRequest_Ethernet"/> class.
         /// </summary>
         internal ARPRequest_Ethernet()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPRequest_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPRequest_Ethernet"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ARPRequest_Ethernet(byte[] rawData)
@@ -208,7 +208,7 @@ namespace Cosmos.System.Network.ARP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPRequest_Ethernet"/> class.
+        /// Create new instance of the <see cref="ARPRequest_Ethernet"/> class.
         /// </summary>
         /// <param name="ourMAC">Source MAC address.</param>
         /// <param name="ourIP">Source IP address.</param>

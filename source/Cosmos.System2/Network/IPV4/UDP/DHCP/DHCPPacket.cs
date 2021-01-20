@@ -61,13 +61,13 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPPacket"/> class.
+        /// Create new instance of the <see cref="DHCPPacket"/> class.
         /// </summary>
         internal DHCPPacket() : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPPacket"/> class.
+        /// Create new instance of the <see cref="DHCPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public DHCPPacket(byte[] rawData)
@@ -75,7 +75,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPPacket"/> class.
+        /// Create new instance of the <see cref="DHCPPacket"/> class.
         /// </summary>
         /// <param name="mac_src">Source MAC Address.</param>
         /// <param name="dhcpDataSize">DHCP Data size</param>
@@ -84,7 +84,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPPacket"/> class.
+        /// Create new instance of the <see cref="DHCPPacket"/> class.
         /// </summary>
         /// <param name="client">Client IPv4 Address.</param>
         /// <param name="server">Server IPv4 Address.</param>

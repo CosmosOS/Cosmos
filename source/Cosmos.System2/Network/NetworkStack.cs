@@ -24,7 +24,7 @@ namespace Cosmos.System.Network
     public static class NetworkStack
     {
         /// <summary>
-        /// Debugger inctanse of the "System" ring, with the "NetworkStack" tag.
+        /// Debugger instance of the "System" ring, with the "NetworkStack" tag.
         /// </summary>
         public static Debugger debugger = new Debugger("System", "NetworkStack");
 

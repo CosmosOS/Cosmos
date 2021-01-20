@@ -31,7 +31,7 @@ namespace Cosmos.System.Network.IPv4
         internal byte[] address = new byte[4];
 
         /// <summary>
-        /// Create new inctanse of the <see cref="Address"/> class, with specified IP address.
+        /// Create new instance of the <see cref="Address"/> class, with specified IP address.
         /// </summary>
         /// <param name="aFirst">First block of the address.</param>
         /// <param name="aSecond">Second block of the address.</param>
@@ -46,7 +46,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="Address"/> class, with specified buffer and offset.
+        /// Create new instance of the <see cref="Address"/> class, with specified buffer and offset.
         /// </summary>
         /// <param name="buffer">Buffer.</param>
         /// <param name="offset">Offset.</param>

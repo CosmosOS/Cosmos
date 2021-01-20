@@ -22,7 +22,7 @@ namespace Cosmos.HAL
 
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
-        /// Init <see cref="Global"/> inctanse.
+        /// Init <see cref="Global"/> instance.
         /// </summary>
         /// <param name="textScreen">Text screen.</param>
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>

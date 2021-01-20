@@ -54,14 +54,14 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="UDPPacket"/> class.
+        /// Create new instance of the <see cref="UDPPacket"/> class.
         /// </summary>
         internal UDPPacket()
         {
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="UDPPacket"/> class.
+        /// Create new instance of the <see cref="UDPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public UDPPacket(byte[] rawData)
@@ -84,7 +84,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="UDPPacket"/> class.
+        /// Create new instance of the <see cref="UDPPacket"/> class.
         /// </summary>
         /// <param name="source">Source address.</param>
         /// <param name="dest">Destination address.</param>

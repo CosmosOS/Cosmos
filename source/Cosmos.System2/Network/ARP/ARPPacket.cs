@@ -92,14 +92,14 @@ namespace Cosmos.System.Network.ARP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// Create new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         internal ARPPacket()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// Create new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public ARPPacket(byte[] rawData)
@@ -120,7 +120,7 @@ namespace Cosmos.System.Network.ARP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// Create new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         /// <param name="dest">Destination MAC address.</param>
         /// <param name="src">Source MAC address.</param>

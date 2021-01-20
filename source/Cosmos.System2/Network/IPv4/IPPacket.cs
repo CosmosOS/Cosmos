@@ -70,14 +70,14 @@ namespace Cosmos.System.Network.IPv4
         public static ushort NextIPFragmentID => sNextFragmentID++;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         internal IPPacket()
         {
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public IPPacket(byte[] rawData)
@@ -108,7 +108,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="dataLength">Data length.</param>
         /// <param name="protocol">Protocol.</param>
@@ -120,7 +120,7 @@ namespace Cosmos.System.Network.IPv4
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="dataLength">Data length.</param>
         /// <param name="protocol">Protocol.</param>
@@ -133,7 +133,7 @@ namespace Cosmos.System.Network.IPv4
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="srcMAC">Source MAC address.</param>
         /// <param name="destMAC">Destination MAC address.</param>

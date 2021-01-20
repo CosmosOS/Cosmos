@@ -31,7 +31,7 @@ namespace Cosmos.System.Network.IPv4
         /// </summary>
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPPacket"/> class.
+        /// Create new instance of the <see cref="ICMPPacket"/> class.
         /// </summary>
         /// <param name="packetData">Packet data.</param>
         /// <exception cref="ArgumentException">Thrown if packetData is invalid.</exception>
@@ -60,14 +60,14 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPPacket"/> class.
+        /// Create new instance of the <see cref="ICMPPacket"/> class.
         /// </summary>
         internal ICMPPacket()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPPacket"/> class.
+        /// Create new instance of the <see cref="ICMPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ICMPPacket(byte[] rawData)
@@ -89,7 +89,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPPacket"/> class.
+        /// Create new instance of the <see cref="ICMPPacket"/> class.
         /// </summary>
         /// <param name="source">Source address.</param>
         /// <param name="dest">Destination address.</param>
@@ -192,14 +192,14 @@ namespace Cosmos.System.Network.IPv4
         protected ushort icmpSequence;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPEchoRequest"/> class.
+        /// Create new instance of the <see cref="ICMPEchoRequest"/> class.
         /// </summary>
         internal ICMPEchoRequest()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPEchoRequest"/> class.
+        /// Create new instance of the <see cref="ICMPEchoRequest"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ICMPEchoRequest(byte[] rawData)
@@ -258,14 +258,14 @@ namespace Cosmos.System.Network.IPv4
         protected ushort icmpSequence;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPEchoReply"/> class.
+        /// Create new instance of the <see cref="ICMPEchoReply"/> class.
         /// </summary>
         internal ICMPEchoReply()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPEchoReply"/> class.
+        /// Create new instance of the <see cref="ICMPEchoReply"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ICMPEchoReply(byte[] rawData)
@@ -286,7 +286,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPEchoReply"/> class.
+        /// Create new instance of the <see cref="ICMPEchoReply"/> class.
         /// </summary>
         /// <param name="request">ICMP echo request.</param>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>

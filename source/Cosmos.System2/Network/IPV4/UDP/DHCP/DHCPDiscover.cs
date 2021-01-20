@@ -10,20 +10,20 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     internal class DHCPDiscover : DHCPPacket
     {
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPDiscover"/> class.
+        /// Create new instance of the <see cref="DHCPDiscover"/> class.
         /// </summary>
         internal DHCPDiscover() : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPDiscover"/> class.
+        /// Create new instance of the <see cref="DHCPDiscover"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal DHCPDiscover(byte[] rawData) : base(rawData)
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPDiscover"/> class.
+        /// Create new instance of the <see cref="DHCPDiscover"/> class.
         /// </summary>
         /// <param name="mac_src">Source MAC Address.</param>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>

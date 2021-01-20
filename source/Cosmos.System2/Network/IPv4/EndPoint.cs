@@ -24,7 +24,7 @@ namespace Cosmos.System.Network.IPv4
         public UInt16 port;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EndPoint"/> class.
+        /// Create new instance of the <see cref="EndPoint"/> class.
         /// </summary>
         /// <param name="addr">Adress.</param>
         /// <param name="port">Port.</param>

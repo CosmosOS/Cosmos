@@ -14,20 +14,20 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     {
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPRequest"/> class.
+        /// Create new instance of the <see cref="DHCPRequest"/> class.
         /// </summary>
         internal DHCPRequest() : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPRequest"/> class.
+        /// Create new instance of the <see cref="DHCPRequest"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal DHCPRequest(byte[] rawData) : base(rawData)
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPRequest"/> class.
+        /// Create new instance of the <see cref="DHCPRequest"/> class.
         /// </summary>
         /// <param name="mac_src">Source MAC Address.</param>
         /// <param name="RequestedAddress">Requested Address.</param>

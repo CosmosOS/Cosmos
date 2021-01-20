@@ -75,7 +75,7 @@ namespace Cosmos.System.Network.IPv4
             public Address nextHop;
 
             /// <summary>
-            /// Create new inctanse of the <see cref="BufferEntry"/> class.
+            /// Create new instance of the <see cref="BufferEntry"/> class.
             /// </summary>
             /// <param name="nic">Network device.</param>
             /// <param name="packet">IP packet.</param>

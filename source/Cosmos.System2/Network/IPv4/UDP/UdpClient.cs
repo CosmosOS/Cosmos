@@ -65,7 +65,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="UdpClient"/> class.
+        /// Create new instance of the <see cref="UdpClient"/> class.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 0 exists.</exception>
@@ -74,7 +74,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="UdpClient"/> class.
+        /// Create new instance of the <see cref="UdpClient"/> class.
         /// </summary>
         /// <param name="localPort">Local port.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
@@ -91,7 +91,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="UdpClient"/> class.
+        /// Create new instance of the <see cref="UdpClient"/> class.
         /// </summary>
         /// <param name="dest">Destination address.</param>
         /// <param name="destPort">Destination port.</param>

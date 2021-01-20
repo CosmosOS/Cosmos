@@ -18,7 +18,7 @@ namespace Cosmos.System
     public static class Global
     {
         /// <summary>
-        /// Create new inctanse of the <see cref="Global"/> class.
+        /// Create new instance of the <see cref="Global"/> class.
         /// </summary>
         static Global()
         {

@@ -10,13 +10,13 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     internal class DHCPAck : DHCPPacket
     {
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPAck"/> class.
+        /// Create new instance of the <see cref="DHCPAck"/> class.
         /// </summary>
         internal DHCPAck() : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPAck"/> class.
+        /// Create new instance of the <see cref="DHCPAck"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal DHCPAck(byte[] rawData) : base(rawData)

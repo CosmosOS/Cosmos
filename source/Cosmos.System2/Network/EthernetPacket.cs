@@ -26,14 +26,14 @@ namespace Cosmos.System.Network
         protected MACAddress destMAC;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EthernetPacket"/> class.
+        /// Create new instance of the <see cref="EthernetPacket"/> class.
         /// </summary>
         protected EthernetPacket()
         {
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified raw data.
+        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified raw data.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         protected EthernetPacket(byte[] rawData)
@@ -53,7 +53,7 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified type and size.
+        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified type and size.
         /// </summary>
         /// <param name="type">Type.</param>
         /// <param name="packet_size">Size.</param>
@@ -63,7 +63,7 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified dsetination, source, type and size.
+        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified dsetination, source, type and size.
         /// </summary>
         /// <param name="dest">Destination.</param>
         /// <param name="src">Source.</param>

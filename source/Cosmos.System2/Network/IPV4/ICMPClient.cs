@@ -58,7 +58,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ICMPClient"/> class.
+        /// Create new instance of the <see cref="ICMPClient"/> class.
         /// </summary>
         public ICMPClient()
         {

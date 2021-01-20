@@ -11,20 +11,20 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     internal class DHCPRelease : DHCPPacket
     {
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPRelease"/> class.
+        /// Create new instance of the <see cref="DHCPRelease"/> class.
         /// </summary>
         internal DHCPRelease() : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPRelease"/> class.
+        /// Create new instance of the <see cref="DHCPRelease"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal DHCPRelease(byte[] rawData) : base(rawData)
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DHCPRelease"/> class.
+        /// Create new instance of the <see cref="DHCPRelease"/> class.
         /// </summary>
         /// <param name="client">Client IPv4 Address.</param>
         /// <param name="server">DHCP Server IPv4 Address.</param>

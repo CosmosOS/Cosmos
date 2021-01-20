@@ -69,14 +69,14 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DNSPacket"/> class.
+        /// Create new instance of the <see cref="DNSPacket"/> class.
         /// </summary>
         internal DNSPacket()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DNSPacket"/> class.
+        /// Create new instance of the <see cref="DNSPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public DNSPacket(byte[] rawData)
@@ -84,7 +84,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="UDPPacket"/> class.
+        /// Create new instance of the <see cref="UDPPacket"/> class.
         /// </summary>
         /// <param name="source">Source address.</param>
         /// <param name="dest">Destination address.</param>
@@ -214,14 +214,14 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     public class DNSPacketAsk : DNSPacket
     {
         /// <summary>
-        /// Create new inctanse of the <see cref="DNSPacketAsk"/> class.
+        /// Create new instance of the <see cref="DNSPacketAsk"/> class.
         /// </summary>
         internal DNSPacketAsk()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DNSPacketAsk"/> class.
+        /// Create new instance of the <see cref="DNSPacketAsk"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public DNSPacketAsk(byte[] rawData)
@@ -229,7 +229,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="UDPPacket"/> class.
+        /// Create new instance of the <see cref="UDPPacket"/> class.
         /// </summary>
         /// <param name="source">Source address.</param>
         /// <param name="dest">DNS Server address.</param>
@@ -281,14 +281,14 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     public class DNSPacketAnswer : DNSPacket
     {
         /// <summary>
-        /// Create new inctanse of the <see cref="DNSPacketAnswer"/> class.
+        /// Create new instance of the <see cref="DNSPacketAnswer"/> class.
         /// </summary>
         internal DNSPacketAnswer()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="DNSPacketAnswer"/> class.
+        /// Create new instance of the <see cref="DNSPacketAnswer"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public DNSPacketAnswer(byte[] rawData)
