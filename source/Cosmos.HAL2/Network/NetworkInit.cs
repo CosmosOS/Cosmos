@@ -5,7 +5,7 @@ using Cosmos.HAL.Drivers.PCI.Network;
 
 namespace Cosmos.HAL.Network
 {
-    class NetworkInit
+    public class NetworkInit
     {
         public static void Init()
         {
