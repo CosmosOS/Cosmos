@@ -8,7 +8,7 @@ namespace Cosmos.System.Network.Config
     /// <summary>
     /// Contains DNS configuration
     /// </summary>
-    class DNSConfig
+    public class DNSConfig
     {
         /// <summary>
         /// DNS Addresses list.

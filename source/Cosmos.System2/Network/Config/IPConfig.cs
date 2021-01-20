@@ -65,7 +65,7 @@ namespace Cosmos.System.Network.Config
         /// <param name="destIP">Destination IP address.</param>
         /// <returns>Address value.</returns>
         /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-        internal static Address FindNetwork(Address destIP)
+        public static Address FindNetwork(Address destIP)
         {
             Address default_gw = null;
 

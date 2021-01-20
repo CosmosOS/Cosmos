@@ -17,11 +17,11 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Address.
         /// </summary>
-        internal Address address;
+        public Address address;
         /// <summary>
         /// Port.
         /// </summary>
-        internal UInt16 port;
+        public UInt16 port;
 
         /// <summary>
         /// Create new inctanse of the <see cref="EndPoint"/> class.
