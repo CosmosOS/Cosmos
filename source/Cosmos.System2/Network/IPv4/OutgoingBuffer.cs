@@ -157,7 +157,7 @@ namespace Cosmos.System.Network.IPv4
 
                 if (second >= 4)
                 {
-                    NetworkStack.debugger.Send("No response in 4 secondes...");
+                    Global.mDebugger.Send("No response in 4 secondes...");
                     break;
                 }
 

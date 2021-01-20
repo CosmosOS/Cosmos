@@ -198,17 +198,17 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                     packet.Client.ToString() == null ||
                     packet.Client.ToString() == null)
                 {
-                    NetworkStack.debugger.Send("Parsing DHCP ACK Packet failed, can't apply network configuration.");
+                    Global.mDebugger.Send("Parsing DHCP ACK Packet failed, can't apply network configuration.");
                 }
                 else
                 {
                     if (message)
                     {
-                        NetworkStack.debugger.Send("[DHCP ACK][" + networkDevice.Name + "] Packet received, applying IP configuration...");
-                        NetworkStack.debugger.Send("   IP Address  : " + packet.Client.ToString());
-                        NetworkStack.debugger.Send("   Subnet mask : " + packet.Subnet.ToString());
-                        NetworkStack.debugger.Send("   Gateway     : " + packet.Server.ToString());
-                        NetworkStack.debugger.Send("   DNS server  : " + packet.DNS.ToString());
+                        Global.mDebugger.Send("[DHCP ACK][" + networkDevice.Name + "] Packet received, applying IP configuration...");
+                        Global.mDebugger.Send("   IP Address  : " + packet.Client.ToString());
+                        Global.mDebugger.Send("   Subnet mask : " + packet.Subnet.ToString());
+                        Global.mDebugger.Send("   Gateway     : " + packet.Server.ToString());
+                        Global.mDebugger.Send("   DNS server  : " + packet.DNS.ToString());
                     }
 
                     IPConfig.Enable(networkDevice, packet.Client, packet.Subnet, packet.Server);
@@ -216,7 +216,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                     if (message)
                     {
-                        NetworkStack.debugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");
+                        Global.mDebugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");
                         asked = false;
                     }
                 }

@@ -33,7 +33,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         {
             UDPPacket udp_packet = new UDPPacket(packetData);
 
-            NetworkStack.debugger.Send("[Received] UDP packet from " + udp_packet.SourceIP.ToString() + ":" + udp_packet.SourcePort.ToString());
+            Global.mDebugger.Send("[Received] UDP packet from " + udp_packet.SourceIP.ToString() + ":" + udp_packet.SourcePort.ToString());
 
             if (udp_packet.SourcePort == 67)
             {

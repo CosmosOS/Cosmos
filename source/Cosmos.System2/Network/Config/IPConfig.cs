@@ -96,7 +96,7 @@ namespace Cosmos.System.Network.Config
             {
                 var config = new IPConfig(ip, subnet, gw);
                 NetworkStack.ConfigIP(device, config);
-                NetworkStack.debugger.Send(config.ToString());
+                Global.mDebugger.Send("Config OK.");
                 return true;
             }
             return false;

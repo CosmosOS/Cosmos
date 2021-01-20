@@ -86,10 +86,13 @@ namespace Cosmos.System
 
             mDebugger.Send("HW Init");
             HAL.Global.Init(textScreen);
+
+            Network.NetworkStack.Init();
+            mDebugger.Send("Network Stack Init");
+
             NumLock = false;
             CapsLock = false;
             ScrollLock = false;
-            Network.NetworkStack.Init();
         }
 
         /// <summary>

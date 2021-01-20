@@ -62,7 +62,7 @@ namespace Cosmos.System.Network.ARP
             mSenderIP = new Address(RawData, 28);
             if (SenderIP == null)
             {
-                NetworkStack.debugger.Send("But its already null again");
+                Global.mDebugger.Send("But its already null again");
             }
             mTargetMAC = new MACAddress(RawData, 32);
             mTargetIP = new Address(RawData, 38);
@@ -219,7 +219,7 @@ namespace Cosmos.System.Network.ARP
         {
             if (SenderIP == null)
             {
-                NetworkStack.debugger.Send("In ARPRequest_Ethernet, SenderIP is null!");
+                Global.mDebugger.Send("In ARPRequest_Ethernet, SenderIP is null!");
             }
         }
 

@@ -58,7 +58,7 @@ namespace Cosmos.System.Network.ARP
                     ARPRequest_Ethernet arp_request = new ARPRequest_Ethernet(packetData);
                     if (arp_request.SenderIP == null)
                     {
-                        NetworkStack.debugger.Send("SenderIP null in ARPHandler!");
+                        Global.mDebugger.Send("SenderIP null in ARPHandler!");
                     }
                     arp_request = new ARPRequest_Ethernet(packetData);
 
@@ -66,7 +66,7 @@ namespace Cosmos.System.Network.ARP
 
                     if (NetworkStack.AddressMap.ContainsKey(arp_request.TargetIP.Hash) == true)
                     {
-                        NetworkStack.debugger.Send("ARP Request Recvd from " + arp_request.SenderIP.ToString());
+                        Global.mDebugger.Send("ARP Request Recvd from " + arp_request.SenderIP.ToString());
                         NetworkDevice nic = NetworkStack.AddressMap[arp_request.TargetIP.Hash];
 
                         ARPReply_Ethernet reply =
@@ -81,9 +81,9 @@ namespace Cosmos.System.Network.ARP
                 if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
                 {
                     ARPReply_Ethernet arp_reply = new ARPReply_Ethernet(packetData);
-                    NetworkStack.debugger.Send("Received ARP Reply");
-                    NetworkStack.debugger.Send(arp_reply.ToString());
-                    NetworkStack.debugger.Send("ARP Reply Recvd from " + arp_reply.SenderIP.ToString());
+                    Global.mDebugger.Send("Received ARP Reply");
+                    Global.mDebugger.Send(arp_reply.ToString());
+                    Global.mDebugger.Send("ARP Reply Recvd from " + arp_reply.SenderIP.ToString());
                     ARPCache.Update(arp_reply.SenderIP, arp_reply.SenderMAC);
 
                     OutgoingBuffer.ARPCache_Update(arp_reply);

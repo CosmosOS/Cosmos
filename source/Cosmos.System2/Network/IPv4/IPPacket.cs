@@ -38,7 +38,7 @@ namespace Cosmos.System.Network.IPv4
             //Sys.Console.WriteLine(ip_packet.ToString());
             if (ip_packet.SourceIP == null)
             {
-                NetworkStack.debugger.Send("SourceIP null in IPv4Handler!");
+                Global.mDebugger.Send("SourceIP null in IPv4Handler!");
             }
             ARPCache.Update(ip_packet.SourceIP, ip_packet.SourceMAC);
 

@@ -37,7 +37,7 @@ namespace Cosmos.System.Network.IPv4
         /// <exception cref="ArgumentException">Thrown if packetData is invalid.</exception>
         internal static void ICMPHandler(byte[] packetData)
         {
-            NetworkStack.debugger.Send("ICMP Handler called");
+            Global.mDebugger.Send("ICMP Handler called");
             ICMPPacket icmp_packet = new ICMPPacket(packetData);
             switch (icmp_packet.ICMP_Type)
             {
@@ -47,12 +47,12 @@ namespace Cosmos.System.Network.IPv4
                     {
                         receiver.receiveData(icmp_packet);
                     }
-                    NetworkStack.debugger.Send("Received ICMP Echo reply from " + icmp_packet.SourceIP.ToString());
+                    Global.mDebugger.Send("Received ICMP Echo reply from " + icmp_packet.SourceIP.ToString());
                     break;
                 case 8:
                     ICMPEchoRequest request = new ICMPEchoRequest(packetData);
                     ICMPEchoReply reply = new ICMPEchoReply(request);
-                    NetworkStack.debugger.Send("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
+                    Global.mDebugger.Send("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
                     OutgoingBuffer.AddPacket(reply);
                     NetworkStack.Update();
                     break;

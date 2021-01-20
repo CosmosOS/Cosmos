@@ -5,6 +5,8 @@
 *                   Port of Cosmos Code.
 */
 
+#define COSMOSDEBUG
+
 using System;
 using System.Collections.Generic;
 using Cosmos.Debug.Kernel;
@@ -43,17 +45,6 @@ namespace Cosmos.System.Network
         {
             AddressMap = new TempDictionary<uint, NetworkDevice>();
             MACMap = new TempDictionary<uint, NetworkDevice>();
-
-            // VMT Scanner issue workaround
-            ARPPacket.VMTInclude();
-            ARPPacket_Ethernet.VMTInclude();
-            ARPReply_Ethernet.VMTInclude();
-            ARPRequest_Ethernet.VMTInclude();
-            ICMPPacket.VMTInclude();
-            ICMPEchoReply.VMTInclude();
-            ICMPEchoRequest.VMTInclude();
-            UDPPacket.VMTInclude();
-            //TCPPacket.VMTInclude();
         }
 
         /// <summary>
@@ -156,10 +147,10 @@ namespace Cosmos.System.Network
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         internal static void HandlePacket(byte[] packetData)
         {
-            debugger.Send("Packet Received Length=" + packetData.Length.ToString());
+            Global.mDebugger.Send("Packet Received Length=" + packetData.Length.ToString());
             if (packetData == null)
             {
-                debugger.Send("Error packet data null");
+                Global.mDebugger.Send("Error packet data null");
                 return;
             }
 

@@ -329,7 +329,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
 
             if ((ushort)(DNSFlags & 0x0F) != (ushort)ReplyCode.OK)
             {
-                NetworkStack.debugger.Send("DNS Packet response not OK. Passing packet.");
+                Global.mDebugger.Send("DNS Packet response not OK. Passing packet.");
                 return;
             }
 
