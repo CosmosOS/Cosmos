@@ -147,7 +147,6 @@ namespace Cosmos.System.Network
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         internal static void HandlePacket(byte[] packetData)
         {
-            Global.mDebugger.Send("Packet Received Length=" + packetData.Length.ToString());
             if (packetData == null)
             {
                 Global.mDebugger.Send("Error packet data null");
