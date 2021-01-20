@@ -15,7 +15,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     /// <summary>
     /// DnsClient class. Used to manage the DNS connection to a server.
     /// </summary>
-    class DnsClient : UdpClient
+    public class DnsClient : UdpClient
     {
         /// <summary>
         /// Domain Name query string

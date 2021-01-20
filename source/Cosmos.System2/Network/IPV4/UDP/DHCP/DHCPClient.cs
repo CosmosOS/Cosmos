@@ -16,7 +16,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     /// <summary>
     /// DHCPClient class. Used to manage the DHCP connection to a server.
     /// </summary>
-    class DHCPClient
+    public class DHCPClient
     {
         /// <summary>
         /// Current DHCPClient
