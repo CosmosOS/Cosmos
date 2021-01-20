@@ -92,14 +92,6 @@ namespace Cosmos.System.Network.ARP
         }
 
         /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public static void VMTInclude()
-        {
-            new ARPPacket();
-        }
-
-        /// <summary>
         /// Create new inctanse of the <see cref="ARPPacket"/> class.
         /// </summary>
         internal ARPPacket()

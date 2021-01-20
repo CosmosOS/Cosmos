@@ -146,14 +146,6 @@ namespace Cosmos.System.Network.ARP
     internal class ARPReply_Ethernet : ARPPacket_Ethernet
     {
         /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public new static void VMTInclude()
-        {
-            new ARPReply_Ethernet();
-        }
-
-        /// <summary>
         /// Create new inctanse of the <see cref="ARPReply_Ethernet"/> class.
         /// </summary>
         internal ARPReply_Ethernet()
@@ -195,14 +187,6 @@ namespace Cosmos.System.Network.ARP
     /// </summary>
     internal class ARPRequest_Ethernet : ARPPacket_Ethernet
     {
-        /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public new static void VMTInclude()
-        {
-            new ARPRequest_Ethernet();
-        }
-
         /// <summary>
         /// Create new inctanse of the <see cref="ARPRequest_Ethernet"/> class.
         /// </summary>

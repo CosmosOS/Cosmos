@@ -69,14 +69,6 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         }
 
         /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public static void VMTInclude()
-        {
-            new DNSPacket();
-        }
-
-        /// <summary>
         /// Create new inctanse of the <see cref="DNSPacket"/> class.
         /// </summary>
         internal DNSPacket()
@@ -222,14 +214,6 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     public class DNSPacketAsk : DNSPacket
     {
         /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public static void VMTInclude()
-        {
-            new DNSPacketAsk();
-        }
-
-        /// <summary>
         /// Create new inctanse of the <see cref="DNSPacketAsk"/> class.
         /// </summary>
         internal DNSPacketAsk()
@@ -296,14 +280,6 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     /// </summary>
     public class DNSPacketAnswer : DNSPacket
     {
-        /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public static void VMTInclude()
-        {
-            new DNSPacketAnswer();
-        }
-
         /// <summary>
         /// Create new inctanse of the <see cref="DNSPacketAnswer"/> class.
         /// </summary>

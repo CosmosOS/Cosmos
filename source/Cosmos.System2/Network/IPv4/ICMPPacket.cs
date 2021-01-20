@@ -60,14 +60,6 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public static void VMTInclude()
-        {
-            new ICMPPacket();
-        }
-
-        /// <summary>
         /// Create new inctanse of the <see cref="ICMPPacket"/> class.
         /// </summary>
         internal ICMPPacket()
@@ -230,14 +222,6 @@ namespace Cosmos.System.Network.IPv4
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
         }
 
-        /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public new static void VMTInclude()
-        {
-            new ICMPEchoRequest();
-        }
-
         protected override void initFields()
         {
             //Sys.Console.WriteLine("ICMPEchoRequest.initFields() called;");
@@ -287,14 +271,6 @@ namespace Cosmos.System.Network.IPv4
         internal ICMPEchoReply(byte[] rawData)
             : base(rawData)
         {
-        }
-
-        /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public new static void VMTInclude()
-        {
-            new ICMPEchoReply();
         }
 
         /// <summary>
