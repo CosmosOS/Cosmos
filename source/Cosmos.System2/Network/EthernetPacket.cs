@@ -86,7 +86,7 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Get raw data byte array.
         /// </summary>
-        internal byte[] RawData { get; }
+        public byte[] RawData { get; }
 
         /// <summary>
         /// Get and set source MAC address.

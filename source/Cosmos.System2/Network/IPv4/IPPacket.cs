@@ -80,7 +80,7 @@ namespace Cosmos.System.Network.IPv4
         /// Create new inctanse of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        internal IPPacket(byte[] rawData)
+        public IPPacket(byte[] rawData)
             : base(rawData)
         {
         }

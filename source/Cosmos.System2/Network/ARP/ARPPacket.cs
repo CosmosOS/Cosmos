@@ -15,7 +15,7 @@ namespace Cosmos.System.Network.ARP
     /// <summary>
     /// ARPPacket class. See also: <seealso cref="EthernetPacket"/>.
     /// </summary>
-    internal class ARPPacket : EthernetPacket
+    public class ARPPacket : EthernetPacket
     {
         /// <summary>
         /// Hardware type.
@@ -110,7 +110,7 @@ namespace Cosmos.System.Network.ARP
         /// Create new inctanse of the <see cref="ARPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        internal ARPPacket(byte[] rawData)
+        public ARPPacket(byte[] rawData)
             : base(rawData)
         { }
 

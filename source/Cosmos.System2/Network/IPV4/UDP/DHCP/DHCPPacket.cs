@@ -78,7 +78,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// Create new inctanse of the <see cref="DHCPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        internal DHCPPacket(byte[] rawData)
+        public DHCPPacket(byte[] rawData)
             : base(rawData)
         { }
 
