@@ -21,7 +21,7 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Clients dictionary.
         /// </summary>
-        private static TempDictionary<uint, ICMPClient> clients;
+        private static Dictionary<uint, ICMPClient> clients;
 
         /// <summary>
         /// Destination address.
@@ -39,7 +39,7 @@ namespace Cosmos.System.Network.IPv4
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         static ICMPClient()
         {
-            clients = new TempDictionary<uint, ICMPClient>();
+            clients = new Dictionary<uint, ICMPClient>();
         }
 
         /// <summary>

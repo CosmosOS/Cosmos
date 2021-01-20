@@ -6,6 +6,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network.ARP
@@ -18,7 +19,7 @@ namespace Cosmos.System.Network.ARP
         /// <summary>
         /// Cache.
         /// </summary>
-        private static TempDictionary<uint, MACAddress> cache;
+        private static Dictionary<uint, MACAddress> cache;
 
         /// <summary>
         /// Ensure cache exists.
@@ -28,7 +29,7 @@ namespace Cosmos.System.Network.ARP
         {
             if (cache == null)
             {
-                cache = new TempDictionary<uint, MACAddress>();
+                cache = new Dictionary<uint, MACAddress>();
             }
         }
 
