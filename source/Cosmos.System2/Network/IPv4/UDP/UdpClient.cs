@@ -54,7 +54,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// </summary>
         /// <param name="destPort">Destination port.</param>
         /// <returns>UdpClient</returns>
-        internal static UdpClient Client(ushort destPort)
+        internal static UdpClient GetClient(ushort destPort)
         {
             if (clients.ContainsKey((uint)destPort) == true)
             {

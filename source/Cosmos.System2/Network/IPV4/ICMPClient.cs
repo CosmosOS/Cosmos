@@ -47,7 +47,7 @@ namespace Cosmos.System.Network.IPv4
         /// </summary>
         /// <param name="iphash">IP Hash.</param>
         /// <returns>ICMPClient</returns>
-        internal static ICMPClient Client(uint iphash)
+        internal static ICMPClient GetClient(uint iphash)
         {
             if (clients.ContainsKey(iphash) == true)
             {

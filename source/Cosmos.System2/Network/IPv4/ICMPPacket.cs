@@ -42,7 +42,7 @@ namespace Cosmos.System.Network.IPv4
             switch (icmp_packet.ICMP_Type)
             {
                 case 0:
-                    ICMPClient receiver = ICMPClient.Client(icmp_packet.SourceIP.Hash);
+                    ICMPClient receiver = ICMPClient.GetClient(icmp_packet.SourceIP.Hash);
                     if (receiver != null)
                     {
                         receiver.receiveData(icmp_packet);
