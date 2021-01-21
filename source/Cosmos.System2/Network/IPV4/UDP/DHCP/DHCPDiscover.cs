@@ -46,11 +46,5 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
             RawData[291] = 0xff; //ENDMARK
         }
-
-        protected override void InitFields()
-        {
-            base.InitFields();
-        }
-
     }
 }

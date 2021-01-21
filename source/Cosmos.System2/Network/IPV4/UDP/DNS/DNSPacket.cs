@@ -264,15 +264,6 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
             RawData[this.DataOffset + 20 + b + 3] = 0x00;
             RawData[this.DataOffset + 20 + b + 4] = 0x01;
         }
-
-        /// <summary>
-        /// Init DNSPacketAsk fields.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
-        {
-            base.InitFields();
-        }
     }
 
     /// <summary>

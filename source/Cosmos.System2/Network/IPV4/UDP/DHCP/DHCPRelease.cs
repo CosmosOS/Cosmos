@@ -61,15 +61,5 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
             RawData[300] = 0xff; //ENDMARK
         }
-
-        /// <summary>
-        /// Init DHCPRelease fields.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
-        {
-            base.InitFields();
-        }
-
     }
 }

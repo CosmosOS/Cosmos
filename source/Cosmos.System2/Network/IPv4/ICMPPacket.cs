@@ -38,11 +38,11 @@ namespace Cosmos.System.Network.IPv4
         internal static void ICMPHandler(byte[] packetData)
         {
             Global.mDebugger.Send("ICMP Handler called");
-            ICMPPacket icmp_packet = new ICMPPacket(packetData);
-            switch (icmp_packet.ICMP_Type)
+            var icmp_packet = new ICMPPacket(packetData);
+            switch (icmp_packet.ICMPType)
             {
                 case 0:
-                    ICMPClient receiver = ICMPClient.GetClient(icmp_packet.SourceIP.Hash);
+                    var receiver = ICMPClient.GetClient(icmp_packet.SourceIP.Hash);
                     if (receiver != null)
                     {
                         receiver.ReceiveData(icmp_packet);
@@ -50,8 +50,8 @@ namespace Cosmos.System.Network.IPv4
                     Global.mDebugger.Send("Received ICMP Echo reply from " + icmp_packet.SourceIP.ToString());
                     break;
                 case 8:
-                    ICMPEchoRequest request = new ICMPEchoRequest(packetData);
-                    ICMPEchoReply reply = new ICMPEchoReply(request);
+                    var request = new ICMPEchoRequest(packetData);
+                    var reply = new ICMPEchoReply(request);
                     Global.mDebugger.Send("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
                     OutgoingBuffer.AddPacket(reply);
                     NetworkStack.Update();
@@ -131,31 +131,22 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Get ICMP type.
         /// </summary>
-        internal byte ICMP_Type
-        {
-            get { return icmpType; }
-        }
+        internal byte ICMPType => icmpType;
+
         /// <summary>
         /// Get ICMP code.
         /// </summary>
-        internal byte ICMP_Code
-        {
-            get { return icmpCode; }
-        }
+        internal byte ICMPCode => icmpCode;
+
         /// <summary>
         /// Get ICMP CRC.
         /// </summary>
-        internal ushort ICMP_CRC
-        {
-            get { return icmpCRC; }
-        }
+        internal ushort ICMPCRC => icmpCRC;
+
         /// <summary>
         /// Get ICMP data length.
         /// </summary>
-        internal ushort ICMP_DataLength
-        {
-            get { return (ushort)(DataLength - 8); }
-        }
+        internal ushort ICMPDataLength => (ushort)(DataLength - 8);
 
         /// <summary>
         /// Get ICMP data.
@@ -163,9 +154,9 @@ namespace Cosmos.System.Network.IPv4
         /// <returns>byte array value.</returns>
         internal byte[] GetICMPData()
         {
-            byte[] data = new byte[ICMP_DataLength];
+            byte[] data = new byte[ICMPDataLength];
 
-            for (int b = 0; b < ICMP_DataLength; b++)
+            for (int b = 0; b < ICMPDataLength; b++)
             {
                 data[b] = RawData[DataOffset + 8 + b];
             }
@@ -207,37 +198,49 @@ namespace Cosmos.System.Network.IPv4
         {
         }
 
+        /// <summary>
+        /// Create new instance of the <see cref="ICMPEchoRequest"/> class.
+        /// </summary>
+        /// <param name="source">Source address.</param>
+        /// <param name="dest">Destination address.</param>
+        /// <param name="id">ID.</param>
+        /// <param name="sequence">Sequence.</param>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         internal ICMPEchoRequest(Address source, Address dest, ushort id, ushort sequence)
             : base(source, dest, 8, 0, id, sequence, 40)
         {
-            for (int b = 8; b < ICMP_DataLength; b++)
+            for (int b = 8; b < ICMPDataLength; b++)
             {
                 RawData[DataOffset + b] = (byte)b;
             }
 
             RawData[DataOffset + 2] = 0x00;
             RawData[DataOffset + 3] = 0x00;
-            icmpCRC = CalcICMPCRC((ushort)(ICMP_DataLength + 8));
+            icmpCRC = CalcICMPCRC((ushort)(ICMPDataLength + 8));
             RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
         }
 
+        /// <summary>
+        /// Init ICMPPacket fields.1
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         protected override void InitFields()
         {
-            //Sys.Console.WriteLine("ICMPEchoRequest.InitFields() called;");
             base.InitFields();
             icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
             icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
         }
 
-        internal ushort ICMP_ID
-        {
-            get { return icmpID; }
-        }
-        internal ushort ICMP_Sequence
-        {
-            get { return icmpSequence; }
-        }
+        /// <summary>
+        /// Get ICMP ID.
+        /// </summary>
+        internal ushort ICMPID => icmpID;
+
+        /// <summary>
+        /// Get ICMP Sequence.
+        /// </summary>
+        internal ushort ICMPSequence => icmpSequence;
 
         /// <summary>
         /// To string.
@@ -291,16 +294,16 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="request">ICMP echo request.</param>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         internal ICMPEchoReply(ICMPEchoRequest request)
-            : base(request.DestinationIP, request.SourceIP, 0, 0, request.ICMP_ID, request.ICMP_Sequence, (ushort)(request.ICMP_DataLength))
+            : base(request.DestinationIP, request.SourceIP, 0, 0, request.ICMPID, request.ICMPSequence, (ushort)(request.ICMPDataLength))
         {
-            for (int b = 0; b < ICMP_DataLength; b++)
+            for (int b = 0; b < ICMPDataLength; b++)
             {
                 RawData[DataOffset + 8 + b] = request.RawData[DataOffset + 8 + b];
             }
 
             RawData[DataOffset + 2] = 0x00;
             RawData[DataOffset + 3] = 0x00;
-            icmpCRC = CalcICMPCRC((ushort)(ICMP_DataLength + 8));
+            icmpCRC = CalcICMPCRC((ushort)(ICMPDataLength + 8));
             RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
         }
@@ -308,17 +311,12 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Get ICMP ID.
         /// </summary>
-        internal ushort ICMP_ID
-        {
-            get { return icmpID; }
-        }
+        internal ushort ICMPID => icmpID;
+
         /// <summary>
         /// Get ICMP sequence.
         /// </summary>
-        internal ushort ICMP_Sequence
-        {
-            get { return icmpSequence; }
-        }
+        internal ushort ICMPSequence => icmpSequence;
 
         /// <summary>
         /// To string.
