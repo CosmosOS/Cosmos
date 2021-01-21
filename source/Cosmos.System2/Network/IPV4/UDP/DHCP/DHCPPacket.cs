@@ -56,7 +56,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             DHCPClient receiver = DHCPClient.currentClient;
             if (receiver != null)
             {
-                receiver.receiveData(dhcp_packet);
+                receiver.ReceiveData(dhcp_packet);
             }
         }
 

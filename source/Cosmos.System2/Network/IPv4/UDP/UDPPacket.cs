@@ -49,7 +49,7 @@ namespace Cosmos.System.Network.IPv4.UDP
             UdpClient receiver = UdpClient.GetClient(udp_packet.DestinationPort);
             if (receiver != null)
             {
-                receiver.receiveData(udp_packet);
+                receiver.ReceiveData(udp_packet);
             }
         }
 

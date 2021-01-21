@@ -45,7 +45,7 @@ namespace Cosmos.System.Network.IPv4
                     ICMPClient receiver = ICMPClient.GetClient(icmp_packet.SourceIP.Hash);
                     if (receiver != null)
                     {
-                        receiver.receiveData(icmp_packet);
+                        receiver.ReceiveData(icmp_packet);
                     }
                     Global.mDebugger.Send("Received ICMP Echo reply from " + icmp_packet.SourceIP.ToString());
                     break;

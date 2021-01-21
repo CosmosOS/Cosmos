@@ -64,7 +64,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
             DnsClient receiver = (DnsClient)UdpClient.GetClient(dns_packet.DestinationPort);
             if (receiver != null)
             {
-                receiver.receiveData(dns_packet);
+                receiver.ReceiveData(dns_packet);
             }
         }
 

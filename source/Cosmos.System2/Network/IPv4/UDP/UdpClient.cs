@@ -205,7 +205,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// <param name="packet">Packet to receive.</param>
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        internal void receiveData(UDPPacket packet)
+        internal void ReceiveData(UDPPacket packet)
         {
             rxBuffer.Enqueue(packet);
         }

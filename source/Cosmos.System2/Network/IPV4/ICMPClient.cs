@@ -135,7 +135,7 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="packet">Packet to receive.</param>
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        public void receiveData(ICMPPacket packet)
+        public void ReceiveData(ICMPPacket packet)
         {
             rxBuffer.Enqueue(packet);
         }

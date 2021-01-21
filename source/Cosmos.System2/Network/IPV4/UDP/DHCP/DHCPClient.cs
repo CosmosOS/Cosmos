@@ -68,7 +68,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// <param name="packet">Packet to receive.</param>
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        internal void receiveData(DHCPPacket packet)
+        internal void ReceiveData(DHCPPacket packet)
         {
             rxBuffer.Enqueue(packet);
         }
@@ -198,7 +198,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                     packet.Client.ToString() == null ||
                     packet.Client.ToString() == null)
                 {
-                    Global.mDebugger.Send("Parsing DHCP ACK Packet failed, can't apply network configuration.");
+                    throw new Exception("Parsing DHCP ACK Packet failed, can't apply network configuration.");
                 }
                 else
                 {
