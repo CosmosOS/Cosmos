@@ -37,15 +37,13 @@ namespace Cosmos.System.Network.Config
         /// <param name="config"></param>
         public static void Remove(Address nameserver)
         {
-            int counter = 0;
-
-            foreach (var ns in DNSNameservers)
+            for (int i = 0; i < DNSNameservers.Count; i++)
             {
-                if (ns.address.ToString() == nameserver.address.ToString())
+                if (DNSNameservers[i].address.Equals(nameserver))
                 {
-                    DNSNameservers.RemoveAt(counter);
+                    DNSNameservers.RemoveAt(i);
+                    return;
                 }
-                counter++;
             }
         }
 
