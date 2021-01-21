@@ -138,7 +138,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         /// </summary>
         /// <param name="RawData">Data</param>
         /// <param name="index">Data offset</param>
-        public string parseName(byte[] RawData, ref int index)
+        public string ParseName(byte[] RawData, ref int index)
         {
             StringBuilder url = new StringBuilder();
 

@@ -103,7 +103,7 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Ensure queue exists.
         /// </summary>
-        private static void ensureQueueExists()
+        private static void EnsureQueueExists()
         {
             if (queue == null)
             {
@@ -117,7 +117,7 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="packet">IP packet.</param>
         internal static void AddPacket(IPPacket packet)
         {
-            ensureQueueExists();
+            EnsureQueueExists();
             NetworkDevice nic = IPConfig.FindInterface(packet.SourceIP);
             packet.SourceMAC = nic.MACAddress;
             queue.Add(new BufferEntry(nic, packet));
@@ -130,7 +130,7 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="device">Network Interface Controller.</param>
         internal static void AddPacket(IPPacket packet, NetworkDevice device)
         {
-            ensureQueueExists();
+            EnsureQueueExists();
             packet.SourceMAC = device.MACAddress;
             queue.Add(new BufferEntry(device, packet));
         }
@@ -143,7 +143,7 @@ namespace Cosmos.System.Network.IPv4
         /// <exception cref="sys.OverflowException">Thrown if RawData length is bigger than Int32.MaxValue.</exception>
         internal static void Send()
         {
-            ensureQueueExists();
+            EnsureQueueExists();
             int _deltaT = 0;
             int second = 0;
 
@@ -249,7 +249,7 @@ namespace Cosmos.System.Network.IPv4
         /// <exception cref="sys.ArgumentException">Thrown if arp_reply.SenderIP is not a IPv4Address.</exception>
         internal static void ARPCache_Update(ARPReply_Ethernet arp_reply)
         {
-            ensureQueueExists();
+            EnsureQueueExists();
             //foreach (BufferEntry entry in queue)
             for (int e = 0; e < queue.Count; e++)
             {
