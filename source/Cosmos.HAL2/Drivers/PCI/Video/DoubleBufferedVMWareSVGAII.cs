@@ -618,7 +618,14 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="height">Height.</param>
         public void Update()
         {
-            Video_Memory.MoveDown(frameBufferOffset, frameBufferSize, frameBufferSize);
+            try
+            {
+                Video_Memory.MoveDown(frameBufferOffset, frameBufferSize, frameBufferSize);
+            }
+            catch (Exception) 
+            {
+                Global.mDebugger.SendInternal("Faild To Update");
+            }
 
             WriteToFifo((uint)FIFOCommand.Update);
             WriteToFifo(0);
