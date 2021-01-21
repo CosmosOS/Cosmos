@@ -16,7 +16,7 @@ namespace Cosmos.System.Network.IPv4
     /// <summary>
     /// ICMPClient class. Used to manage the ICMP connection to a client.
     /// </summary>
-    public class ICMPClient
+    public class ICMPClient : IDisposable
     {
         /// <summary>
         /// Clients dictionary.
@@ -138,6 +138,14 @@ namespace Cosmos.System.Network.IPv4
         public void receiveData(ICMPPacket packet)
         {
             rxBuffer.Enqueue(packet);
+        }
+
+        /// <summary>
+        /// Close Client
+        /// </summary>
+        public void Dispose()
+        {
+            Close();
         }
     }
 }

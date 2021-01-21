@@ -15,7 +15,7 @@ namespace Cosmos.System.Network.IPv4.UDP
     /// <summary>
     /// UdpClient class. Used to manage the UDP connection to a client.
     /// </summary>
-    public class UdpClient
+    public class UdpClient : IDisposable
     {
         /// <summary>
         /// Clients dictionary.
@@ -25,15 +25,15 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// <summary>
         /// Local port.
         /// </summary>
-        protected Int32 localPort;
+        protected int localPort;
         /// <summary>
         /// Destination address.
         /// </summary>
-        protected IPv4.Address destination;
+        protected Address destination;
         /// <summary>
         /// Destination port.
         /// </summary>
-        protected Int32 destinationPort;
+        protected int destinationPort;
 
         /// <summary>
         /// RX buffer queue.
@@ -175,7 +175,7 @@ namespace Cosmos.System.Network.IPv4.UDP
                 return null;
             }
 
-            UDPPacket packet = new UDPPacket(rxBuffer.Dequeue().RawData);
+            var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
             source.address = packet.SourceIP;
             source.port = packet.SourcePort;
 
@@ -192,7 +192,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         {
             while (rxBuffer.Count < 1) ;
 
-            UDPPacket packet = new UDPPacket(rxBuffer.Dequeue().RawData);
+            var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
             source.address = packet.SourceIP;
             source.port = packet.SourcePort;
 
@@ -208,6 +208,14 @@ namespace Cosmos.System.Network.IPv4.UDP
         internal void receiveData(UDPPacket packet)
         {
             rxBuffer.Enqueue(packet);
+        }
+
+        /// <summary>
+        /// Close Client
+        /// </summary>
+        public void Dispose()
+        {
+            Close();
         }
     }
 }

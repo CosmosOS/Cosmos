@@ -317,7 +317,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
                 for (int i = 0; i < Questions; i++)
                 {
                     DNSQuery query = new DNSQuery();
-                    query.Name = parseName(RawData, ref index);
+                    query.Name = ParseName(RawData, ref index);
                     query.Type = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]);
                     query.Class = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]);
                     Queries.Add(query);
