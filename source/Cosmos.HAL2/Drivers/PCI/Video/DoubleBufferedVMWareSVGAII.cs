@@ -684,13 +684,11 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         {
             for (uint h = 0; h < height; h++)
             {
-                Video_Memory.Fill(frameBufferSize + (h * width + x) * depth, width, color);
-                /*
+                //Video_Memory.Fill(frameBufferSize + (h * width + x) * depth, width, color);
                 for (uint w = 0; w < width; w++)
                 {
                     SetPixel(w + x, y + h, color);
                 }
-                */
             }
         }
 
