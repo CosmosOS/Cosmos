@@ -16,18 +16,8 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     /// <summary>
     /// DHCPClient class. Used to manage the DHCP connection to a server.
     /// </summary>
-    public class DHCPClient
+    public class DHCPClient : UdpClient
     {
-        /// <summary>
-        /// Current DHCPClient
-        /// </summary>
-        public static DHCPClient currentClient;
-
-        // <summary>
-        /// RX buffer queue.
-        /// </summary>
-        protected Queue<DHCPPacket> rxBuffer;
-
         // <summary>
         /// Is DHCP ascked check variable
         /// </summary>
@@ -43,34 +33,12 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="UdpClient"/> class.
+        /// Create new instance of the <see cref="DHCPClient"/> class.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 0 exists.</exception>
-        public DHCPClient()
+        /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 53 exists.</exception>
+        public DHCPClient() : base(68)
         {
-            rxBuffer = new Queue<DHCPPacket>(8);
-            currentClient = this;
-        }
-
-        /// <summary>
-        /// Close connection.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public void Close()
-        {
-            currentClient = null;
-        }
-
-        /// <summary>
-        /// Receive data from packet.
-        /// </summary>
-        /// <param name="packet">Packet to receive.</param>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        internal void ReceiveData(DHCPPacket packet)
-        {
-            rxBuffer.Enqueue(packet);
         }
 
         /// <summary>
@@ -90,14 +58,14 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 {
                     return -1;
                 }
-                if (_deltaT != Cosmos.HAL.RTC.Second)
+                if (_deltaT != RTC.Second)
                 {
                     second++;
-                    _deltaT = Cosmos.HAL.RTC.Second;
+                    _deltaT = RTC.Second;
                 }
             }
 
-            var packet = rxBuffer.Dequeue();
+            var packet = new DHCPPacket(rxBuffer.Dequeue().RawData);
 
             if (packet.MessageType == 2) //Boot Reply
             {
@@ -107,7 +75,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 }
                 else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
                 {
-                    DHCPAck ack = new DHCPAck(packet.RawData);
+                    var ack = new DHCPAck(packet.RawData);
                     if (asked)
                     {
                         Apply(ack, true);

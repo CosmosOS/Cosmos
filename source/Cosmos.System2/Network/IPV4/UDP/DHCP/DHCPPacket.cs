@@ -51,9 +51,9 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
         public static void DHCPHandler(byte[] packetData)
         {
-            DHCPPacket dhcp_packet = new DHCPPacket(packetData);
+            var dhcp_packet = new DHCPPacket(packetData);
 
-            DHCPClient receiver = DHCPClient.currentClient;
+            var receiver = UdpClient.GetClient(dhcp_packet.DestinationPort);
             if (receiver != null)
             {
                 receiver.ReceiveData(dhcp_packet);

@@ -36,7 +36,7 @@ namespace Cosmos.System.Network
         /// Create new instance of the <see cref="EthernetPacket"/> class, with specified raw data.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        protected EthernetPacket(byte[] rawData)
+        public EthernetPacket(byte[] rawData)
         {
             RawData = rawData;
             InitFields();
