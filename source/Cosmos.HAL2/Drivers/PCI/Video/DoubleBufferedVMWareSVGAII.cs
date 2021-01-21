@@ -644,7 +644,10 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public void SetPixel(uint x, uint y, uint color)
         {
-            Video_Memory[frameBufferSize + ((y * width + x) * depth)] = color;
+            if (x < width && y < height)
+            {
+                Video_Memory[frameBufferSize + ((y * width + x) * depth)] = color;
+            }
         }
 
         /// <summary>
