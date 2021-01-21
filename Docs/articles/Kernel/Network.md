@@ -20,59 +20,68 @@ IPConfig.Enable(nic, new Address(192, 168, 1, 69), new Address(255, 255, 255, 0)
 ```
 ### Dynamically set IPv4 Config through DHCP
 ```csharp
-var xClient = new DHCPClient();
+using(var xClient = new DHCPClient())
+{
+    /** Send a DHCP Discover packet **/
+    //This will automatically set the IP config after DHCP response
+    xClient.SendDiscoverPacket();
 
-/** Send a DHCP Discover packet **/
-//This will automatically set the IP config after DHCP response
-xClient.SendDiscoverPacket();
+    /** Send a DHCP Release packet **/
+    xClient.SendReleasePacket(); //will tell the DHCP server to delete the address
 
-/** Send a DHCP Release packet **/
-xClient.SendReleasePacket(); //will tell the DHCP server to delete the address
-
-xClient.Close();
+    xClient.Close();  //don't forget to close!
+}
 ```
 
 ## UDP
 Before playing with packets, we have to create a client and call Connect() to specify the remote machine address. After that the client will be able to send or listen for data.
 ```csharp
-var xClient = new UdpClient(4242);
-xClient.Connect(new Address(192, 168, 1, 70), 4242);
+using(var xClient = new UdpClient(4242))
+{
+    xClient.Connect(new Address(192, 168, 1, 70), 4242);
 
-/** Send data **/
-xClient.Send(Encoding.ASCII.GetBytes(message));
+    /** Send data **/
+    xClient.Send(Encoding.ASCII.GetBytes(message));
 
-/** Receive data **/
-var endpoint = new EndPoint(Address.Zero, 0);
-xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
-xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
+    /** Receive data **/
+    var endpoint = new EndPoint(Address.Zero, 0);
+    xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
+    xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
 
-xClient.Close(); //don't forget to close!
+    xClient.Close();
+}
 ```
 
 ## ICMP
 For ICMP, we will only able to send an ICMP echo to a distant machine and wait for its response. If another machine sends us an ICMP echo, Cosmos will automatically handle the request and reply.
 ```csharp
-var xClient = new ICMPClient();
-xClient.Connect(new Address(192, 168, 1, 254));
+using(var xClient = new ICMPClient())
+{
+    xClient.Connect(new Address(192, 168, 1, 254));
 
-/** Send ICMP Echo **/
-xClient.SendEcho();
+    /** Send ICMP Echo **/
+    xClient.SendEcho();
 
-/** Receive ICMP Response **/
-int time = xClient.Receive(ref endpoint); //return elapsed time / timeout if no response
+    /** Receive ICMP Response **/
+    int time = xClient.Receive(ref endpoint); //return elapsed time / timeout if no response
 
-xClient.Close(); //don't forget to close!
+    xClient.Close();
+}
+
 ```
 ## DNS
 DNS can be used to get an IP address from a Domain Name string. For now DNS can only ask for one domain name at the same time.
 ```csharp
-var xClient = new DnsClient();
-xClient.Connect(new Address(192, 168, 1, 254)); //DNS Server address
+using(var xClient = new DnsClient())
+{
+    xClient.Connect(new Address(192, 168, 1, 254)); //DNS Server address
 
-/** Send DNS ask for a single domain name **/
-xClient.SendAsk("github.com");
+    /** Send DNS ask for a single domain name **/
+    xClient.SendAsk("github.com");
 
-/** Receive DNS Response **/
-Address destination = xClient.Receive(); //can set a timeout value
-xClient.Close();
+    /** Receive DNS Response **/
+    Address destination = xClient.Receive(); //can set a timeout value
+    
+    xClient.Close();
+}
 ```
