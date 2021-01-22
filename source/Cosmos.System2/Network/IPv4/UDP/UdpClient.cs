@@ -25,20 +25,20 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// <summary>
         /// Local port.
         /// </summary>
-        protected int localPort;
+        private int localPort;
         /// <summary>
         /// Destination address.
         /// </summary>
-        protected Address destination;
+        internal Address destination;
         /// <summary>
         /// Destination port.
         /// </summary>
-        protected int destinationPort;
+        private int destinationPort;
 
         /// <summary>
         /// RX buffer queue.
         /// </summary>
-        protected Queue<UDPPacket> rxBuffer;
+        internal Queue<UDPPacket> rxBuffer;
 
         /// <summary>
         /// Assign clients dictionary.
