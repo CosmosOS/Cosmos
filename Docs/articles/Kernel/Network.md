@@ -26,9 +26,6 @@ using(var xClient = new DHCPClient())
     //This will automatically set the IP config after DHCP response
     xClient.SendDiscoverPacket();
 
-    /** Send a DHCP Release packet **/
-    xClient.SendReleasePacket(); //will tell the DHCP server to delete the address
-
     xClient.Close();  //don't forget to close!
 }
 ```
