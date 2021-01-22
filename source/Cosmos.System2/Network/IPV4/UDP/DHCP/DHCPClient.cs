@@ -21,7 +21,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         // <summary>
         /// Is DHCP ascked check variable
         /// </summary>
-        protected bool asked = false;
+        private bool asked = false;
 
         /// <summary>
         /// Get the IP address of the DHCP server
@@ -71,7 +71,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             {
                 if (packet.RawData[284] == 0x02) //Offer packet received
                 {
-                    SendRequestPacket(packet.Client, packet.Server);
+                    return SendRequestPacket(packet.Client, packet.Server);
                 }
                 else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
                 {
@@ -98,7 +98,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             foreach (NetworkDevice networkDevice in NetworkDevice.Devices)
             {
                 Address source = IPConfig.FindNetwork(DHCPServerAddress(networkDevice));
-                DHCPRelease dhcp_release = new DHCPRelease(source, DHCPServerAddress(networkDevice), networkDevice.MACAddress);
+                var dhcp_release = new DHCPRelease(source, DHCPServerAddress(networkDevice), networkDevice.MACAddress);
 
                 OutgoingBuffer.AddPacket(dhcp_release);
                 NetworkStack.Update();
@@ -113,7 +113,8 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// <summary>
         /// Send a packet to find the DHCP server and tell that we want a new IP address
         /// </summary>
-        public void SendDiscoverPacket()
+        /// <returns>time value (-1 = timeout)</returns>
+        public int SendDiscoverPacket()
         {
             NetworkStack.RemoveAllConfigIP();
 
@@ -121,28 +122,29 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             {
                 IPConfig.Enable(networkDevice, new Address(0, 0, 0, 0), new Address(0, 0, 0, 0), new Address(0, 0, 0, 0));
 
-                DHCPDiscover dhcp_discover = new DHCPDiscover(networkDevice.MACAddress);
+                var dhcp_discover = new DHCPDiscover(networkDevice.MACAddress);
                 OutgoingBuffer.AddPacket(dhcp_discover);
                 NetworkStack.Update();
 
                 asked = true;
             }
 
-            Receive();
+            return Receive();
         }
 
         /// <summary>
         /// Send a request to apply the new IP configuration
         /// </summary>
-        private void SendRequestPacket(Address RequestedAddress, Address DHCPServerAddress)
+        /// <returns>time value (-1 = timeout)</returns>
+        private int SendRequestPacket(Address RequestedAddress, Address DHCPServerAddress)
         {
             foreach (NetworkDevice networkDevice in NetworkDevice.Devices)
             {
-                DHCPRequest dhcp_request = new DHCPRequest(networkDevice.MACAddress, RequestedAddress, DHCPServerAddress);
+                var dhcp_request = new DHCPRequest(networkDevice.MACAddress, RequestedAddress, DHCPServerAddress);
                 OutgoingBuffer.AddPacket(dhcp_request);
                 NetworkStack.Update();
             }
-            Receive();
+            return Receive();
         }
 
         /*

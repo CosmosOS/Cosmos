@@ -50,7 +50,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
 
             queryurl = url;
 
-            DNSPacketAsk askpacket = new DNSPacketAsk(source, destination, url);
+            var askpacket = new DNSPacketAsk(source, destination, url);
 
             OutgoingBuffer.AddPacket(askpacket);
 
@@ -81,7 +81,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
                 }
             }
 
-            DNSPacketAnswer packet = new DNSPacketAnswer(rxBuffer.Dequeue().RawData);
+            var packet = new DNSPacketAnswer(rxBuffer.Dequeue().RawData);
 
             if ((ushort)(packet.DNSFlags & 0x0F) == (ushort)ReplyCode.OK)
             {
