@@ -22,6 +22,10 @@ namespace NetworkTest
 
         protected override void Run()
         {
+            /** 
+             * Packet creation and parsing tests
+            **/
+
             /** Ethernet Packet Parsing Test **/
             byte[] ethernetPacketData = new byte[]
             {
@@ -91,6 +95,21 @@ namespace NetworkTest
             Equals(arpPacketData, arpPacket.RawData);
 
             TestController.Completed();
+
+            /** 
+             * Clients tests
+            **/
+            var dhcpCLient = new DHCPClient();
+            dhcpCLient.Close();
+
+            var dnsClient = new DnsClient();
+            dnsClient.Close();
+
+            var udpClient = new UdpClient();
+            udpClient.Close();
+
+            var icmpClient = new ICMPClient();
+            icmpClient.Close();
         }
     }
 }
