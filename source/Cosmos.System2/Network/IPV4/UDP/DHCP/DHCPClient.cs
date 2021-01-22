@@ -71,7 +71,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             {
                 if (packet.RawData[284] == 0x02) //Offer packet received
                 {
-                    SendRequestPacket(packet.Client, packet.Server);
+                    return SendRequestPacket(packet.Client, packet.Server);
                 }
                 else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
                 {
@@ -113,7 +113,8 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// <summary>
         /// Send a packet to find the DHCP server and tell that we want a new IP address
         /// </summary>
-        public void SendDiscoverPacket()
+        /// <returns>time value (-1 = timeout)</returns>
+        public int SendDiscoverPacket()
         {
             NetworkStack.RemoveAllConfigIP();
 
@@ -128,13 +129,14 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 asked = true;
             }
 
-            Receive();
+            return Receive();
         }
 
         /// <summary>
         /// Send a request to apply the new IP configuration
         /// </summary>
-        private void SendRequestPacket(Address RequestedAddress, Address DHCPServerAddress)
+        /// <returns>time value (-1 = timeout)</returns>
+        private int SendRequestPacket(Address RequestedAddress, Address DHCPServerAddress)
         {
             foreach (NetworkDevice networkDevice in NetworkDevice.Devices)
             {
@@ -142,7 +144,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 OutgoingBuffer.AddPacket(dhcp_request);
                 NetworkStack.Update();
             }
-            Receive();
+            return Receive();
         }
 
         /*
