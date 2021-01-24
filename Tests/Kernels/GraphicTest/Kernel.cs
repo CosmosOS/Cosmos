@@ -166,13 +166,13 @@ namespace GraphicTest
                 TestBitmaps();
 
                 /* First test with the DefaultMode */
-                Canvas canvas = FullScreenCanvas.GetFullScreenCanvas();
+                Canvas canvas = FullScreenCanvas.GetCanvas();
                 DoTest(canvas);
 
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 1024, ColorDepth.ColorDepth32)));
-                DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetCanvas(new Mode(1024, 768, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetCanvas(new Mode(1280, 1024, ColorDepth.ColorDepth32)));
+                DoTest(FullScreenCanvas.GetCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
 
                 VGACanvas vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
                 DoTest(vGACanvas);

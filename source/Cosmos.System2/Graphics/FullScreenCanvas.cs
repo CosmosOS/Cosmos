@@ -28,16 +28,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// List of all video drivers (BGA, 
-        /// </summary>
-        private enum VideoDriver
-        {
-            VMWareSVGAIIDriver,
-            VBEDriver,
-            VGADriver
-        }
-
-        /// <summary>
         /// SVGA 2 device.
         /// </summary>
         private static PCIDevice _SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
@@ -55,27 +45,6 @@ namespace Cosmos.System.Graphics
         /// Video driver.
         /// </summary>
         private static Canvas _VideoDriver = null;
-
-        /// <summary>
-        /// Get video driver.
-        /// </summary>
-        /// <returns>Canvas value.</returns>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
-        private static Canvas GetVideoDriver()
-        {
-            if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
-            {
-                return new SVGAIICanvas();
-            }
-            if (VBEAvailable())
-            {
-                return new VBECanvas();
-            }
-            else
-            {
-                return new VGACanvas();
-            }
-        }
 
         /// <summary>
         /// Checks is VBE is supported exists
@@ -108,18 +77,57 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Get video driver.
         /// </summary>
-        /// <param name="mode">Mode.</param>
+        /// <param name="doublebuffered">Double buffered driver enable.</param>
         /// <returns>Canvas value.</returns>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
-        private static Canvas GetVideoDriver(Mode mode)
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
+        private static Canvas GetVideoDriver(bool doublebuffered)
         {
             if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
             {
-                return new SVGAIICanvas(mode);
+                if (doublebuffered == true)
+                {
+                    return new DoubleBufferedSVGAIICanvas();
+                }
+                else
+                {
+                    return new SVGAIICanvas();
+                }
+            }
+            if (VBEAvailable())
+            {
+                return new VBECanvas();
+                //TODO: implement non double buffered canva again
+            }
+            else
+            {
+                return new VGACanvas();
+            }
+        }
+
+        /// <summary>
+        /// Get video driver.
+        /// </summary>
+        /// <param name="mode">Mode.</param>
+        /// <param name="doublebuffered">Double buffered driver enable.</param>
+        /// <returns>Canvas value.</returns>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
+        private static Canvas GetVideoDriver(Mode mode, bool doublebuffered)
+        {
+            if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
+            {
+                if (doublebuffered == true)
+                {
+                    return new DoubleBufferedSVGAIICanvas(mode);
+                }
+                else
+                {
+                    return new SVGAIICanvas(mode);
+                }
             }
             if (VBEAvailable())
             {
                 return new VBECanvas(mode);
+                //TODO: implement non double buffered canva again
             }
             else
             {
@@ -130,15 +138,16 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Get full screen canvas.
         /// </summary>
+        /// <param name="doublebuffered">Double buffered driver enable.</param>
         /// <returns>Canvas value.</returns>
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
-        public static Canvas GetFullScreenCanvas()
+        public static Canvas GetCanvas(bool doublebuffered = false)
         {
-            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
+            Global.mDebugger.SendInternal($"GetCanvas() with default mode");
             if (_VideoDriver == null)
             {
                 Global.mDebugger.SendInternal($"_VideoDriver is null creating new object");
-                _VideoDriver = GetVideoDriver();
+                _VideoDriver = GetVideoDriver(doublebuffered);
             }
             else
             {
@@ -152,21 +161,22 @@ namespace Cosmos.System.Graphics
         /// Get full screen canvas.
         /// </summary>
         /// <param name="mode">Mode.</param>
+        /// <param name="doublebuffered">Double buffered driver enable.</param>
         /// <returns>Canvas value.</returns>
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
-        public static Canvas GetFullScreenCanvas(Mode mode)
+        public static Canvas GetCanvas(Mode mode, bool doublebuffered = false)
         {
-            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);
+            Global.mDebugger.SendInternal($"GetCanvas() with mode" + mode);
 
             if (_VideoDriver == null)
             {
-                _VideoDriver = GetVideoDriver(mode);
+                _VideoDriver = GetVideoDriver(mode, doublebuffered);
             }
             else
             {
                 _VideoDriver.Mode = mode;
             }
-                return _VideoDriver;
+            return _VideoDriver;
         }
     }
 }
