@@ -84,14 +84,7 @@ namespace Cosmos.System.Graphics
         {
             if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
             {
-                if (doublebuffered == true)
-                {
-                    return new DoubleBufferedSVGAIICanvas();
-                }
-                else
-                {
-                    return new SVGAIICanvas();
-                }
+                return new SVGAIICanvas(doublebuffered);
             }
             if (VBEAvailable())
             {
@@ -115,14 +108,7 @@ namespace Cosmos.System.Graphics
         {
             if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
             {
-                if (doublebuffered == true)
-                {
-                    return new DoubleBufferedSVGAIICanvas(mode);
-                }
-                else
-                {
-                    return new SVGAIICanvas(mode);
-                }
+                return new SVGAIICanvas(mode, doublebuffered);
             }
             if (VBEAvailable())
             {

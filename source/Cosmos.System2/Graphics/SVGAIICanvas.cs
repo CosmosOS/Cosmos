@@ -34,6 +34,11 @@ namespace Cosmos.System.Graphics
         private Mode _Mode;
 
         /// <summary>
+        /// Double Buffering Enabled
+        /// </summary>
+        private bool DoubleBuffered;
+
+        /// <summary>
         /// VMWare SVGA 2 driver.
         /// </summary>
         private readonly VMWareSVGAII _xSVGADriver;
@@ -42,8 +47,8 @@ namespace Cosmos.System.Graphics
         /// Create new instance of the <see cref="SVGAIICanvas"/> class.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
-        public SVGAIICanvas()
-            : this(_DefaultMode)
+        public SVGAIICanvas(bool doublebuffered)
+            : this(_DefaultMode, doublebuffered)
         {
         }
 
@@ -52,13 +57,22 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="aMode">A graphics mode.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
-        public SVGAIICanvas(Mode aMode)
+        public SVGAIICanvas(Mode aMode, bool doublebuffered)
         {
             mSVGAIIDebugger.SendInternal($"Called ctor with mode {aMode}");
             ThrowIfModeIsNotValid(aMode);
 
-            _xSVGADriver = new VMWareSVGAII();
+            if (doublebuffered)
+            {
+                _xSVGADriver = new DoubleBufferedVMWareSVGAII();
+            }
+            else
+            {
+                _xSVGADriver = new VMWareSVGAII();
+            }
+            
             Mode = aMode;
+            DoubleBuffered = doublebuffered;
         }
 
         /// <summary>
@@ -92,21 +106,30 @@ namespace Cosmos.System.Graphics
         {
             Color xColor = aPen.Color;
 
-            if (xColor.A == 0)
+            if (!DoubleBuffered)
             {
-                return;
+                mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {xColor.Name} Color");
+                _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
+                mSVGAIIDebugger.SendInternal($"Done drawing point");
             }
-            else if (xColor.A < 255)
+            else
             {
-                xColor = AlphaBlend(xColor, GetPointColor(aX, aY), xColor.A);
-            }
+                if (xColor.A == 0)
+                {
+                    return;
+                }
+                else if (xColor.A < 255)
+                {
+                    xColor = AlphaBlend(xColor, GetPointColor(aX, aY), xColor.A);
+                }
 
-            mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {xColor.Name} Color");
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
-            mSVGAIIDebugger.SendInternal($"Done drawing point");
-            /* No need to refresh all the screen to make the point appear on Screen! */
-            //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Columns, (uint)mode.Rows);
-            _xSVGADriver.Update((uint)aX, (uint)aY, 1, 1);
+                mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {xColor.Name} Color");
+                _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
+                mSVGAIIDebugger.SendInternal($"Done drawing point");
+                /* No need to refresh all the screen to make the point appear on Screen! */
+                //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Columns, (uint)mode.Rows);
+                _xSVGADriver.Update((uint)aX, (uint)aY, 1, 1);
+            }
         }
 
         /// <summary>
@@ -337,7 +360,14 @@ namespace Cosmos.System.Graphics
         /// <param name="aY">A Y coordinate.</param>
         public void SetCursor(bool aVisible, int aX, int aY)
         {
-            _xSVGADriver.SetCursor(aVisible, (uint)aX, (uint)aY);
+            if (!DoubleBuffered)
+            {
+                _xSVGADriver.SetCursor(aVisible, (uint)aX, (uint)aY);
+            }
+            else
+            {
+                throw new Exception("SetCursor not supported by double buffered SVGAII driver.");
+            }
         }
 
         /// <summary>
@@ -345,7 +375,14 @@ namespace Cosmos.System.Graphics
         /// </summary>
         public void CreateCursor()
         {
-            _xSVGADriver.DefineCursor();
+            if (!DoubleBuffered)
+            {
+                _xSVGADriver.DefineCursor();
+            }
+            else
+            {
+                throw new Exception("CreateCursor not supported by double buffered SVGAII driver.");
+            }
         }
 
         /// <summary>
@@ -360,7 +397,14 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectangle copy capability</exception>
         public void CopyPixel(int aX, int aY, int aNewX, int aNewY, int aWidth = 1, int aHeight = 1)
         {
-            _xSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, (uint)aWidth, (uint)aHeight);
+            if (!DoubleBuffered)
+            {
+                _xSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, (uint)aWidth, (uint)aHeight);
+            }
+            else
+            {
+                throw new Exception("CopyPixel not supported by double buffered SVGAII driver.");
+            }
         }
 
         /// <summary>
@@ -374,8 +418,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public void MovePixel(int aX, int aY, int aNewX, int aNewY)
         {
-            _xSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, 1, 1);
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, 0);
+            if (!DoubleBuffered)
+            {
+                _xSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, 1, 1);
+                _xSVGADriver.SetPixel((uint)aX, (uint)aY, 0);
+            }
+            else
+            {
+                throw new Exception("MovePixel not supported by double buffered SVGAII driver.");
+            }
         }
 
         /// <summary>

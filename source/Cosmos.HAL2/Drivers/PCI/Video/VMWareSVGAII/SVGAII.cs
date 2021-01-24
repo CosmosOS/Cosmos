@@ -154,7 +154,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// ID values.
         /// </summary>
-        private enum ID : uint
+        public enum ID : uint
         {
             /// <summary>
             /// Magic starting point.
@@ -204,7 +204,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// FIFO command values.
         /// </summary>
-        private enum FIFOCommand
+        public enum FIFOCommand
         {
             /// <summary>
             /// Update.
@@ -299,7 +299,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// IO port offset.
         /// </summary>
-        private enum IOPortOffset : byte
+        public enum IOPortOffset : byte
         {
             /// <summary>
             /// Index.
@@ -323,7 +323,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// Capability values.
         /// </summary>
         [Flags]
-        private enum Capability
+        public enum Capability
         {
             /// <summary>
             /// None.
@@ -430,49 +430,52 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Index port.
         /// </summary>
-        private IOPort IndexPort;
+        public IOPort IndexPort;
         /// <summary>
         /// Value port.
         /// </summary>
-        private IOPort ValuePort;
+        public IOPort ValuePort;
         /// <summary>
         /// BIOS port.
         /// </summary>
-        private IOPort BiosPort;
+        public IOPort BiosPort;
         /// <summary>
         /// IRQ port.
         /// </summary>
-        private IOPort IRQPort;
+        public IOPort IRQPort;
 
         /// <summary>
         /// Video memory block.
         /// </summary>
-        private MemoryBlock Video_Memory;
+        public MemoryBlock Video_Memory;
         /// <summary>
         /// FIFO memory block.
         /// </summary>
-        private MemoryBlock FIFO_Memory;
+        public MemoryBlock FIFO_Memory;
 
         /// <summary>
         /// PCI device.
         /// </summary>
-        private PCIDevice device;
+        public PCIDevice device;
         /// <summary>
         /// Height.
         /// </summary>
-        private uint height;
+        public uint height;
         /// <summary>
         /// Width.
         /// </summary>
-        private uint width;
+        public uint width;
         /// <summary>
         /// Depth.
         /// </summary>
-        private uint depth;
+        public uint depth;
         /// <summary>
         /// Capabilities.
         /// </summary>
-        private uint capabilities;
+        public uint capabilities;
+
+        public uint frameBufferSize;
+        public uint frameBufferOffset;
 
         /// <summary>
         /// Create new instance of the <see cref="VMWareSVGAII"/> class.
@@ -493,6 +496,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
 
             Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
             capabilities = ReadRegister(Register.Capabilities);
+            frameBufferOffset = ReadRegister(Register.FrameBufferOffset);
             InitializeFIFO();
         }
 
@@ -521,6 +525,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             this.depth = (depth / 8);
             this.width = width;
             this.height = height;
+            frameBufferSize = this.width * this.height * this.depth;
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
@@ -621,9 +626,12 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="y">Y coordinate.</param>
         /// <param name="color">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public void SetPixel(uint x, uint y,uint color)
+        public virtual void SetPixel(uint x, uint y,uint color)
         {
-            Video_Memory[((y * width + x) * depth)] = color;
+            if (x < width && y < height)
+            {
+                Video_Memory[((y * width + x) * depth)] = color;
+            } 
         }
 
         /// <summary>
@@ -659,7 +667,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public void Copy(uint x, uint y, uint newX, uint newY, uint width, uint height)
+        public virtual void Copy(uint x, uint y, uint newX, uint newY, uint width, uint height)
         {
             if ((capabilities & (uint)Capability.RectCopy) != 0)
             {
@@ -686,7 +694,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="color">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public void Fill(uint x, uint y, uint width, uint height, uint color)
+        public virtual void Fill(uint x, uint y, uint width, uint height, uint color)
         {
             if ((capabilities & (uint)Capability.RectFill) != 0)
             {
@@ -736,7 +744,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Define cursor.
         /// </summary>
-        public void DefineCursor()
+        public virtual void DefineCursor()
         {
             WaitForFifo();
             WriteToFifo((uint)FIFOCommand.DEFINE_CURSOR);
@@ -765,7 +773,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="visible">Visible.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public void SetCursor(bool visible, uint x, uint y)
+        public virtual void SetCursor(bool visible, uint x, uint y)
         {
             WriteRegister(Register.CursorID, 1);
             if (visible)
