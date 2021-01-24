@@ -443,7 +443,10 @@ namespace Cosmos.System.Graphics
 
         public override void Display()
         {
-            
+            if (DoubleBuffered)
+            {
+                ((DoubleBufferedVMWareSVGAII)_xSVGADriver).Update();
+            }
         }
     }
 }
