@@ -1,26 +1,62 @@
-﻿using System.Collections.Generic;
-using Cosmos.HAL;
-using System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          List of all IPs / Utils
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Alexy DA CRUZ <dacruzalexy@gmail.com>
+*                   Port of Cosmos Code.
+*/
 
-namespace Cosmos.System.Network.IPv4
+using System.Collections.Generic;
+using System;
+using Cosmos.System.Network.IPv4;
+using Cosmos.HAL;
+
+namespace Cosmos.System.Network.Config
 {
     /// <summary>
     /// Contains a IPv4 configuration
     /// </summary>
-    public class Config
+    public class IPConfig
     {
         /// <summary>
         /// IPv4 configurations list.
         /// </summary>
-        private static readonly List<Config> ipConfigs = new List<Config>();
+        private static readonly List<IPConfig> ipConfigs = new List<IPConfig>();
 
         /// <summary>
         /// Add IPv4 configuration.
         /// </summary>
         /// <param name="config"></param>
-        internal static void Add(Config config)
+        internal static void Add(IPConfig config)
         {
             ipConfigs.Add(config);
+        }
+
+        /// <summary>
+        /// Remove IPv4 configuration.
+        /// </summary>
+        /// <param name="config"></param>
+        internal static void Remove(IPConfig config)
+        {
+            int counter = 0;
+
+            foreach (var ipconfig in ipConfigs)
+            {
+                if (ipconfig == config)
+                {
+                    ipConfigs.RemoveAt(counter);
+                    return;
+                }
+                counter++;
+            }
+        }
+
+        /// <summary>
+        /// Remove All IPv4 configuration.
+        /// </summary>
+        internal static void RemoveAll()
+        {
+            ipConfigs.Clear();
         }
 
         /// <summary>
@@ -29,24 +65,41 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="destIP">Destination IP address.</param>
         /// <returns>Address value.</returns>
         /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-        internal static Address FindNetwork(Address destIP)
+        public static Address FindNetwork(Address destIP)
         {
             Address default_gw = null;
 
-            for (int c = 0; c < ipConfigs.Count; c++)
+            foreach (IPConfig ipConfig in ipConfigs)
             {
-                if ((ipConfigs[c].IPAddress.Hash & ipConfigs[c].SubnetMask.Hash) ==
-                    (destIP.Hash & ipConfigs[c].SubnetMask.Hash))
+                if ((ipConfig.IPAddress.Hash & ipConfig.SubnetMask.Hash) ==
+                    (destIP.Hash & ipConfig.SubnetMask.Hash))
                 {
-                    return ipConfigs[c].IPAddress;
+                    return ipConfig.IPAddress;
                 }
-                if ((default_gw == null) && (ipConfigs[c].DefaultGateway.CompareTo(Address.Zero) != 0))
+                if ((default_gw == null) && (ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0))
                 {
-                    default_gw = ipConfigs[c].IPAddress;
+                    default_gw = ipConfig.IPAddress;
+                }
+
+                if (!IsLocalAddress(destIP))
+                {
+                    return ipConfig.IPAddress;
                 }
             }
 
             return default_gw;
+        }
+
+        public static bool Enable(NetworkDevice device, Address ip, Address subnet, Address gw)
+        {
+            if (device != null)
+            {
+                var config = new IPConfig(ip, subnet, gw);
+                NetworkStack.ConfigIP(device, config);
+                Global.mDebugger.Send("Config OK.");
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -88,10 +141,10 @@ namespace Cosmos.System.Network.IPv4
         {
             for (int c = 0; c < ipConfigs.Count; c++)
             {
-                if (ipConfigs[c].DefaultGateway.CompareTo(Address.Zero) != 0)
-                {
+                //if (ipConfigs[c].DefaultGateway.CompareTo(Address.Zero) != 0)
+                //{
                     return ipConfigs[c].DefaultGateway;
-                }
+                //}
             }
 
             return null;
@@ -102,7 +155,7 @@ namespace Cosmos.System.Network.IPv4
         /// </summary>
         /// <param name="ip">IP Address</param>
         /// <param name="subnet">Subnet Mask</param>
-        public Config(Address ip, Address subnet)
+        public IPConfig(Address ip, Address subnet)
             : this(ip, subnet, Address.Zero)
         {
         }
@@ -113,7 +166,7 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="ip">IP Address</param>
         /// <param name="subnet">Subnet Mask</param>
         /// <param name="gw">Default gateway</param>
-        public Config(Address ip, Address subnet, Address gw)
+        public IPConfig(Address ip, Address subnet, Address gw)
         {
             IPAddress = ip;
             SubnetMask = subnet;

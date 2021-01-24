@@ -1,6 +1,16 @@
-﻿using sys = System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          IPv4 Packet
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
+using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
+using Cosmos.System.Network.IPv4.UDP;
+using Cosmos.System.Network.IPv4.UDP.DHCP;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -28,7 +38,7 @@ namespace Cosmos.System.Network.IPv4
             //Sys.Console.WriteLine(ip_packet.ToString());
             if (ip_packet.SourceIP == null)
             {
-                NetworkStack.debugger.Send("SourceIP null in IPv4Handler!");
+                Global.mDebugger.Send("SourceIP null in IPv4Handler!");
             }
             ARPCache.Update(ip_packet.SourceIP, ip_packet.SourceMAC);
 
@@ -48,6 +58,10 @@ namespace Cosmos.System.Network.IPv4
                         break;
                 }
             }
+            else if (NetworkStack.MACMap.ContainsKey(ip_packet.DestinationMAC.Hash))
+            {
+                DHCPPacket.DHCPHandler(packetData);
+            }
         }
 
         /// <summary>
@@ -56,17 +70,17 @@ namespace Cosmos.System.Network.IPv4
         public static ushort NextIPFragmentID => sNextFragmentID++;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         internal IPPacket()
         {
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        internal IPPacket(byte[] rawData)
+        public IPPacket(byte[] rawData)
             : base(rawData)
         {
         }
@@ -75,9 +89,9 @@ namespace Cosmos.System.Network.IPv4
         /// Init IPPacket fields.
         /// </summary>
         /// <exception cref="sys.ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
             IPVersion = (byte)((RawData[14] & 0xF0) >> 4);
             ipHeaderLength = (byte)(RawData[14] & 0x0F);
             TypeOfService = RawData[15];
@@ -94,7 +108,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="dataLength">Data length.</param>
         /// <param name="protocol">Protocol.</param>
@@ -106,7 +120,20 @@ namespace Cosmos.System.Network.IPv4
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
+        /// </summary>
+        /// <param name="dataLength">Data length.</param>
+        /// <param name="protocol">Protocol.</param>
+        /// <param name="source">Source address.</param>
+        /// <param name="dest">Destionation address.</param>
+        /// <param name="Flags">Flags.</param>
+        /// /// <param name="broadcast">Mac address</param>
+        protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte Flags, MACAddress broadcast)
+            : this(MACAddress.None, broadcast, dataLength, protocol, source, dest, Flags)
+        { }
+
+        /// <summary>
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="srcMAC">Source MAC address.</param>
         /// <param name="destMAC">Destination MAC address.</param>
@@ -145,7 +172,7 @@ namespace Cosmos.System.Network.IPv4
             RawData[24] = (byte)((IPCRC >> 8) & 0xFF);
             RawData[25] = (byte)((IPCRC >> 0) & 0xFF);
 
-            initFields();
+            InitFields();
         }
 
         /// <summary>

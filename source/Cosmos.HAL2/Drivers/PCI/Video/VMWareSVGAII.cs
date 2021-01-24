@@ -475,7 +475,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         private uint capabilities;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="VMWareSVGAII"/> class.
+        /// Create new instance of the <see cref="VMWareSVGAII"/> class.
         /// </summary>
         public VMWareSVGAII()
         {
