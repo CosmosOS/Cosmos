@@ -106,11 +106,9 @@ namespace Cosmos.System.Graphics
         {
             Color xColor = aPen.Color;
 
-            if (!DoubleBuffered)
+            if (DoubleBuffered)
             {
-                mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {xColor.Name} Color");
                 _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
-                mSVGAIIDebugger.SendInternal($"Done drawing point");
             }
             else
             {
@@ -174,7 +172,20 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void DrawFilledRectangle(Pen aPen, int aX_start, int aY_start, int aWidth, int aHeight)
         {
-            _xSVGADriver.Fill((uint)aX_start, (uint)aY_start, (uint)aWidth, (uint)aHeight, (uint)aPen.Color.ToArgb());
+            if (DoubleBuffered)
+            {
+                for (uint h = 0; h < aHeight; h++)
+                {
+                    for (uint w = 0; w < aWidth; w++)
+                    {
+                        _xSVGADriver.SetPixel((uint)(w + aX_start), (uint)(aY_start + h), (uint)aPen.Color.ToArgb());
+                    }
+                }
+            }
+            else
+            {
+                _xSVGADriver.Fill((uint)aX_start, (uint)aY_start, (uint)aWidth, (uint)aHeight, (uint)aPen.Color.ToArgb());
+            }
         }
 
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
@@ -336,7 +347,14 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void Clear(Color aColor)
         {
-            _xSVGADriver.Fill(0, 0, (uint)Mode.Columns, (uint)Mode.Rows, (uint)aColor.ToArgb());
+            if (DoubleBuffered)
+            {
+                _xSVGADriver.Clear((uint)aColor.ToArgb());
+            }
+            else
+            {
+                _xSVGADriver.Fill(0, 0, (uint)Mode.Columns, (uint)Mode.Rows, (uint)aColor.ToArgb());
+            }
         }
 
         /// <summary>

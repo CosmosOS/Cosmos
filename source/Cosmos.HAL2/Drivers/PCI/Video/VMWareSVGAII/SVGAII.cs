@@ -460,11 +460,11 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Height.
         /// </summary>
-        public uint height;
+        public uint height { get; private set; }
         /// <summary>
         /// Width.
         /// </summary>
-        public uint width;
+        public uint width { get; private set; }
         /// <summary>
         /// Depth.
         /// </summary>
@@ -474,15 +474,15 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         public uint capabilities;
 
-        public uint frameBufferSize;
-        public uint frameBufferOffset;
+        public uint FrameSize;
+        public uint FrameOffset;
 
         /// <summary>
         /// Create new instance of the <see cref="VMWareSVGAII"/> class.
         /// </summary>
         public VMWareSVGAII()
         {
-            device = (HAL.PCI.GetDevice(HAL.VendorID.VMWare, HAL.DeviceID.SVGAIIAdapter));
+            device = (HAL.PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter));
             device.EnableMemory(true);
             uint basePort = device.BaseAddressBar[0].BaseAddress;
             IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));
@@ -495,8 +495,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 return;
 
             Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
+
             capabilities = ReadRegister(Register.Capabilities);
-            frameBufferOffset = ReadRegister(Register.FrameBufferOffset);
             InitializeFIFO();
         }
 
@@ -525,12 +525,13 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             this.depth = (depth / 8);
             this.width = width;
             this.height = height;
-            frameBufferSize = this.width * this.height * this.depth;
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
             WriteRegister(Register.Enable, 1);
             InitializeFIFO();
+            FrameSize = ReadRegister(Register.FrameBufferSize);
+            FrameOffset = ReadRegister(Register.FrameBufferOffset);
         }
 
         /// <summary>
@@ -538,7 +539,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         /// <param name="register">A register.</param>
         /// <param name="value">A value.</param>
-        protected void WriteRegister(Register register, uint value)
+        public void WriteRegister(Register register, uint value)
         {
             IndexPort.DWord = (uint)register;
             ValuePort.DWord = value;
@@ -549,7 +550,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         /// <param name="register">A register.</param>
         /// <returns>uint value.</returns>
-        protected uint ReadRegister(Register register)
+        public uint ReadRegister(Register register)
         {
             IndexPort.DWord = (uint)register;
             return ValuePort.DWord;
@@ -626,12 +627,12 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="y">Y coordinate.</param>
         /// <param name="color">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void SetPixel(uint x, uint y,uint color)
+        public virtual void SetPixel(uint x, uint y, uint color)
         {
             if (x < width && y < height)
             {
                 Video_Memory[((y * width + x) * depth)] = color;
-            } 
+            }
         }
 
         /// <summary>
@@ -652,7 +653,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="color">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public void Clear(uint color)
+        public virtual void Clear(uint color)
         {
             Fill(0, 0, width, height, color);
         }
@@ -719,6 +720,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                         SetPixel(xTmp, y, color);
                     }
                     // refresh first line for copy process
+
+
                     Update(x, y, width, 1);
                     for (uint yTmp = y + 1; yTmp < yTarget; yTmp++)
                     {
@@ -761,7 +764,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 WriteToFifo(0xFFFFFF);
             WaitForFifo();
         }
-        
+
         public void Disable()
         {
             WriteRegister(Register.Enable, 0);

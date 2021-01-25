@@ -51,32 +51,21 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public override void SetPixel(uint x, uint y, uint color)
         {
-            if (x < width && y < height)
+            if (x < width)
             {
-                Video_Memory[frameBufferSize + ((y * width + x) * depth)] = color;
+                Video_Memory[((y * width + x) * depth) + FrameSize] = color;
             }
         }
 
         /// <summary>
-        /// Fill rectangle.
+        /// Clear screen to specified color.
         /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="width">Width.</param>
-        /// <param name="height">Height.</param>
         /// <param name="color">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public override void Fill(uint x, uint y, uint width, uint height, uint color)
+        public override void Clear(uint color)
         {
-            for (uint h = 0; h < height; h++)
-            {
-                //Video_Memory.Fill(frameBufferSize + (h * width + x) * depth, width, color);
-                for (uint w = 0; w < width; w++)
-                {
-                    SetPixel(w + x, y + h, color);
-                }
-            }
+            Video_Memory.Fill(FrameSize, FrameSize, color);
         }
 
         /// <summary>
@@ -88,21 +77,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="height">Height.</param>
         public void Update()
         {
-            try
-            {
-                Video_Memory.MoveDown(frameBufferOffset, frameBufferSize, frameBufferSize);
-            }
-            catch (Exception)
-            {
-                Global.mDebugger.SendInternal("Faild To Update");
-            }
-
-            WriteToFifo((uint)FIFOCommand.Update);
-            WriteToFifo(0);
-            WriteToFifo(0);
-            WriteToFifo(width);
-            WriteToFifo(height);
-            WaitForFifo();
+            Video_Memory.MoveDown(FrameOffset, FrameSize, FrameSize);
+            Update(0, 0, width, height);
         }
     }
 }
