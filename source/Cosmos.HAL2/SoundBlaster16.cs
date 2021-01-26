@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Cosmos.Core;
 using Cosmos.HAL.Drivers.PCI.Audio.Generic;
 
@@ -186,7 +184,9 @@ namespace Cosmos.HAL
         private void Program_dsp(ushort AudioLength, ushort AudioPosition)
         {
             if (!IsPresent)
+            {
                 return;
+            }
             byte highAudioLength = Convert.ToByte(AudioLength >> 8);
             byte lowerAudioLength = 4;//(byte)(AudioLength & 0xff);
 
@@ -294,13 +294,13 @@ namespace Cosmos.HAL
         }
         private static byte inb(ushort port)
         {
-            IOPort io = new IOPort(port);
+            var io = new IOPort(port);
             return io.Byte;
 
         }
         private static void outb(ushort port, byte data)
         {
-            IOPort io = new IOPort(port);
+            var io = new IOPort(port);
             io.Byte = data;
         }
         private void reset_DSP()

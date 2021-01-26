@@ -48,7 +48,9 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         public static void PlayAudio(byte[] audio)
         {
             if (devices.Count == 0)
+            {
                 throw new InvalidOperationException("No sound cards are installed!");
+            }
             devices[0].PlaySound(audio);
         }
         /// <summary>

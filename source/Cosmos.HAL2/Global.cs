@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Drivers.PCI.Audio;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL
@@ -66,6 +67,8 @@ namespace Cosmos.HAL
 
             mDebugger.Send("Network Devices Init");
             NetworkInit.Init();
+
+            AudioManager.Init();
 
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
