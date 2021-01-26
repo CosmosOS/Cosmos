@@ -72,7 +72,6 @@ namespace Cosmos.HAL
             if (sound_blaster == false)
             {
                 //No sound blaster installed
-                Console.WriteLine("Sound blaster not detected!");
                 return;
             }
 
@@ -193,7 +192,6 @@ namespace Cosmos.HAL
             byte highAudioLength = Convert.ToByte(AudioLength >> 8);
             byte lowerAudioLength = 4;//(byte)(AudioLength & 0xff);
 
-            Console.WriteLine("highAudioLength: " + highAudioLength + ", lowerAudioLength: " + lowerAudioLength);
 
             //Hard coded memory location
             byte firstAudioPosition = 0x4d;
@@ -207,8 +205,6 @@ namespace Cosmos.HAL
             int constt = 65536 - (256000000 / (1 * 16000));
             //The high byte is only used.
             SampleRate = (byte)(constt >> 8);
-            Console.WriteLine("Time const: " + constt);
-            Console.WriteLine("High: " + SampleRate);
 
 
             //Program 8-bit transfers
@@ -242,7 +238,7 @@ namespace Cosmos.HAL
         }
         private void IrqHandler(ref INTs.IRQContext c)
         {
-            Console.WriteLine("***Got IRQ***");
+            Global.mDebugger.Send("Got Sound blaster 16 IRQ");
             PlayingSound = false;
 
             //Play the next sound in the buffer
@@ -262,7 +258,7 @@ namespace Cosmos.HAL
                 {
                     if (i >= Buffer.Length)
                     {
-                        Console.WriteLine("Stop at: " + i);
+                        Global.mDebugger.Send("Audio Buffer " + i);
                         IsAudioBiggerThenBuffer = true;
                         AudioStop = i;
                         break;
