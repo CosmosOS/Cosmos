@@ -21,6 +21,8 @@ namespace Cosmos.HAL
         /// Gets weather or not audio is playing.
         /// </summary>
         public bool IsAudioPlaying { get { return PlayingSound; } }
+        private byte vol = 0xff;
+        public override byte Volume { get { return vol; } set { vol = value; SetVolume(value); } }
 
         #region DSP Ports
         const ushort DSP_RESET = 0x226;
@@ -145,7 +147,7 @@ namespace Cosmos.HAL
         /// </summary>
         private void Program_MixerPort()
         {
-            SetVolume(0xFF);
+            SetVolume(0xFF); //set to max volume
             MixerPortWrite(MIXER_SETIRQ, 0x02); //IRQ 5
 
             INTs.SetIrqHandler(0x05, new INTs.IRQDelegate(IrqHandler));
@@ -161,6 +163,7 @@ namespace Cosmos.HAL
         /// <param name="data">The volume.</param>
         public void SetVolume(byte data)
         {
+            vol = data;
             MixerPortWrite(MIXER_SETVOL, data);
         }
         /// <summary>

@@ -7,6 +7,10 @@ namespace Cosmos.HAL.Drivers.PCI.Audio.Generic
     public abstract class SoundCard
     {
         /// <summary>
+        /// The volume of the sound card. In this format: 0xLF - L = Left, R = Right
+        /// </summary>
+        public abstract byte Volume { get; set; }
+        /// <summary>
         /// Enables the sound card.
         /// </summary>
         public abstract void Enable();
