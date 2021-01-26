@@ -4,7 +4,7 @@ using Cosmos.HAL.Drivers.PCI.Audio.Generic;
 
 namespace Cosmos.HAL
 {
-    public unsafe class SoundBlaster16 : SoundCard
+    public class SoundBlaster16 : SoundCard
     {
         private bool sound_blaster = false;
         private byte sb16_version_major;
@@ -47,7 +47,7 @@ namespace Cosmos.HAL
         const ushort MixerDataPort = 0x225;
         #endregion
         private byte[] Buffer = new byte[64000]; //64K Buffer
-        private byte* bufferinmem;
+        private MemoryBlock bufferinmem;
         private bool PlayingSound = false;
         private bool IsAudioBiggerThenBuffer = false;
         private int AudioStop = 0;
@@ -65,7 +65,7 @@ namespace Cosmos.HAL
         public override void Enable()
         {
             //Reset DSP
-            reset_DSP();
+            ResetDSP();
 
             if (sound_blaster == false)
             {
@@ -75,19 +75,19 @@ namespace Cosmos.HAL
             }
 
             //Get DSP version
-            write_DSP(DSP_GETVERSION);
-            sb16_version_major = read_DSP();
-            sb16_version_minor = read_DSP();
+            WriteDSP(DSP_GETVERSION);
+            sb16_version_major = ReadDSP();
+            sb16_version_minor = ReadDSP();
 
             Console.WriteLine("SoundBlaster Version: " + DSPVersion.ToString());
 
             Program_MixerPort();
 
             //hard coded buffer location
-            bufferinmem = (byte*)0x4d7bbb;
+            bufferinmem = new MemoryBlock(0x4d7bbb, (uint)Buffer.Length);
 
             //Clear buffer to remove garbage
-            for (int i = 0; i < Buffer.Length; i++)
+            for (uint i = 0; i < Buffer.Length; i++)
             {
                 bufferinmem[i] = 0;
             }
@@ -120,8 +120,8 @@ namespace Cosmos.HAL
         /// </summary>
         public override void StopSound()
         {
-            write_DSP(0xD0);
-            write_DSP(0xDa); //exit auto
+            WriteDSP(0xD0);
+            WriteDSP(0xDa); //exit auto
             PlayingSound = false;
             IsAudioBiggerThenBuffer = false;
             AudioStop = 0;
@@ -133,12 +133,12 @@ namespace Cosmos.HAL
         private void PlayBuffer()
         {
             //Copy the Buffer into memory
-            for (int i = 0; i < Buffer.Length; i++)
+            for (uint i = 0; i < Buffer.Length; i++)
             {
                 bufferinmem[i] = Buffer[i];
             }
             PlayingSound = true;
-            Program_dsp((ushort)Buffer.Length, (ushort)bufferinmem);
+            Program_dsp((ushort)Buffer.Length, (ushort)bufferinmem.Base);
         }
         /// <summary>
         /// Programs mixer port.
@@ -146,7 +146,7 @@ namespace Cosmos.HAL
         private void Program_MixerPort()
         {
             SetVolume(0xFF);
-            MixerPort_write(MIXER_SETIRQ, 0x02); //IRQ 5
+            MixerPortWrite(MIXER_SETIRQ, 0x02); //IRQ 5
 
             INTs.SetIrqHandler(0x05, new INTs.IRQDelegate(IrqHandler));
 
@@ -161,21 +161,21 @@ namespace Cosmos.HAL
         /// <param name="data">The volume.</param>
         public void SetVolume(byte data)
         {
-            MixerPort_write(MIXER_SETVOL, data);
+            MixerPortWrite(MIXER_SETVOL, data);
         }
         /// <summary>
         /// Turns on speaker
         /// </summary>
         public void EnableSpeaker()
         {
-            write_DSP(DSP_EnableSpeaker);
+            WriteDSP(DSP_EnableSpeaker);
         }
         /// <summary>
         /// Turns off speaker
         /// </summary>
         public void DisableSpeaker()
         {
-            write_DSP(DSP_DisableSpeaker);
+            WriteDSP(DSP_DisableSpeaker);
         }
         /// <summary>
         /// For debuging
@@ -209,33 +209,33 @@ namespace Cosmos.HAL
 
 
             //Program 8-bit transfers
-            outb(0x0A, 0x05); //Disable channel 1 (Channel # + 0x04)
-            outb(0x0C, 0); //Flip flop flip port
-            outb(0x0B, 0x59); //Auto Init mode
+            Outb(0x0A, 0x05); //Disable channel 1 (Channel # + 0x04)
+            Outb(0x0C, 0); //Flip flop flip port
+            Outb(0x0B, 0x59); //Auto Init mode
 
             //Send sound data location
-            outb(0x83, firstAudioPosition); //Page # example: 0x[01]0F04
-            outb(0x02, lowerAudioPosition); //Lower audio position bits  0x01[0F]04
-            outb(0x02, upperAudioPosition); //high audio position bits 0x010F[04]
+            Outb(0x83, firstAudioPosition); //Page # example: 0x[01]0F04
+            Outb(0x02, lowerAudioPosition); //Lower audio position bits  0x01[0F]04
+            Outb(0x02, upperAudioPosition); //high audio position bits 0x010F[04]
 
             //Send length of data
-            outb(0x03, lowerAudioLength); //Send low bits of audio length
-            outb(0x03, highAudioLength); //Send high bits of audio length
-            outb(0x0A, 1); //Enable channel 1
+            Outb(0x03, lowerAudioLength); //Send low bits of audio length
+            Outb(0x03, highAudioLength); //Send high bits of audio length
+            Outb(0x0A, 1); //Enable channel 1
 
             //Set time constant (speed)
-            write_DSP(DSP_SETTIME);
-            write_DSP(SampleRate);
+            WriteDSP(DSP_SETTIME);
+            WriteDSP(SampleRate);
 
             //set block size for 8-bit auto-init mode
-            write_DSP(0x48);
+            WriteDSP(0x48);
 
             //Send data length to DSP
-            write_DSP((byte)(lowerAudioLength - 1));
-            write_DSP((byte)(highAudioLength - 1));
+            WriteDSP((byte)(lowerAudioLength - 1));
+            WriteDSP((byte)(highAudioLength - 1));
 
             //Start auto init 8-bit transfer
-            write_DSP(0x1c);
+            WriteDSP(0x1c);
         }
         private void IrqHandler(ref INTs.IRQContext c)
         {
@@ -248,7 +248,7 @@ namespace Cosmos.HAL
                 IsAudioBiggerThenBuffer = false;
 
                 //Clear buffer
-                for (int i = 0; i < Buffer.Length; i++)
+                for (uint i = 0; i < Buffer.Length; i++)
                 {
                     Buffer[i] = 0;
                     bufferinmem[i] = 0;
@@ -283,51 +283,42 @@ namespace Cosmos.HAL
             }
         }
         #region I/O
-        private void MixerPort_write(byte port, byte data)
+        private void MixerPortWrite(byte port, byte data)
         {
-            outb(MixerPort, port);
-            outb(MixerDataPort, data);
+            Outb(MixerPort, port);
+            Outb(MixerDataPort, data);
         }
-        private byte MixerPort_read()
+        private byte MixerPortRead()
         {
-            return inb(MixerDataPort);
+            return Inb(MixerDataPort);
         }
-        private static byte inb(ushort port)
+        private static byte Inb(ushort port)
         {
             var io = new IOPort(port);
             return io.Byte;
-
         }
-        private static void outb(ushort port, byte data)
+        private static void Outb(ushort port, byte data)
         {
             var io = new IOPort(port);
             io.Byte = data;
         }
-        private void reset_DSP()
+        private void ResetDSP()
         {
-            outb(DSP_RESET, 1);
+            Outb(DSP_RESET, 1);
             Cosmos.HAL.Global.PIT.Wait(3);
-            outb(DSP_RESET, 0);
-            if (inb(DSP_READ) == 0xAA)
+            Outb(DSP_RESET, 0);
+            if (Inb(DSP_READ) == 0xAA)
             {
                 sound_blaster = true;
             }
         }
-        private void write_DSP(byte value)
+        private void WriteDSP(byte value)
         {
-            //while (inb(0x2C) == 7)
-            //{
-
-            //}
-            outb(DSP_WRITE, value);
+            Outb(DSP_WRITE, value);
         }
-        private byte read_DSP()
+        private byte ReadDSP()
         {
-            //while(inb(0x2E) != 7)
-            //{
-
-            //}
-            return inb(DSP_READ);
+            return Inb(DSP_READ);
         }
         #endregion
     }
