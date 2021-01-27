@@ -80,7 +80,7 @@ namespace Cosmos.HAL
             sb16_version_major = ReadDSP();
             sb16_version_minor = ReadDSP();
 
-            Console.WriteLine("SoundBlaster Version: " + DSPVersion.ToString());
+           
 
             Program_MixerPort();
 
