@@ -1,4 +1,4 @@
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using System.Globalization;
 using Cosmos.Common;
@@ -113,11 +113,6 @@ namespace Cosmos.Core_Plugs.System
             [ObjectPointerAccess] uint* aThis,
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aLength)
         {
-            if(aLength < 0 || aLength > 1000)
-            {
-                mDebugger.Send("Length is: " + aLength);
-                Debugger.DoBochsBreak();
-            }
             return aLength;
         }
 

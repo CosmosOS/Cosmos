@@ -1,4 +1,5 @@
 using System;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System

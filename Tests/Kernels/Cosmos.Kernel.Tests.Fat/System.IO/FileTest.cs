@@ -212,6 +212,7 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             File.Delete(@"0:\test1.txt");
             Assert.IsFalse(File.Exists(@"0:\test1.txt"), "test1.txt wasn't deleted!");
             mDebugger.Send("END TEST");
+            mDebugger.Send("");
 
             //mDebugger.Send("START TEST: Delete a directory with File.Delete:");
             //Simple test: create a directory, then try to delete it as a file.
@@ -236,23 +237,45 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             Assert.IsTrue(KudzuTxtContent == Kudzu2TxtContent, "File has not been copied correctly");
 
             /* Now Try to Copy '0:\Kudzu.txt' onto an existing file with the overload of Copy that does permit this */
+            mDebugger.Send("");
             mDebugger.Send("START TEST: Copy a file (overwrite existing) :");
             File.Copy(@"0:\Kudzu.txt", @"0:\test.dat", true);
 
             mDebugger.Send("The existing file has been overwritten, reading...");
             string TestDatContent = File.ReadAllText(@"0:\test.dat");
 
-            Assert.IsTrue(KudzuTxtContent == TestDatContent, "File has not been copied correctly");
+            Assert.AreEqual(KudzuTxtContent, TestDatContent, "File has not been copied correctly");
+            using (StreamReader streamReader = new StreamReader("0:\\test.dat"))
+            {
+                var t = streamReader.ReadToEnd();
+                Assert.AreEqual(KudzuTxtContent, t, "Using StreamReader to read entire (short) file works");
+            }
 
             mDebugger.Send("END TEST");
+            mDebugger.Send("");
 
             #region Test Writing Large Files
 
             string text = new string('o', 4000);
             text += new string('l', 4000);
             File.WriteAllText("0:\\long.txt", text);
+            var bytes = File.ReadAllBytes("0:\\long.txt");
+            mDebugger.Send("-- Bytes --");
+            mDebugger.Send(BitConverter.ToString(bytes));
+            mDebugger.Send("-- Bytes --");
+            
+            using (StreamReader streamReader = new StreamReader("0:\\long.txt"))
+            {
+                Assert.AreEqual(0, streamReader.BaseStream.Position, "Position of StreamReader is correct");
+                Assert.AreEqual(8000, streamReader.BaseStream.Length, "Length of StreamReader is correct");
+                Debugger.DoBochsBreak();
+                var t = streamReader.ReadToEnd();
+                mDebugger.Send("--------------- Check this place! --------- *************");
+                Assert.AreEqual(text, t, "Using StreamReader to read entire (long) file works");
+            }
+
             string read = File.ReadAllText("0:\\long.txt");
-            Assert.IsTrue(read == text, "Reading files larger than one cluster works using read all text");
+            Assert.AreEqual(text, read, "Reading files larger than one cluster works using read all text");
             byte[] textBytes = Encoding.ASCII.GetBytes(text);
             mDebugger.Send("Reading all bytes");
             byte[] readBytes = File.ReadAllBytes("0:\\long.txt");

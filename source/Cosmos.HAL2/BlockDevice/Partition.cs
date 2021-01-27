@@ -40,11 +40,13 @@ namespace Cosmos.HAL.BlockDevice
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
 		public override void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
 		{
+            Global.mDebugger.Send("-- Partition.ReadBlock --");
             CheckDataSize(aData, aBlockCount);
             UInt64 xHostBlockNo = mStartingSector + aBlockNo;
 			CheckBlockNo(xHostBlockNo, aBlockCount);
 			mHost.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
-		}
+            Global.mDebugger.Send("Returning -- Partition.ReadBlock --");
+        }
 
         /// <summary>
         /// Write block to partition.

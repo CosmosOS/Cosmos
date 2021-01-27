@@ -12,8 +12,6 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
 
         public static object CreateDefaultComparer(Type aType)
         {
-            Debugger.DoBochsBreak();
-
             //TODO: Do application level testing to determine the most frequent comparisons and do those type checks first.
 
             if (aType == typeof(Byte))
@@ -153,8 +151,6 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
 
         public static object CreateDefaultEqualityComparer(Type aType)
         {
-            Debugger.DoBochsBreak();
-
             //TODO: Do application level testing to determine the most frequent comparisons and do those type checks first.
 
             if (aType == typeof(Byte))

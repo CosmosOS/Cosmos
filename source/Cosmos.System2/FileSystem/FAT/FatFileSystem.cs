@@ -349,11 +349,12 @@ namespace Cosmos.System.FileSystem.FAT
             /// <exception cref="Exception">Thrown when data size invalid.</exception>
             private void ReadFatSector(ulong aSector, out byte[] aData)
             {
+                Global.mFileSystemDebugger.Send("-- FatFileSystem.ReadFatSector --");
                 aData = mFileSystem.NewBlockArray();
                 ulong xSector = mFatSector + aSector;
-                Global.mFileSystemDebugger.SendInternal("xSector  =");
-                Global.mFileSystemDebugger.SendInternal(xSector);
+                Global.mFileSystemDebugger.SendInternal("xSector  =" + xSector);
                 mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, ref aData);
+                Global.mFileSystemDebugger.Send("Returning -- FatFileSystem.ReadFatSector --");
             }
 
             /// <summary>
@@ -452,7 +453,7 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xEntryOffset = aEntryNumber * xEntrySize;
 
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
-                ulong xSectorOffset = (xSector * mFileSystem.BytesPerSector) - xEntryOffset;
+                //ulong xSectorOffset = (xSector * mFileSystem.BytesPerSector) - xEntryOffset;
 
                 byte[] xData;
                 ReadFatSector(xSector, out xData);
@@ -476,6 +477,7 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 WriteFatSector(xSector, xData);
+                Global.mFileSystemDebugger.SendInternal("Returning from --- Fat.SetFatEntry ---");
             }
 
             /// <summary>

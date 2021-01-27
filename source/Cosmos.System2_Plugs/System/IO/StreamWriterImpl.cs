@@ -1,5 +1,7 @@
-﻿using System.IO;
-
+﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.IO
@@ -8,5 +10,7 @@ namespace Cosmos.System_Plugs.System.IO
     public static class StreamWriterImpl
     {
         public static void CheckAsyncTaskInProgress(StreamWriter aThis) { }
+
+
     }
 }

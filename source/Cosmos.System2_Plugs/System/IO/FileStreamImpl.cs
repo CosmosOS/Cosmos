@@ -1,4 +1,4 @@
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using global::System;
 using global::System.IO;
 using Cosmos.System;
