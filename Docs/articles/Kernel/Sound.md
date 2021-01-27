@@ -1,4 +1,4 @@
-# Network
+# Sound
 
 In this article we will discuss about Sound on Cosmos, How to play sound, Detect sound cards and stop all playing sounds. For now, supported sound cards are **Sound blaster 16**. Note that Cosmos devkit must be installed for this article.
 
