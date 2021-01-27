@@ -24,7 +24,7 @@ namespace Cosmos.HAL
         private byte vol = 0xff;
         public override byte Volume { get { return vol; } set { vol = value; SetVolume(value); } }
         
-        public override string Name { get { return "Sound blaster 16"; }
+        public override string Name { get { return "Sound blaster 16"; } }
 
         #region DSP Ports
         const ushort DSP_RESET = 0x226;
@@ -295,11 +295,15 @@ namespace Cosmos.HAL
         }
         private static byte Inb(ushort port)
         {
-           return Ports.InB(port, data);
+           //return Ports.InB(port, data);
+            var io = new IOPort(port);
+            return io.Byte;
         }
         private static void Outb(ushort port, byte data)
         {
-            Ports.OutB(port, data);
+            //Ports.OutB(port, data);
+            var io = new IOPort(port);
+            io.Byte = data;
         }
         private void ResetDSP()
         {
