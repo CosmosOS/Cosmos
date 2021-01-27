@@ -20,6 +20,7 @@
 ## [Graphics](Kernel/CGS.md)
 ## [Virtual File System](Kernel/VFS.md)
 ## [Network](Kernel/Network.md)
+## [Sound](Kernel/Sound.md)
 
 # Reference
 ## [x86](Reference/x86.md)
