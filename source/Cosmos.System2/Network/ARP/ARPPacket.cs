@@ -1,4 +1,11 @@
-﻿using sys = System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          ARP Packet
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.IPv4;
@@ -8,7 +15,7 @@ namespace Cosmos.System.Network.ARP
     /// <summary>
     /// ARPPacket class. See also: <seealso cref="EthernetPacket"/>.
     /// </summary>
-    internal class ARPPacket : EthernetPacket
+    public class ARPPacket : EthernetPacket
     {
         /// <summary>
         /// Hardware type.
@@ -51,7 +58,7 @@ namespace Cosmos.System.Network.ARP
                     ARPRequest_Ethernet arp_request = new ARPRequest_Ethernet(packetData);
                     if (arp_request.SenderIP == null)
                     {
-                        NetworkStack.debugger.Send("SenderIP null in ARPHandler!");
+                        Global.mDebugger.Send("SenderIP null in ARPHandler!");
                     }
                     arp_request = new ARPRequest_Ethernet(packetData);
 
@@ -59,7 +66,7 @@ namespace Cosmos.System.Network.ARP
 
                     if (NetworkStack.AddressMap.ContainsKey(arp_request.TargetIP.Hash) == true)
                     {
-                        NetworkStack.debugger.Send("ARP Request Recvd from " + arp_request.SenderIP.ToString());
+                        Global.mDebugger.Send("ARP Request Recvd from " + arp_request.SenderIP.ToString());
                         NetworkDevice nic = NetworkStack.AddressMap[arp_request.TargetIP.Hash];
 
                         ARPReply_Ethernet reply =
@@ -74,9 +81,9 @@ namespace Cosmos.System.Network.ARP
                 if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
                 {
                     ARPReply_Ethernet arp_reply = new ARPReply_Ethernet(packetData);
-                    NetworkStack.debugger.Send("Received ARP Reply");
-                    NetworkStack.debugger.Send(arp_reply.ToString());
-                    NetworkStack.debugger.Send("ARP Reply Recvd from " + arp_reply.SenderIP.ToString());
+                    Global.mDebugger.Send("Received ARP Reply");
+                    Global.mDebugger.Send(arp_reply.ToString());
+                    Global.mDebugger.Send("ARP Reply Recvd from " + arp_reply.SenderIP.ToString());
                     ARPCache.Update(arp_reply.SenderIP, arp_reply.SenderMAC);
 
                     OutgoingBuffer.ARPCache_Update(arp_reply);
@@ -85,34 +92,26 @@ namespace Cosmos.System.Network.ARP
         }
 
         /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public static void VMTInclude()
-        {
-            new ARPPacket();
-        }
-
-        /// <summary>
-        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// Create new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         internal ARPPacket()
             : base()
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// Create new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        internal ARPPacket(byte[] rawData)
+        public ARPPacket(byte[] rawData)
             : base(rawData)
         { }
 
         /// <summary>
         /// Init ARPPacket fields.
         /// </summary>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
             aHardwareType = (ushort)((RawData[14] << 8) | RawData[15]);
             aProtocolType = (ushort)((RawData[16] << 8) | RawData[17]);
             aHardwareLen = RawData[18];
@@ -121,7 +120,7 @@ namespace Cosmos.System.Network.ARP
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="ARPPacket"/> class.
+        /// Create new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         /// <param name="dest">Destination MAC address.</param>
         /// <param name="src">Source MAC address.</param>
@@ -144,7 +143,7 @@ namespace Cosmos.System.Network.ARP
             RawData[20] = (byte)(operation >> 8);
             RawData[21] = (byte)(operation >> 0);
 
-            initFields();
+            InitFields();
         }
 
         /// <summary>

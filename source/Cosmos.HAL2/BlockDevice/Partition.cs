@@ -17,7 +17,7 @@ namespace Cosmos.HAL.BlockDevice
         private readonly UInt64 mStartingSector;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="Partition"/> class.
+        /// Create new instance of the <see cref="Partition"/> class.
         /// </summary>
         /// <param name="aHost">A hosting device.</param>
         /// <param name="aStartingSector">A starting sector.</param>
