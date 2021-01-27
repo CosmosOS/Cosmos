@@ -151,7 +151,7 @@ namespace Cosmos.HAL
             SetVolume(0xFF); //set to max volume
             MixerPortWrite(MIXER_SETIRQ, 0x02); //IRQ 5
 
-            INTs.SetIrqHandler(0x05, new INTs.IRQDelegate(IrqHandler));
+            INTs.SetIntHandler(0x05, new INTs.IRQDelegate(IrqHandler));
 
             //Turn on speaker
             EnableSpeaker();
