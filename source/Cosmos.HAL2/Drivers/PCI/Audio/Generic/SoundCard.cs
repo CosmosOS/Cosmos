@@ -27,5 +27,9 @@ namespace Cosmos.HAL.Drivers.PCI.Audio.Generic
         /// Stops all of the playing sound
         /// </summary>
         public abstract void StopSound();
+        /// <summary>
+        /// The name of the sound card
+        /// </summary>
+        public abstract string Name { get; }
     }
 }
