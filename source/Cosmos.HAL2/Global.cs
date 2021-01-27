@@ -67,7 +67,8 @@ namespace Cosmos.HAL
 
             mDebugger.Send("Network Devices Init");
             NetworkInit.Init();
-
+            
+            mDebugger.Send("Audio Init");
             AudioManager.Init();
 
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
