@@ -11,7 +11,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Register values.
         /// </summary>
-        public enum Register : ushort
+        protected enum Register : ushort
         {
             /// <summary>
             /// ID.
@@ -154,7 +154,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// ID values.
         /// </summary>
-        public enum ID : uint
+        protected enum ID : uint
         {
             /// <summary>
             /// Magic starting point.
@@ -181,7 +181,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// FIFO values.
         /// </summary>
-        public enum FIFO : uint
+        protected enum FIFO : uint
         {   // values are multiplied by 4 to access the array by byte index
             /// <summary>
             /// Min.
@@ -204,7 +204,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// FIFO command values.
         /// </summary>
-        public enum FIFOCommand
+        protected enum FIFOCommand
         {
             /// <summary>
             /// Update.
@@ -299,7 +299,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// IO port offset.
         /// </summary>
-        public enum IOPortOffset : byte
+        protected enum IOPortOffset : byte
         {
             /// <summary>
             /// Index.
@@ -430,52 +430,52 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Index port.
         /// </summary>
-        public IOPort IndexPort;
+        protected IOPort IndexPort;
         /// <summary>
         /// Value port.
         /// </summary>
-        public IOPort ValuePort;
+        protected IOPort ValuePort;
         /// <summary>
         /// BIOS port.
         /// </summary>
-        public IOPort BiosPort;
+        protected IOPort BiosPort;
         /// <summary>
         /// IRQ port.
         /// </summary>
-        public IOPort IRQPort;
+        protected IOPort IRQPort;
 
         /// <summary>
         /// Video memory block.
         /// </summary>
-        public MemoryBlock Video_Memory;
+        protected MemoryBlock Video_Memory;
         /// <summary>
         /// FIFO memory block.
         /// </summary>
-        public MemoryBlock FIFO_Memory;
+        protected MemoryBlock FIFO_Memory;
 
         /// <summary>
         /// PCI device.
         /// </summary>
-        public PCIDevice device;
+        protected PCIDevice device;
         /// <summary>
         /// Height.
         /// </summary>
-        public uint height { get; private set; }
+        protected uint height { get; private set; }
         /// <summary>
         /// Width.
         /// </summary>
-        public uint width { get; private set; }
+        protected uint width { get; private set; }
         /// <summary>
         /// Depth.
         /// </summary>
-        public uint depth;
+        protected uint depth;
         /// <summary>
         /// Capabilities.
         /// </summary>
-        public uint capabilities;
+        protected uint capabilities;
 
-        public uint FrameSize;
-        public uint FrameOffset;
+        protected uint FrameSize;
+        protected uint FrameOffset;
 
         /// <summary>
         /// Create new instance of the <see cref="VMWareSVGAII"/> class.
@@ -539,7 +539,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         /// <param name="register">A register.</param>
         /// <param name="value">A value.</param>
-        public void WriteRegister(Register register, uint value)
+        protected void WriteRegister(Register register, uint value)
         {
             IndexPort.DWord = (uint)register;
             ValuePort.DWord = value;
@@ -550,7 +550,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         /// <param name="register">A register.</param>
         /// <returns>uint value.</returns>
-        public uint ReadRegister(Register register)
+        protected uint ReadRegister(Register register)
         {
             IndexPort.DWord = (uint)register;
             return ValuePort.DWord;
