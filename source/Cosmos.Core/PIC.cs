@@ -70,8 +70,8 @@ namespace Cosmos.Core
 
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
-            //for now enable keyboard, mouse(ps2)
-            Remap(0x20, 0xF8 | 0x08, 0x28, 0xEB);
+            //for now enable keyboard, mouse(ps2), sound blaster 16 irq
+            Remap(0x20, 0xF8 | 0x08 | 0x02, 0x28, 0xEB);
         }
 
         /// <summary>

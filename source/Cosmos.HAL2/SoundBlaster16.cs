@@ -23,7 +23,7 @@ namespace Cosmos.HAL
         public bool IsAudioPlaying { get { return PlayingSound; } }
         private byte vol = 0xff;
         public override byte Volume { get { return vol; } set { vol = value; SetVolume(value); } }
-        
+
         public override string Name { get { return "Sound blaster 16"; } }
 
         #region DSP Ports
@@ -50,17 +50,22 @@ namespace Cosmos.HAL
         const ushort MixerPort = 0x224;
         const ushort MixerDataPort = 0x225;
         #endregion
+
         private byte[] Buffer = new byte[64000]; //64K Buffer
         private MemoryBlock bufferinmem;
         private bool PlayingSound = false;
         private bool IsAudioBiggerThenBuffer = false;
         private int AudioStop = 0;
         private byte[] audiodata;
+
+        byte IRQ = 0x02; //default sb16 irq
         public override void Disable()
         {
             // Clean up
             StopSound();
-            INTs.SetIrqHandler(5, null); //Remove handler
+
+            //Disable IRQ
+            INTs.SetIrqHandler(IRQ, null);
 
             //clean up buffer
             Buffer = null;
@@ -81,19 +86,13 @@ namespace Cosmos.HAL
             WriteDSP(DSP_GETVERSION);
             sb16_version_major = ReadDSP();
             sb16_version_minor = ReadDSP();
-
-           
-
             Program_MixerPort();
 
             //hard coded buffer location
-            bufferinmem = new MemoryBlock(0x4d7bbb, (uint)Buffer.Length);
+            bufferinmem = new MemoryBlock(0x4D8BBB, (uint)Buffer.Length);
 
             //Clear buffer to remove garbage
-            for (uint i = 0; i < Buffer.Length; i++)
-            {
-                bufferinmem[i] = 0;
-            }
+            ClearAudioBuffer();
         }
         /// <summary>
         /// Plays an 8 Bit Unsigned PCM audio (16KHz) on the sound blaster 16
@@ -102,6 +101,8 @@ namespace Cosmos.HAL
         public override void PlaySound(byte[] audio)
         {
             audiodata = audio;
+            ClearAudioBuffer();
+
             //Copy the sound into the buffer
             for (int i = 0; i < audio.Length; i++)
             {
@@ -118,13 +119,22 @@ namespace Cosmos.HAL
             }
             PlayBuffer();
         }
+
+        private void ClearAudioBuffer()
+        {
+            for (uint i = 0; i < Buffer.Length; i++)
+            {
+                Buffer[i] = 0;
+                bufferinmem[i] = 0;
+            }
+        }
         /// <summary>
         /// Stops playing the currently playing sound in the sound blaster 16.
         /// </summary>
         public override void StopSound()
         {
             WriteDSP(0xD0);
-            WriteDSP(0xDa); //exit auto
+            WriteDSP(0xDA); //exit auto init mode
             PlayingSound = false;
             IsAudioBiggerThenBuffer = false;
             AudioStop = 0;
@@ -141,7 +151,7 @@ namespace Cosmos.HAL
                 bufferinmem[i] = Buffer[i];
             }
             PlayingSound = true;
-            Program_dsp((ushort)Buffer.Length, (ushort)bufferinmem.Base);
+            Program_dsp();
         }
         /// <summary>
         /// Programs mixer port.
@@ -149,9 +159,12 @@ namespace Cosmos.HAL
         private void Program_MixerPort()
         {
             SetVolume(0xFF); //set to max volume
-            MixerPortWrite(MIXER_SETIRQ, 0x02); //IRQ 5
 
-            INTs.SetIntHandler(0x05, new INTs.IRQDelegate(IrqHandler));
+            INTs.SetIrqHandler(IRQ, new INTs.IRQDelegate(delegate (ref INTs.IRQContext c)
+            {
+                Inb(0x22E); //acknowledge sound blaster IRQ
+                IrqHandler(ref c);
+            }));
 
             //Turn on speaker
             EnableSpeaker();
@@ -181,32 +194,28 @@ namespace Cosmos.HAL
         {
             WriteDSP(DSP_DisableSpeaker);
         }
-        /// <summary>
-        /// For debuging
-        /// </summary>
-        public byte SampleRate = 192;
-        private void Program_dsp(ushort AudioLength, ushort AudioPosition)
+        private void Program_dsp()
         {
             if (!IsPresent)
             {
                 return;
             }
-            byte highAudioLength = Convert.ToByte(AudioLength >> 8);
-            byte lowerAudioLength = 4;//(byte)(AudioLength & 0xff);
+            EnableSpeaker();
+            byte highAudioLength = 00;//Convert.ToByte(AudioLength >> 8);
+            byte lowerAudioLength = 40;
 
 
             //Hard coded memory location
             byte firstAudioPosition = 0x4d;
-            byte upperAudioPosition = 0x7b;
+            byte upperAudioPosition = 0x8b;
             byte lowerAudioPosition = 0xbb;
-
             //Calculate Time constant
 
             //Time constant = 65536 - (256000000 / (channels * sampling rate))
 
             int constt = 65536 - (256000000 / (1 * 16000));
             //The high byte is only used.
-            SampleRate = (byte)(constt >> 8);
+            byte SampleRate = (byte)(constt >> 8);
 
 
             //Program 8-bit transfers
@@ -220,8 +229,8 @@ namespace Cosmos.HAL
             Outb(0x02, upperAudioPosition); //high audio position bits 0x010F[04]
 
             //Send length of data
-            Outb(0x03, lowerAudioLength); //Send low bits of audio length
-            Outb(0x03, highAudioLength); //Send high bits of audio length
+            Outb(0x03, 00); //Send low bits of audio length
+            Outb(0x03, 255); //Send high bits of audio length
             Outb(0x0A, 1); //Enable channel 1
 
             //Set time constant (speed)
@@ -240,7 +249,9 @@ namespace Cosmos.HAL
         }
         private void IrqHandler(ref INTs.IRQContext c)
         {
+            Console.WriteLine("Got Sound blaster 16 IRQ. IsAudioBiggerThenBuffer: " + IsAudioBiggerThenBuffer);
             Global.mDebugger.Send("Got Sound blaster 16 IRQ");
+            EnableSpeaker(); //just in case
             PlayingSound = false;
 
             //Play the next sound in the buffer
@@ -249,11 +260,7 @@ namespace Cosmos.HAL
                 IsAudioBiggerThenBuffer = false;
 
                 //Clear buffer
-                for (uint i = 0; i < Buffer.Length; i++)
-                {
-                    Buffer[i] = 0;
-                    bufferinmem[i] = 0;
-                }
+                ClearAudioBuffer();
 
                 //Copy the next audio data to the buffer
                 for (int i = AudioStop; i < audiodata.Length; i++)
@@ -295,7 +302,7 @@ namespace Cosmos.HAL
         }
         private static byte Inb(ushort port)
         {
-           //return Ports.InB(port, data);
+            //return Ports.InB(port, data);
             var io = new IOPort(port);
             return io.Byte;
         }
