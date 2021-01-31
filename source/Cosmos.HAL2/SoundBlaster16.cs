@@ -58,7 +58,7 @@ namespace Cosmos.HAL
         private int AudioStop = 0;
         private byte[] audiodata;
 
-        byte IRQ = 0x05; //default sb16 irq
+        byte IRQ = 0x07; //default sb16 irq
         public override void Disable()
         {
             // Clean up
@@ -162,8 +162,14 @@ namespace Cosmos.HAL
 
             INTs.SetIrqHandler(IRQ, new INTs.IRQDelegate(delegate (ref INTs.IRQContext c)
             {
-                Inb(0x22E); //acknowledge sound blaster IRQ
-                IrqHandler(ref c);
+                //TODO: IRQ 7 is unreliable, so we need to check weather this is a real IRQ.
+
+                //Right now, just check weather we are playing a sound
+                if (PlayingSound)
+                {
+                    Inb(0x22E); //acknowledge sound blaster IRQ
+                    IrqHandler(ref c);
+                }
             }));
 
             //Turn on speaker
