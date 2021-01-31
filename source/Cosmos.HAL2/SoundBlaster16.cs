@@ -58,7 +58,7 @@ namespace Cosmos.HAL
         private int AudioStop = 0;
         private byte[] audiodata;
 
-        byte IRQ = 0x07; //default sb16 irq
+        byte IRQ = 0x02; //default sb16 irq
         public override void Disable()
         {
             // Clean up
