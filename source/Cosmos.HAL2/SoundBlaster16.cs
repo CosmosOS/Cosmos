@@ -58,7 +58,7 @@ namespace Cosmos.HAL
         private int AudioStop = 0;
         private byte[] audiodata;
 
-        byte IRQ = 0x02; //default sb16 irq
+        const byte IRQ = 0x10; //default sb16 irq
         public override void Disable()
         {
             // Clean up
@@ -135,6 +135,7 @@ namespace Cosmos.HAL
         {
             WriteDSP(0xD0);
             WriteDSP(0xDA); //exit auto init mode
+
             PlayingSound = false;
             IsAudioBiggerThenBuffer = false;
             AudioStop = 0;
@@ -150,6 +151,7 @@ namespace Cosmos.HAL
             {
                 bufferinmem[i] = Buffer[i];
             }
+
             PlayingSound = true;
             Program_dsp();
         }
@@ -159,18 +161,9 @@ namespace Cosmos.HAL
         private void Program_MixerPort()
         {
             SetVolume(0xFF); //set to max volume
+            MixerPortWrite(MIXER_SETIRQ, 8); //tell sb16 the irq (in our case its 8)
 
-            INTs.SetIrqHandler(IRQ, new INTs.IRQDelegate(delegate (ref INTs.IRQContext c)
-            {
-                //TODO: IRQ 7 is unreliable, so we need to check weather this is a real IRQ.
-
-                //Right now, just check weather we are playing a sound
-                if (PlayingSound)
-                {
-                    Inb(0x22E); //acknowledge sound blaster IRQ
-                    IrqHandler(ref c);
-                }
-            }));
+            INTs.SetIrqHandler(IRQ, IrqHandler);
 
             //Turn on speaker
             EnableSpeaker();
@@ -206,8 +199,10 @@ namespace Cosmos.HAL
             {
                 return;
             }
+
+
             EnableSpeaker();
-            byte highAudioLength = 00;//Convert.ToByte(AudioLength >> 8);
+            byte highAudioLength = 00;
             byte lowerAudioLength = 40;
 
 
@@ -215,11 +210,12 @@ namespace Cosmos.HAL
             byte firstAudioPosition = 0x4d;
             byte upperAudioPosition = 0x8b;
             byte lowerAudioPosition = 0xbb;
-            //Calculate Time constant
 
+            //Calculate Time constant
             //Time constant = 65536 - (256000000 / (channels * sampling rate))
 
             int constt = 65536 - (256000000 / (1 * 16000));
+
             //The high byte is only used.
             byte SampleRate = (byte)(constt >> 8);
 
@@ -257,6 +253,7 @@ namespace Cosmos.HAL
         {
             Console.WriteLine("Got Sound blaster 16 IRQ. IsAudioBiggerThenBuffer: " + IsAudioBiggerThenBuffer);
             Global.mDebugger.Send("Got Sound blaster 16 IRQ");
+            Inb(0x22E); //acknowledge sound blaster IRQ
             EnableSpeaker(); //just in case
             PlayingSound = false;
 
