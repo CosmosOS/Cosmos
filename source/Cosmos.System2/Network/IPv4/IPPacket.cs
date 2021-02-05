@@ -9,6 +9,7 @@ using System;
 using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
+using Cosmos.System.Network.IPv4.TCP;
 using Cosmos.System.Network.IPv4.UDP;
 using Cosmos.System.Network.IPv4.UDP.DHCP;
 
@@ -51,7 +52,7 @@ namespace Cosmos.System.Network.IPv4
                         ICMPPacket.ICMPHandler(packetData);
                         break;
                     case 6:
-                        //TCPPacket.TCPHandler(packetData);
+                        TCPPacket.TCPHandler(packetData);
                         break;
                     case 17:
                         UDPPacket.UDPHandler(packetData);
