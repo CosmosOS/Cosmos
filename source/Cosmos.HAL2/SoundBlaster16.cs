@@ -58,7 +58,7 @@ namespace Cosmos.HAL
         private int AudioStop = 0;
         private byte[] audiodata;
 
-        const byte IRQ = 0x10; //default sb16 irq
+        const byte IRQ = 10; //default sb16 irq
         public override void Disable()
         {
             // Clean up
@@ -161,7 +161,7 @@ namespace Cosmos.HAL
         private void Program_MixerPort()
         {
             SetVolume(0xFF); //set to max volume
-            MixerPortWrite(MIXER_SETIRQ, 8); //tell sb16 the irq (in our case its 8)
+            MixerPortWrite(MIXER_SETIRQ, 8); //tell sb16 the irq (IRQ 10 = 8)
 
             INTs.SetIrqHandler(IRQ, IrqHandler);
 
