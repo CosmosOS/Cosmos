@@ -68,6 +68,10 @@ namespace Cosmos.Core
             // completely. For more info:
             // http://en.wikipedia.org/wiki/Intel_8259#Spurious_Interrupts
 
+
+            //IRQs 0 - 7 are the Master PIC
+            //IRQs 8 - 15 are the Slave PIC
+
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
             //for now enable keyboard, mouse(ps2), sound blaster 16
