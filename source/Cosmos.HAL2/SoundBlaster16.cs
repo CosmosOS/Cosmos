@@ -24,7 +24,7 @@ namespace Cosmos.HAL
         private byte vol = 0xff;
         public override byte Volume { get { return vol; } set { vol = value; SetVolume(value); } }
 
-        public override string Name { get { return "Sound blaster 16"; } }
+        public override string Name { get { return "Sound Blaster 16"; } }
 
         #region DSP Ports
         const ushort DSP_RESET = 0x226;
@@ -50,6 +50,8 @@ namespace Cosmos.HAL
         const ushort MixerPort = 0x224;
         const ushort MixerDataPort = 0x225;
         #endregion
+
+        const ushort IRQAck = 0x22E;
 
         private byte[] Buffer = new byte[64000]; //64K Buffer
         private MemoryBlock bufferinmem;
@@ -223,7 +225,8 @@ namespace Cosmos.HAL
             //Program 8-bit transfers
             Outb(0x0A, 0x05); //Disable channel 1 (Channel # + 0x04)
             Outb(0x0C, 0); //Flip flop flip port
-            Outb(0x0B, 0x59); //Auto Init mode
+            //Outb(0x0B, 0x59); //Auto Init mode
+            Outb(0x0B, 0x49); //Sigle mode
 
             //Send sound data location
             Outb(0x83, firstAudioPosition); //Page # example: 0x[01]0F04
@@ -240,20 +243,22 @@ namespace Cosmos.HAL
             WriteDSP(SampleRate);
 
             //set block size for 8-bit auto-init mode
-            WriteDSP(0x48);
+            //WriteDSP(0x48);
+            WriteDSP(0x14); //8-bit single cycle PCM output
 
             //Send data length to DSP
             WriteDSP((byte)(lowerAudioLength - 1));
             WriteDSP((byte)(highAudioLength - 1));
 
             //Start auto init 8-bit transfer
-            WriteDSP(0x1c);
+            //WriteDSP(0x1c);
         }
         private void IrqHandler(ref INTs.IRQContext c)
         {
-            Console.WriteLine("Got Sound blaster 16 IRQ. IsAudioBiggerThenBuffer: " + IsAudioBiggerThenBuffer);
-            Global.mDebugger.Send("Got Sound blaster 16 IRQ");
-            Inb(0x22E); //acknowledge sound blaster IRQ
+            Inb(IRQAck); //acknowledge sound blaster IRQ
+
+
+            Global.mDebugger.Send("Got Sound blaster 16 IRQ. Audio Bigger than buffer: "+ IsAudioBiggerThenBuffer);
             EnableSpeaker(); //just in case
             PlayingSound = false;
 
