@@ -107,6 +107,9 @@ namespace NetworkTest
 
             var udpClient = new UdpClient();
             udpClient.Close();
+			
+			var tcpClient = new TcpClient();
+            tcpClient.Close();
 
             var icmpClient = new ICMPClient();
             icmpClient.Close();
