@@ -128,6 +128,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             packet.AddOption(options);
 
             OutgoingBuffer.AddPacket(packet);
+            NetworkStack.Update();
         }
 
         /// <summary>
