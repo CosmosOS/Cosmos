@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.HAL;
 using Cosmos.System.Network.Config;
 
 namespace Cosmos.System.Network.IPv4.TCP
@@ -109,7 +110,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         /// <param name="dest">Destination address.</param>
         /// <param name="destPort">Destination port.</param>
-        public void Connect(Address dest, int destPort)
+        public void Connect(Address dest, int destPort, int timeout = 5000)
         {
             destination = dest;
             destinationPort = destPort;
@@ -129,6 +130,38 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
+
+            WaitForConnectionResponse(timeout);
+        }
+
+        private void WaitForConnectionResponse(int timeout)
+        {
+            int second = 0;
+            int _deltaT = 0;
+
+            while (rxBuffer.Count < 1)
+            {
+                if (second > (timeout / 1000))
+                {
+                    return;
+                }
+                if (_deltaT != RTC.Second)
+                {
+                    second++;
+                    _deltaT = RTC.Second;
+                }
+            }
+
+            var packet = new TCPPacket(rxBuffer.Dequeue().RawData);
+
+            Global.mDebugger.Send("Flags=" + packet.Flags);
+
+            if (packet.Flags == 0x12) // SYN/ACK
+            {
+
+            }
+
+            //send ACK
         }
 
         /// <summary>
@@ -208,12 +241,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            Global.mDebugger.Send("Flags=" + packet.Flags);
-
-            if (packet.Flags == 0x12) // SYN/ACK
-            {
-                
-            }
             rxBuffer.Enqueue(packet);
         }
 

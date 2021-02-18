@@ -27,7 +27,7 @@ namespace Cosmos.System.Network.IPv4.TCP
     {
         protected ushort sourcePort;
         protected ushort destinationPort;
-        protected ushort tcpLen;
+        protected ushort optionLen;
         protected ulong sequenceNumber;
         protected ulong ackNumber;
         protected int headerLenght;
@@ -44,7 +44,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         public bool PSH;
         public bool RST;
 
-        protected ushort optionLen;
+        
 
         internal static void TCPHandler(byte[] packetData)
         {
@@ -83,7 +83,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             optionLen = len;
 
             //ports
-            RawData[DataOffset + 0] = (byte)((sourcePort >> 8) & 0xFF);
+            RawData[DataOffset + 0] = (byte)((srcPort >> 8) & 0xFF);
             RawData[DataOffset + 1] = (byte)((srcPort >> 0) & 0xFF);
 
             RawData[DataOffset + 2] = (byte)((destPort >> 8) & 0xFF);
@@ -102,7 +102,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             RawData[DataOffset + 11] = (byte)((acknowledgmentnb >> 0) & 0xFF);
 
             //Header lenght
-            RawData[DataOffset + 12] = (byte)((Headerlenght >> 0) & 0xFF);
+            RawData[DataOffset + 12] = (byte)(((Headerlenght >> 0) & 0xFF) * 4);
 
             //Flags
             RawData[DataOffset + 13] = (byte)((Flags >> 0) & 0xFF);
@@ -111,13 +111,18 @@ namespace Cosmos.System.Network.IPv4.TCP
             RawData[DataOffset + 14] = (byte)((WSValue >> 8) & 0xFF);
             RawData[DataOffset + 15] = (byte)((WSValue >> 0) & 0xFF);
 
-            //Checksum
-            RawData[DataOffset + 16] = 0x00;
-            RawData[DataOffset + 17] = 0x00;
-
             //Urgent Pointer
             RawData[DataOffset + 18] = (byte)((UrgentPointer >> 8) & 0xFF);
             RawData[DataOffset + 19] = (byte)((UrgentPointer >> 0) & 0xFF);
+
+            byte[] header = MakeHeader(source.address, dest.address, (ushort)(20 + len), srcPort, destPort,
+            sequencenumber, acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer);
+
+            ushort calculatedcrc = CalcOcCRC(header, 0, header.Length);
+
+            //Checksum
+            RawData[DataOffset + 16] = (byte)((calculatedcrc >> 8) & 0xFF);
+            RawData[DataOffset + 17] = (byte)((calculatedcrc >> 0) & 0xFF);
 
             InitFields();
         }
@@ -187,6 +192,69 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 RawData[DataOffset + 20 + i] = raw[i];
             }
+        }
+
+        internal byte[] MakeHeader(byte[] sourceIP, byte[] destIP, ushort tcpLen,
+        ushort sourcePort, ushort destPort, ulong sequencenumber, ulong acknowledgmentnb,
+        int Headerlenght, int Flags, int WSValue, int UrgentPointer)
+        {
+            byte[] header = new byte[30 + RawData.Length - (DataOffset + 20)];
+
+            header[0] = sourceIP[0];
+            header[1] = sourceIP[1];
+            header[2] = sourceIP[2];
+            header[3] = sourceIP[3];
+
+            header[4] = destIP[0];
+            header[5] = destIP[1];
+            header[6] = destIP[2];
+            header[7] = destIP[3];
+
+            header[8] = 0x00;
+
+            header[9] = 0x06;
+
+            header[10] = (byte)((tcpLen >> 8) & 0xFF);
+            header[11] = (byte)((tcpLen >> 0) & 0xFF);
+
+            header[12] = (byte)((sourcePort >> 8) & 0xFF);
+            header[13] = (byte)((sourcePort >> 0) & 0xFF);
+
+            header[14] = (byte)((destPort >> 8) & 0xFF);
+            header[15] = (byte)((destPort >> 0) & 0xFF);
+
+            //sequencenumber
+            header[16] = (byte)((sequencenumber >> 24) & 0xFF);
+            header[17] = (byte)((sequencenumber >> 16) & 0xFF);
+            header[18] = (byte)((sequencenumber >> 8) & 0xFF);
+            header[19] = (byte)((sequencenumber >> 0) & 0xFF);
+
+            //Acknowledgment number
+            header[20] = (byte)((acknowledgmentnb >> 24) & 0xFF);
+            header[21] = (byte)((acknowledgmentnb >> 16) & 0xFF);
+            header[22] = (byte)((acknowledgmentnb >> 8) & 0xFF);
+            header[23] = (byte)((acknowledgmentnb >> 0) & 0xFF);
+
+            //Header lenght
+            header[24] = (byte)((Headerlenght >> 0) & 0xFF);
+
+            //Flags
+            header[25] = (byte)((Flags >> 0) & 0xFF);
+
+            //Window size value
+            header[26] = (byte)((WSValue >> 8) & 0xFF);
+            header[27] = (byte)((WSValue >> 0) & 0xFF);
+
+            //Urgent Pointer
+            header[28] = (byte)((UrgentPointer >> 8) & 0xFF);
+            header[29] = (byte)((UrgentPointer >> 0) & 0xFF);
+
+            for (int i = 0; i < RawData.Length - (DataOffset + 20); i++)
+            {
+                header[30 + i] = RawData[DataOffset + 20 + i];
+            }
+
+            return header;
         }
 
         internal ushort DestinationPort
