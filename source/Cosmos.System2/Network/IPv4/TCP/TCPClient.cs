@@ -116,15 +116,14 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             Address source = IPConfig.FindNetwork(dest);
 
-            //TODO: Generate sequence number
-            //TODO: Dynamic header len
-            // Flags=0x02 -> Syn
-            var packet = new TCPPacket(source, dest, (ushort)localPort, (ushort)destPort, 3455719727, 0, 20 + 12, 0x02, 0xFAF0, 0, 12);
-
             byte[] options = new byte[]
             {
                 0x02, 0x04, 0x05, 0xB4, 0x01, 0x03, 0x03, 0x08, 0x01, 0x01, 0x04, 0x02
             };
+
+            //TODO: Generate sequence number
+            // Flags=0x02 -> Syn
+            var packet = new TCPPacket(source, dest, (ushort)localPort, (ushort)destPort, 3455719727, 0, (ushort)(20 + options.Length), 0x02, 0xFAF0, 0, (ushort)options.Length);
 
             packet.AddOption(options);
 
