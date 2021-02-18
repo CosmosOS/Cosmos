@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.System.Network.Config;
 
 namespace Cosmos.System.Network.IPv4.TCP
 {
@@ -112,6 +113,22 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             destination = dest;
             destinationPort = destPort;
+
+            Address source = IPConfig.FindNetwork(dest);
+
+            //TODO: Generate sequence number
+            //TODO: Dynamic header len
+            // Flags=0x02 -> Syn
+            var packet = new TCPPacket(source, dest, (ushort)localPort, (ushort)destPort, 3455719727, 0, 20 + 12, 0x02, 0xFAF0, 0, 12);
+
+            byte[] options = new byte[]
+            {
+                0x02, 0x04, 0x05, 0xB4, 0x01, 0x03, 0x03, 0x08, 0x01, 0x01, 0x04, 0x02
+            };
+
+            packet.AddOption(options);
+
+            OutgoingBuffer.AddPacket(packet);
         }
 
         /// <summary>
@@ -156,7 +173,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         public void Send(byte[] data, Address dest, int destPort)
         {
-            throw new NotImplementedException();
+            Address source = IPConfig.FindNetwork(dest);
+            var packet = new TCPPacket();
+            OutgoingBuffer.AddPacket(packet);
         }
 
         /// <summary>
@@ -189,6 +208,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
+            Global.mDebugger.Send("Flags=" + packet.Flags);
+
+            if (packet.Flags == 0x12) // SYN/ACK
+            {
+                
+            }
             rxBuffer.Enqueue(packet);
         }
 

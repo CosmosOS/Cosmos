@@ -172,6 +172,23 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
         }
 
+        internal void AddOption(TCPOption option)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void AddOption(byte[] raw)
+        {
+            if (raw.Length > optionLen)
+            {
+                throw new Exception("Raw option is larger than max value.");
+            }
+            for (int i = 0; i < raw.Length; i++)
+            {
+                RawData[DataOffset + 20 + i] = raw[i];
+            }
+        }
+
         internal ushort DestinationPort
         {
             get { return destinationPort; }

@@ -158,7 +158,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         public void Send(byte[] data, Address dest, int destPort)
         {
             Address source = IPConfig.FindNetwork(dest);
-            UDPPacket packet = new UDPPacket(source, dest, (ushort)localPort, (ushort)destPort, data);
+            var packet = new UDPPacket(source, dest, (ushort)localPort, (ushort)destPort, data);
             OutgoingBuffer.AddPacket(packet);
         }
 
