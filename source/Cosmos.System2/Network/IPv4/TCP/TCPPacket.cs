@@ -87,6 +87,15 @@ namespace Cosmos.System.Network.IPv4.TCP
 
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
             ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
+            ushort WSValue, ushort UrgentPointer)
+            : base(20, 6, source, dest, 0x40)
+        {
+            MakePacket(source, dest, srcPort, destPort, sequencenumber,
+            acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer, 0);
+        }
+
+        public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
+            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
             ushort WSValue, ushort UrgentPointer, ushort len)
             : base((ushort)(20 + len), 6, source, dest, 0x40)
         {
@@ -255,6 +264,10 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal ushort SourcePort
         {
             get { return sourcePort; }
+        }
+        internal ulong AckNumber
+        {
+            get { return ackNumber; }
         }
         internal ulong SequenceNumber
         {

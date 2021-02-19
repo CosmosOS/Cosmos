@@ -28,6 +28,10 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         private int localPort;
         /// <summary>
+        /// Source address.
+        /// </summary>
+        internal Address source;
+        /// <summary>
         /// Destination address.
         /// </summary>
         internal Address destination;
@@ -40,6 +44,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// RX buffer queue.
         /// </summary>
         internal Queue<TCPPacket> rxBuffer;
+
+        /// <summary>
+        /// Connection status.
+        /// </summary>
+        internal bool Connected = false;
 
         /// <summary>
         /// Assign clients dictionary.
@@ -115,7 +124,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             destination = dest;
             destinationPort = destPort;
 
-            Address source = IPConfig.FindNetwork(dest);
+            source = IPConfig.FindNetwork(dest);
 
             global::System.Console.WriteLine(source.ToString());
 
@@ -157,14 +166,22 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             var packet = new TCPPacket(rxBuffer.Dequeue().RawData);
 
-            Global.mDebugger.Send("Flags=" + packet.Flags);
-
             if (packet.Flags == 0x12) // SYN/ACK
             {
-
+                SendAck(packet);
             }
+        }
 
-            //send ACK
+        private void SendAck(TCPPacket responsepacket)
+        {
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)localPort, responsepacket.AckNumber, responsepacket.SequenceNumber + 1, 20, 0x10, 0xFAF0, 0, 0);
+
+            OutgoingBuffer.AddPacket(packet);
+            NetworkStack.Update();
+
+            Global.mDebugger.Send("TCP Connection established!");
+
+            Connected = true;
         }
 
         /// <summary>
