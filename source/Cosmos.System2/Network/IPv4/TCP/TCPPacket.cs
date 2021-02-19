@@ -77,8 +77,26 @@ namespace Cosmos.System.Network.IPv4.TCP
 
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
             ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
+            ushort WSValue, ushort UrgentPointer, ushort len, byte[] options)
+            : base((ushort)(20 + len), 6, source, dest, 0x40)
+        {
+            AddRawOption(options);
+            MakePacket(source, dest, srcPort, destPort, sequencenumber,
+            acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer, len);
+        }
+
+        public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
+            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
             ushort WSValue, ushort UrgentPointer, ushort len)
             : base((ushort)(20 + len), 6, source, dest, 0x40)
+        {
+            MakePacket(source, dest, srcPort, destPort, sequencenumber,
+            acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer, len);
+        }
+
+        private void MakePacket(Address source, Address dest, ushort srcPort, ushort destPort,
+            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
+            ushort WSValue, ushort UrgentPointer, ushort len)
         {
             optionLen = len;
 
@@ -119,15 +137,15 @@ namespace Cosmos.System.Network.IPv4.TCP
             RawData[DataOffset + 18] = (byte)((UrgentPointer >> 8) & 0xFF);
             RawData[DataOffset + 19] = (byte)((UrgentPointer >> 0) & 0xFF);
 
-            byte[] header = MakeHeader();
+            InitFields();
 
+            //Checksum computation
+            byte[] header = MakeHeader();
             ushort calculatedcrc = CalcOcCRC(header, 0, header.Length);
 
             //Checksum
             RawData[DataOffset + 16] = (byte)((calculatedcrc >> 8) & 0xFF);
             RawData[DataOffset + 17] = (byte)((calculatedcrc >> 0) & 0xFF);
-
-            InitFields();
         }
 
         protected override void InitFields()
@@ -185,12 +203,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             throw new NotImplementedException();
         }
 
-        internal void AddOption(byte[] raw)
+        internal void AddRawOption(byte[] raw)
         {
-            if (raw.Length > optionLen)
-            {
-                throw new Exception("Raw option is larger than max value.");
-            }
             for (int i = 0; i < raw.Length; i++)
             {
                 RawData[DataOffset + 20 + i] = raw[i];
@@ -209,8 +223,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             //Addresses
             for (int b = 0; b < 4; b++)
             {
-                RawData[0 + b] = SourceIP.address[b];
-                RawData[4 + b] = DestinationIP.address[b];
+                header[0 + b] = SourceIP.address[b];
+                header[4 + b] = DestinationIP.address[b];
             }
 
             //Reserved
@@ -225,10 +239,10 @@ namespace Cosmos.System.Network.IPv4.TCP
             header[10] = (byte)((tcplen >> 8) & 0xFF);
             header[11] = (byte)((tcplen >> 0) & 0xFF);
 
-            //TCP Packet
+            /** TCP Packet **/
             for (int i = 0; i < RawData.Length - DataOffset; i++)
             {
-                header[12 + i] = RawData[DataLength + i];
+                header[12 + i] = RawData[DataOffset + i];
             }
 
             return header;

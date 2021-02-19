@@ -117,16 +117,19 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             Address source = IPConfig.FindNetwork(dest);
 
+            global::System.Console.WriteLine(source.ToString());
+
             byte[] options = new byte[]
             {
                 0x02, 0x04, 0x05, 0xB4, 0x01, 0x03, 0x03, 0x08, 0x01, 0x01, 0x04, 0x02
             };
 
-            //TODO: Generate sequence number
-            // Flags=0x02 -> Syn
-            var packet = new TCPPacket(source, dest, (ushort)localPort, (ushort)destPort, 3455719727, 0, (ushort)(20 + options.Length), 0x02, 0xFAF0, 0, (ushort)options.Length);
+            //Generate Random Sequence Number
+            var rnd = new Random();
+            ulong sequencenumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue)); 
 
-            packet.AddOption(options);
+            // Flags=0x02 -> Syn
+            var packet = new TCPPacket(source, dest, (ushort)localPort, (ushort)destPort, sequencenumber, 0, (ushort)(20 + options.Length), 0x02, 0xFAF0, 0, (ushort)options.Length, options);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
