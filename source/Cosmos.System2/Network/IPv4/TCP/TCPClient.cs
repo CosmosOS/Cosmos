@@ -119,14 +119,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         /// <param name="dest">Destination address.</param>
         /// <param name="destPort">Destination port.</param>
-        public void Connect(Address dest, int destPort, int timeout = 5000)
+        public bool Connect(Address dest, int destPort, int timeout = 5000)
         {
             destination = dest;
             destinationPort = destPort;
 
             source = IPConfig.FindNetwork(dest);
-
-            global::System.Console.WriteLine(source.ToString());
 
             byte[] options = new byte[]
             {
@@ -138,15 +136,15 @@ namespace Cosmos.System.Network.IPv4.TCP
             ulong sequencenumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue)); 
 
             // Flags=0x02 -> Syn
-            var packet = new TCPPacket(source, dest, (ushort)localPort, (ushort)destPort, sequencenumber, 0, (ushort)(20 + options.Length), 0x02, 0xFAF0, 0, (ushort)options.Length, options);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destPort, sequencenumber, 0, (ushort)(20 + options.Length), 0x02, 0xFAF0, 0, (ushort)options.Length, options);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
-            WaitForConnectionResponse(timeout);
+            return WaitForConnectionResponse(timeout);
         }
 
-        private void WaitForConnectionResponse(int timeout)
+        private bool WaitForConnectionResponse(int timeout)
         {
             int second = 0;
             int _deltaT = 0;
@@ -155,7 +153,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 if (second > (timeout / 1000))
                 {
-                    return;
+                    return false;
                 }
                 if (_deltaT != RTC.Second)
                 {
@@ -164,24 +162,30 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
             }
 
-            var packet = new TCPPacket(rxBuffer.Dequeue().RawData);
+            var packet = rxBuffer.Dequeue();
 
             if (packet.Flags == 0x12) // SYN/ACK
             {
                 SendAck(packet);
+
+                Global.mDebugger.Send("TCP Connection established!");
+
+                Connected = true;
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
         private void SendAck(TCPPacket responsepacket)
         {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)localPort, responsepacket.AckNumber, responsepacket.SequenceNumber + 1, 20, 0x10, 0xFAF0, 0, 0);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)localPort, responsepacket.AckNumber, responsepacket.SequenceNumber + 1, 20, 0x10, 0xFAF0, 0);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
-
-            Global.mDebugger.Send("TCP Connection established!");
-
-            Connected = true;
         }
 
         /// <summary>

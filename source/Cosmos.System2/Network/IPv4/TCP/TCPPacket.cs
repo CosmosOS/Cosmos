@@ -226,29 +226,25 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>byte array value.</returns>
         internal byte[] MakeHeader()
         {
-            /* Pseudo Header */
             byte[] header = new byte[12 + (RawData.Length - DataOffset)];
 
+            /* Pseudo Header */
             //Addresses
             for (int b = 0; b < 4; b++)
             {
                 header[0 + b] = SourceIP.address[b];
                 header[4 + b] = DestinationIP.address[b];
             }
-
             //Reserved
             header[8] = 0x00;
-
             //Protocol (TCP)
             header[9] = 0x06;
-
             ushort tcplen = (ushort)(RawData.Length - DataOffset);
-
             //TCP Length
             header[10] = (byte)((tcplen >> 8) & 0xFF);
             header[11] = (byte)((tcplen >> 0) & 0xFF);
 
-            /** TCP Packet **/
+            /* TCP Packet */
             for (int i = 0; i < RawData.Length - DataOffset; i++)
             {
                 header[12 + i] = RawData[DataOffset + i];
