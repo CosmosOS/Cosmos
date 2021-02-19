@@ -111,12 +111,15 @@ namespace Cosmos.System.Network.IPv4.TCP
             RawData[DataOffset + 14] = (byte)((WSValue >> 8) & 0xFF);
             RawData[DataOffset + 15] = (byte)((WSValue >> 0) & 0xFF);
 
+            //Checksum
+            RawData[DataOffset + 16] = 0;
+            RawData[DataOffset + 17] = 0;
+
             //Urgent Pointer
             RawData[DataOffset + 18] = (byte)((UrgentPointer >> 8) & 0xFF);
             RawData[DataOffset + 19] = (byte)((UrgentPointer >> 0) & 0xFF);
 
-            byte[] header = MakeHeader(source.address, dest.address, (ushort)(20 + len), srcPort, destPort,
-            sequencenumber, acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer);
+            byte[] header = MakeHeader();
 
             ushort calculatedcrc = CalcOcCRC(header, 0, header.Length);
 
@@ -146,7 +149,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             PSH = (RawData[47] & (1 << 3)) != 0;
             RST = (RawData[47] & (1 << 2)) != 0;
 
-            //options
+            //options parsing
             if (RawData[DataOffset + 20] != 0)
             {
                 options = new List<TCPOption>();
@@ -194,64 +197,38 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
         }
 
-        internal byte[] MakeHeader(byte[] sourceIP, byte[] destIP, ushort tcpLen,
-        ushort sourcePort, ushort destPort, ulong sequencenumber, ulong acknowledgmentnb,
-        int Headerlenght, int Flags, int WSValue, int UrgentPointer)
+        /// <summary>
+        /// Make TCP Header for CRC Computation
+        /// </summary>
+        /// <returns>byte array value.</returns>
+        internal byte[] MakeHeader()
         {
-            byte[] header = new byte[30 + RawData.Length - (DataOffset + 20)];
+            /* Pseudo Header */
+            byte[] header = new byte[12 + (RawData.Length - DataOffset)];
 
-            header[0] = sourceIP[0];
-            header[1] = sourceIP[1];
-            header[2] = sourceIP[2];
-            header[3] = sourceIP[3];
+            //Addresses
+            for (int b = 0; b < 4; b++)
+            {
+                RawData[0 + b] = SourceIP.address[b];
+                RawData[4 + b] = DestinationIP.address[b];
+            }
 
-            header[4] = destIP[0];
-            header[5] = destIP[1];
-            header[6] = destIP[2];
-            header[7] = destIP[3];
-
+            //Reserved
             header[8] = 0x00;
 
+            //Protocol (TCP)
             header[9] = 0x06;
 
-            header[10] = (byte)((tcpLen >> 8) & 0xFF);
-            header[11] = (byte)((tcpLen >> 0) & 0xFF);
+            ushort tcplen = (ushort)(RawData.Length - DataOffset);
 
-            header[12] = (byte)((sourcePort >> 8) & 0xFF);
-            header[13] = (byte)((sourcePort >> 0) & 0xFF);
+            //TCP Length
+            header[10] = (byte)((tcplen >> 8) & 0xFF);
+            header[11] = (byte)((tcplen >> 0) & 0xFF);
 
-            header[14] = (byte)((destPort >> 8) & 0xFF);
-            header[15] = (byte)((destPort >> 0) & 0xFF);
-
-            //sequencenumber
-            header[16] = (byte)((sequencenumber >> 24) & 0xFF);
-            header[17] = (byte)((sequencenumber >> 16) & 0xFF);
-            header[18] = (byte)((sequencenumber >> 8) & 0xFF);
-            header[19] = (byte)((sequencenumber >> 0) & 0xFF);
-
-            //Acknowledgment number
-            header[20] = (byte)((acknowledgmentnb >> 24) & 0xFF);
-            header[21] = (byte)((acknowledgmentnb >> 16) & 0xFF);
-            header[22] = (byte)((acknowledgmentnb >> 8) & 0xFF);
-            header[23] = (byte)((acknowledgmentnb >> 0) & 0xFF);
-
-            //Header lenght
-            header[24] = (byte)((Headerlenght >> 0) & 0xFF);
-
-            //Flags
-            header[25] = (byte)((Flags >> 0) & 0xFF);
-
-            //Window size value
-            header[26] = (byte)((WSValue >> 8) & 0xFF);
-            header[27] = (byte)((WSValue >> 0) & 0xFF);
-
-            //Urgent Pointer
-            header[28] = (byte)((UrgentPointer >> 8) & 0xFF);
-            header[29] = (byte)((UrgentPointer >> 0) & 0xFF);
-
-            for (int i = 0; i < RawData.Length - (DataOffset + 20); i++)
+            //TCP Packet
+            for (int i = 0; i < RawData.Length - DataOffset; i++)
             {
-                header[30 + i] = RawData[DataOffset + 20 + i];
+                header[12 + i] = RawData[DataLength + i];
             }
 
             return header;
