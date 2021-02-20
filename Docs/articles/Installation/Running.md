@@ -30,18 +30,18 @@ VMWare Player can be downloaded [ here](http://vmware.com/download/player/).
 
 Not officially supported at this time, but can be done. Just use the ISO option above with debugging turned off.
 
-Bochs
+### Bochs
 
 Support is underway.
 
-PXE
+### PXE
 
 For PXE, no special software is required. Only an ethernet connection to your router. However, if you have a computer that does not support network booting, or if you must perform the action over WiFi, you may need to look at a PXE chainloader such as [gPXE](#).
 
-Virtual PC
+### Virtual PC
 
 Not officially supported at this time, but can be done. Just use the ISO option above with debugging turned off.
 
-Hyper-V
+### Hyper-V
 
 Not supported at this time.
