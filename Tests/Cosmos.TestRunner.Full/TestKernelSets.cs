@@ -17,13 +17,13 @@ namespace Cosmos.TestRunner.Full
         {
             //yield return typeof(BoxingTests.Kernel);
             //yield return typeof(Compiler.Tests.TypeSystem.Kernel);
-            //yield return typeof(Compiler.Tests.Bcl.Kernel);
+            yield return typeof(Compiler.Tests.Bcl.Kernel);
             //yield return typeof(Compiler.Tests.Bcl.System.Kernel);
             //yield return typeof(Compiler.Tests.Encryption.Kernel);
             //yield return typeof(Compiler.Tests.Exceptions.Kernel);
             //yield return typeof(Compiler.Tests.MethodTests.Kernel);
             //yield return typeof(Compiler.Tests.SingleEchoTest.Kernel);
-            yield return typeof(Kernel.Tests.Fat.Kernel);
+            //yield return typeof(Kernel.Tests.Fat.Kernel);
             //yield return typeof(Kernel.Tests.IO.Kernel);
             ////yield return typeof(SimpleStructsAndArraysTest.Kernel);
             //yield return typeof(Kernel.Tests.DiskManager.Kernel);

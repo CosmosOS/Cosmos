@@ -1,4 +1,4 @@
-//#define COSMOSDEBUG
+#define COSMOSDEBUG
 
 using System;
 using System.IO;
@@ -235,6 +235,15 @@ namespace Cosmos.System.FileSystem.FAT
             Global.mFileSystemDebugger.SendInternal("aBuffer.Length = " + aBuffer.Length);
             Global.mFileSystemDebugger.SendInternal("aOffset = " + aOffset);
             Global.mFileSystemDebugger.SendInternal("aCount = " + aCount);
+            Global.mFileSystemDebugger.SendInternal("Current State");
+            Global.mFileSystemDebugger.SendInternal("mPosition = " + mPosition);
+            Global.mFileSystemDebugger.SendInternal("mDirectoryEntry.mSize = " + mDirectoryEntry.mSize);
+            Global.mFileSystemDebugger.SendInternal("xClusterSize = " + mFS.BytesPerCluster);
+            Global.mFileSystemDebugger.SendInternal("mFatTable = ");
+            for (int i = 0; i < mFatTable.Length; i++)
+            {
+                Global.mFileSystemDebugger.SendInternal(mFatTable[i]);
+            }
 
             if (aCount < 0)
             {
@@ -297,6 +306,9 @@ namespace Cosmos.System.FileSystem.FAT
                 xCount -= xReadSize;
                 mPosition += xReadSize;
             }
+
+            Global.mFileSystemDebugger.SendInternal("aBuffer =" + BitConverter.ToString(aBuffer));
+            Global.mFileSystemDebugger.SendInternal("xOffset =" + xOffset);
 
             return (int)xOffset;
         }
