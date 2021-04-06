@@ -586,8 +586,6 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WriteRegister(Register.Sync, 1);
              if (GetFIFO(FIFO.Stop) > FIFO_CAP)
              {
-              SetFIFO(FIFO.NextCmd, GetFIFO(FIFO.Min));
-              SetFIFO(FIFO.Stop, GetFIFO(FIFO.Min));
               FIFO_Memory.Fill(0);
               return;
              }
