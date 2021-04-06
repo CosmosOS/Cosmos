@@ -473,7 +473,10 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// Capabilities.
         /// </summary>
         private uint capabilities;
-
+        /// <summary>
+        /// Fifo Cap Limit
+        /// </summary>
+        private uint FIFO_CAP;
         /// <summary>
         /// Create new instance of the <see cref="VMWareSVGAII"/> class.
         /// </summary>
@@ -494,6 +497,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
             capabilities = ReadRegister(Register.Capabilities);
             InitializeFIFO();
+            //This calculates a approximate offset of the FIFO Cap limit used in WaitForFifo 
+            FIFO_CAP = (GetFIFO(FIFO.Max) - GetFIFO(FIFO.Min)) / 4;
         }
 
         /// <summary>
@@ -576,9 +581,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         protected void WaitForFifo()
         {
-            //We dont correctly check if the FIFO is full, this calculates a approximate offset and resets NextCmd and Stop
+            //We dont correctly check if the FIFO is full, this resets NextCmd and Stop
             //After the reset we clear the FIFO memory which populates itself again.
-            uint FIFO_CAP = (GetFIFO(FIFO.Max) - GetFIFO(FIFO.Min)) / 4; 
             WriteRegister(Register.Sync, 1);
              if (GetFIFO(FIFO.Stop) > FIFO_CAP)
              {
