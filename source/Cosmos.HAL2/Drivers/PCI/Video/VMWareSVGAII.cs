@@ -576,7 +576,17 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         protected void WaitForFifo()
         {
+            //We dont correctly check if the FIFO is full, this calculates a approximate offset and resets NextCmd and Stop
+            //After the reset we clear the FIFO memory which populates itself again.
+            uint FIFO_CAP = (GetFIFO(FIFO.Max) - GetFIFO(FIFO.Min)) / 4; 
             WriteRegister(Register.Sync, 1);
+             if (GetFIFO(FIFO.Stop) > FIFO_CAP)
+             {
+              SetFIFO(FIFO.NextCmd, GetFIFO(FIFO.Min));
+              SetFIFO(FIFO.Stop, GetFIFO(FIFO.Min));
+              FIFO_Memory.Fill(0);
+              return;
+             }
             while (ReadRegister(Register.Busy) != 0) { }
         }
 
