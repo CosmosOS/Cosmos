@@ -526,7 +526,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
-            WriteRegister(Register.Enable, 1);
+            Enable();
             InitializeFIFO();
         }
 
@@ -755,7 +755,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 WriteToFifo(0xFFFFFF);
             WaitForFifo();
         }
-        //Allow to enable the Driver again after it has been disable (switch between text and graphics mode currently this is SVGA only)
+        //Allow to enable the Driver again after it has been disabled (switch between text and graphics mode currently this is SVGA only)
         public void Enable()
         {
             WriteRegister(Register.Enable, 1);
