@@ -756,11 +756,16 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WaitForFifo();
         }
         //Allow to enable the Driver again after it has been disabled (switch between text and graphics mode currently this is SVGA only)
+        /// <summary>
+        /// Enable the SVGA Driver , only needed after Disable() has been called
+        /// </summary>
         public void Enable()
         {
             WriteRegister(Register.Enable, 1);
         } 
-        
+        /// <summary>
+        /// Disable the SVGA Driver , return to text mode
+        /// </summary>
         public void Disable()
         {
             WriteRegister(Register.Enable, 0);
