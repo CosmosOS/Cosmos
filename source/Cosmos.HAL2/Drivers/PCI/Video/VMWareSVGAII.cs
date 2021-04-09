@@ -517,6 +517,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="depth">Depth.</param>
         public void SetMode(uint width, uint height, uint depth = 32)
         {
+            //Disable the Driver before writing new values and initiating it again to avoid a memory exception
+            Disable();
             // Depth is color depth in bytes.
             this.depth = (depth / 8);
             this.width = width;
@@ -753,6 +755,11 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 WriteToFifo(0xFFFFFF);
             WaitForFifo();
         }
+        //Allow to enable the Driver again after it has been disable (switch between text and graphics mode currently this is SVGA only)
+        public void Enable()
+        {
+            WriteRegister(Register.Enable, 1);
+        } 
         
         public void Disable()
         {
