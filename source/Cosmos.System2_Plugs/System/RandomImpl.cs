@@ -35,7 +35,7 @@ namespace Cosmos.System_Plugs.System
             uint diff = (uint)(maxValue - minValue);
             if (diff <= 1)
                 return minValue;
-            return (int)((uint)(GetUniform() * diff) + minValue);
+            return Next() % diff + minValue;
         }
 
         public static void NextBytes(Random aThis, byte[] buffer)
