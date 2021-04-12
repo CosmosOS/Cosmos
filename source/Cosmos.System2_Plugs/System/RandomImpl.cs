@@ -32,7 +32,7 @@ namespace Cosmos.System_Plugs.System
 
         public static int Next(Random aThis, int minValue, int maxValue)
         {
-            uint diff = (uint)(maxValue - minValue);
+            int diff = maxValue - minValue;
             if (diff <= 1)
                 return minValue;
             return Next(aThis) % diff + minValue;
