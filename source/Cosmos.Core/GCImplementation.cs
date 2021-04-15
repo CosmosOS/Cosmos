@@ -15,6 +15,7 @@ namespace Cosmos.Core
     [DebuggerStepThrough]
     public static class GCImplementation
     {
+        private static bool isInitialized;
         /// <summary>
         /// Acquire lock. Not implemented.
         /// </summary>
@@ -34,12 +35,23 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Alloc new object. Plugged.
+        /// Alloc new object.
         /// </summary>
-        [PlugMethod(PlugRequired = true)]
-        public static uint AllocNewObject(uint aSize)
+        public unsafe static uint AllocNewObject(uint aSize)
         {
-            throw new NotImplementedException();
+
+
+                if (!isInitialized)
+                {
+                isInitialized = true;
+                Init();
+                return (uint)Memory.Heap.Alloc(aSize);
+            }
+           
+            else
+            {
+                return (uint)Memory.Heap.Alloc(aSize);
+            }
 
         }
 
@@ -62,5 +74,17 @@ namespace Cosmos.Core
         {
             throw new NotImplementedException();
         }
+
+        public static unsafe void Init()
+        {
+
+           
+            byte* memPtr = (byte*)CPU.GetEndOfKernel();
+            memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
+            Debug.Kernel.Debugger.DoSendNumber((uint)CPU.GetMemoryMap()[3].Length - (128 * 1024 * 1024));
+            Memory.RAT.Init(memPtr, (uint)CPU.GetMemoryMap()[3].Length - (128 * 1024 * 1024));
+            
+        }
+
     }
 }

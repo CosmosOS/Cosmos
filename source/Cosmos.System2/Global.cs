@@ -74,6 +74,7 @@ namespace Cosmos.System
         /// <param name="textScreen">A screen device.</param>
         public static void Init(TextScreenBase textScreen)
         {
+           
             // We must init Console before calling Inits.
             // This is part of the "minimal" boot to allow output.
             mDebugger.Send("Creating Console");

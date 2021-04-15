@@ -76,7 +76,7 @@ namespace Cosmos.HAL
         /// </summary>
         public static void EnableInterrupts()
         {
-            CPU.EnableInterrupts();
+           CPU.EnableInterrupts();
         }
 
         /// <summary>

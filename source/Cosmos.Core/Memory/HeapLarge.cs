@@ -28,16 +28,37 @@ namespace Cosmos.Core.Memory
         /// </summary>
         /// <param name="aSize">A size of block to alloc, in bytes.</param>
         /// <returns>Byte pointer to the start of the block.</returns>
+        ///             Debug.Kernel.Debugger.DoSendNumber(PrefixBytes);
+        //Debug.Kernel.Debugger.DoSendNumber((uint) xPtr);
         static public byte* Alloc(Native aSize)
         {
+            //Debug.Kernel.Debugger.DoSendNumber(aSize);
+            //Debug.Kernel.Debugger.DoBochsBreak();
             Native xPages = (Native)((aSize + PrefixBytes) / RAT.PageSize) + 1;
+            if(xPages == 0)
+            {
+                //Debug.Kernel.Debugger.DoSendNumber(xPages);
+                //Debug.Kernel.Debugger.DoBochsBreak();
+            }
             var xPtr = (Native*)RAT.AllocPages(RAT.PageType.HeapLarge, xPages);
-
+            Debug.Kernel.Debugger.DoSendNumber((uint)xPtr);
+            if ((uint)xPtr == 0)
+            {
+                
+               // Debug.Kernel.Debugger.DoSendNumber((uint)xPtr);
+                //Debug.Kernel.Debugger.DoSendNumber(2);
+            //    Debug.Kernel.Debugger.DoBochsBreak();
+            }
+            if(PrefixBytes == 0)
+            {
+                //Debug.Kernel.Debugger.DoSendNumber(3);
+                //Debug.Kernel.Debugger.DoBochsBreak();
+            }
             xPtr[0] = xPages * RAT.PageSize - PrefixBytes; // Allocated data size
             xPtr[1] = aSize; // Actual data size
             xPtr[2] = 0; // Ref count
-            xPtr[3] = 0; // Ptr to first
-
+            xPtr[3] = 0; // Ptr to first,
+            //Debug.Kernel.Debugger.DoSendNumber((uint)xPtr + PrefixBytes);
             return (byte*)xPtr + PrefixBytes;
         }
 

@@ -63,7 +63,11 @@ namespace Cosmos.Core.Memory
         static void InitSMT(Native aMaxItemSize)
         {
             mMaxItemSize = aMaxItemSize;
-            mSMT = (void**)RAT.AllocBytes(RAT.PageType.HeapSmall, mMaxItemSize * (Native)sizeof(void*));
+       //     Cosmos.Debug.Kernel.Debugger.DoSendNumber(mMaxItemSize);
+            mSMT = (void**)RAT.AllocBytes(RAT.PageType.HeapSmall, mMaxItemSize * 8,true);
+      //      Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)mSMT);
+        //    Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
+          //  Debug.Kernel.Debugger.SendKernelPanic(06);
         }
 
         /// <summary>
@@ -101,7 +105,7 @@ namespace Cosmos.Core.Memory
             // In future may put some up top and be larger as well.
             Native xPages = 1;
             var xPtr = (Native*)RAT.AllocPages(RAT.PageType.HeapSmall, xPages);
-
+         //   Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xPtr);
             // Ptr to next page of same size
             xPtr[0] = 0;
             //
@@ -114,7 +118,8 @@ namespace Cosmos.Core.Memory
             xPtr[2] = xItemCount;
             //
             xPtr = xPtr + 3;
-
+           // Cosmos.Debug.Kernel.Debugger.DoSendNumber(mMaxItemSize);
+           // Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xPtr);
             for (Native i = 0; i < xItemCount; i++)
             {
                 byte* xSlotPtr = (byte*)xPtr + i * xSlotSize;

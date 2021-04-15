@@ -38,6 +38,7 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         static public byte* Alloc(Native aSize)
         {
+            Cosmos.Debug.Kernel.Debugger.DoSendNumber(MaxItemSize);
             return HeapLarge.Alloc(aSize);
         }
 

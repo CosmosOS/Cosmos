@@ -15,10 +15,6 @@
   #define VSVersion "vs2019"
 #endif
 
-#ifndef RealPath
-  #define RealPath {userappdata}
-#endif
-
 #if BuildConfiguration == "DevKit"
 	; devkit releases are not compressed
 	#pragma warning "Building Dev Kit release"
@@ -40,8 +36,7 @@ AppSupportURL=http://www.goCosmos.org/
 AppUpdatesURL=http://www.goCosmos.org/
 AppVersion={#ChangeSetVersion}
 SetupMutex=CosmosSetupMutexName,Global\CosmoSetupMutexName
-UsePreviousAppDir=false
-DefaultDirName={#RealPath}\Cosmos User Kit
+DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup\Output
 OutputBaseFilename=CosmosUserKit-{#ChangeSetVersion}-{#VSVersion}
@@ -133,16 +128,16 @@ Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}\VSIX\"; Fla
 
 [Registry]
 ; Regiter .xs Extension
-Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
-Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
-Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\XSharp\XSharp.ico,0"
-Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\XSharp\XSC.exe"" ""%1"""
+;Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
+;Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
+;Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\XSharp\XSharp.ico,0"
+;Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\XSharp\XSC.exe"" ""%1"""
 ; User Kit Folder
-Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletekey
+;Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletekey
 ; Dev Kit Folder - Set by builder only, but we delete it here. See comments in builder.
 ; HKCU because Builder doesn't run as admin
 ; Note HKCU is not part of registry redirection
-Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags: deletekey
+;Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags: deletekey
 
 [ThirdParty]
 UseRelativePaths=True
@@ -151,11 +146,11 @@ UseRelativePaths=True
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.DebugEngine.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.DebugEngine.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
 
 [UninstallRun]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; StatusMsg: "Uninstalling Kernel Packages"

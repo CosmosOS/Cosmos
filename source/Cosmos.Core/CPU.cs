@@ -97,8 +97,8 @@ namespace Cosmos.Core
         /// </summary>
         public static void EnableInterrupts()
         {
-            mInterruptsEnabled = true;
-            DoEnableInterrupts();
+            mInterruptsEnabled = false;
+            //DoEnableInterrupts();
         }
 
         /// <summary>
