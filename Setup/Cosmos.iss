@@ -71,7 +71,7 @@ LicenseFile=LICENSE.txt
 DisableDirPage=no
 
 [Messages]
-SelectDirDesc=If the user installing the Cosmos User Kit is not the admin. Please choose the corresponding AppData/Roaming directory.
+SelectDirDesc=If the user installing the Cosmos User Kit is not the admin, please choose the users AppData/Roaming directory
 
 [Dirs]
 Name: {app}; Flags: uninsalwaysuninstall
