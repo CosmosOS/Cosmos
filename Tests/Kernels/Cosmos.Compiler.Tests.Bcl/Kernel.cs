@@ -21,49 +21,50 @@ namespace Cosmos.Compiler.Tests.Bcl
 
         protected override void Run()
         {
-            //try
-            //{
-            //    mDebugger.Send("Run");
+            try
+            {
+                mDebugger.Send("Run");
 
-                // C#
-                //WhileLoopTests.Execute();
-                //ForeachLoopTests.Execute();
+                //// C#
+                ObjectTest.Execute();
+                WhileLoopTests.Execute();
+                ForeachLoopTests.Execute();
 
-                ////mDebugger.Send("Thread test start of 500 ms");
-                ////ThreadTest.Execute();
-                ////mDebugger.Send("Thread test end");
+                //mDebugger.Send("Thread test start of 500 ms");
+                //ThreadTest.Execute();
+                //mDebugger.Send("Thread test end");
 
-                //SpanTest.Execute();
-                ////DecimalTest.Execute();
-                //BitConverterTest.Execute();
-                //UnsafeCodeTest.Execute();
-                //DelegatesTest.Execute();
-                //EventsTest.Execute();
-                //RandomTests.Execute();
-                //ConvertTests.Execute();
+                SpanTest.Execute();
+                //DecimalTest.Execute();
+                BitConverterTest.Execute();
+                UnsafeCodeTest.Execute();
+                DelegatesTest.Execute();
+                EventsTest.Execute();
+                RandomTests.Execute();
+                ConvertTests.Execute();
 
-                //// System.Collections
-                //HashtableTest.Execute();
+                // System.Collections
+                HashtableTest.Execute();
 
-                //// System.Collections.Generic
-                //ListTest.Execute();
-                //QueueTest.Execute();
-                //DictionaryTest.Execute();
+                // System.Collections.Generic
+                ListTest.Execute();
+                QueueTest.Execute();
+                DictionaryTest.Execute();
 
-                // System.Text
+                System.Text
                 StringBuilderTest.Execute();
-                //EncodingTest.Execute();
+                EncodingTest.Execute();
 
                 TestController.Completed();
-            //}
-            //catch (Exception e)
-            //{
-            //    mDebugger.Send("Exception occurred: " + e.Message);
-            //    mDebugger.Send(e.Message);
-            //    Console.WriteLine("Exception occurred");
-            //    Console.WriteLine(e.Message);
-            //    TestController.Failed();
-            //}
+            }
+            catch (Exception e)
+            {
+                mDebugger.Send("Exception occurred: " + e.Message);
+                mDebugger.Send(e.Message);
+                Console.WriteLine("Exception occurred");
+                Console.WriteLine(e.Message);
+                TestController.Failed();
+            }
         }
     }
 }

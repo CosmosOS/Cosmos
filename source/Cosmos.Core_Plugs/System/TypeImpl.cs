@@ -1,6 +1,8 @@
 using Cosmos.Core;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Cosmos.Core_Plugs.System
 {
@@ -12,9 +14,18 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_RuntimeTypeHandle__System_Type_get_Typehandle")]
-        public static RuntimeTypeHandle get_TypeHandle(CosmosRuntimeType aThis)
+        public static unsafe RuntimeTypeHandle get_TypeHandle(CosmosRuntimeType aThis)
         {
-            return new();
+            fixed(uint* ptr = &aThis.mTypeId) // this has to actually stay fixed
+            {
+                var runtimeTypeHandle = CreateRuntimeTypeHandle((int)(uint)ptr);   // internally they do weird stuff and store the pointer as an int,
+                return runtimeTypeHandle;
+            }
+        }
+
+        public static RuntimeTypeHandle CreateRuntimeTypeHandle(int value)
+        {
+            throw new NotImplementedException(); // Implemented directly in ILReader.cs
         }
 
         [PlugMethod(Signature = "System_Type__System_Type_GetTypeFromHandle_System_RuntimeTypeHandle_")]
@@ -40,6 +51,7 @@ namespace Cosmos.Core_Plugs.System
             return aLeft.mTypeId == aRight.mTypeId;
         }
 
+        [PlugMethod(Signature = "System_Boolean__System_Type_op_Inequality_System_Type__System_Type_")]
         public static bool op_Inequality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
         {
             if (aLeft is null)

@@ -798,7 +798,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static string FastAllocateString(int aLength)
         {
-            return new string(new char[aLength]);
+            return new string(new char[aLength]);   
         }
 
         [PlugMethod(IsOptional = true)]

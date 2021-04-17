@@ -24,17 +24,17 @@ namespace Cosmos.Debug.Kernel
 
         public void SendPtr(object aObject) { }
 
-        internal static void DoSendNumber(uint aNumber) { }
+        public static void DoSendNumber(uint aNumber) { }
 
-        internal static void DoSendNumber(int aNumber) { }
+        public static void DoSendNumber(int aNumber) { }
 
-        internal static void DoSendNumber(ulong aNumber) { }
+        public static void DoSendNumber(ulong aNumber) { }
 
-        internal static void DoSendNumber(long aNumber) { }
+        public static void DoSendNumber(long aNumber) { }
 
-        internal static void DoSendNumber(float aNumber) { }
+        public static void DoSendNumber(float aNumber) { }
 
-        internal static void DoSendNumber(double aNumber) { }
+        public static void DoSendNumber(double aNumber) { }
 
         internal static void DoSendCoreDump() { }
 

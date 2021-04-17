@@ -9,19 +9,8 @@ namespace Cosmos.Core_Plugs {
     [Plug(Target = typeof(Cosmos.Core.GCImplementation))]
     public static class GCImplementionImpl {
         public static uint AllocNewObject(uint aSize) {
-            //if (Managed_Memory_System.ManagedMemory.SetUpDone == false)
-            //{
-            //    return Managed_Memory_System.ManagedMemory.SetUpMemoryAlloc(aSize);
-            //}
-            //else
-            //{
-            //    return Managed_Memory_System.ManagedMemory.KernelMemAlloc(aSize);
-            //}
             GlobalSystemInfo.EnsureInitialized();
-            if(aSize == 0xE001FEB6)
-            {
-                Debugger.DoBochsBreak();
-            }
+            
             return Heap.MemAlloc(aSize);
         }
 
