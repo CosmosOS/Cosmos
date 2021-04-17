@@ -79,7 +79,9 @@ namespace Cosmos.Debug.Kernel
 
         internal static void DoSend(string aText) { }
 
-        public static void SendKernelPanic(uint id) { }
+        public static void SendKernelPanic(uint id) {
+            throw new System.Exception(id.ToString()); // this is only executed in the unit tests
+        }
 
         public void Send(string aText) => DoSend(aText);
 

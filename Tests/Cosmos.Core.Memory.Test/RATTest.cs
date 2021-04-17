@@ -1,0 +1,161 @@
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Native = System.UInt32;
+
+namespace Cosmos.Core.Memory.Test
+{
+    [TestClass]
+    public class MemoryTests
+    {
+
+        [TestMethod]
+        public unsafe void InitTest()
+        {
+            var xRAM = new byte[128 * 1024 * 1024]; // 128 MB
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+                Assert.IsTrue(HeapSmall.mMaxItemSize > 512);
+
+                uint xRatPages = RAT.GetPageCount(RAT.PageType.RAT);
+                Assert.IsTrue(xRatPages > 0);
+
+                var xFreePages = RAT.GetPageCount(RAT.PageType.Empty);
+                Assert.IsTrue(xFreePages > 0);
+
+                Assert.IsTrue(RAT.GetPageCount(RAT.PageType.HeapSmall) > 0);
+
+                Assert.AreEqual(0, HeapSmall.GetAllocatedObjectCount());
+            }
+        }
+
+        [TestMethod]
+        public unsafe void SmallAllocTest()
+        {
+            var xRAM = new byte[32 * 1024 * 1024]; // 32 MB
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+                uint smallPages = RAT.GetPageCount(RAT.PageType.HeapSmall);
+                uint largePages = RAT.GetPageCount(RAT.PageType.HeapLarge);
+
+                // the following allocations should all go on the same page
+                var ptr1 = Heap.Alloc(8);
+                var ptr2 = Heap.Alloc(3);
+                ptr2[0] = 12;
+                ptr2[1] = 101;
+                var ptr3 = Heap.Alloc(8);
+                var ptr4 = Heap.Alloc(20);
+                var ptr5 = Heap.Alloc(22);
+                Assert.AreNotEqual((uint)ptr1, (uint)ptr2);
+                Assert.AreEqual((uint)ptr2 - (uint)ptr1, (uint)ptr3 - (uint)ptr2);
+                Assert.AreEqual(24 + HeapSmall.PrefixItemBytes, (uint)ptr5 - (uint)ptr4);
+                Assert.AreEqual(RAT.PageSize, (uint)ptr4 - (uint)ptr1);
+                Assert.AreEqual(12, ptr2[0]);
+                Assert.AreEqual(smallPages, RAT.GetPageCount(RAT.PageType.HeapSmall));
+                Assert.AreEqual(largePages, RAT.GetPageCount(RAT.PageType.HeapLarge));
+                Assert.AreEqual(5, HeapSmall.GetAllocatedObjectCount());
+
+                Heap.Free(ptr2);
+                Assert.AreEqual(4, HeapSmall.GetAllocatedObjectCount());
+                Assert.AreEqual(0, ptr2[0]);
+                var nptr2 = Heap.Alloc(10);
+                Heap.Alloc(10);
+                Assert.AreEqual((uint)ptr2, (uint)nptr2); // we use the earliest free position
+                Assert.AreEqual(6, HeapSmall.GetAllocatedObjectCount());
+            }
+        }
+
+        [TestMethod]
+        public unsafe void SmallHeapMultiPageAllocationTest()
+        {
+            var xRAM = new byte[1024 * 1024]; // 4 MB
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+                uint smallPages = RAT.GetPageCount(RAT.PageType.HeapSmall);
+
+
+                var ptr1 = Heap.Alloc(HeapSmall.mMaxItemSize); // 4 of them should fit on one page
+                var ptr2 = Heap.Alloc(HeapSmall.mMaxItemSize);
+                var ptr3 = Heap.Alloc(HeapSmall.mMaxItemSize);
+                var ptr4 = Heap.Alloc(HeapSmall.mMaxItemSize);
+                Assert.AreEqual((uint)ptr2 - (uint)ptr1, (uint)ptr4 - (uint)ptr3);
+                Assert.AreEqual((uint)RAT.GetPagePtr(ptr1), (uint)RAT.GetPagePtr(ptr2));
+                Assert.AreEqual(4, HeapSmall.GetAllocatedObjectCount());
+                Heap.Free(ptr4);
+                var nptr4 = Heap.Alloc(HeapSmall.mMaxItemSize);
+                Assert.AreEqual((uint)RAT.GetPagePtr(ptr1), (uint)RAT.GetPagePtr(ptr4));
+                var ptr5 = Heap.Alloc(HeapSmall.mMaxItemSize); // this should cause a new page to have to be created
+
+                uint largePages = RAT.GetPageCount(RAT.PageType.HeapLarge);
+                Assert.AreEqual((uint)0, largePages);
+                Assert.AreEqual(smallPages + 1, RAT.GetPageCount(RAT.PageType.HeapSmall));
+                Assert.AreNotEqual((uint)ptr1, (uint)ptr5);
+                Assert.IsTrue(((uint)ptr5 - (uint)ptr1) % RAT.PageSize == 0);
+                Assert.AreEqual(5, HeapSmall.GetAllocatedObjectCount());
+
+
+                // now lets force them to allocate 2 more pages
+                for (int i = 0; i < 8; i++)
+                {
+                    Heap.Alloc(HeapSmall.mMaxItemSize - 2);
+                }
+                Assert.AreEqual(smallPages + 3, RAT.GetPageCount(RAT.PageType.HeapSmall));
+                Assert.AreEqual(13, HeapSmall.GetAllocatedObjectCount());
+
+            }
+        }
+
+        [TestMethod]
+        public unsafe void SmallHeapTestExpansion()
+        {
+            var xRAM = new byte[1024 * 1024]; // 4 MB
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+                uint smallPages = RAT.GetPageCount(RAT.PageType.HeapSmall);
+
+                for (int i = 0; i < 9; i++)
+                {
+                    Heap.Alloc(600);
+                }
+
+                Assert.AreEqual(smallPages + 2, RAT.GetPageCount(RAT.PageType.HeapSmall));
+            }
+        }
+
+        [TestMethod]
+        public unsafe void SmallHeapStressTest() // this test is important since it tests that the SMT table can grow to multiple pages
+        {
+            var xRAM = new byte[1024 * 1024]; // 4 MB
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+
+                Random random = new Random();
+
+                for (int i = 0; i < 1000; i++)
+                {
+                    if(Heap.Alloc((uint)random.Next(4, (int)HeapSmall.mMaxItemSize)) == null)
+                    {
+                        Assert.Fail();
+                    }
+                }
+                Assert.AreEqual(1000, HeapSmall.GetAllocatedObjectCount());
+            }
+        }
+    }
+}
