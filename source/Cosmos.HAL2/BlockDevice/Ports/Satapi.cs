@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Core.Memory.Old;
 using Cosmos.HAL.BlockDevice.Registers;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
+using Cosmos.Core.Memory;
 
 namespace Cosmos.HAL.BlockDevice.Ports
 {
@@ -46,7 +46,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
             xCMDHeader.Write = 0;
 
-            xCMDHeader.CTBA = Heap.MemAlloc(128 + ((uint)xCMDHeader.PRDTL) * 16);
+            xCMDHeader.CTBA = Heap.SafeAlloc(128 + ((uint)xCMDHeader.PRDTL) * 16);
 
             HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 

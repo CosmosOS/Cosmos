@@ -366,7 +366,6 @@ namespace Cosmos.Core.Memory
             {
                 // there is already a block for the same size on the same page
                 parent->NextBlock = smtBlock;
-                System.Diagnostics.Debug.WriteLine($"Page: {(uint)smtBlock:X}");
 
             }
             else
@@ -378,7 +377,6 @@ namespace Cosmos.Core.Memory
 
             smtBlock->SpacesLeft = xItemCount;
             smtBlock->PagePtr = xPtr;
-            System.Diagnostics.Debug.WriteLine($"New Page: {smtBlock->SpacesLeft:X} {(uint)smtBlock->PagePtr:X} {(uint)smtBlock->NextBlock:X}");
         }
 
         /// <summary>
@@ -417,7 +415,6 @@ namespace Cosmos.Core.Memory
                     var heapObject = (ushort*)&page[i * elementSize];
                     heapObject[0] = aSize; // size of actual object being allocated
                     heapObject[1] = 1; // ref count just 1 for now
-                    System.Diagnostics.Debug.WriteLine($"Alloc: {(uint)&heapObject[2]:X} {(uint)pageBlock:X} {pageBlock->SpacesLeft}");
                     return (byte*)&heapObject[2];
 
                 }

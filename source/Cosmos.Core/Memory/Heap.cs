@@ -42,6 +42,16 @@ namespace Cosmos.Core.Memory
             }
         }
 
+        /// <summary>
+        /// Allocates memory and returns the pointer as uint
+        /// </summary>
+        /// <param name="aSize">Size of memory to allocate</param>
+        /// <returns></returns>
+        public static uint SafeAlloc(uint aSize)
+        {
+            return (uint)Alloc(aSize);
+        }
+
         // Keep as void* and not byte* or other. Reduces typecasting from callers
         // who may have typed the pointer to their own needs.
         /// <summary>
@@ -64,7 +74,7 @@ namespace Cosmos.Core.Memory
                 case RAT.PageType.HeapSmall:
                     HeapSmall.Free(aPtr);
                     break;
-
+                case RAT.PageType.HeapMedium:
                 case RAT.PageType.HeapLarge:
                     HeapLarge.Free(aPtr);
                     break;

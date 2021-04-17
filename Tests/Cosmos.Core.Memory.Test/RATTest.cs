@@ -8,6 +8,7 @@ namespace Cosmos.Core.Memory.Test
     public class MemoryTests
     {
 
+
         [TestMethod]
         public unsafe void InitTest()
         {
@@ -22,12 +23,29 @@ namespace Cosmos.Core.Memory.Test
                 uint xRatPages = RAT.GetPageCount(RAT.PageType.RAT);
                 Assert.IsTrue(xRatPages > 0);
 
-                var xFreePages = RAT.GetPageCount(RAT.PageType.Empty);
+                        var xFreePages = RAT.GetPageCount(RAT.PageType.Empty);
                 Assert.IsTrue(xFreePages > 0);
 
                 Assert.IsTrue(RAT.GetPageCount(RAT.PageType.HeapSmall) > 0);
 
                 Assert.AreEqual(0, HeapSmall.GetAllocatedObjectCount());
+            }
+        }
+
+        [TestMethod]
+        public unsafe void RATMethods()
+        {
+            var xRAM = new byte[1024 * 1024];
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+                var largePage = RAT.AllocPages(RAT.PageType.HeapLarge, 3);
+                Assert.AreEqual(RAT.PageType.HeapLarge, RAT.GetPageType(largePage));
+                Assert.AreEqual(RAT.GetFirstRAT(largePage), RAT.GetFirstRAT((byte*)largePage + 20));
+                Assert.AreEqual(RAT.PageType.HeapLarge, RAT.GetPageType((byte*)largePage + RAT.PageSize));
             }
         }
 
@@ -155,6 +173,43 @@ namespace Cosmos.Core.Memory.Test
                     }
                 }
                 Assert.AreEqual(1000, HeapSmall.GetAllocatedObjectCount());
+            }
+        }
+
+        [TestMethod]
+        public unsafe void MediumLargeHeapTest() // as long as medium just does the same as the large heap, we can test them together
+        {
+            var xRAM = new byte[1024 * 1024]; // 4 MB
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+                var largeCount = RAT.GetPageCount(RAT.PageType.HeapLarge);
+                var mediumCount = RAT.GetPageCount(RAT.PageType.HeapMedium);
+
+                var ptr1 = Heap.Alloc(HeapMedium.MaxItemSize); // this will allocate two pages,
+                                                               // since we simplify the math by assuming we never want only one full page
+                var ptr2 = Heap.Alloc(HeapMedium.MaxItemSize - 10);
+                var ptr3 = Heap.Alloc(HeapMedium.MaxItemSize + 10);
+
+                Assert.AreEqual(largeCount + 2, RAT.GetPageCount(RAT.PageType.HeapLarge));
+                Assert.AreEqual(mediumCount + 3, RAT.GetPageCount(RAT.PageType.HeapMedium));
+
+                var ptr4 = Heap.Alloc(RAT.PageSize * 5 - HeapLarge.PrefixBytes - 1);
+
+                Assert.AreEqual(largeCount + 7, RAT.GetPageCount(RAT.PageType.HeapLarge));
+                Assert.AreEqual(6, (int)RAT.GetPageCount(RAT.PageType.Extension));
+
+                Heap.Free(ptr4);
+                Assert.AreEqual(largeCount + 2, RAT.GetPageCount(RAT.PageType.HeapLarge));
+                Assert.AreEqual(2, (int)RAT.GetPageCount(RAT.PageType.Extension));
+
+                Heap.Free(ptr1);
+                Heap.Free(ptr2);
+
+                Assert.AreEqual(mediumCount, RAT.GetPageCount(RAT.PageType.HeapMedium));
+                Assert.AreEqual(largeCount + 2, RAT.GetPageCount(RAT.PageType.HeapLarge));
             }
         }
     }
