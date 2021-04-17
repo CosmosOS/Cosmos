@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cosmos.Core;
-using Cosmos.Core.Memory.Old;
 using Cosmos.HAL.BlockDevice.Registers;
 using Cosmos.Debug.Kernel;
 

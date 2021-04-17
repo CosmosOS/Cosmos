@@ -69,7 +69,7 @@ namespace Cosmos.Core.Memory
         /// <item>x86 Page Size: 4k, 2m (PAE only), 4m.</item>
         /// <item>x64 Page Size: 4k, 2m</item>
         /// </list></remarks>
-        public const Native PageSize = 4096;
+        public const uint PageSize = 4096;
 
         /// <summary>
         /// Start of area usable for heap, and also start of heap.
@@ -78,12 +78,12 @@ namespace Cosmos.Core.Memory
         /// <summary>
         /// Size of heap.
         /// </summary>
-        static private Native mRamSize;
+        static private uint mRamSize;
         /// <summary>
         /// Number of pages in the heap.
         /// </summary>
         /// <remarks>Calculated from mSize.</remarks>
-        static private Native mPageCount;
+        static private uint mPageCount;
 
         /// <summary>
         /// Pointer to the RAT.
@@ -102,13 +102,11 @@ namespace Cosmos.Core.Memory
         /// <item>RAM start or size is not page aligned.</item>
         /// </list>
         /// </exception>
-        static public void Init(byte* aStartPtr, Native aSize)
+        public static void Init(byte* aStartPtr, uint aSize)
         {
-       //     Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)aStartPtr);
-         //   Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)aSize);
-            if ((Native)aStartPtr % PageSize != 0 && !Debug)
+            if ((uint)aStartPtr % PageSize != 0 && !Debug)
             {
-                Cosmos.Debug.Kernel.Debugger.DoSendNumber(((Native)aStartPtr % PageSize));
+                Cosmos.Debug.Kernel.Debugger.DoSendNumber(((uint)aStartPtr % PageSize));
                 Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
                 throw new Exception("RAM start must be page aligned.");
             }
@@ -127,18 +125,16 @@ namespace Cosmos.Core.Memory
             // We need one status byte for each block.
             // Intel blocks are 4k (10 bits). So for 4GB, this means
             // 32 - 12 = 20 bits, 1 MB for a RAT for 4GB. 0.025%
-            Native xRatPageCount = (mPageCount - 1) / PageSize + 1;
-            Native xRatTotalSize = xRatPageCount * PageSize;
+            uint xRatPageCount = (mPageCount - 1) / PageSize + 1;
+            uint xRatTotalSize = xRatPageCount * PageSize;
             mRAT = mRamStart + mRamSize - xRatTotalSize;
-        /*    Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)mRAT);
-            Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)mRamStart);
-            Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)PageSize);
-            Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xRatTotalSize);
-            Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xRatPageCount);*/
+
+            // Mark empty pages as such in the RAT Table
             for (byte* p = mRAT; p < mRAT + xRatTotalSize - xRatPageCount; p++)
             {
                 *p = PageType.Empty;
             }
+            // Mark the rat pages as such
             for (byte* p = mRAT + xRatTotalSize - xRatPageCount; p < mRAT + xRatTotalSize; p++)
             {
                 *p = PageType.RAT;
@@ -151,23 +147,21 @@ namespace Cosmos.Core.Memory
         /// Get page count.
         /// </summary>
         /// <param name="aType">A page type to count.</param>
-        /// <returns>Native value.</returns>
-        static public Native GetPageCount(byte aType = 0)
+        /// <returns>Number of pages of this type including extension pages</returns>
+        public static uint GetPageCount(byte aType = 0)
         {
-            Native xResult = 0;
-            byte xType = 0; // Could us nullable type instead of this + xCounting, but this is faster.
+            uint xResult = 0;
             bool xCounting = false;
             for (byte* p = mRAT; p < mRAT + mPageCount; p++)
             {
                 if (*p == aType)
                 {
-                    xType = *p;
                     xResult++;
                     xCounting = true;
                 }
                 else if (xCounting)
                 {
-                    if (xType == PageType.Extension)
+                    if (*p == PageType.Extension)
                     {
                         xResult++;
                     }
@@ -181,81 +175,26 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Alloc a block with a given type and size.
-        /// </summary>
-        /// <param name="aType">A type of block to alloc.</param>
-        /// <param name="aBytes">Number of bytes to alloc.</param>
-        /// <returns>A pointer to the first page on success, null on failure.</returns>
-        static public void* AllocBytes(byte aType, Native aBytes,bool debug = false)
-        {
-            void* retVal;
-           // if (aBytes / PageSize == 0)
-             //   retVal = AllocPages(aType, aBytes / PageSize + 1, debug);
-            //else
-                retVal = AllocPages(aType, aBytes / PageSize, debug);
-
-            return retVal;
-        }
-
-        /// <summary>
         /// Alloc a given number of pages, all of the same type.
         /// </summary>
         /// <param name="aType">A type of pages to alloc.</param>
         /// <param name="aPageCount">Number of pages to alloc. (default = 1)</param>
         /// <returns>A pointer to the first page on success, null on failure.</returns>
-        public static uint res;
-        public static uint pp;
-        static public void* AllocPages(byte aType, Native aPageCount = 1, bool debug = false)
+        public static void* AllocPages(byte aType, uint aPageCount = 1)
         {
-            if (debug)
-            {
-                if (aPageCount == 0)
-                {
-                    Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
-                    Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x102);
-                }
-            }
-            if (aPageCount == 0)
-            {
-                Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
-                Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x101);
-            }
             byte* xPos = null;
-        //    Cosmos.Debug.Kernel.Debugger.DoSendNumber(aPageCount);
-          //  Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)aType);
-           // Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
-            //Cosmos.Debug.Kernel.Debugger.DoSendNumber(0x101);
             // Could combine with an external method or delegate, but will slow things down
             // unless we can force it to be inlined.
-            //
             // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
-            Native xCount = 0;
+            uint xCount = 0;
             if (aPageCount == 1)
             {
-
-                //FIXME: We should probably use Memory.Fill in the future to be more efficient
-                //Cosmos.Debug.Kernel.Debugger.DoSendNumber(5);
                 for (byte* p = mRAT; p < mRAT + mPageCount; p++)
                 {
-
-                    pp = (uint)p;
-                  //  Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)p);
                     if (*p == PageType.Empty)
                     {
-                      //  Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)*p);
-                        xCount++;
-                        if (xCount == aPageCount)
-                        {
-                        //    Cosmos.Debug.Kernel.Debugger.DoSendNumber(xCount);
-                         //   Cosmos.Debug.Kernel.Debugger.DoSendNumber(aPageCount);
-                            xPos = p - xCount + 1;
-                            break;
-                        }
-                    }
-                    else
-                    {
-            //            Cosmos.Debug.Kernel.Debugger.DoSendNumber(9);
-                        xCount = 0;
+                        xPos = p;
+                        break;
                     }
                 }
             }
@@ -265,25 +204,16 @@ namespace Cosmos.Core.Memory
                 // so we don't bother to account for such a case. xPos would also have issues.
                 for (byte* p = mRAT + mPageCount - 1; p >= mRAT; p--)
                 {
-                  //  Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)p);
                     if (*p == PageType.Empty)
                     {
-                        //    Cosmos.Debug.Kernel.Debugger.DoSendNumber(100);
-                //        Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)mRAT);
-                  //      Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)*p);
-                    //    Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xPos);
-                        
-                        xCount++;
-                        if (xCount == aPageCount)
+                        if (++xCount == aPageCount)
                         {
-                         //   Cosmos.Debug.Kernel.Debugger.DoSendNumber(12);
                             xPos = p;
                             break;
                         }
                     }
                     else
                     {
-                        //Cosmos.Debug.Kernel.Debugger.DoSendNumber(13);
                         xCount = 0;
                     }
                 }
@@ -292,28 +222,16 @@ namespace Cosmos.Core.Memory
             // If we found enough space, mark it as used.
             if (xPos != null)
             {
-                //Cosmos.Debug.Kernel.Debugger.DoSendNumber(14);
-                byte* xResult = mRamStart + (xPos - mRAT) * PageSize;
-                res = (uint)xResult;
+                var diff = xPos - mRAT;
+                byte* xResult = mRamStart + diff * PageSize;
                 *xPos = aType;
-            //    Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xResult);
-                Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xPos);
                 for (byte* p = xPos + 1; p < xPos + xCount; p++)
                 {
                     *p = PageType.Extension;
                 }
-                //Cosmos.Debug.Kernel.Debugger.DoSendNumber(16);
                 return xResult;
             }
-            /*  Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)res);
-              Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)mRAT);
-              Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xPos);
-              Cosmos.Debug.Kernel.Debugger.DoBochsBreak();*/
-            if (aPageCount == 0)
-            {
-                Cosmos.Debug.Kernel.Debugger.DoSend("No Pages available, the RAT has chewed the wires (i.e This shouldnt happen)");
-                Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x06);
-            }
+
             return null;
            
         }
@@ -324,27 +242,32 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr">A pointer to the block.</param>
         /// <returns>Native value.</returns>
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
-        static public Native GetFirstRAT(void* aPtr)
+        public static uint GetFirstRAT(void* aPtr)
         {
-            var xPos = (Native)((byte*)aPtr - mRamStart) / RAT.PageSize;
+            var xPos = (uint)((byte*)aPtr - mRamStart) / RAT.PageSize;
             // See note about when mRAT = 0 in Alloc.
             for (byte* p = mRAT + xPos; p >= mRAT; p--)
             {
                 if (*p != PageType.Extension)
                 {
-                    return (Native)(p - mRAT);
+                    return (uint)(p - mRAT);
                 }
             }
             throw new Exception("Page type not found. Likely RAT is rotten.");
         }
 
+        public static byte* GetPagePtr(void* aPtr)
+        {
+            return (byte*)aPtr - ((byte*)aPtr - mRamStart) % RAT.PageSize;
+        }
+
         /// <summary>
-        /// Get the page type pointed by a pointer.
+        /// Get the page type pointed by a pointer to the RAT entry.
         /// </summary>
         /// <param name="aPtr">A pointer to the page to get the type of.</param>
         /// <returns>byte value.</returns>
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
-        static public byte GetPageType(void* aPtr)
+        public static byte GetPageType(void* aPtr)
         {
             return mRAT[GetFirstRAT(aPtr)];
         }
@@ -353,13 +276,13 @@ namespace Cosmos.Core.Memory
         /// Free page.
         /// </summary>
         /// <param name="aPageIdx">A index to the page to be freed.</param>
-        static public void Free(Native aPageIdx)
+        public static void Free(uint aPageIdx)
         {
             byte* p = mRAT + aPageIdx;
             *p = PageType.Empty;
-            for (; p < mRAT + mPageCount; p++)
+            for (; p < mRAT + mPageCount; )
             {
-                if (*p != PageType.Extension)
+                if (*++p != PageType.Extension)
                 {
                     break;
                 }

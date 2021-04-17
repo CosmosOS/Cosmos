@@ -6,6 +6,7 @@ using ApprovalTests.Reporters;
 
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.IPv4;
+using Cosmos.System.Network.ARP;
 
 namespace Cosmos.System.Tests
 {
