@@ -118,11 +118,13 @@ namespace Cosmos.System.Graphics
         /// <param name="y">Y coordinate.</param>
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
         public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
         {
-            throw new NotImplementedException();
-            //xSVGAIIDriver.
+            for (int i = 0; i < aWidth * aHeight; i++)
+            {
+                int xx = aX + (i % aWidth), yy = aY + (i / aWidth);
+                DrawPoint(new Pen(aColors[i]), xx, yy);
+            }
         }
 
         /// <summary>
@@ -132,11 +134,9 @@ namespace Cosmos.System.Graphics
         /// <param name="pen">Pen to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        /// <exception cref="NotImplementedException">Thrown always (only int coordinates supported).</exception>
         public override void DrawPoint(Pen aPen, float aX, float aY)
         {
-            //xSVGAIIDriver.
-            throw new NotImplementedException();
+            DrawPoint(aPen, (int)aX, (int)aY);
         }
 
         /// <summary>

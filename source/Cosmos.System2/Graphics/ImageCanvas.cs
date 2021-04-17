@@ -32,7 +32,7 @@ namespace Cosmos.System.Graphics
         private Mode mode;
 
         // stores position of drawn image
-        private Point drawPoint;
+        private Point drawPoint = new Point(0, 0);
 
         /// <summary>
         /// Create a new image canvas with default properties(32x32x32)
@@ -107,6 +107,16 @@ namespace Cosmos.System.Graphics
         /// </summary>
         public override void Display()
         {
+            drawPoint.X = 0; drawPoint.Y = 0;
+            FullScreenCanvas.GetFullScreenCanvas().DrawArray(RawData, drawPoint, mode.Columns, mode.Rows);
+        }
+
+        /// <summary>
+        /// Display the image canvas onto active fullscreen canvas with specified position
+        /// </summary>
+        public void Display(int x, int y)
+        {
+            drawPoint.X = x; drawPoint.Y = y;
             FullScreenCanvas.GetFullScreenCanvas().DrawArray(RawData, drawPoint, mode.Columns, mode.Rows);
         }
 
