@@ -139,7 +139,7 @@ namespace Cosmos.Core.Memory
             {
                 *p = PageType.RAT;
             }
-            CPU.ZeroFill((uint)aStartPtr, (uint)mRAT);
+            CPU.ZeroFill((uint)aStartPtr, aSize);
             Heap.Init();
         }
 
@@ -231,10 +231,11 @@ namespace Cosmos.Core.Memory
                     *p = PageType.Extension;
                 }
             
-                Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xResult);
+              //  Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xResult);
                 return xResult;
             }
-
+            Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
+            Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x400);
             return null;
            
         }

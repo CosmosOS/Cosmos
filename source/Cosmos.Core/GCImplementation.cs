@@ -81,7 +81,7 @@ namespace Cosmos.Core
            
             byte* memPtr = (byte*)CPU.GetEndOfKernel();
             memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
-            Memory.RAT.Init(memPtr,(128 * 1024 * 1024));
+            Memory.RAT.Init(memPtr,(512 * 1024 * 1024));
             
         }
 
