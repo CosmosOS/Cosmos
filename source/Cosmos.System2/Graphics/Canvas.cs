@@ -516,7 +516,7 @@ namespace Cosmos.System.Graphics
             {
                 for (byte cx = 0; cx < font.Width; cx++)
                 {
-                    if (font.ConvertByteToBitAddress(font.Data[p + cy], cx + 1))
+                    if (font.ConvertByteToBitAddres(font.Data[p + cy], cx + 1))
                     {
                         DrawPoint(x + (font.Width - cx), y + cy, color);
                     }
@@ -550,7 +550,7 @@ namespace Cosmos.System.Graphics
             {
                 for (byte cx = 0; cx < font.Width; cx++)
                 {
-                    if (font.ConvertByteToBitAddress(font.Data[p + cy], cx + 1))
+                    if (font.ConvertByteToBitAddres(font.Data[p + cy], cx + 1))
                     { DrawPoint(x + (font.Width - cx), y + cy, color); } else { DrawPoint(x + (font.Width - cx), y + cy, backColor); } 
                 }
             }
