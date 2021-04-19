@@ -114,6 +114,8 @@ namespace Cosmos.Core.Memory
         private static RootSMTBlock* GetFirstBlock(SMTPage* aPage, uint aSize)
         {
             RootSMTBlock* ptr = aPage->First;
+            //Debug.Kernel.Debugger.DoSendNumber((uint)aPage);
+            //Debug.Kernel.Debugger.DoSendNumber((uint)ptr);
             uint curSize = ptr->Size;
             while (curSize < aSize)
             {
@@ -214,7 +216,7 @@ namespace Cosmos.Core.Memory
         private static void AddRootSMTBlock(SMTPage* aPage, uint aSize)
         {
             RootSMTBlock* ptr = aPage->First;
-
+          //  Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
             while (ptr->LargerSize != null)
             {
                 ptr = ptr->LargerSize;
@@ -236,8 +238,9 @@ namespace Cosmos.Core.Memory
             else
             {
                 var block = (RootSMTBlock*)NextFreeBlock(aPage);    // we should actually check that this is not null
-                                                                //but we should also only call this code right at the beginning so it should be fine
+                                                               //but we should also only call this code right at the beginning so it should be fine
                 block->Size = aSize;
+                Debugger.DoSendNumber((uint)block);
                 ptr->LargerSize = block;
             }
             CreatePage(aPage, aSize);
@@ -274,6 +277,7 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown on fatal error, contact support.</exception>
         static public void Init()
         {
+          //  Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
             //TODO Adjust for new page and header sizes 
             // 4 slots, ~1k ea
             uint xMaxItemSize = RAT.PageSize / 4 - PrefixItemBytes;

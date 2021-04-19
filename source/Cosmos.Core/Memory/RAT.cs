@@ -140,7 +140,7 @@ namespace Cosmos.Core.Memory
             {
                 *p = PageType.RAT;
             }
-
+            CPU.ZeroFill((uint)aStartPtr, aSize);
             Heap.Init();
         }
 
@@ -184,6 +184,7 @@ namespace Cosmos.Core.Memory
         public static void* AllocPages(byte aType, uint aPageCount = 1)
         {
             byte* xPos = null;
+            
             // Could combine with an external method or delegate, but will slow things down
             // unless we can force it to be inlined.
             // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
@@ -230,10 +231,14 @@ namespace Cosmos.Core.Memory
                 {
                     *p = PageType.Extension;
                 }
+            
+              //  Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xResult);
                 return xResult;
             }
-
-            return null;       
+            Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
+            Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x400);
+            return null;
+           
         }
 
         /// <summary>

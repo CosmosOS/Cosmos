@@ -1,4 +1,6 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Cosmos.HAL;
 using static Cosmos.HAL.VGADriver;
 
@@ -7,7 +9,7 @@ namespace Cosmos.System.Graphics
     /// <summary>
     /// VGAScreen class. Used to control VGA textmode.
     /// </summary>
-    public class VGAScreen
+    public class VGATextMode
     {
         private static readonly VGADriver _Screen = new VGADriver();
 
@@ -63,7 +65,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown when font height > 32.</exception>
         public static void SetFont(byte[] fontData, int fontHeight)
         {
-            if(fontHeight > 32)
+            if (fontHeight > 32)
             {
                 throw new ArgumentOutOfRangeException("fontHeight");
             }
