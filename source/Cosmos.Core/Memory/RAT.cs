@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 using Native = System.UInt32;
 
 namespace Cosmos.Core.Memory
@@ -130,12 +131,12 @@ namespace Cosmos.Core.Memory
             mRAT = mRamStart + mRamSize - xRatTotalSize;
 
             // Mark empty pages as such in the RAT Table
-            for (byte* p = mRAT; p < mRAT + xRatTotalSize - xRatPageCount; p++)
+            for (byte* p = mRAT; p < mRAT + mPageCount - xRatPageCount; p++)
             {
                 *p = PageType.Empty;
             }
             // Mark the rat pages as such
-            for (byte* p = mRAT + xRatTotalSize - xRatPageCount; p < mRAT + xRatTotalSize; p++)
+            for (byte* p = mRAT + mPageCount - xRatPageCount; p < mRAT + xRatTotalSize; p++)
             {
                 *p = PageType.RAT;
             }
@@ -232,8 +233,7 @@ namespace Cosmos.Core.Memory
                 return xResult;
             }
 
-            return null;
-           
+            return null;       
         }
 
         /// <summary>
