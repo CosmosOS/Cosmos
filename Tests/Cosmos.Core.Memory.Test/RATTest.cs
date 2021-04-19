@@ -29,6 +29,8 @@ namespace Cosmos.Core.Memory.Test
                 Assert.IsTrue(RAT.GetPageCount(RAT.PageType.HeapSmall) > 0);
 
                 Assert.AreEqual(0, HeapSmall.GetAllocatedObjectCount());
+
+                Assert.AreEqual((uint)1, RAT.GetPageCount(RAT.PageType.RAT));
             }
         }
 
@@ -210,6 +212,47 @@ namespace Cosmos.Core.Memory.Test
 
                 Assert.AreEqual(mediumCount, RAT.GetPageCount(RAT.PageType.HeapMedium));
                 Assert.AreEqual(largeCount + 2, RAT.GetPageCount(RAT.PageType.HeapLarge));
+            }
+        }
+
+        unsafe void FillRandomy(byte* ptr, uint aSize) // fake new obj and fill object with something
+        {
+            Random random = new Random();
+            for (int i = 0; i < aSize; i++)
+            {
+                ptr[i] = (byte)random.Next(16, 32);
+            }
+        }
+
+        [TestMethod]
+        public unsafe void TestAllocPages() // ensure that we fail gracefully when memory gets full
+        {
+            var xRAM = new byte[10 * RAT.PageSize]; // 10 Pages - 1 for RAT and 9 for values
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+                RAT.Init(xPtr, (uint)xRAM.Length);
+                Assert.AreEqual((uint)1, RAT.GetPageCount(RAT.PageType.RAT));
+
+                try
+                {
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        byte* ptr = Heap.Alloc(40);
+                        FillRandomy(ptr, 40);
+                        if (ptr == null)
+                        {
+                            Assert.Fail();
+                        }
+                        Assert.AreEqual(1, RAT.GetPageCount(RAT.PageType.RAT));
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Assert.AreEqual("137", e.Message);
+                }
+
             }
         }
     }
