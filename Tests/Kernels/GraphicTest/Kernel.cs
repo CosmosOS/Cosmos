@@ -3,7 +3,6 @@ using Sys = Cosmos.System;
 using Cosmos.TestRunner;
 using Cosmos.System.Graphics;
 using System.Drawing;
-using Point = Cosmos.System.Graphics.Point;
 using System.IO;
 using Cosmos.Compiler.Tests.Bcl;
 using Cosmos.System.Graphics.Fonts;
