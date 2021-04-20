@@ -395,7 +395,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <returns>The size of the largest block in bytes</returns>
 
-        private static unsafe RawMemoryMapBlock* GetLargestMemoryBlock()
+        public static unsafe RawMemoryMapBlock* GetLargestMemoryBlock()
         {
             if (!MemoryMapExists())
             {
