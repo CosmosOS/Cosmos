@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -385,6 +386,59 @@ namespace Cosmos.Core
                 };
             }
             return entireMap;
+        }
+
+        /// <summary>
+        /// Returns a pointer to the largest continuous block of free ram
+        /// DOES NOT ALLOCATE ANYTHING so it can be used before Memory Management is initalised
+        /// </summary>
+        /// <returns></returns>
+        public static unsafe byte* GetLargestMemoryBlockStart()
+        {
+            var bestBlock = GetLargestMemoryBlock();
+
+            return (byte*)(bestBlock->HighBaseAddr << 32 | bestBlock->LowBaseAddr);
+        }
+
+        /// <summary>
+        /// Returns the size of largest continuous block of free ram
+        /// DOES NOT ALLOCATE ANYTHING so it can be used before Memory Management is initalised
+        /// </summary>
+        /// <returns>The size of the largest block in bytes</returns>
+        public static unsafe uint GetLargestMemoryBlockSizet()
+        {
+            var bestBlock = GetLargestMemoryBlock();
+
+            return bestBlock->HighLength << 32 | bestBlock->LowLength;
+        }
+
+        private static unsafe RawMemoryMap* GetLargestMemoryBlock()
+        {
+            if (!MemoryMapExists())
+            {
+                Debugger.SendKernelPanic(0x80);
+                while (true) { }
+            }
+            var currentMap = (RawMemoryMap*)Bootstrap.MultibootHeader->memMapAddress;
+            RawMemoryMap* bestMap = null;
+            var bestSize = 0;
+            while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength))
+            {
+                currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4) >> 2)); //The size is in bits, not bytes
+                if (currentMap->Size == 0)
+                {
+                    break;
+                }
+                if (currentMap->Type == 1) // Usable ram
+                {
+                    if (currentMap->Size > bestSize)
+                    {
+                        bestMap = currentMap;
+                    }
+                }
+            }
+
+            return bestMap;
         }
     }
 
