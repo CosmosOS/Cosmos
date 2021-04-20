@@ -350,19 +350,19 @@ namespace Cosmos.Core
         /// Get the Memory Map Information from Multiboot
         /// </summary>
         /// <returns>Returns an array of MemoryMaps containing the Multiboot Memory Map information. The array may have empty values at the end.</returns>
-        public static unsafe MemoryMap[] GetMemoryMap()
+        public static unsafe MemoryMapBlock[] GetMemoryMap()
         {
             if (!MemoryMapExists())
             {
                 throw new Exception("No Memory Map was returned by Multiboot");
             }
-            var rawMap = new RawMemoryMap[64];
-            var currentMap = (RawMemoryMap*)Bootstrap.MultibootHeader->memMapAddress;
+            var rawMap = new RawMemoryMapBlock[64];
+            var currentMap = (RawMemoryMapBlock*)Bootstrap.MultibootHeader->memMapAddress;
             int counter = 0;
             while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength) && counter < 64)
             {
                 rawMap[counter++] = *currentMap;
-                currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes
+                currentMap = (RawMemoryMapBlock*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes
                 if (currentMap->Size == 0)
                 {
                     break;
@@ -374,14 +374,15 @@ namespace Cosmos.Core
                 throw new Exception("Memory Map returned too many segments");
             }
 
-            var entireMap = new MemoryMap[counter];
+            var entireMap = new MemoryMapBlock[counter];
             for (int i = 0; i < counter; i++)
             {
                 var rawMemoryMap = rawMap[i];
-                entireMap[i] = new MemoryMap
+
+                entireMap[i] = new MemoryMapBlock
                 {
-                    Address = (ulong)rawMemoryMap.HighBaseAddr << 32 | rawMemoryMap.LowBaseAddr,
-                    Length = (ulong)rawMemoryMap.HighLength << 32 | rawMemoryMap.LowLength,
+                    Address = rawMemoryMap.BaseAddr,
+                    Length = rawMemoryMap.Length * 1024,
                     Type = rawMemoryMap.Type
                 };
             }
@@ -389,50 +390,33 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Returns a pointer to the largest continuous block of free ram
-        /// DOES NOT ALLOCATE ANYTHING so it can be used before Memory Management is initalised
-        /// </summary>
-        /// <returns></returns>
-        public static unsafe byte* GetLargestMemoryBlockStart()
-        {
-            var bestBlock = GetLargestMemoryBlock();
-
-            return (byte*)(bestBlock->HighBaseAddr << 32 | bestBlock->LowBaseAddr);
-        }
-
-        /// <summary>
-        /// Returns the size of largest continuous block of free ram
+        /// Returns a pointer size of largest continuous block of free ram
         /// DOES NOT ALLOCATE ANYTHING so it can be used before Memory Management is initalised
         /// </summary>
         /// <returns>The size of the largest block in bytes</returns>
-        public static unsafe uint GetLargestMemoryBlockSizet()
-        {
-            var bestBlock = GetLargestMemoryBlock();
 
-            return bestBlock->HighLength << 32 | bestBlock->LowLength;
-        }
-
-        private static unsafe RawMemoryMap* GetLargestMemoryBlock()
+        private static unsafe RawMemoryMapBlock* GetLargestMemoryBlock()
         {
             if (!MemoryMapExists())
             {
                 Debugger.SendKernelPanic(0x80);
                 while (true) { }
             }
-            var currentMap = (RawMemoryMap*)Bootstrap.MultibootHeader->memMapAddress;
-            RawMemoryMap* bestMap = null;
-            var bestSize = 0;
+            var currentMap = (RawMemoryMapBlock*)Bootstrap.MultibootHeader->memMapAddress;
+            RawMemoryMapBlock* bestMap = null;
+            ulong bestSize = 0;
             while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength))
             {
-                currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4) >> 2)); //The size is in bits, not bytes
+                currentMap = (RawMemoryMapBlock*)((uint*)currentMap + ((currentMap->Size + 4) >> 2)); //The size is in bits, not bytes
                 if (currentMap->Size == 0)
                 {
                     break;
                 }
                 if (currentMap->Type == 1) // Usable ram
                 {
-                    if (currentMap->Size > bestSize)
+                    if (currentMap->Length > bestSize)
                     {
+                        bestSize = currentMap->Length;
                         bestMap = currentMap;
                     }
                 }
@@ -442,7 +426,7 @@ namespace Cosmos.Core
         }
     }
 
-    public class MemoryMap
+    public class MemoryMapBlock
     {
         /// <summary>
         /// Base Address of the memory region
@@ -459,7 +443,7 @@ namespace Cosmos.Core
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 24)]
-    public struct RawMemoryMap
+    public struct RawMemoryMapBlock
     {
         /// <summary>
         /// Size of this entry
@@ -467,25 +451,15 @@ namespace Cosmos.Core
         [FieldOffset(0)]
         public uint Size;
         /// <summary>
-        /// Low 32 bits of the base address
+        /// Base address
         /// </summary>
         [FieldOffset(4)]
-        public uint LowBaseAddr;
-        /// <summary>
-        /// High 32 bits of the base address
-        /// </summary>
-        [FieldOffset(8)]
-        public uint HighBaseAddr;
-        /// <summary>
-        /// Low 32 bits of the length of memory block in bytes
-        /// </summary>
+        public ulong BaseAddr;
         [FieldOffset(12)]
-        public uint LowLength;
         /// <summary>
-        /// High 32 bits of the length of memory block in bytes
+        /// Length of memory block in kilobytes
         /// </summary>
-        [FieldOffset(16)]
-        public uint HighLength;
+        public uint Length;
         /// <summary>
         /// Type of memory area, 1 if usable RAM, everything else unusable.
         /// </summary>
