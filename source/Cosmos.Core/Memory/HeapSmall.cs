@@ -361,6 +361,8 @@ namespace Cosmos.Core.Memory
                 smtBlock = NextFreeBlock();
                 if (smtBlock == null)
                 {
+                    Debugger.DoSendNumber((uint)smtBlock);
+                    Debugger.DoSendNumber(0x999);
                     Debugger.SendKernelPanic(0x93);
                     while (true) { };
                 }

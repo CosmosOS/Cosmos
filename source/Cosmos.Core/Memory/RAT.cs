@@ -236,8 +236,8 @@ namespace Cosmos.Core.Memory
               //  Cosmos.Debug.Kernel.Debugger.DoSendNumber((uint)xResult);
                 return xResult;
             }
-            Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
-            Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x400);
+           // Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
+            //Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x400);
             return null;
            
         }
