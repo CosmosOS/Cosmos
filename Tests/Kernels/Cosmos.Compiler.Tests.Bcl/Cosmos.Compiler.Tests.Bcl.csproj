@@ -2,15 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <DebugType>embedded</DebugType>
         <Platform>cosmos</Platform>
         <SupportsX86Intrinsics>false</SupportsX86Intrinsics>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <NoWarn>CA2242;$(NoWarn)</NoWarn>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <PlatformTarget>x86</PlatformTarget>
-        <!--If we dont specify this we can accidently load x64 assemblies which has slight difference in paddings for example in RawArrayData-->
     </PropertyGroup>
 
     <ItemGroup>

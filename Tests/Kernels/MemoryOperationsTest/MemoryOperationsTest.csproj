@@ -4,10 +4,6 @@
         <TargetFramework>net5.0</TargetFramework>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <PlatformTarget>x86</PlatformTarget>
-        <!--If we dont specify this we can accidently load x64 assemblies which has slight difference in paddings for example in RawArrayData-->
-    </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
         <ProjectReference Include="..\..\..\source\Cosmos.System2\Cosmos.System2.csproj" />

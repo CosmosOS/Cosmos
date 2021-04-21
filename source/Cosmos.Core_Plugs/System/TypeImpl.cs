@@ -14,7 +14,7 @@ namespace Cosmos.Core_Plugs.System
         [PlugMethod(Signature = "System_RuntimeTypeHandle__System_Type_get_Typehandle")]
         public static RuntimeTypeHandle get_TypeHandle(CosmosRuntimeType aThis)
         {
-            
+            return new();
         }
 
         [PlugMethod(Signature = "System_Type__System_Type_GetTypeFromHandle_System_RuntimeTypeHandle_")]
