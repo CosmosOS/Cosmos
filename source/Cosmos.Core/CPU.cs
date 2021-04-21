@@ -1,4 +1,4 @@
-//#define COSMOSDEBUG
+#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -343,6 +343,11 @@ namespace Cosmos.Core
         /// <returns></returns>
         public static unsafe bool MemoryMapExists()
         {
+            if (Bootstrap.MultibootHeader == null)
+            {
+                Bootstrap.MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
+            }
+         //   return false;
             return (Bootstrap.MultibootHeader->Flags & 1 << 6) == 64;
         }
 

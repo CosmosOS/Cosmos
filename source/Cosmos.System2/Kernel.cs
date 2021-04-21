@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define COSMOSDEBUG
+using System;
 using sysIO = System.IO;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
@@ -69,6 +70,8 @@ namespace Cosmos.System
         {
             try
             {
+                //We cannot use string before we initiated Memory so no strings before this please.
+         
                 Global.mDebugger.Send("Starting kernel");
                 if (mStarted)
                 {
@@ -77,13 +80,9 @@ namespace Cosmos.System
                 }
                 mStarted = true;
 
-                if (string.Empty == null)
-                {
-                    throw new Exception("Compiler didn't initialize System.String.Empty!");
-                }
-
                 Global.mDebugger.Send("HW Bootstrap Init");
-                HAL.Bootstrap.Init();
+               
+                
 
                 Global.mDebugger.Send("Global Init");
                 Global.Init(GetTextScreen());
@@ -157,6 +156,7 @@ namespace Cosmos.System
         /// </summary>
         public Kernel()
         {
+            HAL.Bootstrap.Init();
             Global.mDebugger.Send("In Cosmos.System.Kernel..ctor");
         }
 

@@ -11,6 +11,8 @@ namespace Cosmos.Core
         // See note in Global - these are a "hack" for now so
         // we dont force static init of Global, and it "pulls" these later till
         // we eventually eliminate them
+
+
         /// <summary>
         /// PIC interrupt.
         /// </summary>
@@ -20,7 +22,6 @@ namespace Cosmos.Core
         /// CPU.
         /// </summary>
         static public readonly CPU CPU = new CPU();
-
         /// <summary>
         /// Multiboot header pointer.
         /// </summary>
@@ -44,6 +45,9 @@ namespace Cosmos.Core
         /// </summary>
         public static void Init()
         {
+            // Call this early so we can get a memorymap for the MemoryManagement in GCImplementation
+            MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
+            Debug.Kernel.Debugger.DoSendNumber(0x6000);
             // Drag this stuff in to the compiler manually until we add the always include attrib
             INTs.Dummy();
 
@@ -61,7 +65,7 @@ namespace Cosmos.Core
              */
             CPU.InitFloat();
 
-            MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
+            
 
             modeinfo = (Core.VBE.ModeInfo*)MultibootHeader->vbeModeInfo;
             controllerinfo = (Core.VBE.ControllerInfo*)MultibootHeader->vbeControlInfo;

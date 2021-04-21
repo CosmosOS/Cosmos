@@ -1,5 +1,5 @@
 #if DEBUG
-//#define GC_DEBUG
+#define GC_DEBUG
 #endif
 using System;
 using System.Diagnostics;
@@ -13,9 +13,11 @@ namespace Cosmos.Core
     /// </summary>
     /// <remarks>Most of the class is yet to be implemented.</remarks>
     [DebuggerStepThrough]
-    public static class GCImplementation
+    public unsafe static class GCImplementation
     {
         private static bool isInitialized;
+        private unsafe static byte* memPtr = null;
+        private static uint memLength = 0;
         /// <summary>
         /// Acquire lock. Not implemented.
         /// </summary>
@@ -39,20 +41,27 @@ namespace Cosmos.Core
         /// </summary>
         public unsafe static uint AllocNewObject(uint aSize)
         {
-
-
-                if (!isInitialized)
-                {
-                isInitialized = true;
-                Init();
-                return (uint)Memory.Heap.Alloc(aSize);
-            }
-           
-            else
+            // Debug.Kernel.Debugger.DoBochsBreak();
+            //Debug.Kernel.Debugger.DoSendNumber((uint)CPU.GetLargestMemoryBlock());
+            //Debug.Kernel.Debugger.DoSendNumber((uint)CPU.GetLargestMemoryBlock()->Length * 1024);
+            //Debug.Kernel.Debugger.DoSendNumber((uint)CPU.GetLargestMemoryBlock()->BaseAddr);
+            //Debug.Kernel.Debugger.DoSendNumber((uint)Bootstrap.MultibootHeader->memMapAddress);
+            //Debug.Kernel.Debugger.DoBochsBreak();
+            /* if (!isInitialized)
+             {
+                 isInitialized = true;
+                 Init();
+             }*/
+            if (isInitialized)
             {
                 return (uint)Memory.Heap.Alloc(aSize);
             }
-
+            else
+            {
+                //We really shouldnt be here, something bad happened uh oh
+                Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x99999);
+                return 0;
+            }
         }
 
         /// <summary>
@@ -77,11 +86,30 @@ namespace Cosmos.Core
 
         public static unsafe void Init()
         {
-
-           
-            byte* memPtr = (byte*)CPU.GetEndOfKernel();
-            memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
-            Memory.RAT.Init(memPtr,(100 * Memory.RAT.PageSize));
+            if(CPU.MemoryMapExists())
+            {
+                var block = CPU.GetLargestMemoryBlock();
+                Debug.Kernel.Debugger.DoSendNumber((uint)block);
+                memPtr = (byte*)block->BaseAddr;
+                memLength = block->Length * 1024;
+                if((uint)memPtr < (uint)CPU.GetEndOfKernel() + 1024)
+                {
+                    memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
+                    memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
+                    memLength = block->Length * 1024 - ((uint)memPtr - (uint)block->BaseAddr);
+                    memLength += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
+                }
+            }
+            else
+            {
+                memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
+                memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
+                memLength = (128 * 1024 * 1024);
+            }
+            Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
+            Debug.Kernel.Debugger.DoSendNumber(memLength);
+            Memory.RAT.Init(memPtr,memLength);
+            isInitialized = true;
             
         }
 
