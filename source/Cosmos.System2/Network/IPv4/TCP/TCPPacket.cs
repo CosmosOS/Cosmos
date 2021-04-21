@@ -44,8 +44,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         public bool PSH;
         public bool RST;
 
-        
-
         internal static void TCPHandler(byte[] packetData)
         {
             var packet = new TCPPacket(packetData);
@@ -269,58 +267,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             get { return sequenceNumber; }
         }
+        internal int TCPFlags
+        {
+            get { return flags; }
+        }
 
         public override string ToString()
         {
             return "TCP Packet Src=" + SourceIP + ":" + sourcePort + ", Dest=" + DestinationIP + ":" + destinationPort;
-        }
-    }
-
-    public class TCPacketSyn : TCPPacket
-    {
-        /// <summary>
-        /// Work around to make VMT scanner include the initFields method
-        /// </summary>
-        public static void VMTInclude()
-        {
-            new TCPacketSyn();
-        }
-
-        internal TCPacketSyn()
-            : base()
-        { }
-
-        public TCPacketSyn(Address Source, Address Destination, ushort SourcePort,
-            ushort DestinationPort, ulong SequenceNumber, ulong ACKNumber,
-            ushort Flags, ushort WSValue, List<TCPOption> options, ushort optionslen)
-            : base(Source, Destination, SourcePort, DestinationPort, SequenceNumber,
-                  ACKNumber, 0x50, Flags, WSValue, 0x0000, optionslen)
-        {
-            int counter = 0;
-            foreach (var option in options)
-            {
-                RawData[DataOffset + 20 + counter] = option.Kind;
-
-                if (option.Kind != 1) //NOP
-                {
-                    RawData[DataOffset + 20 + counter + 1] = option.Length;
-
-                    if (option.Length != 2)
-                    {
-                        for (int j = 0; j < option.Length - 2; j++)
-                        {
-                            RawData[DataOffset + 20 + counter + 2 + j] = option.Data[j];
-                        }
-                    }
-                }
-
-                counter += option.Length;
-            }
-        }
-
-        protected override void InitFields()
-        {
-            base.InitFields();
         }
     }
 }

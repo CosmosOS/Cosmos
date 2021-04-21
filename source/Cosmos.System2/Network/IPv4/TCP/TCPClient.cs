@@ -14,6 +14,17 @@ using Cosmos.System.Network.Config;
 namespace Cosmos.System.Network.IPv4.TCP
 {
     /// <summary>
+    /// TCP Connection status
+    /// </summary>
+    public enum Status
+    {
+        OPENED,
+        OPENING, //SYN sent or received
+        CLOSED,
+        CLOSING //FIN sent or received
+    }
+
+    /// <summary>
     /// TCPClient class. Used to manage the TCP connection to a client.
     /// </summary>
     public class TcpClient : IDisposable
@@ -48,7 +59,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Connection status.
         /// </summary>
-        internal bool Connected = false;
+        internal Status status = Status.CLOSED;
 
         /// <summary>
         /// Assign clients dictionary.
@@ -141,15 +152,17 @@ namespace Cosmos.System.Network.IPv4.TCP
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
-            return WaitForConnectionResponse(timeout);
+            status = Status.OPENING;
+
+            return Wait(timeout);
         }
 
-        private bool WaitForConnectionResponse(int timeout)
+        private bool Wait(int timeout)
         {
             int second = 0;
             int _deltaT = 0;
 
-            while (rxBuffer.Count < 1)
+            while (status != Status.OPENED) // SYN/ACK
             {
                 if (second > (timeout / 1000))
                 {
@@ -161,23 +174,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                     _deltaT = RTC.Second;
                 }
             }
-
-            var packet = rxBuffer.Dequeue();
-
-            if (packet.Flags == 0x12) // SYN/ACK
-            {
-                SendAck(packet);
-
-                Global.mDebugger.Send("TCP Connection established!");
-
-                Connected = true;
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
 
         private void SendAck(TCPPacket responsepacket)
@@ -265,7 +262,18 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            rxBuffer.Enqueue(packet);
+            if (status == Status.OPENING && packet.TCPFlags == 0x12) //SYN/ACK
+            {
+                status = Status.OPENED;
+
+                Global.mDebugger.Send("TCP Connection established!");
+
+                SendAck(packet);
+            }
+            else
+            {
+                rxBuffer.Enqueue(packet);
+            }
         }
 
         /// <summary>
