@@ -77,14 +77,6 @@ namespace Cosmos.System
                 }
                 mStarted = true;
 
-                if (string.Empty == null)
-                {
-                    throw new Exception("Compiler didn't initialize System.String.Empty!");
-                }
-
-                Global.mDebugger.Send("HW Bootstrap Init");
-                HAL.Bootstrap.Init();
-
                 Global.mDebugger.Send("Global Init");
                 Global.Init(GetTextScreen());
 
@@ -113,9 +105,7 @@ namespace Cosmos.System
                 while (!mStopped)
                 {
                     //Network.NetworkStack.Update();
-                    Global.mDebugger.Send("Really before Run");
                     Run();
-                    Global.mDebugger.Send("Really after Run");
                 }
                 Global.mDebugger.Send("AfterRun");
                 AfterRun();
@@ -159,6 +149,7 @@ namespace Cosmos.System
         /// </summary>
         public Kernel()
         {
+            HAL.Bootstrap.Init();
             Global.mDebugger.Send("In Cosmos.System.Kernel..ctor");
         }
 
