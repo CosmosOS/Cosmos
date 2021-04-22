@@ -134,5 +134,7 @@ namespace Cosmos.Core
             
         }
 
+        public static unsafe uint* GetPointer(object o) => throw null; // this is plugged
+
     }
 }
