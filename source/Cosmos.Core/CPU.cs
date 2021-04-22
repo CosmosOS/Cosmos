@@ -347,7 +347,6 @@ namespace Cosmos.Core
             {
                 Bootstrap.MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
             }
-         //   return false;
             return (Bootstrap.MultibootHeader->Flags & 1 << 6) == 64;
         }
 

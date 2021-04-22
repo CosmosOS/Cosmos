@@ -1,6 +1,7 @@
 #if DEBUG
 #define GC_DEBUG
 #endif
+#define COSMOSDEBUG
 using System;
 using System.Diagnostics;
 using IL2CPU.API;
@@ -18,6 +19,8 @@ namespace Cosmos.Core
         private static bool isInitialized;
         private unsafe static byte* memPtr = null;
         private static uint memLength = 0;
+        private static bool AllocAfterInit;
+        private static uint saveSize;
         /// <summary>
         /// Acquire lock. Not implemented.
         /// </summary>
@@ -35,32 +38,28 @@ namespace Cosmos.Core
         {
             throw new NotImplementedException();
         }
+        public static uint FallBackInit(uint aSize)
+        {
+            return (uint)Memory.Heap.Alloc(aSize);
+        }
 
         /// <summary>
         /// Alloc new object.
         /// </summary>
         public unsafe static uint AllocNewObject(uint aSize)
         {
-            // Debug.Kernel.Debugger.DoBochsBreak();
-            //Debug.Kernel.Debugger.DoSendNumber((uint)CPU.GetLargestMemoryBlock());
-            //Debug.Kernel.Debugger.DoSendNumber((uint)CPU.GetLargestMemoryBlock()->Length * 1024);
-            //Debug.Kernel.Debugger.DoSendNumber((uint)CPU.GetLargestMemoryBlock()->BaseAddr);
-            //Debug.Kernel.Debugger.DoSendNumber((uint)Bootstrap.MultibootHeader->memMapAddress);
-            //Debug.Kernel.Debugger.DoBochsBreak();
-            /* if (!isInitialized)
-             {
-                 isInitialized = true;
-                 Init();
-             }*/
             if (isInitialized)
             {
                 return (uint)Memory.Heap.Alloc(aSize);
             }
             else
             {
+      
+                AllocAfterInit = true;   
+                saveSize = aSize;
                 //We really shouldnt be here, something bad happened uh oh
-                Cosmos.Debug.Kernel.Debugger.SendKernelPanic(0x99999);
-                return 0;
+                Init();
+                return FallBackInit(saveSize);
             }
         }
 
@@ -84,20 +83,31 @@ namespace Cosmos.Core
             throw new NotImplementedException();
         }
 
+        public static uint GetDetectedRam()
+        {
+                uint memLength2;
+                var block = CPU.GetLargestMemoryBlock();
+               memLength2 = block->Length  - ((uint)memPtr - (uint)block->BaseAddr);
+               memLength2 += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
+            return memLength2 / 1024 / 1024;
+        }
+        public static uint GetAmountOfRam()
+        {
+            return memLength / 1024 / 1024;
+        }
         public static unsafe void Init()
         {
             if(CPU.MemoryMapExists())
             {
                 var block = CPU.GetLargestMemoryBlock();
-                Debug.Kernel.Debugger.DoSendNumber((uint)block);
                 memPtr = (byte*)block->BaseAddr;
                 memLength = block->Length * 1024;
-                if((uint)memPtr < (uint)CPU.GetEndOfKernel() + 1024)
+                if ((uint)memPtr < (uint)CPU.GetEndOfKernel() + 1024)
                 {
                     memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                     memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
-                    memLength = block->Length * 1024 - ((uint)memPtr - (uint)block->BaseAddr);
-                    memLength += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
+                       memLength = block->Length - ((uint)memPtr - (uint)block->BaseAddr);
+                       memLength += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
                 }
             }
             else
@@ -108,7 +118,14 @@ namespace Cosmos.Core
             }
             Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
             Debug.Kernel.Debugger.DoSendNumber(memLength);
+            Debug.Kernel.Debugger.DoBochsBreak();
             Memory.RAT.Init(memPtr,memLength);
+            if(AllocAfterInit)
+            {
+                isInitialized = true;
+                FallBackInit(saveSize);
+                AllocAfterInit = false;
+            }
             isInitialized = true;
             
         }

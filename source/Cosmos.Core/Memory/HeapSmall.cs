@@ -240,7 +240,7 @@ namespace Cosmos.Core.Memory
                 var block = (RootSMTBlock*)NextFreeBlock(aPage);    // we should actually check that this is not null
                                                                //but we should also only call this code right at the beginning so it should be fine
                 block->Size = aSize;
-                Debugger.DoSendNumber((uint)block);
+               // Debugger.DoSendNumber((uint)block);
                 ptr->LargerSize = block;
             }
             CreatePage(aPage, aSize);
@@ -361,8 +361,6 @@ namespace Cosmos.Core.Memory
                 smtBlock = NextFreeBlock();
                 if (smtBlock == null)
                 {
-                    Debugger.DoSendNumber((uint)smtBlock);
-                    Debugger.DoSendNumber(0x999);
                     Debugger.SendKernelPanic(0x93);
                     while (true) { };
                 }
