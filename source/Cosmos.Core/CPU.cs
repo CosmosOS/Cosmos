@@ -393,7 +393,7 @@ namespace Cosmos.Core
                 entireMap[i] = new MemoryMapBlock
                 {
                     Address = rawMemoryMap.BaseAddr,
-                    Length = rawMemoryMap.Length * 1024,
+                    Length = rawMemoryMap.Length,
                     Type = rawMemoryMap.Type
                 };
             }
