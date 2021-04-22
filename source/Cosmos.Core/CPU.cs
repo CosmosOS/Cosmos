@@ -12,7 +12,7 @@ namespace Cosmos.Core
     /// <summary>
     /// CPU class. Non hardware class, only used by core and hardware drivers for ports etc.
     /// </summary>
-    public class CPU
+    public static class CPU
     {
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
@@ -33,19 +33,19 @@ namespace Cosmos.Core
         /// Update IDT. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public void UpdateIDT(bool aEnableInterruptsImmediately) => throw null;
+        public static void UpdateIDT(bool aEnableInterruptsImmediately) => throw null;
 
         /// <summary>
         /// Init float. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public void InitFloat() => throw null;
+        public static void InitFloat() => throw null;
 
         /// <summary>
         /// Init SSE. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public void InitSSE() => throw null;
+        public static void InitSSE() => throw null;
 
         /// <summary>
         /// Zero fill. Plugged.
@@ -57,12 +57,12 @@ namespace Cosmos.Core
         /// Halt the CPU. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public void Halt() => throw null;
+        public static void Halt() => throw null;
 
         /// <summary>
         /// Reboot the CPU.
         /// </summary>
-        public void Reboot()
+        public static void Reboot()
         {
             // Disable all interrupts
             DisableInterrupts();
@@ -337,16 +337,23 @@ namespace Cosmos.Core
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
 
+        /// <summar>
+        /// Enables Multiboot if it is not enabled
+        /// </summar>
+        internal unsafe static void EnableMultiboot()
+        {
+            if (Bootstrap.MultibootHeader == null)
+            {
+                Bootstrap.MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
+            }
+        }
         /// <summary>
         /// Checks if Multiboot returned a memory map
         /// </summary>
         /// <returns></returns>
         public static unsafe bool MemoryMapExists()
         {
-            if (Bootstrap.MultibootHeader == null)
-            {
-                Bootstrap.MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
-            }
+            EnableMultiboot();
             return (Bootstrap.MultibootHeader->Flags & 1 << 6) == 64;
         }
 

@@ -48,19 +48,17 @@ namespace Cosmos.Core
         /// </summary>
         public unsafe static uint AllocNewObject(uint aSize)
         {
-            if (isInitialized)
+            ///This is a hack, we should really find out why Init is trying to allocate,
+            ///this shouldnt be but for now this works
+        /*    if (!isInitialized)
             {
-                return (uint)Memory.Heap.Alloc(aSize);
-            }
-            else
-            {
-      
-                AllocAfterInit = true;   
+                AllocAfterInit = true;
                 saveSize = aSize;
-                //We really shouldnt be here, something bad happened uh oh
                 Init();
-                return FallBackInit(saveSize);
-            }
+               
+            }*/
+              return (uint)Memory.Heap.Alloc(aSize);
+            
         }
 
         /// <summary>
@@ -95,19 +93,24 @@ namespace Cosmos.Core
         {
             return memLength / 1024 / 1024;
         }
+
         public static unsafe void Init()
         {
             if(CPU.MemoryMapExists())
             {
                 var block = CPU.GetLargestMemoryBlock();
                 memPtr = (byte*)block->BaseAddr;
-                memLength = block->Length * 1024;
+                memLength = block->Length;
+                Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
+                Debug.Kernel.Debugger.DoSendNumber(memLength);
                 if ((uint)memPtr < (uint)CPU.GetEndOfKernel() + 1024)
                 {
                     memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                     memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
-                       memLength = block->Length - ((uint)memPtr - (uint)block->BaseAddr);
-                       memLength += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
+                    memLength = block->Length - ((uint)memPtr - (uint)block->BaseAddr);
+                    memLength += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
+                    Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
+                    Debug.Kernel.Debugger.DoSendNumber(memLength);
                 }
             }
             else
@@ -115,18 +118,19 @@ namespace Cosmos.Core
                 memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                 memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
                 memLength = (128 * 1024 * 1024);
+                Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
+                Debug.Kernel.Debugger.DoSendNumber(memLength);
             }
             Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
             Debug.Kernel.Debugger.DoSendNumber(memLength);
-            Debug.Kernel.Debugger.DoBochsBreak();
             Memory.RAT.Init(memPtr,memLength);
-            if(AllocAfterInit)
+         /*   if(AllocAfterInit)
             {
                 isInitialized = true;
                 FallBackInit(saveSize);
                 AllocAfterInit = false;
             }
-            isInitialized = true;
+            isInitialized = true;*/
             
         }
 

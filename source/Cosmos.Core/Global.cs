@@ -32,13 +32,13 @@ namespace Cosmos.Core
         /// <summary>
         /// Get CPU.
         /// </summary>
-        static public CPU CPU
+     /*   static public CPU CPU
         {
             get
             {
                 return Bootstrap.CPU;
             }
-        }
+        }*/
 
         /// <summary>
         /// Init <see cref="Global"/> instance.

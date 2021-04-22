@@ -21,7 +21,7 @@ namespace Cosmos.Core
         /// <summary>
         /// CPU.
         /// </summary>
-        static public readonly CPU CPU = new CPU();
+      //  static public readonly CPU CPU = new CPU();
         /// <summary>
         /// Multiboot header pointer.
         /// </summary>
