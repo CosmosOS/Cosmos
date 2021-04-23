@@ -7,3 +7,5 @@ Cosmos is an operating system "construction kit". Build your own OS using manage
 For instructions on how to install and use Cosmos, please visit the [Cosmos website](http://www.gocosmos.org).
 
 For documentation and technical information, see the [Cosmos Documentation](https://cosmosos.github.io).
+
+We also have a [Discord Server](https://discord.com/invite/kwtBwv6jhD)!
