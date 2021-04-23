@@ -175,6 +175,10 @@ namespace Cosmos.System.Network.IPv4.TCP
             RST = (RawData[47] & (1 << 2)) != 0;
 
             //options parsing
+            if (RawData.Length <= DataOffset + 20)
+            {
+                return;
+            }
             if (RawData[DataOffset + 20] != 0)
             {
                 options = new List<TCPOption>();
