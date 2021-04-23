@@ -38,7 +38,6 @@ namespace Cosmos.Core.Memory
             }
             else
             {
-                Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
                 return HeapLarge.Alloc(aSize);
             }
         }

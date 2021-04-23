@@ -1,7 +1,7 @@
 #if DEBUG
-#define GC_DEBUG
+//#define GC_DEBUG
 #endif
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using System.Diagnostics;
 using IL2CPU.API;
@@ -16,11 +16,8 @@ namespace Cosmos.Core
     [DebuggerStepThrough]
     public unsafe static class GCImplementation
     {
-        private static bool isInitialized;
         private unsafe static byte* memPtr = null;
         private static uint memLength = 0;
-        private static bool AllocAfterInit;
-        private static uint saveSize;
         /// <summary>
         /// Acquire lock. Not implemented.
         /// </summary>
@@ -38,27 +35,21 @@ namespace Cosmos.Core
         {
             throw new NotImplementedException();
         }
-        public static uint FallBackInit(uint aSize)
-        {
-            return (uint)Memory.Heap.Alloc(aSize);
-        }
-
         /// <summary>
         /// Alloc new object.
         /// </summary>
         public unsafe static uint AllocNewObject(uint aSize)
         {
-            ///This is a hack, we should really find out why Init is trying to allocate,
-            ///this shouldnt be but for now this works
-        /*    if (!isInitialized)
-            {
-                AllocAfterInit = true;
-                saveSize = aSize;
-                Init();
-               
-            }*/
               return (uint)Memory.Heap.Alloc(aSize);
             
+        }
+        /// <summary>
+        /// Free Object from Memory
+        /// </summary>
+        /// <param name="obj">Takes a memory allocated object</param>
+        public unsafe static void Free(object aObj)
+        {
+            Memory.Heap.Free(GetPointer(aObj));
         }
 
         /// <summary>
@@ -81,19 +72,25 @@ namespace Cosmos.Core
             throw new NotImplementedException();
         }
 
-        public static uint GetDetectedRam()
-        {
-                uint memLength2;
-                var block = CPU.GetLargestMemoryBlock();
-               memLength2 = block->Length  - ((uint)memPtr - (uint)block->BaseAddr);
-               memLength2 += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
-            return memLength2 / 1024 / 1024;
-        }
-        public static uint GetAmountOfRam()
+        /// <summary>
+        /// Get amount of available Ram
+        /// </summary>
+        /// <returns>Returns amount of available memory to the System in MB</returns>
+        public static uint GetAvailableRAM()
         {
             return memLength / 1024 / 1024;
         }
-
+        /// <summary>
+        /// Get a rough estimate of used Memory by the System
+        /// </summary>
+        /// <returns>Returns the used PageSize by the MemoryManager in Bytes.</returns>
+        public static uint GetUsedRAM()
+        {
+            return (Memory.RAT.TotalPageCount - Memory.RAT.GetPageCount(Memory.RAT.PageType.Empty)) * Memory.RAT.PageSize;
+        }
+        /// <summary>
+        /// Initialise the Memory Manager, this should not be called anymore since it is done very early during the boot process.
+        /// </summary>
         public static unsafe void Init()
         {
             if(CPU.MemoryMapExists())
@@ -101,16 +98,12 @@ namespace Cosmos.Core
                 var block = CPU.GetLargestMemoryBlock();
                 memPtr = (byte*)block->BaseAddr;
                 memLength = block->Length;
-                Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
-                Debug.Kernel.Debugger.DoSendNumber(memLength);
                 if ((uint)memPtr < (uint)CPU.GetEndOfKernel() + 1024)
                 {
                     memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                     memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
                     memLength = block->Length - ((uint)memPtr - (uint)block->BaseAddr);
                     memLength += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
-                    Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
-                    Debug.Kernel.Debugger.DoSendNumber(memLength);
                 }
             }
             else
@@ -118,23 +111,16 @@ namespace Cosmos.Core
                 memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                 memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
                 memLength = (128 * 1024 * 1024);
-                Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
-                Debug.Kernel.Debugger.DoSendNumber(memLength);
             }
-            Debug.Kernel.Debugger.DoSendNumber((uint)memPtr);
-            Debug.Kernel.Debugger.DoSendNumber(memLength);
             Memory.RAT.Init(memPtr,memLength);
-         /*   if(AllocAfterInit)
-            {
-                isInitialized = true;
-                FallBackInit(saveSize);
-                AllocAfterInit = false;
-            }
-            isInitialized = true;*/
             
         }
-
-        public static unsafe uint* GetPointer(object o) => throw null; // this is plugged
+        /// <summary>
+        /// Get the Pointer of any object needed for Free()
+        /// </summary>
+        /// <param name="o">Takes any kind of object</param>
+        /// <returns>Returns a pointer to the area in memory where the object is located</returns>
+        public static unsafe uint* GetPointer(object aObj) => throw null; // this is plugged
 
     }
 }

@@ -30,7 +30,6 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(uint aSize, byte aType = RAT.PageType.HeapLarge)
         {
-            Debug.Kernel.Debugger.DoBochsBreak();
             uint xPages = ((aSize + PrefixBytes) / RAT.PageSize) + 1;
             var xPtr = (uint*)RAT.AllocPages(aType, xPages);
             xPtr[0] = xPages * RAT.PageSize - PrefixBytes; // Allocated data size

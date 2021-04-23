@@ -13,13 +13,31 @@ namespace Cosmos.Core
     /// </summary>
     public static class CPU
     {
+        public static ulong totalRam;
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
-        /// Get amount of RAM in MB's. Plugged.
+        /// Get amount of RAM in MB's.
         /// </summary>
-        [PlugMethod(PlugRequired = true)]
-        public static uint GetAmountOfRAM() => throw null;
+        public static uint GetAmountOfRAM()
+        {
+            if (MemoryMapExists())
+            {
+                var memoryMap = GetMemoryMap();
+                for (int i = 0; i < memoryMap.Length; i++)
+                {
+                    if (memoryMap[i].Type == 1 && memoryMap[i].Length != 0)
+                    {
+                        totalRam += memoryMap[i].Length;
+                    }
+                }
+            }
+            else
+            {
+                throw new NotSupportedException("MemoryMap not available!");
+            }
+            return (uint)totalRam / 1024 / 1024;
+        }
 
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
@@ -338,9 +356,9 @@ namespace Cosmos.Core
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
 
-        /// <summar>
+        /// <summary>
         /// Enables Multiboot if it is not enabled
-        /// </summar>
+        /// </summary>
         internal unsafe static void EnableMultiboot()
         {
             if (Bootstrap.MultibootHeader == null)

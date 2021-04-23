@@ -10,7 +10,6 @@ namespace Cosmos.Core_Asm.GCImplementation
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.Set(BX, BX);
             // we get the object as an object size 4 and we just leave it as a uint*
             // so this is just an illegal cast
             XS.Set(EAX, EBP, sourceDisplacement: 12);

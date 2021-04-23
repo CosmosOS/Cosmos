@@ -114,8 +114,6 @@ namespace Cosmos.Core.Memory
         private static RootSMTBlock* GetFirstBlock(SMTPage* aPage, uint aSize)
         {
             RootSMTBlock* ptr = aPage->First;
-            //Debug.Kernel.Debugger.DoSendNumber((uint)aPage);
-            //Debug.Kernel.Debugger.DoSendNumber((uint)ptr);
             uint curSize = ptr->Size;
             while (curSize < aSize)
             {
@@ -240,7 +238,6 @@ namespace Cosmos.Core.Memory
                 var block = (RootSMTBlock*)NextFreeBlock(aPage);    // we should actually check that this is not null
                                                                //but we should also only call this code right at the beginning so it should be fine
                 block->Size = aSize;
-               // Debugger.DoSendNumber((uint)block);
                 ptr->LargerSize = block;
             }
             CreatePage(aPage, aSize);
