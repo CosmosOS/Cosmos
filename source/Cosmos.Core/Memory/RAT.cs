@@ -248,7 +248,7 @@ namespace Cosmos.Core.Memory
         /// Get the first RAT address.
         /// </summary>
         /// <param name="aPtr">A pointer to the block.</param>
-        /// <returns>Native value.</returns>
+        /// <returns>The index in RAT.</returns>
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
         public static uint GetFirstRAT(void* aPtr)
         {
