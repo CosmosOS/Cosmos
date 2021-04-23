@@ -59,7 +59,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Connection status.
         /// </summary>
-        internal Status status = Status.CLOSED;
+        internal Status Status;
 
         /// <summary>
         /// Assign clients dictionary.
@@ -103,6 +103,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         public TcpClient(int localPort)
         {
             rxBuffer = new Queue<TCPPacket>(8);
+            Status = Status.CLOSED;
 
             this.localPort = localPort;
             if (localPort > 0)
@@ -152,37 +153,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
-            status = Status.OPENING;
+            Status = Status.OPENING;
 
-            return Wait(timeout);
-        }
-
-        private bool Wait(int timeout)
-        {
-            int second = 0;
-            int _deltaT = 0;
-
-            while (status != Status.OPENED) // SYN/ACK
-            {
-                if (second > (timeout / 1000))
-                {
-                    return false;
-                }
-                if (_deltaT != RTC.Second)
-                {
-                    second++;
-                    _deltaT = RTC.Second;
-                }
-            }
-            return true;
-        }
-
-        private void SendAck(TCPPacket responsepacket)
-        {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)localPort, responsepacket.AckNumber, responsepacket.SequenceNumber + 1, 20, 0x10, 0xFAF0, 0);
-
-            OutgoingBuffer.AddPacket(packet);
-            NetworkStack.Update();
+            return WaitStatus(Status.OPENED, timeout);
         }
 
         /// <summary>
@@ -262,9 +235,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            if (status == Status.OPENING && packet.TCPFlags == 0x12) //SYN/ACK
+            if (Status == Status.OPENING && packet.TCPFlags == 0x12) //SYN/ACK
             {
-                status = Status.OPENED;
+                Status = Status.OPENED;
 
                 Global.mDebugger.Send("TCP Connection established!");
 
@@ -282,6 +255,33 @@ namespace Cosmos.System.Network.IPv4.TCP
         public void Dispose()
         {
             Close();
+        }
+
+        private bool WaitStatus(Status status, int timeout)
+        {
+            int second = 0;
+            int _deltaT = 0;
+
+            while (Status != status)
+            {
+                if (second > (timeout / 1000))
+                {
+                    return false;
+                }
+                if (_deltaT != RTC.Second)
+                {
+                    second++;
+                    _deltaT = RTC.Second;
+                }
+            }
+            return true;
+        }
+
+        private void SendAck(TCPPacket responsepacket)
+        {
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, responsepacket.AckNumber, responsepacket.SequenceNumber + 1, 20, 0x10, 0xFAF0, 0);
+            OutgoingBuffer.AddPacket(packet);
+            NetworkStack.Update();
         }
     }
 }
