@@ -431,4 +431,3 @@ uk.BeveledLabel=Ukrainian
 cn.BeveledLabel=Chinese Simplified
 tw.BeveledLabel=Chinese Traditional
 #endif
-
