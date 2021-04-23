@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
@@ -51,7 +50,9 @@ namespace Cosmos.Core
         /// Zero fill. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public static void ZeroFill(uint aStartAddress, uint aLength) => throw null;
+        public static void ZeroFill(uint aStartAddress, uint aLength)
+        {
+        }
 
         /// <summary>
         /// Halt the CPU. Plugged.
@@ -373,7 +374,7 @@ namespace Cosmos.Core
             while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength) && counter < 64)
             {
                 rawMap[counter++] = *currentMap;
-                currentMap = (RawMemoryMapBlock*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes
+                currentMap = (RawMemoryMapBlock*)((uint*)currentMap + ((currentMap->Size + 4) >> 2)); //The size is in bits, not bytes
                 if (currentMap->Size == 0)
                 {
                     break;

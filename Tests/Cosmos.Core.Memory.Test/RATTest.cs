@@ -255,5 +255,27 @@ namespace Cosmos.Core.Memory.Test
 
             }
         }
+
+        [TestMethod]
+        public unsafe void TestRATHeapMethods()
+        {
+            var xRAM = new byte[10 * RAT.PageSize]; // 10 Pages - 1 for RAT and 9 for values
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+                var ptr1 = Heap.Alloc(10);
+                var ptr2 = Heap.Alloc(10);
+                var ptr3 = Heap.Alloc(10);
+                Assert.AreNotEqual((uint)ptr1, (uint)ptr2);
+                Assert.AreNotEqual((uint)ptr1, (uint)ptr3);
+                Assert.AreNotEqual((uint)ptr2, (uint)ptr3);
+                Assert.AreEqual(RAT.GetFirstRAT(ptr1), RAT.GetFirstRAT(ptr2));
+                Assert.AreEqual(RAT.GetFirstRAT(ptr1), RAT.GetFirstRAT(ptr3));
+                Assert.AreEqual((uint)RAT.GetPagePtr(ptr1), (uint)RAT.GetPagePtr(ptr2));
+                Assert.AreEqual((uint)RAT.GetPagePtr(ptr1), (uint)RAT.GetPagePtr(ptr3));
+            }
+        }
     }
 }
