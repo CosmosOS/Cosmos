@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 using Cosmos.TestRunner;

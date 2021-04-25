@@ -37,7 +37,7 @@ namespace Cosmos.Debug.Hosts
 
       if (aParams.ContainsKey("ISOFile"))
       {
-        _isoFile = aParams["IOSFile"];
+        _isoFile = aParams["ISOFile"];
       }
 
       _debugPortString = "Cosmos\\Serial";
@@ -59,10 +59,10 @@ namespace Cosmos.Debug.Hosts
 
       if (!string.IsNullOrWhiteSpace(_debugPortString))
       {
-        xQemuArguments += $" -chardev pipe,path=\\\\Cosmos\\Serial,id=Cosmos -device isa-serial,chardev=Cosmos";
+        xQemuArguments += @" -chardev console,id=CosmosConsole -chardev pipe,path=\Cosmos\Serial,id=Cosmos -device isa-serial,chardev=Cosmos";
       }
 
-      xQemuArguments += " -boot d";
+      xQemuArguments += " -vga std -boot d -no-shutdown -no-reboot";
 
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)

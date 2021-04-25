@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-
+using System.Collections.Generic;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
-
-using MyConsole = System.Console;
 
 namespace Cosmos.System
 {
@@ -126,13 +123,6 @@ namespace Cosmos.System
             }
             else
             {
-                if (ControlPressed && AltPressed && mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
-                {
-                    //Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                    MyConsole.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                    Power.Reboot();
-                }
-
                 if (!aReleased)
                 {
                     KeyEvent keyInfo;

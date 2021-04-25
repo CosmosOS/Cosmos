@@ -14,12 +14,12 @@ namespace Cosmos.HAL.BlockDevice
             {
                 Console.WriteLine("ATA Primary Master");
                 Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-                //Console.WriteLine("ATA Primary Slave");
-                //Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
+                Console.WriteLine("ATA Primary Slave");
+                Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
                 Console.WriteLine("ATA Secondary Master");
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-                //Console.WriteLine("ATA Secondary Slave");
-                //Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
+                Console.WriteLine("ATA Secondary Slave");
+                Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
             }
         }
 

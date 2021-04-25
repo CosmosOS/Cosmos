@@ -19,6 +19,7 @@
 ## [Startup](Kernel/Startup.md)
 ## [Graphics](Kernel/CGS.md)
 ## [Virtual File System](Kernel/VFS.md)
+## [Network](Kernel/Network.md)
 
 # Reference
 ## [x86](Reference/x86.md)

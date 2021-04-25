@@ -162,18 +162,6 @@ namespace Cosmos.Build.Builder
                 {
                     xKey.SetValue("DevKit", _cosmosDir);
                 }
-
-                // Launch VS
-
-                if (!App.BuilderConfiguration.NoVsLaunch)
-                {
-                    var vsInstance = _visualStudioInstance;
-                    var vsPath = Path.Combine(vsInstance.GetInstallationPath(), "Common7", "IDE", "devenv.exe");
-
-                    var kernelSlnPath = Path.Combine(_cosmosDir, "Kernel.sln");
-
-                    yield return new StartProcessTask(vsPath, kernelSlnPath, "Visual Studio (Kernel.sln)");
-                }
             }
         }
     }

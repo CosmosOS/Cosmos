@@ -145,7 +145,7 @@ namespace Cosmos.System.Graphics
         }
         
         /// <summary>
-        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
         /// </summary>
         /// <param name="imageData">byte array.</param>
         /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
@@ -168,7 +168,7 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
         /// </summary>
         /// <param name="imageData">byte array.</param>
         /// <param name="colorOrder">Order of colors in each pixel.</param>
@@ -249,7 +249,7 @@ namespace Cosmos.System.Graphics
             //now reading size of BITMAPINFOHEADER should be 40 - bytes 14 -> 18
             stream.Read(_int, 0, 4);
             uint infoHeaderSize = BitConverter.ToUInt32(_int, 0);
-            if (infoHeaderSize != 40 && infoHeaderSize != 56) // 56 - is BITMAPV3INFOHEADER, where we ignore the additional values see https://web.archive.org/web/20150127132443/https://forums.adobe.com/message/3272950
+            if (infoHeaderSize != 40 && infoHeaderSize != 56 && infoHeaderSize != 124) // 124 - is BITMAPV5INFOHEADER, 56 - is BITMAPV3INFOHEADER, where we ignore the additional values see https://web.archive.org/web/20150127132443/https://forums.adobe.com/message/3272950
             {
                 throw new Exception("Info header size has the wrong value!");
             }
