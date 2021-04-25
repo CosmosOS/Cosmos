@@ -41,6 +41,26 @@ namespace Cosmos.HAL.Network
 
                     #endregion
 
+                    #region RTL8168
+
+                    if (device.VendorID == 0x10EC && device.DeviceID == 0x8168)
+                    {
+
+                        Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+
+                        var RTL8168Device = new RTL8168(device);
+
+                        RTL8168Device.NameID = ("eth" + NetworkDeviceID);
+
+                        Console.WriteLine("Registered at " + RTL8168Device.NameID + " (" + RTL8168Device.MACAddress.ToString() + ")");
+
+                        RTL8168Device.Enable();
+
+                        NetworkDeviceID++;
+                    }
+
+                    #endregion
+
                 }
             }
 
