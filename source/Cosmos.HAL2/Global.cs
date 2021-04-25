@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL
 {
@@ -19,6 +20,12 @@ namespace Cosmos.HAL
 
         public static readonly PS2Controller PS2Controller = new PS2Controller();
 
+        // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
+        /// <summary>
+        /// Init <see cref="Global"/> instance.
+        /// </summary>
+        /// <param name="textScreen">Text screen.</param>
+        /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
         static public void Init(TextScreenBase textScreen)
         {
             if (textScreen != null)
@@ -57,17 +64,30 @@ namespace Cosmos.HAL
             AHCI.InitDriver();
             //EHCI.InitDriver();
 
+            mDebugger.Send("Network Devices Init");
+            NetworkInit.Init();
+
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
         }
 
+        /// <summary>
+        /// Enable interrupts.
+        /// </summary>
         public static void EnableInterrupts()
         {
             CPU.EnableInterrupts();
         }
 
+        /// <summary>
+        /// Check if CPU interrupts are enabled.
+        /// </summary>
         public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
 
+        /// <summary>
+        /// Get keyboard devices.
+        /// </summary>
+        /// <returns>IEnumerable{KeyboardBase} value.</returns>
         public static IEnumerable<KeyboardBase> GetKeyboardDevices()
         {
             var xKeyboardDevices = new List<KeyboardBase>();
@@ -85,6 +105,10 @@ namespace Cosmos.HAL
             return xKeyboardDevices;
         }
 
+        /// <summary>
+        /// Get mouse devices.
+        /// </summary>
+        /// <returns>IEnumerable{MouseBase} value.</returns>
         public static IEnumerable<MouseBase> GetMouseDevices()
         {
             var xMouseDevices = new List<MouseBase>();

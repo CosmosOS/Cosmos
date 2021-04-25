@@ -1,126 +1,221 @@
-﻿using System;
-using Sys = System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          UDP Client
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using Cosmos.System.Network.Config;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace Cosmos.System.Network
+namespace Cosmos.System.Network.IPv4.UDP
 {
-    public class UdpClient
+    /// <summary>
+    /// UdpClient class. Used to manage the UDP connection to a client.
+    /// </summary>
+    public class UdpClient : IDisposable
     {
-        // TODO: Once we support more than just IPv4, we really need to base all the IPv4 classes on abstract classes
-        // that represent the required functionality, then we can generalize the stack to be independent from IPv4 or IPv6
-        internal class DataGram
-        {
-            internal byte[] data;
-            internal IPv4.EndPoint source;
+        /// <summary>
+        /// Clients dictionary.
+        /// </summary>
+        private static Dictionary<uint, UdpClient> clients;
 
-            internal DataGram(byte[] data, IPv4.EndPoint src)
-            {
-                this.data = data;
-                this.source = src;
-            }
-        }
+        /// <summary>
+        /// Local port.
+        /// </summary>
+        private int localPort;
+        /// <summary>
+        /// Destination address.
+        /// </summary>
+        internal Address destination;
+        /// <summary>
+        /// Destination port.
+        /// </summary>
+        private int destinationPort;
 
-        private static TempDictionary<UdpClient> clients;
+        /// <summary>
+        /// RX buffer queue.
+        /// </summary>
+        internal Queue<UDPPacket> rxBuffer;
 
-        protected Int32 localPort;
-        protected IPv4.Address destination;
-        protected Int32 destinationPort;
-
-        private Queue<DataGram> rxBuffer;
-
+        /// <summary>
+        /// Assign clients dictionary.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         static UdpClient()
         {
-            clients = new TempDictionary<UdpClient>();
+            clients = new Dictionary<uint, UdpClient>();
         }
 
-        internal static UdpClient Client(ushort destPort)
+        /// <summary>
+        /// Get client.
+        /// </summary>
+        /// <param name="destPort">Destination port.</param>
+        /// <returns>UdpClient</returns>
+        internal static UdpClient GetClient(ushort destPort)
         {
-            if (clients.ContainsKey((UInt32)destPort) == true)
+            if (clients.ContainsKey((uint)destPort) == true)
             {
-                return clients[(UInt32)destPort];
+                return clients[(uint)destPort];
             }
 
             return null;
         }
 
+        /// <summary>
+        /// Create new instance of the <see cref="UdpClient"/> class.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 0 exists.</exception>
         public UdpClient()
-            :this(0)
+            : this(0)
         { }
 
-        public UdpClient(Int32 localPort)
+        /// <summary>
+        /// Create new instance of the <see cref="UdpClient"/> class.
+        /// </summary>
+        /// <param name="localPort">Local port.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
+        public UdpClient(int localPort)
         {
-            this.rxBuffer = new Queue<DataGram>(8);
+            rxBuffer = new Queue<UDPPacket>(8);
 
             this.localPort = localPort;
             if (localPort > 0)
             {
-                UdpClient.clients.Add((UInt32)localPort, this);
+                clients.Add((uint)localPort, this);
             }
         }
 
-        public UdpClient(IPv4.Address dest, Int32 destPort)
+        /// <summary>
+        /// Create new instance of the <see cref="UdpClient"/> class.
+        /// </summary>
+        /// <param name="dest">Destination address.</param>
+        /// <param name="destPort">Destination port.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 0 exists.</exception>
+        public UdpClient(Address dest, int destPort)
             : this(0)
         {
-            this.destination = dest;
-            this.destinationPort = destPort;
+            destination = dest;
+            destinationPort = destPort;
         }
 
-        public void Connect(IPv4.Address dest, Int32 destPort)
+        /// <summary>
+        /// Connect to client.
+        /// </summary>
+        /// <param name="dest">Destination address.</param>
+        /// <param name="destPort">Destination port.</param>
+        public void Connect(Address dest, int destPort)
         {
-            this.destination = dest;
-            this.destinationPort = destPort;
+            destination = dest;
+            destinationPort = destPort;
         }
 
-        public void Send(byte[] data)
-        {
-            if ((this.destination == null) ||
-                (this.destinationPort == 0))
-            {
-                throw new Exception("Must establish a default remote host by calling Connect() before using this Send() overload");
-            }
-
-            Send(data, this.destination, this.destinationPort);
-        }
-
-        public void Send(byte[] data, IPv4.Address dest, Int32 destPort)
-        {
-            IPv4.Address source = IPv4.Config.FindNetwork(dest);
-            IPv4.UDPPacket packet = new IPv4.UDPPacket(source, dest, (UInt16)this.localPort, (UInt16)destPort, data);
-
-            Sys.Console.WriteLine("Sending " + packet.ToString());
-            IPv4.OutgoingBuffer.AddPacket(packet);
-        }
-
+        /// <summary>
+        /// Close connection.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         public void Close()
         {
-            if (UdpClient.clients.ContainsKey((UInt32)this.localPort) == true)
+            if (clients.ContainsKey((uint)localPort) == true)
             {
-                UdpClient.clients.Remove((UInt32)this.localPort);
+                clients.Remove((uint)localPort);
             }
         }
 
-        public byte[] Receive(ref IPv4.EndPoint source)
+        /// <summary>
+        /// Send data to client.
+        /// </summary>
+        /// <param name="data">Data array to send.</param>
+        /// <exception cref="Exception">Thrown if destination is null or destinationPort is 0.</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
+        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        public void Send(byte[] data)
         {
-            if (this.rxBuffer.Count < 1)
+            if ((destination == null) || (destinationPort == 0))
+            {
+                throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
+            }
+
+            Send(data, destination, destinationPort);
+            NetworkStack.Update();
+        }
+
+        /// <summary>
+        /// Send data.
+        /// </summary>
+        /// <param name="data">Data array.</param>
+        /// <param name="dest">Destination address.</param>
+        /// <param name="destPort">Destination port.</param>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
+        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        public void Send(byte[] data, Address dest, int destPort)
+        {
+            Address source = IPConfig.FindNetwork(dest);
+            UDPPacket packet = new UDPPacket(source, dest, (ushort)localPort, (ushort)destPort, data);
+            OutgoingBuffer.AddPacket(packet);
+        }
+
+        /// <summary>
+        /// Receive data from end point.
+        /// </summary>
+        /// <param name="source">Source end point.</param>
+        /// <returns>byte array value.</returns>
+        /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        public byte[] NonBlockingReceive(ref EndPoint source)
+        {
+            if (rxBuffer.Count < 1)
             {
                 return null;
             }
 
-            DataGram packet = rxBuffer.Dequeue();
-            source.address = packet.source.address;
-            source.port = packet.source.port;
+            var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
+            source.address = packet.SourceIP;
+            source.port = packet.SourcePort;
 
-            return packet.data;
+            return packet.UDP_Data;
         }
 
-        internal void receiveData(IPv4.UDPPacket packet)
+        /// <summary>
+        /// Receive data from end point.
+        /// </summary>
+        /// <param name="source">Source end point.</param>
+        /// <returns>byte array value.</returns>
+        /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        public byte[] Receive(ref EndPoint source)
         {
-            byte[] data = packet.UDP_Data;
-            IPv4.EndPoint source = new IPv4.EndPoint(packet.SourceIP, packet.SourcePort);
+            while (rxBuffer.Count < 1) ;
 
-            Sys.Console.WriteLine("Received " + data.Length + " bytes data from " + source.ToString());
+            var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
+            source.address = packet.SourceIP;
+            source.port = packet.SourcePort;
 
-            this.rxBuffer.Enqueue(new DataGram(data, source));
+            return packet.UDP_Data;
+        }
+
+        /// <summary>
+        /// Receive data from packet.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        internal void ReceiveData(UDPPacket packet)
+        {
+            rxBuffer.Enqueue(packet);
+        }
+
+        /// <summary>
+        /// Close Client
+        /// </summary>
+        public void Dispose()
+        {
+            Close();
         }
     }
 }

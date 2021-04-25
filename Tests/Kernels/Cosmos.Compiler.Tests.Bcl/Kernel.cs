@@ -37,14 +37,16 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
+                EventsTest.Execute();
                 RandomTests.Execute();
+                ConvertTests.Execute();
 
                 // System.Collections
                 HashtableTest.Execute();
 
                 // System.Collections.Generic
                 ListTest.Execute();
-                QueueTest.Execute();       
+                QueueTest.Execute();
                 DictionaryTest.Execute();
 
                 // System.Text

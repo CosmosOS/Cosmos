@@ -104,6 +104,10 @@ namespace Cosmos.HAL
             }
         }
 
+        /// <summary>
+        /// Check bus.
+        /// </summary>
+        /// <param name="xBus">A bus to check.</param>
         private static void CheckBus(ushort xBus)
         {
             for (ushort device = 0; device < 32; device++)
@@ -131,15 +135,51 @@ namespace Cosmos.HAL
                 CheckBus(xPCIDevice.SecondaryBusNumber);
         }
 
+        public static bool Exists(PCIDevice pciDevice)
+        {
+            return GetDevice((VendorID)pciDevice.VendorID, (DeviceID)pciDevice.DeviceID) != null;
+        }
+
+        public static bool Exists(VendorID aVendorID, DeviceID aDeviceID)
+        {
+            return GetDevice(aVendorID, aDeviceID) != null;
+        }
+
+        /// <summary>
+        /// Get device.
+        /// </summary>
+        /// <param name="aVendorID">A vendor ID.</param>
+        /// <param name="aDeviceID">A device ID.</param>
+        /// <returns></returns>
         public static PCIDevice GetDevice(VendorID aVendorID, DeviceID aDeviceID)
         {
-            for (int i = 0; i < Devices.Count; i++)
+            foreach (var xDevice in Devices)
             {
-                var xDevice = Devices[i];
                 if ((VendorID)xDevice.VendorID == aVendorID &&
                     (DeviceID)xDevice.DeviceID == aDeviceID)
                 {
-                    return Devices[i];
+                    return xDevice;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get device.
+        /// </summary>
+        /// <param name="bus">Bus ID.</param>
+        /// <param name="slot">Slot position ID.</param>
+        /// <param name="function">Function ID.</param>
+        /// <returns></returns>
+        public static PCIDevice GetDevice(uint bus, uint slot, uint function)
+        {
+            foreach (var xDevice in Devices)
+            {
+                if (xDevice.bus == bus &&
+                    xDevice.slot == slot &&
+                    xDevice.function == function)
+                {
+                    return xDevice;
                 }
             }
             return null;
@@ -147,13 +187,12 @@ namespace Cosmos.HAL
 
         public static PCIDevice GetDeviceClass(ClassID Class, SubclassID SubClass)
         {
-            for (int i = 0; i < Devices.Count; i++)
+            foreach (var xDevice in Devices)
             {
-                var xDevice = Devices[i];
                 if ((ClassID)xDevice.ClassCode == Class &&
                     (SubclassID)xDevice.Subclass == SubClass)
                 {
-                    return Devices[i];
+                    return xDevice;
                 }
             }
             return null;
@@ -161,14 +200,13 @@ namespace Cosmos.HAL
 
         public static PCIDevice GetDeviceClass(ClassID aClass, SubclassID aSubClass, ProgramIF aProgIF)
         {
-            for (int i = 0; i < Devices.Count; i++)
+            foreach (var xDevice in Devices)
             {
-                var xDevice = Devices[i];
                 if ((ClassID)xDevice.ClassCode == aClass &&
                     (SubclassID)xDevice.Subclass == aSubClass &&
                     (ProgramIF)xDevice.ProgIF == aProgIF)
                 {
-                    return Devices[i];
+                    return xDevice;
                 }
             }
             return null;
