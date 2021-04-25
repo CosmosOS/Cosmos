@@ -1,7 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          End point
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -13,14 +17,14 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Address.
         /// </summary>
-        internal Address address;
+        public Address address;
         /// <summary>
         /// Port.
         /// </summary>
-        internal UInt16 port;
+        public UInt16 port;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EndPoint"/> class.
+        /// Create new instance of the <see cref="EndPoint"/> class.
         /// </summary>
         /// <param name="addr">Adress.</param>
         /// <param name="port">Port.</param>

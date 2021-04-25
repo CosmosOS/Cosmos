@@ -33,7 +33,9 @@ namespace Cosmos.HAL.Network
         public MACAddress(byte[] address)
         {
             if (address == null || address.Length != 6)
+            {
                 throw new ArgumentException("MACAddress is null or has wrong length", "address");
+            }    
 
             bytes[0] = address[0];
             bytes[1] = address[1];
@@ -52,7 +54,9 @@ namespace Cosmos.HAL.Network
         public MACAddress(byte[] buffer, int offset)
         {
             if (buffer == null || buffer.Length < (offset + 6))
+            {
                 throw new ArgumentException("buffer does not contain enough data starting at offset", "buffer");
+            }
 
             bytes[0] = buffer[offset];
             bytes[1] = buffer[offset + 1];
@@ -95,7 +99,9 @@ namespace Cosmos.HAL.Network
                 return 0;
             }
             else
+            {
                 throw new ArgumentException("obj is not a MACAddress", "obj");
+            }
         }
 
         public override bool Equals(object obj)
@@ -112,17 +118,19 @@ namespace Cosmos.HAL.Network
                     bytes[5] == other.bytes[5];
             }
             else
+            {
                 throw new ArgumentException("obj is not a MACAddress", "obj");
+            } 
         }
 
         public override int GetHashCode()
         {
-            return (GetType().AssemblyQualifiedName + "|" + this.ToString()).GetHashCode();
+            return (GetType().AssemblyQualifiedName + "|" + ToString()).GetHashCode();
         }
 
-        public UInt64 ToNumber()
+        public ulong ToNumber()
         {
-            return (UInt64)((bytes[0] << 40) | (bytes[1] << 32) | (bytes[2] << 24) | (bytes[3] << 16) |
+            return (ulong)((bytes[0] << 40) | (bytes[1] << 32) | (bytes[2] << 24) | (bytes[3] << 16) |
                 (bytes[4] << 8) | (bytes[5] << 0));
         }
 
@@ -131,6 +139,29 @@ namespace Cosmos.HAL.Network
             string xChars = "0123456789ABCDEF";
             aChars[aIndex + 0] = xChars[(aByte >> 4) & 0xF];
             aChars[aIndex + 1] = xChars[aByte & 0xF];
+        }
+
+        public uint To32BitNumber()
+        {
+            return (uint)((bytes[0] << 40) | (bytes[1] << 32) | (bytes[2] << 24) | (bytes[3] << 16) |
+                (bytes[4] << 8) | (bytes[5] << 0));
+        }
+
+        private uint hash;
+        /// <summary>
+        /// Hash value for this mac. Used to uniquely identify each mac
+        /// </summary>
+        public uint Hash
+        {
+            get
+            {
+                if (hash == 0)
+                {
+                    hash = To32BitNumber();
+                }
+
+                return hash;
+            }
         }
 
         public override string ToString()
@@ -148,7 +179,7 @@ namespace Cosmos.HAL.Network
             PutByte(xChars, 12, bytes[4]);
             xChars[14] = ':';
             PutByte(xChars, 15, bytes[5]);
-            return new String(xChars);
+            return new string(xChars);
         }
     }
 }

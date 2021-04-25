@@ -1,8 +1,14 @@
-﻿using System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          Abstract Network Device Class
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.HAL;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL
@@ -18,6 +24,18 @@ namespace Cosmos.HAL
     public abstract class NetworkDevice
     {
         public static List<NetworkDevice> Devices { get; private set; }
+
+        public static NetworkDevice GetDeviceByName(string nameID)
+        {
+            foreach (var device in Devices)
+            {
+                if (device.NameID == nameID)
+                {
+                    return device;
+                }
+            }
+            return null;
+        }
 
         static NetworkDevice()
         {
@@ -40,6 +58,11 @@ namespace Cosmos.HAL
         public abstract MACAddress MACAddress
         {
             get;
+        }
+
+        public string NameID
+        {
+            get; set;
         }
 
         public abstract string Name

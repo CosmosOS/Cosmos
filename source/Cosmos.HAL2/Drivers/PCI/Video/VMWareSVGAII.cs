@@ -475,7 +475,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         private uint capabilities;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="VMWareSVGAII"/> class.
+        /// Create new instance of the <see cref="VMWareSVGAII"/> class.
         /// </summary>
         public VMWareSVGAII()
         {
@@ -517,6 +517,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="depth">Depth.</param>
         public void SetMode(uint width, uint height, uint depth = 32)
         {
+            //Disable the Driver before writing new values and initiating it again to avoid a memory exception
+            Disable();
             // Depth is color depth in bytes.
             this.depth = (depth / 8);
             this.width = width;
@@ -524,7 +526,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
-            WriteRegister(Register.Enable, 1);
+            Enable();
             InitializeFIFO();
         }
 
@@ -753,7 +755,17 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 WriteToFifo(0xFFFFFF);
             WaitForFifo();
         }
-        
+        //Allow to enable the Driver again after it has been disabled (switch between text and graphics mode currently this is SVGA only)
+        /// <summary>
+        /// Enable the SVGA Driver , only needed after Disable() has been called
+        /// </summary>
+        public void Enable()
+        {
+            WriteRegister(Register.Enable, 1);
+        } 
+        /// <summary>
+        /// Disable the SVGA Driver , return to text mode
+        /// </summary>
         public void Disable()
         {
             WriteRegister(Register.Enable, 0);

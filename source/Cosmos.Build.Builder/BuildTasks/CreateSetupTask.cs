@@ -29,7 +29,8 @@ namespace Cosmos.Build.Builder.BuildTasks
             _defines = new Dictionary<string, string>()
             {
                 ["BuildConfiguration"] = configuration,
-                ["ChangeSetVersion"] = releaseVersion
+                ["ChangeSetVersion"] = releaseVersion,
+                ["RealPath"] = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
             };
         }
 
