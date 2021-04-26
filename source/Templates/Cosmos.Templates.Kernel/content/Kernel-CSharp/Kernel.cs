@@ -14,6 +14,7 @@ namespace CosmosKernel
         
         protected override void Run()
         {
+            //OS code here, the code here echoes input. Replace with your own functions.
             Console.Write("Input: ");
             var input = Console.ReadLine();
             Console.Write("Text typed: ");
