@@ -61,6 +61,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal Status Status;
 
+        internal ulong LastACK;
+        internal ulong LastSEQ;
+
         /// <summary>
         /// Assign clients dictionary.
         /// </summary>
@@ -162,11 +165,26 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Close connection.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public void Close()
+        public bool Close()
         {
             if (clients.ContainsKey((uint)localPort) == true)
             {
                 clients.Remove((uint)localPort);
+            }
+
+            if (Status == Status.OPENED)
+            {
+                var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, 0x11, 0xFAF0, 0);
+                OutgoingBuffer.AddPacket(packet);
+                NetworkStack.Update();
+
+                Status = Status.CLOSING;
+
+                return WaitStatus(Status.CLOSED, 5000);
+            }
+            else
+            {
+                return true;
             }
         }
 
@@ -235,17 +253,38 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            if (Status == Status.OPENING && packet.TCPFlags == 0x12) //SYN/ACK
+            LastACK = packet.AckNumber;
+            LastSEQ = packet.SequenceNumber;
+
+            if (packet.RST)
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP Connection Reseted!");
+            }
+            else if (Status == Status.OPENED && packet.FIN)
+            {
+                Status = Status.CLOSING;
+
+                SendAck();
+
+                //TODO: Send FIN Packet
+            }
+            else if (Status == Status.CLOSING && packet.FIN && packet.ACK)
+            {
+                Status = Status.CLOSED;
+
+                SendAck();
+            }
+            else if (Status == Status.OPENING && packet.SYN && packet.ACK)
             {
                 Status = Status.OPENED;
 
-                Global.mDebugger.Send("TCP Connection established!");
-
-                SendAck(packet);
+                SendAck();
             }
             else
             {
-                rxBuffer.Enqueue(packet);
+                throw new Exception("Unknown error on received TCP packet.");
             }
         }
 
@@ -277,9 +316,12 @@ namespace Cosmos.System.Network.IPv4.TCP
             return true;
         }
 
-        private void SendAck(TCPPacket responsepacket)
+        private void SendAck()
         {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, responsepacket.AckNumber, responsepacket.SequenceNumber + 1, 20, 0x10, 0xFAF0, 0);
+            LastACK = LastSEQ + 1;
+            LastSEQ = LastACK;
+
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, 0x10, 0xFAF0, 0);
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
         }
