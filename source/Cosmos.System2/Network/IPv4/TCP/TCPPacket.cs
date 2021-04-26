@@ -28,8 +28,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         protected ushort sourcePort;
         protected ushort destinationPort;
         protected ushort optionLen;
-        protected ulong sequenceNumber;
-        protected ulong ackNumber;
+        protected uint sequenceNumber;
+        protected uint ackNumber;
         protected int headerLenght;
         protected int flags;
         protected int wsValue;
@@ -263,11 +263,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             get { return sourcePort; }
         }
-        internal ulong AckNumber
+        internal uint AckNumber
         {
             get { return ackNumber; }
         }
-        internal ulong SequenceNumber
+        internal uint SequenceNumber
         {
             get { return sequenceNumber; }
         }

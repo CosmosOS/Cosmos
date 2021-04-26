@@ -61,8 +61,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal Status Status;
 
-        internal ulong LastACK;
-        internal ulong LastSEQ;
+        internal uint LastACK;
+        internal uint LastSEQ;
 
         /// <summary>
         /// Assign clients dictionary.
@@ -253,9 +253,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            LastACK = packet.AckNumber;
-            LastSEQ = packet.SequenceNumber;
-
             if (packet.RST)
             {
                 Status = Status.CLOSED;
@@ -279,6 +276,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             else if (Status == Status.OPENING && packet.SYN && packet.ACK)
             {
                 Status = Status.OPENED;
+
+                LastACK = packet.AckNumber;
+                LastSEQ = packet.SequenceNumber;
 
                 SendAck();
             }
@@ -318,10 +318,11 @@ namespace Cosmos.System.Network.IPv4.TCP
 
         private void SendAck()
         {
-            LastACK = LastSEQ + 1;
-            LastSEQ = LastACK;
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastACK, LastSEQ + 1, 20, 0x10, 0xFAF0, 0);
 
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, 0x10, 0xFAF0, 0);
+            LastACK = packet.AckNumber;
+            LastSEQ = packet.SequenceNumber;
+
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
         }
