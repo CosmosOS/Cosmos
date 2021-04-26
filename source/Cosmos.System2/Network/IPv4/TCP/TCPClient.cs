@@ -284,6 +284,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.OPENED;
 
+                LastACK = packet.AckNumber;
+                LastSEQ = packet.SequenceNumber;
+
                 SendAck(LastACK, LastSEQ + 1);
             }
             else
