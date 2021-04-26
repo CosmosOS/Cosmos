@@ -270,11 +270,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSING;
 
-                var tmp = LastACK;
-                LastACK = LastSEQ;
-                LastSEQ = tmp + 1;
-
-                SendAck();
+                SendAck(LastACK, LastSEQ + 1);
 
                 //TODO: Send FIN Packet
             }
@@ -282,16 +278,13 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
 
-                SendAck();
+                SendAck(LastSEQ, LastACK);
             }
             else if (Status == Status.OPENING && packet.SYN && packet.ACK)
             {
                 Status = Status.OPENED;
 
-                LastACK = packet.SequenceNumber;
-                LastSEQ = packet.AckNumber + 1;
-
-                SendAck();
+                SendAck(LastACK, LastSEQ + 1);
             }
             else
             {
@@ -333,9 +326,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Send acknowledgement packet
         /// </summary>
-        private void SendAck()
+        private void SendAck(uint lastSEQ, uint lastACK)
         {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, 0x10, 0xFAF0, 0);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, lastSEQ, lastACK, 20, 0x10, 0xFAF0, 0);
 
             LastACK = packet.AckNumber;
             LastSEQ = packet.SequenceNumber;
