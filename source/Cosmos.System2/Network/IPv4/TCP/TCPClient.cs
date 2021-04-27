@@ -174,11 +174,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         public bool Close()
         {
-            if (clients.ContainsKey((uint)localPort) == true)
-            {
-                clients.Remove((uint)localPort);
-            }
-
             if (Status == Status.OPENED)
             {
                 var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, 0x11, 0xFAF0, 0);
@@ -187,12 +182,18 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 Status = Status.CLOSING;
 
-                return WaitStatus(Status.CLOSED, 5000);
+                if (WaitStatus(Status.CLOSED, 5000) == false)
+                {
+                    return false;
+                }
             }
-            else
+
+            if (clients.ContainsKey((uint)localPort) == true)
             {
-                return true;
+                clients.Remove((uint)localPort);
             }
+
+            return true;
         }
 
         /// <summary>
@@ -288,10 +289,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                 LastSEQ = packet.SequenceNumber;
 
                 SendAck(LastACK, LastSEQ + 1);
-            }
-            else
-            {
-                throw new Exception("Unknown error on received TCP packet.");
             }
         }
 
