@@ -198,11 +198,8 @@ namespace Cosmos.HAL
                      */
                     else if (xFirstByte == 0xAB && ReadDataWithTimeout(ref xSecondByte))
                     {
-                        // TODO: replace xTest with (xSecondByte == 0x41 || xSecondByte == 0xC1)
-                        //       when the stack corruption detection works better for complex conditions
-                        var xTest = (xSecondByte == 0x41 || xSecondByte == 0xC1);
 
-                        if (xTest && aPort == 1)
+                        if ((xSecondByte == 0x41 || xSecondByte == 0xC1) && aPort == 1)
                         {
                             var xDevice = new PS2Keyboard(aPort);
                             xDevice.Initialize();
@@ -239,7 +236,10 @@ namespace Cosmos.HAL
                     mDebugger.SendInternal("(PS/2 Controller) Device detection failed:");
                     mDebugger.SendInternal("First Byte: " + xFirstByte);
                     mDebugger.SendInternal("Second Byte: " + xSecondByte);
-                    throw new Exception("(PS/2 Controller) PS/2 device not supported");
+                    Console.WriteLine("(PS/2 Controller) Device detection failed.");
+                    Console.WriteLine("This is usually Fine for USB to PS / 2 Emulation");
+                    Console.WriteLine("Press any key to Resume (Good Luck)");
+                    Console.ReadLine();
                 }
             }
             else
