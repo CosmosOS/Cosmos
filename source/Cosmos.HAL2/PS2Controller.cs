@@ -198,8 +198,11 @@ namespace Cosmos.HAL
                      */
                     else if (xFirstByte == 0xAB && ReadDataWithTimeout(ref xSecondByte))
                     {
+                        // TODO: replace xTest with (xSecondByte == 0x41 || xSecondByte == 0xC1)
+                        //       when the stack corruption detection works better for complex conditions
+                        var xTest = (xSecondByte == 0x41 || xSecondByte == 0xC1);
 
-                        if ((xSecondByte == 0x41 || xSecondByte == 0xC1) && aPort == 1)
+                        if (xTest && aPort == 1)
                         {
                             var xDevice = new PS2Keyboard(aPort);
                             xDevice.Initialize();
