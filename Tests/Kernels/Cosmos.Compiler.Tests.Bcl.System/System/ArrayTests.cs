@@ -143,6 +143,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 }
                 Assert.IsTrue(error, "Index out of range exception works correctly for too large positions.");
                 error = false;
+              
                 try
                 {
 #pragma warning disable CS0251 // Indexing an array with a negative index
@@ -155,6 +156,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 }
                 Assert.IsTrue(error, "Index out of range exception works correctly for too small positions.");
                 error = false;
+              
                 try
                 {
                     x[7] = new Test();
@@ -165,6 +167,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 }
                 Assert.IsTrue(error, "Index out of range exception works correctly when setting elements.");
             }
+
+            string[] stringArray = new string[10];
+            stringArray[0] += "asd";
+            Assert.AreEqual(stringArray[0], "asd", "Adding directly to array works");
         }
     }
 
