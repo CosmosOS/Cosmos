@@ -349,17 +349,17 @@ namespace Cosmos.System.Graphics
                     {
                         if(colorOrder == ColorOrder.BGR)
                         {
-                            pixel[3] = pixelData[position++];
+                            pixel[3] = 255;
                             pixel[2] = pixelData[position++];
                             pixel[1] = pixelData[position++];
-                            pixel[0] = 0;
+                            pixel[0] = pixelData[position++];
                         }
                         else
                         {
                             pixel[0] = pixelData[position++];
                             pixel[1] = pixelData[position++];
                             pixel[2] = pixelData[position++];
-                            pixel[3] = 0;
+                            pixel[3] = 255;
                         }
                     }
                     rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0); //This bits should be A, R, G, B but order is switched
@@ -510,7 +510,7 @@ namespace Cosmos.System.Graphics
                     data = BitConverter.GetBytes(rawData[x + (Height - (y + 1)) * Width]);
                     for (int i = 0; i < byteNum; i++)
                     {
-                        imageData[imageDataPoint++] = data[i + cOffset];
+                        imageData[imageDataPoint++] = data[byteNum - i];
                     }
                 }
                 imageDataPoint += padding;
