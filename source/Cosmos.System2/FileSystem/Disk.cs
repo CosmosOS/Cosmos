@@ -14,36 +14,21 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// List of partitions
         /// </summary>
-        public List<ManagedPartition> parts = new List<ManagedPartition>();
-
+        private List<ManagedPartition> parts = new List<ManagedPartition>();
         public List<ManagedPartition> Partitions { get { return parts; } }
 
-        /// <summary>
-        /// Get the directory separator char.
-        /// </summary>
-        public static char DirectorySeparatorChar { get { return '\\'; } }
-
-        /// <summary>
-        /// Get the alt. directory separator char.
-        /// </summary>
-        public static char AltDirectorySeparatorChar { get { return '/'; } }
-
-        /// <summary>
-        /// Get the volume separator char.
-        /// </summary>
-        public static char VolumeSeparatorChar { get { return ':'; } }
-        public static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>();
+        private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>();
         /// <summary>
         /// List of file systems.
         /// </summary>
-        public static List<FileSystemFactory> RegisteredFileSystems { get { return registeredFileSystems; } }
+        public static List<FileSystemFactory> RegisteredFileSystemsTypes { get { return registeredFileSystems; } }
         /// <summary>
         /// Main blockdevice that has all of the partitions.
         /// </summary>
-        public BlockDevice host;
+        public BlockDevice Host;
         public Disk(BlockDevice b)
         {
-            host = b;
+            Host = b;
             if (registeredFileSystems.Count == 0)
             {
                 registeredFileSystems.Add(new FatFileSystemFactory());
@@ -52,7 +37,7 @@ namespace Cosmos.System.FileSystem
             {
                 if (BlockDevice.Devices[i] is Partition b2)
                 {
-                    if (b2.mHost == b)
+                    if (b2.Host == b)
                     {
                         parts.Add(new ManagedPartition(b2));
                     }
@@ -124,7 +109,7 @@ namespace Cosmos.System.FileSystem
             xMBRData[446 + 14] = 0x0F;
             xMBRData[446 + 15] = 00;
 
-            host.WriteBlock(0UL, 1U, ref xMBRData);
+            Host.WriteBlock(0UL, 1U, ref xMBRData);
         }
     }
 }

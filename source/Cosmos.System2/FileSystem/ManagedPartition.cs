@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
 {
@@ -23,17 +24,9 @@ namespace Cosmos.System.FileSystem
         {
             get
             {
-                foreach (var item in Disk.RegisteredFileSystems)
-                {
-                    if (item.IsType(Host))
-                    {
-                        return true;
-                    }
-                }
-                return false;
+                return MountedFS != null;
             }
         }
-
 
         public ManagedPartition(Partition host)
         {
@@ -47,10 +40,30 @@ namespace Cosmos.System.FileSystem
             //Don't remount
             if (MountedFS != null)
                 return;
-            string xRootPath = string.Concat(Disk.CurrentDriveLetter, Disk.VolumeSeparatorChar, Disk.DirectorySeparatorChar);
+            string xRootPath = string.Concat(Disk.CurrentDriveLetter, VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
-            foreach (var item in Disk.RegisteredFileSystems)
+            foreach (var item in Disk.RegisteredFileSystemsTypes)
+            {
+                if (item.IsType(Host))
+                {
+                    MountedFS = item.Create(Host, xRootPath, xSize);
+                    RootPath = xRootPath;
+                }
+            }
+        }
+        /// <summary>
+        /// Mounts a FileSystem factory.
+        /// </summary>
+        public void Mount(FileSystemFactory fact)
+        {
+            //Don't remount
+            if (MountedFS != null)
+                return;
+            string xRootPath = string.Concat(Disk.CurrentDriveLetter, VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
+            var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
+
+            foreach (var item in Disk.RegisteredFileSystemsTypes)
             {
                 if (item.IsType(Host))
                 {

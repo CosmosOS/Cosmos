@@ -871,9 +871,9 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="path">The path</param>
         /// <returns>A ManagedPartition</returns>
-        private ManagedPartition GetPartitionFromPath(string path)
+        private ManagedPartition GetPartitionFromPath(string aDriveId)
         {
-            var driveLetter = Path.GetPathRoot(path);
+            var driveLetter = Path.GetPathRoot(aDriveId);
 
             foreach (var disk in Disks)
             {
@@ -886,7 +886,7 @@ namespace Cosmos.System.FileSystem
                 }
             }
 
-            throw new FileNotFoundException("Dirrectory/file entry not found: " + path);
+            throw new FileNotFoundException("Dirrectory/file entry not found: " + aDriveId);
         }
     }
 }
