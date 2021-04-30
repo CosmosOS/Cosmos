@@ -40,7 +40,20 @@ namespace Cosmos.HAL.Network
                     }
 
                     #endregion
+                    #region RTL8139
 
+                    if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
+                    {
+                        var RTL8139Device = new RTL8139(device);
+
+                        RTL8139Device.NameID = ("eth" + NetworkDeviceID);
+
+                        RTL8139Device.Enable();
+
+                        NetworkDeviceID++;
+                    }
+
+                    #endregion
                 }
             }
 
