@@ -44,7 +44,27 @@ namespace Cosmos.System.FileSystem
                 }
             }
             Size = (int)(b.BlockCount * b.BlockSize / 1024 / 1024);
-
+        }
+        internal static int CurrentDriveLetter = 0;
+        /// <summary>
+        /// Mounts the disk.
+        /// </summary>
+        public void Mount()
+        {
+            foreach (var part in Partitions)
+            {
+                if (part != null)
+                {
+                    part.Mount();
+                    CurrentDriveLetter++;
+                }
+            }
+        }
+        /// <summary>
+        /// Display information about the disk.
+        /// </summary>
+        public void DisplayInformation()
+        {
             if (Partitions.Count > 0)
             {
                 for (int i = 0; i < Partitions.Count; i++)
@@ -66,21 +86,6 @@ namespace Cosmos.System.FileSystem
             else
             {
                 global::System.Console.WriteLine("No partitions found!");
-            }
-        }
-        internal static int CurrentDriveLetter = 0;
-        /// <summary>
-        /// Mounts the disk.
-        /// </summary>
-        public void Mount()
-        {
-            foreach (var part in Partitions)
-            {
-                if (part != null)
-                {
-                    part.Mount();
-                    CurrentDriveLetter++;
-                }
             }
         }
         /// <summary>

@@ -855,11 +855,11 @@ namespace Cosmos.System.FileSystem
             //parm checking
             if (aDriveId.Length == 1)
             {
-                aDriveId += @":\";
+                aDriveId += VolumeSeparatorChar + DirectorySeparatorChar;
             }
             if (aDriveId.EndsWith(@":"))
             {
-                aDriveId += @"\";
+                aDriveId += DirectorySeparatorChar;
             }
 
             var xFs = GetFileSystemFromPath(aDriveId);

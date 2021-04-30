@@ -1404,7 +1404,6 @@ namespace Cosmos.System.FileSystem.FAT
 
                 foreach (var el in x)
                 {
-                    Global.mFileSystemDebugger.SendInternal($"Found '{el.mName}' of type {(int)el.mEntryType}");
                     // Delete yourself!
                     el.DeleteDirectoryEntry();
                 }
