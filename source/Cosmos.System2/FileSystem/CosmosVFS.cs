@@ -857,7 +857,7 @@ namespace Cosmos.System.FileSystem
             {
                 aDriveId += VolumeSeparatorChar + DirectorySeparatorChar;
             }
-            if (aDriveId.EndsWith(@":"))
+            if (aDriveId.EndsWith(VolumeSeparatorChar.ToString()))
             {
                 aDriveId += DirectorySeparatorChar;
             }
