@@ -27,8 +27,8 @@ so overwhelming like the dev kit. This article focuses on the user kit.
 
 ##  Writing your first Operating System
 
-Create a new project as you would any C# project, but select Cosmos as the
-project type.
+Create a new project as you would any C# project, but select Cosmos Kernel  
+(Previously CosmosBoot; same functionality) as the project type.
 
 ![](images/SNAG-0000.png)
 
