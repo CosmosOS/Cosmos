@@ -10,7 +10,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Hosting device.
         /// </summary>
-        private readonly BlockDevice mHost;
+        public readonly BlockDevice mHost;
         /// <summary>
         /// Starting sector.
         /// </summary>

@@ -18,10 +18,11 @@ namespace Cosmos.System.FileSystem
     /// <seealso cref="Cosmos.System.FileSystem.VFS.VFSBase" />
     public class CosmosVFS : VFSBase
     {
-        private List<Partition> mPartitions;
-        private List<FileSystem> mFileSystems;
-        private FileSystem mCurrentFileSystem;
-        private List<FileSystemFactory> mRegisteredFileSystems;
+        private List<Disk> disks = new List<Disk>();
+        /// <summary>
+        /// List of disks.
+        /// </summary>
+        public List<Disk> Disks { get { return disks; } }
 
         /// <summary>
         /// Initializes the virtual file system.
@@ -38,29 +39,32 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
         public override void Initialize()
         {
-            mPartitions = new List<Partition>();
-            mFileSystems = new List<FileSystem>();
-            mRegisteredFileSystems = new List<FileSystemFactory>();
+            if (BlockDevice.Devices.Count == 0)
+            {
+                global::System.Console.WriteLine("No disks found!");
+                return;
+            }
 
-            RegisterFileSystem(new FatFileSystemFactory());
+            foreach (var item in BlockDevice.Devices)
+            {
+                if (item is AtaPio)
+                {
+                    Disks.Add(new Disk(item));
+                }
+            }
 
             InitializePartitions();
-            if (mPartitions.Count > 0)
+        }
+        /// <summary>
+        /// Mounts filesystems.
+        /// </summary>
+        protected virtual void InitializePartitions()
+        {
+            foreach (var disk in Disks)
             {
-                InitializeFileSystems();
+                disk.Mount();
             }
         }
-
-        /// <summary>
-        /// Register file system.
-        /// </summary>
-        /// <param name="aFileSystemFactory">A file system to register.</param>
-        public override void RegisterFileSystem(FileSystemFactory aFileSystemFactory)
-        {
-            Global.mFileSystemDebugger.SendInternal($"Registering filesystem {aFileSystemFactory.Name}");
-            mRegisteredFileSystems.Add(aFileSystemFactory);
-        }
-
         /// <summary>
         /// Creates a new file.
         /// </summary>
@@ -426,16 +430,20 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="ArgumentException">Thrown when root path is null or empty.</exception>
         public override List<DirectoryEntry> GetVolumes()
         {
-            List<DirectoryEntry> xVolumes = new List<DirectoryEntry>();
-
-            for (int i = 0; i < mFileSystems.Count; i++)
+            var xVolumes = new List<DirectoryEntry>();
+            foreach (var disk in Disks)
             {
-                xVolumes.Add(GetVolume(mFileSystems[i]));
+                foreach (var part in disk.Partitions)
+                {
+                    if (part.MountedFS != null)
+                    {
+                        xVolumes.Add(GetVolume(part.MountedFS));
+                    }
+                }
             }
 
             return xVolumes;
         }
-
         /// <summary>
         /// Gets the directory entry for a volume.
         /// </summary>
@@ -546,88 +554,6 @@ namespace Cosmos.System.FileSystem
         }
 
         /// <summary>
-        /// Initializes the partitions for all block devices.
-        /// </summary>
-        /// <exception cref="IOException">Thrown on I/O exception.</exception>
-        protected virtual void InitializePartitions()
-        {
-            for (int i = 0; i < BlockDevice.Devices.Count; i++)
-            {
-                if (BlockDevice.Devices[i] is Partition)
-                {
-                    mPartitions.Add((Partition)BlockDevice.Devices[i]);
-                }
-            }
-
-            if (mPartitions.Count > 0)
-            {
-                for (int i = 0; i < mPartitions.Count; i++)
-                {
-                    Global.mFileSystemDebugger.SendInternal("Partition #: ");
-                    Global.mFileSystemDebugger.SendInternal(i + 1);
-                    global::System.Console.WriteLine("Partition #: " + (i + 1));
-                    Global.mFileSystemDebugger.SendInternal("Block Size:");
-                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockSize);
-                    global::System.Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes");
-                    Global.mFileSystemDebugger.SendInternal("Block Count:");
-                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount);
-                    global::System.Console.WriteLine("Block Count: " + mPartitions[i].BlockCount);
-                    Global.mFileSystemDebugger.SendInternal("Size:");
-                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
-                    global::System.Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
-                }
-            }
-            else
-            {
-                global::System.Console.WriteLine("No partitions found!");
-            }
-        }
-
-        /// <summary>
-        /// Initializes the file system for all partitions.
-        /// </summary>
-        /// <exception cref="ArgumentNullException">Thrown if null partition exists.</exception>
-        /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
-        /// <exception cref="Exception">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
-        /// <exception cref="IOException">Thrown on I/O exception.</exception>
-        /// <exception cref="PathTooLongException">Thrown on fatal error.</exception>
-        /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
-        /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
-        /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
-        protected virtual void InitializeFileSystems()
-        {
-            for (int i = 0; i < mPartitions.Count; i++)
-            {
-                string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
-                var xSize = (long)(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
-
-                // We 'probe' the partition <i> with all the FileSystem registered until we find a Filesystem that can read / write to it
-                foreach (var fs in mRegisteredFileSystems)
-                {
-                    if (fs.IsType(mPartitions[i]))
-                    {
-                        Global.mFileSystemDebugger.SendInternal($"Partion {i} has a {fs.Name} filesystem");
-                        mFileSystems.Add(fs.Create(mPartitions[i], xRootPath, xSize));
-                    }
-                }
-
-                if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].RootPath == xRootPath))
-                {
-                    string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
-                    global::System.Console.WriteLine(xMessage);
-                    mFileSystems[i].DisplayFileSystemInfo();
-                }
-                else
-                {
-                    string xMessage = string.Concat("No filesystem found on partition #", i);
-                    global::System.Console.WriteLine(xMessage);
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets the file system from a path.
         /// </summary>
         /// <param name="aPath">The path.</param>
@@ -648,22 +574,12 @@ namespace Cosmos.System.FileSystem
             string xPath = Path.GetPathRoot(aPath);
             Global.mFileSystemDebugger.SendInternal("xPath after GetPathRoot = " + xPath);
 
-            if ((mCurrentFileSystem != null) && (xPath == mCurrentFileSystem.RootPath))
+            var xFS = GetPartitionFromPath(aPath).MountedFS;
+            if (xFS == null)
             {
-                Global.mFileSystemDebugger.SendInternal("Returning current file system.");
-                return mCurrentFileSystem;
+                throw new Exception("Unknown filesystem on disk or not mounted!");
             }
-
-            for (int i = 0; i < mFileSystems.Count; i++)
-            {
-                if (mFileSystems[i].RootPath == xPath)
-                {
-                    Global.mFileSystemDebugger.SendInternal("Found filesystem.");
-                    mCurrentFileSystem = mFileSystems[i];
-                    return mCurrentFileSystem;
-                }
-            }
-            throw new Exception("Unable to determine filesystem for path: " + aPath);
+            return xFS;
         }
 
         /// <summary>
@@ -821,7 +737,11 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetTotalSize(string aDriveId)
         {
-            var xFs = GetFileSystemFromPath(aDriveId);
+            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
+            if (xFs == null)
+            {
+                throw new Exception("Unknown filesystem on disk or not mounted!");
+            }
 
             /* We have to return it in bytes */
             return xFs.Size * 1024 * 1024;
@@ -836,7 +756,11 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetAvailableFreeSpace(string aDriveId)
         {
-            var xFs = GetFileSystemFromPath(aDriveId);
+            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
+            if (xFs == null)
+            {
+                throw new Exception("Unknown filesystem on disk or not mounted!");
+            }
 
             return xFs.AvailableFreeSpace;
         }
@@ -850,7 +774,11 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetTotalFreeSpace(string aDriveId)
         {
-            var xFs = GetFileSystemFromPath(aDriveId);
+            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
+            if (xFs == null)
+            {
+                throw new Exception("Unknown filesystem on disk or not mounted!");
+            }
 
             return xFs.TotalFreeSpace;
         }
@@ -864,7 +792,11 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override string GetFileSystemType(string aDriveId)
         {
-            var xFs = GetFileSystemFromPath(aDriveId);
+            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
+            if (xFs == null)
+            {
+                throw new Exception("Unknown filesystem on disk or not mounted!");
+            }
 
             return xFs.Type;
         }
@@ -878,11 +810,14 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override string GetFileSystemLabel(string aDriveId)
         {
-            var xFs = GetFileSystemFromPath(aDriveId);
+            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
+            if (xFs == null)
+            {
+                throw new Exception("Unknown filesystem on disk or not mounted!");
+            }
 
             return xFs.Label;
         }
-
         /// <summary>
         /// Set file system type.
         /// </summary>
@@ -895,8 +830,15 @@ namespace Cosmos.System.FileSystem
             Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.SetFileSystemLabel ---");
             Global.mFileSystemDebugger.SendInternal($"aDriveId {aDriveId} aLabel {aLabel}");
 
-            var xFs = GetFileSystemFromPath(aDriveId);
-            xFs.Label = aLabel;
+            var xFs = GetPartitionFromPath(aDriveId);
+            if (xFs.MountedFS != null)
+            {
+                xFs.MountedFS.Label = aLabel;
+            }
+            else
+            {
+                throw new Exception("Unknown filesystem on disk or not mounted!");
+            }
         }
 
         /// <summary>
@@ -938,10 +880,41 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Format(string aDriveId, string aDriveFormat, bool aQuick)
         {
+            //parm checking
+            if (aDriveId.Length == 1)
+            {
+                aDriveId += @":\";
+            }
+            if (aDriveId.EndsWith(@":"))
+            {
+                aDriveId += @"\";
+            }
+
             var xFs = GetFileSystemFromPath(aDriveId);
 
             xFs.Format(aDriveFormat, aQuick);
         }
+        /// <summary>
+        /// Gets a ManagedPartition class from a root path.
+        /// </summary>
+        /// <param name="path">The path</param>
+        /// <returns>A ManagedPartition</returns>
+        private ManagedPartition GetPartitionFromPath(string path)
+        {
+            var driveLetter = Path.GetPathRoot(path);
 
+            foreach (var disk in Disks)
+            {
+                foreach (var part in disk.Partitions)
+                {
+                    if (part.MountedFS != null && part.RootPath == driveLetter)
+                    {
+                        return part;
+                    }
+                }
+            }
+
+            throw new FileNotFoundException("Dirrectory/file entry not found: " + path);
+        }
     }
 }

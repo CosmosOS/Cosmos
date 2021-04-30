@@ -462,15 +462,6 @@ namespace Cosmos.System.FileSystem.VFS
         }
 
         /// <summary>
-        /// Register file system.
-        /// </summary>
-        /// <param name="aFileSystemFactory">A file system to register.</param>
-        public static void RegisterFileSystem(FileSystemFactory aFileSystemFactory)
-        {
-            mVFS.RegisterFileSystem(aFileSystemFactory);
-        }
-
-        /// <summary>
         /// Get logical drivers list.
         /// </summary>
         /// <returns>List of strings value.</returns>

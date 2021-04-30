@@ -1395,19 +1395,23 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Format(string aDriveFormat, bool aQuick)
         {
-            var xRootDirectory = (FatDirectoryEntry)GetRootDirectory();
-
+            var xRootDirectory = GetRootDirectory();
             var Fat = GetFat(0);
-
-            var x = xRootDirectory.ReadDirectoryContents();
-
-            foreach (var el in x)
+            if (xRootDirectory != null)
             {
-                Global.mFileSystemDebugger.SendInternal($"Found '{el.mName}' of type {(int)el.mEntryType}");
-                // Delete yourself!
-                el.DeleteDirectoryEntry();
-            }
+                var xRootDirFat = (FatDirectoryEntry)xRootDirectory;
+                
 
+                var x = xRootDirFat.ReadDirectoryContents();
+
+                foreach (var el in x)
+                {
+                    Global.mFileSystemDebugger.SendInternal($"Found '{el.mName}' of type {(int)el.mEntryType}");
+                    // Delete yourself!
+                    el.DeleteDirectoryEntry();
+                }
+
+            }
             Fat.ClearAllFat();
         }
     }

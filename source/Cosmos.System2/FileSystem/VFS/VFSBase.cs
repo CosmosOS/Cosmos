@@ -15,12 +15,6 @@ namespace Cosmos.System.FileSystem.VFS
         public abstract void Initialize();
 
         /// <summary>
-        /// Register file system.
-        /// </summary>
-        /// <param name="aFileSystemFactory">A file system to register.</param>
-        public abstract void RegisterFileSystem(FileSystemFactory aFileSystemFactory);
-
-        /// <summary>
         /// Create File.
         /// </summary>
         /// <param name="aPath">A path to the file.</param>
