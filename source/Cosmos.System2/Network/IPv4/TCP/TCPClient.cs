@@ -279,7 +279,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
 
-                SendAck(LastSEQ, LastACK);
+                SendAck(LastACK, LastSEQ + 1);
             }
             else if (Status == Status.OPENING && packet.SYN && packet.ACK)
             {
