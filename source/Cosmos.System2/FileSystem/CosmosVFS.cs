@@ -41,8 +41,7 @@ namespace Cosmos.System.FileSystem
         {
             if (BlockDevice.Devices.Count == 0)
             {
-                global::System.Console.WriteLine("No disks found!");
-                return;
+                throw new Exception("No disks found!");
             }
 
             foreach (var item in BlockDevice.Devices)
@@ -737,12 +736,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetTotalSize(string aDriveId)
         {
-            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
-            if (xFs == null)
-            {
-                throw new Exception("Unknown filesystem on disk or not mounted!");
-            }
-
+            var xFs = GetFileSystemFromPath(aDriveId);
             /* We have to return it in bytes */
             return xFs.Size * 1024 * 1024;
         }
@@ -756,12 +750,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetAvailableFreeSpace(string aDriveId)
         {
-            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
-            if (xFs == null)
-            {
-                throw new Exception("Unknown filesystem on disk or not mounted!");
-            }
-
+            var xFs = GetFileSystemFromPath(aDriveId);
             return xFs.AvailableFreeSpace;
         }
 
@@ -774,12 +763,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override long GetTotalFreeSpace(string aDriveId)
         {
-            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
-            if (xFs == null)
-            {
-                throw new Exception("Unknown filesystem on disk or not mounted!");
-            }
-
+            var xFs = GetFileSystemFromPath(aDriveId);
             return xFs.TotalFreeSpace;
         }
 
@@ -792,12 +776,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override string GetFileSystemType(string aDriveId)
         {
-            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
-            if (xFs == null)
-            {
-                throw new Exception("Unknown filesystem on disk or not mounted!");
-            }
-
+            var xFs = GetFileSystemFromPath(aDriveId);
             return xFs.Type;
         }
 
@@ -810,7 +789,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aDriveId</exception>
         public override string GetFileSystemLabel(string aDriveId)
         {
-            var xFs = GetPartitionFromPath(aDriveId).MountedFS;
+            var xFs = GetFileSystemFromPath(aDriveId);
             if (xFs == null)
             {
                 throw new Exception("Unknown filesystem on disk or not mounted!");
@@ -830,15 +809,8 @@ namespace Cosmos.System.FileSystem
             Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.SetFileSystemLabel ---");
             Global.mFileSystemDebugger.SendInternal($"aDriveId {aDriveId} aLabel {aLabel}");
 
-            var xFs = GetPartitionFromPath(aDriveId);
-            if (xFs.MountedFS != null)
-            {
-                xFs.MountedFS.Label = aLabel;
-            }
-            else
-            {
-                throw new Exception("Unknown filesystem on disk or not mounted!");
-            }
+            var xFs = GetFileSystemFromPath(aDriveId);
+            xFs.Label = aLabel;
         }
 
         /// <summary>

@@ -10,7 +10,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Hosting device.
         /// </summary>
-        public readonly BlockDevice mHost;
+        public readonly BlockDevice Host;
         /// <summary>
         /// Starting sector.
         /// </summary>
@@ -24,7 +24,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aSectorCount">A sector count.</param>
 		public Partition(BlockDevice aHost, UInt64 aStartingSector, UInt64 aSectorCount)
 		{
-			mHost = aHost;
+            Host = aHost;
 			mStartingSector = aStartingSector;
 			mBlockCount = aSectorCount;
 			mBlockSize = aHost.BlockSize;
@@ -43,7 +43,7 @@ namespace Cosmos.HAL.BlockDevice
             CheckDataSize(aData, aBlockCount);
             UInt64 xHostBlockNo = mStartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
-            mHost.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
+            Host.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Cosmos.HAL.BlockDevice
             CheckDataSize(aData, aBlockCount);
             UInt64 xHostBlockNo = mStartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
-            mHost.WriteBlock(xHostBlockNo, aBlockCount, ref aData);
+            Host.WriteBlock(xHostBlockNo, aBlockCount, ref aData);
         }
 
         /// <summary>
