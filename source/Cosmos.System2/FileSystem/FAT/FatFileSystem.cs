@@ -1400,8 +1400,6 @@ namespace Cosmos.System.FileSystem.FAT
             if (xRootDirectory != null)
             {
                 var xRootDirFat = (FatDirectoryEntry)xRootDirectory;
-                
-
                 var x = xRootDirFat.ReadDirectoryContents();
 
                 foreach (var el in x)
@@ -1410,7 +1408,6 @@ namespace Cosmos.System.FileSystem.FAT
                     // Delete yourself!
                     el.DeleteDirectoryEntry();
                 }
-
             }
             Fat.ClearAllFat();
         }
