@@ -263,7 +263,7 @@ namespace Cosmos.HAL.BlockDevice
                 array[counter++] = bytes[0];
             }
             //Convert byte[] to string
-            return Encoding.ASCII.GetString(array.ToArray());
+            return Encoding.ASCII.GetString(array);
         }
 
 		public bool LBA48Bit;
