@@ -250,20 +250,22 @@ namespace Cosmos.HAL.BlockDevice
 			return xStatus;
 		}
 
-		protected string GetString(UInt16[] aBuffer, int aIndexStart, int aStringLength)
+		protected string GetString(ushort[] aBuffer, int aIndexStart, int aStringLength)
 		{
-			// Would be nice to convert to byte[] and use
-			// new string(ASCIIEncoding.ASCII.GetChars(xBytes));
-			// But it requires some code Cosmos doesnt support yet
-			var xChars = new char[aStringLength];
-			for (int i = 0; i < aStringLength / 2; i++)
-			{
-				UInt16 xChar = aBuffer[aIndexStart + i];
-				xChars[i * 2] = (char)(xChar >> 8);
-				xChars[i * 2 + 1] = (char)xChar;
-			}
-			return new string(xChars);
-		}
+            //Convert ushort[] to byte[]
+            var array = new List<byte>();
+            for (int i = aIndexStart; i < aIndexStart + (aStringLength/2); i++)
+            {
+                var item = aBuffer[i];
+                var bytes = BitConverter.GetBytes(item);
+                for (int i2 = 1; i2 >= 0; i2--)
+                {
+                    array.Add(bytes[i2]);
+                }
+            }
+            //Convert byte[] to string
+            return Encoding.ASCII.GetString(array.ToArray());
+        }
 
 		public bool LBA48Bit;
 		protected void InitDrive()
