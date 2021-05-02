@@ -253,9 +253,9 @@ namespace Cosmos.HAL.BlockDevice
 		protected string GetString(ushort[] aBuffer, int aIndexStart, int aStringLength)
 		{
             //Convert ushort[] to byte[]
-            byte[] array = new byte[aStringLength / 2];
+            byte[] array = new byte[aStringLength];
             int counter = 0;
-            for (int i = aIndexStart; i < aIndexStart + (aStringLength/2); i++)
+            for (int i = aIndexStart; i < aIndexStart + (aStringLength / 2); i++)
             {
                 var item = aBuffer[i];
                 var bytes = BitConverter.GetBytes(item);
