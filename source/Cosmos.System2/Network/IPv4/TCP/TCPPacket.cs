@@ -174,38 +174,40 @@ namespace Cosmos.System.Network.IPv4.TCP
             PSH = (RawData[47] & (1 << 3)) != 0;
             RST = (RawData[47] & (1 << 2)) != 0;
 
-            //options parsing
-            if (RawData.Length <= DataOffset + 20)
+            if (RawData.Length == (DataOffset + headerLenght)) //no data
             {
-                return;
-            }
-            if (RawData[DataOffset + 20] != 0)
-            {
-                options = new List<TCPOption>();
-
-                for (int i = 0; i < RawData.Length - (DataOffset + 20); i++)
+                if (headerLenght > 20) //options
                 {
-                    var option = new TCPOption();
-                    option.Kind = RawData[DataOffset + 20 + i];
+                    options = new List<TCPOption>();
 
-                    if (option.Kind != 1) //NOP
+                    for (int i = 0; i < RawData.Length - (DataOffset + 20); i++)
                     {
-                        option.Length = RawData[DataOffset + 20 + i + 1];
+                        var option = new TCPOption();
+                        option.Kind = RawData[DataOffset + 20 + i];
 
-                        if (option.Length != 2)
+                        if (option.Kind != 1) //NOP
                         {
-                            option.Data = new byte[option.Length - 2];
-                            for (int j = 0; j < option.Length - 2; j++)
+                            option.Length = RawData[DataOffset + 20 + i + 1];
+
+                            if (option.Length != 2)
                             {
-                                option.Data[j] = RawData[DataOffset + 20 + i + 2 + j];
+                                option.Data = new byte[option.Length - 2];
+                                for (int j = 0; j < option.Length - 2; j++)
+                                {
+                                    option.Data[j] = RawData[DataOffset + 20 + i + 2 + j];
+                                }
                             }
+
+                            options.Add(option);
+
+                            i += option.Length - 1;
                         }
-
-                        options.Add(option);
-
-                        i += option.Length - 1;
                     }
                 }
+            }
+            else
+            {
+                //TODO: Parse data
             }
         }
 

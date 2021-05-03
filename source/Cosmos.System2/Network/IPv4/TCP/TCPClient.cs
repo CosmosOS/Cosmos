@@ -20,6 +20,7 @@ namespace Cosmos.System.Network.IPv4.TCP
     {
         OPENED,
         OPENING, //SYN sent or received
+        DATASENT,
         CLOSED,
         CLOSING //FIN sent or received
     }
@@ -204,31 +205,20 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        public void Send(byte[] data)
+        public bool Send(byte[] data)
         {
             if ((destination == null) || (destinationPort == 0))
             {
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
 
-            Send(data, destination, destinationPort);
-            NetworkStack.Update();
-        }
-
-        /// <summary>
-        /// Send data.
-        /// </summary>
-        /// <param name="data">Data array.</param>
-        /// <param name="dest">Destination address.</param>
-        /// <param name="destPort">Destination port.</param>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        public void Send(byte[] data, Address dest, int destPort)
-        {
-            Address source = IPConfig.FindNetwork(dest);
-            var packet = new TCPPacket();
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, (ushort)(20 + data.Length), 0x18, 0xFAF0, 0, (ushort)data.Length, data);
             OutgoingBuffer.AddPacket(packet);
+            NetworkStack.Update();
+
+            Status = Status.DATASENT;
+
+            return WaitStatus(Status.OPENED, 5000);
         }
 
         /// <summary>
@@ -267,10 +257,13 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 throw new Exception("TCP Connection Reseted!");
             }
-            else if (Status == Status.OPENED && packet.FIN)
+
+            LastACK = packet.AckNumber;
+            LastSEQ = packet.SequenceNumber;
+
+            if (Status == Status.OPENED && packet.FIN)
             {
                 Status = Status.CLOSING;
-
                 SendAck(LastACK, LastSEQ + 1);
 
                 //TODO: Send FIN Packet
@@ -278,20 +271,16 @@ namespace Cosmos.System.Network.IPv4.TCP
             else if (Status == Status.CLOSING && packet.FIN && packet.ACK)
             {
                 Status = Status.CLOSED;
-
-                LastACK = packet.AckNumber;
-                LastSEQ = packet.SequenceNumber;
-
                 SendAck(LastACK, LastSEQ + 1);
             }
             else if (Status == Status.OPENING && packet.SYN && packet.ACK)
             {
                 Status = Status.OPENED;
-
-                LastACK = packet.AckNumber;
-                LastSEQ = packet.SequenceNumber;
-
                 SendAck(LastACK, LastSEQ + 1);
+            }
+            else if (Status == Status.DATASENT && packet.ACK)
+            {
+                Status = Status.OPENED;
             }
         }
 
