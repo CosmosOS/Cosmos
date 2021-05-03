@@ -273,6 +273,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             if (Status == Status.CLOSED && packet.SYN)
             {
                 Status = Status.OPENING;
+
+                source = IPConfig.FindNetwork(packet.SourceIP);
+
                 SendAck(LastACK, LastSEQ + 1, 0x12); //SYN / ACK
             }
             else if (Status == Status.OPENED && packet.FIN)
