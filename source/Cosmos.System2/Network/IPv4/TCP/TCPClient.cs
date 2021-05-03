@@ -262,9 +262,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                 throw new Exception("TCP Connection Reseted!");
             }
 
-            LastACK = packet.AckNumber;
-            LastSEQ = packet.SequenceNumber;
-
             if (Status == Status.OPENED && packet.FIN)
             {
                 Status = Status.CLOSING;
@@ -275,16 +272,27 @@ namespace Cosmos.System.Network.IPv4.TCP
             else if (Status == Status.CLOSING && packet.FIN && packet.ACK)
             {
                 Status = Status.CLOSED;
+
+                LastACK = packet.AckNumber;
+                LastSEQ = packet.SequenceNumber;
+
                 SendAck(LastACK, LastSEQ + 1);
             }
             else if (Status == Status.OPENING && packet.SYN && packet.ACK)
             {
                 Status = Status.OPENED;
+
+                LastACK = packet.AckNumber;
+                LastSEQ = packet.SequenceNumber;
+
                 SendAck(LastACK, LastSEQ + 1);
             }
             else if (Status == Status.DATASENT && packet.ACK)
             {
                 Status = Status.OPENED;
+
+                LastACK = packet.SequenceNumber;
+                LastSEQ = packet.AckNumber;
             }
         }
 
