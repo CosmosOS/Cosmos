@@ -276,6 +276,9 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 source = IPConfig.FindNetwork(packet.SourceIP);
 
+                LastACK = packet.AckNumber;
+                LastSEQ = packet.SequenceNumber;
+
                 SendAck(LastACK, LastSEQ + 1, 0x12); //SYN / ACK
             }
             else if (Status == Status.OPENED && packet.FIN)
