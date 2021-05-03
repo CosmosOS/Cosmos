@@ -278,6 +278,30 @@ namespace Cosmos.System.Network.IPv4.TCP
             get { return flags; }
         }
 
+        /// <summary>
+        /// Get TCP data lenght.
+        /// </summary>
+        public ushort TCP_DataLength => (ushort)(RawData.Length - (DataOffset + headerLenght));
+
+        /// <summary>
+        /// Get TCP data.
+        /// </summary>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        internal byte[] TCP_Data
+        {
+            get
+            {
+                byte[] data = new byte[TCP_DataLength];
+
+                for (int b = 0; b < data.Length; b++)
+                {
+                    data[b] = RawData[DataOffset + headerLenght + b];
+                }
+
+                return data;
+            }
+        }
+
         public override string ToString()
         {
             return "TCP Packet Src=" + SourceIP + ":" + sourcePort + ", Dest=" + DestinationIP + ":" + destinationPort;

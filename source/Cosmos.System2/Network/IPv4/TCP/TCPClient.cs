@@ -233,7 +233,16 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
         public byte[] NonBlockingReceive(ref EndPoint source)
         {
-            throw new NotImplementedException();
+            if (rxBuffer.Count < 1)
+            {
+                return null;
+            }
+
+            var packet = new TCPPacket(rxBuffer.Dequeue().RawData);
+            source.address = packet.SourceIP;
+            source.port = packet.SourcePort;
+
+            return packet.TCP_Data;
         }
 
         /// <summary>
@@ -244,7 +253,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
         public byte[] Receive(ref EndPoint source)
         {
-            throw new NotImplementedException();
+            while (rxBuffer.Count < 1);
+
+            var packet = new TCPPacket(rxBuffer.Dequeue().RawData);
+            source.address = packet.SourceIP;
+            source.port = packet.SourcePort;
+
+            return packet.TCP_Data;
         }
 
         /// <summary>
@@ -293,6 +308,15 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 LastACK = packet.SequenceNumber;
                 LastSEQ = packet.AckNumber;
+            }
+            else if (Status == Status.OPENED && packet.PSH && packet.ACK)
+            {
+                LastACK = packet.AckNumber;
+                LastSEQ = packet.SequenceNumber;
+
+                rxBuffer.Enqueue(packet);
+
+                SendAck(LastACK, LastSEQ + 1);
             }
         }
 
