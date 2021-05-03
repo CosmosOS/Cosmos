@@ -276,6 +276,9 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 source = IPConfig.FindNetwork(packet.SourceIP);
 
+                destination = packet.SourceIP;
+                destinationPort = packet.SourcePort;
+
                 LastACK = packet.AckNumber;
                 LastSEQ = packet.SequenceNumber;
 
