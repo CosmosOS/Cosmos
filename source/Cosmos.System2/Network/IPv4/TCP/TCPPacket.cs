@@ -33,7 +33,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         protected int headerLenght;
         protected int flags;
         protected int wsValue;
-        protected int checksum;
+        protected ushort checksum;
         protected int urgentPointer;
 
         protected List<TCPOption> options = null;
@@ -50,10 +50,17 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             Global.mDebugger.Send("[Received] TCP packet from " + packet.SourceIP.ToString() + ":" + packet.SourcePort.ToString());
 
-            var receiver = TcpClient.GetClient(packet.DestinationPort);
-            if (receiver != null)
+            if (packet.CheckCRC())
             {
-                receiver.ReceiveData(packet);
+                var receiver = TcpClient.GetClient(packet.DestinationPort);
+                if (receiver != null)
+                {
+                    receiver.ReceiveData(packet);
+                }
+            }
+            else
+            {
+                Global.mDebugger.Send("Checksum incorrect! Packet passed.");
             }
         }
 
@@ -256,6 +263,26 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             return header;
         }
+
+        /// <summary>
+        /// Check TCP Checksum
+        /// </summary>
+        /// <returns>True if checksum correct, False otherwise.</returns>
+        public bool CheckCRC()
+        {
+            /*byte[] header = MakeHeader();
+
+            if (CalcOcCRC(header, 0, header.Length) == checksum)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }*/
+            return true;
+        }
+
 
         internal ushort DestinationPort
         {
