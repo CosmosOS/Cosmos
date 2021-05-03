@@ -162,7 +162,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             destinationPort = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
             sequenceNumber = (uint)((RawData[DataOffset + 4] << 24) | (RawData[DataOffset + 5] << 16) | (RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
             ackNumber = (uint)((RawData[DataOffset + 8] << 24) | (RawData[DataOffset + 9] << 16) | (RawData[DataOffset + 10] << 8) | RawData[DataOffset + 11]);
-            headerLenght = RawData[DataOffset + 12];
+            headerLenght = (RawData[DataOffset + 12] >> 4) * 4;
             flags = RawData[DataOffset + 13];
             wsValue = (ushort)((RawData[DataOffset + 14] << 8) | RawData[DataOffset + 15]);
             checksum = (ushort)((RawData[DataOffset + 16] << 8) | RawData[DataOffset + 17]);

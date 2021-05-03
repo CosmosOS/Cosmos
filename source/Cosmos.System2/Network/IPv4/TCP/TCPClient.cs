@@ -270,14 +270,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            if (packet.RST)
+            if (Status == Status.CLOSED && packet.SYN)
             {
-                Status = Status.CLOSED;
-
-                throw new Exception("TCP Connection Reseted!");
+                Status = Status.OPENING;
+                SendAck(LastACK, LastSEQ + 1, 0x12); //SYN / ACK
             }
-
-            if (Status == Status.OPENED && packet.FIN)
+            else if (Status == Status.OPENED && packet.FIN)
             {
                 Status = Status.CLOSING;
                 SendAck(LastACK, LastSEQ + 1);
@@ -301,6 +299,17 @@ namespace Cosmos.System.Network.IPv4.TCP
                 LastSEQ = packet.SequenceNumber;
 
                 SendAck(LastACK, LastSEQ + 1);
+            }
+            if (Status == Status.OPENING && packet.ACK)
+            {
+                Status = Status.OPENED;
+
+                LastACK = packet.AckNumber;
+                LastSEQ = packet.SequenceNumber;
+            }
+            else if (Status == Status.OPENING && packet.RST && packet.ACK)
+            {
+                throw new Exception("Connection rejected!");
             }
             else if (Status == Status.DATASENT && packet.ACK)
             {
@@ -354,9 +363,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Send acknowledgement packet
         /// </summary>
-        private void SendAck(uint lastSEQ, uint lastACK)
+        private void SendAck(uint lastSEQ, uint lastACK, ushort flag = 0x10)
         {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, lastSEQ, lastACK, 20, 0x10, 0xFAF0, 0);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, lastSEQ, lastACK, 20, flag, 0xFAF0, 0);
 
             LastACK = packet.AckNumber;
             LastSEQ = packet.SequenceNumber;
