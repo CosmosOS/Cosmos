@@ -213,7 +213,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
 
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, (ushort)(20 + data.Length), 0x18, 0xFAF0, 0, (ushort)data.Length, data);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, 0x18, 0xFAF0, 0, (ushort)data.Length, data);
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
