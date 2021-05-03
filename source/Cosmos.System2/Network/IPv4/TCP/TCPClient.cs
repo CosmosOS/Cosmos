@@ -142,7 +142,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         /// <param name="dest">Destination address.</param>
         /// <param name="destPort">Destination port.</param>
-        public bool Connect(Address dest, int destPort, int timeout = 5000)
+        public void Connect(Address dest, int destPort, int timeout = 5000)
         {
             destination = dest;
             destinationPort = destPort;
@@ -166,14 +166,17 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             Status = Status.OPENING;
 
-            return WaitStatus(Status.OPENED, timeout);
+            if (WaitStatus(Status.OPENED, timeout) == false)
+            {
+                throw new Exception("Failed to open TCP connection!");
+            }
         }
 
         /// <summary>
         /// Close connection.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public bool Close()
+        public void Close()
         {
             if (Status == Status.OPENED)
             {
@@ -185,7 +188,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 if (WaitStatus(Status.CLOSED, 5000) == false)
                 {
-                    return false;
+                    throw new Exception("Failed to close TCP connection!");
                 }
             }
 
@@ -193,8 +196,6 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 clients.Remove((uint)localPort);
             }
-
-            return true;
         }
 
         /// <summary>
@@ -205,7 +206,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        public bool Send(byte[] data)
+        public void Send(byte[] data)
         {
             if ((destination == null) || (destinationPort == 0))
             {
@@ -218,7 +219,10 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             Status = Status.DATASENT;
 
-            return WaitStatus(Status.OPENED, 5000);
+            if (WaitStatus(Status.OPENED, 5000) == false)
+            {
+                throw new Exception("Failed to send TCP data!");
+            }
         }
 
         /// <summary>
