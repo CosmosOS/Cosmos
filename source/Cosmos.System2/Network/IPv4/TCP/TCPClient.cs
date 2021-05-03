@@ -327,6 +327,10 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 SendAck(LastACK, LastSEQ + 1);
             }
+            else if (packet.RST)
+            {
+                throw new Exception("Connection reseted!");
+            }
         }
 
         /// <summary>
