@@ -12,6 +12,18 @@ using System.Text;
 
 namespace Cosmos.System.Network.IPv4.TCP
 {
+    /// <summary>
+    /// TCP Flags
+    /// </summary>
+    public enum Flags
+    {
+        FIN = (1 << 0),
+        SYN = (1 << 1),
+        RST = (1 << 2),
+        PSH = (1 << 3),
+        ACK = (1 << 4),
+        URG = (1 << 5)
+    }
 
     /// <summary>
     /// DHCP Option
@@ -81,7 +93,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         { }
 
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
-            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
+            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, byte Flags,
             ushort WSValue, ushort UrgentPointer, ushort len, byte[] options)
             : base((ushort)(20 + len), 6, source, dest, 0x40)
         {
@@ -91,7 +103,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
-            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
+            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, byte Flags,
             ushort WSValue, ushort UrgentPointer)
             : base(20, 6, source, dest, 0x40)
         {
@@ -100,7 +112,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
-            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
+            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, byte Flags,
             ushort WSValue, ushort UrgentPointer, ushort len)
             : base((ushort)(20 + len), 6, source, dest, 0x40)
         {
@@ -109,7 +121,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         private void MakePacket(Address source, Address dest, ushort srcPort, ushort destPort,
-            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, ushort Flags,
+            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, byte Flags,
             ushort WSValue, ushort UrgentPointer, ushort len)
         {
             optionLen = len;
@@ -175,11 +187,11 @@ namespace Cosmos.System.Network.IPv4.TCP
             checksum = (ushort)((RawData[DataOffset + 16] << 8) | RawData[DataOffset + 17]);
             urgentPointer = (ushort)((RawData[DataOffset + 18] << 8) | RawData[DataOffset + 19]);
 
-            SYN = (RawData[47] & (1 << 1)) != 0;
-            ACK = (RawData[47] & (1 << 4)) != 0;
-            FIN = (RawData[47] & (1 << 0)) != 0;
-            PSH = (RawData[47] & (1 << 3)) != 0;
-            RST = (RawData[47] & (1 << 2)) != 0;
+            SYN = (RawData[47] & (byte)Flags.SYN) != 0;
+            ACK = (RawData[47] & (byte)Flags.ACK) != 0;
+            FIN = (RawData[47] & (byte)Flags.FIN) != 0;
+            PSH = (RawData[47] & (byte)Flags.PSH) != 0;
+            RST = (RawData[47] & (byte)Flags.RST) != 0;
 
             if (RawData.Length == (DataOffset + headerLenght)) //no data
             {

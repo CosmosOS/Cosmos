@@ -23,6 +23,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         DATASENT,
         CLOSED,
         CLOSING //FIN sent or received
+        //TODO: Implement real status values from RFC793
     }
 
     /// <summary>
@@ -149,17 +150,12 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             source = IPConfig.FindNetwork(dest);
 
-            byte[] options = new byte[]
-            {
-                0x02, 0x04, 0x05, 0xB4, 0x01, 0x03, 0x03, 0x08, 0x01, 0x01, 0x04, 0x02
-            };
-
             //Generate Random Sequence Number
             var rnd = new Random();
             ulong sequencenumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue)); 
 
             // Flags=0x02 -> Syn
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destPort, sequencenumber, 0, (ushort)(20 + options.Length), 0x02, 0xFAF0, 0, (ushort)options.Length, options);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destPort, sequencenumber, 0, 20, 0x02, 0xFAF0, 0);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
@@ -282,12 +278,12 @@ namespace Cosmos.System.Network.IPv4.TCP
                 LastACK = packet.AckNumber;
                 LastSEQ = packet.SequenceNumber;
 
-                SendAck(LastACK, LastSEQ + 1, 0x12); //SYN / ACK
+                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.SYN | Flags.ACK);
             }
             else if (Status == Status.OPENED && packet.FIN)
             {
                 Status = Status.CLOSING;
-                SendAck(LastACK, LastSEQ + 1);
+                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
 
                 //TODO: Send FIN Packet
             }
@@ -298,7 +294,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 LastACK = packet.AckNumber;
                 LastSEQ = packet.SequenceNumber;
 
-                SendAck(LastACK, LastSEQ + 1);
+                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
             }
             else if (Status == Status.OPENING && packet.SYN && packet.ACK)
             {
@@ -307,9 +303,9 @@ namespace Cosmos.System.Network.IPv4.TCP
                 LastACK = packet.AckNumber;
                 LastSEQ = packet.SequenceNumber;
 
-                SendAck(LastACK, LastSEQ + 1);
+                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
             }
-            if (Status == Status.OPENING && packet.ACK)
+            else if (Status == Status.OPENING && packet.ACK)
             {
                 Status = Status.OPENED;
 
@@ -334,7 +330,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 rxBuffer.Enqueue(packet);
 
-                SendAck(LastACK, LastSEQ + 1);
+                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
             }
             else if (packet.RST)
             {
@@ -376,9 +372,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Send acknowledgement packet
         /// </summary>
-        private void SendAck(uint lastSEQ, uint lastACK, ushort flag = 0x10)
+        private void SendEmptyPacket(uint lastSEQ, uint lastACK, Flags flag)
         {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, lastSEQ, lastACK, 20, flag, 0xFAF0, 0);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, lastSEQ, lastACK, 20, (byte)flag, 0xFAF0, 0);
 
             LastACK = packet.AckNumber;
             LastSEQ = packet.SequenceNumber;
