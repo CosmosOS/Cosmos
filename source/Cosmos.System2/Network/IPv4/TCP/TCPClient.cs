@@ -72,12 +72,17 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Last Connection Acknowledgement number.
         /// </summary>
-        internal uint LastACK;
+        internal uint AckNumber;
 
         /// <summary>
         /// Last Connection Sequence number.
         /// </summary>
-        internal uint LastSEQ;
+        internal uint SequenceNumber;
+
+        /// <summary>
+        /// Next Connection Sequence number.
+        /// </summary>
+        internal uint NextSequenceNumber;
 
         /// <summary>
         /// Assign clients dictionary.
@@ -280,10 +285,13 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                     source = IPConfig.FindNetwork(packet.SourceIP);
 
+                    AckNumber = packet.SequenceNumber + 1;
+                    SequenceNumber = 0xbeefcafe; //TODO: Generate this
+
                     destination = packet.SourceIP;
                     destinationPort = packet.SourcePort;
 
-                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.SYN | Flags.ACK);
+                    SendEmptyPacket(Flags.SYN | Flags.ACK);
                 }
             }
             else if (Status == Status.SYN_RECEIVED)
@@ -295,13 +303,18 @@ namespace Cosmos.System.Network.IPv4.TCP
                 else if (packet.ACK)
                 {
                     Status = Status.ESTABLISHED;
+
+                    SequenceNumber = packet.SequenceNumber;
                 }
             }
             else if (Status == Status.SYN_SENT)
             {
                 if (packet.SYN && packet.ACK)
                 {
-                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+                    AckNumber = packet.SequenceNumber + 1;
+                    SequenceNumber++;
+
+                    SendEmptyPacket(Flags.ACK);
 
                     Status = Status.ESTABLISHED;
                 }
@@ -310,39 +323,45 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 if (packet.FIN)
                 {
-                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+                    AckNumber++;
+
+                    SendEmptyPacket(Flags.ACK);
 
                     Status = Status.CLOSE_WAIT;
 
-                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.FIN);
+                    SendEmptyPacket(Flags.FIN);
                 }
             }
             else if (Status == Status.FIN_WAIT1)
             {
                 if (packet.FIN && packet.ACK)
                 {
-                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+                    AckNumber++;
+
+                    SendEmptyPacket(Flags.ACK);
 
                     WaitAndClose();
                 }
                 else if (packet.FIN)
                 {
-                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+                    AckNumber++;
+
+                    SendEmptyPacket(Flags.ACK);
 
                     Status = Status.CLOSING;
                 }
                 else if (packet.ACK)
                 {
                     Status = Status.FIN_WAIT2;
-
-                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
                 }
             }
             else if (Status == Status.FIN_WAIT2)
             {
                 if (packet.FIN)
                 {
-                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+                    AckNumber++;
+
+                    SendEmptyPacket(Flags.ACK);
 
                     WaitAndClose();
                 }
@@ -391,14 +410,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Close Client
-        /// </summary>
-        public void Dispose()
-        {
-            Close();
-        }
-
-        /// <summary>
         /// Wait for new TCP connection status.
         /// </summary>
         private bool WaitStatus(Status status, int timeout)
@@ -424,15 +435,20 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Send acknowledgement packet
         /// </summary>
-        private void SendEmptyPacket(uint lastSEQ, uint lastACK, Flags flag)
+        private void SendEmptyPacket(Flags flag)
         {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, lastSEQ, lastACK, 20, (byte)flag, 0xFAF0, 0);
-
-            LastACK = packet.AckNumber;
-            LastSEQ = packet.SequenceNumber;
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)flag, 0xFAF0, 0);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
+        }
+
+        /// <summary>
+        /// Close Client
+        /// </summary>
+        public void Dispose()
+        {
+            Close();
         }
     }
 }
