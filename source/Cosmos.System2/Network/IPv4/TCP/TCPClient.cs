@@ -72,17 +72,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Last Connection Acknowledgement number.
         /// </summary>
-        internal uint AckNumber;
+        internal ulong AckNumber;
 
         /// <summary>
         /// Last Connection Sequence number.
         /// </summary>
-        internal uint SequenceNumber;
-
-        /// <summary>
-        /// Next Connection Sequence number.
-        /// </summary>
-        internal uint NextSequenceNumber;
+        internal ulong SequenceNumber;
 
         /// <summary>
         /// Assign clients dictionary.
@@ -163,10 +158,10 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             //Generate Random Sequence Number
             var rnd = new Random();
-            ulong sequencenumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue)); 
+            SequenceNumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue));
 
             // Flags=0x02 -> Syn
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destPort, sequencenumber, 0, 20, (byte)Flags.SYN, 0xFAF0, 0);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destPort, SequenceNumber, 0, 20, (byte)Flags.SYN, 0xFAF0, 0);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
@@ -187,7 +182,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (Status == Status.ESTABLISHED)
             {
-                var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)Flags.FIN, 0xFAF0, 0);
+                var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)(Flags.FIN | Flags.ACK), 0xFAF0, 0);
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
 
@@ -222,11 +217,11 @@ namespace Cosmos.System.Network.IPv4.TCP
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
 
-            SequenceNumber += (uint)data.Length;
-
             var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, 0x18, 0xFAF0, 0, (ushort)data.Length, data);
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
+
+            SequenceNumber += (uint)data.Length;
 
             /*if (WaitStatus(Status.OPENED, 5000) == false)
             {
@@ -406,7 +401,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             Status = Status.TIME_WAIT;
 
-            Thread.Sleep(100); //100ms for now
+            //Thread.Sleep(100); //100ms for now
 
             Status = Status.CLOSED;
         }
