@@ -187,9 +187,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (Status == Status.ESTABLISHED)
             {
-                var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, (byte)Flags.FIN, 0xFAF0, 0);
+                var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)Flags.FIN, 0xFAF0, 0);
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
+
+                SequenceNumber++;
 
                 Status = Status.FIN_WAIT1;
 
@@ -220,16 +222,16 @@ namespace Cosmos.System.Network.IPv4.TCP
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
 
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, 0x18, 0xFAF0, 0, (ushort)data.Length, data);
+            SequenceNumber += (uint)data.Length;
+
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, 0x18, 0xFAF0, 0, (ushort)data.Length, data);
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
-            Status = Status.DATASENT;
-
-            if (WaitStatus(Status.OPENED, 5000) == false)
+            /*if (WaitStatus(Status.OPENED, 5000) == false)
             {
                 throw new Exception("Failed to send TCP data!");
-            }
+            }*/
         }
 
         /// <summary>
