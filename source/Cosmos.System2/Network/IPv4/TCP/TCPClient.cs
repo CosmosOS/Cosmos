@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Cosmos.HAL;
 using Cosmos.System.Network.Config;
 
@@ -18,12 +19,17 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// </summary>
     public enum Status
     {
-        OPENED,
-        OPENING, //SYN sent or received
-        DATASENT,
-        CLOSED,
-        CLOSING //FIN sent or received
-        //TODO: Implement real status values from RFC793
+        LISTEN,
+        SYN_SENT,
+        SYN_RECEIVED,
+        ESTABLISHED,
+        FIN_WAIT1,
+        FIN_WAIT2,
+        CLOSE_WAIT,
+        CLOSING,
+        LAST_ACK,
+        TIME_WAIT,
+        CLOSED
     }
 
     /// <summary>
@@ -155,14 +161,14 @@ namespace Cosmos.System.Network.IPv4.TCP
             ulong sequencenumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue)); 
 
             // Flags=0x02 -> Syn
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destPort, sequencenumber, 0, 20, 0x02, 0xFAF0, 0);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destPort, sequencenumber, 0, 20, (byte)Flags.SYN, 0xFAF0, 0);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
-            Status = Status.OPENING;
+            Status = Status.SYN_SENT;
 
-            if (WaitStatus(Status.OPENED, timeout) == false)
+            if (WaitStatus(Status.ESTABLISHED, timeout) == false)
             {
                 throw new Exception("Failed to open TCP connection!");
             }
@@ -174,13 +180,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         public void Close()
         {
-            if (Status == Status.OPENED)
+            if (Status == Status.ESTABLISHED)
             {
-                var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, 0x11, 0xFAF0, 0);
+                var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, LastSEQ, LastACK, 20, (byte)Flags.FIN, 0xFAF0, 0);
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
 
-                Status = Status.CLOSING;
+                Status = Status.FIN_WAIT1;
 
                 if (WaitStatus(Status.CLOSED, 5000) == false)
                 {
@@ -266,57 +272,98 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            if (Status == Status.CLOSED && packet.SYN)
+            if (Status == Status.LISTEN)
             {
-                Status = Status.OPENING;
+                if (packet.SYN)
+                {
+                    Status = Status.SYN_RECEIVED;
 
-                source = IPConfig.FindNetwork(packet.SourceIP);
+                    source = IPConfig.FindNetwork(packet.SourceIP);
 
-                destination = packet.SourceIP;
-                destinationPort = packet.SourcePort;
+                    destination = packet.SourceIP;
+                    destinationPort = packet.SourcePort;
 
-                LastACK = packet.AckNumber;
-                LastSEQ = packet.SequenceNumber;
-
-                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.SYN | Flags.ACK);
+                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.SYN | Flags.ACK);
+                }
             }
-            else if (Status == Status.OPENED && packet.FIN)
+            else if (Status == Status.SYN_RECEIVED)
             {
-                Status = Status.CLOSING;
-                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
-
-                //TODO: Send FIN Packet
+                if (packet.RST)
+                {
+                    Status = Status.LISTEN;
+                }
+                else if (packet.ACK)
+                {
+                    Status = Status.ESTABLISHED;
+                }
             }
-            else if (Status == Status.CLOSING && packet.FIN && packet.ACK)
+            else if (Status == Status.SYN_SENT)
             {
-                Status = Status.CLOSED;
+                if (packet.SYN && packet.ACK)
+                {
+                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
 
-                LastACK = packet.AckNumber;
-                LastSEQ = packet.SequenceNumber;
-
-                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+                    Status = Status.ESTABLISHED;
+                }
             }
-            else if (Status == Status.OPENING && packet.SYN && packet.ACK)
+            else if (Status == Status.ESTABLISHED)
             {
-                Status = Status.OPENED;
+                if (packet.FIN)
+                {
+                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
 
-                LastACK = packet.AckNumber;
-                LastSEQ = packet.SequenceNumber;
+                    Status = Status.CLOSE_WAIT;
 
-                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.FIN);
+                }
             }
-            else if (Status == Status.OPENING && packet.ACK)
+            else if (Status == Status.FIN_WAIT1)
             {
-                Status = Status.OPENED;
+                if (packet.FIN && packet.ACK)
+                {
+                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
 
-                LastACK = packet.AckNumber;
-                LastSEQ = packet.SequenceNumber;
+                    WaitAndClose();
+                }
+                else if (packet.FIN)
+                {
+                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+
+                    Status = Status.CLOSING;
+                }
+                else if (packet.ACK)
+                {
+                    Status = Status.FIN_WAIT2;
+
+                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+                }
             }
-            else if (Status == Status.OPENING && packet.RST && packet.ACK)
+            else if (Status == Status.FIN_WAIT2)
             {
-                throw new Exception("Connection rejected!");
+                if (packet.FIN)
+                {
+                    SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
+
+                    WaitAndClose();
+                }
             }
-            else if (Status == Status.DATASENT && packet.ACK)
+            else if (Status == Status.CLOSING)
+            {
+                if (packet.ACK)
+                {
+                    WaitAndClose();
+                }
+            }
+            else if (Status == Status.CLOSE_WAIT)
+            {
+                if (packet.ACK)
+                {
+                    Status = Status.CLOSED;
+                }
+            }
+            
+            
+            /*else if (Status == Status.DATASENT && packet.ACK)
             {
                 Status = Status.OPENED;
 
@@ -331,11 +378,16 @@ namespace Cosmos.System.Network.IPv4.TCP
                 rxBuffer.Enqueue(packet);
 
                 SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
-            }
-            else if (packet.RST)
-            {
-                throw new Exception("Connection reseted!");
-            }
+            }*/
+        }
+
+        private void WaitAndClose()
+        {
+            Status = Status.TIME_WAIT;
+
+            Thread.Sleep(100); //100ms for now
+
+            Status = Status.CLOSED;
         }
 
         /// <summary>
