@@ -328,6 +328,14 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                     SendEmptyPacket(Flags.FIN);
                 }
+                else if (packet.PSH && packet.ACK)
+                {
+                    AckNumber += packet.TCP_DataLength;
+
+                    rxBuffer.Enqueue(packet);
+
+                    SendEmptyPacket(Flags.ACK);
+                }
             }
             else if (Status == Status.FIN_WAIT1)
             {
@@ -377,24 +385,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                     Status = Status.CLOSED;
                 }
             }
-            
-            
-            /*else if (Status == Status.DATASENT && packet.ACK)
-            {
-                Status = Status.OPENED;
-
-                LastACK = packet.SequenceNumber;
-                LastSEQ = packet.AckNumber;
-            }
-            else if (Status == Status.OPENED && packet.PSH && packet.ACK)
-            {
-                LastACK = packet.AckNumber;
-                LastSEQ = packet.SequenceNumber;
-
-                rxBuffer.Enqueue(packet);
-
-                SendEmptyPacket(LastACK, LastSEQ + 1, Flags.ACK);
-            }*/
         }
 
         private void WaitAndClose()
