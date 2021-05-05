@@ -217,7 +217,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
 
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, 0x18, 0xFAF0, 0, (ushort)data.Length, data);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, 0x18, 0xFAF0, 0, data);
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
@@ -267,7 +267,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Receive data from packet.
+        /// Handle TCP discussions and data.
         /// </summary>
         /// <param name="packet">Packet to receive.</param>
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
@@ -387,6 +387,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
         }
 
+        /// <summary>
+        /// Wait until remote receive ACK of its connection termination request.
+        /// </summary>
         private void WaitAndClose()
         {
             Status = Status.TIME_WAIT;

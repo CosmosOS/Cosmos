@@ -26,7 +26,7 @@ namespace Cosmos.System.Network.IPv4.TCP
     }
 
     /// <summary>
-    /// DHCP Option
+    /// TCP Option
     /// </summary>
     public class TCPOption
     {
@@ -35,27 +35,19 @@ namespace Cosmos.System.Network.IPv4.TCP
         public byte[] Data { get; set; }
     }
 
+    /// <summary>
+    /// TCP Packet Class
+    /// </summary>
     public class TCPPacket : IPPacket
     {
-        protected ushort sourcePort;
-        protected ushort destinationPort;
-        protected ushort optionLen;
-        protected uint sequenceNumber;
-        protected uint ackNumber;
-        protected int headerLenght;
-        protected int flags;
-        protected int wsValue;
-        protected ushort checksum;
-        protected int urgentPointer;
-
-        protected List<TCPOption> options = null;
-
-        public bool SYN;
-        public bool ACK;
-        public bool FIN;
-        public bool PSH;
-        public bool RST;
-
+        /// <summary>
+        /// TCP handler.
+        /// </summary>
+        /// <param name="packetData">Packet data.</param>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="sys.ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="sys.OverflowException">Thrown if packetData array length is greater than Int32.MaxValue.</exception>
         internal static void TCPHandler(byte[] packetData)
         {
             var packet = new TCPPacket(packetData);
@@ -77,55 +69,89 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Work around to make VMT scanner include the initFields method
+        /// Create new instance of the <see cref="TCPPacket"/> class.
         /// </summary>
-        public static void VMTInclude()
-        {
-            new TCPPacket();
-        }
-
         internal TCPPacket()
             : base()
         { }
 
+        /// <summary>
+        /// Create new instance of the <see cref="TCPPacket"/> class.
+        /// </summary>
+        /// <param name="rawData">Raw data.</param>
         internal TCPPacket(byte[] rawData)
             : base(rawData)
         { }
 
+        /// <summary>
+        /// Create new instance of the <see cref="TCPPacket"/> class.
+        /// </summary>
+        /// <param name="source">Source address.</param>
+        /// <param name="dest">Destination address.</param>
+        /// <param name="srcPort">Source port.</param>
+        /// <param name="destPort">Destination port.</param>
+        /// <param name="sequencenumber">Sequence number.</param>
+        /// /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
+        /// /// <param name="Headerlenght">TCP Header length.</param>
+        /// /// <param name="Flags">TCP flags.</param>
+        /// /// <param name="WSValue">Windows size.</param>
+        /// /// <param name="UrgentPointer">Urgent Pointer.</param>
+        /// /// <param name="data">Raw data.</param>
+        /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
             ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, byte Flags,
-            ushort WSValue, ushort UrgentPointer, ushort len, byte[] options)
-            : base((ushort)(20 + len), 6, source, dest, 0x40)
+            ushort WSValue, ushort UrgentPointer, byte[] data)
+            : base((ushort)(20 + data.Length), 6, source, dest, 0x40)
         {
-            AddRawOption(options);
+            AddRawData(data);
             MakePacket(source, dest, srcPort, destPort, sequencenumber,
-            acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer, len);
+            acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer);
         }
 
+        /// <summary>
+        /// Create new instance of the <see cref="TCPPacket"/> class.
+        /// </summary>
+        /// <param name="source">Source address.</param>
+        /// <param name="dest">Destination address.</param>
+        /// <param name="srcPort">Source port.</param>
+        /// <param name="destPort">Destination port.</param>
+        /// <param name="sequencenumber">Sequence number.</param>
+        /// /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
+        /// /// <param name="Headerlenght">TCP Header length.</param>
+        /// /// <param name="Flags">TCP flags.</param>
+        /// /// <param name="WSValue">Windows size.</param>
+        /// /// <param name="UrgentPointer">Urgent Pointer.</param>
+        /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
             ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, byte Flags,
             ushort WSValue, ushort UrgentPointer)
             : base(20, 6, source, dest, 0x40)
         {
             MakePacket(source, dest, srcPort, destPort, sequencenumber,
-            acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer, 0);
+            acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer);
         }
 
-        public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
-            ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, byte Flags,
-            ushort WSValue, ushort UrgentPointer, ushort len)
-            : base((ushort)(20 + len), 6, source, dest, 0x40)
-        {
-            MakePacket(source, dest, srcPort, destPort, sequencenumber,
-            acknowledgmentnb, Headerlenght, Flags, WSValue, UrgentPointer, len);
-        }
-
+        /// <summary>
+        /// Make TCP Packet.
+        /// </summary>
+        /// <param name="source">Source address.</param>
+        /// <param name="dest">Destination address.</param>
+        /// <param name="srcPort">Source port.</param>
+        /// <param name="destPort">Destination port.</param>
+        /// <param name="sequencenumber">Sequence number.</param>
+        /// /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
+        /// /// <param name="Headerlenght">TCP Header length.</param>
+        /// /// <param name="Flags">TCP flags.</param>
+        /// /// <param name="WSValue">Windows size.</param>
+        /// /// <param name="UrgentPointer">Urgent Pointer.</param>
+        /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         private void MakePacket(Address source, Address dest, ushort srcPort, ushort destPort,
             ulong sequencenumber, ulong acknowledgmentnb, ushort Headerlenght, byte Flags,
-            ushort WSValue, ushort UrgentPointer, ushort len)
+            ushort WSValue, ushort UrgentPointer)
         {
-            optionLen = len;
-
             //ports
             RawData[DataOffset + 0] = (byte)((srcPort >> 8) & 0xFF);
             RawData[DataOffset + 1] = (byte)((srcPort >> 0) & 0xFF);
@@ -174,18 +200,22 @@ namespace Cosmos.System.Network.IPv4.TCP
             RawData[DataOffset + 17] = (byte)((calculatedcrc >> 0) & 0xFF);
         }
 
+        /// <summary>
+        /// Init TCPPacket fields.
+        /// </summary>
+        /// <exception cref="sys.ArgumentException">Thrown if RawData is invalid or null.</exception>
         protected override void InitFields()
         {
             base.InitFields();
-            sourcePort = (ushort)((RawData[DataOffset] << 8) | RawData[DataOffset + 1]);
-            destinationPort = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
-            sequenceNumber = (uint)((RawData[DataOffset + 4] << 24) | (RawData[DataOffset + 5] << 16) | (RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
-            ackNumber = (uint)((RawData[DataOffset + 8] << 24) | (RawData[DataOffset + 9] << 16) | (RawData[DataOffset + 10] << 8) | RawData[DataOffset + 11]);
-            headerLenght = (RawData[DataOffset + 12] >> 4) * 4;
-            flags = RawData[DataOffset + 13];
-            wsValue = (ushort)((RawData[DataOffset + 14] << 8) | RawData[DataOffset + 15]);
-            checksum = (ushort)((RawData[DataOffset + 16] << 8) | RawData[DataOffset + 17]);
-            urgentPointer = (ushort)((RawData[DataOffset + 18] << 8) | RawData[DataOffset + 19]);
+            SourcePort = (ushort)((RawData[DataOffset] << 8) | RawData[DataOffset + 1]);
+            DestinationPort = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
+            SequenceNumber = (uint)((RawData[DataOffset + 4] << 24) | (RawData[DataOffset + 5] << 16) | (RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
+            AckNumber = (uint)((RawData[DataOffset + 8] << 24) | (RawData[DataOffset + 9] << 16) | (RawData[DataOffset + 10] << 8) | RawData[DataOffset + 11]);
+            TCPHeaderLength = (byte)((RawData[DataOffset + 12] >> 4) * 4);
+            TCPFlags = RawData[DataOffset + 13];
+            WindowSize = (ushort)((RawData[DataOffset + 14] << 8) | RawData[DataOffset + 15]);
+            Checksum = (ushort)((RawData[DataOffset + 16] << 8) | RawData[DataOffset + 17]);
+            UrgentPointer = (ushort)((RawData[DataOffset + 18] << 8) | RawData[DataOffset + 19]);
 
             SYN = (RawData[47] & (byte)Flags.SYN) != 0;
             ACK = (RawData[47] & (byte)Flags.ACK) != 0;
@@ -193,9 +223,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             PSH = (RawData[47] & (byte)Flags.PSH) != 0;
             RST = (RawData[47] & (byte)Flags.RST) != 0;
 
-            if (RawData.Length == (DataOffset + headerLenght)) //no data
+            if (RawData.Length == (DataOffset + TCPHeaderLength)) //no data
             {
-                if (headerLenght > 20) //options
+                if (TCPHeaderLength > 20) //options
                 {
                     options = new List<TCPOption>();
 
@@ -224,18 +254,24 @@ namespace Cosmos.System.Network.IPv4.TCP
                     }
                 }
             }
-            else
-            {
-                //TODO: Parse data
-            }
         }
 
+        /// <summary>
+        /// Add Option to TCP Packet.
+        /// </summary>
+        /// <param name="option">TCP Option.</param>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         internal void AddOption(TCPOption option)
         {
             throw new NotImplementedException();
         }
 
-        internal void AddRawOption(byte[] raw)
+        /// <summary>
+        /// Add raw data to TCP Packet.
+        /// </summary>
+        /// <param name="raw">Raw data.</param>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
+        internal void AddRawData(byte[] raw)
         {
             for (int i = 0; i < raw.Length; i++)
             {
@@ -295,32 +331,73 @@ namespace Cosmos.System.Network.IPv4.TCP
             return true;
         }
 
+        /// <summary>
+        /// TCP Options
+        /// </summary>
+        protected List<TCPOption> options { get; set; }
 
-        internal ushort DestinationPort
-        {
-            get { return destinationPort; }
-        }
-        internal ushort SourcePort
-        {
-            get { return sourcePort; }
-        }
-        internal uint AckNumber
-        {
-            get { return ackNumber; }
-        }
-        internal uint SequenceNumber
-        {
-            get { return sequenceNumber; }
-        }
-        internal int TCPFlags
-        {
-            get { return flags; }
-        }
+        /// <summary>
+        /// Is SYN Flag set.
+        /// </summary>
+        public bool SYN;
+        /// <summary>
+        /// Is ACK Flag set.
+        /// </summary>
+        public bool ACK;
+        /// <summary>
+        /// Is FIN Flag set.
+        /// </summary>
+        public bool FIN;
+        /// <summary>
+        /// Is PSH Flag set.
+        /// </summary>
+        public bool PSH;
+        /// <summary>
+        /// Is RST Flag set.
+        /// </summary>
+        public bool RST;
+
+        /// <summary>
+        /// Get destination port.
+        /// </summary>
+        internal ushort DestinationPort { get; private set; }
+        /// <summary>
+        /// Get source port.
+        /// </summary>
+        internal ushort SourcePort { get; private set; }
+        /// <summary>
+        /// Get acknowledge number.
+        /// </summary>
+        internal uint AckNumber { get; private set; }
+        /// <summary>
+        /// Get sequence number.
+        /// </summary>
+        internal uint SequenceNumber { get; private set; }
+        /// <summary>
+        /// Get sequence number.
+        /// </summary>
+        internal byte TCPHeaderLength { get; private set; }
+        /// <summary>
+        /// Get sequence number.
+        /// </summary>
+        internal byte TCPFlags { get; private set; }
+        /// <summary>
+        /// Get sequence number.
+        /// </summary>
+        internal ushort WindowSize { get; private set; }
+        /// <summary>
+        /// Get sequence number.
+        /// </summary>
+        internal ushort Checksum { get; private set; }
+        /// <summary>
+        /// Get sequence number.
+        /// </summary>
+        internal ushort UrgentPointer { get; private set; }
 
         /// <summary>
         /// Get TCP data lenght.
         /// </summary>
-        public ushort TCP_DataLength => (ushort)(RawData.Length - (DataOffset + headerLenght));
+        public ushort TCP_DataLength => (ushort)(RawData.Length - (DataOffset + TCPHeaderLength));
 
         /// <summary>
         /// Get TCP data.
@@ -334,16 +411,21 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 for (int b = 0; b < data.Length; b++)
                 {
-                    data[b] = RawData[DataOffset + headerLenght + b];
+                    data[b] = RawData[DataOffset + TCPHeaderLength + b];
                 }
 
                 return data;
             }
         }
 
+        /// <summary>
+        /// To string.
+        /// </summary>
+        /// <returns>string value.</returns>
         public override string ToString()
         {
-            return "TCP Packet Src=" + SourceIP + ":" + sourcePort + ", Dest=" + DestinationIP + ":" + destinationPort;
+            return "TCP Packet Src=" + SourceIP + ":" + SourcePort + "," +
+                   "Dest=" + DestinationIP + ":" + DestinationPort + ", DataLen=" + TCP_DataLength;
         }
     }
 }
