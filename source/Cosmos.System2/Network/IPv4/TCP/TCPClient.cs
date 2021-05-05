@@ -216,6 +216,10 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
+            if (data.Length > 1500)
+            {
+                throw new NotImplementedException("Data length must be less than 1500 bytes (yet!)");
+            }
 
             var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, 0x18, 0xFAF0, 0, data);
             OutgoingBuffer.AddPacket(packet);
