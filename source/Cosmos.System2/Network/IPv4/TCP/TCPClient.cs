@@ -283,7 +283,9 @@ namespace Cosmos.System.Network.IPv4.TCP
                     source = IPConfig.FindNetwork(packet.SourceIP);
 
                     AckNumber = packet.SequenceNumber + 1;
-                    SequenceNumber = 0xbeefcafe; //TODO: Generate this
+
+                    var rnd = new Random();
+                    SequenceNumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue));
 
                     destination = packet.SourceIP;
                     destinationPort = packet.SourcePort;
@@ -315,10 +317,24 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                     Status = Status.ESTABLISHED;
                 }
+                else if (packet.RST && packet.ACK)
+                {
+                    AckNumber = packet.SequenceNumber + 1;
+
+                    Status = Status.CLOSED;
+                }
             }
             else if (Status == Status.ESTABLISHED)
             {
-                if (packet.FIN)
+                if (packet.FIN && packet.ACK)
+                {
+                    AckNumber++;
+
+                    SendEmptyPacket(Flags.ACK);
+
+                    WaitAndClose();
+                }
+                else if (packet.FIN)
                 {
                     AckNumber++;
 
@@ -327,6 +343,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                     Status = Status.CLOSE_WAIT;
 
                     SendEmptyPacket(Flags.FIN);
+
+                    Status = Status.LAST_ACK;
                 }
                 else if (packet.PSH && packet.ACK)
                 {
@@ -335,6 +353,12 @@ namespace Cosmos.System.Network.IPv4.TCP
                     rxBuffer.Enqueue(packet);
 
                     SendEmptyPacket(Flags.ACK);
+                }
+                else if (packet.RST)
+                {
+                    AckNumber = packet.SequenceNumber + 1;
+
+                    Status = Status.CLOSED;
                 }
             }
             else if (Status == Status.FIN_WAIT1)
@@ -378,7 +402,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                     WaitAndClose();
                 }
             }
-            else if (Status == Status.CLOSE_WAIT)
+            else if (Status == Status.CLOSE_WAIT || Status == Status.LAST_ACK)
             {
                 if (packet.ACK)
                 {
