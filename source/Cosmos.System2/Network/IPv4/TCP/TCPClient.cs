@@ -348,11 +348,14 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else if (packet.PSH && packet.ACK)
                 {
-                    AckNumber += packet.TCP_DataLength;
+                    if (packet.SequenceNumber != SequenceNumber) //DUP Check
+                    {
+                        AckNumber += packet.TCP_DataLength;
 
-                    rxBuffer.Enqueue(packet);
+                        rxBuffer.Enqueue(packet);
 
-                    SendEmptyPacket(Flags.ACK);
+                        SendEmptyPacket(Flags.ACK);
+                    }
                 }
                 else if (packet.RST)
                 {

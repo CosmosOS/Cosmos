@@ -91,12 +91,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="srcPort">Source port.</param>
         /// <param name="destPort">Destination port.</param>
         /// <param name="sequencenumber">Sequence number.</param>
-        /// /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
-        /// /// <param name="Headerlenght">TCP Header length.</param>
-        /// /// <param name="Flags">TCP flags.</param>
-        /// /// <param name="WSValue">Windows size.</param>
-        /// /// <param name="UrgentPointer">Urgent Pointer.</param>
-        /// /// <param name="data">Raw data.</param>
+        /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
+        /// <param name="Headerlenght">TCP Header length.</param>
+        /// <param name="Flags">TCP flags.</param>
+        /// <param name="WSValue">Windows size.</param>
+        /// <param name="UrgentPointer">Urgent Pointer.</param>
+        /// <param name="data">Raw data.</param>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
@@ -117,11 +117,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="srcPort">Source port.</param>
         /// <param name="destPort">Destination port.</param>
         /// <param name="sequencenumber">Sequence number.</param>
-        /// /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
-        /// /// <param name="Headerlenght">TCP Header length.</param>
-        /// /// <param name="Flags">TCP flags.</param>
-        /// /// <param name="WSValue">Windows size.</param>
-        /// /// <param name="UrgentPointer">Urgent Pointer.</param>
+        /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
+        /// <param name="Headerlenght">TCP Header length.</param>
+        /// <param name="Flags">TCP flags.</param>
+        /// <param name="WSValue">Windows size.</param>
+        /// <param name="UrgentPointer">Urgent Pointer.</param>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         public TCPPacket(Address source, Address dest, ushort srcPort, ushort destPort,
@@ -141,11 +141,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="srcPort">Source port.</param>
         /// <param name="destPort">Destination port.</param>
         /// <param name="sequencenumber">Sequence number.</param>
-        /// /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
-        /// /// <param name="Headerlenght">TCP Header length.</param>
-        /// /// <param name="Flags">TCP flags.</param>
-        /// /// <param name="WSValue">Windows size.</param>
-        /// /// <param name="UrgentPointer">Urgent Pointer.</param>
+        /// <param name="acknowledgmentnb">Acknowledgment Number.</param>
+        /// <param name="Headerlenght">TCP Header length.</param>
+        /// <param name="Flags">TCP flags.</param>
+        /// <param name="WSValue">Windows size.</param>
+        /// <param name="UrgentPointer">Urgent Pointer.</param>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         private void MakePacket(Address source, Address dest, ushort srcPort, ushort destPort,
@@ -397,7 +397,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Get TCP data lenght.
         /// </summary>
-        public ushort TCP_DataLength => (ushort)(RawData.Length - (DataOffset + TCPHeaderLength));
+        public ushort TCP_DataLength => (ushort)(IPLength - HeaderLength - TCPHeaderLength);
 
         /// <summary>
         /// Get TCP data.
