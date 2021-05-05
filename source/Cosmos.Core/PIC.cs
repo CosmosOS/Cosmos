@@ -129,8 +129,8 @@ namespace Cosmos.Core
             // set masks:
             Master.Data.Byte = masterMask;
             IOPort.Wait();
-            Slave.Data.Byte = slaveMask;
-            IOPort.Wait();
+            //Slave.Data.Byte = slaveMask;
+            //IOPort.Wait();
         }
 
         /// <summary>

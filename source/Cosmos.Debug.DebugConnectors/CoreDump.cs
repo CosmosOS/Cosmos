@@ -48,12 +48,18 @@ namespace Cosmos.Debug.DebugConnectors
             {
                 stack.Push(BitConverter.ToUInt32(stackBytes, i));
             }
-
-            return new CoreDump(
-                stack.Pop(), stack.Pop(), stack.Pop(), stack.Pop(),
-                stack.Pop(), stack.Pop(),
-                stack.Pop(), stack.Pop(), stack.Pop(),
-                stack);
+            if(stack.Count != 9)
+            {
+                return null;
+            }
+            else
+            {
+                return new CoreDump(
+                    stack.Pop(), stack.Pop(), stack.Pop(), stack.Pop(),
+                    stack.Pop(), stack.Pop(),
+                    stack.Pop(), stack.Pop(), stack.Pop(),
+                    stack);
+            }
         }
     }
 }

@@ -176,8 +176,10 @@ namespace Cosmos.HAL
                      * |--------|---------------------------|
                      * |  0x04  |  5-button mouse           |
                      * |--------|---------------------------|
+                     * |  0x50  |  Laptop Touchpad          |
+                     * |--------|---------------------------|
                      */
-                    if (xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04)
+                    if (xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04 || xFirstByte == 0x50)
                     {
                         var xDevice = new PS2Mouse(aPort, xFirstByte);
                         xDevice.Initialize();
@@ -237,7 +239,10 @@ namespace Cosmos.HAL
                     mDebugger.SendInternal("(PS/2 Controller) Device detection failed:");
                     mDebugger.SendInternal("First Byte: " + xFirstByte);
                     mDebugger.SendInternal("Second Byte: " + xSecondByte);
-                    throw new Exception("(PS/2 Controller) PS/2 device not supported");
+                    Console.WriteLine("(PS/2 Controller) Device detection failed.");
+                    Console.WriteLine("This is usually Fine for USB to PS / 2 Emulation");
+                    Console.WriteLine("Press any key to Resume (Good Luck)");
+                    Console.ReadLine();
                 }
             }
             else

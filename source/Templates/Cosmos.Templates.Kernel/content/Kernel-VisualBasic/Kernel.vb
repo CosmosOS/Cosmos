@@ -12,6 +12,7 @@ Namespace CosmosKernel
         End Sub
 
         Protected Overrides Sub Run()
+            'OS code here, current code echoes input. Replace with your own functions.
             Console.Write("Input: ")
             Dim input = Console.ReadLine()
             Console.Write("Text typed: ")

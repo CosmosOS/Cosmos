@@ -31,7 +31,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="size">Size of buffer</param>
         /// <param name="alignment">Byte Boundary alignment</param>
-        public ManagedMemoryBlock(UInt32 size, byte alignment)
+        public ManagedMemoryBlock(UInt32 size, int alignment)
             : this(size, alignment, true)
         { }
 
@@ -41,7 +41,7 @@ namespace Cosmos.Core
         /// <param name="size">Size of buffer</param>
         /// <param name="alignment">Byte Boundary alignment</param>
         /// <param name="align">true if buffer should be aligned, false otherwise</param>
-        public ManagedMemoryBlock(UInt32 size, byte alignment, bool align)
+        public ManagedMemoryBlock(UInt32 size, int alignment, bool align)
         {
             memory = new byte[size + alignment - 1];
             fixed (byte* bodystart = memory)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL
 {
@@ -21,7 +22,7 @@ namespace Cosmos.HAL
 
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
-        /// Init <see cref="Global"/> inctanse.
+        /// Init <see cref="Global"/> instance.
         /// </summary>
         /// <param name="textScreen">Text screen.</param>
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
@@ -62,6 +63,9 @@ namespace Cosmos.HAL
             IDE.InitDriver();
             AHCI.InitDriver();
             //EHCI.InitDriver();
+
+            mDebugger.Send("Network Devices Init");
+            NetworkInit.Init();
 
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
