@@ -1,12 +1,18 @@
 ﻿//#define COSMOSDEBUG
 
+using System;
 using System.Collections.Generic;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
 {
     public class Disk
     {
+        private List<ManagedPartition> parts = new List<ManagedPartition>();
+        private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>();
+
+
         /// <summary>
         /// The size of the disk in MB.
         /// </summary>
@@ -14,10 +20,7 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// List of partitions
         /// </summary>
-        private List<ManagedPartition> parts = new List<ManagedPartition>();
         public List<ManagedPartition> Partitions { get { return parts; } }
-
-        private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>();
         /// <summary>
         /// List of file systems.
         /// </summary>
@@ -26,6 +29,28 @@ namespace Cosmos.System.FileSystem
         /// Main blockdevice that has all of the partitions.
         /// </summary>
         public BlockDevice Host;
+        /// <summary>
+        /// The Master Boot record (MBR) of the drive.
+        /// </summary>
+        public byte[] MBR
+        {
+            get
+            {
+                var xMBRData = new byte[512];
+
+                Host.ReadBlock(0, 1, ref xMBRData);
+
+                return xMBRData;
+            }
+            set
+            {
+                if (value.Length != 512)
+                {
+                    throw new Exception("MBR must be 512 bytes.");
+                }
+                Host.WriteBlock(0, 1, ref value);
+            }
+        }
         public Disk(BlockDevice b)
         {
             Host = b;
@@ -45,7 +70,6 @@ namespace Cosmos.System.FileSystem
             }
             Size = (int)(b.BlockCount * b.BlockSize / 1024 / 1024);
         }
-        internal static int CurrentDriveLetter = 0;
         /// <summary>
         /// Mounts the disk.
         /// </summary>
@@ -56,7 +80,6 @@ namespace Cosmos.System.FileSystem
                 if (part != null)
                 {
                     part.Mount();
-                    CurrentDriveLetter++;
                 }
             }
         }
@@ -87,34 +110,6 @@ namespace Cosmos.System.FileSystem
             {
                 global::System.Console.WriteLine("No partitions found!");
             }
-        }
-        /// <summary>
-        /// Initializes this disk with MBR. This may destroy data.
-        /// </summary>
-        public void Format()
-        {
-            var xMBRData = new byte[512];
-            xMBRData[446 + 0] = 0x0; //bootable
-            xMBRData[446 + 1] = 0x1; //starting head
-            xMBRData[446 + 2] = 0x1; //Starting sector
-            xMBRData[446 + 3] = 0x0; //Starting Cylinder
-            xMBRData[446 + 4] = 83;//normal partition
-            xMBRData[446 + 5] = 0xFE; //ending head
-            xMBRData[446 + 6] = 0x3F; //Ending Sector
-            xMBRData[446 + 7] = 0x40;//Ending Cylinder
-
-            //Relative Sector
-            xMBRData[446 + 8] = 0x3F;
-            xMBRData[446 + 9] = 0;
-            xMBRData[446 + 10] = 0;
-            xMBRData[446 + 11] = 0;
-            //Total Sectors in partition
-            xMBRData[446 + 12] = 0xC2;
-            xMBRData[446 + 13] = 0xEE;
-            xMBRData[446 + 14] = 0x0F;
-            xMBRData[446 + 15] = 00;
-
-            Host.WriteBlock(0UL, 1U, ref xMBRData);
         }
     }
 }

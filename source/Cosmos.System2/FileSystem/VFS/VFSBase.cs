@@ -168,5 +168,11 @@ namespace Cosmos.System.FileSystem.VFS
         /// <param name="aDriveFormat">A drive format.</param>
         /// <param name="aQuick">Quick format.</param>
         public abstract void Format(string aDriveId, string aDriveFormat, bool aQuick);
+
+        /// <summary>
+        /// Gets the next available file system letter.
+        /// </summary>
+        /// <returns>Example: 0 or c</returns>
+        public abstract string GetNextFilesystemLetter();
     }
 }

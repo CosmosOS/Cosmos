@@ -39,8 +39,10 @@ namespace Cosmos.System.FileSystem
         {
             //Don't remount
             if (MountedFS != null)
+            {
                 return;
-            string xRootPath = string.Concat(Disk.CurrentDriveLetter, VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
+            }
+            string xRootPath = string.Concat(VFSManager.GetNextFilesystemLetter(), VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
             foreach (var item in Disk.RegisteredFileSystemsTypes)
@@ -59,8 +61,10 @@ namespace Cosmos.System.FileSystem
         {
             //Don't remount
             if (MountedFS != null)
+            {
                 return;
-            string xRootPath = string.Concat(Disk.CurrentDriveLetter, VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
+            }
+            string xRootPath = string.Concat(VFSManager.GetNextFilesystemLetter(), VFSBase.VolumeSeparatorChar.ToString(), VFSBase.DirectorySeparatorChar.ToString());
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
             foreach (var item in Disk.RegisteredFileSystemsTypes)
@@ -73,7 +77,7 @@ namespace Cosmos.System.FileSystem
             }
         }
         /// <summary>
-        /// Zeros out the partition
+        /// Zeros out the entire partition
         /// </summary>
         public void Clear()
         {

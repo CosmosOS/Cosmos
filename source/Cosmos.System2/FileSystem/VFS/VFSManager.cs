@@ -1152,5 +1152,13 @@ namespace Cosmos.System.FileSystem.VFS
 
             return null;
         }
+        /// <summary>
+        /// Gets the next file system letter. For internal cosmos use only.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetNextFilesystemLetter()
+        {
+            return mVFS.GetNextFilesystemLetter();
+        }
     }
 }

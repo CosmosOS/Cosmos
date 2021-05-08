@@ -24,6 +24,8 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         public List<Disk> Disks { get { return disks; } }
 
+        private int CurrentFSLetter;
+
         /// <summary>
         /// Initializes the virtual file system.
         /// </summary>
@@ -887,6 +889,13 @@ namespace Cosmos.System.FileSystem
             }
 
             throw new FileNotFoundException("Dirrectory/file entry not found: " + aDriveId);
+        }
+
+        public override string GetNextFilesystemLetter()
+        {
+            CurrentFSLetter++;
+
+            return CurrentFSLetter.ToString();
         }
     }
 }
