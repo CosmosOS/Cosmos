@@ -1,0 +1,1 @@
+You may need to add a "Global." in each assembly directive in obj/Debug/netcoreapp2.1/Cosmos.Kernel.Tests.VB.AssemblyInfo.vb for the project to build.

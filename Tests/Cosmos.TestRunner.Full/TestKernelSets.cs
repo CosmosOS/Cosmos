@@ -27,6 +27,7 @@ namespace Cosmos.TestRunner.Full
             //yield return typeof(Kernel.Tests.IO.Kernel);
             ////yield return typeof(SimpleStructsAndArraysTest.Kernel);
             //yield return typeof(Kernel.Tests.DiskManager.Kernel);
+            //yield return typeof(Cosmos.Kernel.Tests.VB.Kernel);
 
             ////yield return typeof(KernelGen3.Boot);
 
