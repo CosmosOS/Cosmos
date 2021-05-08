@@ -14,10 +14,23 @@ namespace Cosmos.VS.DebugEngine
 
         public static void MessageBox(string message, string title = "Cosmos Debug Engine")
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            if (!ThreadHelper.CheckAccess())
+            {
+                ThreadHelper.JoinableTaskFactory.Run(async delegate {
+                    // Switch to main thread
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, message, title,
-                OLEMSGICON.OLEMSGICON_NOICON, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
+                    VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, message, title,
+                        OLEMSGICON.OLEMSGICON_NOICON, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                });
+
+            }
+            else
+            {
+                VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, message, title,
+                    OLEMSGICON.OLEMSGICON_NOICON, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            }
         }
     }
 }

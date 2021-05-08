@@ -18,7 +18,8 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static void Init(string aPathname, FileMode aMode, ref Stream innerStream)
         {
-            Global.mFileSystemDebugger.SendInternal("FileStream.Init:");
+            Global.mFileSystemDebugger.SendInternal("-- FileStream.Init --");
+            Global.mFileSystemDebugger.SendInternal("aPathname = " + aPathname);
 
             innerStream = InitializeStream(aPathname, aMode);
         }
@@ -121,7 +122,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream CreateNewFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.CreateNewFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.CreateNewFile -- aPath = {aPath} existing = {aPathExists}");
           
             if (aPathExists)
             {
@@ -141,7 +142,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream TruncateFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.TruncateFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.TruncateFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (!aPathExists)
             {
@@ -159,7 +160,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream CreateFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.CreateFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.CreateFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (aPathExists == false)
             {
@@ -229,7 +230,8 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream InitializeStream(string aPath, FileMode aMode)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.InitializeStream aPath {aPath}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.InitializeStream --");
+            Global.mFileSystemDebugger.Send($"aPath = {aPath}");
             if (aPath == null)
             {
                 Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path == null is true");

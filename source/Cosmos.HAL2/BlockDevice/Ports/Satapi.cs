@@ -46,7 +46,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
             xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
             xCMDHeader.Write = 0;
 
-            xCMDHeader.CTBA = Heap.MemAlloc(128 + ((uint)xCMDHeader.PRDTL) * 16);
+            var aLength = 128 + ((uint)xCMDHeader.PRDTL) * 16;
+            mSATAPIDebugger.SendInternal("SendSATAPICommand");
+            mSATAPIDebugger.SendInternal(aLength);
+            xCMDHeader.CTBA = Heap.MemAlloc(aLength);
 
             HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 
@@ -129,7 +132,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             return -1;
         }
 
-        public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
+        public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             SendSATAPICommand(ATACommands.Read, (uint)aBlockNo, (uint)aBlockCount);
             byte[] xByte = new byte[512];
@@ -140,7 +143,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             }
         }
 
-        public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, byte[] aData)
+        public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             // To be implemented!
         }

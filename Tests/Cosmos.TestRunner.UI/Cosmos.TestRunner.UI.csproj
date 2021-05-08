@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+        <TargetFrameworks>net5.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
-        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win10-x86</RuntimeIdentifier>
         <SignAssembly>False</SignAssembly>
     </PropertyGroup>
 
@@ -15,6 +15,8 @@
     <ItemGroup>
         <PackageReference Include="Avalonia" />
         <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="ReactiveUI" />
     </ItemGroup>
 
     <ItemGroup>

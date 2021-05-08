@@ -17,17 +17,19 @@ namespace Cosmos.TestRunner.Full
                 yield return RunTargetEnum.Bochs;
                 //yield return RunTargetEnum.VMware;
                 //yield return RunTargetEnum.HyperV;
+                //yield return RunTargetEnum.Qemu;
             }
         }
 
-        public virtual bool RunWithGDB => false;
-        public virtual bool StartBochsDebugGUI => false;
+        public virtual bool RunWithGDB => true; 
+        public virtual bool StartBochsDebugGUI => true;
 
         public virtual bool DebugIL2CPU => false;
         public virtual string KernelPkg => String.Empty;
         public virtual TraceAssemblies TraceAssembliesLevel => TraceAssemblies.User;
-        public virtual bool EnableStackCorruptionChecks => true;
-        public virtual StackCorruptionDetectionLevel StackCorruptionDetectionLevel => StackCorruptionDetectionLevel.AllInstructions;
+        public virtual bool EnableStackCorruptionChecks => false;
+        public virtual StackCorruptionDetectionLevel StackCorruptionDetectionLevel => StackCorruptionDetectionLevel.MethodFooters;
+        public virtual DebugMode DebugMode => DebugMode.Source;
 
         public virtual IEnumerable<string> KernelAssembliesToRun
         {

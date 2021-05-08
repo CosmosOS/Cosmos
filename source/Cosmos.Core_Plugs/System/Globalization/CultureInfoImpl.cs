@@ -25,5 +25,15 @@ namespace Cosmos.Core_Plugs.System.Globalization
         }
 
         public static CultureInfo GetCultureInfo(string name) => null;
+
+        public static object GetFormat(CultureInfo aThis, Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static DateTimeFormatInfo get_DateTimeFormat(CultureInfo aThis)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

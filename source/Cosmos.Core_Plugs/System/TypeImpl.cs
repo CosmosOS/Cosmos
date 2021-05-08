@@ -1,5 +1,4 @@
 using Cosmos.Core;
-using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 using System;
 
@@ -8,10 +7,14 @@ namespace Cosmos.Core_Plugs.System
     [Plug(Target = typeof(Type))]
     public unsafe class TypeImpl
     {
-        private static Debugger mDebugger = new Debugger("Core", "Type Plug");
-
         public static void CCtor()
         {
+        }
+
+        [PlugMethod(Signature = "System_RuntimeTypeHandle__System_Type_get_Typehandle")]
+        public static RuntimeTypeHandle get_TypeHandle(CosmosRuntimeType aThis)
+        {
+            return new();
         }
 
         [PlugMethod(Signature = "System_Type__System_Type_GetTypeFromHandle_System_RuntimeTypeHandle_")]
@@ -26,14 +29,34 @@ namespace Cosmos.Core_Plugs.System
 
         public static bool op_Equality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
         {
+            if (aLeft is null) //Compare with null without equality check, since that causes stack overflow
+            {
+                return aRight is null;
+            }
+            if(aRight is null)
+            {
+                return false;
+            }
             return aLeft.mTypeId == aRight.mTypeId;
         }
 
         public static bool op_Inequality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
         {
-            mDebugger.Send("Type.GetInequality");
-
+            if (aLeft is null)
+            {
+                return !(aRight is null);
+            }
+            if (aRight is null)
+            {
+                return true;
+            }
             return aLeft.mTypeId != aRight.mTypeId;
+        }
+
+        [PlugMethod(Signature ="System_Type__System_Type_get_BaseType", IsOptional = false)]
+        public static Type get_BaseType(CosmosRuntimeType aThis)
+        {
+            return aThis.BaseType;
         }
     }
 }

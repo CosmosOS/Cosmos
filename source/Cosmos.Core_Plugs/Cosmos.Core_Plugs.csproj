@@ -1,15 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
         <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
         <ProjectReference Include="..\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp\XSharp\XSharp.csproj" />
     </ItemGroup>
 
 </Project>

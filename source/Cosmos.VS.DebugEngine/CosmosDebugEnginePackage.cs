@@ -7,29 +7,29 @@ using Task = System.Threading.Tasks.Task;
 
 using Cosmos.VS.DebugEngine.Commands;
 
-[assembly: ProvideBindingRedirection(
-    AssemblyName = "SQLitePCLRaw.batteries_green",
-    NewVersion = "1.1.10.86",
-    OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.86")]
+//[assembly: ProvideBindingRedirection(
+//    AssemblyName = "SQLitePCLRaw.batteries_green",
+//    NewVersion = "1.1.10.86",
+//    OldVersionLowerBound = "1.0.0.0",
+//    OldVersionUpperBound = "1.1.10.86")]
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.batteries_v2",
-    NewVersion = "1.1.10.86",
+    NewVersion = "2.0.4.976",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.86")]
+    OldVersionUpperBound = "2.0.4.976")]
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.core",
-    NewVersion = "1.1.10.86",
+    NewVersion = "2.0.4.976",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.86")]
+    OldVersionUpperBound = "2.0.4.976")]
 
 [assembly: ProvideBindingRedirection(
-    AssemblyName = "SQLitePCLRaw.provider.e_sqlite3",
-    NewVersion = "1.1.10.86",
+    AssemblyName = "SQLitePCLRaw.provider.dynamic_cdecl",
+    NewVersion = "2.0.4.976",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.86")]
+    OldVersionUpperBound = "2.0.4.976")]
 
 namespace Cosmos.VS.DebugEngine
 {

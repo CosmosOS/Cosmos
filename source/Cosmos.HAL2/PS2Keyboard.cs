@@ -65,6 +65,9 @@ namespace Cosmos.HAL
             OnKeyPressed?.Invoke(xScanCode, xReleased);
         }
 
+        /// <summary>
+        /// Update keyboard LEDs.
+        /// </summary>
         public override void UpdateLeds()
         {
             // for now, lets not do this..

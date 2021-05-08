@@ -1,15 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyOriginatorKeyFile>C:\Users\Jasper\Desktop\RandomProgrammieren\COSMOS\Cosmos\build\Targets\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="ApprovalTests" NoWarn="NU1701" />
-        <PackageReference Include="ApprovalUtilities" NoWarn="NU1701" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="MSTest.TestAdapter" />
         <PackageReference Include="MSTest.TestFramework" />
+        <PackageReference Include="NSubstitute" Version="4.0.0" />
+        <PackageReference Include="NUnit" Version="3.11.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
     </ItemGroup>
 
     <ItemGroup>

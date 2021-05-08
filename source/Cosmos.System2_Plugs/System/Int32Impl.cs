@@ -20,6 +20,11 @@ namespace Cosmos.System_Plugs.System
             {
                 string result = "";
 
+                if(aThis == 0)
+                {
+                    result = "0";
+                }
+
                 while (aThis != 0)
                 {
                     if ((aThis % 16) < 10)

@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
         <ProjectReference Include="..\..\..\source\Cosmos.System2\Cosmos.System2.csproj" />

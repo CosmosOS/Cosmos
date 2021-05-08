@@ -24,6 +24,12 @@ namespace Cosmos.Core_Plugs.System
 
             return xTypeA == xTypeB;
         }
+
+        [PlugMethod(Signature = "System_IRuntimeMethodInfo__System_Delegate_FindMethodHandle__")]
+        public static object FindMethodHandle(Delegate aThis)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [Plug(Target = typeof(Delegate), Inheritable = true)]

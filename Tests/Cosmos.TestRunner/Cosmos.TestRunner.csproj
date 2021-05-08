@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <OutputType>Exe</OutputType>
-        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
         <DebugType>Full</DebugType>
     </PropertyGroup>
 

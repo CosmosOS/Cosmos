@@ -24,6 +24,7 @@ namespace Cosmos.Core_Plugs.System
         public static unsafe Type GetType([ObjectPointerAccess] uint* aThis)
         {
             uint xType = *aThis;
+            mDebugger.Send("GetType:" + xType);
             return new CosmosRuntimeType(xType);
         }
 

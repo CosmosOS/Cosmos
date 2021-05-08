@@ -20,6 +20,8 @@ namespace Cosmos.Build.Builder
             if (Process.GetProcessesByName("Cosmos.Build.Builder").Skip(1).Any())
             {
                 ShowErrorMessageBox("Cannot run more than 1 instance of builder at the same time!");
+                Current.Shutdown();
+                return;
             }
 
             var configuration = new CommandLineBuilderConfiguration(e.Args);
