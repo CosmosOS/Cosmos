@@ -100,22 +100,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>TcpClient</returns>
         internal static TcpClient GetClient(ushort destPort)
         {
-            if (clients.ContainsKey((uint)destPort) == true)
+            if (clients.ContainsKey((uint)destPort))
             {
                 return clients[(uint)destPort];
             }
 
             return null;
         }
-
-        /// <summary>
-        /// Create new instance of the <see cref="TcpClient"/> class.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArgumentException">Thrown if TcpClient with localPort 0 exists.</exception>
-        public TcpClient()
-            : this(0)
-        { }
 
         /// <summary>
         /// Create new instance of the <see cref="TcpClient"/> class.
@@ -213,7 +204,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
             }
 
-            if (clients.ContainsKey((uint)localPort) == true)
+            if (clients.ContainsKey((uint)localPort))
             {
                 clients.Remove((uint)localPort);
             }
@@ -361,7 +352,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     Status = Status.CLOSED;
                 }
-                else if (packet.TCPFlags == (byte)Flags.ACK) //only ACK
+                else if (packet.TCPFlags == (byte)Flags.ACK && packet.SequenceNumber > LastSequenceNumber) //only ACK
                 {
                     throw new NotImplementedException("TCP sequencing is not supported yet! (received packet size is too huge)");
                 }
