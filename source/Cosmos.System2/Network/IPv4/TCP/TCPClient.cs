@@ -155,8 +155,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         /// <param name="dest">Destination address.</param>
         /// <param name="destPort">Destination port.</param>
+        /// <exception cref="Exception">Thrown if TCP Status is not CLOSED.</exception>
         public void Connect(Address dest, int destPort, int timeout = 5000)
         {
+            if (Status != Status.CLOSED)
+            {
+                throw new Exception("Client must be closed before setting a new connection.");
+            }
+
             destination = dest;
             destinationPort = destPort;
 
@@ -184,8 +190,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Close connection.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">Thrown if TCP Status is CLOSED.</exception>
         public void Close()
         {
+            if (Status == Status.CLOSED)
+            {
+                throw new Exception("Client already closed.");
+            }
             if (Status == Status.ESTABLISHED)
             {
                 var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)(Flags.FIN | Flags.ACK), 0xFAF0, 0);
@@ -216,6 +227,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public void Send(byte[] data)
         {
             if ((destination == null) || (destinationPort == 0))
@@ -226,17 +238,16 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 throw new NotImplementedException("Data length must be less than 1500 bytes (yet!)");
             }
+            if (Status != Status.ESTABLISHED)
+            {
+                throw new Exception("Client must be connected before sending data.");
+            }
 
             var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, 0x18, 0xFAF0, 0, data);
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
             SequenceNumber += (uint)data.Length;
-
-            /*if (WaitStatus(Status.OPENED, 5000) == false)
-            {
-                throw new Exception("Failed to send TCP data!");
-            }*/
         }
 
         /// <summary>
@@ -245,8 +256,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="source">Source end point.</param>
         /// <returns>byte array value.</returns>
         /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] NonBlockingReceive(ref EndPoint source)
         {
+            if (Status != Status.ESTABLISHED)
+            {
+                throw new Exception("Client must be connected before receiving data.");
+            }
             if (rxBuffer.Count < 1)
             {
                 return null;
@@ -265,8 +281,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="source">Source end point.</param>
         /// <returns>byte array value.</returns>
         /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] Receive(ref EndPoint source)
         {
+            if (Status != Status.ESTABLISHED)
+            {
+                throw new Exception("Client must be connected before receiving data.");
+            }
             while (rxBuffer.Count < 1);
 
             var packet = new TCPPacket(rxBuffer.Dequeue().RawData);
@@ -336,7 +357,15 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (Status == Status.ESTABLISHED)
             {
-                if (packet.FIN && packet.ACK)
+                if (packet.RST)
+                {
+                    Status = Status.CLOSED;
+                }
+                else if (packet.TCPFlags == (byte)Flags.ACK) //only ACK
+                {
+                    throw new NotImplementedException("TCP sequencing is not supported yet! (received packet size is too huge)");
+                }
+                else if (packet.FIN && packet.ACK)
                 {
                     AckNumber++;
 
@@ -368,12 +397,6 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                         SendEmptyPacket(Flags.ACK);
                     }
-                }
-                else if (packet.RST)
-                {
-                    AckNumber = packet.SequenceNumber + 1;
-
-                    Status = Status.CLOSED;
                 }
             }
             else if (Status == Status.FIN_WAIT1)
@@ -433,7 +456,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             Status = Status.TIME_WAIT;
 
-            //Thread.Sleep(100); //100ms for now
+            HAL.Global.PIT.Wait(300); //TODO: Calculate time value
 
             Status = Status.CLOSED;
         }
@@ -470,6 +493,22 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
+        }
+
+        /// <summary>
+        /// Is TCP Connected.
+        /// </summary>
+        /// <returns>Boolean value.</returns>
+        public bool IsConnected()
+        {
+            if (Status == Status.ESTABLISHED)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
