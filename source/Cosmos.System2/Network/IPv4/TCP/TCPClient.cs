@@ -29,7 +29,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         CLOSING,
         LAST_ACK,
         TIME_WAIT,
-        CLOSED
+        CLOSED,
+        WAITING_ACK
     }
 
     /// <summary>
@@ -238,6 +239,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
+            Status = Status.WAITING_ACK;
+
             SequenceNumber += (uint)data.Length;
         }
 
@@ -360,17 +363,24 @@ namespace Cosmos.System.Network.IPv4.TCP
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_SENT)");
                 }
             }
-            else if (Status == Status.ESTABLISHED)
+            else if (Status == Status.ESTABLISHED || Status == Status.WAITING_ACK)
             {
                 if (packet.RST)
                 {
                     Status = Status.CLOSED;
                 }
-                else if (packet.TCPFlags == (byte)Flags.ACK && packet.SequenceNumber > LastSequenceNumber) //only ACK
+                if (packet.TCPFlags == (byte)Flags.ACK)
                 {
-                    throw new NotImplementedException("TCP sequencing is not supported yet! (received packet size is too huge)");
+                    if (Status == Status.WAITING_ACK)
+                    {
+                        Status = Status.ESTABLISHED;
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("TCP sequencing is not supported yet! (sent packet size is too huge)");
+                    }
                 }
-                else if (packet.FIN && packet.ACK)
+                if (packet.FIN && packet.ACK)
                 {
                     AckNumber++;
 
