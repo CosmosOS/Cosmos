@@ -79,7 +79,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Create new instance of the <see cref="TCPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        internal TCPPacket(byte[] rawData)
+        public TCPPacket(byte[] rawData)
             : base(rawData)
         { }
 

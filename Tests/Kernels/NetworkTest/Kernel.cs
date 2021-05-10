@@ -85,6 +85,16 @@ namespace NetworkTest
             DHCPPacket dhcpPacket = new DHCPPacket(dhcpPacketData);
             Equals(dhcpPacketData, dhcpPacket.RawData);
 
+            /** TCP Packet Parsing Test **/
+            byte[] tcpPacketData = new byte[]
+            {
+                0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x08, 0x00, 0x45, 0x00, 0x00, 0x2C, 0x21, 0x69, 0x40, 0x00, 0x80, 0x06, 0x9C,
+                0xDA, 0x0A, 0x21, 0x14, 0x11, 0x0A, 0x21, 0x14, 0x36, 0x10, 0x92, 0x10, 0x92, 0xA7, 0xAE, 0x27, 0xD1, 0x56, 0x00, 0x00, 0x1A, 0x50, 0x18, 0xFF, 0x56,
+                0x63, 0xAF, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x0D
+            };
+            TCPPacket tcpPacket = new TCPPacket(tcpPacketData);
+            Equals(tcpPacketData, tcpPacket.RawData);
+
             /** ARP Packet Parsing Test **/
             byte[] arpPacketData = new byte[]
             {
@@ -109,7 +119,7 @@ namespace NetworkTest
             var udpClient = new UdpClient();
             udpClient.Close();
 			
-			var tcpClient = new TcpClient();
+			var tcpClient = new TcpClient(4242);
             tcpClient.Close();
 
             var icmpClient = new ICMPClient();
