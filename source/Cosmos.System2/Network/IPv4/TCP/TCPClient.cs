@@ -70,14 +70,19 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal Status Status;
 
         /// <summary>
-        /// Last Connection Acknowledgement number.
+        /// Connection Acknowledgement number.
         /// </summary>
-        internal ulong AckNumber;
+        internal uint AckNumber;
 
         /// <summary>
-        /// Last Connection Sequence number.
+        /// Connection Sequence number.
         /// </summary>
-        internal ulong SequenceNumber;
+        internal uint SequenceNumber;
+
+        /// <summary>
+        /// Last recveived Connection Sequence number.
+        /// </summary>
+        private uint LastSequenceNumber;
 
         /// <summary>
         /// Assign clients dictionary.
@@ -122,6 +127,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             rxBuffer = new Queue<TCPPacket>(8);
             Status = Status.CLOSED;
+            LastSequenceNumber = 0;
 
             this.localPort = localPort;
             if (localPort > 0)
@@ -158,7 +164,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             //Generate Random Sequence Number
             var rnd = new Random();
-            SequenceNumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue));
+            SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
 
             // Flags=0x02 -> Syn
             var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destPort, SequenceNumber, 0, 20, (byte)Flags.SYN, 0xFAF0, 0);
@@ -289,7 +295,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                     AckNumber = packet.SequenceNumber + 1;
 
                     var rnd = new Random();
-                    SequenceNumber = (ulong)((rnd.Next(0, Int32.MaxValue)) << 32) | (ulong)(rnd.Next(0, Int32.MaxValue));
+                    SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
 
                     destination = packet.SourceIP;
                     destinationPort = packet.SourcePort;
@@ -352,9 +358,11 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else if (packet.PSH && packet.ACK)
                 {
-                    if (packet.SequenceNumber != SequenceNumber) //DUP Check
+                    if (packet.SequenceNumber > LastSequenceNumber) //dup check
                     {
                         AckNumber += packet.TCP_DataLength;
+
+                        LastSequenceNumber = packet.SequenceNumber;
 
                         rxBuffer.Enqueue(packet);
 
