@@ -29,8 +29,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         CLOSING,
         LAST_ACK,
         TIME_WAIT,
-        CLOSED,
-        WAITING_ACK
+        CLOSED
     }
 
     /// <summary>
@@ -84,6 +83,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Last recveived Connection Sequence number.
         /// </summary>
         private uint LastSequenceNumber;
+
+        private bool WaitingAck = false;
 
         /// <summary>
         /// Assign clients dictionary.
@@ -239,7 +240,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
-            Status = Status.WAITING_ACK;
+            WaitingAck = true;
 
             SequenceNumber += (uint)data.Length;
         }
@@ -253,7 +254,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] NonBlockingReceive(ref EndPoint source)
         {
-            if (Status != Status.ESTABLISHED || Status == Status.WAITING_ACK)
+            if (Status != Status.ESTABLISHED)
             {
                 throw new Exception("Client must be connected before receiving data.");
             }
@@ -278,7 +279,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] Receive(ref EndPoint source)
         {
-            if (Status != Status.ESTABLISHED || Status == Status.WAITING_ACK)
+            if (Status != Status.ESTABLISHED)
             {
                 throw new Exception("Client must be connected before receiving data.");
             }
@@ -319,6 +320,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else
                 {
+                    Status = Status.CLOSED;
+
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSED||LISTEN)");
                 }
             }
@@ -336,6 +339,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else
                 {
+                    Status = Status.CLOSED;
+
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_RECEIVED)");
                 }
             }
@@ -352,39 +357,58 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else if (packet.SYN)
                 {
+                    Status = Status.CLOSED;
+
                     throw new NotImplementedException("Simultaneous open not supported.");
                 }
-                else if (packet.RST && packet.ACK)
+                else if (packet.RST)
                 {
                     Status = Status.CLOSED;
+
+                    throw new Exception("Connection refused by remote computer.");
                 }
                 else if (packet.ACK)
                 {
-                    AckNumber = packet.SequenceNumber + 1;
-                    SequenceNumber = packet.AckNumber;
+                    Status = Status.CLOSED;
 
-                    Status = Status.ESTABLISHED;
+                    throw new NotImplementedException("Connecting to an existing connection is not implemented.");
                 }
                 else
                 {
+                    Status = Status.CLOSED;
+
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_SENT)");
                 }
             }
-            else if (Status == Status.ESTABLISHED || Status == Status.WAITING_ACK)
+            else if (Status == Status.ESTABLISHED)
             {
                 if (packet.RST)
                 {
                     Status = Status.CLOSED;
+
+                    throw new Exception("TCP Connection resetted!");
                 }
                 if (packet.TCPFlags == (byte)Flags.ACK)
                 {
-                    if (Status == Status.WAITING_ACK)
+                    if (WaitingAck)
                     {
-                        Status = Status.ESTABLISHED;
+                        if (SequenceNumber == packet.AckNumber)
+                        {
+                            WaitingAck = false;
+                        }
                     }
                     else
                     {
-                        throw new NotImplementedException("TCP sequencing is not supported yet! (sent packet size is too huge)");
+                        if (packet.SequenceNumber > AckNumber)
+                        {
+                            SequenceNumber++;
+
+                            SendEmptyPacket(Flags.RST);
+
+                            Status = Status.CLOSED;
+
+                            throw new NotImplementedException("TCP sequencing is not supported yet! (sent packet size is too huge)");
+                        }
                     }
                 }
                 if (packet.FIN && packet.ACK)
@@ -420,8 +444,14 @@ namespace Cosmos.System.Network.IPv4.TCP
                         SendEmptyPacket(Flags.ACK);
                     }
                 }
+                else if (packet.ACK)
+                {
+                    //DO NOTHING
+                }
                 else
                 {
+                    Status = Status.CLOSED;
+
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=ESTABLISHED)");
                 }
             }
@@ -449,6 +479,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else
                 {
+                    Status = Status.CLOSED;
+
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=FIN_WAIT1)");
                 }
             }
@@ -464,6 +496,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else
                 {
+                    Status = Status.CLOSED;
+
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=FIN_WAIT2)");
                 }
             }
@@ -475,6 +509,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else
                 {
+                    Status = Status.CLOSED;
+
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSING)");
                 }
             }
@@ -486,6 +522,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else
                 {
+                    Status = Status.CLOSED;
+
                     throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSE_WAIT||LAST_ACK)");
                 }
             }
