@@ -253,7 +253,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] NonBlockingReceive(ref EndPoint source)
         {
-            if (Status != Status.ESTABLISHED)
+            if (Status != Status.ESTABLISHED || Status == Status.WAITING_ACK)
             {
                 throw new Exception("Client must be connected before receiving data.");
             }
@@ -278,7 +278,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] Receive(ref EndPoint source)
         {
-            if (Status != Status.ESTABLISHED)
+            if (Status != Status.ESTABLISHED || Status == Status.WAITING_ACK)
             {
                 throw new Exception("Client must be connected before receiving data.");
             }
@@ -357,6 +357,13 @@ namespace Cosmos.System.Network.IPv4.TCP
                 else if (packet.RST && packet.ACK)
                 {
                     Status = Status.CLOSED;
+                }
+                else if (packet.ACK)
+                {
+                    AckNumber = packet.SequenceNumber + 1;
+                    SequenceNumber = packet.AckNumber;
+
+                    Status = Status.ESTABLISHED;
                 }
                 else
                 {
