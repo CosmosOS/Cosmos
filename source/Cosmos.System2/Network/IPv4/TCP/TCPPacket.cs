@@ -223,34 +223,31 @@ namespace Cosmos.System.Network.IPv4.TCP
             PSH = (RawData[47] & (byte)Flags.PSH) != 0;
             RST = (RawData[47] & (byte)Flags.RST) != 0;
 
-            if (RawData.Length == (DataOffset + TCPHeaderLength)) //no data
+            if (TCPHeaderLength > 20) //options
             {
-                if (TCPHeaderLength > 20) //options
+                Options = new List<TCPOption>();
+
+                for (int i = 0; i < TCP_DataLength; i++)
                 {
-                    Options = new List<TCPOption>();
+                    var option = new TCPOption();
+                    option.Kind = RawData[DataOffset + 20 + i];
 
-                    for (int i = 0; i < RawData.Length - (DataOffset + 20); i++)
+                    if (option.Kind != 1) //NOP
                     {
-                        var option = new TCPOption();
-                        option.Kind = RawData[DataOffset + 20 + i];
+                        option.Length = RawData[DataOffset + 20 + i + 1];
 
-                        if (option.Kind != 1) //NOP
+                        if (option.Length != 2)
                         {
-                            option.Length = RawData[DataOffset + 20 + i + 1];
-
-                            if (option.Length != 2)
+                            option.Data = new byte[option.Length - 2];
+                            for (int j = 0; j < option.Length - 2; j++)
                             {
-                                option.Data = new byte[option.Length - 2];
-                                for (int j = 0; j < option.Length - 2; j++)
-                                {
-                                    option.Data[j] = RawData[DataOffset + 20 + i + 2 + j];
-                                }
+                                option.Data[j] = RawData[DataOffset + 20 + i + 2 + j];
                             }
-
-                            Options.Add(option);
-
-                            i += option.Length - 1;
                         }
+
+                        Options.Add(option);
+
+                        i += option.Length - 1;
                     }
                 }
             }
