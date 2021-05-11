@@ -106,8 +106,7 @@ namespace Cosmos.Debug.Hosts
       }
       _bochsStartInfo.Arguments = string.Format("-q {1} -f \"{0}\"", _bochsConfigurationFile.FullName, xExtraLog);
       _bochsStartInfo.WorkingDirectory = _bochsConfigurationFile.Directory.FullName;
-      _bochsStartInfo.CreateNoWindow = true; // when ProcessStartInfo.UseShellExecute is supported in .net core, maybe this line isn't needed
-      //_bochsStartInfo.UseShellExecute = true;
+      _bochsStartInfo.UseShellExecute = true;
       if (RedirectOutput)
       {
         if (LogOutput == null)
