@@ -42,8 +42,27 @@ using(var xClient = new UdpClient(4242))
 
     /** Receive data **/
     var endpoint = new EndPoint(Address.Zero, 0);
-    xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
-    xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
+    var data = xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
+    var data2 = xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
+
+    xClient.Close();
+}
+```
+
+## TCP
+Like UDP, TCP has to create a client and call Connect() to specify the remote machine address before sending or receiving data.
+```csharp
+using(var xClient = new TcpClient(4242))
+{
+    xClient.Connect(new Address(192, 168, 1, 70), 4242);
+
+    /** Send data **/
+    xClient.Send(Encoding.ASCII.GetBytes(message));
+
+    /** Receive data **/
+    var endpoint = new EndPoint(Address.Zero, 0);
+    var data = xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
+    var data2 = xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
 
     xClient.Close();
 }

@@ -9,6 +9,7 @@ using System;
 using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
+using Cosmos.System.Network.IPv4.TCP;
 using Cosmos.System.Network.IPv4.UDP;
 using Cosmos.System.Network.IPv4.UDP.DHCP;
 
@@ -51,7 +52,7 @@ namespace Cosmos.System.Network.IPv4
                         ICMPPacket.ICMPHandler(packetData);
                         break;
                     case 6:
-                        //TCPPacket.TCPHandler(packetData);
+                        TCPPacket.TCPHandler(packetData);
                         break;
                     case 17:
                         UDPPacket.UDPHandler(packetData);
@@ -97,7 +98,7 @@ namespace Cosmos.System.Network.IPv4
             TypeOfService = RawData[15];
             IPLength = (ushort)((RawData[16] << 8) | RawData[17]);
             FragmentID = (ushort)((RawData[18] << 8) | RawData[19]);
-            Flags = (byte)((RawData[20] & 0xE0) >> 5);
+            IPFlags = (byte)((RawData[20] & 0xE0) >> 5);
             FragmentOffset = (ushort)(((RawData[20] & 0x1F) << 8) | RawData[21]);
             TTL = RawData[22];
             Protocol = RawData[23];
@@ -239,7 +240,7 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Get flags.
         /// </summary>
-        internal byte Flags { get; private set; }
+        internal byte IPFlags { get; private set; }
         /// <summary>
         /// Get fragment offset.
         /// </summary>
