@@ -540,14 +540,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>Boolean value.</returns>
         public bool IsConnected()
         {
-            if (Status == Status.ESTABLISHED)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return Status == Status.ESTABLISHED;
         }
 
         /// <summary>

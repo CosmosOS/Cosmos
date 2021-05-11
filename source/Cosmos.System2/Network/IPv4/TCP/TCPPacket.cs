@@ -227,7 +227,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 if (TCPHeaderLength > 20) //options
                 {
-                    options = new List<TCPOption>();
+                    Options = new List<TCPOption>();
 
                     for (int i = 0; i < RawData.Length - (DataOffset + 20); i++)
                     {
@@ -247,7 +247,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                                 }
                             }
 
-                            options.Add(option);
+                            Options.Add(option);
 
                             i += option.Length - 1;
                         }
@@ -316,7 +316,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Check TCP Checksum
         /// </summary>
         /// <returns>True if checksum correct, False otherwise.</returns>
-        public bool CheckCRC()
+        private bool CheckCRC()
         {
             /*byte[] header = MakeHeader();
 
@@ -334,65 +334,65 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// TCP Options
         /// </summary>
-        protected List<TCPOption> options { get; set; }
+        public List<TCPOption> Options { get; set; }
 
         /// <summary>
         /// Is SYN Flag set.
         /// </summary>
-        public bool SYN;
+        internal bool SYN;
         /// <summary>
         /// Is ACK Flag set.
         /// </summary>
-        public bool ACK;
+        internal bool ACK;
         /// <summary>
         /// Is FIN Flag set.
         /// </summary>
-        public bool FIN;
+        internal bool FIN;
         /// <summary>
         /// Is PSH Flag set.
         /// </summary>
-        public bool PSH;
+        internal bool PSH;
         /// <summary>
         /// Is RST Flag set.
         /// </summary>
-        public bool RST;
+        internal bool RST;
 
         /// <summary>
         /// Get destination port.
         /// </summary>
-        internal ushort DestinationPort { get; private set; }
+        public ushort DestinationPort { get; private set; }
         /// <summary>
         /// Get source port.
         /// </summary>
-        internal ushort SourcePort { get; private set; }
+        public ushort SourcePort { get; private set; }
         /// <summary>
         /// Get acknowledge number.
         /// </summary>
-        internal uint AckNumber { get; private set; }
+        public uint AckNumber { get; private set; }
         /// <summary>
         /// Get sequence number.
         /// </summary>
-        internal uint SequenceNumber { get; private set; }
+        public uint SequenceNumber { get; private set; }
         /// <summary>
         /// Get sequence number.
         /// </summary>
-        internal byte TCPHeaderLength { get; private set; }
+        public byte TCPHeaderLength { get; private set; }
         /// <summary>
         /// Get sequence number.
         /// </summary>
-        internal byte TCPFlags { get; private set; }
+        public byte TCPFlags { get; private set; }
         /// <summary>
         /// Get sequence number.
         /// </summary>
-        internal ushort WindowSize { get; private set; }
+        public ushort WindowSize { get; private set; }
         /// <summary>
         /// Get sequence number.
         /// </summary>
-        internal ushort Checksum { get; private set; }
+        public ushort Checksum { get; private set; }
         /// <summary>
         /// Get sequence number.
         /// </summary>
-        internal ushort UrgentPointer { get; private set; }
+        public ushort UrgentPointer { get; private set; }
 
         /// <summary>
         /// Get TCP data lenght.
