@@ -233,13 +233,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 throw new Exception("Client must be connected before sending data.");
             }
-            if (data.Length > 1500)
+            if (data.Length > 536)
             {
-                throw new NotImplementedException("Data length must be less than 1500 bytes (yet!)");
-            }
-            if (data.Length > 1500) //should never go here
-            {
-                var chunks = BufferSplit(data, 537);
+                var chunks = ArraySplit(data, 536);
 
                 for (int i = 0; i < chunks.Length; i++)
                 {
@@ -580,19 +576,28 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Split byte array into chunks. https://stackoverflow.com/a/50655528
+        /// Split byte array into chunks of a specified size.
         /// </summary>
-        public static byte[][] BufferSplit(byte[] buffer, int blockSize)
+        private byte[][] ArraySplit(byte[] buffer, int chunksize = 1000)
         {
-            byte[][] blocks = new byte[(buffer.Length + blockSize - 1) / blockSize][];
+            var size = buffer.Length;
+            var chunkCount = (buffer.Length + chunksize - 1) / chunksize;
+            var bufferArray = new byte[chunkCount][];
+            int index = 0;
 
-            for (int i = 0, j = 0; i < blocks.Length; i++, j += blockSize)
+            for (var i = 0; i < chunkCount; i++)
             {
-                blocks[i] = new byte[Math.Min(blockSize, buffer.Length - j)];
-                Array.Copy(buffer, j, blocks[i], 0, blocks[i].Length);
+                bufferArray[i] = new byte[Math.Min(chunksize, buffer.Length - i * chunksize)];
             }
-
-            return blocks;
+            for (var i = 0; i < chunkCount; i++)
+            {
+                for (var j = 0; j < bufferArray[i].Length; j++)
+                {
+                    bufferArray[i][j] = buffer[index];
+                    index++;
+                }
+            }
+            return bufferArray;
         }
 
         /// <summary>
