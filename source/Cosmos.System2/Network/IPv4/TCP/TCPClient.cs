@@ -229,22 +229,36 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
-            if (data.Length > 1500)
-            {
-                throw new NotImplementedException("Data length must be less than 1500 bytes (yet!)");
-            }
             if (Status != Status.ESTABLISHED)
             {
                 throw new Exception("Client must be connected before sending data.");
             }
+            if (data.Length > 1500)
+            {
+                throw new NotImplementedException("Data length must be less than 1500 bytes (yet!)");
+            }
+            if (data.Length > 1500) //should never go here
+            {
+                var chunks = BufferSplit(data, 537);
 
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)(Flags.PSH | Flags.ACK), 0xFAF0, 0, data);
-            OutgoingBuffer.AddPacket(packet);
-            NetworkStack.Update();
+                for (int i = 0; i < chunks.Length; i++)
+                {
+                    var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), 0xFAF0, 0, chunks[i]);
+                    OutgoingBuffer.AddPacket(packet);
+                    NetworkStack.Update();
 
+                    SequenceNumber += (uint)chunks[i].Length;
+                }
+            }
+            else
+            {
+                var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)(Flags.PSH | Flags.ACK), 0xFAF0, 0, data);
+                OutgoingBuffer.AddPacket(packet);
+                NetworkStack.Update();
+
+                SequenceNumber += (uint)data.Length; 
+            }
             WaitingAck = true;
-
-            SequenceNumber += (uint)data.Length;
         }
 
         /// <summary>
@@ -543,12 +557,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         private byte[] Concat(byte[] a, byte[] b)
         {
             byte[] output;
-            int alen;
+            int alen = 0;
 
             if (a == null)
             {
                 output = new byte[b.Length];
-                alen = 0;
             }
             else
             {
@@ -564,6 +577,22 @@ namespace Cosmos.System.Network.IPv4.TCP
                 output[alen + j] = b[j];
             }
             return output;
+        }
+
+        /// <summary>
+        /// Split byte array into chunks. https://stackoverflow.com/a/50655528
+        /// </summary>
+        public static byte[][] BufferSplit(byte[] buffer, int blockSize)
+        {
+            byte[][] blocks = new byte[(buffer.Length + blockSize - 1) / blockSize][];
+
+            for (int i = 0, j = 0; i < blocks.Length; i++, j += blockSize)
+            {
+                blocks[i] = new byte[Math.Min(blockSize, buffer.Length - j)];
+                Array.Copy(buffer, j, blocks[i], 0, blocks[i].Length);
+            }
+
+            return blocks;
         }
 
         /// <summary>
