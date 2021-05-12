@@ -282,7 +282,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>byte array value.</returns>
         internal byte[] MakeHeader()
         {
-            byte[] header = new byte[12 + (RawData.Length - DataOffset)];
+            byte[] header = new byte[12 + (TCPHeaderLength + TCP_DataLength)];
 
             /* Pseudo Header */
             //Addresses
@@ -295,13 +295,13 @@ namespace Cosmos.System.Network.IPv4.TCP
             header[8] = 0x00;
             //Protocol (TCP)
             header[9] = 0x06;
-            ushort tcplen = (ushort)(RawData.Length - DataOffset);
+            ushort tcplen = (ushort)(TCPHeaderLength + TCP_DataLength);
             //TCP Length
             header[10] = (byte)((tcplen >> 8) & 0xFF);
             header[11] = (byte)((tcplen >> 0) & 0xFF);
 
             /* TCP Packet */
-            for (int i = 0; i < RawData.Length - DataOffset; i++)
+            for (int i = 0; i < tcplen; i++)
             {
                 header[12 + i] = RawData[DataOffset + i];
             }
@@ -315,16 +315,10 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>True if checksum correct, False otherwise.</returns>
         private bool CheckCRC()
         {
-            /*byte[] header = MakeHeader();
+            //byte[] header = MakeHeader();
 
-            if (CalcOcCRC(header, 0, header.Length) == checksum)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }*/
+            //return CalcOcCRC(header, 0, header.Length) == Checksum;
+
             return true;
         }
 
