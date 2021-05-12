@@ -86,6 +86,8 @@ namespace Cosmos.System.Network.IPv4.TCP
 
         private bool WaitingAck = false;
 
+        private byte[] data;
+
         /// <summary>
         /// Assign clients dictionary.
         /// </summary>
@@ -236,7 +238,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 throw new Exception("Client must be connected before sending data.");
             }
 
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, 0x18, 0xFAF0, 0, data);
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)(Flags.PSH | Flags.ACK), 0xFAF0, 0, data);
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
 
@@ -263,11 +265,13 @@ namespace Cosmos.System.Network.IPv4.TCP
                 return null;
             }
 
-            var packet = new TCPPacket(rxBuffer.Dequeue().RawData);
+            var packet = rxBuffer.Dequeue();
             source.address = packet.SourceIP;
             source.port = packet.SourcePort;
 
-            return packet.TCP_Data;
+            var tmp = data;
+            data = null;
+            return tmp;
         }
 
         /// <summary>
@@ -285,11 +289,13 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             while (rxBuffer.Count < 1);
 
-            var packet = new TCPPacket(rxBuffer.Dequeue().RawData);
+            var packet = rxBuffer.Dequeue();
             source.address = packet.SourceIP;
             source.port = packet.SourcePort;
 
-            return packet.TCP_Data;
+            var tmp = data;
+            data = null;
+            return tmp;
         }
 
         /// <summary>
@@ -351,6 +357,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                     AckNumber = packet.SequenceNumber + 1;
                     SequenceNumber++;
 
+                    LastSequenceNumber = packet.SequenceNumber;
+
                     SendEmptyPacket(Flags.ACK);
 
                     Status = Status.ESTABLISHED;
@@ -399,15 +407,11 @@ namespace Cosmos.System.Network.IPv4.TCP
                     }
                     else
                     {
-                        if (packet.SequenceNumber > AckNumber)
+                        if (packet.SequenceNumber >= AckNumber && packet.TCP_DataLength > 0) //packet sequencing
                         {
-                            SequenceNumber++;
+                            AckNumber += packet.TCP_DataLength;
 
-                            SendEmptyPacket(Flags.RST);
-
-                            Status = Status.CLOSED;
-
-                            throw new NotImplementedException("TCP sequencing is not supported yet! (sent packet size is too huge)");
+                            data = Concat(data, packet.TCP_Data);
                         }
                     }
                 }
@@ -438,6 +442,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                         AckNumber += packet.TCP_DataLength;
 
                         LastSequenceNumber = packet.SequenceNumber;
+
+                        data = Concat(data, packet.TCP_Data);
 
                         rxBuffer.Enqueue(packet);
 
@@ -530,6 +536,35 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         #region Utils
+
+        /// <summary>
+        /// Contatenate two byte arrays. https://stackoverflow.com/a/45531730
+        /// </summary>
+        private byte[] Concat(byte[] a, byte[] b)
+        {
+            byte[] output;
+            int alen;
+
+            if (a == null)
+            {
+                output = new byte[b.Length];
+                alen = 0;
+            }
+            else
+            {
+                output = new byte[a.Length + b.Length];
+                alen = a.Length;
+                for (int i = 0; i < a.Length; i++)
+                {
+                    output[i] = a[i];
+                }
+            }
+            for (int j = 0; j < b.Length; j++)
+            {
+                output[alen + j] = b[j];
+            }
+            return output;
+        }
 
         /// <summary>
         /// Wait until remote receive ACK of its connection termination request.
