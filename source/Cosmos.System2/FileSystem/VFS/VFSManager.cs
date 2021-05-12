@@ -37,8 +37,8 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new Exception("Virtual File System Manager already initialized!");
             }
 
-            aVFS.Initialize();
             mVFS = aVFS;
+            aVFS.Initialize();
         }
 
         /// <summary>
