@@ -252,7 +252,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
 
-                SequenceNumber += (uint)data.Length; 
+                SequenceNumber += (uint)data.Length;
             }
             WaitingAck = true;
         }
@@ -297,7 +297,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 throw new Exception("Client must be connected before receiving data.");
             }
-            while (rxBuffer.Count < 1);
+            while (rxBuffer.Count < 1) ;
 
             var packet = rxBuffer.Dequeue();
             source.address = packet.SourceIP;
@@ -387,9 +387,10 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
                 else if (packet.ACK)
                 {
-                    Status = Status.CLOSED;
+                    AckNumber = packet.SequenceNumber;
+                    SequenceNumber = packet.AckNumber;
 
-                    throw new NotImplementedException("Connecting to an existing connection is not implemented.");
+                    Status = Status.ESTABLISHED;
                 }
                 else
                 {
