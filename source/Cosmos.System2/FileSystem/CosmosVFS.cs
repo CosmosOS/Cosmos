@@ -893,9 +893,10 @@ namespace Cosmos.System.FileSystem
 
         public override string GetNextFilesystemLetter()
         {
+            var s = CurrentFSLetter.ToString();
             CurrentFSLetter++;
 
-            return CurrentFSLetter.ToString();
+            return s;
         }
     }
 }
