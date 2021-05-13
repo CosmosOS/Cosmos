@@ -192,16 +192,26 @@ namespace Cosmos.System.Network.IPv4
         /// <returns>ushort value.</returns>
         protected static ushort CalcOcCRC(byte[] buffer, ushort offset, int length)
         {
-            uint crc = 0;
+            return (ushort)~SumShortValues(buffer, offset, length);
+        }
 
-            for (ushort w = offset; w < offset + length; w += 2)
+        protected static ushort SumShortValues(byte[] buffer, int offset, int length)
+        {
+            uint chksum = 0;
+            int end = offset + (length & ~1);
+            int i = offset;
+
+            while (i != end)
             {
-                crc += (ushort)((buffer[w] << 8) | buffer[w + 1]);
+                chksum += (uint)((((ushort)buffer[i++]) << 8) + (ushort)buffer[i++]);
             }
-
-            crc = (~((crc & 0xFFFF) + (crc >> 16)));
-
-            return (ushort)crc;
+            if (i != offset + length)
+            {
+                chksum += (uint)(((ushort)buffer[i]) << 8);
+            }
+            chksum = (chksum & 0xFFFF) + (chksum >> 16);
+            chksum = (chksum & 0xFFFF) + (chksum >> 16);
+            return (ushort)chksum;
         }
 
         /// <summary>
