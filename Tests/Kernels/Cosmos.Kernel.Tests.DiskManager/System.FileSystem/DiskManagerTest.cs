@@ -22,6 +22,7 @@ namespace Cosmos.Kernel.Tests.DiskManager
             {
                 foreach (var part in disk.Partitions)
                 {
+                    mDebugger.Send("Drive: " + part.RootPath);
                     if (part.RootPath == driveName)
                     {
                         ourDisk = disk;
