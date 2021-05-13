@@ -111,5 +111,33 @@ namespace Cosmos.System.FileSystem
                 global::System.Console.WriteLine("No partitions found!");
             }
         }
+
+        /// <summary>
+        /// Create Partition.
+        /// </summary>
+        /// <param name="start">Start.</param>
+        /// <param name="end">End.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if start / end is smaller then 0.</exception>
+        /// <exception cref="ArgumentException">Thrown if end is smaller or equal to start.</exception>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        public void CreatePartion(long start, long end)
+        {
+            if (start < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(start));
+            }
+
+            if (end < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(start));
+            }
+
+            if (end <= start)
+            {
+                throw new ArgumentException("end is <= start");
+            }
+
+            throw new NotImplementedException("CreatePartion");
+        }
     }
 }
