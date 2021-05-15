@@ -1,6 +1,6 @@
 # Network
 
-In this article we will discuss about Networking on Cosmos, how to use the Network Stack, send and received packets. For now, available protocols are **ARP**, **IPv4**, **UDP**, **ICMP**, **DHCP** and **DNS** but the team is also working on TCP. Note that Cosmos devkit must be installed for this article.
+In this article we will discuss about Networking on Cosmos, how to use the Network Stack, send and received packets. For now, available protocols are **ARP**, **IPv4**, **TCP**, **UDP**, **ICMP**, **DHCP** and **DNS**. Note that Cosmos devkit must be installed for this article.
 
 All protocols here don't necessary support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](http://https://github.com/CosmosOS/Cosmos/issues/new/choose "repository") on our repository. 
 
@@ -42,8 +42,27 @@ using(var xClient = new UdpClient(4242))
 
     /** Receive data **/
     var endpoint = new EndPoint(Address.Zero, 0);
-    xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
-    xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
+    var data = xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
+    var data2 = xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
+
+    xClient.Close();
+}
+```
+
+## TCP
+Like UDP, TCP has to create a client and call Connect() to specify the remote machine address before sending or receiving data.
+```csharp
+using(var xClient = new TcpClient(4242))
+{
+    xClient.Connect(new Address(192, 168, 1, 70), 4242);
+
+    /** Send data **/
+    xClient.Send(Encoding.ASCII.GetBytes(message));
+
+    /** Receive data **/
+    var endpoint = new EndPoint(Address.Zero, 0);
+    var data = xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
+    var data2 = xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
 
     xClient.Close();
 }
