@@ -32,7 +32,6 @@ namespace Cosmos.System_Plugs.System
             {
                 return false;
             }
-            Debugger.DoBochsBreak();
             return aThis.GetHashCode() == obj.GetHashCode();
         }
 

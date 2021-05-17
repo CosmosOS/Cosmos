@@ -164,11 +164,7 @@ namespace GraphicTest
             Console.WriteLine("ABAKDSKDNKSNJNFJGNFLPÜQOJOPJD");
             Console.WriteLine("I(39u0pwoejJIosjfppkspjfsdjfp");
 
-            Debugger.DoBochsBreak();
-
             TestBitmaps();
-
-            Debugger.DoBochsBreak();
 
             /* First test with the DefaultMode */
             Canvas canvas = FullScreenCanvas.GetFullScreenCanvas();
