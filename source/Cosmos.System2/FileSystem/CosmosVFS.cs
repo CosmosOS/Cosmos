@@ -624,7 +624,6 @@ namespace Cosmos.System.FileSystem
                     string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
                     global::System.Console.WriteLine(xMessage);
                     mFileSystems[i].DisplayFileSystemInfo();
-                    Directory.SetCurrentDirectory(xRootPath);
                 }
                 else
                 {
@@ -761,6 +760,7 @@ namespace Cosmos.System.FileSystem
                     if (xListingItemName == xPathPart)
                     {
                         xBaseDirectory = xListingItem;
+                        Global.mFileSystemDebugger.SendInternal("Now checking: " + xBaseDirectory.mFullPath);
                         xPartFound = true;
                         break;
                     }
@@ -771,6 +771,8 @@ namespace Cosmos.System.FileSystem
                     throw new Exception("Path part '" + xPathPart + "' not found!");
                 }
             }
+
+            Global.mFileSystemDebugger.SendInternal("Returning: " + xBaseDirectory.mFullPath);
             return xBaseDirectory;
         }
 

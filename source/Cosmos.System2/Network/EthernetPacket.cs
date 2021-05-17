@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          Ethernet frame
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network
@@ -19,26 +26,26 @@ namespace Cosmos.System.Network
         protected MACAddress destMAC;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EthernetPacket"/> class.
+        /// Create new instance of the <see cref="EthernetPacket"/> class.
         /// </summary>
         protected EthernetPacket()
         {
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified raw data.
+        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified raw data.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        protected EthernetPacket(byte[] rawData)
+        public EthernetPacket(byte[] rawData)
         {
             RawData = rawData;
-            initFields();
+            InitFields();
         }
 
         /// <summary>
         /// Init EthernetPacket fields.
         /// </summary>
-        protected virtual void initFields()
+        protected virtual void InitFields()
         {
             destMAC = new MACAddress(RawData, 0);
             srcMAC = new MACAddress(RawData, 6);
@@ -46,7 +53,7 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified type and size.
+        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified type and size.
         /// </summary>
         /// <param name="type">Type.</param>
         /// <param name="packet_size">Size.</param>
@@ -56,7 +63,7 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EthernetPacket"/> class, with specified dsetination, source, type and size.
+        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified dsetination, source, type and size.
         /// </summary>
         /// <param name="dest">Destination.</param>
         /// <param name="src">Source.</param>
@@ -73,13 +80,13 @@ namespace Cosmos.System.Network
 
             RawData[12] = (byte)(type >> 8);
             RawData[13] = (byte)(type >> 0);
-            initFields();
+            InitFields();
         }
 
         /// <summary>
         /// Get raw data byte array.
         /// </summary>
-        internal byte[] RawData { get; }
+        public byte[] RawData { get; }
 
         /// <summary>
         /// Get and set source MAC address.
@@ -93,7 +100,7 @@ namespace Cosmos.System.Network
                 {
                     RawData[6 + i] = value.bytes[i];
                 }
-                initFields();
+                InitFields();
             }
         }
 
@@ -109,7 +116,7 @@ namespace Cosmos.System.Network
                 {
                     RawData[i] = value.bytes[i];
                 }
-                initFields();
+                InitFields();
             }
         }
 
@@ -122,11 +129,7 @@ namespace Cosmos.System.Network
         /// Prepare packet for sending.
         /// Not implemented.
         /// </summary>
-        public virtual void PrepareForSending()
-        {
-
-            
-        }
+        internal virtual void PrepareForSending() { }
 
         /// <summary>
         /// To string.

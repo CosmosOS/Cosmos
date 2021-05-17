@@ -14,12 +14,12 @@ namespace Cosmos.System.ExtendedASCII
     internal static class EncodingTable
     {
         /// <summary>
-        /// Debugger inctanse of the "System" ring with the "EncodingTable" tag.
+        /// Debugger instance of the "System" ring with the "EncodingTable" tag.
         /// </summary>
         private static Debugger mDebugger = new Debugger("System", "EncodingTable");
 
         /// <summary>
-        /// Create new inctanse of the <see cref="EncodingTable"/> class.
+        /// Create new instance of the <see cref="EncodingTable"/> class.
         /// </summary>
         static EncodingTable()
         {
@@ -44,7 +44,7 @@ namespace Cosmos.System.ExtendedASCII
             public Encoding encoding;
 
             /// <summary>
-            /// Create new inctanse of the <see cref="values"/> struct.
+            /// Create new instance of the <see cref="values"/> struct.
             /// </summary>
             /// <param name="desc">Description.</param>
             /// <param name="encoding">Encoding.</param>

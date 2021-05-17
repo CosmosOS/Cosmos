@@ -21,6 +21,7 @@ namespace Cosmos.Compiler.Tests.TypeSystem
 
     public class Kernel : Sys.Kernel
     {
+        static int test = 0;
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Starting Type tests now please wait...");
@@ -66,6 +67,15 @@ namespace Cosmos.Compiler.Tests.TypeSystem
                 Assert.IsTrue(xByte.GetType() == typeof(byte), "GetType or typeof() works for value types!");
                 Assert.IsTrue(xByte.GetType().IsSubclassOf(typeof(ValueType)), "IsSubClassOf works for value types!");
                 Assert.IsTrue(xByte.GetType().IsValueType, "IsValueType works for value types!");
+
+                Action a = () => { };
+                Action<int> a1 = (i) => test++;
+                Assert.IsTrue(a != null , "Anonymous type for action is created correctly");
+                Assert.IsTrue(a1 != null, "Anonymous type for action<int> is created correctly");
+
+                var c = new { i = 1, n = "Test" };
+                Assert.IsTrue(c != null, "Anonymous types are created correctly");
+                Assert.IsTrue(c.i == 1 && c.n == "Test", "Anonymous types have correct values");
 
                 TestController.Completed();
             }

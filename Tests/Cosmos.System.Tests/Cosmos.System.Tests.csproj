@@ -5,6 +5,10 @@
         <AssemblyOriginatorKeyFile>C:\Users\Jasper\Desktop\RandomProgrammieren\COSMOS\Cosmos\build\Targets\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='|AnyCPU'">
+      <DefineConstants>TRACE;</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="ApprovalTests" NoWarn="NU1701" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />

@@ -41,7 +41,7 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Init <see cref="Global"/> inctanse.
+        /// Init <see cref="Global"/> instance.
         /// </summary>
         static public void Init()
         {

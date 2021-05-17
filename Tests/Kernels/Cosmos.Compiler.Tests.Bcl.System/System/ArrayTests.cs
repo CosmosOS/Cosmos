@@ -115,6 +115,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Array.Resize(ref stringArray, 3);
             Assert.AreEqual(new string[] { "ABC", "BAB", "TAT" }, stringArray, "Array.Resize works");
 
+            stringArray = new string[10];
+            stringArray[0] += "asd";
+            Assert.AreEqual(stringArray[0], "asd", "Adding directly to array works");
         }
     }
 }
