@@ -82,7 +82,7 @@ namespace Cosmos.Deploy.Pixie {
       xWriter.Write((byte)0);
 
       xWriter.Write(TxID);
-      xWriter.Write((UInt16)0);
+      xWriter.Write((ushort)0);
       xWriter.Write(Flags);
       xWriter.Write(0);
       xWriter.Write(YourAddr);
@@ -123,7 +123,7 @@ namespace Cosmos.Deploy.Pixie {
       Options.Add(aID, xBytes2);
     }
 
-    protected UInt32 mMagicCookie = 0x63538263;
+    protected uint mMagicCookie = 0x63538263;
     public Dictionary<byte, byte[]> Options = new Dictionary<byte, byte[]>();
 
     public enum MsgType { Discover = 1, Offer, Request, Decline, Ack, Nak, Release };
@@ -134,11 +134,11 @@ namespace Cosmos.Deploy.Pixie {
     public byte HwType;
     public byte HwLength;
     public byte Hops;
-    public UInt32 TxID;
-    public UInt16 Flags;
-    public UInt32 ClientAddr;
-    public UInt32 YourAddr;
-    public UInt32 ServerAddr;
+    public uint TxID;
+    public ushort Flags;
+    public uint ClientAddr;
+    public uint YourAddr;
+    public uint ServerAddr;
     public byte[] HwAddr;
     public string BootFile;
   }

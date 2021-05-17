@@ -226,8 +226,8 @@ namespace Cosmos.System.Graphics
         {
             #region BMP Header
 
-            Byte[] _int = new byte[4];
-            Byte[] _short = new byte[2];
+            byte[] _int = new byte[4];
+            byte[] _short = new byte[2];
             //Assume that we are using the BMP (Windows) V3 header format
 
             //reading magic number to identify if BMP file (BM as string - 42 4D as Hex) - bytes 0 -> 2
@@ -330,9 +330,9 @@ namespace Cosmos.System.Graphics
             //Read data
             stream.Position = (int)pixelTableOffset;
             int position = 0;
-            Byte[] pixelData = new byte[pureImageSize];
+            byte[] pixelData = new byte[pureImageSize];
             stream.Read(pixelData, 0, pureImageSize);
-            Byte[] pixel = new byte[4]; //All must have the same size
+            byte[] pixel = new byte[4]; //All must have the same size
 
             for (int y = 0; y < imageHeight; y++)
             {
@@ -415,7 +415,7 @@ namespace Cosmos.System.Graphics
             {
                 padding = 0;
             }
-            Byte[] file = new Byte[54 /*header*/ + Width * Height * (uint)Depth / 8 + padding * Height];
+            byte[] file = new byte[54 /*header*/ + Width * Height * (uint)Depth / 8 + padding * Height];
             //Writes all bytes at the end into the stream, rather than a few every time
 
             int position = 0;
@@ -430,7 +430,7 @@ namespace Cosmos.System.Graphics
             position += 4;
 
             //Leave bytes 6 -> 10 empty
-            data = new Byte[] { 0, 0, 0, 0 };
+            data = new byte[] { 0, 0, 0, 0 };
             Array.Copy(data, 0, file, position, 4);
             position += 4;
 

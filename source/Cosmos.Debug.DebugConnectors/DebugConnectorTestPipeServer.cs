@@ -58,7 +58,7 @@ namespace Cosmos.Debug.DebugConnectors
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern SafeFileHandle CreateNamedPipe(
-            String pipeName,
+            string pipeName,
             uint dwOpenMode,
             uint dwPipeMode,
             uint nMaxInstances,

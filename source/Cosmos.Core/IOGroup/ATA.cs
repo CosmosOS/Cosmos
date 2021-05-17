@@ -92,7 +92,7 @@ namespace Cosmos.Core.IOGroup
         /// <returns>ushort value.</returns>
         private static ushort GetBAR1(bool aSecondary)
         {
-            UInt16 xBAR1 = (UInt16)(aSecondary ? 0x0374 : 0x03F4);
+            ushort xBAR1 = (ushort)(aSecondary ? 0x0374 : 0x03F4);
             return xBAR1;
         }
 
@@ -103,7 +103,7 @@ namespace Cosmos.Core.IOGroup
         /// <returns>ushort value.</returns>
         private static ushort GetBAR0(bool aSecondary)
         {
-            UInt16 xBAR0 = (UInt16)(aSecondary ? 0x0170 : 0x01F0);
+            ushort xBAR0 = (ushort)(aSecondary ? 0x0170 : 0x01F0);
             return xBAR0;
         }
     }

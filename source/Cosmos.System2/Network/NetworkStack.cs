@@ -147,7 +147,7 @@ namespace Cosmos.System.Network
                 return;
             }
 
-            UInt16 etherType = (UInt16)((packetData[12] << 8) | packetData[13]);
+            ushort etherType = (ushort)((packetData[12] << 8) | packetData[13]);
             switch (etherType)
             {
                 case 0x0806:

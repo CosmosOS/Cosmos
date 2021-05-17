@@ -88,7 +88,7 @@ namespace Cosmos.Debug.Hosts {
       }
       xPSI.UseShellExecute = false;  //must be true to allow elevate the process, sometimes needed if vmware only runs with admin rights
       mProcess.EnableRaisingEvents = true;
-      mProcess.Exited += delegate(Object aSender, EventArgs e) {
+      mProcess.Exited += delegate(object aSender, EventArgs e) {
         if (OnShutDown != null) {
           OnShutDown(aSender, e);
         }

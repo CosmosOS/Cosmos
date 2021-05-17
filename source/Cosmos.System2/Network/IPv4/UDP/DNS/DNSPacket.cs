@@ -125,12 +125,12 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         protected override void InitFields()
         {
             base.InitFields();
-            TransactionID = (UInt16)((RawData[this.DataOffset + 8] << 8) | RawData[this.DataOffset + 9]);
-            DNSFlags = (UInt16)((RawData[this.DataOffset + 10] << 8) | RawData[this.DataOffset + 11]);
-            Questions = (UInt16)((RawData[this.DataOffset + 12] << 8) | RawData[this.DataOffset + 13]);
-            AnswerRRs = (UInt16)((RawData[this.DataOffset + 14] << 8) | RawData[this.DataOffset + 15]);
-            AuthorityRRs = (UInt16)((RawData[this.DataOffset + 16] << 8) | RawData[this.DataOffset + 17]);
-            AdditionalRRs = (UInt16)((RawData[this.DataOffset + 18] << 8) | RawData[this.DataOffset + 19]);
+            TransactionID = (ushort)((RawData[this.DataOffset + 8] << 8) | RawData[this.DataOffset + 9]);
+            DNSFlags = (ushort)((RawData[this.DataOffset + 10] << 8) | RawData[this.DataOffset + 11]);
+            Questions = (ushort)((RawData[this.DataOffset + 12] << 8) | RawData[this.DataOffset + 13]);
+            AnswerRRs = (ushort)((RawData[this.DataOffset + 14] << 8) | RawData[this.DataOffset + 15]);
+            AuthorityRRs = (ushort)((RawData[this.DataOffset + 16] << 8) | RawData[this.DataOffset + 17]);
+            AdditionalRRs = (ushort)((RawData[this.DataOffset + 18] << 8) | RawData[this.DataOffset + 19]);
         }
 
         /// <summary>

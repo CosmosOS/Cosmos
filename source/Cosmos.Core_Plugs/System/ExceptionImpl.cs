@@ -45,7 +45,7 @@ namespace Cosmos.Core_Plugs.System
             throw new NotImplementedException();
         }
 
-        public static void SaveStackTracesFromDeepCopy(Exception aException, Byte[] aByte, object[] aObject)
+        public static void SaveStackTracesFromDeepCopy(Exception aException, byte[] aByte, object[] aObject)
         {
             throw new NotImplementedException();
         }

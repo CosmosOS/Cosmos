@@ -17,9 +17,9 @@ namespace Cosmos.VS.Windows {
       tblkData.Foreground = mPrevValue == mValue ? Brushes.Black : Brushes.Red;
     }
 
-    protected UInt32? mPrevValue;
-    protected UInt32? mValue;
-    public UInt32? Value {
+    protected uint? mPrevValue;
+    protected uint? mValue;
+    public uint? Value {
       get { return mValue; }
 
       set { 

@@ -77,7 +77,7 @@ namespace Cosmos.Core_Plugs.Interop
         }
 
         [PlugMethod(Signature = "System_Int32__Interop_Advapi32_RegEnumValue_Internal_Win32_SafeHandles_SafeRegistryHandle__System_Int32__System_Char_____System_Int32__System_IntPtr__System_Int32____System_Byte____System_Int32___")]
-        public static unsafe int RegEnumValue(object aSafeRegistryHandle, int aInt, Char[] aCharArray, ref int aInt2,
+        public static unsafe int RegEnumValue(object aSafeRegistryHandle, int aInt, char[] aCharArray, ref int aInt2,
             IntPtr aIntPtr, int[] aIntArray, byte[] aByteArray, int[] aIntArray2)
         {
             throw new NotImplementedException();

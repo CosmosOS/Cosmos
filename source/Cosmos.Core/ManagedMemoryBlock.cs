@@ -12,17 +12,17 @@ namespace Cosmos.Core
         /// <summary>
         /// Offset.
         /// </summary>
-        public UInt32 Offset;
+        public uint Offset;
         /// <summary>
         /// Size.
         /// </summary>
-        public UInt32 Size;
+        public uint Size;
 
         /// <summary>
         /// Create a new buffer with the given size, not aligned
         /// </summary>
         /// <param name="size">Size of buffer</param>
-        public ManagedMemoryBlock(UInt32 size)
+        public ManagedMemoryBlock(uint size)
             : this(size, 1, false)
         { }
 
@@ -31,7 +31,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="size">Size of buffer</param>
         /// <param name="alignment">Byte Boundary alignment</param>
-        public ManagedMemoryBlock(UInt32 size, int alignment)
+        public ManagedMemoryBlock(uint size, int alignment)
             : this(size, alignment, true)
         { }
 
@@ -41,12 +41,12 @@ namespace Cosmos.Core
         /// <param name="size">Size of buffer</param>
         /// <param name="alignment">Byte Boundary alignment</param>
         /// <param name="align">true if buffer should be aligned, false otherwise</param>
-        public ManagedMemoryBlock(UInt32 size, int alignment, bool align)
+        public ManagedMemoryBlock(uint size, int alignment, bool align)
         {
             memory = new byte[size + alignment - 1];
             fixed (byte* bodystart = memory)
             {
-                Offset = (UInt32)bodystart;
+                Offset = (uint)bodystart;
                 Size = size;
             }
             if (align == true)
@@ -152,11 +152,11 @@ namespace Cosmos.Core
         /// <param name="offset">Data offset.</param>
         /// <returns>UInt16 value.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size.</exception>
-        public UInt16 Read16(uint offset)
+        public ushort Read16(uint offset)
         {
             if (offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            return *(UInt16*)(this.Offset + offset);
+            return *(ushort*)(this.Offset + offset);
         }
 
         /// <summary>
@@ -165,11 +165,11 @@ namespace Cosmos.Core
         /// <param name="offset">Data offset.</param>
         /// <param name="value">Value to write.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
-        public void Write16(uint offset, UInt16 value)
+        public void Write16(uint offset, ushort value)
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            (*(UInt16*)(this.Offset + offset)) = value;
+            (*(ushort*)(this.Offset + offset)) = value;
         }
 
         /// <summary>
@@ -178,11 +178,11 @@ namespace Cosmos.Core
         /// <param name="offset">Data offset.</param>
         /// <returns>UInt32 value.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size.</exception>
-        public UInt32 Read32(uint offset)
+        public uint Read32(uint offset)
         {
             if (offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            return *(UInt32*)(this.Offset + offset);
+            return *(uint*)(this.Offset + offset);
         }
 
         /// <summary>
@@ -191,11 +191,11 @@ namespace Cosmos.Core
         /// <param name="offset">Data offset.</param>
         /// <param name="value">Value to write.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
-        public void Write32(uint offset, UInt32 value)
+        public void Write32(uint offset, uint value)
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            (*(UInt32*)(this.Offset + offset)) = value;
+            (*(uint*)(this.Offset + offset)) = value;
         }
     }
 }

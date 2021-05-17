@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Cosmos.Debug.GDB {
     public partial class FormCallStack : Form {
         protected class CallStack {
-            public readonly UInt32 Address;
+            public readonly uint Address;
             public readonly string Label;
 
             public CallStack(string aInput) {

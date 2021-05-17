@@ -21,14 +21,14 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Port.
         /// </summary>
-        public UInt16 port;
+        public ushort port;
 
         /// <summary>
         /// Create new instance of the <see cref="EndPoint"/> class.
         /// </summary>
         /// <param name="addr">Adress.</param>
         /// <param name="port">Port.</param>
-        public EndPoint(Address addr, UInt16 port)
+        public EndPoint(Address addr, ushort port)
         {
             this.address = addr;
             this.port = port;

@@ -167,7 +167,7 @@ namespace Cosmos.HAL
         /// <returns>ushort value.</returns>
         public static ushort GetHeaderType(ushort Bus, ushort Slot, ushort Function)
         {
-            UInt32 xAddr = GetAddressBase(Bus, Slot, Function) | 0xE & 0xFC;
+            uint xAddr = GetAddressBase(Bus, Slot, Function) | 0xE & 0xFC;
             IO.ConfigAddressPort.DWord = xAddr;
             return (byte)(IO.ConfigDataPort.DWord >> ((0xE % 4) * 8) & 0xFF);
         }
@@ -179,11 +179,11 @@ namespace Cosmos.HAL
         /// <param name="Slot">A slot.</param>
         /// <param name="Function">A function.</param>
         /// <returns>UInt16 value.</returns>
-        public static UInt16 GetVendorID(ushort Bus, ushort Slot, ushort Function)
+        public static ushort GetVendorID(ushort Bus, ushort Slot, ushort Function)
         {
-            UInt32 xAddr = GetAddressBase(Bus, Slot, Function) | 0x0 & 0xFC;
+            uint xAddr = GetAddressBase(Bus, Slot, Function) | 0x0 & 0xFC;
             IO.ConfigAddressPort.DWord = xAddr;
-            return (UInt16)(IO.ConfigDataPort.DWord >> ((0x0 % 4) * 8) & 0xFFFF);
+            return (ushort)(IO.ConfigDataPort.DWord >> ((0x0 % 4) * 8) & 0xFFFF);
         }
 
         #region IOReadWrite
@@ -194,14 +194,14 @@ namespace Cosmos.HAL
         /// <returns>byte value.</returns>
         protected byte ReadRegister8(byte aRegister)
         {
-            UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
+            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             return (byte)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFF);
         }
 
         protected void WriteRegister8(byte aRegister, byte value)
         {
-            UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
+            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             IO.ConfigDataPort.Byte = value;
         }
@@ -211,11 +211,11 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aRegister">A register.</param>
         /// <returns>UInt16 value.</returns>
-        protected UInt16 ReadRegister16(byte aRegister)
+        protected ushort ReadRegister16(byte aRegister)
         {
-            UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
+            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
-            return (UInt16)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFFFF);
+            return (ushort)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFFFF);
         }
 
         /// <summary>
@@ -225,21 +225,21 @@ namespace Cosmos.HAL
         /// <param name="value">A value.</param>
         protected void WriteRegister16(byte aRegister, ushort value)
         {
-            UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
+            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             IO.ConfigDataPort.Word = value;
         }
 
-        protected UInt32 ReadRegister32(byte aRegister)
+        protected uint ReadRegister32(byte aRegister)
         {
-            UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
+            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             return IO.ConfigDataPort.DWord;
         }
 
         protected void WriteRegister32(byte aRegister, uint value)
         {
-            UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
+            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             IO.ConfigDataPort.DWord = value;
         }
@@ -252,7 +252,7 @@ namespace Cosmos.HAL
         /// <param name="aSlot">A slot.</param>
         /// <param name="aFunction">A function.</param>
         /// <returns>UInt32 value.</returns>
-        protected static UInt32 GetAddressBase(uint aBus, uint aSlot, uint aFunction)
+        protected static uint GetAddressBase(uint aBus, uint aSlot, uint aFunction)
         {
             return 0x80000000 | (aBus << 16) | ((aSlot & 0x1F) << 11) | ((aFunction & 0x07) << 8);
         }
@@ -263,9 +263,9 @@ namespace Cosmos.HAL
         /// <param name="enable">bool value.</param>
         public void EnableMemory(bool enable)
         {
-            UInt16 command = ReadRegister16(0x04);
+            ushort command = ReadRegister16(0x04);
 
-            UInt16 flags = 0x0007;
+            ushort flags = 0x0007;
 
             if (enable)
                 command |= flags;
@@ -277,9 +277,9 @@ namespace Cosmos.HAL
 
         public void EnableBusMaster(bool enable)
         {
-            UInt16 command = ReadRegister16(0x04);
+            ushort command = ReadRegister16(0x04);
 
-            UInt16 flags = (1 << 2);
+            ushort flags = (1 << 2);
 
             if (enable)
                 command |= flags;

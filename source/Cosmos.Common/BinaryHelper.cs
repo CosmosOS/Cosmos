@@ -13,7 +13,7 @@ namespace Cosmos.Common
         /// <param name="data">A 16-bit unsigned int data</param>
         /// <param name="bit">The zero-based position of a bit. I.e. bit 1 is the second bit.</param>
         /// <returns>Returns TRUE if bit is set.</returns>
-        public static bool CheckBit(UInt16 data, ushort bit)
+        public static bool CheckBit(ushort data, ushort bit)
         {
             //A single bit is LEFT SHIFTED the number a given number of bits.
             //and bitwise AND'ed together with the data.
@@ -31,9 +31,9 @@ namespace Cosmos.Common
         /// <param name="data">A 32-bit unsigned int data.</param>
         /// <param name="bit">The zero-based position of a bit. I.e. bit 1 is the second bit.</param>
         /// <returns>Returns TRUE if bit is set.</returns>
-        public static bool CheckBit(UInt32 data, ushort bit)
+        public static bool CheckBit(uint data, ushort bit)
         {
-            UInt32 mask = (UInt32)(1 << (int)bit);
+            uint mask = (uint)(1 << (int)bit);
             return (data & mask) != 0;
         }
 
@@ -64,13 +64,13 @@ namespace Cosmos.Common
         /// <param name="data">A 32-bit unsigned int of data.</param>
         /// <param name="bitposition">A bit position to change.</param>
         /// <returns>The same data, but with one bit changed.</returns>
-        public static UInt32 FlipBit(UInt32 data, ushort bitposition)
+        public static uint FlipBit(uint data, ushort bitposition)
         {
-            UInt32 mask = (UInt32)(1 << bitposition);
+            uint mask = (uint)(1 << bitposition);
             if (CheckBit(data, bitposition))
-                return (UInt32)(data & ~mask);
+                return (uint)(data & ~mask);
             else
-                return (UInt32)(data | mask);
+                return (uint)(data | mask);
         }
 
 
@@ -81,7 +81,7 @@ namespace Cosmos.Common
         /// <param name="offset">The offset (in bytes) from the start of the data.</param>
         /// <exception cref="ArgumentException">Thrown when offset is greater then 24.</exception>
         /// <returns>Extracted 8-bit unsigned int (byte).</returns>
-        public static byte GetByteFrom32bit(UInt32 data, byte offset)
+        public static byte GetByteFrom32bit(uint data, byte offset)
         {
             if (offset > 24)
                 throw new ArgumentException("Offset can not move outside the 32 bit range");

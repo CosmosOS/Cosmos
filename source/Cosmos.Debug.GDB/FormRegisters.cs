@@ -25,7 +25,7 @@ namespace Cosmos.Debug.GDB {
 
     public partial class FormRegisters : Form {
 		private readonly Color Highlight = Color.Red;
-		private Dictionary<RegNames, UInt32> mCurrentValues = new Dictionary<RegNames, UInt32>();
+		private Dictionary<RegNames, uint> mCurrentValues = new Dictionary<RegNames, uint>();
 
         public FormRegisters() {
             InitializeComponent();
@@ -140,7 +140,7 @@ namespace Cosmos.Debug.GDB {
 
         protected class CPUReg {
             public readonly RegNames mName;
-            public readonly UInt32 mValue;
+            public readonly uint mValue;
             public readonly string mText;
 
             public CPUReg(List<string> aInput, ref int rIndex) {
@@ -163,7 +163,7 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        protected void SetRegLabels(Label a32, Label a16, Label a8H, Label a8L, UInt32 aValue) {
+        protected void SetRegLabels(Label a32, Label a16, Label a8H, Label a8L, uint aValue) {
             var xHex = aValue.ToString("X8");
 
 			if (a32.Text != xHex) {
@@ -199,7 +199,7 @@ namespace Cosmos.Debug.GDB {
             aLabel.Visible = true;
         }
 
-		public UInt32 GetRegisterValue(RegNames reg) {
+		public uint GetRegisterValue(RegNames reg) {
 			return mCurrentValues[reg];
 		}
     }

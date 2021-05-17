@@ -300,14 +300,14 @@ namespace Cosmos.Core
         /// <param name="aBuffer">A buffer to write the data to.</param>
         /// <exception cref="OverflowException">Thrown if aBuffer length in greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public unsafe void Read8(Byte[] aBuffer)
+        public unsafe void Read8(byte[] aBuffer)
         {
             if(aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
             for (int i = 0; i < aBuffer.Length; i++)
-                aBuffer[i] = (*(Byte*)(Base + i));
+                aBuffer[i] = (*(byte*)(Base + i));
         }
 
         /// <summary>
@@ -316,14 +316,14 @@ namespace Cosmos.Core
         /// <param name="aBuffer">A buffer to be written to the memory block.</param>
         /// <exception cref="OverflowException">Thrown if aBuffer length in greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public unsafe void Write8(Byte[] aBuffer)
+        public unsafe void Write8(byte[] aBuffer)
         {
             if(aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
             for (int i = 0; i < aBuffer.Length; i++)
-                (*(Byte*)(Base + i)) = aBuffer[i];
+                (*(byte*)(Base + i)) = aBuffer[i];
         }
 
         /// <summary>
