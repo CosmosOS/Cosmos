@@ -18,12 +18,12 @@ namespace Cosmos.Core_Plugs.System
         {
             fixed(uint* ptr = &aThis.mTypeId) // this has to actually stay fixed
             {
-                var runtimeTypeHandle = CreateRuntimeTypeHandle((int)(uint)ptr);   // internally they do weird stuff and store the pointer as an int,
-                return runtimeTypeHandle;
+                return CreateRuntimeTypeHandle((int)(uint)ptr);   // internally they do weird stuff and store the pointer as an int,
+                                                                                        //so we need to pass the pointer straight away
             }
         }
 
-        public static RuntimeTypeHandle CreateRuntimeTypeHandle(int value)
+        static RuntimeTypeHandle CreateRuntimeTypeHandle(int value)
         {
             throw new NotImplementedException(); // Implemented directly in ILReader.cs
         }
@@ -38,6 +38,7 @@ namespace Cosmos.Core_Plugs.System
             return xType;
         }
 
+        [PlugMethod(Signature = "System_Boolean__System_Type_op_Equality_System_Type__System_Type_")]
         public static bool op_Equality(CosmosRuntimeType aLeft, CosmosRuntimeType aRight)
         {
             if (aLeft is null) //Compare with null without equality check, since that causes stack overflow

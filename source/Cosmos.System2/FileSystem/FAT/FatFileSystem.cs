@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -349,12 +349,12 @@ namespace Cosmos.System.FileSystem.FAT
             /// <exception cref="Exception">Thrown when data size invalid.</exception>
             private void ReadFatSector(ulong aSector, out byte[] aData)
             {
-                Global.mFileSystemDebugger.Send("-- FatFileSystem.ReadFatSector --");
+                Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.ReadFatSector --");
                 aData = mFileSystem.NewBlockArray();
                 ulong xSector = mFatSector + aSector;
                 Global.mFileSystemDebugger.SendInternal("xSector  =" + xSector);
                 mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, ref aData);
-                Global.mFileSystemDebugger.Send("Returning -- FatFileSystem.ReadFatSector --");
+                Global.mFileSystemDebugger.SendInternal("Returning -- FatFileSystem.ReadFatSector --");
             }
 
             /// <summary>

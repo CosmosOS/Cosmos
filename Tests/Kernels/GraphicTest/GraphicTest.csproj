@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <SupportsX86Intrinsics>False</SupportsX86Intrinsics>
     </PropertyGroup>
 
     <ItemGroup>

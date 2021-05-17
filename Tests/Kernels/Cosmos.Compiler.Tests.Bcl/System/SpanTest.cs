@@ -71,7 +71,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.AreEqual(20, arr[3], "Array can change value");
 
             Span<byte> slice = span.Slice(start: 5, length: 3);
-            Assert.IsTrue(slice != null, "Spans can be splived");
+            Assert.IsTrue(slice != null, "Spans can be sliced");
             Assert.AreEqual(3, slice.Length, "Sliced Span has correct length");
         }
     }

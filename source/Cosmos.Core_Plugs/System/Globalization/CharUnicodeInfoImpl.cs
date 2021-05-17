@@ -16,7 +16,7 @@ namespace Cosmos.Core_Plugs.System.Globalization
             return InternalGetUnicodeCategory(ch);
         }
 
-        public static byte InternalGetUnicodeCategory(int ch)
+        private static byte InternalGetUnicodeCategory(int ch)
         {
             if (48 <= ch && ch <= 57)
             {

@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -310,8 +310,8 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public override List<DirectoryEntry> GetDirectoryListing(string aPath)
         {
-            Global.mFileSystemDebugger.Send("-- CosmosVFS.GetDirectoryListing(string) --");
-            Global.mFileSystemDebugger.Send("aPath = " + aPath);
+            Global.mFileSystemDebugger.SendInternal("-- CosmosVFS.GetDirectoryListing(string) --");
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
             var xFS = GetFileSystemFromPath(aPath);
             var xDirectory = DoGetDirectoryEntry(aPath, xFS);
             return xFS.GetDirectoryListing(xDirectory);
@@ -360,14 +360,14 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry aDirectory)
         {
-            Global.mFileSystemDebugger.Send("-- CosmosVFS.GetDirectoryListing --");
+            Global.mFileSystemDebugger.SendInternal("-- CosmosVFS.GetDirectoryListing --");
 
             if (aDirectory == null || String.IsNullOrEmpty(aDirectory.mFullPath))
             {
                 throw new ArgumentException("Argument is null or empty", nameof(aDirectory));
             }
 
-            Global.mFileSystemDebugger.Send("Path = " + aDirectory.mFullPath);
+            Global.mFileSystemDebugger.SendInternal("Path = " + aDirectory.mFullPath);
 
             return GetDirectoryListing(aDirectory.mFullPath);
         }

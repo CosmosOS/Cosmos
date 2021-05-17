@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+using System;
 
 namespace Cosmos.HAL.BlockDevice
 {
@@ -40,14 +41,14 @@ namespace Cosmos.HAL.BlockDevice
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
         public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
-            Global.mDebugger.Send("-- Partition.ReadBlock --");
-            Global.mDebugger.Send($"aBlockNo = {aBlockNo}");
-            Global.mDebugger.Send($"aBlockCount = {aBlockCount}");
+            Global.mDebugger.SendInternal("-- Partition.ReadBlock --");
+            Global.mDebugger.SendInternal($"aBlockNo = {aBlockNo}");
+            Global.mDebugger.SendInternal($"aBlockCount = {aBlockCount}");
             CheckDataSize(aData, aBlockCount);
             ulong xHostBlockNo = mStartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
             mHost.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
-            Global.mDebugger.Send("Returning -- Partition.ReadBlock --");
+            Global.mDebugger.SendInternal("Returning -- Partition.ReadBlock --");
         }
 
         /// <summary>

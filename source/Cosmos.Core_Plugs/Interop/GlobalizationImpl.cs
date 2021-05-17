@@ -49,11 +49,6 @@ namespace Cosmos.Core_Plugs.Interop
             throw new NotImplementedException();
         }
 
-        public static unsafe bool GetLocaleInfoString(string aString, uint aUint, char* aCharPtr, int aInt)
-        {
-            throw new NotImplementedException();
-        }
-
         public static bool GetLocaleInfoGroupingSizes(string aString, uint aUint, ref int aInt, ref int aInt2)
         {
             throw new NotImplementedException();
@@ -61,11 +56,6 @@ namespace Cosmos.Core_Plugs.Interop
 
         [PlugMethod(Signature = "System_Int32__Interop_Globalization_GetCalendars_System_String__System_Globalization_CalendarId____System_Int32_")]
         public static int GetCalendars(string aString, ushort[] aCalendarIds, int aInt)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static unsafe bool GetLocaleTimeFormat(string aString, bool aBool, char* aCharPtr, int aInt)
         {
             throw new NotImplementedException();
         }

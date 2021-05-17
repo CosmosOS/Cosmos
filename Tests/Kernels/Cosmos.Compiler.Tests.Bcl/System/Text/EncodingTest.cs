@@ -187,7 +187,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Text
             TestGetString(xEncoding, BodyName, CP437SpanishText, "Cosmos es genial!", "Spanish");
             TestGetString(xEncoding, BodyName, CP437GermanicText, "Cosmos ist großartig!", "Germanic");
             /* CP437 replaces not representable characters with '?' */
-            Debugger.DoBochsBreak();
             TestGetString(xEncoding, BodyName, CP437GreekText, "Cosmos ε??α? ?π??????!", "Greek");
             TestGetString(xEncoding, BodyName, CP437JapanaseText, "Cosmos ???????!", "Japanese");
             TestGetString(xEncoding, BodyName, CP437GothicText, "??", "Gothic");

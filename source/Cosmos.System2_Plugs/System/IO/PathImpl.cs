@@ -74,7 +74,7 @@ namespace Cosmos.System_Plugs.System.IO
             return result;
         }
 
-        public static string CombineNoChecks(string aPath1, string aPath2)
+        private static string CombineNoChecks(string aPath1, string aPath2)
         {
             if (aPath2.Length == 0)
             {
@@ -246,11 +246,6 @@ namespace Cosmos.System_Plugs.System.IO
             return @"0:\Temp";
         }
 
-        public static string RemoveLongPathPrefix(string aPath)
-        {
-            return aPath;
-        }
-
         public static bool HasExtension(string aPath)
         {
             if (aPath != null)
@@ -343,7 +338,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static bool IsRelative(string aPath)
         {
-            Global.mFileSystemDebugger.Send("-- Path.IsRelative -- aPath = " + aPath);
+            Global.mFileSystemDebugger.SendInternal("-- Path.IsRelative -- aPath = " + aPath);
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -500,9 +495,9 @@ namespace Cosmos.System_Plugs.System.IO
             if (IsRelative(result))
             {
                 result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + result;
-                Global.mFileSystemDebugger.Send("aPath is relative");
-                Global.mFileSystemDebugger.Send("aPath =" + aPath);
-                Global.mFileSystemDebugger.Send("result = " + result);
+                Global.mFileSystemDebugger.SendInternal("aPath is relative");
+                Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
+                Global.mFileSystemDebugger.SendInternal("result = " + result);
             }
 
             if (IsDirectorySeparator(result[result.Length - 1]))

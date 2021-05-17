@@ -17,7 +17,7 @@ namespace Cosmos.Core_Plugs.System.Resources
         {
         }
 
-        public static string GetString(string aString)
+        public static string GetString(ResourceManager aThis, string aString)
         {
             return SRImpl.InternalGetResourceString(aString);
         }

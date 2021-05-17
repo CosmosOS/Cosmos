@@ -63,7 +63,6 @@ namespace Cosmos.Debug.Kernel
         internal static void DoSend(string aText) { }
 
         public static void SendKernelPanic(uint id) { }
-
         public void Send(string aText) => DoSend(aText);
         
         [Conditional("COSMOSDEBUG")]

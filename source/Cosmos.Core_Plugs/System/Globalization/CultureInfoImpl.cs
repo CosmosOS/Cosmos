@@ -35,5 +35,10 @@ namespace Cosmos.Core_Plugs.System.Globalization
         {
             throw new NotImplementedException();
         }
+
+        public static CultureInfo get_Parent(CultureInfo aThis)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

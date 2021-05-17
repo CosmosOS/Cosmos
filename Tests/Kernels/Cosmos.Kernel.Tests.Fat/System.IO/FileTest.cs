@@ -255,7 +255,6 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             mDebugger.Send("");
             mDebugger.Send("START TEST: Test Stream Reader with files of length 1000-4000 bytes :");
 
-            mDebugger.Send($"_maxCharsPerBuffer = {Encoding.UTF8.GetMaxCharCount(1024)}");
 
             #region Test Writing Large Files
             string shorterText = new string('a', 1000);
@@ -290,11 +289,10 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             string text = new string('o', 8000);
             text += new string('l', 8000);
             File.WriteAllText("0:\\long.txt", text);
-            var bytes = File.ReadAllBytes("0:\\long.txt");
-            mDebugger.Send("-- Bytes --");
-            mDebugger.Send(BitConverter.ToString(bytes));
-            mDebugger.Send("-- Bytes --");
-            
+
+            string read = File.ReadAllText("0:\\long.txt");
+            Assert.AreEqual(text, read, "Reading files larger than one cluster works using read all text");
+
             using (StreamReader streamReader = new StreamReader("0:\\long.txt"))
             {
                 Assert.AreEqual(0, streamReader.BaseStream.Position, "Position of StreamReader is correct");
@@ -308,25 +306,17 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
                 streamReader.Read(new char[1024], 0, 1024);
                 Assert.AreEqual(2048, streamReader.BaseStream.Position, "Position of StreamReader is correct after reading 128+256+1024 bytes");
                 Assert.AreEqual(16000, streamReader.BaseStream.Length, "Length of StreamReader is correct after reading 128+256+1024 bytes");
-
-                Debugger.DoBochsBreak();
-                mDebugger.Send("--------------- Check this place! --------- *************");
-                var t = streamReader.ReadToEnd();
-                Assert.AreEqual(text, t, "Using StreamReader to read entire (long) file works");
             }
 
-            string read = File.ReadAllText("0:\\long.txt");
-            Assert.AreEqual(text, read, "Reading files larger than one cluster works using read all text");
             byte[] textBytes = Encoding.ASCII.GetBytes(text);
-            mDebugger.Send("Reading all bytes");
             byte[] readBytes = File.ReadAllBytes("0:\\long.txt");
-            mDebugger.Send("Has read all bytes!");
             Assert.IsTrue(ByteArrayAreEquals(readBytes, textBytes), "Reading large files works using read all bytes does not work.");
 
             using (FileStream fs = File.OpenWrite("0:\\long2.txt"))
             {
                 fs.Write(textBytes, 0, textBytes.Length);
             }
+
             using (FileStream fs = File.OpenRead("0:\\long2.txt"))
             {
                 fs.Read(readBytes, 0, (int)fs.Length);

@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.Interop
+namespace Cosmos.System_Plugs.System.Reflection
 {
-    [Plug("Interop, System.Private.CoreLib")]
-    class InteropImpl
+    [Plug(Target =typeof(Assembly))]
+    class AssemblyImpl
     {
-        public static unsafe void GetRandomBytes(byte* aBuffer, int aLength)
+        public static object[] GetCustomAttributes(Assembly aThis, Type aType, bool aBool)
         {
             throw new NotImplementedException();
         }

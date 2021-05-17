@@ -17,10 +17,5 @@ namespace Cosmos.Core_Plugs.System.Reflection
         {
             throw new NotImplementedException();
         }
-
-        public static unsafe int _GetNamespace(IntPtr aIntPtr, int aInt, void** aVoidPtr)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

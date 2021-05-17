@@ -80,22 +80,6 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
-
-        public static unsafe int GetLocaleInfoEx(string aString, uint aUint, void* aVoidPtr, int aInt)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static unsafe bool EnumCalendarInfoExEx(IntPtr aIntPtr, string aString, uint aUint, string aString2, uint aUint2, void* aVoidPtr)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static unsafe bool EnumTimeFormatsEx(IntPtr aIntPtr, string aString, uint aUint, void* aVoidPtr)
-        {
-            throw new NotImplementedException();
-        }
-
         public static unsafe int GetCalendarInfoEx(string aString, uint aUint, IntPtr aIntPtr, uint aUint2, IntPtr aIntPtr1,
             int aInt, ref int aInt2)
         {

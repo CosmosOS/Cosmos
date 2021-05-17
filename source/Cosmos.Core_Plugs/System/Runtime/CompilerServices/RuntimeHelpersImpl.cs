@@ -13,16 +13,8 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         {
         }
 
-        public static new bool Equals(object aO1, object aO2)
+        public static bool Equals(object aO1, object aO2)
         {
-            if (aO1 == null && aO2 == null)
-            {
-                return true;
-            }
-            if (aO1 == null || aO2 == null)
-            {
-                return false;
-            }
             Debugger.DoBochsBreak();
             return aO1 == aO2; //we cant use object.Equals since it just calls this
         }

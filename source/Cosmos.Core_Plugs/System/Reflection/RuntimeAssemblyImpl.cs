@@ -11,5 +11,10 @@ namespace Cosmos.Core_Plugs.System.Reflection
         {
             throw new NotImplementedException();
         }
+
+        public static object[] GetCustomAttributes(object aThis, Type aType, bool aBool)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

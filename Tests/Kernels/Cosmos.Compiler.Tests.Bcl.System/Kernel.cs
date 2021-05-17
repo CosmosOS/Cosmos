@@ -4,8 +4,6 @@ using System.Collections;
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
-using Cosmos.Compiler.Tests.Bcl.CSharp;
-
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
     public class Kernel : Sys.Kernel
@@ -23,25 +21,25 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
 
                 // System
-                //ArrayTests.Execute();
+                ArrayTests.Execute();
                 StringTest.Execute();
-                //ObjectTests.Execute();
-                //ByteTest.Execute();
-                //SByteTest.Execute();
-                //Int16Test.Execute();
-                //UInt16Test.Execute();
-                //Int32Test.Execute();
-                //UInt32Test.Execute();
-                //Int64Test.Execute();
-                //UInt64Test.Execute();
-                //CharTest.Execute();
-                //BooleanTest.Execute();
-                //SingleTest.Execute();
-                //DoubleTest.Execute();
-                //MathTest.Execute();
-                //ConvertTests.Execute();
-                //DateTimeTests.Execute();
-                //TimeSpanTests.Execute();
+                ObjectTests.Execute();
+                ByteTest.Execute();
+                SByteTest.Execute();
+                Int16Test.Execute();
+                UInt16Test.Execute();
+                Int32Test.Execute();
+                UInt32Test.Execute();
+                Int64Test.Execute();
+                UInt64Test.Execute();
+                CharTest.Execute();
+                BooleanTest.Execute();
+                SingleTest.Execute();
+                DoubleTest.Execute();
+                MathTest.Execute();
+                ConvertTests.Execute();
+                DateTimeTests.Execute();
+                TimeSpanTests.Execute();
 
 
                 TestController.Completed();

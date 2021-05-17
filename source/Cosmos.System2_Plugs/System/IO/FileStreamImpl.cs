@@ -231,7 +231,7 @@ namespace Cosmos.System_Plugs.System.IO
         private static Stream InitializeStream(string aPath, FileMode aMode)
         {
             Global.mFileSystemDebugger.SendInternal($"-- FileStream.InitializeStream --");
-            Global.mFileSystemDebugger.Send($"aPath = {aPath}");
+            Global.mFileSystemDebugger.SendInternal($"aPath = {aPath}");
             if (aPath == null)
             {
                 Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path == null is true");

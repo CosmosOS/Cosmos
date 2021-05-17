@@ -7,6 +7,11 @@
         <DebugType>Full</DebugType>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <PlatformTarget>AnyCPU</PlatformTarget>
+      <Prefer32Bit>true</Prefer32Bit>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.TestRunner.Full\Cosmos.TestRunner.Full.csproj" />
     </ItemGroup>

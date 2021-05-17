@@ -1,4 +1,4 @@
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
@@ -21,10 +21,6 @@ namespace Cosmos.Core_Plugs.System
         [PlugMethod(IsOptional = true, Signature = "System_Void__System_Buffer___Memmove_System_Byte___System_Byte___System_UIntPtr_")]
         public static unsafe void __Memmove(byte* aDest, byte* aSrc, uint aCount)
         {
-            mDebugger.Send("-- __Memmove -- ");
-            mDebugger.Send($"aDest = {(ulong)aDest}");
-            mDebugger.Send($"aSrc = {(ulong)aSrc}");
-            mDebugger.Send($"aCount = {aCount}");
             uint t;
             const int wmask = 0xFFFF;
             const int wsize = 2;
@@ -138,7 +134,6 @@ namespace Cosmos.Core_Plugs.System
                     while (--t != 0);
                 }
             }
-            mDebugger.Send("Return -- __Memmove -- ");
         }
 
         /// <summary>
@@ -170,13 +165,6 @@ namespace Cosmos.Core_Plugs.System
             }
 
             // Unsafe.CopyBlock(ref destination, ref source, byteCount);
-        }
-
-        public static unsafe void __ZeroMemory(void* aVoidPtr, UIntPtr aUIntPtr)
-        {
-            mDebugger.Send("-- __ZeroMemory -- ");
-            Debugger.DoBochsBreak();
-            throw new NotImplementedException();
         }
     }
 }

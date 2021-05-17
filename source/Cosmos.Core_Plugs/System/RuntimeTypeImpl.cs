@@ -1,5 +1,5 @@
 using System;
-
+using System.Reflection;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
@@ -25,6 +25,11 @@ namespace Cosmos.Core_Plugs.System
         }
 
         public static Type[] GetInterfaces(object aThis)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static FieldInfo[] GetFields(object aThis, BindingFlags aBindingFlags)
         {
             throw new NotImplementedException();
         }
