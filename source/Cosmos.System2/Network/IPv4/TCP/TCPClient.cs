@@ -348,7 +348,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 case Status.TIME_WAIT:
                     break;
                 case Status.CLOSED:
-                    ProcessListen(packet);
+                    ProcessListen(packet); //TODO: ProcessClose + TcpListener
                     break;
                 default:
                     throw new Exception("Unknown TCP connection state.");
@@ -363,7 +363,27 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessListen(TCPPacket packet)
         {
-            if (packet.SYN)
+            if (packet.RST)
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP connection resetted! (RST received on LISTEN state)");
+            }
+            else if (packet.FIN)
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP connection closed! (FIN received on LISTEN state)");
+            }
+            else if (packet.ACK)
+            {
+                SendEmptyPacket(Flags.RST);
+
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP connection closed! (ACK received on LISTEN state)");
+            }
+            else if (packet.SYN)
             {
                 Status = Status.SYN_RECEIVED;
 
@@ -417,22 +437,18 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessSynSent(TCPPacket packet)
         {
-            if (packet.SYN && packet.ACK)
-            {
-                AckNumber = packet.SequenceNumber + 1;
-                SequenceNumber++;
-
-                LastSequenceNumber = packet.SequenceNumber;
-
-                SendEmptyPacket(Flags.ACK);
-
-                Status = Status.ESTABLISHED;
-            }
-            else if (packet.SYN)
+            if (packet.FIN)
             {
                 Status = Status.CLOSED;
 
-                throw new NotImplementedException("Simultaneous open not supported.");
+                throw new Exception("TCP connection closed! (FIN received on SYN_SENT state)");
+            }
+            else if (packet.TCPFlags == (byte)Flags.ACK)
+            {
+                AckNumber = packet.SequenceNumber;
+                SequenceNumber = packet.AckNumber;
+
+                Status = Status.ESTABLISHED;
             }
             else if (packet.RST)
             {
@@ -440,12 +456,31 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 throw new Exception("Connection refused by remote computer.");
             }
-            else if (packet.ACK)
+            else if (packet.SYN)
             {
-                AckNumber = packet.SequenceNumber;
-                SequenceNumber = packet.AckNumber;
+                if (packet.ACK)
+                {
+                    AckNumber = packet.SequenceNumber + 1;
+                    SequenceNumber++;
 
-                Status = Status.ESTABLISHED;
+                    LastSequenceNumber = packet.SequenceNumber;
+
+                    SendEmptyPacket(Flags.ACK);
+
+                    Status = Status.ESTABLISHED;
+                }
+                else if (packet.TCPFlags == (byte)Flags.SYN)
+                {
+                    Status = Status.CLOSED;
+
+                    throw new NotImplementedException("Simultaneous open not supported.");
+                }
+                else
+                {
+                    Status = Status.CLOSED;
+
+                    throw new Exception("TCP connection closed! (Flag " + packet.TCPFlags +  " received on SYN_SENT state)");
+                }
             }
             else
             {
@@ -632,27 +667,29 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Contatenate two byte arrays. https://stackoverflow.com/a/45531730
         /// </summary>
-        private byte[] Concat(byte[] a, byte[] b)
+        /// <param name="first">First byte array.</param>
+        /// <param name="second">Byte array to concatenate.</param>
+        private byte[] Concat(byte[] first, byte[] second)
         {
             byte[] output;
             int alen = 0;
 
-            if (a == null)
+            if (first == null)
             {
-                output = new byte[b.Length];
+                output = new byte[second.Length];
             }
             else
             {
-                output = new byte[a.Length + b.Length];
-                alen = a.Length;
-                for (int i = 0; i < a.Length; i++)
+                output = new byte[first.Length + second.Length];
+                alen = first.Length;
+                for (int i = 0; i < first.Length; i++)
                 {
-                    output[i] = a[i];
+                    output[i] = first[i];
                 }
             }
-            for (int j = 0; j < b.Length; j++)
+            for (int j = 0; j < second.Length; j++)
             {
-                output[alen + j] = b[j];
+                output[alen + j] = second[j];
             }
             return output;
         }
@@ -660,6 +697,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Split byte array into chunks of a specified size.
         /// </summary>
+        /// <param name="buffer">Byte array to split.</param>
+        /// <param name="chunksize">Chunk size.</param>
         private byte[][] ArraySplit(byte[] buffer, int chunksize = 1000)
         {
             var size = buffer.Length;
