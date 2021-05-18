@@ -4,7 +4,6 @@
         <ApprovalTestsVersion>3.0.18</ApprovalTestsVersion>
         <AvaloniaVersion>0.7.0</AvaloniaVersion>
         <MicrosoftBuildVersion>15.9.20</MicrosoftBuildVersion>
-        <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0-alpha-004</MicrosoftNETFrameworkReferenceAssembliesVersion>
         <MicrosoftNETTestSdkVersion>15.9.0</MicrosoftNETTestSdkVersion>
         <MicrosoftTestPlatformObjectModelVersion>15.9.0</MicrosoftTestPlatformObjectModelVersion>
         <MicrosoftVisualStudioSDKEmbedInteropTypesVersion>15.0.27</MicrosoftVisualStudioSDKEmbedInteropTypesVersion>

@@ -6,13 +6,35 @@
         <PackageId>Cosmos.Build</PackageId>
         <PackageDescription>Cosmos build system.</PackageDescription>
         <IsMSBuildExtensionProject>True</IsMSBuildExtensionProject>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+        <TargetsForTfmSpecificContentInPackage>
+            _SetNoBuildForGeneratePackageOnBuild;
+            $(TargetsForTfmSpecificContentInPackage);
+        </TargetsForTfmSpecificContentInPackage>
+
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
+
+    <!--see https://github.com/AArnott/CodeGeneration.Roslyn/issues/203-->
+    <Target Name="_SetNoBuildForGeneratePackageOnBuild" Condition=" '$(GeneratePackageOnBuild)' == 'true' ">
+        <PropertyGroup>
+            <NoBuild>true</NoBuild>
+        </PropertyGroup>
+    </Target>
 
     <ItemGroup>
         <Content Include="build\**" Pack="True" PackagePath="build\" />
         <Content Include="tools\**" Pack="True" PackagePath="tools\" />
         <Content Include="runtime.json" Pack="True" PackagePath="\" />
     </ItemGroup>
+
+    <!-- from https://github.com/dotnet/msbuild/issues/1310#issuecomment-300155346-->
+    <!--<PropertyGroup>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    </PropertyGroup>-->
+
 
     <ItemGroup>
         <PackageReference Include="IL2CPU.Debug.Symbols" />
