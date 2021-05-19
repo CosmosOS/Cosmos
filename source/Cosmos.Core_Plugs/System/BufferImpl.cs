@@ -1,5 +1,6 @@
 //#define COSMOSDEBUG
 using System;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
@@ -165,6 +166,11 @@ namespace Cosmos.Core_Plugs.System
             }
 
             // Unsafe.CopyBlock(ref destination, ref source, byteCount);
+        }
+
+        public static unsafe void __ZeroMemory(void* aPtr, UIntPtr aLength)
+        {
+            CPU.ZeroFill((uint)aPtr, *(uint*)aLength.ToPointer()); 
         }
     }
 }
