@@ -18,7 +18,6 @@
     <ItemGroup>
         <PackageReference Include="Cosmos.Build.Common" />
         <PackageReference Include="IL2CPU.Debug.Symbols" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.6" />
         <PackageReference Include="Microsoft.VisualStudio.Debugger.Interop.15.0" Version="16.9.31023.347" />
         <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.9.31025.104" />
         <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="16.9.31023.347" />

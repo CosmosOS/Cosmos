@@ -1,27 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <RuntimeIdentifier>win</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
         <PackageDescription>Cosmos build system.</PackageDescription>
         <IsMSBuildExtensionProject>True</IsMSBuildExtensionProject>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-        <TargetsForTfmSpecificContentInPackage>
-            _SetNoBuildForGeneratePackageOnBuild;
-            $(TargetsForTfmSpecificContentInPackage);
-        </TargetsForTfmSpecificContentInPackage>
 
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
 
-    <!--see https://github.com/AArnott/CodeGeneration.Roslyn/issues/203-->
-    <Target Name="_SetNoBuildForGeneratePackageOnBuild" Condition=" '$(GeneratePackageOnBuild)' == 'true' ">
-        <PropertyGroup>
-            <NoBuild>true</NoBuild>
-        </PropertyGroup>
-    </Target>
 
     <ItemGroup>
         <Content Include="build\**" Pack="True" PackagePath="build\" />
@@ -29,35 +18,23 @@
         <Content Include="runtime.json" Pack="True" PackagePath="\" />
     </ItemGroup>
 
-    <!-- from https://github.com/dotnet/msbuild/issues/1310#issuecomment-300155346-->
-    <!--<PropertyGroup>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-        <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    </PropertyGroup>-->
-
-
     <ItemGroup>
         <PackageReference Include="IL2CPU.Debug.Symbols" />
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.0.4" />
         <PackageReference Include="System.Runtime" Version="4.3.1" />
+
+        <PackageReference Update="Microsoft.Build.Framework" Version="16.9.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Update="Microsoft.Build.Utilities.Core" Version="16.9.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" PrivateAssets="All" />
     </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Update="Microsoft.Build.Framework" Version="16.8.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Update="Microsoft.Build.Utilities.Core" Version="16.8.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-    </ItemGroup>
-
 </Project>

@@ -58,7 +58,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)net5.0\Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
+        <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)net472\Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
     </PropertyGroup>
 
     <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
@@ -182,8 +182,8 @@
                 EmitDebugSymbols="$(DebugSymbols)"
                 CosmosBuildDir="$(CosmosDir)\Build"
                 WorkingDir="$(TargetDir)"
-				ToolPath="$(Il2cpuToolPath)"
-				ToolExe="$(Il2cpuToolExe)" />
+                ToolPath="$(Il2cpuToolPath)"
+                ToolExe="$(Il2cpuToolExe)" />
 
     </Target>
 
