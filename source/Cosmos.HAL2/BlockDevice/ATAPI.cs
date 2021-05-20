@@ -121,7 +121,6 @@ namespace Cosmos.HAL.BlockDevice
                 var item = buffer[i];
                 var bytes = BitConverter.GetBytes(item);
 
-                //TODO: Is this correct order.
                 array[counter++] = bytes[0];
                 array[counter++] = bytes[1];
             }
@@ -204,7 +203,7 @@ namespace Cosmos.HAL.BlockDevice
 
         public void Eject()
         {
-            ushort[] output = new ushort[SectorSize];
+            ushort[] output = new ushort[12];
             SendCmd(ATAPI.PacketCommands.Unload, SectorSize, ref output);
         }
 
