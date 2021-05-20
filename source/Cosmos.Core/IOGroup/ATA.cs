@@ -9,21 +9,69 @@ namespace Cosmos.Core.IOGroup
 {
     public class ATA : IOGroup
     {
+        /// <summary>
+        /// Error IOPort
+        /// </summary>
         public readonly IOPort Error; // BAR0 + 1 - read only
+        /// <summary>
+        /// Features IOPort.
+        /// </summary>
         public readonly IOPortWrite Features; // BAR0 + 1 - write only
+        /// <summary>
+        /// Data IOPort.
+        /// </summary>
         public readonly IOPort Data; // BAR0
+        /// <summary>
+        /// Sector Count IOPort.
+        /// </summary>
         public readonly IOPort SectorCount; // BAR0 + 2
+        /// <summary>
+        /// LBA0 IOPort.
+        /// </summary>
         public readonly IOPort LBA0; // BAR0 + 3
+        /// <summary>
+        /// LBA1 IOPort.
+        /// </summary>
         public readonly IOPort LBA1; // BAR0 + 4
+        /// <summary>
+        /// LBA2 IOPort.
+        /// </summary>
         public readonly IOPort LBA2; // BAR0 + 5
+        /// <summary>
+        /// Device select IOPort.
+        /// </summary>
         public readonly IOPort DeviceSelect; // BAR0 + 6
+        /// <summary>
+        /// Command IOPort.
+        /// </summary>
         public readonly IOPortWrite Command; // BAR0 + 7 - write only
+        /// <summary>
+        /// Status IOPort.
+        /// </summary>
         public readonly IOPortRead Status; // BAR0 + 7 - read only
+        /// <summary>
+        /// Sector count IOPort.
+        /// </summary>
         public readonly IOPort SectorCountLBA48; // BAR0 + 8
+        /// <summary>
+        /// LBA3 IOPort.
+        /// </summary>
         public readonly IOPort LBA3; // BAR0 + 9
+        /// <summary>
+        /// LBA4 IOPort.
+        /// </summary>
         public readonly IOPort LBA4; // BAR0 + 10
+        /// <summary>
+        /// LBA5 IOPort.
+        /// </summary>
         public readonly IOPort LBA5; // BAR0 + 11
-        public readonly IOPortRead AlternateStatus; // BAR1 + 2 - read only 
+        /// <summary>
+        /// Alternate Status IOPort.
+        /// </summary>
+        public readonly IOPortRead AlternateStatus; // BAR1 + 2 - read only
+        /// <summary>
+        /// Control IOPort.
+        /// </summary>
         public readonly IOPortWrite Control; // BAR1 + 2 - write only
 
         public ATA(bool aSecondary)
