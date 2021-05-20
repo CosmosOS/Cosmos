@@ -73,7 +73,7 @@ namespace Cosmos.HAL.BlockDevice
 		};
 
 		[Flags]
-		enum DvcSelVal : byte
+		public enum DvcSelVal : byte
 		{
 			// Bits 0-3: Head Number for CHS.
 			// Bit 4: Slave Bit. (0: Selecting Master Drive, 1: Selecting Slave Drive).
