@@ -24,8 +24,11 @@ namespace Cosmos.HAL.BlockDevice
         {
             this.BusPosition = parentDevice.BusPosition;
             this.Primary = parentDevice.ControllerID == ControllerIdEnum.Primary;
+
             mBlockSize = SectorSize;
             IO = new Core.IOGroup.ATA(!Primary);
+            var p = BusPosition == BusPositionEnum.Master;
+            Ata.AtaDebugger.Send("ATAPI: Primary controller: "+ this.Primary+" Bus postion: IsMaster: "+ p);
 
             Devices.Add(this);
             ATAPIDevices.Add(this);
@@ -45,8 +48,7 @@ namespace Cosmos.HAL.BlockDevice
                 INTs.SetIrqHandler(0x0F, HandleIRQ);
             }
 
-            IO.Control.Byte = 0; //Enable IRQs  
-            IO.DeviceSelect.Byte = (byte)((byte)(DvcSelVal.Default | DvcSelVal.LBA | (BusPosition == BusPositionEnum.Slave ? DvcSelVal.Slave : 0)) | 0);
+            IO.Control.Byte = 0; //Enable IRQs
         }
 
         public void Test()
@@ -83,6 +85,9 @@ namespace Cosmos.HAL.BlockDevice
             {
                 throw new NotImplementedException("Reading more than one sectors is not supported. SectorCount: " + SectorCount);
             }
+
+            Ata.AtaDebugger.Send("ATAPI: Reading block. Sector: " + SectorNum + " SectorCount: " + SectorCount);
+
 
             byte[] packet = new byte[12];
             packet[0] = (byte)AtaPio.Cmd.Read;//Read Sector
@@ -132,12 +137,21 @@ namespace Cosmos.HAL.BlockDevice
 
         private void SendCmd(byte[] AtapiPacket, int size, ref ushort[] outputData)
         {
+            //Select the ATAPI device
+            IO.DeviceSelect.Byte = (byte)((byte)(DvcSelVal.Default | DvcSelVal.LBA | (BusPosition == BusPositionEnum.Slave ? DvcSelVal.Slave : 0)) | 0);
+
+            //Wait for the select complete
+            IO.Wait();
+
             Console.WriteLine("[ATAPI] Sending command");
             IO.Features.Byte = 0x00; //PIO Mode
             IO.LBA1.Byte = (byte)((SectorSize) & 0xFF);
             IO.LBA2.Byte = (byte)((SectorSize >> 8) & 0xFF);
             IO.Command.Byte = (byte)AtaPio.Cmd.Packet;
+            Ata.AtaDebugger.Send("ATAPI: Polling");
+
             AtaWait(true);
+            Ata.AtaDebugger.Send("ATAPI: Polling complete");
 
             for (int i = 0; i < AtapiPacket.Length; i++)
             {
