@@ -348,7 +348,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                 case Status.TIME_WAIT:
                     break;
                 case Status.CLOSED:
-                    ProcessListen(packet); //TODO: ProcessClose + TcpListener
                     break;
                 default:
                     throw new Exception("Unknown TCP connection state.");
