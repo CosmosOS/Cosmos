@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
+using Cosmos.System.FileSystem;
 
 namespace Cosmos.HAL.BlockDevice
 {
-    public class GPT
+    public class GPT : PartitioningType
     {
         // Signature: "EFI PART"
         private const ulong EFIParitionSignature = 0x5452415020494645;
 
-        public List<GPartInfo> Partitions = new List<GPartInfo>();
+        internal List<GPartInfo> Partitions = new List<GPartInfo>();
+
+        internal BlockDevice BlockDevice;
 
         public class GPartInfo
         {
@@ -31,6 +34,7 @@ namespace Cosmos.HAL.BlockDevice
 
         public GPT(BlockDevice aBlockDevice)
         {
+            BlockDevice = aBlockDevice;
             byte[] GPTHeader = new byte[512];
             aBlockDevice.ReadBlock(1, 1, ref GPTHeader);
 
@@ -85,5 +89,22 @@ namespace Cosmos.HAL.BlockDevice
 
             return signature == EFIParitionSignature;
         }
+
+        public override bool IsType()
+        {
+            return IsGPTPartition(BlockDevice);
+        }
+        public override List<Partition> GetPartitions()
+        {
+            var parts = new List<Partition>();
+            foreach (var item in Partitions)
+            {
+                parts.Add(new Partition(BlockDevice, item.StartSector, item.SectorCount));
+            }
+            return parts;
+        }
+        public override void RemovePartition(int partIndex) => throw new NotImplementedException();
+        public override void CreatePartition(int sizeInMB) => throw new NotImplementedException();
+        public override void Clear() => throw new NotImplementedException();
     }
 }

@@ -11,8 +11,9 @@ namespace Cosmos.System.FileSystem
     {
         private List<ManagedPartition> parts = new List<ManagedPartition>();
         private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>();
+        private PartitioningType partitioningType;
 
-
+        public PartitioningType PartitioningType { get { return partitioningType; } }
         /// <summary>
         /// The size of the disk in MB.
         /// </summary>
@@ -54,6 +55,14 @@ namespace Cosmos.System.FileSystem
         public Disk(BlockDevice mainBlockDevice)
         {
             Host = mainBlockDevice;
+            if (GPT.IsGPTPartition(mainBlockDevice))
+            {
+                partitioningType = new GPT(mainBlockDevice);
+            }
+            else
+            {
+                partitioningType = new MBR(mainBlockDevice);
+            }
             if (registeredFileSystems.Count == 0)
             {
                 registeredFileSystems.Add(new FatFileSystemFactory());

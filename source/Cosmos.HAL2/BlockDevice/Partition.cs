@@ -15,7 +15,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Starting sector.
         /// </summary>
-        private readonly ulong mStartingSector;
+        public readonly ulong StartingSector;
         public static List<Partition> Partitions = new List<Partition>();
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Cosmos.HAL.BlockDevice
         public Partition(BlockDevice aHost, ulong aStartingSector, ulong aSectorCount)
 		{
             Host = aHost;
-			mStartingSector = aStartingSector;
+			StartingSector = aStartingSector;
 			mBlockCount = aSectorCount;
 			mBlockSize = aHost.BlockSize;
 		}
@@ -43,7 +43,7 @@ namespace Cosmos.HAL.BlockDevice
         public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             CheckDataSize(aData, aBlockCount);
-            ulong xHostBlockNo = mStartingSector + aBlockNo;
+            ulong xHostBlockNo = StartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
             Host.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
         }
@@ -59,7 +59,7 @@ namespace Cosmos.HAL.BlockDevice
         public override void WriteBlock(ulong aBlockNo, ulong aBlockCount,ref  byte[] aData)
         {
             CheckDataSize(aData, aBlockCount);
-            ulong xHostBlockNo = mStartingSector + aBlockNo;
+            ulong xHostBlockNo = StartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
             Host.WriteBlock(xHostBlockNo, aBlockCount, ref aData);
         }

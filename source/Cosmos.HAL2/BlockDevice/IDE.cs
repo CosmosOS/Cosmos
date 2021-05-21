@@ -51,26 +51,24 @@ namespace Cosmos.HAL.BlockDevice
 
                 Ata.AtaDebugger.Send("Number of GPT partitions found:");
                 Ata.AtaDebugger.SendNumber(xGPT.Partitions.Count);
-                for (int i = 0; i < xGPT.Partitions.Count; i++)
+                var parts = xGPT.GetPartitions();
+                for (int i = 0; i < parts.Count; i++)
                 {
-                    var xPart = xGPT.Partitions[i];
+                    var xPart = parts[i];
                     if (xPart == null)
                     {
                         Console.WriteLine("Null partition found at idx: " + i);
                     }
                     else
                     {
-                        var xPartDevice = new Partition(device, xPart.StartSector, xPart.SectorCount);
-                        Partition.Partitions.Add(xPartDevice);
+                        Partition.Partitions.Add(xPart);
                         Console.WriteLine("Found partition at idx: " + i);
                     }
                 }
             }
             else
             {
-                var xMbrData = new byte[512];
-                device.ReadBlock(0UL, 1U, ref xMbrData);
-                var mbr = new MBR(xMbrData);
+                var mbr = new MBR(device);
 
                 if (mbr.EBRLocation != 0)
                 {
@@ -86,20 +84,19 @@ namespace Cosmos.HAL.BlockDevice
                         //Partition.Partitions.Add(xATA, xPartDevice);
                     }
                 }
-
+                var partitions = mbr.GetPartitions();
                 Ata.AtaDebugger.Send("Number of MBR partitions found:");
-                Ata.AtaDebugger.SendNumber(mbr.Partitions.Count);
-                for (int i = 0; i < mbr.Partitions.Count; i++)
+                Ata.AtaDebugger.SendNumber(partitions.Count);
+                for (int i = 0; i < partitions.Count; i++)
                 {
-                    var xPart = mbr.Partitions[i];
+                    var xPart = partitions[i];
                     if (xPart == null)
                     {
                         Console.WriteLine("Null partition found at idx: " + i);
                     }
                     else
                     {
-                        var xPartDevice = new Partition(device, xPart.StartSector, xPart.SectorCount);
-                        Partition.Partitions.Add(xPartDevice);
+                        Partition.Partitions.Add(xPart);
                         Console.WriteLine("Found partition at idx: " + i);
                     }
                 }
