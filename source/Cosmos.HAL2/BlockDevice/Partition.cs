@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cosmos.HAL.BlockDevice
 {
@@ -15,6 +16,7 @@ namespace Cosmos.HAL.BlockDevice
         /// Starting sector.
         /// </summary>
         private readonly UInt64 mStartingSector;
+        public static Dictionary<BlockDevice, Partition> Partitions;
 
         /// <summary>
         /// Create new instance of the <see cref="Partition"/> class.
@@ -22,7 +24,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aHost">A hosting device.</param>
         /// <param name="aStartingSector">A starting sector.</param>
         /// <param name="aSectorCount">A sector count.</param>
-		public Partition(BlockDevice aHost, UInt64 aStartingSector, UInt64 aSectorCount)
+        public Partition(BlockDevice aHost, UInt64 aStartingSector, UInt64 aSectorCount)
 		{
             Host = aHost;
 			mStartingSector = aStartingSector;

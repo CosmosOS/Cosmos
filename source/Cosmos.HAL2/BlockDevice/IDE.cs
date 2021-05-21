@@ -40,9 +40,14 @@ namespace Cosmos.HAL.BlockDevice
                 return;
             }
 
-            if(GPT.IsGPTPartition(xATA))
+            ScanAndInitPartitons(xATA);
+        }
+
+        internal static void ScanAndInitPartitons(BlockDevice device)
+        {
+            if (GPT.IsGPTPartition(device))
             {
-                var xGPT = new GPT(xATA);
+                var xGPT = new GPT(device);
 
                 Ata.AtaDebugger.Send("Number of GPT partitions found:");
                 Ata.AtaDebugger.SendNumber(xGPT.Partitions.Count);
@@ -55,8 +60,8 @@ namespace Cosmos.HAL.BlockDevice
                     }
                     else
                     {
-                        var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                        BlockDevice.Devices.Add(xPartDevice);
+                        var xPartDevice = new Partition(device, xPart.StartSector, xPart.SectorCount);
+                        Partition.Partitions.Add(device, xPartDevice);
                         Console.WriteLine("Found partition at idx: " + i);
                     }
                 }
@@ -64,38 +69,37 @@ namespace Cosmos.HAL.BlockDevice
             else
             {
                 var xMbrData = new byte[512];
-                xATA.ReadBlock(0UL, 1U, ref xMbrData);
-                var xMBR = new MBR(xMbrData);
+                device.ReadBlock(0UL, 1U, ref xMbrData);
+                var mbr = new MBR(xMbrData);
 
-                if (xMBR.EBRLocation != 0)
+                if (mbr.EBRLocation != 0)
                 {
                     //EBR Detected
                     var xEbrData = new byte[512];
-                    xATA.ReadBlock(xMBR.EBRLocation, 1U, ref xEbrData);
+                    device.ReadBlock(mbr.EBRLocation, 1U, ref xEbrData);
                     var xEBR = new EBR(xEbrData);
 
                     for (int i = 0; i < xEBR.Partitions.Count; i++)
                     {
                         //var xPart = xEBR.Partitions[i];
                         //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                        //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+                        //Partition.Partitions.Add(xATA, xPartDevice);
                     }
                 }
 
-                // TODO Change this to foreach when foreach is supported
                 Ata.AtaDebugger.Send("Number of MBR partitions found:");
-                Ata.AtaDebugger.SendNumber(xMBR.Partitions.Count);
-                for (int i = 0; i < xMBR.Partitions.Count; i++)
+                Ata.AtaDebugger.SendNumber(mbr.Partitions.Count);
+                for (int i = 0; i < mbr.Partitions.Count; i++)
                 {
-                    var xPart = xMBR.Partitions[i];
+                    var xPart = mbr.Partitions[i];
                     if (xPart == null)
                     {
                         Console.WriteLine("Null partition found at idx: " + i);
                     }
                     else
                     {
-                        var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                        BlockDevice.Devices.Add(xPartDevice);
+                        var xPartDevice = new Partition(device, xPart.StartSector, xPart.SectorCount);
+                        Partition.Partitions.Add(device, xPartDevice);
                         Console.WriteLine("Found partition at idx: " + i);
                     }
                 }
