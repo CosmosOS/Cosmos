@@ -61,7 +61,7 @@ namespace Cosmos.HAL.BlockDevice
                     else
                     {
                         var xPartDevice = new Partition(device, xPart.StartSector, xPart.SectorCount);
-                        Partition.Partitions.Add(xPartDevice, device);
+                        Partition.Partitions.Add(xPartDevice);
                         Console.WriteLine("Found partition at idx: " + i);
                     }
                 }
@@ -99,7 +99,7 @@ namespace Cosmos.HAL.BlockDevice
                     else
                     {
                         var xPartDevice = new Partition(device, xPart.StartSector, xPart.SectorCount);
-                        Partition.Partitions.Add(xPartDevice, device);
+                        Partition.Partitions.Add(xPartDevice);
                         Console.WriteLine("Found partition at idx: " + i);
                     }
                 }

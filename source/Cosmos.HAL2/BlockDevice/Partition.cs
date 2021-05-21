@@ -16,7 +16,7 @@ namespace Cosmos.HAL.BlockDevice
         /// Starting sector.
         /// </summary>
         private readonly ulong mStartingSector;
-        public static Dictionary<Partition, BlockDevice> Partitions = new Dictionary<Partition, BlockDevice>();
+        public static List<Partition> Partitions = new List<Partition>();
 
         /// <summary>
         /// Create new instance of the <see cref="Partition"/> class.

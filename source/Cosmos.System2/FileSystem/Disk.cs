@@ -60,9 +60,9 @@ namespace Cosmos.System.FileSystem
             }
             foreach (var part in Partition.Partitions)
             {
-                if (part.Value == mainBlockDevice)
+                if (part.Host == mainBlockDevice)
                 {
-                    parts.Add(new ManagedPartition(part.Key));
+                    parts.Add(new ManagedPartition(part));
                 }
             }
             Size = (int)(mainBlockDevice.BlockCount * mainBlockDevice.BlockSize / 1024 / 1024);
