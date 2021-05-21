@@ -84,12 +84,15 @@ namespace Cosmos.HAL.BlockDevice
                 if (xPort.mPortType == PortType.SATA)
                 {
                     mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
+                    BlockDevice.Devices.Add(xPort);
 
                     IDE.ScanAndInitPartitons(xPort);
+                    
                 }
                 else if (xPort.mPortType == PortType.SATAPI)
                 {
                     mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
+                    BlockDevice.Devices.Add(xPort);
 
                     // Just to test Read Sector!
 
