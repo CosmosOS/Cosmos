@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.VFS;
 
@@ -8,6 +9,7 @@ namespace Cosmos.System.FileSystem
 {
     public class ManagedPartition
     {
+        internal static Debugger PartitonDebugger = new Debugger("System", "Partiton");
         public readonly Partition Host;
         /// <summary>
         /// The root path of the file system. Example: 0:\
@@ -51,8 +53,11 @@ namespace Cosmos.System.FileSystem
                 {
                     MountedFS = item.Create(Host, xRootPath, xSize);
                     RootPath = xRootPath;
+                    return;
                 }
             }
+
+            PartitonDebugger.Send("Cannot find file system for partiton.");
         }
         /// <summary>
         /// Mounts using a FileSystem factory.

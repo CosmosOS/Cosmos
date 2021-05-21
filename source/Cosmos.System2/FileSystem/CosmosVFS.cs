@@ -48,10 +48,7 @@ namespace Cosmos.System.FileSystem
 
             foreach (var item in BlockDevice.Devices)
             {
-                if (item is AtaPio)
-                {
-                    Disks.Add(new Disk(item));
-                }
+                Disks.Add(new Disk(item));
             }
 
             InitializePartitions();
