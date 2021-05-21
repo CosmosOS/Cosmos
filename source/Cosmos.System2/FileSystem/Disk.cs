@@ -121,29 +121,32 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Create Partition.
         /// </summary>
-        /// <param name="start">Start.</param>
-        /// <param name="end">End.</param>
+        /// <param name="size">Size in MB.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if start / end is smaller then 0.</exception>
         /// <exception cref="ArgumentException">Thrown if end is smaller or equal to start.</exception>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
-        public void CreatePartion(long start, long end)
+        /// <exception cref="NotImplementedException">Thrown if partition type is GPT.</exception>
+        public void CreatePartion(int size)
         {
-            if (start < 0)
+            if(size == 0 | size < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(start));
+                throw new ArgumentException("size");
             }
-
-            if (end < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(start));
-            }
-
-            if (end <= start)
-            {
-                throw new ArgumentException("end is <= start");
-            }
-
-            throw new NotImplementedException("CreatePartion");
+            partitioningType.CreatePartition(size);
+        }
+        /// <summary>
+        /// Deletes a partition
+        /// </summary>
+        /// <param name="index">Partition index starting from 0</param>
+        public void DeletePartition(int index)
+        {
+            partitioningType.CreatePartition(index);
+        }
+        /// <summary>
+        /// Deletes all partitions on the disk.
+        /// </summary>
+        public void Clear()
+        {
+            partitioningType.Clear();
         }
     }
 }
