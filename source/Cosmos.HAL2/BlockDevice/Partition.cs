@@ -15,8 +15,8 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Starting sector.
         /// </summary>
-        private readonly UInt64 mStartingSector;
-        public static Dictionary<Partition, BlockDevice> Partitions;
+        private readonly ulong mStartingSector;
+        public static Dictionary<Partition, BlockDevice> Partitions = new Dictionary<Partition, BlockDevice>();
 
         /// <summary>
         /// Create new instance of the <see cref="Partition"/> class.
@@ -24,7 +24,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aHost">A hosting device.</param>
         /// <param name="aStartingSector">A starting sector.</param>
         /// <param name="aSectorCount">A sector count.</param>
-        public Partition(BlockDevice aHost, UInt64 aStartingSector, UInt64 aSectorCount)
+        public Partition(BlockDevice aHost, ulong aStartingSector, ulong aSectorCount)
 		{
             Host = aHost;
 			mStartingSector = aStartingSector;
@@ -40,10 +40,10 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aData">A data that been read.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        public override void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
+        public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             CheckDataSize(aData, aBlockCount);
-            UInt64 xHostBlockNo = mStartingSector + aBlockNo;
+            ulong xHostBlockNo = mStartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
             Host.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
         }
@@ -56,10 +56,10 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aData">A data to write.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        public override void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount,ref  byte[] aData)
+        public override void WriteBlock(ulong aBlockNo, ulong aBlockCount,ref  byte[] aData)
         {
             CheckDataSize(aData, aBlockCount);
-            UInt64 xHostBlockNo = mStartingSector + aBlockNo;
+            ulong xHostBlockNo = mStartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
             Host.WriteBlock(xHostBlockNo, aBlockCount, ref aData);
         }
