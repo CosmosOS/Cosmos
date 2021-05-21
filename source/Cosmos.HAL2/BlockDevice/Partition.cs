@@ -16,7 +16,7 @@ namespace Cosmos.HAL.BlockDevice
         /// Starting sector.
         /// </summary>
         private readonly UInt64 mStartingSector;
-        public static Dictionary<BlockDevice, Partition> Partitions;
+        public static Dictionary<Partition, BlockDevice> Partitions;
 
         /// <summary>
         /// Create new instance of the <see cref="Partition"/> class.

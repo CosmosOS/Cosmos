@@ -51,24 +51,21 @@ namespace Cosmos.System.FileSystem
                 Host.WriteBlock(0, 1, ref value);
             }
         }
-        public Disk(BlockDevice b)
+        public Disk(BlockDevice mainBlockDevice)
         {
-            Host = b;
+            Host = mainBlockDevice;
             if (registeredFileSystems.Count == 0)
             {
                 registeredFileSystems.Add(new FatFileSystemFactory());
             }
-            for (int i = 0; i < BlockDevice.Devices.Count; i++)
+            foreach (var part in Partition.Partitions)
             {
-                if (BlockDevice.Devices[i] is Partition b2)
+                if (part.Value == mainBlockDevice)
                 {
-                    if (b2.Host == b)
-                    {
-                        parts.Add(new ManagedPartition(b2));
-                    }
+                    parts.Add(new ManagedPartition(part.Key));
                 }
             }
-            Size = (int)(b.BlockCount * b.BlockSize / 1024 / 1024);
+            Size = (int)(mainBlockDevice.BlockCount * mainBlockDevice.BlockSize / 1024 / 1024);
         }
         /// <summary>
         /// Mounts the disk.
