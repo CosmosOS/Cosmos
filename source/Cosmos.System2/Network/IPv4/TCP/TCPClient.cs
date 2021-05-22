@@ -316,53 +316,148 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            if (Status == Status.LISTEN || Status == Status.CLOSED)
+            switch (Status)
             {
-                if (packet.SYN)
-                {
-                    Status = Status.SYN_RECEIVED;
-
-                    source = IPConfig.FindNetwork(packet.SourceIP);
-
-                    AckNumber = packet.SequenceNumber + 1;
-
-                    var rnd = new Random();
-                    SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
-
-                    destination = packet.SourceIP;
-                    destinationPort = packet.SourcePort;
-
-                    SendEmptyPacket(Flags.SYN | Flags.ACK);
-                }
-                else
-                {
-                    Status = Status.CLOSED;
-
-                    throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSED||LISTEN)");
-                }
+                case Status.LISTEN:
+                    ProcessListen(packet);
+                    break;
+                case Status.SYN_SENT:
+                    ProcessSynSent(packet);
+                    break;
+                case Status.SYN_RECEIVED:
+                    ProcessSynReceived(packet);
+                    break;
+                case Status.ESTABLISHED:
+                    ProcessEstablished(packet);
+                    break;
+                case Status.FIN_WAIT1:
+                    ProcessFinWait1(packet);
+                    break;
+                case Status.FIN_WAIT2:
+                    ProcessFinWait2(packet);
+                    break;
+                case Status.CLOSE_WAIT:
+                    ProcessCloseWait(packet);
+                    break;
+                case Status.CLOSING:
+                    ProcessClosing(packet);
+                    break;
+                case Status.LAST_ACK:
+                    ProcessCloseWait(packet);
+                    break;
+                case Status.TIME_WAIT:
+                    break;
+                case Status.CLOSED:
+                    break;
+                default:
+                    throw new Exception("Unknown TCP connection state.");
             }
-            else if (Status == Status.SYN_RECEIVED)
+        }
+
+        #region Process Status
+
+        /// <summary>
+        /// Process LISTEN Status.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        public void ProcessListen(TCPPacket packet)
+        {
+            if (packet.RST)
             {
-                if (packet.RST)
-                {
-                    Status = Status.LISTEN;
-                }
-                else if (packet.ACK)
-                {
-                    Status = Status.ESTABLISHED;
+                Status = Status.CLOSED;
 
-                    SequenceNumber++;
-                }
-                else
-                {
-                    Status = Status.CLOSED;
-
-                    throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_RECEIVED)");
-                }
+                throw new Exception("TCP connection resetted! (RST received on LISTEN state)");
             }
-            else if (Status == Status.SYN_SENT)
+            else if (packet.FIN)
             {
-                if (packet.SYN && packet.ACK)
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP connection closed! (FIN received on LISTEN state)");
+            }
+            else if (packet.ACK)
+            {
+                SendEmptyPacket(Flags.RST);
+
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP connection closed! (ACK received on LISTEN state)");
+            }
+            else if (packet.SYN)
+            {
+                Status = Status.SYN_RECEIVED;
+
+                source = IPConfig.FindNetwork(packet.SourceIP);
+
+                AckNumber = packet.SequenceNumber + 1;
+
+                var rnd = new Random();
+                SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
+
+                destination = packet.SourceIP;
+                destinationPort = packet.SourcePort;
+
+                SendEmptyPacket(Flags.SYN | Flags.ACK);
+            }
+            else
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSED||LISTEN)");
+            }
+        }
+
+        /// <summary>
+        /// Process SYN_RECEIVED Status.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        public void ProcessSynReceived(TCPPacket packet)
+        {
+            if (packet.RST)
+            {
+                Status = Status.LISTEN;
+            }
+            else if (packet.ACK)
+            {
+                Status = Status.ESTABLISHED;
+
+                SequenceNumber++;
+            }
+            else
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_RECEIVED)");
+            }
+        }
+
+        /// <summary>
+        /// Process SYN_SENT Status.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        public void ProcessSynSent(TCPPacket packet)
+        {
+            if (packet.FIN)
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP connection closed! (FIN received on SYN_SENT state)");
+            }
+            else if (packet.TCPFlags == (byte)Flags.ACK)
+            {
+                AckNumber = packet.SequenceNumber;
+                SequenceNumber = packet.AckNumber;
+
+                Status = Status.ESTABLISHED;
+            }
+            else if (packet.RST)
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("Connection refused by remote computer.");
+            }
+            else if (packet.SYN)
+            {
+                if (packet.ACK)
                 {
                     AckNumber = packet.SequenceNumber + 1;
                     SequenceNumber++;
@@ -373,205 +468,227 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                     Status = Status.ESTABLISHED;
                 }
-                else if (packet.SYN)
+                else if (packet.TCPFlags == (byte)Flags.SYN)
                 {
                     Status = Status.CLOSED;
 
                     throw new NotImplementedException("Simultaneous open not supported.");
                 }
-                else if (packet.RST)
-                {
-                    Status = Status.CLOSED;
-
-                    throw new Exception("Connection refused by remote computer.");
-                }
-                else if (packet.ACK)
-                {
-                    AckNumber = packet.SequenceNumber;
-                    SequenceNumber = packet.AckNumber;
-
-                    Status = Status.ESTABLISHED;
-                }
                 else
                 {
                     Status = Status.CLOSED;
 
-                    throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_SENT)");
+                    throw new Exception("TCP connection closed! (Flag " + packet.TCPFlags +  " received on SYN_SENT state)");
                 }
             }
-            else if (Status == Status.ESTABLISHED)
+            else
             {
-                if (packet.RST)
-                {
-                    Status = Status.CLOSED;
+                Status = Status.CLOSED;
 
-                    throw new Exception("TCP Connection resetted!");
-                }
-                if (packet.TCPFlags == (byte)Flags.ACK)
+                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_SENT)");
+            }
+        }
+
+        /// <summary>
+        /// Process ESTABLISHED Status.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        public void ProcessEstablished(TCPPacket packet)
+        {
+            if (packet.RST)
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP Connection resetted!");
+            }
+            if (packet.TCPFlags == (byte)Flags.ACK)
+            {
+                if (WaitingAck)
                 {
-                    if (WaitingAck)
+                    if (SequenceNumber == packet.AckNumber)
                     {
-                        if (SequenceNumber == packet.AckNumber)
-                        {
-                            WaitingAck = false;
-                        }
-                    }
-                    else
-                    {
-                        if (packet.SequenceNumber >= AckNumber && packet.TCP_DataLength > 0) //packet sequencing
-                        {
-                            AckNumber += packet.TCP_DataLength;
-
-                            data = Concat(data, packet.TCP_Data);
-                        }
+                        WaitingAck = false;
                     }
                 }
-                if (packet.FIN && packet.ACK)
+                else
                 {
-                    AckNumber++;
-
-                    SendEmptyPacket(Flags.ACK);
-
-                    WaitAndClose();
-                }
-                else if (packet.FIN)
-                {
-                    AckNumber++;
-
-                    SendEmptyPacket(Flags.ACK);
-
-                    Status = Status.CLOSE_WAIT;
-
-                    SendEmptyPacket(Flags.FIN);
-
-                    Status = Status.LAST_ACK;
-                }
-                else if (packet.PSH && packet.ACK)
-                {
-                    if (packet.SequenceNumber > LastSequenceNumber) //dup check
+                    if (packet.SequenceNumber >= AckNumber && packet.TCP_DataLength > 0) //packet sequencing
                     {
                         AckNumber += packet.TCP_DataLength;
 
-                        LastSequenceNumber = packet.SequenceNumber;
-
                         data = Concat(data, packet.TCP_Data);
-
-                        rxBuffer.Enqueue(packet);
-
-                        SendEmptyPacket(Flags.ACK);
                     }
                 }
-                else if (packet.ACK)
-                {
-                    //DO NOTHING
-                }
-                else
-                {
-                    Status = Status.CLOSED;
-
-                    throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=ESTABLISHED)");
-                }
             }
-            else if (Status == Status.FIN_WAIT1)
+            if (packet.FIN && packet.ACK)
             {
-                if (packet.FIN && packet.ACK)
+                AckNumber++;
+
+                SendEmptyPacket(Flags.ACK);
+
+                WaitAndClose();
+            }
+            else if (packet.FIN)
+            {
+                AckNumber++;
+
+                SendEmptyPacket(Flags.ACK);
+
+                Status = Status.CLOSE_WAIT;
+
+                SendEmptyPacket(Flags.FIN);
+
+                Status = Status.LAST_ACK;
+            }
+            else if (packet.PSH && packet.ACK)
+            {
+                if (packet.SequenceNumber > LastSequenceNumber) //dup check
                 {
-                    AckNumber++;
+                    AckNumber += packet.TCP_DataLength;
+
+                    LastSequenceNumber = packet.SequenceNumber;
+
+                    data = Concat(data, packet.TCP_Data);
+
+                    rxBuffer.Enqueue(packet);
 
                     SendEmptyPacket(Flags.ACK);
-
-                    WaitAndClose();
-                }
-                else if (packet.FIN)
-                {
-                    AckNumber++;
-
-                    SendEmptyPacket(Flags.ACK);
-
-                    Status = Status.CLOSING;
-                }
-                else if (packet.ACK)
-                {
-                    Status = Status.FIN_WAIT2;
-                }
-                else
-                {
-                    Status = Status.CLOSED;
-
-                    throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=FIN_WAIT1)");
                 }
             }
-            else if (Status == Status.FIN_WAIT2)
+            else if (packet.ACK)
             {
-                if (packet.FIN)
-                {
-                    AckNumber++;
-
-                    SendEmptyPacket(Flags.ACK);
-
-                    WaitAndClose();
-                }
-                else
-                {
-                    Status = Status.CLOSED;
-
-                    throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=FIN_WAIT2)");
-                }
+                //DO NOTHING
             }
-            else if (Status == Status.CLOSING)
+            else
             {
-                if (packet.ACK)
-                {
-                    WaitAndClose();
-                }
-                else
-                {
-                    Status = Status.CLOSED;
+                Status = Status.CLOSED;
 
-                    throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSING)");
-                }
-            }
-            else if (Status == Status.CLOSE_WAIT || Status == Status.LAST_ACK)
-            {
-                if (packet.ACK)
-                {
-                    Status = Status.CLOSED;
-                }
-                else
-                {
-                    Status = Status.CLOSED;
-
-                    throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSE_WAIT||LAST_ACK)");
-                }
+                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=ESTABLISHED)");
             }
         }
+
+        /// <summary>
+        /// Process FIN_WAIT1 Status.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        public void ProcessFinWait1(TCPPacket packet)
+        {
+            if (packet.FIN && packet.ACK)
+            {
+                AckNumber++;
+
+                SendEmptyPacket(Flags.ACK);
+
+                WaitAndClose();
+            }
+            else if (packet.FIN)
+            {
+                AckNumber++;
+
+                SendEmptyPacket(Flags.ACK);
+
+                Status = Status.CLOSING;
+            }
+            else if (packet.ACK)
+            {
+                Status = Status.FIN_WAIT2;
+            }
+            else
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=FIN_WAIT1)");
+            }
+        }
+
+        /// <summary>
+        /// Process FIN_WAIT2 Status.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        public void ProcessFinWait2(TCPPacket packet)
+        {
+            if (packet.FIN)
+            {
+                AckNumber++;
+
+                SendEmptyPacket(Flags.ACK);
+
+                WaitAndClose();
+            }
+            else
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=FIN_WAIT2)");
+            }
+        }
+
+        /// <summary>
+        /// Process CLOSING Status.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        public void ProcessClosing(TCPPacket packet)
+        {
+            if (packet.ACK)
+            {
+                WaitAndClose();
+            }
+            else
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSING)");
+            }
+        }
+
+        /// <summary>
+        /// Process Close_WAIT Status.
+        /// </summary>
+        /// <param name="packet">Packet to receive.</param>
+        public void ProcessCloseWait(TCPPacket packet)
+        {
+            if (packet.ACK)
+            {
+                Status = Status.CLOSED;
+            }
+            else
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSE_WAIT||LAST_ACK)");
+            }
+        }
+
+        #endregion
 
         #region Utils
 
         /// <summary>
         /// Contatenate two byte arrays. https://stackoverflow.com/a/45531730
         /// </summary>
-        private byte[] Concat(byte[] a, byte[] b)
+        /// <param name="first">First byte array.</param>
+        /// <param name="second">Byte array to concatenate.</param>
+        private byte[] Concat(byte[] first, byte[] second)
         {
             byte[] output;
             int alen = 0;
 
-            if (a == null)
+            if (first == null)
             {
-                output = new byte[b.Length];
+                output = new byte[second.Length];
             }
             else
             {
-                output = new byte[a.Length + b.Length];
-                alen = a.Length;
-                for (int i = 0; i < a.Length; i++)
+                output = new byte[first.Length + second.Length];
+                alen = first.Length;
+                for (int i = 0; i < first.Length; i++)
                 {
-                    output[i] = a[i];
+                    output[i] = first[i];
                 }
             }
-            for (int j = 0; j < b.Length; j++)
+            for (int j = 0; j < second.Length; j++)
             {
-                output[alen + j] = b[j];
+                output[alen + j] = second[j];
             }
             return output;
         }
@@ -579,6 +696,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Split byte array into chunks of a specified size.
         /// </summary>
+        /// <param name="buffer">Byte array to split.</param>
+        /// <param name="chunksize">Chunk size.</param>
         private byte[][] ArraySplit(byte[] buffer, int chunksize = 1000)
         {
             var size = buffer.Length;
