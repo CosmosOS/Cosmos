@@ -52,18 +52,12 @@ namespace Cosmos.HAL.BlockDevice
                 Ata.AtaDebugger.Send("Number of GPT partitions found:");
                 Ata.AtaDebugger.SendNumber(xGPT.Partitions.Count);
                 var parts = xGPT.GetPartitions();
-                for (int i = 0; i < parts.Count; i++)
+                int i = 0;
+                foreach (var part in parts)
                 {
-                    var xPart = parts[i];
-                    if (xPart == null)
-                    {
-                        Console.WriteLine("Null partition found at idx: " + i);
-                    }
-                    else
-                    {
-                        Partition.Partitions.Add(xPart);
-                        Console.WriteLine("Found partition at idx: " + i);
-                    }
+                    Partition.Partitions.Add(part);
+                    Console.WriteLine("Found partition at idx: " + i);
+                    i++;
                 }
             }
             else
@@ -87,18 +81,12 @@ namespace Cosmos.HAL.BlockDevice
                 var partitions = mbr.GetPartitions();
                 Ata.AtaDebugger.Send("Number of MBR partitions found:");
                 Ata.AtaDebugger.SendNumber(partitions.Count);
-                for (int i = 0; i < partitions.Count; i++)
+                int c = 0;
+                foreach (var part in partitions)
                 {
-                    var xPart = partitions[i];
-                    if (xPart == null)
-                    {
-                        Console.WriteLine("Null partition found at idx: " + i);
-                    }
-                    else
-                    {
-                        Partition.Partitions.Add(xPart);
-                        Console.WriteLine("Found partition at idx: " + i);
-                    }
+                    Partition.Partitions.Add(part);
+                    Console.WriteLine("Found partition at idx: " + c);
+                    c++;
                 }
             }
         }
