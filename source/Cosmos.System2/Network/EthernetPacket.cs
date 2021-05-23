@@ -129,11 +129,7 @@ namespace Cosmos.System.Network
         /// Prepare packet for sending.
         /// Not implemented.
         /// </summary>
-        public virtual void PrepareForSending()
-        {
-
-
-        }
+        internal virtual void PrepareForSending() { }
 
         /// <summary>
         /// To string.
