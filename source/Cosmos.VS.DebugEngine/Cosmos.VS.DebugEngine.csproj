@@ -26,6 +26,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.0.4" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.0.4" />
         <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
         <PackageReference Include="Microsoft.ServiceHub.Framework" Version="2.8.2018" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />

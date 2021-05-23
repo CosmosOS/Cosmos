@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
 using Cosmos.VS.DebugEngine.Commands;
+using System.IO;
 
 //[assembly: ProvideBindingRedirection(
 //    AssemblyName = "SQLitePCLRaw.batteries_green",
@@ -21,6 +22,11 @@ using Cosmos.VS.DebugEngine.Commands;
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.core",
+    NewVersion = "2.0.4.976",
+    OldVersionLowerBound = "1.0.0.0",
+    OldVersionUpperBound = "2.0.4.976")]
+[assembly: ProvideBindingRedirection(
+    AssemblyName = "SQLitePCLRaw.nativelibrary",
     NewVersion = "2.0.4.976",
     OldVersionLowerBound = "1.0.0.0",
     OldVersionUpperBound = "2.0.4.976")]
@@ -47,6 +53,11 @@ namespace Cosmos.VS.DebugEngine
             IProgress<ServiceProgressData> progress)
         {
             await base.InitializeAsync(cancellationToken, progress);
+
+            var xDir = IntPtr.Size == 4 ? "x86" : "x64";
+            Environment.SetEnvironmentVariable("PATH", // add path so that it finds SQLitePCLRaw.nativelibrary
+                String.Join(";", Environment.GetEnvironmentVariable("PATH"),
+                    Path.Combine(Path.GetDirectoryName(typeof(CosmosDebugEnginePackage).Assembly.Location), xDir)));
 
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
