@@ -58,7 +58,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)net472\Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
+        <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)net48\Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
     </PropertyGroup>
 
     <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
