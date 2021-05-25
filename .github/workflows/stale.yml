@@ -1,0 +1,23 @@
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+  - cron: "30 1 * * *"
+
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/stale@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: 'As this issue has received no new activity, it has been marked as stale'
+        stale-pr-message: 'As this pull request has received no new activity, it has been marked as stale'
+        stale-issue-label: 'no-issue-activity'
+        stale-pr-label: 'no-pr-activity'
+        exempt-issue-labels: 'Up for Grabs,Blocked,PR submitted'
+        exempt-pr-labels: 'Work in progress'
+        exempt-all-milestones: true
+        exempt-all-assignees: true
