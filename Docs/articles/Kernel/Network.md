@@ -2,7 +2,7 @@
 
 In this article we will discuss about Networking on Cosmos, how to use the Network Stack, send and receive packets. For now, available protocols are **ARP**, **IPv4**, **TCP**, **UDP**, **ICMP**, **DHCP** and **DNS**. Note that Cosmos devkit must be installed for this article.
 
-All protocols here don't necessary support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](http://https://github.com/CosmosOS/Cosmos/issues/new/choose "repository") on our repository. 
+All protocols here don't necessary support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository. 
 
 Each protocol has a Client class which can be used to receive and send data. If a Receive() method is blocking, the method will timeout after 5 seconds or use the value optionally set by parameter. Please note that all finished connections should be closed using Close().
 
