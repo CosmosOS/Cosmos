@@ -54,6 +54,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             StateMachine = new Tcp();
 
+            StateMachine.rxBuffer = new Queue<TCPPacket>(8);
+
             StateMachine.localPort = localPort;
 
             if (localPort > 0)
@@ -63,7 +65,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Receive TcpClient from remote computer. This function is blocking.
+        /// Receive TcpClient from remote computer.
         /// </summary>
         /// <returns>Accepted TcpClient</returns>
         public TcpClient AcceptTcpClient()

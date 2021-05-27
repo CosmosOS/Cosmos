@@ -61,8 +61,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
         internal TcpClient(Tcp stateMachine)
         {
-            StateMachine.rxBuffer = new Queue<TCPPacket>(8);
-
             StateMachine = stateMachine;
 
             if (StateMachine.localPort > 0)

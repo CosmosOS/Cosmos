@@ -186,9 +186,11 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.ACK)
             {
-                Status = Status.ESTABLISHED;
+                LastSequenceNumber = packet.SequenceNumber - 1; //TODO: Fix this trick (for dup check when PSH ACK)
 
                 SequenceNumber++;
+
+                Status = Status.ESTABLISHED;
             }
             else
             {
