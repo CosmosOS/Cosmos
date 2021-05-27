@@ -79,9 +79,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
         public TcpClient(int localPort)
         {
-            StateMachine.rxBuffer = new Queue<TCPPacket>(8);
-
             StateMachine = new Tcp();
+
+            StateMachine.rxBuffer = new Queue<TCPPacket>(8);
 
             StateMachine.Status = Status.CLOSED;
             StateMachine.LastSequenceNumber = 0;

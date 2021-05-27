@@ -21,6 +21,15 @@ namespace Cosmos.System.Network.IPv4.TCP
         private static Dictionary<uint, TcpListener> listeners;
 
         /// <summary>
+        /// Assign listeners dictionary.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        static TcpListener()
+        {
+            listeners = new Dictionary<uint, TcpListener>();
+        }
+
+        /// <summary>
         /// Get client.
         /// </summary>
         /// <param name="destPort">Destination port.</param>
@@ -37,6 +46,8 @@ namespace Cosmos.System.Network.IPv4.TCP
 
         public TcpListener(int localPort)
         {
+            StateMachine = new Tcp();
+
             StateMachine.localPort = localPort;
 
             if (localPort > 0)
