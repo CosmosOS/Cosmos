@@ -56,10 +56,18 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             if (packet.CheckCRC())
             {
-                var receiver = TcpClient.GetClient(packet.DestinationPort);
-                if (receiver != null)
+                var client = TcpClient.GetClient(packet.DestinationPort);
+                if (client != null)
                 {
-                    receiver.ReceiveData(packet);
+                    client.StateMachine.ReceiveData(packet);
+                    return;
+                }
+
+                var listener = TcpListener.GetClient(packet.DestinationPort);
+                if (listener != null)
+                {
+                    listener.StateMachine.ReceiveData(packet);
+                    return;
                 }
             }
             else
