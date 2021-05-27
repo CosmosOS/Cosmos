@@ -63,7 +63,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                     return;
                 }
 
-                var listener = TcpListener.GetClient(packet.DestinationPort);
+                var listener = TcpListener.GetListener(packet.DestinationPort);
                 if (listener != null)
                 {
                     listener.StateMachine.ReceiveData(packet);

@@ -56,6 +56,24 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Create new instance of the <see cref="TcpClient"/> class.
         /// </summary>
+        /// <param name="stateMachine">Tcp state machine.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
+        internal TcpClient(Tcp stateMachine)
+        {
+            StateMachine.rxBuffer = new Queue<TCPPacket>(8);
+
+            StateMachine = stateMachine;
+
+            if (StateMachine.localPort > 0)
+            {
+                clients.Add((uint)StateMachine.localPort, this);
+            }
+        }
+
+        /// <summary>
+        /// Create new instance of the <see cref="TcpClient"/> class.
+        /// </summary>
         /// <param name="localPort">Local port.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>

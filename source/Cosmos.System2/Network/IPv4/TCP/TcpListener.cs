@@ -18,22 +18,18 @@ namespace Cosmos.System.Network.IPv4.TCP
         // <summary>
         /// Clients dictionary.
         /// </summary>
-        private static Dictionary<uint, TcpListener> clients;
-
-        public bool ExclusiveAddressUse { get; set; }
-        public EndPoint LocalEndpoint { get; }
-        protected bool Active { get; }
+        private static Dictionary<uint, TcpListener> listeners;
 
         /// <summary>
         /// Get client.
         /// </summary>
         /// <param name="destPort">Destination port.</param>
         /// <returns>TcpClient</returns>
-        internal static TcpListener GetClient(ushort destPort)
+        internal static TcpListener GetListener(ushort destPort)
         {
-            if (clients.ContainsKey((uint)destPort))
+            if (listeners.ContainsKey((uint)destPort))
             {
-                return clients[(uint)destPort];
+                return listeners[(uint)destPort];
             }
 
             return null;
@@ -45,29 +41,15 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             if (localPort > 0)
             {
-                clients.Add((uint)localPort, this);
+                listeners.Add((uint)localPort, this);
             }
-        }
-
-        public TcpListener(Address localaddr, int localPort)
-        {
-            StateMachine.source = localaddr;
-            StateMachine.localPort = localPort;
-
-            if (localPort > 0)
-            {
-                clients.Add((uint)localPort, this);
-            }
-        }
-
-        public static TcpListener Create(int port)
-        {
-            throw new NotImplementedException();
         }
 
         public TcpClient AcceptTcpClient()
         {
-            return new TcpClient(StateMachine.localPort);
+            while (StateMachine.WaitStatus(Status.ESTABLISHED, 5000) != true);
+
+            return new TcpClient(StateMachine);
         }
 
         public void Start()
