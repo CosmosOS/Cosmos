@@ -107,7 +107,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            Global.mDebugger.Send("[Status] " + table[(int)Status]);
+            Global.mDebugger.Send("[" + table[(int)Status] + "] " + packet.ToString());
 
             switch (Status)
             {
@@ -191,12 +191,6 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 SendEmptyPacket(Flags.SYN | Flags.ACK);
             }
-            else
-            {
-                Status = Status.CLOSED;
-
-                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSED||LISTEN)");
-            }
         }
 
         /// <summary>
@@ -216,12 +210,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                 SequenceNumber++;
 
                 Status = Status.ESTABLISHED;
-            }
-            else
-            {
-                Status = Status.CLOSED;
-
-                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_RECEIVED)");
             }
         }
 
@@ -275,12 +263,6 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                     throw new Exception("TCP connection closed! (Flag " + packet.TCPFlags + " received on SYN_SENT state)");
                 }
-            }
-            else
-            {
-                Status = Status.CLOSED;
-
-                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=SYN_SENT)");
             }
         }
 
@@ -354,12 +336,6 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 Status = Status.LAST_ACK;
             }
-            else
-            {
-                Status = Status.CLOSED;
-
-                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=ESTABLISHED)");
-            }
         }
 
         /// <summary>
@@ -388,12 +364,6 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.FIN_WAIT2;
             }
-            else
-            {
-                Status = Status.CLOSED;
-
-                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=FIN_WAIT1)");
-            }
         }
 
         /// <summary>
@@ -410,12 +380,6 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 WaitAndClose();
             }
-            else
-            {
-                Status = Status.CLOSED;
-
-                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=FIN_WAIT2)");
-            }
         }
 
         /// <summary>
@@ -427,12 +391,6 @@ namespace Cosmos.System.Network.IPv4.TCP
             if (packet.ACK)
             {
                 WaitAndClose();
-            }
-            else
-            {
-                Status = Status.CLOSED;
-
-                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSING)");
             }
         }
 
@@ -446,17 +404,67 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
             }
-            else
-            {
-                Status = Status.CLOSED;
-
-                throw new Exception("Received packet not supported. Is this an error? (Flag=" + packet.TCPFlags + ", Status=CLOSE_WAIT||LAST_ACK)");
-            }
         }
 
         #endregion
 
         #region Utils
+
+        /// <summary>
+        /// Wait until remote receive ACK of its connection termination request.
+        /// </summary>
+        private void WaitAndClose()
+        {
+            Status = Status.TIME_WAIT;
+
+            HAL.Global.PIT.Wait(300); //TODO: Calculate time value
+
+            Status = Status.CLOSED;
+        }
+
+        /// <summary>
+        /// Wait for new TCP connection status.
+        /// </summary>
+        internal bool WaitStatus(Status status, int timeout)
+        {
+            int second = 0;
+            int _deltaT = 0;
+
+            while (Status != status)
+            {
+                if (second > (timeout / 1000))
+                {
+                    return false;
+                }
+                if (_deltaT != RTC.Second)
+                {
+                    second++;
+                    _deltaT = RTC.Second;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Wait for new TCP connection status (blocking).
+        /// </summary>
+        internal bool WaitStatus(Status status)
+        {
+            while (Status != status);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Send acknowledgement packet
+        /// </summary>
+        private void SendEmptyPacket(Flags flag)
+        {
+            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)flag, 0xFAF0, 0);
+
+            OutgoingBuffer.AddPacket(packet);
+            NetworkStack.Update();
+        }
 
         /// <summary>
         /// Contatenate two byte arrays. https://stackoverflow.com/a/45531730
@@ -513,62 +521,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
             }
             return bufferArray;
-        }
-
-        /// <summary>
-        /// Wait until remote receive ACK of its connection termination request.
-        /// </summary>
-        private void WaitAndClose()
-        {
-            Status = Status.TIME_WAIT;
-
-            HAL.Global.PIT.Wait(300); //TODO: Calculate time value
-
-            Status = Status.CLOSED;
-        }
-
-        /// <summary>
-        /// Wait for new TCP connection status.
-        /// </summary>
-        internal bool WaitStatus(Status status, int timeout)
-        {
-            int second = 0;
-            int _deltaT = 0;
-
-            while (Status != status)
-            {
-                if (second > (timeout / 1000))
-                {
-                    return false;
-                }
-                if (_deltaT != RTC.Second)
-                {
-                    second++;
-                    _deltaT = RTC.Second;
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Wait for new TCP connection status (blocking).
-        /// </summary>
-        internal bool WaitStatus(Status status)
-        {
-            while (Status != status);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Send acknowledgement packet
-        /// </summary>
-        private void SendEmptyPacket(Flags flag)
-        {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)flag, 0xFAF0, 0);
-
-            OutgoingBuffer.AddPacket(packet);
-            NetworkStack.Update();
         }
 
         #endregion

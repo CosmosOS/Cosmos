@@ -72,11 +72,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (timeout == -1)
             {
-                while (StateMachine.WaitStatus(Status.ESTABLISHED) != true) ;
+                while (StateMachine.WaitStatus(Status.ESTABLISHED) != true);
             }
             else
             {
-                while (StateMachine.WaitStatus(Status.ESTABLISHED, timeout) != true) ;
+                while (StateMachine.WaitStatus(Status.ESTABLISHED, timeout) != true);
             }
 
             return new TcpClient(StateMachine);

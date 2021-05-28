@@ -15,7 +15,7 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// <summary>
     /// TCP Flags
     /// </summary>
-    public enum Flags
+    public enum Flags : byte
     {
         FIN = (1 << 0),
         SYN = (1 << 1),
@@ -51,8 +51,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal static void TCPHandler(byte[] packetData)
         {
             var packet = new TCPPacket(packetData);
-
-            Global.mDebugger.Send("[Received] " + packet.ToString());
 
             if (packet.CheckCRC())
             {
@@ -418,17 +416,17 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Convert a byte to a hexidecimal char
+        /// Convert a byte to a hexadecimal char.
         /// </summary>
         /// <param name="b"></param>
-        /// <returns></returns>
-        private static char ToHex(byte b)
+        /// <returns>Hex string.</returns>
+        static string ToHex(byte b)
         {
-            if (b < 0 || b > 15)
-            {
-                throw new Exception("IntToHexChar: input out of range for Hex value");
-            } 
-            return b < 10 ? (char)(b + 48) : (char)(b + 55);
+            string r = "";
+            string chars = "0123456789ABCDEF";
+
+            r += chars[b >> 4];
+            return r += chars[b &= 0x0F];
         }
 
         /// <summary>
