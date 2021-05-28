@@ -68,9 +68,16 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Receive TcpClient from remote computer.
         /// </summary>
         /// <returns>Accepted TcpClient</returns>
-        public TcpClient AcceptTcpClient()
+        public TcpClient AcceptTcpClient(int timeout = -1)
         {
-            while (StateMachine.WaitStatus(Status.ESTABLISHED, 5000) != true);
+            if (timeout == -1)
+            {
+                while (StateMachine.WaitStatus(Status.ESTABLISHED) != true) ;
+            }
+            else
+            {
+                while (StateMachine.WaitStatus(Status.ESTABLISHED, timeout) != true) ;
+            }
 
             return new TcpClient(StateMachine);
         }
@@ -92,7 +99,10 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         public void Stop()
         {
-            StateMachine.Status = Status.CLOSED;
+            if (listeners.ContainsKey((uint)StateMachine.localPort))
+            {
+                listeners.Remove((uint)StateMachine.localPort);
+            }
         }
 
         /// <summary>

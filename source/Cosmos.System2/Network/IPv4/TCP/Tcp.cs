@@ -265,22 +265,32 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessEstablished(TCPPacket packet)
         {
-            if (packet.RST)
+            if (packet.ACK)
             {
-                Status = Status.CLOSED;
+                if (packet.PSH)
+                {
+                    if (packet.SequenceNumber > LastSequenceNumber) //dup check
+                    {
+                        AckNumber += packet.TCP_DataLength;
 
-                throw new Exception("TCP Connection resetted!");
-            }
-            if (packet.TCPFlags == (byte)Flags.ACK)
-            {
+                        LastSequenceNumber = packet.SequenceNumber;
+
+                        data = Concat(data, packet.TCP_Data);
+
+                        rxBuffer.Enqueue(packet);
+
+                        SendEmptyPacket(Flags.ACK);
+                    }
+                }
+
                 if (WaitingAck)
                 {
-                    if (SequenceNumber == packet.AckNumber)
+                    if (packet.AckNumber == SequenceNumber)
                     {
                         WaitingAck = false;
                     }
                 }
-                else
+                else if (!packet.PSH)
                 {
                     if (packet.SequenceNumber >= AckNumber && packet.TCP_DataLength > 0) //packet sequencing
                     {
@@ -289,8 +299,15 @@ namespace Cosmos.System.Network.IPv4.TCP
                         data = Concat(data, packet.TCP_Data);
                     }
                 }
+                return;
             }
-            if (packet.FIN && packet.ACK)
+            if (packet.RST)
+            {
+                Status = Status.CLOSED;
+
+                throw new Exception("TCP Connection resetted!");
+            }
+            else if (packet.FIN && packet.ACK)
             {
                 AckNumber++;
 
@@ -306,28 +323,11 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 Status = Status.CLOSE_WAIT;
 
+                HAL.Global.PIT.Wait(300);
+
                 SendEmptyPacket(Flags.FIN);
 
                 Status = Status.LAST_ACK;
-            }
-            else if (packet.PSH && packet.ACK)
-            {
-                if (packet.SequenceNumber > LastSequenceNumber) //dup check
-                {
-                    AckNumber += packet.TCP_DataLength;
-
-                    LastSequenceNumber = packet.SequenceNumber;
-
-                    data = Concat(data, packet.TCP_Data);
-
-                    rxBuffer.Enqueue(packet);
-
-                    SendEmptyPacket(Flags.ACK);
-                }
-            }
-            else if (packet.ACK)
-            {
-                //DO NOTHING
             }
             else
             {
@@ -522,6 +522,16 @@ namespace Cosmos.System.Network.IPv4.TCP
                     _deltaT = RTC.Second;
                 }
             }
+            return true;
+        }
+
+        /// <summary>
+        /// Wait for new TCP connection status (blocking).
+        /// </summary>
+        internal bool WaitStatus(Status status)
+        {
+            while (Status != status);
+
             return true;
         }
 
