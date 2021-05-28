@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Cosmos.HAL;
+using Cosmos.System.Helpers;
 using Cosmos.System.Network.Config;
 
 namespace Cosmos.System.Network.IPv4.TCP
@@ -195,7 +196,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             if (data.Length > 536)
             {
-                var chunks = StateMachine.ArraySplit(data, 536);
+                var chunks = ArrayHelper.ArraySplit(data, 536);
 
                 for (int i = 0; i < chunks.Length; i++)
                 {
