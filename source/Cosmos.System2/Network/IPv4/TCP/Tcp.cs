@@ -72,9 +72,32 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal uint LastSequenceNumber;
 
-        internal bool WaitingAck = false;
+        internal bool WaitingAck;
 
         internal byte[] data;
+
+        /// <summary>
+        /// String / enum correspondance (used for debugging)
+        /// </summary>
+        internal string[] table;
+
+        public Tcp()
+        {
+            WaitingAck = false;
+
+            table = new string[11];
+            table[0] = "LISTEN";
+            table[1] = "SYN_SENT";
+            table[2] = "SYN_RECEIVED";
+            table[3] = "ESTABLISHED";
+            table[4] = "FIN_WAIT1";
+            table[5] = "FIN_WAIT2";
+            table[6] = "CLOSE_WAIT";
+            table[7] = "CLOSING";
+            table[8] = "LAST_ACK";
+            table[9] = "TIME_WAIT";
+            table[10] = "CLOSED";
+        }
 
         /// <summary>
         /// Handle TCP discussions and data.
@@ -84,6 +107,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
+            Global.mDebugger.Send("[Status] " + table[(int)Status]);
+
             switch (Status)
             {
                 case Status.LISTEN:
@@ -265,7 +290,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessEstablished(TCPPacket packet)
         {
-            if (packet.ACK)
+            if (packet.ACK && !packet.FIN)
             {
                 if (packet.PSH)
                 {

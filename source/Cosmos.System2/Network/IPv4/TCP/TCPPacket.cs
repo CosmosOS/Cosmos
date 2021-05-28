@@ -52,7 +52,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             var packet = new TCPPacket(packetData);
 
-            Global.mDebugger.Send("[Received] TCP packet from " + packet.SourceIP.ToString() + ":" + packet.SourcePort.ToString());
+            Global.mDebugger.Send("[Received] " + packet.ToString());
 
             if (packet.CheckCRC())
             {
@@ -418,13 +418,27 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
+        /// Convert a byte to a hexidecimal char
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private static char ToHex(byte b)
+        {
+            if (b < 0 || b > 15)
+            {
+                throw new Exception("IntToHexChar: input out of range for Hex value");
+            } 
+            return b < 10 ? (char)(b + 48) : (char)(b + 55);
+        }
+
+        /// <summary>
         /// To string.
         /// </summary>
         /// <returns>string value.</returns>
         public override string ToString()
         {
-            return "TCP Packet Src=" + SourceIP + ":" + SourcePort + "," +
-                   "Dest=" + DestinationIP + ":" + DestinationPort + ", DataLen=" + TCP_DataLength;
+            return "TCP Packet src=" + SourceIP + ":" + SourcePort + ", " + "dst=" + DestinationIP + ":" + DestinationPort +
+                ", flags=0x" + ToHex(TCPFlags) + ", seq=" + SequenceNumber + ", ack=" + AckNumber;
         }
     }
 }
