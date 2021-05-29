@@ -30,7 +30,7 @@ After our VFS has been initialized, we can use more interesting functions, lets 
 We use this function to get the size of the available free space in our file system, in bytes.
 
 ```C#
-long available_space = fs.GetAvailableFreeSpace("0:/");
+long available_space = fs.GetAvailableFreeSpace(@"0:\");
 Console.WriteLine("Available Free Space: " + available_space);
 ```
 
@@ -46,7 +46,7 @@ This will let us know what is the file system type that we are using.
 ![System Type](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Type.PNG)
 
 ```C#
-string fs_type = fs.GetFileSystemType("0:/");
+string fs_type = fs.GetFileSystemType(@"0:\");
 Console.WriteLine("File System Type: " + fs_type);
 ```
 
@@ -55,7 +55,7 @@ Console.WriteLine("File System Type: " + fs_type);
 We start by getting the directory entrys list, using:
 
 ```C#
-var directory_list = fs.GetDirectoryListing("0:/");
+var directory_list = fs.GetDirectoryListing(@"0:\");
 ```
 
 Once we have it, we can get the names of our files:
@@ -77,7 +77,7 @@ We need to get a directoryEntryList, find files in the list and print the conten
 of course, we start with geting the directory listing;
 
 ```C#
-var directory_list = fs.GetDirectoryListing("0:/");
+var directory_list = fs.GetDirectoryListing(@"0:\");
 ```
 
 Now we can go through our list, and and print the txt file content.
