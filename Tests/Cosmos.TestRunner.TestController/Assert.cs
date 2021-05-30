@@ -5,22 +5,31 @@ namespace Cosmos.TestRunner
 {
     public static class Assert
     {
+        public static void Suceed(string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            TestController.Debugger.Send("Assertion succeeded:");
+            TestController.Debugger.Send(message);
+            TestController.AssertionSucceeded();
+        }
+        public static void Fail(string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            TestController.Debugger.Send("Assertion failed:");
+            TestController.Debugger.Send("File: " + file);
+            TestController.Debugger.Send("Line number: " + line);
+            TestController.Debugger.Send(message);
+            TestController.Failed();
+            throw new Exception("Assertion failed!");
+        }
+
         public static void IsTrue(bool condition, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
         {
             if (condition)
             {
-                TestController.Debugger.Send("Assertion succeeded:");
-                TestController.Debugger.Send(message);
-                TestController.AssertionSucceeded();
+                Suceed(message, file, line);
             }
             else
             {
-                TestController.Debugger.Send("Assertion failed:");
-                TestController.Debugger.Send("File: " + file);
-                TestController.Debugger.Send("Line number: " + line);
-                TestController.Debugger.Send(message);
-                TestController.Failed();
-                throw new Exception("Assertion failed!");
+                Fail(message, file, line);
             }
         }
 
@@ -74,20 +83,7 @@ namespace Cosmos.TestRunner
             if(expected.Length != actual.Length)
             {
                 TestController.Debugger.Send($"Array lengths differ: Expected: {expected.Length} Actual: {actual.Length}");
-                if (actual.Length < 32 && expected.Length < 32)
-                {
-                    TestController.Debugger.Send("Values in Expected:");
-                    for (int i = 0; i < expected.Length; i++)
-                    {
-                        TestController.Debugger.Send(expected[i]);
-                    }
-                    TestController.Debugger.Send("Values in Actual:");
-                    for (int i = 0; i < actual.Length; i++)
-                    {
-                        TestController.Debugger.Send(actual[i]);
-                    }
-                }
-                IsTrue(false, message, file, line);
+                Fail(message, file, line);
                 return;
             }
             for (int i = 0; i < expected.Length; i++)
@@ -97,11 +93,78 @@ namespace Cosmos.TestRunner
                     TestController.Debugger.Send($"Values differ in row {i}");
                     TestController.Debugger.Send($"Expected value: '{expected[i]}'");
                     TestController.Debugger.Send($"Actual value: '{actual[i]}'");
-                    IsTrue(false, message, file, line);
+                    Fail(message, file, line);
                     return;
                 }
             }
-            IsTrue(true, message, file, line);
+            Suceed(message, file, line);
+        }
+
+        public static void AreEqual(byte[] expected, byte[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            if (expected.Length != actual.Length)
+            {
+                TestController.Debugger.Send($"Array lengths differ: Expected: {expected.Length} Actual: {actual.Length}");
+                Fail(message, file, line);
+                return;
+            }
+            for (int i = 0; i < expected.Length; i++)
+            {
+                if (expected[i] != actual[i])
+                {
+                    TestController.Debugger.Send($"Values differ in row {i}");
+                    TestController.Debugger.Send($"Expected value: '{expected[i]}'");
+                    TestController.Debugger.Send($"Actual value: '{actual[i]}'");
+                    TestController.Debugger.Send(BitConverter.ToString(actual));
+                    Fail(message, file, line);
+                    return;
+                }
+            }
+            Suceed(message, file, line);
+        }
+
+        public static void AreEqual(uint[] expected, uint[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            if (expected.Length != actual.Length)
+            {
+                TestController.Debugger.Send($"Array lengths differ: Expected: {expected.Length} Actual: {actual.Length}");
+                Fail(message, file, line);
+                return;
+            }
+            for (int i = 0; i < expected.Length; i++)
+            {
+                if (expected[i] != actual[i])
+                {
+                    TestController.Debugger.Send($"Values differ in row {i}");
+                    TestController.Debugger.Send($"Expected value: '{expected[i]}'");
+                    TestController.Debugger.Send($"Actual value: '{actual[i]}'");
+                    Fail(message, file, line);
+                    return;
+                }
+            }
+            Suceed(message, file, line);
+        }
+
+        public static void AreEqual(int[] expected, int[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            if (expected.Length != actual.Length)
+            {
+                TestController.Debugger.Send($"Array lengths differ: Expected: {expected.Length} Actual: {actual.Length}");
+                Fail(message, file, line);
+                return;
+            }
+            for (int i = 0; i < expected.Length; i++)
+            {
+                if (expected[i] != actual[i])
+                {
+                    TestController.Debugger.Send($"Values differ in row {i}");
+                    TestController.Debugger.Send($"Expected value: '{expected[i]}'");
+                    TestController.Debugger.Send($"Actual value: '{actual[i]}'");
+                    Fail(message, file, line);
+                    return;
+                }
+            }
+            Suceed(message, file, line);
         }
     }
 }

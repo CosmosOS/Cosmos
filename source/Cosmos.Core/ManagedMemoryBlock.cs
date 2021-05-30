@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core
 {
@@ -38,22 +39,22 @@ namespace Cosmos.Core
         /// <summary>
         /// Create a new buffer with the given size, and aligned on the byte boundary if align is true
         /// </summary>
-        /// <param name="size">Size of buffer</param>
-        /// <param name="alignment">Byte Boundary alignment</param>
-        /// <param name="align">true if buffer should be aligned, false otherwise</param>
-        public ManagedMemoryBlock(uint size, int alignment, bool align)
+        /// <param name="aSize">Size of buffer</param>
+        /// <param name="aAlignment">Byte Boundary alignment</param>
+        /// <param name="aAlign">true if buffer should be aligned, false otherwise</param>
+        public ManagedMemoryBlock(uint aSize, int aAlignment, bool aAlign)
         {
-            memory = new byte[size + alignment - 1];
+            memory = new byte[aSize + aAlignment - 1];
             fixed (byte* bodystart = memory)
             {
                 Offset = (uint)bodystart;
-                Size = size;
+                Size = aSize;
             }
-            if (align == true)
+            if (aAlign == true)
             {
-                while (this.Offset % alignment != 0)
+                while (Offset % aAlignment != 0)
                 {
-                    this.Offset++;
+                    Offset++;
                 }
             }
         }
@@ -69,14 +70,19 @@ namespace Cosmos.Core
             get
             {
                 if (offset > Size)
-                    throw new ArgumentOutOfRangeException("offset");
-                return *(byte*)(this.Offset + offset);
+                {
+                    throw new ArgumentOutOfRangeException(nameof(offset));
+                }
+
+                return *((byte*)Offset + offset);
             }
             set
             {
                 if (offset < 0 || offset > Size)
-                    throw new ArgumentOutOfRangeException("offset");
-                (*(byte*)(this.Offset + offset)) = value;
+                {
+                    throw new ArgumentOutOfRangeException(nameof(offset));
+                }
+                *((byte*)Offset + offset) = value;
             }
         }
 
@@ -89,22 +95,23 @@ namespace Cosmos.Core
         public unsafe void Fill(uint aStart, uint aCount, uint aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            uint* xDest = (uint*)(this.Offset + aStart);
+            uint* xDest = (uint*)Offset + aStart;
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         /// <summary>
-        /// Fill data to memory block.
+        /// Fill memory block with integer value
         /// </summary>
-        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aStart">A starting position in the memory block. This is integer indexing based</param>
         /// <param name="aCount">Data size.</param>
         /// <param name="aData">A data to fill memory block with.</param>
         public unsafe void Fill(int aStart, int aCount, int aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            fixed (byte* aArrayPtr = this.memory)
+            fixed (byte* aArrayPtr = memory)
             {
-                MemoryOperations.Fill(aArrayPtr + aStart, aData, (int)aCount);
+                Debugger.DoSendNumber((uint)aArrayPtr);
+                MemoryOperations.Fill(aArrayPtr + 4 * aStart, aData, aCount * 4);
             }
         }
 
@@ -114,9 +121,9 @@ namespace Cosmos.Core
         /// <param name="aData">A data to fill.</param>
         public void Fill(uint aData)
         {
-            fixed (byte* destPtr = this.memory)
+            fixed (byte* destPtr = memory)
             {
-                MemoryOperations.Fill(destPtr, (int)aData, (int)this.Size);
+                MemoryOperations.Fill(destPtr, (int)aData, (int)Size);
             }
         }
 
@@ -124,9 +131,9 @@ namespace Cosmos.Core
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             int* xDest;
-            fixed (byte* aArrayPtr = this.memory)
+            fixed (byte* aArrayPtr = memory)
             {
-                xDest = (int*)(aArrayPtr + aStart);
+                xDest = (int*)aArrayPtr + aStart;
             }
             fixed (int* aDataPtr = aData)
             {
@@ -140,7 +147,7 @@ namespace Cosmos.Core
         /// <param name="block">MemoryBlock to copy.</param>
         public unsafe void Copy(MemoryBlock block)
         {
-            byte* xDest = (byte*)(this.Offset);
+            byte* xDest = (byte*)(Offset);
             byte* aDataPtr = (byte*)block.Base;
 
             MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
@@ -155,8 +162,11 @@ namespace Cosmos.Core
         public ushort Read16(uint offset)
         {
             if (offset > Size)
-                throw new ArgumentOutOfRangeException("offset");
-            return *(ushort*)(this.Offset + offset);
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            }
+
+            return *((ushort*)Offset + offset);
         }
 
         /// <summary>
@@ -168,8 +178,10 @@ namespace Cosmos.Core
         public void Write16(uint offset, ushort value)
         {
             if (offset < 0 || offset > Size)
-                throw new ArgumentOutOfRangeException("offset");
-            (*(ushort*)(this.Offset + offset)) = value;
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            }
+            *((ushort*)Offset + offset) = value;
         }
 
         /// <summary>
@@ -181,8 +193,11 @@ namespace Cosmos.Core
         public uint Read32(uint offset)
         {
             if (offset > Size)
-                throw new ArgumentOutOfRangeException("offset");
-            return *(uint*)(this.Offset + offset);
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            }
+
+            return *((uint*)Offset + offset);
         }
 
         /// <summary>
@@ -194,8 +209,10 @@ namespace Cosmos.Core
         public void Write32(uint offset, uint value)
         {
             if (offset < 0 || offset > Size)
-                throw new ArgumentOutOfRangeException("offset");
-            (*(uint*)(this.Offset + offset)) = value;
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            }
+            *((uint*)Offset + offset) = value;
         }
     }
 }

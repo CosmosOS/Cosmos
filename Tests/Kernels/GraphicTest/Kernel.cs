@@ -126,10 +126,6 @@ namespace GraphicTest
             
             aCanvas.DrawImageAlpha(bitmap3, new Point(0, 300));
 
-            /* Drawing BitmapHeaderV5 image */
-            Bitmap v5header = new Bitmap(Convert.FromBase64String(parrot), ColorOrder.RGB);
-            aCanvas.DrawImage(v5header, 0, 0);
-
             /* Drawing ellipses */
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);

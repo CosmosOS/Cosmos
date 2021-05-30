@@ -1,4 +1,5 @@
 ﻿//#define COSMOSDEBUG
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Cosmos.Core
@@ -14,10 +15,11 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="dest">A destination.</param>
         /// <param name="value">A data value.</param>
-        /// <param name="size">A data size.</param>
+        /// <param name="size">Number of bytes to fill</param>
         public static unsafe void Fill(byte* dest, int value, int size)
         {
             // Plugged
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -33,11 +35,11 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Fill data to destination.
+        /// Fill destination region with value.
         /// </summary>
-        /// <param name="dest">Destination.</param>
-        /// <param name="value">Data value.</param>
-        /// <param name="size">Data size.</param>
+        /// <param name="dest">Location</param>
+        /// <param name="value">Value</param>
+        /// <param name="size">Number of integers to write</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe void Fill(int* dest, int value, int size)
         {

@@ -1,5 +1,6 @@
-//#define COSMOSDEBUG
+#define COSMOSDEBUG
 using System;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -95,22 +96,22 @@ namespace Cosmos.Core
         public unsafe void Fill(uint aStart, uint aCount, uint aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            uint* xDest = (uint*)(Base + aStart);
+            uint* xDest = (uint*)Base + aStart;
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         /// <summary>
-        /// Fill data to memory block.
+        /// Fill memory block with a value. The filling is integer aligned
         /// </summary>
-        /// <param name="aStart">A starting position in the memory block.</param>
-        /// <param name="aCount">Data size.</param>
-        /// <param name="aData">A data to fill memory block with.</param>
+        /// <param name="aStart">Integer offset from Base</param>
+        /// <param name="aCount">Number of integers to fill</param>
+        /// <param name="aData">Value to fill memory block with</param>
         [DebugStub(Off = true)]
         public unsafe void Fill(int aStart, int aCount, int aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            int* xDest = (int*)(Base + aStart);
-            MemoryOperations.Fill(xDest, aData, (int)aCount);
+            int* xDest = (int*)Base + aStart;
+            MemoryOperations.Fill(xDest, aData, aCount);
         }
 
         /// <summary>
@@ -230,11 +231,15 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="aData">A data buffer array.</param>
         /// <param name="aIndex">A staring index in the source data buffer array.</param>
-        /// <param name="aCount">Number of bytes to copy.</param>
+        /// <param name="aCount">Number of integers to copy.</param>
         /// <exception cref="OverflowException">Thrown if aData length in greater then Int32.MaxValue.</exception>
-        public void Copy(int []aData, int aIndex, int aCount)
+        public void Copy(int[] aData, int aIndex, int aCount)
         {
-            Copy(0, aData, aIndex, aData.Length);
+            if(aData.Length < aCount)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            Copy(0, aData, aIndex, aCount);
         }
 
         /// <summary>
@@ -243,7 +248,7 @@ namespace Cosmos.Core
         /// <param name="aStart">A data starting position inside the memory block.</param>
         /// <param name="aData">A data buffer array.</param>
         /// <param name="aIndex">A staring index in the source data buffer array.</param>
-        /// <param name="aCount">Number of bytes to copy.</param>
+        /// <param name="aCount">Number of integers to copy.</param>
         public unsafe void Copy(int aStart, int[] aData, int aIndex, int aCount)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
@@ -307,7 +312,9 @@ namespace Cosmos.Core
                 throw new Exception("Memory access violation");
             }
             for (int i = 0; i < aBuffer.Length; i++)
-                aBuffer[i] = (*(byte*)(Base + i));
+            {
+                aBuffer[i] = *((byte*)Base + i);
+            }
         }
 
         /// <summary>
@@ -323,7 +330,9 @@ namespace Cosmos.Core
                 throw new Exception("Memory access violation");
             }
             for (int i = 0; i < aBuffer.Length; i++)
-                (*(byte*)(Base + i)) = aBuffer[i];
+            {
+                *((byte*)Base + i) = aBuffer[i];
+            }
         }
 
         /// <summary>
@@ -338,9 +347,9 @@ namespace Cosmos.Core
             {
                 throw new Exception("Memory access violation");
             }
-            for (int i = 0; i < aBuffer.Length / 2; i++)
+            for (int i = 0; i < aBuffer.Length; i++)
             {
-                aBuffer[i] = (*(ushort*)(Base + i));
+                aBuffer[i] = *((ushort*)Base + i);
             }
         }
 
@@ -356,9 +365,9 @@ namespace Cosmos.Core
             {
                 throw new Exception("Memory access violation");
             }
-            for (int i = 0; i < aBuffer.Length / sizeof(ushort); i++)
+            for (int i = 0; i < aBuffer.Length; i++)
             {
-                (*(ushort*)(Base + i)) = aBuffer[i];
+                *((ushort*)Base + i) = aBuffer[i];
             }
         }
 
@@ -374,8 +383,10 @@ namespace Cosmos.Core
             {
                 throw new Exception("Memory access violation");
             }
-            for (int i = 0; i < aBuffer.Length / sizeof(uint); i++)
-                aBuffer[i] = (*(uint*)(Base + i));
+            for (int i = 0; i < aBuffer.Length; i++)
+            {
+                aBuffer[i] = *((uint*)Base + i);
+            }
         }
 
         /// <summary>
@@ -390,8 +401,10 @@ namespace Cosmos.Core
             {
                 throw new Exception("Memory access violation");
             }
-            for (int i = 0; i < aBuffer.Length / sizeof(uint); i++)
-                (*(uint*)(Base + i)) = aBuffer[i];
+            for (int i = 0; i < aBuffer.Length; i++)
+            {
+                *((uint*)Base + i) = aBuffer[i];
+            }
         }
         #endregion ReadWrite
 
@@ -505,7 +518,7 @@ namespace Cosmos.Core
         /// <summary>
         /// Get and set memory block.
         /// </summary>
-        /// <param name="aByteOffset">A byte offset.</param>
+        /// <param name="aByteOffset">Byte offset from start of memory block</param>
         /// <returns>ushort value.</returns>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe ushort this[uint aByteOffset]
