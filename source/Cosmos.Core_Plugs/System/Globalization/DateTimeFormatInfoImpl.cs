@@ -14,5 +14,10 @@ namespace Cosmos.Core_Plugs.System.Globalization
         {
             return ".";
         }
+
+        public static string[] get_AbbreviatedMonthNames(global::System.Globalization.DateTimeFormatInfo aThis)
+        {
+            return new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "" }; // its 13 for some reason
+        }
     }
 }
