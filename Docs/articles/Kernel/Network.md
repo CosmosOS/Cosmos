@@ -51,6 +51,26 @@ using(var xClient = new UdpClient(4242))
 
 ## TCP
 Like UDP, TCP has to create a client and call Connect() to specify the remote machine address before sending or receiving data.
+
+Server :
+```csharp
+using(var xServer = new TcpListener(4242))
+{
+    /** Start server **/
+    xServer.Start();
+    
+    /** Accept incoming TCP connection **/
+    var client = xServer.AcceptTcpClient(); //blocking
+    
+    /** Stop server **/
+    xServer.Stop();
+
+    /** Send data **/
+    client.Send(Encoding.ASCII.GetBytes(message));
+}
+```
+
+Client :
 ```csharp
 using(var xClient = new TcpClient(4242))
 {

@@ -15,7 +15,7 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// <summary>
     /// TCP Flags
     /// </summary>
-    public enum Flags
+    public enum Flags : byte
     {
         FIN = (1 << 0),
         SYN = (1 << 1),
@@ -52,14 +52,20 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             var packet = new TCPPacket(packetData);
 
-            Global.mDebugger.Send("[Received] TCP packet from " + packet.SourceIP.ToString() + ":" + packet.SourcePort.ToString());
-
             if (packet.CheckCRC())
             {
-                var receiver = TcpClient.GetClient(packet.DestinationPort);
-                if (receiver != null)
+                var client = TcpClient.GetClient(packet.DestinationPort);
+                if (client != null)
                 {
-                    receiver.ReceiveData(packet);
+                    client.StateMachine.ReceiveData(packet);
+                    return;
+                }
+
+                var listener = TcpListener.GetListener(packet.DestinationPort);
+                if (listener != null)
+                {
+                    listener.StateMachine.ReceiveData(packet);
+                    return;
                 }
             }
             else
@@ -222,6 +228,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             FIN = (RawData[47] & (byte)Flags.FIN) != 0;
             PSH = (RawData[47] & (byte)Flags.PSH) != 0;
             RST = (RawData[47] & (byte)Flags.RST) != 0;
+            URG = (RawData[47] & (byte)Flags.URG) != 0;
 
             if (TCPHeaderLength > 20) //options
             {
@@ -347,6 +354,10 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Is RST Flag set.
         /// </summary>
         internal bool RST;
+        /// <summary>
+        /// Is URG Flag set.
+        /// </summary>
+        internal bool URG;
 
         /// <summary>
         /// Get destination port.
@@ -410,13 +421,62 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
+        /// Convert a byte to a hexadecimal char.
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns>Hex string.</returns>
+        static string ToHex(byte b)
+        {
+            string r = "";
+            string chars = "0123456789ABCDEF";
+
+            r += chars[b >> 4];
+            return r += chars[b &= 0x0F];
+        }
+
+        /// <summary>
+        /// Get string representation of TCP flags.
+        /// </summary>
+        /// <returns>string value.</returns>
+        public string getFlags()
+        {
+            string flags = "";
+
+            if (FIN)
+            {
+                flags += "FIN|";
+            }
+            if (SYN)
+            {
+                flags += "SYN|";
+            }
+            if (RST)
+            {
+                flags += "RST|";
+            }
+            if (PSH)
+            {
+                flags += "PSH|";
+            }
+            if (ACK)
+            {
+                flags += "ACK|";
+            }
+            if (URG)
+            {
+                flags += "URG|";
+            }
+            
+            return flags.Remove(flags.Length - 1);
+        }
+
+        /// <summary>
         /// To string.
         /// </summary>
         /// <returns>string value.</returns>
         public override string ToString()
         {
-            return "TCP Packet Src=" + SourceIP + ":" + SourcePort + "," +
-                   "Dest=" + DestinationIP + ":" + DestinationPort + ", DataLen=" + TCP_DataLength;
+            return $"TCP Packet {SourceIP}:{SourcePort} -> {DestinationIP}:{DestinationPort} (flags={getFlags()}, seq={SequenceNumber}, ack={AckNumber})";
         }
     }
 }
