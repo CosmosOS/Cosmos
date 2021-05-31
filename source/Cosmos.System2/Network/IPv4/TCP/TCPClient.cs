@@ -240,8 +240,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             source.address = packet.SourceIP;
             source.port = packet.SourcePort;
 
-            var tmp = StateMachine.data;
-            StateMachine.data = null;
+            var tmp = StateMachine.Data;
+            StateMachine.Data = null;
             return tmp;
         }
 
@@ -264,8 +264,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             source.address = packet.SourceIP;
             source.port = packet.SourcePort;
 
-            var tmp = StateMachine.data;
-            StateMachine.data = null;
+            var tmp = StateMachine.Data;
+            StateMachine.Data = null;
             return tmp;
         }
 

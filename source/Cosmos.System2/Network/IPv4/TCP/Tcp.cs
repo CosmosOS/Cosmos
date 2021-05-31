@@ -73,9 +73,15 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal uint LastSequenceNumber;
 
+        /// <summary>
+        /// Is waiting for an acknowledgement packet.
+        /// </summary>
         internal bool WaitingAck;
 
-        internal byte[] data;
+        /// <summary>
+        /// TCP Received Data.
+        /// </summary>
+        internal byte[] Data;
 
         /// <summary>
         /// String / enum correspondance (used for debugging)
@@ -283,7 +289,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                         LastSequenceNumber = packet.SequenceNumber;
 
-                        data = ArrayHelper.Concat(data, packet.TCP_Data);
+                        Data = ArrayHelper.Concat(Data, packet.TCP_Data);
 
                         rxBuffer.Enqueue(packet);
 
@@ -304,7 +310,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                     {
                         AckNumber += packet.TCP_DataLength;
 
-                        data = ArrayHelper.Concat(data, packet.TCP_Data);
+                        Data = ArrayHelper.Concat(Data, packet.TCP_Data);
                     }
                 }
                 return;
