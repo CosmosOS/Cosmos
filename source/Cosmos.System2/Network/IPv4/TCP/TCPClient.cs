@@ -46,12 +46,16 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>TcpClient</returns>
         internal static TcpClient GetClient(ushort destPort)
         {
-            if (clients.ContainsKey((uint)destPort))
-            {
-                return clients[(uint)destPort];
-            }
+            TcpClient client;
 
-            return null;
+            if (clients.TryGetValue(destPort, out client))
+            {
+                return client;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>

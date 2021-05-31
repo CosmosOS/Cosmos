@@ -36,12 +36,16 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>TcpClient</returns>
         internal static TcpListener GetListener(ushort destPort)
         {
-            if (listeners.ContainsKey((uint)destPort))
-            {
-                return listeners[(uint)destPort];
-            }
+            TcpListener listener;
 
-            return null;
+            if (listeners.TryGetValue(destPort, out listener))
+            {
+                return listener;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
