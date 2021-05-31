@@ -26,7 +26,8 @@ namespace Cosmos.System.Network.IPv4.TCP
     }
 
     /// <summary>
-    /// Tcp class. Used to manage the TCP state machine
+    /// Tcp class. Used to manage the TCP state machine.
+    /// Handle received packets according to current TCP connection Status. Also contains TCB (Transmission Control Block) information.
     /// See <a href="https://datatracker.ietf.org/doc/html/rfc793">RFC 793</a> for more information.
     /// </summary>
     internal class Tcp
@@ -107,7 +108,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Handle TCP discussions and data.
+        /// Handle incoming TCP packets according to current connection status.
         /// </summary>
         /// <param name="packet">Packet to receive.</param>
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
