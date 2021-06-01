@@ -57,7 +57,7 @@ namespace SimpleHttpServer.RouteHandlers
             response.StatusCode = "200";
             response.ReasonPhrase = "Ok";
             response.Headers["Content-Type"] = QuickMimeTypeMapper.GetMimeType(file_extension);
-            response.Content = File.ReadAllBytes(local_path);
+            response.Content = Encoding.ASCII.GetString(File.ReadAllBytes(local_path));
 
             return response;
         }
@@ -76,7 +76,7 @@ namespace SimpleHttpServer.RouteHandlers
             return new HttpResponse() {
                 StatusCode = "200",
                 ReasonPhrase = "Ok",
-                Content = Encoding.ASCII.GetBytes(output.ToString())
+                Content = output.ToString()
             };
         }
     }

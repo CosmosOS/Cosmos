@@ -42,7 +42,7 @@ namespace SimpleHttpServer
             // build a default response for errors
             if (response.Content == null) {
                 if (response.StatusCode != "200") {
-                    response.Content = Encoding.ASCII.GetBytes(string.Format("{0} {1} <p> {2}", response.StatusCode, request.Url, response.ReasonPhrase));
+                    response.Content = string.Format("{0} {1} <p> {2}", response.StatusCode, request.Url, response.ReasonPhrase);
                 }
             }
 
@@ -53,8 +53,8 @@ namespace SimpleHttpServer
 
         // this formats the HTTP response...
         private static void WriteResponse(TcpClient client, HttpResponse response) {            
-            if (response.Content == null) {           
-                response.Content = new byte[]{};
+            if (response.Content == null) {
+                response.Content = "";
             }
             
             // default to text/html content type
@@ -74,8 +74,6 @@ namespace SimpleHttpServer
 
             sb.Append("\r\n");
             sb.Append(response.Content);
-
-            Console.WriteLine(response.Content);
 
             client.Send(Encoding.ASCII.GetBytes(sb.ToString()));
         }
@@ -123,7 +121,7 @@ namespace SimpleHttpServer
             try {
                 return new HttpResponse()
                 {
-                    Content = Encoding.ASCII.GetBytes(route.Content),
+                    Content = route.Content,
                     ReasonPhrase = "OK",
                     StatusCode = "200"
                 };

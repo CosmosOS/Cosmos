@@ -38,7 +38,7 @@ namespace SimpleHttpServer.Models
     {
         public string StatusCode { get; set; }
         public string ReasonPhrase { get; set; }
-        public byte[] Content { get; set; }
+        public string Content { get; set; }
 
         public Dictionary<string, string> Headers { get; set; }
 

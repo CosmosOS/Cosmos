@@ -18,7 +18,7 @@ namespace SimpleHttpServer
             {
                 ReasonPhrase = "InternalServerError",
                 StatusCode = "500",
-                Content = Encoding.ASCII.GetBytes(content)
+                Content = content
             };
         }
 
@@ -31,7 +31,7 @@ namespace SimpleHttpServer
             {
                 ReasonPhrase = "NotFound",
                 StatusCode = "404",
-                Content = Encoding.ASCII.GetBytes(content)
+                Content = content
             };
         }
     }
