@@ -7,10 +7,16 @@ using System.Text;
 
 namespace SimpleHttpServer.Models
 {
+    public class HttpDiscussion
+    {
+        public HttpRequest Request { get; set; }
+        public HttpResponse Response { get; set; }
+    }
+
     public class Route
     {
         public string Name { get; set; } // descriptive name for debugging
         public string Method { get; set; }
-        public string Content { get; set; }
+        public Action<HttpDiscussion> Callable { get; set; }
     }
 }

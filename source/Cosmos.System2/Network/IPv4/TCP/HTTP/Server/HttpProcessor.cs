@@ -119,12 +119,12 @@ namespace SimpleHttpServer
             // trigger the route handler...
             request.Route = route;
             try {
-                return new HttpResponse()
-                {
-                    Content = route.Content,
-                    ReasonPhrase = "OK",
-                    StatusCode = "200"
-                };
+                var httpDiscussion = new HttpDiscussion();
+                httpDiscussion.Request = request;
+
+                route.Callable(httpDiscussion);
+
+                return httpDiscussion.Response;
             } catch(Exception ex) {
                 Global.mDebugger.Send(ex.Message);
                 return HttpBuilder.InternalServerError();
