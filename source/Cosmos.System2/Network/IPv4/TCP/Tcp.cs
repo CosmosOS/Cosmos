@@ -177,11 +177,10 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.ACK)
             {
-                SendEmptyPacket(Flags.RST);
+                AckNumber = packet.SequenceNumber;
+                SequenceNumber = packet.AckNumber;
 
-                Status = Status.CLOSED;
-
-                throw new Exception("TCP connection closed! (ACK received on LISTEN state)");
+                Status = Status.ESTABLISHED;
             }
             else if (packet.SYN)
             {
