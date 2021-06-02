@@ -169,7 +169,8 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
 
             if (splitted.Length > 1)
             {
-                command.Content = splitted[1];
+                int i = data.IndexOf(" ") + 1;
+                command.Content = data.Substring(i);
                 command.Content = command.Content.Replace('/', '\\');
             }
 
