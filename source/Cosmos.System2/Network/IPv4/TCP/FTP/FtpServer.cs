@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Cosmos.System.FileSystem;
+using Cosmos.System.FileSystem.Listing;
 using Console = global::System.Console;
 
 namespace Cosmos.System.Network.IPv4.TCP.FTP
@@ -361,10 +362,23 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     var sb = new StringBuilder();
                     foreach (var directoryEntry in directory_list)
                     {
+                        if (directoryEntry.mEntryType == DirectoryEntryTypeEnum.Directory)
+                        {
+                            sb.Append("d");
+                        }
+                        else
+                        {
+                            sb.Append("-");
+                        }
+                        sb.Append("rwxrwxrwx 1 unknown unknown ");
+                        sb.Append(directoryEntry.mSize);
+                        sb.Append(" Jan 1 09:00 ");
                         sb.AppendLine(directoryEntry.mName);
                     }
 
                     ftpClient.Data.Send(Encoding.ASCII.GetBytes(sb.ToString()));
+
+                    ftpClient.SendReply(226, "Closing data connection.");
 
                     ftpClient.Data.Close();
                 }
