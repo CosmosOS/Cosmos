@@ -315,7 +315,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
-                ftpClient.SendReply(257, CurrentDirectory + " created.");
+                ftpClient.SendReply(257, "/" + CurrentDirectory + "/ created.");
             }
         }
 
@@ -425,7 +425,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         }
 
         /// <summary>
-        /// Process DELE command.
+        /// Process RMD command.
         /// </summary>
         /// <param name="ftpClient">FTP Client.</param>
         /// <param name="command">FTP Command.</param>
@@ -458,7 +458,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         }
 
         /// <summary>
-        /// Process DELE command.
+        /// Process MKD command.
         /// </summary>
         /// <param name="ftpClient">FTP Client.</param>
         /// <param name="command">FTP Command.</param>
