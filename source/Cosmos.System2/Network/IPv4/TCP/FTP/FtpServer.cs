@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using Cosmos.System.FileSystem;
 using Console = global::System.Console;
 
 namespace Cosmos.System.Network.IPv4.TCP.FTP
@@ -31,6 +32,13 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         LIST //List files in the current working directory 
     }
 
+    public enum TransferMode
+    {
+        NONE,
+        ACTV,
+        PASV
+    }
+
     public class FtpCommand
     {
         public string Command;
@@ -39,13 +47,24 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
 
     public class FtpClient
     {
-        public TcpClient Server;
-        public TcpClient Client;
+        public TcpClient Discussion;
+
+        public TcpClient Data;
+        public TcpListener DataListener;
+
+        public TransferMode Mode;
 
         public string Username;
         public string Password;
 
         public bool Connected;
+
+        public FtpClient(TcpClient client)
+        {
+            Discussion = client;
+            Connected = false;
+            Mode = TransferMode.NONE;
+        }
 
         public bool IsConnected()
         {
@@ -67,7 +86,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">Reply content.</param>
         public void SendReply(int code, string message)
         {
-            Client.Send(Encoding.ASCII.GetBytes(code + " " + message + "\r\n"));
+            Discussion.Send(Encoding.ASCII.GetBytes(code + " " + message + "\r\n"));
         }
     }
 
@@ -84,17 +103,20 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
 
         public string CurrentDirectory { get; set; }
 
+        CosmosVFS FileSystem { get; set; }
+
         /// <summary>
         /// Create new instance of the <see cref="FtpServer"/> class.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 53 exists.</exception>
-        public FtpServer(string directory)
+        public FtpServer(CosmosVFS fs, string directory)
         {
             Listening = true;
             ftpClients = new List<FtpClient>();
 
             CurrentDirectory = directory;
+            FileSystem = fs;
         }
 
         public void Listen()
@@ -114,20 +136,18 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
 
         public void ReceiveNewClient(TcpClient client)
         {
-            var ftpClient = new FtpClient();
-            ftpClient.Client = client;
-            ftpClient.Connected = false;
+            var ftpClient = new FtpClient(client);
 
             ftpClient.SendReply(220, "Service ready for new user.");
 
-            while (ftpClient.Client.IsConnected())
+            while (ftpClient.Discussion.IsConnected())
             {
                 ReceiveRequest(ftpClient);
             }
 
             ftpClient.SendReply(221, "Service closing control connection.");
 
-            ftpClient.Client.Close();
+            ftpClient.Discussion.Close();
 
             ftpClients.Add(ftpClient);
         }
@@ -135,7 +155,8 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         public void ReceiveRequest(FtpClient ftpClient)
         {
             var ep = new EndPoint(Address.Zero, 0);
-            var data = Encoding.ASCII.GetString(ftpClient.Client.Receive(ref ep));
+            var data = Encoding.ASCII.GetString(ftpClient.Discussion.Receive(ref ep));
+            data = data.Remove(data.Length - 2, 2);
 
             global::System.Console.WriteLine("Client[0] : " + data);
 
@@ -143,8 +164,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
 
             var command = new FtpCommand();
             command.Command = splitted[0];
-            command.Content = splitted[1];
-            command.Content.Remove(command.Content.Length - 3, 2);
+
+            if (splitted.Length > 1)
+            {
+                command.Content = splitted[1];
+            }
 
             ProcessRequest(ftpClient, command);
         }
@@ -162,6 +186,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 case "CWD":
                     ProcessCwd(ftpClient, command);
                     break;
+                case "SYST":
+                    ftpClient.SendReply(215, "CosmosOS");
+                    break;
                 case "CDUP":
                     break;
                 case "QUIT":
@@ -169,8 +196,10 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 case "DELE":
                     break;
                 case "PWD":
+                    ProcessPwd(ftpClient, command);
                     break;
                 case "PASV":
+                    ProcessPasv(ftpClient, command);
                     break;
                 case "PORT":
                     break;
@@ -183,6 +212,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 case "STOR":
                     break;
                 case "LIST":
+                    ProcessList(ftpClient, command);
                     break;
                 default:
                     ftpClient.SendReply(200, "Unknown command.");
@@ -197,15 +227,19 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         public void ProcessUser(FtpClient ftpClient, FtpCommand command)
         {
-            if (String.IsNullOrEmpty(ftpClient.Username)) {
-                ftpClient.Username = command.Content;
-                ftpClient.SendReply(331, "User name okay, need password.");
-            }
-            else if (command.Content == "anonymous")
+            if (command.Content == "anonymous")
             {
                 ftpClient.Username = command.Content;
                 ftpClient.Connected = true;
                 ftpClient.SendReply(230, "User logged in, proceed.");
+            }
+            else if (String.IsNullOrEmpty(ftpClient.Username)) {
+                ftpClient.Username = command.Content;
+                ftpClient.SendReply(331, "User name okay, need password.");
+            }
+            else
+            {
+                ftpClient.SendReply(550, "Requested action not taken.");
             }
         }
 
@@ -260,6 +294,79 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 catch
                 {
                     ftpClient.SendReply(550, "Requested action not taken.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process PWD command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessPwd(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                ftpClient.SendReply(257, "/" + CurrentDirectory + "/ created.");
+            }
+        }
+
+        /// <summary>
+        /// Process PASV command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessPasv(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                //TODO: Find port dynamically.
+                int port = 20;
+                var address = ftpClient.Discussion.StateMachine.source.ToByteArray();
+
+                ftpClient.SendReply(227, $"Entering Passive Mode ({address[0]},{address[1]},{address[2]},{address[3]},{port / 256},{port % 256})");
+
+                ftpClient.DataListener = new TcpListener(port);
+                ftpClient.DataListener.Start();
+
+                ftpClient.Mode = TransferMode.PASV;
+            }
+        }
+
+        /// <summary>
+        /// Process LIST command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessList(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                if (ftpClient.Mode == TransferMode.NONE)
+                {
+                    ftpClient.SendReply(425, "Can't open data connection.");
+                }
+                else if (ftpClient.Mode == TransferMode.ACTV)
+                {
+                    ftpClient.SendReply(425, "Can't open data connection.");
+                    throw new NotImplementedException("FTP LIST command currently not supported in ACTV mode.");
+                }
+                else if (ftpClient.Mode == TransferMode.PASV)
+                {
+                    ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
+                    ftpClient.DataListener.Stop();
+
+                    var directory_list = FileSystem.GetDirectoryListing(CurrentDirectory + command.Content);
+
+                    var sb = new StringBuilder();
+                    foreach (var directoryEntry in directory_list)
+                    {
+                        sb.AppendLine(directoryEntry.mName);
+                    }
+
+                    ftpClient.Data.Send(Encoding.ASCII.GetBytes(sb.ToString()));
+
+                    ftpClient.Data.Close();
                 }
             }
         }
