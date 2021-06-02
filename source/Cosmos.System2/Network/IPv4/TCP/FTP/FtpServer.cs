@@ -285,10 +285,10 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             {
                 try
                 {
-                    if (Directory.Exists(CurrentDirectory + command.Content))
+                    if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
                     {
+                        CurrentDirectory = CurrentDirectory + "\\" + command.Content;
                         Directory.SetCurrentDirectory(CurrentDirectory);
-                        CurrentDirectory = CurrentDirectory + command.Content + @"\";
                     }
                     else if (File.Exists(CurrentDirectory + command.Content))
                     {
@@ -364,7 +364,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
                     ftpClient.DataListener.Stop();
 
-                    var directory_list = FileSystem.GetDirectoryListing(CurrentDirectory + command.Content);
+                    var directory_list = FileSystem.GetDirectoryListing(CurrentDirectory + "\\" + command.Content);
 
                     var sb = new StringBuilder();
                     foreach (var directoryEntry in directory_list)
@@ -377,8 +377,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                         {
                             sb.Append("-");
                         }
-                        sb.Append("rwxrwxrwx ");
-                        sb.Append(directoryEntry.mSize + " ");
+                        sb.Append("rwxrwxrwx 1 unknown unknown ");
+                        sb.Append(directoryEntry.mSize);
+                        sb.Append(" Jan 1 09:00 ");
                         sb.AppendLine(directoryEntry.mName);
                     }
 
@@ -407,9 +408,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 try
                 {
-                    if (File.Exists(CurrentDirectory + command.Command))
+                    if (File.Exists(CurrentDirectory + "\\" + command.Command))
                     {
-                        File.Delete(CurrentDirectory + command.Command);
+                        File.Delete(CurrentDirectory + "\\" + command.Command);
                         ftpClient.SendReply(250, "Requested file action okay, completed.");
                     }
                     else
@@ -440,9 +441,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 try
                 {
-                    if (Directory.Exists(CurrentDirectory + command.Command))
+                    if (Directory.Exists(CurrentDirectory + "\\" + command.Command))
                     {
-                        Directory.Delete(CurrentDirectory + command.Command, true);
+                        Directory.Delete(CurrentDirectory + "\\" + command.Command, true);
                         ftpClient.SendReply(200, "Command okay.");
                     }
                     else
@@ -473,13 +474,13 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 try
                 {
-                    if (Directory.Exists(CurrentDirectory + command.Command))
+                    if (Directory.Exists(CurrentDirectory + "\\" + command.Command))
                     {
                         ftpClient.SendReply(550, "Requested action not taken.");
                     }
                     else
                     {
-                        Directory.CreateDirectory(CurrentDirectory + command.Command);
+                        Directory.CreateDirectory(CurrentDirectory + "\\" + command.Command);
                         ftpClient.SendReply(200, "Command okay.");
                     }
                 }
