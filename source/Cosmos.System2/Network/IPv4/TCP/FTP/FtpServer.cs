@@ -195,6 +195,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 case "QUIT":
                     break;
                 case "DELE":
+                    ProcessDele(ftpClient, command);
                     break;
                 case "PWD":
                     ProcessPwd(ftpClient, command);
@@ -211,6 +212,12 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 case "RETR":
                     break;
                 case "STOR":
+                    break;
+                case "RMD":
+                    ProcessRmd(ftpClient, command);
+                    break;
+                case "MKD":
+                    ProcessMkd(ftpClient, command);
                     break;
                 case "LIST":
                     ProcessList(ftpClient, command);
@@ -308,7 +315,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
-                ftpClient.SendReply(257, "/" + CurrentDirectory + "/ created.");
+                ftpClient.SendReply(257, CurrentDirectory + " created.");
             }
         }
 
@@ -370,9 +377,8 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                         {
                             sb.Append("-");
                         }
-                        sb.Append("rwxrwxrwx 1 unknown unknown ");
-                        sb.Append(directoryEntry.mSize);
-                        sb.Append(" Jan 1 09:00 ");
+                        sb.Append("rwxrwxrwx ");
+                        sb.Append(directoryEntry.mSize + " ");
                         sb.AppendLine(directoryEntry.mName);
                     }
 
@@ -381,6 +387,105 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     ftpClient.SendReply(226, "Closing data connection.");
 
                     ftpClient.Data.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process DELE command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessDele(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                if (String.IsNullOrEmpty(command.Command))
+                {
+                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                    return;
+                }
+                try
+                {
+                    if (File.Exists(CurrentDirectory + command.Command))
+                    {
+                        File.Delete(CurrentDirectory + command.Command);
+                        ftpClient.SendReply(250, "Requested file action okay, completed.");
+                    }
+                    else
+                    {
+                        ftpClient.SendReply(550, "Requested action not taken.");
+                    }
+                }
+                catch
+                {
+                    ftpClient.SendReply(550, "Requested action not taken.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process DELE command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessRmd(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                if (String.IsNullOrEmpty(command.Command))
+                {
+                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                    return;
+                }
+                try
+                {
+                    if (Directory.Exists(CurrentDirectory + command.Command))
+                    {
+                        Directory.Delete(CurrentDirectory + command.Command, true);
+                        ftpClient.SendReply(200, "Command okay.");
+                    }
+                    else
+                    {
+                        ftpClient.SendReply(550, "Requested action not taken.");
+                    }
+                }
+                catch
+                {
+                    ftpClient.SendReply(550, "Requested action not taken.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process DELE command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessMkd(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                if (String.IsNullOrEmpty(command.Command))
+                {
+                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                    return;
+                }
+                try
+                {
+                    if (Directory.Exists(CurrentDirectory + command.Command))
+                    {
+                        ftpClient.SendReply(550, "Requested action not taken.");
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(CurrentDirectory + command.Command);
+                        ftpClient.SendReply(200, "Command okay.");
+                    }
+                }
+                catch
+                {
+                    ftpClient.SendReply(550, "Requested action not taken.");
                 }
             }
         }
