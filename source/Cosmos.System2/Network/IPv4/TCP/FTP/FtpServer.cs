@@ -371,11 +371,6 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
-                if (String.IsNullOrEmpty(command.Content))
-                {
-                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
-                    return;
-                }
                 if (ftpClient.Mode == TransferMode.NONE)
                 {
                     ftpClient.SendReply(425, "Can't open data connection.");
