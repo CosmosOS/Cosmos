@@ -216,6 +216,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 case "RETR":
                     break;
                 case "STOR":
+                    ProcessStor(ftpClient, command);
                     break;
                 case "RMD":
                     ProcessRmd(ftpClient, command);
@@ -239,6 +240,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         public void ProcessUser(FtpClient ftpClient, FtpCommand command)
         {
+            if (String.IsNullOrEmpty(command.Content))
+            {
+                ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                return;
+            }
             if (command.Content == "anonymous")
             {
                 ftpClient.Username = command.Content;
@@ -262,6 +268,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         public void ProcessPass(FtpClient ftpClient, FtpCommand command)
         {
+            if (String.IsNullOrEmpty(command.Content))
+            {
+                ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                return;
+            }
             if (ftpClient.Username == "anonymous")
             {
                 ftpClient.SendReply(530, "Login incorrect.");
@@ -287,6 +298,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
+                if (String.IsNullOrEmpty(command.Content))
+                {
+                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                    return;
+                }
                 try
                 {
                     if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
@@ -355,6 +371,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
+                if (String.IsNullOrEmpty(command.Content))
+                {
+                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                    return;
+                }
                 if (ftpClient.Mode == TransferMode.NONE)
                 {
                     ftpClient.SendReply(425, "Can't open data connection.");
@@ -406,7 +427,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
-                if (String.IsNullOrEmpty(command.Command))
+                if (String.IsNullOrEmpty(command.Content))
                 {
                     ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
                     return;
@@ -439,7 +460,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
-                if (String.IsNullOrEmpty(command.Command))
+                if (String.IsNullOrEmpty(command.Content))
                 {
                     ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
                     return;
@@ -472,7 +493,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
-                if (String.IsNullOrEmpty(command.Command))
+                if (String.IsNullOrEmpty(command.Content))
                 {
                     ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
                     return;
@@ -513,6 +534,98 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 catch
                 {
                     ftpClient.SendReply(550, "Requested action not taken.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process STOR command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessStor(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                if (String.IsNullOrEmpty(command.Content))
+                {
+                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                    return;
+                }
+                if (ftpClient.Mode == TransferMode.NONE)
+                {
+                    ftpClient.SendReply(425, "Can't open data connection.");
+                }
+                else if (ftpClient.Mode == TransferMode.ACTV)
+                {
+                    ftpClient.SendReply(425, "Can't open data connection.");
+                    throw new NotImplementedException("FTP STOR command currently not supported in ACTV mode.");
+                }
+                else if (ftpClient.Mode == TransferMode.PASV)
+                {
+                    ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
+                    ftpClient.DataListener.Stop();
+
+                    var ep = new EndPoint(Address.Zero, 0);
+                    var data = ftpClient.Data.Receive(ref ep);
+
+                    try
+                    {
+                        File.WriteAllBytes(CurrentDirectory + "\\" + command.Content, data);
+                    }
+                    catch
+                    {
+                        ftpClient.SendReply(550, "Requested action not taken.");
+                    }
+
+                    ftpClient.SendReply(226, "Closing data connection.");
+
+                    ftpClient.Data.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process RETR command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessRetr(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                if (String.IsNullOrEmpty(command.Content))
+                {
+                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                    return;
+                }
+                if (ftpClient.Mode == TransferMode.NONE)
+                {
+                    ftpClient.SendReply(425, "Can't open data connection.");
+                }
+                else if (ftpClient.Mode == TransferMode.ACTV)
+                {
+                    ftpClient.SendReply(425, "Can't open data connection.");
+                    throw new NotImplementedException("FTP RETR command currently not supported in ACTV mode.");
+                }
+                else if (ftpClient.Mode == TransferMode.PASV)
+                {
+                    ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
+                    ftpClient.DataListener.Stop();
+
+                    try
+                    {
+                        var data = File.ReadAllBytes(CurrentDirectory + "\\" + command.Content);
+                        ftpClient.Data.Send(data);
+                    }
+                    catch
+                    {
+                        ftpClient.SendReply(550, "Requested action not taken.");
+                    }
+
+                    ftpClient.SendReply(226, "Closing data connection.");
+
+                    ftpClient.Data.Close();
                 }
             }
         }
