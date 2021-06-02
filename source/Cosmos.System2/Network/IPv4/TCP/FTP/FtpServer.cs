@@ -87,6 +87,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">Reply content.</param>
         public void SendReply(int code, string message)
         {
+            message = message.Replace('\\', '/');
             Discussion.Send(Encoding.ASCII.GetBytes(code + " " + message + "\r\n"));
         }
     }
@@ -169,6 +170,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             if (splitted.Length > 1)
             {
                 command.Content = splitted[1];
+                command.Content = command.Content.Replace('/', '\\');
             }
 
             ProcessRequest(ftpClient, command);
@@ -191,6 +193,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     ftpClient.SendReply(215, "CosmosOS");
                     break;
                 case "CDUP":
+                    ProcessCdup(ftpClient, command);
                     break;
                 case "QUIT":
                     break;
@@ -289,6 +292,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     {
                         CurrentDirectory = CurrentDirectory + "\\" + command.Content;
                         Directory.SetCurrentDirectory(CurrentDirectory);
+                        ftpClient.SendReply(250, "Requested file action okay.");
                     }
                     else if (File.Exists(CurrentDirectory + command.Content))
                     {
@@ -315,7 +319,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             if (ftpClient.IsConnected())
             {
-                ftpClient.SendReply(257, "/" + CurrentDirectory + "/ created.");
+                ftpClient.SendReply(257, "/" + CurrentDirectory + " created.");
             }
         }
 
@@ -483,6 +487,27 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                         Directory.CreateDirectory(CurrentDirectory + "\\" + command.Command);
                         ftpClient.SendReply(200, "Command okay.");
                     }
+                }
+                catch
+                {
+                    ftpClient.SendReply(550, "Requested action not taken.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process CDUP command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessCdup(FtpClient ftpClient, FtpCommand command)
+        {
+            if (ftpClient.IsConnected())
+            {
+                try
+                {
+                    CurrentDirectory = new DirectoryInfo(CurrentDirectory).Parent.FullName;
+                    ftpClient.SendReply(250, "Requested file action okay.");
                 }
                 catch
                 {
