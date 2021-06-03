@@ -56,12 +56,16 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// <returns>UdpClient</returns>
         internal static UdpClient GetClient(ushort destPort)
         {
-            if (clients.ContainsKey((uint)destPort) == true)
-            {
-                return clients[(uint)destPort];
-            }
+            UdpClient client;
 
-            return null;
+            if (clients.TryGetValue(destPort, out client))
+            {
+                return client;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
