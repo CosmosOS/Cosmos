@@ -6,12 +6,6 @@ namespace Cosmos.System.FileSystem
     public abstract class PartitioningType
     {
         /// <summary>
-        /// Checks if the partition type is this device.
-        /// </summary>
-        /// <param name="device">The device</param>
-        /// <returns>True/False</returns>
-        public static abstract bool IsType();
-        /// <summary>
         /// Gets all partitons
         /// </summary>
         /// <returns>All of the partitons on the disk</returns>

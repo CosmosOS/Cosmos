@@ -90,7 +90,7 @@ namespace Cosmos.HAL.BlockDevice
             return signature == EFIParitionSignature;
         }
 
-        public override bool IsType()
+        public static bool IsType(BlockDevice BlockDevice)
         {
             return IsGPTPartition(BlockDevice);
         }

@@ -63,9 +63,10 @@ namespace Cosmos.HAL.BlockDevice
                 Partitions.Add(xPartInfo);
             }
         }
-        public override bool IsType()
+        public static bool IsType(BlockDevice BlockDevice)
         {
-            return Partitions.Count != 0;
+            var mbr = new MBR(BlockDevice);
+            return mbr.Partitions.Count != 0;
         }
         public override List<Partition> GetPartitions()
         {
