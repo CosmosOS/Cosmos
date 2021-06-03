@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using static Cosmos.HAL.BlockDevice.Ata;
 using static Cosmos.HAL.BlockDevice.AtaPio;
 
-namespace Cosmos.HALs
+namespace Cosmos.HAL.BlockDevice
 {
     public class ATAPI : BlockDevice
     {
