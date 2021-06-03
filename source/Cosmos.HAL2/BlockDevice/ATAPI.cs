@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Cosmos.Core;
+using Cosmos.HAL.BlockDevice;
+using System;
 using System.Collections.Generic;
-using Cosmos.Core;
 using static Cosmos.HAL.BlockDevice.Ata;
 using static Cosmos.HAL.BlockDevice.AtaPio;
 
-namespace Cosmos.HAL.BlockDevice
+namespace Cosmos.HALs
 {
     public class ATAPI : BlockDevice
     {
@@ -13,6 +14,7 @@ namespace Cosmos.HAL.BlockDevice
         public const ushort SectorSize = 2048;
         private bool Primary { get; set; }
         private BusPositionEnum BusPosition { get; set; }
+        private AtaPio device;
 
         public class PacketCommands
         {
@@ -22,13 +24,14 @@ namespace Cosmos.HAL.BlockDevice
 
         public ATAPI(AtaPio parentDevice)
         {
+            device = parentDevice;
             this.BusPosition = parentDevice.BusPosition;
             this.Primary = parentDevice.ControllerID == ControllerIdEnum.Primary;
 
             mBlockSize = SectorSize;
             IO = new Core.IOGroup.ATA(!Primary);
             var p = BusPosition == BusPositionEnum.Master;
-            Ata.AtaDebugger.Send("ATAPI: Primary controller: "+ this.Primary+" Bus postion: IsMaster: "+ p);
+            Ata.AtaDebugger.Send("ATAPI: Primary controller: " + this.Primary + " Bus postion: IsMaster: " + p);
 
             Devices.Add(this);
             ATAPIDevices.Add(this);
@@ -50,33 +53,9 @@ namespace Cosmos.HAL.BlockDevice
 
             IO.Control.Byte = 0; //Enable IRQs
         }
-
-        public void Test()
-        {
-            Init();
-            var b = new byte[] { 0, 0, 0 };
-            ReadBlock(0, 1, ref b);
-            // PrintBytes(b);
-            Console.WriteLine("press enter for full test");
-            Console.ReadLine();
-            for (ulong i = 10; i < 100; i++)
-            {
-                ReadBlock(i, 1, ref b);
-                PrintBytes(b);
-            }
-        }
-
         private void HandleIRQ(ref INTs.IRQContext aContext)
         {
-            Console.WriteLine("*****RECIVED IRQ*****");
-        }
-
-        public void PrintBytes(byte[] b)
-        {
-            for (int p = 0; p < b.Length - 1; p++)
-            {
-                Console.Write(b[p].ToString() + ",");
-            }
+            Ata.AtaDebugger.Send("ATAPI IRQ");
         }
 
         public override void ReadBlock(ulong SectorNum, ulong SectorCount, ref byte[] aData)
@@ -102,8 +81,6 @@ namespace Cosmos.HAL.BlockDevice
             packet[9] = (byte)SectorCount;//Sector Count
             packet[10] = 0;
             packet[11] = 0;
-
-
 
             var buffer = new ushort[SectorSize / 2]; //Divide by 2 because we are reading words
             SendCmd(packet, SectorSize, ref buffer);
@@ -142,16 +119,20 @@ namespace Cosmos.HAL.BlockDevice
             //Wait for the select complete
             IO.Wait();
 
-            Console.WriteLine("[ATAPI] Sending command");
             IO.Features.Byte = 0x00; //PIO Mode
+
+            //Set commmand size
             IO.LBA1.Byte = (byte)((SectorSize) & 0xFF);
             IO.LBA2.Byte = (byte)((SectorSize >> 8) & 0xFF);
-            IO.Command.Byte = (byte)AtaPio.Cmd.Packet;
+
+            //Send ATAPI packet command
+            device.SendCmd(Cmd.Packet);
             Ata.AtaDebugger.Send("ATAPI: Polling");
 
-            AtaWait(true);
+            Poll(true);
             Ata.AtaDebugger.Send("ATAPI: Polling complete");
 
+            //Send the command as words
             for (int i = 0; i < AtapiPacket.Length; i++)
             {
                 var b1 = AtapiPacket[i];
@@ -162,6 +143,7 @@ namespace Cosmos.HAL.BlockDevice
 
                 i++;
             }
+            Poll(true);
             CheckForErrors();
             var a = (IO.LBA2.Byte << 8);
 
@@ -178,29 +160,6 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
 
-        private void AtaWait(bool drq = false)
-        {
-            //Read status register 4 times
-            var junk = IO.Status.Byte;
-            junk = IO.Status.Byte;
-            junk = IO.Status.Byte;
-            junk = IO.Status.Byte;
-
-
-            while (true)
-            {
-                if ((IO.Status.Byte & (byte)AtaPio.Status.Busy) == 0) break;
-            }
-
-            if (drq)
-            {
-                while (true)
-                {
-                    if ((IO.Status.Byte & (byte)AtaPio.Status.DRQ) != 0) break;
-                }
-            }
-        }
-
         public void Eject()
         {
             ushort[] output = new ushort[12];
@@ -211,7 +170,6 @@ namespace Cosmos.HAL.BlockDevice
         {
             // 400ns until BSR is set
             IO.Wait();
-            Console.WriteLine("[ATAPI] Polling");
 
             while (true)
             {
@@ -231,25 +189,21 @@ namespace Cosmos.HAL.BlockDevice
                     }
                 }
             }
-            Console.WriteLine("[ATAPI] Finished Polling");
         }
 
         private void CheckForErrors()
         {
             if ((IO.Status.Byte & (byte)AtaPio.Status.Error) != 0)
             {
-                Console.WriteLine("ATA Error");
                 throw new Exception("ATA Error occured!");
             }
 
             if ((IO.Status.Byte & (byte)AtaPio.Status.ATA_SR_DF) != 0)
             {
-                Console.WriteLine("ATA Device Fault");
                 throw new Exception("ATA device fault encountered!");
             }
             if ((IO.Status.Byte & (byte)AtaPio.Status.DRQ) == 0)
             {
-                Console.WriteLine("ATAPI DRQ not set");
                 //throw new Exception("ATAPI DRQ not set");
             }
         }
