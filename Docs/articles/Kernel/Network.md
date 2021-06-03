@@ -1,8 +1,8 @@
 # Network
 
-In this article we will discuss about Networking on Cosmos, how to use the Network Stack, send and received packets. For now, available protocols are **ARP**, **IPv4**, **TCP**, **UDP**, **ICMP**, **DHCP** and **DNS**. Note that Cosmos devkit must be installed for this article.
+In this article we will discuss about Networking on Cosmos, how to use the Network Stack, send and receive packets. For now, available protocols are **ARP**, **IPv4**, **TCP**, **UDP**, **ICMP**, **DHCP** and **DNS**. Note that Cosmos devkit must be installed for this article.
 
-All protocols here don't necessary support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](http://https://github.com/CosmosOS/Cosmos/issues/new/choose "repository") on our repository. 
+All protocols here don't necessary support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository. 
 
 Each protocol has a Client class which can be used to receive and send data. If a Receive() method is blocking, the method will timeout after 5 seconds or use the value optionally set by parameter. Please note that all finished connections should be closed using Close().
 
@@ -51,6 +51,26 @@ using(var xClient = new UdpClient(4242))
 
 ## TCP
 Like UDP, TCP has to create a client and call Connect() to specify the remote machine address before sending or receiving data.
+
+Server :
+```csharp
+using(var xServer = new TcpListener(4242))
+{
+    /** Start server **/
+    xServer.Start();
+    
+    /** Accept incoming TCP connection **/
+    var client = xServer.AcceptTcpClient(); //blocking
+    
+    /** Stop server **/
+    xServer.Stop();
+
+    /** Send data **/
+    client.Send(Encoding.ASCII.GetBytes(message));
+}
+```
+
+Client :
 ```csharp
 using(var xClient = new TcpClient(4242))
 {
@@ -69,7 +89,7 @@ using(var xClient = new TcpClient(4242))
 ```
 
 ## ICMP
-For ICMP, we will only able to send an ICMP echo to a distant machine and wait for its response. If another machine sends us an ICMP echo, Cosmos will automatically handle the request and reply.
+For ICMP, we will only be able to send an ICMP echo to a distant machine and wait for its response. If another machine sends us an ICMP echo, Cosmos will automatically handle the request and reply.
 ```csharp
 using(var xClient = new ICMPClient())
 {
@@ -102,7 +122,7 @@ using(var xClient = new DnsClient())
 }
 ```
 ## Utils
-## Get local IP
+## Get local IP address
 ```csharp
 Console.WriteLine(NetworkConfig.CurrentConfig.Value.IPAddress.ToString());
 ```
