@@ -33,21 +33,80 @@ namespace Cosmos.System.Network.IPv4.TCP
     internal class Tcp
     {
         /// <summary>
+        /// Connection list.
+        /// </summary>
+        internal static List<Tcp> Connections;
+
+        /// <summary>
+        /// String / enum correspondance (used for debugging)
+        /// </summary>
+        internal static string[] table;
+
+        /// <summary>
+        /// Assign connection list.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        static Tcp()
+        {
+            Connections = new List<Tcp>();
+
+            table = new string[11];
+            table[0] = "LISTEN";
+            table[1] = "SYN_SENT";
+            table[2] = "SYN_RECEIVED";
+            table[3] = "ESTABLISHED";
+            table[4] = "FIN_WAIT1";
+            table[5] = "FIN_WAIT2";
+            table[6] = "CLOSE_WAIT";
+            table[7] = "CLOSING";
+            table[8] = "LAST_ACK";
+            table[9] = "TIME_WAIT";
+            table[10] = "CLOSED";
+        }
+
+        /// <summary>
+        /// Get TCP Connection.
+        /// </summary>
+        /// <param name="localPort">Local port.</param>
+        /// <param name="remotePort">Destination port.</param>
+        /// <param name="localIp">Local IPv4 Address.</param>
+        /// <param name="remoteIp">Remote IPv4 Address.</param>
+        /// <returns>Tcp</returns>
+        internal static Tcp GetConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
+        {
+            foreach (var con in Connections)
+            {
+                if (con.Equals(localPort, remotePort, localIp, remoteIp))
+                {
+                    return con;
+                }
+                else if (con.LocalPort.Equals(localPort) && con.Status == Status.LISTEN)
+                {
+                    return con;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Local port.
         /// </summary>
-        internal int localPort;
-        /// <summary>
-        /// Source address.
-        /// </summary>
-        internal Address source;
-        /// <summary>
-        /// Destination address.
-        /// </summary>
-        internal Address destination;
+        internal ushort LocalPort;
+
         /// <summary>
         /// Destination port.
         /// </summary>
-        internal int destinationPort;
+        internal ushort RemotePort;
+
+        /// <summary>
+        /// Source address.
+        /// </summary>
+        internal Address LocalAddress;
+
+        /// <summary>
+        /// Destination address.
+        /// </summary>
+        internal Address RemoteAddress;
 
         /// <summary>
         /// RX buffer queue.
@@ -84,27 +143,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal byte[] Data;
 
-        /// <summary>
-        /// String / enum correspondance (used for debugging)
-        /// </summary>
-        internal string[] table;
-
-        public Tcp()
+        public Tcp(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
-            WaitingAck = false;
+            LocalPort = localPort;
+            RemotePort = remotePort;
+            LocalAddress = localIp;
+            RemoteAddress = remoteIp;
 
-            table = new string[11];
-            table[0] = "LISTEN";
-            table[1] = "SYN_SENT";
-            table[2] = "SYN_RECEIVED";
-            table[3] = "ESTABLISHED";
-            table[4] = "FIN_WAIT1";
-            table[5] = "FIN_WAIT2";
-            table[6] = "CLOSE_WAIT";
-            table[7] = "CLOSING";
-            table[8] = "LAST_ACK";
-            table[9] = "TIME_WAIT";
-            table[10] = "CLOSED";
+            WaitingAck = false;
         }
 
         /// <summary>
@@ -186,15 +232,15 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.SYN_RECEIVED;
 
-                source = IPConfig.FindNetwork(packet.SourceIP);
+                LocalAddress = IPConfig.FindNetwork(packet.SourceIP);
 
                 AckNumber = packet.SequenceNumber + 1;
 
                 var rnd = new Random();
                 SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
 
-                destination = packet.SourceIP;
-                destinationPort = packet.SourcePort;
+                RemoteAddress = packet.SourceIP;
+                RemotePort = packet.SourcePort;
 
                 SendEmptyPacket(Flags.SYN | Flags.ACK);
             }
@@ -467,10 +513,18 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         private void SendEmptyPacket(Flags flag)
         {
-            var packet = new TCPPacket(source, destination, (ushort)localPort, (ushort)destinationPort, SequenceNumber, AckNumber, 20, (byte)flag, 0xFAF0, 0);
+            var packet = new TCPPacket(LocalAddress, RemoteAddress, (ushort)LocalPort, (ushort)RemotePort, SequenceNumber, AckNumber, 20, (byte)flag, 0xFAF0, 0);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
+        }
+
+        /// <summary>
+        /// Equals connection
+        /// </summary>
+        internal bool Equals(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
+        {
+            return LocalPort.Equals(localPort) && RemotePort.Equals(remotePort) && LocalAddress.Hash.Equals(localIp.Hash) && RemoteAddress.Hash.Equals(remoteIp.Hash);
         }
 
         #endregion

@@ -26,39 +26,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal Tcp StateMachine;
 
         /// <summary>
-        /// Clients dictionary.
-        /// </summary>
-        private static Dictionary<uint, TcpClient> clients;
-
-        /// <summary>
-        /// Assign clients dictionary.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        static TcpClient()
-        {
-            clients = new Dictionary<uint, TcpClient>();
-        }
-
-        /// <summary>
-        /// Get client.
-        /// </summary>
-        /// <param name="destPort">Destination port.</param>
-        /// <returns>TcpClient</returns>
-        internal static TcpClient GetClient(ushort destPort)
-        {
-            TcpClient client;
-
-            if (clients.TryGetValue(destPort, out client))
-            {
-                return client;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Create new instance of the <see cref="TcpClient"/> class.
         /// </summary>
         /// <param name="stateMachine">Tcp state machine.</param>
@@ -67,11 +34,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal TcpClient(Tcp stateMachine)
         {
             StateMachine = stateMachine;
-
-            if (StateMachine.localPort > 0)
-            {
-                clients.Add((uint)StateMachine.localPort, this);
-            }
         }
 
         /// <summary>
@@ -82,18 +44,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
         public TcpClient(int localPort)
         {
-            StateMachine = new Tcp();
+            StateMachine = new Tcp((ushort)localPort, 0, Address.Zero, Address.Zero);
 
             StateMachine.rxBuffer = new Queue<TCPPacket>(8);
 
             StateMachine.Status = Status.CLOSED;
             StateMachine.LastSequenceNumber = 0;
-
-            StateMachine.localPort = localPort;
-            if (localPort > 0)
-            {
-                clients.Add((uint)localPort, this);
-            }
         }
 
         /// <summary>
@@ -106,8 +62,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         public TcpClient(Address dest, int destPort)
             : this(0)
         {
-            StateMachine.destination = dest;
-            StateMachine.destinationPort = destPort;
+            StateMachine.RemoteAddress = dest;
+            StateMachine.RemotePort = (ushort)destPort;
         }
 
         /// <summary>
@@ -123,17 +79,19 @@ namespace Cosmos.System.Network.IPv4.TCP
                 throw new Exception("Client must be closed before setting a new connection.");
             }
 
-            StateMachine.destination = dest;
-            StateMachine.destinationPort = destPort;
+            StateMachine.RemoteAddress = dest;
+            StateMachine.RemotePort = (ushort)destPort;
 
-            StateMachine.source = IPConfig.FindNetwork(dest);
+            StateMachine.LocalAddress = IPConfig.FindNetwork(dest);
 
             //Generate Random Sequence Number
             var rnd = new Random();
             StateMachine.SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
 
+            Tcp.Connections.Add(StateMachine);
+
             // Flags=0x02 -> Syn
-            var packet = new TCPPacket(StateMachine.source, StateMachine.destination, (ushort)StateMachine.localPort, (ushort)destPort, StateMachine.SequenceNumber, 0, 20, (byte)Flags.SYN, 0xFAF0, 0);
+            var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)destPort, StateMachine.SequenceNumber, 0, 20, (byte)Flags.SYN, 0xFAF0, 0);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
@@ -159,7 +117,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             if (StateMachine.Status == Status.ESTABLISHED)
             {
-                var packet = new TCPPacket(StateMachine.source, StateMachine.destination, (ushort)StateMachine.localPort, (ushort)StateMachine.destinationPort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, (byte)(Flags.FIN | Flags.ACK), 0xFAF0, 0);
+                var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)StateMachine.RemotePort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, (byte)(Flags.FIN | Flags.ACK), 0xFAF0, 0);
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
 
@@ -173,9 +131,13 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
             }
 
-            if (clients.ContainsKey((uint)StateMachine.localPort))
+            for (int i = 0; i < Tcp.Connections.Count; i++)
             {
-                clients.Remove((uint)StateMachine.localPort);
+                if (Tcp.Connections[i].Equals(StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.LocalAddress, StateMachine.RemoteAddress))
+                {
+                    Tcp.Connections.RemoveAt(i);
+                    return;
+                }
             }
         }
 
@@ -190,7 +152,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public void Send(byte[] data)
         {
-            if ((StateMachine.destination == null) || (StateMachine.destinationPort == 0))
+            if ((StateMachine.RemoteAddress == null) || (StateMachine.RemotePort == 0))
             {
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
@@ -204,7 +166,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 for (int i = 0; i < chunks.Length; i++)
                 {
-                    var packet = new TCPPacket(StateMachine.source, StateMachine.destination, (ushort)StateMachine.localPort, (ushort)StateMachine.destinationPort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), 0xFAF0, 0, chunks[i]);
+                    var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)StateMachine.RemotePort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), 0xFAF0, 0, chunks[i]);
                     OutgoingBuffer.AddPacket(packet);
                     NetworkStack.Update();
 
@@ -213,7 +175,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else
             {
-                var packet = new TCPPacket(StateMachine.source, StateMachine.destination, (ushort)StateMachine.localPort, (ushort)StateMachine.destinationPort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, (byte)(Flags.PSH | Flags.ACK), 0xFAF0, 0, data);
+                var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)StateMachine.RemotePort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, (byte)(Flags.PSH | Flags.ACK), 0xFAF0, 0, data);
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
 

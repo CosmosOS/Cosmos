@@ -130,7 +130,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             {
                 var client = tcpListener.AcceptTcpClient();
 
-                global::System.Console.WriteLine("Client[0] : New connection from " + client.StateMachine.source.ToString());
+                global::System.Console.WriteLine("Client[0] : New connection from " + client.StateMachine.LocalAddress.ToString());
 
                 ReceiveNewClient(client);
             }
@@ -171,6 +171,12 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             {
                 int i = data.IndexOf(" ") + 1;
                 command.Content = data.Substring(i);
+
+                while (command.Content.StartsWith("/"))
+                {
+                    command.Content = command.Content.Remove(0, 1);
+                }
+
                 command.Content = command.Content.Replace('/', '\\');
             }
 
@@ -351,7 +357,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             {
                 //TODO: Find port dynamically.
                 int port = 20;
-                var address = ftpClient.Discussion.StateMachine.source.ToByteArray();
+                var address = ftpClient.Discussion.StateMachine.LocalAddress.ToByteArray();
 
                 ftpClient.SendReply(227, $"Entering Passive Mode ({address[0]},{address[1]},{address[2]},{address[3]},{port / 256},{port % 256})");
 
@@ -382,6 +388,8 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 else if (ftpClient.Mode == TransferMode.PASV)
                 {
+                    ftpClient.SendReply(150, "Opening data connection.");
+
                     ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
                     ftpClient.DataListener.Stop();
 
@@ -406,9 +414,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
 
                     ftpClient.Data.Send(Encoding.ASCII.GetBytes(sb.ToString()));
 
-                    ftpClient.SendReply(226, "Closing data connection.");
-
                     ftpClient.Data.Close();
+
+                    ftpClient.SendReply(226, "Transfer complete.");
                 }
             }
         }
@@ -558,6 +566,8 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 else if (ftpClient.Mode == TransferMode.PASV)
                 {
+                    ftpClient.SendReply(150, "Opening data connection.");
+
                     ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
                     ftpClient.DataListener.Stop();
 
@@ -573,9 +583,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                         ftpClient.SendReply(550, "Requested action not taken.");
                     }
 
-                    ftpClient.SendReply(226, "Closing data connection.");
-
                     ftpClient.Data.Close();
+
+                    ftpClient.SendReply(226, "Transfer complete.");
                 }
             }
         }
@@ -605,6 +615,8 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 else if (ftpClient.Mode == TransferMode.PASV)
                 {
+                    ftpClient.SendReply(150, "Opening data connection.");
+
                     ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
                     ftpClient.DataListener.Stop();
 
@@ -618,9 +630,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                         ftpClient.SendReply(550, "Requested action not taken.");
                     }
 
-                    ftpClient.SendReply(226, "Closing data connection.");
-
                     ftpClient.Data.Close();
+
+                    ftpClient.SendReply(226, "Transfer complete.");
                 }
             }
         }
