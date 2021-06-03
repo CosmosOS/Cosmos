@@ -13,7 +13,6 @@ namespace Cosmos.System.Tests
 {
     class VFSManagerTest
     {
-        CosmosVFS vfs = new CosmosVFS();
         [SetUp]
         public void Setup()
         {
@@ -22,7 +21,7 @@ namespace Cosmos.System.Tests
             var xPartition = new Partition(xDevice, 0, xDevice.BlockCount);
             BlockDevice.Devices.Clear();
             BlockDevice.Devices.Add(xPartition);
-            VFSManager.RegisterVFS(vfs, true);
+            VFSManager.RegisterVFS(new CosmosVFS(), true);
         }
 
         [Test]
@@ -35,8 +34,9 @@ namespace Cosmos.System.Tests
             Assert.AreEqual(0, VFSManager.GetDirectoryListing(root).Count);
             VFSManager.CreateFile(root + "\\test.txt");
             Assert.IsNotNull(VFSManager.GetFile(root + "\\test.txt"));
-            Assert.IsTrue(vfs.Disks.Count != 0);
-            foreach (var item in vfs.Disks)
+            var disks = VFSManager.GetDisks();
+            Assert.IsTrue(disks.Count != 0);
+            foreach (var item in disks)
             {
                 Assert.IsTrue(item.Size != 0);
                 Assert.IsTrue(item.Partitions.Count != 0);

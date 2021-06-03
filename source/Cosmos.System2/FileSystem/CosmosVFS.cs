@@ -895,5 +895,10 @@ namespace Cosmos.System.FileSystem
 
             return s;
         }
+
+        public override List<Disk> GetDisks()
+        {
+            return disks;
+        }
     }
 }

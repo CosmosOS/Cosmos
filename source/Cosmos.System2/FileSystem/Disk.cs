@@ -21,7 +21,18 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// List of partitions
         /// </summary>
-        public List<ManagedPartition> Partitions { get { return parts; } }
+        public List<ManagedPartition> Partitions
+        {
+            get
+            {
+                var converted = new List<ManagedPartition>();
+                foreach (var item in partitioningType.GetPartitions())
+                {
+                    converted.Add(new ManagedPartition(item));
+                }
+                return converted;
+            }
+        }
         /// <summary>
         /// List of file systems.
         /// </summary>
@@ -30,28 +41,6 @@ namespace Cosmos.System.FileSystem
         /// Main blockdevice that has all of the partitions.
         /// </summary>
         public BlockDevice Host;
-        /// <summary>
-        /// The Master Boot record (MBR) of the drive.
-        /// </summary>
-        public byte[] MBR
-        {
-            get
-            {
-                var xMBRData = new byte[512];
-
-                Host.ReadBlock(0, 1, ref xMBRData);
-
-                return xMBRData;
-            }
-            set
-            {
-                if (value.Length != 512)
-                {
-                    throw new Exception("MBR must be 512 bytes.");
-                }
-                Host.WriteBlock(0, 1, ref value);
-            }
-        }
         public Disk(BlockDevice mainBlockDevice)
         {
             Host = mainBlockDevice;
@@ -127,7 +116,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="NotImplementedException">Thrown if partition type is GPT.</exception>
         public void CreatePartion(int size)
         {
-            if(size == 0 | size < 0)
+            if (size == 0 | size < 0)
             {
                 throw new ArgumentException("size");
             }

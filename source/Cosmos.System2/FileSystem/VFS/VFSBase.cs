@@ -174,5 +174,10 @@ namespace Cosmos.System.FileSystem.VFS
         /// </summary>
         /// <returns>Example: 0 or c</returns>
         public abstract string GetNextFilesystemLetter();
+        /// <summary>
+        /// Gets all of the disks
+        /// </summary>
+        /// <returns>All of the disks on the system</returns>
+        public abstract List<Disk> GetDisks();
     }
 }

@@ -65,11 +65,7 @@ namespace Cosmos.HAL.BlockDevice
         }
         public override bool IsType()
         {
-            if (Partitions.Count == 0)
-            {
-                return false;
-            }
-            return true;
+            return Partitions.Count != 0;
         }
         public override List<Partition> GetPartitions()
         {

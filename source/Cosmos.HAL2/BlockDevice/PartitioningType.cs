@@ -10,7 +10,7 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="device">The device</param>
         /// <returns>True/False</returns>
-        public abstract bool IsType();
+        public static abstract bool IsType();
         /// <summary>
         /// Gets all partitons
         /// </summary>

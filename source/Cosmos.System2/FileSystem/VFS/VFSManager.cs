@@ -1173,11 +1173,20 @@ namespace Cosmos.System.FileSystem.VFS
         /// <summary>
         /// Gets the next file system letter. For internal cosmos use only.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Next file system letter</returns>
         public static string GetNextFilesystemLetter()
         {
             ThrowIfNotRegistered();
             return mVFS.GetNextFilesystemLetter();
+        }
+        /// <summary>
+        /// Gets all of the disks
+        /// </summary>
+        /// <returns>All of the disks on the system</returns>
+        public static List<Disk> GetDisks()
+        {
+            ThrowIfNotRegistered();
+            return mVFS.GetDisks();
         }
         /// <summary>
         /// Throws an Exception if VFS is not registered.
