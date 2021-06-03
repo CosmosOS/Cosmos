@@ -104,7 +104,9 @@ namespace Cosmos.Core.IOGroup
             AlternateStatus = new IOPortRead(xBAR1, 2);
             Control = new IOPortWrite(xBAR1, 2);
         }
-
+        /// <summary>
+        /// Waits for IO operations to complete.
+        /// </summary>
         public void Wait()
         {
             // Used for the PATA and IOPort latency
@@ -115,13 +117,21 @@ namespace Cosmos.Core.IOGroup
             wait = Status.Byte;
             wait = Status.Byte;
         }
-
+        /// <summary>
+        /// Get control base address.
+        /// </summary>
+        /// <param name="aSecondary">True if secondary ATA.</param>
+        /// <returns>ushort value.</returns>
         private static ushort GetBAR1(bool aSecondary)
         {
             ushort xBAR1 = (ushort)(aSecondary ? 0x0374 : 0x03F4);
             return xBAR1;
         }
-
+        /// <summary>
+        /// Get command base address.
+        /// </summary>
+        /// <param name="aSecondary">True if secondary ATA.</param>
+        /// <returns>ushort value.</returns>
         private static ushort GetBAR0(bool aSecondary)
         {
             ushort xBAR0 = (ushort)(aSecondary ? 0x0170 : 0x01F0);
