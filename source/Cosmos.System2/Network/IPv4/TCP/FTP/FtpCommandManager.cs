@@ -181,15 +181,16 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 try
                 {
-                    if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
+                    if (command.Content.Length == 2) //root check
                     {
-                        CurrentDirectory = CurrentDirectory + "\\" + command.Content;
+                        command.Content += "\\";
+                    }
+
+                    if (Directory.Exists(command.Content))
+                    {
+                        CurrentDirectory = command.Content;
                         Directory.SetCurrentDirectory(CurrentDirectory);
                         ftpClient.SendReply(250, "Requested file action okay.");
-                    }
-                    else if (File.Exists(CurrentDirectory + command.Content))
-                    {
-                        ftpClient.SendReply(550, "Requested action not taken.");
                     }
                     else
                     {
@@ -345,9 +346,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 try
                 {
-                    if (File.Exists(CurrentDirectory + "\\" + command.Command))
+                    if (File.Exists(CurrentDirectory + "\\" + command.Content))
                     {
-                        File.Delete(CurrentDirectory + "\\" + command.Command);
+                        File.Delete(CurrentDirectory + "\\" + command.Content);
                         ftpClient.SendReply(250, "Requested file action okay, completed.");
                     }
                     else
@@ -378,9 +379,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 try
                 {
-                    if (Directory.Exists(CurrentDirectory + "\\" + command.Command))
+                    if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
                     {
-                        Directory.Delete(CurrentDirectory + "\\" + command.Command, true);
+                        Directory.Delete(CurrentDirectory + "\\" + command.Content, true);
                         ftpClient.SendReply(200, "Command okay.");
                     }
                     else
@@ -411,13 +412,13 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 }
                 try
                 {
-                    if (Directory.Exists(CurrentDirectory + "\\" + command.Command))
+                    if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
                     {
                         ftpClient.SendReply(550, "Requested action not taken.");
                     }
                     else
                     {
-                        Directory.CreateDirectory(CurrentDirectory + "\\" + command.Command);
+                        Directory.CreateDirectory(CurrentDirectory + "\\" + command.Content);
                         ftpClient.SendReply(200, "Command okay.");
                     }
                 }
