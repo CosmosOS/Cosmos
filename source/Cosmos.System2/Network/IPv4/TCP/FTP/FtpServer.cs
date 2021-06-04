@@ -234,6 +234,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 case "LIST":
                     ProcessList(ftpClient, command);
                     break;
+                case "TYPE":
+                    ftpClient.SendReply(200, "Command okay.");
+                    break;
                 default:
                     ftpClient.SendReply(500, "Unknown command.");
                     break;
