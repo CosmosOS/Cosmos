@@ -25,8 +25,6 @@ using(var xClient = new DHCPClient())
     /** Send a DHCP Discover packet **/
     //This will automatically set the IP config after DHCP response
     xClient.SendDiscoverPacket();
-
-    xClient.Close();  //don't forget to close!
 }
 ```
 
@@ -44,8 +42,6 @@ using(var xClient = new UdpClient(4242))
     var endpoint = new EndPoint(Address.Zero, 0);
     var data = xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
     var data2 = xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
-
-    xClient.Close();
 }
 ```
 
@@ -83,8 +79,6 @@ using(var xClient = new TcpClient(4242))
     var endpoint = new EndPoint(Address.Zero, 0);
     var data = xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
     var data2 = xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
-
-    xClient.Close();
 }
 ```
 
@@ -100,8 +94,6 @@ using(var xClient = new ICMPClient())
 
     /** Receive ICMP Response **/
     int time = xClient.Receive(ref endpoint); //return elapsed time / timeout if no response
-
-    xClient.Close();
 }
 
 ```
@@ -117,8 +109,6 @@ using(var xClient = new DnsClient())
 
     /** Receive DNS Response **/
     Address destination = xClient.Receive(); //can set a timeout value
-    
-    xClient.Close();
 }
 ```
 ## Utils
