@@ -126,11 +126,10 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
 
         public void Listen()
         {
-            tcpListener = new TcpListener(21);
-            tcpListener.Start();
-
             while (Listening)
             {
+                tcpListener = new TcpListener(21);
+                tcpListener.Start();
                 var client = tcpListener.AcceptTcpClient();
 
                 global::System.Console.WriteLine("Client[0] : New connection from " + client.StateMachine.LocalAddress.ToString());
@@ -149,12 +148,6 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             {
                 ReceiveRequest(ftpClient);
             }
-
-            ftpClient.SendReply(221, "Service closing control connection.");
-
-            ftpClient.Control.Close();
-
-            ftpClients.Add(ftpClient);
         }
 
         public void ReceiveRequest(FtpClient ftpClient)
@@ -206,6 +199,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     ProcessCdup(ftpClient, command);
                     break;
                 case "QUIT":
+                    ProcessQuit(ftpClient, command);
                     break;
                 case "DELE":
                     ProcessDele(ftpClient, command);
@@ -220,10 +214,13 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     ProcessPort(ftpClient, command);
                     break;
                 case "HELP":
+                    ftpClient.SendReply(200, "Help done.");
                     break;
                 case "NOOP":
+                    ftpClient.SendReply(200, "Command okay.");
                     break;
                 case "RETR":
+                    ProcessRetr(ftpClient, command);
                     break;
                 case "STOR":
                     ProcessStor(ftpClient, command);
@@ -238,7 +235,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     ProcessList(ftpClient, command);
                     break;
                 default:
-                    ftpClient.SendReply(200, "Unknown command.");
+                    ftpClient.SendReply(500, "Unknown command.");
                     break;
             }
         }
@@ -382,10 +379,13 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             if (ftpClient.IsConnected())
             {
                 var splitted = command.Content.Split(',');
-                ftpClient.Address = new Address(Byte.Parse(splitted[0]), Byte.Parse(splitted[1]), Byte.Parse(splitted[2]), Byte.Parse(splitted[3]));
+
+                ftpClient.Address = new Address((byte)int.Parse(splitted[0]), (byte)int.Parse(splitted[1]), (byte)int.Parse(splitted[2]), (byte)int.Parse(splitted[3]));
                 ftpClient.port = Int32.Parse(splitted[4]) * 256 + Int32.Parse(splitted[5]);
 
                 ftpClient.SendReply(227, "Entering Active Mode.");
+
+                ftpClient.Data = new TcpClient(ftpClient.port);
 
                 ftpClient.Mode = TransferMode.ACTV;
             }
@@ -620,17 +620,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
 
         private void DoStor(FtpClient ftpClient, FtpCommand command)
         {
-            Global.mDebugger.Send("Preparing to receive...");
-
             var ep = new EndPoint(Address.Zero, 0);
             var data = ftpClient.Data.Receive(ref ep);
 
-            Global.mDebugger.Send("Data received!");
-
             try
             {
-                Global.mDebugger.Send("CurrentDirectory=" + CurrentDirectory);
-                Global.mDebugger.Send("File path       =" + CurrentDirectory + "\\" + command.Content);
                 File.WriteAllBytes(CurrentDirectory + "\\" + command.Content, data);
             }
             catch
@@ -638,11 +632,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 ftpClient.SendReply(550, "Requested action not taken.");
             }
 
-            Global.mDebugger.Send("Closing...");
-
             ftpClient.Data.Close();
-
-            Global.mDebugger.Send("CLOSED");
 
             ftpClient.SendReply(226, "Transfer complete.");
         }
@@ -693,6 +683,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             try
             {
                 var data = File.ReadAllBytes(CurrentDirectory + "\\" + command.Content);
+
                 ftpClient.Data.Send(data);
             }
             catch
@@ -703,6 +694,18 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             ftpClient.Data.Close();
 
             ftpClient.SendReply(226, "Transfer complete.");
+        }
+
+        /// <summary>
+        /// Process QUIT command.
+        /// </summary>
+        /// <param name="ftpClient">FTP Client.</param>
+        /// <param name="command">FTP Command.</param>
+        public void ProcessQuit(FtpClient ftpClient, FtpCommand command)
+        {
+            ftpClient.SendReply(221, "Service closing control connection.");
+
+            ftpClient.Control.Close();
         }
 
         public void Close()

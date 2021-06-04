@@ -74,7 +74,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not CLOSED.</exception>
         public void Connect(Address dest, int destPort, int timeout = 5000)
         {
-            if (StateMachine.Status != Status.CLOSED)
+            if (StateMachine.Status == Status.ESTABLISHED)
             {
                 throw new Exception("Client must be closed before setting a new connection.");
             }
