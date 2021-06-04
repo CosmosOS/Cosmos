@@ -46,65 +46,73 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessRequest(FtpClient ftpClient, FtpCommand command)
         {
-            switch (command.Command)
+            if (command.Command == "USER")
             {
-                case "USER":
-                    ProcessUser(ftpClient, command);
-                    break;
-                case "PASS":
-                    ProcessPass(ftpClient, command);
-                    break;
-                case "CWD":
-                    ProcessCwd(ftpClient, command);
-                    break;
-                case "SYST":
-                    ftpClient.SendReply(215, "CosmosOS");
-                    break;
-                case "CDUP":
-                    ProcessCdup(ftpClient, command);
-                    break;
-                case "QUIT":
-                    ProcessQuit(ftpClient, command);
-                    break;
-                case "DELE":
-                    ProcessDele(ftpClient, command);
-                    break;
-                case "PWD":
-                    ProcessPwd(ftpClient, command);
-                    break;
-                case "PASV":
-                    ProcessPasv(ftpClient, command);
-                    break;
-                case "PORT":
-                    ProcessPort(ftpClient, command);
-                    break;
-                case "HELP":
-                    ftpClient.SendReply(200, "Help done.");
-                    break;
-                case "NOOP":
-                    ftpClient.SendReply(200, "Command okay.");
-                    break;
-                case "RETR":
-                    ProcessRetr(ftpClient, command);
-                    break;
-                case "STOR":
-                    ProcessStor(ftpClient, command);
-                    break;
-                case "RMD":
-                    ProcessRmd(ftpClient, command);
-                    break;
-                case "MKD":
-                    ProcessMkd(ftpClient, command);
-                    break;
-                case "LIST":
-                    ProcessList(ftpClient, command);
-                    break;
-                case "TYPE":
-                    ftpClient.SendReply(200, "Command okay.");
-                    break;
-                default:
-                    ftpClient.SendReply(500, "Unknown command.");
-                    break;
+                ProcessUser(ftpClient, command);
+            }
+            else if (command.Command == "PASS")
+            {
+                ProcessPass(ftpClient, command);
+            }
+            else
+            {
+                if (ftpClient.IsConnected())
+                {
+                    switch (command.Command)
+                    {
+                        case "CWD":
+                            ProcessCwd(ftpClient, command);
+                            break;
+                        case "SYST":
+                            ftpClient.SendReply(215, "CosmosOS");
+                            break;
+                        case "CDUP":
+                            ProcessCdup(ftpClient, command);
+                            break;
+                        case "QUIT":
+                            ProcessQuit(ftpClient, command);
+                            break;
+                        case "DELE":
+                            ProcessDele(ftpClient, command);
+                            break;
+                        case "PWD":
+                            ProcessPwd(ftpClient, command);
+                            break;
+                        case "PASV":
+                            ProcessPasv(ftpClient, command);
+                            break;
+                        case "PORT":
+                            ProcessPort(ftpClient, command);
+                            break;
+                        case "HELP":
+                            ftpClient.SendReply(200, "Help done.");
+                            break;
+                        case "NOOP":
+                            ftpClient.SendReply(200, "Command okay.");
+                            break;
+                        case "RETR":
+                            ProcessRetr(ftpClient, command);
+                            break;
+                        case "STOR":
+                            ProcessStor(ftpClient, command);
+                            break;
+                        case "RMD":
+                            ProcessRmd(ftpClient, command);
+                            break;
+                        case "MKD":
+                            ProcessMkd(ftpClient, command);
+                            break;
+                        case "LIST":
+                            ProcessList(ftpClient, command);
+                            break;
+                        case "TYPE":
+                            ftpClient.SendReply(200, "Command okay.");
+                            break;
+                        default:
+                            ftpClient.SendReply(500, "Unknown command.");
+                            break;
+                    }
+                }
             }
         }
 
@@ -172,35 +180,32 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessCwd(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
+            if (String.IsNullOrEmpty(command.Content))
             {
-                if (String.IsNullOrEmpty(command.Content))
+                ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                return;
+            }
+            try
+            {
+                if (command.Content.Length == 2) //root check
                 {
-                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
-                    return;
+                    command.Content += "\\";
                 }
-                try
-                {
-                    if (command.Content.Length == 2) //root check
-                    {
-                        command.Content += "\\";
-                    }
 
-                    if (Directory.Exists(command.Content))
-                    {
-                        CurrentDirectory = command.Content;
-                        Directory.SetCurrentDirectory(CurrentDirectory);
-                        ftpClient.SendReply(250, "Requested file action okay.");
-                    }
-                    else
-                    {
-                        ftpClient.SendReply(550, "Requested action not taken.");
-                    }
+                if (Directory.Exists(command.Content))
+                {
+                    CurrentDirectory = command.Content;
+                    Directory.SetCurrentDirectory(CurrentDirectory);
+                    ftpClient.SendReply(250, "Requested file action okay.");
                 }
-                catch
+                else
                 {
                     ftpClient.SendReply(550, "Requested action not taken.");
                 }
+            }
+            catch
+            {
+                ftpClient.SendReply(550, "Requested action not taken.");
             }
         }
 
@@ -211,10 +216,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessPwd(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
-            {
-                ftpClient.SendReply(257, "/" + CurrentDirectory + " created.");
-            }
+            ftpClient.SendReply(257, "/" + CurrentDirectory + " created.");
         }
 
         /// <summary>
@@ -224,19 +226,16 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessPasv(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
-            {
-                //TODO: Find port dynamically.
-                int port = 20;
-                var address = ftpClient.Control.StateMachine.LocalAddress.ToByteArray();
+            //TODO: Find port dynamically.
+            int port = 20;
+            var address = ftpClient.Control.StateMachine.LocalAddress.ToByteArray();
 
-                ftpClient.SendReply(227, $"Entering Passive Mode ({address[0]},{address[1]},{address[2]},{address[3]},{port / 256},{port % 256})");
+            ftpClient.SendReply(227, $"Entering Passive Mode ({address[0]},{address[1]},{address[2]},{address[3]},{port / 256},{port % 256})");
 
-                ftpClient.DataListener = new TcpListener(port);
-                ftpClient.DataListener.Start();
+            ftpClient.DataListener = new TcpListener(port);
+            ftpClient.DataListener.Start();
 
-                ftpClient.Mode = TransferMode.PASV;
-            }
+            ftpClient.Mode = TransferMode.PASV;
         }
 
         /// <summary>
@@ -246,19 +245,16 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessPort(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
-            {
-                var splitted = command.Content.Split(',');
+            var splitted = command.Content.Split(',');
 
-                ftpClient.Address = new Address((byte)int.Parse(splitted[0]), (byte)int.Parse(splitted[1]), (byte)int.Parse(splitted[2]), (byte)int.Parse(splitted[3]));
-                ftpClient.Port = Int32.Parse(splitted[4]) * 256 + Int32.Parse(splitted[5]);
+            ftpClient.Address = new Address((byte)int.Parse(splitted[0]), (byte)int.Parse(splitted[1]), (byte)int.Parse(splitted[2]), (byte)int.Parse(splitted[3]));
+            ftpClient.Port = Int32.Parse(splitted[4]) * 256 + Int32.Parse(splitted[5]);
 
-                ftpClient.SendReply(227, "Entering Active Mode.");
+            ftpClient.SendReply(227, "Entering Active Mode.");
 
-                ftpClient.Data = new TcpClient(ftpClient.Port);
+            ftpClient.Data = new TcpClient(ftpClient.Port);
 
-                ftpClient.Mode = TransferMode.ACTV;
-            }
+            ftpClient.Mode = TransferMode.ACTV;
         }
 
         /// <summary>
@@ -268,32 +264,29 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessList(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
+            try
             {
-                try
-                {
-                    if (ftpClient.Mode == TransferMode.NONE)
-                    {
-                        ftpClient.SendReply(425, "Can't open data connection.");
-                    }
-                    else if (ftpClient.Mode == TransferMode.ACTV)
-                    {
-                        ftpClient.Data.Connect(ftpClient.Address, ftpClient.Port);
-
-                        DoList(ftpClient, command);
-                    }
-                    else if (ftpClient.Mode == TransferMode.PASV)
-                    {
-                        ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
-                        ftpClient.DataListener.Stop();
-
-                        DoList(ftpClient, command);
-                    }
-                }
-                catch
+                if (ftpClient.Mode == TransferMode.NONE)
                 {
                     ftpClient.SendReply(425, "Can't open data connection.");
                 }
+                else if (ftpClient.Mode == TransferMode.ACTV)
+                {
+                    ftpClient.Data.Connect(ftpClient.Address, ftpClient.Port);
+
+                    DoList(ftpClient, command);
+                }
+                else if (ftpClient.Mode == TransferMode.PASV)
+                {
+                    ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
+                    ftpClient.DataListener.Stop();
+
+                    DoList(ftpClient, command);
+                }
+            }
+            catch
+            {
+                ftpClient.SendReply(425, "Can't open data connection.");
             }
         }
 
@@ -337,29 +330,26 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessDele(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
+            if (String.IsNullOrEmpty(command.Content))
             {
-                if (String.IsNullOrEmpty(command.Content))
+                ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                return;
+            }
+            try
+            {
+                if (File.Exists(CurrentDirectory + "\\" + command.Content))
                 {
-                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
-                    return;
+                    File.Delete(CurrentDirectory + "\\" + command.Content);
+                    ftpClient.SendReply(250, "Requested file action okay, completed.");
                 }
-                try
-                {
-                    if (File.Exists(CurrentDirectory + "\\" + command.Content))
-                    {
-                        File.Delete(CurrentDirectory + "\\" + command.Content);
-                        ftpClient.SendReply(250, "Requested file action okay, completed.");
-                    }
-                    else
-                    {
-                        ftpClient.SendReply(550, "Requested action not taken.");
-                    }
-                }
-                catch
+                else
                 {
                     ftpClient.SendReply(550, "Requested action not taken.");
                 }
+            }
+            catch
+            {
+                ftpClient.SendReply(550, "Requested action not taken.");
             }
         }
 
@@ -370,29 +360,26 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessRmd(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
+            if (String.IsNullOrEmpty(command.Content))
             {
-                if (String.IsNullOrEmpty(command.Content))
+                ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                return;
+            }
+            try
+            {
+                if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
                 {
-                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
-                    return;
+                    Directory.Delete(CurrentDirectory + "\\" + command.Content, true);
+                    ftpClient.SendReply(200, "Command okay.");
                 }
-                try
-                {
-                    if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
-                    {
-                        Directory.Delete(CurrentDirectory + "\\" + command.Content, true);
-                        ftpClient.SendReply(200, "Command okay.");
-                    }
-                    else
-                    {
-                        ftpClient.SendReply(550, "Requested action not taken.");
-                    }
-                }
-                catch
+                else
                 {
                     ftpClient.SendReply(550, "Requested action not taken.");
                 }
+            }
+            catch
+            {
+                ftpClient.SendReply(550, "Requested action not taken.");
             }
         }
 
@@ -403,29 +390,26 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessMkd(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
+            if (String.IsNullOrEmpty(command.Content))
             {
-                if (String.IsNullOrEmpty(command.Content))
-                {
-                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
-                    return;
-                }
-                try
-                {
-                    if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
-                    {
-                        ftpClient.SendReply(550, "Requested action not taken.");
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(CurrentDirectory + "\\" + command.Content);
-                        ftpClient.SendReply(200, "Command okay.");
-                    }
-                }
-                catch
+                ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                return;
+            }
+            try
+            {
+                if (Directory.Exists(CurrentDirectory + "\\" + command.Content))
                 {
                     ftpClient.SendReply(550, "Requested action not taken.");
                 }
+                else
+                {
+                    Directory.CreateDirectory(CurrentDirectory + "\\" + command.Content);
+                    ftpClient.SendReply(200, "Command okay.");
+                }
+            }
+            catch
+            {
+                ftpClient.SendReply(550, "Requested action not taken.");
             }
         }
 
@@ -436,17 +420,14 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessCdup(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
+            try
             {
-                try
-                {
-                    CurrentDirectory = new DirectoryInfo(CurrentDirectory).Parent.FullName;
-                    ftpClient.SendReply(250, "Requested file action okay.");
-                }
-                catch
-                {
-                    ftpClient.SendReply(550, "Requested action not taken.");
-                }
+                CurrentDirectory = new DirectoryInfo(CurrentDirectory).Parent.FullName;
+                ftpClient.SendReply(250, "Requested file action okay.");
+            }
+            catch
+            {
+                ftpClient.SendReply(550, "Requested action not taken.");
             }
         }
 
@@ -457,39 +438,36 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessStor(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
+            if (String.IsNullOrEmpty(command.Content))
             {
-                if (String.IsNullOrEmpty(command.Content))
-                {
-                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
-                    return;
-                }
-                try
-                {
-                    if (ftpClient.Mode == TransferMode.NONE)
-                    {
-                        ftpClient.SendReply(425, "Can't open data connection.");
-                    }
-                    else if (ftpClient.Mode == TransferMode.ACTV)
-                    {
-                        ftpClient.Data.Connect(ftpClient.Address, ftpClient.Port);
-
-                        DoStor(ftpClient, command);
-                    }
-                    else if (ftpClient.Mode == TransferMode.PASV)
-                    {
-                        Global.mDebugger.Send("Test.");
-
-                        ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
-                        ftpClient.DataListener.Stop();
-
-                        DoStor(ftpClient, command);
-                    }
-                }
-                catch
+                ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                return;
+            }
+            try
+            {
+                if (ftpClient.Mode == TransferMode.NONE)
                 {
                     ftpClient.SendReply(425, "Can't open data connection.");
                 }
+                else if (ftpClient.Mode == TransferMode.ACTV)
+                {
+                    ftpClient.Data.Connect(ftpClient.Address, ftpClient.Port);
+
+                    DoStor(ftpClient, command);
+                }
+                else if (ftpClient.Mode == TransferMode.PASV)
+                {
+                    Global.mDebugger.Send("Test.");
+
+                    ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
+                    ftpClient.DataListener.Stop();
+
+                    DoStor(ftpClient, command);
+                }
+            }
+            catch
+            {
+                ftpClient.SendReply(425, "Can't open data connection.");
             }
         }
 
@@ -524,37 +502,34 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessRetr(FtpClient ftpClient, FtpCommand command)
         {
-            if (ftpClient.IsConnected())
+            if (String.IsNullOrEmpty(command.Content))
             {
-                if (String.IsNullOrEmpty(command.Content))
-                {
-                    ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
-                    return;
-                }
-                try
-                {
-                    if (ftpClient.Mode == TransferMode.NONE)
-                    {
-                        ftpClient.SendReply(425, "Can't open data connection.");
-                    }
-                    else if (ftpClient.Mode == TransferMode.ACTV)
-                    {
-                        ftpClient.Data.Connect(ftpClient.Address, ftpClient.Port);
-
-                        DoRetr(ftpClient, command);
-                    }
-                    else if (ftpClient.Mode == TransferMode.PASV)
-                    {
-                        ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
-                        ftpClient.DataListener.Stop();
-
-                        DoRetr(ftpClient, command);
-                    }
-                }
-                catch
+                ftpClient.SendReply(501, "Syntax error in parameters or arguments.");
+                return;
+            }
+            try
+            {
+                if (ftpClient.Mode == TransferMode.NONE)
                 {
                     ftpClient.SendReply(425, "Can't open data connection.");
                 }
+                else if (ftpClient.Mode == TransferMode.ACTV)
+                {
+                    ftpClient.Data.Connect(ftpClient.Address, ftpClient.Port);
+
+                    DoRetr(ftpClient, command);
+                }
+                else if (ftpClient.Mode == TransferMode.PASV)
+                {
+                    ftpClient.Data = ftpClient.DataListener.AcceptTcpClient();
+                    ftpClient.DataListener.Stop();
+
+                    DoRetr(ftpClient, command);
+                }
+            }
+            catch
+            {
+                ftpClient.SendReply(425, "Can't open data connection.");
             }
         }
 
