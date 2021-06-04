@@ -111,10 +111,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is CLOSED.</exception>
         public void Close()
         {
-            if (StateMachine.Status == Status.CLOSED)
-            {
-                throw new Exception("Client already closed.");
-            }
             if (StateMachine.Status == Status.ESTABLISHED)
             {
                 var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)StateMachine.RemotePort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, (byte)(Flags.FIN | Flags.ACK), 0xFAF0, 0);
