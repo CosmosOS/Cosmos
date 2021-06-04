@@ -93,6 +93,8 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 global::System.Console.WriteLine("Client[0] : New connection from " + client.StateMachine.LocalAddress.ToString());
 
                 ReceiveNewClient(client);
+
+                break;
             }
         }
 

@@ -422,8 +422,17 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             try
             {
-                CurrentDirectory = new DirectoryInfo(CurrentDirectory).Parent.FullName;
-                ftpClient.SendReply(250, "Requested file action okay.");
+                var root = FileSystem.GetDirectory(CurrentDirectory);
+
+                if (CurrentDirectory.Length > 3)
+                {
+                    CurrentDirectory = root.mParent.mFullPath;
+                    ftpClient.SendReply(250, "Requested file action okay.");
+                }
+                else
+                {
+                    ftpClient.SendReply(550, "Requested action not taken.");
+                }
             }
             catch
             {
