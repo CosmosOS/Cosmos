@@ -74,6 +74,11 @@ namespace Cosmos.Core.IOGroup
         /// </summary>
         public readonly IOPortWrite Control; // BAR1 + 2 - write only
 
+        /// <summary>
+        /// Constructor for ATA-spec device (including ATAPI?)
+        /// aSecondary boolean to check if Primary or Secondary channel, used in modern ATA controllers
+        /// </summary>
+        /// <param name="aSecondary"></param>
         public ATA(bool aSecondary)
         {
             if (aSecondary)
