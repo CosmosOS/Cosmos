@@ -31,6 +31,8 @@ After our VFS has been initialized, we can use more interesting functions, let's
 
 **Note**: You don't have to format your drive if you're debugging your Cosmos project with VMWare. The build will automatically add an already formatted FAT32 VMDK file for your convenience.
 
+**Note 2**: You can only format a drive that already has been formatted with FAT32.
+
 You can format your drive with the Format() function, just like this:
 
 ```C#
