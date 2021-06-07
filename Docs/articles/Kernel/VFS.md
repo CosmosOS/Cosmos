@@ -11,7 +11,7 @@ This is essential for using the VFS.
 We start with creating a global CosmosVFS, this line should appear outside of any function, and before the BeforeRun() function.
 
 ```C#
-var fs = new Sys.FileSystem.CosmosVFS();
+Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
 ```
 
 Next, we register our VFS at the VFS manager, this will initiate the VFS and make it usable, add this to your kernel's BeforeRun() function:
@@ -25,7 +25,7 @@ After the initialization process is done, a message like this would appear on yo
 
 This message is printed by the RegisterVFS() method and it provides info about the partition.
 
-After our VFS has been initialized, we can use more interesting functions, let's go over some of them:
+**Note**: From now on, we'll be using some plugged functions from ``System.IO``, so be sure to use that reference to your code. Alright, now, let's get started over some useful functions:
 
 ## Format drive
 
@@ -71,18 +71,18 @@ Console.WriteLine("File System Type: " + fs_type);
 
 ## Get files list
 
-We start by getting a list of DirectoryEntry, using:
+We start by getting a list of files, using:
 
 ```C#
-var directory_list = fs.GetDirectoryListing(@"0:\");
+var directory_list = Directory.GetFiles(@"0:\");
 ```
 
 Once we have it, we can get the names of our files:
 
 ```C#
-foreach (var directoryEntry in directory_list)
+foreach (var file in directory_list)
 {
-    Console.WriteLine(directoryEntry.mName);
+    Console.WriteLine(file);
 }
 ```
 
@@ -90,12 +90,13 @@ foreach (var directoryEntry in directory_list)
 
 ## Read all the files in a directory
 
-This one is a bit more tricky. We'll need to use our list of DirectoryEntry, loop through all files and print their raw content to the standard output.
+This one is more tricky,
+We need to get a list of files and print all of their content to the screen.
 
-Of course, we'll start with geting the list of DirectoryEntry:
+Of course, we'll start with geting that files list:
 
 ```C#
-var directory_list = fs.GetDirectoryListing(@"0:\");
+var directory_list = Directory.GetFiles(@"0:\");
 ```
 
 Now we can go through our list, and print the raw content of each file.
@@ -103,26 +104,13 @@ Now we can go through our list, and print the raw content of each file.
 ```C#
 try
 {
-    foreach (var directoryEntry in directory_list)
+    foreach (var file in directory_list)
     {
-        var file_stream = directoryEntry.GetFileStream();   
-        if (file_stream.CanRead)
-        {
-            var entry_type = directoryEntry.mEntryType;
-            if(entry_type == Sys.FileSystem.Listing.DirectoryEntryTypeEnum.File)
-            {
-                var content = new byte[file_stream.Length];
-                file_stream.Read(content, 0, content.Length);
-                Console.WriteLine("File name: " + directoryEntry.mName);
-                Console.WriteLine("File size: " + directoryEntry.mSize);
-                Console.WriteLine("Content: ");
-                foreach (var ch in content)
-                {
-                    Console.Write(ch.ToString());
-                }
-                Console.WriteLine();
-            }
-        }
+        var content = File.ReadAllText(file);
+
+        Console.WriteLine("File name: " + file);
+        Console.WriteLine("File size: " + content.Length);
+        Console.WriteLine("Content: " + content);
     }
 }
 catch(Exception e)
@@ -130,24 +118,23 @@ catch(Exception e)
     Console.WriteLine(e.ToString());
 }
 ```
+
 ![Read File](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Read%20File.PNG)
 
 ## Create new file
 Reading and writing is working on existing files, but it's much more useful to write to our own files.
-let's jump right into it:
+Let's jump right into it:
 
 ```C#
 try
 {
-    var directory_entry = fs.CreateFile(@"0:\hello_from_elia.txt");
+    var file_stream = File.Create(@"0:\testing.txt");
 }
 catch (Exception e)
 {
     Console.WriteLine(e.ToString());
 }
 ```
-
-This would create new, empty file (its size is 0 bytes). We can directly write to the created DirectoryEntry like the section below except replacing the **file** variable which uses the GetFile() function by this **directory_entry** which uses the CreateFile() function.
 
 We can also [check our files list](https://github.com/CosmosOS/Cosmos/wiki/FAT-FileSystem#get-files-list) and see our new file in it.
 
@@ -162,24 +149,13 @@ Always remember that we should put our code in a try catch block.
 ```C#
 try
 {
-    var file = fs.GetFile(@"0:\testing.txt");
-    var file_stream = file.GetFileStream();
-
-    if (file_stream.CanWrite)
-    {
-        byte[] write_buffer = Encoding.ASCII.GetBytes("Learning how to use VFS!");
-        file_stream.Write(write_buffer, 0, write_buffer.Length);
-    }
+    File.WriteAllText(@"0:\testing.txt", "Learning how to use VFS!");
 }
 catch (Exception e)
 {
     Console.WriteLine(e.ToString());
 }
 ```
-
-Again we use the GetFile() method, which returns a file from a path.  
-Next we open a stream to the file and check if we can write to it.  
-The last thing we do is writing to the stream, we use Write() method, which write a byte array to the stream.  
 
 ## Read specific file
 
@@ -189,18 +165,7 @@ As usual, we'll do it in a try catch block.
 ```C#
 try
 {
-    var file = fs.GetFile(@"0:\testing.txt");
-    var file_stream = file.GetFileStream();
-
-    if (file_stream.CanRead)
-    {
-        byte[] file_buffer = new byte[file_stream.Length];
-        file_stream.Read(file_buffer, 0, file_buffer.Length);
-        foreach (var ch in file_buffer)
-        {
-            Console.Write(ch.ToString());
-        }
-    }
+    Console.WriteLine(File.ReadAllText(@"0:\testing.txt"));
 }
 catch (Exception e)
 {
@@ -208,11 +173,4 @@ catch (Exception e)
 }
 ```
 
-We use the GetFile() method, which returns a DirectoryEntry from a path.  
-Next we open its stream and check if we can read it.  
-The last thing we do is reading from the stream, we use the Read() method, which writes the stream to a byte array.
-
 ![Read Specific File](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Read%20Specified%20File.PNG)
-
-Notice that there is not much difference between this and [read all the files in a directory](https://github.com/CosmosOS/Cosmos/wiki/FAT-FileSystem#read-all-the-files-in-a-directory).  
-Actually the difference is by using GetFile() instead of GetDirectoryListing(), as the first returns a single DirectoryEntry, and the second returns a list of DirectoryEntry.
