@@ -12,17 +12,125 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// </summary>
     public enum Status
     {
+        /// <summary>
+        /// Wait for a connection request from any remote TCP and port.
+        /// </summary>
         LISTEN,
+
+        /// <summary>
+        /// Wait for a matching connection request after having sent a connection request.
+        /// </summary>
         SYN_SENT,
+
+        /// <summary>
+        /// Wait for a confirming connection request acknowledgment after having both received and sent a connection request.
+        /// </summary>
         SYN_RECEIVED,
+
+        /// <summary>
+        /// Represents an open connection, data received can be delivered to the user. The normal state for the data transfer phase of the connection.
+        /// </summary>
         ESTABLISHED,
+
+        /// <summary>
+        /// Wait for a connection termination request from the remote TCP, or an acknowledgment of the connection termination request previously sent.
+        /// </summary>
         FIN_WAIT1,
+
+        /// <summary>
+        /// Wait for a connection termination request from the remote TCP.
+        /// </summary>
         FIN_WAIT2,
+
+        /// <summary>
+        /// Wait for a connection termination request from the local user.
+        /// </summary>
         CLOSE_WAIT,
+
+        /// <summary>
+        /// Wait for a connection termination request acknowledgment from the remote TCP.
+        /// </summary>
         CLOSING,
+
+        /// <summary>
+        /// Wait for an acknowledgment of the connection termination request previously sent to the remote TCP (which includes an acknowledgment of its connection termination request).
+        /// </summary>
         LAST_ACK,
+
+        /// <summary>
+        /// Wait for enough time to pass to be sure the remote TCP received the acknowledgment of its connection termination request.
+        /// </summary>
         TIME_WAIT,
+
+        /// <summary>
+        /// represents no connection state at all.
+        /// </summary>
         CLOSED
+    }
+
+    /// <summary>
+    /// Transmission Control Block (TCB).
+    /// </summary>
+    public class TransmissionControlBlock
+    {
+        /** Send Sequence Variables **/
+
+        /// <summary>
+        /// Send unacknowledged.
+        /// </summary>
+        public uint SndUna { get; set; }
+
+        /// <summary>
+        /// Send next.
+        /// </summary>
+        public uint SndNxt { get; set; }
+
+        /// <summary>
+        /// Send window.
+        /// </summary>
+        public uint SndWnd { get; set; }
+
+        /// <summary>
+        /// Send urgent pointer.
+        /// </summary>
+        public uint SndUp { get; set; }
+
+        /// <summary>
+        /// Segment sequence number used for last window update.
+        /// </summary>
+        public uint SndWl1 { get; set; }
+
+        /// <summary>
+        /// Segment acknowledgment number used for last window update.
+        /// </summary>
+        public uint SndWl2 { get; set; }
+
+        /// <summary>
+        /// Initial send sequence number
+        /// </summary>
+        public uint ISS { get; set; }
+
+        /** Receive Sequence Variables **/
+
+        /// <summary>
+        /// Receive next.
+        /// </summary>
+        public uint RcvNxt { get; set; }
+
+        /// <summary>
+        /// Receive window.
+        /// </summary>
+        public uint RcvWnd { get; set; }
+
+        /// <summary>
+        /// Receive urgent pointer.
+        /// </summary>
+        public uint RcvUp { get; set; }
+
+        /// <summary>
+        /// Initial receive sequence number.
+        /// </summary>
+        public uint IRS { get; set; }
     }
 
     /// <summary>
@@ -32,6 +140,13 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// </summary>
     internal class Tcp
     {
+        /// <summary>
+        /// TCP Window Size.
+        /// </summary>
+        public const ushort TcpWindowSize = 8192;
+
+        #region Static
+
         /// <summary>
         /// Connection list.
         /// </summary>
@@ -88,6 +203,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             return null;
         }
 
+        #endregion
+
         /// <summary>
         /// Local port.
         /// </summary>
@@ -119,19 +236,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal Status Status;
 
         /// <summary>
-        /// Connection Acknowledgement number.
+        /// Connection Transmission Control Block.
         /// </summary>
-        internal uint AckNumber;
-
-        /// <summary>
-        /// Connection Sequence number.
-        /// </summary>
-        internal uint SequenceNumber;
-
-        /// <summary>
-        /// Last recveived Connection Sequence number.
-        /// </summary>
-        internal uint LastSequenceNumber;
+        internal TransmissionControlBlock TCB { get; set; }
 
         /// <summary>
         /// Is waiting for an acknowledgement packet.
@@ -139,9 +246,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal bool WaitingAck;
 
         /// <summary>
+        /// Last recveived Connection Sequence number.
+        /// </summary>
+        internal uint LastSequenceNumber;
+
+        /// <summary>
         /// TCP Received Data.
         /// </summary>
-        internal byte[] Data;
+        internal byte[] Data { get; set; }
 
         public Tcp(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
@@ -149,6 +261,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             RemotePort = remotePort;
             LocalAddress = localIp;
             RemoteAddress = remoteIp;
+
+            TCB = new TransmissionControlBlock();
 
             WaitingAck = false;
         }
@@ -223,8 +337,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.ACK)
             {
-                AckNumber = packet.SequenceNumber;
-                SequenceNumber = packet.AckNumber;
+                TCB.RcvNxt = packet.SequenceNumber;
+                TCB.SndNxt = packet.AckNumber;
 
                 Status = Status.ESTABLISHED;
             }
@@ -234,10 +348,10 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 LocalAddress = IPConfig.FindNetwork(packet.SourceIP);
 
-                AckNumber = packet.SequenceNumber + 1;
+                TCB.RcvNxt = packet.SequenceNumber + 1;
 
                 var rnd = new Random();
-                SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
+                TCB.SndNxt = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
 
                 RemoteAddress = packet.SourceIP;
                 RemotePort = packet.SourcePort;
@@ -260,7 +374,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 LastSequenceNumber = packet.SequenceNumber - 1; //TODO: Fix this trick (for dup check when PSH ACK)
 
-                SequenceNumber++;
+                TCB.SndNxt++;
 
                 Status = Status.ESTABLISHED;
             }
@@ -272,18 +386,27 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessSynSent(TCPPacket packet)
         {
-            if (packet.FIN)
+            if (packet.TCPFlags == (byte)Flags.ACK)
+            {
+                if ((packet.AckNumber - TCB.ISS) < 0 || (packet.AckNumber - TCB.SndNxt) > 0)
+                {
+                    SendEmptyPacket(Flags.RST, packet.AckNumber);
+
+                    Global.mDebugger.Send("Bad ACK received at SYN_SENT.");
+                }
+                else
+                {
+                    TCB.RcvNxt = packet.SequenceNumber;
+                    TCB.SndNxt = packet.AckNumber;
+
+                    Status = Status.ESTABLISHED;
+                }
+            }
+            else if (packet.FIN)
             {
                 Status = Status.CLOSED;
 
                 throw new Exception("TCP connection closed! (FIN received on SYN_SENT state)");
-            }
-            else if (packet.TCPFlags == (byte)Flags.ACK)
-            {
-                AckNumber = packet.SequenceNumber;
-                SequenceNumber = packet.AckNumber;
-
-                Status = Status.ESTABLISHED;
             }
             else if (packet.RST)
             {
@@ -295,8 +418,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 if (packet.ACK)
                 {
-                    AckNumber = packet.SequenceNumber + 1;
-                    SequenceNumber++;
+                    TCB.RcvNxt = packet.SequenceNumber + 1;
+                    TCB.SndNxt++;
 
                     LastSequenceNumber = packet.SequenceNumber;
 
@@ -331,7 +454,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     if (packet.SequenceNumber > LastSequenceNumber) //dup check
                     {
-                        AckNumber += packet.TCP_DataLength;
+                        TCB.RcvNxt += packet.TCP_DataLength;
 
                         LastSequenceNumber = packet.SequenceNumber;
 
@@ -345,16 +468,16 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 if (WaitingAck)
                 {
-                    if (packet.AckNumber == SequenceNumber)
+                    if (packet.AckNumber == TCB.SndNxt)
                     {
                         WaitingAck = false;
                     }
                 }
                 else if (!packet.PSH)
                 {
-                    if (packet.SequenceNumber >= AckNumber && packet.TCP_DataLength > 0) //packet sequencing
+                    if (packet.SequenceNumber >= TCB.RcvNxt && packet.TCP_DataLength > 0) //packet sequencing
                     {
-                        AckNumber += packet.TCP_DataLength;
+                        TCB.RcvNxt += packet.TCP_DataLength;
 
                         Data = ArrayHelper.Concat(Data, packet.TCP_Data);
                     }
@@ -369,7 +492,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.FIN && packet.ACK)
             {
-                AckNumber++;
+                TCB.RcvNxt++;
 
                 SendEmptyPacket(Flags.ACK);
 
@@ -377,7 +500,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.FIN)
             {
-                AckNumber++;
+                TCB.RcvNxt++;
 
                 SendEmptyPacket(Flags.ACK);
 
@@ -399,7 +522,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (packet.FIN && packet.ACK)
             {
-                AckNumber++;
+                TCB.RcvNxt++;
 
                 SendEmptyPacket(Flags.ACK);
 
@@ -407,7 +530,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.FIN)
             {
-                AckNumber++;
+                TCB.RcvNxt++;
 
                 SendEmptyPacket(Flags.ACK);
 
@@ -427,7 +550,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (packet.FIN)
             {
-                AckNumber++;
+                TCB.RcvNxt++;
 
                 SendEmptyPacket(Flags.ACK);
 
@@ -509,18 +632,29 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Send acknowledgement packet
+        /// Send empty packet.
         /// </summary>
-        private void SendEmptyPacket(Flags flag)
+        internal void SendEmptyPacket(Flags flag)
         {
-            var packet = new TCPPacket(LocalAddress, RemoteAddress, (ushort)LocalPort, (ushort)RemotePort, SequenceNumber, AckNumber, 20, (byte)flag, 0xFAF0, 0);
+            var packet = new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TcpWindowSize, 0);
 
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
         }
 
         /// <summary>
-        /// Equals connection
+        /// Send empty packet.
+        /// </summary>
+        internal void SendEmptyPacket(Flags flag, uint sequenceNumber)
+        {
+            var packet = new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TcpWindowSize, 0);
+
+            OutgoingBuffer.AddPacket(packet);
+            NetworkStack.Update();
+        }
+
+        /// <summary>
+        /// Equals connection.
         /// </summary>
         internal bool Equals(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {

@@ -80,21 +80,30 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
 
             StateMachine.RemoteAddress = dest;
-            StateMachine.RemotePort = (ushort)destPort;
-
             StateMachine.LocalAddress = IPConfig.FindNetwork(dest);
+            StateMachine.RemotePort = (ushort)destPort;
 
             //Generate Random Sequence Number
             var rnd = new Random();
-            StateMachine.SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
+            var SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
+
+            //Fill TCB
+            StateMachine.TCB.SndUna = SequenceNumber;
+            StateMachine.TCB.SndNxt = SequenceNumber;
+            StateMachine.TCB.SndWnd = Tcp.TcpWindowSize;
+            StateMachine.TCB.SndUp = 0;
+            StateMachine.TCB.SndWl1 = 0;
+            StateMachine.TCB.SndWl2 = 0;
+            StateMachine.TCB.ISS = SequenceNumber;
+
+            StateMachine.TCB.RcvNxt = 0;
+            StateMachine.TCB.RcvWnd = Tcp.TcpWindowSize;
+            StateMachine.TCB.RcvUp = 0;
+            StateMachine.TCB.IRS = 0;
 
             Tcp.Connections.Add(StateMachine);
 
-            // Flags=0x02 -> Syn
-            var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)destPort, StateMachine.SequenceNumber, 0, 20, (byte)Flags.SYN, 0xFAF0, 0);
-
-            OutgoingBuffer.AddPacket(packet);
-            NetworkStack.Update();
+            StateMachine.SendEmptyPacket(Flags.SYN);
 
             StateMachine.Status = Status.SYN_SENT;
 
@@ -113,11 +122,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (StateMachine.Status == Status.ESTABLISHED)
             {
-                var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)StateMachine.RemotePort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, (byte)(Flags.FIN | Flags.ACK), 0xFAF0, 0);
-                OutgoingBuffer.AddPacket(packet);
-                NetworkStack.Update();
+                StateMachine.SendEmptyPacket(Flags.FIN | Flags.ACK);
 
-                StateMachine.SequenceNumber++;
+                StateMachine.TCB.SndNxt++;
 
                 StateMachine.Status = Status.FIN_WAIT1;
 
@@ -162,20 +169,20 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 for (int i = 0; i < chunks.Length; i++)
                 {
-                    var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)StateMachine.RemotePort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), 0xFAF0, 0, chunks[i]);
+                    var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), Tcp.TcpWindowSize, 0, chunks[i]);
                     OutgoingBuffer.AddPacket(packet);
                     NetworkStack.Update();
 
-                    StateMachine.SequenceNumber += (uint)chunks[i].Length;
+                    StateMachine.TCB.SndNxt += (uint)chunks[i].Length;
                 }
             }
             else
             {
-                var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, (ushort)StateMachine.LocalPort, (ushort)StateMachine.RemotePort, StateMachine.SequenceNumber, StateMachine.AckNumber, 20, (byte)(Flags.PSH | Flags.ACK), 0xFAF0, 0, data);
+                var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, (byte)(Flags.PSH | Flags.ACK), Tcp.TcpWindowSize, 0, data);
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
 
-                StateMachine.SequenceNumber += (uint)data.Length;
+                StateMachine.TCB.SndNxt += (uint)data.Length;
             }
             StateMachine.WaitingAck = true;
         }
