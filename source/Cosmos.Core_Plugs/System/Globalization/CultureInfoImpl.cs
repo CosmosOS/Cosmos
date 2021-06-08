@@ -8,8 +8,9 @@ namespace Cosmos.Core_Plugs.System.Globalization
     [Plug(Target = typeof(CultureInfo))]
     public static class CultureInfoImpl
     {
-        public static void CCtor()
+        public static void CCtor(CultureInfo aThis, [FieldAccess(Name = "System.Boolean System.Globalization.CultureInfo._isInherited")] ref bool aIsInherited)
         {
+            aIsInherited = false;
         }
 
         public static CultureInfo get_CurrentCulture() => CultureInfo.InvariantCulture;
@@ -26,19 +27,14 @@ namespace Cosmos.Core_Plugs.System.Globalization
 
         public static CultureInfo GetCultureInfo(string name) => null;
 
-        public static object GetFormat(CultureInfo aThis, Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static DateTimeFormatInfo get_DateTimeFormat(CultureInfo aThis)
-        {
-            throw new NotImplementedException();
-        }
-
         public static CultureInfo get_Parent(CultureInfo aThis)
         {
             throw new NotImplementedException();
+        }
+
+        public static string GetUserDefaultLocaleName()
+        {
+            return "GetUserDefaultLocaleName is not implemented";
         }
     }
 }

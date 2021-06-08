@@ -11,7 +11,7 @@ namespace Cosmos.Core_Plugs.Interop
         [PlugMethod(Signature = "System_Int32__Interop_Globalization_LoadICU__")]
         public static int LoadICU()
         {
-            throw new NotImplementedException();
+            return 0; //this is required for at least DateTimeFormat
         }
         [PlugMethod(Signature = "System_Void__Interop_Globalization_ChangeCase_System_Char___System_Int32__System_Char___System_Int32__System_Boolean_")]
         public static unsafe void ChangeCase(char* aChar, int aInt, char* aChar2, int aInt2, bool Bool)
