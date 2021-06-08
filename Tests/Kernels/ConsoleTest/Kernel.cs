@@ -32,6 +32,8 @@ namespace ConsoleTest
         {
             try
             {
+                SetKeyboardScanMap(new DE_Standard());
+                Console.ReadLine();
                 Console.Clear();
 
                 Console.WriteLine("Testing Console Enconding");

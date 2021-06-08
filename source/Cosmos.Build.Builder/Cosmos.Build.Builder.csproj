@@ -22,9 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" />
-        <PackageReference Include="NuGet.Common" />
-        <PackageReference Include="NuGet.Configuration" />
+        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" />
+        <PackageReference Include="NuGet.Configuration" Version="5.9.1" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
     </ItemGroup>
 
 </Project>

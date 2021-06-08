@@ -32,5 +32,7 @@ namespace Cosmos.System_Plugs.System
 
             return time;
         }
+
+        public static string ToString(ref TimeSpan aThis, string format, IFormatProvider provider) => aThis.ToString();
     }
 }

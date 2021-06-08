@@ -49,14 +49,14 @@ namespace Cosmos.HAL.BlockDevice.Ports
             //       But make sure that isIdentify returns the exact value (true if the command is identify
             //       or false if not identify).
             SendSATA28Command((ATACommands)0x00, 0, 0);
-            UInt16[] xBuffer = new UInt16[256];
+            ushort[] xBuffer = new ushort[256];
             Mem.DataBlock.Read16(xBuffer);
             
             mSerialNo = GetString(xBuffer, 10, 20);
             mFirmwareRev = GetString(xBuffer, 23, 8);
             mModelNo = GetString(xBuffer, 27, 40);
 
-            mBlockCount = ((UInt32)xBuffer[61] << 16 | xBuffer[60]) - 1;
+            mBlockCount = ((uint)xBuffer[61] << 16 | xBuffer[60]) - 1;
 
         }
 
@@ -334,7 +334,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             return -1;
         }
 
-        protected string GetString(UInt16[] aBuffer, int aIndexStart, int aStringLength)
+        protected string GetString(ushort[] aBuffer, int aIndexStart, int aStringLength)
         {
             // Would be nice to convert to byte[] and use
             // new string(ASCIIEncoding.ASCII.GetChars(xBytes));
@@ -342,7 +342,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             var xChars = new char[aStringLength];
             for (int i = 0; i < aStringLength / 2; i++)
             {
-                UInt16 xChar = aBuffer[aIndexStart + i];
+                ushort xChar = aBuffer[aIndexStart + i];
                 xChars[i * 2] = (char)(xChar >> 8);
                 xChars[i * 2 + 1] = (char)xChar;
             }

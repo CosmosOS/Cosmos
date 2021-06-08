@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmos.Core;
@@ -41,6 +42,7 @@ namespace Cosmos.Core.Memory.Old
         private static void ClearMemory(void* aStartAddress, uint aLength)
         {
             //TODO: Move to memory. Internal access only...
+            //Debugger.DoSendNumber(aLength);
             CPU.ZeroFill((uint)aStartAddress, aLength);
         }
 
@@ -53,6 +55,7 @@ namespace Cosmos.Core.Memory.Old
                 {
                 }
             }
+            //Debugger.DoSendNumber(aLength);
 
             bool xInterruptsWereEnabled = CPU.DisableInterrupts();
             try

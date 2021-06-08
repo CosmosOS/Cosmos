@@ -55,7 +55,8 @@ namespace Cosmos.TestRunner.Core
             {
                 Encoding = Encoding.UTF8,
                 Indent = true,
-                OmitXmlDeclaration = true
+                OmitXmlDeclaration = true,
+                CheckCharacters =false
             };
 
             using (var xWriter = XmlWriter.Create(aFilePath, xWriterSettings))

@@ -13,6 +13,8 @@ namespace Cosmos.System_Plugs.System
             return StringHelper.GetNumberString(aThis);
         }
 
+        public static string ToString(ref double aThis, string format, IFormatProvider provider) => aThis.ToString();
+
         public static double Parse(string s)
         {
             //Format of Double string: [whitespace][sign][integral-digits[,]]integral-digits[.[fractional-digits]][E[sign]exponential-digits][whitespace]

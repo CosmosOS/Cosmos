@@ -1,0 +1,11 @@
+<Project>
+
+    <PropertyGroup>
+        <PackageVersion Condition="'$(PackageVersionSuffix)' != ''">$(PackageVersion)$(PackageVersionSuffix)</PackageVersion>
+        <PackageDescription Condition="'$(PackageDescription)' != ''">$(PackageDescription)
+
+$(CosmosDescription)</PackageDescription>
+        <PackageDescription Condition="'$(PackageDescription)' == ''">$(CosmosDescription)</PackageDescription>
+    </PropertyGroup>
+
+</Project>

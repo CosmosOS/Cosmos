@@ -8,10 +8,10 @@
 
     <ItemGroup>
         <PackageReference Include="IL2CPU.API" />
-        <PackageReference Include="XSharp" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\XSharp\source\XSharp\XSharp\XSharp.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
     </ItemGroup>
 

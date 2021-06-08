@@ -2,12 +2,13 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Runtime.CompilerServices;
 using Cosmos.Common.Extensions;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT.Listing;
 using Cosmos.System.FileSystem.Listing;
 
+[assembly: InternalsVisibleTo("Cosmos.System.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100e3ef5198fa2f8926f006b5d2053eb3b3c875e74695675a6b97bd27ba6b0c5cbee26710c04277f7975927ace4a037692eddb71340a4c3f11e06c645c6a4cebad303301228943b39378bf3222f9432ff9c72c31d1a5e936db6cf9f18c23bd52a43c091fc803ce2139cd390a9678553d1e6061656c3d0196ddbd2233143fc433195")]
 namespace Cosmos.System.FileSystem.FAT
 {
     /// <summary>
@@ -307,11 +308,12 @@ namespace Cosmos.System.FileSystem.FAT
             /// <exception cref="Exception">Thrown when data size invalid.</exception>
             private void ReadFatSector(ulong aSector, out byte[] aData)
             {
+                Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.ReadFatSector --");
                 aData = mFileSystem.NewBlockArray();
                 ulong xSector = mFatSector + aSector;
-                Global.mFileSystemDebugger.SendInternal("xSector  =");
-                Global.mFileSystemDebugger.SendInternal(xSector);
+                Global.mFileSystemDebugger.SendInternal("xSector  =" + xSector);
                 mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, ref aData);
+                Global.mFileSystemDebugger.SendInternal("Returning -- FatFileSystem.ReadFatSector --");
             }
 
             /// <summary>
@@ -347,19 +349,15 @@ namespace Cosmos.System.FileSystem.FAT
             internal void GetFatEntry(uint aEntryNumber, out uint aValue)
             {
                 Global.mFileSystemDebugger.SendInternal("-- Fat.GetFatEntry --");
-                Global.mFileSystemDebugger.SendInternal("aEntryNumber =");
-                Global.mFileSystemDebugger.SendInternal(aEntryNumber);
+                Global.mFileSystemDebugger.SendInternal("aEntryNumber = " + aEntryNumber);
 
                 uint xEntrySize = GetFatEntrySizeInBytes();
                 ulong xEntryOffset = aEntryNumber * xEntrySize;
-                Global.mFileSystemDebugger.SendInternal("xEntrySize =");
-                Global.mFileSystemDebugger.SendInternal(xEntrySize);
-                Global.mFileSystemDebugger.SendInternal("xEntryOffset =");
-                Global.mFileSystemDebugger.SendInternal(xEntryOffset);
+                Global.mFileSystemDebugger.SendInternal("xEntrySize = " + xEntrySize);
+                Global.mFileSystemDebugger.SendInternal("xEntryOffset = " + xEntryOffset);
 
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
-                Global.mFileSystemDebugger.SendInternal("xSector =");
-                Global.mFileSystemDebugger.SendInternal(xSector);
+                Global.mFileSystemDebugger.SendInternal("xSector = " + xSector);
 
                 ReadFatSector(xSector, out byte[] xData);
 
@@ -414,7 +412,7 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xEntryOffset = aEntryNumber * xEntrySize;
 
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
-                ulong xSectorOffset = (xSector * mFileSystem.BytesPerSector) - xEntryOffset;
+                //ulong xSectorOffset = (xSector * mFileSystem.BytesPerSector) - xEntryOffset;
 
                 byte[] xData;
                 ReadFatSector(xSector, out xData);
@@ -438,6 +436,7 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 WriteFatSector(xSector, xData);
+                Global.mFileSystemDebugger.SendInternal("Returning from --- Fat.SetFatEntry ---");
             }
 
             /// <summary>
@@ -822,19 +821,18 @@ namespace Cosmos.System.FileSystem.FAT
         /// </summary>
         /// <param name="aCluster">A cluster to read from.</param>
         /// <param name="aData">A data array to write the output to.</param>
-        /// <param name="aSize">prob. unused.</param>
-        /// <param name="aOffset">unused.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
         internal void Read(long aCluster, out byte[] aData)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Read --");
+            Global.mFileSystemDebugger.SendInternal($"aCluster = {aCluster}");
 
             if (mFatType == FatTypeEnum.Fat32)
             {
                 aData = NewBlockArray();
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                Global.mFileSystemDebugger.SendInternal("xSector: " + aCluster);
+                Global.mFileSystemDebugger.SendInternal($"xSector = {xSector}");
                 Device.ReadBlock((ulong)xSector, SectorsPerCluster, ref aData);
             }
             else
@@ -843,6 +841,7 @@ namespace Cosmos.System.FileSystem.FAT
                 aData = Device.NewBlockArray(1);
                 Device.ReadBlock((ulong)aCluster, RootSectorCount, ref aData);
             }
+            Global.mFileSystemDebugger.SendInternal($"aData.Length = {aData.Length}");
         }
 
         /// <summary>

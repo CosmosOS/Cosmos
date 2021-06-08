@@ -61,7 +61,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             butnProfileDelete.Click += new EventHandler(butnProfileDelete_Click);
             butnProfileRename.Click += new EventHandler(butnProfileRename_Click);
 
-            lboxProfile.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            lboxProfile.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 var xProfile = (ProfileItem)lboxProfile.SelectedItem;
                 if (xProfile.Prefix != mViewModel.BuildProperties.Profile)
@@ -80,7 +80,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             # region Deploy
 
-            lboxDeployment.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            lboxDeployment.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 var xValue = (DeploymentType)((EnumValue)lboxDeployment.SelectedItem).Value;
                 if (xValue != mViewModel.BuildProperties.Deployment)
@@ -93,7 +93,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             # region Launch
 
-            lboxLaunch.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            lboxLaunch.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 var xValue = (LaunchType)((EnumValue)lboxLaunch.SelectedItem).Value;
                 if (xValue != mViewModel.BuildProperties.Launch)
@@ -121,7 +121,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             #region Compile
 
-            comboFramework.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            comboFramework.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
@@ -130,7 +130,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                     mViewModel.BuildProperties.Framework = value;
                 }
             };
-            comboBinFormat.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            comboBinFormat.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var value = (BinFormat)((EnumValue)comboBinFormat.SelectedItem).Value;
@@ -144,7 +144,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             #region Assembler
 
-            checkUseInternalAssembler.CheckedChanged += delegate (Object sender, EventArgs e)
+            checkUseInternalAssembler.CheckedChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 bool value = checkUseInternalAssembler.Checked;
@@ -158,7 +158,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             #region VMware
 
-            cmboVMwareEdition.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            cmboVMwareEdition.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var x = (VMwareEdition)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
@@ -172,7 +172,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             #region PXE
 
-            comboPxeInterface.TextChanged += delegate (Object sender, EventArgs e)
+            comboPxeInterface.TextChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var x = comboPxeInterface.Text.Trim();
@@ -182,7 +182,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 }
             };
 
-            cmboSlavePort.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            cmboSlavePort.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var x = (string)cmboSlavePort.SelectedItem;
@@ -198,7 +198,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             #region Debug
 
-            comboDebugMode.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            comboDebugMode.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var x = (DebugMode)((EnumValue)comboDebugMode.SelectedItem).Value;
@@ -215,7 +215,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 mViewModel.BuildProperties.DebugEnabled = chckEnableDebugStub.Checked;
             };
 
-            comboTraceMode.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            comboTraceMode.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var x = (TraceAssemblies)((EnumValue)comboTraceMode.SelectedItem).Value;
@@ -225,7 +225,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 }
             };
 
-            checkIgnoreDebugStubAttribute.CheckedChanged += delegate (Object sender, EventArgs e)
+            checkIgnoreDebugStubAttribute.CheckedChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 bool x = checkIgnoreDebugStubAttribute.Checked;
@@ -235,7 +235,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 }
             };
 
-            cmboCosmosDebugPort.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            cmboCosmosDebugPort.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var x = (string)cmboCosmosDebugPort.SelectedItem;
@@ -245,7 +245,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 }
             };
 
-            cmboVisualStudioDebugPort.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            cmboVisualStudioDebugPort.SelectedIndexChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 var x = (string)cmboVisualStudioDebugPort.SelectedItem;
@@ -255,7 +255,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 }
             };
 
-            checkEnableGDB.CheckedChanged += delegate (Object sender, EventArgs e)
+            checkEnableGDB.CheckedChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 bool x = checkEnableGDB.Checked;
@@ -267,7 +267,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 checkStartCosmosGDB.Checked = x;
             };
 
-            checkStartCosmosGDB.CheckedChanged += delegate (Object sender, EventArgs e)
+            checkStartCosmosGDB.CheckedChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 bool x = checkStartCosmosGDB.Checked;
@@ -277,7 +277,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 }
             };
 
-            checkEnableBochsDebug.CheckedChanged += delegate (Object sender, EventArgs e)
+            checkEnableBochsDebug.CheckedChanged += delegate (object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
                 bool x = checkEnableBochsDebug.Checked;

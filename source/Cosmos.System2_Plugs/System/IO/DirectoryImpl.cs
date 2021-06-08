@@ -42,6 +42,9 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static DirectoryInfo CreateDirectory(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal($"-- Directory.CreateDirectory --");
+            Global.mFileSystemDebugger.SendInternal($"aPath = {aPath}");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -51,8 +54,6 @@ namespace Cosmos.System_Plugs.System.IO
             {
                 throw new ArgumentException("Path must not be empty.", "aPath");
             }
-
-            Global.mFileSystemDebugger.SendInternal($"Directory.CreateDirectory : aPath = {aPath}");
 
             var xEntry = VFSManager.CreateDirectory(aPath);
 

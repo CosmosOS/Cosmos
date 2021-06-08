@@ -1,0 +1,27 @@
+<Project>
+
+    <PropertyGroup>
+        <ApprovalTestsVersion>3.0.18</ApprovalTestsVersion>
+        <AvaloniaVersion>0.7.0</AvaloniaVersion>
+        <NuGetVersion>5.9.1</NuGetVersion>
+        <NUnitVersion>3.11.0</NUnitVersion>
+        <NUnit3TestAdapterVersion>3.12.0</NUnit3TestAdapterVersion>
+        <RoslynAnalyzersVersion>2.6.2</RoslynAnalyzersVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Update="ApprovalTests" Version="$(ApprovalTestsVersion)" />
+        <PackageReference Update="ApprovalUtilities" Version="$(ApprovalTestsVersion)" />
+        <PackageReference Update="Avalonia" Version="$(AvaloniaVersion)" />
+        <PackageReference Update="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+        <PackageReference Update="NuGet.Common" Version="$(NuGetVersion)" />
+        <PackageReference Update="NuGet.Configuration" Version="$(NuGetVersion)" />
+        <PackageReference Update="NUnit" Version="$(NUnitVersion)" />
+        <PackageReference Update="NUnit3TestAdapter" Version="$(NUnit3TestAdapterVersion)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="@(RoslynAnalyzer)" Version="$(RoslynAnalyzersVersion)" />
+    </ItemGroup>
+
+</Project>

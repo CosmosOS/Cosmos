@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 
@@ -38,7 +37,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             sb.Clear();
 
             // Capacity does not change after Clear
-            Assert.IsTrue(sb.Capacity == 32, "StringBuilder.Capacity after Clear is wrong)");
+            Assert.IsTrue(sb.Capacity == 26, "StringBuilder.Capacity after Clear is wrong");
 
             // ... but Lenght should be 0 again
             Assert.IsTrue(sb.Length == 0, "After Clear StringBuilder.Lenght is wrong");
@@ -47,26 +46,26 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             /* This is required NumberBuffer to work it will be 90% managed code in Net Core 2.1 so better to wait */
 #if false
-            int var1 = 111;
-            float var2 = 2.22F;
-            string var3 = "abcd";
-            object[] var4 = { 3, 4.4, 'X' };
+                        int var1 = 111;
+                        float var2 = 2.22F;
+                        string var3 = "abcd";
+                        object[] var4 = { 3, 4.4, 'X' };
 
-            sb.AppendFormat($"1) {var1}");
-            Assert.IsTrue(sb.ToString() == "1) 111", "StringBuilder.AppendFormat() with 1 arg does not work");
-            sb.Length = 0; // Same of sb.Clear() maybe faster
+                        sb.AppendFormat($"1) {var1}");
+                        Assert.IsTrue(sb.ToString() == "1) 111", "StringBuilder.AppendFormat() with 1 arg does not work");
+                        sb.Length = 0; // Same of sb.Clear() maybe faster
 
-            sb.AppendFormat("2) {0}, {1}", var1, var2);
-            Assert.IsTrue(sb.ToString() == "2) 111, 2.22", "StringBuilder.AppendFormat() with 2 args does not work");
-            sb.Length = 0; // Same of sb.Clear() maybe faster
+                        sb.AppendFormat("2) {0}, {1}", var1, var2);
+                        Assert.IsTrue(sb.ToString() == "2) 111, 2.22", "StringBuilder.AppendFormat() with 2 args does not work");
+                        sb.Length = 0; // Same of sb.Clear() maybe faster
 
-            sb.AppendFormat("3) {0}, {1}, {2}", var1, var2, var3);
-            Assert.IsTrue(sb.ToString() == "111, 2.22, abcd", "StringBuilder.AppendFormat() with 3 args does not work");
-            sb.Length = 0; // Same of sb.Clear() maybe faster
+                        sb.AppendFormat("3) {0}, {1}, {2}", var1, var2, var3);
+                        Assert.IsTrue(sb.ToString() == "111, 2.22, abcd", "StringBuilder.AppendFormat() with 3 args does not work");
+                        sb.Length = 0; // Same of sb.Clear() maybe faster
 
-            sb.AppendFormat("4) {0}, {1}, {2}", var4);
-            Assert.IsTrue(sb.ToString() == "111, 2.22, abcd", "StringBuilder.AppendFormat() with arg array does not work");
-            sb.Length = 0; // Same of sb.Clear() maybe faster
+                        sb.AppendFormat("4) {0}, {1}, {2}", var4);
+                        Assert.IsTrue(sb.ToString() == "111, 2.22, abcd", "StringBuilder.AppendFormat() with arg array does not work");
+                        sb.Length = 0; // Same of sb.Clear() maybe faster
 #endif
 
             sb.Append("This is a test");
@@ -142,9 +141,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Decimal has a totally managed implementation in .Net Core 2.1, let's wait for that
 #if false
-            sb.Insert(3, xDecimal);
-            Assert.IsTrue(sb.ToString() == "--[5]--", "Insert #11 does not work");
-            sb = new StringBuilder(initialValue);
+                        sb.Insert(3, xDecimal);
+                        Assert.IsTrue(sb.ToString() == "--[5]--", "Insert #11 does not work");
+                        sb = new StringBuilder(initialValue);
 #endif
             sb.Insert(3, xSingle);
             Assert.IsTrue(sb.ToString() == "--[6.6]--", "Insert #11 does not work");
@@ -198,6 +197,20 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             sb[2] = '1';
 
             Assert.IsTrue(sb.ToString() == "Th1s is a simple sentence.", "Index set operator does not work");
+
+            // test string builders with large amounts of data
+            StringBuilder builder = new StringBuilder();
+            char[] data = new char[1024];
+            for (int i = 0; i < 1024; i++)
+            {
+                data[i] = 'a';
+            }
+            builder.Append(data, 0, 1024);
+            builder.Append(data, 0, 976);
+            builder.Append(data, 24, 524);
+            string aStr = builder.ToString();
+            Assert.AreEqual(2524, aStr.Length, "StringBuilder produced the correct string");
+            Assert.AreEqual(new string('a', 2524), builder.ToString(), "StringBuilder works with 2500 chars");
         }
     }
 }

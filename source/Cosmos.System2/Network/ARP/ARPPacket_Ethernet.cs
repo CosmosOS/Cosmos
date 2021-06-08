@@ -79,7 +79,7 @@ namespace Cosmos.System.Network.ARP
         /// <param name="packet_size">Packet size.</param>
         /// <param name="arpTargetMAC">ARP destination MAC address.</param>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected ARPPacket_Ethernet(UInt16 operation, MACAddress senderMAC, Address senderIP,
+        protected ARPPacket_Ethernet(ushort operation, MACAddress senderMAC, Address senderIP,
             MACAddress targetMAC, Address targetIP, int packet_size, MACAddress arpTargetMAC)
             : base(targetMAC, senderMAC, 1, 0x0800, 6, 4, operation, packet_size)
         {

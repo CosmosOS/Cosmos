@@ -14,10 +14,5 @@ namespace Cosmos.Core_Plugs.System
         {
 
         }
-
-        public static bool InitTable()
-        {
-            return false;
-        }
     }
 }

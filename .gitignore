@@ -17,10 +17,8 @@
 Docs/log.txt
 
 *.[Oo]bj
-*.suo
 *.ncb
 *.aps
-*.user
 *.ccscc
 *.cache
 *.bak
@@ -37,8 +35,6 @@ Docs/log.txt
 *.vsp
 *.pdb
 *.lock.json
-*.nuget.props
-*.nuget.targets
 Thumbs.db
 build.force
 
@@ -57,3 +53,5 @@ Docs/~$RingsGen2.xlsx
 source/Kernel-X86/90-Application/GuessKernelGen3.csproj
 Docs/~$RingsGen3.xlsx
 *.map
+/Resources/Dependencies/Dapper/DapperExtensions.StrongName.deps.json
+/Resources/Dependencies/Dapper/ref/DapperExtensions.StrongName.dll

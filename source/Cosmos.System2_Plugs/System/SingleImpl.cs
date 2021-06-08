@@ -13,6 +13,8 @@ namespace Cosmos.System_Plugs.System
             return StringHelper.GetNumberString(aThis);
         }
 
+        public static string ToString(ref float aThis, string format, IFormatProvider provider) => aThis.ToString();
+
         public static float Parse(string s)
         {
             //Format of Float string: [whitespace][sign][integral-digits[,]]integral-digits[.[fractional-digits]][E[sign]exponential-digits][whitespace]

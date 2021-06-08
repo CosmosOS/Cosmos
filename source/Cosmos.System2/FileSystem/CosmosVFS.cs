@@ -310,7 +310,8 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public override List<DirectoryEntry> GetDirectoryListing(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("-- CosmosVFS.GetDirectoryListing --");
+            Global.mFileSystemDebugger.SendInternal("-- CosmosVFS.GetDirectoryListing(string) --");
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
             var xFS = GetFileSystemFromPath(aPath);
             var xDirectory = DoGetDirectoryEntry(aPath, xFS);
             return xFS.GetDirectoryListing(xDirectory);
@@ -359,10 +360,14 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry aDirectory)
         {
+            Global.mFileSystemDebugger.SendInternal("-- CosmosVFS.GetDirectoryListing --");
+
             if (aDirectory == null || String.IsNullOrEmpty(aDirectory.mFullPath))
             {
                 throw new ArgumentException("Argument is null or empty", nameof(aDirectory));
             }
+
+            Global.mFileSystemDebugger.SendInternal("Path = " + aDirectory.mFullPath);
 
             return GetDirectoryListing(aDirectory.mFullPath);
         }
@@ -375,6 +380,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Thrown when the entry at aPath is not a directory.</exception>
         public override DirectoryEntry GetDirectory(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetDirectory Checking: " + aPath);
             try
             {
                 var xFileSystem = GetFileSystemFromPath(aPath);
@@ -741,11 +747,15 @@ namespace Cosmos.System.FileSystem
                 var xPartFound = false;
                 var xListing = aFS.GetDirectoryListing(xBaseDirectory);
 
+                Global.mFileSystemDebugger.SendInternal("xPathPart = " + xPathPart);
+
                 for (int j = 0; j < xListing.Count; j++)
                 {
                     var xListingItem = xListing[j];
                     string xListingItemName = xListingItem.mName.ToLower();
                     xPathPart = xPathPart.ToLower();
+
+                    Global.mFileSystemDebugger.SendInternal(xListingItemName);
 
                     if (xListingItemName == xPathPart)
                     {
