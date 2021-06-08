@@ -192,9 +192,22 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                     command.Content += "\\";
                 }
 
-                if (Directory.Exists(command.Content))
+                while (command.Content[0] == '\\')
+                {
+                    command.Content = command.Content.Remove(0, 1);
+                }
+
+                if (command.Content.Contains(":\\")) //full path check
                 {
                     CurrentDirectory = command.Content;
+                }
+                else
+                {
+                    CurrentDirectory += "\\" + command.Content;
+                }
+
+                if (Directory.Exists(CurrentDirectory))
+                {
                     Directory.SetCurrentDirectory(CurrentDirectory);
                     ftpClient.SendReply(250, "Requested file action okay.");
                 }
@@ -216,7 +229,15 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessPwd(FtpClient ftpClient, FtpCommand command)
         {
-            ftpClient.SendReply(257, "/" + CurrentDirectory + " created.");
+            string tmp = "Cosmos";
+
+            if (CurrentDirectory.Length == 3) //root check
+            {
+                int i = CurrentDirectory.IndexOf(":") + 1;
+                tmp += CurrentDirectory.Substring(i);
+            }
+
+            ftpClient.SendReply(257, "/" + tmp + " created.");
         }
 
         /// <summary>
@@ -226,7 +247,14 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessPasv(FtpClient ftpClient, FtpCommand command)
         {
-            //TODO: Find port dynamically.
+            /*
+                TODO: - Fix new TCP SYN connection (https://stackoverflow.com/questions/67824462/why-does-my-ftp-client-open-multiple-control-connection)
+                      - Find port dynamically.
+            */
+
+            throw new NotImplementedException("FTP Passive mode not supported yet!");
+
+            /*
             int port = 20;
             var address = ftpClient.Control.StateMachine.LocalAddress.ToByteArray();
 
@@ -235,7 +263,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             ftpClient.DataListener = new TcpListener(port);
             ftpClient.DataListener.Start();
 
-            ftpClient.Mode = TransferMode.PASV;
+            ftpClient.Mode = TransferMode.PASV;*/
         }
 
         /// <summary>

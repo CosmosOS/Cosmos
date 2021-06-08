@@ -118,7 +118,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// Parse and execute FTP command.
         /// </summary>
         /// <param name="ftpClient">FTP Client.</param>
-        internal void ReceiveRequest(FtpClient ftpClient)
+        private void ReceiveRequest(FtpClient ftpClient)
         {
             var ep = new EndPoint(Address.Zero, 0);
             var data = Encoding.ASCII.GetString(ftpClient.Control.Receive(ref ep));
