@@ -15,7 +15,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <Style TargetType="Button">
+        <Style TargetType="Button" BasedOn="{ui:StaticResource DefaultButtonStyle}">
             <Setter Property="Margin" Value="4" />
             <Setter Property="MinWidth" Value="48" />
             <Setter Property="Padding" Value="8,3" />
@@ -45,12 +45,12 @@
                         HorizontalAlignment="Right"
                         Margin="0,8,0,0"
                         Orientation="Horizontal">
-                <ToggleButton Command="{Binding OkCommand}"
+                <Button Command="{Binding OkCommand}"
                         CommandParameter="{Binding ElementName=visualStudioInstanceDialog}"
                         Content="OK" Margin="0,0,5,0"/>
-                <ToggleButton Command="{Binding CancelCommand}"
+                <Button Command="{Binding CancelCommand}"
                         CommandParameter="{Binding ElementName=visualStudioInstanceDialog}"
-                        Content="Cancel"/>
+                        Content="Cancel" Margin="0,0,5,0"/>
             </StackPanel>
 
         </StackPanel>

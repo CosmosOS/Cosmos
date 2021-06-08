@@ -122,7 +122,7 @@ namespace Cosmos.Build.Builder.ViewModels
                         }
                         else
                         {
-                            MessageBox.Show($"{dependency.Name} is not installed. Please install {dependency.OtherDependencysThatAreMissing}");
+                            Views.MessageBox.Show($"{dependency.Name} is not installed. Please {dependency.OtherDependencysThatAreMissing}");
                             _logger.SetError();
                             _logger.NewSection("Error");
                             _logger.LogMessage($"{dependency.Name} not found.");
@@ -135,6 +135,7 @@ namespace Cosmos.Build.Builder.ViewModels
             catch (Exception e)
             {
                 OnError("Error while installing dependencies: " + e.Message);
+                return;
             }
 
             try
@@ -149,6 +150,7 @@ namespace Cosmos.Build.Builder.ViewModels
             catch (Exception e)
             {
                 OnError(e.Message);
+                return;
             }
 
             await Task.Delay(5000).ConfigureAwait(false);

@@ -16,7 +16,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <Style TargetType="Button">
+        <Style TargetType="Button" BasedOn="{ui:StaticResource DefaultButtonStyle}">
             <Setter Property="Margin" Value="4" />
             <Setter Property="MinWidth" Value="48" />
             <Setter Property="Padding" Value="8,3" />
@@ -41,11 +41,10 @@
                         HorizontalAlignment="Right"
                         Margin="5,8,5,0"
                         Orientation="Horizontal">
-                <!--I am using a toggleButton because normal buttons for some reason use the default WPF skin-->
-                <ToggleButton Visibility="{Binding IsNotInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
+                <Button Visibility="{Binding IsNotInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Command="{Binding InstallCommand}"
-                        Content="OK" Margin="0,0,5,0"></ToggleButton>
-                <ToggleButton Visibility="{Binding InstallationNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Content="OK" Margin="0,0,5,0"></Button>
+                <Button Visibility="{Binding InstallationNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Command="{Binding CancelCommand}"
                         CommandParameter="{Binding ElementName=dependencyInstallationDialog}"
                         Content="Cancel" />
@@ -66,12 +65,12 @@
                          Margin="0,4"
                          IsIndeterminate="True" />
 
-            <ToggleButton Grid.Row="1"
+            <Button Grid.Row="1"
                     HorizontalAlignment="Right"
                     Margin="0,8,0,0"
                     Command="{Binding CancelInstallationCommand}"
                     Content="Cancel">
-            </ToggleButton>
+            </Button>
 
         </StackPanel>
 
@@ -83,7 +82,7 @@
                        Margin="0,0,0,4"
                        Text="{Binding InstallationCompletedText}" />
 
-            <ToggleButton Grid.Row="1"
+            <Button Grid.Row="1"
                     HorizontalAlignment="Right"
                     Margin="0,8,0,0"
                     Command="{Binding OkCommand}"
