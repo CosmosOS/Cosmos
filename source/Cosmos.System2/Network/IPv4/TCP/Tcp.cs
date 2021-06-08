@@ -205,6 +205,8 @@ namespace Cosmos.System.Network.IPv4.TCP
 
         #endregion
 
+        #region TCB
+
         /// <summary>
         /// Local port.
         /// </summary>
@@ -226,19 +228,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal Address RemoteAddress;
 
         /// <summary>
-        /// RX buffer queue.
-        /// </summary>
-        internal Queue<TCPPacket> rxBuffer;
-
-        /// <summary>
-        /// Connection status.
-        /// </summary>
-        internal Status Status;
-
-        /// <summary>
         /// Connection Transmission Control Block.
         /// </summary>
         internal TransmissionControlBlock TCB { get; set; }
+
+        #endregion
 
         /// <summary>
         /// Is waiting for an acknowledgement packet.
@@ -249,6 +243,16 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Last recveived Connection Sequence number.
         /// </summary>
         internal uint LastSequenceNumber;
+
+        /// <summary>
+        /// RX buffer queue.
+        /// </summary>
+        internal Queue<TCPPacket> rxBuffer;
+
+        /// <summary>
+        /// Connection status.
+        /// </summary>
+        internal Status Status;
 
         /// <summary>
         /// TCP Received Data.
@@ -366,17 +370,18 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessSynReceived(TCPPacket packet)
         {
-            if (packet.RST)
+            if (packet.ACK)
             {
-                Status = Status.LISTEN;
-            }
-            else if (packet.ACK)
-            {
-                LastSequenceNumber = packet.SequenceNumber - 1; //TODO: Fix this trick (for dup check when PSH ACK)
+                if (TCB.SndUna <= packet.AckNumber && packet.AckNumber <= TCB.SndNxt)
+                {
+                    TCB.SndWnd = packet.WindowSize;
+                    TCB.SndWl1 = packet.SequenceNumber;
+                    TCB.SndWl2 = packet.SequenceNumber;
 
-                TCB.SndNxt++;
+                    LastSequenceNumber = packet.SequenceNumber - 1; //TODO: Fix this trick (for dup check when PSH ACK)
 
-                Status = Status.ESTABLISHED;
+                    Status = Status.ESTABLISHED;
+                }
             }
         }
 
@@ -406,20 +411,25 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
 
-                throw new Exception("TCP connection closed! (FIN received on SYN_SENT state)");
+                Global.mDebugger.Send("TCP connection closed! (FIN received on SYN_SENT state).");
             }
             else if (packet.RST)
             {
                 Status = Status.CLOSED;
 
-                throw new Exception("Connection refused by remote computer.");
+                Global.mDebugger.Send("Connection refused by remote computer.");
             }
             else if (packet.SYN)
             {
+                TCB.IRS = packet.SequenceNumber;
+                TCB.RcvNxt = packet.SequenceNumber + 1;
+
                 if (packet.ACK)
                 {
-                    TCB.RcvNxt = packet.SequenceNumber + 1;
-                    TCB.SndNxt++;
+                    TCB.SndUna = packet.AckNumber;
+                    TCB.SndWnd = packet.WindowSize;
+                    TCB.SndWl1 = packet.SequenceNumber;
+                    TCB.SndWl2 = packet.SequenceNumber;
 
                     LastSequenceNumber = packet.SequenceNumber;
 
@@ -431,13 +441,13 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     Status = Status.CLOSED;
 
-                    throw new NotImplementedException("Simultaneous open not supported.");
+                    Global.mDebugger.Send("Simultaneous open not supported.");
                 }
                 else
                 {
                     Status = Status.CLOSED;
 
-                    throw new Exception("TCP connection closed! (Flag " + packet.TCPFlags + " received on SYN_SENT state)");
+                    Global.mDebugger.Send("TCP connection closed! (" + packet.getFlags() + " received on SYN_SENT state)");
                 }
             }
         }
@@ -454,9 +464,9 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     if (packet.SequenceNumber > LastSequenceNumber) //dup check
                     {
-                        TCB.RcvNxt += packet.TCP_DataLength;
-
                         LastSequenceNumber = packet.SequenceNumber;
+
+                        TCB.RcvNxt += packet.TCP_DataLength;
 
                         Data = ArrayHelper.Concat(Data, packet.TCP_Data);
 
@@ -636,10 +646,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal void SendEmptyPacket(Flags flag)
         {
-            var packet = new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TcpWindowSize, 0);
-
-            OutgoingBuffer.AddPacket(packet);
-            NetworkStack.Update();
+            SendPacket(new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TcpWindowSize, 0));
         }
 
         /// <summary>
@@ -647,10 +654,21 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal void SendEmptyPacket(Flags flag, uint sequenceNumber)
         {
-            var packet = new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TcpWindowSize, 0);
+            SendPacket(new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TcpWindowSize, 0));
+        }
 
+        /// <summary>
+        /// Send TCP packet.
+        /// </summary>
+        private void SendPacket(TCPPacket packet)
+        {
             OutgoingBuffer.AddPacket(packet);
             NetworkStack.Update();
+
+            if (packet.SYN || packet.FIN)
+            {
+                TCB.SndNxt++;
+            }
         }
 
         /// <summary>
