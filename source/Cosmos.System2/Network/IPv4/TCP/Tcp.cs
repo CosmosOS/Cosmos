@@ -240,11 +240,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         internal bool WaitingAck;
 
         /// <summary>
-        /// Last recveived Connection Sequence number.
-        /// </summary>
-        internal uint LastSequenceNumber;
-
-        /// <summary>
         /// RX buffer queue.
         /// </summary>
         internal Queue<TCPPacket> rxBuffer;
@@ -409,8 +404,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                     TCB.SndWl1 = packet.SequenceNumber;
                     TCB.SndWl2 = packet.SequenceNumber;
 
-                    LastSequenceNumber = packet.SequenceNumber - 1; //TODO: Fix this trick (for dup check when PSH ACK)
-
                     Status = Status.ESTABLISHED;
                 }
                 else
@@ -466,8 +459,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                     TCB.SndWl1 = packet.SequenceNumber;
                     TCB.SndWl2 = packet.SequenceNumber;
 
-                    LastSequenceNumber = packet.SequenceNumber;
-
                     SendEmptyPacket(Flags.ACK);
 
                     Status = Status.ESTABLISHED;
@@ -497,18 +488,13 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 if (packet.PSH)
                 {
-                    if (packet.SequenceNumber > LastSequenceNumber) //dup check
-                    {
-                        LastSequenceNumber = packet.SequenceNumber;
+                    TCB.RcvNxt += packet.TCP_DataLength;
 
-                        TCB.RcvNxt += packet.TCP_DataLength;
+                    Data = ArrayHelper.Concat(Data, packet.TCP_Data);
 
-                        Data = ArrayHelper.Concat(Data, packet.TCP_Data);
+                    rxBuffer.Enqueue(packet);
 
-                        rxBuffer.Enqueue(packet);
-
-                        SendEmptyPacket(Flags.ACK);
-                    }
+                    SendEmptyPacket(Flags.ACK);
                 }
 
                 if (WaitingAck)
