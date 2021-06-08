@@ -2,7 +2,7 @@
 name: Documentation/Website Bug Report
 about: For bugs involving the Cosmos documentation & website
 title: ''
-labels: Bug
+labels: 'Area: Documentation'
 assignees: ''
 
 ---
