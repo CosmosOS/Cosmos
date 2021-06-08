@@ -1,8 +1,8 @@
 ﻿# Welcome to the Official Cosmos Documentation</h1>
   
-If you're knew to Cosmos, welcome! Before you get stuck in the API documentation, we highly recommend you visit the website linked at the bottom.  
+If you're new to Cosmos, welcome! Before you get stuck in the API documentation, we highly recommend you visit the website linked at the bottom.  
   
-The Articles section of this website includes some articles which have been written many years ago for websites such as www.codeproject.com and are kept for archival purposes. These discuss elements such as the Cosmos Virtual FIle System. We prefer newcomers who want to develop their own operating systems to read the API documentation while we update these articles to comply with the current Cosmos project. 
+The Articles section of this website includes some articles which have been written many years ago for websites such as www.codeproject.com and are kept for archival purposes. These discuss elements such as the Cosmos Virtual File System. We prefer newcomers who want to develop their own operating systems to read the API documentation while we update these articles to comply with the current Cosmos project. 
     
 For projects using the VFS directly, we recommend you use System.IO methods where possible. This is because these were written before much progress was made making .NET assemblies usable
   
