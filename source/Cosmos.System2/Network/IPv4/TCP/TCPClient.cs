@@ -168,7 +168,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 for (int i = 0; i < chunks.Length; i++)
                 {
-                    var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), Tcp.TcpWindowSize, 0, chunks[i]);
+                    var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), StateMachine.TCB.SndWnd, 0, chunks[i]);
                     OutgoingBuffer.AddPacket(packet);
                     NetworkStack.Update();
 
@@ -177,13 +177,12 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else
             {
-                var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, (byte)(Flags.PSH | Flags.ACK), Tcp.TcpWindowSize, 0, data);
+                var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, (byte)(Flags.PSH | Flags.ACK), StateMachine.TCB.SndWnd, 0, data);
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
 
                 StateMachine.TCB.SndNxt += (uint)data.Length;
             }
-            StateMachine.WaitingAck = true;
         }
 
         /// <summary>

@@ -88,7 +88,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Send window.
         /// </summary>
-        public uint SndWnd { get; set; }
+        public ushort SndWnd { get; set; }
 
         /// <summary>
         /// Send urgent pointer.
@@ -235,11 +235,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         #endregion
 
         /// <summary>
-        /// Is waiting for an acknowledgement packet.
-        /// </summary>
-        internal bool WaitingAck;
-
-        /// <summary>
         /// RX buffer queue.
         /// </summary>
         internal Queue<TCPPacket> rxBuffer;
@@ -262,8 +257,6 @@ namespace Cosmos.System.Network.IPv4.TCP
             RemoteAddress = remoteIp;
 
             TCB = new TransmissionControlBlock();
-
-            WaitingAck = false;
         }
 
         /// <summary>
@@ -419,8 +412,38 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessSynSent(TCPPacket packet)
         {
-            if (packet.TCPFlags == (byte)Flags.ACK)
+            if (packet.SYN)
             {
+                TCB.IRS = packet.SequenceNumber;
+                TCB.RcvNxt = packet.SequenceNumber + 1;
+
+                if (packet.ACK)
+                {
+                    TCB.SndUna = packet.AckNumber;
+                    TCB.SndWnd = packet.WindowSize;
+                    TCB.SndWl1 = packet.SequenceNumber;
+                    TCB.SndWl2 = packet.AckNumber;
+
+                    SendEmptyPacket(Flags.ACK);
+
+                    Status = Status.ESTABLISHED;
+                }
+                else if (packet.TCPFlags == (byte)Flags.SYN)
+                {
+                    Status = Status.CLOSED;
+
+                    Global.mDebugger.Send("Simultaneous open not supported.");
+                }
+                else
+                {
+                    Status = Status.CLOSED;
+
+                    Global.mDebugger.Send("TCP connection closed! (" + packet.getFlags() + " received on SYN_SENT state)");
+                }
+            }
+            else if (packet.ACK)
+            {
+                //Check for bad ACK packet
                 if ((packet.AckNumber - TCB.ISS) < 0 || (packet.AckNumber - TCB.SndNxt) > 0)
                 {
                     SendEmptyPacket(Flags.RST, packet.AckNumber);
@@ -447,35 +470,6 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 Global.mDebugger.Send("Connection refused by remote computer.");
             }
-            else if (packet.SYN)
-            {
-                TCB.IRS = packet.SequenceNumber;
-                TCB.RcvNxt = packet.SequenceNumber + 1;
-
-                if (packet.ACK)
-                {
-                    TCB.SndUna = packet.AckNumber;
-                    TCB.SndWnd = packet.WindowSize;
-                    TCB.SndWl1 = packet.SequenceNumber;
-                    TCB.SndWl2 = packet.SequenceNumber;
-
-                    SendEmptyPacket(Flags.ACK);
-
-                    Status = Status.ESTABLISHED;
-                }
-                else if (packet.TCPFlags == (byte)Flags.SYN)
-                {
-                    Status = Status.CLOSED;
-
-                    Global.mDebugger.Send("Simultaneous open not supported.");
-                }
-                else
-                {
-                    Status = Status.CLOSED;
-
-                    Global.mDebugger.Send("TCP connection closed! (" + packet.getFlags() + " received on SYN_SENT state)");
-                }
-            }
         }
 
         /// <summary>
@@ -484,8 +478,34 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessEstablished(TCPPacket packet)
         {
-            if (packet.ACK && !packet.FIN)
+            if (packet.ACK)
             {
+                if (TCB.SndUna < packet.AckNumber && packet.AckNumber <= TCB.SndNxt)
+                {
+                    TCB.SndUna = packet.AckNumber;
+
+                    //Update Window Size
+                    if (TCB.SndWl1 < packet.SequenceNumber || (TCB.SndWl1 == packet.SequenceNumber && TCB.SndWl2 <= packet.AckNumber))
+                    {
+                        TCB.SndWnd = packet.WindowSize;
+                        TCB.SndWl1 = packet.SequenceNumber;
+                        TCB.SndWl2 = packet.AckNumber;
+                    }
+                }
+
+                // Check for duplicate packet
+                if (packet.AckNumber < TCB.SndUna)
+                {
+                    return;
+                }
+
+                // Something not yet sent
+                if (packet.AckNumber > TCB.SndNxt)
+                {
+                    SendEmptyPacket(Flags.ACK);
+                    return;
+                }
+
                 if (packet.PSH)
                 {
                     TCB.RcvNxt += packet.TCP_DataLength;
@@ -495,39 +515,31 @@ namespace Cosmos.System.Network.IPv4.TCP
                     rxBuffer.Enqueue(packet);
 
                     SendEmptyPacket(Flags.ACK);
+                    return;
+                }
+                else if (packet.FIN)
+                {
+                    TCB.RcvNxt++;
+
+                    SendEmptyPacket(Flags.ACK);
+
+                    WaitAndClose();
+
+                    return;
                 }
 
-                if (WaitingAck)
+                if (packet.TCP_DataLength > 0 && packet.SequenceNumber >= TCB.RcvNxt) //packet sequencing
                 {
-                    if (packet.AckNumber == TCB.SndNxt)
-                    {
-                        WaitingAck = false;
-                    }
-                }
-                else if (!packet.PSH)
-                {
-                    if (packet.SequenceNumber >= TCB.RcvNxt && packet.TCP_DataLength > 0) //packet sequencing
-                    {
-                        TCB.RcvNxt += packet.TCP_DataLength;
+                    TCB.RcvNxt += packet.TCP_DataLength;
 
-                        Data = ArrayHelper.Concat(Data, packet.TCP_Data);
-                    }
+                    Data = ArrayHelper.Concat(Data, packet.TCP_Data);
                 }
-                return;
             }
             if (packet.RST)
             {
                 Status = Status.CLOSED;
 
                 throw new Exception("TCP Connection resetted!");
-            }
-            else if (packet.FIN && packet.ACK)
-            {
-                TCB.RcvNxt++;
-
-                SendEmptyPacket(Flags.ACK);
-
-                WaitAndClose();
             }
             else if (packet.FIN)
             {
@@ -551,13 +563,20 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="packet">Packet to receive.</param>
         public void ProcessFinWait1(TCPPacket packet)
         {
-            if (packet.FIN && packet.ACK)
+            if (packet.ACK)
             {
-                TCB.RcvNxt++;
+                if (packet.FIN)
+                {
+                    TCB.RcvNxt++;
 
-                SendEmptyPacket(Flags.ACK);
+                    SendEmptyPacket(Flags.ACK);
 
-                WaitAndClose();
+                    WaitAndClose();
+                }
+                else
+                {
+                    Status = Status.FIN_WAIT2;
+                }
             }
             else if (packet.FIN)
             {
@@ -566,10 +585,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                 SendEmptyPacket(Flags.ACK);
 
                 Status = Status.CLOSING;
-            }
-            else if (packet.ACK)
-            {
-                Status = Status.FIN_WAIT2;
             }
         }
 
@@ -667,7 +682,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal void SendEmptyPacket(Flags flag)
         {
-            SendPacket(new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TcpWindowSize, 0));
+            SendPacket(new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
         }
 
         /// <summary>
@@ -675,7 +690,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal void SendEmptyPacket(Flags flag, uint sequenceNumber)
         {
-            SendPacket(new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TcpWindowSize, 0));
+            SendPacket(new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
         }
 
         /// <summary>
