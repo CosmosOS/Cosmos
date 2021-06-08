@@ -312,7 +312,8 @@ namespace Cosmos.System.Network.IPv4.TCP
                         case Status.TIME_WAIT:
                             break;
                         default:
-                            throw new Exception("Unknown TCP connection state.");
+                            Global.mDebugger.Send("Unknown TCP connection state.");
+                            break;
                     }
                 }
                 else
@@ -345,7 +346,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
 
-                throw new Exception("TCP connection closed! (FIN received on LISTEN state)");
+                Global.mDebugger.Send("TCP connection closed! (FIN received on LISTEN state)");
             }
             else if (packet.ACK)
             {
@@ -539,7 +540,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
 
-                throw new Exception("TCP Connection resetted!");
+                Global.mDebugger.Send("TCP Connection resetted!");
             }
             else if (packet.FIN)
             {
