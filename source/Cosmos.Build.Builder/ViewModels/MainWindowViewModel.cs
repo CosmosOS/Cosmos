@@ -62,7 +62,7 @@ namespace Cosmos.Build.Builder.ViewModels
             CopyCommand = new RelayCommand(CopyLogToClipboard);
 
             CloseWhenCompleted = true;
-            
+
             _logger = new MainWindowLogger(this);
 
             _buildTask = BuildAsync();
@@ -95,10 +95,9 @@ namespace Cosmos.Build.Builder.ViewModels
 
         private async Task BuildAsync()
         {
+            _logger.NewSection("Checking Dependencies");
             try
             {
-                _logger.NewSection("Checking Dependencies");
-
                 foreach (var dependency in _buildDefinition.GetDependencies())
                 {
                     if (await dependency.IsInstalledAsync(CancellationToken.None).ConfigureAwait(false))
@@ -107,7 +106,7 @@ namespace Cosmos.Build.Builder.ViewModels
                     }
                     else
                     {
-                        _logger.LogMessage($"{dependency.Name} not found. Install {dependency.OtherDependencysThatAreMissing}");
+                        _logger.LogMessage($"{dependency.Name} not found. Install {dependency.OtherDependencysThatAreMissing.TrimEnd(',')}");
 
                         if (dependency.ShouldInstallByDefault)
                         {
@@ -132,7 +131,14 @@ namespace Cosmos.Build.Builder.ViewModels
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                OnError("Error while installing dependencies: " + e.Message);
+            }
 
+            try
+            {
                 foreach (var buildTask in _buildDefinition.GetBuildTasks())
                 {
                     _logger.NewSection(buildTask.Name);
@@ -142,11 +148,7 @@ namespace Cosmos.Build.Builder.ViewModels
             }
             catch (Exception e)
             {
-                _logger.SetError();
-
-                _logger.NewSection("Error");
-                _logger.LogMessage(e.ToString());
-                _logger.SetError();
+                OnError(e.Message);
             }
 
             await Task.Delay(5000).ConfigureAwait(false);
@@ -162,6 +164,14 @@ namespace Cosmos.Build.Builder.ViewModels
                     WindowState = WindowState.Normal;
                 }
             }
+        }
+        public void OnError(string message)
+        {
+            _logger.SetError();
+
+            _logger.NewSection("Error");
+            _logger.LogMessage(message);
+            _logger.SetError();
         }
     }
 }

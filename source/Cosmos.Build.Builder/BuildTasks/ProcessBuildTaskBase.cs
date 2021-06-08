@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -12,6 +13,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
         private readonly bool _waitForExit;
         private readonly bool _createWindow;
+        private static List<string> Lines = new List<string>();
 
         protected ProcessBuildTaskBase(bool waitForExit, bool createWindow)
         {
@@ -26,6 +28,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             logger.LogMessage($"\"{exePath}\" {args}");
 
+            Lines.Clear();
             var process = new Process();
             var processStartInfo = new ProcessStartInfo(exePath, args);
 
@@ -62,7 +65,14 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             if (process.ExitCode != 0)
             {
-                throw new Exception("The process failed to execute!");
+                if (Lines.Count == 0)
+                {
+                    throw new Exception("The process failed to execute!");
+                }
+                else
+                {
+                    throw new Exception("The process failed to execute!\nLast 1 line from output: \n"+Lines[Lines.Count - 1]);
+                }
             }
         }
 
@@ -76,7 +86,7 @@ namespace Cosmos.Build.Builder.BuildTasks
                 {
                     return;
                 }
-
+                Lines.Add(line);
                 logger.LogMessage(line);
             }
         }

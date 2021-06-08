@@ -10,7 +10,9 @@
         ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
         Title="Cosmos Kit Builder"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
@@ -37,12 +39,13 @@
 
             <StackPanel Grid.Row="2"
                         HorizontalAlignment="Right"
-                        Margin="0,8,0,0"
+                        Margin="5,8,5,0"
                         Orientation="Horizontal">
-                <Button Visibility="{Binding IsNotInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
+                <!--I am using a toggleButton because normal buttons for some reason use the default WPF skin-->
+                <ToggleButton Visibility="{Binding IsNotInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Command="{Binding InstallCommand}"
-                        Content="OK" />
-                <Button Visibility="{Binding InstallationNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Content="OK" Margin="0,0,5,0"></ToggleButton>
+                <ToggleButton Visibility="{Binding InstallationNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Command="{Binding CancelCommand}"
                         CommandParameter="{Binding ElementName=dependencyInstallationDialog}"
                         Content="Cancel" />
@@ -63,11 +66,12 @@
                          Margin="0,4"
                          IsIndeterminate="True" />
 
-            <Button Grid.Row="1"
+            <ToggleButton Grid.Row="1"
                     HorizontalAlignment="Right"
                     Margin="0,8,0,0"
                     Command="{Binding CancelInstallationCommand}"
-                    Content="Cancel" />
+                    Content="Cancel">
+            </ToggleButton>
 
         </StackPanel>
 
@@ -79,7 +83,7 @@
                        Margin="0,0,0,4"
                        Text="{Binding InstallationCompletedText}" />
 
-            <Button Grid.Row="1"
+            <ToggleButton Grid.Row="1"
                     HorizontalAlignment="Right"
                     Margin="0,8,0,0"
                     Command="{Binding OkCommand}"
