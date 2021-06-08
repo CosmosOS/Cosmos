@@ -510,7 +510,7 @@ namespace Cosmos.System.Graphics
                     data = BitConverter.GetBytes(rawData[x + (Height - (y + 1)) * Width]);
                     for (int i = 0; i < byteNum; i++)
                     {
-                        imageData[imageDataPoint++] = data[byteNum - i];
+                        imageData[imageDataPoint++] = data[byteNum - i - 1];
                     }
                 }
                 imageDataPoint += padding;
