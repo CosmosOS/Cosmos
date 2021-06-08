@@ -281,41 +281,61 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             Global.mDebugger.Send("[" + table[(int)Status] + "] " + packet.ToString());
 
-            switch (Status)
+            if (Status == Status.CLOSED)
             {
-                case Status.LISTEN:
-                    ProcessListen(packet);
-                    break;
-                case Status.SYN_SENT:
-                    ProcessSynSent(packet);
-                    break;
-                case Status.SYN_RECEIVED:
-                    ProcessSynReceived(packet);
-                    break;
-                case Status.ESTABLISHED:
-                    ProcessEstablished(packet);
-                    break;
-                case Status.FIN_WAIT1:
-                    ProcessFinWait1(packet);
-                    break;
-                case Status.FIN_WAIT2:
-                    ProcessFinWait2(packet);
-                    break;
-                case Status.CLOSE_WAIT:
-                    ProcessCloseWait(packet);
-                    break;
-                case Status.CLOSING:
-                    ProcessClosing(packet);
-                    break;
-                case Status.LAST_ACK:
-                    ProcessCloseWait(packet);
-                    break;
-                case Status.TIME_WAIT:
-                    break;
-                case Status.CLOSED:
-                    break;
-                default:
-                    throw new Exception("Unknown TCP connection state.");
+                //DO NOTHING
+            }
+            else if (Status == Status.LISTEN)
+            {
+                ProcessListen(packet);
+            }
+            else if (Status == Status.SYN_SENT)
+            {
+                ProcessSynSent(packet);
+            }
+            else
+            {
+                // Check sequence number and segment data.
+                if (TCB.RcvNxt <= packet.SequenceNumber && packet.SequenceNumber + packet.TCP_DataLength < TCB.RcvNxt + TCB.RcvWnd)
+                {
+                    switch (Status)
+                    {
+                        case Status.SYN_RECEIVED:
+                            ProcessSynReceived(packet);
+                            break;
+                        case Status.ESTABLISHED:
+                            ProcessEstablished(packet);
+                            break;
+                        case Status.FIN_WAIT1:
+                            ProcessFinWait1(packet);
+                            break;
+                        case Status.FIN_WAIT2:
+                            ProcessFinWait2(packet);
+                            break;
+                        case Status.CLOSE_WAIT:
+                            ProcessCloseWait(packet);
+                            break;
+                        case Status.CLOSING:
+                            ProcessClosing(packet);
+                            break;
+                        case Status.LAST_ACK:
+                            ProcessCloseWait(packet);
+                            break;
+                        case Status.TIME_WAIT:
+                            break;
+                        default:
+                            throw new Exception("Unknown TCP connection state.");
+                    }
+                }
+                else
+                {
+                    if (!packet.RST)
+                    {
+                        SendEmptyPacket(Flags.ACK);
+                    }
+
+                    Global.mDebugger.Send("Sequence number or segment data invalid, packet passed.");
+                }
             }
         }
 
@@ -329,9 +349,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (packet.RST)
             {
-                Status = Status.CLOSED;
+                Global.mDebugger.Send("RST received at LISTEN state, packet passed.");
 
-                throw new Exception("TCP connection resetted! (RST received on LISTEN state)");
+                return;
             }
             else if (packet.FIN)
             {
@@ -348,19 +368,30 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.SYN)
             {
-                Status = Status.SYN_RECEIVED;
-
                 LocalAddress = IPConfig.FindNetwork(packet.SourceIP);
-
-                TCB.RcvNxt = packet.SequenceNumber + 1;
-
-                var rnd = new Random();
-                TCB.SndNxt = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
-
                 RemoteAddress = packet.SourceIP;
                 RemotePort = packet.SourcePort;
 
+                var rnd = new Random();
+                var sequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
+
+                //Fill TCB
+                TCB.SndUna = sequenceNumber;
+                TCB.SndNxt = sequenceNumber;
+                TCB.SndWnd = Tcp.TcpWindowSize;
+                TCB.SndUp = 0;
+                TCB.SndWl1 = packet.SequenceNumber - 1;
+                TCB.SndWl2 = 0;
+                TCB.ISS = sequenceNumber;
+
+                TCB.RcvNxt = packet.SequenceNumber + 1;
+                TCB.RcvWnd = Tcp.TcpWindowSize;
+                TCB.RcvUp = 0;
+                TCB.IRS = packet.SequenceNumber;
+
                 SendEmptyPacket(Flags.SYN | Flags.ACK);
+
+                Status = Status.SYN_RECEIVED;
             }
         }
 
@@ -381,6 +412,10 @@ namespace Cosmos.System.Network.IPv4.TCP
                     LastSequenceNumber = packet.SequenceNumber - 1; //TODO: Fix this trick (for dup check when PSH ACK)
 
                     Status = Status.ESTABLISHED;
+                }
+                else
+                {
+                    SendEmptyPacket(Flags.RST, packet.AckNumber);
                 }
             }
         }
