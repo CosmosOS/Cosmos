@@ -1,8 +1,8 @@
 # Introduction
 
-The Cosmos Graphic Subsystem (CGS from now on) is based on the abstraction of Canvas that is an empty space in which the user of CGS can draw its content. CGS is not a widget toolkit as Winforms or Gnome / GTK but is tough to be more lower level and it will be the basic in which widget toolkits will be implemented. CGS hides the graphics driver (so far VGA and VBE) used and it is tough to be the universal way to draw on the screen in Cosmos.
+The Cosmos Graphic Subsystem (CGS from now on) is based on the abstraction of Canvas that is an empty space in which the user of CGS can draw its content. CGS is not a widget toolkit as Winforms or Gnome / GTK but is thought to be more lower level and it will be the basic in which widget toolkits will be implemented. CGS hides the graphics driver (so far VGA, VBE and SVGA II) used and it is thought to be the universal way to draw on the screen in Cosmos.
 
-While Canvas could be overwritten (for example to create sub windows) the user of CGS does not have to deal with it directly but it must use the static class FullScreenCanvas.
+While Canvas could be overwritten (for example to create sub windows) the user of CGS does not have to deal with it directly but they must use the static class FullScreenCanvas.
 
 Let's give a look to its API methods.
 # FullScreenCanvas
@@ -41,9 +41,12 @@ namespace GraphicTest
         protected override void BeforeRun()
         {
             /* If all works correctly you should not really see this :-) */
-            Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
+            Console.WriteLine("Cosmos booted successfully. Let's go in Graphical Mode");
 
             canvas = FullScreenCanvas.GetFullScreenCanvas();
+
+            /* It is better to directly specify the mode in the GetFullScreenCanvas() function */
+            canvas.Mode = new Mode(640, 480, ColorDepth.ColorDepth32);
 
             canvas.Clear(Color.Blue);
         }
@@ -72,38 +75,34 @@ namespace GraphicTest
                 pen.Color = Color.PaleVioletRed;
                 canvas.DrawRectangle(pen, 350, 350, 80, 60);
 
-                Console.ReadKey();
-
-                /* Let's try to change mode...*/
-                canvas.Mode = new Mode(800, 600, ColorDepth.ColorDepth32);
-
                 /* A LimeGreen rectangle */
                 pen.Color = Color.LimeGreen;
                 canvas.DrawRectangle(pen, 450, 450, 80, 60);
 
-                Console.ReadKey();
-
-                Stop();
+                Sys.Power.Shutdown();
             }
             catch (Exception e)
             {
                 mDebugger.Send("Exception occurred: " + e.Message);
-                mDebugger.Send(e.Message);
-                Stop();
+                Sys.Power.Shutdown();
             }
         }
     }
 }
 ```
-# Limitation of the current implementation
+# Limitations of the current implementation
 
-1. Only the Bochs Graphic Adapter is actually supported; this means that CGS will work only on Bochs, QEMU and VirtualBox. CGS does not make any assumption on the underlying hardware, simple a VGA driver should be adapted to use it. No change to user code should be required to use another driver
-2. Only 32 bit color depth is actually supported, the API provides methods to set a resolution with 24, 16, 8 and 4 bit but the low level Bochs driver has not yet implemented them
-3. CGS does not permits yet to do basic operations that would permit to fulfill its promise to be the basic block from which a "Widget Toolkit" could be derived for example these methods should be added:
-    DrawFilledRectangle((Pen pen, int x_start, int y_start,int width, int height)
-    void DrawImage(Image image, int x, int y) Canvas has already defined this method but it is not yet implemented
-    void DrawString(String string, Font font, Brush brush, int x, int y) Canvas has already defined this method but it is not yet implemented
-    .Net System.Drawing has overload of these methods taking a float to evaluate if they are really needed for CGS, they are defined but for now no implementation is provided
-    A double buffering strategy could be implemented to make it faster
-    This is more a limitation of the Bochs driver when the Graphic Mode is set there is no more a way to return to text mode
-    CGS / Graphic Mode interacts badly with the Kernel.Stop method: Bochs does not exit cleanly. You must use Sys.Power.Shutdown to shut down correctly your computer.
+1. Only the Bochs Graphic Adapter (VBE) is actually supported; this means that CGS will work only on Bochs, QEMU and VirtualBox. CGS does not make any assumption on the underlying hardware, simple a VGA driver should be adapted to use it. No change to user code should be required to use another driver.
+
+2. Only 32 bit color depth is actually supported, the API provides methods to set a resolution with 24, 16, 8 and 4 bit but the low level Bochs driver has not yet implemented them.
+
+3. CGS does not permits yet to do basic operations that would permit to fulfill its promise to be the basic block from which a "Widget Toolkit" could be derived from. For example these methods should be added:
+    - void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
+    - void DrawImage(Image image, int x, int y)
+    - void DrawString(String string, Font font, Brush brush, int x, int y)
+
+4. In addition, some other nice things could be implemented:
+    - Plugging System.Drawing functions for easier manipulation of colors
+    - A double buffering strategy, to make drawing faster (one is already implemented in the VBE driver, but not VGA or SVGA II)
+
+5. CGS interacts badly with the Kernel.Stop method: Bochs does not exist cleanly. You must use the Sys.Power.Shutdown() function to properly shut down your computer.
