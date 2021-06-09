@@ -68,7 +68,9 @@ using(var xClient = new TcpClient(4242))
 ## FTP
 Only server side is implemented in Cosmos. We recommand to use FileZilla as your FTP client.
 
-**Your FTP client must enable active mode**. Since in Active Mode the server has to open TCP connections, **your computer firewall must be disabled** to accept incoming connection. An FTP connection is made of two TCP sockets. One for control connection (as a textual protocol) and one for data transmission. Data transmission sockets can be opened by the client (if it is in Passive Mode) or by the server (if in Active Mode). The Passive Mode is not supported yet due to current Cosmos TCP and multithreading limitation. 
+**Your FTP client must enable active mode**. Since in Active Mode the server has to open TCP connections, **your computer firewall must be disabled** to accept incoming connection. An FTP connection is made of two TCP sockets. One for control connection (as a textual protocol) and one for data transmission. Data transmission sockets can be opened by the client (if it is in Passive Mode) or by the server (if in Active Mode). The Passive Mode is not supported yet due to current Cosmos TCP and multithreading limitation.
+
+Please note that for now only one FTP connection can be accepted, the server will shut down itself after the client disconnection.
 
 ```csharp
 var fs = new CosmosVFS();
