@@ -71,7 +71,19 @@ namespace Cosmos.Build.Builder.BuildTasks
                 }
                 else
                 {
-                    throw new Exception("The process failed to execute!\nLast 1 line from output: \n"+Lines[Lines.Count - 1]);
+                    string error = "";
+                    foreach (var item in Lines)
+                    {
+                        if (item.Contains("error"))
+                        {
+                            error += item + "\n";
+                        }
+                    }
+                    if (error == "")
+                    {
+                        error = Lines[Lines.Count - 1];
+                    }
+                    throw new Exception("The process failed to execute!\nError: \n"+error);
                 }
             }
         }

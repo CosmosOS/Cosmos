@@ -34,7 +34,7 @@
                         Orientation="Horizontal">
                 <Button Visibility="{Binding IsNotInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Command="{Binding InstallCommand}"
-                        Content="OK" Margin="0,0,0,0" Click="ToggleButton_Click"></Button>
+                        Content="OK" Margin="0,0,0,0" Click="Button_Click"></Button>
             </StackPanel>
         </StackPanel>
     </Grid>
