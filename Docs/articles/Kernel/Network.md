@@ -73,11 +73,13 @@ Only server side is implemented in Cosmos. We recommand to use FileZilla as your
 Please note that for now only one FTP connection can be accepted, the server will shut down itself after the client disconnection.
 
 ```csharp
+/** Initialize filesystem **/
 var fs = new CosmosVFS();
 VFSManager.RegisterVFS(fs);
 
 using(var xServer = new FtpServer(fs, "0:\\"))
 {
+    /** Listen for new FTP client connections **/
     ftpSever.Listen();
 }
 ```
