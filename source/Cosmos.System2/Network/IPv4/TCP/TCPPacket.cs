@@ -17,11 +17,34 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// </summary>
     public enum Flags : byte
     {
+        /// <summary>
+        /// No more data from sender.
+        /// </summary>
         FIN = (1 << 0),
+
+        /// <summary>
+        /// Synchronize sequence numbers.
+        /// </summary>
         SYN = (1 << 1),
+
+        /// <summary>
+        /// Reset the connection.
+        /// </summary>
         RST = (1 << 2),
+
+        /// <summary>
+        /// Push Function.
+        /// </summary>
         PSH = (1 << 3),
+
+        /// <summary>
+        /// Acknowledgment field significant.
+        /// </summary>
         ACK = (1 << 4),
+
+        /// <summary>
+        /// Urgent Pointer field significant.
+        /// </summary>
         URG = (1 << 5)
     }
 
@@ -54,18 +77,11 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             if (packet.CheckCRC())
             {
-                var client = TcpClient.GetClient(packet.DestinationPort);
-                if (client != null)
-                {
-                    client.StateMachine.ReceiveData(packet);
-                    return;
-                }
+                var connection = Tcp.GetConnection(packet.DestinationPort, packet.SourcePort, packet.DestinationIP, packet.SourceIP);
 
-                var listener = TcpListener.GetListener(packet.DestinationPort);
-                if (listener != null)
+                if (connection != null)
                 {
-                    listener.StateMachine.ReceiveData(packet);
-                    return;
+                    connection.ReceiveData(packet);
                 }
             }
             else
@@ -418,20 +434,6 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 return data;
             }
-        }
-
-        /// <summary>
-        /// Convert a byte to a hexadecimal char.
-        /// </summary>
-        /// <param name="b"></param>
-        /// <returns>Hex string.</returns>
-        static string ToHex(byte b)
-        {
-            string r = "";
-            string chars = "0123456789ABCDEF";
-
-            r += chars[b >> 4];
-            return r += chars[b &= 0x0F];
         }
 
         /// <summary>

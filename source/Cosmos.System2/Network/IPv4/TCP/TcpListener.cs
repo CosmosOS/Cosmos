@@ -15,57 +15,20 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal Tcp StateMachine;
 
-        // <summary>
-        /// Clients dictionary.
-        /// </summary>
-        private static Dictionary<uint, TcpListener> listeners;
-
-        /// <summary>
-        /// Assign listeners dictionary.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        static TcpListener()
-        {
-            listeners = new Dictionary<uint, TcpListener>();
-        }
-
-        /// <summary>
-        /// Get client.
-        /// </summary>
-        /// <param name="destPort">Destination port.</param>
-        /// <returns>TcpClient</returns>
-        internal static TcpListener GetListener(ushort destPort)
-        {
-            TcpListener listener;
-
-            if (listeners.TryGetValue(destPort, out listener))
-            {
-                return listener;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         /// <summary>
         /// Create new instance of the <see cref="TcpListener"/> class.
         /// </summary>
+        /// <param name="address">Local address.</param>
         /// <param name="localPort">Local port.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
         public TcpListener(int localPort)
         {
-            StateMachine = new Tcp();
+            StateMachine = new Tcp((ushort)localPort, 0, Address.Zero, Address.Zero);
 
             StateMachine.rxBuffer = new Queue<TCPPacket>(8);
 
-            StateMachine.localPort = localPort;
-
-            if (localPort > 0)
-            {
-                listeners.Add((uint)localPort, this);
-            }
+            StateMachine.LocalPort = (ushort)localPort;
         }
 
         /// <summary>
@@ -94,6 +57,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         public void Start()
         {
             StateMachine.Status = Status.LISTEN;
+
+            Tcp.Connections.Add(StateMachine);
         }
 
         /// <summary>
@@ -103,10 +68,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         public void Stop()
         {
-            if (listeners.ContainsKey((uint)StateMachine.localPort))
-            {
-                listeners.Remove((uint)StateMachine.localPort);
-            }
         }
 
         /// <summary>
