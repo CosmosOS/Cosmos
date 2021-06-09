@@ -1,8 +1,8 @@
 # Network
 
-In this article we will discuss about Networking on Cosmos, how to use the Network Stack, send and received packets. For now, available protocols are **ARP**, **IPv4**, **TCP**, **UDP**, **ICMP**, **DHCP** and **DNS**. Note that Cosmos devkit must be installed for this article.
+In this article we will discuss about Networking on Cosmos, how to use the Network Stack, send and receive packets. For now, available protocols are **ARP**, **IPv4**, **TCP**, **UDP**, **ICMP**, **DHCP** and **DNS**. Note that Cosmos devkit must be installed for this article.
 
-All protocols here don't necessary support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](http://https://github.com/CosmosOS/Cosmos/issues/new/choose "repository") on our repository. 
+All protocols here don't necessary support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository. 
 
 Each protocol has a Client class which can be used to receive and send data. If a Receive() method is blocking, the method will timeout after 5 seconds or use the value optionally set by parameter. Please note that all finished connections should be closed using Close().
 
@@ -25,8 +25,6 @@ using(var xClient = new DHCPClient())
     /** Send a DHCP Discover packet **/
     //This will automatically set the IP config after DHCP response
     xClient.SendDiscoverPacket();
-
-    xClient.Close();  //don't forget to close!
 }
 ```
 
@@ -44,13 +42,31 @@ using(var xClient = new UdpClient(4242))
     var endpoint = new EndPoint(Address.Zero, 0);
     var data = xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
     var data2 = xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
-
-    xClient.Close();
 }
 ```
 
 ## TCP
 Like UDP, TCP has to create a client and call Connect() to specify the remote machine address before sending or receiving data.
+
+Server :
+```csharp
+using(var xServer = new TcpListener(4242))
+{
+    /** Start server **/
+    xServer.Start();
+    
+    /** Accept incoming TCP connection **/
+    var client = xServer.AcceptTcpClient(); //blocking
+    
+    /** Stop server **/
+    xServer.Stop();
+
+    /** Send data **/
+    client.Send(Encoding.ASCII.GetBytes(message));
+}
+```
+
+Client :
 ```csharp
 using(var xClient = new TcpClient(4242))
 {
@@ -63,13 +79,11 @@ using(var xClient = new TcpClient(4242))
     var endpoint = new EndPoint(Address.Zero, 0);
     var data = xClient.Receive(ref endpoint);  //set endpoint to remote machine IP:port
     var data2 = xClient.NonBlockingReceive(ref endpoint); //retrieve receive buffer without waiting
-
-    xClient.Close();
 }
 ```
 
 ## ICMP
-For ICMP, we will only able to send an ICMP echo to a distant machine and wait for its response. If another machine sends us an ICMP echo, Cosmos will automatically handle the request and reply.
+For ICMP, we will only be able to send an ICMP echo to a distant machine and wait for its response. If another machine sends us an ICMP echo, Cosmos will automatically handle the request and reply.
 ```csharp
 using(var xClient = new ICMPClient())
 {
@@ -80,8 +94,6 @@ using(var xClient = new ICMPClient())
 
     /** Receive ICMP Response **/
     int time = xClient.Receive(ref endpoint); //return elapsed time / timeout if no response
-
-    xClient.Close();
 }
 
 ```
@@ -97,12 +109,10 @@ using(var xClient = new DnsClient())
 
     /** Receive DNS Response **/
     Address destination = xClient.Receive(); //can set a timeout value
-    
-    xClient.Close();
 }
 ```
 ## Utils
-## Get local IP
+## Get local IP address
 ```csharp
 Console.WriteLine(NetworkConfig.CurrentConfig.Value.IPAddress.ToString());
 ```
