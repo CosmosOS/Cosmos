@@ -49,12 +49,16 @@ namespace Cosmos.System.Network.IPv4
         /// <returns>ICMPClient</returns>
         internal static ICMPClient GetClient(uint iphash)
         {
-            if (clients.ContainsKey(iphash) == true)
-            {
-                return clients[iphash];
-            }
+            ICMPClient client;
 
-            return null;
+            if (clients.TryGetValue(iphash, out client))
+            {
+                return client;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>

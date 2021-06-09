@@ -93,6 +93,6 @@ namespace Cosmos.Build.Builder
         }
 
         private static void ShowErrorMessageBox(string message) =>
-            MessageBox.Show(message, "Cosmos Kit Builder", MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show(message, "Cosmos Kit Builder", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }
