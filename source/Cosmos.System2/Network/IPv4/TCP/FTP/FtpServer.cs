@@ -90,11 +90,9 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 tcpListener.Start();
                 var client = tcpListener.AcceptTcpClient();
 
-                global::System.Console.WriteLine("Client[0] : New connection from " + client.StateMachine.LocalAddress.ToString());
+                global::System.Console.WriteLine("Client : New connection from " + client.StateMachine.LocalAddress.ToString());
 
                 ReceiveNewClient(client);
-
-                break;
             }
         }
 
@@ -112,6 +110,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             {
                 ReceiveRequest(ftpClient);
             }
+
+            ftpClient.Control.Close();
+
+            //TODO: Support multiple FTP client connection
+            Close();
         }
 
         /// <summary>
@@ -121,30 +124,34 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         private void ReceiveRequest(FtpClient ftpClient)
         {
             var ep = new EndPoint(Address.Zero, 0);
-            var data = Encoding.ASCII.GetString(ftpClient.Control.Receive(ref ep));
-            data = data.Remove(data.Length - 2, 2);
 
-            global::System.Console.WriteLine("Client[0] : " + data);
-
-            var splitted = data.Split(' ');
-
-            var command = new FtpCommand();
-            command.Command = splitted[0];
-
-            if (splitted.Length > 1)
+            try
             {
-                int i = data.IndexOf(" ") + 1;
-                command.Content = data.Substring(i);
+                var data = Encoding.ASCII.GetString(ftpClient.Control.Receive(ref ep));
+                data = data.Remove(data.Length - 2, 2);
 
-                while (command.Content.StartsWith("/"))
+                global::System.Console.WriteLine("Client : " + data);
+
+                var splitted = data.Split(' ');
+
+                var command = new FtpCommand();
+                command.Command = splitted[0];
+
+                if (splitted.Length > 1)
                 {
-                    command.Content = command.Content.Remove(0, 1);
+                    //Handle command content containing spaces
+                    int i = data.IndexOf(" ") + 1;
+                    command.Content = data.Substring(i);
+
+                    command.Content = command.Content.Replace('/', '\\');
                 }
 
-                command.Content = command.Content.Replace('/', '\\');
+                CommandManager.ProcessRequest(ftpClient, command);
             }
-
-            CommandManager.ProcessRequest(ftpClient, command);
+            catch (Exception ex)
+            {
+                Global.mDebugger.Send("Exception: " + ex.Message);
+            }
         }
 
         /// <summary>

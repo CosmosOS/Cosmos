@@ -221,11 +221,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] Receive(ref EndPoint source)
         {
-            if (StateMachine.Status != Status.ESTABLISHED)
+            while (StateMachine.rxBuffer.Count < 1)
             {
-                throw new Exception("Client must be connected before receiving data.");
+                if (StateMachine.Status != Status.ESTABLISHED)
+                {
+                    throw new Exception("Client must be connected before receiving data.");
+                }
             }
-            while (StateMachine.rxBuffer.Count < 1) ;
 
             var packet = StateMachine.rxBuffer.Dequeue();
             source.address = packet.SourceIP;

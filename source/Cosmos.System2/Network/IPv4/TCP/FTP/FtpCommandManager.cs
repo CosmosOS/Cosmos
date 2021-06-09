@@ -24,6 +24,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         internal CosmosVFS FileSystem { get; set; }
 
         /// <summary>
+        /// Base path.
+        /// </summary>
+        internal string BaseDirectory { get; set; }
+
+        /// <summary>
         /// Current path.
         /// </summary>
         internal string CurrentDirectory { get; set; }
@@ -37,6 +42,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         {
             FileSystem = fs;
             CurrentDirectory = directory;
+            BaseDirectory = directory;
         }
 
         /// <summary>
@@ -187,28 +193,33 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             }
             try
             {
-                if (command.Content.Length == 2) //root check
+                if (command.Content.StartsWith("\\"))
                 {
-                    command.Content += "\\";
-                }
-
-                while (command.Content[0] == '\\')
-                {
-                    command.Content = command.Content.Remove(0, 1);
-                }
-
-                if (command.Content.Contains(":\\")) //full path check
-                {
-                    CurrentDirectory = command.Content;
+                    //Client asking for a path
+                    if (command.Content == "\\")
+                    {
+                        CurrentDirectory = BaseDirectory;
+                    }
+                    else
+                    {
+                        CurrentDirectory = BaseDirectory + command.Content;
+                    }
                 }
                 else
                 {
-                    CurrentDirectory += "\\" + command.Content;
+                    //Client asking for a folder in current directory
+                    if (CurrentDirectory == BaseDirectory)
+                    {
+                        CurrentDirectory += command.Content;
+                    }
+                    else
+                    {
+                        CurrentDirectory += "\\" + command.Content;
+                    }
                 }
 
                 if (Directory.Exists(CurrentDirectory))
                 {
-                    Directory.SetCurrentDirectory(CurrentDirectory);
                     ftpClient.SendReply(250, "Requested file action okay.");
                 }
                 else
@@ -229,15 +240,18 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <param name="command">FTP Command.</param>
         internal void ProcessPwd(FtpClient ftpClient, FtpCommand command)
         {
-            string tmp = "Cosmos";
+            //Replace 0:/ by /Cosmos/ for FTP client
+            int i = CurrentDirectory.IndexOf(":") + 2;
+            var tmp = CurrentDirectory.Substring(i);
 
-            if (CurrentDirectory.Length == 3) //root check
+            if (tmp.Length == 0)
             {
-                int i = CurrentDirectory.IndexOf(":") + 1;
-                tmp += CurrentDirectory.Substring(i);
+                ftpClient.SendReply(257, "/ created.");
             }
-
-            ftpClient.SendReply(257, "/" + tmp + " created.");
+            else
+            {
+                ftpClient.SendReply(257, "\"/" + tmp + "\" created.");
+            }
         }
 
         /// <summary>
