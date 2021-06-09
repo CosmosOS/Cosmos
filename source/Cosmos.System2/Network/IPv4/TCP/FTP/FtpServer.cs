@@ -69,11 +69,18 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         internal bool Listening;
 
         /// <summary>
+        /// Are debug logs enabled.
+        /// </summary>
+        internal bool Debug;
+
+        /// <summary>
         /// Create new instance of the <see cref="FtpServer"/> class.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 53 exists.</exception>
-        public FtpServer(CosmosVFS fs, string directory)
+        /// <exception cref="Exception">Thrown if directory does not exists.</exception>
+        /// <param name="fs">Initialized Cosmos Virtual Filesystem.</param>
+        /// <param name="directory">FTP Server root directory path.</param>
+        /// <param name="debug">Is debug logging enabled.</param>
+        public FtpServer(CosmosVFS fs, string directory, bool debug = false)
         {
             if (Directory.Exists(directory) == false)
             {
@@ -83,6 +90,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             CommandManager = new FtpCommandManager(fs, directory);
 
             Listening = true;
+            Debug = debug;
         }
 
         /// <summary>
@@ -96,7 +104,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 tcpListener.Start();
                 var client = tcpListener.AcceptTcpClient();
 
-                global::System.Console.WriteLine("Client : New connection from " + client.StateMachine.LocalAddress.ToString());
+                Log("Client : New connection from " + client.StateMachine.LocalAddress.ToString());
 
                 ReceiveNewClient(client);
             }
@@ -136,7 +144,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 var data = Encoding.ASCII.GetString(ftpClient.Control.Receive(ref ep));
                 data = data.Remove(data.Length - 2, 2);
 
-                global::System.Console.WriteLine("Client : " + data);
+                Log("Client : " + data);
 
                 var splitted = data.Split(' ');
 
@@ -157,6 +165,18 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
             catch (Exception ex)
             {
                 Global.mDebugger.Send("Exception: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Write logs to console
+        /// </summary>
+        /// <param name="str">String to write.</param>
+        private void Log(string str)
+        {
+            if (Debug)
+            {
+                global::System.Console.WriteLine(str);
             }
         }
 
