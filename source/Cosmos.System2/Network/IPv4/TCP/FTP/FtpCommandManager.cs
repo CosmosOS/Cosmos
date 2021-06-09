@@ -266,7 +266,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                       - Find port dynamically.
             */
 
-            throw new NotImplementedException("FTP Passive mode not supported yet!");
+            ftpClient.SendReply(502, "Command not implemented.");
 
             /*
             int port = 20;
