@@ -10,11 +10,13 @@
         ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
         Title="Cosmos Kit Builder"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <Style TargetType="Button">
+        <Style TargetType="Button" BasedOn="{ui:StaticResource DefaultButtonStyle}">
             <Setter Property="Margin" Value="4" />
             <Setter Property="MinWidth" Value="48" />
             <Setter Property="Padding" Value="8,3" />
@@ -37,11 +39,11 @@
 
             <StackPanel Grid.Row="2"
                         HorizontalAlignment="Right"
-                        Margin="0,8,0,0"
+                        Margin="5,8,5,0"
                         Orientation="Horizontal">
                 <Button Visibility="{Binding IsNotInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Command="{Binding InstallCommand}"
-                        Content="OK" />
+                        Content="OK" Margin="0,0,5,0"></Button>
                 <Button Visibility="{Binding InstallationNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Command="{Binding CancelCommand}"
                         CommandParameter="{Binding ElementName=dependencyInstallationDialog}"
@@ -67,7 +69,8 @@
                     HorizontalAlignment="Right"
                     Margin="0,8,0,0"
                     Command="{Binding CancelInstallationCommand}"
-                    Content="Cancel" />
+                    Content="Cancel">
+            </Button>
 
         </StackPanel>
 
