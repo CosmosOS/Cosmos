@@ -5,6 +5,7 @@
 */
 
 using System;
+using System.IO;
 using System.Text;
 using Cosmos.System.FileSystem;
 
@@ -74,6 +75,11 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
         /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 53 exists.</exception>
         public FtpServer(CosmosVFS fs, string directory)
         {
+            if (Directory.Exists(directory) == false)
+            {
+                throw new Exception("FTP server can't open specified directory.");
+            }
+
             CommandManager = new FtpCommandManager(fs, directory);
 
             Listening = true;
