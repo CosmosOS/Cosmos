@@ -24,6 +24,8 @@ To really draw into the screen we need to use the Canvas class. Let's give a loo
     void DrawPoint(Pen pen, int x, int y) draws a point at the coordinates specified by x and y with the specified pen
     void DrawLine(Pen pen, int x_start, int y_start, int x_end, int y_end) draws a line at the coordinates specified by x_start, y_start and x_end, y_end with the specified pen
     void DrawRectangle(Pen pen, int x_start, int y_start,int width, int height) draws a rectangle specified by a coordinate pair, a width, and a height with the specified pen
+    void DrawImage(Image image, int x, int y) draws nan image at the x and y specified
+    void DrawString(String string, Font font, Brush brush, int x, int y) draws a string with the specified font and brush at the specified x and y coordinates
 
 Really simple right?
 # A working example
@@ -43,11 +45,7 @@ namespace GraphicTest
             /* If all works correctly you should not really see this :-) */
             Console.WriteLine("Cosmos booted successfully. Let's go in Graphical Mode");
 
-            canvas = FullScreenCanvas.GetFullScreenCanvas();
-
-            /* It is better to directly specify the mode in the GetFullScreenCanvas() function */
-            canvas.Mode = new Mode(640, 480, ColorDepth.ColorDepth32);
-
+            canvas = FullScreenCanvas.GetFullScreenCanvas(new Mode(640, 480, ColorDepth.ColorDepth32));
             canvas.Clear(Color.Blue);
         }
 
@@ -55,8 +53,9 @@ namespace GraphicTest
         {
             try
             {
-                /* A red Point */
                 Pen pen = new Pen(Color.Red);
+
+                /* A red Point */
                 canvas.DrawPoint(pen, 69, 69);
 
                 /* A GreenYellow horizontal line */
@@ -92,9 +91,7 @@ namespace GraphicTest
 ```
 # Limitations of the current implementation
 
-1. Only the Bochs Graphic Adapter (VBE) is actually supported; this means that CGS will work only on Bochs, QEMU and VirtualBox. CGS does not make any assumption on the underlying hardware, simple a VGA driver should be adapted to use it. No change to user code should be required to use another driver.
-
-2. Only 32 bit color depth is actually supported, the API provides methods to set a resolution with 24, 16, 8 and 4 bit but the low level Bochs driver has not yet implemented them.
+1. Only 32 bit color depth is actually supported, the API provides methods to set a resolution with 24, 16, 8 and 4 bit but the low level Bochs driver has not yet implemented them.
 
 3. CGS does not permits yet to do basic operations that would permit to fulfill its promise to be the basic block from which a "Widget Toolkit" could be derived from. For example these methods should be added:
     - void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
