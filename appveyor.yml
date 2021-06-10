@@ -58,3 +58,8 @@ artifacts:
   - path: 'artifacts\Debug\nupkg\*.nupkg'
   - path: 'artifacts\Debug\VSIX\*.vsix'
   - path: 'TestResult.xml'
+
+
+skip_commits:
+  files:
+    - Docs/
