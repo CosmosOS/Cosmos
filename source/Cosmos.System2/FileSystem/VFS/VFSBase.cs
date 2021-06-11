@@ -5,14 +5,14 @@ using System.IO;
 namespace Cosmos.System.FileSystem.VFS
 {
     /// <summary>
-    /// Virtual file system base abstract class. 
+    /// Virtual file system base abstract class.
     /// </summary>
     public abstract class VFSBase
     {
         /// <summary>
         /// Initializes the <see cref="VFSBase"/> system.
         /// </summary>
-        public abstract void Initialize();
+        public abstract void Initialize(bool aShowInfo);
 
         /// <summary>
         /// Register file system.
