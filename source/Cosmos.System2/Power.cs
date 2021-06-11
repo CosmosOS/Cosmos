@@ -1,4 +1,5 @@
-﻿using sysIO = System.IO;
+﻿using Cosmos.Core;
+using sysIO = System.IO;
 namespace Cosmos.System
 {
     /// <summary>
@@ -11,7 +12,10 @@ namespace Cosmos.System
         /// </summary>
         public static void Reboot()
         {
-            HAL.Power.CPUReboot();
+            // ACPI reset not done yet
+            // ACPI.Reboot();
+
+            Core.Global.CPU.Reboot();
         }
 
         /// <summary>
@@ -20,7 +24,7 @@ namespace Cosmos.System
         /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
         public static void Shutdown()
         {
-            HAL.Power.ACPIShutdown();
+            ACPI.Shutdown();
         }
     }
 }
