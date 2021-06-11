@@ -33,11 +33,11 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright (c) 2007-2019 The Cosmos Project
+AppCopyright=Copyright (c) 2007-2021 The Cosmos Project
 AppPublisher=Cosmos Project
-AppPublisherURL=http://www.goCosmos.org/
-AppSupportURL=http://www.goCosmos.org/
-AppUpdatesURL=http://www.goCosmos.org/
+AppPublisherURL=http://www.gocosmos.org/
+AppSupportURL=http://www.gocosmos.org/
+AppUpdatesURL=http://www.gocosmos.org/
 AppVersion={#ChangeSetVersion}
 SetupMutex=CosmosSetupMutexName,Global\CosmoSetupMutexName
 UsePreviousAppDir=false
