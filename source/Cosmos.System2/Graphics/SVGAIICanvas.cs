@@ -25,7 +25,7 @@ namespace Cosmos.System.Graphics
         /// Debugger.
         /// </summary>
         internal Debugger mSVGAIIDebugger = new Debugger("System", "SVGAIIScreen");
-        
+
         private static readonly Mode _DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
 
         /// <summary>
@@ -96,7 +96,8 @@ namespace Cosmos.System.Graphics
             {
                 return;
             }
-            else if (xColor.A < 255)
+
+            if (xColor.A < 255)
             {
                 xColor = AlphaBlend(xColor, GetPointColor(aX, aY), xColor.A);
             }
@@ -105,8 +106,8 @@ namespace Cosmos.System.Graphics
             _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
             mSVGAIIDebugger.SendInternal($"Done drawing point");
             /* No need to refresh all the screen to make the point appear on Screen! */
-            //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Columns, (uint)mode.Rows);
-            _xSVGADriver.Update((uint)aX, (uint)aY, 1, 1);
+            //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Width, (uint)mode.Height);
+            //_xSVGADriver.Update((uint)aX, (uint)aY, 1, 1);
         }
 
         /// <summary>
@@ -121,8 +122,8 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown always.</exception>
         public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
         {
-            throw new NotImplementedException();
             //xSVGAIIDriver.
+            base.DrawArray(aColors, new Point(aX, aY), aWidth, aHeight);
         }
 
         /// <summary>
@@ -136,7 +137,24 @@ namespace Cosmos.System.Graphics
         public override void DrawPoint(Pen aPen, float aX, float aY)
         {
             //xSVGAIIDriver.
-            throw new NotImplementedException();
+            Color xColor = aPen.Color;
+
+            if (xColor.A == 0)
+            {
+                return;
+            }
+
+            if (xColor.A < 255)
+            {
+                xColor = AlphaBlend(xColor, GetPointColor((int)aX, (int)aY), xColor.A);
+            }
+
+            mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {xColor.Name} Color");
+            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
+            mSVGAIIDebugger.SendInternal($"Done drawing point");
+            /* No need to refresh all the screen to make the point appear on Screen! */
+            //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Width, (uint)mode.Height);
+            //_xSVGADriver.Update((uint)aX, (uint)aY, 1, 1);
         }
 
         /// <summary>
@@ -151,7 +169,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void DrawFilledRectangle(Pen aPen, int aX_start, int aY_start, int aWidth, int aHeight)
         {
-            _xSVGADriver.Fill((uint)aX_start, (uint)aY_start, (uint)aWidth, (uint)aHeight, (uint)aPen.Color.ToArgb());
+            //_xSVGADriver.Fill((uint)aX_start, (uint)aY_start, (uint)aWidth, (uint)aHeight, (uint)aPen.Color.ToArgb());
+
+            for (uint h = 0; h < aHeight; h++)
+            {
+                for (uint w = 0; w < aWidth; w++)
+                {
+                    DrawPoint(aPen, w + aX_start, aY_start + h);
+                }
+            }
         }
 
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
@@ -298,8 +324,8 @@ namespace Cosmos.System.Graphics
         {
             ThrowIfModeIsNotValid(aMode);
 
-            var xWidth = (uint)aMode.Columns;
-            var xHeight = (uint)aMode.Rows;
+            var xWidth = (uint)aMode.Width;
+            var xHeight = (uint)aMode.Height;
             var xColorDepth = (uint)aMode.ColorDepth;
 
             _xSVGADriver.SetMode(xWidth, xHeight, xColorDepth);
@@ -313,7 +339,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void Clear(Color aColor)
         {
-            _xSVGADriver.Fill(0, 0, (uint)Mode.Columns, (uint)Mode.Rows, (uint)aColor.ToArgb());
+            _xSVGADriver.Clear((uint)aColor.ToArgb());
         }
 
         /// <summary>
@@ -392,7 +418,7 @@ namespace Cosmos.System.Graphics
 
         public override void Display()
         {
-            
+            _xSVGADriver.Update();
         }
     }
 }
