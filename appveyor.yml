@@ -63,3 +63,5 @@ artifacts:
 skip_commits:
   files:
     - Docs/
+    - .github/
+    - Artwork/
