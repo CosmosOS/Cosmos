@@ -65,3 +65,10 @@ skip_commits:
     - Docs/
     - .github/
     - Artwork/
+    - '**/*.md'
+    - LICENSE.txt
+    - README.txt
+    - .gitignore
+    - source/Archive/
+    - Users/
+    
