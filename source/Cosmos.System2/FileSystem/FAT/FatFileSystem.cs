@@ -710,7 +710,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public FatFileSystem(Partition aDevice, string aRootPath, long aSize)
+        public FatFileSystem(Partition aDevice, string aRootPath, long aSize, bool noFs = false)
             : base(aDevice, aRootPath, aSize)
         {
             if (aDevice == null)
@@ -723,7 +723,27 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
             }
 
-            ReadBootSector();
+            if (!noFs)
+            {
+                ReadBootSector();
+            }
+        }
+
+        public static FatFileSystem CreateFatFileSystem(Partition aDevice, string aRootPath, long aSize)
+        {
+            if (aDevice == null)
+            {
+                throw new ArgumentNullException(nameof(aDevice));
+            }
+
+            if (String.IsNullOrEmpty(aRootPath))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
+            }
+
+            var fs = new FatFileSystem(aDevice, aRootPath, aSize, true);
+            fs.Format("FAT32", true);
+            return fs;
         }
 
         internal void ReadBootSector()
@@ -1600,6 +1620,9 @@ namespace Cosmos.System.FileSystem.FAT
 
             if (NumberOfFATs == 2)
                 Device.WriteBlock(ReservedSectorCount + sectorsPerFat, 1, ref firstFat.memory);
+
+            var Fat = GetFat(0);
+            Fat.ClearAllFat();
 
             ReadBootSector();
         }
