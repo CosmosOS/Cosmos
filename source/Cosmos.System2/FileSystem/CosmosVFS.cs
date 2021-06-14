@@ -944,7 +944,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Format(string aDriveId, string aDriveFormat, bool aQuick)
         {
-            try
+            try //TODO: Check if filesystem exists
             {
                 var xFs = GetFileSystemFromPath(aDriveId);
 
@@ -952,9 +952,10 @@ namespace Cosmos.System.FileSystem
             }
             catch
             {
-                var partition = mPartitions[int.Parse(aDriveId)];
+                var id = int.Parse(aDriveId);
+                var partition = mPartitions[id];
                 var xSize = (long)(partition.BlockCount * partition.BlockSize / 1024 / 1024);
-                var fs = new FatFileSystem(partition, "0:\\", xSize, true);
+                var fs = FatFileSystem.CreateFatFileSystem(partition, id + ":\\", xSize);
                 mFileSystems.Add(fs);
             }
         }
