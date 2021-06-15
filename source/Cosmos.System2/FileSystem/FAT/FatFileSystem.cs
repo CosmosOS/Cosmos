@@ -1496,7 +1496,10 @@ namespace Cosmos.System.FileSystem.FAT
 
             var sectorsPerFat = (val1 + (val2 - 1)) / val2;
 
+            /* BPB (BIOS Parameter Block) */
             var xBPB = new ManagedMemoryBlock(512);
+            xBPB.Fill(0);
+
             xBPB.Write32(0, 0);
             xBPB.WriteString(3, "COSMOS  ");
             xBPB.Write16(0x0B, (ushort)BytesPerSector);
@@ -1519,9 +1522,9 @@ namespace Cosmos.System.FileSystem.FAT
 
             xBPB.Write8(0x15, 0xF8); // Media type -> 0xF8 is Hard disk
 
+            /* Extended Boot Record */
             if (mFatType == FatTypeEnum.Fat32)
             {
-                xBPB.Write16(0x16, 0);
                 xBPB.Write32(0x24, sectorsPerFat);
                 xBPB.Write8(0x28, 0);
                 xBPB.Write16(0x2A, 0);
@@ -1547,9 +1550,10 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new NotImplementedException("Unknown FAT type.");
             }
 
-            //Write FAT32 Boot sector
+            //Write FAT32 Boot sector to partition
             Device.WriteBlock(0, 1, ref xBPB.memory);
 
+            /* FSInfo Structure */
             if (mFatType == FatTypeEnum.Fat32)
             {
                 // Write backup Boot Sector
@@ -1557,6 +1561,7 @@ namespace Cosmos.System.FileSystem.FAT
 
                 // Create FSInfo Structure
                 var infoSector = new ManagedMemoryBlock(512);
+                infoSector.Fill(0);
 
                 infoSector.Write32(0x00, 0x41615252);
 
@@ -1566,7 +1571,7 @@ namespace Cosmos.System.FileSystem.FAT
                 infoSector.Write32(492, 0xFFFFFFFF);
 
                 //FSInfo.FSI_Reserved2
-                xBPB.Write32(508, 0xAA550000);
+                infoSector.Write32(508, 0xAA550000);
 
                 // Write FSInfo Structure
                 Device.WriteBlock(1, 1, ref infoSector.memory);
@@ -1581,15 +1586,14 @@ namespace Cosmos.System.FileSystem.FAT
                 Device.WriteBlock(8, 1, ref secondSector.memory);
             }
 
-            // Create FAT table(s)
-
-            // Clear primary & secondary FATs
+            /* Empty FAT */
             var emptyFat = new ManagedMemoryBlock(512);
+            emptyFat.Fill(0);
 
             for (uint i = 1; i < sectorsPerFat; i++)
             {
                 Device.WriteBlock(ReservedSectorCount + i, 1, ref emptyFat.memory);
-            }      
+            }
 
             if (NumberOfFATs == 2)
             {
@@ -1599,8 +1603,9 @@ namespace Cosmos.System.FileSystem.FAT
                 }
             }
 
-            // First FAT block is special
+            /* Create first FAT block */
             var firstFat = new ManagedMemoryBlock(512);
+            emptyFat.Fill(0);
 
             if (mFatType == FatTypeEnum.Fat32)
             {
@@ -1620,9 +1625,6 @@ namespace Cosmos.System.FileSystem.FAT
 
             if (NumberOfFATs == 2)
                 Device.WriteBlock(ReservedSectorCount + sectorsPerFat, 1, ref firstFat.memory);
-
-            var Fat = GetFat(0);
-            Fat.ClearAllFat();
 
             ReadBootSector();
         }
