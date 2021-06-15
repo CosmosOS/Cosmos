@@ -1587,13 +1587,11 @@ namespace Cosmos.System.FileSystem.FAT
             
             firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
 
-            /* Clean reserved sectors */
+            /* Clean sectors */
             var emptyFat = new ManagedMemoryBlock(512);
             emptyFat.Fill(0);
 
-            var SystemAreaSize = ReservedSectorCount + (NumberOfFATs * FatSectorCount) + SectorsPerCluster;
-
-            for (uint i = 0; i < SystemAreaSize; i++)
+            for (uint i = 0; i < TotalSectorCount; i++)
             {
                 Device.WriteBlock(i, 1, ref emptyFat.memory);
             }
