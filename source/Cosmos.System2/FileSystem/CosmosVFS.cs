@@ -944,6 +944,11 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Format(string aDriveId, string aDriveFormat, bool aQuick)
         {
+            if (aDriveId.Length != 1 || !char.IsDigit(aDriveId, 0))
+            {
+                throw new ArgumentException("aDriveId is not a drive number.");
+            }
+
             try //TODO: Check if filesystem exists
             {
                 var xFs = GetFileSystemFromPath(aDriveId);

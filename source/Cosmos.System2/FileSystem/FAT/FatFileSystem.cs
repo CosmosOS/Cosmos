@@ -741,6 +741,8 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
             }
 
+            Global.mFileSystemDebugger.SendInternal("Creating new FAT32 Filesystem.");
+
             var fs = new FatFileSystem(aDevice, aRootPath, aSize, true);
             fs.Format("FAT32", true);
             return fs;
@@ -1475,7 +1477,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             if (SectorsPerCluster == 0)
             {
-                throw new Exception("SectorsPerCluster is 0.");
+                throw new Exception("FAT32 must have at least 65536 clusters.");
             }
 
             if (mFatType == FatTypeEnum.Fat32)
@@ -1491,15 +1493,13 @@ namespace Cosmos.System.FileSystem.FAT
             RootSectorCount = (RootEntryCount * 32 + (BytesPerSector - 1)) / BytesPerSector;
             uint val1 = TotalSectorCount - (ReservedSectorCount + RootSectorCount);
             uint val2 = (SectorsPerCluster * 256) + NumberOfFATs;
-
             if (mFatType == FatTypeEnum.Fat32)
             {
                 val2 /= 2;
             }
-                
-            var sectorsPerFat = (val1 + (val2 - 1)) / val2;
+            FatSectorCount = (val1 + (val2 - 1)) / val2;
 
-            /* BPB (BIOS Parameter Block) */
+            /* Create BPB (BIOS Parameter Block) Structure */
             var xBPB = new ManagedMemoryBlock(512);
             xBPB.Fill(0);
 
@@ -1525,10 +1525,10 @@ namespace Cosmos.System.FileSystem.FAT
 
             xBPB.Write8(0x15, 0xF8); // Media type -> 0xF8 is Hard disk
 
-            /* Extended Boot Record */
+            /* Create Extended Boot Record Structure */
             if (mFatType == FatTypeEnum.Fat32)
             {
-                xBPB.Write32(0x24, sectorsPerFat);
+                xBPB.Write32(0x24, FatSectorCount);
                 xBPB.Write8(0x28, 0);
                 xBPB.Write16(0x2A, 0);
                 xBPB.Write32(0x2C, 2);
@@ -1553,16 +1553,12 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new NotImplementedException("Unknown FAT type.");
             }
 
-            Device.WriteBlock(0, 1, ref xBPB.memory); //Write BIOS Parameter Block to partition
+            /* Create FSInfo Structure */
+            var infoSector = new ManagedMemoryBlock(512);
+            infoSector.Fill(0);
 
-            /* FSInfo Structure */
             if (mFatType == FatTypeEnum.Fat32)
             {
-                Device.WriteBlock(6, 1, ref xBPB.memory);
-
-                var infoSector = new ManagedMemoryBlock(512);
-                infoSector.Fill(0);
-
                 infoSector.Write32(0x00, 0x41615252);
 
                 infoSector.Write32(484, 0x61417272);
@@ -1571,43 +1567,17 @@ namespace Cosmos.System.FileSystem.FAT
 
                 infoSector.Write32(508, 0xAA550000);
 
-                Device.WriteBlock(1, 1, ref infoSector.memory);
-                Device.WriteBlock(7, 1, ref infoSector.memory);
-
-                var secondSector = new ManagedMemoryBlock(512);
-                secondSector.Fill(0);
-
-                secondSector.Write16(510, 0xAA55);
-
-                Device.WriteBlock(2, 1, ref secondSector.memory);
-                Device.WriteBlock(8, 1, ref secondSector.memory);
-            }
-
-            /* Empty FAT */
-            var emptyFat = new ManagedMemoryBlock(512);
-            emptyFat.Fill(0);
-
-            for (uint i = 1; i < sectorsPerFat; i++)
-            {
-                Device.WriteBlock(ReservedSectorCount + i, 1, ref emptyFat.memory);
-            }
-
-            if (NumberOfFATs == 2)
-            {
-                for (uint i = 1; i < sectorsPerFat; i++)
-                {
-                    Device.WriteBlock(ReservedSectorCount + sectorsPerFat + i, 1, ref emptyFat.memory);
-                }
+                infoSector.Write16(510, 0xAA55);
             }
 
             /* Create first FAT block */
             var firstFat = new ManagedMemoryBlock(512);
-            emptyFat.Fill(0);
+            firstFat.Fill(0);
 
             if (mFatType == FatTypeEnum.Fat32)
             {
-                firstFat.Write32(0, 0x0FFFFFFF);
-                firstFat.Write32(4, 0x0FFFFFFF); // 0x0FFFFFF8
+                firstFat.Write32(0, 0x0FFFFFFF); // 0x0FFFFFF8
+                firstFat.Write32(4, 0x0FFFFFFF); 
                 firstFat.Write32(8, 0x0FFFFFFF); // Also reserve the 2nd cluster for root directory
             }
             else
@@ -1617,14 +1587,33 @@ namespace Cosmos.System.FileSystem.FAT
             
             firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
 
-            Device.WriteBlock(ReservedSectorCount, 1, ref firstFat.memory);
+            /* Clean reserved sectors */
+            var emptyFat = new ManagedMemoryBlock(512);
+            emptyFat.Fill(0);
 
-            if (NumberOfFATs == 2)
+            var SystemAreaSize = ReservedSectorCount + (NumberOfFATs * FatSectorCount) + SectorsPerCluster;
+
+            for (uint i = 0; i < SystemAreaSize; i++)
             {
-                Device.WriteBlock(ReservedSectorCount + sectorsPerFat, 1, ref firstFat.memory);
-            }  
+                Device.WriteBlock(i, 1, ref emptyFat.memory);
+            }
+
+            /* Write structures */
+            Device.WriteBlock(0, 1, ref xBPB.memory); //Write BIOS Parameter Block to partition
+            Device.WriteBlock(6, 1, ref xBPB.memory); //Write backup
+
+            Device.WriteBlock(1, 1, ref infoSector.memory);
+            Device.WriteBlock(7, 1, ref infoSector.memory);
+
+            /* Write FAT sectors */
+            for (uint i = 0; i < NumberOfFATs; i++)
+            {
+                Device.WriteBlock(ReservedSectorCount + i, 1, ref firstFat.memory);
+            }
 
             ReadBootSector();
+
+            DisplayFileSystemInfo();
         }
     }
 }

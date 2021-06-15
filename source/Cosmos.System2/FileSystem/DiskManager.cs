@@ -84,12 +84,6 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public void Format(string aDriveFormat, bool aQuick = true)
         {
-            /* For now we do the more easy thing: quick format of a drive with the same filesystem */
-            if (VFSManager.GetFileSystemType(Name) != aDriveFormat)
-            {
-                throw new NotImplementedException($"Formatting in {aDriveFormat} drive {Name} with Filesystem {VFSManager.GetFileSystemType(Name)} not yet supported");
-            }
-
             if (aQuick == false)
             {
                 throw new NotImplementedException("Slow format not implemented yet");
