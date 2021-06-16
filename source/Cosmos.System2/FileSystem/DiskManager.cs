@@ -89,7 +89,7 @@ namespace Cosmos.System.FileSystem
                 throw new NotImplementedException("Slow format not implemented yet");
             }
 
-            VFSManager.Format(Name, aDriveFormat, aQuick);
+            VFSManager.Format(Name[0].ToString(), aDriveFormat, aQuick);
         }
 
         /// <summary>
