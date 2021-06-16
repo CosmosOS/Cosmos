@@ -1596,13 +1596,10 @@ namespace Cosmos.System.FileSystem.FAT
             firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
 
             /* Clean sectors */
-            var emptyFat = new ManagedMemoryBlock(512);
+            var emptyFat = new ManagedMemoryBlock(TotalSectorCount);
             emptyFat.Fill(0);
 
-            for (uint i = 0; i < TotalSectorCount; i++)
-            {
-                Device.WriteBlock(i, 1, ref emptyFat.memory);
-            }
+            Device.WriteBlock(0, TotalSectorCount / BytesPerSector, ref emptyFat.memory);
 
             /* Write structures */
             Device.WriteBlock(0, 1, ref xBPB.memory); //Write BIOS Parameter Block to partition
