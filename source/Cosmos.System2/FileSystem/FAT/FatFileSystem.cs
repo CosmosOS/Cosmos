@@ -1433,9 +1433,17 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 mFatType = FatTypeEnum.Fat32;
             }
+            else if (aDriveFormat == "FAT16")
+            {
+                throw new NotImplementedException("FAT16 formatting not supported yet.");
+            }
+            else if (aDriveFormat == "FAT12")
+            {
+                throw new NotImplementedException("FAT12 formatting not supported yet.");
+            }
             else
             {
-                throw new NotImplementedException("Unknown FAT type.");
+                throw new Exception("Unknown FAT type.");
             }
 
             /* FAT Configuration */
