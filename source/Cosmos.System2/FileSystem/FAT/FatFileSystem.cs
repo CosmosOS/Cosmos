@@ -1498,14 +1498,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new NotImplementedException("Unknown FAT type.");
             }
 
-            RootSectorCount = (RootEntryCount * 32 + (BytesPerSector - 1)) / BytesPerSector;
-            uint val1 = TotalSectorCount - (ReservedSectorCount + RootSectorCount);
-            uint val2 = (SectorsPerCluster * 256) + NumberOfFATs;
-            if (mFatType == FatTypeEnum.Fat32)
-            {
-                val2 /= 2;
-            }
-            FatSectorCount = (val1 + (val2 - 1)) / val2;
+            FatSectorCount = (uint)GetFatSizeSectors();
 
             /* Create BPB (BIOS Parameter Block) Structure */
             var xBPB = new ManagedMemoryBlock(512);
@@ -1596,10 +1589,12 @@ namespace Cosmos.System.FileSystem.FAT
             firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
 
             /* Clean sectors */
-            var emptyFat = new ManagedMemoryBlock(TotalSectorCount);
+            var SystemAreaSize = ReservedSectorCount + (NumberOfFATs * FatSectorCount) + SectorsPerCluster;
+
+            var emptyFat = new ManagedMemoryBlock(SystemAreaSize * BytesPerSector);
             emptyFat.Fill(0);
 
-            Device.WriteBlock(0, TotalSectorCount / BytesPerSector, ref emptyFat.memory);
+            Device.WriteBlock(ReservedSectorCount, SystemAreaSize, ref emptyFat.memory);
 
             /* Write structures */
             Device.WriteBlock(0, 1, ref xBPB.memory); //Write BIOS Parameter Block to partition
@@ -1617,6 +1612,20 @@ namespace Cosmos.System.FileSystem.FAT
             ReadBootSector();
 
             DisplayFileSystemInfo();
+        }
+
+        /// <summary>
+        /// Computation of FAT size.
+        /// </summary>
+        /// <returns>FAT size.</returns>
+        private ulong GetFatSizeSectors()
+        {
+            ulong FatElementSize = 4;
+            ulong ReservedClusCnt = 2;
+            ulong Numerator = TotalSectorCount - ReservedSectorCount + ReservedClusCnt * SectorsPerCluster;
+            ulong Denominator = SectorsPerCluster * BytesPerSector / FatElementSize + NumberOfFATs;
+
+            return Numerator / Denominator + 1;
         }
     }
 }
