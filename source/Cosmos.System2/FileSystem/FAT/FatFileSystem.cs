@@ -1447,7 +1447,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /* FAT Configuration */
-            BytesPerSector = 512;
+            BytesPerSector = (uint)Device.BlockSize;
             NumberOfFATs = 2;
             TotalSectorCount = (uint)Device.BlockCount;
 
@@ -1501,7 +1501,7 @@ namespace Cosmos.System.FileSystem.FAT
             FatSectorCount = (uint)GetFatSizeSectors();
 
             /* Create BPB (BIOS Parameter Block) Structure */
-            var xBPB = new ManagedMemoryBlock(512);
+            var xBPB = new ManagedMemoryBlock(BytesPerSector);
             xBPB.Fill(0);
 
             xBPB.Write32(0, 0);
@@ -1555,7 +1555,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /* Create FSInfo Structure */
-            var infoSector = new ManagedMemoryBlock(512);
+            var infoSector = new ManagedMemoryBlock(BytesPerSector);
             infoSector.Fill(0);
 
             if (mFatType == FatTypeEnum.Fat32)
@@ -1572,7 +1572,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             /* Create first FAT block */
-            var firstFat = new ManagedMemoryBlock(512);
+            var firstFat = new ManagedMemoryBlock(BytesPerSector);
             firstFat.Fill(0);
 
             if (mFatType == FatTypeEnum.Fat32)
@@ -1589,7 +1589,7 @@ namespace Cosmos.System.FileSystem.FAT
             firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
 
             /* Clean sectors */
-            var emptyFat = new ManagedMemoryBlock(512);
+            var emptyFat = new ManagedMemoryBlock(BytesPerSector);
             emptyFat.Fill(0);
 
             //Clean FATs
