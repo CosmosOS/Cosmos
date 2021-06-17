@@ -1577,9 +1577,9 @@ namespace Cosmos.System.FileSystem.FAT
 
             if (mFatType == FatTypeEnum.Fat32)
             {
-                firstFat.Write32(0, 0x0FFFFFFF); // 0x0FFFFFF8
-                firstFat.Write32(4, 0x0FFFFFFF); 
-                firstFat.Write32(8, 0x0FFFFFFF); // Also reserve the 2nd cluster for root directory
+                firstFat.Write32(0, 0x0FFFFFFF); // Reserved cluster 1
+                firstFat.Write32(4, 0x0FFFFFFF); // Reserved cluster 2
+                firstFat.Write32(8, 0x0FFFFFFF); // mark end for 2nd cluster (root directory)
             }
             else
             {
@@ -1589,13 +1589,15 @@ namespace Cosmos.System.FileSystem.FAT
             firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
 
             /* Clean sectors */
-
-            var emptyFat = new ManagedMemoryBlock(FatSectorCount * BytesPerSector);
+            var emptyFat = new ManagedMemoryBlock(512);
             emptyFat.Fill(0);
 
             for (uint i = 0; i < NumberOfFATs; i++)
             {
-                Device.WriteBlock(ReservedSectorCount + (i * FatSectorCount), FatSectorCount, ref emptyFat.memory);
+                for (uint sector = 0; sector < FatSectorCount; sector++)
+                {
+                    Device.WriteBlock(ReservedSectorCount + (i * FatSectorCount) + sector, 1, ref firstFat.memory);
+                }
             }
 
             /* Write structures */
