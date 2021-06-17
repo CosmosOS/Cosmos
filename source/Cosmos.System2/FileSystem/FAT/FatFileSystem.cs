@@ -1592,11 +1592,24 @@ namespace Cosmos.System.FileSystem.FAT
             var emptyFat = new ManagedMemoryBlock(512);
             emptyFat.Fill(0);
 
+            //Clean FATs
             for (uint i = 0; i < NumberOfFATs; i++)
             {
                 for (uint sector = 0; sector < FatSectorCount; sector++)
                 {
                     Device.WriteBlock(ReservedSectorCount + (i * FatSectorCount) + sector, 1, ref firstFat.memory);
+                }
+            }
+
+            //Clean data
+            if (aQuick == false)
+            {
+                DataSectorCount = TotalSectorCount - (ReservedSectorCount + NumberOfFATs * FatSectorCount + ReservedSectorCount);
+                DataSector = ReservedSectorCount + (NumberOfFATs * FatSectorCount);
+
+                for (uint sector = 0; sector < DataSectorCount; sector++)
+                {
+                    Device.WriteBlock(DataSector + sector, 1, ref firstFat.memory);
                 }
             }
 
