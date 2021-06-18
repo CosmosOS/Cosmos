@@ -1650,18 +1650,10 @@ namespace Cosmos.System.FileSystem.FAT
                     Device.WriteBlock((ulong)ReservedSectorCount + (FatSectorCount * fat), FatSectorCount, ref emptyFat2.memory);
                 }
 
-                //Clean Data
-                for (uint sector = 0; sector < 5; sector++)
-                {
-                    Device.WriteBlock((ulong)DataSector + sector, 1, ref emptyFat.memory);
-                }
-            }
-            else
-            {
                 //Clear out a few data sectors to remove old data
                 for (uint sector = 0; sector < 5; sector++)
                 {
-                    Device.WriteBlock(DataSector + sector, 1, ref firstFat.memory);
+                    Device.WriteBlock((ulong)DataSector + sector, 1, ref emptyFat.memory);
                 }
             }
 
