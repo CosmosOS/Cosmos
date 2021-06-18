@@ -1656,6 +1656,14 @@ namespace Cosmos.System.FileSystem.FAT
                     Device.WriteBlock((ulong)DataSector + sector, 1, ref emptyFat.memory);
                 }
             }
+            else
+            {
+                //Clear out a few data sectors to remove old data
+                for (uint sector = 0; sector < 5; sector++)
+                {
+                    Device.WriteBlock(DataSector + sector, 1, ref firstFat.memory);
+                }
+            }
 
             /* Write structures */
             Device.WriteBlock(0, 1, ref xBPB.memory); //Write BIOS Parameter Block to partition
