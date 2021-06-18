@@ -1638,22 +1638,22 @@ namespace Cosmos.System.FileSystem.FAT
             /* Clean sectors */
             if (FileSystemExists)
             {
-                var emptyFat = new ManagedMemoryBlock(BytesPerSector);
+                var emptySector = new ManagedMemoryBlock(BytesPerSector);
+                emptySector.Fill(0);
+
+                var emptyFat = new ManagedMemoryBlock(FatSectorCount * BytesPerSector);
                 emptyFat.Fill(0);
 
                 //Clean FATs
                 for (uint fat = 0; fat < NumberOfFATs; fat++)
                 {
-                    var emptyFat2 = new ManagedMemoryBlock(FatSectorCount * BytesPerSector);
-                    emptyFat2.Fill(0);
-
-                    Device.WriteBlock((ulong)ReservedSectorCount + (FatSectorCount * fat), FatSectorCount, ref emptyFat2.memory);
+                    Device.WriteBlock((ulong)ReservedSectorCount + (FatSectorCount * fat), FatSectorCount, ref emptyFat.memory);
                 }
 
                 //Clear out a few data sectors to remove old data
                 for (uint sector = 0; sector < 5; sector++)
                 {
-                    Device.WriteBlock((ulong)DataSector + sector, 1, ref emptyFat.memory);
+                    Device.WriteBlock((ulong)DataSector + sector, 1, ref emptySector.memory);
                 }
             }
 
