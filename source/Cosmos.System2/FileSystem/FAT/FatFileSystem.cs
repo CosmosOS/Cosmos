@@ -1552,7 +1552,7 @@ namespace Cosmos.System.FileSystem.FAT
             xBPB.Fill(0);
 
             xBPB.Write32(0, 0);
-            xBPB.WriteString(3, "COSMOS  ");
+            xBPB.WriteString(3, "MSWIN4.1");
             xBPB.Write16(0x0B, (ushort)BytesPerSector);
             xBPB.Write8(0x0D, (byte)SectorsPerCluster);
             xBPB.Write16(0x0E, (ushort)ReservedSectorCount);
@@ -1578,13 +1578,14 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 xBPB.Write32(0x24, FatSectorCount);
                 xBPB.Write8(0x28, 0);
-                xBPB.Write16(0x2A, 0);
-                xBPB.Write32(0x2C, 2);
-                xBPB.Write16(0x30, 1);
-                xBPB.Write16(0x32, 6);
-                xBPB.Write8(0x34, 0x80);
-                xBPB.Write8(0x40, 0);
-                xBPB.Write8(0x42, 0x29);
+                xBPB.Write16(0x2A, 0); //fat version
+                xBPB.Write16(0x2B, 0);
+                xBPB.Write32(0x2C, 2); //cluster number of root directory
+                xBPB.Write16(0x30, 1); //sector # of fsinfo struct
+                xBPB.Write16(0x32, 6); //backup boot sector #
+                xBPB.Write8(0x34, 0); //reserved
+                xBPB.Write8(0x40, 0x80); //drive number. 0x00 = floppy disk, 0x80 = hard disk
+                xBPB.Write8(0x42, 0x29); //signature
 
                 var SerialID = new byte[4] { 0x01, 0x02, 0x03, 0x04 };
                 var VolumeLabel = "COSMOSDISK";
