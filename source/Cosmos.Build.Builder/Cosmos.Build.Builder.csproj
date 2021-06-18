@@ -23,6 +23,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" />
+        <PackageReference Include="ModernWpfUI" Version="0.9.4" />
         <PackageReference Include="NuGet.Common" />
         <PackageReference Include="NuGet.Configuration" />
     </ItemGroup>
