@@ -1671,6 +1671,8 @@ namespace Cosmos.System.FileSystem.FAT
                 Device.WriteBlock(ReservedSectorCount + i, 1, ref firstFat.memory);
             }
 
+            FileSystemExists = true;
+
             ReadBootSector();
 
             DisplayFileSystemInfo();
