@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Text;
 using Cosmos.Common.Extensions;
 using Cosmos.Core;
 using Cosmos.HAL.BlockDevice;
@@ -651,6 +651,11 @@ namespace Cosmos.System.FileSystem.FAT
         private Fat[] mFats { get; set; }
 
         /// <summary>
+        /// FileSystem exits
+        /// </summary>
+        public bool FileSystemExists { get; private set; }
+
+        /// <summary>
         /// Get FAT type.
         /// <para>
         /// possible types:
@@ -722,6 +727,8 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
             }
+
+            FileSystemExists = !noFs;
 
             if (!noFs)
             {
@@ -1629,27 +1636,24 @@ namespace Cosmos.System.FileSystem.FAT
             firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
 
             /* Clean sectors */
-            var emptyFat = new ManagedMemoryBlock(BytesPerSector);
-            emptyFat.Fill(0);
-
-            //Clean FATs
-            for (uint i = 0; i < NumberOfFATs; i++)
+            if (FileSystemExists)
             {
-                for (uint sector = 0; sector < FatSectorCount; sector++)
+                var emptyFat = new ManagedMemoryBlock(BytesPerSector);
+                emptyFat.Fill(0);
+
+                //Clean FATs
+                for (uint fat = 0; fat < NumberOfFATs; fat++)
                 {
-                    Device.WriteBlock(ReservedSectorCount + (i * FatSectorCount) + sector, 1, ref firstFat.memory);
+                    var emptyFat2 = new ManagedMemoryBlock(FatSectorCount * BytesPerSector);
+                    emptyFat2.Fill(0);
+
+                    Device.WriteBlock((ulong)ReservedSectorCount + (FatSectorCount * fat), FatSectorCount, ref emptyFat2.memory);
                 }
-            }
 
-            //Clean data
-            if (aQuick == false)
-            {
-                DataSectorCount = TotalSectorCount - (ReservedSectorCount + NumberOfFATs * FatSectorCount + ReservedSectorCount);
-                DataSector = ReservedSectorCount + (NumberOfFATs * FatSectorCount);
-
-                for (uint sector = 0; sector < DataSectorCount; sector++)
+                //Clean Data
+                for (uint sector = 0; sector < 5; sector++)
                 {
-                    Device.WriteBlock(DataSector + sector, 1, ref firstFat.memory);
+                    Device.WriteBlock((ulong)DataSector + sector, 1, ref emptyFat.memory);
                 }
             }
 
