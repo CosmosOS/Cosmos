@@ -729,7 +729,36 @@ namespace Cosmos.System.FileSystem.FAT
             }
         }
 
-        public static FatFileSystem CreateFatFileSystem(Partition aDevice, string aRootPath, long aSize)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FatFileSystem"/> class, then format the partition into a new FAT filesystem.
+        /// </summary>
+        /// <param name="aDevice">The partition.</param>
+        /// <param name="aRootPath">The root path.</param>
+        /// <param name="aSize">The partition size.</param>
+        /// <param name="aDriveFormat">The drive format.</param>
+        /// <returns>Fat FileSystem.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aDevice is null.</item>
+        /// <item>Thrown when FatFileSystem is null.</item>
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aRootPath is null.</item>
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>>FAT signature not found.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        public static FatFileSystem CreateFatFileSystem(Partition aDevice, string aRootPath, long aSize, string aDriveFormat)
         {
             if (aDevice == null)
             {
@@ -741,13 +770,24 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("Creating new FAT32 Filesystem.");
+            Global.mFileSystemDebugger.SendInternal("Creating a new " + aDriveFormat + " FileSystem.");
 
             var fs = new FatFileSystem(aDevice, aRootPath, aSize, true);
-            fs.Format("FAT32", true);
+            fs.Format(aDriveFormat, true);
             return fs;
         }
 
+        /// <summary>
+        /// Parse BPB
+        /// </summary>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>>FAT signature not found.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         internal void ReadBootSector()
         {
             var xBPB = Device.NewBlockArray(1);

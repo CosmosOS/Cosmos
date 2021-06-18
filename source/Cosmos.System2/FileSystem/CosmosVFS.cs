@@ -957,11 +957,35 @@ namespace Cosmos.System.FileSystem
             }
             catch
             {
-                var id = int.Parse(aDriveId);
-                var partition = mPartitions[id];
-                var xSize = (long)(partition.BlockCount * partition.BlockSize / 1024 / 1024);
-                var fs = FatFileSystem.CreateFatFileSystem(partition, id + ":\\", xSize);
+                CreateNewFileSystem(aDriveId, aDriveFormat);
+            }
+        }
+
+        /// <summary>
+        /// Create new FileSystem
+        /// </summary>
+        /// <param name="aDriveId">A drive id.</param>
+        /// <param name="aDriveFormat">A drive format.</param>
+        private void CreateNewFileSystem(string aDriveId, string aDriveFormat)
+        {
+            var id = int.Parse(aDriveId);
+
+            if (id < 0 || id >= mPartitions.Count)
+            {
+                throw new Exception("Can't find partition.");
+            }
+
+            var partition = mPartitions[id];
+            var xSize = (long)(partition.BlockCount * partition.BlockSize / 1024 / 1024);
+
+            if (aDriveFormat.StartsWith("FAT"))
+            {
+                var fs = FatFileSystem.CreateFatFileSystem(partition, id + ":\\", xSize, aDriveFormat);
                 mFileSystems.Add(fs);
+            }
+            else
+            {
+                throw new NotImplementedException(aDriveFormat + " formatting not supported.");
             }
         }
 
