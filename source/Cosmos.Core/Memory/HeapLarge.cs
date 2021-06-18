@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 using Native = System.UInt32;
 
 namespace Cosmos.Core.Memory
@@ -32,6 +33,10 @@ namespace Cosmos.Core.Memory
         {
             uint xPages = ((aSize + PrefixBytes) / RAT.PageSize) + 1;
             var xPtr = (uint*)RAT.AllocPages(aType, xPages);
+            if(xPtr == null)
+            {
+                Debugger.SendKernelPanic(0x67); // out of pages
+            }
             xPtr[0] = xPages * RAT.PageSize - PrefixBytes; // Allocated data size
             xPtr[1] = aSize; // Actual data size
             xPtr[2] = 1; // Ref count
@@ -48,6 +53,44 @@ namespace Cosmos.Core.Memory
         {
             var xPageIdx = RAT.GetFirstRAT(aPtr);
             RAT.Free(xPageIdx);
+        }
+
+        /// <summary>
+        /// Increment the reference count for an object stored on the large heap
+        /// </summary>
+        /// <param name="aPtr">Pointer to the object</param>
+        public static void IncRefCount(void* aPtr)
+        {
+            uint* obj = (uint*)aPtr;
+            obj[-2]++;
+        }
+
+
+        /// <summary>
+        /// Get the reference count for an object stored on the large heap
+        /// </summary>
+        /// <param name="aPtr">Pointer to the object</param>
+        public static uint GetRefCount(void* aPtr)
+        {
+            uint* obj = (uint*)aPtr;
+            return obj[-2];
+        }
+
+        /// <summary>
+        /// Decrement the reference count for an object stored on the large heap
+        /// Frees the object if ref count reaches 0
+        /// </summary>
+        /// <param name="aPtr">Pointer to the object</param>
+        public static void DecRefCount(void* aPtr)
+        {
+            uint* obj = (uint*)aPtr;
+            obj[-2]--;
+            if (obj[-2] == 0)
+            {
+                Debugger.DoSendNumber(0x22);
+                Debugger.DoSendNumber((uint)obj);
+                Free(aPtr);
+            }
         }
     }
 }
