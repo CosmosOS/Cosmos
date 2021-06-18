@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 using Native = System.UInt32;
 
 namespace Cosmos.Core.Memory
@@ -68,6 +69,8 @@ namespace Cosmos.Core.Memory
         {
             //TODO find a better way to remove the double look up here for GetPageType and then again in the
             // .Free methods which actually free the entries in the RAT.
+            Debugger.DoSendNumber(0x77);
+            Debugger.DoSendNumber((uint)aPtr);
             var xType = RAT.GetPageType(aPtr);
             switch (xType)
             {
@@ -84,5 +87,67 @@ namespace Cosmos.Core.Memory
             }
         }
 
+        /// <summary>
+        /// Increment reference count of a heap item
+        /// </summary>
+        /// <param name="aPtr"></param>
+        public static void IncRefCount(void* aPtr)
+        {
+            var xType = RAT.GetPageType(aPtr);
+            switch (xType)
+            {
+                case RAT.PageType.HeapSmall:
+                    HeapSmall.IncRefCount(aPtr);
+                    break;
+                case RAT.PageType.HeapMedium:
+                case RAT.PageType.HeapLarge:
+                    HeapLarge.IncRefCount(aPtr);
+                    break;
+
+                default:
+                    throw new Exception("Heap item not found in RAT.");
+            }
+        }
+
+        /// <summary>
+        /// Decrement reference count of a heap item
+        /// </summary>
+        /// <param name="aPtr"></param>
+        public static void DecRefCount(void* aPtr)
+        {
+            var xType = RAT.GetPageType(aPtr);
+            switch (xType)
+            {
+                case RAT.PageType.HeapSmall:
+                    HeapSmall.DecRefCount(aPtr);
+                    break;
+                case RAT.PageType.HeapMedium:
+                case RAT.PageType.HeapLarge:
+                    HeapLarge.DecRefCount(aPtr);
+                    break;
+
+                default:
+                    throw new Exception("Heap item not found in RAT.");
+            }
+        }
+
+        /// <summary>
+        /// Decrement reference count of a heap item
+        /// </summary>
+        /// <param name="aPtr"></param>
+        public static uint GetRefCount(void* aPtr)
+        {
+            var xType = RAT.GetPageType(aPtr);
+            switch (xType)
+            {
+                case RAT.PageType.HeapSmall:
+                    return HeapSmall.GetRefCount(aPtr);
+                case RAT.PageType.HeapMedium:
+                case RAT.PageType.HeapLarge:
+                    return HeapLarge.GetRefCount(aPtr);
+                default:
+                    throw new Exception("Heap item not found in RAT.");
+            }
+        }
     }
 }

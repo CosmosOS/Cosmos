@@ -332,6 +332,10 @@ namespace Cosmos.Core.Memory
         static void CreatePage(SMTPage* aPage, uint aItemSize)
         {
             var xPtr = (byte*)RAT.AllocPages(RAT.PageType.HeapSmall, 1);
+            if(xPtr == null)
+            {
+                return; // we failed to create the page, Alloc should still handle this case
+            }
             uint xSlotSize = aItemSize + PrefixItemBytes;
             uint xItemCount = RAT.PageSize / xSlotSize;
             for (uint i = 0; i < xItemCount; i++)
@@ -477,6 +481,43 @@ namespace Cosmos.Core.Memory
                 while (true) { }
             }
             blockPtr->SpacesLeft++;
+        }
+
+        /// <summary>
+        /// Increment the reference count for an object stored on the small heap
+        /// </summary>
+        /// <param name="aPtr">Pointer to the object</param>
+        public static void IncRefCount(void* aPtr)
+        {
+            ushort* obj = (ushort*)aPtr;
+            obj[-1]++;
+        }
+
+        /// <summary>
+        /// Get the reference count for an object stored on the small heap
+        /// </summary>
+        /// <param name="aPtr">Pointer to the object</param>
+        public static ushort GetRefCount(void* aPtr)
+        {
+            ushort* obj = (ushort*)aPtr;
+            return obj[-1];
+        }
+
+        /// <summary>
+        /// Decrement the reference count for an object stored on the small heap
+        /// Frees the object if ref count reaches 0
+        /// </summary>
+        /// <param name="aPtr">Pointer to the object</param>
+        public static void DecRefCount(void* aPtr)
+        {
+            ushort* obj = (ushort*)aPtr;
+            obj[-1]--;
+            if(obj[-1] == 0)
+            {
+                Debugger.DoSendNumber(0x11);
+                Debugger.DoSendNumber((uint)obj);
+                Free(aPtr);
+            }
         }
 
         #region Statistics

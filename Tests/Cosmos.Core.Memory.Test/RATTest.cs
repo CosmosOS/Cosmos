@@ -30,7 +30,7 @@ namespace Cosmos.Core.Memory.Test
 
                 Assert.AreEqual(0, HeapSmall.GetAllocatedObjectCount());
 
-                Assert.AreEqual((uint)1, RAT.GetPageCount(RAT.PageType.RAT));
+                Assert.AreEqual((uint)8, RAT.GetPageCount(RAT.PageType.RAT));
             }
         }
 
@@ -215,7 +215,7 @@ namespace Cosmos.Core.Memory.Test
             }
         }
 
-        unsafe void FillRandomy(byte* ptr, uint aSize) // fake new obj and fill object with something
+        unsafe void FillRandom(byte* ptr, uint aSize) // fake new obj and fill object with something
         {
             Random random = new Random();
             for (int i = 0; i < aSize; i++)
@@ -239,21 +239,21 @@ namespace Cosmos.Core.Memory.Test
                     for (int i = 0; i < 10000; i++)
                     {
                         byte* ptr = Heap.Alloc(40);
-                        FillRandomy(ptr, 40);
+                        FillRandom(ptr, 40);
                         if (ptr == null)
                         {
                             Assert.Fail();
                         }
-                        Assert.AreEqual(1, RAT.GetPageCount(RAT.PageType.RAT));
+                        Assert.AreEqual((uint)1, RAT.GetPageCount(RAT.PageType.RAT));
                     }
 
-                }
-                catch (Exception e)
-                {
-                    Assert.AreEqual("137", e.Message);
-                }
-
             }
+                catch (Exception e)
+            {
+                Assert.AreEqual("289", e.Message);
+            }
+
+        }
         }
 
         [TestMethod]
@@ -275,6 +275,39 @@ namespace Cosmos.Core.Memory.Test
                 Assert.AreEqual(RAT.GetFirstRAT(ptr1), RAT.GetFirstRAT(ptr3));
                 Assert.AreEqual((uint)RAT.GetPagePtr(ptr1), (uint)RAT.GetPagePtr(ptr2));
                 Assert.AreEqual((uint)RAT.GetPagePtr(ptr1), (uint)RAT.GetPagePtr(ptr3));
+            }
+        }
+
+        [TestMethod]
+        public unsafe void TestRefCounting()
+        {
+            var xRAM = new byte[20 * RAT.PageSize]; // 10 Pages - 1 for RAT and 19 for values
+            fixed (byte* xPtr = xRAM)
+            {
+                RAT.Debug = true;
+                RAT.Init(xPtr, (uint)xRAM.Length);
+
+                var ptr1 = Heap.Alloc(10);
+                TestPointerRefCounting(ptr1);
+                Assert.AreEqual(1, HeapSmall.GetAllocatedObjectCount());
+                Heap.DecRefCount(ptr1);
+                Assert.AreEqual(0, HeapSmall.GetAllocatedObjectCount());
+                var ptr2 = Heap.Alloc(HeapMedium.MaxItemSize + 10); // this should make a large pointer
+                TestPointerRefCounting(ptr2);
+                Assert.AreEqual((uint)2, RAT.GetPageCount(RAT.PageType.HeapLarge));
+                Heap.DecRefCount(ptr2);
+                Assert.AreEqual((uint)0, RAT.GetPageCount(RAT.PageType.HeapLarge));
+            }
+
+            static unsafe void TestPointerRefCounting(byte* aPtr)
+            {
+                Assert.AreEqual((uint)1, Heap.GetRefCount(aPtr));
+                Heap.IncRefCount(aPtr);
+                Heap.IncRefCount(aPtr);
+                Assert.AreEqual((uint)3, Heap.GetRefCount(aPtr));
+                Heap.DecRefCount(aPtr);
+                Assert.AreEqual((uint)2, Heap.GetRefCount(aPtr));
+                Heap.DecRefCount(aPtr);
             }
         }
     }

@@ -109,15 +109,15 @@ namespace Cosmos.Core.Memory
             CPU.ZeroFill((uint)aStartPtr, aSize);
             if ((uint)aStartPtr % PageSize != 0 && !Debug)
             {
-                Cosmos.Debug.Kernel.Debugger.DoSendNumber(((uint)aStartPtr % PageSize));
-                Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
+                Debugger.DoSendNumber(((uint)aStartPtr % PageSize));
+                Debugger.DoBochsBreak();
                 throw new Exception("RAM start must be page aligned.");
             }
 
             if (aSize % PageSize != 0)
             {
-                Cosmos.Debug.Kernel.Debugger.DoSendNumber((aSize % PageSize));
-                Cosmos.Debug.Kernel.Debugger.SendKernelPanic(11);
+                Debugger.DoSendNumber((aSize % PageSize));
+                Debugger.SendKernelPanic(11);
                 throw new Exception("RAM size must be page aligned.");
             }
 
@@ -247,7 +247,7 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
         public static uint GetFirstRAT(void* aPtr)
         {
-            var xPos = (uint)((byte*)aPtr - mRamStart) / RAT.PageSize;
+            var xPos = (uint)((byte*)aPtr - mRamStart) / PageSize;
             // See note about when mRAT = 0 in Alloc.
             for (byte* p = mRAT + xPos; p >= mRAT; p--)
             {
@@ -261,7 +261,7 @@ namespace Cosmos.Core.Memory
 
         public static byte* GetPagePtr(void* aPtr)
         {
-            return (byte*)aPtr - ((byte*)aPtr - mRamStart) % RAT.PageSize;
+            return (byte*)aPtr - ((byte*)aPtr - mRamStart) % PageSize;
         }
 
         /// <summary>

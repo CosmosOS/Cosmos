@@ -60,7 +60,7 @@ namespace Cosmos.Core
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         public static unsafe void IncRefCount(uint aObject)
         {
-            throw new NotImplementedException();
+            //Memory.Heap.IncRef;
         }
 
         /// <summary>
