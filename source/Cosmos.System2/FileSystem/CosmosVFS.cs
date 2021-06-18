@@ -951,7 +951,7 @@ namespace Cosmos.System.FileSystem
 
             try
             {
-                var xFs = GetFileSystemFromPath(aDriveId);
+                var xFs = GetFileSystemFromPath(aDriveId + ":\\");
 
                 xFs.Format(aDriveFormat, aQuick);
             }

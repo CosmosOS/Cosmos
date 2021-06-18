@@ -651,7 +651,7 @@ namespace Cosmos.System.FileSystem.FAT
         private Fat[] mFats { get; set; }
 
         /// <summary>
-        /// FileSystem exits
+        /// FileSystem exits.
         /// </summary>
         public bool FileSystemExists { get; private set; }
 
@@ -715,7 +715,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public FatFileSystem(Partition aDevice, string aRootPath, long aSize, bool noFs = false)
+        public FatFileSystem(Partition aDevice, string aRootPath, long aSize, bool fileSystemExists = true)
             : base(aDevice, aRootPath, aSize)
         {
             if (aDevice == null)
@@ -728,9 +728,9 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
             }
 
-            FileSystemExists = !noFs;
+            FileSystemExists = fileSystemExists;
 
-            if (!noFs)
+            if (FileSystemExists)
             {
                 ReadBootSector();
             }
@@ -779,7 +779,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             Global.mFileSystemDebugger.SendInternal("Creating a new " + aDriveFormat + " FileSystem.");
 
-            var fs = new FatFileSystem(aDevice, aRootPath, aSize, true);
+            var fs = new FatFileSystem(aDevice, aRootPath, aSize, false);
             fs.Format(aDriveFormat, true);
             return fs;
         }
