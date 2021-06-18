@@ -75,8 +75,8 @@ namespace Cosmos.HAL
                 mDebugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mMouseID);
             }
 
-            //SendCommand(Command.SetDefaults);
-            //mPS2Controller.WaitForAck();
+            SendCommand(Command.SetDefaults);
+            mPS2Controller.WaitForAck();
 
             INTs.SetIrqHandler(12, HandleMouse);
 
@@ -128,6 +128,13 @@ namespace Cosmos.HAL
                 {
                     mMouseCycle++;
                 }
+                else 
+                {
+                    mMouseByte[0] = 0;
+                    mMouseByte[1] = 0;
+                    mMouseByte[2] = 0;
+                    mMouseByte[3] = 0;
+                }
             }
             else if (mMouseCycle == 1)
             {
@@ -137,19 +144,18 @@ namespace Cosmos.HAL
             else if (mMouseCycle == 2)
             {
                 mMouseByte[2] = IO.Data.Byte;
-
-                if (HasScrollWheel)
-                {
-                    mMouseCycle++;
-                }
+                mMouseCycle++;
+            }
+            else if (mMouseCycle == 3) 
+            {
+                mMouseByte[3] = IO.Data.Byte;
             }
 
             // TODO: move conditions to the if statement when stack corruption detection
             //       works better for complex conditions
-            var xTest1 = (mMouseCycle == 2 && !HasScrollWheel);
-            var xTest2 = (mMouseCycle == 3 && HasScrollWheel);
+            var xTest1 = (mMouseCycle == 3);
 
-            if (xTest1 || xTest2)
+            if (xTest1)
             {
                 int xDeltaX = 0;
                 int xDeltaY = 0;
