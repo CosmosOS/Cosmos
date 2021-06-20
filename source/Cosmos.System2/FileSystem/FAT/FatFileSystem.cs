@@ -1670,7 +1670,7 @@ namespace Cosmos.System.FileSystem.FAT
             /* Write FAT sectors */
             for (uint i = 0; i < NumberOfFATs; i++)
             {
-                Device.WriteBlock(ReservedSectorCount + i, 1, ref firstFat.memory);
+                Device.WriteBlock(ReservedSectorCount + (i * FatSectorCount), 1, ref firstFat.memory);
             }
 
             FileSystemExists = true;
