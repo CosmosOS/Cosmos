@@ -1551,7 +1551,9 @@ namespace Cosmos.System.FileSystem.FAT
             var xBPB = new ManagedMemoryBlock(BytesPerSector);
             xBPB.Fill(0);
 
-            xBPB.Write32(0, 0);
+            xBPB.Write8(0, 0xEB);
+            xBPB.Write8(1, 0xFE);
+            xBPB.Write8(2, 0x90);
             xBPB.WriteString(3, "MSWIN4.1");
             xBPB.Write16(0x0B, (ushort)BytesPerSector);
             xBPB.Write8(0x0D, (byte)SectorsPerCluster);
