@@ -60,15 +60,15 @@ artifacts:
   - path: 'TestResult.xml'
 
 
-skip_commits:
-  files:
-    - Docs/
-    - .github/
-    - Artwork/
-    - '**/*.md'
-    - LICENSE.txt
-    - README.txt
-    - .gitignore
-    - source/Archive/
-    - Users/
+#skip_commits:
+#  files:
+#    - Docs/
+#    - .github/
+#    - Artwork/
+#    - '**/*.md'
+#    - LICENSE.txt
+#    - README.txt
+#    - .gitignore
+#    - source/Archive/
+#    - Users/
     
