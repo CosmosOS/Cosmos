@@ -13,6 +13,7 @@ init:
 
 before_build:
   - ps: |
+      cd C:\Cosmos
       $range = "$env:APPVEYOR_REPO_BRANCH..$env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT"
       if (-not (git diff --name-only --diff-filter=d $range | Where-Object { $_ -NotMatch "\.md$" })) {
         Write-Host "Only Markdown files were modified, skipping CI run."
