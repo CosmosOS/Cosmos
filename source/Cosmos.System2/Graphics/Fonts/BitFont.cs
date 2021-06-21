@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 
-namespace CosmosKernel1
+namespace Cosmos.System.Graphics.Fonts
 {
     public struct BitFontDescriptor
     {
