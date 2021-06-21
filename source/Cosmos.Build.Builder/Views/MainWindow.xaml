@@ -9,7 +9,9 @@
         MinWidth="800"
         Title="Cosmos Kit Builder"
         WindowStartupLocation="CenterScreen"
-        WindowState="{Binding WindowState}">
+        WindowState="{Binding WindowState}"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
@@ -35,10 +37,8 @@
         <Rectangle DockPanel.Dock="Top"
                    Height="5" />
         <TextBlock DockPanel.Dock="Top"
-                   Background="LightGray"
                    FontSize="18"
-                   Foreground="Blue"
-                   FontWeight="ExtraBold"
+                   FontWeight="Medium"
                    Text="{Binding CurrentSection.Name, StringFormat='Current Task Log Tail - {0}', FallbackValue='Current Task Log Tail'}" />
         <ItemsControl DockPanel.Dock="Top"
                       Background="Black"
@@ -61,7 +61,7 @@
 
         <Rectangle DockPanel.Dock="Top"
                    Height="5"
-                   Fill="LightGray"/>
+                   />
         <ScrollViewer HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Sections}">
@@ -70,18 +70,46 @@
                         <HeaderedContentControl>
                             <HeaderedContentControl.Header>
                                 <ToggleButton x:Name="sectionToggleButton"
-                                              Background="LightGray"
                                               FontSize="18"
                                               FontWeight="Bold"
                                               HorizontalContentAlignment="Left"
-                                              Content="{Binding Name}">
+                                              Content="{Binding Name}"
+                                              HorizontalAlignment="Stretch"
+                                              >
                                     <ToggleButton.Style>
-                                        <Style TargetType="ToggleButton">
+                                        <Style TargetType="ToggleButton" BasedOn="{ui:StaticResource DefaultToggleButtonStyle}">
                                             <Setter Property="Foreground" Value="Green" />
+
+                                           
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding HasLoggedErrors}" Value="True">
-                                                    <Setter Property="Foreground" Value="Red" />
+                                                    <Setter Property="Foreground" Value="White" />
                                                     <Setter Property="IsChecked" Value="True" />
+                                                    <Setter Property= "Background" Value="DarkRed"/>
+
+                                                    <!--Override the background color with Red-->
+                                                    <Setter Property="Template">
+                                                        <Setter.Value >
+                                                            <ControlTemplate TargetType="ToggleButton">
+                                                                <Border x:Name="border"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            SnapsToDevicePixels="True">
+                                                                    <ContentPresenter x:Name="contentPresenter"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                  Focusable="False"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  RecognizesAccessKey="True"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                                                </Border>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
