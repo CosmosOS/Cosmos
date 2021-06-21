@@ -2,8 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Text;
 using Cosmos.Common.Extensions;
+using Cosmos.Core;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT.Listing;
 using Cosmos.System.FileSystem.Listing;
@@ -560,32 +561,32 @@ namespace Cosmos.System.FileSystem.FAT
         /// <summary>
         /// Number of bytes per cluster.
         /// </summary>
-        public readonly uint BytesPerCluster;
+        public uint BytesPerCluster { get; private set; }
 
         /// <summary>
         /// Number of bytes per sector.
         /// </summary>
-        public readonly uint BytesPerSector;
+        public uint BytesPerSector { get; private set; }
 
         /// <summary>
         /// Number of clusters.
         /// </summary>
-        public readonly uint ClusterCount;
+        public uint ClusterCount { get; private set; }
 
         /// <summary>
         /// First data sector.
         /// </summary>
-        public readonly uint DataSector; // First Data Sector
+        public uint DataSector { get; private set; } // First Data Sector
 
         /// <summary>
         /// Number of data sectors.
         /// </summary>
-        public readonly uint DataSectorCount;
+        public uint DataSectorCount { get; private set; }
 
         /// <summary>
         /// Number of FAT sectors.
         /// </summary>
-        public readonly uint FatSectorCount;
+        public uint FatSectorCount { get; private set; }
 
         /// <summary>
         /// FAT type.
@@ -599,32 +600,32 @@ namespace Cosmos.System.FileSystem.FAT
         /// </list>
         /// </para>
         /// </summary>
-        private readonly FatTypeEnum mFatType;
+        public FatTypeEnum mFatType { get; private set; }
 
         /// <summary>
         /// Nuber of FATs in the filesystem.
         /// </summary>
-        public readonly uint NumberOfFATs;
+        public uint NumberOfFATs { get; private set; }
 
         /// <summary>
         /// Number of reserved sectors.
         /// </summary>
-        public readonly uint ReservedSectorCount;
+        public uint ReservedSectorCount { get; private set; }
 
         /// <summary>
         /// FAT32 root cluster.
         /// </summary>
-        public readonly uint RootCluster; // FAT32
+        public uint RootCluster { get; private set; } // FAT32
 
         /// <summary>
         /// Number of root entrys.
         /// </summary>
-        public readonly uint RootEntryCount;
+        public uint RootEntryCount { get; private set; }
 
         /// <summary>
         /// FAT12/16 root sector.
         /// </summary>
-        public readonly uint RootSector; // FAT12/16
+        public uint RootSector { get; private set; } // FAT12/16
 
         /// <summary>
         /// Number of root sectors.
@@ -632,22 +633,27 @@ namespace Cosmos.System.FileSystem.FAT
         /// For FAT12/16. In FAT32 this field remains 0.
         /// </para>
         /// </summary>
-        public readonly uint RootSectorCount; // FAT12/16, FAT32 remains 0
+        public uint RootSectorCount { get; private set; } // FAT12/16, FAT32 remains 0
 
         /// <summary>
         /// Number of sectors per cluster.
         /// </summary>
-        public readonly uint SectorsPerCluster;
+        public uint SectorsPerCluster { get; private set; }
 
         /// <summary>
         /// Total number of sectors.
         /// </summary>
-        public readonly uint TotalSectorCount;
+        public uint TotalSectorCount { get; private set; }
 
         /// <summary>
         /// FATs array.
         /// </summary>
-        private readonly Fat[] mFats;
+        private Fat[] mFats { get; set; }
+
+        /// <summary>
+        /// FileSystem exits.
+        /// </summary>
+        public bool FileSystemExists { get; private set; }
 
         /// <summary>
         /// Get FAT type.
@@ -709,7 +715,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public FatFileSystem(Partition aDevice, string aRootPath, long aSize)
+        public FatFileSystem(Partition aDevice, string aRootPath, long aSize, bool fileSystemExists = true)
             : base(aDevice, aRootPath, aSize)
         {
             if (aDevice == null)
@@ -722,6 +728,75 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
             }
 
+            FileSystemExists = fileSystemExists;
+
+            if (FileSystemExists)
+            {
+                ReadBootSector();
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FatFileSystem"/> class, then format the partition into a new FAT filesystem.
+        /// </summary>
+        /// <param name="aDevice">The partition.</param>
+        /// <param name="aRootPath">The root path.</param>
+        /// <param name="aSize">The partition size.</param>
+        /// <param name="aDriveFormat">The drive format.</param>
+        /// <returns>Fat FileSystem.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aDevice is null.</item>
+        /// <item>Thrown when FatFileSystem is null.</item>
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <list type="bullet">
+        /// <item>Thrown when aRootPath is null.</item>
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>>FAT signature not found.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        public static FatFileSystem CreateFatFileSystem(Partition aDevice, string aRootPath, long aSize, string aDriveFormat)
+        {
+            if (aDevice == null)
+            {
+                throw new ArgumentNullException(nameof(aDevice));
+            }
+
+            if (String.IsNullOrEmpty(aRootPath))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aRootPath));
+            }
+
+            Global.mFileSystemDebugger.SendInternal("Creating a new " + aDriveFormat + " FileSystem.");
+
+            var fs = new FatFileSystem(aDevice, aRootPath, aSize, false);
+            fs.Format(aDriveFormat, true);
+            return fs;
+        }
+
+        /// <summary>
+        /// Parse BPB
+        /// </summary>
+        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="Exception">
+        /// <list type="bullet">
+        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>>FAT signature not found.</item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        internal void ReadBootSector()
+        {
             var xBPB = Device.NewBlockArray(1);
 
             Device.ReadBlock(0UL, 1U, ref xBPB);
@@ -1362,7 +1437,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// <summary>
         /// Format drive. (delete all)
         /// </summary>
-        /// <param name="aDriveFormat">unused.</param>
+        /// <param name="aDriveFormat">FAT Format.</param>
         /// <param name="aQuick">unused.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
@@ -1395,20 +1470,228 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Format(string aDriveFormat, bool aQuick)
         {
-            var xRootDirectory = (FatDirectoryEntry)GetRootDirectory();
-
-            var Fat = GetFat(0);
-
-            var x = xRootDirectory.ReadDirectoryContents();
-
-            foreach (var el in x)
+            /* Parmaters check */
+            if (Device == null)
             {
-                Global.mFileSystemDebugger.SendInternal($"Found '{el.mName}' of type {(int)el.mEntryType}");
-                // Delete yourself!
-                el.DeleteDirectoryEntry();
+                throw new ArgumentNullException(nameof(Device));
             }
 
-            Fat.ClearAllFat();
+            if (aDriveFormat == "FAT32")
+            {
+                mFatType = FatTypeEnum.Fat32;
+            }
+            else if (aDriveFormat == "FAT16")
+            {
+                throw new NotImplementedException("FAT16 formatting not supported yet.");
+            }
+            else if (aDriveFormat == "FAT12")
+            {
+                throw new NotImplementedException("FAT12 formatting not supported yet.");
+            }
+            else
+            {
+                throw new Exception("Unknown FAT type.");
+            }
+
+            /* FAT Configuration */
+            BytesPerSector = (uint)Device.BlockSize;
+            NumberOfFATs = 2;
+            TotalSectorCount = (uint)Device.BlockCount;
+
+            if (mFatType == FatTypeEnum.Fat32)
+            {
+                if (TotalSectorCount < 66600)
+                {
+                    SectorsPerCluster = 0;
+                }
+                else if (TotalSectorCount < 532480)
+                {
+                    SectorsPerCluster = 1;
+                }
+                else if (TotalSectorCount < 16777216)
+                {
+                    SectorsPerCluster = 8;
+                }
+                else if (TotalSectorCount < 33554432)
+                {
+                    SectorsPerCluster = 16;
+                }
+                else if (TotalSectorCount < 67108864)
+                {
+                    SectorsPerCluster = 32;
+                }
+                else
+                {
+                    SectorsPerCluster = 64;
+                }
+            }
+            else
+            {
+                throw new NotImplementedException("Unknown FAT type.");
+            }
+
+            if (SectorsPerCluster == 0)
+            {
+                throw new Exception("FAT32 must have at least 65536 clusters.");
+            }
+
+            if (mFatType == FatTypeEnum.Fat32)
+            {
+                ReservedSectorCount = 32;
+                RootEntryCount = 0;
+            }
+            else
+            {
+                throw new NotImplementedException("Unknown FAT type.");
+            }
+
+            FatSectorCount = (uint)GetFatSizeSectors();
+
+            /* Create BPB (BIOS Parameter Block) Structure */
+            var xBPB = new ManagedMemoryBlock(BytesPerSector);
+            xBPB.Fill(0);
+
+            xBPB.Write8(0, 0xEB);
+            xBPB.Write8(1, 0xFE);
+            xBPB.Write8(2, 0x90);
+            xBPB.WriteString(3, "MSWIN4.1");
+            xBPB.Write16(0x0B, (ushort)BytesPerSector);
+            xBPB.Write8(0x0D, (byte)SectorsPerCluster);
+            xBPB.Write16(0x0E, (ushort)ReservedSectorCount);
+            xBPB.Write8(0x10, (byte)NumberOfFATs);
+            xBPB.Write16(0x11, (ushort)RootEntryCount);
+            xBPB.Write16(0x1FE, 0xAA55);
+
+            if (TotalSectorCount > 0xFFFF)
+            {
+                xBPB.Write16(0x13, 0);
+                xBPB.Write32(0x20, TotalSectorCount);
+            }
+            else
+            {
+                xBPB.Write16(0x13, (ushort)TotalSectorCount);
+                xBPB.Write32(0x20, 0);
+            }
+
+            xBPB.Write8(0x15, 0xF8); // Media type -> 0xF8 is Hard disk
+
+            /* Create Extended Boot Record Structure */
+            if (mFatType == FatTypeEnum.Fat32)
+            {
+                xBPB.Write32(0x24, FatSectorCount);
+                xBPB.Write8(0x28, 0);
+                xBPB.Write16(0x2A, 0); //fat version
+                xBPB.Write16(0x2B, 0);
+                xBPB.Write32(0x2C, 2); //cluster number of root directory
+                xBPB.Write16(0x30, 1); //sector # of fsinfo struct
+                xBPB.Write16(0x32, 6); //backup boot sector #
+                xBPB.Write8(0x34, 0); //reserved
+                xBPB.Write8(0x40, 0x80); //drive number. 0x00 = floppy disk, 0x80 = hard disk
+                xBPB.Write8(0x42, 0x29); //signature
+
+                var SerialID = new byte[4] { 0x01, 0x02, 0x03, 0x04 };
+                var VolumeLabel = "COSMOSDISK";
+
+                xBPB.Copy(0x43, SerialID, 0, SerialID.Length);
+                xBPB.WriteString(0x47, "           ");
+                xBPB.WriteString(0x47, VolumeLabel);
+                xBPB.WriteString(0x52, "FAT32   ");
+
+                //TODO: OS Boot Code
+            }
+            else
+            {
+                throw new NotImplementedException("Unknown FAT type.");
+            }
+
+            /* Create FSInfo Structure */
+            var infoSector = new ManagedMemoryBlock(BytesPerSector);
+            infoSector.Fill(0);
+
+            if (mFatType == FatTypeEnum.Fat32)
+            {
+                infoSector.Write32(0x00, 0x41615252);
+
+                infoSector.Write32(484, 0x61417272);
+                infoSector.Write32(488, 0xFFFFFFFF);
+                infoSector.Write32(492, 0xFFFFFFFF);
+
+                infoSector.Write32(508, 0xAA550000);
+
+                infoSector.Write16(510, 0xAA55);
+            }
+
+            /* Create first FAT block */
+            var firstFat = new ManagedMemoryBlock(BytesPerSector);
+            firstFat.Fill(0);
+
+            if (mFatType == FatTypeEnum.Fat32)
+            {
+                firstFat.Write32(0, 0x0FFFFFFF); // Reserved cluster 1
+                firstFat.Write32(4, 0x0FFFFFFF); // Reserved cluster 2
+                firstFat.Write32(8, 0x0FFFFFFF); // mark end for 2nd cluster (root directory)
+            }
+            else
+            {
+                throw new NotImplementedException("Unknown FAT type.");
+            }
+            
+            firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
+
+            /* Clean sectors */
+            if (FileSystemExists)
+            {
+                var emptySector = new ManagedMemoryBlock(BytesPerSector);
+                emptySector.Fill(0);
+
+                var emptyFat = new ManagedMemoryBlock(FatSectorCount * BytesPerSector);
+                emptyFat.Fill(0);
+
+                //Clean FATs
+                for (uint fat = 0; fat < NumberOfFATs; fat++)
+                {
+                    Device.WriteBlock((ulong)ReservedSectorCount + (FatSectorCount * fat), FatSectorCount, ref emptyFat.memory);
+                }
+
+                //Clear out root cluster to remove old data
+                for (uint sector = 0; sector < SectorsPerCluster; sector++)
+                {
+                    Device.WriteBlock((ulong)DataSector + sector, 1, ref emptySector.memory);
+                }
+            }
+
+            /* Write structures */
+            Device.WriteBlock(0, 1, ref xBPB.memory); //Write BIOS Parameter Block to partition
+            Device.WriteBlock(6, 1, ref xBPB.memory); //Write backup
+
+            Device.WriteBlock(1, 1, ref infoSector.memory);
+            Device.WriteBlock(7, 1, ref infoSector.memory);
+
+            /* Write FAT sectors */
+            for (uint i = 0; i < NumberOfFATs; i++)
+            {
+                Device.WriteBlock(ReservedSectorCount + (i * FatSectorCount), 1, ref firstFat.memory);
+            }
+
+            FileSystemExists = true;
+
+            ReadBootSector();
+
+            DisplayFileSystemInfo();
+        }
+
+        /// <summary>
+        /// Computation of FAT size.
+        /// </summary>
+        /// <returns>FAT size.</returns>
+        private ulong GetFatSizeSectors()
+        {
+            ulong FatElementSize = 4;
+            ulong ReservedClusCnt = 2;
+            ulong Numerator = TotalSectorCount - ReservedSectorCount + ReservedClusCnt * SectorsPerCluster;
+            ulong Denominator = SectorsPerCluster * BytesPerSector / FatElementSize + NumberOfFATs;
+
+            return Numerator / Denominator + 1;
         }
     }
 }
