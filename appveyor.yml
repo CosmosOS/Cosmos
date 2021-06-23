@@ -2,13 +2,11 @@ version: 0.20150918.{build}
 image: Visual Studio 2019
 configuration: Debug-CI
 platform: Any CPU
-shallow_clone: true
 clone_folder: c:\Cosmos
 
 
-
 init:
-- cmd: |
+- ps: |
     git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
 
 install:
@@ -43,7 +41,7 @@ build_script:
 #  - Cosmos.TestRunner.UnitTest.dll
 
 test_script:
-- cmd: dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
+- ps: dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
 
 on_finish:
 - ps: |
