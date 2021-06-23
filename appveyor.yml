@@ -14,7 +14,7 @@ install:
   - ps: |
       $range = "$env:APPVEYOR_REPO_BRANCH..$env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT"
       if (-not (git diff --name-only --diff-filter=d $range | Where-Object { $_ -NotMatch ".git*|md|yml|txt$" })) {
-        Write-Host "Only Markdown or YAML files were modified, skipping CI run."
+        Write-Host "Only metafiles were modified, skipping CI run."
         Exit-AppVeyorBuild
       }
 
@@ -47,7 +47,6 @@ test_script:
 on_finish:
 - ps: |
     $tests = "c:\Cosmos\TestResult.xml"
-    Write-Host "Check if Tests were performed on build, skipping if md/yml files edited"
     if ((Test-Path $tests)) {
       $wc = New-Object 'System.Net.WebClient'
       $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
