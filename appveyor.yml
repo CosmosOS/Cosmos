@@ -46,8 +46,11 @@ test_script:
 
 on_finish:
 - ps: |
-    $wc = New-Object 'System.Net.WebClient'
-    $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
+    $tests = 'c:\Cosmos\TestResult.xml'
+    if (-not(Test-Path -Path $file -PathType Leaf)) {
+      $wc = New-Object 'System.Net.WebClient'
+      $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", $tests)
+    }
 
 notifications:
 - provider: Webhook
