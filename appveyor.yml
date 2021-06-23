@@ -5,8 +5,9 @@ platform: Any CPU
 clone_folder: c:\Cosmos
 
 
+
 init:
-- ps: |
+- cmd: |
     git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
 
 install:
@@ -41,7 +42,7 @@ build_script:
 #  - Cosmos.TestRunner.UnitTest.dll
 
 test_script:
-- ps: dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
+- cmd: dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
 
 on_finish:
 - ps: |
