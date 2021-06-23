@@ -10,3 +10,9 @@ For projects using the VFS directly, we recommend you use System.IO methods wher
 For the up-to-date API documentation generated from the master branch, please visit the [Cosmos API Documentation](https://cosmosos.github.io/api/Cosmos.Build.Tasks.html)  
   
 If you're looking for general information about Cosmos e.g. our goals and various links to chat with us or for help with using Cosmos that can't be answered with existing documentation, please visit the [Cosmos website](https://gocosmos.org)  
+
+
+You can find the latest and previous build statuses on [AppVeyor](https://ci.appveyor.com/project/CosmosOS/cosmos)  
+
+[![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)  
+[![Join the chat at (https://discord.com/invite/kwtBwv6jhD](https://img.shields.io/discord/833970409337913344)](https://discord.com/invite/kwtBwv6jhD)  
