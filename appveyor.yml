@@ -13,7 +13,7 @@ init:
 install:
   - ps: |
       $range = "$env:APPVEYOR_REPO_BRANCH..$env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT"
-      if (-not (git diff --name-only --diff-filter=d $range | Where-Object { $_ -NotLike "/Source/Archive|/Users|/Docs|/.github|/Artwork|.gitignore|md|yml|txt$" })) {
+      if (-not (git diff --name-only --diff-filter=d $range | Where-Object { $_ -NotLike ".git|md|yml|txt$" })) {
         Write-Host "Only Markdown or YAML files were modified, skipping CI run."
         Exit-AppVeyorBuild
       }
