@@ -108,9 +108,7 @@ namespace Cosmos.HAL.BlockDevice
                     }
                     else
                     {
-                        var xMBRData = new byte[512];
-                        xPort.ReadBlock(0UL, 1U, ref xMBRData);
-                        var xMBR = new MBR(xMBRData);
+                        var xMBR = new MBR(xPort);
 
                         if (xMBR.EBRLocation != 0)
                         {

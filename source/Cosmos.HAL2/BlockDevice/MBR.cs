@@ -18,6 +18,8 @@ namespace Cosmos.HAL.BlockDevice
 
         public UInt32 EBRLocation = 0;
 
+        public BlockDevice Host;
+
         public class PartInfo
         {
             public readonly byte SystemID;
@@ -32,12 +34,10 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
 
-        public MBR(byte[] aMBR)
+        public MBR(BlockDevice Host)
         {
-            ParsePartition(aMBR, 446);
-            ParsePartition(aMBR, 462);
-            ParsePartition(aMBR, 478);
-            ParsePartition(aMBR, 494);
+            this.Host = Host;
+            Init();
         }
 
         protected void ParsePartition(byte[] aMBR, UInt32 aLoc)
@@ -61,6 +61,123 @@ namespace Cosmos.HAL.BlockDevice
                 var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
                 Partitions.Add(xPartInfo);
             }
+        }
+        public void RemovePartition(int partIndex)
+        {
+            int location;
+            if (partIndex == 0)
+            {
+                location = 446;
+            }
+            else if (partIndex == 1)
+            {
+                location = 462;
+            }
+            else if (partIndex == 2)
+            {
+                location = 478;
+            }
+            else if (partIndex == 3)
+            {
+                location = 494;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+
+            byte[] mbr = Host.NewBlockArray(1);
+            Host.ReadBlock(0, 1, ref mbr);
+            for (int i = location; i < location + 16; i++)
+            {
+                mbr[i] = 0;
+            }
+            Host.WriteBlock(0, 1, ref mbr);
+            Init();
+        }
+        public void CreatePartition(int sizeInMB)
+        {
+            int location;
+            int startingSector = 63;
+            uint amountOfSectors = (uint)(sizeInMB * 1024 * 1024 / 512);
+            //TODO: Check if partition is too big
+
+            if (Partitions.Count == 0)
+            {
+                location = 446;
+                startingSector = 63;
+            }
+            else if (Partitions.Count == 1)
+            {
+                location = 462;
+                startingSector = (int)(Partitions[0].StartSector + Partitions[0].SectorCount);
+            }
+            else if (Partitions.Count == 2)
+            {
+                location = 478;
+            }
+            else if (Partitions.Count == 3)
+            {
+                location = 494;
+            }
+            else
+            {
+                throw new NotImplementedException("Extended partitons not yet supported.");
+            }
+
+            //Create MBR
+            var mbrData = new byte[512];
+            Host.ReadBlock(0, 1, ref mbrData);
+            mbrData[location + 0] = 0x80; //bootable
+            mbrData[location + 1] = 0x1; //starting head
+            mbrData[location + 2] = 0; //Starting sector
+            mbrData[location + 3] = 0x0; //Starting Cylinder
+            mbrData[location + 4] = 83;//normal partition
+            mbrData[location + 5] = 0xFE; //ending head
+            mbrData[location + 6] = 0x3F; //Ending Sector
+            mbrData[location + 7] = 0x40;//Ending Cylinder
+
+            //Starting Sector
+            byte[] startingSectorBytes = BitConverter.GetBytes(startingSector);
+            mbrData[location + 8] = startingSectorBytes[0];
+            mbrData[location + 9] = startingSectorBytes[1];
+            mbrData[location + 10] = startingSectorBytes[2];
+            mbrData[location + 11] = startingSectorBytes[3];
+
+            //Total Sectors in partition
+            byte[] total = BitConverter.GetBytes(amountOfSectors);
+            mbrData[location + 12] = total[0];
+            mbrData[location + 13] = total[1];
+            mbrData[location + 14] = total[2];
+            mbrData[location + 15] = total[3];
+
+            //Boot flag
+            byte[] boot = BitConverter.GetBytes((ushort)0xAA55);
+            mbrData[510] = boot[0];
+            mbrData[511] = boot[1];
+
+            //Save the data
+            Host.WriteBlock(0, 1, ref mbrData);
+            Init();
+        }
+        public void RemoveAllPartitions()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                RemovePartition(i);
+            }
+        }
+        private void Init()
+        {
+            Partitions.Clear();
+
+            byte[] mbr = Host.NewBlockArray(1);
+            Host.ReadBlock(0, 1, ref mbr);
+
+            ParsePartition(mbr, 446);
+            ParsePartition(mbr, 462);
+            ParsePartition(mbr, 478);
+            ParsePartition(mbr, 494);
         }
     }
 }
