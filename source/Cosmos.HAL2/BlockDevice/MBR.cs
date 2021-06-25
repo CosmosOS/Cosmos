@@ -14,18 +14,43 @@ namespace Cosmos.HAL.BlockDevice
     {
         // TODO Lock this so other code cannot add/remove/modify the list
         // Can make a locked list class which wraps a list<>
+
+        /// <summary>
+        /// List of Partitions
+        /// </summary>
         public List<PartInfo> Partitions = new List<PartInfo>();
 
+        /// <summary>
+        /// EBR location. Set to 0 if no EBR detected
+        /// </summary>
         public UInt32 EBRLocation = 0;
-
+        /// <summary>
+        /// Host device that has all of the partitions
+        /// </summary>
         public BlockDevice Host;
-
+        /// <summary>
+        /// Partiton Info
+        /// </summary>
         public class PartInfo
         {
+            /// <summary>
+            /// System ID
+            /// </summary>
             public readonly byte SystemID;
+            /// <summary>
+            /// Start sector
+            /// </summary>
             public readonly UInt32 StartSector;
+            /// <summary>
+            /// Sector count
+            /// </summary>
             public readonly UInt32 SectorCount;
-
+            /// <summary>
+            /// Partition info constructor.
+            /// </summary>
+            /// <param name="aSystemID">System ID</param>
+            /// <param name="aStartSector">Start sector</param>
+            /// <param name="aSectorCount">Sector count</param>
             public PartInfo(byte aSystemID, UInt32 aStartSector, UInt32 aSectorCount)
             {
                 SystemID = aSystemID;
@@ -33,13 +58,20 @@ namespace Cosmos.HAL.BlockDevice
                 SectorCount = aSectorCount;
             }
         }
-
+        /// <summary>
+        /// MBR contructor
+        /// </summary>
+        /// <param name="Host">Blockdevice that has all of the partitions</param>
         public MBR(BlockDevice Host)
         {
             this.Host = Host;
             Init();
         }
-
+        /// <summary>
+        /// Parses a partition
+        /// </summary>
+        /// <param name="aMBR">The MBR</param>
+        /// <param name="aLoc">Location of the partition in the MBR</param>
         protected void ParsePartition(byte[] aMBR, UInt32 aLoc)
         {
             byte xSystemID = aMBR[aLoc + 4];
@@ -62,8 +94,14 @@ namespace Cosmos.HAL.BlockDevice
                 Partitions.Add(xPartInfo);
             }
         }
+        /// <summary>
+        /// Removes a partiton
+        /// </summary>
+        /// <param name="partIndex">The partition index. 0 = first partition, 1 = second partition, 2 = third partition, 3 = forth partition</param>
+        /// <exception cref="NotImplementedException">Occurs when an Invaild partIndex is specified</exception>
         public void RemovePartition(int partIndex)
         {
+            //get location from partition number
             int location;
             if (partIndex == 0)
             {
@@ -86,6 +124,7 @@ namespace Cosmos.HAL.BlockDevice
                 throw new NotImplementedException();
             }
 
+            //remove that partition
             byte[] mbr = Host.NewBlockArray(1);
             Host.ReadBlock(0, 1, ref mbr);
             for (int i = location; i < location + 16; i++)
@@ -95,6 +134,11 @@ namespace Cosmos.HAL.BlockDevice
             Host.WriteBlock(0, 1, ref mbr);
             Init();
         }
+        /// <summary>
+        /// Creates a partiton
+        /// </summary>
+        /// <param name="sizeInMB">Size of the partition in Megabytes</param>
+        /// <exception cref="NotImplementedException">Occurs when an there are too many partitions</exception>
         public void CreatePartition(int sizeInMB)
         {
             int location;
@@ -160,6 +204,9 @@ namespace Cosmos.HAL.BlockDevice
             Host.WriteBlock(0, 1, ref mbrData);
             Init();
         }
+        /// <summary>
+        /// Removes all partitions.
+        /// </summary>
         public void RemoveAllPartitions()
         {
             for (int i = 0; i < 4; i++)
@@ -167,6 +214,9 @@ namespace Cosmos.HAL.BlockDevice
                 RemovePartition(i);
             }
         }
+        /// <summary>
+        /// Reads partition info from disk, and adds it to the Partitions list
+        /// </summary>
         private void Init()
         {
             Partitions.Clear();
