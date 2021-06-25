@@ -144,7 +144,8 @@ namespace Cosmos.HAL
             else if (mMouseCycle == 2)
             {
                 mMouseByte[2] = IO.Data.Byte;
-                mMouseCycle++;
+                if (HasScrollWheel)
+                    mMouseCycle++;
             }
             else if (mMouseCycle == 3) 
             {
@@ -153,9 +154,9 @@ namespace Cosmos.HAL
 
             // TODO: move conditions to the if statement when stack corruption detection
             //       works better for complex conditions
-            var xTest1 = (mMouseCycle == 3);
-
-            if (xTest1)
+            var xTest1 = (mMouseCycle == 2);
+            var xTest2 = (mMouseCycle == 3);
+            if (xTest1 || xTest2)
             {
                 int xDeltaX = 0;
                 int xDeltaY = 0;
