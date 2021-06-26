@@ -1,10 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
 namespace Cosmos.System.Graphics
 {
     /// <summary>
-    /// Describes the order in which the colors are stored in each pixel of an image
+    /// Order in which a packed color is formatted as
     /// </summary>
     public enum ColorOrder
     {
-        RGB, BGR
+        RGB,
+        BGR,
     }
 }

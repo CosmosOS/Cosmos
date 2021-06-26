@@ -8,12 +8,12 @@ namespace Cosmos.System.Graphics
 {
     /// <summary>
     /// Color depth. Available:
-    /// <list type="bullet">
-    /// <item>ColorDepth4 - EGA 16 colors</item>
-    /// <item>ColorDepth8 - VGA 256 colors</item>
-    /// <item>ColorDepth16 - 65535 colors</item>
-    /// <item>ColorDepth24 - 16,777,216 of colors</item>
-    /// <item>ColorDepth32 - 16,777,216 of colors (with transparency)</item>
+    /// <list>
+    /// <item>4-bit color depth  - 16 total colors</item>
+    /// <item>8-bit color depth  - 255 total colors</item>
+    /// <item>16-bit color depth - 65535 total colorss</item>
+    /// <item>24-bit color depth - 16,777,216 total colorss</item>
+    /// <item>32-bit color depth - 16,777,216 of colors with transparency</item>
     /// </list>
     /// </summary>
     public enum ColorDepth

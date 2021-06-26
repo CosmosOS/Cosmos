@@ -5,14 +5,14 @@ using System.Text;
 namespace Cosmos.System.Graphics.Fonts
 {
     /// <summary>
-    /// Base class for fonts.
+    /// Base class for fonts
     /// </summary>
     public abstract class Font
     {
         /// <summary>
-        /// Get font pure data.
+        /// Get font width.
         /// </summary>
-        public byte[] Data { get; }
+        public byte Width { get; }
 
         /// <summary>
         /// Get font height.
@@ -20,26 +20,61 @@ namespace Cosmos.System.Graphics.Fonts
         public byte Height { get; }
 
         /// <summary>
-        /// Get font Width.
+        /// Get horizontal font spacing
         /// </summary>
-        public byte Width { get; }
+        public byte HorizontalSpacing { get; private set; }
 
         /// <summary>
-        /// Used to draw font.
+        /// Get vertical font spacing
         /// </summary>
-        /// <param name="byteToConvert">byteToConvert</param>
-        /// <param name="bitToReturn">bitToReturn</param>
-        public bool ConvertByteToBitAddres(byte byteToConvert, int bitToReturn)
-        {
-            int mask = 1 << (bitToReturn - 1);
-            return (byteToConvert & mask) != 0;
-        }
+        public byte VerticalSpacing { get; private set; }
 
+        /// <summary>
+        /// Get raw binary font data
+        /// </summary>
+        public byte[] Data { get; }
+
+        /// <summary>
+        /// Create new font with default spacing
+        /// </summary>
+        /// <param name="aWidth"></param>
+        /// <param name="aHeight"></param>
+        /// <param name="aData"></param>
         public Font(byte aWidth, byte aHeight, byte[] aData)
         {
             Width = aWidth;
             Height = aHeight;
+            HorizontalSpacing = 0;
+            VerticalSpacing = 0;
             Data = aData;
+        }
+
+        /// <summary>
+        /// Create new font with specified horizontal and vertical spacing
+        /// </summary>
+        /// <param name="aWidth"></param>
+        /// <param name="aHeight"></param>
+        /// <param name="aSpacingH"></param>
+        /// <param name="aSpacingV"></param>
+        /// <param name="aData"></param>
+        public Font(byte aWidth, byte aHeight, byte aSpacingH, byte aSpacingV, byte[] aData)
+        {
+            Width = aWidth;
+            Height = aHeight;
+            HorizontalSpacing = aSpacingH;
+            VerticalSpacing = aSpacingV;
+            Data = aData;
+        }
+
+        /// <summary>
+        /// Conversion algorithm used for drawing font characters
+        /// </summary>
+        /// <param name="byteToConvert">byteToConvert</param>
+        /// <param name="bitToReturn">bitToReturn</param>
+        public bool ConvertByteToBitAddress(byte byteToConvert, int bitToReturn)
+        {
+            int mask = 1 << (bitToReturn - 1);
+            return (byteToConvert & mask) != 0;
         }
     }
 }

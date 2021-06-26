@@ -1,4 +1,6 @@
-//#define COSMOSDEBUG
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Cosmos.Core;
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers;
@@ -6,167 +8,140 @@ using Cosmos.HAL.Drivers;
 namespace Cosmos.System.Graphics
 {
     /// <summary>
-    /// FullScreenCanvas class. Used to set and get full screen canvas.
+    /// Available video driver modes
+    /// <list>
+    /// <item>VMWareSVGAII - Compatible with VMWare and QEMU(using vga -vmware)</item>
+    /// <item>VBE/VESA - Compatible with VirtualBox, QEMU, and BOCHS</item>
+    /// <item>VGA - Compatible with VMWare, QEMU, VirtualBox, BOCHS, and bare-metal</item>
+    /// </list>
+    /// </summary>
+    public enum VideoDriver
+    {
+        VMWareSVGAII,
+        VBE,
+        VGA,
+    }
+
+    /// <summary>
+    /// Manage video driver and canvas
     /// </summary>
     public static class FullScreenCanvas
     {
         /// <summary>
-        /// Boolean value whether CGS is in use or not
+        /// Checks if canvas actively being used
         /// </summary>
-        public static bool IsInUse = false;
+        public static bool InUse = false;
+
+        // svga pci device
+        private static PCIDevice svgaDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
+
+        // canvas
+        private static Canvas canvas;
 
         /// <summary>
-        /// Disables the specified Graphics Driver used and returns to VGA text mode 80x25
+        /// Disable fullscreen canvas
         /// </summary>
         public static void Disable()
         {
-            if (IsInUse)
+            if (InUse)
             {
-                _VideoDriver.Disable();
+                canvas.Disable();
                 VGAScreen.SetTextMode(VGADriver.TextSize.Size80x25);
             }
         }
 
-        /// <summary>
-        /// List of all video drivers (BGA, 
-        /// </summary>
-        private enum VideoDriver
+        // get canvas
+        private static Canvas GetCanvas()
         {
-            VMWareSVGAIIDriver,
-            VBEDriver,
-            VGADriver
+            if (svgaDevice != null && PCI.Exists(svgaDevice)) { return new SVGAIICanvas(); }
+            if (IsVBECompatible()) { return new VBECanvas(); }
+            return new VGACanvas();
+        }
+
+        // get canvas with mode
+        private static Canvas GetCanvas(Mode mode)
+        {
+            if (svgaDevice != null && PCI.Exists(svgaDevice)) { return new SVGAIICanvas(mode); }
+            if (IsVBECompatible()) { return new VBECanvas(mode); }
+            return new VGACanvas(mode);
+        }
+
+        // get canvas with driver and mode
+        private static Canvas GetCanvas(VideoDriver driver, Mode mode)
+        {
+            // vmware
+            if (driver == VideoDriver.VMWareSVGAII)
+            {
+                if (svgaDevice != null && PCI.Exists(svgaDevice)) { return new SVGAIICanvas(mode); }
+                else { Global.mDebugger.SendInternal("No VMWareSVGAII device found"); throw new Exception("No VMWareSVGAII device found"); }
+            }
+            // vbe
+            else if (driver == VideoDriver.VBE)
+            {
+                if (IsVBECompatible()) { return new VBECanvas(mode); }
+                else { Global.mDebugger.SendInternal("No VMWareSVGAII device found"); throw new Exception("No VMWareSVGAII device found"); }
+            }
+            // vga
+            else if (driver == VideoDriver.VGA) { return new VGACanvas(mode); }
+            // return auto-selected otherwise
+            return GetCanvas(mode);
         }
 
         /// <summary>
-        /// SVGA 2 device.
-        /// </summary>
-        private static PCIDevice _SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
-
-        /// <summary>
-        /// Checks whether the Bochs Graphics Adapter exists (not limited to Bochs)
+        /// Automatically select video driver and set to default mode
         /// </summary>
         /// <returns></returns>
-        public static bool BGAExists()
-        {
-            return VBEDriver.ISAModeAvailable();
-        }
-
-        /// <summary>
-        /// Video driver.
-        /// </summary>
-        private static Canvas _VideoDriver = null;
-
-        /// <summary>
-        /// Get video driver.
-        /// </summary>
-        /// <returns>Canvas value.</returns>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
-        private static Canvas GetVideoDriver()
-        {
-            if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
-            {
-                return new SVGAIICanvas();
-            }
-            if (VBEAvailable())
-            {
-                return new VBECanvas();
-            }
-            else
-            {
-                return new VGACanvas();
-            }
-        }
-
-        /// <summary>
-        /// Checks is VBE is supported exists
-        /// </summary>
-        /// <returns></returns>
-        private static bool VBEAvailable()
-        {
-            if (BGAExists())
-            {
-                return true;
-            }
-            else if (PCI.Exists(VendorID.VirtualBox, DeviceID.VBVGA))
-            {
-                return true;
-            }
-            else if (PCI.Exists(VendorID.Bochs, DeviceID.BGA))
-            {
-                return true;
-            }
-            else if (VBE.IsAvailable())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Get video driver.
-        /// </summary>
-        /// <param name="mode">Mode.</param>
-        /// <returns>Canvas value.</returns>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
-        private static Canvas GetVideoDriver(Mode mode)
-        {
-            if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
-            {
-                return new SVGAIICanvas(mode);
-            }
-            if (VBEAvailable())
-            {
-                return new VBECanvas(mode);
-            }
-            else
-            {
-                return new VGACanvas(mode);
-            }
-        }
-
-        /// <summary>
-        /// Get full screen canvas.
-        /// </summary>
-        /// <returns>Canvas value.</returns>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
         public static Canvas GetFullScreenCanvas()
         {
-            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
-            if (_VideoDriver == null)
-            {
-                Global.mDebugger.SendInternal($"_VideoDriver is null creating new object");
-                _VideoDriver = GetVideoDriver();
-            }
-            else
-            {
-                Global.mDebugger.SendInternal($"_VideoDriver is NOT null using the old one changing mode to DefaultMode");
-                _VideoDriver.Mode = _VideoDriver.DefaultGraphicMode;
-            }
-            return _VideoDriver;
+            Global.mDebugger.SendInternal("Get fullscreen canvas with default mode");
+            if (canvas == null) { canvas = GetCanvas(); }
+            else { canvas.Mode = canvas.DefaultGraphicMode; }
+            return canvas;
         }
 
         /// <summary>
-        /// Get full screen canvas.
+        /// Automatically select video driver and set to specified mode
         /// </summary>
-        /// <param name="mode">Mode.</param>
-        /// <returns>Canvas value.</returns>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public static Canvas GetFullScreenCanvas(Mode mode)
         {
-            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);
-
-            if (_VideoDriver == null)
-            {
-                _VideoDriver = GetVideoDriver(mode);
-            }
-            else
-            {
-                _VideoDriver.Mode = mode;
-            }
-                return _VideoDriver;
+            Global.mDebugger.SendInternal($"Get fullscreen canvas with mode {mode}");
+            if (canvas == null) { canvas = GetCanvas(mode); }
+            else { canvas.Mode = mode; }
+            return canvas;
         }
+
+        /// <summary>
+        /// Manually select video driver and set to specified mode
+        /// </summary>
+        /// <param name="driver"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public static Canvas GetFullScreenCanvas(VideoDriver driver, Mode mode)
+        {
+            Global.mDebugger.SendInternal($"Get fullscreen canvas with driver {driver} and mode {mode}");
+            canvas = GetCanvas(driver, mode);
+            return canvas;
+        }
+
+        /// <summary>
+        /// Check if system is compatible with VBE/VESA
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsVBECompatible()
+        {
+            if (IsBGACompatible()) { return true; }
+            if (PCI.Exists(VendorID.VirtualBox, DeviceID.VBVGA)) { return true; }
+            if (PCI.Exists(VendorID.Bochs, DeviceID.BGA)) { return true; }
+            if (VBE.IsAvailable()) { return true; }
+            return false;
+        }
+
+        /// <summary>
+        /// Check if system is compatible with BGA(Bochs Graphics Adapter)
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsBGACompatible() { return VBEDriver.ISAModeAvailable(); }
     }
 }

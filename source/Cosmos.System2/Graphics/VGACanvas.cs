@@ -1,417 +1,124 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Cosmos.HAL;
 using System.Drawing;
-using static Cosmos.HAL.VGADriver;
+using System.Text;
+using Cosmos.Debug.Kernel;
+using Cosmos.HAL;
+using Cosmos.HAL.Drivers.PCI.Video;
 
 namespace Cosmos.System.Graphics
 {
-    /// <summary>
-    /// VGACanvas class. Used to control screen.
-    /// </summary>
     public class VGACanvas : Canvas
     {
-        /// <summary>
-        /// Private boolean whether VGA graphics mode is enabled or not
-        /// </summary>
-        bool _Enabled;
+        // debugger
+        internal Debugger debugger = new Debugger("System", "VGACanvas");
 
-        /// <summary>
-        /// The HAL VGA driver
-        /// </summary>
-        private readonly VGADriver _VGADriver;
+        // driver
+        private VGADriver driver;
 
-        /// <summary>
-        /// VGA graphics mode Canvas constructor - see Canvas.cs
-        /// </summary>
-        /// <param name="aMode"></param>
-        public VGACanvas(Mode aMode) : base()
-        {
-            Global.mDebugger.Send("Creating VGACanvas with mode");
-            _VGADriver = new VGADriver();
-            _VGADriver.SetGraphicsMode(ModeToScreenSize(aMode), (VGADriver.ColorDepth)(int)aMode.ColorDepth);
-            Mode = aMode;
-            Enabled = true;
-        }
-
-        /// <summary>
-        /// Creates a VGA graphics mode with the default mode
-        /// </summary>
-        public VGACanvas() : base()
-        {
-            Enabled = true;
-            Mode = DefaultGraphicMode;
-            Global.mDebugger.Send("Creating VGACanvas with standard mode");
-            _VGADriver = new VGADriver();
-            _VGADriver.SetGraphicsMode(ModeToScreenSize(DefaultGraphicMode), (VGADriver.ColorDepth)(int)DefaultGraphicMode.ColorDepth);
-        }
-
-        /// <summary>
-        /// Gets or sets the VGA graphics mode
-        /// </summary>
-        public override Mode Mode { get; set; }
-
-        /// <summary>
-        /// Clears the screen of all pixels
-        /// </summary>
-        /// <param name="aColor"></param>
-        public override void Clear(Color aColor)
-        {
-            var paletteIndex = _VGADriver.GetClosestColorInPalette(aColor);
-            _VGADriver.DrawFilledRectangle(0,0, _VGADriver.PixelWidth, _VGADriver.PixelHeight, paletteIndex);
-        }
-
-        /// <summary>
-        /// Disables VGA graphics mode, parent method returns to 80x25 text mode
-        /// </summary>
-        public override void Disable()
-        {
-            if (Enabled)
-            {
-                Enabled = false;
-            }
-        }
-
-        /// <summary>
-        /// Draws an array of colors
-        /// </summary>
-        /// <param name="aColors"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawArray(Color[] aColors, Point aPoint, int aWidth, int aHeight)
-        {
-            base.DrawArray(aColors, aPoint, aWidth, aHeight);
-        }
-
-        /// <summary>
-        /// Draws an array of colors, specifiying X and Y coords
-        /// </summary>
-        /// <param name="aColors"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Draws a circle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aXCenter"></param>
-        /// <param name="aYCenter"></param>
-        /// <param name="aRadius"></param>
-        public override void DrawCircle(Pen aPen, int aXCenter, int aYCenter, int aRadius)
-        {
-            base.DrawCircle(aPen, aXCenter, aYCenter, aRadius);
-        }
-
-        /// <summary>
-        /// Draws a circle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aRadius"></param>
-        public override void DrawCircle(Pen aPen, Point aPoint, int aRadius)
-        {
-            base.DrawCircle(aPen, aPoint, aRadius);
-        }
-
-        /// <summary>
-        /// Draws an ellipse
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aXCenter"></param>
-        /// <param name="aYCenter"></param>
-        /// <param name="aXRadius"></param>
-        /// <param name="aYRadius"></param>
-        public override void DrawEllipse(Pen aPen, int aXCenter, int aYCenter, int aXRadius, int aYRadius)
-        {
-            base.DrawEllipse(aPen, aXCenter, aYCenter, aXRadius, aYRadius);
-        }
-
-        /// <summary>
-        /// Draws an ellipse
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aXRadius"></param>
-        /// <param name="aYRadius"></param>
-        public override void DrawEllipse(Pen aPen, Point aPoint, int aXRadius, int aYRadius)
-        {
-            base.DrawEllipse(aPen, aPoint, aXRadius, aYRadius);
-        }
-
-        /// <summary>
-        /// Draws a filled circle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aX0"></param>
-        /// <param name="aY0"></param>
-        /// <param name="aRadius"></param>
-        public override void DrawFilledCircle(Pen aPen, int aX0, int aY0, int aRadius)
-        {
-            base.DrawFilledCircle(aPen, aX0, aY0, aRadius);
-        }
-
-        /// <summary>
-        /// Draws a filled circle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aRadius"></param>
-        public override void DrawFilledCircle(Pen aPen, Point aPoint, int aRadius)
-        {
-            base.DrawFilledCircle(aPen, aPoint, aRadius);
-        }
-
-        /// <summary>
-        /// Draws a filled ellipse
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aHeight"></param>
-        /// <param name="aWidth"></param>
-        public override void DrawFilledEllipse(Pen aPen, Point aPoint, int aHeight, int aWidth)
-        {
-            base.DrawFilledEllipse(aPen, aPoint, aHeight, aWidth);
-        }
-
-        /// <summary>
-        /// Draws a filled ellipse
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aHeight"></param>
-        /// <param name="aWidth"></param>
-        public override void DrawFilledEllipse(Pen aPen, int aX, int aY, int aHeight, int aWidth)
-        {
-            base.DrawFilledEllipse(aPen, aX, aY, aHeight, aWidth);
-        }
-
-        /// <summary>
-        /// Draws a filled rectangle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawFilledRectangle(Pen aPen, Point aPoint, int aWidth, int aHeight)
-        {
-            DrawFilledRectangle(aPen, aPoint.X, aPoint.Y, aWidth, aHeight);
-        }
-
-        /// <summary>
-        /// Draws a filled rectangle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aXStart"></param>
-        /// <param name="aYStart"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawFilledRectangle(Pen aPen, int aXStart, int aYStart, int aWidth, int aHeight)
-        {
-            _VGADriver.DrawFilledRectangle(aXStart, aYStart, aWidth, aHeight, _VGADriver.GetClosestColorInPalette(aPen.Color));
-        }
-
-        /// <summary>
-        /// Draws a line (in the sand?)
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aX1"></param>
-        /// <param name="aY1"></param>
-        /// <param name="aX2"></param>
-        /// <param name="aY2"></param>
-        public override void DrawLine(Pen aPen, int aX1, int aY1, int aX2, int aY2)
-        {
-            base.DrawLine(aPen, aX1, aY1, aX2, aY2);
-        }
-
-        /// <summary>
-        /// Draws a point
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        public override void DrawPoint(Pen aPen, int aX, int aY)
-        {
-            _VGADriver.SetPixel((uint)aX, (uint)aY, aPen.Color);
-        }
-
-        /// <summary>
-        /// Draws a point
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        public void DrawPoint(uint aColor, int aX, int aY)
-        {
-            _VGADriver.SetPixel((uint)aX, (uint)aY, aColor);
-        }
-
-        /// <summary>
-        /// Draws a point
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        public override void DrawPoint(Pen aPen, float aX, float aY)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Draws a polygon
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoints"></param>
-        public override void DrawPolygon(Pen aPen, params Point[] aPoints)
-        {
-            base.DrawPolygon(aPen, aPoints);
-        }
-
-        /// <summary>
-        /// Draws a rectangle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawRectangle(Pen aPen, Point aPoint, int aWidth, int aHeight)
-        {
-            base.DrawRectangle(aPen, aPoint, aWidth, aHeight);
-        }
-
-        /// <summary>
-        /// Draws a rectangle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
-        {
-            base.DrawRectangle(aPen, aX, aY, aWidth, aHeight);
-        }
-
-        /// <summary>
-        /// Draws a square
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aSize"></param>
-        public override void DrawSquare(Pen aPen, Point aPoint, int aSize)
-        {
-            base.DrawSquare(aPen, aPoint, aSize);
-        }
-
-        /// <summary>
-        /// Draws a square
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aSize"></param>
-        public override void DrawSquare(Pen aPen, int aX, int aY, int aSize)
-        {
-            base.DrawSquare(aPen, aX, aY, aSize);
-        }
-
-        /// <summary>
-        /// Draws a triangle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aPoint0"></param>
-        /// <param name="aPoint1"></param>
-        /// <param name="aPoint2"></param>
-        public override void DrawTriangle(Pen aPen, Point aPoint0, Point aPoint1, Point aPoint2)
-        {
-            base.DrawTriangle(aPen, aPoint0, aPoint1, aPoint2);
-        }
-
-        /// <summary>
-        /// Draws a triangle
-        /// </summary>
-        /// <param name="aPen"></param>
-        /// <param name="aV1x"></param>
-        /// <param name="aV1y"></param>
-        /// <param name="aV2x"></param>
-        /// <param name="aV2y"></param>
-        /// <param name="aV3x"></param>
-        /// <param name="aV3y"></param>
-        public override void DrawTriangle(Pen aPen, int aV1x, int aV1y, int aV2x, int aV2y, int aV3x, int aV3y)
-        {
-            base.DrawTriangle(aPen, aV1x, aV1y, aV2x, aV2y, aV3x, aV3y);
-        }
-
-        /// <summary>
-        /// List of available resolutions
-        /// </summary>
-        private static readonly List<Mode> _AvailableModes = new List<Mode>
+        // available modes
+        public override List<Mode> AvailableModes { get; } = new List<Mode>()
         {
             new Mode(640, 480, ColorDepth.ColorDepth4),
             new Mode(720, 480, ColorDepth.ColorDepth4),
-            new Mode(320, 200, ColorDepth.ColorDepth8)
+            new Mode(320, 200, ColorDepth.ColorDepth8),
         };
 
-        public override List<Mode> AvailableModes
+        /// <summary>
+        /// Default graphics mode - 320x200x8
+        /// </summary>
+        public override Mode DefaultGraphicMode { get; } = new Mode(320, 200, ColorDepth.ColorDepth8);
+
+        /// <summary>
+        /// Get and set active video mode
+        /// </summary>
+        private Mode mode;
+        public override Mode Mode
         {
-            get
+            get { return mode; }
+            set
             {
-                return _AvailableModes;
+                mode = value;
+                if (SendDebug) { debugger.SendInternal($"Set mode property to {value}"); }
+                SetMode(value);
             }
         }
 
         /// <summary>
-        /// Retrieves the RGB value of a specified pixel
+        /// Create new VGA canvas with default mode
         /// </summary>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
+        public VGACanvas() { this.Mode = DefaultGraphicMode; }
+
+        /// <summary>
+        /// Create new VGA canvas with specified mode
+        /// </summary>
+        /// <param name="mode"></param>
+        public VGACanvas(Mode mode) { this.Mode = mode; }
+
+        // set graphics mode
+        private void SetMode(Mode mode)
+        {
+            this.mode = mode;
+            if (!CheckIfModeIsValid(mode)) { throw new Exception($"Unsupported mode {mode}"); }
+            if (driver == null) { driver = new VGADriver(); }
+            if (mode.Width == 720) { driver.SetGraphicsMode(VGADriver.ScreenSize.Size720x480, VGADriver.ColorDepth.BitDepth4); }
+            else if (mode.Width == 640) { driver.SetGraphicsMode(VGADriver.ScreenSize.Size640x480, VGADriver.ColorDepth.BitDepth4); }
+            else if (mode.Width == 320) { driver.SetGraphicsMode(VGADriver.ScreenSize.Size320x200, VGADriver.ColorDepth.BitDepth8); }
+            else { throw new Exception($"Unsupported mode {mode}"); }
+        }
+
+        /// <summary>
+        /// Clear the screen with specified color
+        /// </summary>
+        /// <param name="color"></param>
+        public override void Clear(Color color) { for (int i = 0; i < Mode.Width * Mode.Height; i++) { driver.SetPixel((uint)(i % Mode.Width), (uint)(i / Mode.Width), color); } }
+
+        /// <summary>
+        /// Disable video driver
+        /// </summary>
+        public override void Disable() { driver.SetTextMode(VGADriver.TextSize.Size80x25); }
+
+        /// <summary>
+        /// Render canvas onto screen - not required for VGA mode
+        /// </summary>
+        public override void Display() { return; }
+
+        /// <summary>
+        /// Draw filled rectangle with color
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public override void DrawFilledRectangle(Color color, int x, int y, int width, int height)
+        {
+            for (int i = 0; i < width * height; i++) { DrawPoint(color, i % width, i / width); }
+        }
+
+
+        /// <summary>
+        /// Draw point with color at specified position
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public override void DrawPoint(Color color, int x, int y)
+        {
+            if (x < 0 || x >= Mode.Width || y < 0 || y >= Mode.Height) { if (SendDebug) { debugger.SendInternal("Tried to draw pixel out of bounds at " + x.ToString() + ", " + y.ToString()); } return; }
+            driver.SetPixel((uint)x, (uint)y, color);
+        }
+
+        /// <summary>
+        /// Get color at specified position on screen
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         /// <returns></returns>
-        public override Color GetPointColor(int aX, int aY)
+        public override Color GetPointColor(int x, int y)
         {
-            return Color.FromArgb((int)(_VGADriver.GetPixel((uint)aX, (uint)aY)));
-        }
-
-        /// <summary>
-        /// The default graphics mode
-        /// </summary>
-        public override Mode DefaultGraphicMode => new Mode(640, 480, ColorDepth.ColorDepth4);
-
-        /// <summary>
-        /// Boolean value whether VGA is in graphics mode or not
-        /// </summary>
-        public bool Enabled { get => _Enabled; private set => _Enabled = value; }
-
-        private ScreenSize ModeToScreenSize(Mode aMode)
-        {
-            if (aMode.Columns == 320 && aMode.Rows == 200)
-            {
-                return ScreenSize.Size320x200;
-            }
-            else if (aMode.Columns == 640 && aMode.Rows == 480)
-            {
-                return ScreenSize.Size640x480;
-            }
-            else if (aMode.Columns == 720 && aMode.Rows == 480)
-            {
-                return ScreenSize.Size720x480;
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public override void Display()
-        {
-            
+            if (x < 0 || x >= Mode.Width || y < 0 || y >= Mode.Height) { if (SendDebug) { debugger.SendInternal("Tried to draw pixel out of bounds at " + x.ToString() + ", " + y.ToString()); } return Color.Black; }
+            return Color.FromArgb((int)driver.GetPixel((uint)x, (uint)y));
         }
     }
 }

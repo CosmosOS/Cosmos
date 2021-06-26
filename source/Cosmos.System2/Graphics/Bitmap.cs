@@ -1,233 +1,79 @@
-﻿//#define COSMOSDEBUG
-using System;
+﻿using System;
 using System.IO;
-using System.Security;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Cosmos.System.Graphics
 {
     /// <summary>
-    /// Bitmap class, used to represent image of the type of Bitmap. See also: <seealso cref="Image"/>.
+    /// Bitmap image
     /// </summary>
     public class Bitmap : Image
     {
         /// <summary>
-        /// Create new instance of <see cref="Bitmap"/> class.
+        /// Create a new bitmap
         /// </summary>
-        /// <param name="Width">Image width (greater then 0).</param>
-        /// <param name="Height">Image height (greater then 0).</param>
-        /// <param name="colorDepth">Color depth.</param>
-        public Bitmap(uint Width, uint Height, ColorDepth colorDepth) : base(Width, Height, colorDepth)
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="depth"></param>
+        public Bitmap(int width, int height, ColorDepth depth) : base(width, height, depth)
         {
-            rawData = new int[Width * Height];
+            // initialize raw data
+            RawData = new uint[width * height];
         }
 
         /// <summary>
-        /// Create a bitmap from a byte array representing the pixels.
+        /// Create a new bitmap with specified pixel data
         /// </summary>
-        /// <param name="Width">Width of the bitmap.</param>
-        /// <param name="Height">Height of the bitmap.</param>
-        /// <param name="pixelData">Byte array which includes the values for each pixel.</param>
-        /// <param name="colorDepth">Format of pixel data.</param>
-        /// <exception cref="NotImplementedException">Thrwon if color depth is not 32.</exception>
-        /// <exception cref="OverflowException">Thrown if bitmap size is bigger than Int32.MaxValue.</exception>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public Bitmap(uint Width, uint Height, byte[] pixelData, ColorDepth colorDepth) : base(Width, Height, colorDepth)
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="pixelData"></param>
+        /// <param name="colorDepth"></param>
+        public Bitmap(int width, int height, byte[] pixelData, ColorDepth colorDepth) : base(width, height, colorDepth)
         {
-            rawData = new int[Width * Height];
-            if (colorDepth != ColorDepth.ColorDepth32 && colorDepth != ColorDepth.ColorDepth24)
+            // initialize raw data
+            RawData = new uint[Width * Height];
+
+            // throw if image is unsupported
+            if ((uint)colorDepth < 24)
             {
-                Global.mDebugger.Send("Only color depths 24 and 32 are supported!");
-                throw new NotImplementedException("Only color depths 24 and 32 are supported!");
+                Global.mDebugger.Send("Only 32 and 24-bit color bitmaps are supported");
+                throw new NotImplementedException("Only 32 and 24-bit color bitmaps are supported");
             }
 
-            for (int i = 0; i < rawData.Length; i++)
+            // copy data from array
+            for (int i = 0; i < RawData.Length; i++)
             {
                 if (colorDepth == ColorDepth.ColorDepth32)
-                {
-                    rawData[i] = BitConverter.ToInt32(new byte[] { pixelData[(i * 4)], pixelData[(i * 4) + 1], pixelData[(i * 4) + 2], pixelData[(i * 4) + 3] }, 0);
-                }
-                else
-                {
-                    rawData[i] = BitConverter.ToInt32(new byte[] { 0, pixelData[(i * 3)], pixelData[(i * 3) + 1], pixelData[(i * 3) + 2] }, 0);
-                }
+                { RawData[i] = BitConverter.ToUInt32(new byte[] { pixelData[(i * 4)], pixelData[(i * 4) + 1], pixelData[(i * 4) + 2], pixelData[(i * 4) + 3] }, 0); }
+                else { RawData[i] = BitConverter.ToUInt32(new byte[] { 0, pixelData[(i * 3)], pixelData[(i * 3) + 1], pixelData[(i * 3) + 2] }, 0); }
             }
-        }
-        
-        /// <summary>
-        /// Create new instance of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
-        /// </summary>
-        /// <param name="path">Path to file.</param>
-        /// <exception cref="ArgumentException">
-        /// <list type="bullet">
-        /// <item>Thrown if path is invalid.</item>
-        /// <item>Memory error.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <list type="bullet">
-        /// <item>Thrown if path is null.</item>
-        /// <item>Memory error.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="IOException">Thrown on IO error.</exception>
-        /// <exception cref="NotSupportedException">
-        /// <list type="bullet">
-        /// <item>Thrown on fatal error (contact support).</item>
-        /// <item>The path refers to non-file.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="ObjectDisposedException">Thrown if the stream is closed.</exception>
-        /// <exception cref="Exception">
-        /// <list type="bullet">
-        /// <item>Thrown if header is not from a BMP.</item>
-        /// <item>Info header size has the wrong value.</item>
-        /// <item>Number of planes is not 1. Can not read file.</item>
-        /// <item>Total Image Size is smaller than pure image size.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
-        /// <exception cref="SecurityException">Thrown if the caller does not have permissions to read / write the file.</exception>
-        /// <exception cref="FileNotFoundException">Thrown if the file cannot be found.</exception>
-        /// <exception cref="DirectoryNotFoundException">Thrown if the specified path is invalid.</exception>
-        /// <exception cref="PathTooLongException">Thrown if the specified path is exceed the system-defined max length.</exception>
-        public Bitmap(string path) : this(path, ColorOrder.BGR)
-        {
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
+        /// Load a bitmap from a file
         /// </summary>
-        /// <param name="path">Path to file.</param>
-        /// <param name="colorOrder">Order of colors in each pixel.</param>
-        /// <exception cref="ArgumentException">
-        /// <list type="bullet">
-        /// <item>Thrown if path is invalid.</item>
-        /// <item>Memory error.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <list type="bullet">
-        /// <item>Thrown if path is null.</item>
-        /// <item>Memory error.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="IOException">Thrown on IO error.</exception>
-        /// <exception cref="NotSupportedException">
-        /// <list type="bullet">
-        /// <item>Thrown on fatal error (contact support).</item>
-        /// <item>The path refers to non-file.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="ObjectDisposedException">Thrown if the stream is closed.</exception>
-        /// <exception cref="Exception">
-        /// <list type="bullet">
-        /// <item>Thrown if header is not from a BMP.</item>
-        /// <item>Info header size has the wrong value.</item>
-        /// <item>Number of planes is not 1. Can not read file.</item>
-        /// <item>Total Image Size is smaller than pure image size.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
-        /// <exception cref="SecurityException">Thrown if the caller does not have permissions to read / write the file.</exception>
-        /// <exception cref="FileNotFoundException">Thrown if the file cannot be found.</exception>
-        /// <exception cref="DirectoryNotFoundException">Thrown if the specified path is invalid.</exception>
-        /// <exception cref="PathTooLongException">Thrown if the specified path is exceed the system-defined max length.</exception>
-        public Bitmap(string path, ColorOrder colorOrder = ColorOrder.BGR) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
+        /// <param name="path"></param>
+        /// <param name="colorOrder"></param>
+        public Bitmap(string file, ColorOrder colorOrder = ColorOrder.BGR) : base(0, 0, ColorDepth.ColorDepth32)
         {
-            using (var fs = new FileStream(path, FileMode.Open))
-            {
-                CreateBitmap(fs, colorOrder);
-            }
-        }
-        
-        /// <summary>
-        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
-        /// </summary>
-        /// <param name="imageData">byte array.</param>
-        /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
-        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="IOException">Thrown on IO error.</exception>
-        /// <exception cref="NotSupportedException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ObjectDisposedException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Exception">
-        /// <list type="bullet">
-        /// <item>Thrown if header is not from a BMP.</item>
-        /// <item>Info header size has the wrong value.</item>
-        /// <item>Number of planes is not 1.</item>
-        /// <item>Total Image Size is smaller than pure image size.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
-        public Bitmap(byte[] imageData) : this(imageData, ColorOrder.BGR) //Call the image constructor with wrong values
-        {
+            using (var fs = new FileStream(file, FileMode.Open)) { CreateBitmap(fs, colorOrder); }
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Load bitmap from pixel data
         /// </summary>
-        /// <param name="imageData">byte array.</param>
-        /// <param name="colorOrder">Order of colors in each pixel.</param>
-        /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
-        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="IOException">Thrown on IO error.</exception>
-        /// <exception cref="NotSupportedException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ObjectDisposedException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Exception">
-        /// <list type="bullet">
-        /// <item>Thrown if header is not from a BMP.</item>
-        /// <item>Info header size has the wrong value.</item>
-        /// <item>Number of planes is not 1.</item>
-        /// <item>Total Image Size is smaller than pure image size.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
+        /// <param name="imageData"></param>
+        /// <param name="colorOrder"></param>
         public Bitmap(byte[] imageData, ColorOrder colorOrder = ColorOrder.BGR) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
-            using (var ms = new MemoryStream(imageData))
-            {
-                CreateBitmap(ms, colorOrder);
-            }
+            using (var ms = new MemoryStream(imageData)) { CreateBitmap(ms, colorOrder); }
         }
 
-
-        // For more information about the format: https://docs.microsoft.com/en-us/previous-versions/ms969901(v=msdn.10)?redirectedfrom=MSDN
-        /// <summary>
-        /// Create bitmap from stream.
-        /// </summary>
-        /// <param name="stream">Stream.</param>
-        /// <param name="colorOrder">Order of colors in each pixel.</param>
-        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="IOException">Thrown on IO error.</exception>
-        /// <exception cref="NotSupportedException">
-        /// <list type="bullet">
-        /// <item>Thrown on fatal error (contact support).</item>
-        /// <item>The stream does not support seeking.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="ObjectDisposedException">Thrown if the stream is closed.</exception>
-        /// <exception cref="Exception">
-        /// <list type="bullet">
-        /// <item>Thrown if header is not from a BMP.</item>
-        /// <item>Info header size has the wrong value.</item>
-        /// <item>Number of planes is not 1. Can not read file.</item>
-        /// <item>Total Image Size is smaller than pure image size.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
         private void CreateBitmap(Stream stream, ColorOrder colorOrder)
         {
-            #region BMP Header
-
-            Byte[] _int = new byte[4];
-            Byte[] _short = new byte[2];
+            byte[] _int = new byte[4];
+            byte[] _short = new byte[2];
             //Assume that we are using the BMP (Windows) V3 header format
 
             //reading magic number to identify if BMP file (BM as string - 42 4D as Hex) - bytes 0 -> 2
@@ -295,19 +141,15 @@ namespace Cosmos.System.Graphics
                 Global.mDebugger.SendInternal("Calcualted image size: " + totalImageSize);
             }
 
-            #endregion BMP Header
-
             //Set the bitmap to have the correct values
-            Width = imageWidth;
-            Height = imageHeight;
+            Width = (int)imageWidth;
+            Height = (int)imageHeight;
             Depth = (ColorDepth)pixelSize;
             Global.mDebugger.SendInternal("Width: " + Width);
             Global.mDebugger.SendInternal("Height: " + Height);
             Global.mDebugger.SendInternal("Depth: " + pixelSize);
 
-            rawData = new int[Width * Height];
-
-            #region Pixel Table
+            RawData = new uint[Width * Height];
 
             //Calculate padding
             int paddingPerRow;
@@ -330,9 +172,9 @@ namespace Cosmos.System.Graphics
             //Read data
             stream.Position = (int)pixelTableOffset;
             int position = 0;
-            Byte[] pixelData = new byte[pureImageSize];
+            byte[] pixelData = new byte[pureImageSize];
             stream.Read(pixelData, 0, pureImageSize);
-            Byte[] pixel = new byte[4]; //All must have the same size
+            byte[] pixel = new byte[4]; //All must have the same size
 
             for (int y = 0; y < imageHeight; y++)
             {
@@ -347,7 +189,7 @@ namespace Cosmos.System.Graphics
                     }
                     else
                     {
-                        if(colorOrder == ColorOrder.BGR)
+                        if (colorOrder == ColorOrder.BGR)
                         {
                             pixel[3] = pixelData[position++];
                             pixel[2] = pixelData[position++];
@@ -362,51 +204,26 @@ namespace Cosmos.System.Graphics
                             pixel[3] = 0;
                         }
                     }
-                    rawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0); //This bits should be A, R, G, B but order is switched
+                    RawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToUInt32(pixel, 0); //This bits should be A, R, G, B but order is switched
                 }
                 position += paddingPerRow;
             }
-
-            #endregion Pixel Table
         }
 
         /// <summary>
-        /// Save image as bmp file.
+        /// Save bitmap with specified filename
         /// </summary>
-        /// <param name="path">Path to the file.</param>
-        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="InvalidCastException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
-        /// <exception cref="OverflowException">Thrown on memory error.</exception>
-        /// <exception cref="IOException">Thrown on IO error.</exception>
-        /// <exception cref="NotSupportedException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ObjectDisposedException">Thrown on fatal error (contact support).</exception>
-        public void Save(string path)
+        /// <param name="path"></param>
+        public void Save(string file)
         {
-            using (FileStream fs = File.Open(path, FileMode.Create))
-            {
-                Save(fs, ImageFormat.bmp);
-            }
+            using (FileStream fs = File.Open(file, FileMode.Create)) { Save(fs, ImageFormat.BMP); }
         }
 
         /// <summary>
-        /// Save image to stream.
+        /// Save bitmap to specified stream
         /// </summary>
-        /// <param name="stream">Stream.</param>
-        /// <param name="imageFormat">Image format.</param>
-        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="InvalidCastException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
-        /// <exception cref="ArgumentException">Thrown on memory error.</exception>
-        /// <exception cref="OverflowException">Thrown on memory error.</exception>
-        /// <exception cref="IOException">Thrown on IO error.</exception>
-        /// <exception cref="NotSupportedException">Thrown if the stream does not support writing.</exception>
-        /// <exception cref="ObjectDisposedException">Thrown if the stream is closed.</exception>
+        /// <param name="stream"></param>
+        /// <param name="imageFormat"></param>
         public void Save(Stream stream, ImageFormat imageFormat)
         {
             //Calculate padding
@@ -507,7 +324,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    data = BitConverter.GetBytes(rawData[x + (Height - (y + 1)) * Width]);
+                    data = BitConverter.GetBytes(RawData[x + (Height - (y + 1)) * Width]);
                     for (int i = 0; i < byteNum; i++)
                     {
                         imageData[imageDataPoint++] = data[i + cOffset];

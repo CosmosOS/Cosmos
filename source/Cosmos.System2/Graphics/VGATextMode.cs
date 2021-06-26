@@ -4,70 +4,55 @@ using static Cosmos.HAL.VGADriver;
 
 namespace Cosmos.System.Graphics
 {
-    /// <summary>
-    /// VGAScreen class. Used to control VGA textmode.
-    /// </summary>
     public class VGAScreen
     {
-        private static readonly VGADriver _Screen = new VGADriver();
+        // driver
+        private static readonly VGADriver driver = new VGADriver();
 
         /// <summary>
-        /// Set graphics mode.
+        /// Real width of pixel
         /// </summary>
-        /// <param name="screenSize">Screen size.</param>
-        /// <param name="colorDepth">Color depth.</param>
-        /// <exception cref="Exception">Thrown if screen size / color depth not supported.</exception>
-        public static void SetGraphicsMode(ScreenSize aScreenSize, ColorDepth aColorDepth)
+        public static int PixelWidth = driver.PixelWidth;
+
+        /// <summary>
+        /// Real height of pixel
+        /// </summary>
+        public static int PixelHeight = driver.PixelHeight;
+
+        /// <summary>
+        /// Color palette
+        /// </summary>
+        public static int Colors = driver.Colors;
+
+        /// <summary>
+        /// Set vga graphics mode
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="depth"></param>
+        public static void SetGraphicsMode(ScreenSize size, ColorDepth depth)
         {
-            var vgaColorDepth = aColorDepth switch
-            {
-                ColorDepth.ColorDepth4 => VGADriver.ColorDepth.BitDepth4,
-                ColorDepth.ColorDepth8 => VGADriver.ColorDepth.BitDepth8,
-                ColorDepth.ColorDepth16 => VGADriver.ColorDepth.BitDepth16,
-                ColorDepth.ColorDepth24 => throw new NotImplementedException(),
-                ColorDepth.ColorDepth32 => throw new NotImplementedException(),
-                _ => throw new NotImplementedException(),
-            };
-            _Screen.SetGraphicsMode(aScreenSize, vgaColorDepth);
+            if ((uint)depth > 8) { throw new Exception(((uint)depth).ToString() + "-bit color is not compatible with VGA"); }
+            driver.SetGraphicsMode(size, (VGADriver.ColorDepth)depth);
         }
 
         /// <summary>
-        /// Set text mode.
+        /// Set vga text mode
         /// </summary>
-        /// <param name="Size">Text size.</param>
-        public static void SetTextMode(TextSize aSize)
+        /// <param name="aSize"></param>
+        public static void SetTextMode(TextSize size)
         {
-            _Screen.SetTextMode(aSize);
+            driver.SetTextMode(size);
         }
 
         /// <summary>
-        /// Get Height
+        /// Set vga font
         /// </summary>
-        public static int PixelHeight = _Screen.PixelHeight;
-
-        /// <summary>
-        /// Get Width
-        /// </summary>
-        public static int PixelWidth = _Screen.PixelWidth;
-
-        /// <summary>
-        /// Get Colors
-        /// </summary>
-        public static int Colors = _Screen.Colors;
-
-        /// <summary>
-        /// Set a textmode font.
-        /// </summary>
-        /// <param name="fontData">Font file.</param>
-        /// /// <param name="fontHeight">Font Height.</param>
-        /// <exception cref="Exception">Thrown when font height > 32.</exception>
+        /// <param name="fontData"></param>
+        /// <param name="fontHeight"></param>
         public static void SetFont(byte[] fontData, int fontHeight)
         {
-            if(fontHeight > 32)
-            {
-                throw new ArgumentOutOfRangeException("fontHeight");
-            }
-            _Screen.WriteFont(fontData, (byte)fontHeight);
+            if (fontHeight > 32) { throw new ArgumentOutOfRangeException("Font height cannot be higher than 32"); }
+            driver.WriteFont(fontData, (byte)fontHeight);
         }
     }
 }
