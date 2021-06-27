@@ -228,7 +228,7 @@ namespace Cosmos.Core
             if (PM1b_CNT != null)
                 pm1bIO.Word = (ushort)(SLP_TYPb | SLP_EN);
 
-            Global.CPU.Halt();
+            CPU.Halt();
         }
 
         /// <summary>

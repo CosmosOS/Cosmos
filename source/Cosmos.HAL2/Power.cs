@@ -13,7 +13,7 @@ namespace Cosmos.HAL
         /// </summary>
         public static void CPUReboot()
         {
-            Core.Global.CPU.Reboot();
+            Core.CPU.Reboot();
         }
 
         //Reboot with ACPI

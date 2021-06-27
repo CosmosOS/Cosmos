@@ -1,6 +1,7 @@
 #if DEBUG
 //#define GC_DEBUG
 #endif
+//#define COSMOSDEBUG
 using System;
 using System.Diagnostics;
 using IL2CPU.API;
@@ -13,8 +14,10 @@ namespace Cosmos.Core
     /// </summary>
     /// <remarks>Most of the class is yet to be implemented.</remarks>
     [DebuggerStepThrough]
-    public static class GCImplementation
+    public unsafe static class GCImplementation
     {
+        private unsafe static byte* memPtr = null;
+        private static uint memLength = 0;
         /// <summary>
         /// Acquire lock. Not implemented.
         /// </summary>
@@ -32,15 +35,21 @@ namespace Cosmos.Core
         {
             throw new NotImplementedException();
         }
-
         /// <summary>
-        /// Alloc new object. Plugged.
+        /// Alloc new object.
         /// </summary>
-        [PlugMethod(PlugRequired = true)]
-        public static uint AllocNewObject(uint aSize)
+        public unsafe static uint AllocNewObject(uint aSize)
         {
-            throw new NotImplementedException();
-
+              return (uint)Memory.Heap.Alloc(aSize);
+            
+        }
+        /// <summary>
+        /// Free Object from Memory
+        /// </summary>
+        /// <param name="obj">Takes a memory allocated object</param>
+        public unsafe static void Free(object aObj)
+        {
+            Memory.Heap.Free(GetPointer(aObj));
         }
 
         /// <summary>
@@ -62,5 +71,56 @@ namespace Cosmos.Core
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Get amount of available Ram
+        /// </summary>
+        /// <returns>Returns amount of available memory to the System in MB</returns>
+        public static uint GetAvailableRAM()
+        {
+            return memLength / 1024 / 1024;
+        }
+        /// <summary>
+        /// Get a rough estimate of used Memory by the System
+        /// </summary>
+        /// <returns>Returns the used PageSize by the MemoryManager in Bytes.</returns>
+        public static uint GetUsedRAM()
+        {
+            return (Memory.RAT.TotalPageCount - Memory.RAT.GetPageCount(Memory.RAT.PageType.Empty)) * Memory.RAT.PageSize;
+        }
+        /// <summary>
+        /// Initialise the Memory Manager, this should not be called anymore since it is done very early during the boot process.
+        /// </summary>
+        public static unsafe void Init()
+        {
+            if(CPU.MemoryMapExists())
+            {
+                var block = CPU.GetLargestMemoryBlock();
+                memPtr = (byte*)block->BaseAddr;
+                memLength = block->Length;
+                if ((uint)memPtr < (uint)CPU.GetEndOfKernel() + 1024)
+                {
+                    memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
+                    memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
+                    memLength = block->Length - ((uint)memPtr - (uint)block->BaseAddr);
+                    memLength += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
+                }
+            }
+            else
+            {
+                memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
+                memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
+                memLength = (128 * 1024 * 1024);
+            }
+            Memory.RAT.Init(memPtr,memLength);
+            
+        }
+        /// <summary>
+        /// Get the Pointer of any object needed for Free()
+        /// </summary>
+        /// <param name="o">Takes any kind of object</param>
+        /// <returns>Returns a pointer to the area in memory where the object is located</returns>
+        public static unsafe uint* GetPointer(object aObj) => throw null; // this is plugged
+
     }
 }

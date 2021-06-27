@@ -201,7 +201,7 @@ namespace Cosmos.HAL
 
 			while (!WaitSignaled)
 			{
-				Core.Global.CPU.Halt();
+				Core.CPU.Halt();
 			}
 		}
 
@@ -213,7 +213,7 @@ namespace Cosmos.HAL
 
 			while (!WaitSignaled)
 			{
-				Core.Global.CPU.Halt();
+				Core.CPU.Halt();
 			}
 		}
 

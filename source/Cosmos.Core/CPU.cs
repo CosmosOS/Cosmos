@@ -1,8 +1,8 @@
-//#define COSMOSDEBUG
+#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -11,15 +11,33 @@ namespace Cosmos.Core
     /// <summary>
     /// CPU class. Non hardware class, only used by core and hardware drivers for ports etc.
     /// </summary>
-    public class CPU
+    public static class CPU
     {
+        public static ulong totalRam;
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
-        /// Get amount of RAM in MB's. Plugged.
+        /// Get amount of RAM in MB's.
         /// </summary>
-        [PlugMethod(PlugRequired = true)]
-        public static uint GetAmountOfRAM() => throw null;
+        public static uint GetAmountOfRAM()
+        {
+            if (MemoryMapExists())
+            {
+                var memoryMap = GetMemoryMap();
+                for (int i = 0; i < memoryMap.Length; i++)
+                {
+                    if (memoryMap[i].Type == 1 && memoryMap[i].Length != 0)
+                    {
+                        totalRam += memoryMap[i].Length;
+                    }
+                }
+            }
+            else
+            {
+                throw new NotSupportedException("MemoryMap not available!");
+            }
+            return (uint)totalRam / 1024 / 1024;
+        }
 
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
@@ -32,36 +50,38 @@ namespace Cosmos.Core
         /// Update IDT. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public void UpdateIDT(bool aEnableInterruptsImmediately) => throw null;
+        public static void UpdateIDT(bool aEnableInterruptsImmediately) => throw null;
 
         /// <summary>
         /// Init float. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public void InitFloat() => throw null;
+        public static void InitFloat() => throw null;
 
         /// <summary>
         /// Init SSE. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public void InitSSE() => throw null;
+        public static void InitSSE() => throw null;
 
         /// <summary>
         /// Zero fill. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public static void ZeroFill(uint aStartAddress, uint aLength) => throw null;
+        public static void ZeroFill(uint aStartAddress, uint aLength)
+        {
+        }
 
         /// <summary>
         /// Halt the CPU. Plugged.
         /// </summary>
         [PlugMethod(PlugRequired = true)]
-        public void Halt() => throw null;
+        public static void Halt() => throw null;
 
         /// <summary>
         /// Reboot the CPU.
         /// </summary>
-        public void Reboot()
+        public static void Reboot()
         {
             // Disable all interrupts
             DisableInterrupts();
@@ -101,7 +121,7 @@ namespace Cosmos.Core
             DoEnableInterrupts();
         }
 
-        /// <summary>
+        /// <summary>                                                                                                                                                                    
         /// Returns if the interrupts were actually enabled.
         /// </summary>
         /// <returns>bool value.</returns>
@@ -337,11 +357,22 @@ namespace Cosmos.Core
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
 
         /// <summary>
+        /// Enables Multiboot if it is not enabled
+        /// </summary>
+        internal unsafe static void EnableMultiboot()
+        {
+            if (Bootstrap.MultibootHeader == null)
+            {
+                Bootstrap.MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
+            }
+        }
+        /// <summary>
         /// Checks if Multiboot returned a memory map
         /// </summary>
         /// <returns></returns>
         public static unsafe bool MemoryMapExists()
         {
+            EnableMultiboot();
             return (Bootstrap.MultibootHeader->Flags & 1 << 6) == 64;
         }
 
@@ -349,19 +380,19 @@ namespace Cosmos.Core
         /// Get the Memory Map Information from Multiboot
         /// </summary>
         /// <returns>Returns an array of MemoryMaps containing the Multiboot Memory Map information. The array may have empty values at the end.</returns>
-        public static unsafe MemoryMap[] GetMemoryMap()
+        public static unsafe MemoryMapBlock[] GetMemoryMap()
         {
             if (!MemoryMapExists())
             {
                 throw new Exception("No Memory Map was returned by Multiboot");
             }
-            var rawMap = new RawMemoryMap[64];
-            var currentMap = (RawMemoryMap*)Bootstrap.MultibootHeader->memMapAddress;
+            var rawMap = new RawMemoryMapBlock[64];
+            var currentMap = (RawMemoryMapBlock*)Bootstrap.MultibootHeader->memMapAddress;
             int counter = 0;
             while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength) && counter < 64)
             {
                 rawMap[counter++] = *currentMap;
-                currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes
+                currentMap = (RawMemoryMapBlock*)((uint*)currentMap + ((currentMap->Size + 4) >> 2)); //The size is in bits, not bytes
                 if (currentMap->Size == 0)
                 {
                     break;
@@ -373,22 +404,59 @@ namespace Cosmos.Core
                 throw new Exception("Memory Map returned too many segments");
             }
 
-            var entireMap = new MemoryMap[counter];
+            var entireMap = new MemoryMapBlock[counter];
             for (int i = 0; i < counter; i++)
             {
                 var rawMemoryMap = rawMap[i];
-                entireMap[i] = new MemoryMap
+
+                entireMap[i] = new MemoryMapBlock
                 {
-                    Address = (ulong)rawMemoryMap.HighBaseAddr << 32 | rawMemoryMap.LowBaseAddr,
-                    Length = (ulong)rawMemoryMap.HighLength << 32 | rawMemoryMap.LowLength,
+                    Address = rawMemoryMap.BaseAddr,
+                    Length = rawMemoryMap.Length,
                     Type = rawMemoryMap.Type
                 };
             }
             return entireMap;
         }
+
+        /// <summary>
+        /// Returns a pointer size of largest continuous block of free ram
+        /// DOES NOT ALLOCATE ANYTHING so it can be used before Memory Management is initalised
+        /// </summary>
+        /// <returns>The size of the largest block in bytes</returns>
+
+        public static unsafe RawMemoryMapBlock* GetLargestMemoryBlock()
+        {
+            if (!MemoryMapExists())
+            {
+                Debugger.SendKernelPanic(0x80);
+                while (true) { }
+            }
+            var currentMap = (RawMemoryMapBlock*)Bootstrap.MultibootHeader->memMapAddress;
+            RawMemoryMapBlock* bestMap = null;
+            ulong bestSize = 0;
+            while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength))
+            {
+                currentMap = (RawMemoryMapBlock*)((uint*)currentMap + ((currentMap->Size + 4) >> 2)); //The size is in bits, not bytes
+                if (currentMap->Size == 0)
+                {
+                    break;
+                }
+                if (currentMap->Type == 1) // Usable ram
+                {
+                    if (currentMap->Length > bestSize)
+                    {
+                        bestSize = currentMap->Length;
+                        bestMap = currentMap;
+                    }
+                }
+            }
+
+            return bestMap;
+        }
     }
 
-    public class MemoryMap
+    public class MemoryMapBlock
     {
         /// <summary>
         /// Base Address of the memory region
@@ -405,7 +473,7 @@ namespace Cosmos.Core
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 24)]
-    public struct RawMemoryMap
+    public struct RawMemoryMapBlock
     {
         /// <summary>
         /// Size of this entry
@@ -413,25 +481,15 @@ namespace Cosmos.Core
         [FieldOffset(0)]
         public uint Size;
         /// <summary>
-        /// Low 32 bits of the base address
+        /// Base address
         /// </summary>
         [FieldOffset(4)]
-        public uint LowBaseAddr;
-        /// <summary>
-        /// High 32 bits of the base address
-        /// </summary>
-        [FieldOffset(8)]
-        public uint HighBaseAddr;
-        /// <summary>
-        /// Low 32 bits of the length of memory block in bytes
-        /// </summary>
+        public ulong BaseAddr;
         [FieldOffset(12)]
-        public uint LowLength;
         /// <summary>
-        /// High 32 bits of the length of memory block in bytes
+        /// Length of memory block in kilobytes
         /// </summary>
-        [FieldOffset(16)]
-        public uint HighLength;
+        public uint Length;
         /// <summary>
         /// Type of memory area, 1 if usable RAM, everything else unusable.
         /// </summary>

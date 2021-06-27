@@ -20,7 +20,7 @@
         /// </summary>
         public static void WaitForKey()
         {
-            Core.Global.CPU.Halt();
+            Core.CPU.Halt();
         }
     }
 }

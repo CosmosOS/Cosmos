@@ -26,11 +26,11 @@ namespace Cosmos.Core.Memory
         /// </summary>
         /// <param name="aSize">A size of block to alloc, in bytes.</param>
         /// <returns>Byte pointer to the start of the block.</returns>
-        public static byte* Alloc(Native aSize)
+        public static byte* Alloc(uint aSize)
         {
             if (aSize <= HeapSmall.mMaxItemSize)
             {
-                return HeapSmall.Alloc(aSize);
+                return HeapSmall.Alloc((ushort)aSize);
             }
             else if (aSize <= HeapMedium.MaxItemSize)
             {
@@ -40,6 +40,16 @@ namespace Cosmos.Core.Memory
             {
                 return HeapLarge.Alloc(aSize);
             }
+        }
+
+        /// <summary>
+        /// Allocates memory and returns the pointer as uint
+        /// </summary>
+        /// <param name="aSize">Size of memory to allocate</param>
+        /// <returns></returns>
+        public static uint SafeAlloc(uint aSize)
+        {
+            return (uint)Alloc(aSize);
         }
 
         // Keep as void* and not byte* or other. Reduces typecasting from callers
@@ -61,6 +71,10 @@ namespace Cosmos.Core.Memory
             var xType = RAT.GetPageType(aPtr);
             switch (xType)
             {
+                case RAT.PageType.HeapSmall:
+                    HeapSmall.Free(aPtr);
+                    break;
+                case RAT.PageType.HeapMedium:
                 case RAT.PageType.HeapLarge:
                     HeapLarge.Free(aPtr);
                     break;
