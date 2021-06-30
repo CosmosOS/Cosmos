@@ -1,4 +1,4 @@
-@set DROPPATH="C:\Users\valentinbreiz\.nuget\packages\runtime.win-x64.microsoft.dotnet.ilcompiler\6.0.0-preview.7.21327.1"
+@set DROPPATH="C:\Users\valentin.charbonnier\.nuget\packages\runtime.win-x64.microsoft.dotnet.ilcompiler\6.0.0-preview.7.21327.1"
 @set ILCPATH=%DROPPATH%\tools
 @if not exist %ILCPATH%\ilc.exe (
   echo The DROPPATH environment variable not set. Refer to README.md.

@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net5.0</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>9.0</LangVersion>
+
+		<Platforms>x64</Platforms>
+
+		<EnableDefaultItems>false</EnableDefaultItems>
+
+		<IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
+		<IlcInvariantGlobalization>true</IlcInvariantGlobalization>
+		<IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
+		<NoStdLib>true</NoStdLib>
+		<NoConfig>true</NoConfig>
+		<RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+		<Optimize>true</Optimize>
+		<IlcOptimizationPreference>Size</IlcOptimizationPreference>
+		<IlcDisableReflection>true</IlcDisableReflection>
+		<IncludePal>true</IncludePal>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<IlcSystemModule>Cosmos</IlcSystemModule>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="00-Loader/**" />
+		<Compile Include="10-System/**" />
+		<Compile Include="20-Core/**" />
+		<Compile Include="30-HAL/**" />
+		<Compile Include="40-System/**" />
+	</ItemGroup>
+
+    <ItemGroup>
+        <LinkerArg Include="/subsystem:EFI_APPLICATION /entry:EfiMain" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="1.0.0-alpha-*" />
+    </ItemGroup>
+
+    <Target Name="CustomizeReferences" BeforeTargets="BeforeCompile" AfterTargets="FindReferenceAssembliesForReferences">
+        <ItemGroup>
+            <ReferencePathWithRefAssemblies Remove="@(ReferencePathWithRefAssemblies)" />
+            <ReferencePath Remove="@(ReferencePath)" />
+        </ItemGroup>
+    </Target>
+
+    <ItemGroup>
+        <LinkerArg Include="/entry:kernel_main /fixed /safeseh:no /base:0x100000 /filealign:0x1000" />
+    </ItemGroup>
+
+    <Target Name="CopyAndRunEFI" AfterTargets="Publish">
+        <Copy SourceFiles="$(MSBuildProjectDirectory)\$(NativeOutputPath)$(TargetName)$(NativeBinaryExt)" DestinationFiles="$(MSBuildStartupDirectory)\build\kernel.bin" />
+        <Copy SourceFiles="$(MSBuildProjectDirectory)\$(NativeOutputPath)$(TargetName)$(NativeBinaryExt)" DestinationFiles="$(MSBuildStartupDirectory)\build\EFI\BOOT\BOOTX64.efi" />
+        <Exec Command="tools\qemu\qemu-system-x86_64.exe -s -d cpu_reset -L &quot;.\\tools\\qemu\\&quot; -bios bios64.bin -m 512M -drive file=fat:rw:&quot;.\build\&quot;,format=raw,media=disk" />
+    </Target>
+
+</Project>
