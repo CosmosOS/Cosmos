@@ -4,7 +4,6 @@
         <_CosmosLocalPackageFeed>$(AppData)\Cosmos User Kit\packages\</_CosmosLocalPackageFeed>
 
         <RestoreSources>
-			https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json;
             https://api.nuget.org/v3/index.json;
             https://www.myget.org/F/cosmos/api/v3/index.json;
             https://ci.appveyor.com/nuget/cosmos-common;
