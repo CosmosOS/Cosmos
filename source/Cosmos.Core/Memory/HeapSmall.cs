@@ -1,5 +1,6 @@
 ﻿using System;
 using Cosmos.Debug.Kernel;
+using IL2CPU.API;
 
 namespace Cosmos.Core.Memory
 {
@@ -518,6 +519,55 @@ namespace Cosmos.Core.Memory
                 Debugger.DoSendNumber((uint)obj);
                 Free(aPtr);
             }
+        }
+
+        /// <summary>
+        /// Find all fields of the object and decrease ref counts
+        /// </summary>
+        /// <param name="aPtr"></param>
+        public static void CleanupObject(void* aPtr)
+        {
+            Debugger.DoSendNumber(0x77777);
+            Debugger.DoSendNumber((uint)aPtr);
+            uint* obj = (uint*)aPtr;
+            if(_StringType == 0)
+            {
+                _StringType = GetStringTypeID();
+            }
+
+            // Check what we are dealing with
+            if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
+            {
+                var type = *obj;
+                // Deal with strings first
+                if(type == _StringType)
+                {
+                    return; // we are done since they dont hold any reference to fields
+                }
+
+            }
+            else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
+            {
+
+            }
+            else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// Stores the ID used for strings for quick comparison in CleanUp
+        /// </summary>
+        private static uint _StringType = 0;
+
+        /// <summary>
+        /// This is plugged using asm and gets the value for _StringType 
+        /// </summary>
+        /// <returns></returns>
+        private static uint GetStringTypeID()
+        {
+            return UInt32.MaxValue; // so that tests still pass return bogus value
         }
 
         #region Statistics

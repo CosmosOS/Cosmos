@@ -89,6 +89,7 @@ namespace Cosmos.Core.Memory
 
         /// <summary>
         /// Increment reference count of a heap item
+        /// Do not use this method on non-managed memory
         /// </summary>
         /// <param name="aPtr"></param>
         public static void IncRefCount(void* aPtr)
@@ -110,7 +111,8 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Decrement reference count of a heap item
+        /// Decrement reference count of a heap item.
+        /// Do not use this method on non-managed memory
         /// </summary>
         /// <param name="aPtr"></param>
         public static void DecRefCount(void* aPtr)
@@ -132,7 +134,7 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Decrement reference count of a heap item
+        /// Get reference count of a heap item
         /// </summary>
         /// <param name="aPtr"></param>
         public static uint GetRefCount(void* aPtr)
