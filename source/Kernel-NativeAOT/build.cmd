@@ -1,56 +1,37 @@
-@set DROPPATH="C:\Users\valentinbreiz\.nuget\packages\runtime.win-x64.microsoft.dotnet.ilcompiler\6.0.0-preview.7.21327.1"
+@set DROPPATH=%USERPROFILE%\.nuget\packages\runtime.win-x64.microsoft.dotnet.ilcompiler\6.0.0-preview.7.21327.1
 @set ILCPATH=%DROPPATH%\tools
 @if not exist %ILCPATH%\ilc.exe (
-  echo The DROPPATH environment variable not set. Refer to README.md.
+  echo ilc.exe not found.
   exit /B
 )
 @where csc >nul 2>&1
 @if ERRORLEVEL 1 (
-  echo CSC not on the PATH. Refer to README.md.
+  echo CSC not on the PATH.
   exit /B
 )
 
-@set VHD=%CD%\zerosharp.vhdx
-@set VHD_SCRIPT=%CD%\diskpart.txt
-@del %VHD% >nul 2>&1
-@del %VHD_SCRIPT% >nul 2>&1
-@del zerosharp.ilexe >nul 2>&1
-@del zerosharp.obj >nul 2>&1
-@del zerosharp.map >nul 2>&1
-@del zerosharp.pdb >nul 2>&1
-@del BOOTX64.EFI >nul 2>&1
+@del *.ilexe >nul 2>&1
+@del *.obj >nul 2>&1
+@del *.map >nul 2>&1
+@del *.pdb >nul 2>&1
+@del *.EFI >nul 2>&1
+@del *.log >nul 2>&1
+@rmdir /s /q bin
+@rmdir /s /q obj
+@rmdir /s /q build
 
 @if "%1" == "clean" exit /B
 
-csc /nologo /debug:embedded /noconfig /nostdlib /runtimemetadataversion:v4.0.30319 zerosharp.cs /out:zerosharp.ilexe /langversion:latest /unsafe
-%ILCPATH%\ilc zerosharp.ilexe -o zerosharp.obj --systemmodule zerosharp --map zerosharp.map -O
-link /nologo /subsystem:EFI_APPLICATION zerosharp.obj /entry:EfiMain /incremental:no /out:BOOTX64.EFI
+csc /nologo /debug:embedded /noconfig /nostdlib /runtimemetadataversion:v4.0.30319 *.cs /out:Bootloader.ilexe /langversion:latest /unsafe
+%ILCPATH%\ilc Bootloader.ilexe -o Bootloader.obj --systemmodule Bootloader --map Bootloader.map -O
+link /nologo /subsystem:EFI_APPLICATION Bootloader.obj /entry:EfiMain /incremental:no /out:BOOTX64.EFI
 
-@rem Build a VHD if requested
+@if not "%1" == "start" exit /B
 
-@if not "%1" == "vhd" exit /B
+xcopy BOOTX64.EFI build\EFI\BOOT\BOOTX64.EFI* /Y
 
-@(
-echo create vdisk file=%VHD% maximum=500
-echo select vdisk file=%VHD%
-echo attach vdisk
-echo convert gpt
-echo create partition efi size=100
-echo format quick fs=fat32 label="System"
-echo assign letter="X"
-echo exit
-)>%VHD_SCRIPT%
+@if not exist os_drive (
+  mkdir os_drive
+)
 
-diskpart /s %VHD_SCRIPT%
-
-xcopy BOOTX64.EFI X:\EFI\BOOT\
-
-@(
-echo select vdisk file=%VHD%
-echo select partition 2
-echo remove letter=X
-echo detach vdisk
-echo exit
-)>%VHD_SCRIPT%
-
-diskpart /s %VHD_SCRIPT%
+ tools\\qemu\\qemu-system-x86_64 -s -d cpu_reset -D ./qemu.log -L ".\\tools\\qemu\\" -bios bios64.bin -k en-gb -m 512M -drive file=fat:rw:".\\build\\",format=raw,media=disk -drive file=fat:rw:".\\os_drive\\",format=raw,media=disk -serial file:serial.log
