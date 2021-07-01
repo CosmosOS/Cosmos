@@ -18,6 +18,14 @@ namespace Cosmos.Compiler.Tests.TypeSystem
     {
 
     }
+    
+    class TestType
+    {
+        public int FieldA;
+        public object FieldB;
+        public string FieldC;
+        public List<int> FieldD;
+    }
 
     public class Kernel : Sys.Kernel
     {
