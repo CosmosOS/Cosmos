@@ -70,6 +70,23 @@ namespace System.Runtime.InteropServices
         Unicode = 3,    // Strings should be marshalled as Unicode 2 byte chars.
         Auto = 4,       // Marshal Strings in the right way for the target system.
     }
+
+    public enum CallingConvention
+    {
+        Winapi = 1,
+        Cdecl = 2,
+        StdCall = 3,
+        ThisCall = 4,
+        FastCall = 5,
+    }
+
+    public sealed class UnmanagedCallersOnlyAttribute : Attribute
+    {
+        public string EntryPoint;
+        public CallingConvention CallingConvention;
+
+        public UnmanagedCallersOnlyAttribute() { }
+    }
 }
 
 #region Things needed by ILC

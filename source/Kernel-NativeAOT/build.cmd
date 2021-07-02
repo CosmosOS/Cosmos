@@ -16,15 +16,22 @@
 @del *.pdb >nul 2>&1
 @del *.EFI >nul 2>&1
 @del *.log >nul 2>&1
+@del *.o >nul 2>&1
 @rmdir /s /q bin
 @rmdir /s /q obj
-@rmdir /s /q build
 
 @if "%1" == "clean" exit /B
 
-csc /nologo /debug:embedded /noconfig /nostdlib /runtimemetadataversion:v4.0.30319 *.cs /out:Bootloader.ilexe /langversion:latest /unsafe
-%ILCPATH%\ilc Bootloader.ilexe -o Bootloader.obj --systemmodule Bootloader --map Bootloader.map -O
-link /nologo /subsystem:EFI_APPLICATION Bootloader.obj /entry:EfiMain /incremental:no /out:BOOTX64.EFI
+nasm -f elf64 asm/multiboot2.asm -o multiboot2.o
+nasm -f elf64 asm/boot.asm -o boot.o
+nasm -f elf64 asm/dotnet.asm -o dotnet.o
+nasm -f elf64 asm/modules.asm -o modules.o
+
+dotnet restore
+dotnet build
+
+%ILCPATH%\ilc bin/x64/Debug/net5.0/Kernel.dll -o Kernel.o --systemmodule Kernel --map Kernel.map
+
 
 @if not "%1" == "start" exit /B
 
