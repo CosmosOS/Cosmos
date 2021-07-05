@@ -39,7 +39,7 @@ $(ISO): $(KERNEL)
 	mkdir -p obj/isofiles/EFI/BOOT && \
 	mkdir -p obj/isofiles/boot/ && \
 	cp $(KERNEL) obj/isofiles/boot/kernel.bin && \
-	grub-mkstandalone -O x86_64-efi -o obj/isofiles/EFI/BOOT/BOOTX64.EFI "boot/grub/grub.cfg=scripts/grub.cfg" "boot/kernel.bin=obj/isofiles/boot/kernel.bin"
+	grub-mkstandalone -O x86_64-efi -o obj/isofiles/EFI/BOOT/BOOTX64.EFI "boot/grub/grub.cfg=scripts/grub.cfg"
 
 $(KERNEL): $(OS_OBJ) $(OBJ)
 	@echo Linking $(KERNEL); \

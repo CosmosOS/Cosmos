@@ -5,7 +5,6 @@ extern stack_top
 extern __load_end_addr
 
 section .text
-bits 32
 
 _start:
 mb_header:
