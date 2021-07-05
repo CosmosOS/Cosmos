@@ -1,6 +1,7 @@
 global start
 global stack_top
 global __load_end_addr
+extern start_dotnet
 
 section .text
 bits 32
@@ -170,7 +171,6 @@ long_mode_start:
     ;mov	edi, 1
     ;call __managed__Main
 
-    extern start_dotnet
     call start_dotnet
 
     ; print `OKAY` to screen

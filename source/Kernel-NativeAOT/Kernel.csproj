@@ -3,11 +3,14 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net5.0</TargetFramework>
-		<LangVersion>9.0</LangVersion>
+		<RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
+		<LangVersion>latest</LangVersion>
 		<Platforms>x64</Platforms>
 		<Configurations>Debug;Release</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
+
+		<NoExplicitReferenceToStdLib>true</NoExplicitReferenceToStdLib>
 
 		<NoStdLib>true</NoStdLib>
 		<NoConfig>true</NoConfig>
