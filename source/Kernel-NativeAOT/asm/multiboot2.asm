@@ -4,6 +4,7 @@ extern start
 extern stack_top
 extern __load_end_addr
 
+.code32
 section .text
 
 _start:
@@ -30,6 +31,16 @@ entry_addr_tag:
     dd entry_addr_tag_end - entry_addr_tag ; size
     dd start                               ; header_addr
 entry_addr_tag_end:
+
+frame_buffer_start:
+    dw 5                                     ; type
+    dw 0                                     ; flags
+    dd frame_buffer_end - frame_buffer_start ; size
+    dd 800                                   ; x
+    dd 600                                   ; y
+    dd 32                                    ; bpp
+frame_buffer_end:
+
     ; insert optional multiboot tags here
 
     ; required end tag
