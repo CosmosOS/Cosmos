@@ -1,12 +1,12 @@
-global start_dotnet
+GLOBAL start_dotnet
 
-section .text
-bits 64
+SECTION .text
+[BITS 64]
 
-start_dotnet:
-  extern stack_top
-  extern Kernel_Program__EntryPoint
+  start_dotnet:
+    extern stack_top
+    extern Kernel_Program__EntryPoint
 
-  call Kernel_Program__EntryPoint
+    call Kernel_Program__EntryPoint
 
-  ret
+    ret
