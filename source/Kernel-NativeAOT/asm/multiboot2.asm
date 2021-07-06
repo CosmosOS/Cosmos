@@ -34,10 +34,10 @@ section .multiboot_header
         ALIGN 8
         frame_buffer_start:
             dw 5                                     ; type
-            dw 0                                     ; flags
+            dw 1                                     ; flags
             dd frame_buffer_end - frame_buffer_start ; size
-            dd 800                                   ; x
-            dd 600                                   ; y
+            dd 1024                                  ; x
+            dd 768                                   ; y
             dd 32                                    ; bpp
         frame_buffer_end:
 
