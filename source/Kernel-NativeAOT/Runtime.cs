@@ -14,10 +14,50 @@ namespace System
     public struct UInt32 { }
     public struct Int64 { }
     public struct UInt64 { }
-    public struct IntPtr
+    public unsafe struct IntPtr
     {
+        void* _value;
+
+        public IntPtr(void* value) { _value = value; }
+        public IntPtr(int value) { _value = (void*)value; }
+        public IntPtr(uint value) { _value = (void*)value; }
+        public IntPtr(long value) { _value = (void*)value; }
+        public IntPtr(ulong value) { _value = (void*)value; }
+
         [Intrinsic]
         public static readonly IntPtr Zero;
+
+        //public override bool Equals(object o)
+        //	=> _value == ((IntPtr)o)._value;
+
+        public bool Equals(IntPtr ptr)
+            => _value == ptr._value;
+
+        //public override int GetHashCode()
+        //	=> (int)_value;
+
+        public static explicit operator IntPtr(int value) => new IntPtr(value);
+        public static explicit operator IntPtr(uint value) => new IntPtr(value);
+        public static explicit operator IntPtr(long value) => new IntPtr(value);
+        public static explicit operator IntPtr(ulong value) => new IntPtr(value);
+        public static explicit operator IntPtr(void* value) => new IntPtr(value);
+        public static explicit operator void*(IntPtr value) => value._value;
+
+        public static explicit operator int(IntPtr value)
+        {
+            var l = (long)value._value;
+
+            return checked((int)l);
+        }
+
+        public static explicit operator long(IntPtr value) => (long)value._value;
+        public static explicit operator ulong(IntPtr value) => (ulong)value._value;
+
+        public static IntPtr operator +(IntPtr a, uint b)
+            => new IntPtr((byte*)a._value + b);
+
+        public static IntPtr operator +(IntPtr a, ulong b)
+            => new IntPtr((byte*)a._value + b);
     }
     public struct UIntPtr { }
     public struct Single { }
@@ -55,6 +95,25 @@ namespace System
 
 namespace System.Runtime.InteropServices
 {
+    public sealed class DllImportAttribute : Attribute
+    {
+        public string EntryPoint;
+        public CharSet CharSet;
+        public bool SetLastError;
+        public bool ExactSpelling;
+        public CallingConvention CallingConvention;
+        public bool BestFitMapping;
+        public bool PreserveSig;
+        public bool ThrowOnUnmappableChar;
+
+        public string Value { get; }
+
+        public DllImportAttribute(string dllName)
+        {
+            Value = dllName;
+        }
+    }
+
     public class UnmanagedType { }
 
     sealed class StructLayoutAttribute : Attribute
@@ -71,7 +130,7 @@ namespace System.Runtime.InteropServices
         Auto = 3, // 0x00000000,
     }
 
-    internal enum CharSet
+    public enum CharSet
     {
         None = 1,       // User didn't specify how to marshal strings.
         Ansi = 2,       // Strings should be marshalled as ANSI 1 byte chars.
@@ -106,6 +165,11 @@ namespace System
         {
             public RuntimeExportAttribute(string entry) { }
         }
+
+        internal sealed class RuntimeImportAttribute : Attribute
+        {
+            public RuntimeImportAttribute(string entry) { }
+        }
     }
 
     class Array<T> : Array { }
@@ -113,6 +177,7 @@ namespace System
 
 namespace Internal.Runtime.CompilerHelpers
 {
+    using System;
     using System.Runtime;
 
     class StartupCodeHelpers
@@ -127,6 +192,77 @@ namespace Internal.Runtime.CompilerHelpers
         static void RphPinvoke() { }
         [System.Runtime.RuntimeExport("RhpPInvokeReturn")]
         static void RphPinvokeReturn() { }
+    }
+
+    sealed internal class MethodImplAttribute : Attribute
+    {
+        internal MethodImplOptions _val;
+
+        public MethodImplAttribute(MethodImplOptions methodImplOptions)
+        {
+            _val = methodImplOptions;
+        }
+
+        public MethodImplAttribute(short value)
+        {
+            _val = (MethodImplOptions)value;
+        }
+
+        public MethodImplAttribute()
+        {
+        }
+
+        public MethodImplOptions Value { get { return _val; } }
+    }
+
+    internal enum MethodImplOptions
+    {
+        NoInlining = 0x0008,
+        NoOptimization = 0x0040,
+        AggressiveInlining = 0x0100,
+        InternalCall = 0x1000,
+    }
+
+    public static class ThrowHelpers
+    {
+        public static void ThrowInvalidProgramException(ExceptionStringID id) { }
+        public static void ThrowInvalidProgramExceptionWithArgument(ExceptionStringID id, string methodName) { }
+        public static void ThrowOverflowException() { }
+        public static void ThrowIndexOutOfRangeException() { }
+        public static void ThrowTypeLoadException(ExceptionStringID id, string className, string typeName) { }
+    }
+
+    /// <summary>
+    /// Represents an ID of a localized exception string.
+    /// </summary>
+    public enum ExceptionStringID
+    {
+        // TypeLoadException
+        ClassLoadGeneral,
+        ClassLoadExplicitGeneric,
+        ClassLoadBadFormat,
+        ClassLoadExplicitLayout,
+        ClassLoadValueClassTooLarge,
+        ClassLoadRankTooLarge,
+
+        // MissingMethodException
+        MissingMethod,
+
+        // MissingFieldException
+        MissingField,
+
+        // FileNotFoundException
+        FileLoadErrorGeneric,
+
+        // InvalidProgramException
+        InvalidProgramDefault,
+        InvalidProgramSpecific,
+        InvalidProgramVararg,
+        InvalidProgramCallVirtFinalize,
+        InvalidProgramNativeCallable,
+
+        // BadImageFormatException
+        BadImageFormatGeneric,
     }
 }
 #endregion

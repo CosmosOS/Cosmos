@@ -1,31 +1,40 @@
 EXTERN start_dotnet
 GLOBAL _initial_stack_top
 GLOBAL start
-GLOBAL multiboot_magic_var
-GLOBAL multiboot_tags_address_var
 
 SECTION .text
 
 [BITS 64]
 
     start:
-        mov esp, _initial_stack_top
+        mov rsp, _initial_stack_top
+        mov rbp, _initial_stack_top
+
         call check_multiboot
-        mov rdi, rax ;put multiboot in first funcion argument
+
+        mov edi, ebx ;push multiboot address to first argument (RDI)
+
+        ;mov rsi, _initial_stack_top ;push heap base address to second argument (RSI)
+
         call start_dotnet
+        ret
+
+    ; Throw error if eax doesn't contain the Multiboot2 magic value (0x36d76289).
+    check_multiboot:
+        cmp eax, 0x36d76289
+        jne error
+        ret
 
     ;halt CPU
     error:
+        mov rcx, 0x0badcafe
+        mov rdx, 0x0badcafe
+        mov rdi, 0x0badcafe
+        mov rsi, 0x0badcafe
+        cli
+        .hlt:
         hlt
-
-    ; Throw error 0 if eax doesn't contain the Multiboot 2 magic value (0x36d76289).
-    check_multiboot:
-        cmp eax, 0x36d76289
-        jne .no_multiboot
-        ret
-    .no_multiboot:
-        mov al, "0"
-        jmp error
+        jmp .hlt ; make sure our program definitely halts, even if HLT is cancelled
 
 SECTION .bss
     _initial_stack_bottom:

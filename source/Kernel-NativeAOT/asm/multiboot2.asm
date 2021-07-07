@@ -12,6 +12,23 @@ section .multiboot_header
         dd 0x100000000 - (0xe85250d6 + 0 + (mb_header_end - mb_header)) ; checksum
 
         ALIGN 8
+        frame_buffer_start:
+            dw 5                                     ; type
+            dw 1                                     ; flags
+            dd frame_buffer_end - frame_buffer_start ; size
+            dd 1024                                  ; x
+            dd 768                                   ; y
+            dd 32                                    ; bpp
+        frame_buffer_end:
+
+        ALIGN 8
+        tag_ebs_start: ; leaves UEFI boot services enabled
+            dw 7
+            dw 0
+            dd tag_ebs_end - tag_ebs_start
+        tag_ebs_end:
+
+        ALIGN 8
         address_tag:
             dw 2                              ; type
             dw 0                              ; flags
@@ -30,23 +47,13 @@ section .multiboot_header
             dd start                               ; header_addr
         entry_addr_tag_end:
 
-        ALIGN 8
-        frame_buffer_start:
-            dw 5                                     ; type
-            dw 1                                     ; flags
-            dd frame_buffer_end - frame_buffer_start ; size
-            dd 1024                                  ; x
-            dd 768                                   ; y
-            dd 32                                    ; bpp
-        frame_buffer_end:
-
         ; insert optional multiboot tags here
 
         ALIGN 8
         mb2_header_tag_end_start: ; required end tag
-            dw 0                                                    ; type
-            dw 0                                                    ; flags
-            dd mb2_header_tag_end_end - mb2_header_tag_end_start    ; size
+            dw 0    ; type
+            dw 0    ; flags
+            dd 8    ; size
         mb2_header_tag_end_end:
 
     mb_header_end:
