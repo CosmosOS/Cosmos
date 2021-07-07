@@ -6,11 +6,10 @@ ALIGN 8
 section .multiboot_header
 
     mb_header:
-        dd 0xe85250d6                              ; magic number (multiboot 2)
-        dd 0                                       ; architecture 0 (protected mode i386)
-        dd mb_header_end - mb_header ; header length
-        ; checksum
-        dd 0x100000000 - (0xe85250d6 + 0 + (mb_header_end - mb_header))
+        dd 0xe85250d6                                                   ; magic number (multiboot 2)
+        dd 0                                                            ; architecture 0 (protected mode i386)
+        dd mb_header_end - mb_header                                    ; header length
+        dd 0x100000000 - (0xe85250d6 + 0 + (mb_header_end - mb_header)) ; checksum
 
         ALIGN 8
         address_tag:
@@ -20,7 +19,7 @@ section .multiboot_header
             dd mb_header                      ; header_addr
             dd start                          ; load_addr
             dd __load_end_addr                ; load_end_addr
-            dd _initial_stack_top                      ; bss_end_addr
+            dd _initial_stack_top             ; bss_end_addr
         address_tag_end:
 
         ALIGN 8

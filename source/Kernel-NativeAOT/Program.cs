@@ -5,11 +5,13 @@ public unsafe class Program
 {
     public static void Main()
     {
-        EntryPoint();
+        EntryPoint(IntPtr.Zero);
     }
 
-    public static void EntryPoint()
+    public static void EntryPoint(IntPtr MbAddress)
     {
+        //Parse multiboot2
+
         while (true)
         {
 

@@ -1,4 +1,6 @@
-﻿namespace System
+﻿using System.Runtime.CompilerServices;
+
+namespace System
 {
     public class Object { public IntPtr m_pEEType; } // The layout of object is a contract with the compiler.
     public struct Void { }
@@ -12,7 +14,11 @@
     public struct UInt32 { }
     public struct Int64 { }
     public struct UInt64 { }
-    public struct IntPtr { }
+    public struct IntPtr
+    {
+        [Intrinsic]
+        public static readonly IntPtr Zero;
+    }
     public struct UIntPtr { }
     public struct Single { }
     public struct Double { }
@@ -42,6 +48,8 @@
         {
             public const string UnmanagedSignatureCallingConvention = nameof(UnmanagedSignatureCallingConvention);
         }
+        
+        internal sealed class IntrinsicAttribute : Attribute { }
     }
 }
 
