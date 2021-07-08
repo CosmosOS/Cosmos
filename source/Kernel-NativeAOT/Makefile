@@ -1,7 +1,7 @@
-﻿ILC=/mnt/c/Users/valentin.charbonnier/.nuget/packages/runtime.win-x64.microsoft.dotnet.ilcompiler/6.0.0-preview.7.21327.1/tools/ilc.exe
+﻿ILC=/home/valentinbreiz/.nuget/packages/runtime.linux-x64.microsoft.dotnet.ilcompiler/6.0.0-preview.7.21355.1/tools/ilc
 DOTNET = dotnet
 NASM = nasm
-QEMU_OPTS=-s -d cpu_reset -D ./qemu.log -L ".\\tools\\qemu\\" -bios bios64.bin -k en-gb -m 512M -drive file=fat:rw:"obj/isofiles",format=raw,media=disk -serial file:serial.log
+QEMU_OPTS=-s -d cpu_reset -L ".\\tools\\qemu\\" -bios bios64.bin -k en-gb -m 512M -drive file=fat:rw:"obj/isofiles",format=raw,media=disk -serial file:serial.log
 
 ASM_FLAGS = -f elf64 
 
@@ -32,7 +32,7 @@ build: $(ISO)
 
 run: $(ISO)
 	@echo Starting VM; \
-	./tools/qemu/qemu-system-x86_64.exe $(QEMU_OPTS)
+	qemu $(QEMU_OPTS)
 
 $(ISO): $(KERNEL)
 	@echo Building EFI; \
@@ -48,7 +48,7 @@ $(KERNEL): $(OS_OBJ) $(OBJ)
 
 $(OS_OBJ): $(OS_DLL)
 	@echo Converting CIL to native code; \
-	$(ILC) -g --systemmodule Kernel --out $(OS_OBJ) $(OS_DLL)
+	$(ILC) --systemmodule Kernel --out $(OS_OBJ) $(OS_DLL)
 
 $(OBJ_DIR): $(OBJ_DIR)
 	@mkdir $(OBJ_DIR)

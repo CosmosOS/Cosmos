@@ -27,7 +27,6 @@ namespace Kernel
         public static extern uint In32(ushort port);
     }
 
-    /*
     public static unsafe class Memory
     {
         private static long _heapBase;
@@ -79,5 +78,5 @@ namespace Kernel
             for (var i = 0U; i < rem; i++)
                 ((byte*)dst)[count + i] = ((byte*)src)[count + i];
         }
-    }*/
+    }
 }

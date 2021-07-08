@@ -13,8 +13,7 @@ SECTION .text
         call check_multiboot
 
         mov edi, ebx ;push multiboot address to first argument (RDI)
-
-        ;mov rsi, _initial_stack_top ;push heap base address to second argument (RSI)
+        mov esi, _initial_stack_top ;push heap base address to second argument (RSI)
 
         call start_dotnet
         ret

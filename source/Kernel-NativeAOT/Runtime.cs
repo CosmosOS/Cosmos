@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Kernel;
 
 namespace System
 {
@@ -77,6 +78,8 @@ namespace System
 
     public class Attribute { }
 
+    public sealed class FlagsAttribute : Attribute { }
+
     namespace Runtime.CompilerServices
     {
         public class RuntimeHelpers
@@ -154,6 +157,14 @@ namespace System.Runtime.InteropServices
 
         public UnmanagedCallersOnlyAttribute() { }
     }
+
+    public sealed class FieldOffsetAttribute : Attribute {
+		public FieldOffsetAttribute(int offset) {
+			Value = offset;
+		}
+
+		public int Value { get; }
+	}
 }
 
 #region Things needed by ILC
@@ -179,6 +190,7 @@ namespace Internal.Runtime.CompilerHelpers
 {
     using System;
     using System.Runtime;
+    using Internal.Runtime.CompilerServices;
 
     class StartupCodeHelpers
     {
@@ -192,6 +204,34 @@ namespace Internal.Runtime.CompilerHelpers
         static void RphPinvoke() { }
         [System.Runtime.RuntimeExport("RhpPInvokeReturn")]
         static void RphPinvokeReturn() { }
+        [RuntimeExport("RhpNewArray")]
+		internal static unsafe object RhpNewArray(EEType* pEEType, int length) {
+			var size = pEEType->BaseSize + (ulong)length * pEEType->ComponentSize;
+
+			// Round to next power of 8
+			if (size % 8 > 0)
+				size = ((size / 8) + 1) * 8;
+
+			var data = Memory.Alloc((long)size);
+			var obj = Unsafe.As<IntPtr, object>(ref data);
+			Memory.Zero(data, size);
+			SetEEType(data, pEEType);
+
+			var b = (byte*)data;
+			b += sizeof(IntPtr);
+			Memory.Copy((IntPtr)b, (IntPtr)(&length), sizeof(int));
+
+			return obj;
+		}
+
+        [RuntimeExport("RhpAssignRef")]
+		static unsafe void RhpAssignRef(void** address, void* obj) {
+			*address = obj;
+		}
+
+        internal static unsafe void SetEEType(IntPtr obj, EEType* type) {
+			Memory.Copy(obj, (IntPtr)(&type), (ulong)sizeof(IntPtr));
+		}
     }
 
     sealed internal class MethodImplAttribute : Attribute
@@ -266,3 +306,26 @@ namespace Internal.Runtime.CompilerHelpers
     }
 }
 #endregion
+
+namespace Internal.Runtime.CompilerServices {
+    using System;
+	public static unsafe class Unsafe {
+		[Intrinsic]
+		public static extern ref T Add<T>(ref T source, int elementOffset);
+
+		[Intrinsic]
+		public static extern ref TTo As<TFrom, TTo>(ref TFrom source);
+
+		[Intrinsic]
+		public static extern void* AsPointer<T>(ref T value);
+
+		[Intrinsic]
+		public static extern ref T AsRef<T>(void* pointer);
+
+		public static ref T AsRef<T>(IntPtr pointer)
+			=> ref AsRef<T>((void*)pointer);
+
+		[Intrinsic]
+		public static extern int SizeOf<T>();
+	}
+}
