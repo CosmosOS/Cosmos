@@ -10,42 +10,24 @@ public unsafe class Program
     }
 
     static FrameBuffer frameBuffer;
+    static EFI_SYSTEM_TABLE* systemTable;
 
     public static void EntryPoint(IntPtr MbAddress, long heapBase)
     {
-        Memory.Init(heapBase);
+        Multiboot2.Parse(MbAddress);
 
-        //0x80000000 is QEMU framebuffer address
-        frameBuffer = new FrameBuffer((IntPtr)0x80000000, 1024 * 768 * 4, 1024, 768, FrameBuffer.PixelFormat.R8G8B8);
+        systemTable = (EFI_SYSTEM_TABLE*)Multiboot2.TagEFI64->Address;
 
-        frameBuffer.Fill(frameBuffer.MakePixel(0, 0, 0));
-
-        int[] array = new int[] {
-            0, 0
-        };
-
-        for (int i = 0; i < 2; i++) {
-            if (array[i] == 1) {
-                frameBuffer.Fill(frameBuffer.MakePixel(255, 255, 255));
-            }
-            else
-            {
-                frameBuffer.Fill(frameBuffer.MakePixel(0, 0, 0));
-            }
+        string hello = "Hello world!";
+        fixed (char* pHello = hello)
+        {
+            systemTable->ConOut->OutputString(systemTable->ConOut, pHello);
         }
 
-        //DrawChar('X', 50, 50, frameBuffer.MakePixel(255, 255, 255));
+        //0x80000000 is QEMU framebuffer address
+        //frameBuffer = new FrameBuffer((IntPtr)Multiboot2.TagFramebuffer->Common.Address, 1024 * 768 * 4, 1024, 768, FrameBuffer.PixelFormat.R8G8B8);
 
-
-        //Serial.Init(); //COM1
-        //Serial.Write('X');
-        //serial.Write('H');
-        //serial.Write('e');
-        //serial.Write('l');
-        //serial.Write('l');
-        //serial.Write('o');
-
-        //TODO: Parse multiboot2
+        //frameBuffer.Fill(frameBuffer.MakePixel(255, 255, 255));
 
         while (true)
         {
