@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-[StructLayout(LayoutKind.Sequential)]
-public struct FrameBuffer
+public class FrameBuffer
 {
     public enum PixelFormat
     {
@@ -11,16 +10,12 @@ public struct FrameBuffer
         B8G8R8,
     }
 
-    readonly IntPtr _ptr;
-    readonly ulong _len;
+    public readonly IntPtr _ptr;
+    public readonly ulong _len;
 
     public readonly uint Width;
     public readonly uint Height;
     public readonly PixelFormat Format;
-
-
-    internal static FrameBuffer _instance;
-    public static ref FrameBuffer I => ref _instance;
 
     public FrameBuffer(IntPtr pointer, ulong length, uint width, uint height, PixelFormat format)
     {

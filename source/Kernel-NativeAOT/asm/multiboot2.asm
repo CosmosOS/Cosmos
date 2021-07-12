@@ -11,23 +11,23 @@ section .multiboot_header
         dd mb_header_end - mb_header                                    ; header length
         dd 0x100000000 - (0xe85250d6 + 0 + (mb_header_end - mb_header)) ; checksum
 
-        ALIGN 8
-        tag_flags_start: ; leaves UEFI boot services enabled
-            dw 4
-            dw 0
-            dd tag_flags_end - tag_flags_start
-            dd 1
-        tag_flags_end:
-
         ;ALIGN 8
-        ;frame_buffer_start:
-        ;    dw 5                                     ; type
-        ;    dw 1                                     ; flags
-        ;    dd frame_buffer_end - frame_buffer_start ; size
-        ;    dd 1024                                  ; x
-        ;    dd 768                                   ; y
-        ;    dd 32                                    ; bpp
-        ;frame_buffer_end:
+        ;tag_flags_start: ;console
+        ;    dw 4
+        ;    dw 0
+        ;    dd tag_flags_end - tag_flags_start
+        ;    dd 1
+        ;tag_flags_end:
+
+        ALIGN 8
+        frame_buffer_start:
+            dw 5                                     ; type
+            dw 1                                     ; flags
+            dd frame_buffer_end - frame_buffer_start ; size
+            dd 1024                                  ; x
+            dd 768                                   ; y
+            dd 32                                    ; bpp
+        frame_buffer_end:
 
         ALIGN 8
         tag_ebs_start: ; leaves UEFI boot services enabled

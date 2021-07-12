@@ -41,12 +41,13 @@ namespace Kernel
     {
         public static Mb2TagFramebuffer* TagFramebuffer;
         public static Mb2TagEFI64* TagEFI64;
+        public static bool BootServicesTerminated = true;
 
         public static void Parse(IntPtr MbAddress)
         {
             Mb2Tag *tag;
 
-            for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((byte*)tag + ((tag->Size + 7) & ~7)))
+            for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((uint)tag + Align(tag->Size, 8)))
             {
                 switch (tag->Type)
                 {
@@ -56,10 +57,18 @@ namespace Kernel
                     case 12:
                         TagEFI64 = (Mb2TagEFI64*)tag;
                         break;
+                    case 18:
+                        BootServicesTerminated = false;
+                        break;
                     default:
                         break;
                 }
             }
+        }
+
+        private static uint Align(uint Value, uint Alignment)
+        {
+            return ((Value) + (((Alignment) - (Value)) & ((Alignment) - 1)));
         }
     }
 }

@@ -204,33 +204,16 @@ namespace Internal.Runtime.CompilerHelpers
         static void RphPinvoke() { }
         [System.Runtime.RuntimeExport("RhpPInvokeReturn")]
         static void RphPinvokeReturn() { }
-        [RuntimeExport("RhpNewArray")]
-		internal static unsafe object RhpNewArray(EEType* pEEType, int length) {
-			var size = pEEType->BaseSize + (ulong)length * pEEType->ComponentSize;
 
-			// Round to next power of 8
-			if (size % 8 > 0)
-				size = ((size / 8) + 1) * 8;
-
-			var data = Memory.Alloc((long)size);
-			var obj = Unsafe.As<IntPtr, object>(ref data);
-			Memory.Zero(data, size);
-			SetEEType(data, pEEType);
-
-			var b = (byte*)data;
-			b += sizeof(IntPtr);
-			Memory.Copy((IntPtr)b, (IntPtr)(&length), sizeof(int));
-
-			return obj;
+        [RuntimeExport("RhpNewFast")]
+		static unsafe object RhpNewFast(void* pEEType) {
+			return null;
 		}
+
 
         [RuntimeExport("RhpAssignRef")]
 		static unsafe void RhpAssignRef(void** address, void* obj) {
 			*address = obj;
-		}
-
-        internal static unsafe void SetEEType(IntPtr obj, EEType* type) {
-			Memory.Copy(obj, (IntPtr)(&type), (ulong)sizeof(IntPtr));
 		}
     }
 

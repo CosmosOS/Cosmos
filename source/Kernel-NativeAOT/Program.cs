@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using Internal.Runtime.CompilerServices;
 using Kernel;
 
 public unsafe class Program
@@ -10,24 +11,25 @@ public unsafe class Program
     }
 
     static FrameBuffer frameBuffer;
-    static EFI_SYSTEM_TABLE* systemTable;
 
     public static void EntryPoint(IntPtr MbAddress, long heapBase)
     {
         Multiboot2.Parse(MbAddress);
+        Memory.Init(heapBase);
 
-        systemTable = (EFI_SYSTEM_TABLE*)Multiboot2.TagEFI64->Address;
+        uint buffersize = (uint)(Multiboot2.TagFramebuffer->Common.Width * Multiboot2.TagFramebuffer->Common.Height * (Multiboot2.TagFramebuffer->Common.Bpp / 8));
+        frameBuffer = new FrameBuffer((IntPtr)Multiboot2.TagFramebuffer->Common.Address, buffersize, Multiboot2.TagFramebuffer->Common.Width, Multiboot2.TagFramebuffer->Common.Height, FrameBuffer.PixelFormat.R8G8B8);
+        
+        frameBuffer.Fill(frameBuffer.MakePixel(0, 0, 255));
 
-        string hello = "Hello world!";
-        fixed (char* pHello = hello)
-        {
-            systemTable->ConOut->OutputString(systemTable->ConOut, pHello);
-        }
+        //DrawChar('A', 50, 50, frameBuffer.MakePixel(255, 255, 255));
 
-        //0x80000000 is QEMU framebuffer address
-        //frameBuffer = new FrameBuffer((IntPtr)Multiboot2.TagFramebuffer->Common.Address, 1024 * 768 * 4, 1024, 768, FrameBuffer.PixelFormat.R8G8B8);
+        //string hello = "Hello world!";
+        //fixed (char* pHello = hello)
+        //{
+        //    systemTable->ConOut->OutputString(systemTable->ConOut, pHello);
+        //}
 
-        //frameBuffer.Fill(frameBuffer.MakePixel(255, 255, 255));
 
         while (true)
         {
