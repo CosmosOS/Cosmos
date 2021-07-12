@@ -11,7 +11,8 @@ namespace Cosmos.System.FileSystem.ISO9660
 
         public override FileSystem Create(Partition aDevice, string aRootPath, long aSize)
         {
-            return new ISO9660FileSystem(aDevice, aRootPath, 100000);
+            //TODO: Replace 1000000 with proper size once ATAPI driver implements it 
+            return new ISO9660FileSystem(aDevice, aRootPath, 1000000);
         }
 
         public override bool IsType(Partition aDevice)
