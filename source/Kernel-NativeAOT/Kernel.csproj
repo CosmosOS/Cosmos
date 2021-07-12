@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net5.0</TargetFramework>
+		<RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
+		<LangVersion>latest</LangVersion>
+		<Platforms>x64</Platforms>
+		<Configurations>Debug;Release</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
+
+		<NoExplicitReferenceToStdLib>true</NoExplicitReferenceToStdLib>
+
+		<NoStdLib>true</NoStdLib>
+		<NoConfig>true</NoConfig>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+
+		<AssemblyName>Kernel</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-preview.7.21355.1" />
+	</ItemGroup>
+
+	<Target Name="CustomizeReferences" BeforeTargets="BeforeCompile" AfterTargets="FindReferenceAssembliesForReferences">
+		<ItemGroup>
+			<ReferencePathWithRefAssemblies Remove="@(ReferencePathWithRefAssemblies)" />
+			<ReferencePath Remove="@(ReferencePath)" />
+		</ItemGroup>
+	</Target>
+
+</Project>
