@@ -74,7 +74,7 @@ namespace Cosmos.Build.Builder.ViewModels
         {
             var log = @"
 ========================================
-    Builder Log
+    Build Log
 ========================================
 
 ";
@@ -95,7 +95,7 @@ namespace Cosmos.Build.Builder.ViewModels
 
         private async Task BuildAsync()
         {
-            _logger.NewSection("Checking Dependencies");
+            _logger.NewSection("Checking Dependencies...");
             try
             {
                 foreach (var dependency in _buildDefinition.GetDependencies())
@@ -106,7 +106,7 @@ namespace Cosmos.Build.Builder.ViewModels
                     }
                     else
                     {
-                        _logger.LogMessage($"{dependency.Name} not found. Install {dependency.OtherDependencysThatAreMissing.TrimEnd(',')}");
+                        _logger.LogMessage($"{dependency.Name} was not found. Install {dependency.OtherDependencysThatAreMissing.TrimEnd(',')}");
 
                         if (dependency.ShouldInstallByDefault)
                         {
