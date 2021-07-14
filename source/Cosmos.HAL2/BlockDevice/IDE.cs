@@ -39,7 +39,6 @@ namespace Cosmos.HAL.BlockDevice
             else if (xATA.DriveType == ATA_PIO.SpecLevel.ATAPI)
             {
                 var atapi = new ATAPI(xATA);
-                BlockDevice.Devices.Add(atapi);
 
                 //TODO: Replace 1000000 with proper size once ATAPI driver implements it
                 BlockDevice.Devices.Add(new Partition(atapi, 0, 1000000));
