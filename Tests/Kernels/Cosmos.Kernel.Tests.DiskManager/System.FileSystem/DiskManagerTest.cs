@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Tests.DiskManager
         /// </summary>
         public static void Execute(Debugger mDebugger)
         {
-            string driveName = @"0:\";
+            string driveName = @"1:\";
             var MyDrive = new System.FileSystem.DiskManager(driveName);
 
             mDebugger.Send("START TEST: Get Name");
