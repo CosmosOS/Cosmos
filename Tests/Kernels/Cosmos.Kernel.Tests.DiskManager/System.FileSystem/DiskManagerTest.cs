@@ -28,6 +28,24 @@ namespace Cosmos.Kernel.Tests.DiskManager
 
             mDebugger.Send("START TEST: Format");
 
+            try
+            {
+                MyDrive.Format("FAT16", aQuick: true);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is NotImplementedException, "Not implemented FAT exception.");
+            }
+
+            try
+            {
+                MyDrive.Format("NTFS", aQuick: true);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is NotImplementedException, "Not implemented FileSystem exception.");
+            }
+
             MyDrive.Format("FAT32", aQuick: true);
 
             mDebugger.Send("Format done testing HDD is really empty");
