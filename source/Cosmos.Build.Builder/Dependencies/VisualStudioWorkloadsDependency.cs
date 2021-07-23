@@ -34,7 +34,7 @@ namespace Cosmos.Build.Builder.Dependencies
                 }
 
                 //Add the missing packages together
-                string missingPackages_proper = "";
+                string missingPackages_proper = "install ";
                 foreach (var item in missingPackages)
                 {
                     missingPackages_proper += GetProperName(item) + ", ";

@@ -1,0 +1,41 @@
+﻿<Window x:Class="Cosmos.Build.Builder.Views.MessageBox"
+        x:Name="MessageBoxWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        Title="Cosmos Kit Builder"
+        WindowStartupLocation="CenterOwner"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+    </Window.Resources>
+
+    <Grid Margin="8"
+          MinWidth="400">
+
+        <StackPanel Grid.Row="0"
+                    Margin="8">
+
+            <TextBlock x:Name="lblMain" Grid.Row="0"
+                       Margin="0,0,0,4"
+                       Text="Enter text here" />
+
+            <StackPanel Grid.Row="2"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                        Margin="5,8,5,0"
+                        Orientation="Horizontal">
+                <Button Visibility="{Binding IsNotInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Command="{Binding InstallCommand}"
+                        Content="OK" Margin="0,0,0,0" Click="Button_Click"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
