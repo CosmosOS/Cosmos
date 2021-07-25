@@ -4,18 +4,6 @@ for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
 
 if "%version%" == "6.1" goto seven
 
-:seven
-echo Detected Windows 7! Checking for update KB3140245...
-
-for /f "delims=" %%i in ("wmic qfe | find /c ""KB3140245""") do set update=%%i
-if "%update%" == "0" goto update404
-
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client" /v DisabledByDefault /t REG_DWORD /d 0 /f /reg:32
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client" /v DisabledByDefault /t REG_DWORD /d 0 /f /reg:64
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client" /v Enabled /t REG_DWORD /d 1 /f /reg:32
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client" /v Enabled /t REG_DWORD /d 1 /f /reg:64
-goto start
-
 :start
 cd /D "%~dp0"
 
@@ -45,7 +33,17 @@ echo Building Builder.sln
 start "Cosmos Builder" "source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-VSPATH=%InstallDir%" %*
 exit
 
-:update404
-echo "The update KB3140245 isn't installed on your computer! It is mandatory on Windows 7 to install it in order to build Cosmos."
-pause
-exit
+:seven
+echo Detected Windows 7! Checking for update KB3140245...
+
+for /f "delims=" %%i in ("wmic qfe | find /c ""KB3140245""") do set update=%%i
+if "%update%" == "0" (
+    echo "The update KB3140245 isn't installed on your computer! It is mandatory on Windows 7 to install it in order to build Cosmos."
+    pause
+)
+
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client" /v DisabledByDefault /t REG_DWORD /d 0 /f /reg:32
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client" /v DisabledByDefault /t REG_DWORD /d 0 /f /reg:64
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client" /v Enabled /t REG_DWORD /d 1 /f /reg:32
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client" /v Enabled /t REG_DWORD /d 1 /f /reg:64
+goto start
