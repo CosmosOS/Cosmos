@@ -9,17 +9,79 @@
 		<Configurations>Debug;Release</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
-
+        <EnableDefaultItems>false</EnableDefaultItems>
+		
 		<NoExplicitReferenceToStdLib>true</NoExplicitReferenceToStdLib>
 
 		<NoStdLib>true</NoStdLib>
 		<NoConfig>true</NoConfig>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
 		<RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
 
 		<AssemblyName>Kernel</AssemblyName>
 	</PropertyGroup>
+
+    <PropertyGroup>
+        <DefineConstants>INPLACE_RUNTIME;SYSTEM_PRIVATE_CORELIB;$(DefineConstants)</DefineConstants>
+        <TargetsCoreRT>true</TargetsCoreRT>
+        <DefineConstants>CORERT;$(DefineConstants)</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Platform)' == 'x64'">
+        <Prefer32Bit>false</Prefer32Bit>
+        <DefineConstants>TARGET_64BIT;TARGET_AMD64;BIT64;$(DefineConstants)</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="asm\**\*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="scripts\**\*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+	<ItemGroup>
+        <Compile Include="*cs" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Compile Remove="CoreLib\Internal\**" />
+	  <Compile Remove="CoreLib\Interop\**" />
+	  <Compile Remove="CoreLib\System\**" />
+	  <Compile Remove="NewFolder\**" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Compile Include="CoreLib\EFISharp\Console\EFIKeyNotifyHandle.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\EFIOutputRequiredChars.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\EFI_INPUT_KEY.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\EFI_KEY_DATA.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\EFI_KEY_STATE.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\EFI_KEY_TOGGLE_STATE.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\KeyShiftState.cs" />
+	  <Compile Include="CoreLib\EFISharp\Console\SIMPLE_TEXT_OUTPUT_MODE.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_BOOT_SERVICES.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_EVENT.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_GUID.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_HANDLE.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_LOCATE_SEARCH_TYPE.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_MEMORY_TYPE.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_OPEN_PROTOCOL.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_RNG_ALGORITHM.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_RNG_PROTOCOL.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_SIMPLE_TEXT_INPUT_PROTOCOL.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_STATUS.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_SYSTEM_TABLE.cs" />
+	  <Compile Include="CoreLib\EFISharp\EFI_TABLE_HEADER.cs" />
+	  <Compile Include="CoreLib\EFISharp\Queue.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-preview.7.21355.1" />

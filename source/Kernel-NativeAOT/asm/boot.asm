@@ -26,10 +26,10 @@ SECTION .text
 
     ;halt CPU
     error:
-        mov rcx, 0x0badcafe
-        mov rdx, 0x0badcafe
-        mov rdi, 0x0badcafe
-        mov rsi, 0x0badcafe
+        mov rcx, 0xbadcafe
+        mov rdx, 0xdeadbabe
+        mov rdi, 0xbadcafe
+        mov rsi, 0xdeadbabe
         cli
         .hlt:
         hlt
@@ -37,5 +37,5 @@ SECTION .text
 
 SECTION .bss
     _initial_stack_bottom:
-        resb 0x20000
+        resb 4096
     _initial_stack_top:

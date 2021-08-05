@@ -15,7 +15,7 @@ public unsafe class Program
     public static void EntryPoint(IntPtr MbAddress, long heapBase)
     {
         Multiboot2.Parse(MbAddress);
-        Memory.Init(heapBase);
+        Memory.Init(0xA0000000); //TODO: don't hardcore base heap address
 
         uint buffersize = (uint)(Multiboot2.TagFramebuffer->Common.Width * Multiboot2.TagFramebuffer->Common.Height * (Multiboot2.TagFramebuffer->Common.Bpp / 8));
         frameBuffer = new FrameBuffer((IntPtr)Multiboot2.TagFramebuffer->Common.Address, buffersize, Multiboot2.TagFramebuffer->Common.Width, Multiboot2.TagFramebuffer->Common.Height, FrameBuffer.PixelFormat.R8G8B8);
