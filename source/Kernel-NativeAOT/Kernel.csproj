@@ -57,30 +57,30 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="CoreLib\EFISharp\Console\EFIKeyNotifyHandle.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\EFIOutputRequiredChars.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\EFI_INPUT_KEY.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\EFI_KEY_DATA.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\EFI_KEY_STATE.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\EFI_KEY_TOGGLE_STATE.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\KeyShiftState.cs" />
-        <Compile Include="CoreLib\EFISharp\Console\SIMPLE_TEXT_OUTPUT_MODE.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_BOOT_SERVICES.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_EVENT.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_GUID.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_HANDLE.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_LOCATE_SEARCH_TYPE.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_MEMORY_TYPE.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_OPEN_PROTOCOL.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_RNG_ALGORITHM.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_RNG_PROTOCOL.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_SIMPLE_TEXT_INPUT_PROTOCOL.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_STATUS.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_SYSTEM_TABLE.cs" />
-        <Compile Include="CoreLib\EFISharp\EFI_TABLE_HEADER.cs" />
-        <Compile Include="CoreLib\EFISharp\Queue.cs" />
+        <Compile Include="EFISharp\Console\EFIKeyNotifyHandle.cs" />
+        <Compile Include="EFISharp\Console\EFIOutputRequiredChars.cs" />
+        <Compile Include="EFISharp\Console\EFI_INPUT_KEY.cs" />
+        <Compile Include="EFISharp\Console\EFI_KEY_DATA.cs" />
+        <Compile Include="EFISharp\Console\EFI_KEY_STATE.cs" />
+        <Compile Include="EFISharp\Console\EFI_KEY_TOGGLE_STATE.cs" />
+        <Compile Include="EFISharp\Console\EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.cs" />
+        <Compile Include="EFISharp\Console\EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.cs" />
+        <Compile Include="EFISharp\Console\KeyShiftState.cs" />
+        <Compile Include="EFISharp\Console\SIMPLE_TEXT_OUTPUT_MODE.cs" />
+        <Compile Include="EFISharp\EFI_BOOT_SERVICES.cs" />
+        <Compile Include="EFISharp\EFI_EVENT.cs" />
+        <Compile Include="EFISharp\EFI_GUID.cs" />
+        <Compile Include="EFISharp\EFI_HANDLE.cs" />
+        <Compile Include="EFISharp\EFI_LOCATE_SEARCH_TYPE.cs" />
+        <Compile Include="EFISharp\EFI_MEMORY_TYPE.cs" />
+        <Compile Include="EFISharp\EFI_OPEN_PROTOCOL.cs" />
+        <Compile Include="EFISharp\EFI_RNG_ALGORITHM.cs" />
+        <Compile Include="EFISharp\EFI_RNG_PROTOCOL.cs" />
+        <Compile Include="EFISharp\EFI_SIMPLE_TEXT_INPUT_PROTOCOL.cs" />
+        <Compile Include="EFISharp\EFI_STATUS.cs" />
+        <Compile Include="EFISharp\EFI_SYSTEM_TABLE.cs" />
+        <Compile Include="EFISharp\EFI_TABLE_HEADER.cs" />
+        <Compile Include="EFISharp\Queue.cs" />
     </ItemGroup>
 
     <ItemGroup>
