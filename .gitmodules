@@ -1,0 +1,3 @@
+[submodule "source/Kernel-NativeAOT/runtimelab"]
+	path = source/Kernel-NativeAOT/runtimelab
+	url = https://github.com/dotnet/runtimelab/tree/feature/NativeAOT
