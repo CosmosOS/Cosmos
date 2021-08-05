@@ -96,6 +96,9 @@
         <Compile Include="CoreLib\System\Object.cs" />
         <Compile Include="CoreLib\System\Type.cs" />
         <Compile Include="CoreLib\System\RuntimeTypeHandle.cs" />
+        <Compile Include="runtimelab\src\coreclr\nativeaot\Common\src\Internal\Runtime\TypeManagerHandle.cs">
+            <Link>CoreLib\Internal\Runtime\TypeManagerHandle.cs</Link>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -279,6 +282,10 @@
         <Compile Include="runtimelab\src\coreclr\nativeaot\Common\src\Internal\Runtime\TransitionBlock.cs">
             <Link>CoreLib\Common\TransitionBlock.cs</Link>
         </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="CoreLib\AsmOffsets.cs"/>
     </ItemGroup>
 
     <ItemGroup>
