@@ -40,6 +40,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="Makefile">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <Content Include="scripts\**\*.*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
