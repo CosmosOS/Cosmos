@@ -43,8 +43,8 @@ namespace Cosmos.System.FileSystem
             mFileSystems = new List<FileSystem>();
             mRegisteredFileSystems = new List<FileSystemFactory>();
 
-            RegisterFileSystem(new FatFileSystemFactory());
             RegisterFileSystem(new ISO9660FileSystemFactory());
+            RegisterFileSystem(new FatFileSystemFactory());
 
             InitializePartitions(aShowInfo);
             if (mPartitions.Count > 0)
