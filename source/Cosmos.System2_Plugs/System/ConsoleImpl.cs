@@ -37,7 +37,6 @@ namespace Cosmos.System_Plugs.System
         public static int get_BufferHeight()
         {
             throw new NotImplementedException("Not implemented: get_BufferHeight");
-            return -1;
         }
 
         public static void set_BufferHeight(int aHeight)
@@ -48,7 +47,6 @@ namespace Cosmos.System_Plugs.System
         public static int get_BufferWidth()
         {
             throw new NotImplementedException("Not implemented: get_BufferWidth");
-            return -1;
         }
 
         public static void set_BufferWidth(int aWidth)
@@ -227,13 +225,11 @@ namespace Cosmos.System_Plugs.System
         public static int get_LargestWindowHeight()
         {
             throw new NotImplementedException("Not implemented: get_LargestWindowHeight");
-            return -1;
         }
 
         public static int get_LargestWindowWidth()
         {
             throw new NotImplementedException("Not implemented: get_LargestWindowWidth");
-            return -1;
         }
 
         public static bool get_NumberLock()
@@ -249,7 +245,6 @@ namespace Cosmos.System_Plugs.System
         public static string get_Title()
         {
             throw new NotImplementedException("Not implemented: get_Title");
-            return string.Empty;
         }
 
         public static void set_Title(string value)
@@ -260,7 +255,6 @@ namespace Cosmos.System_Plugs.System
         public static bool get_TreatControlCAsInput()
         {
             throw new NotImplementedException("Not implemented: get_TreatControlCAsInput");
-            return false;
         }
 
         public static void set_TreatControlCAsInput(bool value)
@@ -287,7 +281,6 @@ namespace Cosmos.System_Plugs.System
         public static int get_WindowLeft()
         {
             throw new NotImplementedException("Not implemented: get_WindowLeft");
-            return -1;
         }
 
         public static void set_WindowLeft(int value)
@@ -298,7 +291,6 @@ namespace Cosmos.System_Plugs.System
         public static int get_WindowTop()
         {
             throw new NotImplementedException("Not implemented: get_WindowTop");
-            return -1;
         }
 
         public static void set_WindowTop(int value)
