@@ -1,5 +1,6 @@
 ﻿using System;
-
+using System.Collections.Generic;
+using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -40,19 +41,19 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             float[] xSingleResult = { 1.25f, 2.50f, 3.51f, 4.31f, 9.28f, 18.56f };
             float[] xSingleExpectedResult = { 1.25f, 2.598f, 5.39f, 4.31f, 9.28f, 18.56f };
             float[] xSingleSource = { 0.49382f, 1.59034f, 2.598f, 5.39f, 7.48392f, 4.2839f };
-            
+
             xSingleResult[1] = xSingleSource[2];
             xSingleResult[2] = xSingleSource[3];
-            
+
             Assert.IsTrue(((xSingleResult[1] + xSingleResult[2]) == (xSingleExpectedResult[1] + xSingleExpectedResult[2])), "Assinging values to single array elements doesn't work: xResult[1] =  " + (uint)xSingleResult[1] + " != " + (uint)xSingleExpectedResult[1] + " and xResult[2] =  " + (uint)xSingleResult[2] + " != " + (uint)xSingleExpectedResult[2]);
-            
+
             // Double[] Test
             double[] xDoubleResult = { 0.384, 1.5823, 2.5894, 2.9328539, 3.9201, 4.295 };
             double[] xDoubleExpectedResult = { 0.384, 1.5823, 2.5894, 95.32815, 3.9201, 4.295 };
             double[] xDoubleSource = { 95.32815 };
-            
+
             xDoubleResult[3] = xDoubleSource[0];
-            
+
             Assert.IsTrue(xDoubleResult[3] == xDoubleExpectedResult[3], "Assinging values to double array elements doesn't work: xResult[1] =  " + (uint)xDoubleResult[3] + " != " + (uint)xDoubleExpectedResult[3]);
 
             //Test array indexes
@@ -79,10 +80,23 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 error = true;
             }
             Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too small positions.");
-            
-            string[] stringArray = new string[10];
-            stringArray[0] += "asd";
-            Assert.AreEqual(stringArray[0], "asd", "Adding directly to array works");
+
+            //string[] stringArray = new string[10];
+            //stringArray[0] += "asd";
+            //Assert.AreEqual(stringArray[0], "asd", "Adding directly to array works");
+
+            // Lets test the SZArrayHelper/interface methods
+            Assert.AreEqual(5, x.Length, "Length of array is correct");
+            var enumerator = x.GetEnumerator();
+            bool moved = enumerator.MoveNext();
+            Assert.IsTrue(moved, "Enumerator can move into first state");
+            int current = (int)enumerator.Current;
+            Assert.AreEqual(x[0], current, "Getting enumerator directly from array works");
+
+            //IEnumerable<int> enumerable = x;
+            //enumerator = enumerable.GetEnumerator();
+            //Assert.AreEqual(x[0], (int)enumerator.Current, "Getting enumerator from array as enumerable works");
+            //Debugger.DoBochsBreak();
         }
     }
 }
