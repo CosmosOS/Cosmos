@@ -113,9 +113,9 @@ namespace Cosmos.System
                 while (!mStopped)
                 {
                     //Network.NetworkStack.Update();
-                    Global.mDebugger.Send("Really before Run");
+                    //Global.mDebugger.Send("Really before Run");
                     Run();
-                    Global.mDebugger.Send("Really after Run");
+                    //Global.mDebugger.Send("Really after Run");
                 }
                 Global.mDebugger.Send("AfterRun");
                 AfterRun();
