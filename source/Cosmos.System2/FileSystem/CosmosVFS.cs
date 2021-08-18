@@ -6,6 +6,7 @@ using System.IO;
 
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
+using Cosmos.System.FileSystem.ISO9660;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 
@@ -42,6 +43,7 @@ namespace Cosmos.System.FileSystem
             mFileSystems = new List<FileSystem>();
             mRegisteredFileSystems = new List<FileSystemFactory>();
 
+            RegisterFileSystem(new ISO9660FileSystemFactory());
             RegisterFileSystem(new FatFileSystemFactory());
 
             InitializePartitions(aShowInfo);
