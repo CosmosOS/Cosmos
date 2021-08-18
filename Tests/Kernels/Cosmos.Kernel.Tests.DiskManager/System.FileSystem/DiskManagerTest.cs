@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Tests.DiskManager
         /// </summary>
         public static void Execute(Debugger mDebugger)
         {
-            string driveName = @"1:\";
+            string driveName = @"0:\";
             var MyDrive = new System.FileSystem.DiskManager(driveName);
 
             mDebugger.Send("START TEST: Get Name");
@@ -56,16 +56,16 @@ namespace Cosmos.Kernel.Tests.DiskManager
             Assert.IsTrue(xDi.TotalSize == xDi.TotalFreeSpace, "DiskManager.Format (quick) failed TotalFreeSpace is not the same of TotalSize");
 
             /* Let's try to create a new file on the Root Directory */
-            File.Create(@"1:\newFile.txt");
+            File.Create(@"0:\newFile.txt");
 
-            Assert.IsTrue(File.Exists(@"1:\newFile.txt") == true, "Failed to create new file after disk format");
+            Assert.IsTrue(File.Exists(@"0:\newFile.txt") == true, "Failed to create new file after disk format");
 
             mDebugger.Send("END TEST");
 
             mDebugger.Send("Testing if you can create directories");
 
-            Directory.CreateDirectory(@"1:\SYS\");
-            Assert.IsTrue(Directory.GetDirectories(@"1:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
+            Directory.CreateDirectory(@"0:\SYS\");
+            Assert.IsTrue(Directory.GetDirectories(@"0:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
 
             mDebugger.Send("END TEST");
 
