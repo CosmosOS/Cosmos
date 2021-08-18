@@ -18,7 +18,7 @@
 
     <DockPanel>
 
-        <Grid DockPanel.Dock="Top">
+        <Grid DockPanel.Dock="Bottom" Height="46">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -27,19 +27,19 @@
 
             <Button Grid.Column="0"
                     Command="{Binding CopyCommand}"
-                    Content="Copy" />
+                    Content="Copy log" Grid.ColumnSpan="2" Width="96" Height="46" />
 
             <CheckBox Grid.Column="2"
                       IsChecked="{Binding CloseWhenCompleted}"
-                      Content="Close window when completed" />
+                      Content="Close when finished" Height="39" Margin="0,0,20,7" />
         </Grid>
 
         <Rectangle DockPanel.Dock="Top"
                    Height="5" />
         <TextBlock DockPanel.Dock="Top"
-                   FontSize="18"
+                   FontSize="26"
                    FontWeight="Medium"
-                   Text="{Binding CurrentSection.Name, StringFormat='Current Task Log Tail - {0}', FallbackValue='Current Task Log Tail'}" />
+                   Text="{Binding CurrentSection.Name, StringFormat='  Build status: {0}', FallbackValue='  Starting build...'}" />
         <ItemsControl DockPanel.Dock="Top"
                       Background="Black"
                       BorderBrush="DarkGray"
@@ -63,8 +63,8 @@
                    Height="5"
                    />
         <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Sections}">
+                      VerticalScrollBarVisibility="Auto" Height="400" VerticalAlignment="Top" Margin="0,5,0,0">
+            <ItemsControl ItemsSource="{Binding Sections}" Height="406">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <HeaderedContentControl>
@@ -80,7 +80,7 @@
                                         <Style TargetType="ToggleButton" BasedOn="{ui:StaticResource DefaultToggleButtonStyle}">
                                             <Setter Property="Foreground" Value="Green" />
 
-                                           
+
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding HasLoggedErrors}" Value="True">
                                                     <Setter Property="Foreground" Value="White" />
