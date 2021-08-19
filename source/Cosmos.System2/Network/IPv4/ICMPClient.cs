@@ -128,7 +128,7 @@ namespace Cosmos.System.Network.IPv4
             }
 
             ICMPEchoReply packet = new ICMPEchoReply(rxBuffer.Dequeue().RawData);
-            source.address = packet.SourceIP;
+            source.Address = packet.SourceIP;
 
             return second;
         }
