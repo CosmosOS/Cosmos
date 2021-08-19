@@ -104,7 +104,7 @@ namespace Cosmos.System.Network.IPv4.TCP.FTP
                 tcpListener.Start();
                 var client = tcpListener.AcceptTcpClient();
 
-                Log("Client : New connection from " + client.StateMachine.LocalAddress.ToString());
+                Log("Client : New connection from " + client.StateMachine.LocalEndPoint.Address.ToString());
 
                 ReceiveNewClient(client);
             }
