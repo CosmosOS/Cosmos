@@ -3,10 +3,7 @@
     <PropertyGroup>
         <ApprovalTestsVersion>3.0.18</ApprovalTestsVersion>
         <AvaloniaVersion>0.7.0</AvaloniaVersion>
-        <MicrosoftNETTestSdkVersion>15.9.0</MicrosoftNETTestSdkVersion>
-        <MicrosoftTestPlatformObjectModelVersion>15.9.0</MicrosoftTestPlatformObjectModelVersion>
-        <MSTestVersion>1.4.0</MSTestVersion>
-        <NuGetVersion>4.8.0</NuGetVersion>
+        <NuGetVersion>5.9.1</NuGetVersion>
         <NUnitVersion>3.11.0</NUnitVersion>
         <NUnit3TestAdapterVersion>3.12.0</NUnit3TestAdapterVersion>
         <RoslynAnalyzersVersion>2.6.2</RoslynAnalyzersVersion>
@@ -17,10 +14,6 @@
         <PackageReference Update="ApprovalUtilities" Version="$(ApprovalTestsVersion)" />
         <PackageReference Update="Avalonia" Version="$(AvaloniaVersion)" />
         <PackageReference Update="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />
-        <PackageReference Update="Microsoft.TestPlatform.ObjectModel" Version="$(MicrosoftTestPlatformObjectModelVersion)" />
-        <PackageReference Update="MSTest.TestAdapter" Version="$(MSTestVersion)" />
-        <PackageReference Update="MSTest.TestFramework" Version="$(MSTestVersion)" />
         <PackageReference Update="NuGet.Common" Version="$(NuGetVersion)" />
         <PackageReference Update="NuGet.Configuration" Version="$(NuGetVersion)" />
         <PackageReference Update="NUnit" Version="$(NUnitVersion)" />
