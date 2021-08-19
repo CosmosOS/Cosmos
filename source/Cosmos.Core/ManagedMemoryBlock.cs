@@ -8,7 +8,7 @@ namespace Cosmos.Core
     /// </summary>
     public unsafe class ManagedMemoryBlock
     {
-        private byte[] memory;
+        public byte[] memory;
 
         /// <summary>
         /// Offset.
@@ -127,6 +127,20 @@ namespace Cosmos.Core
             }
         }
 
+        public unsafe void Copy(int aStart, byte[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            byte* xDest;
+            fixed (byte* aArrayPtr = this.memory)
+            {
+                xDest = (byte*)(aArrayPtr + aStart);
+            }
+            fixed (byte* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
+            }
+        }
+
         public unsafe void Copy(int aStart, int[] aData, int aIndex, int aCount)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
@@ -151,6 +165,19 @@ namespace Cosmos.Core
             byte* aDataPtr = (byte*)block.Base;
 
             MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
+        }
+
+        /// <summary>
+        /// Write 8-bit to the memory block.
+        /// </summary>
+        /// <param name="offset">Data offset.</param>
+        /// <param name="value">Value to write.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
+        public void Write8(uint offset, byte value)
+        {
+            if (offset < 0 || offset > Size)
+                throw new ArgumentOutOfRangeException("offset");
+            (*(byte*)(this.Offset + offset)) = value;
         }
 
         /// <summary>
@@ -213,6 +240,24 @@ namespace Cosmos.Core
                 throw new ArgumentOutOfRangeException(nameof(offset));
             }
             *((uint*)Offset + offset) = value;
+        }
+
+        /// <summary>
+        /// Write string to the memory block.
+        /// </summary>
+        /// <param name="offset">Data offset.</param>
+        /// <param name="value">Value to write.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
+        public void WriteString(uint offset, string value)
+        {
+            if (offset < 0 || offset > Size)
+                throw new ArgumentOutOfRangeException("offset");
+            if (value.Length + offset > Size)
+                throw new ArgumentOutOfRangeException("value");
+            for (int index = 0; index < value.Length; index++)
+            {
+                memory[offset + index] = (byte)value[index];
+            }
         }
     }
 }

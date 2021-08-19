@@ -37,7 +37,8 @@ namespace Cosmos.Build.Builder
 
         public IEnumerable<IDependency> GetDependencies()
         {
-            yield return new ReposDependency(_cosmosDir);
+            yield return new ReposDependency(_cosmosDir); 
+            yield return new ProperRepoNameDependency(_cosmosDir);
             yield return new VisualStudioDependency(_visualStudioInstance);
             yield return new VisualStudioWorkloadsDependency(_visualStudioInstance);
             yield return new InnoSetupDependency(_innoSetupService);

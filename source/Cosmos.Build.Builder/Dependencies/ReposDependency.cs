@@ -19,7 +19,7 @@ namespace Cosmos.Build.Builder.Dependencies
         {
             get
             {
-                string result = "";
+                string result = "install ";
                 if (!Directory.Exists(Path.GetFullPath(Path.Combine(_cosmosDir, "..", "IL2CPU"))))
                 {
                     result += "IL2CPU Repo, ";

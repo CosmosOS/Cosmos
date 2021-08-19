@@ -29,7 +29,7 @@ namespace Cosmos.System.FileSystem.VFS
         /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
         /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
-        public static void RegisterVFS(VFSBase aVFS, bool aAllowReinitialise = false)
+        public static void RegisterVFS(VFSBase aVFS, bool aShowInfo = true, bool aAllowReinitialise = false)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.RegisterVFS ---");
             if (!aAllowReinitialise && mVFS != null)
@@ -37,7 +37,7 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new Exception("Virtual File System Manager already initialized!");
             }
 
-            aVFS.Initialize();
+            aVFS.Initialize(aShowInfo);
             mVFS = aVFS;
         }
 

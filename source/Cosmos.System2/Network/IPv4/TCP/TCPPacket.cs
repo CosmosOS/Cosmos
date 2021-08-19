@@ -15,13 +15,36 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// <summary>
     /// TCP Flags
     /// </summary>
-    public enum Flags
+    public enum Flags : byte
     {
+        /// <summary>
+        /// No more data from sender.
+        /// </summary>
         FIN = (1 << 0),
+
+        /// <summary>
+        /// Synchronize sequence numbers.
+        /// </summary>
         SYN = (1 << 1),
+
+        /// <summary>
+        /// Reset the connection.
+        /// </summary>
         RST = (1 << 2),
+
+        /// <summary>
+        /// Push Function.
+        /// </summary>
         PSH = (1 << 3),
+
+        /// <summary>
+        /// Acknowledgment field significant.
+        /// </summary>
         ACK = (1 << 4),
+
+        /// <summary>
+        /// Urgent Pointer field significant.
+        /// </summary>
         URG = (1 << 5)
     }
 
@@ -52,14 +75,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             var packet = new TCPPacket(packetData);
 
-            Global.mDebugger.Send("[Received] TCP packet from " + packet.SourceIP.ToString() + ":" + packet.SourcePort.ToString());
-
             if (packet.CheckCRC())
             {
-                var receiver = TcpClient.GetClient(packet.DestinationPort);
-                if (receiver != null)
+                var connection = Tcp.GetConnection(packet.DestinationPort, packet.SourcePort, packet.DestinationIP, packet.SourceIP);
+
+                if (connection != null)
                 {
-                    receiver.ReceiveData(packet);
+                    connection.ReceiveData(packet);
                 }
             }
             else
@@ -222,6 +244,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             FIN = (RawData[47] & (byte)Flags.FIN) != 0;
             PSH = (RawData[47] & (byte)Flags.PSH) != 0;
             RST = (RawData[47] & (byte)Flags.RST) != 0;
+            URG = (RawData[47] & (byte)Flags.URG) != 0;
 
             if (TCPHeaderLength > 20) //options
             {
@@ -347,6 +370,10 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Is RST Flag set.
         /// </summary>
         internal bool RST;
+        /// <summary>
+        /// Is URG Flag set.
+        /// </summary>
+        internal bool URG;
 
         /// <summary>
         /// Get destination port.
@@ -410,13 +437,48 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
+        /// Get string representation of TCP flags.
+        /// </summary>
+        /// <returns>string value.</returns>
+        public string getFlags()
+        {
+            string flags = "";
+
+            if (FIN)
+            {
+                flags += "FIN|";
+            }
+            if (SYN)
+            {
+                flags += "SYN|";
+            }
+            if (RST)
+            {
+                flags += "RST|";
+            }
+            if (PSH)
+            {
+                flags += "PSH|";
+            }
+            if (ACK)
+            {
+                flags += "ACK|";
+            }
+            if (URG)
+            {
+                flags += "URG|";
+            }
+            
+            return flags.Remove(flags.Length - 1);
+        }
+
+        /// <summary>
         /// To string.
         /// </summary>
         /// <returns>string value.</returns>
         public override string ToString()
         {
-            return "TCP Packet Src=" + SourceIP + ":" + SourcePort + "," +
-                   "Dest=" + DestinationIP + ":" + DestinationPort + ", DataLen=" + TCP_DataLength;
+            return $"TCP Packet {SourceIP}:{SourcePort} -> {DestinationIP}:{DestinationPort} (flags={getFlags()}, seq={SequenceNumber}, ack={AckNumber})";
         }
     }
 }
