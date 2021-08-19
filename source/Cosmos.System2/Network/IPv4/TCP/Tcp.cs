@@ -195,7 +195,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     return con;
                 }
-                else if (con.LocalPort.Equals(localPort) && con.Status == Status.LISTEN)
+                else if (con.LocalEndPoint.Port.Equals(localPort) && con.Status == Status.LISTEN)
                 {
                     return con;
                 }
@@ -208,24 +208,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         #region TCB
 
         /// <summary>
-        /// Local port.
+        /// Local EndPoint.
         /// </summary>
-        internal ushort LocalPort;
+        internal EndPoint LocalEndPoint;
 
         /// <summary>
-        /// Destination port.
+        /// Remote EndPoint.
         /// </summary>
-        internal ushort RemotePort;
-
-        /// <summary>
-        /// Source address.
-        /// </summary>
-        internal Address LocalAddress;
-
-        /// <summary>
-        /// Destination address.
-        /// </summary>
-        internal Address RemoteAddress;
+        internal EndPoint RemoteEndPoint;
 
         /// <summary>
         /// Connection Transmission Control Block.
@@ -251,11 +241,8 @@ namespace Cosmos.System.Network.IPv4.TCP
 
         public Tcp(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
-            LocalPort = localPort;
-            RemotePort = remotePort;
-            LocalAddress = localIp;
-            RemoteAddress = remoteIp;
-
+            LocalEndPoint = new EndPoint(localIp, localPort);
+            RemoteEndPoint = new EndPoint(remoteIp, remotePort);
             TCB = new TransmissionControlBlock();
         }
 
@@ -357,9 +344,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.SYN)
             {
-                LocalAddress = IPConfig.FindNetwork(packet.SourceIP);
-                RemoteAddress = packet.SourceIP;
-                RemotePort = packet.SourcePort;
+                LocalEndPoint.Address = IPConfig.FindNetwork(packet.SourceIP);
+                RemoteEndPoint.Address = packet.SourceIP;
+                RemoteEndPoint.Port = packet.SourcePort;
 
                 var rnd = new Random();
                 var sequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
@@ -683,7 +670,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal void SendEmptyPacket(Flags flag)
         {
-            SendPacket(new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
+            SendPacket(new TCPPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
         }
 
         /// <summary>
@@ -691,7 +678,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal void SendEmptyPacket(Flags flag, uint sequenceNumber)
         {
-            SendPacket(new TCPPacket(LocalAddress, RemoteAddress, LocalPort, RemotePort, sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
+            SendPacket(new TCPPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port, sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
         }
 
         /// <summary>
@@ -713,7 +700,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// </summary>
         internal bool Equals(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
-            return LocalPort.Equals(localPort) && RemotePort.Equals(remotePort) && LocalAddress.Hash.Equals(localIp.Hash) && RemoteAddress.Hash.Equals(remoteIp.Hash);
+            return LocalEndPoint.Port.Equals(localPort) && RemoteEndPoint.Port.Equals(remotePort) && LocalEndPoint.Address.Hash.Equals(localIp.Hash) && RemoteEndPoint.Address.Hash.Equals(remoteIp.Hash);
         }
 
         #endregion

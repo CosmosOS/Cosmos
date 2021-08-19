@@ -28,7 +28,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             StateMachine.rxBuffer = new Queue<TCPPacket>(8);
 
-            StateMachine.LocalPort = (ushort)localPort;
+            StateMachine.LocalEndPoint.Port = (ushort)localPort;
         }
 
         /// <summary>

@@ -61,8 +61,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         public TcpClient(Address dest, int destPort)
             : this(0)
         {
-            StateMachine.RemoteAddress = dest;
-            StateMachine.RemotePort = (ushort)destPort;
+            StateMachine.RemoteEndPoint.Address = dest;
+            StateMachine.RemoteEndPoint.Port = (ushort)destPort;
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace Cosmos.System.Network.IPv4.TCP
                 throw new Exception("Client must be closed before setting a new connection.");
             }
 
-            StateMachine.RemoteAddress = dest;
-            StateMachine.LocalAddress = IPConfig.FindNetwork(dest);
-            StateMachine.RemotePort = (ushort)destPort;
+            StateMachine.RemoteEndPoint.Address = dest;
+            StateMachine.LocalEndPoint.Address = IPConfig.FindNetwork(dest);
+            StateMachine.RemoteEndPoint.Port = (ushort)destPort;
 
             //Generate Random Sequence Number
             var rnd = new Random();
@@ -135,7 +135,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             for (int i = 0; i < Tcp.Connections.Count; i++)
             {
-                if (Tcp.Connections[i].Equals(StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.LocalAddress, StateMachine.RemoteAddress))
+                if (Tcp.Connections[i].Equals(StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address))
                 {
                     Tcp.Connections.RemoveAt(i);
                     return;
@@ -154,7 +154,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public void Send(byte[] data)
         {
-            if ((StateMachine.RemoteAddress == null) || (StateMachine.RemotePort == 0))
+            if ((StateMachine.RemoteEndPoint.Address == null) || (StateMachine.RemoteEndPoint.Port == 0))
             {
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
@@ -168,7 +168,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 for (int i = 0; i < chunks.Length; i++)
                 {
-                    var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), StateMachine.TCB.SndWnd, 0, chunks[i]);
+                    var packet = new TCPPacket(StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address, StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), StateMachine.TCB.SndWnd, 0, chunks[i]);
                     OutgoingBuffer.AddPacket(packet);
                     NetworkStack.Update();
 
@@ -177,7 +177,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else
             {
-                var packet = new TCPPacket(StateMachine.LocalAddress, StateMachine.RemoteAddress, StateMachine.LocalPort, StateMachine.RemotePort, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, (byte)(Flags.PSH | Flags.ACK), StateMachine.TCB.SndWnd, 0, data);
+                var packet = new TCPPacket(StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address, StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, (byte)(Flags.PSH | Flags.ACK), StateMachine.TCB.SndWnd, 0, data);
                 OutgoingBuffer.AddPacket(packet);
                 NetworkStack.Update();
 
@@ -204,8 +204,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
 
             var packet = StateMachine.rxBuffer.Dequeue();
-            source.address = packet.SourceIP;
-            source.port = packet.SourcePort;
+            source.Address = packet.SourceIP;
+            source.Port = packet.SourcePort;
 
             var tmp = StateMachine.Data;
             StateMachine.Data = null;
@@ -230,12 +230,36 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
 
             var packet = StateMachine.rxBuffer.Dequeue();
-            source.address = packet.SourceIP;
-            source.port = packet.SourcePort;
+            source.Address = packet.SourceIP;
+            source.Port = packet.SourcePort;
 
             var tmp = StateMachine.Data;
             StateMachine.Data = null;
             return tmp;
+        }
+
+        /// <summary>
+        /// Get distant computer EndPoint (IP adress and port).
+        /// </summary>
+        /// <returns>Remote EndPoint.</returns>
+        public EndPoint RemoteEndPoint
+        {
+            get
+            {
+                return StateMachine.RemoteEndPoint;
+            }
+        }
+
+        /// <summary>
+        /// Get local computer EndPoint (IP adress and port).
+        /// </summary>
+        /// <returns>Remote EndPoint.</returns>
+        public EndPoint LocalEndPoint
+        {
+            get
+            {
+                return StateMachine.LocalEndPoint;
+            }
         }
 
         /// <summary>

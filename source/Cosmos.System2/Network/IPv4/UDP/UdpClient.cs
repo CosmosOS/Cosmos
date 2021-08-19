@@ -180,8 +180,8 @@ namespace Cosmos.System.Network.IPv4.UDP
             }
 
             var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
-            source.address = packet.SourceIP;
-            source.port = packet.SourcePort;
+            source.Address = packet.SourceIP;
+            source.Port = packet.SourcePort;
 
             return packet.UDP_Data;
         }
@@ -197,8 +197,8 @@ namespace Cosmos.System.Network.IPv4.UDP
             while (rxBuffer.Count < 1) ;
 
             var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
-            source.address = packet.SourceIP;
-            source.port = packet.SourcePort;
+            source.Address = packet.SourceIP;
+            source.Port = packet.SourcePort;
 
             return packet.UDP_Data;
         }
