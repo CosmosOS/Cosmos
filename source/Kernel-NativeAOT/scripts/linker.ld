@@ -12,7 +12,7 @@ SECTIONS {
      * there is lots of memory mapped I/O and 1MiB is a conventional padding (legacy?!)
      * TODO find out if this only is valid for legacy BIOS boot or also for UEFI!
      */
-    . = 1M;
+    . = 8M;
 
     /* Multiboot2-Header must be 64-bit (8 byte) aligned according to spec. We ensure this also in the *.asm-file
        but safe is safe. Strictly speaking, the 1MiB padding (see above) is 8-byte aligned anyway. */

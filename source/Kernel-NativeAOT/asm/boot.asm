@@ -7,16 +7,22 @@ SECTION .text
 [BITS 64]
 
     start:
-        mov rsp, _initial_stack_top
-        mov rbp, _initial_stack_top
+        mov rsp, 0
+        mov rbp, 0
+        mov esp, _initial_stack_top
+        mov ebp, _initial_stack_top
 
         call check_multiboot
 
-        mov edi, ebx ;push multiboot address to first argument (RDI)
+        mov rdi, 0
+        mov rsi, 0
+        mov edi, ebx ;push multiboot2 address to first argument (RDI)
         mov esi, _initial_stack_top ;push heap base address to second argument (RSI)
 
         call start_dotnet
-        ret
+
+        cli
+        hlt
 
     ; Throw error if eax doesn't contain the Multiboot2 magic value (0x36d76289).
     check_multiboot:
@@ -26,16 +32,16 @@ SECTION .text
 
     ;halt CPU
     error:
-        mov rcx, 0xbadcafe
+        mov rax, 0xbadcafe
         mov rdx, 0xdeadbabe
-        mov rdi, 0xbadcafe
-        mov rsi, 0xdeadbabe
         cli
         .hlt:
         hlt
         jmp .hlt ; make sure our program definitely halts, even if HLT is cancelled
 
 SECTION .bss
+
+    ALIGN 16
     _initial_stack_bottom:
         resb 4096
     _initial_stack_top:

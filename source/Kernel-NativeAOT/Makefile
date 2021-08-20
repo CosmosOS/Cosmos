@@ -1,4 +1,4 @@
-﻿ILC=/home/valentinbreiz/.nuget/packages/runtime.linux-x64.microsoft.dotnet.ilcompiler/6.0.0-preview.7.21355.1/tools/ilc
+﻿ILC=/mnt/c/Users/valentin.charbonnier/.nuget/packages/runtime.win-x64.microsoft.dotnet.ilcompiler/6.0.0-preview.7.21327.1/tools/ilc.exe
 DOTNET = dotnet
 NASM = nasm
 QEMU_OPTS=-s -d cpu_reset -L ".\\tools\\qemu\\" -bios bios64.bin -k en-gb -m 512M -drive file=fat:rw:"obj/isofiles",format=raw,media=disk -serial file:serial.log
@@ -11,7 +11,7 @@ ASM_DIR=asm
 _DEPS = boot.asm dotnet.asm load_end_addr.asm multiboot2.asm
 
 OS_SOURCES = $(wildcard *.cs)
-OS_DLL=bin/Debug/net5.0/Kernel.dll
+OS_DLL=bin/x64/Debug/net5.0/Kernel.dll
 OS_OBJ=obj/Kernel.o
 
 ISO=bin/Kernel.iso
@@ -32,7 +32,7 @@ build: $(ISO)
 
 run: $(ISO)
 	@echo Starting VM; \
-	qemu $(QEMU_OPTS)
+	./tools/qemu/qemu-system-x86_64.exe $(QEMU_OPTS)
 
 $(ISO): $(KERNEL)
 	@echo Building EFI; \

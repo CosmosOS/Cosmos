@@ -38,7 +38,6 @@ public class FrameBuffer
         set { ((uint*)_ptr)[y * Width + x] = value; }
     }
 
-
     public unsafe void Clear()
     {
         var count = _len / 2;

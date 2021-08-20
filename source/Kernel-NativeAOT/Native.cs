@@ -6,27 +6,6 @@ using Internal.Runtime.CompilerHelpers;
 
 namespace Kernel
 {
-    public static class Native
-    {
-        [DllImport("*")]
-        public static extern void Out8(ushort port, byte value);
-
-        [DllImport("*")]
-        public static extern void Out16(ushort port, ushort value);
-
-        [DllImport("*")]
-        public static extern void Out32(ushort port, uint value);
-
-        [DllImport("*")]
-        public static extern byte In8(ushort port);
-
-        [DllImport("*")]
-        public static extern ushort In16(ushort port);
-
-        [DllImport("*")]
-        public static extern uint In32(ushort port);
-    }
-
     public static unsafe class Memory
     {
         private static long _heapBase;
