@@ -46,7 +46,6 @@ namespace Cosmos.HAL
             // system level and not accessible from Core. Need to think about this
             // for the future.
             Console.Clear();
-            Console.WriteLine("Finding PCI Devices");
             mDebugger.Send("PCI Devices");
             PCI.Setup();
 
@@ -62,7 +61,6 @@ namespace Cosmos.HAL
 
             IDE.InitDriver();
             AHCI.InitDriver();
-            //EHCI.InitDriver();
 
             mDebugger.Send("Network Devices Init");
             NetworkInit.Init();

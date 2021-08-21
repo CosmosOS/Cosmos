@@ -88,14 +88,6 @@ namespace Cosmos.System
                 Global.mDebugger.Send("Global Init");
                 Global.Init(GetTextScreen());
 
-                // Provide the user with a clear screen if they requested it
-                if (ClearScreen)
-                {
-                    Global.mDebugger.Send("Cls");
-                    //Global.Console.Clear();
-                }
-
-                Global.mDebugger.Send("Before Run");
                 BeforeRun();
 
                 // now enable interrupts:
@@ -112,14 +104,10 @@ namespace Cosmos.System
                 }
                 while (!mStopped)
                 {
-                    //Network.NetworkStack.Update();
                     Run();
                 }
                 Global.mDebugger.Send("AfterRun");
                 AfterRun();
-                //bool xTest = 1 != 3;
-                //while (xTest) {
-                //}
             }
             catch (Exception E)
             {
