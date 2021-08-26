@@ -21,7 +21,7 @@ namespace Cosmos.TestRunner.Full
             }
         }
 
-        public virtual bool RunWithGDB => true;
+        public virtual bool RunWithGDB => false;
         public virtual bool StartBochsDebugGUI => false;
 
         public virtual bool DebugIL2CPU => false;
