@@ -17,21 +17,21 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Address.
         /// </summary>
-        public Address address;
+        public Address Address;
         /// <summary>
         /// Port.
         /// </summary>
-        public UInt16 port;
+        public ushort Port;
 
         /// <summary>
         /// Create new instance of the <see cref="EndPoint"/> class.
         /// </summary>
         /// <param name="addr">Adress.</param>
         /// <param name="port">Port.</param>
-        public EndPoint(Address addr, UInt16 port)
+        public EndPoint(Address addr, ushort port)
         {
-            this.address = addr;
-            this.port = port;
+            Address = addr;
+            Port = port;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Cosmos.System.Network.IPv4
         /// <returns>string value.</returns>
         public override string ToString()
         {
-            return this.address.ToString() + ":" + this.port.ToString();
+            return Address.ToString() + ":" + Port.ToString();
         }
 
         /// <summary>
@@ -53,9 +53,9 @@ namespace Cosmos.System.Network.IPv4
         {
             if (obj is EndPoint)
             {
-                EndPoint other = (EndPoint)obj;
-                if ((other.address.CompareTo(this.address) != 0) ||
-                    (other.port != this.port))
+                var other = (EndPoint)obj;
+
+                if ((other.Address.CompareTo(Address) != 0) || (other.Port != Port))
                 {
                     return -1;
                 }
@@ -63,7 +63,9 @@ namespace Cosmos.System.Network.IPv4
                 return 0;
             }
             else
+            {
                 throw new ArgumentException("obj is not a IPv4EndPoint", "obj");
+            }
         }
     }
 }
