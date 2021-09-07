@@ -79,7 +79,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 error = true;
             }
             Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too small positions.");
-
+            
+            string[] stringArray = new string[10];
+            stringArray[0] += "asd";
+            Assert.AreEqual(stringArray[0], "asd", "Adding directly to array works");
         }
     }
 }

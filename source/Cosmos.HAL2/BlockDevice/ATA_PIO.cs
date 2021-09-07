@@ -15,7 +15,7 @@ namespace Cosmos.HAL.BlockDevice
 	// to do this as capabilities can also be detected, but all ATA devices must support PIO
 	// and thus it can also be used to read the partition table and perform other tasks before
 	// initializing another ATA class in favour of AtaPio
-	public class AtaPio : Ata
+	public class ATA_PIO : Ata
 	{
 		#region Properties
 		protected Core.IOGroup.ATA IO;
@@ -73,7 +73,7 @@ namespace Cosmos.HAL.BlockDevice
 		};
 
 		[Flags]
-		enum DvcSelVal : byte
+		public enum DvcSelVal : byte
 		{
 			// Bits 0-3: Head Number for CHS.
 			// Bit 4: Slave Bit. (0: Selecting Master Drive, 1: Selecting Slave Drive).
@@ -130,18 +130,33 @@ namespace Cosmos.HAL.BlockDevice
 
 	    internal static Debugger mDebugger = new Debugger("HAL", "AtaPio");
 
+        /// <summary>
+        /// Internal Debugger method
+        /// </summary>
+        /// <param name="message"></param>
 	    private static void Debug(string message)
 	    {
 	        mDebugger.Send("AtaPio debug: " + message);
 	    }
 
+        /// <summary>
+        /// Internal Debugger method
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="number"></param>
 	    private static void DebugHex(string message, uint number)
 	    {
 	        Debug(message);
 	        mDebugger.SendNumber(number);
 	    }
 
-        public AtaPio(Core.IOGroup.ATA aIO, Ata.ControllerIdEnum aControllerId, Ata.BusPositionEnum aBusPosition)
+        /// <summary>
+        /// ATA_PIO mode constructor
+        /// </summary>
+        /// <param name="aIO"></param>
+        /// <param name="aControllerId"></param>
+        /// <param name="aBusPosition"></param>
+        public ATA_PIO(Core.IOGroup.ATA aIO, Ata.ControllerIdEnum aControllerId, Ata.BusPositionEnum aBusPosition)
 		{
 			IO = aIO;
 			mControllerID = aControllerId;
@@ -160,6 +175,10 @@ namespace Cosmos.HAL.BlockDevice
 		//#define      ATA_READ      0x00
 		//#define      ATA_WRITE     0x01
 
+        /// <summary>
+        /// Does this drive even exist? Are there any drives out there in the wild ATA desert?
+        /// </summary>
+        /// <returns></returns>
 		public SpecLevel DiscoverDrive()
 		{
 			SelectDrive(0);
@@ -217,17 +236,32 @@ namespace Cosmos.HAL.BlockDevice
 			xVoid = IO.Status.Byte;
 		}
 
+        /// <summary>
+        /// Selects the drive 
+        /// </summary>
+        /// <param name="aLbaHigh4"></param>
 		public void SelectDrive(byte aLbaHigh4)
 		{
 			IO.DeviceSelect.Byte = (byte)((byte)(DvcSelVal.Default | DvcSelVal.LBA | (mBusPosition == BusPositionEnum.Slave ? DvcSelVal.Slave : 0)) | aLbaHigh4);
 			Wait();
 		}
 
+        /// <summary>
+        /// Returns the status of the sent command, and always throws an exception
+        /// </summary>
+        /// <param name="aCmd"></param>
+        /// <returns></returns>
 		public Status SendCmd(Cmd aCmd)
 		{
 			return SendCmd(aCmd, true);
 		}
 
+        /// <summary>
+        /// Returns the status of a sent command, and throws an exception depending on the status
+        /// </summary>
+        /// <param name="aCmd"></param>
+        /// <param name="aThrowOnError"></param>
+        /// <returns></returns>
 		public Status SendCmd(Cmd aCmd, bool aThrowOnError)
 		{
 			IO.Command.Byte = (byte)aCmd;
@@ -250,22 +284,34 @@ namespace Cosmos.HAL.BlockDevice
 			return xStatus;
 		}
 
-		protected string GetString(UInt16[] aBuffer, int aIndexStart, int aStringLength)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="aBuffer"></param>
+        /// <param name="aIndexStart"></param>
+        /// <param name="aStringLength"></param>
+        /// <returns></returns>
+		protected string GetString(ushort[] aBuffer, int aIndexStart, int aStringLength)
 		{
-			// Would be nice to convert to byte[] and use
-			// new string(ASCIIEncoding.ASCII.GetChars(xBytes));
-			// But it requires some code Cosmos doesnt support yet
-			var xChars = new char[aStringLength];
-			for (int i = 0; i < aStringLength / 2; i++)
-			{
-				UInt16 xChar = aBuffer[aIndexStart + i];
-				xChars[i * 2] = (char)(xChar >> 8);
-				xChars[i * 2 + 1] = (char)xChar;
-			}
-			return new string(xChars);
-		}
+            //Convert ushort[] to byte[]
+            byte[] array = new byte[aStringLength];
+            int counter = 0;
+            for (int i = aIndexStart; i < aIndexStart + (aStringLength / 2); i++)
+            {
+                var item = aBuffer[i];
+                var bytes = BitConverter.GetBytes(item);
+                array[counter++] = bytes[1];
+                array[counter++] = bytes[0];
+            }
+            //Convert byte[] to string
+            return Encoding.ASCII.GetString(array);
+        }
 
 		public bool LBA48Bit;
+
+        /// <summary>
+        /// Initializes the ATA drive. This includes ATAPI devices too AFAIK
+        /// </summary>
 		protected void InitDrive()
 		{
 			if (mDriveType == SpecLevel.ATA)
@@ -313,6 +359,11 @@ namespace Cosmos.HAL.BlockDevice
 			}
 		}
 
+        /// <summary>
+        /// SelectSector selects the specified starting sector and the following sectors.
+        /// </summary>
+        /// <param name="aSectorNo"></param>
+        /// <param name="aSectorCount"></param>
 		protected void SelectSector(UInt64 aSectorNo, UInt64 aSectorCount)
 		{
 			CheckBlockNo(aSectorNo, aSectorCount);
@@ -342,6 +393,12 @@ namespace Cosmos.HAL.BlockDevice
 			//TODO LBA3  ...
 		}
 
+        /// <summary>
+        /// Reads the data from a specific starting block using aBlockCount (how many blocks to be read), and fills the specified byte[] with the block.
+        /// </summary>
+        /// <param name="aBlockNo"></param>
+        /// <param name="aBlockCount"></param>
+        /// <param name="aData"></param>
 		public override void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
 		{
 			CheckDataSize(aData, aBlockCount);
@@ -350,6 +407,13 @@ namespace Cosmos.HAL.BlockDevice
 			IO.Data.Read8(aData);
 		}
 
+        /// <summary>
+        /// Writes the specific block of data using the starting block,
+        /// and the count of how many blocks to be written.
+        /// </summary>
+        /// <param name="aBlockNo"></param>
+        /// <param name="aBlockCount"></param>
+        /// <param name="aData"></param>
 		public override void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
 		{
             CheckDataSize(aData, aBlockCount);
@@ -370,6 +434,10 @@ namespace Cosmos.HAL.BlockDevice
 			SendCmd(Cmd.CacheFlush);
 		}
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
 	    public override string ToString()
 	    {
 	        return "AtaPio";

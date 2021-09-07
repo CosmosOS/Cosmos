@@ -19,7 +19,7 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Create new instance of <see cref="DiskManager"/> class.
         /// </summary>
-        /// <param name="aDriveName">A drive name assinged to the disk.</param>
+        /// <param name="aDriveName">A drive name assigned to the disk.</param>
         /// <exception cref="ArgumentNullException">Thrown if aDriveName is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if aDriveName length is smaller then 2, or greater than Int32.MaxValue.</exception>
         /// <exception cref="ArgumentException">Thrown if aDriveName is invalid drive identifier / not a root dir.</exception>
@@ -84,18 +84,12 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public void Format(string aDriveFormat, bool aQuick = true)
         {
-            /* For now we do the more easy thing: quick format of a drive with the same filesystem */
-            if (VFSManager.GetFileSystemType(Name) != aDriveFormat)
-            {
-                throw new NotImplementedException($"Formatting in {aDriveFormat} drive {Name} with Filesystem {VFSManager.GetFileSystemType(Name)} not yet supported");
-            }
-
             if (aQuick == false)
             {
                 throw new NotImplementedException("Slow format not implemented yet");
             }
 
-            VFSManager.Format(Name, aDriveFormat, aQuick);
+            VFSManager.Format(Name[0].ToString(), aDriveFormat, aQuick);
         }
 
         /// <summary>

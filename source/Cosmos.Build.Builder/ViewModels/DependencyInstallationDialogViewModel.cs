@@ -70,6 +70,10 @@ namespace Cosmos.Build.Builder.ViewModels
 
         public void Dispose()
         {
+            if (_installTask == null)
+            {
+                return;
+            }
             _installTask.Dispose();
             _installTaskCancellationTokenSource.Dispose();
         }

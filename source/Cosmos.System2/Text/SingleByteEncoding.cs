@@ -11,7 +11,7 @@ namespace Cosmos.System.ExtendedASCII
     internal class SingleByteEncoding : Encoding
     {
         /// <summary>
-        /// Debugger inctanse of the "System" ring with the "SingleByteEncoding" tag.
+        /// Debugger instance of the "System" ring with the "SingleByteEncoding" tag.
         /// </summary>
         private static Debugger mDebugger = new Debugger("System", "SingleByteEncoding");
 

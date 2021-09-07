@@ -145,7 +145,7 @@ namespace Cosmos.System.Graphics
         }
         
         /// <summary>
-        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
         /// </summary>
         /// <param name="imageData">byte array.</param>
         /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
@@ -168,7 +168,7 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
         /// </summary>
         /// <param name="imageData">byte array.</param>
         /// <param name="colorOrder">Order of colors in each pixel.</param>

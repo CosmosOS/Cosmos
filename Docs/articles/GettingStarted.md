@@ -27,8 +27,8 @@ so overwhelming like the dev kit. This article focuses on the user kit.
 
 ##  Writing your first Operating System
 
-Create a new project as you would any C# project, but select Cosmos as the
-project type.
+Create a new project as you would any C# project, but select Cosmos Kernel  
+(Previously CosmosBoot; same functionality) as the project type.
 
 ![](images/SNAG-0000.png)
 
@@ -126,7 +126,7 @@ and it will appear in the Visual Studio output window.
 
 ##  What's the catch?
 
-There really is no catch. Everything We've shown here is functioning as seen.
+There really is no catch. Everything we've shown here is functioning as seen.
 No mockups were used. However we still have a lot of work to go. Items of
 interest that are on our current task list include interfaces (necessary for
 foreach loops), file systems (partial support exists), threads, networking, and
@@ -137,7 +137,7 @@ rolled into the mainline Cosmos development as of yet.
 
 Cosmos does not run on Linux. A boot loader called Syslinux is used to boot
 Cosmos. After booting, Syslinux is not used. Syslinux is a bootloader and is
-not a Linux distro. Syslinux simplifies the booting process by doing tasks such as enabline the A20 gate, initializing hardware, and switching to real mode (all of which are required by modern operating systems).
+not a Linux distro. Syslinux simplifies the booting process by doing tasks such as enabling the A20 gate, initializing hardware, and switching to real mode (all of which are required by modern operating systems).
 
 ##  Obtaining Cosmos
 

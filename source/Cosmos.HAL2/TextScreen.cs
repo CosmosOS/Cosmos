@@ -23,7 +23,7 @@ namespace Cosmos.HAL
         protected readonly MemoryBlock08 mRAM;
 
         /// <summary>
-        /// Creat new inctanse of the <see cref="TextScreen"/> class.
+        /// Creat new instance of the <see cref="TextScreen"/> class.
         /// </summary>
         public TextScreen()
         {

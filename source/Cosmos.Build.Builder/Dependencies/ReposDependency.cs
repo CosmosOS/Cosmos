@@ -13,6 +13,28 @@ namespace Cosmos.Build.Builder.Dependencies
     internal class ReposDependency : IDependency
     {
         public string Name => "Repos: IL2CPU, XSharp and Common";
+        public bool ShouldInstallByDefault => true;
+
+        public string OtherDependencysThatAreMissing
+        {
+            get
+            {
+                string result = "install ";
+                if (!Directory.Exists(Path.GetFullPath(Path.Combine(_cosmosDir, "..", "IL2CPU"))))
+                {
+                    result += "IL2CPU Repo, ";
+                }
+                if (!Directory.Exists(Path.GetFullPath(Path.Combine(_cosmosDir, "..", "XSharp"))))
+                {
+                    result += "XSharp Repo, ";
+                }
+                if (!Directory.Exists(Path.GetFullPath(Path.Combine(_cosmosDir, "..", "Common"))))
+                {
+                    result += "Common Repo";
+                }
+                return result;
+            }
+        }
 
         private readonly string _cosmosDir;
         private readonly IEnumerable<Repo> _repos;

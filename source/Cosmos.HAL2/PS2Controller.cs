@@ -239,7 +239,10 @@ namespace Cosmos.HAL
                     mDebugger.SendInternal("(PS/2 Controller) Device detection failed:");
                     mDebugger.SendInternal("First Byte: " + xFirstByte);
                     mDebugger.SendInternal("Second Byte: " + xSecondByte);
-                    throw new Exception("(PS/2 Controller) PS/2 device not supported");
+                    Console.WriteLine("(PS/2 Controller) Device detection failed.");
+                    Console.WriteLine("This is usually Fine for USB to PS / 2 Emulation");
+                    Console.WriteLine("Press any key to Resume (Good Luck)");
+                    Console.ReadLine();
                 }
             }
             else

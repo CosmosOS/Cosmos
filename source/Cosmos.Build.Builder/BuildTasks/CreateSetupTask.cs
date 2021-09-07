@@ -41,7 +41,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             if (!File.Exists(innoSetupCompilerPath))
             {
-                throw new InvalidOperationException("Inno Setup installation detected, but the compiler doesn't exist!");
+                throw new InvalidOperationException($"An Inno Setup installation was detected, but no compiler exists at {innoSetupCompilerPath}");
             }
 
             return innoSetupCompilerPath;

@@ -1,4 +1,5 @@
-﻿using sysIO = System.IO;
+using sysIO = System.IO;
+
 namespace Cosmos.System
 {
     /// <summary>

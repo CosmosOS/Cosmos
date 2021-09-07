@@ -6,6 +6,7 @@ using System.IO;
 
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
+using Cosmos.System.FileSystem.ISO9660;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 
@@ -36,18 +37,19 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
         /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
-        public override void Initialize()
+        public override void Initialize(bool aShowInfo)
         {
             mPartitions = new List<Partition>();
             mFileSystems = new List<FileSystem>();
             mRegisteredFileSystems = new List<FileSystemFactory>();
 
+            RegisterFileSystem(new ISO9660FileSystemFactory());
             RegisterFileSystem(new FatFileSystemFactory());
 
-            InitializePartitions();
+            InitializePartitions(aShowInfo);
             if (mPartitions.Count > 0)
             {
-                InitializeFileSystems();
+                InitializeFileSystems(aShowInfo);
             }
         }
 
@@ -549,7 +551,7 @@ namespace Cosmos.System.FileSystem
         /// Initializes the partitions for all block devices.
         /// </summary>
         /// <exception cref="IOException">Thrown on I/O exception.</exception>
-        protected virtual void InitializePartitions()
+        protected virtual void InitializePartitions(bool aShowInfo)
         {
             for (int i = 0; i < BlockDevice.Devices.Count; i++)
             {
@@ -559,27 +561,30 @@ namespace Cosmos.System.FileSystem
                 }
             }
 
-            if (mPartitions.Count > 0)
+            if (aShowInfo)
             {
-                for (int i = 0; i < mPartitions.Count; i++)
+                if (mPartitions.Count > 0)
                 {
-                    Global.mFileSystemDebugger.SendInternal("Partition #: ");
-                    Global.mFileSystemDebugger.SendInternal(i + 1);
-                    global::System.Console.WriteLine("Partition #: " + (i + 1));
-                    Global.mFileSystemDebugger.SendInternal("Block Size:");
-                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockSize);
-                    global::System.Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes");
-                    Global.mFileSystemDebugger.SendInternal("Block Count:");
-                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount);
-                    global::System.Console.WriteLine("Block Count: " + mPartitions[i].BlockCount);
-                    Global.mFileSystemDebugger.SendInternal("Size:");
-                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
-                    global::System.Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
+                    for (int i = 0; i < mPartitions.Count; i++)
+                    {
+                        Global.mFileSystemDebugger.SendInternal("Partition #: ");
+                        Global.mFileSystemDebugger.SendInternal(i + 1);
+                        global::System.Console.WriteLine("Partition #: " + (i + 1));
+                        Global.mFileSystemDebugger.SendInternal("Block Size:");
+                        Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockSize);
+                        global::System.Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes");
+                        Global.mFileSystemDebugger.SendInternal("Block Count:");
+                        Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount);
+                        global::System.Console.WriteLine("Block Count: " + mPartitions[i].BlockCount);
+                        Global.mFileSystemDebugger.SendInternal("Size:");
+                        Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
+                        global::System.Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
+                    }
                 }
-            }
-            else
-            {
-                global::System.Console.WriteLine("No partitions found!");
+                else
+                {
+                    global::System.Console.WriteLine("No partitions found!");
+                }
             }
         }
 
@@ -596,7 +601,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
         /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
-        protected virtual void InitializeFileSystems()
+        protected virtual void InitializeFileSystems(bool aShowInfo)
         {
             for (int i = 0; i < mPartitions.Count; i++)
             {
@@ -613,16 +618,19 @@ namespace Cosmos.System.FileSystem
                     }
                 }
 
-                if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].RootPath == xRootPath))
+                if (aShowInfo)
                 {
-                    string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
-                    global::System.Console.WriteLine(xMessage);
-                    mFileSystems[i].DisplayFileSystemInfo();
-                }
-                else
-                {
-                    string xMessage = string.Concat("No filesystem found on partition #", i);
-                    global::System.Console.WriteLine(xMessage);
+                    if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].RootPath == xRootPath))
+                    {
+                        string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
+                        global::System.Console.WriteLine(xMessage);
+                        mFileSystems[i].DisplayFileSystemInfo();
+                    }
+                    else
+                    {
+                        string xMessage = string.Concat("No filesystem found on partition #", i);
+                        global::System.Console.WriteLine(xMessage);
+                    }
                 }
             }
         }
@@ -938,9 +946,49 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Format(string aDriveId, string aDriveFormat, bool aQuick)
         {
-            var xFs = GetFileSystemFromPath(aDriveId);
+            if (aDriveId.Length != 1 && !char.IsDigit(aDriveId[0]))
+            {
+                throw new ArgumentException("aDriveId is not a drive number.");
+            }
 
-            xFs.Format(aDriveFormat, aQuick);
+            try
+            {
+                var xFs = GetFileSystemFromPath(aDriveId + ":\\");
+
+                xFs.Format(aDriveFormat, aQuick);
+            }
+            catch
+            {
+                CreateNewFileSystem(aDriveId, aDriveFormat);
+            }
+        }
+
+        /// <summary>
+        /// Create new FileSystem
+        /// </summary>
+        /// <param name="aDriveId">A drive id.</param>
+        /// <param name="aDriveFormat">A drive format.</param>
+        private void CreateNewFileSystem(string aDriveId, string aDriveFormat)
+        {
+            var id = int.Parse(aDriveId);
+
+            if (id < 0 || id >= mPartitions.Count)
+            {
+                throw new Exception("Can't find partition.");
+            }
+
+            var partition = mPartitions[id];
+            var xSize = (long)(partition.BlockCount * partition.BlockSize / 1024 / 1024);
+
+            if (aDriveFormat.StartsWith("FAT"))
+            {
+                var fs = FatFileSystem.CreateFatFileSystem(partition, id + ":\\", xSize, aDriveFormat);
+                mFileSystems.Add(fs);
+            }
+            else
+            {
+                throw new NotImplementedException(aDriveFormat + " formatting not supported.");
+            }
         }
 
     }

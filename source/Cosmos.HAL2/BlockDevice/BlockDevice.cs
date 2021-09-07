@@ -79,7 +79,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
         protected void CheckDataSize(byte[] aData, UInt64 aBlockCount)
         {
-            if ((ulong)aData.Length != aBlockCount * mBlockSize)
+            if ((ulong)aData.Length / mBlockSize != aBlockCount)
             {
                 throw new Exception("Invalid data size.");
             }

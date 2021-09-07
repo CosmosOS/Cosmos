@@ -40,24 +40,22 @@ namespace Cosmos.System_Plugs.System
 
         public static int get_BufferHeight()
         {
-            WriteLine("Not implemented: get_BufferHeight");
-            return -1;
+            throw new NotImplementedException("Not implemented: get_BufferHeight");
         }
 
         public static void set_BufferHeight(int aHeight)
         {
-            WriteLine("Not implemented: set_BufferHeight");
+            throw new NotImplementedException("Not implemented: set_BufferHeight");
         }
 
         public static int get_BufferWidth()
         {
-            WriteLine("Not implemented: get_BufferWidth");
-            return -1;
+            throw new NotImplementedException("Not implemented: get_BufferWidth");
         }
 
         public static void set_BufferWidth(int aWidth)
         {
-            WriteLine("Not implemented: set_BufferWidth");
+            throw new NotImplementedException("Not implemented: set_BufferWidth");
         }
 
         public static bool get_CapsLock()
@@ -85,13 +83,18 @@ namespace Cosmos.System_Plugs.System
                 return;
             }
 
-            if (x < get_WindowWidth())
+            if (x < 0)
+            {
+                throw new ArgumentException("The value x must be at least 0!");
+            }
+
+            if (x < get_WindowHeight())
             {
                 xConsole.X = x;
             }
             else
             {
-                WriteLine("x must be lower than the console width!");
+                throw new ArgumentException("The value x must be lower than the console width!");
             }
         }
 
@@ -137,13 +140,18 @@ namespace Cosmos.System_Plugs.System
                 return;
             }
 
+            if (y < 0)
+            {
+                throw new ArgumentException("The value y must be at least 0!");
+            }
+
             if (y < get_WindowHeight())
             {
                 xConsole.Y = y;
             }
             else
             {
-                WriteLine("y must be lower than the console height!");
+                throw new ArgumentException("The value y must be lower than the console height!");
             }
         }
 
@@ -220,14 +228,12 @@ namespace Cosmos.System_Plugs.System
 
         public static int get_LargestWindowHeight()
         {
-            WriteLine("Not implemented: get_LargestWindowHeight");
-            return -1;
+            throw new NotImplementedException("Not implemented: get_LargestWindowHeight");
         }
 
         public static int get_LargestWindowWidth()
         {
-            WriteLine("Not implemented: get_LargestWindowWidth");
-            return -1;
+            throw new NotImplementedException("Not implemented: get_LargestWindowWidth");
         }
 
         public static bool get_NumberLock()
@@ -242,24 +248,22 @@ namespace Cosmos.System_Plugs.System
 
         public static string get_Title()
         {
-            WriteLine("Not implemented: get_Title");
-            return string.Empty;
+            throw new NotImplementedException("Not implemented: get_Title");
         }
 
         public static void set_Title(string value)
         {
-            WriteLine("Not implemented: set_Title");
+            throw new NotImplementedException("Not implemented: set_Title");
         }
 
         public static bool get_TreatControlCAsInput()
         {
-            WriteLine("Not implemented: get_TreatControlCAsInput");
-            return false;
+            throw new NotImplementedException("Not implemented: get_TreatControlCAsInput");
         }
 
         public static void set_TreatControlCAsInput(bool value)
         {
-            WriteLine("Not implemented: set_TreatControlCAsInput");
+            throw new NotImplementedException("Not implemented: set_TreatControlCAsInput");
         }
 
         public static int get_WindowHeight()
@@ -275,29 +279,27 @@ namespace Cosmos.System_Plugs.System
 
         public static void set_WindowHeight(int value)
         {
-            WriteLine("Not implemented: set_WindowHeight");
+            throw new NotImplementedException("Not implemented: set_WindowHeight");
         }
 
         public static int get_WindowLeft()
         {
-            WriteLine("Not implemented: get_WindowLeft");
-            return -1;
+            throw new NotImplementedException("Not implemented: get_WindowLeft");
         }
 
         public static void set_WindowLeft(int value)
         {
-            WriteLine("Not implemented: set_WindowLeft");
+            throw new NotImplementedException("Not implemented: set_WindowLeft");
         }
 
         public static int get_WindowTop()
         {
-            WriteLine("Not implemented: get_WindowTop");
-            return -1;
+            throw new NotImplementedException("Not implemented: get_WindowTop");
         }
 
         public static void set_WindowTop(int value)
         {
-            WriteLine("Not implemented: set_WindowTop");
+            throw new NotImplementedException("Not implemented: set_WindowTop");
         }
 
         public static int get_WindowWidth()
@@ -313,7 +315,7 @@ namespace Cosmos.System_Plugs.System
 
         public static void set_WindowWidth(int value)
         {
-            WriteLine("Not implemented: set_WindowWidth");
+            throw new NotImplementedException("Not implemented: set_WindowWidth");
         }
 
         /// <summary>
@@ -365,7 +367,7 @@ namespace Cosmos.System_Plugs.System
         public static void MoveBufferArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight,
             int targetLeft, int targetTop, Char sourceChar, ConsoleColor sourceForeColor, ConsoleColor sourceBackColor)
         {
-            WriteLine("Not implemented: MoveBufferArea");
+            throw new NotImplementedException("Not implemented: MoveBufferArea");
         }
 
         //public static Stream OpenStandardError() {
@@ -549,7 +551,7 @@ namespace Cosmos.System_Plugs.System
 
         public static void SetBufferSize(int width, int height)
         {
-            WriteLine("Not implemented: SetBufferSize");
+            throw new NotImplementedException("Not implemented: SetBufferSize");
         }
 
         public static void SetCursorPosition(int left, int top)
@@ -572,12 +574,12 @@ namespace Cosmos.System_Plugs.System
 
         public static void SetWindowPosition(int left, int top)
         {
-            WriteLine("Not implemented: SetWindowPosition");
+            throw new NotImplementedException("Not implemented: SetWindowPosition");
         }
 
         public static void SetWindowSize(int width, int height)
         {
-            WriteLine("Not implemented: SetWindowSize");
+            throw new NotImplementedException("Not implemented: SetWindowSize");
         }
 
         #region Write
@@ -672,7 +674,7 @@ namespace Cosmos.System_Plugs.System
 
 #endregion
 
-#region WriteLine
+        #region WriteLine
 
         public static void WriteLine() => Write(Environment.NewLine);
 
