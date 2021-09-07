@@ -4,6 +4,8 @@ using System.Text;
 using Cosmos.System;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+using Cosmos.Core.Processing;
+using Console = Cosmos.System.Console;
 
 namespace Cosmos.System_Plugs.System
 {
@@ -14,12 +16,12 @@ namespace Cosmos.System_Plugs.System
         private static ConsoleColor mBackground = ConsoleColor.Black;
         private static Encoding ConsoleInputEncoding = Encoding.ASCII;
         private static Encoding ConsoleOutputEncoding = Encoding.ASCII;
-        private static Core.Processing.Mutex mConsoleGateRead = new Core.Processing.Mutex();
-        private static Core.Processing.Mutex mConsoleGateWrite = new Core.Processing.Mutex();
+        private static Mutex mConsoleGateRead = new Mutex();
+        private static Mutex mConsoleGateWrite = new Mutex();
 
-        private static readonly Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
+        private static readonly Console mFallbackConsole = new Console(null);
 
-        private static Cosmos.System.Console GetConsole()
+        private static Console GetConsole()
         {
             return mFallbackConsole;
         }
@@ -608,7 +610,7 @@ namespace Cosmos.System_Plugs.System
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
         public static void Write(object value) => Write((value ?? String.Empty));
 
-        private static Cosmos.System.Console xConsole = null;
+        private static Console xConsole = null;
 
         public static void Write(string aText)
         {
