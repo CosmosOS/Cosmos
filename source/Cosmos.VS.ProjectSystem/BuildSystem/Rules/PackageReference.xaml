@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="PackageReference"
+      PageTemplate="generic"
+      OverrideMode="Extend"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <Rule.Categories>
+        <Category Name="Cosmos" DisplayName="Cosmos" />
+    </Rule.Categories>
+
+    <BoolProperty Name="IsPlugsReference"
+                  DisplayName="IsPlugsReference"
+                  Category="Cosmos" />
+
+</Rule>

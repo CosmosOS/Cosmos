@@ -1,8 +1,8 @@
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Text
 {
-    [Plug(TargetName = "System.Text.InternalDecoderBestFitFallbackBuffer")]
+    [Plug("System.Text.InternalDecoderBestFitFallbackBuffer, System.Private.CoreLib")]
     public static class InternalDecoderBestFitFallbackBufferImpl
     {
         // See note in EncoderFallbackImpl

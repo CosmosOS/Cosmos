@@ -1,4 +1,5 @@
 ﻿using System;
+using sysIO = System.IO;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
@@ -11,26 +12,50 @@ namespace Cosmos.System
     /// </summary>
     public abstract class Kernel
     {
+        /// <summary>
+        /// User ring debugger instance, with the tag "Kernel".
+        /// </summary>
         public readonly Debugger mDebugger = new Debugger("User", "Kernel");
 
+        /// <summary>
+        /// Clear screen.
+        /// </summary>
         public bool ClearScreen = true;
 
         // Set after initial start. Can be started and stopped at same time
+        /// <summary>
+        /// Kernel started.
+        /// </summary>
         protected bool mStarted = false;
         // Set to signal stopped
+        /// <summary>
+        /// Kernel stopped.
+        /// </summary>
         protected bool mStopped = false;
 
+        /// <summary>
+        /// Get text screen device.
+        /// </summary>
+        /// <returns>null</returns>
         protected virtual TextScreenBase GetTextScreen()
         {
             // null means use default
             return null;
         }
 
+        /// <summary>
+        /// Get keyboard key layout.
+        /// </summary>
+        /// <returns>Keyboard key layout.</returns>
         protected ScanMapBase GetKeyboardScanMap()
         {
             return KeyboardManager.GetKeyLayout();
         }
 
+        /// <summary>
+        /// Set keyboard key layout.
+        /// </summary>
+        /// <param name="ScanMap">Keyboard key layout.</param>
         protected void SetKeyboardScanMap(ScanMapBase ScanMap)
         {
             KeyboardManager.SetKeyLayout(ScanMap);
@@ -39,6 +64,7 @@ namespace Cosmos.System
         /// <summary>
         /// Start the system up using the properties for configuration.
         /// </summary>
+        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
         public virtual void Start()
         {
             try
@@ -61,9 +87,6 @@ namespace Cosmos.System
 
                 Global.mDebugger.Send("Global Init");
                 Global.Init(GetTextScreen());
-
-                //Start with a PS2Keyboard
-                KeyboardManager.AddKeyboard(new PS2Keyboard());
 
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen)
@@ -90,9 +113,7 @@ namespace Cosmos.System
                 while (!mStopped)
                 {
                     //Network.NetworkStack.Update();
-                    Global.mDebugger.Send("Really before Run");
                     Run();
-                    Global.mDebugger.Send("Really after Run");
                 }
                 Global.mDebugger.Send("AfterRun");
                 AfterRun();
@@ -131,21 +152,35 @@ namespace Cosmos.System
             mStopped = true;
         }
 
+        /// <summary>
+        /// Kernal object constructor.
+        /// </summary>
         public Kernel()
         {
             Global.mDebugger.Send("In Cosmos.System.Kernel..ctor");
         }
 
         // Shutdown and restart
+        /// <summary>
+        /// Shutdown and restart.
+        /// Not implemented.
+        /// </summary>
         public void Restart()
         {
         }
 
+        /// <summary>
+        /// Print message to the debbuger at system ring with "Global"-tag.
+        /// </summary>
+        /// <param name="message">A message to print.</param>
         public static void PrintDebug(string message)
         {
             Global.mDebugger.Send(message);
         }
 
+        /// <summary>
+        /// Get interrupts status.
+        /// </summary>
         public static bool InterruptsEnabled
         {
             get

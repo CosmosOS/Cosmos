@@ -1,59 +1,69 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
 
 namespace Cosmos.System
 {
+    /// <summary>
+    /// Keyboard manager class. Used to manage keyboard.
+    /// </summary>
     public static class KeyboardManager
     {
+        /// <summary>
+        /// Get and set NumLock.
+        /// </summary>
+        public static bool NumLock { get; set; }
 
-        public static bool NumLock
-        {
-            get;
-            set;
-        }
+        /// <summary>
+        /// Get and set CapsLock.
+        /// </summary>
+        public static bool CapsLock { get; set; }
 
-        public static bool CapsLock
-        {
-            get;
-            set;
-        }
+        /// <summary>
+        /// Get and set ScrollLock.
+        /// </summary>
+        public static bool ScrollLock { get; set; }
 
-        public static bool ScrollLock
-        {
-            get;
-            set;
-        }
+        /// <summary>
+        /// Get and set Ctrl pressed.
+        /// </summary>
+        public static bool ControlPressed { get; set; }
 
-        public static bool ControlPressed
-        {
-            get;
-            set;
-        }
+        /// <summary>
+        /// Get and set Shift pressed.
+        /// </summary>
+        public static bool ShiftPressed { get; set; }
 
-        public static bool ShiftPressed
-        {
-            get;
-            set;
-        }
+        /// <summary>
+        /// Get and set Alt pressed.
+        /// </summary>
+        public static bool AltPressed { get; set; }
 
-        public static bool AltPressed
-        {
-            get;
-            set;
-        }
+        /// <summary>
+        /// Get if queued keys exists.
+        /// </summary>
+        public static bool KeyAvailable => mQueuedKeys.Count > 0;
 
-        public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
-
-        private static ScanMapBase _scanMap = new US_Standard();
+        private static List<KeyboardBase> mKeyboardList = new List<KeyboardBase>();
+        private static ScanMapBase mScanMap = new US_Standard();
         private static Queue<KeyEvent> mQueuedKeys = new Queue<KeyEvent>();
 
+        /// <summary>
+        /// Create new instance of the <see cref="KeyboardManager"/> class.
+        /// </summary>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        static KeyboardManager()
+        {
+            foreach (var keyboard in HAL.Global.GetKeyboardDevices())
+            {
+                AddKeyboard(keyboard);
+            }
+        }
+
+        /// <summary>
+        /// Enqueue keyEvent.
+        /// </summary>
+        /// <param name="keyEvent">KeyEvent to enqueue.</param>
         private static void Enqueue(KeyEvent keyEvent)
         {
             mQueuedKeys.Enqueue(keyEvent);
@@ -62,52 +72,57 @@ namespace Cosmos.System
         /// <summary>
         /// Allow faking scancodes. Used for test kernels
         /// </summary>
+        /// <param name="aScancode">A scan code.</param>
+        /// <param name="aReleased">Key released.</param>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         internal static void HandleFakeScanCode(byte aScancode, bool aReleased)
         {
             HandleScanCode(aScancode, aReleased);
         }
 
+        /// <summary>
+        /// Handle scan code. Used to update LEDs, 
+        /// </summary>
+        /// <param name="aScanCode">A scan code.</param>
+        /// <param name="aReleased">Key released.</param>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         private static void HandleScanCode(byte aScanCode, bool aReleased)
         {
+            Global.mDebugger.Send("KeyboardManager.HandleScanCode");
+
             byte key = aScanCode;
-            if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased)
+            if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased)
             {
                 // caps lock
                 CapsLock = !CapsLock;
                 UpdateLeds();
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased)
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased)
             {
                 // num lock
                 NumLock = !NumLock;
                 UpdateLeds();
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased)
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased)
             {
                 // scroll lock
                 ScrollLock = !ScrollLock;
                 UpdateLeds();
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl))
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl))
             {
                 ControlPressed = !aReleased;
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift))
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift))
             {
                 ShiftPressed = !aReleased;
             }
-            else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt))
+            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt))
             {
                 AltPressed = !aReleased;
             }
             else
             {
-                if (ControlPressed && AltPressed && _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.Delete))
-                {
-                    Global.Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                    Power.Reboot();
-                }
-
                 if (!aReleased)
                 {
                     KeyEvent keyInfo;
@@ -120,26 +135,41 @@ namespace Cosmos.System
             }
         }
 
+        /// <summary>
+        /// Update keyboard LEDs.
+        /// </summary>
         private static void UpdateLeds()
         {
-            foreach(KeyboardBase keyboard in Keyboards)
+            foreach (KeyboardBase keyboard in mKeyboardList)
             {
                 keyboard.UpdateLeds();
             }
         }
 
+        /// <summary>
+        /// Get key pressed.
+        /// </summary>
+        /// <param name="aScancode">A scan code.</param>
+        /// <param name="keyInfo">KeyEvent output.</param>
+        /// <returns>bool value.</returns>
         public static bool GetKey(byte aScancode, out KeyEvent keyInfo)
         {
-            if (_scanMap == null)
+            if (mScanMap == null)
             {
                 Global.mDebugger.Send("No KeyLayout");
             }
 
-            keyInfo = _scanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
+            keyInfo = mScanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
 
             return keyInfo != null;
         }
 
+        /// <summary>
+        /// Try read key.
+        /// </summary>
+        /// <param name="oKey">Output KeyEvent.</param>
+        /// <returns>bool value.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when queue is empty.</exception>
         public static bool TryReadKey(out KeyEvent oKey)
         {
             if (mQueuedKeys.Count > 0)
@@ -153,6 +183,11 @@ namespace Cosmos.System
             return false;
         }
 
+        /// <summary>
+        /// Read key.
+        /// </summary>
+        /// <returns>KeyEvent value.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when queue is empty.</exception>
         public static KeyEvent ReadKey()
         {
             while (mQueuedKeys.Count == 0)
@@ -163,39 +198,38 @@ namespace Cosmos.System
             return mQueuedKeys.Dequeue();
         }
 
+        /// <summary>
+        /// Get key layout.
+        /// </summary>
+        /// <returns>ScanMapBase value.</returns>
         public static ScanMapBase GetKeyLayout()
         {
-            return _scanMap;
+            return mScanMap;
         }
 
-        public static void SetKeyLayout(ScanMapBase ScanMap)
+        /// <summary>
+        /// Set key layout.
+        /// </summary>
+        /// <param name="aScanMap">A scan map</param>
+        public static void SetKeyLayout(ScanMapBase aScanMap)
         {
-            if (ScanMap != null)
+            if (aScanMap != null)
             {
-                _scanMap = ScanMap;
+                mScanMap = aScanMap;
             }
         }
 
-        public static void AddKeyboard(KeyboardBase Keyboard)
+        /// <summary>
+        /// Add keyboard
+        /// </summary>
+        /// <param name="aKeyboard">A keyboard to add.</param>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        private static void AddKeyboard(KeyboardBase aKeyboard)
         {
-            //if (!KeyboardExists(Keyboard.GetType()))
-            //{
-                Keyboard.OnKeyPressed = HandleScanCode;
-                Keyboards.Add(Keyboard);
-            //}
+            Global.mDebugger.Send("KeyboardManager.AddKeyboard");
+
+            aKeyboard.OnKeyPressed = HandleScanCode;
+            mKeyboardList.Add(aKeyboard);
         }
-
-        //public static bool KeyboardExists(Type KeyboardType)
-        //{
-        //    foreach (KeyboardBase Keyboard in Keyboards)
-        //    {
-        //        if (Keyboard.GetType() == KeyboardType)
-        //        {
-        //            return true;
-        //        }
-        //    }
-
-        //    return false;
-        //}
     }
 }

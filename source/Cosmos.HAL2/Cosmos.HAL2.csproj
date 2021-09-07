@@ -1,22 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard1.5</TargetFramework>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-        <Authors>Cosmos</Authors>
-        <Company>Cosmos</Company>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <RootNamespace>Cosmos.HAL</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='|AnyCPU'">
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
-        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
-        <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
-        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <PackageReference Include="IL2CPU.API" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Properties\" />
+        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
+        <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
+        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
     </ItemGroup>
 
 </Project>

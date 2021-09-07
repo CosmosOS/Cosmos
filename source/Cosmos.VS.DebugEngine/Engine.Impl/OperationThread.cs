@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Cosmos.VS.DebugEngine.Engine.Impl
@@ -24,7 +25,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl
             m_opComplete = new ManualResetEvent(true);
             m_quitOperation = new Operation(delegate() { });
             
-            Thread thread = new Thread(new ThreadStart(ThreadFunc));
+            var thread = new Thread(new ThreadStart(ThreadFunc));
             thread.Start();
         }
 
@@ -37,15 +38,20 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl
         public void RunOperation(Operation op)
         {
             if (op == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             SetOperationInternal(op, true);
         }
 
+        [SuppressMessage("AsyncUsage.CSharp.Naming", "AvoidAsyncSuffix:Avoid Async suffix", Scope = "member")]
         public void RunOperationAsync(Operation op)
         {
             if (op == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             SetOperationInternal(op, false);
         }

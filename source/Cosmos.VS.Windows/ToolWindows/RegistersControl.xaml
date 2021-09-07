@@ -1,0 +1,54 @@
+﻿<local:DebuggerUC x:Class="Cosmos.VS.Windows.RegistersControl"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  mc:Ignorable="d"
+                  xmlns:local="clr-namespace:Cosmos.VS.Windows"
+                  xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+                  Background="{DynamicResource {x:Static platformui:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+                  Foreground="{DynamicResource {x:Static platformui:EnvironmentColors.ToolWindowTextBrushKey}}"
+                  FontFamily="Consolas"
+                  d:DataContext="{d:DesignInstance {x:Type local:RegistersViewModel}, IsDesignTimeCreatable=True}">
+    <StackPanel Orientation="Vertical"
+                Margin="8">
+        <StackPanel Orientation="Horizontal">
+            <StackPanel>
+                <TextBlock Text="{Binding EAX, StringFormat='EAX = {0}'}" />
+                <TextBlock Text="{Binding EBX, StringFormat='EBX = {0}'}" />
+                <TextBlock Text="{Binding ECX, StringFormat='ECX = {0}'}" />
+                <TextBlock Text="{Binding EDX, StringFormat='EDX = {0}'}" />
+            </StackPanel>
+            <StackPanel Margin="12,0,0,0">
+                <TextBlock Text="{Binding AX, StringFormat='AX = {0}'}" />
+                <TextBlock Text="{Binding BX, StringFormat='BX = {0}'}" />
+                <TextBlock Text="{Binding CX, StringFormat='CX = {0}'}" />
+                <TextBlock Text="{Binding DX, StringFormat='DX = {0}'}" />
+            </StackPanel>
+            <StackPanel Margin="12,0,0,0">
+                <TextBlock Text="{Binding AH, StringFormat='AH = {0}'}" />
+                <TextBlock Text="{Binding BH, StringFormat='BH = {0}'}" />
+                <TextBlock Text="{Binding CH, StringFormat='CH = {0}'}" />
+                <TextBlock Text="{Binding DH, StringFormat='DH = {0}'}" />
+            </StackPanel>
+            <StackPanel Margin="12,0,0,0">
+                <TextBlock Text="{Binding AL, StringFormat='AL = {0}'}" />
+                <TextBlock Text="{Binding BL, StringFormat='BL = {0}'}" />
+                <TextBlock Text="{Binding CL, StringFormat='CL = {0}'}" />
+                <TextBlock Text="{Binding DL, StringFormat='DL = {0}'}" />
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Text="{Binding ESP, StringFormat='ESP = {0}'}" />
+                <TextBlock Text="{Binding EBP, StringFormat='EBP = {0}'}" />
+                <TextBlock Text="{Binding ESI, StringFormat='ESI = {0}'}" />
+                <TextBlock Text="{Binding EDI, StringFormat='EDI = {0}'}" />
+            </StackPanel>
+            <StackPanel Margin="12,0,0,0">
+                <TextBlock Text="{Binding EIP, StringFormat='EIP = {0}'}" />
+                <TextBlock Text="{Binding Flags, StringFormat='Flags = {0}'}" />
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</local:DebuggerUC>

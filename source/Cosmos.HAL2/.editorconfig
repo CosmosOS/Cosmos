@@ -1,8 +1,0 @@
-[*.cs]
-indent_size=4
-
-[Global.cs]
-indent_size = 2
-
-[BlockDevice/Ata.cs]
-indent_size = 2

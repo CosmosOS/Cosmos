@@ -1,12 +1,12 @@
 //#define COSMOSDEBUG
 using System;
 using System.Globalization;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.CPU_Plugs.System {
-    [Plug(Target = typeof(string), IsMicrosoftdotNETOnly = true)]
+    [Plug(Target = typeof(string))]
     public static class StringImpl {
         internal static Debugger mDebugger = new Debugger("CPU", "String Plugs");
 

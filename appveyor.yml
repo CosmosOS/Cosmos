@@ -1,72 +1,39 @@
 version: 0.20150918.{build}
-image: Visual Studio 2017
-configuration: Debug
-platform: AnyCPU
-shallow_clone: true
+image: Visual Studio 2019
+configuration: Debug-CI
+platform: Any CPU
 clone_folder: c:\Cosmos
+
+
 
 init:
 - cmd: |
-    git clone https://github.com/CosmosOS/XSharp.git c:\XSharp --depth 1
     git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
 
+install:
+  - ps: |
+      $range = "$env:APPVEYOR_REPO_BRANCH..$env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT"
+      if (-not (git diff --name-only --diff-filter=d $range | Where-Object { $_ -NotMatch ".git*|md|yml|txt$" })) {
+        Write-Host "Only metafiles were modified, skipping CI run."
+        Exit-AppVeyorBuild
+      }
+
 build_script:
-- cmd: >-
+- cmd: |
     rem %APPVEYOR_BUILD_FOLDER%
 
-    
-    nuget restore "Builder.sln"
+    msbuild Build.sln /t:Restore;Build /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-    nuget restore "..\XSharp\XSharp.sln"
+    dotnet publish ..\IL2CPU\source\IL2CPU -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
 
-    nuget restore "..\IL2CPU\IL2CPU.sln"
-
-    nuget restore "Build.sln"
-
-    nuget restore "Test.sln"
-
-
-    msbuild "Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
-
-    msbuild "Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
-
-    msbuild "Test.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug
-
-
-    dotnet publish source\Cosmos.Build.MSBuild -f net462 -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
-
-    dotnet publish ..\IL2CPU\source\IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
-
-
-    xcopy /Y "Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
-
-    xcopy /Y "Build\VSIP\Cosmos.Core.*" "c:\CosmosRun\Kernel\"
-
-    xcopy /Y "Build\VSIP\Cosmos.HAL.*" "c:\CosmosRun\Kernel\"
-
-    xcopy /Y "Build\VSIP\Cosmos.System.*" "c:\CosmosRun\Kernel\"
-
-    xcopy /Y "Build\VSIP\Cosmos.Common.*" "c:\CosmosRun\Kernel\"
-
-    xcopy /Y "Build\VSIP\Cosmos.Debug.GDB.exe" "c:\CosmosRun\Build\VSIP\"
-
-    xcopy /Y /S "Build\ISO" "c:\CosmosRun\Build\ISO\"
-
-    xcopy /Y "Build\*.*" "c:\CosmosRun\Build\ISO\"
-
+    xcopy /Y "Build\syslinux\*.*" "c:\CosmosRun\Build\ISO\"
     xcopy /Y /S "Build\VMware\*" "c:\CosmosRun\Build\VMware\"
-
     xcopy /Y /S "Build\Tools" "c:\CosmosRun\Build\Tools\"
-
-    xcopy /Y "source\Cosmos.Core.DebugStub\*.xs" "c:\CosmosRun\XSharp\DebugStub\"
-
+    xcopy /Y "..\IL2CPU\source\Cosmos.Core.DebugStub\*.xs" "c:\CosmosRun\XSharp\DebugStub\"
     xcopy /Y /S "Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
-
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
-
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
-
 
 #test: off
 #  assemblies:
@@ -79,8 +46,11 @@ test_script:
 
 on_finish:
 - ps: |
-    $wc = New-Object 'System.Net.WebClient'
-    $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
+    $tests = "c:\Cosmos\TestResult.xml"
+    if ((Test-Path $tests)) {
+      $wc = New-Object 'System.Net.WebClient'
+      $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
+    }
 
 notifications:
 - provider: Webhook
@@ -91,6 +61,26 @@ notifications:
 
 matrix:
   fast_finish: true
+  
+branches:
+  only:
+    - master
 
 artifacts:
-  - path: '**\TestResult.xml'
+  - path: 'artifacts\Debug\nupkg\*.nupkg'
+  - path: 'artifacts\Debug\VSIX\*.vsix'
+  - path: 'TestResult.xml'
+
+
+#skip_commits:
+#  files:
+#    - Docs/
+#    - .github/
+#    - Artwork/
+#    - '**/*.md'
+#    - LICENSE.txt
+#    - README.txt
+#    - .gitignore
+#    - source/Archive/
+#    - Users/
+    

@@ -9,11 +9,12 @@
 
 # Build results
 
-[Oo]bj/
+[Aa]rtifacts
 [Bb]in
-[Dd]ebug/
-[Rr]elease/
 [Pp]ackages/
+[Oo]bj/
+
+Docs/log.txt
 
 *.[Oo]bj
 *.suo
@@ -55,3 +56,4 @@ source/_ReSharper.Caches/
 Docs/~$RingsGen2.xlsx
 source/Kernel-X86/90-Application/GuessKernelGen3.csproj
 Docs/~$RingsGen3.xlsx
+*.map

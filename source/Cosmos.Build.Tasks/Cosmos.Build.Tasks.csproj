@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <RuntimeIdentifier>win</RuntimeIdentifier>
+        <PackageId>Cosmos.Build</PackageId>
+        <PackageDescription>Cosmos build system.</PackageDescription>
+        <IsMSBuildExtensionProject>True</IsMSBuildExtensionProject>
+        <AppendTargetFrameworkToToolsPackageFolder>False</AppendTargetFrameworkToToolsPackageFolder>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="build\**" Pack="True" PackagePath="build\" />
+        <Content Include="tools\**" Pack="True" PackagePath="tools\" />
+        <Content Include="runtime.json" Pack="True" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="IL2CPU.Debug.Symbols" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" PrivateAssets="All" />
+    </ItemGroup>
+
+</Project>

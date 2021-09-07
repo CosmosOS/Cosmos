@@ -4,6 +4,7 @@
     {
         Bochs,
         VMware,
-        HyperV
+        HyperV,
+        Qemu
     }
 }

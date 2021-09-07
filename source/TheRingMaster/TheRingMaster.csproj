@@ -1,17 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
-  <PropertyGroup>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
-    <OutputType>Exe</OutputType>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
   
-  <ItemGroup>
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
-    <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="IL2CPU.API" />
+        <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    </ItemGroup>
 
 </Project>

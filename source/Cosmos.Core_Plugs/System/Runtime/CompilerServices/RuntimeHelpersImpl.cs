@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
 {
@@ -37,6 +37,12 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         public static int GetHashCode(object o)
         {
             throw new NotImplementedException();
+        }
+
+        // TODO: Implement this correctly
+        public static bool IsReferenceOrContainsReferences<T>()
+        {
+            return false;
         }
     }
 }

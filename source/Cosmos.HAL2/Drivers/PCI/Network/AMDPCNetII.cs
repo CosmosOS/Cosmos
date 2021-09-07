@@ -4,13 +4,12 @@ using Cosmos.Common;
 using Cosmos.Core;
 using Cosmos.Core.IOGroup.Network;
 using Cosmos.HAL.Network;
-using Cosmos.IL2CPU.API.Attribs;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
 {
     public class AMDPCNetII : NetworkDevice
     {
-        protected PCIDeviceNormal pciCard;
+        protected PCIDevice pciCard;
         protected AMDPCNetIIIOGroup io;
         protected MACAddress mac;
         protected bool mInitDone;
@@ -24,7 +23,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         protected Queue<byte[]> mTransmitBuffer;
         private int mNextTXDesc;
 
-        public AMDPCNetII(PCIDeviceNormal device)
+        public AMDPCNetII(PCIDevice device)
             : base()
         {
             if (device == null)
@@ -36,7 +35,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             this.pciCard.Claimed = true;
             this.pciCard.EnableDevice();
 
-            this.io = new AMDPCNetIIIOGroup((ushort) this.pciCard.BaseAddresses[0].BaseAddress());
+            this.io = new AMDPCNetIIIOGroup((ushort)this.pciCard.BaseAddressBar[0].BaseAddress);
             this.io.RegisterData.DWord = 0;
 
             // Get the EEPROM MAC Address and set it as the devices MAC
@@ -58,8 +57,8 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
             mInitBlock.Write32(0x00, (0x4 << 28) | (0x4 << 20));
             mInitBlock.Write32(0x04,
-                (UInt32) (eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24)));
-            mInitBlock.Write32(0x08, (UInt32) (eeprom_mac[4] | (eeprom_mac[5] << 8)));
+                (UInt32)(eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24)));
+            mInitBlock.Write32(0x08, (UInt32)(eeprom_mac[4] | (eeprom_mac[5] << 8)));
             mInitBlock.Write32(0x0C, 0x0);
             mInitBlock.Write32(0x10, 0x0);
             mInitBlock.Write32(0x14, mRxDescriptor.Offset);
@@ -76,9 +75,9 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
                 ManagedMemoryBlock buffer = new ManagedMemoryBlock(2048);
                 mRxDescriptor.Write32(xOffset + 8, buffer.Offset);
-                UInt16 buffer_len = (UInt16) (~buffer.Size);
+                UInt16 buffer_len = (UInt16)(~buffer.Size);
                 buffer_len++;
-                UInt32 flags = (UInt32) (buffer_len & 0x0FFF) | 0xF000 | 0x80000000;
+                UInt32 flags = (UInt32)(buffer_len & 0x0FFF) | 0xF000 | 0x80000000;
                 mRxDescriptor.Write32(xOffset + 4, flags);
                 mRxBuffers.Add(buffer);
             }
@@ -104,7 +103,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             UInt32 cur_status = StatusRegister;
 
-            //Console.WriteLine("AMD PCNet IRQ raised!");
             if ((cur_status & 0x100) != 0)
             {
                 mInitDone = true;
@@ -135,10 +133,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static void FindAll()
         {
             Console.WriteLine("Scanning for AMD PCNetII cards...");
-            PCIDevice device = Cosmos.HAL.PCI.GetDevice(0x1022, 0x2000);
+            PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
             if (device != null)
             {
-                AMDPCNetII nic = new AMDPCNetII((PCIDeviceNormal) device);
+                AMDPCNetII nic = new AMDPCNetII((PCIDevice)device);
 
                 Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
                                   device.function);
@@ -213,6 +211,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             get { return mInitDone; }
         }
 
+        public override CardType CardType => CardType.Ethernet;
+
+        public override string Name => "PCNETII";
+
         public override bool Enable()
         {
             StatusRegister = 0x43;
@@ -220,7 +222,15 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             return true;
         }
 
-        [DebugStub(Off = true)]
+        /// <summary>
+        /// Add bytes to the transmit buffer queue.
+        /// </summary>
+        /// <param name="buffer">bytes array to queue.</param>
+        /// <param name="offset">Offset of the data in the buffer.</param>
+        /// <param name="length">Data length.</param>
+        /// <returns>TRUE on success.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown if length is bigger than Int32.MaxValue.</exception>
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {
             byte[] data = new byte[length];
@@ -277,7 +287,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
         #region Helper Functions
 
-        [DebugStub(Off = true)]
+        /// <summary>
+        /// Send bytes to memory block.
+        /// </summary>
+        /// <param name="aData">A data to send.</param>
+        /// <returns>TRUE on success.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+        /// <exception cref="OverflowException">Thrown if aData length is bigger than Int32.MaxValue.</exception>
         protected bool SendBytes(ref byte[] aData)
         {
             int txd = mNextTXDesc++;
@@ -286,7 +302,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 mNextTXDesc = 0;
             }
 
-            uint xOffset = (uint) (txd * 16);
+            uint xOffset = (uint)(txd * 16);
             UInt32 status = mTxDescriptor.Read32(xOffset + 4);
             if ((status & 0x80000000) == 0)
             {
@@ -295,11 +311,11 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                     mTxBuffers[txd][b] = aData[b];
                 }
                 //UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
-                UInt16 buffer_len = (UInt16) aData.Length;
-                buffer_len = (UInt16) (~buffer_len);
+                UInt16 buffer_len = (UInt16)aData.Length;
+                buffer_len = (UInt16)(~buffer_len);
                 buffer_len++;
 
-                UInt32 flags = (UInt32) ((buffer_len) & 0x0FFF) | 0x0300F000 | 0x80000000;
+                UInt32 flags = (UInt32)((buffer_len) & 0x0FFF) | 0x0300F000 | 0x80000000;
 
                 mTxDescriptor.Write32(xOffset + 4, flags);
 
@@ -309,7 +325,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             return false;
         }
 
-        [DebugStub(Off = true)]
         private void ReadRawData()
         {
             uint status;
@@ -318,11 +333,17 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
             for (int rxd = 0; rxd < 16; rxd++)
             {
-                uint xOffset = (uint) (rxd * 16);
+                uint xOffset = (uint)(rxd * 16);
                 status = mRxDescriptor.Read32(xOffset + 4);
                 if ((status & 0x80000000) == 0)
                 {
-                    recv_size = (UInt16) (mRxDescriptor[xOffset + 0] & 0xFFF);
+                    recv_size = (UInt16)(mRxDescriptor.Read32(xOffset + 0) & 0xFFF);
+
+                    if (recv_size > 64) // remove checksum
+                    {
+                        recv_size -= 4;
+                    }
+
                     recv_data = new byte[recv_size];
                     for (uint b = 0; b < recv_size; b++)
                     {

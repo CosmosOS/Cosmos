@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.Hosts
@@ -21,7 +22,7 @@ namespace Cosmos.Debug.Hosts
                                      + "plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1\n"
                                      + "config_interface: win32config\n" + "display_library: win32" + debugGui + "\n"
                                      + "debug_symbols: file=\"%DEBUGSYMBOLSPATH%\"\n"
-                                     + "memory: host=128, guest=128\n" + "romimage: file=\"" + BochsDirectory
+                                     + "memory: host=256, guest=256\n" + "romimage: file=\"" + BochsDirectory
                                      + "/BIOS-bochs-latest\"\n" + "vgaromimage: file=\"" + BochsDirectory
                                      + "/VGABIOS-lgpl-latest\"\n" + "boot: cdrom\n"
                                      + "floppy_bootsig_check: disabled=0\n" + "# no floppya\n" + "# no floppyb\n"
@@ -31,16 +32,16 @@ namespace Cosmos.Debug.Hosts
                                      + "ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15\n"
                                      + "ata1-master: type=disk, path=\"%HARDDISKPATH%\", mode=vmware4, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n"
                                      + "ata2: enabled=0\n" + "ata3: enabled=0\n" + "pci: enabled=1, chipset=i440fx\n"
-                                     + "vga: extension=vbe, update_freq=5, realtime=1\n"
+                                     + "vga: extension=vbe, update_freq=20, realtime=1\n"
                                      //+ "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
-                                     + "cpu: count=1, ips=4000000, model=p4_prescott_celeron_336, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
+                                     + "cpu: count=1, ips=40000000, model=p4_prescott_celeron_336, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
                                      + "print_timestamps: enabled=0\n" + "port_e9_hack: enabled=0\n"
                                      + "private_colormap: enabled=0\n" + "clock: sync=none, time0=local, rtc_sync=0\n"
                                      + "# no cmosimage\n" + "# no loader\n" + "log: -\n" + "logprefix: %t%e%d\n"
                                      + "debug: action=ignore\n" + "info: action=report\n" + "error: action=report\n"
                                      + "panic: action=ask\n"
                                      + "keyboard: type=mf, serial_delay=250, paste_delay=100000, user_shortcut=none\n"
-                                     + "mouse: type=ps2, enabled=0, toggle=ctrl+mbutton\n"
+                                     + "mouse: type=imps2, enabled=0, toggle=ctrl+mbutton\n"
                                      + "sound: waveoutdrv=win, waveout=none, waveindrv=win, wavein=none, midioutdrv=win, midiout=none\n"
                                      + "speaker: enabled=1, mode=sound\n" + "parport1: enabled=1, file=none\n"
                                      + "parport2: enabled=0\n" + "com1: enabled=1, mode=pipe-client, dev=\""

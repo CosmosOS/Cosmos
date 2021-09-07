@@ -1,15 +1,12 @@
-﻿// Guids.cs
-// MUST match guids.h - There is no such file???? I think its referencing old VS2005 style, but vsct is used now instead.
-
-using System;
+﻿using System;
 
 namespace Cosmos.VS.DebugEngine
 {
     static class Guids
     {
-        public const string guidPackageString = "A82B45E9-2A89-43BD-925D-C7F0EDD212AA";
-        public const string guidDebugEngineString = "DC8503AB-7EE6-456C-A209-66C690D9F6F4";
-        public const string guidDebugEngineCmdSetString = "94EBFC49-EC0F-4BD3-B3FF-D3AADB8DAC9F";
+        public const string guidPackageString = "a82b45e9-2a89-43bd-925d-c7f0edd212aa";
+        public const string guidDebugEngineString = "dc8503ab-7ee6-456c-a209-66c690d9f6f4";
+        public const string guidDebugEngineCmdSetString = "94ebfc49-ec0f-4bd3-b3ff-d3aadb8dac9f";
 
         public static readonly Guid DebugEngineGuid = new Guid(guidDebugEngineString);
         public static readonly Guid DebugEngineCmdSetGuid = new Guid(guidDebugEngineCmdSetString);

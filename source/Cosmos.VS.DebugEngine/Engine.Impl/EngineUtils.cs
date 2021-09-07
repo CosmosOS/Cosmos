@@ -14,7 +14,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
       }
 
       if (exe[0] == '\"') {
-        startQuote = string.Empty;
+        startQuote = String.Empty;
         if (exe.Length == 1) {
           //throw new ComponentException(Constants.E_WIN32_INVALID_NAME);
         }
@@ -25,7 +25,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
           if (exe.Length == 2 || endQuote != exe.Length - 1) {
             //throw new ComponentException(Constants.E_WIN32_INVALID_NAME);
           }
-          afterExe = string.Empty;
+          afterExe = String.Empty;
         }
       } else {
         // If it doesn't start with a quote, it shouldn't have any
@@ -36,7 +36,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
 
       if (args == null) {
         args = "";
-      } else if (args != String.Empty) {
+      } else if (args.Length != 0) {
           afterExe = "\" ";
       } else {
           afterExe = " ";
@@ -47,9 +47,8 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
 
     public static string GetAddressDescription(/*DebuggedModule module,*/AD7Engine engine, uint ip)
     {
-      AD7StackFrame d = new AD7StackFrame(engine, engine.mThread, engine.mProcess);
-      FRAMEINFO info;
-      d.SetFrameInfo(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME | enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS, out info);
+      var d = new AD7StackFrame(engine, engine.mThread, engine.mProcess);
+      d.SetFrameInfo(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME | enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS, out var info);
       return info.m_bstrFuncName;
 
       //string location = ip.ToString("x8", CultureInfo.InvariantCulture);
@@ -76,8 +75,8 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
     }
 
     public static int GetProcessId(IDebugProcess2 process) {
-      AD_PROCESS_ID[] pid = new AD_PROCESS_ID[1];
-      EngineUtils.RequireOk(process.GetPhysicalProcessId(pid));
+      var pid = new AD_PROCESS_ID[1];
+      RequireOk(process.GetPhysicalProcessId(pid));
 
       if (pid[0].ProcessIdType != (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM) {
         return 0;
@@ -87,9 +86,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl {
     }
 
     public static int GetProcessId(IDebugProgram2 program) {
-      IDebugProcess2 process;
-      RequireOk(program.GetProcess(out process));
-
+      RequireOk(program.GetProcess(out var process));
       return GetProcessId(process);
     }
 

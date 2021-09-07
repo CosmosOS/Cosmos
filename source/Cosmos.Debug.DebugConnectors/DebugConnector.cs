@@ -9,7 +9,8 @@ using System.Threading;
 
 namespace Cosmos.Debug.DebugConnectors
 {
-    /// <summary>Handles the dialog between the Debug Stub embedded in a debugged Cosmos Kernel and
+    /// <summary>
+    /// Handles the dialog between the Debug Stub embedded in a debugged Cosmos Kernel and
     /// our Debug Engine hosted in Visual Studio. This abstract class is communication protocol
     /// independent. Sub-classes exist that manage the wire level details of the communications.
     /// </summary>
@@ -31,7 +32,7 @@ namespace Cosmos.Debug.DebugConnectors
         public Action<byte[]> CmdStack;
         public Action<byte[]> CmdPong;
         public Action<byte, byte, byte[]> CmdChannel;
-        public Action<byte[]> CmdCoreDump;
+        public Action<CoreDump> CmdCoreDump;
         public Action<UInt32> CmdStackCorruptionOccurred;
         public Action<UInt32> CmdStackOverflowOccurred;
         public Action<UInt32> CmdInterruptOccurred;
@@ -53,32 +54,21 @@ namespace Cosmos.Debug.DebugConnectors
 
         protected void HandleError(Exception E)
         {
-            if (Error != null)
-            {
-                Error(E);
-            }
-            else
+            if (Error == null)
             {
                 throw new Exception("Unhandled exception occurred!", E);
             }
+
+            Error(E);
         }
 
         /// <summary>Descendants must invoke this method whenever they detect an incoming connection.</summary>
-        public void DoConnected()
-        {
-            if (Connected != null)
-            {
-                Connected();
-            }
-        }
+        public void DoConnected() => Connected?.Invoke();
 
         /// <summary>Defines the handler to be invoked when a connection occurs on this condector. This
         /// method is for use by the AD7Process instance.</summary>
         /// <param name="handler">The handler to be notified when a connection occur.</param>
-        public void SetConnectionHandler(Action handler)
-        {
-            Connected = handler;
-        }
+        public void SetConnectionHandler(Action handler) => Connected = handler;
 
         /// <summary>
         /// Method to do debug logging of the debug connector itself.
@@ -96,58 +86,22 @@ namespace Cosmos.Debug.DebugConnectors
             if (IsConnected || aOnlyIfConnected == false)
             {
                 System.Diagnostics.Debug.WriteLine(aMsg);
-                if (OnDebugMsg != null)
-                {
-                    OnDebugMsg(aMsg);
-                }
+                OnDebugMsg?.Invoke(aMsg);
             }
         }
 
         protected bool mSigReceived = false;
-        public bool SigReceived
-        {
-            get { return mSigReceived; }
-        }
+        public bool SigReceived => mSigReceived;
 
         // Is stream alive? Other side may not be responsive yet, use SigReceived instead for this instead
-        public abstract bool IsConnected
-        {
-            get;
-        }
+        public abstract bool IsConnected { get; }
 
         private int mDataSize;
         private List<byte[]> MethodContextDatas = new List<byte[]>();
         private List<byte[]> MemoryDatas = new List<byte[]>();
 
-        public void DeleteBreakpoint(int aID)
-        {
-            SetBreakpoint(aID, 0);
-        }
+        public void DeleteBreakpoint(int aID) => SetBreakpoint(aID, 0);
 
-        protected ushort GetUInt16(byte[] aBytes, int aOffset)
-        {
-            return BitConverter.ToUInt16(aBytes, aOffset);
-        }
-
-        protected uint GetUInt32(byte[] aBytes, int aOffset)
-        {
-            return BitConverter.ToUInt32(aBytes, aOffset);
-        }
-
-        protected ulong GetUInt64(byte[] aBytes, int aOffset)
-        {
-            return BitConverter.ToUInt64(aBytes, aOffset);
-        }
-
-        protected float GetSingle(byte[] aBytes, int aOffset)
-        {
-            return BitConverter.ToSingle(aBytes, aOffset);
-        }
-
-        protected double GetDouble(byte[] aBytes, int aOffset)
-        {
-            return BitConverter.ToDouble(aBytes, aOffset);
-        }
         protected void PacketMsg(byte[] aPacket)
         {
             mCurrentMsgType = aPacket[0];
@@ -308,21 +262,20 @@ namespace Cosmos.Debug.DebugConnectors
             }
         }
 
-        public virtual void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
-            if (mDebugWriter != null)
+            if (disposing)
             {
-                mDebugWriter.Dispose();
-                mDebugWriter = null;
-            }
-            if (mBackgroundThread != null)
-            {
-                // not supported in .net core
-                //mBackgroundThread.Abort();
+                mDebugWriter?.Dispose();
+
                 mCancellationTokenSource.Cancel();
-                mBackgroundThread.Join();
-                mBackgroundThread = null;
+                mBackgroundThread?.Join();
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -353,16 +306,7 @@ namespace Cosmos.Debug.DebugConnectors
             }
         }
 
-        protected void SendPacketToConsole(byte[] aPacket)
-        {
-            CmdChannel(129, 0, aPacket);
-        }
-
-        protected void SendTextToConsole(string aText)
-        {
-            SendPacketToConsole(Encoding.UTF8.GetBytes(aText));
-        }
-
-
+        protected void SendPacketToConsole(byte[] aPacket) => CmdChannel(129, 0, aPacket);
+        protected void SendTextToConsole(string aText) => SendPacketToConsole(Encoding.UTF8.GetBytes(aText));
     }
 }

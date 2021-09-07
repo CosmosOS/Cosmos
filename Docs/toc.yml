@@ -1,0 +1,11 @@
+- name: Home
+  href: index.md
+- name: Install
+  href: install.md
+- name: Cosmos Website
+  href: https://gocosmos.org
+- name: Articles
+  href: articles/
+  homepage: articles/GettingStarted.md
+- name: API Documentation
+  href: obj/api/

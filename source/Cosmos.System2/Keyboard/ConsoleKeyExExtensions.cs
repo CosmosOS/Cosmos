@@ -2,15 +2,23 @@ using System;
 
 namespace Cosmos.System
 {
+    /// <summary>
+    /// ConsoleKeyEx extensions class.
+    /// </summary>
     public static class ConsoleKeyExExtensions
     {
+        /// <summary>
+        /// Convert ConsoleKeyEx to ConsoleKey.
+        /// </summary>
+        /// <param name="keyEx">KeyEx to convert.</param>
+        /// <returns>ConsoleKey value.</returns>
+        /// <exception cref="Exception">Thorwn if KeyEx not implemented.</exception>
         public static ConsoleKey ToConsoleKey(this ConsoleKeyEx keyEx)
         {
             switch (keyEx)
             {
-                //TODO: .Net Core
-                //case ConsoleKeyEx.NoName:
-                //    return ConsoleKey.NoName;
+                case ConsoleKeyEx.NoName:
+                    return ConsoleKey.NoName;
                 case ConsoleKeyEx.Escape:
                     return ConsoleKey.Escape;
                 case ConsoleKeyEx.F1:
@@ -199,13 +207,12 @@ namespace Cosmos.System
                 case ConsoleKeyEx.Semicolon:
                 case ConsoleKeyEx.Colon:
                     return ConsoleKey.Oem1;
-                //TODO: .Net Core
-                //case ConsoleKeyEx.OEM102:
-                //    return ConsoleKey.Oem102;
-                //case ConsoleKeyEx.LWin:
-                //    return ConsoleKey.LeftWindows;
-                //case ConsoleKeyEx.RWin:
-                //    return ConsoleKey.RightWindows;
+                case ConsoleKeyEx.OEM102:
+                    return ConsoleKey.Oem102;
+                case ConsoleKeyEx.LWin:
+                    return ConsoleKey.LeftWindows;
+                case ConsoleKeyEx.RWin:
+                    return ConsoleKey.RightWindows;
                 default:
                     throw new Exception("KeyEx not implemented!");
             }

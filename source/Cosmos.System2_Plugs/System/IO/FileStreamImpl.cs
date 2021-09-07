@@ -2,10 +2,9 @@
 using global::System;
 using global::System.IO;
 using Cosmos.System;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
-using Cosmos.System.FileSystem;
+using IL2CPU.API.Attribs;
 using Cosmos.System.FileSystem.VFS;
+using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -17,19 +16,29 @@ namespace Cosmos.System_Plugs.System.IO
 
         // This plug basically forwards all calls to the $$InnerStream$$ stream, which is supplied by the file system.
 
-        //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
+        private static void Init(string aPathname, FileMode aMode, ref Stream innerStream)
+        {
+            Global.mFileSystemDebugger.SendInternal("FileStream.Init:");
+
+            innerStream = InitializeStream(aPathname, aMode);
+        }
 
         public static void Ctor(FileStream aThis, string aPathname, FileMode aMode,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
-            Global.mFileSystemDebugger.SendInternal("FileStream.Ctor:");
-
-            innerStream = InitializeStream(aPathname, aMode);
+            Init(aPathname, aMode, ref innerStream);
         }
 
         public static void CCtor()
         {
             // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
+        }
+
+        public static void Ctor(FileStream aThis, string aPathname, FileMode aMode, FileAccess access,
+                                FileShare share, int bufferSize, FileOptions options,
+                                [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            Init(aPathname, aMode, ref innerStream);
         }
 
         public static int Read(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
@@ -48,7 +57,7 @@ namespace Cosmos.System_Plugs.System.IO
         public static void Write(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
-            Global.mFileSystemDebugger.SendInternal("FileStream.Write:");
+            Global.mFileSystemDebugger.SendInternal($"FileStream.Write: aOffset {aOffset} aCount {aCount}");
 
             innerStream.Write(aBuffer, aOffset, aCount);
         }
@@ -83,7 +92,11 @@ namespace Cosmos.System_Plugs.System.IO
         public static void Flush(FileStream aThis,
            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
-            innerStream.Flush();
+            /*
+             * It gives NRE and kills the OS, commented it for now... we will "de-plug" FileStream soon
+             */
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.InitializeStream Flush()");
+            //innerStream.Flush();
         }
 
         public static long get_Position(FileStream aThis,
@@ -98,12 +111,117 @@ namespace Cosmos.System_Plugs.System.IO
             innerStream.Position = value;
         }
 
-        //static void Init(FileStream aThis, string path, FileMode mode, FileAccess access, int rights, bool useRights, FileShare share, int bufferSize
-        //  , FileOptions options, Microsoft.Win32.Win32Native.SECURITY_ATTRIBUTES secAttrs, string msgPath, bool bFromProxy) { }
+        private static Stream CreateNewFile(string aPath, bool aPathExists)
+        {
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.CreateNewFile aPath {aPath} existing? {aPathExists}");
+          
+            if (aPathExists)
+            {
+                Global.mFileSystemDebugger.SendInternal("CreateNew Mode with aPath already existing");
+                throw new IOException("File already existing but CreateNew Requested");
+            }
+
+            DirectoryEntry xEntry;
+            xEntry = VFSManager.CreateFile(aPath);
+            if (xEntry == null)
+            {
+                return null;
+            }
+            
+            return VFSManager.GetFileStream(aPath);
+        }
+
+        private static Stream TruncateFile(string aPath, bool aPathExists)
+        {
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.TruncateFile aPath {aPath} existing? {aPathExists}");
+
+            if (!aPathExists)
+            {
+                Global.mFileSystemDebugger.SendInternal("Truncate Mode with aPath not existing");
+                throw new IOException("File not existing but Truncate Requested");
+            }
+
+            Global.mFileSystemDebugger.SendInternal("Truncate Mode: change file lenght to 0 bytes");
+           
+            var aStream = VFSManager.GetFileStream(aPath);
+            aStream.SetLength(0);
+
+            return aStream;
+        }
+
+        private static Stream CreateFile(string aPath, bool aPathExists)
+        {
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.CreateFile aPath {aPath} existing? {aPathExists}");
+
+            if (aPathExists == false)
+            {
+                Global.mFileSystemDebugger.SendInternal($"File does not exist let's call CreateNew() to create it");
+                return CreateNewFile(aPath, aPathExists);
+            }
+            else
+            {
+                Global.mFileSystemDebugger.SendInternal($"File does exist let's call TruncateFile() to truncate it");
+                return TruncateFile(aPath, aPathExists);
+            }
+        }
+
+        private static Stream AppendToFile(string aPath, bool aPathExists)
+        {
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.AppendToFile aPath {aPath} existing? {aPathExists}");
+
+            if (aPathExists)
+            {
+                Global.mFileSystemDebugger.SendInternal("Append mode with aPath already existing let's seek to end of the file");
+                var aStream = VFSManager.GetFileStream(aPath);
+                Global.mFileSystemDebugger.SendInternal("Actual aStream Lenght: " + aStream.Length);
+                
+                aStream.Seek(0, SeekOrigin.End);
+                return aStream;
+            }
+            else
+            {
+                Global.mFileSystemDebugger.SendInternal("Append mode with aPath not existing let's create a new the file");
+                return CreateNewFile(aPath, aPathExists);
+            }
+        }
+
+        private static Stream OpenFile(string aPath, bool aPathExists)
+        {
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.OpenFile aPath {aPath} existing? {aPathExists}");
+
+            if (!aPathExists)
+            {
+                Global.mFileSystemDebugger.SendInternal("Open Mode with aPath not existing");
+                //throw new FileNotFoundException("File not existing but Open Requested");
+                throw new IOException("File not existing but Open Requested");
+            }
+
+            Global.mFileSystemDebugger.SendInternal("Open Mode with aPath already existing opening file");
+            var aStream = VFSManager.GetFileStream(aPath);
+
+            aStream.Position = 0;
+            return aStream;
+        }
+
+        private static Stream OpenOrCreateFile(string aPath, bool aPathExists)
+        {
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.OpenOrCreateFile aPath {aPath} existing? {aPathExists}");
+
+            if (aPathExists)
+            {
+                Global.mFileSystemDebugger.SendInternal("OpenOrCreateFile Mode with aPath already existing, let's Open it!");
+                return OpenFile(aPath, aPathExists);
+            }
+            else
+            {
+                Global.mFileSystemDebugger.SendInternal("OpenOrCreateFile Mode with aPath not existing, let's Create it!");
+                return CreateNewFile(aPath, aPathExists);
+            }
+        }
 
         private static Stream InitializeStream(string aPath, FileMode aMode)
         {
-            Global.mFileSystemDebugger.SendInternal("In FileStream.InitializeStream");
+            Global.mFileSystemDebugger.SendInternal($"In FileStream.InitializeStream aPath {aPath}");
             if (aPath == null)
             {
                 Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path == null is true");
@@ -115,88 +233,50 @@ namespace Cosmos.System_Plugs.System.IO
                 throw new ArgumentException("The file path cannot be empty.");
             }
 
-            // Naive, but working implementation of FileMode. Probably is better to do this at lower level...
-
             // Before let's see if aPath already exists
-            bool aPathExists = File.Exists(aPath);
-
-            Stream aStream = null;
+            bool aPathExists = VFSManager.FileExists(aPath);
 
             switch (aMode)
             {
                 case FileMode.Append:
-                    // TODO it seems that GetFileStream effectively Creates the file if not exist
-                    aStream = aPathExists ? VFSManager.GetFileStream(aPath) : File.Create(aPath);
-
-                    if (aPathExists)
-                    {
-                        Global.mFileSystemDebugger.SendInternal("Append mode with aPath already existing let's seek to end of the file");
-                        Global.mFileSystemDebugger.SendInternal("Actual aStream Lenght: " + aStream.Length);
-                        aStream.Seek(0, SeekOrigin.End);
-                    }
-                    else
-                    {
-                        Global.mFileSystemDebugger.SendInternal("Append mode with aPath not existing let's create a new the file");
-                    }
-                    break;
+                    return AppendToFile(aPath, aPathExists);
 
                 case FileMode.Create:
-                    Global.mFileSystemDebugger.SendInternal("Create Mode aPath will be overwritten if existing");
-                    // TODO it seems that GetFileStream effectively Creates the file if not exist
-                    aStream = File.Create(aPath);
-                    break;
+                    return CreateFile(aPath, aPathExists);
 
                 case FileMode.CreateNew:
-                    if (aPathExists)
-                    {
-                        Global.mFileSystemDebugger.SendInternal("CreateNew Mode with aPath already existing");
-                        throw new IOException("File already existing but CreateNew Requested");
-                    }
-
-                    Global.mFileSystemDebugger.SendInternal("CreateNew Mode with aPath not existing new file created");
-                    // TODO it seems that GetFileStream effectively Creates the file if it does not exist
-                    aStream = File.Create(aPath);
-                    break;
+                    return CreateNewFile(aPath, aPathExists);
 
                 case FileMode.Open:
-                    if (!aPathExists)
-                    {
-                        Global.mFileSystemDebugger.SendInternal("Open Mode with aPath not existing");
-#warning TODO: Change IOException to FileNotFoundException, it asks for a plug
-                        throw new IOException("File not existing but Open Requested");
-                    }
-
-                    Global.mFileSystemDebugger.SendInternal("Open Mode with aPath existing opening file");
-                    // TODO it seems that GetFileStream effectively Creates the file if it does not exist
-                    aStream = VFSManager.GetFileStream(aPath);
-                    aStream.Position = 0;
-                    break;
+                    return OpenFile(aPath, aPathExists);
 
                 case FileMode.OpenOrCreate:
-                    Global.mFileSystemDebugger.SendInternal("OpenOrCreate Mode with aPath not existing new file created");
-                    // TODO it seems that GetFileStream effectively Creates the file if it does not exist
-                    aStream = aPathExists ? VFSManager.GetFileStream(aPath) : File.Create(aPath);
-                    break;
+                    return OpenOrCreateFile(aPath, aPathExists);
 
                 case FileMode.Truncate:
-                    if (!aPathExists)
-                    {
-                        Global.mFileSystemDebugger.SendInternal("Truncate Mode with aPath not existing");
-                        throw new IOException("File not existing but Truncate Requested");
-                    }
-
-                    Global.mFileSystemDebugger.SendInternal("Truncate Mode with aPath existing change its lenght to 0 bytes");
-                    // TODO it seems that GetFileStream effectively Creates the file if it does not exist
-                    aStream = VFSManager.GetFileStream(aPath);
-                    aStream.SetLength(0);
-                    break;
+                    return TruncateFile(aPath, aPathExists);
 
                 default:
                     Global.mFileSystemDebugger.SendInternal("The mode " + aMode + "is out of range");
                     throw new ArgumentOutOfRangeException("The file mode is invalid");
             }
-
-            return aStream;
         }
+
+        public static bool get_CanWrite(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            return innerStream.CanWrite;
+        }
+
+        public static bool get_CanRead(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            return innerStream.CanRead;
+        }
+
+        public static void WriteByte(FileStream aThis, byte aByte)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
+

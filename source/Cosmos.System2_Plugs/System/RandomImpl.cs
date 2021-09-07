@@ -1,11 +1,11 @@
 using System;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 using Cosmos.HAL;
 
 namespace Cosmos.System_Plugs.System
 {
     [Plug(Target = typeof(Random))]
-    public class RandomImpl
+    public static class RandomImpl
     {
         public static void Ctor(Random aThis)
         {
@@ -16,6 +16,9 @@ namespace Cosmos.System_Plugs.System
         {
             //empty ATM
         }
+
+        // TODO: improve this
+        public static int GenerateGlobalSeed() => RTC.Second;
 
         public static int Next(Random aThis, int maxValue)
         {
@@ -29,10 +32,10 @@ namespace Cosmos.System_Plugs.System
 
         public static int Next(Random aThis, int minValue, int maxValue)
         {
-            uint diff = (uint)(maxValue - minValue);
+            int diff = maxValue - minValue;
             if (diff <= 1)
                 return minValue;
-            return (int)((uint)(GetUniform() * diff) + minValue);
+            return Next(aThis) % diff + minValue;
         }
 
         public static void NextBytes(Random aThis, byte[] buffer)
@@ -48,9 +51,17 @@ namespace Cosmos.System_Plugs.System
             return GetUniform();
         }
 
+        static uint counter = 0;
+        static uint lastSeed = 0;
         static double GetUniform()
         {
             uint seed = (uint)RTC.Second;
+            if(lastSeed == seed)
+            {
+                counter++; //If either of these overflow, no problem since we just have to ensure that two random numbers quickly generated after each other are not the same
+                seed += counter * 1000;
+            }
+            lastSeed = seed;
             uint m_w = (uint)(seed >> 16);
             uint m_z = (uint)(seed % 4294967296);
             m_z = 36969 * (m_z & 65535) + (m_z >> 16);

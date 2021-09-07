@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net462</TargetFramework>
+        <RootNamespace>Cosmos.ILSpyPlugs.Plugin</RootNamespace>
+        <AssemblyName>Cosmos.ILSpyPlugs.Plugin</AssemblyName>
+        <IncludeWpfReferences>True</IncludeWpfReferences>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ILSpyReference Include="ICSharpCode.TreeView.dll" />
+        <ILSpyReference Include="ICSharpCode.Decompiler.dll" />
+        <ILSpyReference Include="ILSpy.exe" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="@(ILSpyReference)" HintPath="$(RepoRoot)Resources\Dependencies\ILSpy\%(Identity)" />
+        <Reference Include="System.ComponentModel.Composition" />
+    </ItemGroup>
+
+</Project>

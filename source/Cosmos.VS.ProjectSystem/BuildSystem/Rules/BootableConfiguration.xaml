@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="BootableConfiguration"
+      DisplayName="Bootable Configuration"
+      PageTemplate="generic"
+      Description="Bootable configuration."
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <Rule.DataSource>
+        <DataSource Persistence="ProjectFile"
+                    Label="Configuration"
+                    SourceOfDefaultValue="AfterContext" />
+    </Rule.DataSource>
+    <Rule.Categories>
+        <Category Name="General"
+                  DisplayName="General"
+                  Description="General" />
+    </Rule.Categories>
+
+    <StringProperty Name="IsoFile" />
+
+    <StringProperty Name="BinFile" />
+
+</Rule>

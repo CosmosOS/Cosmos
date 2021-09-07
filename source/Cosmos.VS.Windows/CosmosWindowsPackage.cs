@@ -1,37 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows;
-using System.Windows.Threading;
-using Cosmos.Debug.Common;
-using Cosmos.Debug.DebugConnectors;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+using Timer = System.Timers.Timer;
+
+using Cosmos.Debug.Common;
+using Cosmos.Debug.DebugConnectors;
+
+using Cosmos.VS.Windows.ToolWindows;
 
 namespace Cosmos.VS.Windows
 {
-    [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [Guid(Guids.PackageGuidString)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(AssemblyTW))]
-    [ProvideToolWindow(typeof(RegistersTW))]
+    [ProvideToolWindow(typeof(AssemblyToolWindow))]
+    [ProvideToolWindow(typeof(RegistersToolWindow))]
     [ProvideToolWindow(typeof(StackTW))]
     [ProvideToolWindow(typeof(InternalTW))]
     [ProvideToolWindow(typeof(ConsoleTW))]
-    [Guid(Guids.PackageGuidString)]
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    public sealed class CosmosWindowsPackage: Package
+    public sealed class CosmosWindowsPackage: AsyncPackage
     {
         private readonly Queue<ushort> mCommand;
         private readonly Queue<byte[]> mMessage;
-        private readonly System.Timers.Timer mTimer = new System.Timers.Timer(100);
+        private readonly Timer mTimer;
 
         private PipeServer mPipeDown;
-        private PipeServer mConsoleDown;
 
         public StateStorer StateStorer { get; }
 
@@ -46,8 +46,9 @@ namespace Cosmos.VS.Windows
 
             // There are a lot of threading issues in VSIP, and the WPF dispatchers do not work.
             // So instead we use a stack and a timer to poll it for data.
+            mTimer = new Timer(100);
             mTimer.AutoReset = true;
-            mTimer.Elapsed += ProcessMessage;
+            mTimer.Elapsed += (sender, e) => JoinableTaskFactory.RunAsync(() => ProcessMessageAsync(sender, e));
             mTimer.Start();
 
             mPipeDown = new PipeServer(Pipes.DownName);
@@ -55,18 +56,38 @@ namespace Cosmos.VS.Windows
             mPipeDown.Start();
         }
 
-        protected override void Initialize()
+        protected override async Task InitializeAsync(
+            CancellationToken cancellationToken,
+            IProgress<ServiceProgressData> progress)
         {
-            base.Initialize();
+            await base.InitializeAsync(cancellationToken, progress);
 
-            var xDTE = (EnvDTE80.DTE2)GetGlobalService(typeof(EnvDTE.DTE));
-            var xPane = xDTE.ToolWindows.OutputWindow.OutputWindowPanes;
-            Global.OutputPane = xPane.Add("Cosmos");
-            Global.OutputPane.OutputString("Debugger windows loaded.\r\n");
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            var xOutputWindow = (IVsOutputWindow)await GetServiceAsync(typeof(SVsOutputWindow));
+            var xCosmosPaneGuid = Guid.NewGuid();
+
+            ErrorHandler.ThrowOnFailure(
+                xOutputWindow.CreatePane(ref xCosmosPaneGuid, "Cosmos", Convert.ToInt32(true), Convert.ToInt32(true)));
+            ErrorHandler.ThrowOnFailure(xOutputWindow.GetPane(ref xCosmosPaneGuid, out var xOutputPane));
+
+            Global.OutputPane = xOutputPane;
+            xOutputPane.OutputString($"Debugger windows loaded.{Environment.NewLine}");
+
             CosmosMenuCmdSet.Initialize(this);
         }
 
-        void ProcessMessage(object sender, EventArgs e)
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                mTimer?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+        
+        private async Task ProcessMessageAsync(object sender, EventArgs e)
         {
             ushort xCmd;
             byte[] xMsg;
@@ -90,54 +111,47 @@ namespace Cosmos.VS.Windows
                             break;
 
                         case Debugger2Windows.Stack:
-                            UpdateWindow(typeof(StackTW), "STACK", xMsg);
+                            await UpdateWindowAsync(typeof(StackTW), "STACK", xMsg);
                             break;
 
                         case Debugger2Windows.Frame:
-                            UpdateWindow(typeof(StackTW), "FRAME", xMsg);
+                            await UpdateWindowAsync(typeof(StackTW), "FRAME", xMsg);
                             break;
 
                         case Debugger2Windows.Registers:
-                            UpdateWindow(typeof(RegistersTW), null, xMsg);
+                            await UpdateWindowAsync(typeof(RegistersToolWindow), null, xMsg);
                             break;
 
                         case Debugger2Windows.Quit:
                             break;
 
                         case Debugger2Windows.AssemblySource:
-                            UpdateWindow(typeof(AssemblyTW), null, xMsg);
+                            await UpdateWindowAsync(typeof(AssemblyToolWindow), null, xMsg);
                             break;
 
                         case Debugger2Windows.PongVSIP:
-                            UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
+                            await UpdateWindowAsync(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
                             break;
 
                         case Debugger2Windows.PongDebugStub:
-                            UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
+                            await UpdateWindowAsync(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
                             break;
 
                         case Debugger2Windows.OutputPane:
-                            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                                                                                 (Action)delegate
-                                                                                 {
-                                                                                     Global.OutputPane.OutputString(Encoding.UTF8.GetString(xMsg));
-                                                                                 }
-                                );
+                            await JoinableTaskFactory.SwitchToMainThreadAsync();
+                            Global.OutputPane.OutputString(Encoding.UTF8.GetString(xMsg));
                             break;
 
                         case Debugger2Windows.OutputClear:
-                            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                                                                                 (Action)delegate ()
-                                                                                         {
-                                                                                             Global.OutputPane.Clear();
-                                                                                             StateStorer.ClearState();
-                                                                                         });
+                            await JoinableTaskFactory.SwitchToMainThreadAsync();
+                            Global.OutputPane.Clear();
+                            StateStorer.ClearState();
                             break;
                     }
                 }
                 else
                 {
-                    UpdateChannelWindows(xCmd, xMsg);
+                    await UpdateChannelWindowsAsync(xCmd, xMsg);
                 }
             }
         }
@@ -164,6 +178,19 @@ namespace Cosmos.VS.Windows
             return xWindow as ToolWindowPane2;
         }
 
+        public async Task<ToolWindowPane2> FindWindowAsync(Type aWindowType)
+        {
+            // Get the instance number 0 of this tool window.
+            // Our windows are single instance so this instance will be the only one.
+            // The last flag is set to true so that if the tool window does not exists it will be created.
+            var xWindow = await FindToolWindowAsync(aWindowType, 0, true, default);
+            if (xWindow?.Frame == null)
+            {
+                throw new NotSupportedException("Failed to create the Cosmos tool window.");
+            }
+            return xWindow as ToolWindowPane2;
+        }
+
         public ToolWindowPaneChannel FindChannelWindow(Type aWindowType)
         {
             // Get the instance number 0 of this tool window.
@@ -177,31 +204,40 @@ namespace Cosmos.VS.Windows
             return xWindow as ToolWindowPaneChannel;
         }
 
-        public void UpdateChannelWindows(ushort aChannelAndCommand, byte[] aData)
+        public async Task<ToolWindowPaneChannel> FindChannelWindowAsync(Type aWindowType)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate ()
-                {
-                    foreach (var xType in mAllChannelWindowTypes)
-                    {
-                        var xWindow = FindChannelWindow(xType);
-                        xWindow.UserControl.Package = this;
-                        xWindow.UserControl.HandleChannelMessage(aChannelAndCommand, aData);
-                    }
-                }
-            );
+            // Get the instance number 0 of this tool window.
+            // Our windows are single instance so this instance will be the only one.
+            // The last flag is set to true so that if the tool window does not exists it will be created.
+            var xWindow = await FindToolWindowAsync(aWindowType, 0, true, default);
+            if (xWindow?.Frame == null)
+            {
+                throw new NotSupportedException("Failed to create the Cosmos tool window.");
+            }
+            return xWindow as ToolWindowPaneChannel;
         }
 
-        public void UpdateWindow(Type aWindowType, string aTag, byte[] aData)
+        public async Task UpdateChannelWindowsAsync(ushort aChannelAndCommand, byte[] aData)
         {
-            System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.DataBind,
-                (Action)delegate ()
-                {
-                    var xWindow = FindWindow(aWindowType);
-                    xWindow.UserControl.Package = this;
-                    xWindow.UserControl.Update(aTag, aData);
-                }
-            );
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            
+            foreach (var xType in mAllChannelWindowTypes)
+            {
+                var xWindow = await FindChannelWindowAsync(xType);
+
+                xWindow.UserControl.Package = this;
+                xWindow.UserControl.HandleChannelMessage(aChannelAndCommand, aData);
+            }
+        }
+
+        private async Task UpdateWindowAsync(Type aWindowType, string aTag, byte[] aData)
+        {
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var xWindow = await FindWindowAsync(aWindowType);
+
+            xWindow.UserControl.Package = this;
+            xWindow.UserControl.Update(aTag, aData);
         }
 
         public void StoreAllStates()
@@ -210,7 +246,7 @@ namespace Cosmos.VS.Windows
             byte[] aData = cWindow.UserControl.GetCurrentState();
             StateStorer.StoreState("StackTW", aData == null ? null : (byte[])aData.Clone());
 
-            cWindow = FindWindow(typeof(RegistersTW));
+            cWindow = FindWindow(typeof(RegistersToolWindow));
             aData = cWindow.UserControl.GetCurrentState();
             StateStorer.StoreState("RegistersTW", aData == null ? null : (byte[])aData.Clone());
         }
@@ -221,7 +257,7 @@ namespace Cosmos.VS.Windows
             byte[] aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "StackTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
 
-            cWindow = FindWindow(typeof(RegistersTW));
+            cWindow = FindWindow(typeof(RegistersToolWindow));
             aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "RegistersTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
         }

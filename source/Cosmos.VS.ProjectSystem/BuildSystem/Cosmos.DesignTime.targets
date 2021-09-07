@@ -1,0 +1,36 @@
+﻿<Project>
+
+    <PropertyGroup>
+        <_CosmosXamlResourcesDirectory>$(MSBuildThisFileDirectory)</_CosmosXamlResourcesDirectory>
+        <DebuggerFlavor>CosmosDebugger</DebuggerFlavor>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectCapability Remove="LaunchProfiles" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectCapability Include="Bootable" />
+        <ProjectCapability Include="Cosmos" />
+    </ItemGroup>
+
+    <ItemGroup>
+
+        <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\Content.xaml">
+            <Context>File;BrowseObject</Context>
+        </PropertyPageSchema>
+
+        <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\CosmosDebugger.xaml">
+            <Context>Project</Context>
+        </PropertyPageSchema>
+
+        <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\PackageReference.xaml">
+            <Context>ProjectSubscriptionService;BrowseObject</Context>
+        </PropertyPageSchema>
+        <PropertyPageSchema Include="$(_CosmosXamlResourcesDirectory)Rules\ResolvedPackageReference.xaml">
+            <Context>ProjectSubscriptionService;BrowseObject</Context>
+        </PropertyPageSchema>
+
+    </ItemGroup>
+
+</Project>

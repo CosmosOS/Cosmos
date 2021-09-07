@@ -1,9 +1,9 @@
 using System.Threading;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Threading
 {
-    [Plug(Target = typeof(Thread))]
+    [Plug("System.Threading.Thread, System.Private.CoreLib")]
     public static class ThreadImpl
     {
         public static Thread GetCurrentThreadNative()
@@ -23,10 +23,10 @@ namespace Cosmos.Core_Plugs.System.Threading
 
         //        if ((ms > 0) && (ms != Timeout.Infinite))
         //        {
-        //            double fac = ProcessorInformation.GetCycleRate() / 1000d;
-        //            double ticks = ms / 1000d * Stopwatch.Frequency + ProcessorInformation.GetCycleCount() * fac;
+        //            double fac = CPU.GetCycleRate() / 1000d;
+        //            double ticks = ms / 1000d * Stopwatch.Frequency + CPU.GetCycleCount() * fac;
 
-        //            while (ticks < ProcessorInformation.GetCycleCount() * fac)
+        //            while (ticks < CPU.GetCycleCount() * fac)
         //                new Action(() => { }).Invoke(); // execute an empty operation
         //        }
         //        else if (ms < 0)

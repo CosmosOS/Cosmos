@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cosmos.System.VSTests
+namespace Cosmos.System.Tests
 {
     public static class Utilities
     {

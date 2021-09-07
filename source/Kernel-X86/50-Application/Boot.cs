@@ -1,5 +1,5 @@
-﻿using System;
-using Cosmos.IL2CPU.API.Attribs;
+using System;
+using IL2CPU.API.Attribs;
 using Cosmos.System;
 
 namespace KernelGen3 {

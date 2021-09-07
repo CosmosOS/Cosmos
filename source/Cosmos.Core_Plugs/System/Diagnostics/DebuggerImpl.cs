@@ -1,5 +1,5 @@
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Diagnostics
 {

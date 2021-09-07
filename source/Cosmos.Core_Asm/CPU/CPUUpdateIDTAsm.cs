@@ -1,15 +1,16 @@
 using System;
 using System.Reflection;
 
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
+
+using XSharp;
 using XSharp.Assembler;
 using XSharp.Assembler.x86;
-using Cosmos.IL2CPU.API.Attribs;
-using XSharp;
 using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
 {
-    //TODO: This asm refs Hardware.. should not.. its a higher ring
     public class CPUUpdateIDTAsm : AssemblerMethod
     {
         private static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound)
@@ -32,7 +33,7 @@ namespace Cosmos.Core_Asm
 
         private static MethodBase GetInterruptHandler(byte aInterrupt)
         {
-            return GetMethodDef(typeof(Cosmos.Core.INTs).GetTypeInfo().Assembly, typeof(Cosmos.Core.INTs).FullName
+            return GetMethodDef(typeof(Cosmos.Core.INTs).Assembly, typeof(Cosmos.Core.INTs).FullName
                 , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
         }
 
@@ -97,7 +98,7 @@ namespace Cosmos.Core_Asm
                 MethodBase xHandler = GetInterruptHandler((byte)j);
                 if (xHandler == null)
                 {
-                    xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).GetTypeInfo().Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
+                    xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
                 }
                 XS.Call(LabelName.Get(xHandler));
                 XS.Pop(EAX);

@@ -1,4 +1,4 @@
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 using Cosmos.CPU.x86;
 
 namespace Cosmos.CPU_Asm {

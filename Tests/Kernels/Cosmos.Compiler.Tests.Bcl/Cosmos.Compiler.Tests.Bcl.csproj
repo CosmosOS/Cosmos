@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>CA2242;$(NoWarn)</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference Include="..\..\..\source\Cosmos.System2\Cosmos.System2.csproj" />
+        <ProjectReference Include="..\..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
+    </ItemGroup>
+
+</Project>

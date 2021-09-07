@@ -55,7 +55,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl {
 
           xFrameInfoArray = new FRAMEINFO[1];
           var xFrame = new AD7StackFrame(mEngine, this, mProcess);
-          xFrame.SetFrameInfo((enum_FRAMEINFO_FLAGS)aFieldSpec, out xFrameInfoArray[0]);
+          xFrame.SetFrameInfo(aFieldSpec, out xFrameInfoArray[0]);
 
           //} else {
           //frameInfoArray = new FRAMEINFO[numStackFrames];

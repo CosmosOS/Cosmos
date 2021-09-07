@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cosmos.IL2CPU.API;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
 {
@@ -22,6 +22,11 @@ namespace Cosmos.System_Plugs.System
         public static int GetHashCodeOfPtr(IntPtr ptr)
         {
             throw new NotImplementedException("ValueType.GetHashCodeOfPtr()");
+        }
+
+        public static bool Equals(ValueType aThis, object obj)
+        {
+            throw new NotImplementedException("ValueType.Equals()");
         }
 
         //public static string ToString(ValueType aThis)

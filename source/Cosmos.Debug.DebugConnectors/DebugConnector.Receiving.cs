@@ -1,25 +1,16 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 
 namespace Cosmos.Debug.DebugConnectors
 {
     partial class DebugConnector
     {
-        protected void WaitForMessage()
-        {
-            Next(1, PacketMsg);
-        }
+        protected void WaitForMessage() => Next(1, PacketMsg);
 
-        protected void PacketTextSize(byte[] aPacket)
-        {
-            Next(GetUInt16(aPacket, 0), PacketText);
-        }
+        protected void PacketTextSize(byte[] aPacket) => Next(GetUInt16(aPacket, 0), PacketText);
 
-        protected void PacketOtherChannelCommand(byte aChannel, byte[] aPacket)
-        {
+        protected void PacketOtherChannelCommand(byte aChannel, byte[] aPacket) =>
             Next(4, data => PacketOtherChannelSize(aChannel, aPacket[0], data));
-        }
 
         protected void PacketOtherChannelSize(byte aChannel, byte aCommand, byte[] aPacket)
         {
@@ -28,10 +19,7 @@ namespace Cosmos.Debug.DebugConnectors
             Next(xPacketSize, data => PacketChannel(aChannel, aCommand, data));
         }
 
-        protected void PacketMessageBoxTextSize(byte[] aPacket)
-        {
-            Next(GetUInt16(aPacket, 0), PacketMessageBoxText);
-        }
+        protected void PacketMessageBoxTextSize(byte[] aPacket) => Next(GetUInt16(aPacket, 0), PacketMessageBoxText);
 
         protected void PacketMethodContext(byte[] aPacket)
         {
@@ -47,28 +35,19 @@ namespace Cosmos.Debug.DebugConnectors
 
         protected void PacketRegisters(byte[] aPacket)
         {
-            if (CmdRegisters != null)
-            {
-                CmdRegisters(aPacket.ToArray());
-            }
+            CmdRegisters?.Invoke(aPacket.ToArray());
             WaitForMessage();
         }
 
         protected void PacketFrame(byte[] aPacket)
         {
-            if (CmdFrame != null)
-            {
-                CmdFrame(aPacket.ToArray());
-            }
+            CmdFrame?.Invoke(aPacket.ToArray());
             WaitForMessage();
         }
 
         protected void PacketPong(byte[] aPacket)
         {
-            if (CmdPong != null)
-            {
-                CmdPong(aPacket.ToArray());
-            }
+            CmdPong?.Invoke(aPacket.ToArray());
             WaitForMessage();
         }
 
@@ -76,20 +55,15 @@ namespace Cosmos.Debug.DebugConnectors
         {
             if (SigReceived)
             {
-                if (CmdChannel != null)
-                {
-                    CmdChannel(channel, command, aPacket);
-                }
+                CmdChannel?.Invoke(channel, command, aPacket);
             }
+
             WaitForMessage();
         }
 
         protected void PacketNullReferenceOccurred(byte[] aPacket)
         {
-            if (CmdNullReferenceOccurred != null)
-            {
-                CmdNullReferenceOccurred(GetUInt32(aPacket, 0));
-            }
+            CmdNullReferenceOccurred?.Invoke(GetUInt32(aPacket, 0));
             WaitForMessage();
         }
 
@@ -125,37 +99,25 @@ namespace Cosmos.Debug.DebugConnectors
 
         protected void PacketStackCorruptionOccurred(byte[] aPacket)
         {
-            if (CmdStackCorruptionOccurred != null)
-            {
-                CmdStackCorruptionOccurred(GetUInt32(aPacket, 0));
-            }
+            CmdStackCorruptionOccurred?.Invoke(GetUInt32(aPacket, 0));
             WaitForMessage();
         }
 
         protected void PacketStackOverflowOccurred(byte[] aPacket)
         {
-            if (CmdStackOverflowOccurred != null)
-            {
-                CmdStackOverflowOccurred(GetUInt32(aPacket, 0));
-            }
+            CmdStackOverflowOccurred?.Invoke(GetUInt32(aPacket, 0));
             WaitForMessage();
         }
 
         protected void PacketInterruptOccurred(byte[] aPacket)
         {
-            if (CmdInterruptOccurred != null)
-            {
-                CmdInterruptOccurred(GetUInt32(aPacket, 0));
-            }
+            CmdInterruptOccurred?.Invoke(GetUInt32(aPacket, 0));
             WaitForMessage();
         }
 
         protected void PacketStack(byte[] aPacket)
         {
-            if (CmdStack != null)
-            {
-                CmdStack(aPacket.ToArray());
-            }
+            CmdStack?.Invoke(aPacket.ToArray());
             WaitForMessage();
         }
 
@@ -203,10 +165,7 @@ namespace Cosmos.Debug.DebugConnectors
 
         protected void PacketCoreDump(byte[] aPacket)
         {
-            if (CmdCoreDump != null)
-            {
-                CmdCoreDump(aPacket.ToArray());
-            }
+            CmdCoreDump?.Invoke(CoreDump.FromStackArray(aPacket));
             WaitForMessage();
         }
 

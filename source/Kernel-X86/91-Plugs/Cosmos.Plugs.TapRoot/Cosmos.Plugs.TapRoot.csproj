@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard1.5</TargetFramework>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
-        <Authors>Cosmos</Authors>
-        <Company>Cosmos</Company>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>Cosmos.Plugs</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Cosmos.cfg" />
+        <EmbeddedResource Include="Cosmos.cfg" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference PrivateAssets="All" Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-      <ProjectReference PrivateAssets="All" Include="..\..\..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+        <PackageReference Include="IL2CPU.API" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

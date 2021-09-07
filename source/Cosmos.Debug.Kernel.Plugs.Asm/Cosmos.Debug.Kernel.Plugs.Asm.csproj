@@ -1,19 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard1.5</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-        <Authors>Cosmos</Authors>
-        <Company>Cosmos</Company>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
-        <ProjectReference Include="..\..\..\XSharp\source\XSharp.Assembler\XSharp.Assembler.csproj" />
+        <PackageReference Include="IL2CPU.API" />
+        <PackageReference Include="XSharp" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference Include="..\..\..\XSharp\source\XSharp\XSharp.csproj" />
     </ItemGroup>
 
 </Project>

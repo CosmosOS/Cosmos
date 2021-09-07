@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 
-using Cosmos.Build.Common;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace TheRingMaster
 {
@@ -20,8 +19,8 @@ namespace TheRingMaster
             HAL = 30,
             System = 40,
             Application = 50,
-            Shared = 90,
-            Plugs = 91,
+            Plug = 91,
+            CpuPlug = 92,
             Debug
         }
 
@@ -124,7 +123,7 @@ namespace TheRingMaster
                     throw new Exception(xExceptionMessage);
                 }
 
-                if (xRing != Ring.CPU && xRing != Ring.Plugs)
+                if (xRing != Ring.CPU && xRing != Ring.CpuPlug)
                 {
                     foreach (var xModule in aAssembly.Modules)
                     {
@@ -134,9 +133,9 @@ namespace TheRingMaster
 
                 foreach (var xType in aAssembly.GetTypes())
                 {
-                    if (xRing != Ring.Plugs)
+                    if (xRing != Ring.Plug)
                     {
-                        if (xType.GetTypeInfo().GetCustomAttribute<Plug>() != null)
+                        if (xType.GetCustomAttribute<Plug>() != null)
                         {
                             throw new Exception("Plugs are only allowed in the Plugs ring! Assembly: " + aAssembly.GetName().Name);
                         }
@@ -165,10 +164,10 @@ namespace TheRingMaster
                 return xAssembly;
             }
 
-            if (ResolveAssemblyForDir(CosmosPaths.Kernel, out xAssembly))
-            {
-                return xAssembly;
-            }
+            //if (ResolveAssemblyForDir(CosmosPaths.Kernel, out xAssembly))
+            //{
+            //    return xAssembly;
+            //}
 
             return xAssembly;
 
@@ -177,7 +176,7 @@ namespace TheRingMaster
                 aAssembly = null;
 
                 var xFiles = Directory.GetFiles(aDir, aAssemblyName.Name + ".*", SearchOption.TopDirectoryOnly);
-                
+
                 if (xFiles.Any(f => Path.GetExtension(f) == ".dll"))
                 {
                     aAssembly = aContext.LoadFromAssemblyPath(xFiles.Where(f => Path.GetExtension(f) == ".dll").Single());

@@ -1,12 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net462</TargetFramework>
-        <RuntimeIdentifiers>win7-x86</RuntimeIdentifiers>
-        <DebugType>Full</DebugType>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <TargetFramework>net472</TargetFramework>
         <OutputType>Exe</OutputType>
+        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <DebugType>Full</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\Cosmos.IL2CPU.API\Cosmos.IL2CPU.API.csproj" />
+        <ProjectReference Include="..\..\source\IL2CPU.API\IL2CPU.API.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
     </ItemGroup>
 

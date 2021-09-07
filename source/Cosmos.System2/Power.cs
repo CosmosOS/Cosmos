@@ -1,17 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using sysIO = System.IO;
 
 namespace Cosmos.System
 {
-    public class Power
+    /// <summary>
+    /// Power class.
+    /// </summary>
+    public static class Power
     {
+        /// <summary>
+        /// Reboot with CPU.
+        /// </summary>
         public static void Reboot()
         {
             HAL.Power.CPUReboot();
         }
+
+        /// <summary>
+        /// Shutdown the ACPI.
+        /// </summary>
+        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
         public static void Shutdown()
         {
             HAL.Power.ACPIShutdown();

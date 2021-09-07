@@ -1,8 +1,9 @@
-using System;
-using Cosmos.IL2CPU.API.Attribs;
+using System.Globalization;
+
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU_Plugs.System {
-    [Plug(Target = typeof(global::System.Globalization.CharUnicodeInfo))]
+    [Plug(typeof(CharUnicodeInfo))]
     public static class CharUnicodeInfoImpl {
         public static void Cctor() {
 

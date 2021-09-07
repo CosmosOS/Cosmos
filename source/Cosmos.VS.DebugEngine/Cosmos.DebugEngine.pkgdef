@@ -1,0 +1,25 @@
+﻿[$RootKey$\AD7Metrics\Engine\{fa1da3a6-66ff-4c65-b077-e65f7164ef83}]
+@="Cosmos Debug Engine"
+; "AddressBP"=dword:00000001
+"AlwaysLoadLocal"=dword:00000001
+"AlwaysLoadProgramProviderLocal"=dword:00000001
+; "CallStackBP"=dword:00000001
+; "ConditionalBP"=dword:00000001
+"DataBP"=dword:00000001
+"Disassembly"=dword:00000001
+"EnginePriority"=dword:00000050
+"Exceptions"=dword:00000001
+; "FunctionBP"=dword:00000001
+; "HitCountBP"=dword:00000001
+; "JustMyCodeStepping"=dword:00000001
+"Name"="Cosmos Debug"
+"SetNextStatement"=dword:00000001
+; "SuspendThread"=dword:00000001
+"CLSID"="{dc8503ab-7ee6-456c-a209-66c690d9f6f4}"
+"GlobalVisualizersDirectory"="$PackageFolder$"
+
+[$RootKey$\CLSID\{dc8503ab-7ee6-456c-a209-66c690d9f6f4}]
+"Assembly"="Cosmos.VS.DebugEngine"
+"Class"="Cosmos.VS.DebugEngine.AD7.Impl.AD7Engine"
+"InprocServer32"="$WinDir$\SYSTEM32\MSCOREE.DLL"
+"CodeBase"="$PackageFolder$\Cosmos.VS.DebugEngine.dll"

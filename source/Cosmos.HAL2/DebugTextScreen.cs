@@ -62,7 +62,7 @@ namespace Cosmos.HAL
         private int mCurrentY = 1;
 
 
-        public override char this[int x, int y]
+        public override byte this[int x, int y]
         {
             get
             {
@@ -79,7 +79,7 @@ namespace Cosmos.HAL
                              });
                     mCurrentY = y;
                 }
-                SendChar(new []{value});
+                SendChar(new []{(char)value});
             }
         }
 

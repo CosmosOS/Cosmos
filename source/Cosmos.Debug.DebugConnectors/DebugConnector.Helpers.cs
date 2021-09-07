@@ -5,7 +5,13 @@ namespace Cosmos.Debug.DebugConnectors
 {
     partial class DebugConnector
     {
-        internal static string BytesToString(byte[] bytes, int index, int count)
+        protected static ushort GetUInt16(byte[] aBytes, int aOffset) => BitConverter.ToUInt16(aBytes, aOffset);
+        protected static uint GetUInt32(byte[] aBytes, int aOffset) => BitConverter.ToUInt32(aBytes, aOffset);
+        protected static ulong GetUInt64(byte[] aBytes, int aOffset) => BitConverter.ToUInt64(aBytes, aOffset);
+        protected static float GetSingle(byte[] aBytes, int aOffset) => BitConverter.ToSingle(aBytes, aOffset);
+        protected static double GetDouble(byte[] aBytes, int aOffset) => BitConverter.ToDouble(aBytes, aOffset);
+
+        protected static string BytesToString(byte[] bytes, int index, int count)
         {
             if (count > 100 || count <= 0 || bytes.Length == 0)
             {

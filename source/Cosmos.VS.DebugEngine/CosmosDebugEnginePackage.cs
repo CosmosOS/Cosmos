@@ -1,39 +1,63 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 using Cosmos.VS.DebugEngine.Commands;
 
+[assembly: ProvideBindingRedirection(
+    AssemblyName = "SQLitePCLRaw.batteries_green",
+    NewVersion = "1.1.10.86",
+    OldVersionLowerBound = "1.0.0.0",
+    OldVersionUpperBound = "1.1.10.86")]
+
+[assembly: ProvideBindingRedirection(
+    AssemblyName = "SQLitePCLRaw.batteries_v2",
+    NewVersion = "1.1.10.86",
+    OldVersionLowerBound = "1.0.0.0",
+    OldVersionUpperBound = "1.1.10.86")]
+
+[assembly: ProvideBindingRedirection(
+    AssemblyName = "SQLitePCLRaw.core",
+    NewVersion = "1.1.10.86",
+    OldVersionLowerBound = "1.0.0.0",
+    OldVersionUpperBound = "1.1.10.86")]
+
+[assembly: ProvideBindingRedirection(
+    AssemblyName = "SQLitePCLRaw.provider.e_sqlite3",
+    NewVersion = "1.1.10.86",
+    OldVersionLowerBound = "1.0.0.0",
+    OldVersionUpperBound = "1.1.10.86")]
+
 namespace Cosmos.VS.DebugEngine
 {
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [Guid(Guids.guidPackageString)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(Guids.guidPackageString)]
-    public sealed class CosmosDebugEnginePackage : Package, IOleCommandTarget
+    internal sealed class CosmosDebugEnginePackage : AsyncPackage, IOleCommandTarget
     {
         private IOleCommandTarget packageCommandTarget;
         private DebugCommandHandler packageCommandHandler;
 
-        public CosmosDebugEnginePackage()
+        protected override async Task InitializeAsync(
+            CancellationToken cancellationToken,
+            IProgress<ServiceProgressData> progress)
         {
-        }
+            await base.InitializeAsync(cancellationToken, progress);
 
-        #region Package Members
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-        protected override void Initialize()
-        {
-            base.Initialize();
-
-            packageCommandTarget = GetService(typeof(IOleCommandTarget)) as IOleCommandTarget;
+            packageCommandTarget = await GetServiceAsync(typeof(IOleCommandTarget)).ConfigureAwait(true) as IOleCommandTarget;
             packageCommandHandler = new DebugCommandHandler(this);
         }
 
-        #endregion
-
         int IOleCommandTarget.Exec(ref Guid cmdGroup, uint nCmdID, uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (cmdGroup == Guids.DebugEngineCmdSetGuid)
             {
                 return packageCommandHandler.Execute(nCmdID, nCmdExecOpt, pvaIn, pvaOut);
@@ -44,6 +68,8 @@ namespace Cosmos.VS.DebugEngine
 
         int IOleCommandTarget.QueryStatus(ref Guid cmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (cmdGroup == Guids.DebugEngineCmdSetGuid)
             {
                 return packageCommandHandler.Query(cCmds, prgCmds, pCmdText);

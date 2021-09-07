@@ -1,0 +1,44 @@
+<Project>
+
+    <PropertyGroup>
+        <LangVersion>Latest</LangVersion>
+        <NoWarn>CA1051;CA1501;CA1707;CA1711;CA1801;CS1572;CS1573;CS1574;CS1591;$(NoWarn)</NoWarn>
+        <SignAssembly>True</SignAssembly>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+        <CommonRepoRoot>$(RepoRoot)..\Common\</CommonRepoRoot>
+        <IL2CPURepoRoot>$(RepoRoot)..\IL2CPU\</IL2CPURepoRoot>
+        <XSharpRepoRoot>$(RepoRoot)..\XSharp\</XSharpRepoRoot>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!--
+            This property sets the suffix for local builds.
+            For example, if the value of this property is '100', the version will be x.y.z-localbuild100.
+            The property is empty by default as it's not really easy to generate a unique number per local build.
+        -->
+        <PackageVersionLocalBuildSuffix></PackageVersionLocalBuildSuffix>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageVersion>0.1.0</PackageVersion>
+        <PackageVersionSuffix Condition="'$(APPVEYOR)' == 'True'">-build$(APPVEYOR_BUILD_NUMBER)+$(APPVEYOR_REPO_COMMIT.Substring(0, 7))</PackageVersionSuffix>
+        <PackageVersionSuffix Condition="'$(PackageVersionSuffix)' == ''">-localbuild$(PackageVersionLocalBuildSuffix)</PackageVersionSuffix>
+        <PackageVersionSuffix Condition="'$(APPVEYOR_REPO_TAG)' == 'True'"></PackageVersionSuffix>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <CommonVersion>0.1.0-build37</CommonVersion>
+        <IL2CPUVersion>0.1.0-build425</IL2CPUVersion>
+        <XSharpVersion>0.1.0-build562</XSharpVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DeployExtension Condition="'$(CI)' == 'True'">False</DeployExtension>
+    </PropertyGroup>
+
+    <Import Project="build\Targets\Import.props" />
+
+</Project>

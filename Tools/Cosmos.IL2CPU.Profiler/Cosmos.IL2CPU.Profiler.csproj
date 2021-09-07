@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp1.0</TargetFramework>
-        <RuntimeIdentifiers>win7-x86</RuntimeIdentifiers>
-        <DebugType>Full</DebugType>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
         <OutputType>Exe</OutputType>
+        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <DebugType>Full</DebugType>
     </PropertyGroup>
 
     <ItemGroup>

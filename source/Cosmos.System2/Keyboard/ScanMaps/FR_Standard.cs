@@ -6,8 +6,14 @@ using Cosmos.HAL;
 
 namespace Cosmos.System.ScanMaps
 {
+    /// <summary>
+    /// FR_Standard class. Represent FR_Standard keyboard layout.
+    /// </summary>
     public class FR_Standard : ScanMapBase
     {
+        /// <summary>
+        /// Init key list.
+        /// </summary>
         protected override void InitKeys()
         {
             _keys = new List<KeyMapping>();

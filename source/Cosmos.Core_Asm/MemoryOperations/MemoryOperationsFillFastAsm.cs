@@ -14,9 +14,9 @@ namespace Cosmos.Core_Asm.MemoryOperations
         /*
          *
          * public static unsafe void Fill16Blocks(
-         *                       byte *dest, [ebp + 8]
+         *                       byte *dest, [ebp + 16]
          *                       int value, [ebp + 12]
-         *                       int BlocksNum) [ebp + 16]
+         *                       int BlocksNum) [ebp + 8]
          */
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
@@ -37,7 +37,7 @@ namespace Cosmos.Core_Asm.MemoryOperations
              * |value|value|value|value
              * luckily we don't need to do a loop for this there is the SSE3 instruction for this shufps
              */
-            XS.SSE2.MoveD(XMM0, EBX);
+            XS.MoveD(XMM0, EBX);
             XS.SSE.Shufps(XMM0, XMM0, 0x0000); // This broadcast the first element of XMM0 on the other 3
 
             /* Do the 'loop' */

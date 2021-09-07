@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 
 using Cosmos.Build.Common;
-using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.Hosts
 {
@@ -41,6 +40,11 @@ namespace Cosmos.Debug.Hosts
       }
 
       InitializeKeyValues();
+      if (Environment.GetEnvironmentVariable("CI") == "True")
+      {
+        string debugGui = startDebugGui ? ", options=\"gui_debug\"" : "";
+        defaultConfigs["display_library"] = "nogui " + debugGui;
+      }
       GenerateConfiguration(configurationFile.FullName);
       _bochsConfigurationFile = configurationFile;
     }
@@ -102,8 +106,7 @@ namespace Cosmos.Debug.Hosts
       }
       _bochsStartInfo.Arguments = string.Format("-q {1} -f \"{0}\"", _bochsConfigurationFile.FullName, xExtraLog);
       _bochsStartInfo.WorkingDirectory = _bochsConfigurationFile.Directory.FullName;
-      _bochsStartInfo.CreateNoWindow = true; // when ProcessStartInfo.UseShellExecute is supported in .net core, maybe this line isn't needed
-      //_bochsStartInfo.UseShellExecute = true;
+      _bochsStartInfo.UseShellExecute = true;
       if (RedirectOutput)
       {
         if (LogOutput == null)

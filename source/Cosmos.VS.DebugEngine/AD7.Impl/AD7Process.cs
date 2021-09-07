@@ -5,18 +5,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+
 using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 using Cosmos.Debug.DebugConnectors;
 using Cosmos.Debug.Hosts;
-using Cosmos.Debug.Symbols;
 using Cosmos.VS.DebugEngine.Engine.Impl;
-using Cosmos.VS.DebugEngine.Properties;
 using Cosmos.VS.DebugEngine.Utilities;
-using Label = Cosmos.Debug.Symbols.Label;
+
+using IL2CPU.Debug.Symbols;
+using Label = IL2CPU.Debug.Symbols.Label;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {
@@ -282,8 +282,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         {
             mDbgConnector = null;
 
-            string xPort;
-            mDebugInfo.TryGetValue(BuildPropertyNames.VisualStudioDebugPortString, out xPort);
+            mDebugInfo.TryGetValue(BuildPropertyNames.VisualStudioDebugPortString, out var xPort);
 
             // using (var xDebug = new StreamWriter(@"e:\debug.info", false))
             // {
@@ -299,10 +298,10 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 mDebugInfo.TryGetValue(BuildPropertyNames.CosmosDebugPortString, out xPort);
             }
 
-            var xParts = (null == xPort) ? null : xPort.Split(' ');
+            var xParts = xPort?.Split(' ');
             if ((null == xParts) || (2 > xParts.Length))
             {
-                throw new Exception(string.Format("Unable to parse VS debug port: '{0}'", xPort));
+                throw new Exception(String.Format("Unable to parse VS debug port: '{0}'", xPort));
                 //throw new Exception(string.Format(
                 //    "The '{0}' Cosmos project file property is either ill-formed or missing.",
                 //    BuildProperties.VisualStudioDebugPortString));
@@ -310,13 +309,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             string xPortType = xParts[0].ToLower();
             string xPortParam = xParts[1].ToLower();
 
-            var xLaunch = mDebugInfo[BuildPropertyNames.LaunchString];
-
             OutputText("Starting debug connector.");
             switch (xPortType)
             {
                 case "pipe:":
-                    if (xLaunch == "HyperV")
+                    if (mLaunch == LaunchType.HyperV || mLaunch == LaunchType.Qemu)
                     {
                         mDbgConnector = new DebugConnectorPipeClient(xPortParam);
                     }
@@ -325,9 +322,8 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         mDbgConnector = new DebugConnectorPipeServer(xPortParam);
                     }
                     break;
-#if SERIAL_PORT
                 case "serial:":
-                    if (xLaunch == "IntelEdison")
+                    if (mLaunch == LaunchType.IntelEdison)
                     {
                         mDbgConnector = new DebugConnectorEdison(xPortParam, Path.ChangeExtension(mDebugInfo["ISOFile"], ".bin"));
                     }
@@ -336,10 +332,8 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         mDbgConnector = new DebugConnectorSerial(xPortParam);
                     }
                     break;
-#endif
                 default:
                     throw new Exception("No debug connector found for port type '" + xPortType + "'");
-
             }
             mDbgConnector.SetConnectionHandler(DebugConnectorConnected);
             mDbgConnector.CmdBreak += new Action<uint>(DbgCmdBreak);
@@ -362,6 +356,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mDbgConnector.CmdNullReferenceOccurred += DbgCmdNullReferenceOccurred;
             mDbgConnector.CmdMessageBox += DbgCmdMessageBox;
             mDbgConnector.CmdChannel += DbgCmdChannel;
+            mDbgConnector.CmdCoreDump += DbgCmdCoreDump;
         }
 
         private void DbgCmdChannel(byte aChannel, byte aCommand, byte[] aData)
@@ -381,12 +376,93 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         private void DbgCmdNullReferenceOccurred(uint lastEIPAddress)
         {
+            if (mDebugInfo.TryGetValue(BuildPropertyNames.DebugModeString, out var xDebugMode))
+            {
+                if (xDebugMode == "Source")
+                {
+                    try
+                    {
+                        var xMethod = mDebugInfoDb.GetMethod(lastEIPAddress);
+                        var xLabel = mDebugInfoDb.GetLabels(lastEIPAddress)[0];
+                        var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
+                        var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
+                        var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+
+                        AD7Util.MessageBox($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(xMethod.DocumentID).Pathname}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
+                        return;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                    }
+                }
+            }
+
             AD7Util.MessageBox(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
         }
 
         private void DbgCmdMessageBox(string message)
         {
             AD7Util.MessageBox("Message from your Cosmos operating system:\r\n\r\n" + message);
+        }
+
+        private void DbgCmdCoreDump(CoreDump dump)
+        {
+            var eax = GetRegister("EAX", dump.EAX);
+            var ebx = GetRegister("EBX", dump.EBX);
+            var ecx = GetRegister("ECX", dump.ECX);
+            var edx = GetRegister("EDX", dump.EDX);
+
+            var edi = GetRegister("EDI", dump.EDI);
+            var esi = GetRegister("ESI", dump.ESI);
+
+            var ebp = GetRegister("EBP", dump.EBP);
+            var esp = GetRegister("ESP", dump.ESP);
+            var eip = GetRegister("EIP", dump.EIP);
+
+            var message = "Core dump:" + Environment.NewLine
+                        + $"{eax}    {ebx}    {ecx}    {edx}" + Environment.NewLine
+                        + $"{edi}    {esi}" + Environment.NewLine
+                        + $"{ebp}    {esp}    {eip}" + Environment.NewLine
+                        + Environment.NewLine
+                        + "Call stack:"
+                        + Environment.NewLine;
+
+            while (dump.StackTrace.Count > 0)
+            {
+                message += GetStackTraceEntry(dump.StackTrace.Pop()) + Environment.NewLine;
+            }
+
+            AD7Util.MessageBox(message);
+
+            string GetRegister(string name, uint value) => $"{name} = 0x{value:X8}";
+
+            string GetStackTraceEntry(uint address)
+            {
+                var entry = $"at 0x{address:X8}";
+
+                if (mDebugInfo.TryGetValue(BuildPropertyNames.DebugModeString, out var xDebugMode))
+                {
+                    if (xDebugMode == "Source")
+                    {
+                        try
+                        {
+                            var xMethod = mDebugInfoDb.GetMethod(address);
+                            var xDocument = mDebugInfoDb.GetDocumentById(xMethod.DocumentID);
+                            var xLabel = mDebugInfoDb.GetLabels(address)[0];
+                            var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
+                            var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
+                            var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+
+                            entry += $"in {xDocument.Pathname}:line {xLine}";
+                        }
+                        catch (InvalidOperationException)
+                        {
+                        }
+                    }
+                }
+
+                return entry;
+            }
         }
 
         internal AD7Process(Dictionary<string, string> aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
@@ -414,20 +490,20 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             OutputClear();
             OutputText("Debugger process initialized.");
 
+            mDebugInfo["ISOFile"] = Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), mDebugInfo["ISOFile"]);
             mISO = mDebugInfo["ISOFile"];
             OutputText("Using ISO file " + mISO + ".");
             mProjectFile = mDebugInfo["ProjectFile"];
             //
-            bool xUseGDB = string.Equals(mDebugInfo[BuildPropertyNames.EnableGDBString], "true", StringComparison.InvariantCultureIgnoreCase);
+            bool xUseGDB = String.Equals(mDebugInfo[BuildPropertyNames.EnableGDBString], "true", StringComparison.InvariantCultureIgnoreCase);
             OutputText("GDB " + (xUseGDB ? "Enabled" : "Disabled") + ".");
             //
-            var xGDBClient = false;
-            Boolean.TryParse(mDebugInfo[BuildPropertyNames.StartCosmosGDBString], out xGDBClient);
+            Boolean.TryParse(mDebugInfo[BuildPropertyNames.StartCosmosGDBString], out var xGDBClient);
 
             switch (mLaunch)
             {
                 case LaunchType.VMware:
-#region CheckIfHyperVServiceIsRunning
+                    #region CheckIfHyperVServiceIsRunning
 
                     using (System.ServiceProcess.ServiceController sc = new System.ServiceProcess.ServiceController("vmms"))
                     {
@@ -436,8 +512,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                             if (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running)
                             {
                                 AD7Util.MessageBox(
-                                    "The Hyper-V Virtual Machine Management Service will be stopped. This is needed to allow to run VMware. If you press \"No\" the debug will stop.",
-                                    "Question");
+                                    "The Hyper-V Virtual Machine Management Service will be stopped. This is needed to allow to run VMware.");
                                 sc.Stop();
                             }
                         }
@@ -447,27 +522,25 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         }
                     }
 
-#endregion CheckIfHyperVServiceIsRunning
+                    #endregion
 
                     mHost = new VMware(mDebugInfo, xUseGDB);
                     break;
-#if SERIAL_PORT
                 case LaunchType.Slave:
                     mHost = new Slave(mDebugInfo, xUseGDB);
                     break;
-#endif
                 case LaunchType.Bochs:
                     // The project has been created on another machine or Bochs has been uninstalled since the project has
                     // been created.
                     if (!BochsSupport.BochsEnabled)
                     {
-                        throw new Exception(Resources.BochsIsNotInstalled);
+                        throw new Exception("The Bochs emulator doesn't seem to be installed on this machine.");
                     }
 
                     string bochsConfigurationFileName;
                     mDebugInfo.TryGetValue(BuildProperties.BochsEmulatorConfigurationFileString, out bochsConfigurationFileName);
 
-                    if (string.IsNullOrEmpty(bochsConfigurationFileName))
+                    if (String.IsNullOrEmpty(bochsConfigurationFileName))
                     {
                         bochsConfigurationFileName = BuildProperties.BochsDefaultConfigurationFileName;
                     }
@@ -485,6 +558,13 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                     //((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
                     break;
+                case LaunchType.Qemu:
+                    if (!QemuSupport.QemuEnabled)
+                    {
+                        throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
+                    }
+                    mHost = new Qemu(mDebugInfo, xUseGDB);
+                    break;
                 case LaunchType.IntelEdison:
                     mHost = new IntelEdison(mDebugInfo, false);
                     break;
@@ -497,12 +577,12 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mHost.OnShutDown += HostShutdown;
 
             string xDbPath = Path.ChangeExtension(mISO, "cdb");
-            if (!File.Exists(xDbPath))
+            if (!File.Exists(Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), xDbPath)))
             {
                 throw new Exception("Debug data file " + xDbPath + " not found. Could be a omitted build process of Cosmos project so that not created.");
             }
 
-            mDebugInfoDb = new DebugInfo(xDbPath);
+            mDebugInfoDb = new DebugInfo(Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), xDbPath));
             mDebugInfoDb.LoadLookups();
 
             CreateDebugConnector();
@@ -522,9 +602,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         protected void LaunchGdbClient()
         {
             OutputText("Launching GDB client.");
-            if (File.Exists(Cosmos.Build.Common.CosmosPaths.GdbClientExe))
+            if (File.Exists(CosmosPaths.GdbClientExe))
             {
-                var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GdbClientExe);
+                var xPSInfo = new ProcessStartInfo(CosmosPaths.GdbClientExe);
                 xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
                 xPSInfo.UseShellExecute = false;
                 xPSInfo.RedirectStandardInput = false;
@@ -535,9 +615,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             }
             else
             {
-                AD7Util.MessageBox(string.Format(
+                AD7Util.MessageBox(String.Format(
                     "The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
-                    Cosmos.Build.Common.CosmosPaths.GdbClientExe), "GDB-Client");
+                    CosmosPaths.GdbClientExe), "GDB-Client");
             }
         }
 
@@ -610,13 +690,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mCallback.OnOutputStringUser(obj + "\r\n");
         }
 
-        internal AD7Thread Thread
-        {
-            get
-            {
-                return mThread;
-            }
-        }
+        internal AD7Thread Thread => mThread;
 
         void DbgCmdTrace(uint aAddress)
         {
@@ -1097,7 +1171,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
             string currentASMLine = mCurrentASMLine;
 
-            if (string.IsNullOrEmpty(currentASMLine))
+            if (String.IsNullOrEmpty(currentASMLine))
             {
                 mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
             }
@@ -1110,7 +1184,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     //Get the line after the call
                     string nextASMLine = mNextASMLine1;
                     uint? nextAddress = mNextAddress1;
-                    if (string.IsNullOrEmpty(nextASMLine) || !nextAddress.HasValue)
+                    if (String.IsNullOrEmpty(nextASMLine) || !nextAddress.HasValue)
                     {
                         mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
                     }
@@ -1200,7 +1274,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 {
                     xCurrentLabel = xCurrentLabels.OrderBy(q => q.Length).Last();
                 }
-                if (string.IsNullOrEmpty(xCurrentLabel))
+                if (String.IsNullOrEmpty(xCurrentLabel))
                 {
                     xCurrentLabel = "NO_METHOD_LABEL_FOUND";
                 }

@@ -83,7 +83,7 @@
     </Bitmaps>
   </Commands>
   <Symbols>
-    <GuidSymbol name="guidVSPackage" value="{A82B45E9-2A89-43BD-925D-C7F0EDD212AA}" />
+    <GuidSymbol name="guidVSPackage" value="{2084F89A-967C-4F7D-A3F8-217C3FA8EE66}" />
 
     <GuidSymbol name="guidCosmosMenu" value="{5C177460-F057-4AC1-8B7F-D1685C915E3D}">
       <IDSymbol name="TopLevelMenu" value="0x1020" />

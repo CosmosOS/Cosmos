@@ -1,51 +1,16 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Collections.Generic;
-using Cosmos.Debug.Common;
-using System.Windows.Threading;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+
 using Cosmos.Debug.DebugConnectors;
 
 namespace Cosmos.VS.Windows
 {
-    /// This class implements the tool window exposed by this package and hosts a user control.
-    ///
-    /// In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane,
-    /// usually implemented by the package implementer.
-    ///
-    /// This class derives from the ToolWindowPane class provided from the MPF in order to use its
-    /// implementation of the IVsUIElementPane interface.
-
-    [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
-    public class AssemblyTW : ToolWindowPane2
-    {
-        public AssemblyTW()
-        {
-            //ToolBar = new CommandID(GuidList.guidAsmToolbarCmdSet, (int)PkgCmdIDList.AsmToolbar);
-            Caption = "Cosmos Assembly";
-
-            // Set the image that will appear on the tab of the window frame
-            // when docked with an other window.
-            // The resource ID correspond to the one defined in the resx file
-            // while the Index is the offset in the bitmap strip. Each image in
-            // the strip being 16x16.
-            BitmapResourceID = 301;
-            BitmapIndex = 1;
-
-            // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
-            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
-            // the object returned by the Content property.
-            mUserControl = new AssemblyUC();
-            Content = mUserControl;
-        }
-    }
-
     public partial class AssemblyUC : DebuggerUC
     {
         protected List<AsmLine> mLines = new List<AsmLine>();
@@ -152,9 +117,8 @@ namespace Cosmos.VS.Windows
 
                 if (aFilter)
                 {
-                    if (xLine is AsmLabel)
+                    if (xLine is AsmLabel xAsmLabel)
                     {
-                        var xAsmLabel = (AsmLabel)xLine;
                         xDisplayLine = xAsmLabel.Label + ":";
 
                         // Skip ASM labels
@@ -169,7 +133,7 @@ namespace Cosmos.VS.Windows
                             xLabelPrefixes.Add(xLabelParts[0] + ".");
                             foundMETHOD_Prefix = true;
                         }
-                        else if(!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_")
+                        else if (!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_")
                                                  && !xAsmLabel.Label.StartsWith("GUID_"))
                         {
                             var xLabelParts = xAsmLabel.Label.Split(':');
@@ -183,7 +147,7 @@ namespace Cosmos.VS.Windows
                     }
 
                     // Replace all and not just labels so we get jumps, calls etc
-                    foreach(string xLabelPrefix in xLabelPrefixes)
+                    foreach (string xLabelPrefix in xLabelPrefixes)
                     {
                         xDisplayLine = xDisplayLine.Replace(xLabelPrefix, "");
                     }
@@ -234,10 +198,8 @@ namespace Cosmos.VS.Windows
                 {
                     xRun.Foreground = Brushes.Green;
                 }
-                else if (xLine is AsmCode)
+                else if (xLine is AsmCode xAsmCode)
                 {
-                    var xAsmCode = (AsmCode)xLine;
-
                     gutterRect.MouseUp += gutterRect_MouseUp;
                     gutterRect.Fill = Brushes.LightGray;
                     mGutterRectsToCode.Add(gutterRect, xAsmCode);
@@ -261,11 +223,11 @@ namespace Cosmos.VS.Windows
                             nextCodeDistFromCurrent++;
                         }
 
-                        if(mASMBPs.Contains(GetLineId(xAsmCode)))
+                        if (mASMBPs.Contains(GetLineId(xAsmCode)))
                         {
                             xRun.Background = Brushes.MediumVioletRed;
                         }
-                        else if(Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
+                        else if (Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
                         {
                             xRun.Background = Brushes.LightYellow;
                         }
@@ -305,9 +267,9 @@ namespace Cosmos.VS.Windows
             var line = mGutterRectsToCode[rect];
             var xRun = mGutterRectsToRun[rect];
             //Search for associated label
-            Global.PipeUp.SendCommand(Windows2Debugger.ToggleAsmBreak2, Encoding.UTF8.GetBytes(((AsmCode)line).AsmLabel.Label));
+            Global.PipeUp.SendCommand(Windows2Debugger.ToggleAsmBreak2, Encoding.UTF8.GetBytes((line).AsmLabel.Label));
 
-            string lineId = GetLineId((AsmCode)line);
+            string lineId = GetLineId(line);
             if (mASMBPs.Contains(lineId))
             {
                 if (line.LabelMatches(mCurrentLabel))

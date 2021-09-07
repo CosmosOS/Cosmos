@@ -1,150 +1,129 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL
 {
-  public static class Global
-  {
-    public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
-
-    //static public PIT PIT = new PIT();
-    // Must be static init, other static inits rely on it not being null
-    public static TextScreenBase TextScreen = new TextScreen();
-
-    public static PCI Pci;
-
-    private static void InitAta(Ata.ControllerIdEnum aControllerID,
-                                Ata.BusPositionEnum aBusPosition)
+    public static class Global
     {
-      var xIO = aControllerID == Ata.ControllerIdEnum.Primary
-                  ? Core.Global.BaseIOGroups.ATA1
-                  : Core.Global.BaseIOGroups.ATA2;
-      var xATA = new AtaPio(xIO, aControllerID, aBusPosition);
-      if (xATA.DriveType == AtaPio.SpecLevel.Null)
-      {
-        return;
-      }
-      if (xATA.DriveType == AtaPio.SpecLevel.ATA)
-      {
-        BlockDevice.BlockDevice.Devices.Add(xATA);
-        Ata.AtaDebugger.Send("ATA device with speclevel ATA found.");
-      }
-      else
-      {
-        //Ata.AtaDebugger.Send("ATA device with spec level " + (int)xATA.DriveType +
-        //                     " found, which is not supported!");
-        return;
-      }
-      var xMbrData = new byte[512];
-      xATA.ReadBlock(0UL, 1U, xMbrData);
-      var xMBR = new MBR(xMbrData);
+        public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
 
-      if (xMBR.EBRLocation != 0)
-      {
-        //EBR Detected
-        var xEbrData = new byte[512];
-        xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
-        var xEBR = new EBR(xEbrData);
+        public static PIT PIT = new PIT();
+        // Must be static init, other static inits rely on it not being null
 
-        for (int i = 0; i < xEBR.Partitions.Count; i++)
+        public static TextScreenBase TextScreen = new TextScreen();
+        public static PCI Pci;
+
+        public static readonly PS2Controller PS2Controller = new PS2Controller();
+
+        // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
+        /// <summary>
+        /// Init <see cref="Global"/> instance.
+        /// </summary>
+        /// <param name="textScreen">Text screen.</param>
+        /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
+        static public void Init(TextScreenBase textScreen)
         {
-          //var xPart = xEBR.Partitions[i];
-          //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-          //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-        }
-      }
+            if (textScreen != null)
+            {
+                TextScreen = textScreen;
+            }
 
-      // TODO Change this to foreach when foreach is supported
-      Ata.AtaDebugger.Send("Number of MBR partitions found:");
-      Ata.AtaDebugger.SendNumber(xMBR.Partitions.Count);
-      for (int i = 0; i < xMBR.Partitions.Count; i++)
-      {
-        var xPart = xMBR.Partitions[i];
-        if (xPart == null)
+            mDebugger.Send("Before Core.Global.Init");
+            Core.Global.Init();
+
+            //TODO Redo this - Global init should be other.
+            // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
+            // If we let hardware do it, we need to protect it from being used by System.
+            // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
+            //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
+
+            //TODO: Since this is FCL, its "common". Otherwise it should be
+            // system level and not accessible from Core. Need to think about this
+            // for the future.
+            Console.Clear();
+            Console.WriteLine("Finding PCI Devices");
+            mDebugger.Send("PCI Devices");
+            PCI.Setup();
+
+            Console.WriteLine("Starting ACPI");
+            mDebugger.Send("ACPI Init");
+            ACPI.Start();
+
+            // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
+            // TODO: USB should be initialized before the PS/2 controller
+            // TODO: ACPI should be used to check if a PS/2 controller exists
+            mDebugger.Send("PS/2 Controller Init");
+            PS2Controller.Initialize();
+
+            IDE.InitDriver();
+            AHCI.InitDriver();
+            //EHCI.InitDriver();
+
+            mDebugger.Send("Network Devices Init");
+            NetworkInit.Init();
+
+            mDebugger.Send("Done initializing Cosmos.HAL.Global");
+
+        }
+
+        /// <summary>
+        /// Enable interrupts.
+        /// </summary>
+        public static void EnableInterrupts()
         {
-          Console.WriteLine("Null partition found at idx: " + i);
+            CPU.EnableInterrupts();
         }
-        else
+
+        /// <summary>
+        /// Check if CPU interrupts are enabled.
+        /// </summary>
+        public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
+
+        /// <summary>
+        /// Get keyboard devices.
+        /// </summary>
+        /// <returns>IEnumerable{KeyboardBase} value.</returns>
+        public static IEnumerable<KeyboardBase> GetKeyboardDevices()
         {
-          var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
-          BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-          Console.WriteLine("Found partition at idx" + i);
+            var xKeyboardDevices = new List<KeyboardBase>();
+
+            if (PS2Controller.FirstDevice is KeyboardBase xKeyboard1)
+            {
+                xKeyboardDevices.Add(xKeyboard1);
+            }
+
+            if (PS2Controller.SecondDevice is KeyboardBase xKeyboard2)
+            {
+                xKeyboardDevices.Add(xKeyboard2);
+            }
+
+            return xKeyboardDevices;
         }
-      }
+
+        /// <summary>
+        /// Get mouse devices.
+        /// </summary>
+        /// <returns>IEnumerable{MouseBase} value.</returns>
+        public static IEnumerable<MouseBase> GetMouseDevices()
+        {
+            var xMouseDevices = new List<MouseBase>();
+
+            if (PS2Controller.FirstDevice is PS2Mouse xMouse1)
+            {
+                xMouseDevices.Add(xMouse1);
+            }
+
+            if (PS2Controller.SecondDevice is PS2Mouse xMouse2)
+            {
+                xMouseDevices.Add(xMouse2);
+            }
+
+            return xMouseDevices;
+        }
     }
-
-    // Init devices that are "static"/mostly static. These are devices
-    // that all PCs are expected to have. Keyboards, screens, ATA hard drives etc.
-    // Despite them being static, some discovery is required. For example, to see if
-    // a hard drive is connected or not and if so what type.
-    internal static void InitStaticDevices()
-    {
-      //TextScreen = new TextScreen();
-      mDebugger.Send("CLS");
-      //TODO: Since this is FCL, its "common". Otherwise it should be
-      // system level and not accessible from Core. Need to think about this
-      // for the future.
-      mDebugger.Send("Finding PCI Devices");
-      //PCI.Setup();
-    }
-
-    static public void Init(TextScreenBase textScreen)
-    {
-      if (textScreen != null)
-      {
-        TextScreen = textScreen;
-      }
-
-      mDebugger.Send("Before Core.Global.Init");
-      Core.Global.Init();
-      mDebugger.Send("Static Devices");
-      InitStaticDevices();
-      mDebugger.Send("PCI Devices");
-      InitPciDevices();
-      mDebugger.Send("ACPI Init");
-      StartACPI();
-      mDebugger.Send("Done initializing Cosmos.HAL.Global");
-
-      mDebugger.Send("ATA Primary Master");
-      InitAta(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-
-      //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum?
-      // They do show up in PCI space as well as the fixed space.
-      // Or is it always here, and was our compiler stack corruption issue?
-      mDebugger.Send("ATA Secondary Master");
-      InitAta(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-      //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
-    }
-
-    internal static void InitPciDevices()
-    {
-      //TODO Redo this - Global init should be other.
-      // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
-      // If we let hardware do it, we need to protect it from being used by System.
-      // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
-      //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
-
-      //TODO: Since this is FCL, its "common". Otherwise it should be
-      // system level and not accessible from Core. Need to think about this
-      // for the future.
-      Console.WriteLine("Finding PCI Devices");
-      PCI.Setup();
-    }
-
-    public static void StartACPI()
-    {
-      Console.WriteLine("Starting ACPI");
-      ACPI.Start();
-    }
-
-    public static void EnableInterrupts()
-    {
-      CPU.EnableInterrupts();
-    }
-
-    public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
-  }
 }

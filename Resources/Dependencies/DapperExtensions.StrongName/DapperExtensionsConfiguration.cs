@@ -98,7 +98,7 @@ namespace DapperExtensions
                         select type).SingleOrDefault();
             };
 
-            Type result = getType(entityType.GetTypeInfo().Assembly);
+            Type result = getType(entityType.Assembly);
             if (result != null)
             {
                 return result;
@@ -113,7 +113,7 @@ namespace DapperExtensions
                 }
             }
 
-            return getType(entityType.GetTypeInfo().Assembly);
+            return getType(entityType.Assembly);
         }
     }
 }

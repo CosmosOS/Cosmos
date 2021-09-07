@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -16,9 +18,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         public AD7Expression(DebugLocalInfo pVar, AD7Process pProcess, AD7StackFrame pStackFrame)
         {
-            this.m_var = pVar;
-            this.Process = pProcess;
-            this.StackFrame = pStackFrame;
+            m_var = pVar;
+            Process = pProcess;
+            StackFrame = pStackFrame;
         }
 
         // This method cancels asynchronous expression evaluation as started by a call to the IDebugExpression2::EvaluateAsync method.
@@ -33,6 +35,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         // must be sent to the IDebugEventCallback2 event callback
         //
         // This is primarily used for the immediate window which this engine does not currently support.
+        [SuppressMessage("AsyncUsage.CSharp.Naming", "AvoidAsyncSuffix:Avoid Async suffix", Scope = "member")]
         int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback)
         {
             throw new NotImplementedException();

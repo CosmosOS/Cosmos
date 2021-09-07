@@ -5,31 +5,58 @@ namespace Cosmos.Core
     // PIC is not in hardware becuase its a special core piece like CPU that is not interacted with by anything except Core.
     //
     // Remaps the IRQ's to INT20-INT2F
+    /// <summary>
+    /// PIC class. Used to manage PIC interrupts.
+    /// </summary>
     public class PIC
     {
         // This is here and not in BaseGroups for 2 reasons.
         // 1) Its needed before the other Basegroups are created.
         // 2) Its only used by this class, and it also exists in Core.
+        /// <summary>
+        /// Master PIC.
+        /// </summary>
         protected IOGroup.PIC Master = new IOGroup.PIC(false);
+        /// <summary>
+        /// Slave PIC.
+        /// </summary>
         protected IOGroup.PIC Slave = new IOGroup.PIC(true);
 
+        /// <summary>
+        /// Commands.
+        /// </summary>
         protected enum Cmd
         {
+            /// <summary>
+            /// Initialize.
+            /// </summary>
             Init = 0x10,
+            /// <summary>
+            /// End of interrupt.
+            /// </summary>
             EOI = 0x20
         }
 
+        /// <summary>
+        /// Master end of interrupt.
+        /// </summary>
         public void EoiMaster()
         {
             Master.Cmd.Byte = (byte) Cmd.EOI;
         }
 
+        /// <summary>
+        /// Slave end of interrupt.
+        /// </summary>
         public void EoiSlave()
         {
             Master.Cmd.Byte = (byte) Cmd.EOI;
             Slave.Cmd.Byte = (byte) Cmd.EOI;
         }
 
+        /// <summary>
+        /// Create new instance of the <see cref="PIC"/> class.
+        /// </summary>
         public PIC()
         {
             // MTW: to disable PIT, send 0x01 to Master mask
@@ -44,10 +71,16 @@ namespace Cosmos.Core
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
             //for now enable keyboard, mouse(ps2)
-            Remap(0x20, 0xF9 | 0x08, 0x28, 0xEF);
-
+            Remap(0x20, 0xF8 | 0x08, 0x28, 0xEB);
         }
 
+        /// <summary>
+        /// Remap master and slave relationship.
+        /// </summary>
+        /// <param name="masterStart">Master start.</param>
+        /// <param name="masterMask">Master mask.</param>
+        /// <param name="slaveStart">Slave start.</param>
+        /// <param name="slaveMask">Slave mask.</param>
         private void Remap(byte masterStart, byte masterMask, byte slaveStart, byte slaveMask)
         {
             #region consts
@@ -96,10 +129,17 @@ namespace Cosmos.Core
             // set masks:
             Master.Data.Byte = masterMask;
             IOPort.Wait();
-            Slave.Data.Byte = slaveMask;
-            IOPort.Wait();
+            //Slave.Data.Byte = slaveMask;
+            //IOPort.Wait();
         }
 
+        /// <summary>
+        /// Initialize PIC.
+        /// </summary>
+        /// <param name="aPIC">A PIC.</param>
+        /// <param name="aBase">A base data port.</param>
+        /// <param name="aIDunno">Slave relationship message.</param>
+        /// <param name="aMask">A mask.</param>
         protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask)
         {
             // We need to remap the PIC interrupt lines to the CPU. The BIOS sets

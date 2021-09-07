@@ -1,0 +1,8 @@
+﻿<Project>
+
+    <PropertyGroup>
+        <RunCommand>dotnet</RunCommand>
+        <RunArguments>msbuild /t:Launch</RunArguments>
+    </PropertyGroup>
+
+</Project>

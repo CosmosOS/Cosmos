@@ -1,7 +1,0 @@
-Font Dialog code found at: http://www.bennedik.de/2007/10/wpf-fast-font-drop-down-list.html
-Color picker dialog found at: http://blogs.msdn.com/wpfsdk/archive/2006/10/26/Uncommon-Dialogs--Font-Chooser-and-Color-Picker-Dialogs.aspx
-
-
-01/13/2010:
-- Implemented completion.
-- Started working on even more accurate text alignment.

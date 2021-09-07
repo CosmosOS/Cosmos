@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="ResolvedPackageReference"
+      PageTemplate="generic"
+      OverrideMode="Extend"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <Rule.Categories>
+        <Category Name="Cosmos" DisplayName="Cosmos" />
+    </Rule.Categories>
+
+    <BoolProperty Name="IsPlugsReference"
+                  DisplayName="IsPlugsReference"
+                  Category="Cosmos">
+        <BoolProperty.DataSource>
+            <DataSource Persistence="ProjectFile"
+                        ItemType="PackageReference"
+                        HasConfigurationCondition="False"
+                        SourceOfDefaultValue="AfterContext" />
+        </BoolProperty.DataSource>
+    </BoolProperty>
+
+</Rule>

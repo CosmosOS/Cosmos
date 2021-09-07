@@ -1,7 +1,0 @@
-Special debug build using 4.05. Not included in builds, genec build it for us.
-
-Was built with -DDEBUG=1 in mk/devel.mk
-
-Emits debug data on COM1 at 115200 8n1.
-
-To use replace mboot.c32 in the user profile areas, or change the config to use mbootdebug.c32.

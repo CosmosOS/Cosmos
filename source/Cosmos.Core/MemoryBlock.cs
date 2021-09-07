@@ -1,18 +1,42 @@
+//#define COSMOSDEBUG
 using System;
-using Cosmos.IL2CPU.API.Attribs;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
 {
+    /// <summary>
+    /// MemoryBlock class. Used to read and write to memory blocks.
+    /// </summary>
     public class MemoryBlock
     {
-        public readonly UInt32 Base;
-        public readonly UInt32 Size;
+        /// <summary>
+        /// Memory block base address.
+        /// </summary>
+        public readonly uint Base;
+        /// <summary>
+        /// Memory block size.
+        /// </summary>
+        public readonly uint Size;
 
+        /// <summary>
+        /// Bytes memory block.
+        /// </summary>
         public readonly MemoryBlock08 Bytes;
+        /// <summary>
+        /// Words memory block.
+        /// </summary>
         public readonly MemoryBlock16 Words;
+        /// <summary>
+        /// DWords memory block.
+        /// </summary>
         public readonly MemoryBlock32 DWords;
 
-        public MemoryBlock(UInt32 aBase, UInt32 aSize)
+        /// <summary>
+        /// Create new instance of the <see cref="MemoryBlock"/> class.
+        /// </summary>
+        /// <param name="aBase">A base.</param>
+        /// <param name="aSize">A size.</param>
+        public MemoryBlock(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
@@ -25,7 +49,13 @@ namespace Cosmos.Core
         //TODO: Make an attribute that can be applied to methods to tell the copmiler to inline them to save
         // the overhead of a call on operations like this.
         // Need to check bounds for 16 and 32 better so offset cannot be size - 1 and then the 4 bytes write past the end
-        public unsafe UInt32 this[UInt32 aByteOffset]
+        /// <summary>
+        /// Get and set memory block.
+        /// </summary>
+        /// <param name="aByteOffset">A byte offset.</param>
+        /// <returns>uint value.</returns>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe uint this[uint aByteOffset]
         {
             get
             {
@@ -33,7 +63,7 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt32*)(Base + aByteOffset);
+                return *(uint*)(Base + aByteOffset);
             }
             set
             {
@@ -41,81 +71,391 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt32*)(Base + aByteOffset)) = value;
+                (*(uint*)(Base + aByteOffset)) = value;
             }
         }
 
-        public void Fill(UInt32 aData)
+        /// <summary>
+        /// Fill memory block.
+        /// </summary>
+        /// <param name="aData">A data to fill.</param>
+        public void Fill(uint aData)
         {
             //Fill(0, Size / 4, aData);
             Fill(0, Size, aData);
         }
 
+        /// <summary>
+        /// Fill memory block.
+        /// </summary>
+        /// <param name="aStart">A start.</param>
+        /// <param name="aCount">A count.</param>
+        /// <param name="aData">A data.</param>
         [DebugStub(Off = true)]
-        public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt32 aData)
+        public unsafe void Fill(uint aStart, uint aCount, uint aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            UInt32* xDest = (UInt32*)(this.Base + aStart);
+            uint* xDest = (uint*)(Base + aStart);
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aCount">Data size.</param>
+        /// <param name="aData">A data to fill memory block with.</param>
+        [DebugStub(Off = true)]
+        public unsafe void Fill(int aStart, int aCount, int aData)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(Base + aStart);
+            MemoryOperations.Fill(xDest, aData, (int)aCount);
+        }
+
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aData">Data to fill the memory block with.</param>
         public void Fill(byte aData)
         {
             Fill(0, Size, aData);
         }
 
-        public void Fill(UInt16 aData)
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aData">Data to fill the memory block with.</param>
+        public void Fill(ushort aData)
         {
             Fill(0, Size, aData);
         }
 
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aCount">Data size.</param>
+        /// <param name="aData">A data to fill memory block with.</param>
         [DebugStub(Off = true)]
-        public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt16 aData)
+        public unsafe void Fill(uint aStart, uint aCount, ushort aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            UInt16* xDest = (UInt16*)(this.Base + aStart);
+            ushort* xDest = (ushort*)(Base + aStart);
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
+        /// <summary>
+        /// Fill data to memory block.
+        /// </summary>
+        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aCount">Data size.</param>
+        /// <param name="aData">A data to fill memory block with.</param>
         [DebugStub(Off = true)]
-        public unsafe void Fill(UInt32 aStart, UInt32 aCount, byte aData)
+        public unsafe void Fill(uint aStart, uint aCount, byte aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            byte* xDest = (byte*)(this.Base + aStart);
+            byte* xDest = (byte*)(Base + aStart);
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
+        /// <summary>
+        /// Copy data from the buffer to the start of the memory block.
+        /// </summary>
+        /// <param name="aData">A data buffer array.</param>
+        /// <exception cref="OverflowException">Thrown if aData length in greater then Int32.MaxValue.</exception>
         [DebugStub(Off = true)]
-        public unsafe void MoveDown(UInt32 aDest, UInt32 aSrc, UInt32 aCount)
+        public unsafe void Copy(uint[] aData)
         {
-            byte* xDest = (byte*)(this.Base + aDest);
-            byte* xSrc = (byte*)(this.Base + aSrc);
-            for (int i = 0; i < aCount; i++)
-            {
-                *xDest = *xSrc;
-                xDest++;
-                xSrc++;
+            Copy(0, aData, 0, aData.Length);
+        }
+
+        /// <summary>
+        /// Copy data from the buffer array to the memory block.
+        /// </summary>
+        /// <param name="aStart">A data starting position inside the memory block.</param>
+        /// <param name="aData">A data buffer array.</param>
+        /// <param name="aIndex">A staring index in the source data buffer array.</param>
+        /// <param name="aCount">Number of bytes to copy.</param>
+        unsafe public void Copy(uint aStart, uint[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            uint* xDest = (uint*)(Base + aStart);
+
+            Global.mDebugger.SendInternal($"Base is {Base} xDest is {(uint)xDest}");
+            fixed (uint* aDataPtr = aData) {
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
             }
         }
 
-        public void MoveUp(UInt32 aDest, UInt32 aSrc, UInt32 aCount)
+        /// <summary>
+        /// Copy data from the buffer to the start of the memory block.
+        /// </summary>
+        /// <param name="aData">A data buffer array.</param>
+        /// <exception cref="OverflowException">Thrown if aData length in greater then Int32.MaxValue.</exception>
+        public void Copy(byte[] aData)
+        {
+            Copy(0, aData, 0, aData.Length);
+        }
+
+        /// <summary>
+        /// Copy data from the buffer array to the memory block.
+        /// </summary>
+        /// <param name="aStart">A data starting position inside the memory block.</param>
+        /// <param name="aData">A data buffer array.</param>
+        /// <param name="aIndex">A staring index in the source data buffer array.</param>
+        /// <param name="aCount">Number of bytes to copy.</param>
+        public unsafe void Copy(int aStart, byte[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(Base + aStart);
+            fixed (byte* aDataPtr = aData)
+            {
+                MemoryOperations.Copy((byte*)xDest, aDataPtr + aIndex, aCount);
+            }
+        }
+
+        /// <summary>
+        /// Copy data from the buffer to the start of the memory block.
+        /// </summary>
+        /// <param name="aData">A data buffer array.</param>
+        /// <exception cref="OverflowException">Thrown if aData length in greater then Int32.MaxValue.</exception>
+        public void Copy(int[] aData)
+        {
+            Copy(0, aData, 0, aData.Length);
+        }
+
+        /// <summary>
+        /// Copy data from the buffer array to the start of the memory block.
+        /// </summary>
+        /// <param name="aData">A data buffer array.</param>
+        /// <param name="aIndex">A staring index in the source data buffer array.</param>
+        /// <param name="aCount">Number of bytes to copy.</param>
+        /// <exception cref="OverflowException">Thrown if aData length in greater then Int32.MaxValue.</exception>
+        public void Copy(int []aData, int aIndex, int aCount)
+        {
+            Copy(0, aData, aIndex, aData.Length);
+        }
+
+        /// <summary>
+        /// Copy data from the buffer array to the memory block.
+        /// </summary>
+        /// <param name="aStart">A data starting position inside the memory block.</param>
+        /// <param name="aData">A data buffer array.</param>
+        /// <param name="aIndex">A staring index in the source data buffer array.</param>
+        /// <param name="aCount">Number of bytes to copy.</param>
+        public unsafe void Copy(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xDest = (int*)(Base + aStart);
+            fixed (int* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
+            }
+        }
+
+        /// <summary>
+        /// Copy ManagedMemoryBlock into MemoryBlock
+        /// </summary>
+        /// <param name="block">ManagedMemoryBlock to copy.</param>
+        public unsafe void Copy(ManagedMemoryBlock block)
+        {
+            byte* xDest = (byte*)(Base);
+            byte* aDataPtr = (byte*)block.Offset;
+
+            MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
+        }
+
+        /// <summary>
+        /// Move bytes array down the memory block.
+        /// </summary>
+        /// <param name="aDest">Destination location.</param>
+        /// <param name="aSrc">Sourcs location.</param>
+        /// <param name="aCount">Number of bytes to move.</param>
+        [DebugStub(Off = true)]
+        public unsafe void MoveDown(uint aDest, uint aSrc, uint aCount)
+        {
+            byte* xDest = (byte*)(Base + aDest);
+            byte* xSrc = (byte*)(Base + aSrc);
+            MemoryOperations.Copy(xDest, xSrc, (int)aCount);
+        }
+
+        /// <summary>
+        /// Move data inside the block. Undone.
+        /// </summary>
+        /// <remarks>Always throw. Yet to be done.</remarks>
+        /// <param name="aDest">A destination address.</param>
+        /// <param name="aSrc">A source address.</param>
+        /// <param name="aCount">Number of bytes to move.</param>
+        /// <exception cref="Exception">Thrown always.</exception>
+        public void MoveUp(uint aDest, uint aSrc, uint aCount)
         {
             throw new Exception("TODO");
         }
+
+        #region ReadWrite
+        /// <summary>
+        /// Read 8-bit from the memory block.
+        /// </summary>
+        /// <param name="aBuffer">A buffer to write the data to.</param>
+        /// <exception cref="OverflowException">Thrown if aBuffer length in greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe void Read8(Byte[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length; i++)
+                aBuffer[i] = (*(Byte*)(Base + i));
+        }
+
+        /// <summary>
+        /// Write 8-bit to the memory block.
+        /// </summary>
+        /// <param name="aBuffer">A buffer to be written to the memory block.</param>
+        /// <exception cref="OverflowException">Thrown if aBuffer length in greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe void Write8(Byte[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length; i++)
+                (*(Byte*)(Base + i)) = aBuffer[i];
+        }
+
+        /// <summary>
+        /// Read 16-bit from the memory block.
+        /// </summary>
+        /// <param name="aBuffer">A buffer to write the data to.</param>
+        /// <exception cref="OverflowException">Thrown if aBuffer length in greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe void Read16(ushort[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length / 2; i++)
+            {
+                aBuffer[i] = (*(ushort*)(Base + i));
+            }
+        }
+
+        /// <summary>
+        /// Write 16-bit to the memory block.
+        /// </summary>
+        /// <param name="aBuffer">A buffer to be written to the memory block.</param>
+        /// <exception cref="OverflowException">Thrown if aBuffer length in greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe void Write16(ushort[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length / sizeof(ushort); i++)
+            {
+                (*(ushort*)(Base + i)) = aBuffer[i];
+            }
+        }
+
+        /// <summary>
+        /// Read 32-bit from the memory block.
+        /// </summary>
+        /// <param name="aBuffer">A buffer to write the data to.</param>
+        /// <exception cref="OverflowException">Thrown if aBuffer length in greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe void Read32(uint[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length / sizeof(uint); i++)
+                aBuffer[i] = (*(uint*)(Base + i));
+        }
+
+        /// <summary>
+        /// Write 32-bit to the memory block.
+        /// </summary>
+        /// <param name="aBuffer">A buffer to be written to the memory block.</param>
+        /// <exception cref="OverflowException">Thrown if aBuffer length in greater then Int32.MaxValue.</exception>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe void Write32(uint[] aBuffer)
+        {
+            if(aBuffer.Length >= Size)
+            {
+                throw new Exception("Memory access violation");
+            }
+            for (int i = 0; i < aBuffer.Length / sizeof(uint); i++)
+                (*(uint*)(Base + i)) = aBuffer[i];
+        }
+        #endregion ReadWrite
+
+        /// <summary>
+        /// Convert part for the memory block to array.
+        /// </summary>
+        /// <param name="aStart">A starting position of the data at the source memory block.</param>
+        /// <param name="aIndex">A index to be the staring index at the destination array.</param>
+        /// <param name="aCount">Number of bytes to get.</param>
+        /// <returns>uint array.</returns>
+        public unsafe uint[] ToArray(int aStart, int aIndex, int aCount)
+        {
+            uint* xDest = (uint*)(Base + aStart);
+            uint[] array = new uint[aCount];
+            fixed (uint* aArrayPtr = array)
+            {
+                MemoryOperations.Copy(aArrayPtr + aIndex, xDest, aCount);
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// Convert the memory block to array.
+        /// </summary>
+        /// <returns>uint array.</returns>
+        public uint[] ToArray()
+        {
+            return ToArray(0, 0, (int)Size);
+        }
+            
     }
 
+    /// <summary>
+    /// MemoryBlock08 class.
+    /// </summary>
     public class MemoryBlock08
     {
-        public readonly UInt32 Base;
-        public readonly UInt32 Size;
+        /// <summary>
+        /// Base.
+        /// </summary>
+        public readonly uint Base;
+        /// <summary>
+        /// Size.
+        /// </summary>
+        public readonly uint Size;
 
-        internal MemoryBlock08(UInt32 aBase, UInt32 aSize)
+        /// <summary>
+        /// Create new instance of the <see cref="MemoryBlock08"/> class.
+        /// </summary>
+        /// <param name="aBase">A base.</param>
+        /// <param name="aSize">A size.</param>
+        internal MemoryBlock08(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
-        public unsafe byte this[UInt32 aByteOffset]
+        /// <summary>
+        /// Get and set memory block.
+        /// </summary>
+        /// <param name="aByteOffset">A byte offset.</param>
+        /// <returns>byte value.</returns>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe byte this[uint aByteOffset]
         {
             get
             {
@@ -137,18 +477,38 @@ namespace Cosmos.Core
         }
     }
 
+    /// <summary>
+    /// MemoryBlock16 class.
+    /// </summary>
     public class MemoryBlock16
     {
-        public readonly UInt32 Base;
-        public readonly UInt32 Size;
+        /// <summary>
+        /// Base.
+        /// </summary>
+        public readonly uint Base;
+        /// <summary>
+        /// Size.
+        /// </summary>
+        public readonly uint Size;
 
-        internal MemoryBlock16(UInt32 aBase, UInt32 aSize)
+        /// <summary>
+        /// Create new instance of the <see cref="MemoryBlock16"/> class.
+        /// </summary>
+        /// <param name="aBase">A base.</param>
+        /// <param name="aSize">A size.</param>
+        internal MemoryBlock16(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
-        public unsafe UInt16 this[UInt32 aByteOffset]
+        /// <summary>
+        /// Get and set memory block.
+        /// </summary>
+        /// <param name="aByteOffset">A byte offset.</param>
+        /// <returns>ushort value.</returns>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe ushort this[uint aByteOffset]
         {
             get
             {
@@ -156,7 +516,7 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt16*)(Base + aByteOffset);
+                return *(ushort*)(Base + aByteOffset);
             }
             set
             {
@@ -164,24 +524,44 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt16*)(Base + aByteOffset)) = value;
+                (*(ushort*)(Base + aByteOffset)) = value;
             }
         }
 
     }
 
+    /// <summary>
+    /// MemoryBlock32 class.
+    /// </summary>
     public class MemoryBlock32
     {
-        public readonly UInt32 Base;
-        public readonly UInt32 Size;
+        /// <summary>
+        /// Base.
+        /// </summary>
+        public readonly uint Base;
+        /// <summary>
+        /// Size.
+        /// </summary>
+        public readonly uint Size;
 
-        internal MemoryBlock32(UInt32 aBase, UInt32 aSize)
+        /// <summary>
+        /// Create new instance of the <see cref="MemoryBlock32"/> class.
+        /// </summary>
+        /// <param name="aBase">A base.</param>
+        /// <param name="aSize">A size.</param>
+        internal MemoryBlock32(uint aBase, uint aSize)
         {
             Base = aBase;
             Size = aSize;
         }
 
-        public unsafe UInt32 this[UInt32 aByteOffset]
+        /// <summary>
+        /// Get and set memory block.
+        /// </summary>
+        /// <param name="aByteOffset">A byte offset.</param>
+        /// <returns>uint value.</returns>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public unsafe uint this[uint aByteOffset]
         {
             get
             {
@@ -189,7 +569,7 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt32*)(Base + aByteOffset);
+                return *(uint*)(Base + aByteOffset);
             }
             set
             {
@@ -197,9 +577,8 @@ namespace Cosmos.Core
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt32*)(Base + aByteOffset)) = value;
+                (*(uint*)(Base + aByteOffset)) = value;
             }
         }
-
     }
 }

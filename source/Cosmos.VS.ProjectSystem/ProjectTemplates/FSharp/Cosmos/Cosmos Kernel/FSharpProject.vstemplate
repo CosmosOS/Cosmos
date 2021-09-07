@@ -1,0 +1,21 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+
+    <TemplateData>
+        <Name Package="{29194faf-90ce-454b-bc53-08b722f1dadf}" ID="7" />
+        <Description Package="{29194faf-90ce-454b-bc53-08b722f1dadf}" ID="8" />
+        <Icon Package="{29194faf-90ce-454b-bc53-08b722f1dadf}" ID="9" />
+        <ProjectType>FSharp</ProjectType>
+        <CreateNewFolder>true</CreateNewFolder>
+        <DefaultName>CosmosKernel</DefaultName>
+        <ProvideDefaultName>true</ProvideDefaultName>
+        <CreateInPlace>true</CreateInPlace>
+        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    </TemplateData>
+
+    <TemplateContent>
+        <Project File="FSharpProject.fsproj">
+            <ProjectItem ReplaceParameters="true" OpenInEditor="true">Kernel.fs</ProjectItem>
+        </Project>
+    </TemplateContent>
+
+</VSTemplate>

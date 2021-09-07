@@ -1,0 +1,10 @@
+<Project>
+
+    <Target Name="WorkaroundForXamlIntellisenseBuildIssue"
+            AfterTargets="_CheckCompileDesignTimePrerequisite">
+        <PropertyGroup>
+            <BuildingProject>False</BuildingProject>
+        </PropertyGroup>
+    </Target>
+
+</Project>

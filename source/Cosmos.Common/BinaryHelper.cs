@@ -8,8 +8,9 @@ namespace Cosmos.Common
     public class BinaryHelper
     {
         /// <summary>
-        /// Bitwise checks it the given bit is set in the data.
+        /// Bitwise checks if the given bit is set in the data.
         /// </summary>
+        /// <param name="data">A 16-bit unsigned int data</param>
         /// <param name="bit">The zero-based position of a bit. I.e. bit 1 is the second bit.</param>
         /// <returns>Returns TRUE if bit is set.</returns>
         public static bool CheckBit(UInt16 data, ushort bit)
@@ -24,6 +25,12 @@ namespace Cosmos.Common
             return (data & mask) != 0;
         }
 
+        /// <summary>
+        /// Bitwise checks if the given bit is set in the data.
+        /// </summary>
+        /// <param name="data">A 32-bit unsigned int data.</param>
+        /// <param name="bit">The zero-based position of a bit. I.e. bit 1 is the second bit.</param>
+        /// <returns>Returns TRUE if bit is set.</returns>
         public static bool CheckBit(UInt32 data, ushort bit)
         {
             UInt32 mask = (UInt32)(1 << (int)bit);
@@ -37,9 +44,11 @@ namespace Cosmos.Common
         }
 
         /// <summary>
-        /// Changes the value in the given position. Change bitvalue from low to high, or high to low.
-        /// Returns the same byte, but with one bit changed.
+        /// Flips the bit value at the given position in the data, from low to high, or from high to low.
         /// </summary>
+        /// <param name="data">A byte of data.</param>
+        /// <param name="bitposition">A bit position to change.</param>
+        /// <returns>The same data, but with one bit changed.</returns>
         public static byte FlipBit(byte data, ushort bitposition)
         {
             byte mask = (byte)(1 << bitposition);
@@ -49,6 +58,12 @@ namespace Cosmos.Common
                 return (byte)(data | mask);
         }
 
+        /// <summary>
+        /// Flips the bit value at the given position in the data, from low to high, or from high to low.
+        /// </summary>
+        /// <param name="data">A 32-bit unsigned int of data.</param>
+        /// <param name="bitposition">A bit position to change.</param>
+        /// <returns>The same data, but with one bit changed.</returns>
         public static UInt32 FlipBit(UInt32 data, ushort bitposition)
         {
             UInt32 mask = (UInt32)(1 << bitposition);
@@ -60,12 +75,12 @@ namespace Cosmos.Common
 
 
         /// <summary>
-        /// Retrieves a byte of data from somewhere inside a 32 bit number. An offset is used to indicate where in
-        /// the 32 bit number to start extracting 8 bits.
+        /// Get 32-bit unsigned int from 32-bit unsigned int, starting from a given offset.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="offset"></param>
-        /// <returns></returns>
+        /// <param name="data">A 32-bit unsigned int data.</param>
+        /// <param name="offset">The offset (in bytes) from the start of the data.</param>
+        /// <exception cref="ArgumentException">Thrown when offset is greater then 24.</exception>
+        /// <returns>Extracted 8-bit unsigned int (byte).</returns>
         public static byte GetByteFrom32bit(UInt32 data, byte offset)
         {
             if (offset > 24)
@@ -76,7 +91,7 @@ namespace Cosmos.Common
         }
 
         /// <summary>
-        /// Returns the HEX value of a given bitnumber
+        /// Returns the HEX value of a given bitnumber.
         /// </summary>
         [Flags]
         public enum BitPos : uint

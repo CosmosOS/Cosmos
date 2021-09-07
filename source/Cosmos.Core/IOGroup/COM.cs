@@ -6,15 +6,42 @@ using Cosmos.Core;
 
 namespace Cosmos.Core.IOGroup
 {
+    /// <summary>
+    /// Communication port (COM) class. See also: <seealso cref="IOGroup"/>.
+    /// </summary>
     public class COM : IOGroup
     {
+        /// <summary>
+        /// Data register port.
+        /// </summary>
         public readonly IOPort Data;
+        /// <summary>
+        /// Interrupt enable register port.
+        /// </summary>
         public readonly IOPort InterruptEnable;
+        /// <summary>
+        /// FIFO control register port.
+        /// </summary>
         public readonly IOPort FIFOControl;
+        /// <summary>
+        /// Line control register port.
+        /// </summary>
         public readonly IOPort LineControl;
+        /// <summary>
+        /// Modem control register port.
+        /// </summary>
         public readonly IOPort ModemControl;
+        /// <summary>
+        /// Line status register port.
+        /// </summary>
         public readonly IOPort LineStatus;
+        /// <summary>
+        /// Modem status register port.
+        /// </summary>
         public readonly IOPort ModemStatus;
+        /// <summary>
+        /// Scratch register port.
+        /// </summary>
         public readonly IOPort Scratch;
 
         /// <summary>

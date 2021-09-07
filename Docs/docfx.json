@@ -1,0 +1,74 @@
+{
+    "metadata": [
+        {
+            "src": [
+                {
+                    "files": [
+                        "Build.sln"
+                    ],
+                    "exclude": [
+                        "**/bin/**",
+                        "**/obj/**"
+                    ],
+                    "src": "../"
+                }
+            ],
+            "dest": "obj/api"
+        }
+    ],
+    "build": {
+        "content": [
+            {
+                "files": [
+                    "**/*.yml"
+                ],
+                "src": "obj/api",
+                "dest": "api"
+            },
+            {
+                "files": [
+                    "**/*.md",
+                    "*.md",
+                    "toc.yml"
+                ]
+            }
+        ],
+        "resource": [
+            {
+                "files": [
+                    "favicon.ico",
+                    "images/**",
+                    "articles/images/**"
+                ]
+            }
+        ],
+        "overwrite": [
+            {
+                "files": [
+                    "apidoc/**.md"
+                ],
+                "exclude": [
+                    "obj/**",
+                    "_site/**"
+                ]
+            }
+        ],
+        "dest": "_site",
+        "globalMetadata": {
+            "_appFooter": "<span></span>",
+            "_appLogoPath": "images/logo.png",
+            "_enableNewTab": true
+        },
+        "globalMetadataFiles": [],
+        "fileMetadataFiles": [],
+        "template": [
+            "statictoc"
+        ],
+        "postProcessors": [],
+        "markdownEngineName": "markdig",
+        "noLangKeyword": false,
+        "keepFileLink": false,
+        "cleanupCacheHistory": false,
+        "disableGitFeatures": false
+    }
+}

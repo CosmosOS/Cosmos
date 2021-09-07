@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net462</TargetFramework>
+
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="nunit" Version="3.12.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ILSpyPlugAddin\ILSpyPlugAddin.csproj" />
+        <ProjectReference Include="..\TestAssembly\TestAssembly.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ILSpyReference Include="ICSharpCode.TreeView.dll" />
+        <ILSpyReference Include="ICSharpCode.Decompiler.dll" />
+        <ILSpyReference Include="ILSpy.exe" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="@(ILSpyReference)" HintPath="$(RepoRoot)Resources\Dependencies\ILSpy\%(Identity)" />
+    </ItemGroup>
+
+</Project>

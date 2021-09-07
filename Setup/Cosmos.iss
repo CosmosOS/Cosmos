@@ -7,20 +7,24 @@
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
 ; IDE so that we don't get an undefined error.
 ; We default to devkit so we dont have to wait on compression.
-#define BuildConfiguration "devkit"
-;#define BuildConfiguration "userkit"
+#define BuildConfiguration "DevKit"
+;#define BuildConfiguration "UserKit"
 #endif
 
 #ifndef VSVersion
-  #define VSVersion "vs2017"
+  #define VSVersion "vs2019"
 #endif
 
-#if BuildConfiguration == "Devkit"
+#ifndef RealPath
+  #define RealPath {userappdata}
+#endif
+
+#if BuildConfiguration == "DevKit"
 	; devkit releases are not compressed
-	#pragma warning "Building Devkit release"
+	#pragma warning "Building Dev Kit release"
 #else
 	; userkit releases get compressed, and get languages included
-	#pragma message "Building Userkit release"
+	#pragma message "Building User Kit release"
 	#define Compress true
 	#define IncludeUILanguages true
 #endif
@@ -29,14 +33,15 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright (c) 2007-2017 The Cosmos Project
+AppCopyright=Copyright (c) 2007-2021 The Cosmos Project
 AppPublisher=Cosmos Project
-AppPublisherURL=http://www.goCosmos.org/
-AppSupportURL=http://www.goCosmos.org/
-AppUpdatesURL=http://www.goCosmos.org/
+AppPublisherURL=http://www.gocosmos.org/
+AppSupportURL=http://www.gocosmos.org/
+AppUpdatesURL=http://www.gocosmos.org/
 AppVersion={#ChangeSetVersion}
 SetupMutex=CosmosSetupMutexName,Global\CosmoSetupMutexName
-DefaultDirName={userappdata}\Cosmos User Kit
+UsePreviousAppDir=false
+DefaultDirName={#RealPath}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup\Output
 OutputBaseFilename=CosmosUserKit-{#ChangeSetVersion}-{#VSVersion}
@@ -63,7 +68,10 @@ FlatComponentsList=False
 AlwaysShowComponentsList=False
 ShowComponentSizes=False
 LicenseFile=LICENSE.txt
-DisableDirPage=yes
+DisableDirPage=no
+
+[Messages]
+SelectDirDesc=If the user installing the Cosmos User Kit is not the admin, please choose the users AppData/Roaming directory
 
 [Dirs]
 Name: {app}; Flags: uninsalwaysuninstall
@@ -78,12 +86,10 @@ Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ig
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\NASM\*"; DestDir: "{app}\Build\NASM"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\XSharp\*"; DestDir: "{app}\Build\XSharp"; Flags: ignoreversion uninsremovereadonly
+;Source: ".\Build\VSIP\XSharp\*"; DestDir: "{app}\Build\XSharp"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\MSBuild\*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.GDB.exe"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 ; Kernel assemblies
 Source: ".\Build\VSIP\Cosmos.Debug.Kernel*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
@@ -91,32 +97,39 @@ Source: ".\Build\VSIP\Cosmos.Core*"; DestDir: "{app}\Kernel"; Flags: ignoreversi
 Source: ".\Build\VSIP\Cosmos.HAL*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.System*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Common*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-; Kernel packages
-Source: ".\Build\VSIP\KernelPackages\*.nupkg"; DestDir: "{app}\Kernel\packages"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\IL2CPU.API*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+; Packages
+Source: ".\Build\VSIP\Packages\*.nupkg"; DestDir: "{app}\packages\"; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 ; XSharp
 Source: ".\Artwork\XSharp\XSharp.ico"; DestDir: "{app}\XSharp\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\source\Cosmos.Core.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
-; VMware
+Source: "..\IL2CPU\source\Cosmos.Core.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
+; HyperV
 Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
-Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
-Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\isolinux.bin"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
 ; USB
-Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
-Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
-Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
+Source: ".\Build\syslinux\pxelinux.0"; DestDir: "{app}\Build\PXE"
+Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\XSharp.VS.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
 ; Regiter .xs Extension
@@ -135,26 +148,99 @@ Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags
 UseRelativePaths=True
 
 [Run]
-Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packages"" ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
-Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:XSharp.VS"; Description: "Remove X# Language Service"; StatusMsg: "Removing Visual Studio Extension: X# Language Service"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.DebugEngine.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q XSharp.VS.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install X# Language Service"; StatusMsg: "Installing Visual Studio Extension: X# Language Service"
 
 [UninstallRun]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; StatusMsg: "Uninstalling Kernel Packages"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:XSharp.VS"; StatusMsg: "Removing Visual Studio Extension: X# Language Service"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
 [Code]
-function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
-  const Wait: TExecWait; var ResultCode: Integer; var ResultString: String): Boolean;
+function IsAppRunning(const FileName: string): Boolean;
 var
-  TempFilename: String;
+  FWMIService: Variant;
+  FSWbemLocator: Variant;
+  FWbemObjectSet: Variant;
+begin
+  Result := false;
+  FSWbemLocator := CreateOleObject('WBEMScripting.SWBEMLocator');
+  FWMIService := FSWbemLocator.ConnectServer('', 'root\CIMV2', '', '');
+  FWbemObjectSet := FWMIService.ExecQuery(Format('SELECT Name FROM Win32_Process Where Name="%s"',[FileName]));
+  Result := (FWbemObjectSet.Count > 0);
+  FWbemObjectSet := Unassigned;
+  FWMIService := Unassigned;
+  FSWbemLocator := Unassigned;
+end;
+
+function IsAppRunningWithResponse(const FileName: string): Boolean;
+var
+  Retry: Integer;
+begin
+  Result := IsAppRunning(FileName);
+  if Result then
+    MsgBox(FileName  + ' is running. Please close the application before running the installer.', mbError, MB_OK);
+end;
+
+function InitializeSetup: boolean;
+var
+  Retry: Integer;
+begin
+for Retry := 0 to 2 do
+  begin
+    Result := not IsAppRunningWithResponse('devenv.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('VSIXInstaller.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.IdentityHost.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.VSDetouredHost.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.Host.Node.x86.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.SettingsHost.exe');
+    if not Result then
+    begin
+      continue;
+    end;
+    Result := not IsAppRunningWithResponse('ServiceHub.Host.CLR.x86.exe');
+    if not Result then
+    begin
+      continue;
+    end
+    else
+    begin
+      break;
+    end;
+  end;
+end;
+
+function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
+  const Wait: TExecWait; var ResultCode: Integer; var ResultString: AnsiString): Boolean;
+var
+  TempFilename: AnsiString;
   Command: String;
 begin
   TempFilename :=
@@ -186,11 +272,11 @@ end;
 
 function GetVSPath(): String;
 var
-  Command: String;
-  Params: String;
+  Command: AnsiString;
+  Params: AnsiString;
   Success: Boolean;
   ResultCode: Integer;
-  ResultText: String;
+  ResultText: AnsiString;
 begin
   Command := ExpandConstant('{app}\Build\Tools\vswhere.exe');
   Params := '-latest -version "[15.0,16.0)" -requires Microsoft.Component.MSBuild -property installationPath';

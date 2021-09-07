@@ -1,18 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard1.5</TargetFramework>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Cosmos.Build.Common" />
         <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+        <PackageReference Include="System.IO.Ports" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
-        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
     </ItemGroup>
+
+    <Target Name="IncludeHyperVServer" BeforeTargets="AssignTargetPaths">
+
+        <PropertyGroup>
+            <_HyperVServerPath>$(IntermediateOutputPath)HyperVServer\</_HyperVServerPath>
+        </PropertyGroup>
+
+        <MSBuild Projects="..\Cosmos.Debug.HyperVServer\Cosmos.Debug.HyperVServer.csproj" Targets="Restore;Publish" Properties="PublishDir=$(MSBuildProjectDirectory)\$(_HyperVServerPath)" RemoveProperties="TargetFramework" />
+
+        <ItemGroup>
+            <ContentWithTargetPath Include="$(_HyperVServerPath)**" CopyToOutputDirectory="Always" />
+            <ContentWithTargetPath Update="@(ContentWithTargetPath)" TargetPath="HyperVServer\%(RecursiveDir)%(Filename)%(Extension)" />
+        </ItemGroup>
+
+    </Target>
 
 </Project>

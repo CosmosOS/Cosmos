@@ -1,0 +1,16 @@
+<Project>
+
+    <PropertyGroup>
+        <IsVsixProject Condition="'$(IsVsixProject)' == '' AND $(MSBuildProjectName.StartsWith('Cosmos.VS'))">True</IsVsixProject>
+    </PropertyGroup>
+
+    <Import Project="Workarounds.props" />
+
+    <Import Project="RepoLayout.props" />
+    <Import Project="RestoreSources.props" />
+
+    <Import Project="PackageProperties.props" />
+
+    <Import Project="Versions.props" />
+
+</Project>

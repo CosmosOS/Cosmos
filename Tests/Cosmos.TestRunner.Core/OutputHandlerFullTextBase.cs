@@ -26,7 +26,7 @@ namespace Cosmos.TestRunner.Core
 
         protected override void OnUnhandledException(Exception exception)
         {
-            Log("Unhandled exception: " + exception.ToString());
+            Log("Unhandled exception: " + exception?.ToString() ?? "Unable to get exception: Exception was null!");
         }
 
         protected override void OnExecutionEnd()
