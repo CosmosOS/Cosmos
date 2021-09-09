@@ -16,7 +16,6 @@ namespace Cosmos.Core_Plugs
         public static double Round(double d)
         {
             throw new NotImplementedException();
-            //return ((Floor(d) % 2 == 0) ? Floor(d) : Ceiling(d));
         }
     }
 
