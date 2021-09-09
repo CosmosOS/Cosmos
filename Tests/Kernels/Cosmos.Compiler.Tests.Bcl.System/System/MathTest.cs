@@ -466,6 +466,18 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1.5707963267949), "Atan works with -INF");
 
             #endregion Math.Atan
+
+            #region Math.Round
+
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(1, Math.Round(0.8)), "Math.Round works for 0.8");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(0, Math.Round(0.2)), "Math.Round works for 0.2");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(99, Math.Round(99.2)), "Math.Round works for 99.2");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(99, Math.Round(99d)), "Math.Round works for 99");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(0, Math.Round(-0.2)), "Math.Round works for -0.2");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(-1, Math.Round(-0.8)), "Math.Round works for -0.8");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(0, Math.Round(-0.000000006494348)), "Math.Round works for very small values");
+
+            #endregion
         }
     }
 }
