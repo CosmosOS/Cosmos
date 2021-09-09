@@ -24,8 +24,9 @@ namespace Cosmos.Core_Plugs
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+            XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
             XS.FPU.FloatRound();
+            XS.Sub(ESP, 8);
             XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
         }
     }
