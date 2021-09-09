@@ -113,7 +113,9 @@ namespace Cosmos.Core_Plugs.System
             throw new NotImplementedException("String Ctor(sbyte ptr with lenght)");
         }
 
-        public static unsafe int get_Length([ObjectPointerAccess] uint* aThis, [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aLength)
+        public static unsafe int get_Length(
+            [ObjectPointerAccess] uint* aThis,
+            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aLength)
         {
             return aLength;
         }

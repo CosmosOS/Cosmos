@@ -1,34 +1,30 @@
 <Project>
 
-    <PropertyGroup>
-        <ApprovalTestsVersion>3.0.18</ApprovalTestsVersion>
-        <AvaloniaVersion>0.7.0</AvaloniaVersion>
-        <MicrosoftNETTestSdkVersion>15.9.0</MicrosoftNETTestSdkVersion>
-        <MicrosoftTestPlatformObjectModelVersion>15.9.0</MicrosoftTestPlatformObjectModelVersion>
-        <MSTestVersion>1.4.0</MSTestVersion>
-        <NuGetVersion>4.8.0</NuGetVersion>
-        <NUnitVersion>3.11.0</NUnitVersion>
-        <NUnit3TestAdapterVersion>3.12.0</NUnit3TestAdapterVersion>
-        <RoslynAnalyzersVersion>2.6.2</RoslynAnalyzersVersion>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Update="ApprovalTests" Version="$(ApprovalTestsVersion)" />
-        <PackageReference Update="ApprovalUtilities" Version="$(ApprovalTestsVersion)" />
         <PackageReference Update="Avalonia" Version="$(AvaloniaVersion)" />
         <PackageReference Update="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+        <PackageReference Update="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
+        <PackageReference Update="Microsoft.Build" Version="$(MicrosoftBuildVersion)" />
+        <PackageReference Update="Microsoft.Build.Framework" Version="$(MicrosoftBuildVersion)" />
+        <PackageReference Update="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildVersion)" />
+        <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="$(MicrosoftNETFrameworkReferenceAssembliesVersion)" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />
         <PackageReference Update="Microsoft.TestPlatform.ObjectModel" Version="$(MicrosoftTestPlatformObjectModelVersion)" />
+        <PackageReference Update="Microsoft.VisualStudio.ProjectSystem.Analyzers" Version="$(MicrosoftVisualStudioProjectSystemVersion)" />
+        <PackageReference Update="Microsoft.VisualStudio.ProjectSystem.Sdk" Version="$(MicrosoftVisualStudioProjectSystemVersion)" />
+        <PackageReference Update="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="$(MicrosoftVisualStudioSdkEmbedInteropTypesVersion)" />
+        <PackageReference Update="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="$(MicrosoftVisualStudioSetupConfigurationInteropVersion)" />
+        <PackageReference Update="Microsoft.VisualStudio.Shell.15.0" Version="$(MicrosoftVisualStudioShell150Version)" />
+        <PackageReference Update="Microsoft.VisualStudio.Shell.Interop.11.0" Version="$(MicrosoftVisualStudioShellInterop110Version)" />
+        <PackageReference Update="Microsoft.VSSDK.BuildTools" Version="$(MicrosoftVSSDKBuildToolsVersion)" />
         <PackageReference Update="MSTest.TestAdapter" Version="$(MSTestVersion)" />
         <PackageReference Update="MSTest.TestFramework" Version="$(MSTestVersion)" />
         <PackageReference Update="NuGet.Common" Version="$(NuGetVersion)" />
         <PackageReference Update="NuGet.Configuration" Version="$(NuGetVersion)" />
         <PackageReference Update="NUnit" Version="$(NUnitVersion)" />
         <PackageReference Update="NUnit3TestAdapter" Version="$(NUnit3TestAdapterVersion)" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Update="@(RoslynAnalyzer)" Version="$(RoslynAnalyzersVersion)" />
+        <PackageReference Update="ReactiveUI" Version="$(ReactiveUIVersion)" />
     </ItemGroup>
 
 </Project>

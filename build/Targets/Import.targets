@@ -7,6 +7,8 @@
     <Import Project="InternalsVisibleTo.targets" />
 
     <Import Project="PackageProperties.targets" />
+    
+    <Import Project="NETFramework.targets" Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" />
         
     <Import Project="References.targets" />
 
@@ -21,7 +23,7 @@
 
     <Import Project="Workarounds.targets" />
 
-    <Import Project="InternalPackages.targets" />
+	<Import Project="InternalPackages.targets" />
 
     <Import Project="PackageVersions.targets" />
 
