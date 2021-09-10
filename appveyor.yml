@@ -18,6 +18,10 @@ install:
         Exit-AppVeyorBuild
       }
 
+nuget:
+  account_feed: true
+  project_feed: false
+
 build_script:
 - cmd: |
     rem %APPVEYOR_BUILD_FOLDER%
