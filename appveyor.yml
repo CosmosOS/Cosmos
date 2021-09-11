@@ -26,7 +26,7 @@ build_script:
 - cmd: |
     rem %APPVEYOR_BUILD_FOLDER%
     
-    nuget sources
+     nuget sources add -Name AccountFeed -Source https://ci.appveyor.com/nuget/cosmos -UserName %nuget_user% -Password %nuget_password%
 
     msbuild Build.sln /t:Restore;Build /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
