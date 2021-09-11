@@ -25,6 +25,8 @@ nuget:
 build_script:
 - cmd: |
     rem %APPVEYOR_BUILD_FOLDER%
+    
+    nuget sources
 
     msbuild Build.sln /t:Restore;Build /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
