@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalPackage Include="@(XSharpPackage)" Version="Highest" RepoRoot="$(XSharpRepoRoot)" />
+        <InternalPackage Include="@(XSharpPackage)" Version="0.1.0-build*" RepoRoot="$(XSharpRepoRoot)" />
     </ItemGroup>
 
     <ItemGroup>
