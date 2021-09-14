@@ -924,15 +924,6 @@ namespace Cosmos.System_Plugs.System
 
         #endregion Pow
 
-        #region Round
-
-        public static double Round(double d)
-        {
-            return ((Floor(d) % 2 == 0) ? Floor(d) : Ceiling(d));
-        }
-
-        #endregion Round
-
         #region Sin
 
         public static double Sin(double x)
