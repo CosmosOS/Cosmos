@@ -133,14 +133,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
             }
 
-            for (int i = 0; i < Tcp.Connections.Count; i++)
-            {
-                if (Tcp.Connections[i].Equals(StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address))
-                {
-                    Tcp.Connections.RemoveAt(i);
-                    return;
-                }
-            }
+            Tcp.RemoveConnection(StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address);
         }
 
         /// <summary>

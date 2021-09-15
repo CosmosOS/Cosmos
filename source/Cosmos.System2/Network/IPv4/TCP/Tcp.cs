@@ -203,6 +203,28 @@ namespace Cosmos.System.Network.IPv4.TCP
             return null;
         }
 
+        /// <summary>
+        /// Remove TCP Connection.
+        /// </summary>
+        /// <param name="localPort">Local port.</param>
+        /// <param name="remotePort">Destination port.</param>
+        /// <param name="localIp">Local IPv4 Address.</param>
+        /// <param name="remoteIp">Remote IPv4 Address.</param>
+        internal static void RemoveConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
+        {
+            for (int i = 0; i < Connections.Count; i++)
+            {
+                if (Connections[i].Equals(localPort, remotePort, localIp, remoteIp))
+                {
+                    Connections.RemoveAt(i);
+
+                    Global.mDebugger.Send("Connection removed!");
+
+                    return;
+                }
+            }
+        }
+
         #endregion
 
         #region TCB
