@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <XSharpPackage Include="XSharp" ProjectPath="source\XSharp\XSharp.csproj" />
+        <XSharpPackage Include="XSharp" ProjectPath="source\XSharp\XSharp\XSharp.csproj" />
         <XSharpPackage Include="XSharp.Assembler" ProjectPath="source\XSharp.Assembler\XSharp.Assembler.csproj" />
     </ItemGroup>
 
