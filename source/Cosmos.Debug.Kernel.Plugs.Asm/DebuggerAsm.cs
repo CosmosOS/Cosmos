@@ -1,5 +1,6 @@
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+using Cosmos.Debug.Kernel;
 
 using XSharp;
 using XSharp.Assembler;
