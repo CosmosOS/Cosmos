@@ -15,7 +15,6 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
 
         public static bool Equals(object aO1, object aO2)
         {
-            Debugger.DoBochsBreak();
             return aO1 == aO2; //we cant use object.Equals since it just calls this
         }
 

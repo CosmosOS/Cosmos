@@ -74,19 +74,6 @@ namespace BoxingTests
             UTF8Encoding encoding = new UTF8Encoding();
             mDebugger.Send("Testing boxing on structs!");
             object xValBoxed = new Values("UTF-8", encoding);
-
-            //Values xValBoxed1 = ((Values)xValBoxed);
-            //string desc = xValBoxed1.desc;
-            //if(desc is null)
-            //{
-            //    mDebugger.Send("desc is null");
-            //}
-            //else
-            //{
-            //    mDebugger.Send(desc);
-            //}
-            //Assert.IsTrue(desc == "UTF-8", "Boxing and then Unboxing Values does not work");
-            Debugger.DoBochsBreak();
             bool condition = xValBoxed.Equals(xValBoxed);
             Assert.IsTrue(condition, "Equality works for boxed structs");
         }

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <AssemblyOriginatorKeyFile>C:\Users\Jasper\Desktop\RandomProgrammieren\COSMOS\Cosmos\build\Targets\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <AssemblyOriginatorKeyFile>..\..\build\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='|AnyCPU'">
