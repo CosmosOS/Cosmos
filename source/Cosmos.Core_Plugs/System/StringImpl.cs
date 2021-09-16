@@ -636,6 +636,11 @@ namespace Cosmos.Core_Plugs.System
             return aThis.Substring(0, aStartPos) + aValue + aThis.Substring(aStartPos);
         }
 
+        public static int LastIndexOf(string aThis, string aString)
+        {
+            return LastIndexOf(aThis, aString, 0, aThis.Length);
+        }
+
         public static int LastIndexOf(string aThis, string aString, int aIndex)
         {
             return LastIndexOf(aThis, aString, aIndex, aThis.Length - aIndex);
