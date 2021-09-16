@@ -19,12 +19,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <XSharpPackage Include="XSharp" ProjectPath="source\XSharp\XSharp.csproj" />
+        <XSharpPackage Include="XSharp" ProjectPath="source\XSharp\XSharp\XSharp.csproj" />
         <XSharpPackage Include="XSharp.Assembler" ProjectPath="source\XSharp.Assembler\XSharp.Assembler.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <InternalPackage Include="@(XSharpPackage)" Version="$(XSharpVersion)" RepoRoot="$(XSharpRepoRoot)" />
+        <InternalPackage Include="@(XSharpPackage)" Version="0.1.0-build*" RepoRoot="$(XSharpRepoRoot)" />
     </ItemGroup>
 
     <ItemGroup>
