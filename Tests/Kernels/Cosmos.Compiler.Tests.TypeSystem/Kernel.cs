@@ -35,6 +35,13 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Console.WriteLine("Cosmos booted successfully. Starting Type tests now please wait...");
         }
 
+        private void TestGarbageCollector()
+        {
+            object a = new object();
+
+            GCImplementation.Free(a);
+        }
+
         protected override void Run()
         {
             try
@@ -84,6 +91,8 @@ namespace Cosmos.Compiler.Tests.TypeSystem
                 var c = new { i = 1, n = "Test" };
                 Assert.IsTrue(c != null, "Anonymous types are created correctly");
                 Assert.IsTrue(c.i == 1 && c.n == "Test", "Anonymous types have correct values");
+
+                TestGarbageCollector();
 
                 TestController.Completed();
             }
