@@ -134,6 +134,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(test.IndexOfAny(new[] { 'T', 'h', 'i', 's' }) == 0, "string.IndexOfAny finds the first one");
             Assert.IsTrue(test.IndexOfAny(new[] { 'A', 'B', 'C' }) == -1, "string.IndexOfAny finds none if none are present");
 
+            Assert.AreEqual(0, test.LastIndexOf("T"), "string.LastIndexOf works for char as string");
+            Assert.AreEqual(0, test.LastIndexOf("This"), "string.LastIndexOf works for existing string");
+            Assert.AreEqual(-1, test.LastIndexOf("Test"), "string.LastIndexOf works for existing string");
             Assert.IsTrue(test.LastIndexOf(string.Empty, 100) == test.Length, "string.LastIndexOf handles empty correctly");
             Assert.IsTrue(test.LastIndexOf('T') == 0, "string.LastIndexOf finds the only occurance of a letter");
             Assert.IsTrue(test.LastIndexOf('.') == test.Length - 1, "string.LastIndexOf finds the only occurance of a letter at the end of the string");
