@@ -9,7 +9,7 @@ namespace Cosmos.System.Graphics
     /// <summary>
     /// Canvas abstract class.
     /// </summary>
-    public abstract partial class Canvas
+    public abstract class Canvas
     {
         /*
          * IReadOnlyList<T> is not working, the Modes inside it become corrupted and then you get Stack Overflow
