@@ -6,10 +6,8 @@
         <SupportsX86Intrinsics>false</SupportsX86Intrinsics>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <NoWarn>CA2242;$(NoWarn)</NoWarn>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <Prefer32Bit>true</Prefer32Bit>
+        <Prefer32Bit>true</Prefer32Bit>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

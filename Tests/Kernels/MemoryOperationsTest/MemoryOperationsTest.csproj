@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />

@@ -5,9 +5,15 @@
         <OutputType>Exe</OutputType>
         <RuntimeIdentifier>win-x86</RuntimeIdentifier>
         <DebugType>Full</DebugType>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <PlatformTarget>AnyCPU</PlatformTarget>
+      <Prefer32Bit>true</Prefer32Bit>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TEST|AnyCPU'">
       <PlatformTarget>AnyCPU</PlatformTarget>
       <Prefer32Bit>true</Prefer32Bit>
     </PropertyGroup>

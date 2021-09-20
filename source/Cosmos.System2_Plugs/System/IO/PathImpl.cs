@@ -448,8 +448,7 @@ namespace Cosmos.System_Plugs.System.IO
         internal static int GetRootLength(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("Path.GetRootLength");
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
 
             int i = 0;
             int xLength = aPath.Length;

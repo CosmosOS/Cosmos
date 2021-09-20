@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,7 @@ namespace Cosmos.System.FileSystem.VFS
     public static class VFSManager
     {
         private static VFSBase mVFS;
+
 
         /// <summary>
         /// Register VFS. Initialize the VFS.
@@ -64,8 +65,7 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new ArgumentNullException(nameof(aPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
 
             return mVFS.CreateFile(aPath);
         }
@@ -211,12 +211,14 @@ namespace Cosmos.System.FileSystem.VFS
             Global.mFileSystemDebugger.SendInternal("-- VFSManager.CreateDirectory -- " + aPath);
             Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
-            if (string.IsNullOrEmpty(aPath))
+            if (String.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentNullException(nameof(aPath));
             }
 
-            return mVFS.CreateDirectory(aPath);
+            var directoryEntry = mVFS.CreateDirectory(aPath);
+            Global.mFileSystemDebugger.SendInternal("-- -------------------------- -- " + aPath);
+            return directoryEntry;
         }
 
         /// <summary>
@@ -1143,6 +1145,15 @@ namespace Cosmos.System.FileSystem.VFS
             }
 
             return null;
+        }
+
+
+        /// <summary>
+        /// Cleans up manager if the VFS has to be reintialised.
+        /// </summary>
+        internal static void Reset()
+        {
+            mVFS = null;
         }
     }
 }

@@ -4,9 +4,14 @@
         <TargetFramework>net5.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>Cosmos.HAL</RootNamespace>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TEST|AnyCPU'">
       <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 

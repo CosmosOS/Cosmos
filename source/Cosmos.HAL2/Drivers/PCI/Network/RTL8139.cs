@@ -48,7 +48,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             this.mac = new MACAddress(eeprom_mac);
             // Get a receive buffer and assign it to the card
             rxBuffer = new ManagedMemoryBlock(RxBufferSize + 2048 + 16, 4);
-            RBStartRegister = rxBuffer.Offset;
+            RBStartRegister = (uint)rxBuffer.Offset;
             // Setup receive Configuration
             RecvConfigRegister = 0xF381;
             // Setup Transmit Configuration
@@ -356,19 +356,19 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             switch (txd)
             {
                 case 0:
-                    TransmitAddress1Register = txBuffer.Offset;
+                    TransmitAddress1Register = (uint)txBuffer.Offset;
                     TransmitDescriptor1Register = txBuffer.Size;
                     break;
                 case 1:
-                    TransmitAddress2Register = txBuffer.Offset;
+                    TransmitAddress2Register = (uint)txBuffer.Offset;
                     TransmitDescriptor2Register = txBuffer.Size;
                     break;
                 case 2:
-                    TransmitAddress3Register = txBuffer.Offset;
+                    TransmitAddress3Register = (uint)txBuffer.Offset;
                     TransmitDescriptor3Register = txBuffer.Size;
                     break;
                 case 3:
-                    TransmitAddress4Register = txBuffer.Offset;
+                    TransmitAddress4Register = (uint)txBuffer.Offset;
                     TransmitDescriptor4Register = txBuffer.Size;
                     break;
                 default:

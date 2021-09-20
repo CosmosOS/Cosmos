@@ -5,6 +5,7 @@
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <NoWarn>CA2242;$(NoWarn)</NoWarn>
         <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />

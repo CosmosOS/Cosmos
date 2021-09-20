@@ -33,7 +33,7 @@ namespace Cosmos.Core
         {
             Fill((byte*)dest, (int)value, size * 4);
         }
-
+            
         /// <summary>
         /// Fill destination region with value.
         /// </summary>
@@ -200,9 +200,9 @@ namespace Cosmos.Core
                 Copy(destPtr, srcPtr, dest.Length);
             }
         }
-        #endregion Fill
+#endregion Fill
 
-        #region Copy
+#region Copy
         /// <summary>
         /// Copy source to destination.
         /// plugged.
@@ -349,6 +349,6 @@ namespace Cosmos.Core
             }
         }
 
-        #endregion Copy
+#endregion Copy
     }
 }

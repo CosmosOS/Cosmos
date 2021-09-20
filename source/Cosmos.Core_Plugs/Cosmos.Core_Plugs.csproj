@@ -4,6 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -11,16 +12,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.5.0" />
+        <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.5.0" />
+        <PackageReference Include="XSharp" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="..\..\..\IL2CPU\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
         <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
         <ProjectReference Include="..\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference Include="$(XSharpRepoRoot)source\XSharp\XSharp\XSharp.csproj" />
     </ItemGroup>
 
 </Project>

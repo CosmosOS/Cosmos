@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System

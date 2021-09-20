@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -180,10 +180,10 @@ namespace Cosmos.System.FileSystem.FAT
                 for (uint i = mFileSystem.RootCluster + 1; i < xTotalEntries; i++)
                 {
                     GetFatEntry(i, out uint xEntryValue);
-                    if (FatEntryIsFree(xEntryValue))
+                    if (xEntryValue == 0) // check if fat entry is free
                     {
-                        Global.mFileSystemDebugger.SendInternal("i =");
-                        Global.mFileSystemDebugger.SendInternal(i);
+                        Global.mFileSystemDebugger.SendInternal("i =" + i);
+                        Global.mFileSystemDebugger.SendInternal("-- ------------------------------ --");
                         return i;
                     }
                 }
@@ -315,7 +315,7 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xSector = mFatSector + aSector;
                 Global.mFileSystemDebugger.SendInternal("xSector  =" + xSector);
                 mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, ref aData);
-                Global.mFileSystemDebugger.SendInternal("Returning -- FatFileSystem.ReadFatSector --");
+                Global.mFileSystemDebugger.SendInternal("-- --------------------------- --");
             }
 
             /// <summary>
@@ -391,8 +391,8 @@ namespace Cosmos.System.FileSystem.FAT
                     default:
                         throw new NotSupportedException("Unknown FAT type.");
                 }
-                Global.mFileSystemDebugger.SendInternal("aValue =");
-                Global.mFileSystemDebugger.SendInternal(aValue);
+                Global.mFileSystemDebugger.SendInternal("aValue =" + aValue);
+                Global.mFileSystemDebugger.SendInternal("-- --------------- --");
             }
 
             /// <summary>
@@ -480,16 +480,6 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 WriteFatSector(xSectorOffset, xData);
-            }
-
-            /// <summary>
-            /// Check if FAT entry is free.
-            /// </summary>
-            /// <param name="aValue">A entry to check.</param>
-            /// <returns>bool value.</returns>
-            internal bool FatEntryIsFree(uint aValue)
-            {
-                return aValue == 0;
             }
 
             /// <summary>
@@ -918,6 +908,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Device.ReadBlock((ulong)aCluster, RootSectorCount, ref aData);
             }
             Global.mFileSystemDebugger.SendInternal($"aData.Length = {aData.Length}");
+            Global.mFileSystemDebugger.SendInternal("-- ------------------ --");
         }
 
         /// <summary>
@@ -1038,7 +1029,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// <summary>
         /// Get list of entries of a directory.
         /// </summary>
-        /// <param name="baseDirectory">A base directory.</param>
+        /// <param name="aBaseDirectory">A base directory.</param>
         /// <returns>DirectoryEntry list.</returns>
         /// <exception cref="ArgumentNullException">Thrown when baseDirectory is null / memory error.</exception>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
@@ -1046,24 +1037,25 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="ArgumentException">Thrown on memory error.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
-        public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry baseDirectory)
+        public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry aBaseDirectory)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.GetDirectoryListing --");
-            Global.mFileSystemDebugger.SendInternal("baseDirectory: " + baseDirectory.mFullPath);
+            Global.mFileSystemDebugger.SendInternal("aBaseDirectory: " + aBaseDirectory.mFullPath);
 
-            if (baseDirectory == null)
+            if (aBaseDirectory == null)
             {
-                throw new ArgumentNullException(nameof(baseDirectory));
+                throw new ArgumentNullException(nameof(aBaseDirectory));
             }
 
             var result = new List<DirectoryEntry>();
-            var xEntry = (FatDirectoryEntry)baseDirectory;
+            var xEntry = (FatDirectoryEntry)aBaseDirectory;
             var fatListing = xEntry.ReadDirectoryContents();
 
             for (int i = 0; i < fatListing.Count; i++)
             {
                 result.Add(fatListing[i]);
             }
+            Global.mFileSystemDebugger.SendInternal("-- --------------------------------- --");
             return result;
         }
 
@@ -1121,6 +1113,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewDirectory, DirectoryEntryTypeEnum.Directory);
+            Global.mFileSystemDebugger.SendInternal("-- ----------------------------- --");
             return xDirectoryEntryToAdd;
         }
 

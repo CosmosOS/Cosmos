@@ -4,6 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
         <RuntimeIdentifier>win-x86</RuntimeIdentifier>
         <OutputType>Exe</OutputType>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

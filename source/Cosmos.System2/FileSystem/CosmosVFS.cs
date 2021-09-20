@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -112,8 +112,7 @@ namespace Cosmos.System.FileSystem
                 throw new ArgumentException("aPath is empty");
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
 
             if (File.Exists(aPath))
             {
@@ -124,13 +123,11 @@ namespace Cosmos.System.FileSystem
 
             string xFileToCreate = Path.GetFileName(aPath);
             Global.mFileSystemDebugger.SendInternal("After GetFileName");
-            Global.mFileSystemDebugger.SendInternal("xFileToCreate =");
-            Global.mFileSystemDebugger.SendInternal(xFileToCreate);
+            Global.mFileSystemDebugger.SendInternal("xFileToCreate =" + xFileToCreate);
 
             string xParentDirectory = Path.GetDirectoryName(aPath);
             Global.mFileSystemDebugger.SendInternal("After removing last path part");
-            Global.mFileSystemDebugger.SendInternal("xParentDirectory =");
-            Global.mFileSystemDebugger.SendInternal(xParentDirectory);
+            Global.mFileSystemDebugger.SendInternal("xParentDirectory =" + xParentDirectory);
 
             DirectoryEntry xParentEntry = GetDirectory(xParentDirectory);
             if (xParentEntry == null)
@@ -611,7 +608,11 @@ namespace Cosmos.System.FileSystem
         {
             for (int i = 0; i < mPartitions.Count; i++)
             {
-                string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
+#if TEST
+                string xRootPath = new string[] { "C:\\", "D:\\" }[i]; //so that we can use the windows path methods
+#else
+                string xRootPath = String.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
+#endif
                 var xSize = (long)(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
 
                 // We 'probe' the partition <i> with all the FileSystem registered until we find a Filesystem that can read / write to it
@@ -628,13 +629,13 @@ namespace Cosmos.System.FileSystem
                 {
                     if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].RootPath == xRootPath))
                     {
-                        string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
+                        string xMessage = String.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
                         global::System.Console.WriteLine(xMessage);
                         mFileSystems[i].DisplayFileSystemInfo();
                     }
                     else
                     {
-                        string xMessage = string.Concat("No filesystem found on partition #", i);
+                        string xMessage = String.Concat("No filesystem found on partition #", i);
                         global::System.Console.WriteLine(xMessage);
                     }
                 }
@@ -660,6 +661,7 @@ namespace Cosmos.System.FileSystem
             Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             string xPath = Path.GetPathRoot(aPath);
+
             Global.mFileSystemDebugger.SendInternal("xPath after GetPathRoot = " + xPath);
 
             if ((mCurrentFileSystem != null) && (xPath == mCurrentFileSystem.RootPath))

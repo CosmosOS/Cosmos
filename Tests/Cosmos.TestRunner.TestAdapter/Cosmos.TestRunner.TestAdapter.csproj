@@ -6,6 +6,7 @@
         <IsToolProject>True</IsToolProject>
         <AppendTargetFrameworkToToolsPackageFolder>False</AppendTargetFrameworkToToolsPackageFolder>
         <NoWarn>NU5111;$(NoWarn)</NoWarn>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

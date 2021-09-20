@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <OutputType>Exe</OutputType>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
   
     <ItemGroup>

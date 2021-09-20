@@ -13,7 +13,7 @@ namespace Cosmos.Core
         /// <summary>
         /// Offset.
         /// </summary>
-        public uint Offset;
+        public ulong Offset;
         /// <summary>
         /// Size.
         /// </summary>
@@ -22,37 +22,37 @@ namespace Cosmos.Core
         /// <summary>
         /// Create a new buffer with the given size, not aligned
         /// </summary>
-        /// <param name="size">Size of buffer</param>
-        public ManagedMemoryBlock(uint size)
-            : this(size, 1, false)
-        { }
+        /// <param name="byteSize">Size of buffer</param>
+        public ManagedMemoryBlock(uint aByteCount) : this(aByteCount, 1, false)
+        {
+        }
 
         /// <summary>
         /// Create a new buffer with the given size, aligned on the byte boundary specified
         /// </summary>
-        /// <param name="size">Size of buffer</param>
+        /// <param name="byteCount">Size of buffer</param>
         /// <param name="alignment">Byte Boundary alignment</param>
-        public ManagedMemoryBlock(uint size, int alignment)
-            : this(size, alignment, true)
-        { }
+        public ManagedMemoryBlock(uint aByteCount, int alignment) : this(aByteCount, alignment, true)
+        {
+        }
 
         /// <summary>
         /// Create a new buffer with the given size, and aligned on the byte boundary if align is true
         /// </summary>
-        /// <param name="aSize">Size of buffer</param>
+        /// <param name="aByteCount">Size of buffer</param>
         /// <param name="aAlignment">Byte Boundary alignment</param>
         /// <param name="aAlign">true if buffer should be aligned, false otherwise</param>
-        public ManagedMemoryBlock(uint aSize, int aAlignment, bool aAlign)
+        public ManagedMemoryBlock(uint aByteCount, int aAlignment, bool aAlign)
         {
-            memory = new byte[aSize + aAlignment - 1];
+            memory = new byte[aByteCount + aAlignment - 1];
             fixed (byte* bodystart = memory)
             {
-                Offset = (uint)bodystart;
-                Size = aSize;
+                Offset = (ulong)bodystart;
+                Size = aByteCount;
             }
             if (aAlign == true)
             {
-                while (Offset % aAlignment != 0)
+                while (Offset % (ulong)aAlignment != 0)
                 {
                     Offset++;
                 }
@@ -89,29 +89,28 @@ namespace Cosmos.Core
         /// <summary>
         /// Fill memory block.
         /// </summary>
-        /// <param name="aStart">A start.</param>
+        /// <param name="aByteOffset">A start.</param>
         /// <param name="aCount">A count.</param>
         /// <param name="aData">A data.</param>
-        public unsafe void Fill(uint aStart, uint aCount, uint aData)
+        public unsafe void Fill(uint aByteOffset, uint aCount, uint aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            uint* xDest = (uint*)Offset + aStart;
+            uint* xDest = (uint*)(Offset + aByteOffset);
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         /// <summary>
         /// Fill memory block with integer value
         /// </summary>
-        /// <param name="aStart">A starting position in the memory block. This is integer indexing based</param>
+        /// <param name="aByteOffset">A starting position in the memory block. This is integer indexing based</param>
         /// <param name="aCount">Data size.</param>
         /// <param name="aData">A data to fill memory block with.</param>
-        public unsafe void Fill(int aStart, int aCount, int aData)
+        public unsafe void Fill(int aByteOffset, int aCount, int aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             fixed (byte* aArrayPtr = memory)
             {
-                Debugger.DoSendNumber((uint)aArrayPtr);
-                MemoryOperations.Fill(aArrayPtr + 4 * aStart, aData, aCount * 4);
+                MemoryOperations.Fill(aArrayPtr + aByteOffset, aData, aCount * 4);
             }
         }
 
@@ -121,10 +120,14 @@ namespace Cosmos.Core
         /// <param name="aData">A data to fill.</param>
         public void Fill(uint aData)
         {
+#if TEST
+            Array.Fill(memory, (byte)aData);
+#else
             fixed (byte* destPtr = memory)
             {
                 MemoryOperations.Fill(destPtr, (int)aData, (int)Size);
             }
+#endif
         }
 
         public unsafe void Copy(int aStart, byte[] aData, int aIndex, int aCount)
@@ -170,93 +173,93 @@ namespace Cosmos.Core
         /// <summary>
         /// Write 8-bit to the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <param name="value">Value to write.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
-        public void Write8(uint offset, byte value)
+        public void Write8(uint aByteOffset, byte value)
         {
-            if (offset < 0 || offset > Size)
+            if (aByteOffset < 0 || aByteOffset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            (*(byte*)(this.Offset + offset)) = value;
+            (*(byte*)(Offset + aByteOffset)) = value;
         }
 
         /// <summary>
         /// Read 16-bit from the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <returns>UInt16 value.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size.</exception>
-        public ushort Read16(uint offset)
+        public ushort Read16(uint aByteOffset)
         {
-            if (offset > Size)
+            if (aByteOffset > Size)
             {
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(aByteOffset));
             }
 
-            return *((ushort*)Offset + offset);
+            return *((ushort*)(Offset + aByteOffset));
         }
 
         /// <summary>
         /// Write 16-bit to the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <param name="value">Value to write.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
-        public void Write16(uint offset, ushort value)
+        public void Write16(uint aByteOffset, ushort value)
         {
-            if (offset < 0 || offset > Size)
+            if (aByteOffset < 0 || aByteOffset > Size)
             {
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(aByteOffset));
             }
-            *((ushort*)Offset + offset) = value;
+            *((ushort*)(Offset + aByteOffset)) = value;
         }
 
         /// <summary>
         /// Read 32-bit from the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <returns>UInt32 value.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size.</exception>
-        public uint Read32(uint offset)
+        public uint Read32(uint aByteOffset)
         {
-            if (offset > Size)
+            if (aByteOffset > Size)
             {
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(aByteOffset));
             }
 
-            return *((uint*)Offset + offset);
+            return *((uint*)(Offset + aByteOffset));
         }
 
         /// <summary>
         /// Write 32-bit to the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <param name="value">Value to write.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
-        public void Write32(uint offset, uint value)
+        public void Write32(uint aByteOffset, uint value)
         {
-            if (offset < 0 || offset > Size)
+            if (aByteOffset < 0 || aByteOffset > Size)
             {
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(aByteOffset));
             }
-            *((uint*)Offset + offset) = value;
+            *((uint*)(Offset + aByteOffset)) = value;
         }
 
         /// <summary>
         /// Write string to the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <param name="value">Value to write.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
-        public void WriteString(uint offset, string value)
+        public void WriteString(uint aByteOffset, string value)
         {
-            if (offset < 0 || offset > Size)
+            if (aByteOffset < 0 || aByteOffset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            if (value.Length + offset > Size)
+            if (value.Length + aByteOffset > Size)
                 throw new ArgumentOutOfRangeException("value");
             for (int index = 0; index < value.Length; index++)
             {
-                memory[offset + index] = (byte)value[index];
+                memory[aByteOffset + index] = (byte)value[index];
             }
         }
     }

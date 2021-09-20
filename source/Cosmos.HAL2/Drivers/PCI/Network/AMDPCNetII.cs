@@ -61,10 +61,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             mInitBlock.Write32(0x08, (uint)(eeprom_mac[4] | (eeprom_mac[5] << 8)));
             mInitBlock.Write32(0x0C, 0x0);
             mInitBlock.Write32(0x10, 0x0);
-            mInitBlock.Write32(0x14, mRxDescriptor.Offset);
-            mInitBlock.Write32(0x18, mTxDescriptor.Offset);
+            mInitBlock.Write32(0x14, (uint)mRxDescriptor.Offset);
+            mInitBlock.Write32(0x18, (uint)mTxDescriptor.Offset);
 
-            InitializationBlockAddress = mInitBlock.Offset;
+            InitializationBlockAddress = (uint)mInitBlock.Offset;
             SoftwareStyleRegister = 0x03;
 
             mRxBuffers = new List<ManagedMemoryBlock>();
@@ -74,7 +74,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 uint xOffset = rxd * 16;
 
                 ManagedMemoryBlock buffer = new ManagedMemoryBlock(2048);
-                mRxDescriptor.Write32(xOffset + 8, buffer.Offset);
+                mRxDescriptor.Write32(xOffset + 8, (uint)buffer.Offset);
                 ushort buffer_len = (ushort)(~buffer.Size);
                 buffer_len++;
                 uint flags = (uint)(buffer_len & 0x0FFF) | 0xF000 | 0x80000000;
@@ -86,7 +86,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 uint xOffset = txd * 16;
 
                 ManagedMemoryBlock buffer = new ManagedMemoryBlock(2048);
-                mTxDescriptor.Write32(xOffset + 8, buffer.Offset);
+                mTxDescriptor.Write32(xOffset + 8, (uint)buffer.Offset);
                 mTxBuffers.Add(buffer);
             }
 

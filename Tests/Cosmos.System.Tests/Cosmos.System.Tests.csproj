@@ -3,6 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <AssemblyOriginatorKeyFile>..\..\build\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <DefineConstants>UNIT_TEST</DefineConstants>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='|AnyCPU'">
