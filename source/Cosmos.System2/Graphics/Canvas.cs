@@ -9,7 +9,7 @@ namespace Cosmos.System.Graphics
     /// <summary>
     /// Canvas abstract class.
     /// </summary>
-    public abstract class Canvas
+    public abstract partial class Canvas
     {
         /*
          * IReadOnlyList<T> is not working, the Modes inside it become corrupted and then you get Stack Overflow
@@ -102,6 +102,11 @@ namespace Cosmos.System.Graphics
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="NotImplementedException">Thrown always (only int coordinats supported).</exception>
         public abstract void DrawPoint(Pen pen, float x, float y);
+
+        /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public abstract string Name();
 
         /// <summary>
         /// Display screen
