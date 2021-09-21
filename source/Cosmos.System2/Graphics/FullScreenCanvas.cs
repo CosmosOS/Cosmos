@@ -24,6 +24,7 @@ namespace Cosmos.System.Graphics
             {
                 _VideoDriver.Disable();
                 VGAScreen.SetTextMode(VGADriver.TextSize.Size80x25);
+                IsInUse = false;
             }
         }
 
@@ -146,6 +147,7 @@ namespace Cosmos.System.Graphics
                 Global.mDebugger.SendInternal($"_VideoDriver is NOT null using the old one changing mode to DefaultMode");
                 _VideoDriver.Mode = _VideoDriver.DefaultGraphicMode;
             }
+            IsInUse = true;
             return _VideoDriver;
         }
 
@@ -168,6 +170,7 @@ namespace Cosmos.System.Graphics
             {
                 _VideoDriver.Mode = mode;
             }
+            IsInUse = true;
             return _VideoDriver;
         }
 
@@ -184,9 +187,10 @@ namespace Cosmos.System.Graphics
             try
             {
                 canvas = GetFullScreenCanvas(mode);
+                IsInUse = true;
                 return true;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
             }
             canvas = null;
