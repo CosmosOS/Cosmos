@@ -3,9 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
         <RuntimeIdentifier>win10-x32</RuntimeIdentifier>
-        <Version>1.0.0</Version>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-        <FileVersion>1.0.1.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,17 +15,17 @@
     <ItemGroup>
         <PackageReference Include="Cosmos.Build.Common" />
         <PackageReference Include="IL2CPU.Debug.Symbols" />
-        <PackageReference Include="Microsoft.VisualStudio.Debugger.Interop.15.0" Version="16.9.31023.347" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.9.31025.104" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="16.9.31023.347" />
+        <PackageReference Include="Microsoft.VisualStudio.Debugger.Interop.15.0" Version="16.10.31320.204" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.10.31321.278" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="16.10.31320.204" />
         <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.1600">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.0.4" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.0.4" />
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.0.6" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.0.6" />
         <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
-        <PackageReference Include="Microsoft.ServiceHub.Framework" Version="2.8.2018" />
+        <PackageReference Include="Microsoft.ServiceHub.Framework" Version="3.0.2065" />
         <PackageReference Include="System.Runtime" Version="4.3.1" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
     </ItemGroup>
