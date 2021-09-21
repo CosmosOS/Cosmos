@@ -99,23 +99,26 @@ namespace MemoryOperationsTest
             memoryBlock.Write32(1, 101);
             Assert.AreEqual(101, memoryBlock[1], "ManagedMemoryBlock read/write at index 1 works");
             Assert.AreEqual(25857, memoryBlock.Read32(0), "ManagedMemoryBlock read int at index 0 works");
-            memoryBlock.Write32(2, 2^16+2);
+            memoryBlock.Write32(2, 2 ^ 16 + 2);
             Assert.AreEqual(16, memoryBlock[2], "ManagedMemoryBlock write int at index 2 works");
             Assert.AreEqual(0, memoryBlock[3], "ManagedMemoryBlock write int at index 2 works");
             Assert.AreEqual(1074433, memoryBlock.Read32(0), "ManagedMemoryBlock read int at index 0 works");
             memoryBlock.Write32(3, int.MaxValue);
-            Assert.AreEqual(3, memoryBlock[3], "ManagedMemoryBlock write int at index 3 works");
-            Assert.AreEqual(51406081, memoryBlock.Read32(0), "ManagedMemoryBlock read int at index 0 works");
-            Assert.AreEqual(200805, memoryBlock.Read32(1), "ManagedMemoryBlock read int at index 1 works");
-            Assert.AreEqual(784, memoryBlock.Read32(2), "ManagedMemoryBlock read int at index 2 works");
+            Assert.AreEqual(255, memoryBlock[3], "ManagedMemoryBlock write int at index 3 works");
+            Assert.AreEqual(0xFF106501, memoryBlock.Read32(0), "ManagedMemoryBlock read int at index 0 works");
+            Assert.AreEqual(0xFFFF1065, memoryBlock.Read32(1), "ManagedMemoryBlock read int at index 1 works");
+            Assert.AreEqual(0xFFFFFF10, memoryBlock.Read32(2), "ManagedMemoryBlock read int at index 2 works");
             Assert.AreEqual(int.MaxValue, memoryBlock.Read32(3), "ManagedMemoryBlock read/write at index 3 works");
 
             memoryBlock.Fill(101);
             Assert.AreEqual(101, memoryBlock.Read32(0), "ManagedMemoryBlock fill works at index 0");
-            Assert.AreEqual(6619136, memoryBlock.Read32(1), "ManagedMemoryBlock fill works at index 10");
+            Assert.AreEqual(0, memoryBlock[1], "ManagedMemoryBlock fill fills entire ints");
+            Assert.AreEqual(6619136, memoryBlock.Read32(10), "ManagedMemoryBlock fill works at index 10");
 
+            memoryBlock.Write8(0, 101);
+            Assert.AreEqual(101, memoryBlock[0], "ManagedMemoryBlock write byte works at index 0");
             memoryBlock.Fill(1, 1, 987893745);
-            Assert.AreEqual(101, memoryBlock.Read32(0), "ManagedMemoryBlock Fill(int, int, int) works at index 0");
+            Assert.AreEqual(101, memoryBlock[0], "ManagedMemoryBlock Fill(1, int, int) skips index 0");
             Assert.AreEqual(987893745, memoryBlock.Read32(1), "ManagedMemoryBlock Fill(int, int, int) works at index 1");
         }
 
@@ -132,7 +135,7 @@ namespace MemoryOperationsTest
                     Assert.Fail($"Values read differ at {i}. Expected: {values[i]} Actual: {read[i]}");
                 }
             }
-            Assert.Suceed("Writing and reading uints works");
+            Assert.Succeed("Writing and reading uints works");
             byte* ptr = (byte*)memoryBlock.Base;
             Assert.AreEqual(1, *ptr, "Expected 1 in first byte of memory block when checking using pointer");
             Assert.AreEqual(0, *(ptr + 3), "Expected 0 in fourth byte of memory block when checking using pointer");
@@ -149,7 +152,7 @@ namespace MemoryOperationsTest
             memoryBlock.Read8(readByte);
             Assert.AreEqual(new byte[] { 101, 101, 101, 101 }, readByte, "Filling works");
             values = new uint[] { 0x65656565, 987893745, 0x65656565, 0x65656565 };
-            memoryBlock.Fill(1, 1, 987893745);
+            memoryBlock.Fill(4, 1, 987893745);
             memoryBlock.Read32(read);
             Assert.AreEqual(values, read, "Using Fill(int, int, int) works");
         }

@@ -5,7 +5,7 @@ namespace Cosmos.TestRunner
 {
     public static class Assert
     {
-        public static void Suceed(string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        public static void Succeed(string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
         {
             TestController.Debugger.Send("Assertion succeeded:");
             TestController.Debugger.Send(message);
@@ -25,7 +25,7 @@ namespace Cosmos.TestRunner
         {
             if (condition)
             {
-                Suceed(message, file, line);
+                Succeed(message, file, line);
             }
             else
             {
@@ -97,7 +97,7 @@ namespace Cosmos.TestRunner
                     return;
                 }
             }
-            Suceed(message, file, line);
+            Succeed(message, file, line);
         }
 
         public static void AreEqual(byte[] expected, byte[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
@@ -120,7 +120,7 @@ namespace Cosmos.TestRunner
                     return;
                 }
             }
-            Suceed(message, file, line);
+            Succeed(message, file, line);
         }
 
         public static void AreEqual(uint[] expected, uint[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
@@ -142,7 +142,7 @@ namespace Cosmos.TestRunner
                     return;
                 }
             }
-            Suceed(message, file, line);
+            Succeed(message, file, line);
         }
 
         public static void AreEqual(int[] expected, int[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
@@ -164,7 +164,7 @@ namespace Cosmos.TestRunner
                     return;
                 }
             }
-            Suceed(message, file, line);
+            Succeed(message, file, line);
         }
     }
 }

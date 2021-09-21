@@ -137,7 +137,7 @@ namespace Cosmos.System.FileSystem.VFS
         /// </exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public static DirectoryEntry GetFile(string aPath)
-        {
+            {
             Global.mFileSystemDebugger.SendInternal("-- VFSManager.GetFile --");
 
             if (string.IsNullOrEmpty(aPath))

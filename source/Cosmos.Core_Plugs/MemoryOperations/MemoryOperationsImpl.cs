@@ -127,9 +127,15 @@ namespace Cosmos.Core_Plugs.MemoryOperations
 
             //Global.mDebugger.SendInternal("size " + size + " is composed of " + BlocksNum + " block of 16 bytes with " + ByteRemaining + " remainder");
 
-            for (int i = 0; i < xByteRemaining; i++)
+
+            for (int i = 0; i < xByteRemaining / 4; i++)
             {
-                *(dest + i) = (byte)value;
+                *((int*)dest + i) = value;
+            }
+
+            for (int i = 0; i < xByteRemaining % 4; i++)
+            {
+                *(dest + i) = (byte)(value >> (i * 4));
             }
 
             /* Let's call the assembler version now to do the 16 byte block copies */

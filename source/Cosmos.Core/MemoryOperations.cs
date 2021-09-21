@@ -14,12 +14,16 @@ namespace Cosmos.Core
         /// Fill memory block. Plugged.
         /// </summary>
         /// <param name="dest">A destination.</param>
-        /// <param name="value">A data value.</param>
+        /// <param name="aValue">A data value.</param>
         /// <param name="size">Number of bytes to fill</param>
-        public static unsafe void Fill(byte* dest, int value, int size)
+        public static unsafe void Fill(byte* dest, int aValue, int size)
         {
-            // Plugged
-            throw new NotImplementedException();
+            // Plugged but we use this for unit tests
+            var bytes = BitConverter.GetBytes(aValue);
+            for (int i = 0; i < size; i++)
+            {
+                dest[i] = bytes[i % 4];
+            }
         }
 
         /// <summary>

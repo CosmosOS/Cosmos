@@ -120,14 +120,10 @@ namespace Cosmos.Core
         /// <param name="aData">A data to fill.</param>
         public void Fill(uint aData)
         {
-#if TEST
-            Array.Fill(memory, (byte)aData);
-#else
             fixed (byte* destPtr = memory)
             {
                 MemoryOperations.Fill(destPtr, (int)aData, (int)Size);
             }
-#endif
         }
 
         public unsafe void Copy(int aStart, byte[] aData, int aIndex, int aCount)

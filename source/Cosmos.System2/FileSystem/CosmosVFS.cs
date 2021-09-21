@@ -197,16 +197,12 @@ namespace Cosmos.System.FileSystem
                 return GetDirectory(aPath);
             }
 
-            Global.mFileSystemDebugger.SendInternal("Path doesn't exist.");
-
             aPath = aPath.TrimEnd(DirectorySeparatorChar, AltDirectorySeparatorChar);
 
             string xDirectoryToCreate = Path.GetFileName(aPath);
-            Global.mFileSystemDebugger.SendInternal("After GetFileName");
             Global.mFileSystemDebugger.SendInternal("xDirectoryToCreate = " + xDirectoryToCreate);
 
             string xParentDirectory = Path.GetDirectoryName(aPath);
-            Global.mFileSystemDebugger.SendInternal("After removing last path part");
             Global.mFileSystemDebugger.SendInternal("xParentDirectory = " + xParentDirectory);
 
             DirectoryEntry xParentEntry = GetDirectory(xParentDirectory);
@@ -379,7 +375,8 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Thrown when the entry at aPath is not a directory.</exception>
         public override DirectoryEntry GetDirectory(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetDirectory Checking: " + aPath);
+            Global.mFileSystemDebugger.SendInternal("-- CosmosVFS.GetDirectory --");
+            Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
             try
             {
                 var xFileSystem = GetFileSystemFromPath(aPath);
@@ -651,22 +648,15 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aPath</exception>
         private FileSystem GetFileSystemFromPath(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.GetFileSystemFromPath ---");
-
             if (String.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentException("Argument is null or empty", nameof(aPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
-
             string xPath = Path.GetPathRoot(aPath);
-
-            Global.mFileSystemDebugger.SendInternal("xPath after GetPathRoot = " + xPath);
 
             if ((mCurrentFileSystem != null) && (xPath == mCurrentFileSystem.RootPath))
             {
-                Global.mFileSystemDebugger.SendInternal("Returning current file system.");
                 return mCurrentFileSystem;
             }
 
@@ -674,11 +664,12 @@ namespace Cosmos.System.FileSystem
             {
                 if (mFileSystems[i].RootPath == xPath)
                 {
-                    Global.mFileSystemDebugger.SendInternal("Found filesystem.");
                     mCurrentFileSystem = mFileSystems[i];
                     return mCurrentFileSystem;
                 }
             }
+            Global.mFileSystemDebugger.SendInternal("Unable to determine filesystem for path = " + aPath);
+            Global.mFileSystemDebugger.SendInternal("xPath = " + xPath);
             throw new Exception("Unable to determine filesystem for path: " + aPath);
         }
 
@@ -815,6 +806,9 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="ArgumentOutOfRangeException">Thrown if driveId length is smaller then 2, or greater than Int32.MaxValue.</exception>
         public override bool IsValidDriveId(string driveId)
         {
+#if TEST
+            return true;
+#else
             Global.mFileSystemDebugger.SendInternal($"driveId is {driveId} after normalization");
 
             /* We need to remove ':\' to get only the numeric value */
@@ -822,14 +816,15 @@ namespace Cosmos.System.FileSystem
             Global.mFileSystemDebugger.SendInternal($"driveId is now {driveId}");
 
             /*
-             * Cosmos Drive name is really similar to DOS / Windows but a number instead of a letter is used, it is not limited
-             * to 1 character but any number is valid
-             */
+            *Cosmos Drive name is really similar to DOS / Windows but a number instead of a letter is used, it is not limited
+            *to 1 character but any number is valid
+            */
 
             bool isOK = Int32.TryParse(driveId, out int val);
             Global.mFileSystemDebugger.SendInternal($"isOK is {isOK}");
 
             return isOK;
+#endif
         }
 
         /// <summary>

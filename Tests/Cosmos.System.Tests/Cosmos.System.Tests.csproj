@@ -24,6 +24,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\source\Cosmos.HAL2\Cosmos.HAL2.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.System2\Cosmos.System2.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj" />
     </ItemGroup>
 
 </Project>
