@@ -33,7 +33,7 @@ namespace Cosmos.TestRunner.Full
             yield return typeof(GraphicTest.Kernel);
             yield return typeof(NetworkTest.Kernel);
             /* Please see the notes on the kernel itself before enabling it */
-            yield return typeof(ConsoleTest.Kernel);
+            //yield return typeof(ConsoleTest.Kernel);
             /* This is a bit slow and works only because ring check is disabled to decide if leave it enabled */
             yield return typeof(MemoryOperationsTest.Kernel);
             yield return typeof(ProcessorTests.Kernel);
