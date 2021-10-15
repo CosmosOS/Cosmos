@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Cosmos.TestRunner;
 
@@ -56,33 +56,128 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(xDoubleResult[3] == xDoubleExpectedResult[3], "Assinging values to double array elements doesn't work: xResult[1] =  " + (uint)xDoubleResult[3] + " != " + (uint)xDoubleExpectedResult[3]);
 
             //Test array indexes
-            int y = 0;
-            int[] x = new int[5] { 1, 2, 3, 4, 5 };
-            bool error = false;
-            try
             {
-                y = x[1];
-                y = x[7];
+                int y = 0;
+                int[] x = new int[5] { 1, 2, 3, 4, 5 };
+                bool error = false;
+                try
+                {
+                    y = x[1];
+                    y = x[7];
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too large positions.");
+                error = false;
+                try
+                {
+    #pragma warning disable CS0251 // Indexing an array with a negative index
+                    y = x[-1];
+    #pragma warning restore CS0251 // Indexing an array with a negative index
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too small positions.");
+                error = false;
+                try
+                {
+                    x[7] = 9;
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Index out of range exception works correctly when setting elements.");
             }
-            catch (IndexOutOfRangeException)
             {
-                error = true;
+                object y;
+                object[] x = new object[5] { new object(), new object(), new object(), new object(), new object() };
+                bool error = false;
+                try
+                {
+                    y = x[28987];
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Index out of range exception works correctly for too large positions.");
+                error = false;
+                try
+                {
+#pragma warning disable CS0251 // Indexing an array with a negative index
+                    y = x[-1];
+#pragma warning restore CS0251 // Indexing an array with a negative index
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Index out of range exception works correctly for too small positions.");
+                error = false;
+                try
+                {
+                    x[7] = new object();
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Index out of range exception works correctly when setting elements.");
             }
-            Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too large positions.");
-            error = false;
-            try
             {
-                y = x[-1];
+                Test y;
+                Test[] x = new Test[5] { new Test(), new Test(), new Test(), new Test(), new Test() };
+                bool error = false;
+                try
+                {
+                    y = x[28987];
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Index out of range exception works correctly for too large positions.");
+                error = false;
+              
+                try
+                {
+#pragma warning disable CS0251 // Indexing an array with a negative index
+                    y = x[-1];
+#pragma warning restore CS0251 // Indexing an array with a negative index
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Index out of range exception works correctly for too small positions.");
+                error = false;
+              
+                try
+                {
+                    x[7] = new Test();
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    error = true;
+                }
+                Assert.IsTrue(error, "Index out of range exception works correctly when setting elements.");
             }
-            catch (IndexOutOfRangeException)
-            {
-                error = true;
-            }
-            Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too small positions.");
-            
+
             string[] stringArray = new string[10];
             stringArray[0] += "asd";
             Assert.AreEqual(stringArray[0], "asd", "Adding directly to array works");
         }
+    }
+
+    struct Test
+    {
+        int x;
+        int y;
+        int z;
     }
 }
