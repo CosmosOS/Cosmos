@@ -905,7 +905,7 @@ namespace Cosmos.System.Graphics
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
-        public void DrawImageAlpha(Image image, int x, int y)
+        public virtual void DrawImageAlpha(Image image, int x, int y)
         {
             for (int _x = 0; _x < image.Width; _x++)
             {
@@ -936,7 +936,7 @@ namespace Cosmos.System.Graphics
         /// <param name="point">Point of the top left corner of the image.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
-        public void DrawImageAlpha(Image image, Point point)
+        public virtual void DrawImageAlpha(Image image, Point point)
         {
             DrawImageAlpha(image, point.X, point.Y);
         }
@@ -948,7 +948,7 @@ namespace Cosmos.System.Graphics
         /// <param name="aFont">Font used.</param>
         /// <param name="pen">Color.</param>
         /// <param name="point">Point of the top left corner of the string.</param>
-        public void DrawString(string str, Font aFont, Pen pen, Point point)
+        public virtual void DrawString(string str, Font aFont, Pen pen, Point point)
         {
             DrawString(str, aFont, pen, point.X, point.Y);
         }
@@ -961,7 +961,7 @@ namespace Cosmos.System.Graphics
         /// <param name="pen">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        public virtual void DrawString(string str, Font aFont, Pen pen, int x, int y)
         {
             foreach (char c in str)
             {
@@ -977,7 +977,7 @@ namespace Cosmos.System.Graphics
         /// <param name="aFont">Font used.</param>
         /// <param name="pen">Color.</param>
         /// <param name="point">Point of the top left corner of the char.</param>
-        public void DrawChar(char c, Font aFont, Pen pen, Point point)
+        public virtual void DrawChar(char c, Font aFont, Pen pen, Point point)
         {
             DrawChar(c, aFont, pen, point.X, point.Y);
         }
@@ -990,7 +990,7 @@ namespace Cosmos.System.Graphics
         /// <param name="pen">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        public virtual void DrawChar(char c, Font aFont, Pen pen, int x, int y)
         {
             int p = aFont.Height * (byte)c;
 

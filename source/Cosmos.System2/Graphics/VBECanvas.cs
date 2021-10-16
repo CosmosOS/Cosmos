@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-
+using Cosmos.System.Graphics.Fonts;
 using Cosmos.HAL.Drivers;
 
 namespace Cosmos.System.Graphics
@@ -342,6 +342,85 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Draws a filled circle
+        /// </summary>
+        /// <param name="aPen"></param>
+        /// <param name="aX0"></param>
+        /// <param name="aY0"></param>
+        /// <param name="aRadius"></param>
+        public override void DrawFilledCircle(Pen aPen, int aX0, int aY0, int aRadius)
+        {
+            int x = aRadius;
+            int y = 0;
+            int xChange = 1 - (aRadius << 1);
+            int yChange = 0;
+            int radiusError = 0;
+
+            while (x >= y)
+            {
+                for (int i = aX0 - x; i <= aX0 + x; i++)
+                {
+                    _VBEDriver.ClearVRAM(i, aY0 + y, aPen.Color.ToArgb());
+                    _VBEDriver.ClearVRAM(i, aY0 - y, aPen.Color.ToArgb());
+                }
+                for (int i = aX0 - y; i <= aX0 + y; i++)
+                {
+                    _VBEDriver.ClearVRAM(i, aY0 + x, aPen.Color.ToArgb());
+                    _VBEDriver.ClearVRAM(i, aY0 - x, aPen.Color.ToArgb());
+                }
+
+                y++;
+                radiusError += yChange;
+                yChange += 2;
+                if (((radiusError << 1) + xChange) > 0)
+                {
+                    x--;
+                    radiusError += xChange;
+                    xChange += 2;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws a filled circle
+        /// </summary>
+        /// <param name="aPen"></param>
+        /// <param name="aPoint"></param>
+        /// <param name="aRadius"></param>
+        public override void DrawFilledCircle(Pen aPen, Point aPoint, int aRadius)
+        {
+            int x = aRadius;
+            int y = 0;
+            int xChange = 1 - (aRadius << 1);
+            int yChange = 0;
+            int radiusError = 0;
+
+            while (x >= y)
+            {
+                for (int i = aPoint.X - x; i <= aPoint.X + x; i++)
+                {
+                    _VBEDriver.ClearVRAM(i, aPoint.Y + y, aPen.Color.ToArgb());
+                    _VBEDriver.ClearVRAM(i, aPoint.Y - y, aPen.Color.ToArgb());
+                }
+                for (int i = aPoint.X - y; i <= aPoint.X + y; i++)
+                {
+                    _VBEDriver.ClearVRAM(i, aPoint.Y + x, aPen.Color.ToArgb());
+                    _VBEDriver.ClearVRAM(i, aPoint.Y - x, aPen.Color.ToArgb());
+                }
+
+                y++;
+                radiusError += yChange;
+                yChange += 2;
+                if (((radiusError << 1) + xChange) > 0)
+                {
+                    x--;
+                    radiusError += xChange;
+                    xChange += 2;
+                }
+            }
+        }
+
+        /// <summary>
         /// Draw image.
         /// </summary>
         /// <param name="aImage">Image.</param>
@@ -362,6 +441,92 @@ namespace Cosmos.System.Graphics
                 _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
             }
             Global.mDebugger.SendInternal("Done");
+        }
+
+        /// <summary>
+        /// Draw image with alpha channel.
+        /// </summary>
+        /// <param name="image">Image to draw.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        public override void DrawImageAlpha(Image image, int x, int y)
+        {
+            Global.mDebugger.SendInternal($"Drawing image of size {image.Width}x{image.Height} array size {image.rawData.Length} with alpha chanel...");
+            for (int _x = 0; _x < image.Width; _x++)
+            {
+                for (int _y = 0; _y < image.Height; _y++)
+                {
+                    _VBEDriver.ClearVRAM(x + _x, y + _y, new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])).Color.ToArgb());
+                }
+            }
+            Global.mDebugger.SendInternal("Done");
+        }
+
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="str">string to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="point">Point of the top left corner of the string.</param>
+        public override void DrawString(string str, Font aFont, Pen pen, Point point)
+        {
+            DrawString(str, aFont, pen, point.X, point.Y);
+        }
+
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="str">string to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        {
+            foreach (char c in str)
+            {
+                DrawChar(c, aFont, pen, x, y);;
+                x += aFont.Width;
+            }
+        }
+
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="str">char to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="point">Point of the top left corner of the char.</param>
+        public void DrawChar(char c, Font aFont, Pen pen, Point point)
+        {
+            DrawChar(c, aFont, pen, point.X, point.Y);
+        }
+
+        /// <summary>
+        /// Draw char.
+        /// </summary>
+        /// <param name="str">char to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        {
+            int p = aFont.Height * (byte)c;
+
+            for (int cy = 0; cy < aFont.Height; cy++)
+            {
+                for (byte cx = 0; cx < aFont.Width; cx++)
+                {
+                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
+                    {
+                        _VBEDriver.ClearVRAM((ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy), pen.Color.ToArgb());
+                    }
+                }
+            }
         }
 
         #endregion
