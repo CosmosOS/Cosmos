@@ -6,7 +6,7 @@
 
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
-        <RuntimeIdentifier>win10-x32</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x32</RuntimeIdentifier>
         <RootNamespace>Cosmos.VS.ProjectSystem</RootNamespace>
         <FileVersion>1.0.0.0</FileVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>

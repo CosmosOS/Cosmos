@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <RuntimeIdentifier>win10-x32</RuntimeIdentifier>
         <RootNamespace>Cosmos.VS.Windows</RootNamespace>
         <IncludeWpfReferences>True</IncludeWpfReferences>
@@ -39,8 +39,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.ServiceHub.Framework" Version="2.8.2018" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.9.31025.104" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.10.0" Version="16.9.31023.347" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.7.30329.88" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.10.0" Version="16.7.30329.88" />
         <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.1600">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
