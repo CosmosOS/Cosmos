@@ -141,6 +141,9 @@ namespace Cosmos.System {
         private void DoTab()
         {
             Write(Space);
+            Write(Space);
+            Write(Space);
+            Write(Space);
         }
 
         /// <summary>
