@@ -977,7 +977,7 @@ namespace Cosmos.System.Graphics
         /// <param name="aFont">Font used.</param>
         /// <param name="pen">Color.</param>
         /// <param name="point">Point of the top left corner of the char.</param>
-        public virtual void DrawChar(char c, Font aFont, Pen pen, Point point)
+        public void DrawChar(char c, Font aFont, Pen pen, Point point)
         {
             DrawChar(c, aFont, pen, point.X, point.Y);
         }

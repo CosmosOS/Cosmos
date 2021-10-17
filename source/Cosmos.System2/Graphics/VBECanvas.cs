@@ -389,35 +389,7 @@ namespace Cosmos.System.Graphics
         /// <param name="aRadius"></param>
         public override void DrawFilledCircle(Pen aPen, Point aPoint, int aRadius)
         {
-            int x = aRadius;
-            int y = 0;
-            int xChange = 1 - (aRadius << 1);
-            int yChange = 0;
-            int radiusError = 0;
-
-            while (x >= y)
-            {
-                for (int i = aPoint.X - x; i <= aPoint.X + x; i++)
-                {
-                    _VBEDriver.ClearVRAM(i, aPoint.Y + y, aPen.Color.ToArgb());
-                    _VBEDriver.ClearVRAM(i, aPoint.Y - y, aPen.Color.ToArgb());
-                }
-                for (int i = aPoint.X - y; i <= aPoint.X + y; i++)
-                {
-                    _VBEDriver.ClearVRAM(i, aPoint.Y + x, aPen.Color.ToArgb());
-                    _VBEDriver.ClearVRAM(i, aPoint.Y - x, aPen.Color.ToArgb());
-                }
-
-                y++;
-                radiusError += yChange;
-                yChange += 2;
-                if (((radiusError << 1) + xChange) > 0)
-                {
-                    x--;
-                    radiusError += xChange;
-                    xChange += 2;
-                }
-            }
+            DrawFilledCircle(aPen, aPoint.X, aPoint.Y, aRadius);
         }
 
         /// <summary>
