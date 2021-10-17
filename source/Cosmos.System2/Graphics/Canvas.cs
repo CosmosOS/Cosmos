@@ -948,7 +948,7 @@ namespace Cosmos.System.Graphics
         /// <param name="aFont">Font used.</param>
         /// <param name="pen">Color.</param>
         /// <param name="point">Point of the top left corner of the string.</param>
-        public virtual void DrawString(string str, Font aFont, Pen pen, Point point)
+        public void DrawString(string str, Font aFont, Pen pen, Point point)
         {
             DrawString(str, aFont, pen, point.X, point.Y);
         }
