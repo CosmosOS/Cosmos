@@ -350,34 +350,19 @@ namespace Cosmos.System.Graphics
         /// <param name="aRadius"></param>
         public override void DrawFilledCircle(Pen aPen, int aX0, int aY0, int aRadius)
         {
-            int x = aRadius;
-            int y = 0;
-            int xChange = 1 - (aRadius << 1);
-            int yChange = 0;
-            int radiusError = 0;
+            int r2 = aRadius * aRadius;
+            int area = r2 << 2;
+            int rr = aRadius << 1;
 
-            while (x >= y)
+            for (int i = 0; i < area; i++)
             {
-                for (int i = aX0 - x; i <= aX0 + x; i++)
-                {
-                    _VBEDriver.ClearVRAM(i, aY0 + y, aPen.Color.ToArgb());
-                    _VBEDriver.ClearVRAM(i, aY0 - y, aPen.Color.ToArgb());
-                }
-                for (int i = aX0 - y; i <= aX0 + y; i++)
-                {
-                    _VBEDriver.ClearVRAM(i, aY0 + x, aPen.Color.ToArgb());
-                    _VBEDriver.ClearVRAM(i, aY0 - x, aPen.Color.ToArgb());
-                }
+                int tx = (i % rr) - aRadius;
+                int ty = (i / rr) - aRadius;
 
-                y++;
-                radiusError += yChange;
-                yChange += 2;
-                if (((radiusError << 1) + xChange) > 0)
+                if (tx * tx + ty * ty <= r2)
                 {
-                    x--;
-                    radiusError += xChange;
-                    xChange += 2;
-                }
+                    _VBEDriver.ClearVRAM(aX0 + tx, aY0 + ty, aPen.Color.ToArgb());
+                } 
             }
         }
 
