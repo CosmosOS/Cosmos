@@ -361,7 +361,7 @@ namespace Cosmos.System.Graphics
 
                 if (tx * tx + ty * ty <= r2)
                 {
-                    _VBEDriver.ClearVRAM(aX0 + tx, aY0 + ty, aPen.Color.ToArgb());
+                    _VBEDriver.SetVRAM((uint)GetPointOffset(aY0 + ty, + aX0 + tx), (byte)aPen.Color.ToArgb());
                 } 
             }
         }
@@ -415,7 +415,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
-                    _VBEDriver.ClearVRAM(x + _x, y + _y, image.rawData[_x + _y * image.Width]);
+                    _VBEDriver.SetVRAM((uint)GetPointOffset(y + _y, x + _x), (byte)image.rawData[_x + _y * image.Width]);
                 }
             }
             Global.mDebugger.SendInternal("Done");
@@ -481,7 +481,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        _VBEDriver.ClearVRAM((ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy), Color);
+                        _VBEDriver.SetVRAM((uint)GetPointOffset(x + (aFont.Width - cx), y + cy), (byte)Color);
                     }
                 }
             }
