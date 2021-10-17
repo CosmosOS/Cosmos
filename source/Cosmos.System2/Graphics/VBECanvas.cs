@@ -430,7 +430,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
-                    _VBEDriver.ClearVRAM(x + _x, y + _y, new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])).Color.ToArgb());
+                    _VBEDriver.ClearVRAM(x + _x, y + _y, image.rawData[_x + _y * image.Width]);
                 }
             }
             Global.mDebugger.SendInternal("Done");
@@ -443,7 +443,7 @@ namespace Cosmos.System.Graphics
         /// <param name="aFont">Font used.</param>
         /// <param name="pen">Color.</param>
         /// <param name="point">Point of the top left corner of the string.</param>
-        public override void DrawString(string str, Font aFont, Pen pen, Point point)
+        public void DrawString(string str, Font aFont, Pen pen, Point point)
         {
             DrawString(str, aFont, pen, point.X, point.Y);
         }
@@ -456,7 +456,7 @@ namespace Cosmos.System.Graphics
         /// <param name="pen">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        public override void DrawString(string str, Font aFont, Pen pen, int x, int y)
         {
             foreach (char c in str)
             {
@@ -487,6 +487,7 @@ namespace Cosmos.System.Graphics
         /// <param name="y">Y coordinate.</param>
         public void DrawChar(char c, Font aFont, Pen pen, int x, int y)
         {
+            int Color = pen.Color.ToArgb();
             int p = aFont.Height * (byte)c;
 
             for (int cy = 0; cy < aFont.Height; cy++)
@@ -495,7 +496,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        _VBEDriver.ClearVRAM((ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy), pen.Color.ToArgb());
+                        _VBEDriver.ClearVRAM((ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy), Color);
                     }
                 }
             }
