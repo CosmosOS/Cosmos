@@ -1,35 +1,29 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Cosmos.VS.DebugEngine.Commands;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
-using Cosmos.VS.DebugEngine.Commands;
-
-[assembly: ProvideBindingRedirection(
-    AssemblyName = "SQLitePCLRaw.batteries_green",
-    NewVersion = "1.1.10.86",
-    OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.86")]
-
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.batteries_v2",
-    NewVersion = "1.1.10.86",
+    NewVersion = "2.0.6.1341",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.86")]
+    OldVersionUpperBound = "2.0.6.1341")]
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.core",
-    NewVersion = "1.1.10.86",
+    NewVersion = "2.0.6.1341",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.86")]
+    OldVersionUpperBound = "2.0.6.1341")]
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.provider.e_sqlite3",
-    NewVersion = "1.1.10.86",
+    NewVersion = "2.0.6.1341",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "1.1.10.86")]
+    OldVersionUpperBound = "2.0.6.1341")]
 
 namespace Cosmos.VS.DebugEngine
 {
@@ -48,6 +42,10 @@ namespace Cosmos.VS.DebugEngine
         {
             await base.InitializeAsync(cancellationToken, progress);
 
+            var xDir = IntPtr.Size == 4 ? "x86" : "x64";
+            Environment.SetEnvironmentVariable("PATH", // add path so that it finds SQLitePCLRaw.nativelibrary
+                String.Join(";", Environment.GetEnvironmentVariable("PATH"),
+                    Path.Combine(Path.GetDirectoryName(typeof(CosmosDebugEnginePackage).Assembly.Location), xDir)));
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             packageCommandTarget = await GetServiceAsync(typeof(IOleCommandTarget)).ConfigureAwait(true) as IOleCommandTarget;

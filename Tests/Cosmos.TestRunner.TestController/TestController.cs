@@ -32,6 +32,7 @@ namespace Cosmos.TestRunner
         {
             Debugger.Send("Failed");
             Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestFailed);
+            Debugger.DoBochsBreak();
             while (true)
                 ;
         }

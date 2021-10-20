@@ -1,18 +1,18 @@
 using System;
+
 using Cosmos.Common;
+
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
 {
-    [Plug(Target = typeof(Int32))]
+    [Plug(Target = typeof(int))]
     public static class Int32Impl
     {
         public static string ToString(ref int aThis)
         {
             return StringHelper.GetNumberString(aThis);
         }
-
-        public static string ToString(ref int aThis, IFormatProvider aFormatProvider) => ToString(ref aThis);
 
         public static string ToString(ref int aThis, string format)
         {
@@ -28,7 +28,9 @@ namespace Cosmos.System_Plugs.System
                 while (aThis != 0)
                 {
                     if ((aThis % 16) < 10)
+                    {
                         result = aThis % 16 + result;
+                    }
                     else
                     {
                         string temp = "";
@@ -57,17 +59,25 @@ namespace Cosmos.System_Plugs.System
             }
         }
 
-        public static Int32 Parse(string s)
+        public static string ToString(ref int aThis, IFormatProvider provider) => ToString(ref aThis);
+
+        public static string ToString(ref int aThis, string format, IFormatProvider provider) => ToString(ref aThis, format);
+
+        public static int Parse(string s)
         {
             const string digits = "0123456789";
-            Int32 result = 0;
+            var result = 0;
 
             int z = 0;
             bool neg = false;
 
             if (s.Length >= 1)
             {
-                if (s[0] == '+') z = 1;
+                if (s[0] == '+')
+                {
+                    z = 1;
+                }
+
                 if (s[0] == '-')
                 {
                     z = 1;
@@ -77,15 +87,18 @@ namespace Cosmos.System_Plugs.System
 
             for (int i = z; i < s.Length; i++)
             {
-                Int32 ind = (Int32)digits.IndexOf(s[i]);
+                var ind = digits.IndexOf(s[i]);
                 if (ind == -1)
                 {
                     throw new FormatException();
                 }
-                result = (Int32)((result * 10) + ind);
+                result = (result * 10) + ind;
             }
 
-            if (neg) result *= -1;
+            if (neg)
+            {
+                result *= -1;
+            }
 
             return result;
         }
