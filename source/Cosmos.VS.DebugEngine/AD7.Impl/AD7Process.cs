@@ -503,27 +503,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             switch (mLaunch)
             {
                 case LaunchType.VMware:
-                    #region CheckIfHyperVServiceIsRunning
-
-                    using (System.ServiceProcess.ServiceController sc = new System.ServiceProcess.ServiceController("vmms"))
-                    {
-                        try
-                        {
-                            if (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running)
-                            {
-                                AD7Util.MessageBox(
-                                    "The Hyper-V Virtual Machine Management Service will be stopped. This is needed to allow to run VMware.");
-                                sc.Stop();
-                            }
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            // service not present
-                        }
-                    }
-
-                    #endregion
-
                     mHost = new VMware(mDebugInfo, xUseGDB);
                     break;
                 case LaunchType.Slave:
