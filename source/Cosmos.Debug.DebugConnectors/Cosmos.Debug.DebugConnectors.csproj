@@ -2,12 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
         <PackageReference Include="System.IO.Pipes" Version="4.3.0" />
-        <PackageReference Include="System.IO.Ports" Version="4.4.0" />
+        <PackageReference Include="System.IO.Ports" Version="5.0.0" />
         <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
     </ItemGroup>
 

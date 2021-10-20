@@ -164,11 +164,9 @@ namespace Cosmos.Deploy.Pixie {
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
       if (mDhcpThread != null) {
-        mDhcpThread.Abort();
         mDHCP.Stop();
       }
       if (mTftpThread != null) {
-        mTftpThread.Abort();
         mTFTP.Stop();
       }
     }

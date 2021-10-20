@@ -16,7 +16,6 @@ namespace Cosmos.Core_Plugs.MemoryOperations
         {
             throw new NotImplementedException();
         }
-
         unsafe public static void Fill(byte* dest, int value, int size)
         {
             //Console.WriteLine("Filling array of size " + size + " with value 0x" + value.ToString("X"));
@@ -115,28 +114,28 @@ namespace Cosmos.Core_Plugs.MemoryOperations
             }
 
             /*
-			 * OK size is >= 16 it does not make any sense to do it with primitive types as C#
-			 * has not a Int128 type, the Int128 operations will be done in assembler but we can
-			 * do yet in the Managed world the two things:
-			 * 1. Check of how many blocks of 16 bytes size is composed
-			 * 2. If there are reaming bytes (that is size is not a perfect multiple of size)
-			 *    we do the Fill() using a simple managed for() loop of bytes
-			 */
-            int xBlocksNum;
-            int xByteRemaining;
-
-#if NETSTANDARD1_5
-            xBlocksNum = size / 16;
-            xByteRemaining = size % 16;
-#else
-            xBlocksNum = Math.DivRem(size, 16, out xByteRemaining);
-#endif
+             * OK size is >= 16 it does not make any sense to do it with primitive types as C#
+             * has not a Int128 type, the Int128 operations will be done in assembler but we can
+             * do yet in the Managed world the two things:
+             * 1. Check of how many blocks of 16 bytes size is composed
+             * 2. If there are reaming bytes (that is size is not a perfect multiple of size)
+             *    we do the Fill() using a simple managed for() loop of bytes
+             */
+            
+            int xBlocksNum = size / 16;
+            int xByteRemaining = size % 16;
 
             //Global.mDebugger.SendInternal("size " + size + " is composed of " + BlocksNum + " block of 16 bytes with " + ByteRemaining + " remainder");
 
-            for (int i = 0; i < xByteRemaining; i++)
+
+            for (int i = 0; i < xByteRemaining / 4; i++)
             {
-                *(dest + i) = (byte)value;
+                *((int*)dest + i) = value;
+            }
+
+            for (int i = 0; i < xByteRemaining % 4; i++)
+            {
+                *(dest + i) = (byte)(value >> (i * 4));
             }
 
             /* Let's call the assembler version now to do the 16 byte block copies */

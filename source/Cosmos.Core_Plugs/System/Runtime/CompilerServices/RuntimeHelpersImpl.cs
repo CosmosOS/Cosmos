@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
@@ -12,21 +13,9 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         {
         }
 
-#pragma warning disable 108,114
-        public static bool Equals(object o1, object o2)
-#pragma warning restore 108,114
+        public static bool Equals(object aO1, object aO2)
         {
-            if (o1 == null
-                && o2 == null)
-            {
-                return true;
-            }
-            if (o1 == null
-                || o2 == null)
-            {
-                return false;
-            }
-            return object.Equals(o1, o2);
+            return aO1 == aO2; //we cant use object.Equals since it just calls this
         }
 
         public static void ProbeForSufficientStack()
@@ -43,6 +32,11 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         public static bool IsReferenceOrContainsReferences<T>()
         {
             return false;
+        }
+
+        public static bool TryEnsureSufficientExecutionStack()
+        {
+            throw new NotImplementedException();
         }
     }
 }

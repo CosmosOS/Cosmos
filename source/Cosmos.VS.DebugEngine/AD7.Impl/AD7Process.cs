@@ -577,9 +577,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mHost.OnShutDown += HostShutdown;
 
             string xDbPath = Path.ChangeExtension(mISO, "cdb");
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), xDbPath)))
+            if (!File.Exists(xDbPath))
             {
-                throw new Exception("Debug data file " + xDbPath + " not found. Could be a omitted build process of Cosmos project so that not created.");
+                throw new Exception($"Debug data file {xDbPath} not found. Project path is {mDebugInfo["ProjectFile"]} and iso path {mDebugInfo["ISOFile"]}. Could be a omitted build process of Cosmos project so that not created.");
             }
 
             mDebugInfoDb = new DebugInfo(Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), xDbPath));
