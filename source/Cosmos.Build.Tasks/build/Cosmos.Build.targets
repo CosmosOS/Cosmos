@@ -58,7 +58,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
+        <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)net48\Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
     </PropertyGroup>
 
     <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
@@ -86,7 +86,7 @@
 
     <ItemGroup Condition="'$(KernelPkg)' == 'X86'">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.CPU.x86.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.CPU_Asm.dll" />
+         
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.CPU_Plugs.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Debug.Kernel.Plugs.Asm.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Platform.PC.dll" />
@@ -182,8 +182,8 @@
                 EmitDebugSymbols="$(DebugSymbols)"
                 CosmosBuildDir="$(CosmosDir)\Build"
                 WorkingDir="$(TargetDir)"
-				ToolPath="$(Il2cpuToolPath)"
-				ToolExe="$(Il2cpuToolExe)" />
+                ToolPath="$(Il2cpuToolPath)"
+                ToolExe="$(Il2cpuToolExe)" />
 
     </Target>
 

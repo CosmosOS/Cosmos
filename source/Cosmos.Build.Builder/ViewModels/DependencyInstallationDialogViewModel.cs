@@ -74,8 +74,8 @@ namespace Cosmos.Build.Builder.ViewModels
             {
                 return;
             }
-            _installTask.Dispose();
-            _installTaskCancellationTokenSource.Dispose();
+            _installTask?.Dispose();
+            _installTaskCancellationTokenSource?.Dispose();
         }
 
         private void Install(object parameter) => _installTask = InstallAsync();

@@ -1,4 +1,5 @@
 ﻿//#define COSMOSDEBUG
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Cosmos.Core
@@ -13,11 +14,16 @@ namespace Cosmos.Core
         /// Fill memory block. Plugged.
         /// </summary>
         /// <param name="dest">A destination.</param>
-        /// <param name="value">A data value.</param>
-        /// <param name="size">A data size.</param>
-        public static unsafe void Fill(byte* dest, int value, int size)
+        /// <param name="aValue">A data value.</param>
+        /// <param name="size">Number of bytes to fill</param>
+        public static unsafe void Fill(byte* dest, int aValue, int size)
         {
-            // Plugged
+            // Plugged but we use this for unit tests
+            var bytes = BitConverter.GetBytes(aValue);
+            for (int i = 0; i < size; i++)
+            {
+                dest[i] = bytes[i % 4];
+            }
         }
 
         /// <summary>
@@ -31,13 +37,13 @@ namespace Cosmos.Core
         {
             Fill((byte*)dest, (int)value, size * 4);
         }
-
+            
         /// <summary>
-        /// Fill data to destination.
+        /// Fill destination region with value.
         /// </summary>
-        /// <param name="dest">Destination.</param>
-        /// <param name="value">Data value.</param>
-        /// <param name="size">Data size.</param>
+        /// <param name="dest">Location</param>
+        /// <param name="value">Value</param>
+        /// <param name="size">Number of integers to write</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe void Fill(int* dest, int value, int size)
         {
@@ -198,9 +204,9 @@ namespace Cosmos.Core
                 Copy(destPtr, srcPtr, dest.Length);
             }
         }
-        #endregion Fill
+#endregion Fill
 
-        #region Copy
+#region Copy
         /// <summary>
         /// Copy source to destination.
         /// plugged.
@@ -347,6 +353,6 @@ namespace Cosmos.Core
             }
         }
 
-        #endregion Copy
+#endregion Copy
     }
 }

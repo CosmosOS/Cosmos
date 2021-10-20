@@ -27,53 +27,6 @@ namespace MemoryOperationsTest
             Console.WriteLine("Cosmos booted successfully. Let's Test MemoryOperations!");
         }
 
-        /*
-         * It checks 32 byte any time to make it more faster, for now we need unsafe to do this
-         */ 
-        public static unsafe bool AreArrayEquals(byte* b0, byte* b1, int length)
-        {
-            byte* lastAddr = b0 + length;
-            byte* lastAddrMinus32 = lastAddr - 32;
-            while (b0 < lastAddrMinus32) // unroll the loop so that we are comparing 32 bytes at a time.
-            {
-                if (*(ulong*)b0 != *(ulong*)b1)
-                    return false;
-                if (*(ulong*)(b0 + 8) != *(ulong*)(b1 + 8))
-                    return false;
-                if (*(ulong*)(b0 + 16) != *(ulong*)(b1 + 16))
-                    return false;
-                if (*(ulong*)(b0 + 24) != *(ulong*)(b1 + 24))
-                    return false;
-                b0 += 32;
-                b1 += 32;
-            }
-            while (b0 < lastAddr)
-            {
-                if (*b0 != *b1)
-                    return false;
-                b0++;
-                b1++;
-            }
-            return true;
-        }
-
-        public static unsafe bool AreArrayEquals(byte[] arr0, byte[] arr1)
-        {
-            fixed (byte* b0 = arr0, b1 = arr1)
-            {
-                return b0 == b1 || AreArrayEquals(b0, b1, arr0.Length);
-            }
-        }
-
-        public static unsafe bool AreArrayEquals(int[] arr0, int[] arr1)
-        {
-            int lenght = arr0.Length * 4;
-            fixed (int* b0 = arr0, b1 = arr1)
-            {
-                return b0 == b1 || AreArrayEquals((byte *)b0, (byte*)b1, lenght);
-            }
-        }
-
         private void TestIntArrayCopy(int size)
         {
             int[] src = new int[size];
@@ -87,7 +40,7 @@ namespace MemoryOperationsTest
             MemoryOperations.Copy(dst, src);
             mDebugger.Send("Copy End");
 
-            Assert.IsTrue(AreArrayEquals(src, dst), $"Copy failed Array src and dst with size {size} are not equals");
+            Assert.AreEqual(src, dst, $"Copy failed Array src and dst with size {size} are not equals");
 
             mDebugger.Send("End");
         }
@@ -105,7 +58,7 @@ namespace MemoryOperationsTest
             MemoryOperations.Copy(dst, src);
             mDebugger.Send("Copy End");
 
-            Assert.IsTrue(AreArrayEquals(src, dst), $"Copy failed Array src and dst with size {size} are not equals");
+            Assert.AreEqual(src, dst, $"Copy failed Array src and dst with size {size} are not equals");
 
             mDebugger.Send("End");
         }
@@ -138,13 +91,79 @@ namespace MemoryOperationsTest
             TestIntArrayCopy(1024 * 768); // XVGA resolution
             TestIntArrayCopy(1920 * 1080); // HDTV resolution
         }
+        static unsafe void TestManagedMemoryBlock(ManagedMemoryBlock memoryBlock)
+        {
+            memoryBlock.Write32(0, 1);
+            Assert.AreEqual(1, memoryBlock[0], "ManagedMemoryBlock write int at index 0 works");
+            Assert.AreEqual(1, memoryBlock.Read32(0), "ManagedMemoryBlock read/write at index 0 works");
+            memoryBlock.Write32(1, 101);
+            Assert.AreEqual(101, memoryBlock[1], "ManagedMemoryBlock read/write at index 1 works");
+            Assert.AreEqual(25857, memoryBlock.Read32(0), "ManagedMemoryBlock read int at index 0 works");
+            memoryBlock.Write32(2, 2 ^ 16 + 2);
+            Assert.AreEqual(16, memoryBlock[2], "ManagedMemoryBlock write int at index 2 works");
+            Assert.AreEqual(0, memoryBlock[3], "ManagedMemoryBlock write int at index 2 works");
+            Assert.AreEqual(1074433, memoryBlock.Read32(0), "ManagedMemoryBlock read int at index 0 works");
+            memoryBlock.Write32(3, int.MaxValue);
+            Assert.AreEqual(255, memoryBlock[3], "ManagedMemoryBlock write int at index 3 works");
+            Assert.AreEqual(0xFF106501, memoryBlock.Read32(0), "ManagedMemoryBlock read int at index 0 works");
+            Assert.AreEqual(0xFFFF1065, memoryBlock.Read32(1), "ManagedMemoryBlock read int at index 1 works");
+            Assert.AreEqual(0xFFFFFF10, memoryBlock.Read32(2), "ManagedMemoryBlock read int at index 2 works");
+            Assert.AreEqual(int.MaxValue, memoryBlock.Read32(3), "ManagedMemoryBlock read/write at index 3 works");
+
+            memoryBlock.Fill(101);
+            Assert.AreEqual(101, memoryBlock.Read32(0), "ManagedMemoryBlock fill works at index 0");
+            Assert.AreEqual(0, memoryBlock[1], "ManagedMemoryBlock fill fills entire ints");
+            Assert.AreEqual(6619136, memoryBlock.Read32(10), "ManagedMemoryBlock fill works at index 10");
+
+            memoryBlock.Write8(0, 101);
+            Assert.AreEqual(101, memoryBlock[0], "ManagedMemoryBlock write byte works at index 0");
+            memoryBlock.Fill(1, 1, 987893745);
+            Assert.AreEqual(101, memoryBlock[0], "ManagedMemoryBlock Fill(1, int, int) skips index 0");
+            Assert.AreEqual(987893745, memoryBlock.Read32(1), "ManagedMemoryBlock Fill(int, int, int) works at index 1");
+        }
+
+        static unsafe void TestMemoryBlock(MemoryBlock memoryBlock)
+        {
+            uint[] values = new uint[] { 1, 101, 2 ^ 16 + 2, int.MaxValue };
+            memoryBlock.Write32(values);
+            uint[] read = new uint[4];
+            memoryBlock.Read32(read);
+            for (int i = 0; i < 4; i++)
+            {
+                if(values[i] != read[i])
+                {
+                    Assert.Fail($"Values read differ at {i}. Expected: {values[i]} Actual: {read[i]}");
+                }
+            }
+            Assert.Succeed("Writing and reading uints works");
+            byte* ptr = (byte*)memoryBlock.Base;
+            Assert.AreEqual(1, *ptr, "Expected 1 in first byte of memory block when checking using pointer");
+            Assert.AreEqual(0, *(ptr + 3), "Expected 0 in fourth byte of memory block when checking using pointer");
+            byte[] valueBytes = new byte[] { 1, 0, 0, 0 };
+            byte[] readByte = new byte[4];
+            memoryBlock.Read8(readByte);
+            Assert.AreEqual(valueBytes, readByte, "Reading bytes works");
+            valueBytes[0] = 65;
+            valueBytes[1] = 127;
+            memoryBlock.Write8(valueBytes);
+            memoryBlock.Read8(readByte);
+            Assert.AreEqual(valueBytes, readByte, "Writing bytes works");
+            memoryBlock.Fill(101);
+            memoryBlock.Read8(readByte);
+            Assert.AreEqual(new byte[] { 101, 101, 101, 101 }, readByte, "Filling works");
+            values = new uint[] { 0x65656565, 987893745, 0x65656565, 0x65656565 };
+            memoryBlock.Fill(4, 1, 987893745);
+            memoryBlock.Read32(read);
+            Assert.AreEqual(values, read, "Using Fill(int, int, int) works");
+        }
 
         protected override void Run()
         {
             try
             {
                 TestCopy();
-
+                TestMemoryBlock(new MemoryBlock(0x60000, 128)); //we are testing in SVGA video memory which should not be in use
+                TestManagedMemoryBlock(new ManagedMemoryBlock(128));
                 TestController.Completed();
             }
             catch (Exception e)

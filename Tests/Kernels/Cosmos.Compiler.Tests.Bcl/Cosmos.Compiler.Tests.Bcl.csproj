@@ -1,9 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
+        <Platform>cosmos</Platform>
+        <SupportsX86Intrinsics>false</SupportsX86Intrinsics>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <NoWarn>CA2242;$(NoWarn)</NoWarn>
+        <Prefer32Bit>true</Prefer32Bit>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

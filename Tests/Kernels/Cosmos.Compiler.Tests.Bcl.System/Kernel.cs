@@ -4,8 +4,6 @@ using System.Collections;
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
-using Cosmos.Compiler.Tests.Bcl.CSharp;
-
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
     public class Kernel : Sys.Kernel
@@ -23,9 +21,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
 
                 // System
-                ObjectTests.Execute();
                 ArrayTests.Execute();
                 StringTest.Execute();
+                ObjectTests.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();
                 Int16Test.Execute();
