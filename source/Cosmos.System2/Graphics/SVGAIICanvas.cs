@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.Drivers.PCI.Video;
 
