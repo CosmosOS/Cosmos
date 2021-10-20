@@ -40,7 +40,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
             // Get the EEPROM MAC Address and set it as the devices MAC
             byte[] eeprom_mac = new byte[6];
-            UInt32 result = io.MAC1.DWord;
+            uint result = io.MAC1.DWord;
             eeprom_mac[0] = BinaryHelper.GetByteFrom32bit(result, 0);
             eeprom_mac[1] = BinaryHelper.GetByteFrom32bit(result, 8);
             eeprom_mac[2] = BinaryHelper.GetByteFrom32bit(result, 16);
@@ -57,14 +57,14 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
             mInitBlock.Write32(0x00, (0x4 << 28) | (0x4 << 20));
             mInitBlock.Write32(0x04,
-                (UInt32)(eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24)));
-            mInitBlock.Write32(0x08, (UInt32)(eeprom_mac[4] | (eeprom_mac[5] << 8)));
+                (uint)(eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24)));
+            mInitBlock.Write32(0x08, (uint)(eeprom_mac[4] | (eeprom_mac[5] << 8)));
             mInitBlock.Write32(0x0C, 0x0);
             mInitBlock.Write32(0x10, 0x0);
-            mInitBlock.Write32(0x14, mRxDescriptor.Offset);
-            mInitBlock.Write32(0x18, mTxDescriptor.Offset);
+            mInitBlock.Write32(0x14, (uint)mRxDescriptor.Offset);
+            mInitBlock.Write32(0x18, (uint)mTxDescriptor.Offset);
 
-            InitializationBlockAddress = mInitBlock.Offset;
+            InitializationBlockAddress = (uint)mInitBlock.Offset;
             SoftwareStyleRegister = 0x03;
 
             mRxBuffers = new List<ManagedMemoryBlock>();
@@ -74,10 +74,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 uint xOffset = rxd * 16;
 
                 ManagedMemoryBlock buffer = new ManagedMemoryBlock(2048);
-                mRxDescriptor.Write32(xOffset + 8, buffer.Offset);
-                UInt16 buffer_len = (UInt16)(~buffer.Size);
+                mRxDescriptor.Write32(xOffset + 8, (uint)buffer.Offset);
+                ushort buffer_len = (ushort)(~buffer.Size);
                 buffer_len++;
-                UInt32 flags = (UInt32)(buffer_len & 0x0FFF) | 0xF000 | 0x80000000;
+                uint flags = (uint)(buffer_len & 0x0FFF) | 0xF000 | 0x80000000;
                 mRxDescriptor.Write32(xOffset + 4, flags);
                 mRxBuffers.Add(buffer);
             }
@@ -86,7 +86,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 uint xOffset = txd * 16;
 
                 ManagedMemoryBlock buffer = new ManagedMemoryBlock(2048);
-                mTxDescriptor.Write32(xOffset + 8, buffer.Offset);
+                mTxDescriptor.Write32(xOffset + 8, (uint)buffer.Offset);
                 mTxBuffers.Add(buffer);
             }
 
@@ -101,7 +101,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
         protected void HandleNetworkInterrupt(ref INTs.IRQContext aContext)
         {
-            UInt32 cur_status = StatusRegister;
+            uint cur_status = StatusRegister;
 
             if ((cur_status & 0x100) != 0)
             {
@@ -147,7 +147,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
         #region Register Access Properties
 
-        protected UInt32 StatusRegister
+        protected uint StatusRegister
         {
             get
             {
@@ -161,11 +161,11 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             }
         }
 
-        protected UInt32 InitializationBlockAddress
+        protected uint InitializationBlockAddress
         {
             get
             {
-                UInt32 result;
+                uint result;
 
                 io.RegisterAddress.DWord = 0x01;
                 result = io.RegisterData.DWord;
@@ -183,7 +183,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             }
         }
 
-        protected UInt32 SoftwareStyleRegister
+        protected uint SoftwareStyleRegister
         {
             get
             {
@@ -303,7 +303,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             }
 
             uint xOffset = (uint)(txd * 16);
-            UInt32 status = mTxDescriptor.Read32(xOffset + 4);
+            uint status = mTxDescriptor.Read32(xOffset + 4);
             if ((status & 0x80000000) == 0)
             {
                 for (uint b = 0; b < aData.Length; b++)
@@ -311,11 +311,11 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                     mTxBuffers[txd][b] = aData[b];
                 }
                 //UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
-                UInt16 buffer_len = (UInt16)aData.Length;
-                buffer_len = (UInt16)(~buffer_len);
+                ushort buffer_len = (ushort)aData.Length;
+                buffer_len = (ushort)(~buffer_len);
                 buffer_len++;
 
-                UInt32 flags = (UInt32)((buffer_len) & 0x0FFF) | 0x0300F000 | 0x80000000;
+                uint flags = (uint)((buffer_len) & 0x0FFF) | 0x0300F000 | 0x80000000;
 
                 mTxDescriptor.Write32(xOffset + 4, flags);
 
@@ -328,7 +328,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         private void ReadRawData()
         {
             uint status;
-            UInt16 recv_size;
+            ushort recv_size;
             byte[] recv_data;
 
             for (int rxd = 0; rxd < 16; rxd++)
@@ -337,7 +337,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 status = mRxDescriptor.Read32(xOffset + 4);
                 if ((status & 0x80000000) == 0)
                 {
-                    recv_size = (UInt16)(mRxDescriptor.Read32(xOffset + 0) & 0xFFF);
+                    recv_size = (ushort)(mRxDescriptor.Read32(xOffset + 0) & 0xFFF);
 
                     if (recv_size > 64) // remove checksum
                     {

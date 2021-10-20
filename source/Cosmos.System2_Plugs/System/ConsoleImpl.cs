@@ -626,8 +626,6 @@ namespace Cosmos.System_Plugs.System
 
         public static void Write(string format, object arg0, object arg1, object arg2) => Write(String.Format(format, arg0, arg1, arg2));
 
-        public static void Write(string format, object arg0, object arg1, object arg2, object arg3) => Write(String.Format(format, arg0, arg1, arg2, arg3));
-
         public static void Write(string format, params object[] arg) => Write(String.Format(format, arg));
 
         public static void Write(char[] aBuffer, int aIndex, int aCount)
@@ -696,8 +694,6 @@ namespace Cosmos.System_Plugs.System
         public static void WriteLine(string format, object arg0, object arg1) => WriteLine(String.Format(format, arg0, arg1));
 
         public static void WriteLine(string format, object arg0, object arg1, object arg2) => WriteLine(String.Format(format, arg0, arg1, arg2));
-
-        public static void WriteLine(string format, object arg0, object arg1, object arg2, object arg3) => WriteLine(String.Format(format, arg0, arg1, arg2, arg3));
 
         public static void WriteLine(string format, params object[] arg) => WriteLine(String.Format(format, arg));
 

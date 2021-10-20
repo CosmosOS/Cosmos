@@ -12,6 +12,11 @@ namespace Cosmos.Core_Asm
             throw new NotImplementedException();
         }
 
+        public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length)
+        {
+            Copy(sourceArray, sourceIndex, destinationArray, destinationIndex, length, false);
+        }
+
         [PlugMethod(Assembler = typeof(ArrayInternalCopyAsm))]
         public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable)
         {

@@ -503,27 +503,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             switch (mLaunch)
             {
                 case LaunchType.VMware:
-                    #region CheckIfHyperVServiceIsRunning
-
-                    using (System.ServiceProcess.ServiceController sc = new System.ServiceProcess.ServiceController("vmms"))
-                    {
-                        try
-                        {
-                            if (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running)
-                            {
-                                AD7Util.MessageBox(
-                                    "The Hyper-V Virtual Machine Management Service will be stopped. This is needed to allow to run VMware.");
-                                sc.Stop();
-                            }
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            // service not present
-                        }
-                    }
-
-                    #endregion
-
                     mHost = new VMware(mDebugInfo, xUseGDB);
                     break;
                 case LaunchType.Slave:
@@ -577,9 +556,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             mHost.OnShutDown += HostShutdown;
 
             string xDbPath = Path.ChangeExtension(mISO, "cdb");
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), xDbPath)))
+            if (!File.Exists(xDbPath))
             {
-                throw new Exception("Debug data file " + xDbPath + " not found. Could be a omitted build process of Cosmos project so that not created.");
+                throw new Exception($"Debug data file {xDbPath} not found. Project path is {mDebugInfo["ProjectFile"]} and iso path {mDebugInfo["ISOFile"]}. Could be a omitted build process of Cosmos project so that not created.");
             }
 
             mDebugInfoDb = new DebugInfo(Path.Combine(Path.GetDirectoryName(aDebugInfo["ProjectFile"]), xDbPath));

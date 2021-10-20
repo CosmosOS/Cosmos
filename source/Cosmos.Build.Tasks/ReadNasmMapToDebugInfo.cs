@@ -89,7 +89,7 @@ namespace Cosmos.Build.Tasks
                     }
                     else
                     {
-                        xId = DebugInfo.CreateId();
+                        xId = DebugInfo.CreateId;
                     }
                     xSource.Add(new Label()
                     {

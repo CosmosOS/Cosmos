@@ -25,7 +25,8 @@ namespace Cosmos.Compiler.Tests.Bcl
             {
                 mDebugger.Send("Run");
 
-                // C#
+                //// C#
+                ObjectTest.Execute();
                 WhileLoopTests.Execute();
                 ForeachLoopTests.Execute();
 
@@ -33,6 +34,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 //ThreadTest.Execute();
                 //mDebugger.Send("Thread test end");
 
+                SpanTest.Execute();
                 //DecimalTest.Execute();
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();

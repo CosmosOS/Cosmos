@@ -20,8 +20,8 @@ namespace Cosmos.Debug.DebugConnectors
         // The issue was that randomly it wouldn't return any data anymore, resulting in freezes of the kernel.
 
         public Action<Exception> ConnectionLost;
-        public Action<UInt32> CmdTrace;
-        public Action<UInt32> CmdBreak;
+        public Action<uint> CmdTrace;
+        public Action<uint> CmdBreak;
         public Action<byte[]> CmdMethodContext;
         public Action<string> CmdText;
         public Action<string> CmdMessageBox;
@@ -33,10 +33,10 @@ namespace Cosmos.Debug.DebugConnectors
         public Action<byte[]> CmdPong;
         public Action<byte, byte, byte[]> CmdChannel;
         public Action<CoreDump> CmdCoreDump;
-        public Action<UInt32> CmdStackCorruptionOccurred;
-        public Action<UInt32> CmdStackOverflowOccurred;
-        public Action<UInt32> CmdInterruptOccurred;
-        public Action<UInt32> CmdNullReferenceOccurred;
+        public Action<uint> CmdStackCorruptionOccurred;
+        public Action<uint> CmdStackOverflowOccurred;
+        public Action<uint> CmdInterruptOccurred;
+        public Action<uint> CmdNullReferenceOccurred;
         public Action<uint> CmdSimpleNumber;
         public Action<uint> CmdKernelPanic;
         public Action<ulong> CmdSimpleLongNumber;

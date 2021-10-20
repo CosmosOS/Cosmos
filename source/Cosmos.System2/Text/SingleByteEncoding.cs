@@ -140,7 +140,7 @@ namespace Cosmos.System.ExtendedASCII
             if (chars.Length - charIndex < charCount)
                 throw new ArgumentOutOfRangeException("chars", "count more that what is in array");
 
-            mDebugger.SendInternal($"Converting to CodePageTable: {new String(chars)}");
+            mDebugger.SendInternal($"Converting to CodePageTable: {new string(chars)}");
 
             for (int i = charIndex; i < charCount; i++)
             {
@@ -234,7 +234,7 @@ namespace Cosmos.System.ExtendedASCII
                 chars[charIndex + i] = GetChar(bytes[i]);
             }
 
-            mDebugger.SendInternal($"So as chars we have {new String(chars)}");
+            mDebugger.SendInternal($"So as chars we have {new string(chars)}");
 
             return chars.Length;
         }
