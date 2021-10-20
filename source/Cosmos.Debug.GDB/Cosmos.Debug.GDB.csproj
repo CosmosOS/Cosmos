@@ -8,36 +8,36 @@
 
     <ItemGroup>
 
-        <Compile Update="BreakpointUC.cs" SubType="UserControl" />
+        <Compile Update="BreakpointUC.cs" />
         <Compile Update="BreakpointUC.Designer.cs" DependentUpon="BreakpointUC.cs" />
 
-        <Compile Update="ToolTipListBox.cs" SubType="Component" />
+        <Compile Update="ToolTipListBox.cs" />
 
-        <Compile Update="WatchUC.cs" SubType="UserControl" />
+        <Compile Update="WatchUC.cs" />
         <Compile Update="WatchUC.Designer.cs" DependentUpon="WatchUC.cs" />
 
-        <Compile Update="FormBreakpoints.cs" SubType="Form" />
+        <Compile Update="FormBreakpoints.cs" />
         <Compile Update="FormBreakpoints.Designer.cs" DependentUpon="FormBreakpoints.cs" />
 
-        <Compile Update="FormCallStack.cs" SubType="Form" />
+        <Compile Update="FormCallStack.cs" />
         <Compile Update="FormCallStack.Designer.cs" DependentUpon="FormCallStack.cs" />
 
-        <Compile Update="FormLog.cs" SubType="Form" />
+        <Compile Update="FormLog.cs" />
         <Compile Update="FormLog.Designer.cs" DependentUpon="FormLog.cs" />
 
-        <Compile Update="FormMain.cs" SubType="Form" />
+        <Compile Update="FormMain.cs" />
         <Compile Update="FormMain.Designer.cs" DependentUpon="FormMain.cs" />
 
-        <Compile Update="FormRegisters.cs" SubType="Form" />
+        <Compile Update="FormRegisters.cs" />
         <Compile Update="FormRegisters.Designer.cs" DependentUpon="FormRegisters.cs" />
 
-        <Compile Update="FormWatches.cs" SubType="Form" />
+        <Compile Update="FormWatches.cs" />
         <Compile Update="FormWatches.Designer.cs" DependentUpon="FormWatches.cs" />
 
-        <Compile Update="FormHistory.cs" SubType="Form" />
+        <Compile Update="FormHistory.cs" />
         <Compile Update="FormHistory.Designer.cs" DependentUpon="FormHistory.cs" />
 
-        <Compile Update="FormSettings.cs" SubType="Form" />
+        <Compile Update="FormSettings.cs" />
         <Compile Update="FormSettings.Designer.cs" DependentUpon="FormSettings.cs" />
 
         <EmbeddedResource Update="**" DependentUpon="%(Filename).cs" />
@@ -60,6 +60,10 @@
 
     <ItemGroup>
         <PackageReference Include="Cosmos.Build.Common" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
     </ItemGroup>
 
 </Project>

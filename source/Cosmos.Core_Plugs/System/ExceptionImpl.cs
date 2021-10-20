@@ -39,5 +39,26 @@ namespace Cosmos.Core_Plugs.System
         {
             return "Exception: " + aThis.Message;
         }
+
+        public static bool IsImmutableAgileException(Exception aException)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void SaveStackTracesFromDeepCopy(Exception aException, byte[] aByte, object[] aObject)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void PrepareForForeignExceptionRaise()
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_Exception_GetStackTracesDeepCopy_System_Exception___System_Byte_____System_Object___")]
+        public static void GetStackTracesDeepCopy(Exception aException, ref byte[] aByte, ref object[] aObject)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

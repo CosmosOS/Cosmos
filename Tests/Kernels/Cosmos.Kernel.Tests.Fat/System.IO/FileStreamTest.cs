@@ -25,8 +25,9 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             mDebugger.Send("New FileStream with FileMode.Create (file not existing)");
             using (var xFS = new FileStream(@"0:\fsTest", FileMode.Create))
             {
+                mDebugger.Send("FileMode.Create Created file");
                 // The File should exist now
-                Assert.IsTrue(File.Exists(@"0:\fsTest") == true, "Filestream with FileMode.Create failed: File not created");
+                Assert.IsTrue(File.Exists(@"0:\fsTest"), "Filestream with FileMode.Create works: File created");
 
                 mDebugger.Send("Start writing");
 

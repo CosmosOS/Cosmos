@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using static Cosmos.Build.Tasks.OperatingSystem;
 
 namespace Cosmos.Build.Tasks
 {
@@ -13,7 +14,7 @@ namespace Cosmos.Build.Tasks
         [Required]
         public string OutputFile { get; set; }
 
-        protected override string ToolName => "mkisofs.exe";
+        protected override string ToolName => IsWindows() ? "mkisofs.exe" : "mkisofs";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
