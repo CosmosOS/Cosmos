@@ -27,6 +27,7 @@
 
         <SyslinuxToolPath Condition = "'$(SyslinuxToolPath)' == ''">$(CosmosToolsPath)syslinux\win\</SyslinuxToolPath>
         <SyslinuxToolExe Condition = "'$(SyslinuxToolExe)' == ''">syslinux.exe</SyslinuxToolExe>
+        <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*" />
     </PropertyGroup>
 
     <PropertyGroup>
@@ -316,6 +317,9 @@
 
         <Copy SourceFiles="@(_IsoFile)"
               DestinationFolder="$(IntermediateIsoDirectory)" />
+
+        <Copy SourceFiles="@(_IsoCustomFiles)"
+             DestinationFolder="$(IntermediateIsoDirectory)" />
 
         <CreateSyslinuxConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
