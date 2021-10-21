@@ -27,6 +27,7 @@
         <PackageReference Include="NuGet.Common" />
         <PackageReference Include="NuGet.Configuration" />
         <PackageReference Include="System.Runtime.WindowsRuntime" Version="4.6.0" />
+        <PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.0.1" />
     </ItemGroup>
 
 </Project>
