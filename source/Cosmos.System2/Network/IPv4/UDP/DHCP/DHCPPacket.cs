@@ -165,7 +165,6 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             base.InitFields();
             MessageType = RawData[42];
             Client = new Address(RawData, 58);
-            Server = new Address(RawData, 62);
 
             if (RawData[282] != 0)
             {
@@ -173,7 +172,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                 for (int i = 0; i < RawData.Length - 282 && RawData[282 + i] != 0xFF; i += 2) //0xFF is DHCP packet end
                 {
-                    DHCPOption option = new DHCPOption();
+                    var option = new DHCPOption();
                     option.Type = RawData[282 + i];
                     option.Length = RawData[282 + i + 1];
                     option.Data = new byte[option.Length];
@@ -197,11 +196,6 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// Get Client IPv4 Address
         /// </summary>
         internal Address Client { get; private set; }
-
-        /// <summary>
-        /// Get DHCP Server IPv4 Address
-        /// </summary>
-        internal Address Server { get; private set; }
 
         /// <summary>
         /// Get DHCP Options
