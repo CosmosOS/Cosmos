@@ -36,6 +36,10 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 {
                     Subnet = new Address(option.Data, 0);
                 }
+                else if (option.Type == 3) //Router
+                {
+                    Server = new Address(option.Data, 0);
+                }
                 else if (option.Type == 6) //DNS
                 {
                     DNS = new Address(option.Data, 0);
@@ -53,5 +57,9 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// </summary>
         internal Address DNS { get; private set; }
 
+        /// <summary>
+        /// Get DHCP Server IPv4 Address
+        /// </summary>
+        internal Address Server { get; private set; }
     }
 }
