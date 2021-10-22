@@ -27,7 +27,6 @@
 
         <SyslinuxToolPath Condition = "'$(SyslinuxToolPath)' == ''">$(CosmosToolsPath)syslinux\win\</SyslinuxToolPath>
         <SyslinuxToolExe Condition = "'$(SyslinuxToolExe)' == ''">syslinux.exe</SyslinuxToolExe>
-        <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*" />
     </PropertyGroup>
 
     <PropertyGroup>
@@ -302,7 +301,11 @@
             Inputs="$(BinFile)"
             Outputs="$(IsoFile)"
             Condition="'$(Deployment)' == 'ISO'">
-
+			
+		<ItemGroup>
+			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*" />
+		</ItemGroup>
+		
         <ItemGroup>
             <_IsoFile Include="$(SyslinuxPath)core\isolinux.bin" />
             <_IsoFile Include="$(SyslinuxPath)com32\elflink\ldlinux\ldlinux.c32" />
