@@ -71,7 +71,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             {
                 if (packet.RawData[284] == 0x02) //Offer packet received
                 {
-                    return SendRequestPacket(packet.Client, packet.Server);
+                    return SendRequestPacket(packet.Client, packet.SourceIP);
                 }
                 else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
                 {
