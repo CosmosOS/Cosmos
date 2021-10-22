@@ -31,8 +31,8 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
                 try
                 {
                     mDebugger.Send("Start writing");
-
                     xSW.Write(text);
+
                 }
                 catch
                 {

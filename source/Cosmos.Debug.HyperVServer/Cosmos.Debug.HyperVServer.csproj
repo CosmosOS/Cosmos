@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net48</TargetFramework>
         <OutputType>WinExe</OutputType>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <LangVersion>Latest</LangVersion>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +14,10 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.PowerShell.3.ReferenceAssemblies" Version="1.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
     </ItemGroup>
 
 </Project>

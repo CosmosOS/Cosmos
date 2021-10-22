@@ -1,5 +1,6 @@
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+using Cosmos.Debug.Kernel;
 
 using XSharp;
 using XSharp.Assembler;
@@ -53,6 +54,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 8]");
+      new LiteralAssemblerCode("xchg bx, bx");
       new LiteralAssemblerCode("Call DebugStub_SendKernelPanic");
       new LiteralAssemblerCode("add ESP, 4");
       new LiteralAssemblerCode("%endif");

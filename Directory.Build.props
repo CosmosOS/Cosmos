@@ -31,8 +31,6 @@
 
     <PropertyGroup>
         <CommonVersion>0.1.0-build37</CommonVersion>
-        <IL2CPUVersion>0.1.0-build425</IL2CPUVersion>
-        <XSharpVersion>0.1.0-build562</XSharpVersion>
     </PropertyGroup>
 
     <PropertyGroup>

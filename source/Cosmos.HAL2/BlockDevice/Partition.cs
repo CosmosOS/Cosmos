@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+using System;
 
 namespace Cosmos.HAL.BlockDevice
 {
@@ -14,7 +15,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Starting sector.
         /// </summary>
-        private readonly UInt64 mStartingSector;
+        private readonly ulong mStartingSector;
 
         /// <summary>
         /// Create new instance of the <see cref="Partition"/> class.
@@ -22,13 +23,13 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aHost">A hosting device.</param>
         /// <param name="aStartingSector">A starting sector.</param>
         /// <param name="aSectorCount">A sector count.</param>
-		public Partition(BlockDevice aHost, UInt64 aStartingSector, UInt64 aSectorCount)
-		{
-			mHost = aHost;
-			mStartingSector = aStartingSector;
-			mBlockCount = aSectorCount;
-			mBlockSize = aHost.BlockSize;
-		}
+        public Partition(BlockDevice aHost, ulong aStartingSector, ulong aSectorCount)
+        {
+            mHost = aHost;
+            mStartingSector = aStartingSector;
+            mBlockCount = aSectorCount;
+            mBlockSize = aHost.BlockSize;
+        }
 
         /// <summary>
         /// Read block from partition.
@@ -38,12 +39,16 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aData">A data that been read.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        public override void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
+        public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
+            Global.mDebugger.SendInternal("-- Partition.ReadBlock --");
+            Global.mDebugger.SendInternal($"aBlockNo = {aBlockNo}");
+            Global.mDebugger.SendInternal($"aBlockCount = {aBlockCount}");
             CheckDataSize(aData, aBlockCount);
-            UInt64 xHostBlockNo = mStartingSector + aBlockNo;
+            ulong xHostBlockNo = mStartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
             mHost.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
+            Global.mDebugger.SendInternal("Returning -- Partition.ReadBlock --");
         }
 
         /// <summary>
@@ -54,10 +59,10 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aData">A data to write.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        public override void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount,ref  byte[] aData)
+        public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             CheckDataSize(aData, aBlockCount);
-            UInt64 xHostBlockNo = mStartingSector + aBlockNo;
+            ulong xHostBlockNo = mStartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
             mHost.WriteBlock(xHostBlockNo, aBlockCount, ref aData);
         }

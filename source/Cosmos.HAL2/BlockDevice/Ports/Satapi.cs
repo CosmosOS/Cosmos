@@ -46,7 +46,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
             xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
             xCMDHeader.Write = 0;
 
-            xCMDHeader.CTBA = Heap.SafeAlloc(128 + ((uint)xCMDHeader.PRDTL) * 16);
+            var aLength = 128 + ((uint)xCMDHeader.PRDTL) * 16;
+            mSATAPIDebugger.SendInternal("SendSATAPICommand");
+            mSATAPIDebugger.SendInternal(aLength);
+            xCMDHeader.CTBA = Heap.SafeAlloc(aLength);
 
             HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 

@@ -39,7 +39,7 @@ namespace Cosmos.Debug.GDB {
 			}
 
 			var xAddress = xParts[0];
-			UInt32 xAddressNum = 0;
+            uint xAddressNum = 0;
 			RegNames xReg;
 			bool xRegisterSet = false;
 			if (Enum.TryParse<RegNames>(xAddress, out xReg) && Enum.IsDefined(typeof(RegNames),xReg)) {

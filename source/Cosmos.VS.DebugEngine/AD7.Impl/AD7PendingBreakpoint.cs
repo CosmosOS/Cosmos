@@ -109,7 +109,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     var xEndPos = new TEXT_POSITION[1];
                     EngineUtils.CheckOk(xDocPos.GetRange(xStartPos, xEndPos));
 
-                    UInt32 xAddress = 0;
+                    uint xAddress = 0;
                     var xDebugInfo = mEngine.mProcess.mDebugInfoDb;
 
                     // We must check for DocID. This is important because in a solution that contains many projects,
@@ -122,7 +122,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         // Find which Method the Doc, Line, Col are in.
                         // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.
                         // () around << are VERY important.. + has precedence over <<
-                        Int64 xPos = (((Int64)xStartPos[0].dwLine + 1) << 32) + xStartPos[0].dwColumn + 1;
+                        long xPos = (((long)xStartPos[0].dwLine + 1) << 32) + xStartPos[0].dwColumn + 1;
 
                         try
                         {
