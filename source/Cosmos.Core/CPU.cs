@@ -26,7 +26,7 @@ namespace Cosmos.Core
                 var memoryMap = GetMemoryMap();
                 for (int i = 0; i < memoryMap.Length; i++)
                 {
-                    if (memoryMap[i].Type == 1 && memoryMap[i].Length != 0)
+                    if (memoryMap[i].Type == 1)
                     {
                         totalRam += memoryMap[i].Length;
                     }

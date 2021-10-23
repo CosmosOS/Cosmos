@@ -15,6 +15,10 @@
   #define VSVersion "vs2019"
 #endif
 
+#ifndef RealPath
+  #define RealPath {userappdata}
+#endif
+
 #if BuildConfiguration == "DevKit"
 	; devkit releases are not compressed
 	#pragma warning "Building Dev Kit release"
@@ -36,7 +40,8 @@ AppSupportURL=http://www.gocosmos.org/
 AppUpdatesURL=http://www.gocosmos.org/
 AppVersion={#ChangeSetVersion}
 SetupMutex=CosmosSetupMutexName,Global\CosmoSetupMutexName
-DefaultDirName={userappdata}\Cosmos User Kit
+UsePreviousAppDir=false
+DefaultDirName={#RealPath}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup\Output
 OutputBaseFilename=CosmosUserKit-{#ChangeSetVersion}-{#VSVersion}
@@ -128,16 +133,16 @@ Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}\VSIX\"; Fla
 
 [Registry]
 ; Regiter .xs Extension
-;Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
-;Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
-;Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\XSharp\XSharp.ico,0"
-;Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\XSharp\XSC.exe"" ""%1"""
+Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
+Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\XSharp\XSharp.ico,0"
+Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\XSharp\XSC.exe"" ""%1"""
 ; User Kit Folder
-;Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletekey
 ; Dev Kit Folder - Set by builder only, but we delete it here. See comments in builder.
 ; HKCU because Builder doesn't run as admin
 ; Note HKCU is not part of registry redirection
-;Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags: deletekey
+Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags: deletekey
 
 [ThirdParty]
 UseRelativePaths=True
@@ -146,11 +151,11 @@ UseRelativePaths=True
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.DebugEngine.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.DebugEngine.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
 
 [UninstallRun]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; StatusMsg: "Uninstalling Kernel Packages"
@@ -174,7 +179,6 @@ begin
   FWMIService := Unassigned;
   FSWbemLocator := Unassigned;
 end;
-
 function IsAppRunningWithResponse(const FileName: string): Boolean;
 var
   Retry: Integer;
@@ -183,7 +187,6 @@ begin
   if Result then
     MsgBox(FileName  + ' is running. Please close the application before running the installer.', mbError, MB_OK);
 end;
-
 function InitializeSetup: boolean;
 var
   Retry: Integer;
@@ -231,7 +234,6 @@ for Retry := 0 to 2 do
     end;
   end;
 end;
-
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
   const Wait: TExecWait; var ResultCode: Integer; var ResultString: AnsiString): Boolean;
 var
@@ -251,7 +253,6 @@ begin
   if (Length(ResultString) >= 2) and (ResultString[Length(ResultString) - 1] = #13) and (ResultString[Length(ResultString)] = #10) then
     Delete(ResultString, Length(ResultString) - 1, 2);
 end;
-
 function ExecWithoutResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
   const Wait: TExecWait; var ResultCode: Integer): Boolean;
 var
@@ -264,7 +265,6 @@ begin
   if not Result then
     Exit;
 end;
-
 function GetVSPath(): String;
 var
   Command: AnsiString;
@@ -281,7 +281,6 @@ begin
   if Success then
     Result := ResultText;
 end;
-
 function GetVsixInstallerPath(): String;
 var
   VsPath: String;
@@ -289,7 +288,6 @@ begin
   VsPath := GetVSPath();
   Result := VsPath + '\Common7\IDE\vsixinstaller.exe';
 end;
-
 function GetVsixInstallCommand(Param: String): String;
 var
   Command: String;
@@ -297,7 +295,6 @@ begin
   Command := GetVsixInstallerPath();
   Result := Command;
 end;
-
 function GetVsixInstallParams(const Filename: String): String;
 var
   Params: String;
@@ -305,7 +302,6 @@ begin
   Params := ' "' + ExpandConstant('{app}\') + Filename + '"';
   Result := Params;
 end;
-
 function GetVsixUninstallParams(const Filename: String): String;
 var
   Params: String;
@@ -313,7 +309,6 @@ begin
   Params := ' /uninstall:"' + Filename + '"';
   Result := Params;
 end;
-
 function GetMSBuildDirectory(Param: String): String;
 var
   VSPath: String;
@@ -321,7 +316,6 @@ begin
   VSPath := GetVSPath();
   Result := VsPath + '\MSBuild';
 end;
-
 function GetUninstallString(): String;
 var
   sUnInstPath: String;
@@ -333,7 +327,6 @@ begin
     RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
   Result := sUnInstallString;
 end;
-
 /////////////////////////////////////////////////////////////////////
 // Uninstall previously installed application.
 /////////////////////////////////////////////////////////////////////
@@ -346,10 +339,8 @@ begin
 // 1 - uninstall string is empty
 // 2 - error executing the UnInstallString
 // 3 - successfully executed the UnInstallString
-
   // default return value
   Result := 0;
-
   // get the uninstall string of the old app
   sUnInstallString := GetUninstallString();
   if sUnInstallString <> '' then begin
@@ -361,7 +352,6 @@ begin
   end else
     Result := 1;
 end;
-
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl; InfoBeforeFile: .\setup\Readme.txt
 #ifdef IncludeUILanguages

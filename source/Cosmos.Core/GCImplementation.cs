@@ -18,6 +18,7 @@ namespace Cosmos.Core
     {
         private unsafe static byte* memPtr = null;
         private static uint memLength = 0;
+        private static bool StartedMemoryManager = false;
         /// <summary>
         /// Acquire lock. Not implemented.
         /// </summary>
@@ -93,7 +94,13 @@ namespace Cosmos.Core
         /// </summary>
         public static unsafe void Init()
         {
-            if(CPU.MemoryMapExists())
+            if (StartedMemoryManager)
+            {
+                return;
+            }
+            StartedMemoryManager = true;
+
+            if (CPU.MemoryMapExists())
             {
                 var block = CPU.GetLargestMemoryBlock();
                 memPtr = (byte*)block->BaseAddr;
@@ -112,7 +119,7 @@ namespace Cosmos.Core
                 memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
                 memLength = (128 * 1024 * 1024);
             }
-            Memory.RAT.Init(memPtr,memLength);
+            Memory.RAT.Init(memPtr, memLength);
             
         }
         /// <summary>
