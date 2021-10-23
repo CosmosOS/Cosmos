@@ -20,6 +20,7 @@
 ## [Graphics](Kernel/CGS.md)
 ## [Virtual File System](Kernel/VFS.md)
 ## [Network](Kernel/Network.md)
+## [Resource Files](Kernel/ManifestResouceStream.md)
 
 # Reference
 ## [x86](Reference/x86.md)
