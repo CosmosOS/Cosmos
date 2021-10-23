@@ -179,6 +179,7 @@ begin
   FWMIService := Unassigned;
   FSWbemLocator := Unassigned;
 end;
+
 function IsAppRunningWithResponse(const FileName: string): Boolean;
 var
   Retry: Integer;
@@ -187,6 +188,7 @@ begin
   if Result then
     MsgBox(FileName  + ' is running. Please close the application before running the installer.', mbError, MB_OK);
 end;
+
 function InitializeSetup: boolean;
 var
   Retry: Integer;
@@ -234,6 +236,7 @@ for Retry := 0 to 2 do
     end;
   end;
 end;
+
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
   const Wait: TExecWait; var ResultCode: Integer; var ResultString: AnsiString): Boolean;
 var
@@ -253,6 +256,7 @@ begin
   if (Length(ResultString) >= 2) and (ResultString[Length(ResultString) - 1] = #13) and (ResultString[Length(ResultString)] = #10) then
     Delete(ResultString, Length(ResultString) - 1, 2);
 end;
+
 function ExecWithoutResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
   const Wait: TExecWait; var ResultCode: Integer): Boolean;
 var
@@ -265,6 +269,7 @@ begin
   if not Result then
     Exit;
 end;
+
 function GetVSPath(): String;
 var
   Command: AnsiString;
@@ -281,6 +286,7 @@ begin
   if Success then
     Result := ResultText;
 end;
+
 function GetVsixInstallerPath(): String;
 var
   VsPath: String;
@@ -288,6 +294,7 @@ begin
   VsPath := GetVSPath();
   Result := VsPath + '\Common7\IDE\vsixinstaller.exe';
 end;
+
 function GetVsixInstallCommand(Param: String): String;
 var
   Command: String;
@@ -295,6 +302,7 @@ begin
   Command := GetVsixInstallerPath();
   Result := Command;
 end;
+
 function GetVsixInstallParams(const Filename: String): String;
 var
   Params: String;
@@ -302,6 +310,7 @@ begin
   Params := ' "' + ExpandConstant('{app}\') + Filename + '"';
   Result := Params;
 end;
+
 function GetVsixUninstallParams(const Filename: String): String;
 var
   Params: String;
@@ -309,6 +318,7 @@ begin
   Params := ' /uninstall:"' + Filename + '"';
   Result := Params;
 end;
+
 function GetMSBuildDirectory(Param: String): String;
 var
   VSPath: String;
@@ -316,6 +326,7 @@ begin
   VSPath := GetVSPath();
   Result := VsPath + '\MSBuild';
 end;
+
 function GetUninstallString(): String;
 var
   sUnInstPath: String;
@@ -327,6 +338,7 @@ begin
     RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
   Result := sUnInstallString;
 end;
+
 /////////////////////////////////////////////////////////////////////
 // Uninstall previously installed application.
 /////////////////////////////////////////////////////////////////////
@@ -339,8 +351,10 @@ begin
 // 1 - uninstall string is empty
 // 2 - error executing the UnInstallString
 // 3 - successfully executed the UnInstallString
+
   // default return value
   Result := 0;
+
   // get the uninstall string of the old app
   sUnInstallString := GetUninstallString();
   if sUnInstallString <> '' then begin
@@ -352,6 +366,7 @@ begin
   end else
     Result := 1;
 end;
+
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl; InfoBeforeFile: .\setup\Readme.txt
 #ifdef IncludeUILanguages
