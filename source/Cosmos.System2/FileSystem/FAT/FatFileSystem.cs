@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿// #define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
