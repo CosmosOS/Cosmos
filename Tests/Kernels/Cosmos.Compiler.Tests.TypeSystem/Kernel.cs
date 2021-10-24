@@ -7,6 +7,7 @@ using Cosmos.TestRunner;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU;
+using Cosmos.Core.Memory;
 
 namespace Cosmos.Compiler.Tests.TypeSystem
 {
@@ -69,9 +70,13 @@ namespace Cosmos.Compiler.Tests.TypeSystem
 
         private void TestGarbageCollector()
         {
+            int allocated = HeapSmall.GetAllocatedObjectCount();
             object a = new object();
-
+            int nowAllocated = HeapSmall.GetAllocatedObjectCount();
             GCImplementation.Free(a);
+            int afterFree = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated + 1, nowAllocated, "NewObj causes one object to be allocated");
+            Assert.AreEqual(allocated, afterFree, "Free causes one object to be freed again");
         }
 
         protected override void Run()
