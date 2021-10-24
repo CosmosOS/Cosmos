@@ -105,7 +105,8 @@ namespace Cosmos.Core.Memory
         /// </exception>
         public static void Init(byte* aStartPtr, uint aSize)
         {
-
+            Debugger.DoSendNumber((uint)aStartPtr);
+            Debugger.DoSendNumber(aSize);
             CPU.ZeroFill((uint)aStartPtr, aSize);
             if ((uint)aStartPtr % PageSize != 0 && !Debug)
             {

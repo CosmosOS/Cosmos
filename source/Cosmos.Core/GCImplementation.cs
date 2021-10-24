@@ -129,5 +129,15 @@ namespace Cosmos.Core
         /// <returns>Returns a pointer to the area in memory where the object is located</returns>
         public static unsafe uint* GetPointer(object aObj) => throw null; // this is plugged
 
+        /// <summary>
+        /// Get cosmos internal type from object
+        /// </summary>
+        /// <param name="aObj"></param>
+        /// <returns></returns>
+        public static unsafe uint GetType(object aObj)
+        {
+            return *GetPointer(aObj);
+        }
+
     }
 }
