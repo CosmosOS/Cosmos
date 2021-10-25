@@ -1,5 +1,6 @@
 ﻿using System;
 using Cosmos.Debug.Kernel;
+using Cosmos.IL2CPU;
 using IL2CPU.API;
 
 namespace Cosmos.Core.Memory
@@ -451,6 +452,8 @@ namespace Cosmos.Core.Memory
             var allocated = (uint*)aPtr;
             allocated[-1] = 0; // zero both size and ref count at once
 
+            CleanupObject(aPtr);
+
             // now zero the object so its ready for next allocation
             if (size < 4) // so we dont actually forget to clean up too small items
             {
@@ -513,10 +516,8 @@ namespace Cosmos.Core.Memory
         {
             ushort* obj = (ushort*)aPtr;
             obj[-1]--;
-            if(obj[-1] == 0)
+            if (obj[-1] == 0)
             {
-                Debugger.DoSendNumber(0x11);
-                Debugger.DoSendNumber((uint)obj);
                 Free(aPtr);
             }
         }
@@ -527,8 +528,6 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr"></param>
         public static void CleanupObject(void* aPtr)
         {
-            Debugger.DoSendNumber(0x77777);
-            Debugger.DoSendNumber((uint)aPtr);
             uint* obj = (uint*)aPtr;
             if(_StringType == 0)
             {
@@ -545,14 +544,29 @@ namespace Cosmos.Core.Memory
                     return; // we are done since they dont hold any reference to fields
                 }
 
+                uint fields = VTablesImpl.GetGCFieldCount(type);
+                var offsets = VTablesImpl.GetGCFieldOffsets(type);
+                //var types = VTablesImpl.GetGCFieldTypes(type);
+                for (int i = 0; i < fields; i++)
+                {
+                    var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
+                    if(*location != 0) // Check if its null
+                    {
+                        location = *(uint**)location;
+                        if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
+                        {
+                            Heap.DecRefCount(location);
+                        }
+                    }
+                }
             }
             else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
             {
-
+                throw new NotImplementedException();
             }
             else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
             {
-
+                throw new NotImplementedException();
             }
         }
 

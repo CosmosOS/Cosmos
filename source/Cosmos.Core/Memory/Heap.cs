@@ -148,7 +148,9 @@ namespace Cosmos.Core.Memory
                 case RAT.PageType.HeapLarge:
                     return HeapLarge.GetRefCount(aPtr);
                 default:
-                    throw new Exception("Heap item not found in RAT.");
+                    Debugger.DoSendNumber((uint)aPtr);
+                    Debugger.DoSendNumber(xType);
+                    throw new Exception($"Heap item not found in RAT. ");
             }
         }
     }

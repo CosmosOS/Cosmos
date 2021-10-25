@@ -92,7 +92,7 @@ namespace Cosmos.Core
         /// <param name="aByteOffset">A start.</param>
         /// <param name="aCount">A count.</param>
         /// <param name="aData">A data.</param>
-        [DebugStub(Off = true)]
+        [global::IL2CPU.API.Attribs.DebugStub(Off = true)]
         public unsafe void Fill(uint aByteOffset, uint aCount, uint aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
@@ -106,7 +106,7 @@ namespace Cosmos.Core
         /// <param name="aByteOffset">Byte offset from Base</param>
         /// <param name="aCount">Number of integers to fill</param>
         /// <param name="aData">Value to fill memory block with</param>
-        [DebugStub(Off = true)]
+        [global::IL2CPU.API.Attribs.DebugStub(Off = true)]
         public unsafe void Fill(int aByteOffset, int aCount, int aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
@@ -138,7 +138,7 @@ namespace Cosmos.Core
         /// <param name="aByteOffset">Starting point offset in bytes</param>
         /// <param name="aCount">Data size.</param>
         /// <param name="aData">A data to fill memory block with.</param>
-        [DebugStub(Off = true)]
+        [global::IL2CPU.API.Attribs.DebugStub(Off = true)]
         public unsafe void Fill(uint aByteOffset, uint aCount, ushort aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
@@ -152,7 +152,7 @@ namespace Cosmos.Core
         /// <param name="aByteOffset">Starting point offset in bytes</param>
         /// <param name="aCount">Data size.</param>
         /// <param name="aData">A data to fill memory block with.</param>
-        [DebugStub(Off = true)]
+        [global::IL2CPU.API.Attribs.DebugStub(Off = true)]
         public unsafe void Fill(uint aByteOffset, uint aCount, byte aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
@@ -165,7 +165,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="aData">A data buffer array.</param>
         /// <exception cref="OverflowException">Thrown if aData length in greater then Int32.MaxValue.</exception>
-        [DebugStub(Off = true)]
+        [global::IL2CPU.API.Attribs.DebugStub(Off = true)]
         public unsafe void Copy(uint[] aData)
         {
             Copy(0, aData, 0, aData.Length);
@@ -276,7 +276,7 @@ namespace Cosmos.Core
         /// <param name="aDest">Destination location.</param>
         /// <param name="aSrc">Sourcs location.</param>
         /// <param name="aCount">Number of bytes to move.</param>
-        [DebugStub(Off = true)]
+        [global::IL2CPU.API.Attribs.DebugStub(Off = true)]
         public unsafe void MoveDown(uint aDest, uint aSrc, uint aCount)
         {
             byte* xDest = (byte*)(Base + aDest);

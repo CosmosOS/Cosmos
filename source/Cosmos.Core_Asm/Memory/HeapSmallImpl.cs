@@ -7,7 +7,7 @@ namespace Cosmos.Core_Asm.Memory
     [Plug(Target = typeof(HeapSmall))]
     class HeapSmallImpl
     {
-        [PlugMethod(Assembler = typeof(ArrayInternalCopyAsm))]
+        [PlugMethod(Assembler = typeof(GetStringTypeIDAsm))]
         public static uint GetStringTypeID()
         {
             throw new NotImplementedException();

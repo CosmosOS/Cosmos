@@ -54,21 +54,21 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             TestType tObj = new TestType();
             Assert.AreEqual(GCImplementation.GetType(tObj), ((CosmosRuntimeType)typeof(TestType)).mTypeId, "Methods and constant get type id return the same value for TestType");
 
-            Assert.AreEqual(4, VTablesImpl.GetGCFieldCount(GCImplementation.GetType(tObj)), "TestType has 3 fields tracked by GC");
+            Assert.AreEqual(4, VTablesImpl.GetGCFieldCount(GCImplementation.GetType(tObj)), "TestType has 4 fields tracked by GC");
 
             var types = VTablesImpl.GetGCFieldTypes(GCImplementation.GetType(tObj));
             Assert.AreEqual(4, types.Length, "GetGCFieldTypes returns correct number of values");
             Assert.AreEqual(((CosmosRuntimeType)typeof(object)).mTypeId, types[0], "GetGCFieldTypes returns object at offset 0");
-            Assert.AreEqual(((CosmosRuntimeType)typeof(string)).mTypeId, types[1], "GetGCFieldTypes returns string at offset 1");
-            Assert.AreEqual(((CosmosRuntimeType)typeof(List<int>)).mTypeId, types[2], "GetGCFieldTypes returns List<int> at offset 2");
+            Assert.AreEqual(((CosmosRuntimeType)typeof(List<int>)).mTypeId, types[1], "GetGCFieldTypes returns List<int> at offset 1");
+            Assert.AreEqual(((CosmosRuntimeType)typeof(string)).mTypeId, types[2], "GetGCFieldTypes returns string at offset 2");
             Assert.AreEqual(((CosmosRuntimeType)typeof(object)).mTypeId, types[3], "GetGCFieldTypes returns object at offset 3");
 
             Assert.AreEqual(4, VTablesImpl.GetGCFieldOffsets(GCImplementation.GetType(tObj)).Length, "GetGCFieldOffsets returned the correct number of values");
 
-            Assert.AreEqual(new uint[] { 4, 12, 20, 28}, VTablesImpl.GetGCFieldOffsets(GCImplementation.GetType(tObj)), "GetGCFieldOffsets returns the correct values");
+            Assert.AreEqual(new uint[] { 12, 20, 28, 36}, VTablesImpl.GetGCFieldOffsets(GCImplementation.GetType(tObj)), "GetGCFieldOffsets returns the correct values");
         }
 
-        private void TestGarbageCollector()
+        private unsafe void TestGarbageCollector()
         {
             int allocated = HeapSmall.GetAllocatedObjectCount();
             object a = new object();
@@ -77,6 +77,23 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             int afterFree = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated + 1, nowAllocated, "NewObj causes one object to be allocated");
             Assert.AreEqual(allocated, afterFree, "Free causes one object to be freed again");
+            a = new object();
+            var test = new TestType();
+            test.FieldB = a;
+            test.FieldC = "asd";
+
+            uint* aPtr = GCImplementation.GetPointer(test);
+            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "Object correctly has one ref count");
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "object correctly has 1 ref count currently");
+            Assert.AreEqual(RAT.PageType.Empty, RAT.GetPageType(GCImplementation.GetPointer(test.FieldC)), "String is created statically and not managed by GC");
+            Heap.IncRefCount(aPtr);
+            Assert.AreEqual(2, Heap.GetRefCount(aPtr), "IncRefCount works");
+            Heap.DecRefCount(aPtr);
+            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "DecRefCount works");
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            Heap.DecRefCount(aPtr);
+            afterFree = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated - 2, afterFree, "DecRefCount triggers free, which works recursivly");
         }
 
         protected override void Run()
