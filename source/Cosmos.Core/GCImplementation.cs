@@ -4,6 +4,7 @@
 //#define COSMOSDEBUG
 using System;
 using System.Diagnostics;
+using Cosmos.Core.Memory;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
@@ -60,7 +61,7 @@ namespace Cosmos.Core
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         public static unsafe void IncRefCount(uint aObject)
         {
-            //Memory.Heap.IncRef;
+            Heap.IncRefCount((uint*)aObject);
         }
 
         /// <summary>
@@ -70,7 +71,17 @@ namespace Cosmos.Core
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         public static unsafe void DecRefCount(uint aObject)
         {
-            throw new NotImplementedException();
+            Heap.DecRefCount((uint*)aObject);
+        }
+
+        /// <summary>
+        /// Get the number of current references to an object
+        /// </summary>
+        /// <param name="aObject">Location of the object</param>
+        /// <returns>Reference count</returns>
+        public static unsafe uint GetRefCount(uint aObject)
+        {
+            return Heap.GetRefCount((uint*)aObject);
         }
 
         /// <summary>
