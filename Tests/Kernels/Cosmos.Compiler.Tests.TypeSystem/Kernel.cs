@@ -83,15 +83,20 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             test.FieldC = "asd";
 
             uint* aPtr = GCImplementation.GetPointer(test);
-            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "Object correctly has one ref count");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "object correctly has 1 ref count currently");
+            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "Object has one ref count");
+            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "object a has 2 ref count currently");
+            test.FieldB = new object();
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "new object has 1 ref count currently");
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(a)), "object a has 1 ref count currently");
+
             Assert.AreEqual(RAT.PageType.Empty, RAT.GetPageType(GCImplementation.GetPointer(test.FieldC)), "String is created statically and not managed by GC");
             Heap.IncRefCount(aPtr);
-            Assert.AreEqual(2, Heap.GetRefCount(aPtr), "IncRefCount works");
-            Heap.DecRefCount(aPtr);
-            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "DecRefCount works");
+            Assert.AreEqual(3, Heap.GetRefCount(aPtr), "IncRefCount works");
+            Heap.DecRefCount(aPtr, 0);
+            Assert.AreEqual(2, Heap.GetRefCount(aPtr), "DecRefCount works");
+            Heap.DecRefCount(aPtr, 0);
             allocated = HeapSmall.GetAllocatedObjectCount();
-            Heap.DecRefCount(aPtr);
+            Heap.DecRefCount(aPtr, 0);
             afterFree = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated - 2, afterFree, "DecRefCount triggers free, which works recursivly");
         }

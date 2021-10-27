@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using Cosmos.Core.Memory;
+using Cosmos.IL2CPU;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
@@ -42,7 +43,7 @@ namespace Cosmos.Core
         /// </summary>
         public unsafe static uint AllocNewObject(uint aSize)
         {
-              return (uint)Memory.Heap.Alloc(aSize);
+              return (uint)Heap.Alloc(aSize);
             
         }
         /// <summary>
@@ -51,11 +52,11 @@ namespace Cosmos.Core
         /// <param name="obj">Takes a memory allocated object</param>
         public unsafe static void Free(object aObj)
         {
-            Memory.Heap.Free(GetPointer(aObj));
+            Heap.Free(GetPointer(aObj));
         }
 
         /// <summary>
-        /// Increase reference count of an given object. Plugged.
+        /// Increase reference count of an given object
         /// </summary>
         /// <param name="aObject">An object to increase to reference count of.</param>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
@@ -65,13 +66,23 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Decrease reference count of an given object. Plugged.
+        /// Decrease reference count of an given object
         /// </summary>
         /// <param name="aObject">An object to decrease to reference count of.</param>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        public static unsafe void DecRefCount(uint aObject)
+        public static unsafe void DecRefCount(uint aObject, uint aId)
         {
-            Heap.DecRefCount((uint*)aObject);
+            Heap.DecRefCount((uint*)aObject, aId);
+        }
+
+        /// <summary>
+        /// Decrease reference count of an given object of the given type.
+        /// </summary>
+        /// <param name="aObject">An object to decrease to reference count of.</param>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
+        public static unsafe void DecTypedRefCount(uint aObject, uint aType)
+        {
+            Heap.DecTypedRefCount((uint*)aObject, aType);
         }
 
         /// <summary>
@@ -98,7 +109,7 @@ namespace Cosmos.Core
         /// <returns>Returns the used PageSize by the MemoryManager in Bytes.</returns>
         public static uint GetUsedRAM()
         {
-            return (Memory.RAT.TotalPageCount - Memory.RAT.GetPageCount(Memory.RAT.PageType.Empty)) * Memory.RAT.PageSize;
+            return (RAT.TotalPageCount - RAT.GetPageCount(RAT.PageType.Empty)) * RAT.PageSize;
         }
         /// <summary>
         /// Initialise the Memory Manager, this should not be called anymore since it is done very early during the boot process.
@@ -119,18 +130,18 @@ namespace Cosmos.Core
                 if ((uint)memPtr < (uint)CPU.GetEndOfKernel() + 1024)
                 {
                     memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
-                    memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
+                    memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;
                     memLength = block->Length - ((uint)memPtr - (uint)block->BaseAddr);
-                    memLength += Memory.RAT.PageSize - memLength % Memory.RAT.PageSize;
+                    memLength += RAT.PageSize - memLength % RAT.PageSize;
                 }
             }
             else
             {
                 memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
-                memPtr += Memory.RAT.PageSize - (uint)memPtr % Memory.RAT.PageSize;
+                memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;
                 memLength = (128 * 1024 * 1024);
             }
-            Memory.RAT.Init(memPtr, memLength);
+            RAT.Init(memPtr, memLength);
             
         }
         /// <summary>
@@ -148,6 +159,49 @@ namespace Cosmos.Core
         public static unsafe uint GetType(object aObj)
         {
             return *GetPointer(aObj);
+        }
+
+        /// <summary>
+        /// Clean up the remains of an object/value at a location
+        /// </summary>
+        /// <param name="aPtr">Pointer to the first byte of the location</param>
+        /// <param name="aType">Type of the object being cleaned up</param>
+        public static unsafe void CleanupTypedObject(void* aPtr, uint aType)
+        {
+            HeapSmall.CleanupTypedObject(aPtr, aType);
+        }
+
+        /// <summary>
+        /// Increment the GC References of objects stored in a struct
+        /// </summary>
+        /// <param name="aPtr"></param>
+        /// <param name="aType"></param>
+        [NoGC()]
+        public static unsafe void IncStructFieldReferences(void* aPtr, uint aType)
+        {
+            uint fields = VTablesImpl.GetGCFieldCount(aType);
+            var offsets = VTablesImpl.GetGCFieldOffsets(aType);
+            var types = VTablesImpl.GetGCFieldTypes(aType);
+            var obj = (uint*)aPtr;
+            for (int i = 0; i < fields; i++)
+            {
+                if (VTablesImpl.IsValueType(types[i]))
+                {
+                    var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
+                    if (*location != 0) // Check if its null
+                    {
+                        location = *(uint**)location;
+                        if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
+                        {
+                            Heap.DecRefCount(location, 0);
+                        }
+                    }
+                }
+                else
+                {
+                    IncStructFieldReferences(obj + offsets[i] / 4, types[i]);
+                }
+            }
         }
 
     }

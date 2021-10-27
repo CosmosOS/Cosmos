@@ -290,12 +290,12 @@ namespace Cosmos.Core.Memory.Test
                 var ptr1 = Heap.Alloc(10);
                 TestPointerRefCounting(ptr1);
                 Assert.AreEqual(1, HeapSmall.GetAllocatedObjectCount());
-                Heap.DecRefCount(ptr1);
+                Heap.DecRefCount(ptr1, 0);
                 Assert.AreEqual(0, HeapSmall.GetAllocatedObjectCount());
                 var ptr2 = Heap.Alloc(HeapMedium.MaxItemSize + 10); // this should make a large pointer
                 TestPointerRefCounting(ptr2);
                 Assert.AreEqual((uint)2, RAT.GetPageCount(RAT.PageType.HeapLarge));
-                Heap.DecRefCount(ptr2);
+                Heap.DecRefCount(ptr2, 0);
                 Assert.AreEqual((uint)0, RAT.GetPageCount(RAT.PageType.HeapLarge));
             }
 
@@ -305,9 +305,9 @@ namespace Cosmos.Core.Memory.Test
                 Heap.IncRefCount(aPtr);
                 Heap.IncRefCount(aPtr);
                 Assert.AreEqual((uint)3, Heap.GetRefCount(aPtr));
-                Heap.DecRefCount(aPtr);
+                Heap.DecRefCount(aPtr, 0);
                 Assert.AreEqual((uint)2, Heap.GetRefCount(aPtr));
-                Heap.DecRefCount(aPtr);
+                Heap.DecRefCount(aPtr, 0);
             }
         }
     }
