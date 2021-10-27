@@ -2,6 +2,7 @@
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU;
 using IL2CPU.API;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core.Memory
 {
@@ -421,7 +422,9 @@ namespace Cosmos.Core.Memory
                     // set info in page
                     var heapObject = (ushort*)&page[i * elementSize];
                     heapObject[0] = aSize; // size of actual object being allocated
-                    heapObject[1] = 1; // ref count just 1 for now
+                    heapObject[1] = 0; // ref count to 0 since either stfld or stloc will increment it
+                    Debugger.DoSendNumber(0x111);
+                    Debugger.DoSendNumber((uint)heapObject + 4);
                     return (byte*)&heapObject[2];
 
                 }
@@ -438,13 +441,17 @@ namespace Cosmos.Core.Memory
         /// Free a object
         /// </summary>
         /// <param name="aPtr">A pointer to the start object.</param>
+        [NoGC()]
         public static void Free(void* aPtr)
         {
+            Debugger.DoSendNumber(0x6666);
+            Debugger.DoSendNumber((uint)aPtr);
             var heapObject = (ushort*)aPtr;
             ushort size = heapObject[-2];
             if (size == 0)
             {
                 // double free, this object has already been freed
+                Debugger.DoBochsBreak();
                 Debugger.DoSendNumber((uint)heapObject);
                 Debugger.SendKernelPanic(0x99);
             }
@@ -459,7 +466,62 @@ namespace Cosmos.Core.Memory
             {
                 size = 4;
             }
-            for (int i = 0; i < size / 4 * 4; i++) //  we can do it uint wise since we know the objects are uint aligned
+            for (int i = 0; i < size / 4; i++) //  we can do it uint wise since we know the objects are uint aligned
+            {
+                allocated[i] = 0;
+            }
+
+            // need to increase count in SMT again
+            var allocatedOnPage = RAT.GetPagePtr(aPtr);
+            var smtPage = mSMT;
+            SMTBlock* blockPtr = null;
+            while (smtPage != null)
+            {
+                blockPtr = GetFirstBlock(smtPage, size)->First;
+                while (blockPtr != null && blockPtr->PagePtr != allocatedOnPage)
+                {
+                    blockPtr = blockPtr->NextBlock;
+                }
+                smtPage = smtPage->Next;
+            }
+
+            if (blockPtr == null)
+            {
+                // this shouldnt happen
+                Debugger.SendKernelPanic(0x98);
+                while (true) { }
+            }
+            blockPtr->SpacesLeft++;
+        }
+
+        /// <summary>
+        /// Free a object of the given type
+        /// </summary>
+        /// <param name="aPtr">A pointer to the start object.</param>
+        /// <param name="aType">Type of the object</param>
+        [NoGC()]
+        public static void TypedFree(void* aPtr, uint aType)
+        {
+            var heapObject = (ushort*)aPtr;
+            ushort size = heapObject[-2];
+            if (size == 0)
+            {
+                // double free, this object has already been freed
+                Debugger.DoSendNumber((uint)heapObject);
+                Debugger.SendKernelPanic(0x99);
+            }
+
+            var allocated = (uint*)aPtr;
+            allocated[-1] = 0; // zero both size and ref count at once
+
+            CleanupTypedObject(aPtr, aType);
+
+            // now zero the object so its ready for next allocation
+            if (size < 4) // so we dont actually forget to clean up too small items
+            {
+                size = 4;
+            }
+            for (int i = 0; i < size / 4; i++) //  we can do it uint wise since we know the objects are uint aligned
             {
                 allocated[i] = 0;
             }
@@ -493,8 +555,16 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr">Pointer to the object</param>
         public static void IncRefCount(void* aPtr)
         {
+            Debugger.DoSendNumber(0x444);
+            Debugger.DoSendNumber((uint)aPtr);
             ushort* obj = (ushort*)aPtr;
             obj[-1]++;
+            Debugger.DoSendNumber(obj[-1]);
+            if(obj[-2] == 0)
+            {
+                Debugger.DoBochsBreak();
+                Debugger.SendKernelPanic(0x909);
+            }
         }
 
         /// <summary>
@@ -514,6 +584,8 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr">Pointer to the object</param>
         public static void DecRefCount(void* aPtr)
         {
+            Debugger.DoSendNumber(0x222);
+            Debugger.DoSendNumber((uint)aPtr);
             ushort* obj = (ushort*)aPtr;
             obj[-1]--;
             if (obj[-1] == 0)
@@ -523,9 +595,26 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
+        /// Decreement the reference count for an object stored on the small heap of the given type
+        /// Frees the object if ref count reaches 0
+        /// </summary>
+        /// <param name="aPtr"></param>
+        /// <param name="aType"></param>
+        internal static void DecTypedRefCount(uint* aPtr, uint aType)
+        {
+            ushort* obj = (ushort*)aPtr;
+            obj[-1]--;
+            if (obj[-1] == 0)
+            {
+                TypedFree(aPtr, aType);
+            }
+        }
+
+        /// <summary>
         /// Find all fields of the object and decrease ref counts
         /// </summary>
         /// <param name="aPtr"></param>
+        [NoGC()]
         public static void CleanupObject(void* aPtr)
         {
             uint* obj = (uint*)aPtr;
@@ -538,27 +627,15 @@ namespace Cosmos.Core.Memory
             if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
             {
                 var type = *obj;
+                Debugger.DoSendNumber(0x888);
+                Debugger.DoSendNumber(type);
                 // Deal with strings first
                 if(type == _StringType)
                 {
                     return; // we are done since they dont hold any reference to fields
                 }
 
-                uint fields = VTablesImpl.GetGCFieldCount(type);
-                var offsets = VTablesImpl.GetGCFieldOffsets(type);
-                //var types = VTablesImpl.GetGCFieldTypes(type);
-                for (int i = 0; i < fields; i++)
-                {
-                    var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
-                    if(*location != 0) // Check if its null
-                    {
-                        location = *(uint**)location;
-                        if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
-                        {
-                            Heap.DecRefCount(location);
-                        }
-                    }
-                }
+                PropagateDecRefCount(obj, type);
             }
             else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
             {
@@ -567,6 +644,77 @@ namespace Cosmos.Core.Memory
             else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
             {
                 throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Find all fields of the typed object and decrease ref counts
+        /// This method is needed to cleanup structs since we cant determine their type directly
+        /// </summary>
+        /// <param name="aPtr"></param>
+        /// <param name="aType"></param>
+        [NoGC()]
+        public static void CleanupTypedObject(void* aPtr, uint aType)
+        {
+            uint* obj = (uint*)aPtr;
+            if (_StringType == 0)
+            {
+                _StringType = GetStringTypeID();
+            }
+
+            //TODO: Determine if this is a value type
+            if (VTablesImpl.IsValueType(aType))
+            {
+                PropagateDecRefCount(obj, aType);
+            }
+            else
+            {
+                // Check what we are dealing with
+                if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
+                {
+                    // Deal with strings first
+                    if (aType == _StringType)
+                    {
+                        return; // we are done since they dont hold any reference to fields
+                    }
+
+                    PropagateDecRefCount(obj, aType);
+                }
+                else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
+                {
+                    throw new NotImplementedException();
+                }
+                else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+        }
+
+        [NoGC()]
+        private static void PropagateDecRefCount(uint* obj, uint type)
+        {
+            uint fields = VTablesImpl.GetGCFieldCount(type);
+            var offsets = VTablesImpl.GetGCFieldOffsets(type);
+            var types = VTablesImpl.GetGCFieldTypes(type);
+            for (int i = 0; i < fields; i++)
+            {
+                if (VTablesImpl.IsValueType(types[i]))
+                {
+                    var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
+                    if (*location != 0) // Check if its null
+                    {
+                        location = *(uint**)location;
+                        if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
+                        {
+                            Heap.DecRefCount(location, 0);
+                        }
+                    }
+                }
+                else
+                {
+                    PropagateDecRefCount(obj + offsets[i] / 4, types[i]);
+                }
             }
         }
 

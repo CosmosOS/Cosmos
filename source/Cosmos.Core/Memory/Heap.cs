@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
-using Native = System.UInt32;
 
 namespace Cosmos.Core.Memory
 {
@@ -88,6 +85,29 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
+        /// Decrease reference count of an object pointed to by the pointer of the given type
+        /// </summary>
+        /// <param name="aPtr"></param>
+        /// <param name="aType"></param>
+        internal static void DecTypedRefCount(uint* aPtr, uint aType)
+        {
+            var xType = RAT.GetPageType(aPtr);
+            switch (xType)
+            {
+                case RAT.PageType.HeapSmall:
+                    HeapSmall.DecTypedRefCount(aPtr, aType);
+                    break;
+                case RAT.PageType.HeapMedium:
+                case RAT.PageType.HeapLarge:
+                    HeapLarge.DecTypedRefCount(aPtr, aType);
+                    break;
+
+                    //default: we may be incorrectly trying to inc/dec string literals which is why we shouldnt throw an error here
+                    //    throw new Exception("Heap item not found in RAT.");
+            }
+        }
+
+        /// <summary>
         /// Increment reference count of a heap item
         /// Do not use this method on non-managed memory
         /// </summary>
@@ -105,8 +125,8 @@ namespace Cosmos.Core.Memory
                     HeapLarge.IncRefCount(aPtr);
                     break;
 
-                default:
-                    throw new Exception("Heap item not found in RAT.");
+                    //default: we may be incorrectly trying to inc/dec string literals which is why we shouldnt throw an error here
+                    //    throw new Exception("Heap item not found in RAT.");
             }
         }
 
@@ -115,8 +135,9 @@ namespace Cosmos.Core.Memory
         /// Do not use this method on non-managed memory
         /// </summary>
         /// <param name="aPtr"></param>
-        public static void DecRefCount(void* aPtr)
+        public static void DecRefCount(void* aPtr, uint id)
         {
+            Debugger.DoSendNumber(id);
             var xType = RAT.GetPageType(aPtr);
             switch (xType)
             {
@@ -128,8 +149,8 @@ namespace Cosmos.Core.Memory
                     HeapLarge.DecRefCount(aPtr);
                     break;
 
-                default:
-                    throw new Exception("Heap item not found in RAT.");
+                    //default: we may be incorrectly trying to inc/dec string literals which is why we shouldnt throw an error here
+                    //    throw new Exception("Heap item not found in RAT.");
             }
         }
 

@@ -92,5 +92,15 @@ namespace Cosmos.Core.Memory
                 Free(aPtr);
             }
         }
+
+        /// <summary>
+        /// Decrement the reference count for an object of the given type
+        /// Not Implemented!
+        /// </summary>
+        /// <param name="aPtr"></param>
+        public static void DecTypedRefCount(void* aPtr, uint aType)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
