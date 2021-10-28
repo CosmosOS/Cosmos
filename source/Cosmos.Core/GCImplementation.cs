@@ -127,7 +127,7 @@ namespace Cosmos.Core
                 var block = CPU.GetLargestMemoryBlock();
                 memPtr = (byte*)block->BaseAddr;
                 memLength = block->Length;
-                if ((uint)memPtr < (uint)CPU.GetEndOfKernel() + 1024)
+                if ((uint)memPtr < CPU.GetEndOfKernel() + 1024)
                 {
                     memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                     memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;

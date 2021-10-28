@@ -677,7 +677,6 @@ namespace Cosmos.Core.Memory
                     {
                         return; // we are done since they dont hold any reference to fields
                     }
-
                     PropagateDecRefCount(obj, aType);
                 }
                 else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
@@ -699,7 +698,7 @@ namespace Cosmos.Core.Memory
             var types = VTablesImpl.GetGCFieldTypes(type);
             for (int i = 0; i < fields; i++)
             {
-                if (VTablesImpl.IsValueType(types[i]))
+                if (!VTablesImpl.IsValueType(types[i]))
                 {
                     var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
                     if (*location != 0) // Check if its null

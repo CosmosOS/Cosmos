@@ -46,6 +46,10 @@ namespace Cosmos.Core.Memory
             /// Large heap page.
             /// </summary>
             public const byte HeapLarge = 4;
+            /// <summary>
+            /// Page type of a region which is not a page
+            /// </summary>
+            public const byte None = 8;
             // Code
             // Stack
             // Disk Cache
@@ -273,6 +277,10 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
         public static byte GetPageType(void* aPtr)
         {
+            if(aPtr < mRamStart)
+            {
+                return PageType.None;
+            }
             return mRAT[GetFirstRAT(aPtr)];
         }
 

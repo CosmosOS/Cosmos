@@ -71,13 +71,13 @@ namespace Cosmos.Compiler.Tests.TypeSystem
         private unsafe void TestGarbageCollector()
         {
             int allocated = HeapSmall.GetAllocatedObjectCount();
-            object a = new object();
+            object c = new object();
             int nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            GCImplementation.Free(a);
+            GCImplementation.Free(c);
             int afterFree = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated + 1, nowAllocated, "NewObj causes one object to be allocated");
             Assert.AreEqual(allocated, afterFree, "Free causes one object to be freed again");
-            a = new object();
+            object a = new object();
             var test = new TestType();
             test.FieldB = a;
             test.FieldC = "asd";
@@ -89,12 +89,11 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "new object has 1 ref count currently");
             Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(a)), "object a has 1 ref count currently");
 
-            Assert.AreEqual(RAT.PageType.Empty, RAT.GetPageType(GCImplementation.GetPointer(test.FieldC)), "String is created statically and not managed by GC");
+            Assert.AreEqual(RAT.PageType.None, RAT.GetPageType(GCImplementation.GetPointer(test.FieldC)), "String is created statically and not managed by GC");
             Heap.IncRefCount(aPtr);
-            Assert.AreEqual(3, Heap.GetRefCount(aPtr), "IncRefCount works");
+            Assert.AreEqual(2, Heap.GetRefCount(aPtr), "IncRefCount works");
             Heap.DecRefCount(aPtr, 0);
-            Assert.AreEqual(2, Heap.GetRefCount(aPtr), "DecRefCount works");
-            Heap.DecRefCount(aPtr, 0);
+            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "DecRefCount works");
             allocated = HeapSmall.GetAllocatedObjectCount();
             Heap.DecRefCount(aPtr, 0);
             afterFree = HeapSmall.GetAllocatedObjectCount();
