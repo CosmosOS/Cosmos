@@ -26,6 +26,8 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(uint aSize)
         {
+            Debugger.DoSendNumber(0xA550C);
+            Debugger.DoSendNumber(aSize);
             if (aSize <= HeapSmall.mMaxItemSize)
             {
                 return HeapSmall.Alloc((ushort)aSize);
@@ -147,6 +149,30 @@ namespace Cosmos.Core.Memory
                 case RAT.PageType.HeapMedium:
                 case RAT.PageType.HeapLarge:
                     HeapLarge.DecRefCount(aPtr);
+                    break;
+
+                    //default: we may be incorrectly trying to inc/dec string literals which is why we shouldnt throw an error here
+                    //    throw new Exception("Heap item not found in RAT.");
+            }
+        }
+
+        /// <summary>
+        /// Decrement reference count of a heap item. Does not free if count reaches 0
+        /// Do not use this method on non-managed memory
+        /// </summary>
+        /// <param name="aPtr"></param>
+        public static void WeakDecRefCount(void* aPtr, uint id)
+        {
+            Debugger.DoSendNumber(id);
+            var xType = RAT.GetPageType(aPtr);
+            switch (xType)
+            {
+                case RAT.PageType.HeapSmall:
+                    HeapSmall.WeakDecRefCount(aPtr);
+                    break;
+                case RAT.PageType.HeapMedium:
+                case RAT.PageType.HeapLarge:
+                    HeapLarge.WeakDecRefCount(aPtr);
                     break;
 
                     //default: we may be incorrectly trying to inc/dec string literals which is why we shouldnt throw an error here

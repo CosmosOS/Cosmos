@@ -31,7 +31,10 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(uint aSize, byte aType = RAT.PageType.HeapLarge)
         {
+            Debugger.DoSendNumber(0xB16A220C);
+            Debugger.DoSendNumber(aSize);
             uint xPages = ((aSize + PrefixBytes) / RAT.PageSize) + 1;
+            Debugger.DoSendNumber(xPages);
             var xPtr = (uint*)RAT.AllocPages(aType, xPages);
             if(xPtr == null)
             {
@@ -91,6 +94,17 @@ namespace Cosmos.Core.Memory
                 Debugger.DoSendNumber((uint)obj);
                 Free(aPtr);
             }
+        }
+
+        /// <summary>
+        /// Decrement the reference count for an object stored on the large heap
+        /// DDOES not free the object if ref count reaches 0
+        /// </summary>
+        /// <param name="aPtr">Pointer to the object</param>
+        public static void WeakDecRefCount(void* aPtr)
+        {
+            uint* obj = (uint*)aPtr;
+            obj[-2]--;
         }
 
         /// <summary>
