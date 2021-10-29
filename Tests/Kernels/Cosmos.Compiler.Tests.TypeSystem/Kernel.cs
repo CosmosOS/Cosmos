@@ -30,6 +30,11 @@ namespace Cosmos.Compiler.Tests.TypeSystem
         public object FieldE;
     }
 
+    class Counter
+    {
+        public int x;
+    }
+
     public class Kernel : Sys.Kernel
     {
         static int test = 0;
@@ -98,6 +103,33 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Heap.DecRefCount(aPtr, 0);
             afterFree = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated - 2, afterFree, "DecRefCount triggers free, which works recursivly");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            TestMethod1();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "All local objects in a method are cleaned up");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            var counter = TestMethod2();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated + 1, nowAllocated, "Method with return value only keeps return value alive");
+            Assert.AreEqual(counter.x, 3, "Returned object is not freed");
+        }
+
+        public void TestMethod1()
+        {
+            object a = new object();
+            int x = 1;
+            TestType b = new TestType();
+        }
+
+        Counter TestMethod2()
+        {
+            Counter a = new Counter();
+            a.x = 3;
+            Counter b = new Counter();
+            b.x = 4;
+            return a;
         }
 
         protected override void Run()

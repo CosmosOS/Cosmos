@@ -76,6 +76,16 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Decrease reference count of an given object. Even if the reference count reaches 0 the object is not deallocated
+        /// </summary>
+        /// <param name="aObject">An object to decrease to reference count of.</param>
+        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
+        public static unsafe void WeakDecRefCount(uint aObject, uint aId)
+        {
+            Heap.WeakDecRefCount((uint*)aObject, aId);
+        }
+
+        /// <summary>
         /// Decrease reference count of an given object of the given type.
         /// </summary>
         /// <param name="aObject">An object to decrease to reference count of.</param>

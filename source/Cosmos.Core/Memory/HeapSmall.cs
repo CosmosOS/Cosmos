@@ -425,6 +425,7 @@ namespace Cosmos.Core.Memory
                     heapObject[1] = 0; // ref count to 0 since either stfld or stloc will increment it
                     Debugger.DoSendNumber(0x111);
                     Debugger.DoSendNumber((uint)heapObject + 4);
+                    Debugger.DoSendNumber(aSize);
                     return (byte*)&heapObject[2];
 
                 }
@@ -448,6 +449,7 @@ namespace Cosmos.Core.Memory
             Debugger.DoSendNumber((uint)aPtr);
             var heapObject = (ushort*)aPtr;
             ushort size = heapObject[-2];
+            Debugger.DoSendNumber(size);
             if (size == 0)
             {
                 // double free, this object has already been freed
@@ -492,6 +494,7 @@ namespace Cosmos.Core.Memory
                 while (true) { }
             }
             blockPtr->SpacesLeft++;
+            Debugger.DoSend("Free finished");
         }
 
         /// <summary>
@@ -587,11 +590,33 @@ namespace Cosmos.Core.Memory
             Debugger.DoSendNumber(0x222);
             Debugger.DoSendNumber((uint)aPtr);
             ushort* obj = (ushort*)aPtr;
+            if (obj[-1] == 0)
+            {
+                Debugger.DoBochsBreak();
+            }
             obj[-1]--;
             if (obj[-1] == 0)
             {
                 Free(aPtr);
             }
+        }
+
+        /// <summary>
+        /// Decrement the reference count for an object stored on the small heap
+        /// DOES NOT free the object if ref count reaches 0
+        /// </summary>
+        /// <param name="aPtr">Pointer to the object</param>
+        public static void WeakDecRefCount(void* aPtr)
+        {
+            Debugger.DoSendNumber(0x3222);
+            Debugger.DoSendNumber((uint)aPtr);
+            ushort* obj = (ushort*)aPtr;
+            if (obj[-1] == 0)
+            {
+                Debugger.DoBochsBreak();
+                return;
+            }
+            obj[-1]--;
         }
 
         /// <summary>
@@ -617,12 +642,14 @@ namespace Cosmos.Core.Memory
         [NoGC()]
         public static void CleanupObject(void* aPtr)
         {
+            Debugger.DoSendNumber(0xC2ea409);
             uint* obj = (uint*)aPtr;
             if(_StringType == 0)
             {
+                Debugger.DoSendNumber(0x3333);
                 _StringType = GetStringTypeID();
             }
-
+            Debugger.DoSendNumber(*(obj + 1));
             // Check what we are dealing with
             if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
             {
@@ -639,12 +666,29 @@ namespace Cosmos.Core.Memory
             }
             else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
             {
-                throw new NotImplementedException();
+                var elementType = *obj;
+                var length = *(obj + 2);
+                var size = *(obj + 3);
+                if (VTablesImpl.IsValueType(elementType))
+                {
+                    for (int i = 0; i < length; i++)
+                    {
+                        CleanupTypedObject(obj + 3 + size / 4 * i, elementType); 
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < length; i++)
+                    {
+                        DecRefCount(obj + 3 + i * size / 4);
+                    }
+                }
             }
             else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
             {
-                throw new NotImplementedException();
+                Debugger.SendKernelPanic(0x808808);
             }
+            Debugger.DoSendNumber(0xF14156ed);
         }
 
         /// <summary>
