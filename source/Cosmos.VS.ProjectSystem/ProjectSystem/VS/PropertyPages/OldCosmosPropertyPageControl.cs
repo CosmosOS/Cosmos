@@ -12,6 +12,8 @@ using VSPropertyPages;
 using Cosmos.Build.Common;
 
 using DebugMode = Cosmos.Build.Common.DebugMode;
+using System.IO;
+using System.Diagnostics;
 
 namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 {
@@ -831,6 +833,18 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                     mViewModel.BuildProperties.StackCorruptionDetectionLevel = x;
                 }
             }
+        }
+
+        private void buttonAddFilesToISO_Click(object sender, EventArgs e)
+        {
+            var projectFolder = Path.GetDirectoryName(mViewModel.ProjectPath);
+            var isoFolder = Path.Combine(projectFolder, "isoFiles");
+            if (!Directory.Exists(isoFolder))
+            {
+                Directory.CreateDirectory(isoFolder);
+            }
+
+            Process.Start(isoFolder);
         }
     }
 }

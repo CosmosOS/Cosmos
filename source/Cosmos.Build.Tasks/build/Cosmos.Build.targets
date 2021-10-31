@@ -301,7 +301,11 @@
             Inputs="$(BinFile)"
             Outputs="$(IsoFile)"
             Condition="'$(Deployment)' == 'ISO'">
-
+			
+		<ItemGroup>
+			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*" />
+		</ItemGroup>
+		
         <ItemGroup>
             <_IsoFile Include="$(SyslinuxPath)core\isolinux.bin" />
             <_IsoFile Include="$(SyslinuxPath)com32\elflink\ldlinux\ldlinux.c32" />
@@ -316,6 +320,9 @@
 
         <Copy SourceFiles="@(_IsoFile)"
               DestinationFolder="$(IntermediateIsoDirectory)" />
+
+        <Copy SourceFiles="@(_IsoCustomFiles)"
+             DestinationFolder="$(IntermediateIsoDirectory)" />
 
         <CreateSyslinuxConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
