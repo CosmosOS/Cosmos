@@ -1,4 +1,5 @@
 //#define COSMOSDEBUG
+using System;
 using Cosmos.Core;
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers;
@@ -24,6 +25,7 @@ namespace Cosmos.System.Graphics
             {
                 _VideoDriver.Disable();
                 VGAScreen.SetTextMode(VGADriver.TextSize.Size80x25);
+                IsInUse = false;
             }
         }
 
@@ -129,6 +131,7 @@ namespace Cosmos.System.Graphics
 
         /// <summary>
         /// Get full screen canvas.
+        /// Changes current Mode to default.
         /// </summary>
         /// <returns>Canvas value.</returns>
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
@@ -145,11 +148,13 @@ namespace Cosmos.System.Graphics
                 Global.mDebugger.SendInternal($"_VideoDriver is NOT null using the old one changing mode to DefaultMode");
                 _VideoDriver.Mode = _VideoDriver.DefaultGraphicMode;
             }
+            IsInUse = true;
             return _VideoDriver;
         }
 
         /// <summary>
         /// Get full screen canvas.
+        /// Changes the current Mode.
         /// </summary>
         /// <param name="mode">Mode.</param>
         /// <returns>Canvas value.</returns>
@@ -166,7 +171,42 @@ namespace Cosmos.System.Graphics
             {
                 _VideoDriver.Mode = mode;
             }
-                return _VideoDriver;
+            IsInUse = true;
+            return _VideoDriver;
+        }
+
+        /// <summary>
+        /// Trys to get full screen canvas.
+        /// </summary>
+        /// <param name="mode">Mode.</param>
+        /// <returns>true if successfully; otherwise, false.</returns>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
+        public static bool TryGetFullScreenCanvas(Mode mode, out Canvas canvas)
+        {
+            Global.mDebugger.SendInternal($"TryGetFullScreenCanvas() with mode" + mode);
+
+            try
+            {
+                canvas = GetFullScreenCanvas(mode);
+                IsInUse = true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+            }
+            canvas = null;
+            return false;
+        }
+        /// <summary>
+        /// Gets current full screen canvas
+        /// with out setting Mode.
+        /// </summary>
+        /// <returns>Canvas value.</returns>
+        public static Canvas GetCurrentFullScreenCanvas()
+        {
+            Global.mDebugger.SendInternal($"GetCurrentFullScreenCanvas()");
+
+            return _VideoDriver;
         }
     }
 }
