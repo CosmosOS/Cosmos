@@ -1,4 +1,5 @@
 //#define COSMOSDEBUG
+using System;
 using Cosmos.Core;
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers;
