@@ -52,7 +52,7 @@ namespace Cosmos.Debug.Hosts {
     //}
 
     protected string GetPathname(string aKey, string aEXE) {
-      using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\VMware, Inc.\" + aKey, false)) {
+      using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\WOW6432Node\VMware, Inc.\" + aKey, false)) {
         if (xRegKey != null) {
           string xResult = Path.Combine(((string)xRegKey.GetValue("InstallPath")), aEXE);
           if (File.Exists(xResult)) {
