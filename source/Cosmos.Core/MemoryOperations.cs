@@ -13,16 +13,16 @@ namespace Cosmos.Core
         /// <summary>
         /// Fill memory block. Plugged.
         /// </summary>
-        /// <param name="dest">A destination.</param>
+        /// <param name="aDest">A destination.</param>
         /// <param name="aValue">A data value.</param>
-        /// <param name="size">Number of bytes to fill</param>
-        public static unsafe void Fill(byte* dest, int aValue, int size)
+        /// <param name="aSize">A data size.</param>
+        public static unsafe void Fill(byte* aDest, int aValue, int aSize)
         {
             // Plugged but we use this for unit tests
             var bytes = BitConverter.GetBytes(aValue);
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < aSize; i++)
             {
-                dest[i] = bytes[i % 4];
+                aDest[i] = bytes[i % 4];
             }
         }
 
@@ -37,7 +37,7 @@ namespace Cosmos.Core
         {
             Fill((byte*)dest, (int)value, size * 4);
         }
-            
+
         /// <summary>
         /// Fill destination region with value.
         /// </summary>
@@ -353,6 +353,21 @@ namespace Cosmos.Core
             }
         }
 
-#endregion Copy
+        /// <summary>
+        /// Copy source to destination.
+        /// </summary>
+        /// <param name="dest">Destination.</param>
+        /// <param name="src">Source.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Copy(byte[] aDest, int aDestOffset, byte[] aSrc, int aSrcOffset, int aCount)
+        {
+            fixed (byte* destPtr = &aDest[aDestOffset])
+            fixed (byte* srcPtr = &aSrc[aSrcOffset])
+            {
+                Copy(destPtr, srcPtr, aCount);
+            }
+        }
+
+        #endregion Copy
     }
 }
