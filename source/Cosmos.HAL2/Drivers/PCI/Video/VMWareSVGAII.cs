@@ -447,7 +447,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Video memory block.
         /// </summary>
-        private MemoryBlock Video_Memory;
+        public MemoryBlock VideoMemory;
         /// <summary>
         /// FIFO memory block.
         /// </summary>
@@ -491,7 +491,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             if (ReadRegister(Register.ID) != (uint)ID.V2)
                 return;
 
-            Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
+            VideoMemory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
             capabilities = ReadRegister(Register.Capabilities);
             InitializeFIFO();
         }
@@ -625,7 +625,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public void SetPixel(uint x, uint y,uint color)
         {
-            Video_Memory[((y * width + x) * depth)] = color;
+            VideoMemory[((y * width + x) * depth)] = color;
         }
 
         /// <summary>
@@ -637,7 +637,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public uint GetPixel(uint x, uint y)
         {
-            return Video_Memory[((y * width + x) * depth)];
+            return VideoMemory[((y * width + x) * depth)];
         }
 
         /// <summary>
