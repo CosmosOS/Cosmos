@@ -61,6 +61,11 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public override string Name() => "VMWareSVGAII";
+
+        /// <summary>
         /// Get and set graphics mode.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">(set) Thrown if mode is not suppoted.</exception>

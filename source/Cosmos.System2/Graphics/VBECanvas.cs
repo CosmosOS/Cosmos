@@ -66,6 +66,11 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public override string Name() => "VBECanvas";
+
+        /// <summary>
         /// Get and set video mode.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">(set) Thrown if mode is not suppoted.</exception>
