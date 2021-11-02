@@ -49,6 +49,11 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public override string Name() => "VGACanvas";
+
+        /// <summary>
         /// Gets or sets the VGA graphics mode
         /// </summary>
         public override Mode Mode
