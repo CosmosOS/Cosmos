@@ -82,19 +82,14 @@ namespace Cosmos.System
                     throw new Exception("Compiler didn't initialize System.String.Empty!");
                 }
 
-                Global.mDebugger.Send("HW Bootstrap Init");
-                HAL.Bootstrap.Init();
-
-                Global.mDebugger.Send("Global Init");
-                Global.Init(GetTextScreen());
-
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen)
                 {
                     Global.mDebugger.Send("Cls");
                     //Global.Console.Clear();
                 }
-
+              //  Global.mDebugger.Send("On Boot");
+              //  OnBoot();
                 Global.mDebugger.Send("Before Run");
                 BeforeRun();
 
@@ -129,6 +124,15 @@ namespace Cosmos.System
             }
         }
 
+        /// <summary>
+        /// Boot Events
+        /// </summary>
+        protected virtual void OnBoot() {
+            Global.mDebugger.Send("HW Bootstrap Init");
+            HAL.Bootstrap.Init();
+            Global.mDebugger.Send("Global Init");
+            Global.Init(GetTextScreen());
+        }
         /// <summary>
         /// Pre-run events
         /// </summary>

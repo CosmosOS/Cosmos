@@ -26,7 +26,7 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="textScreen">Text screen.</param>
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
-        static public void Init(TextScreenBase textScreen)
+        static public void Init(TextScreenBase textScreen, bool InitScrollWheel)
         {
             if (textScreen != null)
             {
@@ -58,7 +58,7 @@ namespace Cosmos.HAL
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
             mDebugger.Send("PS/2 Controller Init");
-            PS2Controller.Initialize();
+            PS2Controller.Initialize(InitScrollWheel);
 
             IDE.InitDriver();
             AHCI.InitDriver();
