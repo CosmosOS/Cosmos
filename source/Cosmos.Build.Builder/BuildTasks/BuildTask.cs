@@ -23,7 +23,8 @@ namespace Cosmos.Build.Builder.BuildTasks
             IMSBuildService msBuildService,
             string projectFilePath,
             string outputPath,
-            string vsixOutputPath)
+            string vsixOutputPath,
+            bool vsixBuild = false) // vsixBuild triggers if the vsix value is set, causing IL2CPU.Debug.Symbols to target net48
             : base(msBuildService)
         {
             ProjectFilePath = projectFilePath;
@@ -33,6 +34,11 @@ namespace Cosmos.Build.Builder.BuildTasks
                 ["OutputPath"] = outputPath,
                 ["VsixOutputPath"] = vsixOutputPath
             };
+
+            if (vsixBuild)
+            {
+                _properties["VSIX"] = "True";
+            }
         }
     }
 }

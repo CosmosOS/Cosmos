@@ -90,7 +90,7 @@ namespace Cosmos.Build.Builder
 
             // Build Build.sln
 
-            yield return new BuildTask(_msBuildService, buildSlnPath, vsipDir, vsipDir);
+            yield return new BuildTask(_msBuildService, buildSlnPath, vsipDir, vsipDir, true);
 
             // Publish IL2CPU
 
