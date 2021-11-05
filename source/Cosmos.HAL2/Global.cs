@@ -58,13 +58,13 @@ namespace Cosmos.HAL
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
             mDebugger.Send("PS/2 Controller Init");
-            if (!InitPS2)
+            if (InitPS2)
             {
-                mDebugger.Send("PS/2 Controller disabled in User Kernel");
+                PS2Controller.Initialize(InitScrollWheel);
             }
             else
             {
-                PS2Controller.Initialize(InitScrollWheel);
+                mDebugger.Send("PS/2 Controller disabled in User Kernel");
             }
             if (IDEInit)
             {
