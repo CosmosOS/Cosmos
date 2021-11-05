@@ -26,7 +26,7 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="textScreen">Text screen.</param>
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
-        static public void Init(TextScreenBase textScreen, bool InitScrollWheel)
+        static public void Init(TextScreenBase textScreen, bool InitScrollWheel, bool InitPS2, bool InitNetwork, bool IDEInit)
         {
             if (textScreen != null)
             {
@@ -58,15 +58,33 @@ namespace Cosmos.HAL
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
             mDebugger.Send("PS/2 Controller Init");
-            PS2Controller.Initialize(InitScrollWheel);
-
-            IDE.InitDriver();
+            if (!InitPS2)
+            {
+                mDebugger.Send("PS/2 Controller disabled in User Kernel");
+            }
+            else
+            {
+                PS2Controller.Initialize(InitScrollWheel);
+            }
+            if (IDEInit)
+            {
+                IDE.InitDriver();
+            }
+            else
+            {
+                mDebugger.Send("IDE Driver disabled in User Kernel");
+            }
             AHCI.InitDriver();
             //EHCI.InitDriver();
-
-            mDebugger.Send("Network Devices Init");
-            NetworkInit.Init();
-
+            if (InitNetwork)
+            {
+                mDebugger.Send("Network Devices Init");
+                NetworkInit.Init();
+            }
+            else
+            {
+                mDebugger.Send("Network Driver disabled in User Kernel");
+            }
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
         }

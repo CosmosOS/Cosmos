@@ -187,6 +187,7 @@ namespace Cosmos.HAL
                     else
                     {
                         InitBytes = xFirstByte == 0x00 || xFirstByte == 0x04 || xFirstByte == 0x50;
+                        mDebugger.Send("Mousewheel detection disabled");
                     }
                     if (InitBytes)
                     {
