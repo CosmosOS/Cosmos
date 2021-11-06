@@ -37,7 +37,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             if (vsixBuild)
             {
-                _properties["VSIX"] = "True";
+                _properties["Net48"] = "True";
             }
         }
     }
