@@ -84,7 +84,7 @@ namespace Cosmos.System_Plugs.System
                 throw new ArgumentException("The value x must be at least 0!");
             }
 
-            if (x < get_WindowHeight())
+            if (x < get_WindowWidth())
             {
                 xConsole.X = x;
             }
