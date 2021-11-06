@@ -1,19 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using Cosmos.Debug.Kernel;
-using Cosmos.HAL;
 using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4;
 using Cosmos.System.Network.IPv4.TCP;
-using Cosmos.System.Network.IPv4.UDP.DHCP;
 using Con = System.Console;
+
 namespace Cosmos.System.Network
 {
     public class NetworkDebugger
     {
+        /// <summary>
+        /// TCP Server.
+        /// </summary>
         private TcpListener xListener = null;
+
+        /// <summary>
+        /// TCP Client.
+        /// </summary>
         private TcpClient xClient = null;
+
         /// <summary>
         /// Remote IP Address
         /// </summary>
@@ -27,6 +32,7 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Create NetworkDebugger class (used to listen for a debugger connection)
         /// </summary>
+        /// <param name="port">Port used for TCP connection.</param>
         public NetworkDebugger(int port)
         {
             Port = port;
@@ -36,6 +42,8 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Create NetworkDebugger class (used to connect to a remote debugger)
         /// </summary>
+        /// <param name="ip">IP Address of the remote debugger.</param>
+        /// <param name="port">Port used for TCP connection.</param>
         public NetworkDebugger(Address ip, int port)
         {
             Ip = ip;
@@ -67,9 +75,10 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Send text to the debugger
         /// </summary>
+        /// <param name="message">Text to send to the debugger.</param>
         public void Send(string message)
         {
-            xClient.Send(Encoding.ASCII.GetBytes("[" + Time.TimeString(true, true, true) + "] - " + message + "\r\n"));
+            xClient.Send(Encoding.ASCII.GetBytes("[" + DateTime.Now.ToString("HH:mm:ss") + "] - " + message + "\r\n"));
         }
 
         /// <summary>
@@ -81,172 +90,5 @@ namespace Cosmos.System.Network
             Send("Closing...");
             xClient.Close();
         }
-    }
-
-    public static class Time
-    {
-
-        static int Hour() { return RTC.Hour; }
-
-        static int Minute() { return RTC.Minute; }
-
-        static int Second() { return RTC.Second; }
-
-        static int Century() { return RTC.Century; }
-
-        static int Year() { return RTC.Year; }
-
-        static int Month() { return RTC.Month; }
-
-        static int DayOfMonth() { return RTC.DayOfTheMonth; }
-
-        static int DayOfWeek() { return RTC.DayOfTheWeek; }
-
-        static string getTime24(bool hour, bool min, bool sec)
-        {
-            string timeStr = "";
-            if (hour)
-            {
-                if (Hour().ToString().Length == 1)
-                {
-                    timeStr += "0" + Hour().ToString();
-                }
-                else
-                {
-                    timeStr += Hour().ToString();
-                }
-            }
-            if (min)
-            {
-                if (Minute().ToString().Length == 1)
-                {
-                    timeStr += ":";
-                    timeStr += "0" + Minute().ToString();
-                }
-                else
-                {
-                    timeStr += ":";
-                    timeStr += Minute().ToString();
-                }
-            }
-            if (sec)
-            {
-                if (Second().ToString().Length == 1)
-                {
-                    timeStr += ":";
-                    timeStr += "0" + Second().ToString();
-                }
-                else
-                {
-                    timeStr += ":";
-                    timeStr += Second().ToString();
-                }
-            }
-            return timeStr;
-        }
-
-        static string getTime12(bool hour, bool min, bool sec)
-        {
-            string timeStr = "";
-            if (hour)
-            {
-                if (Hour() > 12)
-                    timeStr += Hour() - 12;
-                else
-                    timeStr += Hour();
-            }
-            if (min)
-            {
-                if (Minute().ToString().Length == 1)
-                {
-                    timeStr += ":";
-                    timeStr += "0" + Minute().ToString();
-                }
-                else
-                {
-                    timeStr += ":";
-                    timeStr += Minute().ToString();
-                }
-            }
-            if (sec)
-            {
-                if (Second().ToString().Length == 1)
-                {
-                    timeStr += ":";
-                    timeStr += "0" + Second().ToString();
-                }
-                else
-                {
-                    timeStr += ":";
-                    timeStr += Second().ToString();
-                }
-            }
-            if (hour)
-            {
-                if (Hour() > 12)
-                    timeStr += " PM";
-                else
-                    timeStr += " AM";
-            }
-            return timeStr;
-        }
-
-        /// <summary>
-        /// return the Hour String
-        /// </summary>
-        /// <returns>Actual Hour</returns>
-        public static string TimeString(bool hour, bool min, bool sec)
-        {
-            return getTime12(hour, min, sec);
-        }
-
-        /// <summary>
-        /// return the Year String
-        /// </summary>
-        /// <returns>Actual Year</returns>
-        public static string YearString()
-        {
-            int intyear = Year();
-            string stringyear = intyear.ToString();
-
-            if (stringyear.Length == 2)
-            {
-                stringyear = "20" + stringyear;
-            }
-            return stringyear;
-        }
-
-        /// <summary>
-        /// return the Month String
-        /// </summary>
-        /// <returns>Actual Month</returns>
-        public static string MonthString()
-        {
-            int intmonth = Month();
-            string stringmonth = intmonth.ToString();
-
-            if (stringmonth.Length == 1)
-            {
-                stringmonth = "0" + stringmonth;
-            }
-            return stringmonth;
-        }
-
-        /// <summary>
-        /// return the Day String
-        /// </summary>
-        /// <returns>Actual Day</returns>
-        public static string DayString()
-        {
-            int intday = DayOfMonth();
-            string stringday = intday.ToString();
-
-            if (stringday.Length == 1)
-            {
-                stringday = "0" + stringday;
-            }
-            return stringday;
-        }
-
     }
 }
