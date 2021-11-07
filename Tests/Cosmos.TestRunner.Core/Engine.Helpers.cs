@@ -265,13 +265,14 @@ namespace Cosmos.TestRunner.Core
         private void RunNasm(string inputFile, string outputFile, bool isElf)
         {
             bool xUsingUserkit = false;
-            string xYasmPath = Path.Combine(FindCosmosRoot(), "Tools", "Nasm");
-            if (!Directory.Exists(xYasmPath))
+            //Path to nasm starter
+            string xNasmPath = Path.Combine(FindCosmosRoot(), "Tools", "Nasm");
+            if (!Directory.Exists(xNasmPath))
             {
                 xUsingUserkit = true;
-                xYasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Nasm");
+                xNasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Nasm");
             }
-            if (!Directory.Exists(xYasmPath))
+            if (!Directory.Exists(xNasmPath))
             {
                 throw new DirectoryNotFoundException("NASM path not found.");
             }
@@ -286,13 +287,13 @@ namespace Cosmos.TestRunner.Core
 
             if (xUsingUserkit)
             {
-                RunProcess("NASM.exe", xYasmPath, xArgs);
+                RunProcess("NASM.exe", xNasmPath, xArgs);
             }
             else
             {
                 xArgs.Insert(0, "run");
                 xArgs.Insert(1, " -- ");
-                RunProcess("dotnet", xYasmPath, xArgs);
+                RunProcess("dotnet", xNasmPath, xArgs);
             }
         }
 
