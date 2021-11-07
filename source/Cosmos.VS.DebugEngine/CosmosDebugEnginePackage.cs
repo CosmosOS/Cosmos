@@ -9,21 +9,21 @@ using Task = System.Threading.Tasks.Task;
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.batteries_v2",
-    NewVersion = "2.0.7.1395",
+    NewVersion = "2.0.6.1341",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "2.0.7.1395")]
+    OldVersionUpperBound = "2.0.6.1341")]
 
 [assembly: ProvideBindingRedirection(
     AssemblyName = "SQLitePCLRaw.core",
-    NewVersion = "2.0.7.1395",
+    NewVersion = "2.0.6.1341",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "2.0.7.1395")]
+    OldVersionUpperBound = "2.0.6.1341")]
 
 [assembly: ProvideBindingRedirection(
-    AssemblyName = "SQLitePCLRaw.provider.dynamic_cdecl",
-    NewVersion = "2.0.7.1395",
+    AssemblyName = "SQLitePCLRaw.provider.e_sqlite3",
+    NewVersion = "2.0.6.1341",
     OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "2.0.7.1395")]
+    OldVersionUpperBound = "2.0.6.1341")]
 
 namespace Cosmos.VS.DebugEngine
 {
