@@ -269,7 +269,7 @@ namespace Cosmos.TestRunner.Core
             if (!Directory.Exists(xYasmPath))
             {
                 xUsingUserkit = true;
-                xYasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Yasm");
+                xYasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Tools","Yasm");
             }
             if (!Directory.Exists(xYasmPath))
             {
