@@ -265,20 +265,20 @@ namespace Cosmos.TestRunner.Core
         private void RunNasm(string inputFile, string outputFile, bool isElf)
         {
             bool xUsingUserkit = false;
-            string xNasmPath = Path.Combine(FindCosmosRoot(), "Tools", "NASM");
-            if (!Directory.Exists(xNasmPath))
+            string xYasmPath = Path.Combine(FindCosmosRoot(), "Tools", "Yasm");
+            if (!Directory.Exists(xYasmPath))
             {
                 xUsingUserkit = true;
-                xNasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "NASM");
+                xYasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Yasm");
             }
-            if (!Directory.Exists(xNasmPath))
+            if (!Directory.Exists(xYasmPath))
             {
-                throw new DirectoryNotFoundException("NASM path not found.");
+                throw new DirectoryNotFoundException("YASM path not found.");
             }
 
             var xArgs = new List<string>
             {
-                $"ExePath:{Path.Combine(xUsingUserkit ? GetCosmosUserkitFolder() : FindCosmosRoot(), "Build", "Tools", "NAsm", "nasm.exe")}",
+                $"ExePath:{Path.Combine(xUsingUserkit ? GetCosmosUserkitFolder() : FindCosmosRoot(), "Build", "Tools", "Yasm", "yasm.exe")}",
                 $"InputFile:{inputFile}",
                 $"OutputFile:{outputFile}",
                 $"IsELF:{isElf}"
@@ -286,13 +286,13 @@ namespace Cosmos.TestRunner.Core
 
             if (xUsingUserkit)
             {
-                RunProcess("NASM.exe", xNasmPath, xArgs);
+                RunProcess("yasm.exe", xYasmPath, xArgs);
             }
             else
             {
                 xArgs.Insert(0, "run");
                 xArgs.Insert(1, " -- ");
-                RunProcess("dotnet", xNasmPath, xArgs);
+                RunProcess("dotnet", xYasmPath, xArgs);
             }
         }
 
