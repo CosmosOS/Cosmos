@@ -265,15 +265,15 @@ namespace Cosmos.TestRunner.Core
         private void RunNasm(string inputFile, string outputFile, bool isElf)
         {
             bool xUsingUserkit = false;
-            string xYasmPath = Path.Combine(FindCosmosRoot(), "Tools", "Yasm");
+            string xYasmPath = Path.Combine(FindCosmosRoot(), "Tools", "Nasm");
             if (!Directory.Exists(xYasmPath))
             {
                 xUsingUserkit = true;
-                xYasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Yasm");
+                xYasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Nasm");
             }
             if (!Directory.Exists(xYasmPath))
             {
-                throw new DirectoryNotFoundException("YASM path not found.");
+                throw new DirectoryNotFoundException("NASM path not found.");
             }
 
             var xArgs = new List<string>
