@@ -97,7 +97,7 @@ namespace NASM
                                              Path.Combine(Directory.GetCurrentDirectory(), OutputFile),
                                              Path.Combine(Directory.GetCurrentDirectory(), InputFile),
                                              xFormat.ToUpper(),
-                                             IsELF);
+                                             xDebugFormat);
 
                 var xProcess = Process.Start(ExePath, xArgs);
 
