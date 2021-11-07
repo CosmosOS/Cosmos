@@ -269,7 +269,7 @@ namespace Cosmos.TestRunner.Core
             if (!Directory.Exists(xYasmPath))
             {
                 xUsingUserkit = true;
-                xYasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Tools","Yasm");
+                xYasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "Yasm");
             }
             if (!Directory.Exists(xYasmPath))
             {
@@ -286,7 +286,7 @@ namespace Cosmos.TestRunner.Core
 
             if (xUsingUserkit)
             {
-                RunProcess("nasm.exe", xYasmPath, xArgs);
+                RunProcess("NASM.exe", xYasmPath, xArgs);
             }
             else
             {
