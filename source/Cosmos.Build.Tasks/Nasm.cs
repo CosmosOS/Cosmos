@@ -34,7 +34,7 @@ namespace Cosmos.Build.Tasks
 
         private OutputFormatEnum mOutputFormat;
 
-        protected override string ToolName => IsWindows() ? "nasm.exe" : "nasm";
+        protected override string ToolName => IsWindows() ? "yasm.exe" : "yasm";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
@@ -77,9 +77,16 @@ namespace Cosmos.Build.Tasks
         {
             var xBuilder = new CommandLineBuilder();
 
-            xBuilder.AppendSwitch("-g");
+            if (mOutputFormat == OutputFormatEnum.ELF)
+            {
+                xBuilder.AppendSwitch("-g dwarf2");
+            }
+            else
+            {
+                xBuilder.AppendSwitch("-g null");
+            }
 
-            xBuilder.AppendSwitchIfNotNull("-f ", OutputFormat);
+            xBuilder.AppendSwitchIfNotNull("-f ", OutputFormat.ToLower());
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
 
             if (mOutputFormat == OutputFormatEnum.ELF)
@@ -109,7 +116,7 @@ namespace Cosmos.Build.Tasks
             finally
             {
                 xSW.Stop();
-                Log.LogMessage(MessageImportance.High, "Nasm task took {0}", xSW.Elapsed);
+                Log.LogMessage(MessageImportance.High, "Yasm task took {0}", xSW.Elapsed);
             }
         }
     }
