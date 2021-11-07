@@ -286,7 +286,7 @@ namespace Cosmos.TestRunner.Core
 
             if (xUsingUserkit)
             {
-                RunProcess("yasm.exe", xYasmPath, xArgs);
+                RunProcess("nasm.exe", xYasmPath, xArgs);
             }
             else
             {
