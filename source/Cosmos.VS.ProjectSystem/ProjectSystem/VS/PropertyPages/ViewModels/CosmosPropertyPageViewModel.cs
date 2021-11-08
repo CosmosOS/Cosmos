@@ -103,6 +103,12 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages.ViewModels
             set => SetProperty(nameof(CompileVBEMultiboot), value.ToString(), nameof(CompileVBEMultiboot));
         }
 
+        public string VBEResolution
+        {
+            get => GetProperty(nameof(VBEResolution));
+            set => SetProperty(nameof(VBEResolution), value);
+        }
+
         public CosmosPropertyPageViewModel(
             IPropertyManager propertyManager,
             IProjectThreadingService projectThreadingService)

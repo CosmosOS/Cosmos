@@ -54,6 +54,8 @@ namespace Cosmos.Build.Tasks
 
         public bool CompileVBEMultiboot { get; set; }
 
+        public string VBEResolution { get; set; }
+
         #endregion
 
         protected override string ToolName => IsWindows() ? "IL2CPU.exe" : "IL2CPU";
@@ -88,6 +90,7 @@ namespace Cosmos.Build.Tasks
                 ["EmitDebugSymbols"] = EmitDebugSymbols.ToString(),
                 ["IgnoreDebugStubAttribute"] = IgnoreDebugStubAttribute.ToString(),
                 ["CompileVBEMultiboot"] = CompileVBEMultiboot.ToString(),
+                ["VBEResolution"] = VBEResolution.ToString(),
             }.ToList();
 
             foreach (var reference in References)

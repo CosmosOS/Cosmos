@@ -56,7 +56,7 @@
 
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
 
-        <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">True</CompileVBEMultiboot>
+        <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
     
 </PropertyGroup>
 
@@ -187,7 +187,8 @@
                 WorkingDir="$(TargetDir)"
                 ToolPath="$(Il2cpuToolPath)"
                 ToolExe="$(Il2cpuToolExe)"
-                CompileVBEMultiboot="$(CompileVBEMultiboot)"/>
+                CompileVBEMultiboot="$(CompileVBEMultiboot)"
+				VBEResolution="$(VBEResolution)"/>
 
     </Target>
 

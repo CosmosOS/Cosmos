@@ -308,7 +308,24 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             checkBoxVBEMultiboot.CheckedChanged += delegate (object aSender, EventArgs e)
             {
                 if (FreezeEvents) return;
-                mViewModel.BuildProperties.CompileVBEMultiboot = chckEnableDebugStub.Checked;
+                mViewModel.BuildProperties.CompileVBEMultiboot = checkBoxVBEMultiboot.Checked;
+
+                if (checkBoxVBEMultiboot.Checked)
+                {
+                    textBoxVBEResolution.Visible = true;
+                    label2.Visible = true;
+                }
+                else
+                {
+                    textBoxVBEResolution.Visible = false;
+                    label2.Visible = false;
+                }
+            };
+
+            textBoxVBEResolution.TextChanged += delegate (object aSender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                mViewModel.BuildProperties.VBEResolution = textBoxVBEResolution.Text;
             };
 
             #endregion
@@ -404,6 +421,10 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             mShowTabDebug = true;
             cmboCosmosDebugPort.Enabled = true;
             cmboVisualStudioDebugPort.Enabled = true;
+
+            checkBoxVBEMultiboot.Checked = false;
+            textBoxVBEResolution.Visible = false;
+            label2.Visible = false;
 
             if (mViewModel.BuildProperties.Profile == "ISO")
             {
@@ -512,6 +533,18 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             checkEnableBochsDebug.Checked = mViewModel.BuildProperties.EnableBochsDebug;
             checkStartBochsDebugGui.Checked = mViewModel.BuildProperties.StartBochsDebugGui;
             checkBoxVBEMultiboot.Checked = mViewModel.BuildProperties.CompileVBEMultiboot;
+
+            if (mViewModel.BuildProperties.CompileVBEMultiboot)
+            {
+                textBoxVBEResolution.Visible = true;
+                label2.Visible = true;
+            }
+            else
+            {
+                textBoxVBEResolution.Visible = false;
+                label2.Visible = false;
+            }
+
             // Locked to COM1 for now.
             //cmboCosmosDebugPort.SelectedIndex = 0;
 
@@ -859,6 +892,25 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             if (!FreezeEvents)
             {
                 mViewModel.BuildProperties.CompileVBEMultiboot = checkBoxVBEMultiboot.Checked;
+
+                if (checkBoxVBEMultiboot.Checked)
+                {
+                    textBoxVBEResolution.Visible = true;
+                    label2.Visible = true;
+                }
+                else
+                {
+                    textBoxVBEResolution.Visible = false;
+                    label2.Visible = false;
+                }
+            }
+        }
+
+        private void textBoxVBEResolution_TextChanged(object sender, EventArgs e)
+        {
+            if (!FreezeEvents)
+            {
+                mViewModel.BuildProperties.VBEResolution = textBoxVBEResolution.Text;
             }
         }
     }
