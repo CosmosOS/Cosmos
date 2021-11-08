@@ -853,5 +853,13 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
 
             Process.Start(isoFolder);
         }
+
+        private void checkBoxVBEMultiboot_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!FreezeEvents)
+            {
+                mViewModel.BuildProperties.CompileVBEMultiboot = checkBoxVBEMultiboot.Checked;
+            }
+        }
     }
 }
