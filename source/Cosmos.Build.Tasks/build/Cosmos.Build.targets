@@ -55,7 +55,10 @@
         <SyslinuxPath Condition="'$(SyslinuxPath)' == ''">$(CosmosToolsPath)syslinux\bios\</SyslinuxPath>
 
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
-    </PropertyGroup>
+
+        <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">True</CompileVBEMultiboot>
+    
+</PropertyGroup>
 
     <PropertyGroup>
         <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)net48\Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
@@ -183,7 +186,8 @@
                 CosmosBuildDir="$(CosmosDir)\Build"
                 WorkingDir="$(TargetDir)"
                 ToolPath="$(Il2cpuToolPath)"
-                ToolExe="$(Il2cpuToolExe)" />
+                ToolExe="$(Il2cpuToolExe)"
+                CompileVBEMultiboot="$(CompileVBEMultiboot)"/>
 
     </Target>
 

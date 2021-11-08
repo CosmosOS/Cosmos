@@ -44,6 +44,7 @@
             this.lablDeployText = new System.Windows.Forms.Label();
             this.lablBuildOnly = new System.Windows.Forms.Label();
             this.tabCompile = new System.Windows.Forms.TabPage();
+            this.buttonAddFilesToISO = new System.Windows.Forms.Button();
             this.labelBinFormat = new System.Windows.Forms.Label();
             this.comboBinFormat = new System.Windows.Forms.ComboBox();
             this.comboFramework = new System.Windows.Forms.ComboBox();
@@ -96,7 +97,7 @@
             this.cmboSlavePort = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.buttonAddFilesToISO = new System.Windows.Forms.Button();
+            this.checkBoxVBEMultiboot = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.TabControl1.SuspendLayout();
             this.tabProfile.SuspendLayout();
@@ -281,6 +282,7 @@
             // tabCompile
             // 
             this.tabCompile.AutoScroll = true;
+            this.tabCompile.Controls.Add(this.checkBoxVBEMultiboot);
             this.tabCompile.Controls.Add(this.buttonAddFilesToISO);
             this.tabCompile.Controls.Add(this.labelBinFormat);
             this.tabCompile.Controls.Add(this.comboBinFormat);
@@ -294,6 +296,16 @@
             this.tabCompile.TabIndex = 0;
             this.tabCompile.Text = "Compile";
             this.tabCompile.UseVisualStyleBackColor = true;
+            // 
+            // buttonAddFilesToISO
+            // 
+            this.buttonAddFilesToISO.Location = new System.Drawing.Point(21, 204);
+            this.buttonAddFilesToISO.Name = "buttonAddFilesToISO";
+            this.buttonAddFilesToISO.Size = new System.Drawing.Size(128, 23);
+            this.buttonAddFilesToISO.TabIndex = 25;
+            this.buttonAddFilesToISO.Text = "Add files to ISO";
+            this.buttonAddFilesToISO.UseVisualStyleBackColor = true;
+            this.buttonAddFilesToISO.Click += new System.EventHandler(this.buttonAddFilesToISO_Click);
             // 
             // labelBinFormat
             // 
@@ -851,15 +863,15 @@
             this.label6.TabIndex = 34;
             this.label6.Text = "Slave Port:";
             // 
-            // buttonAddFilesToISO
+            // checkBox1
             // 
-            this.buttonAddFilesToISO.Location = new System.Drawing.Point(21, 191);
-            this.buttonAddFilesToISO.Name = "buttonAddFilesToISO";
-            this.buttonAddFilesToISO.Size = new System.Drawing.Size(128, 23);
-            this.buttonAddFilesToISO.TabIndex = 25;
-            this.buttonAddFilesToISO.Text = "Add files to ISO";
-            this.buttonAddFilesToISO.UseVisualStyleBackColor = true;
-            this.buttonAddFilesToISO.Click += new System.EventHandler(this.buttonAddFilesToISO_Click);
+            this.checkBoxVBEMultiboot.AutoSize = true;
+            this.checkBoxVBEMultiboot.Location = new System.Drawing.Point(21, 172);
+            this.checkBoxVBEMultiboot.Name = "checkBox1";
+            this.checkBoxVBEMultiboot.Size = new System.Drawing.Size(228, 17);
+            this.checkBoxVBEMultiboot.TabIndex = 26;
+            this.checkBoxVBEMultiboot.Text = "Add VBE informations in multiboot structure";
+            this.checkBoxVBEMultiboot.UseVisualStyleBackColor = true;
             // 
             // OldCosmosPropertyPageControl
             // 
@@ -976,5 +988,6 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TabPage tabHyperV;
         private System.Windows.Forms.Button buttonAddFilesToISO;
+        private System.Windows.Forms.CheckBox checkBoxVBEMultiboot;
     }
 }

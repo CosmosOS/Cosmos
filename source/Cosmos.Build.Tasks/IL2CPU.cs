@@ -52,6 +52,8 @@ namespace Cosmos.Build.Tasks
 
         public bool EmitDebugSymbols { get; set; }
 
+        public bool CompileVBEMultiboot { get; set; }
+
         #endregion
 
         protected override string ToolName => IsWindows() ? "IL2CPU.exe" : "IL2CPU";
@@ -85,6 +87,7 @@ namespace Cosmos.Build.Tasks
                 ["EnableLogging"] = EnableLogging.ToString(),
                 ["EmitDebugSymbols"] = EmitDebugSymbols.ToString(),
                 ["IgnoreDebugStubAttribute"] = IgnoreDebugStubAttribute.ToString(),
+                ["CompileVBEMultiboot"] = CompileVBEMultiboot.ToString(),
             }.ToList();
 
             foreach (var reference in References)

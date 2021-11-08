@@ -305,6 +305,12 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 }
             };
 
+            checkBoxVBEMultiboot.CheckedChanged += delegate (object aSender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                mViewModel.BuildProperties.CompileVBEMultiboot = chckEnableDebugStub.Checked;
+            };
+
             #endregion
 
             FillProperties();
@@ -398,6 +404,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             mShowTabDebug = true;
             cmboCosmosDebugPort.Enabled = true;
             cmboVisualStudioDebugPort.Enabled = true;
+            checkBoxVBEMultiboot.Enabled = false;
 
             if (mViewModel.BuildProperties.Profile == "ISO")
             {
@@ -505,6 +512,7 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             checkStartCosmosGDB.Checked = mViewModel.BuildProperties.StartCosmosGDB;
             checkEnableBochsDebug.Checked = mViewModel.BuildProperties.EnableBochsDebug;
             checkStartBochsDebugGui.Checked = mViewModel.BuildProperties.StartBochsDebugGui;
+            checkBoxVBEMultiboot.Checked = mViewModel.BuildProperties.CompileVBEMultiboot;
             // Locked to COM1 for now.
             //cmboCosmosDebugPort.SelectedIndex = 0;
 
