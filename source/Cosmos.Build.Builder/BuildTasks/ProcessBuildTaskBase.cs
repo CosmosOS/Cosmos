@@ -74,7 +74,7 @@ namespace Cosmos.Build.Builder.BuildTasks
                     string error = "";
                     foreach (var item in Lines)
                     {
-                        if (item.Contains("error"))
+                        if (item.ToLower().Contains("error"))
                         {
                             error += item + "\n";
                         }
