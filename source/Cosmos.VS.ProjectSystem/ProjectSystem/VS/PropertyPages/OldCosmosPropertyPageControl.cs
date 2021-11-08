@@ -404,7 +404,6 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             mShowTabDebug = true;
             cmboCosmosDebugPort.Enabled = true;
             cmboVisualStudioDebugPort.Enabled = true;
-            checkBoxVBEMultiboot.Enabled = false;
 
             if (mViewModel.BuildProperties.Profile == "ISO")
             {
