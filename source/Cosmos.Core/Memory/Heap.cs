@@ -28,6 +28,7 @@ namespace Cosmos.Core.Memory
         {
             Debugger.DoSendNumber(0xA550C);
             Debugger.DoSendNumber(aSize);
+
             if (aSize <= HeapSmall.mMaxItemSize)
             {
                 return HeapSmall.Alloc((ushort)aSize);
@@ -87,35 +88,13 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Decrease reference count of an object pointed to by the pointer of the given type
-        /// </summary>
-        /// <param name="aPtr"></param>
-        /// <param name="aType"></param>
-        internal static void DecTypedRefCount(uint* aPtr, uint aType)
-        {
-            var xType = RAT.GetPageType(aPtr);
-            switch (xType)
-            {
-                case RAT.PageType.HeapSmall:
-                    HeapSmall.DecTypedRefCount(aPtr, aType);
-                    break;
-                case RAT.PageType.HeapMedium:
-                case RAT.PageType.HeapLarge:
-                    HeapLarge.DecTypedRefCount(aPtr, aType);
-                    break;
-
-                    //default: we may be incorrectly trying to inc/dec string literals which is why we shouldnt throw an error here
-                    //    throw new Exception("Heap item not found in RAT.");
-            }
-        }
-
-        /// <summary>
         /// Increment reference count of a heap item
         /// Do not use this method on non-managed memory
         /// </summary>
         /// <param name="aPtr"></param>
         public static void IncRefCount(void* aPtr)
         {
+            Debugger.DoSendNumber(0x14C14C);
             var xType = RAT.GetPageType(aPtr);
             switch (xType)
             {
@@ -139,6 +118,7 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr"></param>
         public static void DecRefCount(void* aPtr, uint id)
         {
+            Debugger.DoSendNumber(0xDECDEC);
             Debugger.DoSendNumber(id);
             var xType = RAT.GetPageType(aPtr);
             switch (xType)

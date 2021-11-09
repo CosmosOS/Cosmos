@@ -73,8 +73,10 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(new uint[] { 12, 20, 28, 36}, VTablesImpl.GetGCFieldOffsets(GCImplementation.GetType(tObj)), "GetGCFieldOffsets returns the correct values");
         }
 
+        static object staticObject;
         private unsafe void TestGarbageCollector()
         {
+            // allocating + freeing works on gc side
             int allocated = HeapSmall.GetAllocatedObjectCount();
             object c = new object();
             int nowAllocated = HeapSmall.GetAllocatedObjectCount();
@@ -82,11 +84,12 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             int afterFree = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated + 1, nowAllocated, "NewObj causes one object to be allocated");
             Assert.AreEqual(allocated, afterFree, "Free causes one object to be freed again");
+
+            // stloc correctly updates ref counts
             object a = new object();
             var test = new TestType();
             test.FieldB = a;
             test.FieldC = "asd";
-
             uint* aPtr = GCImplementation.GetPointer(test);
             Assert.AreEqual(1, Heap.GetRefCount(aPtr), "Object has one ref count");
             Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "object a has 2 ref count currently");
@@ -94,6 +97,7 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "new object has 1 ref count currently");
             Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(a)), "object a has 1 ref count currently");
 
+            // Manual ref counting works
             Assert.AreEqual(RAT.PageType.None, RAT.GetPageType(GCImplementation.GetPointer(test.FieldC)), "String is created statically and not managed by GC");
             Heap.IncRefCount(aPtr);
             Assert.AreEqual(2, Heap.GetRefCount(aPtr), "IncRefCount works");
@@ -104,16 +108,48 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             afterFree = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated - 2, afterFree, "DecRefCount triggers free, which works recursivly");
 
+            // Cleaning up locals test
             allocated = HeapSmall.GetAllocatedObjectCount();
             TestMethod1();
             nowAllocated = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated, nowAllocated, "All local objects in a method are cleaned up");
 
+            // Return value test
             allocated = HeapSmall.GetAllocatedObjectCount();
             var counter = TestMethod2();
             nowAllocated = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated + 1, nowAllocated, "Method with return value only keeps return value alive");
             Assert.AreEqual(counter.x, 3, "Returned object is not freed");
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(counter)), "Return value has 1 ref from local variable");
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            counter = TestMethod3();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "Recursive methof calling with return value only keeps return value alive");
+            Assert.AreEqual(counter.x, 3, "Returned object is not freed");
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(counter)), "Return value has 1 ref from local variable");
+
+            // Array GC Test
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            Counter counter1 = new Counter();
+            Counter[] counters = new Counter[3];
+            counters[0] = counter1;
+            counters[1] = new Counter();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated + 3, nowAllocated, "Array test allocates 3 elements");
+            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(counter1)), "Storing element in array increases refcount");
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(counters[1])), "Storing element in array increases refcount");
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            Heap.DecRefCount(GCImplementation.GetPointer(counters), 0);
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated - 2, nowAllocated, "Decreasing ref count of array to zero frees it and propagates to elements");
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(counter1)), "Freeing array decreases ref count by 1 of elements");
+
+            // stsfld GC test
+            staticObject = new object();
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(staticObject)), "Storing object in static variable increases ref count by 1");
+            object x = staticObject;
+            staticObject = new object();
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(staticObject)), "Replacing object in static variable decreases ref count by 1 of old object");
         }
 
         public void TestMethod1()
@@ -131,6 +167,13 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             b.x = 4;
             return a;
         }
+
+        Counter TestMethod3()
+        {
+            Counter x = new Counter();
+            return TestMethod2();
+        }
+
 
         protected override void Run()
         {

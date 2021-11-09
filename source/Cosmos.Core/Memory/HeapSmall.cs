@@ -164,13 +164,16 @@ namespace Cosmos.Core.Memory
 
         private static SMTBlock* GetFirstWithSpace(uint aSize)
         {
+            Debugger.DoSendNumber(0x8178);
             var page = mSMT;
             SMTBlock* block = null;
             do
             {
+                Debugger.DoSendNumber((uint)page);
                 block = GetFirstWithSpace(page, aSize);
                 page = page->Next;
             } while (block == null && page != null);
+            Debugger.DoSendNumber(0x8718);
             return block;
         }
 
@@ -217,7 +220,7 @@ namespace Cosmos.Core.Memory
         private static void AddRootSMTBlock(SMTPage* aPage, uint aSize)
         {
             RootSMTBlock* ptr = aPage->First;
-          //  Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
+            //  Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
             while (ptr->LargerSize != null)
             {
                 ptr = ptr->LargerSize;
@@ -232,14 +235,14 @@ namespace Cosmos.Core.Memory
                 while (true) { }
             }
 
-            if(ptr->Size == 0)
+            if (ptr->Size == 0)
             {
                 ptr->Size = aSize;
             }
             else
             {
                 var block = (RootSMTBlock*)NextFreeBlock(aPage);    // we should actually check that this is not null
-                                                               //but we should also only call this code right at the beginning so it should be fine
+                                                                    //but we should also only call this code right at the beginning so it should be fine
                 block->Size = aSize;
                 ptr->LargerSize = block;
             }
@@ -277,7 +280,7 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown on fatal error, contact support.</exception>
         static public void Init()
         {
-          //  Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
+            //  Cosmos.Debug.Kernel.Debugger.DoBochsBreak();
             //TODO Adjust for new page and header sizes 
             // 4 slots, ~1k ea
             uint xMaxItemSize = RAT.PageSize / 4 - PrefixItemBytes;
@@ -335,7 +338,7 @@ namespace Cosmos.Core.Memory
         static void CreatePage(SMTPage* aPage, uint aItemSize)
         {
             var xPtr = (byte*)RAT.AllocPages(RAT.PageType.HeapSmall, 1);
-            if(xPtr == null)
+            if (xPtr == null)
             {
                 return; // we failed to create the page, Alloc should still handle this case
             }
@@ -374,6 +377,9 @@ namespace Cosmos.Core.Memory
             {
                 // there is already a block for the same size on the same page
                 parent->NextBlock = smtBlock;
+                Debugger.DoSendNumber(0x6789);
+                Debugger.DoSendNumber((uint)parent);
+                Debugger.DoSendNumber((uint)parent->NextBlock);
 
             }
             else
@@ -394,7 +400,9 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(ushort aSize)
         {
+            Debugger.DoSendNumber(0x7777);
             var pageBlock = GetFirstWithSpace(aSize);
+            Debugger.DoSendNumber((uint)pageBlock);
             if (pageBlock == null) // This happens when the page is full and we need to allocate a new page for this size
             {
                 CreatePage(GetLastPage(), GetRoundedSize(aSize));
@@ -468,7 +476,13 @@ namespace Cosmos.Core.Memory
             {
                 size = 4;
             }
-            for (int i = 0; i < size / 4; i++) //  we can do it uint wise since we know the objects are uint aligned
+            var bytes = size / 4;
+            if (size % 4 != 0)
+            {
+                bytes += 1;
+            }
+            Debugger.DoSendNumber(bytes);
+            for (int i = 0; i < bytes; i++)
             {
                 allocated[i] = 0;
             }
@@ -498,61 +512,6 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Free a object of the given type
-        /// </summary>
-        /// <param name="aPtr">A pointer to the start object.</param>
-        /// <param name="aType">Type of the object</param>
-        [NoGC()]
-        public static void TypedFree(void* aPtr, uint aType)
-        {
-            var heapObject = (ushort*)aPtr;
-            ushort size = heapObject[-2];
-            if (size == 0)
-            {
-                // double free, this object has already been freed
-                Debugger.DoSendNumber((uint)heapObject);
-                Debugger.SendKernelPanic(0x99);
-            }
-
-            var allocated = (uint*)aPtr;
-            allocated[-1] = 0; // zero both size and ref count at once
-
-            CleanupTypedObject(aPtr, aType);
-
-            // now zero the object so its ready for next allocation
-            if (size < 4) // so we dont actually forget to clean up too small items
-            {
-                size = 4;
-            }
-            for (int i = 0; i < size / 4; i++) //  we can do it uint wise since we know the objects are uint aligned
-            {
-                allocated[i] = 0;
-            }
-
-            // need to increase count in SMT again
-            var allocatedOnPage = RAT.GetPagePtr(aPtr);
-            var smtPage = mSMT;
-            SMTBlock* blockPtr = null;
-            while (smtPage != null)
-            {
-                blockPtr = GetFirstBlock(smtPage, size)->First;
-                while (blockPtr != null && blockPtr->PagePtr != allocatedOnPage)
-                {
-                    blockPtr = blockPtr->NextBlock;
-                }
-                smtPage = smtPage->Next;
-            }
-
-            if (blockPtr == null)
-            {
-                // this shouldnt happen
-                Debugger.SendKernelPanic(0x98);
-                while (true) { }
-            }
-            blockPtr->SpacesLeft++;
-        }
-
-        /// <summary>
         /// Increment the reference count for an object stored on the small heap
         /// </summary>
         /// <param name="aPtr">Pointer to the object</param>
@@ -563,7 +522,7 @@ namespace Cosmos.Core.Memory
             ushort* obj = (ushort*)aPtr;
             obj[-1]++;
             Debugger.DoSendNumber(obj[-1]);
-            if(obj[-2] == 0)
+            if (obj[-2] == 0)
             {
                 Debugger.DoBochsBreak();
                 Debugger.SendKernelPanic(0x909);
@@ -593,6 +552,7 @@ namespace Cosmos.Core.Memory
             if (obj[-1] == 0)
             {
                 Debugger.DoBochsBreak();
+                Debugger.SendKernelPanic(0x700);
             }
             obj[-1]--;
             if (obj[-1] == 0)
@@ -613,26 +573,9 @@ namespace Cosmos.Core.Memory
             ushort* obj = (ushort*)aPtr;
             if (obj[-1] == 0)
             {
-                Debugger.DoBochsBreak();
                 return;
             }
             obj[-1]--;
-        }
-
-        /// <summary>
-        /// Decreement the reference count for an object stored on the small heap of the given type
-        /// Frees the object if ref count reaches 0
-        /// </summary>
-        /// <param name="aPtr"></param>
-        /// <param name="aType"></param>
-        internal static void DecTypedRefCount(uint* aPtr, uint aType)
-        {
-            ushort* obj = (ushort*)aPtr;
-            obj[-1]--;
-            if (obj[-1] == 0)
-            {
-                TypedFree(aPtr, aType);
-            }
         }
 
         /// <summary>
@@ -644,47 +587,66 @@ namespace Cosmos.Core.Memory
         {
             Debugger.DoSendNumber(0xC2ea409);
             uint* obj = (uint*)aPtr;
-            if(_StringType == 0)
+            if (_StringType == 0)
             {
                 Debugger.DoSendNumber(0x3333);
                 _StringType = GetStringTypeID();
             }
             Debugger.DoSendNumber(*(obj + 1));
             // Check what we are dealing with
-            if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
+            if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
             {
                 var type = *obj;
                 Debugger.DoSendNumber(0x888);
                 Debugger.DoSendNumber(type);
                 // Deal with strings first
-                if(type == _StringType)
+                if (type == _StringType)
                 {
                     return; // we are done since they dont hold any reference to fields
                 }
 
                 PropagateDecRefCount(obj, type);
             }
-            else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
+            else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
             {
                 var elementType = *obj;
                 var length = *(obj + 2);
                 var size = *(obj + 3);
+                Debugger.DoSend("Array");
+                Debugger.DoSendNumber(elementType);
+                Debugger.DoSendNumber(length);
+                Debugger.DoSendNumber(size);
                 if (VTablesImpl.IsValueType(elementType))
                 {
-                    for (int i = 0; i < length; i++)
+                    if (VTablesImpl.IsStruct(elementType))
                     {
-                        CleanupTypedObject(obj + 3 + size / 4 * i, elementType); 
+                        for (int i = 0; i < length; i++)
+                        {
+                            var location = obj + 3 + size / 4 * i;
+                            Debugger.DoSendNumber((uint)location);
+                            Debugger.DoSendNumber((uint)location);
+                            Debugger.DoBochsBreak();
+                            CleanupTypedObject(*(uint**)location, elementType);
+                        }
                     }
                 }
                 else
                 {
                     for (int i = 0; i < length; i++)
                     {
-                        DecRefCount(obj + 3 + i * size / 4);
+                        var location = obj + 4 + size / 4 * i + 1;
+                        if (*location != 0)
+                        {
+                            location = *(uint**)location;
+                            if (RAT.GetPageType(location) == RAT.PageType.HeapSmall) // so we dont try free string literals
+                            {
+                                DecRefCount(location);
+                            }
+                        }
                     }
                 }
             }
-            else if(*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
+            else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
             {
                 Debugger.SendKernelPanic(0x808808);
             }
@@ -725,10 +687,12 @@ namespace Cosmos.Core.Memory
                 }
                 else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
                 {
+                    Debugger.SendKernelPanic(0xA22A9);
                     throw new NotImplementedException();
                 }
                 else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
                 {
+                    Debugger.SendKernelPanic(0xB05ED);
                     throw new NotImplementedException();
                 }
             }
@@ -737,6 +701,9 @@ namespace Cosmos.Core.Memory
         [NoGC()]
         private static void PropagateDecRefCount(uint* obj, uint type)
         {
+            Debugger.DoSendNumber(0x9509A6A7EDEC);
+            Debugger.DoSendNumber((uint)obj);
+            Debugger.DoSendNumber(type);
             uint fields = VTablesImpl.GetGCFieldCount(type);
             var offsets = VTablesImpl.GetGCFieldOffsets(type);
             var types = VTablesImpl.GetGCFieldTypes(type);
@@ -756,9 +723,12 @@ namespace Cosmos.Core.Memory
                 }
                 else
                 {
-                    PropagateDecRefCount(obj + offsets[i] / 4, types[i]);
+                    var obj1 = obj + offsets[i] / 4;
+                    Debugger.DoSendNumber((uint)obj1);
+                    PropagateDecRefCount(obj1, types[i]);
                 }
             }
+            Debugger.DoSendNumber(0xF1409509A6A7EDEC);
         }
 
         /// <summary>
