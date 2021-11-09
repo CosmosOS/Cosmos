@@ -14,7 +14,7 @@ namespace Cosmos.Build.Builder.Dependencies
 
         private static readonly string[] RequiredPackages = new string[]
         {
-            NetCoreToolsWorkload,
+           // NetCoreToolsWorkload,
             VisualStudioExtensionsWorkload
         };
         public bool ShouldInstallByDefault => false;

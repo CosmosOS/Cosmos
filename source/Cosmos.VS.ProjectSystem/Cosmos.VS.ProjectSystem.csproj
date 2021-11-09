@@ -70,9 +70,9 @@
         <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" PrivateAssets="All" Version="15.8.243" />
         <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk" Version="15.8.243" />
         <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.0.28729" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="16.9.31023.347" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="16.10.31320.204" />
         <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-        <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.8.3038">
+        <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
