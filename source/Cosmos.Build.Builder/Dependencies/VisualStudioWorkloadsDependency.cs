@@ -11,12 +11,18 @@ namespace Cosmos.Build.Builder.Dependencies
     {
         private const string NetCoreToolsWorkload = "Microsoft.VisualStudio.Workload.NetCoreTools";
         private const string VisualStudioExtensionsWorkload = "Microsoft.VisualStudio.Workload.VisualStudioExtension";
-
-        private static readonly string[] RequiredPackages = new string[]
+        
+        private static readonly string[] RequiredPackagesVS2022 = new string[]
         {
-           // NetCoreToolsWorkload,
             VisualStudioExtensionsWorkload
         };
+        private static readonly string[] RequiredPackagesVS2019 = new string[]
+        {
+            NetCoreToolsWorkload,
+            VisualStudioExtensionsWorkload
+        };
+        private static string[] RequiredPackages;
+        public string[] arg = Environment.GetCommandLineArgs();
         public bool ShouldInstallByDefault => false;
         public string Name => "Visual Studio Workloads";
 
@@ -24,6 +30,14 @@ namespace Cosmos.Build.Builder.Dependencies
         {
             get
             {
+                if(arg[2] == "--vs2022")
+                {
+                    RequiredPackages = RequiredPackagesVS2022;
+                }
+                else
+                {
+                    RequiredPackages = RequiredPackagesVS2019;
+                }
                 var missingPackages = ((string[])RequiredPackages.Clone()).ToList();
                 foreach (var item in RequiredPackages)
                 {
@@ -53,6 +67,14 @@ namespace Cosmos.Build.Builder.Dependencies
 
         public Task<bool> IsInstalledAsync(CancellationToken cancellationToken)
         {
+            if (arg[2] == "--vs2022")
+            {
+                RequiredPackages = RequiredPackagesVS2022;
+            }
+            else
+            {
+                RequiredPackages = RequiredPackagesVS2019;
+            }
             var installedPackages = _visualStudioInstance.GetPackages();
             return Task.FromResult(RequiredPackages.All(p => IsPackageInstalled(p)));
         }
@@ -78,7 +100,14 @@ namespace Cosmos.Build.Builder.Dependencies
             var installedPackages = _visualStudioInstance.GetPackages();
 
             var args = $"modify --passive --norestart --installPath \"{vsInstancePath}\"";
-
+            if (arg[2] == "--vs2022")
+            {
+                RequiredPackages = RequiredPackagesVS2022;
+            }
+            else
+            {
+                RequiredPackages = RequiredPackagesVS2019;
+            }
             foreach (var workload in RequiredPackages)
             {
                 if (!IsPackageInstalled(workload))
