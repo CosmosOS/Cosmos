@@ -86,16 +86,6 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Decrease reference count of an given object of the given type.
-        /// </summary>
-        /// <param name="aObject">An object to decrease to reference count of.</param>
-        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        public static unsafe void DecTypedRefCount(uint aObject, uint aType)
-        {
-            Heap.DecTypedRefCount((uint*)aObject, aType);
-        }
-
-        /// <summary>
         /// Get the number of current references to an object
         /// </summary>
         /// <param name="aObject">Location of the object</param>

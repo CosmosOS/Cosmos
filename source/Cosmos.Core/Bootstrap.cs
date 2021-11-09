@@ -47,7 +47,6 @@ namespace Cosmos.Core
         {
             // Call this early so we can get a memorymap for the MemoryManagement in GCImplementation
             MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
-            Debug.Kernel.Debugger.DoSendNumber(0x6000);
             // Drag this stuff in to the compiler manually until we add the always include attrib
             INTs.Dummy();
 

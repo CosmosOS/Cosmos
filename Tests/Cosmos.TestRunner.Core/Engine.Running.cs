@@ -196,7 +196,7 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-                OutputHandler.LogMessage($"ChannelPacketReceived, Channel = {arg1}, Command = {arg2}");
+                OutputHandler.LogMessage($"ChannelPacketReceived, Channel = {arg1}, Command = {arg2}, Args = {BitConverter.ToString(arg3)}");
             }
         }
 

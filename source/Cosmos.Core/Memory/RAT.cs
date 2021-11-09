@@ -109,6 +109,7 @@ namespace Cosmos.Core.Memory
         /// </exception>
         public static void Init(byte* aStartPtr, uint aSize)
         {
+            Debugger.DoSendNumber(0x101101101);
             Debugger.DoSendNumber((uint)aStartPtr);
             Debugger.DoSendNumber(aSize);
             CPU.ZeroFill((uint)aStartPtr, aSize);
@@ -129,13 +130,16 @@ namespace Cosmos.Core.Memory
             mRamStart = aStartPtr;
             mRamSize = aSize;
             TotalPageCount = aSize / PageSize;
+            Debugger.DoSendNumber(TotalPageCount);
 
             // We need one status byte for each block.
             // Intel blocks are 4k (10 bits). So for 4GB, this means
             // 32 - 12 = 20 bits, 1 MB for a RAT for 4GB. 0.025%
             uint xRatPageCount = (TotalPageCount - 1) / PageSize + 1;
+            Debugger.DoSendNumber(xRatPageCount);
             uint xRatTotalSize = xRatPageCount * PageSize;
             mRAT = mRamStart + mRamSize - xRatTotalSize;
+            Debugger.DoSendNumber((uint)mRAT);
 
             // Mark empty pages as such in the RAT Table
             for (byte* p = mRAT; p < mRAT + TotalPageCount - xRatPageCount; p++)
@@ -147,8 +151,9 @@ namespace Cosmos.Core.Memory
             {
                 *p = PageType.RAT;
             }
-            
+            Debugger.DoBochsBreak();
             Heap.Init();
+            Debugger.DoBochsBreak();
         }
 
         /// <summary>
@@ -247,12 +252,15 @@ namespace Cosmos.Core.Memory
         /// <summary>
         /// Get the first RAT address.
         /// </summary>
+        /// +
         /// <param name="aPtr">A pointer to the block.</param>
         /// <returns>The index in RAT.</returns>
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
         public static uint GetFirstRAT(void* aPtr)
         {
             var xPos = (uint)((byte*)aPtr - mRamStart) / PageSize;
+            Debugger.DoSendNumber(0x4A74A7);
+            Debugger.DoSendNumber(xPos);
             // See note about when mRAT = 0 in Alloc.
             for (byte* p = mRAT + xPos; p >= mRAT; p--)
             {
