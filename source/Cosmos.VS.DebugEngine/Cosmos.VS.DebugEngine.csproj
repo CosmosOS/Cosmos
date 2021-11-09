@@ -5,6 +5,10 @@
         <RuntimeIdentifier>win-x32</RuntimeIdentifier>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <Net48>True</Net48>
+    </PropertyGroup>
+
     <ItemGroup>
         <Content Include="Resources\Icon.png" IncludeInVSIX="True" />
         <Content Include="Cosmos.DebugEngine.pkgdef" CopyToOutputDirectory="Always" IncludeInVSIX="True" />
