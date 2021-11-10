@@ -12,7 +12,7 @@
 #endif
 
 #ifndef VSVersion
-  #define VSVersion "vs2019"
+  #define VSVersion "vs2022"
 #endif
 
 #ifndef RealPath
