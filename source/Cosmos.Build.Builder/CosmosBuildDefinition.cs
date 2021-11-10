@@ -155,7 +155,7 @@ namespace Cosmos.Build.Builder
 
             if (!App.BuilderConfiguration.UserKit)
             {
-                var cosmosSetupPath = Path.Combine(cosmosSetupDir, "Output", $"CosmosUserKit-{cosmosSetupVersion}-vs2019.exe");
+                var cosmosSetupPath = Path.Combine(cosmosSetupDir, "Output", $"CosmosUserKit-{cosmosSetupVersion}-vs2022.exe");
 
                 // Run Setup
 

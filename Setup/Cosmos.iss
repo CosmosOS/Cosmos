@@ -279,7 +279,7 @@ var
   ResultText: AnsiString;
 begin
   Command := ExpandConstant('{app}\Build\Tools\vswhere.exe');
-  Params := '-latest -version "[15.0,16.0)" -requires Microsoft.Component.MSBuild -property installationPath';
+  Params := '-latest -version "[17.0,18.0)" -requires Microsoft.Component.MSBuild -property installationPath';
   Success :=
     ExecWithResult(Command, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode, ResultText)
       or (ResultCode <> 0);
