@@ -151,9 +151,7 @@ namespace Cosmos.Core.Memory
             {
                 *p = PageType.RAT;
             }
-            Debugger.DoBochsBreak();
             Heap.Init();
-            Debugger.DoBochsBreak();
         }
 
         /// <summary>
@@ -259,8 +257,8 @@ namespace Cosmos.Core.Memory
         public static uint GetFirstRAT(void* aPtr)
         {
             var xPos = (uint)((byte*)aPtr - mRamStart) / PageSize;
-            Debugger.DoSendNumber(0x4A74A7);
-            Debugger.DoSendNumber(xPos);
+            //Debugger.DoSendNumber(0x4A74A7);
+            //Debugger.DoSendNumber(xPos);
             // See note about when mRAT = 0 in Alloc.
             for (byte* p = mRAT + xPos; p >= mRAT; p--)
             {

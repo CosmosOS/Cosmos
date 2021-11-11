@@ -3,8 +3,8 @@
 #endif
 //#define COSMOSDEBUG
 using System;
-using System.Diagnostics;
 using Cosmos.Core.Memory;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
@@ -15,7 +15,7 @@ namespace Cosmos.Core
     /// GCImplementation class. Garbage collector. Mostly not implemented.
     /// </summary>
     /// <remarks>Most of the class is yet to be implemented.</remarks>
-    [DebuggerStepThrough]
+    [System.Diagnostics.DebuggerStepThrough]
     public unsafe static class GCImplementation
     {
         private unsafe static byte* memPtr = null;
@@ -162,14 +162,25 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Clean up the remains of an object/value at a location
+        /// Decrease the ref count for each field in the object
         /// </summary>
-        /// <param name="aPtr">Pointer to the first byte of the location</param>
-        /// <param name="aType">Type of the object being cleaned up</param>
-        public static unsafe void CleanupTypedObject(void* aPtr, uint aType)
+        /// <param name="aPtr"></param>
+        /// <param name="aType"></param>
+        public static void PropagateDecRefCount(void* aPtr, uint aType)
         {
-            HeapSmall.CleanupTypedObject(aPtr, aType);
+            HeapSmall.PropagateDecRefCount((uint*)aPtr, aType);
         }
+
+        /// <summary>
+        /// Decrease the ref count for each field in the object
+        /// </summary>
+        /// <param name="aPtr"></param>
+        /// <param name="aType"></param>
+        public static void PropagateWeakDecRefCount(void* aPtr, uint aType)
+        {
+            HeapSmall.PropagateWeakDecRefCount((uint*)aPtr, aType);
+        }
+
 
         /// <summary>
         /// Increment the GC References of objects stored in a struct
@@ -179,29 +190,37 @@ namespace Cosmos.Core
         [NoGC()]
         public static unsafe void IncStructFieldReferences(void* aPtr, uint aType)
         {
+            Debugger.DoSendNumber(0x14c14c);
+            Debugger.DoSendNumber((uint)aPtr);
+            Debugger.DoSendNumber(aType);
             uint fields = VTablesImpl.GetGCFieldCount(aType);
             var offsets = VTablesImpl.GetGCFieldOffsets(aType);
             var types = VTablesImpl.GetGCFieldTypes(aType);
             var obj = (uint*)aPtr;
             for (int i = 0; i < fields; i++)
             {
-                if (VTablesImpl.IsValueType(types[i]))
+                if (!VTablesImpl.IsValueType(types[i]))
                 {
                     var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
+                    Debugger.DoSendNumber((uint)location);
+                    Debugger.DoSendNumber(*location);
                     if (*location != 0) // Check if its null
                     {
                         location = *(uint**)location;
                         if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
                         {
-                            Heap.DecRefCount(location, 0);
+                            Heap.IncRefCount(location);
                         }
                     }
                 }
-                else
+                else if(VTablesImpl.IsStruct(types[i]))
                 {
-                    IncStructFieldReferences(obj + offsets[i] / 4, types[i]);
+                    var location = obj + offsets[i] / 4;
+                    Debugger.DoSendNumber((uint)location);
+                    IncStructFieldReferences(location, types[i]);
                 }
             }
+            Debugger.DoSendNumber(0x555555);
         }
 
     }
