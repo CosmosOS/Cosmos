@@ -26,8 +26,8 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(uint aSize)
         {
-            Debugger.DoSendNumber(0xA550C);
-            Debugger.DoSendNumber(aSize);
+            //Debugger.DoSendNumber(0xA550C);
+            //Debugger.DoSendNumber(aSize);
 
             if (aSize <= HeapSmall.mMaxItemSize)
             {
@@ -69,8 +69,8 @@ namespace Cosmos.Core.Memory
         {
             //TODO find a better way to remove the double look up here for GetPageType and then again in the
             // .Free methods which actually free the entries in the RAT.
-            Debugger.DoSendNumber(0x77);
-            Debugger.DoSendNumber((uint)aPtr);
+            //Debugger.DoSendNumber(0x77);
+            //Debugger.DoSendNumber((uint)aPtr);
             var xType = RAT.GetPageType(aPtr);
             switch (xType)
             {
@@ -94,7 +94,7 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr"></param>
         public static void IncRefCount(void* aPtr)
         {
-            Debugger.DoSendNumber(0x14C14C);
+            //Debugger.DoSendNumber(0x14C14C);
             var xType = RAT.GetPageType(aPtr);
             switch (xType)
             {
@@ -118,8 +118,9 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr"></param>
         public static void DecRefCount(void* aPtr, uint id)
         {
-            Debugger.DoSendNumber(0xDECDEC);
-            Debugger.DoSendNumber(id);
+            //Debugger.DoSendNumber(0xDECDEC);
+            //Debugger.DoSendNumber(id);
+            //Debugger.DoSendNumber((uint)aPtr);
             var xType = RAT.GetPageType(aPtr);
             switch (xType)
             {
@@ -143,7 +144,7 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr"></param>
         public static void WeakDecRefCount(void* aPtr, uint id)
         {
-            Debugger.DoSendNumber(id);
+            //Debugger.DoSendNumber(id);
             var xType = RAT.GetPageType(aPtr);
             switch (xType)
             {
@@ -175,8 +176,8 @@ namespace Cosmos.Core.Memory
                 case RAT.PageType.HeapLarge:
                     return HeapLarge.GetRefCount(aPtr);
                 default:
-                    Debugger.DoSendNumber((uint)aPtr);
-                    Debugger.DoSendNumber(xType);
+                    //Debugger.DoSendNumber((uint)aPtr);
+                    //Debugger.DoSendNumber(xType);
                     throw new Exception($"Heap item not found in RAT. ");
             }
         }

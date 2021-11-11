@@ -164,16 +164,16 @@ namespace Cosmos.Core.Memory
 
         private static SMTBlock* GetFirstWithSpace(uint aSize)
         {
-            Debugger.DoSendNumber(0x8178);
+            //Debugger.DoSendNumber(0x8178);
             var page = mSMT;
             SMTBlock* block = null;
             do
             {
-                Debugger.DoSendNumber((uint)page);
+                //Debugger.DoSendNumber((uint)page);
                 block = GetFirstWithSpace(page, aSize);
                 page = page->Next;
             } while (block == null && page != null);
-            Debugger.DoSendNumber(0x8718);
+            //Debugger.DoSendNumber(0x8718);
             return block;
         }
 
@@ -377,9 +377,9 @@ namespace Cosmos.Core.Memory
             {
                 // there is already a block for the same size on the same page
                 parent->NextBlock = smtBlock;
-                Debugger.DoSendNumber(0x6789);
-                Debugger.DoSendNumber((uint)parent);
-                Debugger.DoSendNumber((uint)parent->NextBlock);
+                //Debugger.DoSendNumber(0x6789);
+                //Debugger.DoSendNumber((uint)parent);
+                //Debugger.DoSendNumber((uint)parent->NextBlock);
 
             }
             else
@@ -400,9 +400,8 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(ushort aSize)
         {
-            Debugger.DoSendNumber(0x7777);
+            //Debugger.DoSendNumber(0x7777);
             var pageBlock = GetFirstWithSpace(aSize);
-            Debugger.DoSendNumber((uint)pageBlock);
             if (pageBlock == null) // This happens when the page is full and we need to allocate a new page for this size
             {
                 CreatePage(GetLastPage(), GetRoundedSize(aSize));
@@ -416,6 +415,8 @@ namespace Cosmos.Core.Memory
 
             //now find position in the block
             var page = pageBlock->PagePtr;
+            //Debugger.DoSendNumber((uint)pageBlock);
+            //Debugger.DoSendNumber((uint)page);
             var elementSize = GetRoundedSize(aSize) + PrefixItemBytes;
             var positions = RAT.PageSize / elementSize;
             for (int i = 0; i < positions; i++)
@@ -431,9 +432,9 @@ namespace Cosmos.Core.Memory
                     var heapObject = (ushort*)&page[i * elementSize];
                     heapObject[0] = aSize; // size of actual object being allocated
                     heapObject[1] = 0; // ref count to 0 since either stfld or stloc will increment it
-                    Debugger.DoSendNumber(0x111);
-                    Debugger.DoSendNumber((uint)heapObject + 4);
-                    Debugger.DoSendNumber(aSize);
+                    //Debugger.DoSendNumber(0x111);
+                    //Debugger.DoSendNumber((uint)heapObject + 4);
+                    //Debugger.DoSendNumber(aSize);
                     return (byte*)&heapObject[2];
 
                 }
@@ -453,11 +454,11 @@ namespace Cosmos.Core.Memory
         [NoGC()]
         public static void Free(void* aPtr)
         {
-            Debugger.DoSendNumber(0x6666);
-            Debugger.DoSendNumber((uint)aPtr);
+            //Debugger.DoSendNumber(0x6666);
+            //Debugger.DoSendNumber((uint)aPtr);
             var heapObject = (ushort*)aPtr;
             ushort size = heapObject[-2];
-            Debugger.DoSendNumber(size);
+            //Debugger.DoSendNumber(size);
             if (size == 0)
             {
                 // double free, this object has already been freed
@@ -481,7 +482,7 @@ namespace Cosmos.Core.Memory
             {
                 bytes += 1;
             }
-            Debugger.DoSendNumber(bytes);
+            //Debugger.DoSendNumber(bytes);
             for (int i = 0; i < bytes; i++)
             {
                 allocated[i] = 0;
@@ -508,7 +509,7 @@ namespace Cosmos.Core.Memory
                 while (true) { }
             }
             blockPtr->SpacesLeft++;
-            Debugger.DoSend("Free finished");
+            //Debugger.DoSend("Free finished");
         }
 
         /// <summary>
@@ -517,11 +518,11 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr">Pointer to the object</param>
         public static void IncRefCount(void* aPtr)
         {
-            Debugger.DoSendNumber(0x444);
-            Debugger.DoSendNumber((uint)aPtr);
+            //Debugger.DoSendNumber(0x444);
+            //Debugger.DoSendNumber((uint)aPtr);
             ushort* obj = (ushort*)aPtr;
             obj[-1]++;
-            Debugger.DoSendNumber(obj[-1]);
+            //Debugger.DoSendNumber(obj[-1]);
             if (obj[-2] == 0)
             {
                 Debugger.DoBochsBreak();
@@ -546,8 +547,8 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr">Pointer to the object</param>
         public static void DecRefCount(void* aPtr)
         {
-            Debugger.DoSendNumber(0x222);
-            Debugger.DoSendNumber((uint)aPtr);
+            //Debugger.DoSendNumber(0x222);
+            //Debugger.DoSendNumber((uint)aPtr);
             ushort* obj = (ushort*)aPtr;
             if (obj[-1] == 0)
             {
@@ -568,8 +569,8 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr">Pointer to the object</param>
         public static void WeakDecRefCount(void* aPtr)
         {
-            Debugger.DoSendNumber(0x3222);
-            Debugger.DoSendNumber((uint)aPtr);
+            //Debugger.DoSendNumber(0x3222);
+            //Debugger.DoSendNumber((uint)aPtr);
             ushort* obj = (ushort*)aPtr;
             if (obj[-1] == 0)
             {
@@ -585,20 +586,20 @@ namespace Cosmos.Core.Memory
         [NoGC()]
         public static void CleanupObject(void* aPtr)
         {
-            Debugger.DoSendNumber(0xC2ea409);
+            //Debugger.DoSendNumber(0xC2ea409);
             uint* obj = (uint*)aPtr;
             if (_StringType == 0)
             {
-                Debugger.DoSendNumber(0x3333);
+                //Debugger.DoSendNumber(0x3333);
                 _StringType = GetStringTypeID();
             }
-            Debugger.DoSendNumber(*(obj + 1));
+            //Debugger.DoSendNumber(*(obj + 1));
             // Check what we are dealing with
             if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
             {
                 var type = *obj;
-                Debugger.DoSendNumber(0x888);
-                Debugger.DoSendNumber(type);
+                //Debugger.DoSendNumber(0x888);
+                //Debugger.DoSendNumber(type);
                 // Deal with strings first
                 if (type == _StringType)
                 {
@@ -612,10 +613,10 @@ namespace Cosmos.Core.Memory
                 var elementType = *obj;
                 var length = *(obj + 2);
                 var size = *(obj + 3);
-                Debugger.DoSend("Array");
-                Debugger.DoSendNumber(elementType);
-                Debugger.DoSendNumber(length);
-                Debugger.DoSendNumber(size);
+                //Debugger.DoSend("Array");
+                //Debugger.DoSendNumber(elementType);
+                //Debugger.DoSendNumber(length);
+                //Debugger.DoSendNumber(size);
                 if (VTablesImpl.IsValueType(elementType))
                 {
                     if (VTablesImpl.IsStruct(elementType))
@@ -623,10 +624,8 @@ namespace Cosmos.Core.Memory
                         for (int i = 0; i < length; i++)
                         {
                             var location = obj + 3 + size / 4 * i;
-                            Debugger.DoSendNumber((uint)location);
-                            Debugger.DoSendNumber((uint)location);
-                            Debugger.DoBochsBreak();
-                            CleanupTypedObject(*(uint**)location, elementType);
+                            //Debugger.DoSendNumber((uint)location);
+                            PropagateDecRefCount(*(uint**)location, elementType);
                         }
                     }
                 }
@@ -650,57 +649,16 @@ namespace Cosmos.Core.Memory
             {
                 Debugger.SendKernelPanic(0x808808);
             }
-            Debugger.DoSendNumber(0xF14156ed);
-        }
-
-        /// <summary>
-        /// Find all fields of the typed object and decrease ref counts
-        /// This method is needed to cleanup structs since we cant determine their type directly
-        /// </summary>
-        /// <param name="aPtr"></param>
-        /// <param name="aType"></param>
-        [NoGC()]
-        public static void CleanupTypedObject(void* aPtr, uint aType)
-        {
-            uint* obj = (uint*)aPtr;
-            if (_StringType == 0)
-            {
-                _StringType = GetStringTypeID();
-            }
-
-            //TODO: Determine if this is a value type
-            if (VTablesImpl.IsValueType(aType))
-            {
-                PropagateDecRefCount(obj, aType);
-            }
-            else
-            {
-                // Check what we are dealing with
-                if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
-                {
-                    // Deal with strings first
-                    if (aType == _StringType)
-                    {
-                        return; // we are done since they dont hold any reference to fields
-                    }
-                    PropagateDecRefCount(obj, aType);
-                }
-                else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.Array)
-                {
-                    Debugger.SendKernelPanic(0xA22A9);
-                    throw new NotImplementedException();
-                }
-                else if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.BoxedValueType)
-                {
-                    Debugger.SendKernelPanic(0xB05ED);
-                    throw new NotImplementedException();
-                }
-            }
+            //Debugger.DoSendNumber(0xF14156ed);
         }
 
         [NoGC()]
-        private static void PropagateDecRefCount(uint* obj, uint type)
+        public static void PropagateDecRefCount(uint* obj, uint type)
         {
+            if(obj == null)
+            {
+                return;
+            }
             Debugger.DoSendNumber(0x9509A6A7EDEC);
             Debugger.DoSendNumber((uint)obj);
             Debugger.DoSendNumber(type);
@@ -712,6 +670,8 @@ namespace Cosmos.Core.Memory
                 if (!VTablesImpl.IsValueType(types[i]))
                 {
                     var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
+                    Debugger.DoSendNumber((uint)location);
+                    Debugger.DoSendNumber(*location);
                     if (*location != 0) // Check if its null
                     {
                         location = *(uint**)location;
@@ -721,11 +681,50 @@ namespace Cosmos.Core.Memory
                         }
                     }
                 }
-                else
+                else if (VTablesImpl.IsStruct(types[i]))
                 {
                     var obj1 = obj + offsets[i] / 4;
                     Debugger.DoSendNumber((uint)obj1);
                     PropagateDecRefCount(obj1, types[i]);
+                }
+            }
+            Debugger.DoSendNumber(0xF1409509A6A7EDEC);
+        }
+
+        [NoGC()]
+        public static void PropagateWeakDecRefCount(uint* obj, uint type)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+            Debugger.DoSendNumber(0x9509A6A7EDEC);
+            Debugger.DoSendNumber((uint)obj);
+            Debugger.DoSendNumber(type);
+            uint fields = VTablesImpl.GetGCFieldCount(type);
+            var offsets = VTablesImpl.GetGCFieldOffsets(type);
+            var types = VTablesImpl.GetGCFieldTypes(type);
+            for (int i = 0; i < fields; i++)
+            {
+                if (!VTablesImpl.IsValueType(types[i]))
+                {
+                    var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
+                    Debugger.DoSendNumber((uint)location);
+                    Debugger.DoSendNumber(*location);
+                    if (*location != 0) // Check if its null
+                    {
+                        location = *(uint**)location;
+                        if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
+                        {
+                            Heap.WeakDecRefCount(location, 0);
+                        }
+                    }
+                }
+                else if (VTablesImpl.IsStruct(types[i]))
+                {
+                    var obj1 = obj + offsets[i] / 4;
+                    Debugger.DoSendNumber((uint)obj1);
+                    PropagateWeakDecRefCount(obj1, types[i]);
                 }
             }
             Debugger.DoSendNumber(0xF1409509A6A7EDEC);
