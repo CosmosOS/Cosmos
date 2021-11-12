@@ -44,10 +44,13 @@
             this.lablDeployText = new System.Windows.Forms.Label();
             this.lablBuildOnly = new System.Windows.Forms.Label();
             this.tabCompile = new System.Windows.Forms.TabPage();
+            this.label2 = new System.Windows.Forms.Label();
+            this.textBoxVBEResolution = new System.Windows.Forms.TextBox();
+            this.checkBoxVBEMultiboot = new System.Windows.Forms.CheckBox();
+            this.buttonAddFilesToISO = new System.Windows.Forms.Button();
             this.labelBinFormat = new System.Windows.Forms.Label();
             this.comboBinFormat = new System.Windows.Forms.ComboBox();
             this.comboFramework = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.labelFramework = new System.Windows.Forms.Label();
             this.tabAssembler = new System.Windows.Forms.TabPage();
             this.checkUseInternalAssembler = new System.Windows.Forms.CheckBox();
@@ -96,7 +99,6 @@
             this.cmboSlavePort = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.buttonAddFilesToISO = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.TabControl1.SuspendLayout();
             this.tabProfile.SuspendLayout();
@@ -281,11 +283,13 @@
             // tabCompile
             // 
             this.tabCompile.AutoScroll = true;
+            this.tabCompile.Controls.Add(this.label2);
+            this.tabCompile.Controls.Add(this.textBoxVBEResolution);
+            this.tabCompile.Controls.Add(this.checkBoxVBEMultiboot);
             this.tabCompile.Controls.Add(this.buttonAddFilesToISO);
             this.tabCompile.Controls.Add(this.labelBinFormat);
             this.tabCompile.Controls.Add(this.comboBinFormat);
             this.tabCompile.Controls.Add(this.comboFramework);
-            this.tabCompile.Controls.Add(this.label2);
             this.tabCompile.Controls.Add(this.labelFramework);
             this.tabCompile.Location = new System.Drawing.Point(4, 40);
             this.tabCompile.Name = "tabCompile";
@@ -295,6 +299,43 @@
             this.tabCompile.Text = "Compile";
             this.tabCompile.UseVisualStyleBackColor = true;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(16, 166);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(60, 13);
+            this.label2.TabIndex = 28;
+            this.label2.Text = "Resolution:";
+            // 
+            // textBoxVBEResolution
+            // 
+            this.textBoxVBEResolution.Location = new System.Drawing.Point(82, 163);
+            this.textBoxVBEResolution.Name = "textBoxVBEResolution";
+            this.textBoxVBEResolution.Size = new System.Drawing.Size(122, 20);
+            this.textBoxVBEResolution.TabIndex = 27;
+            this.textBoxVBEResolution.TextChanged += new System.EventHandler(this.textBoxVBEResolution_TextChanged);
+            // 
+            // checkBoxVBEMultiboot
+            // 
+            this.checkBoxVBEMultiboot.AutoSize = true;
+            this.checkBoxVBEMultiboot.Location = new System.Drawing.Point(16, 137);
+            this.checkBoxVBEMultiboot.Name = "checkBoxVBEMultiboot";
+            this.checkBoxVBEMultiboot.Size = new System.Drawing.Size(228, 17);
+            this.checkBoxVBEMultiboot.TabIndex = 26;
+            this.checkBoxVBEMultiboot.Text = "Add VBE informations in multiboot structure";
+            this.checkBoxVBEMultiboot.UseVisualStyleBackColor = true;
+            // 
+            // buttonAddFilesToISO
+            // 
+            this.buttonAddFilesToISO.Location = new System.Drawing.Point(16, 94);
+            this.buttonAddFilesToISO.Name = "buttonAddFilesToISO";
+            this.buttonAddFilesToISO.Size = new System.Drawing.Size(128, 23);
+            this.buttonAddFilesToISO.TabIndex = 25;
+            this.buttonAddFilesToISO.Text = "Add files to ISO";
+            this.buttonAddFilesToISO.UseVisualStyleBackColor = true;
+            this.buttonAddFilesToISO.Click += new System.EventHandler(this.buttonAddFilesToISO_Click);
+            // 
             // labelBinFormat
             // 
             this.labelBinFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -302,7 +343,7 @@
             this.labelBinFormat.AutoSize = true;
             this.labelBinFormat.Enabled = false;
             this.labelBinFormat.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelBinFormat.Location = new System.Drawing.Point(18, 113);
+            this.labelBinFormat.Location = new System.Drawing.Point(13, 56);
             this.labelBinFormat.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
             this.labelBinFormat.Name = "labelBinFormat";
             this.labelBinFormat.Size = new System.Drawing.Size(66, 15);
@@ -314,7 +355,7 @@
             // 
             this.comboBinFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBinFormat.FormattingEnabled = true;
-            this.comboBinFormat.Location = new System.Drawing.Point(34, 136);
+            this.comboBinFormat.Location = new System.Drawing.Point(85, 54);
             this.comboBinFormat.Name = "comboBinFormat";
             this.comboBinFormat.Size = new System.Drawing.Size(228, 21);
             this.comboBinFormat.TabIndex = 22;
@@ -324,17 +365,10 @@
             this.comboFramework.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboFramework.Enabled = false;
             this.comboFramework.FormattingEnabled = true;
-            this.comboFramework.Location = new System.Drawing.Point(74, 86);
+            this.comboFramework.Location = new System.Drawing.Point(85, 14);
             this.comboFramework.Name = "comboFramework";
             this.comboFramework.Size = new System.Drawing.Size(228, 21);
             this.comboFramework.TabIndex = 5;
-            // 
-            // label2
-            // 
-            this.label2.Location = new System.Drawing.Point(0, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(100, 23);
-            this.label2.TabIndex = 24;
             // 
             // labelFramework
             // 
@@ -343,7 +377,7 @@
             this.labelFramework.AutoSize = true;
             this.labelFramework.Enabled = false;
             this.labelFramework.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelFramework.Location = new System.Drawing.Point(18, 66);
+            this.labelFramework.Location = new System.Drawing.Point(13, 16);
             this.labelFramework.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
             this.labelFramework.Name = "labelFramework";
             this.labelFramework.Size = new System.Drawing.Size(69, 15);
@@ -851,16 +885,6 @@
             this.label6.TabIndex = 34;
             this.label6.Text = "Slave Port:";
             // 
-            // buttonAddFilesToISO
-            // 
-            this.buttonAddFilesToISO.Location = new System.Drawing.Point(21, 191);
-            this.buttonAddFilesToISO.Name = "buttonAddFilesToISO";
-            this.buttonAddFilesToISO.Size = new System.Drawing.Size(128, 23);
-            this.buttonAddFilesToISO.TabIndex = 25;
-            this.buttonAddFilesToISO.Text = "Add files to ISO";
-            this.buttonAddFilesToISO.UseVisualStyleBackColor = true;
-            this.buttonAddFilesToISO.Click += new System.EventHandler(this.buttonAddFilesToISO_Click);
-            // 
             // OldCosmosPropertyPageControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -921,7 +945,6 @@
         private System.Windows.Forms.ListBox lboxLaunch;
         private System.Windows.Forms.TabPage tabCompile;
         private System.Windows.Forms.ComboBox comboFramework;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label labelFramework;
         private System.Windows.Forms.TabPage tabAssembler;
         private System.Windows.Forms.CheckBox checkUseInternalAssembler;
@@ -976,5 +999,8 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TabPage tabHyperV;
         private System.Windows.Forms.Button buttonAddFilesToISO;
+        private System.Windows.Forms.CheckBox checkBoxVBEMultiboot;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox textBoxVBEResolution;
     }
 }

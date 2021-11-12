@@ -97,6 +97,18 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages.ViewModels
             set => SetProperty(nameof(VisualStudioDebugPort), value);
         }
 
+        public bool CompileVBEMultiboot
+        {
+            get => String.Equals(GetProperty(nameof(CompileVBEMultiboot)), "True", StringComparison.OrdinalIgnoreCase);
+            set => SetProperty(nameof(CompileVBEMultiboot), value.ToString(), nameof(CompileVBEMultiboot));
+        }
+
+        public string VBEResolution
+        {
+            get => GetProperty(nameof(VBEResolution));
+            set => SetProperty(nameof(VBEResolution), value);
+        }
+
         public CosmosPropertyPageViewModel(
             IPropertyManager propertyManager,
             IProjectThreadingService projectThreadingService)
