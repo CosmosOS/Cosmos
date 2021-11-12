@@ -69,6 +69,14 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(4, VTablesImpl.GetGCFieldOffsets(GCImplementation.GetType(tObj)).Length, "GetGCFieldOffsets returned the correct number of values");
 
             Assert.AreEqual(new uint[] { 12, 20, 28, 36 }, VTablesImpl.GetGCFieldOffsets(GCImplementation.GetType(tObj)), "GetGCFieldOffsets returns the correct values");
+
+            ClassWithStruct classWithStruct = new ClassWithStruct();
+
+            Assert.AreEqual(3, VTablesImpl.GetGCFieldCount(GCImplementation.GetType(classWithStruct)), "ClassWithStruct has 3 fields tracked by GC");
+            types = VTablesImpl.GetGCFieldTypes(GCImplementation.GetType(classWithStruct));
+            Assert.AreEqual(((CosmosRuntimeType)typeof(object)).mTypeId, types[0], "GetGCFieldTypes returns object at offset 0");
+            Assert.AreEqual(((CosmosRuntimeType)typeof(TestStruct)).mTypeId, types[1], "GetGCFieldTypes returns TestStruct at offset 1");
+            Assert.AreEqual(((CosmosRuntimeType)typeof(object)).mTypeId, types[2], "GetGCFieldTypes returns object at offset 2");
         }
 
         [NoGC]
@@ -234,6 +242,33 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             TestMethod5();
             nowAllocated = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated, nowAllocated, "Objects stored in local struct are cleaned up correctly by end of method");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            TestStruct[] testStructs = new TestStruct[8];
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated + 1, nowAllocated, "Creating array of structs allocates 1 object");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            testStructs[0] = new TestStruct();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "Nothing gets allocated when setting new struct in an array");
+            testStructs[0].b = new object();
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[0].b)), "Setting object in struct in array has correct ref count");
+            testStructs[1] = testStructs[0];
+            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[0].b)), "Copying structure to other location in array correctly increments reference count");
+            testStructs[0] = new TestStruct();
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[1].b)), "Clearing struct stored in array correctly decreases ref count");
+            testStructs[0].b = new object();
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[0].b)), "Setting object in struct in array has correct ref count");
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            testStructs[1] = testStructs[0];
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated - 1, nowAllocated, "Correctly decrements and frees objects in struct when storing other struct at location");
+            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[0].b)), "Copying structure to other location in array correctly increments reference count");
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            testStructs = null;
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated - 2, nowAllocated, "Removing last reference to struct array causes it to be freed and object only stored within");
         }
 
         TestStruct TestMethod4()
@@ -251,6 +286,58 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             testStruct.a = 10;
             testStruct.b = new object();
             testStruct.c = new TestType();
+        }
+
+        class ClassWithStruct
+        {
+            public int a;
+            public object b;
+            public TestStruct c;
+            public object d;
+        }
+
+        public unsafe void TestGCStructComplexCases()
+        {
+            int allocated = HeapSmall.GetAllocatedObjectCount();
+            ClassWithStruct classWithStruct = new ClassWithStruct();
+            int nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated + 1, nowAllocated, "Newobj allocates one object");
+
+            TestStruct testStruct = new TestStruct();
+            testStruct.b = new object();
+            testStruct.c = new TestType();
+
+            classWithStruct.c = testStruct;
+            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(testStruct.b)), "Storing structure in object increments references of child objects");
+            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(testStruct.c)), "Storing structure in object increments references of child objects");
+            classWithStruct.d = testStruct.b;
+            Assert.AreEqual(3, Heap.GetRefCount(GCImplementation.GetPointer(testStruct.b)), "Storing another instance");
+            Assert.AreEqual(3, Heap.GetRefCount(GCImplementation.GetPointer(classWithStruct.d)), "Refcount is reflexive");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            testStruct = new TestStruct();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "When struct still exists elsewhere no child objects are deallocated");
+            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(classWithStruct.d)), "Refcount are decremented");
+            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(classWithStruct.c.c)), "Refcount are decremented");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            classWithStruct = null;
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated - 3, nowAllocated, "ClassWithStruct, object and TestType are all freed");
+        }
+
+        public void RealMethodsTest()
+        {
+            int allocated = HeapSmall.GetAllocatedObjectCount();
+            TestMethod7();
+            int nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "Concentating and writing strings does not leak objects");
+        }
+
+        void TestMethod7()
+        {
+            Console.WriteLine("Test: " + 3 + " vs " + 5);
         }
 
         protected override void Run()
@@ -307,6 +394,8 @@ namespace Cosmos.Compiler.Tests.TypeSystem
                 TestGarbageCollectorMethods();
                 TestGarbageCollector();
                 TestGarbageCollectorWithStructs();
+                TestGCStructComplexCases();
+                RealMethodsTest();
 
                 TestController.Completed();
             }

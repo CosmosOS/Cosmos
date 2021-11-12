@@ -190,9 +190,9 @@ namespace Cosmos.Core
         [NoGC()]
         public static unsafe void IncStructFieldReferences(void* aPtr, uint aType)
         {
-            Debugger.DoSendNumber(0x14c14c);
-            Debugger.DoSendNumber((uint)aPtr);
-            Debugger.DoSendNumber(aType);
+            //Debugger.DoSendNumber(0x14c14c);
+            //Debugger.DoSendNumber((uint)aPtr);
+            //Debugger.DoSendNumber(aType);
             uint fields = VTablesImpl.GetGCFieldCount(aType);
             var offsets = VTablesImpl.GetGCFieldOffsets(aType);
             var types = VTablesImpl.GetGCFieldTypes(aType);
@@ -202,8 +202,8 @@ namespace Cosmos.Core
                 if (!VTablesImpl.IsValueType(types[i]))
                 {
                     var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
-                    Debugger.DoSendNumber((uint)location);
-                    Debugger.DoSendNumber(*location);
+                    //Debugger.DoSendNumber((uint)location);
+                    //Debugger.DoSendNumber(*location);
                     if (*location != 0) // Check if its null
                     {
                         location = *(uint**)location;
@@ -216,11 +216,11 @@ namespace Cosmos.Core
                 else if(VTablesImpl.IsStruct(types[i]))
                 {
                     var location = obj + offsets[i] / 4;
-                    Debugger.DoSendNumber((uint)location);
+                    //Debugger.DoSendNumber((uint)location);
                     IncStructFieldReferences(location, types[i]);
                 }
             }
-            Debugger.DoSendNumber(0x555555);
+            //Debugger.DoSendNumber(0x555555);
         }
 
     }
