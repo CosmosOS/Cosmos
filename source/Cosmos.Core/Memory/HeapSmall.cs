@@ -614,6 +614,7 @@ namespace Cosmos.Core.Memory
                 var length = *(obj + 2);
                 var size = *(obj + 3);
                 //Debugger.DoSend("Array");
+                //Debugger.DoSendNumber((uint)obj);
                 //Debugger.DoSendNumber(elementType);
                 //Debugger.DoSendNumber(length);
                 //Debugger.DoSendNumber(size);
@@ -623,9 +624,9 @@ namespace Cosmos.Core.Memory
                     {
                         for (int i = 0; i < length; i++)
                         {
-                            var location = obj + 3 + size / 4 * i;
+                            var location = obj + 4 + size / 4 * i;
                             //Debugger.DoSendNumber((uint)location);
-                            PropagateDecRefCount(*(uint**)location, elementType);
+                            PropagateDecRefCount(location, elementType);
                         }
                     }
                 }
@@ -659,9 +660,9 @@ namespace Cosmos.Core.Memory
             {
                 return;
             }
-            Debugger.DoSendNumber(0x9509A6A7EDEC);
-            Debugger.DoSendNumber((uint)obj);
-            Debugger.DoSendNumber(type);
+            //Debugger.DoSendNumber(0x9509A6A7EDEC);
+            //Debugger.DoSendNumber((uint)obj);
+            //Debugger.DoSendNumber(type);
             uint fields = VTablesImpl.GetGCFieldCount(type);
             var offsets = VTablesImpl.GetGCFieldOffsets(type);
             var types = VTablesImpl.GetGCFieldTypes(type);
@@ -670,8 +671,8 @@ namespace Cosmos.Core.Memory
                 if (!VTablesImpl.IsValueType(types[i]))
                 {
                     var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
-                    Debugger.DoSendNumber((uint)location);
-                    Debugger.DoSendNumber(*location);
+                    //Debugger.DoSendNumber((uint)location);
+                    //Debugger.DoSendNumber(*location);
                     if (*location != 0) // Check if its null
                     {
                         location = *(uint**)location;
@@ -684,11 +685,11 @@ namespace Cosmos.Core.Memory
                 else if (VTablesImpl.IsStruct(types[i]))
                 {
                     var obj1 = obj + offsets[i] / 4;
-                    Debugger.DoSendNumber((uint)obj1);
+                    //Debugger.DoSendNumber((uint)obj1);
                     PropagateDecRefCount(obj1, types[i]);
                 }
             }
-            Debugger.DoSendNumber(0xF1409509A6A7EDEC);
+            //Debugger.DoSendNumber(0xF1409509A6A7EDEC);
         }
 
         [NoGC()]
@@ -698,9 +699,9 @@ namespace Cosmos.Core.Memory
             {
                 return;
             }
-            Debugger.DoSendNumber(0x9509A6A7EDEC);
-            Debugger.DoSendNumber((uint)obj);
-            Debugger.DoSendNumber(type);
+            //Debugger.DoSendNumber(0x9509A6A7EDEC);
+            //Debugger.DoSendNumber((uint)obj);
+            //Debugger.DoSendNumber(type);
             uint fields = VTablesImpl.GetGCFieldCount(type);
             var offsets = VTablesImpl.GetGCFieldOffsets(type);
             var types = VTablesImpl.GetGCFieldTypes(type);
@@ -709,8 +710,8 @@ namespace Cosmos.Core.Memory
                 if (!VTablesImpl.IsValueType(types[i]))
                 {
                     var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
-                    Debugger.DoSendNumber((uint)location);
-                    Debugger.DoSendNumber(*location);
+                    //Debugger.DoSendNumber((uint)location);
+                    //Debugger.DoSendNumber(*location);
                     if (*location != 0) // Check if its null
                     {
                         location = *(uint**)location;
@@ -723,11 +724,11 @@ namespace Cosmos.Core.Memory
                 else if (VTablesImpl.IsStruct(types[i]))
                 {
                     var obj1 = obj + offsets[i] / 4;
-                    Debugger.DoSendNumber((uint)obj1);
+                    //Debugger.DoSendNumber((uint)obj1);
                     PropagateWeakDecRefCount(obj1, types[i]);
                 }
             }
-            Debugger.DoSendNumber(0xF1409509A6A7EDEC);
+            //Debugger.DoSendNumber(0xF1409509A6A7EDEC);
         }
 
         /// <summary>
