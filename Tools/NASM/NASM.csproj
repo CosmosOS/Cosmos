@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
-        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <TargetFramework>net5.0</TargetFramework>
+        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
         <OutputType>Exe</OutputType>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

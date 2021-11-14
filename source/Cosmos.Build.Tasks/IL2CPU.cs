@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using static Cosmos.Build.Tasks.OperatingSystem;
 
 namespace Cosmos.Build.Tasks
 {
@@ -51,9 +52,13 @@ namespace Cosmos.Build.Tasks
 
         public bool EmitDebugSymbols { get; set; }
 
+        public bool CompileVBEMultiboot { get; set; }
+
+        public string VBEResolution { get; set; }
+
         #endregion
 
-        protected override string ToolName => "IL2CPU.exe";
+        protected override string ToolName => IsWindows() ? "IL2CPU.exe" : "IL2CPU";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
@@ -62,7 +67,7 @@ namespace Cosmos.Build.Tasks
         {
             if (String.IsNullOrWhiteSpace(ToolPath))
             {
-                return Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe");
+                return Path.Combine(CosmosBuildDir, IsWindows() ? @"IL2CPU\IL2CPU.exe" : "IL2CPU/IL2CPU");
             }
 
             return Path.Combine(Path.GetFullPath(ToolPath), ToolExe);
@@ -84,6 +89,8 @@ namespace Cosmos.Build.Tasks
                 ["EnableLogging"] = EnableLogging.ToString(),
                 ["EmitDebugSymbols"] = EmitDebugSymbols.ToString(),
                 ["IgnoreDebugStubAttribute"] = IgnoreDebugStubAttribute.ToString(),
+                ["CompileVBEMultiboot"] = CompileVBEMultiboot.ToString(),
+                ["VBEResolution"] = VBEResolution.ToString(),
             }.ToList();
 
             foreach (var reference in References)

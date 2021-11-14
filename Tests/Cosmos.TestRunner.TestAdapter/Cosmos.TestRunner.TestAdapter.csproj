@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <PackageDescription>Test adapter for Cosmos kernels.</PackageDescription>
         <IsToolProject>True</IsToolProject>
         <AppendTargetFrameworkToToolsPackageFolder>False</AppendTargetFrameworkToToolsPackageFolder>
         <NoWarn>NU5111;$(NoWarn)</NoWarn>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

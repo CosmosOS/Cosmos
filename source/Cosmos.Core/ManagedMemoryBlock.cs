@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core
 {
@@ -7,53 +8,53 @@ namespace Cosmos.Core
     /// </summary>
     public unsafe class ManagedMemoryBlock
     {
-        private byte[] memory;
+        public byte[] memory;
 
         /// <summary>
         /// Offset.
         /// </summary>
-        public UInt32 Offset;
+        public ulong Offset;
         /// <summary>
         /// Size.
         /// </summary>
-        public UInt32 Size;
+        public uint Size;
 
         /// <summary>
         /// Create a new buffer with the given size, not aligned
         /// </summary>
-        /// <param name="size">Size of buffer</param>
-        public ManagedMemoryBlock(UInt32 size)
-            : this(size, 1, false)
-        { }
+        /// <param name="byteSize">Size of buffer</param>
+        public ManagedMemoryBlock(uint aByteCount) : this(aByteCount, 1, false)
+        {
+        }
 
         /// <summary>
         /// Create a new buffer with the given size, aligned on the byte boundary specified
         /// </summary>
-        /// <param name="size">Size of buffer</param>
+        /// <param name="byteCount">Size of buffer</param>
         /// <param name="alignment">Byte Boundary alignment</param>
-        public ManagedMemoryBlock(UInt32 size, int alignment)
-            : this(size, alignment, true)
-        { }
+        public ManagedMemoryBlock(uint aByteCount, int alignment) : this(aByteCount, alignment, true)
+        {
+        }
 
         /// <summary>
         /// Create a new buffer with the given size, and aligned on the byte boundary if align is true
         /// </summary>
-        /// <param name="size">Size of buffer</param>
-        /// <param name="alignment">Byte Boundary alignment</param>
-        /// <param name="align">true if buffer should be aligned, false otherwise</param>
-        public ManagedMemoryBlock(UInt32 size, int alignment, bool align)
+        /// <param name="aByteCount">Size of buffer</param>
+        /// <param name="aAlignment">Byte Boundary alignment</param>
+        /// <param name="aAlign">true if buffer should be aligned, false otherwise</param>
+        public ManagedMemoryBlock(uint aByteCount, int aAlignment, bool aAlign)
         {
-            memory = new byte[size + alignment - 1];
+            memory = new byte[aByteCount + aAlignment - 1];
             fixed (byte* bodystart = memory)
             {
-                Offset = (UInt32)bodystart;
-                Size = size;
+                Offset = (ulong)bodystart;
+                Size = aByteCount;
             }
-            if (align == true)
+            if (aAlign == true)
             {
-                while (this.Offset % alignment != 0)
+                while (Offset % (ulong)aAlignment != 0)
                 {
-                    this.Offset++;
+                    Offset++;
                 }
             }
         }
@@ -69,42 +70,47 @@ namespace Cosmos.Core
             get
             {
                 if (offset > Size)
-                    throw new ArgumentOutOfRangeException("offset");
-                return *(byte*)(this.Offset + offset);
+                {
+                    throw new ArgumentOutOfRangeException(nameof(offset));
+                }
+
+                return *((byte*)Offset + offset);
             }
             set
             {
                 if (offset < 0 || offset > Size)
-                    throw new ArgumentOutOfRangeException("offset");
-                (*(byte*)(this.Offset + offset)) = value;
+                {
+                    throw new ArgumentOutOfRangeException(nameof(offset));
+                }
+                *((byte*)Offset + offset) = value;
             }
         }
 
         /// <summary>
         /// Fill memory block.
         /// </summary>
-        /// <param name="aStart">A start.</param>
+        /// <param name="aByteOffset">A start.</param>
         /// <param name="aCount">A count.</param>
         /// <param name="aData">A data.</param>
-        public unsafe void Fill(uint aStart, uint aCount, uint aData)
+        public unsafe void Fill(uint aByteOffset, uint aCount, uint aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            uint* xDest = (uint*)(this.Offset + aStart);
+            uint* xDest = (uint*)(Offset + aByteOffset);
             MemoryOperations.Fill(xDest, aData, (int)aCount);
         }
 
         /// <summary>
-        /// Fill data to memory block.
+        /// Fill memory block with integer value
         /// </summary>
-        /// <param name="aStart">A starting position in the memory block.</param>
+        /// <param name="aByteOffset">A starting position in the memory block. This is integer indexing based</param>
         /// <param name="aCount">Data size.</param>
         /// <param name="aData">A data to fill memory block with.</param>
-        public unsafe void Fill(int aStart, int aCount, int aData)
+        public unsafe void Fill(int aByteOffset, int aCount, int aData)
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
-            fixed (byte* aArrayPtr = this.memory)
+            fixed (byte* aArrayPtr = memory)
             {
-                MemoryOperations.Fill(aArrayPtr + aStart, aData, (int)aCount);
+                MemoryOperations.Fill(aArrayPtr + aByteOffset, aData, aCount * 4);
             }
         }
 
@@ -114,9 +120,23 @@ namespace Cosmos.Core
         /// <param name="aData">A data to fill.</param>
         public void Fill(uint aData)
         {
-            fixed (byte* destPtr = this.memory)
+            fixed (byte* destPtr = memory)
             {
-                MemoryOperations.Fill(destPtr, (int)aData, (int)this.Size);
+                MemoryOperations.Fill(destPtr, (int)aData, (int)Size);
+            }
+        }
+
+        public unsafe void Copy(int aStart, byte[] aData, int aIndex, int aCount)
+        {
+            // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            byte* xDest;
+            fixed (byte* aArrayPtr = this.memory)
+            {
+                xDest = (byte*)(aArrayPtr + aStart);
+            }
+            fixed (byte* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
             }
         }
 
@@ -124,9 +144,9 @@ namespace Cosmos.Core
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             int* xDest;
-            fixed (byte* aArrayPtr = this.memory)
+            fixed (byte* aArrayPtr = memory)
             {
-                xDest = (int*)(aArrayPtr + aStart);
+                xDest = (int*)aArrayPtr + aStart;
             }
             fixed (int* aDataPtr = aData)
             {
@@ -140,62 +160,103 @@ namespace Cosmos.Core
         /// <param name="block">MemoryBlock to copy.</param>
         public unsafe void Copy(MemoryBlock block)
         {
-            byte* xDest = (byte*)(this.Offset);
+            byte* xDest = (byte*)(Offset);
             byte* aDataPtr = (byte*)block.Base;
 
             MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
         }
 
         /// <summary>
+        /// Write 8-bit to the memory block.
+        /// </summary>
+        /// <param name="aByteOffset">Data offset.</param>
+        /// <param name="value">Value to write.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
+        public void Write8(uint aByteOffset, byte value)
+        {
+            if (aByteOffset < 0 || aByteOffset > Size)
+                throw new ArgumentOutOfRangeException("offset");
+            (*(byte*)(Offset + aByteOffset)) = value;
+        }
+
+        /// <summary>
         /// Read 16-bit from the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <returns>UInt16 value.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size.</exception>
-        public UInt16 Read16(uint offset)
+        public ushort Read16(uint aByteOffset)
         {
-            if (offset > Size)
-                throw new ArgumentOutOfRangeException("offset");
-            return *(UInt16*)(this.Offset + offset);
+            if (aByteOffset > Size)
+            {
+                throw new ArgumentOutOfRangeException(nameof(aByteOffset));
+            }
+
+            return *((ushort*)(Offset + aByteOffset));
         }
 
         /// <summary>
         /// Write 16-bit to the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <param name="value">Value to write.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
-        public void Write16(uint offset, UInt16 value)
+        public void Write16(uint aByteOffset, ushort value)
         {
-            if (offset < 0 || offset > Size)
-                throw new ArgumentOutOfRangeException("offset");
-            (*(UInt16*)(this.Offset + offset)) = value;
+            if (aByteOffset < 0 || aByteOffset > Size)
+            {
+                throw new ArgumentOutOfRangeException(nameof(aByteOffset));
+            }
+            *((ushort*)(Offset + aByteOffset)) = value;
         }
 
         /// <summary>
         /// Read 32-bit from the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <returns>UInt32 value.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size.</exception>
-        public UInt32 Read32(uint offset)
+        public uint Read32(uint aByteOffset)
         {
-            if (offset > Size)
-                throw new ArgumentOutOfRangeException("offset");
-            return *(UInt32*)(this.Offset + offset);
+            if (aByteOffset > Size)
+            {
+                throw new ArgumentOutOfRangeException(nameof(aByteOffset));
+            }
+
+            return *((uint*)(Offset + aByteOffset));
         }
 
         /// <summary>
         /// Write 32-bit to the memory block.
         /// </summary>
-        /// <param name="offset">Data offset.</param>
+        /// <param name="aByteOffset">Data offset.</param>
         /// <param name="value">Value to write.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
-        public void Write32(uint offset, UInt32 value)
+        public void Write32(uint aByteOffset, uint value)
         {
-            if (offset < 0 || offset > Size)
+            if (aByteOffset < 0 || aByteOffset > Size)
+            {
+                throw new ArgumentOutOfRangeException(nameof(aByteOffset));
+            }
+            *((uint*)(Offset + aByteOffset)) = value;
+        }
+
+        /// <summary>
+        /// Write string to the memory block.
+        /// </summary>
+        /// <param name="aByteOffset">Data offset.</param>
+        /// <param name="value">Value to write.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if offset if bigger than memory block size or smaller than 0.</exception>
+        public void WriteString(uint aByteOffset, string value)
+        {
+            if (aByteOffset < 0 || aByteOffset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            (*(UInt32*)(this.Offset + offset)) = value;
+            if (value.Length + aByteOffset > Size)
+                throw new ArgumentOutOfRangeException("value");
+            for (int index = 0; index < value.Length; index++)
+            {
+                memory[aByteOffset + index] = (byte)value[index];
+            }
         }
     }
 }

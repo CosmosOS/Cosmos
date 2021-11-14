@@ -1,18 +1,23 @@
-﻿<Project>
+﻿<Project Sdk="Microsoft.NET.SDK">
 
-    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
     <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.props" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
+    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.targets" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
+
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net48</TargetFramework>
+        <RuntimeIdentifier>win-x32</RuntimeIdentifier>
         <RootNamespace>Cosmos.VS.ProjectSystem</RootNamespace>
-        <IncludeWpfReferences>True</IncludeWpfReferences>
-        <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
+        <FileVersion>1.0.0.0</FileVersion>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
 
     <PropertyGroup>
+        <IncludeWpfReferences>True</IncludeWpfReferences>
+        <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
         <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
         <ExtensionInstallationFolder>Cosmos\ProjectSystem</ExtensionInstallationFolder>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     </PropertyGroup>
 
     <ItemGroup>
@@ -55,18 +60,23 @@
             <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
         </EmbeddedResource>
     </ItemGroup>
-
     <ItemGroup>
         <Reference Include="Microsoft.VisualBasic" />
     </ItemGroup>
-
+    
     <ItemGroup>
         <PackageReference Include="Cosmos.Build.Common" />
-        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" />
-        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime" Version="16.7.30328.74" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" PrivateAssets="All" Version="15.8.243" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk" Version="15.8.243" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.0.28729" />
+        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="16.9.31023.347" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+        <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.8.3038">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
         <PackageReference Include="VSPropertyPages" />
     </ItemGroup>
 
@@ -76,7 +86,7 @@
         </ItemGroup>
     </Target>
 
-    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.targets" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
-
+    <ItemGroup>
+      <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
+    </ItemGroup>
 </Project>

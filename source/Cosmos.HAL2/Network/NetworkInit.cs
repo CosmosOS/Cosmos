@@ -40,6 +40,20 @@ namespace Cosmos.HAL.Network
                     }
 
                     #endregion
+                    #region RTL8139
+
+                    if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
+                    {
+                        var RTL8139Device = new RTL8139(device);
+
+                        RTL8139Device.NameID = ("eth" + NetworkDeviceID);
+
+                        RTL8139Device.Enable();
+
+                        NetworkDeviceID++;
+                    }
+
+                    #endregion
 
                     #region RTL8168
 
@@ -55,12 +69,9 @@ namespace Cosmos.HAL.Network
                         Console.WriteLine("Registered at " + RTL8168Device.NameID + " (" + RTL8168Device.MACAddress.ToString() + ")");
 
                         RTL8168Device.Enable();
-
-                        NetworkDeviceID++;
                     }
 
                     #endregion
-
                 }
             }
 

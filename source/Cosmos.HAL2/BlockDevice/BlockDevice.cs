@@ -24,7 +24,7 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
         /// <param name="aBlockCount">Number of blocks to alloc.</param>
         /// <returns>byte array.</returns>
-        public byte[] NewBlockArray(UInt32 aBlockCount)
+        public byte[] NewBlockArray(uint aBlockCount)
         {
             return new byte[aBlockCount * mBlockSize];
         }
@@ -32,20 +32,20 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Block count.
         /// </summary>
-        protected UInt64 mBlockCount = 0;
+        protected ulong mBlockCount = 0;
         /// <summary>
         /// Get block count.
         /// </summary>
-        public UInt64 BlockCount => mBlockCount;
+        public ulong BlockCount => mBlockCount;
 
         /// <summary>
         /// Block size.
         /// </summary>
-        protected UInt64 mBlockSize = 0;
+        protected ulong mBlockSize = 0;
         /// <summary>
         /// Get block size.
         /// </summary>
-        public UInt64 BlockSize => mBlockSize;
+        public ulong BlockSize => mBlockSize;
 
         // Only allow reading and writing whole blocks because many of the hardware
         // command work that way and we dont want to add complexity at the BlockDevice level.
@@ -58,7 +58,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aData">A data that been read.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        public abstract void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData);
+        public abstract void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData);
 
         /// <summary>
         /// Write block to partition.
@@ -68,7 +68,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aData">A data to write.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        public abstract void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData);
+        public abstract void WriteBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData);
 
         /// <summary>
         /// Check data size.
@@ -77,9 +77,9 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aBlockCount">Number of blocks used to store the data.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        protected void CheckDataSize(byte[] aData, UInt64 aBlockCount)
+        protected void CheckDataSize(byte[] aData, ulong aBlockCount)
         {
-            if ((ulong)aData.Length != aBlockCount * mBlockSize)
+            if ((ulong)aData.Length / mBlockSize != aBlockCount)
             {
                 throw new Exception("Invalid data size.");
             }
@@ -91,7 +91,7 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
         /// <param name="aBlockNo">A block number to be checked.</param>
         /// <param name="aBlockCount">A block count.</param>
-        protected void CheckBlockNo(UInt64 aBlockNo, UInt64 aBlockCount)
+        protected void CheckBlockNo(ulong aBlockNo, ulong aBlockCount)
         {
             if (aBlockNo + aBlockCount >= mBlockCount)
             {

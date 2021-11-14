@@ -28,6 +28,25 @@ namespace Cosmos.Kernel.Tests.DiskManager
 
             mDebugger.Send("START TEST: Format");
 
+            try
+            {
+                MyDrive.Format("FAT16", aQuick: true);
+                Assert.Fail("Should not be able to format FAT16");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is NotImplementedException, "Not implemented FAT exception.");
+            }
+
+            try
+            {
+                MyDrive.Format("NTFS", aQuick: true);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is NotImplementedException, "Not implemented FileSystem exception.");
+            }
+
             MyDrive.Format("FAT32", aQuick: true);
 
             mDebugger.Send("Format done testing HDD is really empty");
@@ -35,19 +54,19 @@ namespace Cosmos.Kernel.Tests.DiskManager
             var xDi = new DriveInfo(driveName);
 
             /* If the drive is emptry all Space should be free */
-            Assert.IsTrue(xDi.TotalSize == xDi.TotalFreeSpace, "DiskManager.Format (quick) failed TotalFreeSpace is not the same of TotalSize");
+            Assert.AreEqual(xDi.TotalSize, xDi.TotalFreeSpace, $"DiskManager.Format (quick) failed TotalFreeSpace is not the same of TotalSize");
 
             /* Let's try to create a new file on the Root Directory */
             File.Create(@"0:\newFile.txt");
 
-            Assert.IsTrue(File.Exists(@"0:\newFile.txt") == true, "Failed to create new file after disk format");
+            Assert.IsTrue(File.Exists(@"0:\newFile.txt"), "Failed to create new file after disk format");
 
             mDebugger.Send("END TEST");
 
             mDebugger.Send("Testing if you can create directories");
 
             Directory.CreateDirectory(@"0:\SYS\");
-            Assert.IsTrue(Directory.GetDirectories(@"0:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
+            Assert.AreEqual(Directory.GetDirectories(@"0:\SYS\").Length, 0, "Can create a directory and its content is emtpy");
 
             mDebugger.Send("END TEST");
 

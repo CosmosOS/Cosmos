@@ -56,12 +56,16 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// <returns>UdpClient</returns>
         internal static UdpClient GetClient(ushort destPort)
         {
-            if (clients.ContainsKey((uint)destPort) == true)
-            {
-                return clients[(uint)destPort];
-            }
+            UdpClient client;
 
-            return null;
+            if (clients.TryGetValue(destPort, out client))
+            {
+                return client;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -158,7 +162,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         public void Send(byte[] data, Address dest, int destPort)
         {
             Address source = IPConfig.FindNetwork(dest);
-            UDPPacket packet = new UDPPacket(source, dest, (ushort)localPort, (ushort)destPort, data);
+            var packet = new UDPPacket(source, dest, (ushort)localPort, (ushort)destPort, data);
             OutgoingBuffer.AddPacket(packet);
         }
 
@@ -176,8 +180,8 @@ namespace Cosmos.System.Network.IPv4.UDP
             }
 
             var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
-            source.address = packet.SourceIP;
-            source.port = packet.SourcePort;
+            source.Address = packet.SourceIP;
+            source.Port = packet.SourcePort;
 
             return packet.UDP_Data;
         }
@@ -193,8 +197,8 @@ namespace Cosmos.System.Network.IPv4.UDP
             while (rxBuffer.Count < 1) ;
 
             var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
-            source.address = packet.SourceIP;
-            source.port = packet.SourcePort;
+            source.Address = packet.SourceIP;
+            source.Port = packet.SourcePort;
 
             return packet.UDP_Data;
         }

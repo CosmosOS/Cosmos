@@ -13,7 +13,7 @@ namespace Cosmos.Build.Builder.Dependencies
         public string Name => $"Visual Studio {MinimumVsVersion.Major}.{MinimumVsVersion.Minor}+";
         public string OtherDependencysThatAreMissing
         {
-            get { return Name+"+"; }
+            get { return "install " + Name +"+"; }
         }
 
         private readonly ISetupInstance2 _visualStudioInstance;

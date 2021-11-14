@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,7 @@ namespace Cosmos.System.FileSystem.VFS
     {
         private static VFSBase mVFS;
 
+
         /// <summary>
         /// Register VFS. Initialize the VFS.
         /// </summary>
@@ -29,7 +30,7 @@ namespace Cosmos.System.FileSystem.VFS
         /// <exception cref="System.Security.SecurityException">Thrown on fatal error.</exception>
         /// <exception cref="FileNotFoundException">Thrown on memory error.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown on fatal error.</exception>
-        public static void RegisterVFS(VFSBase aVFS, bool aAllowReinitialise = false)
+        public static void RegisterVFS(VFSBase aVFS, bool aShowInfo = true, bool aAllowReinitialise = false)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.RegisterVFS ---");
             if (!aAllowReinitialise && mVFS != null)
@@ -37,7 +38,7 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new Exception("Virtual File System Manager already initialized!");
             }
 
-            aVFS.Initialize();
+            aVFS.Initialize(aShowInfo);
             mVFS = aVFS;
         }
 
@@ -64,8 +65,7 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new ArgumentNullException(nameof(aPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
 
             return mVFS.CreateFile(aPath);
         }
@@ -137,29 +137,26 @@ namespace Cosmos.System.FileSystem.VFS
         /// </exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         public static DirectoryEntry GetFile(string aPath)
-        {
-            Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFile ---");
+            {
+            Global.mFileSystemDebugger.SendInternal("-- VFSManager.GetFile --");
 
             if (string.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentNullException(nameof(aPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             string xFileName = Path.GetFileName(aPath);
-            Global.mFileSystemDebugger.SendInternal("xFileName =");
-            Global.mFileSystemDebugger.SendInternal(xFileName);
+            Global.mFileSystemDebugger.SendInternal("xFileName = " + xFileName);
 
             string xDirectory = aPath.Remove(aPath.Length - xFileName.Length);
-            Global.mFileSystemDebugger.SendInternal("xDirectory =");
-            Global.mFileSystemDebugger.SendInternal(xDirectory);
+            Global.mFileSystemDebugger.SendInternal("xDirectory = " + xDirectory);
 
             char xLastChar = xDirectory[xDirectory.Length - 1];
             if (xLastChar != Path.DirectorySeparatorChar)
             {
-                xDirectory = xDirectory + Path.DirectorySeparatorChar;
+                xDirectory += Path.DirectorySeparatorChar;
             }
 
             var xList = GetDirectoryListing(xDirectory);
@@ -211,17 +208,17 @@ namespace Cosmos.System.FileSystem.VFS
         /// <exception cref="PathTooLongException">Thrown when The aPath is longer than the system defined maximum length.</exception>
         public static DirectoryEntry CreateDirectory(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("--- VFSManager.CreateDirectory ---");
+            Global.mFileSystemDebugger.SendInternal("-- VFSManager.CreateDirectory -- " + aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
-            if (string.IsNullOrEmpty(aPath))
+            if (String.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentNullException(nameof(aPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
-
-            return mVFS.CreateDirectory(aPath);
+            var directoryEntry = mVFS.CreateDirectory(aPath);
+            Global.mFileSystemDebugger.SendInternal("-- -------------------------- -- " + aPath);
+            return directoryEntry;
         }
 
         /// <summary>
@@ -360,8 +357,7 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new ArgumentNullException(nameof(aPath));
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             return mVFS.GetDirectory(aPath);
         }
@@ -495,31 +491,19 @@ namespace Cosmos.System.FileSystem.VFS
         /// <returns>bool value.</returns>
         public static bool FileExists(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("VFSManager.FileExists");
+            Global.mFileSystemDebugger.SendInternal("-- VFSManager.FileExists --");
 
             if (aPath == null)
             {
                 return false;
             }
 
-            try
-            {
-                Global.mFileSystemDebugger.SendInternal("aPath =");
-                Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
+            string xPath = Path.GetFullPath(aPath);
 
-                string xPath = Path.GetFullPath(aPath);
-                Global.mFileSystemDebugger.SendInternal("After GetFullPath");
-                Global.mFileSystemDebugger.SendInternal("xPath =");
-                Global.mFileSystemDebugger.SendInternal(xPath);
+            Global.mFileSystemDebugger.SendInternal("xPath = " + xPath);
 
-                return GetFile(xPath) != null;
-            }
-            catch (Exception e)
-            {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(e.Message);
-                return false;
-            }
+            return GetFile(xPath) != null;
         }
 
         /// <summary>
@@ -569,17 +553,18 @@ namespace Cosmos.System.FileSystem.VFS
             }
 
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.DirectoryExists ---");
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
             try
             {
-                Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
 
                 string xPath = Path.GetFullPath(aPath);
                 Global.mFileSystemDebugger.SendInternal("After GetFullPath");
-                Global.mFileSystemDebugger.SendInternal("xPath =");
-                Global.mFileSystemDebugger.SendInternal(xPath);
+                Global.mFileSystemDebugger.SendInternal("xPath = " + xPath);
 
-                return GetDirectory(xPath) != null;
+                var result = GetDirectory(xPath) != null;
+                Global.mFileSystemDebugger.SendInternal("--- VFSManager.DirectoryExists --- Returns: " + result);
+                return result;
             }
             catch
             {
@@ -1160,6 +1145,15 @@ namespace Cosmos.System.FileSystem.VFS
             }
 
             return null;
+        }
+
+
+        /// <summary>
+        /// Cleans up manager if the VFS has to be reintialised.
+        /// </summary>
+        internal static void Reset()
+        {
+            mVFS = null;
         }
     }
 }

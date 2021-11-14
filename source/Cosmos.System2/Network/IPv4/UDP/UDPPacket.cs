@@ -69,14 +69,14 @@ namespace Cosmos.System.Network.IPv4.UDP
         {
         }
 
-        public UDPPacket(Address source, Address dest, UInt16 srcport, UInt16 destport, UInt16 datalength)
+        public UDPPacket(Address source, Address dest, ushort srcport, ushort destport, ushort datalength)
             : base((ushort)(datalength + 8), 17, source, dest, 0x00)
         {
             MakePacket(srcport, destport, datalength);
             InitFields();
         }
 
-        public UDPPacket(Address source, Address dest, UInt16 srcport, UInt16 destport, UInt16 datalength, MACAddress destmac)
+        public UDPPacket(Address source, Address dest, ushort srcport, ushort destport, ushort datalength, MACAddress destmac)
             : base((ushort)(datalength + 8), 17, source, dest, 0x00, destmac)
         {
             MakePacket(srcport, destport, datalength);

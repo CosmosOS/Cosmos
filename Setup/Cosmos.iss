@@ -33,11 +33,11 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright (c) 2007-2019 The Cosmos Project
+AppCopyright=Copyright (c) 2007-2021 The Cosmos Project
 AppPublisher=Cosmos Project
-AppPublisherURL=http://www.goCosmos.org/
-AppSupportURL=http://www.goCosmos.org/
-AppUpdatesURL=http://www.goCosmos.org/
+AppPublisherURL=http://www.gocosmos.org/
+AppSupportURL=http://www.gocosmos.org/
+AppUpdatesURL=http://www.gocosmos.org/
 AppVersion={#ChangeSetVersion}
 SetupMutex=CosmosSetupMutexName,Global\CosmoSetupMutexName
 UsePreviousAppDir=false
@@ -85,7 +85,7 @@ Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversio
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly recursesubdirs
 ;Source: ".\Build\VSIP\XSharp\*"; DestDir: "{app}\Build\XSharp"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
@@ -105,7 +105,7 @@ Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremo
 ; XSharp
 Source: ".\Artwork\XSharp\XSharp.ico"; DestDir: "{app}\XSharp\"; Flags: ignoreversion uninsremovereadonly
 Source: "..\IL2CPU\source\Cosmos.Core.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
-; VMware
+; HyperV
 Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs

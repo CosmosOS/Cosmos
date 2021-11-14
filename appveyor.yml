@@ -2,12 +2,21 @@ version: 0.20150918.{build}
 image: Visual Studio 2019
 configuration: Debug-CI
 platform: Any CPU
-shallow_clone: true
 clone_folder: c:\Cosmos
+
+
 
 init:
 - cmd: |
     git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
+
+install:
+  - ps: |
+      $range = "$env:APPVEYOR_REPO_BRANCH..$env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT"
+      if (-not (git diff --name-only --diff-filter=d $range | Where-Object { $_ -NotMatch ".git*|md|yml|txt$" })) {
+        Write-Host "Only metafiles were modified, skipping CI run."
+        Exit-AppVeyorBuild
+      }
 
 build_script:
 - cmd: |
@@ -37,8 +46,11 @@ test_script:
 
 on_finish:
 - ps: |
-    $wc = New-Object 'System.Net.WebClient'
-    $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
+    $tests = "c:\Cosmos\TestResult.xml"
+    if ((Test-Path $tests)) {
+      $wc = New-Object 'System.Net.WebClient'
+      $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
+    }
 
 notifications:
 - provider: Webhook
@@ -58,3 +70,17 @@ artifacts:
   - path: 'artifacts\Debug\nupkg\*.nupkg'
   - path: 'artifacts\Debug\VSIX\*.vsix'
   - path: 'TestResult.xml'
+
+
+#skip_commits:
+#  files:
+#    - Docs/
+#    - .github/
+#    - Artwork/
+#    - '**/*.md'
+#    - LICENSE.txt
+#    - README.txt
+#    - .gitignore
+#    - source/Archive/
+#    - Users/
+    

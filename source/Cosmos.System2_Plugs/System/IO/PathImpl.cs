@@ -8,6 +8,7 @@ using IL2CPU.API;
 using IL2CPU.API.Attribs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
+using System.Text;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -73,7 +74,7 @@ namespace Cosmos.System_Plugs.System.IO
             return result;
         }
 
-        public static string CombineNoChecks(string aPath1, string aPath2)
+        private static string CombineNoChecks(string aPath1, string aPath2)
         {
             if (aPath2.Length == 0)
             {
@@ -245,11 +246,6 @@ namespace Cosmos.System_Plugs.System.IO
             return @"0:\Temp";
         }
 
-        public static string RemoveLongPathPrefix(string aPath)
-        {
-            return aPath;
-        }
-
         public static bool HasExtension(string aPath)
         {
             if (aPath != null)
@@ -308,7 +304,7 @@ namespace Cosmos.System_Plugs.System.IO
             return false;
         }
 
-        public static bool IsDirectorySeparator(char aC)
+        static bool IsDirectorySeparator(char aC)
         {
             if (aC == Path.DirectorySeparatorChar)
             {
@@ -342,17 +338,23 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static bool IsRelative(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal("-- Path.IsRelative -- aPath = " + aPath);
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
             }
 
-            if (aPath.Length < 3)
+            if (aPath.Length < 2) // We have to do in two steps so we dont parse '0:' as a path incorrectly
             {
                 return true;
             }
 
-            if (aPath[1] != Path.VolumeSeparatorChar)
+            if (aPath[1] == Path.VolumeSeparatorChar)
+            {
+                return false;
+            }
+
+            if (aPath.Length < 3)
             {
                 return true;
             }
@@ -446,8 +448,7 @@ namespace Cosmos.System_Plugs.System.IO
         internal static int GetRootLength(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("Path.GetRootLength");
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
 
             int i = 0;
             int xLength = aPath.Length;
@@ -479,9 +480,9 @@ namespace Cosmos.System_Plugs.System.IO
             return i;
         }
 
-        public static string NormalizePath(string aPath, bool aFullCheck)
+        static string NormalizePath(string aPath, bool aFullCheck)
         {
-            Global.mFileSystemDebugger.SendInternal("Path.NormalizePath");
+            Global.mFileSystemDebugger.SendInternal("-- Path.NormalizePath -- aPath = " + aPath);
 
             if (aPath == null)
             {
@@ -494,10 +495,8 @@ namespace Cosmos.System_Plugs.System.IO
             {
                 result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + result;
                 Global.mFileSystemDebugger.SendInternal("aPath is relative");
-                Global.mFileSystemDebugger.SendInternal("aPath =");
-                Global.mFileSystemDebugger.SendInternal(aPath);
-                Global.mFileSystemDebugger.SendInternal("result =");
-                Global.mFileSystemDebugger.SendInternal(result);
+                Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
+                Global.mFileSystemDebugger.SendInternal("result = " + result);
             }
 
             if (IsDirectorySeparator(result[result.Length - 1]))
@@ -509,10 +508,8 @@ namespace Cosmos.System_Plugs.System.IO
                 }
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
-            Global.mFileSystemDebugger.SendInternal("result =");
-            Global.mFileSystemDebugger.SendInternal(result);
+            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
+            Global.mFileSystemDebugger.SendInternal("result = " + result);
             return result;
         }
     }
