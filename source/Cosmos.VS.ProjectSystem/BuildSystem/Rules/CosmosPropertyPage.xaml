@@ -88,6 +88,7 @@
                 <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
+        <EnumValue Name="None"/>
         <EnumValue Name="IL"/>
         <EnumValue Name="Source"/>
     </EnumProperty>
@@ -145,6 +146,9 @@
         <EnumProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
                 <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "StackCorruptionDetectionEnabled" true)</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
         <EnumValue Name="AllInstructions" DisplayName="All Instructions"/>
