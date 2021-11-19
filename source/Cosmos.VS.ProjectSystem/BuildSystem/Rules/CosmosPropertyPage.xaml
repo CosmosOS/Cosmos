@@ -128,17 +128,6 @@
         </BoolProperty.Metadata>
     </BoolProperty>
 
-    <BoolProperty Name="IgnoreDebugStubAttribute"
-                  DisplayName="Debug Stub"
-                  Description="Ignore Debug Stub Attribute."
-                  Category="Debug">
-        <BoolProperty.Metadata>
-            <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
-            </NameValuePair>
-        </BoolProperty.Metadata>
-    </BoolProperty>
-
     <BoolProperty Name="StackCorruptionDetectionEnabled"
                   DisplayName="Stack Corruption Detection"
                   Description="Enable Stack Corruption Detection."
