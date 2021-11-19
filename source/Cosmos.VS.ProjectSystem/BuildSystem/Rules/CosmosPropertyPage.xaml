@@ -4,7 +4,7 @@
       Description="Cosmos Project Property Page"
       DisplayName="Cosmos"
       PageTemplate="generic"
-      Order="1000"
+      Order="1"
       xmlns="http://schemas.microsoft.com/build/2009/properties">
 
     <Rule.DataSource>
@@ -45,7 +45,8 @@
     </EnumProperty>
 
     <BoolProperty Name="DebugEnabled"
-                  DisplayName="Enable Remote Debugging"
+                  DisplayName="Remote Debugging"
+                  Description="Enable Cosmos Remote Debugger."
                   Category="Debug"/>
 
     <EnumProperty Name="VMWareEdition"
@@ -56,11 +57,13 @@
     </EnumProperty>
 
     <BoolProperty Name="EnableGDB"
-                  DisplayName="Enable GDB Debugger"
+                  DisplayName="GDB Debugger"
+                  Description="Use GDB Debugger."
                   Category="VMWare"/>
 
     <BoolProperty Name="StartCosmosGDB"
-                  DisplayName="Use Cosmos GDB Client"
+                  DisplayName="Cosmos GDB"
+                  Description="Use Cosmos GDB Client."
                   Category="VMWare">
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
