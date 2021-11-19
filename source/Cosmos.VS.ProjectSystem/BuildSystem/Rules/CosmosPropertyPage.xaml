@@ -66,6 +66,113 @@
                   Description="Enable Cosmos Remote Debugger."
                   Category="Debug"/>
 
+    <EnumProperty Name="DebugCom"
+                  DisplayName="Debug COM Port"
+                  Category="Debug">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="1" DisplayName="Serial: COM1"/>
+        <EnumValue Name="2" DisplayName="Serial: COM2"/>
+        <EnumValue Name="3" DisplayName="Serial: COM3"/>
+        <EnumValue Name="4" DisplayName="Serial: COM4"/>
+    </EnumProperty>
+
+    <EnumProperty Name="DebugMode"
+                  DisplayName="Debug mode:"
+                  Category="Debug">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="IL"/>
+        <EnumValue Name="Source"/>
+    </EnumProperty>
+
+    <EnumProperty Name="TraceMode"
+                  DisplayName="Trace mode:"
+                  Category="Debug">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="None"/>
+        <EnumValue Name="User"/>
+        <EnumValue Name="Cosmos"/>
+        <EnumValue Name="All"/>
+    </EnumProperty>
+
+    <StringProperty Name="VisualStudioDebugPort"
+                    DisplayName="Visual Studio debug port:"
+                    Description="Example format: Pipe: Cosmos\Serial"
+                    Category="Debug">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
+    <BoolProperty Name="IgnoreDebugStubAttribute"
+                  DisplayName="Debug Stub"
+                  Description="Ignore Debug Stub Attribute."
+                  Category="Debug">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="IgnoreDebugStubAttribute"
+                  DisplayName="Debug Stub"
+                  Description="Ignore Debug Stub Attribute."
+                  Category="Debug">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="StackCorruptionDetectionEnabled"
+                  DisplayName="Stack Corruption Detection"
+                  Description="Enable Stack Corruption Detection."
+                  Category="Debug">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <EnumProperty Name="StackCorruptionDetectionLevel"
+                  DisplayName="Stack Corruption detection level:"
+                  Category="Debug">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="AllInstructions" DisplayName="All Instructions"/>
+        <EnumValue Name="MethodFooters" DisplayName="Method Footers"/>
+    </EnumProperty>
+
+    <StringProperty Name="CosmosDebugPort"
+                    DisplayName="Cosmos debug port:"
+                    Description="Example format: Serial: COM1"
+                    Category="Debug">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
     <EnumProperty Name="VMWareEdition"
                   DisplayName="Edition"
                   Category="VMWare">
