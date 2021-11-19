@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+    
+<Rule Name="CosmosPropertyPage"
+      Description="Cosmos Project Property Page"
+      DisplayName="Cosmos"
+      PageTemplate="generic"
+      Order="500"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <Rule.DataSource>
+        <DataSource Persistence="ProjectFile"
+                  SourceOfDefaultValue="AfterContext"
+                  HasConfigurationCondition="False" />
+    </Rule.DataSource>
+
+    <StringProperty Name="MyProperty"
+                  DisplayName="My property"
+                  Description="A property that writes to the project file." />
+
+</Rule>

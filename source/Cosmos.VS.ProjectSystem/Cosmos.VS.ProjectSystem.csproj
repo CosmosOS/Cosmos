@@ -42,24 +42,19 @@
         <XamlPropertyRule Include="BuildSystem\Rules\LaunchConfiguration.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\PackageReference.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\ResolvedPackageReference.xaml" />
+        <XamlPropertyRule Include="BuildSystem\Rules\CosmosPropertyPage.xaml" />
     </ItemGroup>
 
     <ItemGroup>
-        <Page Include="ProjectSystem\VS\PropertyPages\**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
-        <Compile Update="ProjectSystem\VS\PropertyPages\**\*.xaml.cs" DependentUpon="%(Filename)" />
+        <None Update="BuildSystem\Rules\CosmosPropertyPage.xaml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Generator>MSBuild:Compile</Generator>
+        </None>
     </ItemGroup>
 
     <!--
         WinForms
     -->
-    <ItemGroup>
-        <Compile Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.Designer.cs">
-            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
-        </Compile>
-        <EmbeddedResource Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.resx">
-            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
-        </EmbeddedResource>
-    </ItemGroup>
     <ItemGroup>
         <Reference Include="Microsoft.VisualBasic" />
     </ItemGroup>
