@@ -44,6 +44,23 @@
         <EnumValue Name="Bin" DisplayName="Bin"/>
     </EnumProperty>
 
+    <BoolProperty Name="CompileVBEMultiboot"
+                  DisplayName="VBE Multiboot"
+                  Description="Compile Cosmos with VBE information specified in Multiboot structure."
+                  Category="Compile">
+    </BoolProperty>
+
+    <StringProperty Name="VBEResolution"
+                    DisplayName="VBE Resolution"
+                    Description="Example format: 800x600x32"
+                    Category="Compile">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "CompileVBEMultiboot" true)</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
     <BoolProperty Name="DebugEnabled"
                   DisplayName="Remote Debugging"
                   Description="Enable Cosmos Remote Debugger."
@@ -52,6 +69,11 @@
     <EnumProperty Name="VMWareEdition"
                   DisplayName="Edition"
                   Category="VMWare">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "VMware")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
         <EnumValue Name="Workstation"/>
         <EnumValue Name="Player"/>
     </EnumProperty>
@@ -59,7 +81,13 @@
     <BoolProperty Name="EnableGDB"
                   DisplayName="GDB Debugger"
                   Description="Use GDB Debugger."
-                  Category="VMWare"/>
+                  Category="VMWare">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "VMware")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
 
     <BoolProperty Name="StartCosmosGDB"
                   DisplayName="Cosmos GDB"
