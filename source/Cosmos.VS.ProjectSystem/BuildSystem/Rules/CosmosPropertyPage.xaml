@@ -4,7 +4,7 @@
       Description="Cosmos Project Property Page"
       DisplayName="Cosmos"
       PageTemplate="generic"
-      Order="500"
+      Order="1000"
       xmlns="http://schemas.microsoft.com/build/2009/properties">
 
     <Rule.DataSource>
@@ -13,8 +13,60 @@
                   HasConfigurationCondition="False" />
     </Rule.DataSource>
 
-    <StringProperty Name="MyProperty"
-                  DisplayName="My property"
-                  Description="A property that writes to the project file." />
+    <Rule.Categories>
+        <Category Name="Profile"
+              DisplayName="Profile"/>
+        <Category Name="Compile"
+              DisplayName="Compile" />
+        <Category Name="Debug"
+              DisplayName="Debug" />
+        <Category Name="VMWare"
+              DisplayName="VMWare" />
+    </Rule.Categories>
+
+    <EnumProperty Name="Profile"
+                  Category="Profile"
+                  Description="Choose which deployment profile you want to use.">
+        <EnumValue Name="ISO" DisplayName="ISO Image"/>
+        <EnumValue Name="USB" DisplayName="USB Bootable Drive"/>
+        <EnumValue Name="PXE" DisplayName="PXE Network Boot"/>
+        <EnumValue Name="VMware" DisplayName="VMware"/>
+        <EnumValue Name="Bochs" DisplayName="Bochs"/>
+        <EnumValue Name="Qemu" DisplayName="Qemu"/>
+        <EnumValue Name="IntelEdison" DisplayName="Intel Edison Serial boot"/>
+        <EnumValue Name="HyperV" DisplayName="Hyper-V"/>
+    </EnumProperty>
+
+    <EnumProperty Name="BinFormat"
+                  DisplayName="Binary Format"
+                  Category="Compile">
+        <EnumValue Name="Elf" DisplayName="Elf"/>
+        <EnumValue Name="Bin" DisplayName="Bin"/>
+    </EnumProperty>
+
+    <BoolProperty Name="DebugEnabled"
+                  DisplayName="Enable Remote Debugging"
+                  Category="Debug"/>
+
+    <EnumProperty Name="VMWareEdition"
+                  DisplayName="Edition"
+                  Category="VMWare">
+        <EnumValue Name="Workstation"/>
+        <EnumValue Name="Player"/>
+    </EnumProperty>
+
+    <BoolProperty Name="EnableGDB"
+                  DisplayName="Enable GDB Debugger"
+                  Category="VMWare"/>
+
+    <BoolProperty Name="StartCosmosGDB"
+                  DisplayName="Use Cosmos GDB Client"
+                  Category="VMWare">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "EnableGDB" true)</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
 
 </Rule>
