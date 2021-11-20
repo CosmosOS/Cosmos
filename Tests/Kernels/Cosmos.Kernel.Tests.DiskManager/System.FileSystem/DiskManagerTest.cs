@@ -5,6 +5,7 @@ using System;
 using Cosmos.System.FileSystem;
 using System.Collections.Generic;
 using Cosmos.System.FileSystem.Listing;
+using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.Kernel.Tests.DiskManager
 {
@@ -16,61 +17,58 @@ namespace Cosmos.Kernel.Tests.DiskManager
         public static void Execute(Debugger mDebugger)
         {
             string driveName = @"0:\";
-            var MyDrive = new System.FileSystem.DiskManager(driveName);
+            Disk ourDisk = null;
+            ManagedPartition ourPart = null;
+            foreach (var disk in VFSManager.GetDisks())
+            {
+                foreach (var part in disk.Partitions)
+                {
+                    mDebugger.Send("Drive: " + part.RootPath);
+                    if (part.RootPath == driveName)
+                    {
+                        ourDisk = disk;
+                        ourPart = part;
+                        break;
+                    }
+                }
+            }
+            if (ourDisk == null)
+            {
+                throw new Exception("Failed to find our drive.");
+            }
 
             mDebugger.Send("START TEST: Get Name");
 
-            Assert.IsTrue(MyDrive.Name == driveName, "DiskManager.Name failed drive has wrong name");
+            Assert.IsTrue(ourPart.RootPath == driveName, "ManagedPartition.RootPath failed drive has wrong name");
 
             mDebugger.Send("END TEST");
 
-            /* How to really test this? I fear the other tests relies on the fact that there are files on 0: */
+            //How to really test this? I fear the other tests relies on the fact that there are files on 0:
 
             mDebugger.Send("START TEST: Format");
 
-            try
-            {
-                MyDrive.Format("FAT16", aQuick: true);
-                Assert.Fail("Should not be able to format FAT16");
-            }
-            catch (Exception ex)
-            {
-                Assert.IsTrue(ex is NotImplementedException, "Not implemented FAT exception.");
-            }
-
-            try
-            {
-                MyDrive.Format("NTFS", aQuick: true);
-            }
-            catch (Exception ex)
-            {
-                Assert.IsTrue(ex is NotImplementedException, "Not implemented FileSystem exception.");
-            }
-
-            MyDrive.Format("FAT32", aQuick: true);
+            ourPart.Format("FAT32", true);
 
             mDebugger.Send("Format done testing HDD is really empty");
 
             var xDi = new DriveInfo(driveName);
 
-            /* If the drive is emptry all Space should be free */
-            Assert.AreEqual(xDi.TotalSize, xDi.TotalFreeSpace, $"DiskManager.Format (quick) failed TotalFreeSpace is not the same of TotalSize");
+            //If the drive is empty all Space should be free
+            Assert.IsTrue(xDi.TotalSize == xDi.TotalFreeSpace, "DiskManager.Format (quick) failed TotalFreeSpace is not the same of TotalSize");
 
-            /* Let's try to create a new file on the Root Directory */
+            //Let's try to create a new file on the Root Directory
             File.Create(@"0:\newFile.txt");
 
-            Assert.IsTrue(File.Exists(@"0:\newFile.txt"), "Failed to create new file after disk format");
+            Assert.IsTrue(File.Exists(@"0:\newFile.txt") == true, "Failed to create new file after disk format");
 
             mDebugger.Send("END TEST");
 
             mDebugger.Send("Testing if you can create directories");
 
             Directory.CreateDirectory(@"0:\SYS\");
-            Assert.AreEqual(Directory.GetDirectories(@"0:\SYS\").Length, 0, "Can create a directory and its content is emtpy");
+            Assert.IsTrue(Directory.GetDirectories(@"0:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
 
             mDebugger.Send("END TEST");
-
-            //while (true) ;
         }
     }
 }

@@ -1,43 +1,98 @@
-﻿//#define COSMOSDEBUG
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Debug.Kernel;
+using Cosmos.HAL.BlockDevice;
+using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
 {
-    /// <summary>
-    /// DiskManager class. Used to manage drives.
-    /// </summary>
-    public class DiskManager
+    public class ManagedPartition
     {
+        internal static Debugger PartitonDebugger = new Debugger("System", "Partiton");
+        public readonly Partition Host;
         /// <summary>
-        /// Get drive name.
+        /// The root path of the file system. Example: 0:\
         /// </summary>
-        public string Name {get; }
-
+        public string RootPath = "";
         /// <summary>
-        /// Create new instance of <see cref="DiskManager"/> class.
+        /// The FileSystem object. Null if not mounted.
         /// </summary>
-        /// <param name="aDriveName">A drive name assigned to the disk.</param>
-        /// <exception cref="ArgumentNullException">Thrown if aDriveName is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if aDriveName length is smaller then 2, or greater than Int32.MaxValue.</exception>
-        /// <exception cref="ArgumentException">Thrown if aDriveName is invalid drive identifier / not a root dir.</exception>
-        public DiskManager(string aDriveName)
+        public FileSystem MountedFS;
+        /// <summary>
+        /// Does the partition have a known file system?
+        /// </summary>
+        public bool HasFileSystem
         {
-            if (aDriveName == null)
+            get
             {
-                throw new ArgumentNullException(nameof(aDriveName));
+                return MountedFS != null;
+            }
+        }
+
+        public ManagedPartition(Partition host)
+        {
+            Host = host;
+        }
+        /// <summary>
+        /// Mounts the partition
+        /// </summary>
+        public void Mount()
+        {
+            //Don't remount
+            if (MountedFS != null)
+            {
+                return;
+            }
+            string xRootPath = String.Concat(VFSManager.GetNextFilesystemLetter(), VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
+            var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
+
+            foreach (var item in Disk.RegisteredFileSystemsTypes)
+            {
+                if (item.IsType(Host))
+                {
+                    MountedFS = item.Create(Host, xRootPath, xSize);
+                    RootPath = xRootPath;
+                    return;
+                }
             }
 
-            if (!VFSManager.IsValidDriveId(aDriveName))
+            PartitonDebugger.Send("Cannot find file system for partiton.");
+        }
+        /// <summary>
+        /// Mounts using a FileSystem factory.
+        /// </summary>
+        public void Mount(FileSystemFactory fact)
+        {
+            //Don't remount
+            if (MountedFS != null)
             {
-                throw new ArgumentException("Argument must be drive identifier or root dir");
+                return;
             }
+            string xRootPath = String.Concat(VFSManager.GetNextFilesystemLetter(), VFSBase.VolumeSeparatorChar.ToString(), VFSBase.DirectorySeparatorChar.ToString());
+            var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
-            Global.mFileSystemDebugger.SendInternal($"Creating DriskManager for drive {aDriveName}");
-
-            Name = aDriveName;
+            if (fact.IsType(Host))
+            {
+                MountedFS = fact.Create(Host, xRootPath, xSize);
+                RootPath = xRootPath;
+            }
+            else
+            {
+                throw new Exception("The disk filesystem does not match with the FileSystemFactory.");
+            }
+        }
+        /// <summary>
+        /// Zeros out the entire partition
+        /// </summary>
+        public void Clear()
+        {
+            for (ulong i = 0; i < Host.BlockCount; i++)
+            {
+                byte[] data = new byte[512];
+                Host.WriteBlock(i, 1, ref data);
+            }
         }
 
         /// <summary>
@@ -84,12 +139,17 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public void Format(string aDriveFormat, bool aQuick = true)
         {
-            if (aQuick == false)
-            {
-                throw new NotImplementedException("Slow format not implemented yet");
-            }
+            var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
-            VFSManager.Format(Name[0].ToString(), aDriveFormat, aQuick);
+            if (aDriveFormat.StartsWith("FAT"))
+            {
+                FatFileSystem.CreateFatFileSystem(Host, VFSManager.GetNextFilesystemLetter() + ":\\", xSize, aDriveFormat);
+                Mount();
+            }
+            else
+            {
+                throw new NotImplementedException(aDriveFormat + " formatting not supported.");
+            }
         }
 
         /// <summary>
@@ -117,34 +177,6 @@ namespace Cosmos.System.FileSystem
              * 2. Update 'Name' to be 'aNewName'
              */
             throw new NotImplementedException("ChangeDriveLetter");
-        }
-
-        /// <summary>
-        /// Create Partition.
-        /// </summary>
-        /// <param name="start">Start.</param>
-        /// <param name="end">End.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if start / end is smaller then 0.</exception>
-        /// <exception cref="ArgumentException">Thrown if end is smaller or equal to start.</exception>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
-        public void CreatePartion(long start, long end)
-        {
-            if (start < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(start));
-            }
-
-            if (end < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(start));
-            }
-
-            if (end <= start)
-            {
-                throw new ArgumentException("end is <= start");
-            }
-
-            throw new NotImplementedException("CreatePartion");
         }
     }
 }

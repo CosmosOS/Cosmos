@@ -13,7 +13,6 @@ namespace Cosmos.System.Tests
 {
     class VFSManagerTest
     {
-
         [SetUp]
         public void Setup()
         {
@@ -36,6 +35,14 @@ namespace Cosmos.System.Tests
         [Test]
         public void Test_Disk_Manager()
         {
+            var disks = VFSManager.GetDisks();
+            Assert.IsTrue(disks.Count != 0);
+            foreach (var item in disks)
+            {
+                Assert.IsTrue(item.Size != 0);
+                Assert.IsTrue(item.Partitions.Count != 0);
+            }
+
             const string root = @"C:\";
             long initialSize = VFSManager.GetTotalSize(root);
             VFSManager.Format("C", "FAT32", true);

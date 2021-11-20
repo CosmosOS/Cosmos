@@ -1,5 +1,6 @@
 ﻿//#define COSMOSDEBUG
 using System;
+using System.Collections.Generic;
 
 namespace Cosmos.HAL.BlockDevice
 {
@@ -11,11 +12,12 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Hosting device.
         /// </summary>
-        private readonly BlockDevice mHost;
+        public readonly BlockDevice Host;
         /// <summary>
         /// Starting sector.
         /// </summary>
-        private readonly ulong mStartingSector;
+        public readonly ulong StartingSector;
+        public static List<Partition> Partitions = new List<Partition>();
 
         /// <summary>
         /// Create new instance of the <see cref="Partition"/> class.
@@ -23,12 +25,12 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aHost">A hosting device.</param>
         /// <param name="aStartingSector">A starting sector.</param>
         /// <param name="aSectorCount">A sector count.</param>
-        public Partition(BlockDevice aHost, ulong aStartingSector, ulong aSectorCount)
+        public Partition(BlockDevice aHost, ulong StartingSector, ulong SectorCount)
         {
-            mHost = aHost;
-            mStartingSector = aStartingSector;
-            mBlockCount = aSectorCount;
-            mBlockSize = aHost.BlockSize;
+            Host = aHost;
+            this.StartingSector = StartingSector;
+            mBlockCount = SectorCount;
+            mBlockSize = Host.BlockSize;
         }
 
         /// <summary>
@@ -45,9 +47,9 @@ namespace Cosmos.HAL.BlockDevice
             Global.mDebugger.SendInternal($"aBlockNo = {aBlockNo}");
             Global.mDebugger.SendInternal($"aBlockCount = {aBlockCount}");
             CheckDataSize(aData, aBlockCount);
-            ulong xHostBlockNo = mStartingSector + aBlockNo;
+            ulong xHostBlockNo = StartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
-            mHost.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
+            Host.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
             Global.mDebugger.SendInternal("Returning -- Partition.ReadBlock --");
         }
 
@@ -62,9 +64,9 @@ namespace Cosmos.HAL.BlockDevice
         public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             CheckDataSize(aData, aBlockCount);
-            ulong xHostBlockNo = mStartingSector + aBlockNo;
+            ulong xHostBlockNo = StartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
-            mHost.WriteBlock(xHostBlockNo, aBlockCount, ref aData);
+            Host.WriteBlock(xHostBlockNo, aBlockCount, ref aData);
         }
 
         /// <summary>
