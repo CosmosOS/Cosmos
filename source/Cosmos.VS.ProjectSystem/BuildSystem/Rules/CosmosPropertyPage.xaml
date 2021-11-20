@@ -326,11 +326,34 @@
 
     <StringProperty Name="QemuCustomParameters"
                     DisplayName="Custom Parameters"
-                    Description="See https://www.qemu.org/docs/master/system/invocation.html."
+                    Description="Use Custom Parameters for Qemu launch."
                     Category="Qemu">
         <StringProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu") (has-evaluated-value "CosmosPropertyPage" "QemuUseCustomParameters" true))</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
+    <StringProperty Name="QemuCustomParametersInfo"
+                    DisplayName="Qemu Documentation for custom parameters."
+                    Category="Qemu">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuCustomParametersInfo"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="LinkAction">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Action" Value="URL" />
+                    <NameValuePair Name="URL" Value="https://www.qemu.org/docs/master/system/invocation.html" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
