@@ -152,19 +152,16 @@
         <EnumValue Name="MethodFooters" DisplayName="Method Footers"/>
     </EnumProperty>
 
-    <EnumProperty Name="CosmosDebugPort"
-                  DisplayName="Cosmos debug port:"
-                  Category="Debug">
-        <EnumProperty.Metadata>
+    <StringProperty Name="CosmosDebugPort"
+                    DisplayName="Cosmos debug port:"
+                    Description="Example format: Serial: COM1"
+                    Category="Debug">
+        <StringProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
                 <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
             </NameValuePair>
-        </EnumProperty.Metadata>
-        <EnumValue Name="Serial: COM1"/>
-        <EnumValue Name="Serial: COM2"/>
-        <EnumValue Name="Serial: COM3"/>
-        <EnumValue Name="Serial: COM4"/>
-    </EnumProperty>
+        </StringProperty.Metadata>
+    </StringProperty>
 
     <EnumProperty Name="VMWareEdition"
                   DisplayName="Edition"
