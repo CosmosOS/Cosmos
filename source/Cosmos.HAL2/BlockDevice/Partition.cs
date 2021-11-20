@@ -18,7 +18,7 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
         public readonly ulong StartingSector;
         public static List<Partition> Partitions = new List<Partition>();
-
+        public override BlockDeviceType Type { get { return Host.Type; } }
         /// <summary>
         /// Create new instance of the <see cref="Partition"/> class.
         /// </summary>

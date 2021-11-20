@@ -8,7 +8,8 @@ namespace Cosmos.HAL.BlockDevice
     {
         private static PCIDevice xDevice = HAL.PCI.GetDeviceClass(HAL.ClassID.MassStorageController,
                                                                   HAL.SubclassID.IDEInterface);
-
+        private static List<BlockDevice> ATAPIDevices = new List<BlockDevice>();
+        private static List<Partition> ATAPIPartitions = new List<Partition>();
         internal static void InitDriver()
         {
             if (xDevice != null)
@@ -21,6 +22,16 @@ namespace Cosmos.HAL.BlockDevice
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
                 Console.WriteLine("ATA Secondary Slave");
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
+            }
+
+            //Add the ATAPI devices
+            foreach (var item in ATAPIDevices)
+            {
+                BlockDevice.Devices.Add(item);
+            }
+            foreach (var item in ATAPIPartitions)
+            {
+                Partition.Partitions.Add(item);
             }
         }
         private static void Initialize(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
@@ -42,7 +53,8 @@ namespace Cosmos.HAL.BlockDevice
 
                 //TODO: Replace 1000000 with proper size once ATAPI driver implements it
                 //Add the atapi device to an array so we reorder them to be last
-                Partition.Partitions.Add(new Partition(atapi, 0, 1000000));
+                ATAPIDevices.Add(atapi);
+                ATAPIPartitions.Add(new Partition(atapi, 0, 1000000));
                 Ata.AtaDebugger.Send("ATA device with speclevel ATAPI found");
                 return;
             }

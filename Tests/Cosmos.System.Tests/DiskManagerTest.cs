@@ -15,20 +15,27 @@ namespace Cosmos.System.Tests
 {
     public class DiskManagerTest
     {
-        /// <summary>
-        /// Tests DiskManager.
-        /// </summary>
-        public static void Execute(Debugger mDebugger)
+        static ManagedPartition ourPart;
+        static Disk ourDisk;
+        [SetUp]
+        public void Setup()
         {
-            string driveName = @"0:\";
-            Disk ourDisk = null;
-            ManagedPartition ourPart = null;
+            DebuggerFactory.WriteToConsole = true;
+            var xDevice = new TestBlockDevice();
+            var xPartition = new Partition(xDevice, 0, xDevice.BlockCount);
+            BlockDevice.Devices.Clear();
+            Partition.Partitions.Clear();
+
+            BlockDevice.Devices.Add(xDevice);
+            Partition.Partitions.Add(xPartition);
+            CosmosVFS cosmosVFS = new CosmosVFS();
+            VFSManager.RegisterVFS(cosmosVFS, true, true);
+
             foreach (var disk in VFSManager.GetDisks())
             {
                 foreach (var part in disk.Partitions)
                 {
-                    mDebugger.Send("Drive: " + part.RootPath);
-                    if (part.RootPath == driveName)
+                    if (part.RootPath == @"0:\")
                     {
                         ourDisk = disk;
                         ourPart = part;
@@ -38,22 +45,24 @@ namespace Cosmos.System.Tests
             }
             if (ourDisk == null)
             {
-                throw new Exception("Failed to find our drive.");
+                throw new Exception("Failed to find our disk.");
             }
+        }
 
-            mDebugger.Send("START TEST: Get Name");
+        [TearDown]
+        public void CleanUp()
+        {
+            VFSManager.Reset();
+        }
+
+        [Test]
+        public void Execute()
+        {
+            string driveName = @"0:\";
 
             Assert.IsTrue(ourPart.RootPath == driveName, "ManagedPartition.RootPath failed drive has wrong name");
 
-            mDebugger.Send("END TEST");
-
-            //How to really test this? I fear the other tests relies on the fact that there are files on 0:
-
-            mDebugger.Send("START TEST: Format");
-
-            ourPart.Format("FAT32", true);
-
-            mDebugger.Send("Format done testing HDD is really empty");
+            ourDisk.FormatPartition(0, "FAT32", true);
 
             var xDi = new DriveInfo(driveName);
 
@@ -65,14 +74,9 @@ namespace Cosmos.System.Tests
 
             Assert.IsTrue(File.Exists(@"0:\newFile.txt") == true, "Failed to create new file after disk format");
 
-            mDebugger.Send("END TEST");
-
-            mDebugger.Send("Testing if you can create directories");
-
             Directory.CreateDirectory(@"0:\SYS\");
-            Assert.IsTrue(Directory.GetDirectories(@"0:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
 
-            mDebugger.Send("END TEST");
+            Assert.IsTrue(Directory.GetDirectories(@"0:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
         }
     }
 }

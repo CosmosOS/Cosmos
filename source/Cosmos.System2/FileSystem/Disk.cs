@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
@@ -11,9 +12,7 @@ namespace Cosmos.System.FileSystem
     {
         private List<ManagedPartition> parts = new List<ManagedPartition>();
         private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>();
-        private bool isMBR;
-
-        public bool IsMBR { get { return isMBR; } }
+        public bool IsMBR { get { return !GPT.IsGPTPartition(Host); } }
         /// <summary>
         /// The size of the disk in MB.
         /// </summary>
@@ -29,17 +28,35 @@ namespace Cosmos.System.FileSystem
                 if (GPT.IsGPTPartition(Host))
                 {
                     var gpt = new GPT(Host);
+                    int i = 0;
                     foreach (var item in gpt.Partitions)
                     {
-                        converted.Add(new ManagedPartition(new Partition(Host, item.StartSector, item.SectorCount)));
+                        var part = new ManagedPartition(new Partition(Host, item.StartSector, item.SectorCount));
+                        if (MountedPartitions[i] != null)
+                        {
+                            var data = MountedPartitions[i];
+                            part.RootPath = data.RootPath;
+                            part.MountedFS = data;
+                        }
+                        converted.Add(part);
+                        i++;
                     }
                 }
                 else
                 {
                     var mbr = new MBR(Host);
+                    int i = 0;
                     foreach (var item in mbr.Partitions)
                     {
-                        converted.Add(new ManagedPartition(new Partition(Host, item.StartSector, item.SectorCount)));
+                        var part = new ManagedPartition(new Partition(Host, item.StartSector, item.SectorCount));
+                        if (MountedPartitions[i] != null)
+                        {
+                            var data = MountedPartitions[i];
+                            part.RootPath = data.RootPath;
+                            part.MountedFS = data;
+                        }
+                        converted.Add(part);
+                        i++;
                     }
                 }
 
@@ -54,6 +71,7 @@ namespace Cosmos.System.FileSystem
         /// Main blockdevice that has all of the partitions.
         /// </summary>
         public BlockDevice Host;
+        public BlockDeviceType Type { get { return Host.Type; } }
         public Disk(BlockDevice mainBlockDevice)
         {
             Host = mainBlockDevice;
@@ -71,16 +89,13 @@ namespace Cosmos.System.FileSystem
             Size = (int)(mainBlockDevice.BlockCount * mainBlockDevice.BlockSize / 1024 / 1024);
         }
         /// <summary>
-        /// Mounts the disk.
+        /// Mounts all of the partitions in the disk
         /// </summary>
         public void Mount()
         {
-            foreach (var part in Partitions)
+            for (int i = 0; i < Partitions.Count; i++)
             {
-                if (part != null)
-                {
-                    part.Mount();
-                }
+                MountPartition(i);
             }
         }
         /// <summary>
@@ -221,8 +236,61 @@ namespace Cosmos.System.FileSystem
             {
                 throw new Exception("Removing all partitions with GPT style not yet supported!");
             }
+        }
 
-            
+        public void FormatPartition(int index, string format, bool quick = true)
+        {
+            var part = Partitions[index];
+
+            var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
+
+            if (format.StartsWith("FAT"))
+            {
+                FatFileSystem.CreateFatFileSystem(part.Host, VFSManager.GetNextFilesystemLetter() + ":\\", xSize, format);
+                Mount();
+            }
+            else
+            {
+                throw new NotImplementedException(format + " formatting not supported.");
+            }
+        }
+
+        private FileSystem[] MountedPartitions = new FileSystem[4];
+        /// <summary>
+        /// Mounts a partition
+        /// </summary>
+        /// <param name="index">Partiton index</param>
+        public void MountPartition(int index)
+        {
+            var part = Partitions[index];
+            //Don't remount
+            if (MountedPartitions[index] != null)
+            {
+                //We already mounted this partiton
+                return;
+            }
+            string xRootPath = String.Concat(VFSManager.GetNextFilesystemLetter(), VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
+            var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
+
+            foreach (var item in Disk.RegisteredFileSystemsTypes)
+            {
+                if (item.IsType(part.Host))
+                {
+                    Kernel.PrintDebug("Mounted partition.");
+
+                    //We would have done Partitions[i].MountedFS = item.Create(...), but since the array is not cached, we need to store the mounted partitions in a list
+                    MountedPartitions[index] = item.Create(part.Host, xRootPath, xSize);
+                    return;
+                }
+            }
+            Kernel.PrintDebug("Cannot find file system for partiton.");
+        }
+
+        private class MountedPartInfo
+        {
+            public FileSystem MountedFS;
+            public string RootPath;
+
         }
     }
 }

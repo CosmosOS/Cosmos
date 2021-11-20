@@ -62,6 +62,7 @@ namespace Cosmos.System.FileSystem
         {
             foreach (var disk in Disks)
             {
+                Kernel.PrintDebug("Mounting disk");
                 disk.Mount();
             }
         }
@@ -184,7 +185,7 @@ namespace Cosmos.System.FileSystem
 
             if (aPath == null)
             {
-                throw new ArgumentNullException(nameof(aPath));
+                throw new ArgumentNullException("path is: "+nameof(aPath));
             }
 
             if (aPath.Length == 0)
