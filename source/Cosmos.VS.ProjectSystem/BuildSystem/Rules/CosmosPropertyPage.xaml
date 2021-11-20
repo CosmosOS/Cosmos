@@ -22,6 +22,8 @@
               DisplayName="Debug" />
         <Category Name="VMWare"
               DisplayName="VMWare" />
+        <Category Name="Bochs"
+              DisplayName="Bochs" />
     </Rule.Categories>
 
     <EnumProperty Name="Profile"
@@ -193,6 +195,28 @@
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
                 <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "EnableGDB" true)</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="EnableBochsDebug"
+                  DisplayName="Bochs Debugger"
+                  Description="Enable Bochs Debugger."
+                  Category="Bochs">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Bochs")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="StartBochsDebugGui"
+                  DisplayName="Bochs Debugger GUI"
+                  Description="Use Bochs Debugger GUI."
+                  Category="Bochs">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Profile" "Bochs") (has-evaluated-value "CosmosPropertyPage" "EnableBochsDebug" true))</NameValuePair.Value>
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
