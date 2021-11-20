@@ -24,6 +24,8 @@
               DisplayName="VMWare" />
         <Category Name="Bochs"
               DisplayName="Bochs" />
+        <Category Name="Qemu"
+              DisplayName="Qemu" />
     </Rule.Categories>
 
     <EnumProperty Name="Profile"
@@ -220,5 +222,116 @@
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
+
+    <EnumProperty Name="QemuNetworkDevice"
+                  DisplayName="Network Device"
+                  Category="Qemu">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="None"/>
+        <EnumValue Name="RTL8139"/>
+        <EnumValue Name="E1000"/>
+    </EnumProperty>
+
+    <BoolProperty Name="QemuUSBKeyboard"
+                  DisplayName="USB Keyboard"
+                  Description="Use Qemu USB Keyboard."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="QemuUSBMouse"
+                  DisplayName="USB Mouse"
+                  Description="Use Qemu USB Mouse."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <EnumProperty Name="QemuVideoDriver"
+                  DisplayName="Video Driver"
+                  Category="Qemu">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="None"/>
+        <EnumValue Name="VBE"/>
+        <EnumValue Name="VGA"/>
+    </EnumProperty>
+
+    <EnumProperty Name="QemuAudioDriver"
+                  DisplayName="Video Driver"
+                  Category="Qemu">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="None"/>
+        <EnumValue Name="SoundBlaster16"/>
+    </EnumProperty>
+
+    <BoolProperty Name="QemuUseSerial"
+                  DisplayName="Serial"
+                  Description="Use Qemu Serial."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="QemuUseCustomParameters"
+                  DisplayName="Custom Parameters"
+                  Description="Use Custom Parameters for Qemu launch."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <StringProperty Name="QemuCustomParameters"
+                    DisplayName="Custom Parameters"
+                    Description="See https://www.qemu.org/docs/master/system/invocation.html."
+                    Category="Qemu">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu") (has-evaluated-value "CosmosPropertyPage" "QemuUseCustomParameters" true))</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
+    <StringProperty Name="QemuDescription"
+                  DisplayName="Ignored"
+                  Description="Please note that options in this category are not all implemented in Cosmos and are here for Driver development purposes!">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuDescription"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="Description" />
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
 
 </Rule>
