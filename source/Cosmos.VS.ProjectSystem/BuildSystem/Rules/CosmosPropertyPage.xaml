@@ -223,6 +223,25 @@
         </BoolProperty.Metadata>
     </BoolProperty>
 
+    <StringProperty Name="QemuDescription"
+                    DisplayName="Ignored"
+                    Description="Please note that options in this category are not all implemented in Cosmos and are here for Driver development purposes!"
+                    Category="Qemu">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuDescription"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="Description" />
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
     <EnumProperty Name="QemuNetworkDevice"
                   DisplayName="Network Device"
                   Category="Qemu">
@@ -312,24 +331,6 @@
         <StringProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
                 <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu") (has-evaluated-value "CosmosPropertyPage" "QemuUseCustomParameters" true))</NameValuePair.Value>
-            </NameValuePair>
-        </StringProperty.Metadata>
-    </StringProperty>
-
-    <StringProperty Name="QemuDescription"
-                  DisplayName="Ignored"
-                  Description="Please note that options in this category are not all implemented in Cosmos and are here for Driver development purposes!">
-        <StringProperty.DataSource>
-            <DataSource PersistedName="QemuDescription"
-                  Persistence="ProjectFileWithInterception"
-                  HasConfigurationCondition="False" />
-        </StringProperty.DataSource>
-        <StringProperty.ValueEditors>
-            <ValueEditor EditorType="Description" />
-        </StringProperty.ValueEditors>
-        <StringProperty.Metadata>
-            <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
