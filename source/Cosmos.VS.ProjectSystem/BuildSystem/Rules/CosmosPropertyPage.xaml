@@ -28,7 +28,7 @@
               DisplayName="Qemu" />
     </Rule.Categories>
 
-    <EnumProperty Name="Profile"
+    <EnumProperty Name="Launch"
                   Category="Profile"
                   Description="Choose which deployment profile you want to use.">
         <EnumValue Name="ISO" DisplayName="ISO Image"/>
