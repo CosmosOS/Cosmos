@@ -17,17 +17,13 @@
         <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
         <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
         <ExtensionInstallationFolder>Cosmos\ProjectSystem</ExtensionInstallationFolder>
-    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Remove="ProjectTemplates\**" />
         <Content Include="ProjectTemplates\**" IncludeInVSIX="True" />
         <Content Include="Resources\Icon.png" IncludeInVSIX="True" />
-        <Content Include="CosmosImages.imagemanifest" IncludeInVSIX="True" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Resource Include="Resources\CosmosProjectRootIcon.png" />
     </ItemGroup>
 
@@ -47,6 +43,10 @@
 
     <ItemGroup>
         <None Update="BuildSystem\Rules\CosmosPropertyPage.xaml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Generator>MSBuild:Compile</Generator>
+        </None>
+        <None Update="CosmosImages.imagemanifest">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Generator>MSBuild:Compile</Generator>
         </None>
