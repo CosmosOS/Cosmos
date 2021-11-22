@@ -172,7 +172,7 @@
                   Category="VMWare">
         <EnumProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "VMware")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "VMware")</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
         <EnumValue Name="Workstation"/>
@@ -185,7 +185,7 @@
                   Category="VMWare">
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "VMware")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "VMware")</NameValuePair.Value>
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
@@ -207,7 +207,7 @@
                   Category="Bochs">
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Bochs")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Bochs")</NameValuePair.Value>
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
@@ -218,7 +218,7 @@
                   Category="Bochs">
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Profile" "Bochs") (has-evaluated-value "CosmosPropertyPage" "EnableBochsDebug" true))</NameValuePair.Value>
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Launch" "Bochs") (has-evaluated-value "CosmosPropertyPage" "EnableBochsDebug" true))</NameValuePair.Value>
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
@@ -237,7 +237,7 @@
         </StringProperty.ValueEditors>
         <StringProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
@@ -247,7 +247,7 @@
                   Category="Qemu">
         <EnumProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
         <EnumValue Name="None"/>
@@ -261,7 +261,7 @@
                   Category="Qemu">
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
@@ -272,7 +272,7 @@
                   Category="Qemu">
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
@@ -282,7 +282,7 @@
                   Category="Qemu">
         <EnumProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
         <EnumValue Name="None"/>
@@ -295,7 +295,7 @@
                   Category="Qemu">
         <EnumProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
         <EnumValue Name="None"/>
@@ -308,7 +308,7 @@
                   Category="Qemu">
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
@@ -319,7 +319,7 @@
                   Category="Qemu">
         <BoolProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
@@ -330,7 +330,7 @@
                     Category="Qemu">
         <StringProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
@@ -353,7 +353,7 @@
         </StringProperty.ValueEditors>
         <StringProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Profile" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
