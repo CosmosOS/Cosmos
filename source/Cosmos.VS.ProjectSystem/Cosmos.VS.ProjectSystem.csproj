@@ -24,7 +24,11 @@
         <Compile Remove="ProjectTemplates\**" />
         <Content Include="ProjectTemplates\**" IncludeInVSIX="True" />
         <Content Include="Resources\Icon.png" IncludeInVSIX="True" />
-        <Content Include="Resources\CosmosProjectRootIcon.png" IncludeInVSIX="True" />
+        <Content Include="CosmosImages.imagemanifest" IncludeInVSIX="True" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Resource Include="Resources\CosmosProjectRootIcon.png" IncludeInVSIX="True" />
     </ItemGroup>
 
     <ItemGroup>
