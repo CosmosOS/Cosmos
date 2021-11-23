@@ -63,8 +63,8 @@
                    Height="5"
                    />
         <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto" Height="400" VerticalAlignment="Top" Margin="0,5,0,0">
-            <ItemsControl ItemsSource="{Binding Sections}" Height="406">
+                      VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,5,0,0">
+            <ItemsControl ItemsSource="{Binding Sections}" HorizontalAlignment="Stretch">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <HeaderedContentControl>
