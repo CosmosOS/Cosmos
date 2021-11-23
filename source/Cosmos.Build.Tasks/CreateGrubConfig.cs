@@ -28,16 +28,8 @@ namespace Cosmos.Build.Tasks
 
             using (var xWriter = File.CreateText(Path.Combine(TargetDirectory + "/boot/grub/", "grub.cfg")))
             {
-                xWriter.WriteLine("insmod vbe");
-                xWriter.WriteLine("insmod vga");
-                xWriter.WriteLine("insmod video_bochs");
-                xWriter.WriteLine("insmod video_cirrus");
-                xWriter.WriteLine("set root='(hd0,msdos1)'");
-                xWriter.WriteLine();
                 xWriter.WriteLine("menuentry '" + xLabelName + "' {");
-                WriteIndentedLine(xWriter, "multiboot /boot/" + xBinName + " vid=preset,1024,768 hdd=0");
-                WriteIndentedLine(xWriter, "set gfxpayload=800x600x32");
-                WriteIndentedLine(xWriter, "boot");
+                WriteIndentedLine(xWriter, "multiboot /boot/" + xBinName);
                 xWriter.WriteLine("}");
             }
 
