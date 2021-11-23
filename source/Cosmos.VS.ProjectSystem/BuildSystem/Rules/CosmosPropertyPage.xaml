@@ -65,6 +65,19 @@
         </StringProperty.Metadata>
     </StringProperty>
 
+    <StringProperty Name="AddFilesToISO"
+                    DisplayName="Add files to ISO."
+                    Category="Compile">
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="LinkAction">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Action" Value="Command" />
+                    <NameValuePair Name="Command" Value="AddFilesISO" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+    </StringProperty>
+
     <BoolProperty Name="DebugEnabled"
                   DisplayName="Remote Debugging"
                   Description="Enable Cosmos Remote Debugger."
