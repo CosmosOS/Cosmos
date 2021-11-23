@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -36,12 +37,12 @@ namespace Cosmos.VS.Windows
             butnStepInto.Click += new RoutedEventHandler(butnStepInto_Click);
             butnStepMode.Click += new RoutedEventHandler(butnStepMode_Click);
 
-            Update(null, mData);
+            _ = UpdateAsync(null, mData);
         }
 
         void butnStepMode_Click(object sender, RoutedEventArgs e)
         {
-            if(butnStepMode.BorderBrush == Brushes.Black)
+            if (butnStepMode.BorderBrush == Brushes.Black)
             {
                 butnStepMode.BorderBrush = Brushes.LightBlue;
                 Global.PipeUp.SendCommand(Windows2Debugger.SetStepModeSource);
@@ -348,11 +349,11 @@ namespace Cosmos.VS.Windows
                 var asmLine = mRunsToLines[xRun];
                 if (Package != null)
                 {
-                    if(Package.StateStorer.ContainsStatesForLine(GetLineId((AsmCode)asmLine)))
+                    if (Package.StateStorer.ContainsStatesForLine(GetLineId((AsmCode)asmLine)))
                     {
                         Package.StoreAllStates();
                         Package.StateStorer.CurrLineId = GetLineId((AsmCode)asmLine);
-                        Package.RestoreAllStates();
+                        Package.JoinableTaskFactory.Run(async delegate { await Package.RestoreAllStatesAsync(); });
                     }
                 }
             }
@@ -597,53 +598,49 @@ namespace Cosmos.VS.Windows
             //File.AppendAllText(@"c:\data\sources\AssemblyUC.log", DateTime.Now.ToString("HH:mm:ss.ffffff: ") + String.Format(message, args) + Environment.NewLine);
         }
 
-        protected override void DoUpdate(string aTag)
+        protected override async Task DoUpdateAsync(string aTag)
         {
             Log("DoUpdate");
             mLines.Clear();
 
-            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
+            await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
+            if (mData.Length == 0)
+            {
+                Display(false);
+            }
+            else
+            {
+                // Used for creating a test file for Cosmos.VS.Windows.Test
+                /*if (false)
                 {
-                    if (mData.Length == 0)
-                    {
-                        Display(false);
-                    }
-                    else
-                    {
-                        // Used for creating a test file for Cosmos.VS.Windows.Test
-                        /*if (false)
-                        {
-                            System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
-                        }/**/
-                    }
-                    Log("DoUpdate - Parse input");
-                    Parse();
-                    Log("DoUpdate - Done");
-                    if (mParams != null && mParams.Length > 0 && mParams[0] == "NoDisplay")
-                    {
-                        //Don't call display
-                    }
-                    else
-                    {
-                        Log("DoUpdate - Displaying");
-                        Display(mFilter);
-                        Log("DoUpdate - Done");
-                    }
+                    System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+                }/**/
+            }
+            Log("DoUpdate - Parse input");
+            Parse();
+            Log("DoUpdate - Done");
+            if (mParams != null && mParams.Length > 0 && mParams[0] == "NoDisplay")
+            {
+                //Don't call display
+            }
+            else
+            {
+                Log("DoUpdate - Displaying");
+                Display(mFilter);
+                Log("DoUpdate - Done");
+            }
 
-                    if (mParams != null && mParams.Length > 1)
-                    {
-                        if (mParams[1] == "AsmStepMode")
-                        {
-                            butnStepMode.BorderBrush = Brushes.LightBlue;
-                        }
-                        else
-                        {
-                            butnStepMode.BorderBrush = Brushes.Black;
-                        }
-                    }
+            if (mParams != null && mParams.Length > 1)
+            {
+                if (mParams[1] == "AsmStepMode")
+                {
+                    butnStepMode.BorderBrush = Brushes.LightBlue;
                 }
-            );
+                else
+                {
+                    butnStepMode.BorderBrush = Brushes.Black;
+                }
+            }
         }
     }
 }
