@@ -16,7 +16,7 @@ namespace Cosmos.VS.ProjectSystem
             if (propertyValues.Flags.Contains(ProjectTreeFlags.Common.ProjectRoot))
             {
                 //propertyValues.Icon = CosmosImagesMonikers.ProjectRootIcon.ToProjectSystemType();
-                propertyValues.Icon = KnownMonikers.StatusOK.ToProjectSystemType();
+                propertyValues.Icon = KnownMonikers.FeedbackSmile.ToProjectSystemType();
             }
         }
     }
