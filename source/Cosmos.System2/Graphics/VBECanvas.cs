@@ -336,7 +336,6 @@ namespace Cosmos.System.Graphics
         /// <param name="aHeight">Height.</param>
         public override void DrawFilledRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
         {
-            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
             //no body knows how any why but we must divide aWidth by 32, not by 8, because otherwise everything would end up 4 times the width
             aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
 
