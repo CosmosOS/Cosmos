@@ -336,13 +336,13 @@ namespace Cosmos.System.Graphics
         /// <param name="aHeight">Height.</param>
         public override void DrawFilledRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
         {
-            int xOffset = GetPointOffset(aX, aY);
             int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
-            aWidth *= (int)Mode.ColorDepth / 8;
+            //no body knows how any why but we must divide aWidth by 32, not by 8, because otherwise everything would end up 4 times the width
+            aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
 
-            for (int i = 0; i < aHeight; i++)
+            for (int i = aY; i < aHeight; i++)
             {
-                _VBEDriver.ClearVRAM((i * xScreenWidthInPixel) + xOffset, aWidth, aPen.Color.ToArgb());
+                _VBEDriver.ClearVRAM(GetPointOffset(aX, i), aWidth, aPen.Color.ToArgb());
             }
         }
 
