@@ -14,7 +14,7 @@ namespace Cosmos.System.FileSystem
         private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>();
         public bool IsMBR { get { return !GPT.IsGPTPartition(Host); } }
         /// <summary>
-        /// The size of the disk in MB.
+        /// The size of the disk in bytes.
         /// </summary>
         public int Size { get; }
         /// <summary>
@@ -86,7 +86,7 @@ namespace Cosmos.System.FileSystem
                     parts.Add(new ManagedPartition(part));
                 }
             }
-            Size = (int)(mainBlockDevice.BlockCount * mainBlockDevice.BlockSize / 1024 / 1024);
+            Size = (int)(mainBlockDevice.BlockCount * mainBlockDevice.BlockSize);
         }
         /// <summary>
         /// Mounts all of the partitions in the disk
@@ -235,6 +235,10 @@ namespace Cosmos.System.FileSystem
             if (GPT.IsGPTPartition(Host))
             {
                 throw new Exception("Removing all partitions with GPT style not yet supported!");
+            }
+            for (int i = 0; i < Partitions.Count; i++)
+            {
+                DeletePartition(i);
             }
         }
 

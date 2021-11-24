@@ -74,7 +74,6 @@ namespace Cosmos.HAL.BlockDevice
                 foreach (var part in xGPT.Partitions)
                 {
                     Partition.Partitions.Add(new Partition(device, part.StartSector, part.SectorCount));
-                    Console.WriteLine("Found partition at idx: " + i);
                     i++;
                 }
             }
@@ -100,7 +99,6 @@ namespace Cosmos.HAL.BlockDevice
                 foreach (var part in mbr.Partitions)
                 {
                     Partition.Partitions.Add(new Partition(device, part.StartSector, part.SectorCount));
-                    Console.WriteLine("Found partition at idx: " + c);
                     c++;
                 }
             }

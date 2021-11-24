@@ -46,6 +46,8 @@ namespace Cosmos.System.FileSystem
                 byte[] data = new byte[512];
                 Host.WriteBlock(i, 1, ref data);
             }
+            MountedFS = null;
+            RootPath = "";
         }
     }
 }

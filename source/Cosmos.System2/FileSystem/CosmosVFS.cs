@@ -185,7 +185,7 @@ namespace Cosmos.System.FileSystem
 
             if (aPath == null)
             {
-                throw new ArgumentNullException("path is: "+nameof(aPath));
+                throw new ArgumentNullException(nameof(aPath));
             }
 
             if (aPath.Length == 0)
