@@ -336,10 +336,10 @@ namespace Cosmos.System.Graphics
         /// <param name="aHeight">Height.</param>
         public override void DrawFilledRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
         {
-            //no body knows how any why but we must divide aWidth by 32, not by 8, because otherwise everything would end up 4 times the width
+            //ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
             aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
 
-            for (int i = aY; i < aHeight; i++)
+            for (int i = aY; i < aY + aHeight; i++)
             {
                 _VBEDriver.ClearVRAM(GetPointOffset(aX, i), aWidth, aPen.Color.ToArgb());
             }
