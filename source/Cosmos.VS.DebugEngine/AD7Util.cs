@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
 using VSUtilities = Cosmos.VS.DebugEngine.Utilities.VS;
 
 namespace Cosmos.VS.DebugEngine
