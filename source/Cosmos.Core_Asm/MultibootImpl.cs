@@ -9,7 +9,7 @@ namespace Cosmos.Core_Asm
     public class Multiboot2Impl
     {
         [PlugMethod(Assembler = typeof(Multiboot2ImplAsm))]
-        public uint GetMBIAddress()
+        public static uint GetMBIAddress()
         {
             return 0;
         }
