@@ -15,6 +15,7 @@ namespace Cosmos.Core
         /// PIC interrupt.
         /// </summary>
         static public PIC PIC;
+
         // Has to be static for now, ZeroFill gets called before the Init.
         /// <summary>
         /// CPU.
@@ -22,18 +23,9 @@ namespace Cosmos.Core
         static public readonly CPU CPU = new CPU();
 
         /// <summary>
-        /// Multiboot header pointer.
+        /// Multiboot.
         /// </summary>
-        public static Multiboot.Header* MultibootHeader;
-
-        /// <summary>
-        /// VBE mode info pointer.
-        /// </summary>
-        public static VBE.ModeInfo* modeinfo;
-        /// <summary>
-        /// VBE controller info pointer.
-        /// </summary>
-        public static VBE.ControllerInfo* controllerinfo;
+        static public readonly Multiboot2 Multiboot = new Multiboot2();
 
         // Bootstrap is a class designed only to get the essentials done.
         // ie the stuff needed to "pre boot". Do only the very minimal here.
@@ -61,10 +53,8 @@ namespace Cosmos.Core
              */
             CPU.InitFloat();
 
-            MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
-
-            modeinfo = (Core.VBE.ModeInfo*)MultibootHeader->vbeModeInfo;
-            controllerinfo = (Core.VBE.ControllerInfo*)MultibootHeader->vbeControlInfo;
+            //Parse multiboot2 structure
+            Multiboot.Init();
         }
     }
 }

@@ -1,128 +1,111 @@
-﻿using IL2CPU.API.Attribs;
+﻿/*
+* PROJECT:          Cosmos Development
+* CONTENT:          Multiboot2 class
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+* RESOURCES:        https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html
+*/
+
+using IL2CPU.API.Attribs;
 using System;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.Core
 {
     /// <summary>
-    /// Multiboot class. Used for Multiboot parsing.
+    /// Multiboot2 class. Used for multiboot parsing.
     /// </summary>
-    public class Multiboot
+    public unsafe class Multiboot2
     {
+        /// <summary>
+        /// Base Tag
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe readonly struct Mb2Tag
+        {
+            public readonly uint Type;
+            public readonly uint Size;
+        }
+
+        /// <summary>
+        /// Tag Framebuffer
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe readonly struct Mb2TagVbeInfo
+        {
+            public readonly Mb2Tag Info;
+            public readonly ushort VbeMode;
+            public readonly ushort VbeInterfaceSeg;
+            public readonly ushort VbeInterfaceOff;
+            public readonly ushort VbeInterfaceLen;
+            public readonly byte* VbeControlInfo; //512
+            public readonly byte* VbeModeInfo; //256
+        }
+
+        /// <summary>
+        /// Tag Framebuffer
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe readonly struct Mb2TagFramebuffer
+        {
+            public readonly Mb2Tag Info;
+            public readonly ulong Address;
+            public readonly uint Pitch;
+            public readonly uint Width;
+            public readonly uint Height;
+            public readonly byte Bpp;
+            public readonly byte Type;
+            public readonly ushort Reserved;
+        }
+
+        /// <summary>
+        /// Tag EFI64
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe readonly struct Mb2TagEFI64
+        {
+            public readonly Mb2Tag Info;
+            public readonly ulong Address;
+        }
+
+        public Mb2TagVbeInfo* VbeInfo { get; internal set; }
+
+        public Mb2TagFramebuffer* Framebuffer { get; internal set; }
+
+        public Mb2TagEFI64* EFI64 { get; internal set; }
+
+        /// /// <summary>
+        /// Parse multiboot2 structure
+        /// </summary>
+        public void Init()
+        {
+            var MbAddress = (IntPtr)GetMBIAddress();
+            Mb2Tag* tag;
+
+            for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((byte*)tag + ((tag->Size + 7) & ~7)))
+            {
+                switch (tag->Type)
+                {
+                    case 7:
+                        VbeInfo = (Mb2TagVbeInfo*)tag;
+                        break;
+                    case 8:
+                        Framebuffer = (Mb2TagFramebuffer*)tag;
+                        break;
+                    case 12:
+                        EFI64 = (Mb2TagEFI64*)tag;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         /// /// <summary>
         /// Get Multiboot address. Plugged.
         /// </summary>
         /// <returns>The Multiboot Address</returns>
         [PlugMethod(PlugRequired = true)]
         public static uint GetMBIAddress() => throw null;
-
-        /// <summary>
-        /// Header struct.
-        /// </summary>
-        [StructLayout(LayoutKind.Explicit, Size = 88)]
-        public unsafe struct Header
-        {
-            /// <summary>
-            /// Flags.
-            /// </summary>
-            [FieldOffset(0)]
-            public uint Flags;
-            /// <summary>
-            /// Lower memory amount.
-            /// </summary>
-            [FieldOffset(4)]
-            public uint mem_lower;
-            /// <summary>
-            /// Upper memory amount.
-            /// </summary>
-            [FieldOffset(8)]
-            public uint mem_upper;
-            /// <summary>
-            /// Boot device.
-            /// </summary>
-            [FieldOffset(12)]
-            public uint boot_device;
-            /// <summary>
-            /// CMD line.
-            /// </summary>
-            [FieldOffset(16)]
-            public uint cmdline;
-            /// <summary>
-            /// Modules count.
-            /// </summary>
-            [FieldOffset(20)]
-            public uint mods_count;
-            /// <summary>
-            /// Modules address.
-            /// </summary>
-            [FieldOffset(24)]
-            public uint mods_addr;
-            /// <summary>
-            /// Symbol table.
-            /// </summary>
-            [FieldOffset(28)]
-            public fixed uint syms[4];
-            /// <summary>
-            /// Memory map length.
-            /// </summary>
-            [FieldOffset(44)]
-            public uint memMapLength;
-            /// <summary>
-            /// Memory map address.
-            /// </summary>
-            [FieldOffset(48)]
-            public uint memMapAddress;
-            /// <summary>
-            /// Drives list length.
-            /// </summary>
-            [FieldOffset(52)]
-            public uint drivesLength;
-            /// <summary>
-            /// Drives list address.
-            /// </summary>
-            [FieldOffset(56)]
-            public uint drivesAddress;
-            /// <summary>
-            /// ROM config table.
-            /// </summary>
-            [FieldOffset(60)]
-            public uint configTable;
-            /// <summary>
-            /// APM table.
-            /// </summary>
-            [FieldOffset(68)]
-            public uint apmTable;
-            /// <summary>
-            /// VBE control info.
-            /// </summary>
-            [FieldOffset(72)]
-            public uint vbeControlInfo;
-            /// <summary>
-            /// VBE mode info.
-            /// </summary>
-            [FieldOffset(76)]
-            public uint vbeModeInfo;
-            /// <summary>
-            /// VBE mode.
-            /// </summary>
-            [FieldOffset(80)]
-            public uint vbeMode;
-            /// <summary>
-            /// VBE interface segment.
-            /// </summary>
-            [FieldOffset(82)]
-            public uint vbeInterfaceSeg;
-            /// <summary>
-            /// VBE interface offset.
-            /// </summary>
-            [FieldOffset(84)]
-            public uint vbeInterfaceOff;
-            /// <summary>
-            /// VBE interface length.
-            /// </summary>
-            [FieldOffset(86)]
-            public uint vbeInterfaceLength;
-        }
     }
 
     /// <summary>
@@ -130,16 +113,13 @@ namespace Cosmos.Core
     /// </summary>
     public unsafe static class VBE
     {
-
-        static uint VBEINFO_PRESENT = (1 << 11);
-
         /// /// <summary>
-        /// Check in Multiboot if VBE is available
+        /// Check in Multiboot if framebuffer is available
         /// </summary>
         /// <returns>True if is available, false if not</returns>
         public static bool IsAvailable()
         {
-            if ((Bootstrap.MultibootHeader->Flags & VBEINFO_PRESENT) == 0)
+            if (Bootstrap.Multiboot.Framebuffer != null)
             {
                 return false;
             }
@@ -154,7 +134,7 @@ namespace Cosmos.Core
         /// </summary>
         public static ModeInfo getModeInfo()
         {
-            return *Bootstrap.modeinfo;
+            return *((ModeInfo*)Bootstrap.Multiboot.VbeInfo->VbeModeInfo);
         }
 
         /// /// <summary>
@@ -163,9 +143,8 @@ namespace Cosmos.Core
         /// <returns>the offset in an uint</returns>
         public static uint getLfbOffset()
         {
-            return Bootstrap.modeinfo->framebuffer;
+            return getModeInfo().framebuffer;
         }
-
 
         /// <summary>
         /// Controller info struct.
