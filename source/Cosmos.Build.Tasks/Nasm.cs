@@ -102,6 +102,8 @@ namespace Cosmos.Build.Tasks
 
             xBuilder.AppendFileNameIfNotNull(InputFile);
 
+            Log.LogMessage(MessageImportance.High, xBuilder.ToString());
+
             return xBuilder.ToString();
         }
 

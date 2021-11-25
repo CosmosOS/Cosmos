@@ -20,7 +20,6 @@ namespace Cosmos.HAL
     public class PCSpeaker
     {
         protected static Core.IOGroup.PCSpeaker IO = BaseIOGroups.PCSpeaker;
-        private static PIT SpeakerPIT = new PIT();
 
         /// <summary>
         /// Enable sound.
@@ -78,7 +77,7 @@ namespace Cosmos.HAL
             }
 
             Beep(frequency);
-            SpeakerPIT.Wait(duration);
+            Global.PIT.Wait(duration);
             DisableSound();
         }
     }
