@@ -308,7 +308,7 @@
             Condition="'$(Deployment)' == 'ISO'">
 			
 		<ItemGroup>
-			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*" />
+			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
 		</ItemGroup>
 		
         <ItemGroup>
@@ -327,7 +327,11 @@
               DestinationFolder="$(IntermediateIsoDirectory)" />
 
         <Copy SourceFiles="@(_IsoCustomFiles)"
-             DestinationFolder="$(IntermediateIsoDirectory)" />
+             DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)" 
+			 SkipUnchangedFiles="true"
+			 OverwriteReadOnlyFiles="true"
+			 Retries="3"
+			 RetryDelayMilliseconds="300"/>
 
         <CreateSyslinuxConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
