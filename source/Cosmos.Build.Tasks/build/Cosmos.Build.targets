@@ -310,7 +310,7 @@
             Condition="'$(Deployment)' == 'ISO'">
 			
 		<ItemGroup>
-			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*" />
+			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
 		</ItemGroup>
 
         <ItemGroup>
@@ -329,7 +329,11 @@
               DestinationFolder="$(IntermediateIsoDirectory)\boot\" />
 
         <Copy SourceFiles="@(_IsoCustomFiles)"
-             DestinationFolder="$(IntermediateIsoDirectory)" />
+             DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)" 
+			 SkipUnchangedFiles="true"
+			 OverwriteReadOnlyFiles="true"
+			 Retries="3"
+			 RetryDelayMilliseconds="300"/>
 
         <Copy SourceFiles="@(_i386pcFile)"
               DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
