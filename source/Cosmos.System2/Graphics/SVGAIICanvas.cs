@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.Drivers.PCI.Video;
 
@@ -60,6 +59,11 @@ namespace Cosmos.System.Graphics
             _xSVGADriver = new VMWareSVGAII();
             Mode = aMode;
         }
+
+        /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public override string Name() => "VMWareSVGAII";
 
         /// <summary>
         /// Get and set graphics mode.
@@ -393,6 +397,14 @@ namespace Cosmos.System.Graphics
         public override void Display()
         {
             
+        }
+
+        public override void DrawImage(Image aImage, int aX, int aY)
+        {
+            for (int y = 0; y < aImage.Height; y++)
+            {
+                _xSVGADriver.VideoMemory.Copy((int)(aX + (aY + y) * aImage.Width), aImage.rawData, (int)(y * aImage.Width), (int)aImage.Width);
+            }
         }
     }
 }

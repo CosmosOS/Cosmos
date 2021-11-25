@@ -104,6 +104,11 @@ namespace Cosmos.System.Graphics
         public abstract void DrawPoint(Pen pen, float x, float y);
 
         /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public abstract string Name();
+
+        /// <summary>
         /// Display screen
         /// </summary>
         public abstract void Display();
