@@ -29,7 +29,8 @@ namespace Cosmos.Build.Tasks
             using (var xWriter = File.CreateText(Path.Combine(TargetDirectory + "/boot/grub/", "grub.cfg")))
             {
                 xWriter.WriteLine("menuentry '" + xLabelName + "' {");
-                WriteIndentedLine(xWriter, "multiboot /boot/" + xBinName);
+                WriteIndentedLine(xWriter, "multiboot2 /boot/" + xBinName);
+                WriteIndentedLine(xWriter, "boot");
                 xWriter.WriteLine("}");
             }
 
