@@ -19,59 +19,78 @@ namespace Cosmos.Core
         /// <summary>
         /// Base Tag
         /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Explicit, Size = 8)]
         public unsafe readonly struct Mb2Tag
         {
+            [FieldOffset(0)]
             public readonly uint Type;
+            [FieldOffset(8)]
             public readonly uint Size;
         }
 
         /// <summary>
         /// Tag Framebuffer
         /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Explicit, Size = 784)]
         public unsafe readonly struct Mb2TagVbeInfo
         {
+            [FieldOffset(0)]
             public readonly Mb2Tag Info;
+            [FieldOffset(8)]
             public readonly ushort VbeMode;
+            [FieldOffset(10)]
             public readonly ushort VbeInterfaceSeg;
+            [FieldOffset(12)]
             public readonly ushort VbeInterfaceOff;
+            [FieldOffset(14)]
             public readonly ushort VbeInterfaceLen;
-            public readonly byte* VbeControlInfo; //512
-            public readonly byte* VbeModeInfo; //256
+            [FieldOffset(16)]
+            public readonly VBE.ControllerInfo* VbeControlInfo; //512
+            [FieldOffset(528)]
+            public readonly VBE.ModeInfo* VbeModeInfo; //256
         }
 
         /// <summary>
         /// Tag Framebuffer
         /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Explicit, Size = 32)]
         public unsafe readonly struct Mb2TagFramebuffer
         {
+            [FieldOffset(0)]
             public readonly Mb2Tag Info;
+            [FieldOffset(8)]
             public readonly ulong Address;
+            [FieldOffset(16)]
             public readonly uint Pitch;
+            [FieldOffset(20)]
             public readonly uint Width;
+            [FieldOffset(24)]
             public readonly uint Height;
+            [FieldOffset(28)]
             public readonly byte Bpp;
+            [FieldOffset(29)]
             public readonly byte Type;
+            [FieldOffset(30)]
             public readonly ushort Reserved;
         }
 
         /// <summary>
         /// Tag EFI64
         /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Explicit, Size = 16)]
         public unsafe readonly struct Mb2TagEFI64
         {
+            [FieldOffset(0)]
             public readonly Mb2Tag Info;
+            [FieldOffset(8)]
             public readonly ulong Address;
         }
 
-        public Mb2TagVbeInfo* VbeInfo { get; internal set; }
+        internal Mb2TagVbeInfo* VbeInfo { get; set; }
 
-        public Mb2TagFramebuffer* Framebuffer { get; internal set; }
+        internal Mb2TagFramebuffer* Framebuffer { get; set; }
 
-        public Mb2TagEFI64* EFI64 { get; internal set; }
+        internal Mb2TagEFI64* EFI64 { get; set; }
 
         /// /// <summary>
         /// Parse multiboot2 structure
@@ -79,6 +98,7 @@ namespace Cosmos.Core
         public void Init()
         {
             var MbAddress = (IntPtr)GetMBIAddress();
+
             Mb2Tag* tag;
 
             for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((byte*)tag + ((tag->Size + 7) & ~7)))
@@ -119,7 +139,7 @@ namespace Cosmos.Core
         /// <returns>True if is available, false if not</returns>
         public static bool IsAvailable()
         {
-            if (Bootstrap.Multiboot.Framebuffer != null)
+            if (Bootstrap.Multiboot.VbeInfo != null)
             {
                 return false;
             }
@@ -134,7 +154,15 @@ namespace Cosmos.Core
         /// </summary>
         public static ModeInfo getModeInfo()
         {
-            return *((ModeInfo*)Bootstrap.Multiboot.VbeInfo->VbeModeInfo);
+            return *(Bootstrap.Multiboot.VbeInfo->VbeModeInfo);
+        }
+
+        /// /// <summary>
+        /// Get VBE Modeinfo structure
+        /// </summary>
+        public static ControllerInfo getControllerInfo()
+        {
+            return *(Bootstrap.Multiboot.VbeInfo->VbeControlInfo);
         }
 
         /// /// <summary>
