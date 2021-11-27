@@ -24,7 +24,7 @@ namespace Cosmos.Core
         {
             [FieldOffset(0)]
             public readonly uint Type;
-            [FieldOffset(8)]
+            [FieldOffset(4)]
             public readonly uint Size;
         }
 
