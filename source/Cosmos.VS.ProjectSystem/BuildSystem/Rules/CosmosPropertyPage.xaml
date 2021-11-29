@@ -78,6 +78,17 @@
         </StringProperty.ValueEditors>
     </StringProperty>
 
+    <BoolProperty Name="ExtractMapFile"
+                  DisplayName="Map file"
+                  Description="Extract ELF Map File."
+                  Category="Debug">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "BinFormat" "Elf")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
     <BoolProperty Name="DebugEnabled"
                   DisplayName="Remote Debugging"
                   Description="Enable Cosmos Remote Debugger."
