@@ -348,8 +348,9 @@ namespace Cosmos.Core
             }
             var rawMap = new RawMemoryMap[64];
             var currentMap = Bootstrap.Multiboot.MemoryMap->MemoryMapEntries;
+            uint size = Bootstrap.Multiboot.MemoryMap->Info.Size - 40;
             int counter = 0;
-            while (currentMap < (Bootstrap.Multiboot.MemoryMap->MemoryMapEntries + Bootstrap.Multiboot.MemoryMap->EntrySize) && counter < 64)
+            while (currentMap < (Bootstrap.Multiboot.MemoryMap->MemoryMapEntries + size) && counter < 64)
             {
                 rawMap[counter++] = *currentMap;
                 currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes

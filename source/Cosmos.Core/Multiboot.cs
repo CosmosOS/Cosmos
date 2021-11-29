@@ -31,7 +31,7 @@ namespace Cosmos.Core
         /// <summary>
         /// Tag MemoryMap
         /// </summary>
-        [StructLayout(LayoutKind.Explicit, Size = 16)]
+        [StructLayout(LayoutKind.Explicit, Size = 40)]
         internal unsafe readonly struct Mb2TagMemoryMap
         {
             [FieldOffset(0)]
