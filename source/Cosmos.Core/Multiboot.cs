@@ -35,7 +35,9 @@ namespace Cosmos.Core
         internal unsafe readonly struct Mb2TagMemoryMap
         {
             [FieldOffset(0)]
-            public readonly Mb2Tag Info;
+            public readonly uint Type;
+            [FieldOffset(4)]
+            public readonly uint Size;
             [FieldOffset(8)]
             public readonly uint EntrySize;
             [FieldOffset(12)]
