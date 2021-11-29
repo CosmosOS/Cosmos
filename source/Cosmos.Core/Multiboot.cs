@@ -43,7 +43,7 @@ namespace Cosmos.Core
             [FieldOffset(12)]
             public readonly uint EntryVersion;
             [FieldOffset(16)]
-            public readonly RawMemoryMap* MemoryMapEntries;
+            public readonly RawMemoryMap MemoryMapEntries;
         }
 
         /// <summary>
@@ -134,14 +134,9 @@ namespace Cosmos.Core
                 switch (tag->Type)
                 {
                     case 6:
-                        Global.mDebugger.Send("MultibootInit - MemoryMap detected.");
-
                         MemoryMap = (Mb2TagMemoryMap*)tag;
-
                         break;
                     case 7:
-                        Global.mDebugger.Send("MultibootInit - VbeInfo detected.");
-
                         VbeInfo = (Mb2TagVbeInfo*)tag;
                         break;
                     /*case 8:
@@ -151,7 +146,6 @@ namespace Cosmos.Core
                         EFI64 = (Mb2TagEFI64*)tag;
                         break;*/
                     default:
-                        Global.mDebugger.Send("MultibootInit - " + tag->Type + " detected.");
                         break;
                 }
             }
