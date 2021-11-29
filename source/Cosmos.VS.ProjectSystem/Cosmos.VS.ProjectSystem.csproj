@@ -1,20 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.SDK">
 
-    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.props" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
-    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.targets" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
-
-
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
-        <RuntimeIdentifier>win-x32</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <RootNamespace>Cosmos.VS.ProjectSystem</RootNamespace>
         <FileVersion>1.0.0.0</FileVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
 
     <PropertyGroup>
-        <IncludeWpfReferences>True</IncludeWpfReferences>
-        <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
+        <UseCodebase>true</UseCodebase>
         <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
         <ExtensionInstallationFolder>Cosmos\ProjectSystem</ExtensionInstallationFolder>
         <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
@@ -26,6 +21,7 @@
         <Content Include="Resources\Icon.png" IncludeInVSIX="True" />
         <Content Include="Resources\CosmosProjectRootIcon.png" IncludeInVSIX="True" />
         <Content Include="CosmosImages.imagemanifest" IncludeInVSIX="True" />
+        <EmbeddedResource Update="VSPackage.resx" MergeWithCTO="True" />
     </ItemGroup>
 
     <ItemGroup>
@@ -53,22 +49,12 @@
         </None>
     </ItemGroup>
 
-    <!--
-        WinForms
-    -->
-    <ItemGroup>
-        <Reference Include="Microsoft.VisualBasic" />
-    </ItemGroup>
-    
     <ItemGroup>
         <PackageReference Include="Cosmos.Build.Common" />
-        <PackageReference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime" Version="17.0.31902.203" />
-        <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" Version="17.0.31902.203" />
         <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" PrivateAssets="All" Version="17.0.1313-pre" />
         <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk" Version="17.0.1313-pre" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.0.31902.203" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="17.0.31902.203" />
-        <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.5.21301.5" />
+        <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
         <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -83,6 +69,7 @@
     </Target>
 
     <ItemGroup>
-      <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
+        <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
     </ItemGroup>
+
 </Project>
