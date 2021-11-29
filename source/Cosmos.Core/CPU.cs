@@ -337,28 +337,19 @@ namespace Cosmos.Core
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
 
         /// <summary>
-        /// Checks if Multiboot returned a memory map
-        /// </summary>
-        /// <returns></returns>
-        public static unsafe bool MemoryMapExists()
-        {
-            return (Bootstrap.MultibootHeader->Flags & 1 << 6) == 64;
-        }
-
-        /// <summary>
         /// Get the Memory Map Information from Multiboot
         /// </summary>
         /// <returns>Returns an array of MemoryMaps containing the Multiboot Memory Map information. The array may have empty values at the end.</returns>
         public static unsafe MemoryMap[] GetMemoryMap()
         {
-            if (!MemoryMapExists())
+            if (!Multiboot2.MemoryMapExists())
             {
                 throw new Exception("No Memory Map was returned by Multiboot");
             }
             var rawMap = new RawMemoryMap[64];
-            var currentMap = (RawMemoryMap*)Bootstrap.MultibootHeader->memMapAddress;
+            var currentMap = Bootstrap.Multiboot.MemoryMap->MemoryMapEntries;
             int counter = 0;
-            while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength) && counter < 64)
+            while (currentMap < (Bootstrap.Multiboot.MemoryMap->MemoryMapEntries + Bootstrap.Multiboot.MemoryMap->EntrySize) && counter < 64)
             {
                 rawMap[counter++] = *currentMap;
                 currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes

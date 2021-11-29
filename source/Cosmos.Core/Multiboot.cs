@@ -20,7 +20,7 @@ namespace Cosmos.Core
         /// Base Tag
         /// </summary>
         [StructLayout(LayoutKind.Explicit, Size = 8)]
-        public unsafe readonly struct Mb2Tag
+        internal unsafe readonly struct Mb2Tag
         {
             [FieldOffset(0)]
             public readonly uint Type;
@@ -29,10 +29,26 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Tag MemoryMap
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 16)]
+        internal unsafe readonly struct Mb2TagMemoryMap
+        {
+            [FieldOffset(0)]
+            public readonly Mb2Tag Info;
+            [FieldOffset(8)]
+            public readonly uint EntrySize;
+            [FieldOffset(12)]
+            public readonly uint EntryVersion;
+            [FieldOffset(16)]
+            public readonly RawMemoryMap* MemoryMapEntries;
+        }
+
+        /// <summary>
         /// Tag Framebuffer
         /// </summary>
         [StructLayout(LayoutKind.Explicit, Size = 784)]
-        public unsafe readonly struct Mb2TagVbeInfo
+        internal unsafe readonly struct Mb2TagVbeInfo
         {
             [FieldOffset(0)]
             public readonly Mb2Tag Info;
@@ -54,7 +70,7 @@ namespace Cosmos.Core
         /// Tag Framebuffer
         /// </summary>
         [StructLayout(LayoutKind.Explicit, Size = 32)]
-        public unsafe readonly struct Mb2TagFramebuffer
+        internal unsafe readonly struct Mb2TagFramebuffer
         {
             [FieldOffset(0)]
             public readonly Mb2Tag Info;
@@ -78,7 +94,7 @@ namespace Cosmos.Core
         /// Tag EFI64
         /// </summary>
         [StructLayout(LayoutKind.Explicit, Size = 16)]
-        public unsafe readonly struct Mb2TagEFI64
+        internal unsafe readonly struct Mb2TagEFI64
         {
             [FieldOffset(0)]
             public readonly Mb2Tag Info;
@@ -86,17 +102,17 @@ namespace Cosmos.Core
             public readonly ulong Address;
         }
 
+        internal Mb2TagMemoryMap* MemoryMap { get; set; }
         internal Mb2TagVbeInfo* VbeInfo { get; set; }
-
         internal Mb2TagFramebuffer* Framebuffer { get; set; }
-
         internal Mb2TagEFI64* EFI64 { get; set; }
 
         /// /// <summary>
         /// Multiboot2 ctor
         /// </summary>
-        public Multiboot2()
+        internal Multiboot2()
         {
+            MemoryMap = null;
             VbeInfo = null;
             Framebuffer = null;
             EFI64 = null;
@@ -105,7 +121,7 @@ namespace Cosmos.Core
         /// /// <summary>
         /// Parse multiboot2 structure
         /// </summary>
-        public void Init()
+        internal void Init()
         {
             var MbAddress = (IntPtr)GetMBIAddress();
 
@@ -115,18 +131,43 @@ namespace Cosmos.Core
             {
                 switch (tag->Type)
                 {
+                    case 6:
+                        Global.mDebugger.Send("MultibootInit - MemoryMap detected.");
+
+                        MemoryMap = (Mb2TagMemoryMap*)tag;
+
+                        break;
                     case 7:
+                        Global.mDebugger.Send("MultibootInit - VbeInfo detected.");
+
                         VbeInfo = (Mb2TagVbeInfo*)tag;
                         break;
-                    case 8:
+                    /*case 8:
                         Framebuffer = (Mb2TagFramebuffer*)tag;
                         break;
                     case 12:
                         EFI64 = (Mb2TagEFI64*)tag;
-                        break;
+                        break;*/
                     default:
+                        Global.mDebugger.Send("MultibootInit - " + tag->Type + " detected.");
                         break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks if Multiboot returned a memory map
+        /// </summary>
+        /// <returns>True if is available, false if not</returns>
+        public static bool MemoryMapExists()
+        {
+            if (Bootstrap.Multiboot.MemoryMap != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

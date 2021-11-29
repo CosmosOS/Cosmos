@@ -57,7 +57,7 @@ namespace ProcessorTests
 
         public void TestMultiboot()
         {
-            Assert.IsTrue(Multiboot.GetMBIAddress() != 0, $"Multiboot.GetMBIAddress works {Multiboot.GetMBIAddress()}");
+            Assert.IsTrue(Multiboot2.GetMBIAddress() != 0, $"Multiboot.GetMBIAddress works {Multiboot2.GetMBIAddress()}");
         }
          
         public void TestBrandStringBlank()
