@@ -45,9 +45,9 @@ namespace Cosmos.Core
             [FieldOffset(14)]
             public readonly ushort VbeInterfaceLen;
             [FieldOffset(16)]
-            public readonly VBE.ControllerInfo* VbeControlInfo; //512
+            public readonly VBE.ControllerInfo VbeControlInfo; //512
             [FieldOffset(528)]
-            public readonly VBE.ModeInfo* VbeModeInfo; //256
+            public readonly VBE.ModeInfo VbeModeInfo; //256
         }
 
         /// <summary>
@@ -91,6 +91,16 @@ namespace Cosmos.Core
         internal Mb2TagFramebuffer* Framebuffer { get; set; }
 
         internal Mb2TagEFI64* EFI64 { get; set; }
+
+        /// /// <summary>
+        /// Multiboot2 ctor
+        /// </summary>
+        public Multiboot2()
+        {
+            VbeInfo = null;
+            Framebuffer = null;
+            EFI64 = null;
+        }
 
         /// /// <summary>
         /// Parse multiboot2 structure
@@ -141,11 +151,11 @@ namespace Cosmos.Core
         {
             if (Bootstrap.Multiboot.VbeInfo != null)
             {
-                return false;
+                return true;
             }
             else
             {
-                return true;
+                return false;
             }
         }
 
@@ -154,7 +164,7 @@ namespace Cosmos.Core
         /// </summary>
         public static ModeInfo getModeInfo()
         {
-            return *(Bootstrap.Multiboot.VbeInfo->VbeModeInfo);
+            return Bootstrap.Multiboot.VbeInfo->VbeModeInfo;
         }
 
         /// /// <summary>
@@ -162,7 +172,7 @@ namespace Cosmos.Core
         /// </summary>
         public static ControllerInfo getControllerInfo()
         {
-            return *(Bootstrap.Multiboot.VbeInfo->VbeControlInfo);
+            return Bootstrap.Multiboot.VbeInfo->VbeControlInfo;
         }
 
         /// /// <summary>
@@ -177,7 +187,7 @@ namespace Cosmos.Core
         /// <summary>
         /// Controller info struct.
         /// </summary>
-        [StructLayout(LayoutKind.Explicit, Size = 36)]
+        [StructLayout(LayoutKind.Explicit, Size = 512)]
         public struct ControllerInfo
         {
             /// <summary>
