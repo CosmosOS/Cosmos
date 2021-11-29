@@ -63,6 +63,12 @@ namespace Cosmos.Build.Tasks
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
 
+        public IL2CPU()
+        {
+            CompileVBEMultiboot = false;
+            VBEResolution = "800x600x32";
+        }
+
         protected override string GenerateFullPathToTool()
         {
             if (String.IsNullOrWhiteSpace(ToolPath))
