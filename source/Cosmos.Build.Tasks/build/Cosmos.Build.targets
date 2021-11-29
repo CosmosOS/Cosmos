@@ -57,7 +57,7 @@
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
 
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
-    
+
 </PropertyGroup>
 
     <PropertyGroup>
@@ -89,7 +89,7 @@
 
     <ItemGroup Condition="'$(KernelPkg)' == 'X86'">
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.CPU.x86.dll" />
-         
+
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.CPU_Plugs.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Debug.Kernel.Plugs.Asm.dll" />
         <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Platform.PC.dll" />
@@ -306,11 +306,11 @@
             Inputs="$(BinFile)"
             Outputs="$(IsoFile)"
             Condition="'$(Deployment)' == 'ISO'">
-			
+
 		<ItemGroup>
 			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
 		</ItemGroup>
-		
+
         <ItemGroup>
             <_IsoFile Include="$(SyslinuxPath)core\isolinux.bin" />
             <_IsoFile Include="$(SyslinuxPath)com32\elflink\ldlinux\ldlinux.c32" />
@@ -327,7 +327,7 @@
               DestinationFolder="$(IntermediateIsoDirectory)" />
 
         <Copy SourceFiles="@(_IsoCustomFiles)"
-             DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)" 
+             DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)"
 			 SkipUnchangedFiles="true"
 			 OverwriteReadOnlyFiles="true"
 			 Retries="3"
