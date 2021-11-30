@@ -32,20 +32,9 @@ namespace ConsoleTest
         {
             try
             {
-                testConsoleEncoding();
+                TestConsoleEncoding();
 
-                Console.SetWindowSize(90, 60);
-                while (true)
-                {
-                    Console.Write("Input: ");
-                    string input = Console.ReadLine();
-                    if (input == "exit")
-                        break;
-                    else
-                        Console.WriteLine("You wrote: " + input);
-                }
-                
-                Console.ReadLine();
+                TestVGAResolutions();
 
                 TestController.Completed();
             }
@@ -57,7 +46,7 @@ namespace ConsoleTest
             }            
         }
 
-        public void testConsoleEncoding()
+        public void TestConsoleEncoding()
         {
             Console.Clear();
 
@@ -145,6 +134,34 @@ namespace ConsoleTest
             Console.WriteLine("Press any key to terminate this test...");
 
             Console.ReadKey();
+        }
+
+        public void TestVGAResolutions()
+        {
+            Console.SetWindowSize(40, 25);
+            TestVariousConsoleFunctions();
+            Console.SetWindowSize(40, 50);
+            TestVariousConsoleFunctions();
+            Console.SetWindowSize(80, 25);
+            TestVariousConsoleFunctions();
+            Console.SetWindowSize(80, 50);
+            TestVariousConsoleFunctions();
+            Console.SetWindowSize(90, 30);
+            TestVariousConsoleFunctions();
+            Console.SetWindowSize(90, 60);
+            TestVariousConsoleFunctions();
+        }
+
+        public void TestVariousConsoleFunctions()
+        {
+            Console.Clear();
+            Console.WriteLine("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+            Console.Write("Reading input: ");
+            Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Green; Console.BackgroundColor = ConsoleColor.Blue;
+            Console.WriteLine("Colored text :)");
+            Console.ResetColor();
+            Console.Write("Press enter to continue to the next step: "); Console.ReadLine();
         }
     }
 }

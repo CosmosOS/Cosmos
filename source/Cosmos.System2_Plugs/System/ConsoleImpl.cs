@@ -15,7 +15,7 @@ namespace Cosmos.System_Plugs.System
         private static Encoding ConsoleInputEncoding = Encoding.ASCII;
         private static Encoding ConsoleOutputEncoding = Encoding.ASCII;
 
-        public static Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
+        private static Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
 
         private static Cosmos.System.Console GetConsole()
         {
@@ -613,11 +613,8 @@ namespace Cosmos.System_Plugs.System
             mFallbackConsole.Cols = mFallbackConsole.mText.Cols;
             mFallbackConsole.Rows = mFallbackConsole.mText.Rows;
 
-            //VGA memory
-            ((Cosmos.HAL.TextScreen)mFallbackConsole.mText).IO.Memory = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(width * height * 2));
-            ((Cosmos.HAL.TextScreen)mFallbackConsole.mText).mRAM = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(width * height * 2)).Bytes;
-            ((Cosmos.HAL.TextScreen)mFallbackConsole.mText).mScrollSize = (uint)(width * (height - 1) * 2);
-            ((Cosmos.HAL.TextScreen)mFallbackConsole.mText).mRow2Addr = (uint)(width * 2);
+            ((Cosmos.HAL.TextScreen)mFallbackConsole.mText).UpdateWindowSize();
+
             Clear();
         }
 

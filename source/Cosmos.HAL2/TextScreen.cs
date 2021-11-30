@@ -46,6 +46,14 @@ namespace Cosmos.HAL
             TextScreenHelpers.Debug("End of TextScreen..ctor");
         }
 
+        public void UpdateWindowSize()
+        {
+            IO.Memory = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(Cols * Rows * 2));
+            mRAM = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(Cols * Rows * 2)).Bytes;
+            mScrollSize = (uint)(Cols * (Rows - 1) * 2);
+            mRow2Addr = (uint)(Cols * 2);
+        }
+
         public override ushort Rows { set; get; } = 25;
         public override ushort Cols { set; get; } = 80;
 
