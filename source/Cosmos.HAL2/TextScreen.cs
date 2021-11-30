@@ -14,13 +14,13 @@ namespace Cosmos.HAL
         protected byte Color = 0x0F; // White
         protected ushort mBackgroundClearCellValue;
         protected ushort mTextClearCellValue;
-        protected uint mRow2Addr;
-        protected uint mScrollSize;
+        public uint mRow2Addr;
+        public uint mScrollSize;
         protected int mCursorSize = 25; // 25 % as C# Console class
         protected bool mCursorVisible = true;
 
-        protected Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
-        protected readonly MemoryBlock08 mRAM;
+        public Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
+        public MemoryBlock08 mRAM;
 
         /// <summary>
         /// Creat new instance of the <see cref="TextScreen"/> class.
@@ -46,8 +46,8 @@ namespace Cosmos.HAL
             TextScreenHelpers.Debug("End of TextScreen..ctor");
         }
 
-        public override ushort Rows { get { return 25; } }
-        public override ushort Cols { get { return 80; } }
+        public override ushort Rows { set; get; } = 25;
+        public override ushort Cols { set; get; } = 80;
 
         /// <summary>
         /// Clear text screen.
