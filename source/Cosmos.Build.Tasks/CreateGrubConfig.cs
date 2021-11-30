@@ -28,6 +28,8 @@ namespace Cosmos.Build.Tasks
 
             using (var xWriter = File.CreateText(Path.Combine(TargetDirectory + "/boot/grub/", "grub.cfg")))
             {
+                xWriter.WriteLine("set timeout=0");
+                xWriter.WriteLine();
                 xWriter.WriteLine("menuentry '" + xLabelName + "' {");
                 WriteIndentedLine(xWriter, "multiboot2 /boot/" + xBinName);
                 WriteIndentedLine(xWriter, "boot");

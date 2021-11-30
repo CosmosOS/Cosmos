@@ -309,9 +309,9 @@
             Outputs="$(IsoFile)"
             Condition="'$(Deployment)' == 'ISO'">
 			
-		<ItemGroup>
-			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
-		</ItemGroup>
+		    <ItemGroup>
+			    <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
+		    </ItemGroup>
 
         <ItemGroup>
             <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
@@ -329,11 +329,11 @@
               DestinationFolder="$(IntermediateIsoDirectory)\boot\" />
 
         <Copy SourceFiles="@(_IsoCustomFiles)"
-             DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)" 
-			 SkipUnchangedFiles="true"
-			 OverwriteReadOnlyFiles="true"
-			 Retries="3"
-			 RetryDelayMilliseconds="300"/>
+              DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)" 
+			        SkipUnchangedFiles="true"
+			        OverwriteReadOnlyFiles="true"
+			        Retries="3"
+			        RetryDelayMilliseconds="300"/>
 
         <Copy SourceFiles="@(_i386pcFile)"
               DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
@@ -388,16 +388,38 @@
         </PropertyGroup>
 
         <ItemGroup>
-            <_UsbFile Include="$(SyslinuxPath)com32\elflink\ldlinux\ldlinux.c32" />
-            <_UsbFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
-            <_UsbFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
-            <_UsbFile Include="$(BinFile)" />
+            <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
         </ItemGroup>
 
+        <ItemGroup>
+            <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
+        </ItemGroup>
+
+        <ItemGroup>
+            <_UsbFile Include="$(BinFile)" />
+            <_UsbFile Include="@(ContentToDeploy)" />
+        </ItemGroup>
+
+        <RemoveDir Directories="$(IntermediateIsoDirectory)" />
+        <MakeDir Directories="$(IntermediateIsoDirectory)" />
+
         <Copy SourceFiles="@(_UsbFile)"
+              DestinationFolder="$(IntermediateIsoDirectory)\boot\" />
+
+        <Copy SourceFiles="@(_IsoCustomFiles)"
+              DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)"
+			        SkipUnchangedFiles="true"
+			        OverwriteReadOnlyFiles="true"
+			        Retries="3"
+			        RetryDelayMilliseconds="300"/>
+
+        <Copy SourceFiles="@(_i386pcFile)"
+              DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
+
+        <Copy SourceFiles="@(IntermediateIsoDirectory)"
               DestinationFolder="$(UsbPublishDrive)" />
 
-        <CreateSyslinuxConfig TargetDirectory="$(UsbPublishDrive)"
+        <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
 
         <CreateMbr TargetDrive="$(UsbPublishDrive)"
