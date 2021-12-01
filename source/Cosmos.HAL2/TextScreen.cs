@@ -49,7 +49,7 @@ namespace Cosmos.HAL
         public void UpdateWindowSize()
         {
             IO.Memory = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(Cols * Rows * 2));
-            mRAM = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(Cols * Rows * 2)).Bytes;
+            mRAM = IO.Memory.Bytes;
             mScrollSize = (uint)(Cols * (Rows - 1) * 2);
             mRow2Addr = (uint)(Cols * 2);
         }
