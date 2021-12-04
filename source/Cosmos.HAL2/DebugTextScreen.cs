@@ -27,6 +27,7 @@ namespace Cosmos.HAL
 
         public override ushort Cols
         {
+            set { }
             get
             {
                 return 80;
@@ -35,6 +36,7 @@ namespace Cosmos.HAL
 
         public override ushort Rows
         {
+            set { }
             get
             {
                 return 25;
