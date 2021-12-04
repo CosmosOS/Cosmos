@@ -12,7 +12,7 @@ namespace Cosmos.Core.IOGroup {
         /// <summary>
         /// Memory.
         /// </summary>
-        public readonly MemoryBlock Memory = new MemoryBlock(0xB8000, 80 * 25 * 2);
+        public MemoryBlock Memory = new MemoryBlock(0xB8000, 80 * 25 * 2);
         // These should probably move to a VGA class later, or this class should be remade into a VGA class
         /// <summary>
         /// Misc. output.
