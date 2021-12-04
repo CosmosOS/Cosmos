@@ -15,7 +15,7 @@ namespace Cosmos.System_Plugs.System
         private static Encoding ConsoleInputEncoding = Encoding.ASCII;
         private static Encoding ConsoleOutputEncoding = Encoding.ASCII;
 
-        private static readonly Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
+        private static Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
 
         private static Cosmos.System.Console GetConsole()
         {
@@ -570,7 +570,52 @@ namespace Cosmos.System_Plugs.System
 
         public static void SetWindowSize(int width, int height)
         {
-            throw new NotImplementedException("Not implemented: SetWindowSize");
+            if (width == 40 && height == 25)
+            {
+                mFallbackConsole.mText.Cols = 40;
+                mFallbackConsole.mText.Rows = 25;
+                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size40x25);
+            }
+            else if (width == 40 && height == 50)
+            {
+                mFallbackConsole.mText.Cols = 40;
+                mFallbackConsole.mText.Rows = 50;
+                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size40x50);
+            }
+            else if (width == 80 && height == 25)
+            {
+                mFallbackConsole.mText.Cols = 80;
+                mFallbackConsole.mText.Rows = 25;
+                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size80x25);
+            }
+            else if (width == 80 && height == 50)
+            {
+                mFallbackConsole.mText.Cols = 80;
+                mFallbackConsole.mText.Rows = 50;
+                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size80x50);
+            }
+            else if (width == 90 && height == 30)
+            {
+                mFallbackConsole.mText.Cols = 90;
+                mFallbackConsole.mText.Rows = 30;
+                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size90x30);
+            }
+            else if (width == 90 && height == 60)
+            {
+                mFallbackConsole.mText.Cols = 90;
+                mFallbackConsole.mText.Rows = 60;
+                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size90x60);
+            }
+            else
+            {
+                throw new Exception("Invalid text size.");
+            }
+            mFallbackConsole.Cols = mFallbackConsole.mText.Cols;
+            mFallbackConsole.Rows = mFallbackConsole.mText.Rows;
+
+            ((Cosmos.HAL.TextScreen)mFallbackConsole.mText).UpdateWindowSize();
+
+            Clear();
         }
 
         #region Write

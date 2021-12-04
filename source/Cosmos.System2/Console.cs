@@ -63,6 +63,7 @@ namespace Cosmos.System {
         /// Get window width.
         /// </summary>
         public int Cols {
+            set { }
             get { return mText.Cols; }
         }
 
@@ -70,13 +71,14 @@ namespace Cosmos.System {
         /// Get window height.
         /// </summary>
         public int Rows {
+            set { }
             get { return mText.Rows; }
         }
 
         /// <summary>
         /// Text screen.
         /// </summary>
-        protected HAL.TextScreenBase mText;
+        public HAL.TextScreenBase mText;
 
         /// <summary>
         /// Console object constructor.
