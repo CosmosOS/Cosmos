@@ -322,6 +322,14 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
                 }
             };
 
+            chckExtractMapFile.CheckedChanged += delegate (object aSender, EventArgs e)
+            {
+                if (!FreezeEvents)
+                {
+                    mViewModel.BuildProperties.ExtractMapFile = chckExtractMapFile.Checked;
+                }
+            };
+
             textBoxVBEResolution.TextChanged += delegate (object aSender, EventArgs e)
             {
                 if (FreezeEvents) return;
@@ -911,6 +919,14 @@ namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
             if (!FreezeEvents)
             {
                 mViewModel.BuildProperties.VBEResolution = textBoxVBEResolution.Text;
+            }
+        }
+
+        private void chckExtractMapFile_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!FreezeEvents)
+            {
+                mViewModel.BuildProperties.ExtractMapFile = chckExtractMapFile.Checked;
             }
         }
     }
