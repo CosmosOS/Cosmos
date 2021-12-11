@@ -18,7 +18,7 @@ namespace Cosmos.TestRunner.Full
             yield return typeof(BoxingTests.Kernel);
             yield return typeof(Compiler.Tests.TypeSystem.Kernel);
             yield return typeof(Compiler.Tests.Bcl.Kernel);
-            yield return typeof(Compiler.Tests.Bcl.System.Kernel);
+            //yield return typeof(Compiler.Tests.Bcl.System.Kernel);
             //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
             yield return typeof(Compiler.Tests.Exceptions.Kernel);
             yield return typeof(Compiler.Tests.MethodTests.Kernel);
