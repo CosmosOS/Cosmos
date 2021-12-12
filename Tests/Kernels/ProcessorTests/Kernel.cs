@@ -25,6 +25,7 @@ namespace ProcessorTests
                 TestMultibootMemoryMap();
                 TestGetRam();
                 TestVendorNameIsNotBlank();
+                TestBrandStringBlank();
                 TestCycleCount();
                 TestCycleRateIsNotZero();
                 TestMultiboot();

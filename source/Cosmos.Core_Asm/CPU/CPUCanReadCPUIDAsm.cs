@@ -1,6 +1,7 @@
 using Cosmos.Debug.Kernel;
 using XSharp;
 using XSharp.Assembler;
+using XSharp.Assembler.x86;
 using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
@@ -11,24 +12,28 @@ namespace Cosmos.Core_Asm
         {
             /*
              * pushfd
-             * pushfd
-             * xor dword [esp], 00200000h
+             * pop eax
+             * mov ecx, eax
+             * xor eax, 1 << 21
+             * push eax
              * popfd
              * pushfd
              * pop eax
-             * xor eax, [esp]
-             * and eax, 00200000h
-             * ret
+             * push ecx
+             * popfd
+             * xor eax, ecx
              */
             XS.Pushfd();
-            XS.Pushfd();
-            XS.Xor(ESP, 0x00200000, destinationIsIndirect: true);
+            XS.Pop(EAX);
+            XS.Set(ECX, EAX, destinationIsIndirect: true);
+            XS.Xor(EAX, 1 << 21, destinationIsIndirect: true);
+            XS.Push(EAX);
             XS.Popfd();
             XS.Pushfd();
             XS.Pop(EAX);
-            XS.Xor(EAX, ESP, destinationIsIndirect: true);
+            XS.Push(ECX);
             XS.Popfd();
-            XS.And(EAX, 0x00200000);
+            XS.Xor(EAX, ECX, destinationIsIndirect: true);
             XS.Push(EAX);
         }
     }
