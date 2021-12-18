@@ -112,13 +112,13 @@ namespace Cosmos.System
                 //bool xTest = 1 != 3;
                 //while (xTest) {
                 //}
-            }
-            catch (Exception E)
-            {
-                // todo: better ways to handle?
-                global::System.Console.WriteLine("Exception occurred while running kernel:");
-                global::System.Console.WriteLine(E.ToString());
-            }
+            //}
+            //catch (Exception E)
+            //{
+            //    // todo: better ways to handle?
+            //    global::System.Console.WriteLine("Exception occurred while running kernel:");
+            //    global::System.Console.WriteLine(E.ToString());
+            //}
         }
 
         /// <summary>
