@@ -11,7 +11,7 @@ namespace Cosmos.System.FileSystem
     public class Disk
     {
         private List<ManagedPartition> parts = new List<ManagedPartition>();
-        private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>();
+        private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>() { new FatFileSystemFactory(), new ISO9660.ISO9660FileSystemFactory()};
         public bool IsMBR { get { return !GPT.IsGPTPartition(Host); } }
         /// <summary>
         /// The size of the disk in bytes.
@@ -75,10 +75,6 @@ namespace Cosmos.System.FileSystem
         public Disk(BlockDevice mainBlockDevice)
         {
             Host = mainBlockDevice;
-            if (registeredFileSystems.Count == 0)
-            {
-                registeredFileSystems.Add(new FatFileSystemFactory());
-            }
             foreach (var part in Partition.Partitions)
             {
                 if (part.Host == mainBlockDevice)
