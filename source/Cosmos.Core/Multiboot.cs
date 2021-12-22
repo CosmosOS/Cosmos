@@ -29,6 +29,22 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Tag BasicMemoryInformation
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 16)]
+        internal unsafe readonly struct Mb2TagBasicMemoryInformation
+        {
+            [FieldOffset(0)]
+            public readonly uint Type;
+            [FieldOffset(4)]
+            public readonly uint Size;
+            [FieldOffset(8)]
+            public readonly uint MemLower;
+            [FieldOffset(12)]
+            public readonly uint MemUpper;
+        }
+
+        /// <summary>
         /// Tag MemoryMap
         /// </summary>
         [StructLayout(LayoutKind.Explicit, Size = 40)]
@@ -104,6 +120,7 @@ namespace Cosmos.Core
             public readonly ulong Address;
         }
 
+        internal Mb2TagBasicMemoryInformation* BasicMemoryInformation { get; set; }
         internal Mb2TagMemoryMap* MemoryMap { get; set; }
         internal Mb2TagVbeInfo* VbeInfo { get; set; }
         internal Mb2TagFramebuffer* Framebuffer { get; set; }
@@ -131,8 +148,13 @@ namespace Cosmos.Core
 
             for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((byte*)tag + ((tag->Size + 7) & ~7)))
             {
+                Global.mDebugger.Send("Detected MbTag: " + tag->Type);
+
                 switch (tag->Type)
-                {
+                {  
+                    case 4:
+                        BasicMemoryInformation = (Mb2TagBasicMemoryInformation*)tag;
+                        break;
                     case 6:
                         MemoryMap = (Mb2TagMemoryMap*)tag;
                         break;
@@ -149,6 +171,24 @@ namespace Cosmos.Core
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Get MemLower
+        /// </summary>
+        /// <returns>MemLower</returns>
+        public uint GetMemLower()
+        {
+            return BasicMemoryInformation->MemLower;
+        }
+
+        /// <summary>
+        /// Get MemUpper
+        /// </summary>
+        /// <returns>MemUpper</returns>
+        public uint GetMemUpper()
+        {
+            return BasicMemoryInformation->MemUpper;
         }
 
         /// <summary>
