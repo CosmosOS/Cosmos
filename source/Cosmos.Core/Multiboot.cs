@@ -148,8 +148,6 @@ namespace Cosmos.Core
 
             for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((byte*)tag + ((tag->Size + 7) & ~7)))
             {
-                Global.mDebugger.Send("Detected MbTag: " + tag->Type);
-
                 switch (tag->Type)
                 {  
                     case 4:
