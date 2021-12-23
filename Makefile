@@ -99,4 +99,4 @@ install:
 nuget-install:
 	@echo "Installing Nuget packages"
 	$(DOTNET) nuget remove source "Cosmos Local Package Feed"
-	$(DOTNET) nuget add source $(DESTDIR)/Packages/ "Cosmos Local Package Feed"
+	$(DOTNET) nuget add source $(DESTDIR)/Packages/ -n "Cosmos Local Package Feed"
