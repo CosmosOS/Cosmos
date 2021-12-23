@@ -1,8 +1,9 @@
 ﻿<Project>
 
     <PropertyGroup>
-        <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
-        <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
+        <CosmosDir Condition="$(CosmosDir) == '' AND '$(OS)' == 'Windows_NT'">$(AppData)\Cosmos User Kit</CosmosDir>
+        <CosmosDir Condition="$(CosmosDir) == '' AND '$(OS)' != 'Windows_NT'">/opt/cosmos</CosmosDir>
+        <KernelAssembliesDir>$(CosmosDir)/Kernel/</KernelAssembliesDir>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -20,7 +21,8 @@
         <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
 
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.bat</ObjdumpToolExe>
+        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == '' AND '$(OS)' == 'Windows_NT'">objdump.bat</ObjdumpToolExe>
+        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == '' AND '$(OS)' != 'Windows_NT'">objdump.sh</ObjdumpToolExe>
 
         <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
         <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
