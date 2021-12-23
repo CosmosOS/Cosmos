@@ -56,7 +56,7 @@ build:
 
 .PHONY: publish
 publish:
-	@echo "Publishing IL2CPU
+	@echo "Publishing IL2CPU"
 	$(DOTNET) publish $(IL2CPU_DIR)/source/IL2CPU -r linux-x64 --self-contained $(DOTNETFLAGS)
 
 	@echo "Publishing Cosmos"
