@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 error() {
   printf '\E[31m'; echo "$@"; printf '\E[0m'
 }
 
-if [[ $EUID -ne 0 ]]; then
-    error "Please run this script as root"
+if [ "$EUID" -ne 0 ]
+    then error "Please run this script as root"
     exit 1
 fi
 
@@ -67,6 +67,6 @@ cp source/Cosmos.System2_Plugs/bin/Debug/net5.0/publish/*.dll $InstallDir/Kernel
 cp source/Cosmos.HAL2/bin/Debug/net5.0/publish/*.dll $InstallDir/Kernel/
 cp source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $InstallDir/Kernel/
 
-cp build/HyperV/*.vhdx $InstallDir/Build/HyperV/ 
-cp build/VMWare/Workstation/* $InstallDir/Build/VMware/Workstation/ 
+cp build/HyperV/*.vhdx $InstallDir/Build/HyperV/
+cp build/VMWare/Workstation/* $InstallDir/Build/VMware/Workstation/
 cp build/syslinux/* $InstallDir/Build/ISO/
