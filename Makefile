@@ -92,3 +92,11 @@ install:
 	@cp $(THISDIR)/build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
 	@cp $(THISDIR)/build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
 	@cp $(THISDIR)/build/syslinux/* $(DESTDIR)/Build/ISO/
+
+	$(MAKE) nuget-install
+
+.PHONY: nuget-install
+nuget-install:
+	@echo "Installing Nuget packages"
+	$(DOTNET) nuget remove source "Cosmos Local Package Feed"
+	$(DOTNET) nuget add source $(DESTDIR)/Packages/ "Cosmos Local Package Feed"
