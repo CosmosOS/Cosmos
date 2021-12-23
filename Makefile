@@ -19,10 +19,6 @@ DOTNETFLAGS = -v:q -nologo
 all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
 	$(MAKE) build
 	$(MAKE) publish
-	@if ! [ "$(shell id -u)" = 0 ];then
-		sudo $(MAKE) install
-		exit 0
-	fi
 	$(MAKE) install
 
 $(IL2CPU_DIR):
@@ -53,6 +49,7 @@ build:
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2 $(DOTNETFLAGS)
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks $(DOTNETFLAGS)
 
 .PHONY: publish
 publish:
@@ -74,24 +71,24 @@ install:
 	@mkdir -p $(DESTDIR)/Build/IL2CPU
 	@mkdir -p $(DESTDIR)/Build/HyperV/
 	@mkdir -p $(DESTDIR)/Build/VMware/Workstation
-	@mkdir -p $(DESTDIR)/Cosmos/Packages
+	@mkdir -p $(DESTDIR)/Packages
 	@mkdir -p $(DESTDIR)/Kernel
-	@cp $(IL2CPU_DIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Cosmos/Packages/
-	@cp $(THISDIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Cosmos/
-	@cp $(IL2CPU_DIR)/source/Cosmos.Core.DebugStub/*.xs $(DESTDIR)/XSharp/DebugStub/
+	@cp -r $(IL2CPU_DIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
+	@cp -r $(THISDIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
+	@cp -r $(IL2CPU_DIR)/source/Cosmos.Core.DebugStub/*.xs $(DESTDIR)/XSharp/DebugStub/
 
-	@cp $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/
-	@cp $(THISDIR)/Artwork/Cosmos.ico $(DESTDIR)/
+	@cp -r $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/
+	@cp -r $(THISDIR)/Artwork/Cosmos.ico $(DESTDIR)/
 
 	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Debug/net5.0/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
-	@cp $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp $(THISDIR)/source/Cosmos.HAL2/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
 
-	@cp $(THISDIR)/build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
-	@cp $(THISDIR)/build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
-	@cp $(THISDIR)/build/syslinux/* $(DESTDIR)/Build/ISO/
+	@cp -r $(THISDIR)/build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
+	@cp -r $(THISDIR)/build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
+	@cp -r $(THISDIR)/build/syslinux/* $(DESTDIR)/Build/ISO/
 
 	$(MAKE) nuget-install
 

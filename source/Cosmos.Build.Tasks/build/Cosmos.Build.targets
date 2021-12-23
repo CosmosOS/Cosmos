@@ -20,9 +20,8 @@
         <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</LdToolPath>
         <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
 
-        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == '' AND '$(OS)' == 'Windows_NT'">objdump.bat</ObjdumpToolExe>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == '' AND '$(OS)' != 'Windows_NT'">objdump.sh</ObjdumpToolExe>
+        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
+        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/bin/</ObjdumpToolPath>
 
         <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
         <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
@@ -266,7 +265,8 @@
                                MapFile="$(MapFile)"
                                DebugInfoFile="$(CosmosDebugSymbolsFile)"
                                ToolPath="$(ObjdumpToolPath)"
-                               ToolExe="$(ObjdumpToolExe)" />
+                               ToolExe="$(ObjdumpToolExe)"
+                               ActualToolPath="$(CosmosToolsPath)cygwin\win\"/>
 
     </Target>
 
