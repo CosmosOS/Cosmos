@@ -30,6 +30,7 @@ dotnet pack source/Cosmos.Core_Plugs -v:q -nologo
 dotnet pack source/Cosmos.HAL2 -v:q -nologo
 dotnet pack source/Cosmos.System2 -v:q -nologo
 dotnet pack source/Cosmos.System2_Plugs -v:q -nologo
+dotnet pack source/Cosmos.Build.Tasks -v:q -nologo
 
 echo Publishing IL2CPU
 cd ../IL2CPU
@@ -50,12 +51,12 @@ mkdir -p $InstallDir/XSharp/DebugStub
 mkdir -p $InstallDir/Build/
 mkdir -p $InstallDir/Build/ISO
 mkdir -p $InstallDir/Build/VMware/Workstation
-mkdir -p $InstallDir/Cosmos/Packages
+mkdir -p $InstallDir/Packages
 mkdir -p $InstallDir/Kernel
 mkdir -p $InstallDir/Build/IL2CPU
 mkdir -p $InstallDir/Build/HyperV/
-cp ../IL2CPU/artifacts/Debug/nupkg/*.nupkg $InstallDir/Cosmos/Packages/
-cp artifacts/Debug/nupkg/*.nupkg $InstallDir/Cosmos/
+cp ../IL2CPU/artifacts/Debug/nupkg/*.nupkg $InstallDir/Packages/
+cp artifacts/Debug/nupkg/*.nupkg $InstallDir/Packages/
 cp ../IL2CPU/source/Cosmos.Core.DebugStub/*.xs $InstallDir/XSharp/DebugStub/
 
 cp Artwork/XSharp/XSharp.ico $InstallDir/XSharp/
@@ -70,3 +71,10 @@ cp source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $
 cp build/HyperV/*.vhdx $InstallDir/Build/HyperV/
 cp build/VMWare/Workstation/* $InstallDir/Build/VMware/Workstation/
 cp build/syslinux/* $InstallDir/Build/ISO/
+
+echo Installing nuget packages
+set +e
+dotnet nuget remove source "Cosmos Local Package Feed"
+set -e
+
+dotnet nuget add source /opt/cosmos/Packages/ -n "Cosmos Local Package Feed"
