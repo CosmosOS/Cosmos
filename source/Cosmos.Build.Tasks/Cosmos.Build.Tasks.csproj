@@ -11,7 +11,10 @@
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
 
-
+    <PropertyGroup>
+        <Net48>True</Net48>
+    </PropertyGroup>
+    
     <ItemGroup>
         <Content Include="build\**" Pack="True" PackagePath="build\" />
         <Content Include="tools\**" Pack="True" PackagePath="tools\" />
