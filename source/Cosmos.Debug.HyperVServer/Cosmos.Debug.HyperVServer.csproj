@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.PowerShell.3.ReferenceAssemblies" Version="1.0.0" />
-        <PackageReference Include="System.IO.Pipes.AccessControl" Version="6.0.0-preview.5.21301.5" />
+        <PackageReference Include="System.IO.Pipes.AccessControl" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
