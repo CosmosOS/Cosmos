@@ -110,22 +110,14 @@ Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion 
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
-Source: ".\Build\syslinux\isolinux.bin"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\ISO\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\ISO\boot\grub\"
 ; USB
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\USB\"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\USB\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\USB\boot\grub\"
 ; PXE
-Source: ".\Build\syslinux\pxelinux.0"; DestDir: "{app}\Build\PXE"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\PXE\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\PXE\boot\grub\"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
