@@ -99,6 +99,7 @@
             this.cmboSlavePort = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.chckExtractMapFile = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.TabControl1.SuspendLayout();
             this.tabProfile.SuspendLayout();
@@ -424,6 +425,7 @@
             // tabDebug
             // 
             this.tabDebug.AutoScroll = true;
+            this.tabDebug.Controls.Add(this.chckExtractMapFile);
             this.tabDebug.Controls.Add(this.chckEnableDebugStub);
             this.tabDebug.Controls.Add(this.panlDebugSettings);
             this.tabDebug.Location = new System.Drawing.Point(4, 40);
@@ -437,7 +439,7 @@
             // chckEnableDebugStub
             // 
             this.chckEnableDebugStub.AutoSize = true;
-            this.chckEnableDebugStub.Location = new System.Drawing.Point(14, 6);
+            this.chckEnableDebugStub.Location = new System.Drawing.Point(16, 48);
             this.chckEnableDebugStub.Name = "chckEnableDebugStub";
             this.chckEnableDebugStub.Size = new System.Drawing.Size(154, 17);
             this.chckEnableDebugStub.TabIndex = 7;
@@ -449,7 +451,7 @@
             this.panlDebugSettings.Controls.Add(this.stackCorruptionDetectionGroupBox);
             this.panlDebugSettings.Controls.Add(this.debugLevelGroupBox);
             this.panlDebugSettings.Controls.Add(this.debugStubGroupBox);
-            this.panlDebugSettings.Location = new System.Drawing.Point(6, 29);
+            this.panlDebugSettings.Location = new System.Drawing.Point(8, 71);
             this.panlDebugSettings.Name = "panlDebugSettings";
             this.panlDebugSettings.Size = new System.Drawing.Size(280, 400);
             this.panlDebugSettings.TabIndex = 33;
@@ -885,6 +887,16 @@
             this.label6.TabIndex = 34;
             this.label6.Text = "Slave Port:";
             // 
+            // checkBox1
+            // 
+            this.chckExtractMapFile.AutoSize = true;
+            this.chckExtractMapFile.Location = new System.Drawing.Point(16, 16);
+            this.chckExtractMapFile.Name = "chckExtractMapFile";
+            this.chckExtractMapFile.Size = new System.Drawing.Size(99, 17);
+            this.chckExtractMapFile.TabIndex = 34;
+            this.chckExtractMapFile.Text = "Extact Map File";
+            this.chckExtractMapFile.UseVisualStyleBackColor = true;
+            // 
             // OldCosmosPropertyPageControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1002,5 +1014,6 @@
         private System.Windows.Forms.CheckBox checkBoxVBEMultiboot;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBoxVBEResolution;
+        private System.Windows.Forms.CheckBox chckExtractMapFile;
     }
 }

@@ -39,6 +39,7 @@
         <BinFormat Condition="'$(BinFormat)' == ''">ELF</BinFormat>
         <DebugMode Condition="'$(DebugMode)' == ''">Source</DebugMode>
         <TraceMode Condition="'$(TraceMode)' == ''">User</TraceMode>
+		<ExtractMapFile Condition="'$(ExtractMapFile)' == ''">False</ExtractMapFile>
         <StackCorruptionDetectionEnabled Condition="'$(StackCorruptionDetectionEnabled)' == ''">True</StackCorruptionDetectionEnabled>
         <StackCorruptionDetectionLevel Condition="'$(StackCorruptionDetectionLevel)' == ''">MethodFooters</StackCorruptionDetectionLevel>
         <IgnoreDebugStubAttribute Condition="'$(IgnoreDebugStubAttribute)' == ''">False</IgnoreDebugStubAttribute>
@@ -258,7 +259,7 @@
     <Target Name="ExtractMapFromElfFile"
             Inputs="$(BinFile)"
             Outputs="$(CosmosDebugSymbolsFile)"
-            Condition="'$(BinFormat)' == 'ELF'">
+            Condition="'$(BinFormat)' == 'ELF' AND '$(ExtractMapFile)' == 'True'">
 
         <ExtractMapFromElfFile InputFile="$(BinFile)"
                                MapFile="$(MapFile)"
