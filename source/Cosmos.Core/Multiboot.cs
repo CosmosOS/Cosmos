@@ -120,27 +120,16 @@ namespace Cosmos.Core
             public readonly ulong Address;
         }
 
-        internal Mb2TagBasicMemoryInformation* BasicMemoryInformation { get; set; }
-        internal Mb2TagMemoryMap* MemoryMap { get; set; }
-        internal Mb2TagVbeInfo* VbeInfo { get; set; }
-        internal Mb2TagFramebuffer* Framebuffer { get; set; }
-        internal Mb2TagEFI64* EFI64 { get; set; }
-
-        /// /// <summary>
-        /// Multiboot2 ctor
-        /// </summary>
-        internal Multiboot2()
-        {
-            MemoryMap = null;
-            VbeInfo = null;
-            Framebuffer = null;
-            EFI64 = null;
-        }
+        internal static Mb2TagBasicMemoryInformation* BasicMemoryInformation { get; set; }
+        internal static Mb2TagMemoryMap* MemoryMap { get; set; }
+        internal static Mb2TagVbeInfo* VbeInfo { get; set; }
+        internal static Mb2TagFramebuffer* Framebuffer { get; set; }
+        internal static Mb2TagEFI64* EFI64 { get; set; }
 
         /// /// <summary>
         /// Parse multiboot2 structure
         /// </summary>
-        internal void Init()
+        internal static void Init()
         {
             var MbAddress = (IntPtr)GetMBIAddress();
 
@@ -175,7 +164,7 @@ namespace Cosmos.Core
         /// Get MemLower
         /// </summary>
         /// <returns>MemLower</returns>
-        public uint GetMemLower()
+        public static uint GetMemLower()
         {
             return BasicMemoryInformation->MemLower;
         }
@@ -184,7 +173,7 @@ namespace Cosmos.Core
         /// Get MemUpper
         /// </summary>
         /// <returns>MemUpper</returns>
-        public uint GetMemUpper()
+        public static uint GetMemUpper()
         {
             return BasicMemoryInformation->MemUpper;
         }
@@ -195,7 +184,7 @@ namespace Cosmos.Core
         /// <returns>True if is available, false if not</returns>
         public static bool MemoryMapExists()
         {
-            if (Bootstrap.Multiboot.MemoryMap != null)
+            if (MemoryMap != null)
             {
                 return true;
             }
@@ -224,7 +213,7 @@ namespace Cosmos.Core
         /// <returns>True if is available, false if not</returns>
         public static bool IsAvailable()
         {
-            if (Bootstrap.Multiboot.VbeInfo != null)
+            if (Multiboot2.VbeInfo != null)
             {
                 return true;
             }
@@ -239,7 +228,7 @@ namespace Cosmos.Core
         /// </summary>
         public static ModeInfo getModeInfo()
         {
-            return Bootstrap.Multiboot.VbeInfo->VbeModeInfo;
+            return Multiboot2.VbeInfo->VbeModeInfo;
         }
 
         /// /// <summary>
@@ -247,7 +236,7 @@ namespace Cosmos.Core
         /// </summary>
         public static ControllerInfo getControllerInfo()
         {
-            return Bootstrap.Multiboot.VbeInfo->VbeControlInfo;
+            return Multiboot2.VbeInfo->VbeControlInfo;
         }
 
         /// /// <summary>

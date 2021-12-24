@@ -348,11 +348,11 @@ namespace Cosmos.Core
             }
 
             var rawMap = new RawMemoryMap[64];
-            var baseMap = (RawMemoryMap*)((uint*)Bootstrap.Multiboot.MemoryMap + (uint)16);
+            var baseMap = (RawMemoryMap*)((uint*)Multiboot2.MemoryMap + (uint)16);
             var currentMap = baseMap;
 
-            uint totalSize = Bootstrap.Multiboot.MemoryMap->Size - 16;
-            uint entrySize = Bootstrap.Multiboot.MemoryMap->EntrySize;
+            uint totalSize = Multiboot2.MemoryMap->Size - 16;
+            uint entrySize = Multiboot2.MemoryMap->EntrySize;
 
             int counter = 0;
             while ((uint)currentMap < ((uint)baseMap + totalSize) && counter < 64)

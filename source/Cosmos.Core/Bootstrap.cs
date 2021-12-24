@@ -22,11 +22,6 @@ namespace Cosmos.Core
         /// </summary>
         static public readonly CPU CPU = new CPU();
 
-        /// <summary>
-        /// Multiboot.
-        /// </summary>
-        static public readonly Multiboot2 Multiboot = new Multiboot2();
-
         // Bootstrap is a class designed only to get the essentials done.
         // ie the stuff needed to "pre boot". Do only the very minimal here.
         // IDT, PIC, and Float
@@ -54,7 +49,7 @@ namespace Cosmos.Core
             CPU.InitFloat();
 
             //Parse multiboot2 structure
-            Multiboot.Init();
+            Multiboot2.Init();
         }
     }
 }
