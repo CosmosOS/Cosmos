@@ -1,5 +1,6 @@
 ﻿using Cosmos.Core;
 using Cosmos.Core.Memory;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU;
 using Cosmos.TestRunner;
 using IL2CPU.API.Attribs;
@@ -9,6 +10,12 @@ using Sys = Cosmos.System;
 
 namespace Cosmos.Compiler.Tests.TypeSystem
 {
+    static class StaticTestClass
+    {
+        internal static object A;
+        internal static TestType B;
+    }
+
     class A
     {
 
@@ -35,7 +42,12 @@ namespace Cosmos.Compiler.Tests.TypeSystem
 
     public class Kernel : Sys.Kernel
     {
-        static int test = 0;
+        // When testing the changes locally alt tabbing on to bochs/sending key codes will cause more objects to be freed and
+        // can cause the tests to fail if badly timed
+        // so just let the tests run in peace :)
+
+        private static int test = 0;
+
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Starting Type tests now please wait...");
@@ -79,7 +91,6 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(((CosmosRuntimeType)typeof(object)).mTypeId, types[2], "GetGCFieldTypes returns object at offset 2");
         }
 
-        [NoGC]
         private unsafe void TestGarbageCollectorMethods()
         {
             // allocating + freeing works on gc side
@@ -91,86 +102,41 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(allocated + 1, nowAllocated, "NewObj causes one object to be allocated");
             Assert.AreEqual(allocated, afterFree, "Free causes one object to be freed again");
 
-            // stloc correctly updates ref counts
-            object a = new object();
-            var test = new TestType();
-            test.FieldB = a;
-            test.FieldC = "asd";
-            uint* aPtr = GCImplementation.GetPointer(test);
+            var testString = "asd";
+            Assert.AreEqual(RAT.PageType.Empty, RAT.GetPageType(GCImplementation.GetPointer(testString)), "String is created statically and not managed by GC");
 
-            // Manual ref counting works
-            Assert.AreEqual(RAT.PageType.None, RAT.GetPageType(GCImplementation.GetPointer(test.FieldC)), "String is created statically and not managed by GC");
-            Heap.IncRefCount(aPtr);
-            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "IncRefCount works");
-            Heap.IncRefCount(aPtr);
-            Assert.AreEqual(2, Heap.GetRefCount(aPtr), "IncRefCount works");
-            Heap.DecRefCount(aPtr, 0);
-            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "DecRefCount works");
-
-            Heap.IncRefCount(GCImplementation.GetPointer(a)); // so that free does not panic
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            Heap.DecRefCount(aPtr, 0);
-            afterFree = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated - 2, afterFree, "DecRefCount triggers free, which works recursivly");
+            Assert.IsTrue(Heap.Collect() >= 0, "Running GC Collect first time does not crash and returns non-negative value");
         }
 
-        static object staticObject;
         private unsafe void TestGarbageCollector()
         {
-            // stloc correctly updates ref counts
-            object a = new object();
-            var test = new TestType();
-            test.FieldB = a;
-            test.FieldC = "asd";
-            uint* aPtr = GCImplementation.GetPointer(test);
-            Assert.AreEqual(1, Heap.GetRefCount(aPtr), "Object has one ref count");
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "object a has 2 ref count currently");
-            test.FieldB = new object();
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.FieldB)), "new object has 1 ref count currently");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(a)), "object a has 1 ref count currently");
-
-            // Cleaning up locals test
-            int allocated = HeapSmall.GetAllocatedObjectCount();
+            Heap.Collect();
             TestMethod1();
-            int nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated, nowAllocated, "All local objects in a method are cleaned up");
-
-            // Return value test
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            var counter = TestMethod2();
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated + 1, nowAllocated, "Method with return value only keeps return value alive");
-            Assert.AreEqual(counter.x, 3, "Returned object is not freed");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(counter)), "Return value has 1 ref from local variable");
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            counter = TestMethod3();
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated, nowAllocated, "Recursive methof calling with return value only keeps return value alive");
-            Assert.AreEqual(counter.x, 3, "Returned object is not freed");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(counter)), "Return value has 1 ref from local variable");
-
-            // Array GC Test
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            Counter counter1 = new Counter();
-            Counter[] counters = new Counter[3];
-            counters[0] = counter1;
-            counters[1] = new Counter();
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated + 3, nowAllocated, "Array test allocates 3 elements");
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(counter1)), "Storing element in array increases refcount");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(counters[1])), "Storing element in array increases refcount");
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            counters = null; // indirectly decrement the ref count
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated - 2, nowAllocated, "Decreasing ref count of array to zero frees it and propagates to elements");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(counter1)), "Freeing array decreases ref count by 1 of elements");
-
-            // stsfld GC test
-            staticObject = new object();
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(staticObject)), "Storing object in static variable increases ref count by 1");
-            object x = staticObject;
-            staticObject = new object();
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(staticObject)), "Replacing object in static variable decreases ref count by 1 of old object");
+            int collected = Heap.Collect();
+            Assert.AreEqual(2, collected, "GC Collect correctly cleans up locals from method");
+            Heap.Collect();
+            Counter a = TestMethod2();
+            collected = Heap.Collect();
+            Assert.AreEqual(3, a.x, "a is not freed and still contains value");
+            Assert.AreEqual(1, collected, "GC Collect correctly keeps local element alive");
+            Heap.Collect();
+            Counter b = TestMethod3();
+            collected = Heap.Collect();
+            Assert.AreEqual(2, collected, "GC Collect collects unused locals from both methods");
+            Heap.Collect();
+            TestStruct testStruct = TestMethod4();
+            collected = Heap.Collect();
+            Assert.AreEqual(0, collected, "Storing elements in struct keeps them referenced");
+            Heap.Collect();
+            TestMethod5();
+            collected = Heap.Collect();
+            Assert.AreEqual(2, collected, "Objects once stored in struct are cleaned up");
+            Heap.Collect();
+            StaticTestClass.A = new object();
+            StaticTestClass.B = new TestType();
+            StaticTestClass.B.FieldA = 10;
+            collected = Heap.Collect();
+            Assert.AreEqual(0, collected, "Storing elements in static class keeps them referenced");
         }
 
         public void TestMethod1()
@@ -202,75 +168,6 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             public TestType c;
         }
 
-        public unsafe void TestGarbageCollectorWithStructs()
-        {
-            TestStruct test = new TestStruct();
-            object obj = new object();
-            test.b = obj;
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(obj)), "Stfld to struct saves object reference");
-            test = new TestStruct();
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(obj)), "Freeing of structs leads object reference counts decreasing");
-            test.b = obj;
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(obj)), "Stfld to struct saves object reference");
-            test.b = new object();
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(obj)), "Replacing object stored in struct leads to decreasing old object reference");
-
-            int allocated = HeapSmall.GetAllocatedObjectCount();
-            test = new TestStruct();
-            int nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated - 1, nowAllocated, "Struct being replaced propagates to free of objects within");
-
-            test.c = new TestType();
-            test.c.FieldB = new object();
-
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.c)), "TestType stored in struct has correct ref count");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.c.FieldB)), "Object in TestType stored in struct has correct ref count");
-
-            var test3 = test;
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(test3.c)), "Storing struct in other local increments reference count");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test.c.FieldB)), "Increase struct amount does not propagate");
-
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            var test2 = TestMethod4();
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated + 2, nowAllocated, "Only objects are allocated on heap");
-            Assert.AreEqual(10, test2.a, "Struct is correctly returned from method");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test2.b)), "Object stored in struct created in other method has correct ref count");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(test2.c)), "TestType stored in struct created in other method has correct ref count");
-
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            TestMethod5();
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated, nowAllocated, "Objects stored in local struct are cleaned up correctly by end of method");
-
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            TestStruct[] testStructs = new TestStruct[8];
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated + 1, nowAllocated, "Creating array of structs allocates 1 object");
-
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            testStructs[0] = new TestStruct();
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated, nowAllocated, "Nothing gets allocated when setting new struct in an array");
-            testStructs[0].b = new object();
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[0].b)), "Setting object in struct in array has correct ref count");
-            testStructs[1] = testStructs[0];
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[0].b)), "Copying structure to other location in array correctly increments reference count");
-            testStructs[0] = new TestStruct();
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[1].b)), "Clearing struct stored in array correctly decreases ref count");
-            testStructs[0].b = new object();
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[0].b)), "Setting object in struct in array has correct ref count");
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            testStructs[1] = testStructs[0];
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated - 1, nowAllocated, "Correctly decrements and frees objects in struct when storing other struct at location");
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(testStructs[0].b)), "Copying structure to other location in array correctly increments reference count");
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            testStructs = null;
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated - 2, nowAllocated, "Removing last reference to struct array causes it to be freed and object only stored within");
-        }
-
         TestStruct TestMethod4()
         {
             TestStruct testStruct = new TestStruct();
@@ -296,46 +193,17 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             public object d;
         }
 
-        public unsafe void TestGCStructComplexCases()
-        {
-            int allocated = HeapSmall.GetAllocatedObjectCount();
-            ClassWithStruct classWithStruct = new ClassWithStruct();
-            int nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated + 1, nowAllocated, "Newobj allocates one object");
-
-            TestStruct testStruct = new TestStruct();
-            testStruct.b = new object();
-            testStruct.c = new TestType();
-
-            classWithStruct.c = testStruct;
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(testStruct.b)), "Storing structure in object increments references of child objects");
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(testStruct.c)), "Storing structure in object increments references of child objects");
-            classWithStruct.d = testStruct.b;
-            Assert.AreEqual(3, Heap.GetRefCount(GCImplementation.GetPointer(testStruct.b)), "Storing another instance");
-            Assert.AreEqual(3, Heap.GetRefCount(GCImplementation.GetPointer(classWithStruct.d)), "Refcount is reflexive");
-
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            testStruct = new TestStruct();
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated, nowAllocated, "When struct still exists elsewhere no child objects are deallocated");
-            Assert.AreEqual(2, Heap.GetRefCount(GCImplementation.GetPointer(classWithStruct.d)), "Refcount are decremented");
-            Assert.AreEqual(1, Heap.GetRefCount(GCImplementation.GetPointer(classWithStruct.c.c)), "Refcount are decremented");
-
-            allocated = HeapSmall.GetAllocatedObjectCount();
-            classWithStruct = null;
-            nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            Assert.AreEqual(allocated - 3, nowAllocated, "ClassWithStruct, object and TestType are all freed");
-        }
-
         public void RealMethodsTest()
         {
+            Heap.Collect();
             int allocated = HeapSmall.GetAllocatedObjectCount();
-            TestMethod7();
+            TestMethod6();
+            Heap.Collect();
             int nowAllocated = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated, nowAllocated, "Concentating and writing strings does not leak objects");
         }
 
-        void TestMethod7()
+        void TestMethod6()
         {
             Console.WriteLine("Test: " + 3 + " vs " + 5);
         }
@@ -346,55 +214,53 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             {
                 mDebugger.Send("Run");
 
-                //object xString = "a";
-                //string xString2 = "b";
+                object xString = "a";
+                string xString2 = "b";
 
-                //Assert.IsTrue(xString.GetType() == typeof(string), "GetType or typeof() works for reference types!");
-                //Assert.IsTrue(xString.GetType() == xString2.GetType(), "GetType or typeof() works for reference types!");
-                //Assert.IsTrue(xString is ICloneable, "isinst works for interfaces on reference types!");
-                //Assert.IsTrue(xString is IEnumerable<char>, "isinst works for generic interfaces on reference types!");
-                //Assert.IsFalse(xString.GetType().IsValueType, "IsValueType works for reference types!");
+                Assert.IsTrue(xString.GetType() == typeof(string), "GetType or typeof() works for reference types!");
+                Assert.IsTrue(xString.GetType() == xString2.GetType(), "GetType or typeof() works for reference types!");
+                Assert.IsTrue(xString is ICloneable, "isinst works for interfaces on reference types!");
+                Assert.IsTrue(xString is IEnumerable<char>, "isinst works for generic interfaces on reference types!");
+                Assert.IsFalse(xString.GetType().IsValueType, "IsValueType works for reference types!");
 
-                //IComparable<int> xNumber = 3;
+                IComparable<int> xNumber = 3;
 
-                //Assert.IsTrue(xNumber.GetType() == typeof(int), "GetType or typeof() works for value types!");
-                //Assert.IsTrue(xNumber is IConvertible, "isinst works for interfaces on value types!");
-                //Assert.IsTrue(xNumber is IEquatable<int>, "isinst works for generic interfaces on value types!");
+                Assert.IsTrue(xNumber.GetType() == typeof(int), "GetType or typeof() works for value types!");
+                Assert.IsTrue(xNumber is IConvertible, "isinst works for interfaces on value types!");
+                Assert.IsTrue(xNumber is IEquatable<int>, "isinst works for generic interfaces on value types!");
 
-                //IEnumerable<string> xEnumerable = new List<string>();
+                IEnumerable<string> xEnumerable = new List<string>();
 
-                //Assert.IsTrue(xEnumerable.GetType() == typeof(List<string>), "GetType or typeof() works for reference types!");
-                //Assert.IsTrue(xEnumerable is IEnumerable, "isinst works for interfaces on generic reference types!");
-                //Assert.IsTrue(xEnumerable is IList<string>, "isinst works for generic interfaces on generic reference types!");
+                Assert.IsTrue(xEnumerable.GetType() == typeof(List<string>), "GetType or typeof() works for reference types!");
+                Assert.IsTrue(xEnumerable is global::System.Collections.IEnumerable, "isinst works for interfaces on generic reference types!");
+                Assert.IsTrue(xEnumerable is IList<string>, "isinst works for generic interfaces on generic reference types!");
 
-                //B b = new B();
-                //Assert.IsTrue(b.GetType() == typeof(B), "GetType or typeof() works for custom types!");
+                B b = new B();
+                Assert.IsTrue(b.GetType() == typeof(B), "GetType or typeof() works for custom types!");
 
-                //Type baseType = b.GetType().BaseType;
-                //Type objectType = typeof(A);
-                //Assert.IsTrue(baseType == objectType, "BaseType works for custom reference types!");
-                //Assert.IsTrue(b.GetType().BaseType == new B().GetType().BaseType, "BaseType works for custom reference types!");
-                //Assert.IsTrue(b.GetType().IsSubclassOf(typeof(A)), "IsSubClassOf works for custom reference types!");
+                Type baseType = b.GetType().BaseType;
+                Type objectType = typeof(A);
+                Assert.IsTrue(baseType == objectType, "BaseType works for custom reference types!");
+                Assert.IsTrue(b.GetType().BaseType == new B().GetType().BaseType, "BaseType works for custom reference types!");
+                Assert.IsTrue(b.GetType().IsSubclassOf(typeof(A)), "IsSubClassOf works for custom reference types!");
 
-                //byte xByte = 1;
-                //Assert.IsTrue(xByte.GetType() == typeof(byte), "GetType or typeof() works for value types!");
-                //Assert.IsTrue(xByte.GetType().IsSubclassOf(typeof(ValueType)), "IsSubClassOf works for value types!");
-                //Assert.IsTrue(xByte.GetType().IsValueType, "IsValueType works for value types!");
+                byte xByte = 1;
+                Assert.IsTrue(xByte.GetType() == typeof(byte), "GetType or typeof() works for value types!");
+                Assert.IsTrue(xByte.GetType().IsSubclassOf(typeof(ValueType)), "IsSubClassOf works for value types!");
+                Assert.IsTrue(xByte.GetType().IsValueType, "IsValueType works for value types!");
 
-                //Action a = () => { };
-                //Action<int> a1 = (i) => test++;
-                //Assert.IsTrue(a != null , "Anonymous type for action is created correctly");
-                //Assert.IsTrue(a1 != null, "Anonymous type for action<int> is created correctly");
+                Action a = () => { };
+                Action<int> a1 = (i) => test++;
+                Assert.IsTrue(a != null, "Anonymous type for action is created correctly");
+                Assert.IsTrue(a1 != null, "Anonymous type for action<int> is created correctly");
 
-                //var c = new { i = 1, n = "Test" };
-                //Assert.IsTrue(c != null, "Anonymous types are created correctly");
-                //Assert.IsTrue(c.i == 1 && c.n == "Test", "Anonymous types have correct values");
+                var c = new { i = 1, n = "Test" };
+                Assert.IsTrue(c != null, "Anonymous types are created correctly");
+                Assert.IsTrue(c.i == 1 && c.n == "Test", "Anonymous types have correct values");
 
                 TestVTablesImpl();
                 TestGarbageCollectorMethods();
                 TestGarbageCollector();
-                TestGarbageCollectorWithStructs();
-                TestGCStructComplexCases();
                 RealMethodsTest();
 
                 TestController.Completed();

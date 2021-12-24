@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.IL2CPU;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Native = System.UInt32;
 
@@ -46,7 +47,7 @@ namespace Cosmos.Core.Memory.Test
 
                 var largePage = RAT.AllocPages(RAT.PageType.HeapLarge, 3);
                 Assert.AreEqual(RAT.PageType.HeapLarge, RAT.GetPageType(largePage));
-                Assert.AreEqual(RAT.GetFirstRAT(largePage), RAT.GetFirstRAT((byte*)largePage + 20));
+                Assert.AreEqual(RAT.GetFirstRATIndex(largePage), RAT.GetFirstRATIndex((byte*)largePage + 20));
                 Assert.AreEqual(RAT.PageType.HeapLarge, RAT.GetPageType((byte*)largePage + RAT.PageSize));
             }
         }
@@ -271,43 +272,10 @@ namespace Cosmos.Core.Memory.Test
                 Assert.AreNotEqual((uint)ptr1, (uint)ptr2);
                 Assert.AreNotEqual((uint)ptr1, (uint)ptr3);
                 Assert.AreNotEqual((uint)ptr2, (uint)ptr3);
-                Assert.AreEqual(RAT.GetFirstRAT(ptr1), RAT.GetFirstRAT(ptr2));
-                Assert.AreEqual(RAT.GetFirstRAT(ptr1), RAT.GetFirstRAT(ptr3));
+                Assert.AreEqual(RAT.GetFirstRATIndex(ptr1), RAT.GetFirstRATIndex(ptr2));
+                Assert.AreEqual(RAT.GetFirstRATIndex(ptr1), RAT.GetFirstRATIndex(ptr3));
                 Assert.AreEqual((uint)RAT.GetPagePtr(ptr1), (uint)RAT.GetPagePtr(ptr2));
                 Assert.AreEqual((uint)RAT.GetPagePtr(ptr1), (uint)RAT.GetPagePtr(ptr3));
-            }
-        }
-
-        [TestMethod]
-        public unsafe void TestRefCounting()
-        {
-            var xRAM = new byte[20 * RAT.PageSize]; // 10 Pages - 1 for RAT and 19 for values
-            fixed (byte* xPtr = xRAM)
-            {
-                RAT.Debug = true;
-                RAT.Init(xPtr, (uint)xRAM.Length);
-
-                var ptr1 = Heap.Alloc(10);
-                TestPointerRefCounting(ptr1);
-                Assert.AreEqual(1, HeapSmall.GetAllocatedObjectCount());
-                Heap.DecRefCount(ptr1, 0);
-                Assert.AreEqual(0, HeapSmall.GetAllocatedObjectCount());
-                var ptr2 = Heap.Alloc(HeapMedium.MaxItemSize + 10); // this should make a large pointer
-                TestPointerRefCounting(ptr2);
-                Assert.AreEqual((uint)2, RAT.GetPageCount(RAT.PageType.HeapLarge));
-                Heap.DecRefCount(ptr2, 0);
-                Assert.AreEqual((uint)0, RAT.GetPageCount(RAT.PageType.HeapLarge));
-            }
-
-            static unsafe void TestPointerRefCounting(byte* aPtr)
-            {
-                Assert.AreEqual((uint)1, Heap.GetRefCount(aPtr));
-                Heap.IncRefCount(aPtr);
-                Heap.IncRefCount(aPtr);
-                Assert.AreEqual((uint)3, Heap.GetRefCount(aPtr));
-                Heap.DecRefCount(aPtr, 0);
-                Assert.AreEqual((uint)2, Heap.GetRefCount(aPtr));
-                Heap.DecRefCount(aPtr, 0);
             }
         }
     }

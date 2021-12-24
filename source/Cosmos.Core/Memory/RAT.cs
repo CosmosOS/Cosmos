@@ -26,39 +26,41 @@ namespace Cosmos.Core.Memory
         {
             /// <summary>
             /// Empty page.
+            /// Can also indicate invalid page.
             /// </summary>
             public const byte Empty = 0;
 
             // Data Types from 1, special meanings from 255 down.
             /// <summary>
-            /// RAT type page.
+            /// Indicates that the page contains objects managed by the GC
             /// </summary>
-            public const byte RAT = 1;
+            public const byte GCManaged = 1;
             /// <summary>
             /// Small heap page.
             /// </summary>
-            public const byte HeapSmall = 2;
+            public const byte HeapSmall = 3;
             /// <summary>
             /// Medium heap page.
             /// </summary>
-            public const byte HeapMedium = 3;
+            public const byte HeapMedium = 5;
             /// <summary>
             /// Large heap page.
             /// </summary>
-            public const byte HeapLarge = 4;
-            /// <summary>
-            /// Page type of a region which is not a page
-            /// </summary>
-            public const byte None = 8;
-            // Code
-            // Stack
-            // Disk Cache
+            public const byte HeapLarge = 7;
 
+            /// <summary>
+            /// RAT type page.
+            /// </summary>
+            public const byte RAT = 32;
+            /// <summary>
+            /// Page which is part of the SMT
+            /// </summary>
+            public const byte SMT = 64;
             // Extension of previous page.
             /// <summary>
             /// Extension of pre-existing page.
             /// </summary>
-            public const byte Extension = 255;
+            public const byte Extension = 128;
         }
 
         /// <summary>
@@ -79,11 +81,15 @@ namespace Cosmos.Core.Memory
         /// <summary>
         /// Start of area usable for heap, and also start of heap.
         /// </summary>
-        static private byte* mRamStart;
+        public static byte* RamStart;
+        /// <summary>
+        /// Pointer to end of the heap
+        /// </summary>
+        public static byte* HeapEnd;
         /// <summary>
         /// Size of heap.
         /// </summary>
-        static private uint mRamSize;
+        public static uint RamSize;
         /// <summary>
         /// Number of pages in the heap.
         /// </summary>
@@ -95,7 +101,7 @@ namespace Cosmos.Core.Memory
         /// </summary>
         /// <remarks>Covers Data area only.</remarks>
         // We need a pointer as the RAT can move around in future with dynamic RAM etc.
-        static private byte* mRAT;
+        public static byte* mRAT;
 
         /// <summary>
         /// Init RAT.
@@ -109,9 +115,6 @@ namespace Cosmos.Core.Memory
         /// </exception>
         public static void Init(byte* aStartPtr, uint aSize)
         {
-            Debugger.DoSendNumber(0x101101101);
-            Debugger.DoSendNumber((uint)aStartPtr);
-            Debugger.DoSendNumber(aSize);
             CPU.ZeroFill((uint)aStartPtr, aSize);
             if ((uint)aStartPtr % PageSize != 0 && !Debug)
             {
@@ -127,19 +130,17 @@ namespace Cosmos.Core.Memory
                 throw new Exception("RAM size must be page aligned.");
             }
 
-            mRamStart = aStartPtr;
-            mRamSize = aSize;
+            RamStart = aStartPtr;
+            RamSize = aSize;
+            HeapEnd = aStartPtr + aSize;
             TotalPageCount = aSize / PageSize;
-            Debugger.DoSendNumber(TotalPageCount);
 
             // We need one status byte for each block.
             // Intel blocks are 4k (10 bits). So for 4GB, this means
             // 32 - 12 = 20 bits, 1 MB for a RAT for 4GB. 0.025%
             uint xRatPageCount = (TotalPageCount - 1) / PageSize + 1;
-            Debugger.DoSendNumber(xRatPageCount);
             uint xRatTotalSize = xRatPageCount * PageSize;
-            mRAT = mRamStart + mRamSize - xRatTotalSize;
-            Debugger.DoSendNumber((uint)mRAT);
+            mRAT = RamStart + RamSize - xRatTotalSize;
 
             // Mark empty pages as such in the RAT Table
             for (byte* p = mRAT; p < mRAT + TotalPageCount - xRatPageCount; p++)
@@ -235,7 +236,7 @@ namespace Cosmos.Core.Memory
             if (xPos != null)
             {
                 var diff = xPos - mRAT;
-                byte* xResult = mRamStart + diff * PageSize;
+                byte* xResult = RamStart + diff * PageSize;
                 *xPos = aType;
                 for (byte* p = xPos + 1; p < xPos + xCount; p++)
                 {
@@ -250,13 +251,12 @@ namespace Cosmos.Core.Memory
         /// <summary>
         /// Get the first RAT address.
         /// </summary>
-        /// +
         /// <param name="aPtr">A pointer to the block.</param>
-        /// <returns>The index in RAT.</returns>
+        /// <returns>The index in RAT to which this pointer belongs</returns>
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
-        public static uint GetFirstRAT(void* aPtr)
+        public static uint GetFirstRATIndex(void* aPtr)
         {
-            var xPos = (uint)((byte*)aPtr - mRamStart) / PageSize;
+            var xPos = (uint)((byte*)aPtr - RamStart) / PageSize;
             //Debugger.DoSendNumber(0x4A74A7);
             //Debugger.DoSendNumber(xPos);
             // See note about when mRAT = 0 in Alloc.
@@ -272,7 +272,7 @@ namespace Cosmos.Core.Memory
 
         public static byte* GetPagePtr(void* aPtr)
         {
-            return (byte*)aPtr - ((byte*)aPtr - mRamStart) % PageSize;
+            return (byte*)aPtr - ((byte*)aPtr - RamStart) % PageSize;
         }
 
         /// <summary>
@@ -283,11 +283,11 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
         public static byte GetPageType(void* aPtr)
         {
-            if(aPtr < mRamStart)
+            if(aPtr < RamStart || aPtr > HeapEnd)
             {
-                return PageType.None;
+                return PageType.Empty;
             }
-            return mRAT[GetFirstRAT(aPtr)];
+            return mRAT[GetFirstRATIndex(aPtr)];
         }
 
         /// <summary>

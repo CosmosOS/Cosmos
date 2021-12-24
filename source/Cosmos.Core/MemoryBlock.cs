@@ -481,7 +481,6 @@ namespace Cosmos.Core
             {
                 if (aByteOffset >= Size)
                 {
-                    // Also this exception gets eaten?
                     throw new Exception("Memory access violation");
                 }
                 (*(byte*)(Base + aByteOffset)) = value;

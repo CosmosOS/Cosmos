@@ -19,7 +19,7 @@ namespace Cosmos.HAL
         protected int mCursorSize = 25; // 25 % as C# Console class
         protected bool mCursorVisible = true;
 
-        protected Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
+        protected Core.IOGroup.TextScreen IO = new Core.IOGroup.TextScreen();
         protected readonly MemoryBlock08 mRAM;
 
         /// <summary>
@@ -27,14 +27,6 @@ namespace Cosmos.HAL
         /// </summary>
         public TextScreen()
         {
-            if (this is TextScreen)
-            {
-                TextScreenHelpers.Debug("this is TextScreen");
-            }
-            else
-            {
-                TextScreenHelpers.Debug("ERROR: This is not of type TextScreen!");
-            }
             mRAM = IO.Memory.Bytes;
             // Set the Console default colors: White foreground on Black background, the default value of mClearCellValue is set there too as it is linked with the Color
             SetColors(ConsoleColor.White, ConsoleColor.Black);
@@ -115,7 +107,7 @@ namespace Cosmos.HAL
             IO.Data3.Byte = (byte)(xPos & 0xFF);
             // Cursor high byte to VGA index register
             IO.Idx3.Byte = 0x0E;
-            IO.Data3.Byte = (byte)(xPos >> 8);
+            IO.Data3.Byte = (byte)(xPos >> 8); 
         }
 
         /// <summary>

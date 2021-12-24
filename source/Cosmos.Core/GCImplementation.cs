@@ -22,6 +22,7 @@ namespace Cosmos.Core
         private static uint memLength = 0;
         private static bool StartedMemoryManager = false;
         /// <summary>
+        /// 
         /// Acquire lock. Not implemented.
         /// </summary>
         /// <exception cref="NotImplementedException">Thrown always.</exception>
@@ -44,7 +45,6 @@ namespace Cosmos.Core
         public unsafe static uint AllocNewObject(uint aSize)
         {
               return (uint)Heap.Alloc(aSize);
-            
         }
         /// <summary>
         /// Free Object from Memory
@@ -53,46 +53,6 @@ namespace Cosmos.Core
         public unsafe static void Free(object aObj)
         {
             Heap.Free(GetPointer(aObj));
-        }
-
-        /// <summary>
-        /// Increase reference count of an given object
-        /// </summary>
-        /// <param name="aObject">An object to increase to reference count of.</param>
-        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        public static unsafe void IncRefCount(uint aObject)
-        {
-            Heap.IncRefCount((uint*)aObject);
-        }
-
-        /// <summary>
-        /// Decrease reference count of an given object
-        /// </summary>
-        /// <param name="aObject">An object to decrease to reference count of.</param>
-        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        public static unsafe void DecRefCount(uint aObject, uint aId)
-        {
-            Heap.DecRefCount((uint*)aObject, aId);
-        }
-
-        /// <summary>
-        /// Decrease reference count of an given object. Even if the reference count reaches 0 the object is not deallocated
-        /// </summary>
-        /// <param name="aObject">An object to decrease to reference count of.</param>
-        /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
-        public static unsafe void WeakDecRefCount(uint aObject, uint aId)
-        {
-            Heap.WeakDecRefCount((uint*)aObject, aId);
-        }
-
-        /// <summary>
-        /// Get the number of current references to an object
-        /// </summary>
-        /// <param name="aObject">Location of the object</param>
-        /// <returns>Reference count</returns>
-        public static unsafe uint GetRefCount(uint aObject)
-        {
-            return Heap.GetRefCount((uint*)aObject);
         }
 
         /// <summary>
@@ -142,7 +102,6 @@ namespace Cosmos.Core
                 memLength = (128 * 1024 * 1024);
             }
             RAT.Init(memPtr, memLength);
-            
         }
         /// <summary>
         /// Get the Pointer of any object needed for Free()
@@ -152,6 +111,17 @@ namespace Cosmos.Core
         public static unsafe uint* GetPointer(object aObj) => throw null; // this is plugged
 
         /// <summary>
+        /// Get the pointer of any object as a uint
+        /// </summary>
+        /// <param name="aObj"></param>
+        /// <returns></returns>
+        public static unsafe uint GetSafePointer(object aObj)
+        {
+            return (uint)GetPointer(aObj);
+        }
+
+        /// <summary>
+
         /// Get cosmos internal type from object
         /// </summary>
         /// <param name="aObj"></param>
@@ -162,66 +132,69 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Decrease the ref count for each field in the object
+        /// Increments the root count of the object at the pointer by 1
         /// </summary>
         /// <param name="aPtr"></param>
-        /// <param name="aType"></param>
-        public static void PropagateDecRefCount(void* aPtr, uint aType)
+        public static unsafe void IncRootCount(ushort* aPtr)
         {
-            HeapSmall.PropagateDecRefCount((uint*)aPtr, aType);
+            var rootCount = *(aPtr - 1) >> 1; // lowest bit is used to set if hit
+            *(aPtr - 1) = (ushort)((rootCount + 1) << 1); // loest bit can be zero since we shouldnt be doing this while gc is collecting
         }
 
         /// <summary>
-        /// Decrease the ref count for each field in the object
+        /// Decrements the root count of the object at the pointer by 1
         /// </summary>
         /// <param name="aPtr"></param>
-        /// <param name="aType"></param>
-        public static void PropagateWeakDecRefCount(void* aPtr, uint aType)
+        public static unsafe void DecRootCount(ushort* aPtr)
         {
-            HeapSmall.PropagateWeakDecRefCount((uint*)aPtr, aType);
+            var rootCount = *(aPtr - 1) >> 1; // lowest bit is used to set if hit
+            *(aPtr - 1) = (ushort)((rootCount - 1) << 1); // loest bit can be zero since we shouldnt be doing this while gc is collecting
         }
 
-
         /// <summary>
-        /// Increment the GC References of objects stored in a struct
+        /// Increments the root count of all object stored in this struct by 1
         /// </summary>
         /// <param name="aPtr"></param>
-        /// <param name="aType"></param>
-        [NoGC()]
-        public static unsafe void IncStructFieldReferences(void* aPtr, uint aType)
+        /// <param name="aType">Type of the struct</param>
+        public static unsafe void IncRootCountsInStruct(ushort* aPtr, uint aType)
         {
-            //Debugger.DoSendNumber(0x14c14c);
-            //Debugger.DoSendNumber((uint)aPtr);
-            //Debugger.DoSendNumber(aType);
-            uint fields = VTablesImpl.GetGCFieldCount(aType);
-            var offsets = VTablesImpl.GetGCFieldOffsets(aType);
-            var types = VTablesImpl.GetGCFieldTypes(aType);
-            var obj = (uint*)aPtr;
-            for (int i = 0; i < fields; i++)
+            uint count = VTablesImpl.GetGCFieldCount(aType);
+            uint[] offset = VTablesImpl.GetGCFieldOffsets(aType);
+            uint[] types = VTablesImpl.GetGCFieldTypes(aType);
+            for (int i = 0; i < count; i++)
             {
-                if (!VTablesImpl.IsValueType(types[i]))
+                if (VTablesImpl.IsStruct(types[i]))
                 {
-                    var location = obj + offsets[i] / 4 + 1; // +1 since we are only using 32bits from the 64bit
-                    //Debugger.DoSendNumber((uint)location);
-                    //Debugger.DoSendNumber(*location);
-                    if (*location != 0) // Check if its null
-                    {
-                        location = *(uint**)location;
-                        if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
-                        {
-                            Heap.IncRefCount(location);
-                        }
-                    }
+                    IncRootCountsInStruct(aPtr + offset[i] / 2, types[i]);
                 }
-                else if(VTablesImpl.IsStruct(types[i]))
+                else
                 {
-                    var location = obj + offsets[i] / 4;
-                    //Debugger.DoSendNumber((uint)location);
-                    IncStructFieldReferences(location, types[i]);
+                    IncRootCount(*(ushort**)(aPtr + offset[i] / 2));
                 }
             }
-            //Debugger.DoSendNumber(0x555555);
         }
 
+        /// <summary>
+        /// Decrements the root count of all object stored in this struct by 1
+        /// </summary>
+        /// <param name="aPtr"></param>
+        /// <param name="aType">Type of the struct</param>
+        public static unsafe void DecRootCountsInStruct(ushort* aPtr, uint aType)
+        {
+            uint count = VTablesImpl.GetGCFieldCount(aType);
+            uint[] offset = VTablesImpl.GetGCFieldOffsets(aType);
+            uint[] types = VTablesImpl.GetGCFieldTypes(aType);
+            for (int i = 0; i < count; i++)
+            {
+                if (VTablesImpl.IsStruct(types[i]))
+                {
+                    DecRootCountsInStruct(aPtr + offset[i] / 2, types[i]);
+                }
+                else
+                {
+                    DecRootCount(*(ushort**)(aPtr + offset[i] / 2));
+                }
+            }
+        }
     }
 }
