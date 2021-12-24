@@ -103,7 +103,7 @@ namespace Cosmos.Core.Memory
             while (ptr->PagePtr != null) // this would check Size if its actually a RootSMTBlock
             {
                 ptr += 1;
-                if (ptr > (byte*)aPage + RAT.PageSize)
+                if (ptr >= (byte*)aPage + RAT.PageSize - 8)
                 {
                     return null;
                 }
@@ -166,13 +166,17 @@ namespace Cosmos.Core.Memory
             return ptr;
         }
 
-        private static SMTBlock* GetFirstWithSpace(uint aSize)
+        private static SMTBlock* GetFirstWithSpace(uint aSize, bool aLog = false)
         {
             var page = SMT;
             SMTBlock* block = null;
             do
             {
-                block = GetFirstWithSpace(page, aSize);
+                block = GetFirstWithSpace(page, aSize, aLog);
+                if (aLog)
+                {
+                    Debugger.DoSendNumber((uint)block);
+                }
                 page = page->Next;
             } while (block == null && page != null);
             return block;
@@ -183,9 +187,9 @@ namespace Cosmos.Core.Memory
         /// </summary>
         /// <param name="aSize"></param>
         /// <returns></returns>
-        private static SMTBlock* GetFirstWithSpace(SMTPage* aPage, uint aSize)
+        private static SMTBlock* GetFirstWithSpace(SMTPage* aPage, uint aSize, bool aLog = false)
         {
-            return GetFirstWithSpace(aSize, GetFirstBlock(aPage, aSize));
+            return GetFirstWithSpace(aSize, GetFirstBlock(aPage, aSize), aLog);
         }
 
         /// <summary>
@@ -194,9 +198,14 @@ namespace Cosmos.Core.Memory
         /// <param name="aSize"></param>
         /// <param name="root">The root node to start the search at</param>
         /// <returns></returns>
-        private static SMTBlock* GetFirstWithSpace(uint aSize, RootSMTBlock* root)
+        private static SMTBlock* GetFirstWithSpace(uint aSize, RootSMTBlock* root, bool aLog = false)
         {
             SMTBlock* ptr = root->First;
+            if (aLog)
+            {
+                Debugger.DoSendNumber(0x1111);
+                Debugger.DoSendNumber((uint)ptr);
+            }
             if (ptr == null)
             {
                 return null;
@@ -206,6 +215,10 @@ namespace Cosmos.Core.Memory
             {
                 lptr = ptr;
                 ptr = ptr->NextBlock;
+                if (aLog)
+                {
+                    Debugger.DoSendNumber((uint)ptr);
+                }
             }
             if (ptr->SpacesLeft == 0 && ptr->NextBlock == null)
             {
@@ -357,6 +370,8 @@ namespace Cosmos.Core.Memory
 
             if (smtBlock == null) // we could not allocate a new block since the SMT table is all full
             {
+                Debugger.DoSendNumber(0x987987);
+                Debugger.DoSendNumber(0x987987);
                 // we need to expand the SMT table by a page
                 var last = SMT;
                 while (last->Next != null)
@@ -364,6 +379,7 @@ namespace Cosmos.Core.Memory
                     last = last->Next;
                 }
                 last->Next = InitSMTPage();
+                parent = GetLastBlock(last->Next, aItemSize);
                 smtBlock = NextFreeBlock();
                 if (smtBlock == null)
                 {
@@ -433,7 +449,18 @@ namespace Cosmos.Core.Memory
 
             // if we get here, RAM is corrupted, since we know we had a space but it turns out we didnt
             Debugger.DoSendNumber((uint)pageBlock);
+            Debugger.DoSendNumber(RAT.GetPageCount(RAT.PageType.Empty));
+            Debugger.DoSendNumber(RAT.GetPageCount(RAT.PageType.HeapSmall));
+            var aPage = SMT;
+            while (aPage != null)
+            {
+                Debugger.DoSendNumber((uint)aPage);
+                aPage = aPage->Next;
+            }
             Debugger.DoSendNumber(aSize);
+            Debugger.DoSendNumber(GetRoundedSize(aSize));
+            Debugger.DoSendNumber((uint)GetFirstWithSpace(aSize, true));
+            Debugger.DoBochsBreak();
             Debugger.SendKernelPanic(0x122);
             while (true) { }
         }
@@ -487,12 +514,18 @@ namespace Cosmos.Core.Memory
                 {
                     blockPtr = blockPtr->NextBlock;
                 }
+                if(blockPtr->PagePtr == allocatedOnPage)
+                {
+                    break;
+                }
                 smtPage = smtPage->Next;
             }
 
             if (blockPtr == null)
             {
                 // this shouldnt happen
+                Debugger.DoSendNumber((uint)aPtr);
+                Debugger.DoSendNumber((uint)SMT);
                 Debugger.SendKernelPanic(0x98);
                 while (true) { }
             }

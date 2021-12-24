@@ -13,7 +13,10 @@ namespace Cosmos.Core_Asm
 
         [PlugMethod(Assembler = typeof(CPUGetEndOfKernelAsm))]
         public static uint GetEndOfKernel() => throw null;
-
+        [PlugMethod(Assembler = typeof(CPUGetEBPValue))]
+        public static uint GetEBPValue() => throw null;
+        [PlugMethod(Assembler = typeof(CPUGetStackStart))]
+        public static uint GetStackStart() => throw null;
         [PlugMethod(Assembler = typeof(CPUZeroFillAsm))]
         // TODO: implement this using REP STOSB and REPO STOSD
         public static void ZeroFill(uint aStartAddress, uint aLength) => throw null;

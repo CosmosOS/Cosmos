@@ -13,7 +13,7 @@ namespace Cosmos.Core
     /// </summary>
     public static class CPU
     {
-        public static ulong totalRam;
+        static ulong totalRam;
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
@@ -46,6 +46,19 @@ namespace Cosmos.Core
         [PlugMethod(PlugRequired = true)]
         public static uint GetEndOfKernel() => throw null;
 
+        /// <summary>
+        /// Get position of current EBP register
+        /// </summary>
+        /// <returns></returns>
+        [PlugMethod(PlugRequired = true)]
+        public static uint GetEBPValue() => throw null;
+
+        /// <summary>
+        /// Get the address at which the stack starts
+        /// </summary>
+        /// <returns></returns>
+        [PlugMethod(PlugRequired = true)]
+        public static uint GetStackStart() => throw null;
         /// <summary>
         /// Update IDT. Plugged.
         /// </summary>

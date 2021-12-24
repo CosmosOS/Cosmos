@@ -350,16 +350,16 @@ namespace Cosmos.System.Graphics
         public override void DrawImage(Image aImage, int aX, int aY)
         {
             var xBitmap = aImage.rawData;
-            var xWidht = (int)aImage.Width;
+            var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
 
             int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+            int xScreenWidthInPixel = Mode.Columns;
 
             Global.mDebugger.SendInternal($"Drawing image of size {aImage.Width}x{aImage.Height} array size {aImage.rawData.Length}");
             for (int i = 0; i < xHeight; i++)
             {
-                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
+                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidth), xWidth);
             }
             Global.mDebugger.SendInternal("Done");
         }

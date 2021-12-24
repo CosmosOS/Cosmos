@@ -83,6 +83,14 @@ namespace Cosmos.TestRunner
             if(expected.Length != actual.Length)
             {
                 TestController.Debugger.Send($"Array lengths differ: Expected: {expected.Length} Actual: {actual.Length}");
+                if(actual.Length < 32)
+                {
+                    TestController.Debugger.Send("Actual Content:");
+                    for (int i = 0; i < actual.Length; i++)
+                    {
+                        TestController.Debugger.Send(actual[i]);
+                    }
+                }
                 Fail(message, file, line);
                 return;
             }
@@ -98,6 +106,24 @@ namespace Cosmos.TestRunner
                 }
             }
             Succeed(message, file, line);
+        }
+
+        public static void AreNotEqual(uint expected, uint actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            var xResult = expected != actual;
+            if (!xResult)
+            {
+                TestController.Debugger.Send("Expected value");
+                TestController.Debugger.SendNumber((uint)expected);
+                TestController.Debugger.Send("Actual value");
+                TestController.Debugger.SendNumber((uint)actual);
+
+                TestController.Debugger.SendNumber("TestAssertion", "Expected", (uint)expected, 32);
+                TestController.Debugger.SendNumber("TestAssertion", "Actual", (uint)actual, 32);
+
+                TestController.Debugger.Send("Numbers sent!");
+            }
+            IsTrue(xResult, message, file, line);
         }
 
         public static void AreEqual(byte[] expected, byte[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
