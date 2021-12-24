@@ -126,36 +126,43 @@ namespace Cosmos.Core
         internal static Mb2TagFramebuffer* Framebuffer { get; set; }
         internal static Mb2TagEFI64* EFI64 { get; set; }
 
+        private static bool mInitialized = false;
+
         /// /// <summary>
         /// Parse multiboot2 structure
         /// </summary>
         public static void Init()
         {
-            var MbAddress = (IntPtr)GetMBIAddress();
-
-            Mb2Tag* tag;
-
-            for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((byte*)tag + ((tag->Size + 7) & ~7)))
+            if (!mInitialized)
             {
-                switch (tag->Type)
-                {  
-                    case 4:
-                        BasicMemoryInformation = (Mb2TagBasicMemoryInformation*)tag;
-                        break;
-                    case 6:
-                        MemoryMap = (Mb2TagMemoryMap*)tag;
-                        break;
-                    case 7:
-                        VbeInfo = (Mb2TagVbeInfo*)tag;
-                        break;
-                    /*case 8:
-                        Framebuffer = (Mb2TagFramebuffer*)tag;
-                        break;
-                    case 12:
-                        EFI64 = (Mb2TagEFI64*)tag;
-                        break;*/
-                    default:
-                        break;
+                mInitialized = true;
+
+                var MbAddress = (IntPtr)GetMBIAddress();
+
+                Mb2Tag* tag;
+
+                for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((byte*)tag + ((tag->Size + 7) & ~7)))
+                {
+                    switch (tag->Type)
+                    {
+                        case 4:
+                            BasicMemoryInformation = (Mb2TagBasicMemoryInformation*)tag;
+                            break;
+                        case 6:
+                            MemoryMap = (Mb2TagMemoryMap*)tag;
+                            break;
+                        case 7:
+                            VbeInfo = (Mb2TagVbeInfo*)tag;
+                            break;
+                        /*case 8:
+                            Framebuffer = (Mb2TagFramebuffer*)tag;
+                            break;
+                        case 12:
+                            EFI64 = (Mb2TagEFI64*)tag;
+                            break;*/
+                        default:
+                            break;
+                    }
                 }
             }
         }
