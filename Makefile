@@ -89,6 +89,7 @@ install:
 	@cp -r $(THISDIR)/build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
 	@cp -r $(THISDIR)/build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
 	@cp -r $(THISDIR)/build/syslinux/* $(DESTDIR)/Build/ISO/
+	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
 
 	$(MAKE) nuget-install
 
