@@ -16,10 +16,12 @@ namespace Cosmos.Core
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
-        /// Get amount of RAM in MB's. Plugged.
+        /// Get amount of RAM in MB's.
         /// </summary>
-        [PlugMethod(PlugRequired = true)]
-        public static uint GetAmountOfRAM() => throw null;
+        public static uint GetAmountOfRAM()
+        {
+            return Multiboot2.GetMemUpper() / 1024;
+        }
 
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
@@ -337,35 +339,28 @@ namespace Cosmos.Core
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
 
         /// <summary>
-        /// Checks if Multiboot returned a memory map
-        /// </summary>
-        /// <returns></returns>
-        public static unsafe bool MemoryMapExists()
-        {
-            return (Bootstrap.MultibootHeader->Flags & 1 << 6) == 64;
-        }
-
-        /// <summary>
         /// Get the Memory Map Information from Multiboot
         /// </summary>
         /// <returns>Returns an array of MemoryMaps containing the Multiboot Memory Map information. The array may have empty values at the end.</returns>
         public static unsafe MemoryMap[] GetMemoryMap()
         {
-            if (!MemoryMapExists())
+            if (!Multiboot2.MemoryMapExists())
             {
                 throw new Exception("No Memory Map was returned by Multiboot");
             }
+
             var rawMap = new RawMemoryMap[64];
-            var currentMap = (RawMemoryMap*)Bootstrap.MultibootHeader->memMapAddress;
+            var baseMap = (RawMemoryMap*)((uint*)Multiboot2.MemoryMap + (uint)16);
+            var currentMap = baseMap;
+
+            uint totalSize = Multiboot2.MemoryMap->Size - 16;
+            uint entrySize = Multiboot2.MemoryMap->EntrySize;
+
             int counter = 0;
-            while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength) && counter < 64)
+            while ((uint)currentMap < ((uint)baseMap + totalSize) && counter < 64)
             {
                 rawMap[counter++] = *currentMap;
-                currentMap = (RawMemoryMap*)((uint*)currentMap + ((currentMap->Size + 4 )>> 2)); //The size is in bits, not bytes
-                if (currentMap->Size == 0)
-                {
-                    break;
-                }
+                currentMap = (RawMemoryMap*)((uint)currentMap + entrySize);
             }
 
             if (counter >= 64)
@@ -379,8 +374,8 @@ namespace Cosmos.Core
                 var rawMemoryMap = rawMap[i];
                 entireMap[i] = new MemoryMap
                 {
-                    Address = (ulong)rawMemoryMap.HighBaseAddr << 32 | rawMemoryMap.LowBaseAddr,
-                    Length = (ulong)rawMemoryMap.HighLength << 32 | rawMemoryMap.LowLength,
+                    Address = rawMemoryMap.Address,
+                    Length = rawMemoryMap.Length,
                     Type = rawMemoryMap.Type
                 };
             }
@@ -408,34 +403,24 @@ namespace Cosmos.Core
     public struct RawMemoryMap
     {
         /// <summary>
-        /// Size of this entry
+        /// Base address
         /// </summary>
         [FieldOffset(0)]
-        public uint Size;
+        public ulong Address;
         /// <summary>
-        /// Low 32 bits of the base address
-        /// </summary>
-        [FieldOffset(4)]
-        public uint LowBaseAddr;
-        /// <summary>
-        /// High 32 bits of the base address
+        /// Length of memory block in bytes
         /// </summary>
         [FieldOffset(8)]
-        public uint HighBaseAddr;
+        public ulong Length;
         /// <summary>
-        /// Low 32 bits of the length of memory block in bytes
-        /// </summary>
-        [FieldOffset(12)]
-        public uint LowLength;
-        /// <summary>
-        /// High 32 bits of the length of memory block in bytes
+        /// Type
         /// </summary>
         [FieldOffset(16)]
-        public uint HighLength;
+        public uint Type;
         /// <summary>
-        /// Type of memory area, 1 if usable RAM, everything else unusable.
+        /// Zero
         /// </summary>
         [FieldOffset(20)]
-        public uint Type;
+        public uint Zero;
     }
 }
