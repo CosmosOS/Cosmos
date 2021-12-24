@@ -48,7 +48,7 @@ namespace Cosmos.Core
              */
             CPU.InitFloat();
 
-            //Parse multiboot2 structure
+            //call for IL2CPU
             Multiboot2.Init();
         }
     }

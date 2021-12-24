@@ -16,10 +16,12 @@ namespace Cosmos.Core
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
-        /// Get amount of RAM in MB's. Plugged.
+        /// Get amount of RAM in MB's.
         /// </summary>
-        [PlugMethod(PlugRequired = true)]
-        public static uint GetAmountOfRAM() => throw null;
+        public static uint GetAmountOfRAM()
+        {
+            return Multiboot2.GetMemUpper() / 1024;
+        }
 
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>

@@ -129,7 +129,7 @@ namespace Cosmos.Core
         /// /// <summary>
         /// Parse multiboot2 structure
         /// </summary>
-        internal static void Init()
+        public static void Init()
         {
             var MbAddress = (IntPtr)GetMBIAddress();
 

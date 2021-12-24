@@ -11,9 +11,6 @@ namespace Cosmos.Core_Asm
         [PlugMethod(Assembler = typeof(CPUUpdateIDTAsm))]
         public static void UpdateIDT(CPU aThis, bool aEnableInterruptsImmediately) => throw null;
 
-        [PlugMethod(Assembler = typeof(CPUGetAmountOfRAMAsm))]
-        public static uint GetAmountOfRAM() => throw null;
-
         [PlugMethod(Assembler = typeof(CPUGetEndOfKernelAsm))]
         public static uint GetEndOfKernel() => throw null;
 
