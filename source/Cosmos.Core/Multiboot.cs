@@ -1,128 +1,212 @@
-﻿using IL2CPU.API.Attribs;
+﻿/*
+* PROJECT:          Cosmos Development
+* CONTENT:          Multiboot2 class
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+* RESOURCES:        https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html
+*/
+
+using IL2CPU.API.Attribs;
 using System;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.Core
 {
     /// <summary>
-    /// Multiboot class. Used for Multiboot parsing.
+    /// Multiboot2 class. Used for multiboot parsing.
     /// </summary>
-    public class Multiboot
+    public unsafe class Multiboot2
     {
+        /// <summary>
+        /// Base Tag
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 8)]
+        internal unsafe readonly struct Mb2Tag
+        {
+            [FieldOffset(0)]
+            public readonly uint Type;
+            [FieldOffset(4)]
+            public readonly uint Size;
+        }
+
+        /// <summary>
+        /// Tag BasicMemoryInformation
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 16)]
+        internal unsafe readonly struct Mb2TagBasicMemoryInformation
+        {
+            [FieldOffset(0)]
+            public readonly uint Type;
+            [FieldOffset(4)]
+            public readonly uint Size;
+            [FieldOffset(8)]
+            public readonly uint MemLower;
+            [FieldOffset(12)]
+            public readonly uint MemUpper;
+        }
+
+        /// <summary>
+        /// Tag MemoryMap
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 40)]
+        internal unsafe readonly struct Mb2TagMemoryMap
+        {
+            [FieldOffset(0)]
+            public readonly uint Type;
+            [FieldOffset(4)]
+            public readonly uint Size;
+            [FieldOffset(8)]
+            public readonly uint EntrySize;
+            [FieldOffset(12)]
+            public readonly uint EntryVersion;
+            [FieldOffset(16)]
+            public readonly RawMemoryMap MemoryMapEntries;
+        }
+
+        /// <summary>
+        /// Tag Framebuffer
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 784)]
+        internal unsafe readonly struct Mb2TagVbeInfo
+        {
+            [FieldOffset(0)]
+            public readonly Mb2Tag Info;
+            [FieldOffset(8)]
+            public readonly ushort VbeMode;
+            [FieldOffset(10)]
+            public readonly ushort VbeInterfaceSeg;
+            [FieldOffset(12)]
+            public readonly ushort VbeInterfaceOff;
+            [FieldOffset(14)]
+            public readonly ushort VbeInterfaceLen;
+            [FieldOffset(16)]
+            public readonly VBE.ControllerInfo VbeControlInfo; //512
+            [FieldOffset(528)]
+            public readonly VBE.ModeInfo VbeModeInfo; //256
+        }
+
+        /// <summary>
+        /// Tag Framebuffer
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 32)]
+        internal unsafe readonly struct Mb2TagFramebuffer
+        {
+            [FieldOffset(0)]
+            public readonly Mb2Tag Info;
+            [FieldOffset(8)]
+            public readonly ulong Address;
+            [FieldOffset(16)]
+            public readonly uint Pitch;
+            [FieldOffset(20)]
+            public readonly uint Width;
+            [FieldOffset(24)]
+            public readonly uint Height;
+            [FieldOffset(28)]
+            public readonly byte Bpp;
+            [FieldOffset(29)]
+            public readonly byte Type;
+            [FieldOffset(30)]
+            public readonly ushort Reserved;
+        }
+
+        /// <summary>
+        /// Tag EFI64
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 16)]
+        internal unsafe readonly struct Mb2TagEFI64
+        {
+            [FieldOffset(0)]
+            public readonly Mb2Tag Info;
+            [FieldOffset(8)]
+            public readonly ulong Address;
+        }
+
+        internal static Mb2TagBasicMemoryInformation* BasicMemoryInformation { get; set; }
+        internal static Mb2TagMemoryMap* MemoryMap { get; set; }
+        internal static Mb2TagVbeInfo* VbeInfo { get; set; }
+        internal static Mb2TagFramebuffer* Framebuffer { get; set; }
+        internal static Mb2TagEFI64* EFI64 { get; set; }
+
+        private static bool mInitialized = false;
+
+        /// /// <summary>
+        /// Parse multiboot2 structure
+        /// </summary>
+        public static void Init()
+        {
+            if (!mInitialized)
+            {
+                mInitialized = true;
+
+                var MbAddress = (IntPtr)GetMBIAddress();
+
+                Mb2Tag* tag;
+
+                for (tag = (Mb2Tag*)(MbAddress + 8); tag->Type != 0; tag = (Mb2Tag*)((byte*)tag + ((tag->Size + 7) & ~7)))
+                {
+                    switch (tag->Type)
+                    {
+                        case 4:
+                            BasicMemoryInformation = (Mb2TagBasicMemoryInformation*)tag;
+                            break;
+                        case 6:
+                            MemoryMap = (Mb2TagMemoryMap*)tag;
+                            break;
+                        case 7:
+                            VbeInfo = (Mb2TagVbeInfo*)tag;
+                            break;
+                        /*case 8:
+                            Framebuffer = (Mb2TagFramebuffer*)tag;
+                            break;
+                        case 12:
+                            EFI64 = (Mb2TagEFI64*)tag;
+                            break;*/
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get MemLower
+        /// </summary>
+        /// <returns>MemLower</returns>
+        public static uint GetMemLower()
+        {
+            return BasicMemoryInformation->MemLower;
+        }
+
+        /// <summary>
+        /// Get MemUpper
+        /// </summary>
+        /// <returns>MemUpper</returns>
+        public static uint GetMemUpper()
+        {
+            return BasicMemoryInformation->MemUpper;
+        }
+
+        /// <summary>
+        /// Checks if Multiboot returned a memory map
+        /// </summary>
+        /// <returns>True if is available, false if not</returns>
+        public static bool MemoryMapExists()
+        {
+            if (MemoryMap != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         /// /// <summary>
         /// Get Multiboot address. Plugged.
         /// </summary>
         /// <returns>The Multiboot Address</returns>
         [PlugMethod(PlugRequired = true)]
         public static uint GetMBIAddress() => throw null;
-
-        /// <summary>
-        /// Header struct.
-        /// </summary>
-        [StructLayout(LayoutKind.Explicit, Size = 88)]
-        public unsafe struct Header
-        {
-            /// <summary>
-            /// Flags.
-            /// </summary>
-            [FieldOffset(0)]
-            public uint Flags;
-            /// <summary>
-            /// Lower memory amount.
-            /// </summary>
-            [FieldOffset(4)]
-            public uint mem_lower;
-            /// <summary>
-            /// Upper memory amount.
-            /// </summary>
-            [FieldOffset(8)]
-            public uint mem_upper;
-            /// <summary>
-            /// Boot device.
-            /// </summary>
-            [FieldOffset(12)]
-            public uint boot_device;
-            /// <summary>
-            /// CMD line.
-            /// </summary>
-            [FieldOffset(16)]
-            public uint cmdline;
-            /// <summary>
-            /// Modules count.
-            /// </summary>
-            [FieldOffset(20)]
-            public uint mods_count;
-            /// <summary>
-            /// Modules address.
-            /// </summary>
-            [FieldOffset(24)]
-            public uint mods_addr;
-            /// <summary>
-            /// Symbol table.
-            /// </summary>
-            [FieldOffset(28)]
-            public fixed uint syms[4];
-            /// <summary>
-            /// Memory map length.
-            /// </summary>
-            [FieldOffset(44)]
-            public uint memMapLength;
-            /// <summary>
-            /// Memory map address.
-            /// </summary>
-            [FieldOffset(48)]
-            public uint memMapAddress;
-            /// <summary>
-            /// Drives list length.
-            /// </summary>
-            [FieldOffset(52)]
-            public uint drivesLength;
-            /// <summary>
-            /// Drives list address.
-            /// </summary>
-            [FieldOffset(56)]
-            public uint drivesAddress;
-            /// <summary>
-            /// ROM config table.
-            /// </summary>
-            [FieldOffset(60)]
-            public uint configTable;
-            /// <summary>
-            /// APM table.
-            /// </summary>
-            [FieldOffset(68)]
-            public uint apmTable;
-            /// <summary>
-            /// VBE control info.
-            /// </summary>
-            [FieldOffset(72)]
-            public uint vbeControlInfo;
-            /// <summary>
-            /// VBE mode info.
-            /// </summary>
-            [FieldOffset(76)]
-            public uint vbeModeInfo;
-            /// <summary>
-            /// VBE mode.
-            /// </summary>
-            [FieldOffset(80)]
-            public uint vbeMode;
-            /// <summary>
-            /// VBE interface segment.
-            /// </summary>
-            [FieldOffset(82)]
-            public uint vbeInterfaceSeg;
-            /// <summary>
-            /// VBE interface offset.
-            /// </summary>
-            [FieldOffset(84)]
-            public uint vbeInterfaceOff;
-            /// <summary>
-            /// VBE interface length.
-            /// </summary>
-            [FieldOffset(86)]
-            public uint vbeInterfaceLength;
-        }
     }
 
     /// <summary>
@@ -130,22 +214,19 @@ namespace Cosmos.Core
     /// </summary>
     public unsafe static class VBE
     {
-
-        static uint VBEINFO_PRESENT = (1 << 11);
-
         /// /// <summary>
-        /// Check in Multiboot if VBE is available
+        /// Check in Multiboot if framebuffer is available
         /// </summary>
         /// <returns>True if is available, false if not</returns>
         public static bool IsAvailable()
         {
-            if ((Bootstrap.MultibootHeader->Flags & VBEINFO_PRESENT) == 0)
+            if (Multiboot2.VbeInfo != null)
             {
-                return false;
+                return true;
             }
             else
             {
-                return true;
+                return false;
             }
         }
 
@@ -154,7 +235,15 @@ namespace Cosmos.Core
         /// </summary>
         public static ModeInfo getModeInfo()
         {
-            return *Bootstrap.modeinfo;
+            return Multiboot2.VbeInfo->VbeModeInfo;
+        }
+
+        /// /// <summary>
+        /// Get VBE Modeinfo structure
+        /// </summary>
+        public static ControllerInfo getControllerInfo()
+        {
+            return Multiboot2.VbeInfo->VbeControlInfo;
         }
 
         /// /// <summary>
@@ -163,14 +252,13 @@ namespace Cosmos.Core
         /// <returns>the offset in an uint</returns>
         public static uint getLfbOffset()
         {
-            return Bootstrap.modeinfo->framebuffer;
+            return getModeInfo().framebuffer;
         }
-
 
         /// <summary>
         /// Controller info struct.
         /// </summary>
-        [StructLayout(LayoutKind.Explicit, Size = 36)]
+        [StructLayout(LayoutKind.Explicit, Size = 512)]
         public struct ControllerInfo
         {
             /// <summary>

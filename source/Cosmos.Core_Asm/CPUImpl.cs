@@ -9,7 +9,7 @@ namespace Cosmos.Core_Asm
     public class CPUImpl
     {
         [PlugMethod(Assembler = typeof(CPUUpdateIDTAsm))]
-        public static void UpdateIDT(bool aEnableInterruptsImmediately) => throw null;
+        public static void UpdateIDT(CPU aThis, bool aEnableInterruptsImmediately) => throw null;
 
         [PlugMethod(Assembler = typeof(CPUGetEndOfKernelAsm))]
         public static uint GetEndOfKernel() => throw null;
