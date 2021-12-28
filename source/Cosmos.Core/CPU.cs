@@ -354,17 +354,6 @@ namespace Cosmos.Core
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
 
-        /// <summary>
-        /// Enables Multiboot if it is not enabled
-        /// </summary>
-        internal unsafe static void EnableMultiboot()
-        {
-            if (Bootstrap.MultibootHeader == null)
-            {
-                Bootstrap.MultibootHeader = (Multiboot.Header*)Multiboot.GetMBIAddress();
-            }
-        }
-
         /// Get the Memory Map Information from Multiboot
         /// </summary>
         /// <returns>Returns an array of MemoryMaps containing the Multiboot Memory Map information. The array may have empty values at the end.</returns>
@@ -375,8 +364,8 @@ namespace Cosmos.Core
                 throw new Exception("No Memory Map was returned by Multiboot");
             }
           
-            var rawMap = new RawMemoryMap[64];
-            var baseMap = (RawMemoryMap*)((uint*)Multiboot2.MemoryMap + (uint)16);
+            var rawMap = new RawMemoryMapBlock[64];
+            var baseMap = (RawMemoryMapBlock*)((uint*)Multiboot2.MemoryMap + (uint)16);
             var currentMap = baseMap;
 
             uint totalSize = Multiboot2.MemoryMap->Size - 16;
@@ -386,7 +375,7 @@ namespace Cosmos.Core
             while ((uint)currentMap < ((uint)baseMap + totalSize) && counter < 64)
             {
                 rawMap[counter++] = *currentMap;
-                currentMap = (RawMemoryMap*)((uint)currentMap + entrySize);
+                currentMap = (RawMemoryMapBlock*)((uint)currentMap + entrySize);
             }
 
             if (counter >= 64)
@@ -415,28 +404,19 @@ namespace Cosmos.Core
         /// </summary>
         /// <returns>The size of the largest block in bytes</returns>
 
-        public static unsafe RawMemoryMapBlock* GetLargestMemoryBlock()
+        public static unsafe MemoryMapBlock GetLargestMemoryBlock()
         {
-            if (!MemoryMapExists())
-            {
-                Debugger.SendKernelPanic(0x80);
-                while (true) { }
-            }
-            var currentMap = (RawMemoryMapBlock*)Bootstrap.MultibootHeader->memMapAddress;
-            RawMemoryMapBlock* bestMap = null;
+            MemoryMapBlock bestMap = null;
             ulong bestSize = 0;
-            while ((uint)currentMap < (Bootstrap.MultibootHeader->memMapAddress + Bootstrap.MultibootHeader->memMapLength))
+            var maps = GetMemoryMap();
+
+            foreach (var currentMap in maps)
             {
-                currentMap = (RawMemoryMapBlock*)((uint*)currentMap + ((currentMap->Size + 4) >> 2)); //The size is in bits, not bytes
-                if (currentMap->Size == 0)
+                if (currentMap.Type == 1) // Usable ram
                 {
-                    break;
-                }
-                if (currentMap->Type == 1) // Usable ram
-                {
-                    if (currentMap->Length > bestSize)
+                    if (currentMap.Length > bestSize)
                     {
-                        bestSize = currentMap->Length;
+                        bestSize = currentMap.Length;
                         bestMap = currentMap;
                     }
                 }

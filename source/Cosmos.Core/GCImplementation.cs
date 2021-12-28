@@ -19,7 +19,7 @@ namespace Cosmos.Core
     public unsafe static class GCImplementation
     {
         private unsafe static byte* memPtr = null;
-        private static uint memLength = 0;
+        private static ulong memLength = 0;
         private static bool StartedMemoryManager = false;
         /// <summary>
         /// 
@@ -59,7 +59,7 @@ namespace Cosmos.Core
         /// Get amount of available Ram
         /// </summary>
         /// <returns>Returns amount of available memory to the System in MB</returns>
-        public static uint GetAvailableRAM()
+        public static ulong GetAvailableRAM()
         {
             return memLength / 1024 / 1024;
         }
@@ -81,17 +81,17 @@ namespace Cosmos.Core
                 return;
             }
             StartedMemoryManager = true;
+            var largestBlock = CPU.GetLargestMemoryBlock();
 
-            if (CPU.MemoryMapExists())
+            if (largestBlock != null)
             {
-                var block = CPU.GetLargestMemoryBlock();
-                memPtr = (byte*)block->BaseAddr;
-                memLength = block->Length;
+                memPtr = (byte*)largestBlock.Address;
+                memLength = largestBlock.Length;
                 if ((uint)memPtr < CPU.GetEndOfKernel() + 1024)
                 {
                     memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                     memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;
-                    memLength = block->Length - ((uint)memPtr - (uint)block->BaseAddr);
+                    memLength = largestBlock.Length - ((uint)memPtr - (uint)largestBlock.Address);
                     memLength += RAT.PageSize - memLength % RAT.PageSize;
                 }
             }
@@ -101,7 +101,7 @@ namespace Cosmos.Core
                 memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;
                 memLength = (128 * 1024 * 1024);
             }
-            RAT.Init(memPtr, memLength);
+            RAT.Init(memPtr, (uint)memLength);
         }
         /// <summary>
         /// Get the Pointer of any object needed for Free()
