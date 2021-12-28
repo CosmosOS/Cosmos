@@ -13,10 +13,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
         internal static Debugger mSATAPIDebugger = new Debugger("HAL", "SATAPI");
 
         public PortRegisters mPortReg;
-
         public override PortType mPortType => PortType.SATAPI;
         public override string mPortName => "SATAPI";
         public override uint mPortNumber => mPortReg.mPortNumber;
+        public override BlockDeviceType Type => BlockDeviceType.RemovableCD;
 
         public SATAPI(PortRegisters aSATAPIPort)
         {
