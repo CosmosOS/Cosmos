@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Tests.DiskManager
     /// <seealso cref="Cosmos.System.Kernel" />
     public class Kernel : Sys.Kernel
     {
-        private VFSBase mVFS;
+        public static VFSBase mVFS;
 
         /// <summary>
         /// Pre-run events
