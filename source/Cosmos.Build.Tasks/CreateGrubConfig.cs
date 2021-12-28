@@ -1,10 +1,11 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace Cosmos.Build.Tasks
 {
-    public class CreateSyslinuxConfig : Task
+    public class CreateGrubConfig: Task
     {
         [Required]
         public string TargetDirectory { get; set; }
@@ -25,12 +26,14 @@ namespace Cosmos.Build.Tasks
             var xBinName = BinName;
             var xLabelName = Path.GetFileNameWithoutExtension(xBinName);
 
-            using (var xWriter = File.CreateText(Path.Combine(TargetDirectory, "syslinux.cfg")))
+            using (var xWriter = File.CreateText(Path.Combine(TargetDirectory + "/boot/grub/", "grub.cfg")))
             {
-                xWriter.WriteLine("default " + xLabelName);
-                xWriter.WriteLine("label " + xLabelName);
-                WriteIndentedLine(xWriter, "kernel mboot.c32");
-                WriteIndentedLine(xWriter, "append " + xBinName);
+                xWriter.WriteLine("set timeout=0");
+                xWriter.WriteLine();
+                xWriter.WriteLine("menuentry '" + xLabelName + "' {");
+                WriteIndentedLine(xWriter, "multiboot2 /boot/" + xBinName);
+                WriteIndentedLine(xWriter, "boot");
+                xWriter.WriteLine("}");
             }
 
             return true;

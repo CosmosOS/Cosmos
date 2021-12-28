@@ -17,8 +17,19 @@ namespace Cosmos.HAL.BlockDevice
 	// initializing another ATA class in favour of AtaPio
 	public class ATA_PIO : Ata
 	{
-		#region Properties
-		protected Core.IOGroup.ATA IO;
+        #region Properties
+        public override BlockDeviceType Type
+        {
+            get
+            {
+                if (DriveType == SpecLevel.ATAPI)
+                {
+                    return BlockDeviceType.RemovableCD;
+                }
+                return BlockDeviceType.HardDrive;
+            }
+        }
+        protected Core.IOGroup.ATA IO;
 
 		protected SpecLevel mDriveType = SpecLevel.Null;
 		public SpecLevel DriveType
