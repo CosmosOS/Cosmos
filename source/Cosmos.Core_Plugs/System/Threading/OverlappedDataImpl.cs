@@ -8,6 +8,7 @@ using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Threading
 {
+    [Plug()]
     class OverlappedDataImpl
     {
         [PlugMethod(Signature = "System_Threading_OverlappedData__System_Threading_OverlappedData_GetOverlappedFromNative_System_Threading_NativeOverlapped__")]
