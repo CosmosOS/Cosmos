@@ -13,9 +13,10 @@ using System.Text;
 
 namespace Cosmos.System.Tests
 {
-    class DiskManagerTest
+    public class DiskManagerTest
     {
-
+        static ManagedPartition ourPart;
+        static Disk ourDisk;
         [SetUp]
         public void Setup()
         {
@@ -23,10 +24,29 @@ namespace Cosmos.System.Tests
             var xDevice = new TestBlockDevice();
             var xPartition = new Partition(xDevice, 0, xDevice.BlockCount);
             BlockDevice.Devices.Clear();
-            BlockDevice.Devices.Add(xPartition);
+            Partition.Partitions.Clear();
+
+            BlockDevice.Devices.Add(xDevice);
+            Partition.Partitions.Add(xPartition);
             CosmosVFS cosmosVFS = new CosmosVFS();
-            VFSManager.RegisterVFS(cosmosVFS, true);
-            cosmosVFS.Initialize(false);
+            VFSManager.RegisterVFS(cosmosVFS, true, true);
+
+            foreach (var disk in VFSManager.GetDisks())
+            {
+                foreach (var part in disk.Partitions)
+                {
+                    if (part.RootPath == @"0:\")
+                    {
+                        ourDisk = disk;
+                        ourPart = part;
+                        break;
+                    }
+                }
+            }
+            if (ourDisk == null)
+            {
+                throw new Exception("Failed to find our disk.");
+            }
         }
 
         [TearDown]
@@ -36,24 +56,27 @@ namespace Cosmos.System.Tests
         }
 
         [Test]
-        public void TestDiskManagerQuickFormat()
+        public void Execute()
         {
-            string driveName = @"C:\";
-            var drive = new DiskManager(driveName);
-            drive.Format("FAT32", aQuick: true);
+            string driveName = @"0:\";
+
+            Assert.IsTrue(ourPart.RootPath == driveName, "ManagedPartition.RootPath failed drive has wrong name");
+
+            ourDisk.FormatPartition(0, "FAT32", true);
 
             var xDi = new DriveInfo(driveName);
 
-            /* If the drive is emptry all Space should be free */
-            Assert.IsTrue(DriveInfoImpl.get_TotalSize(xDi) == DriveInfoImpl.get_TotalFreeSpace(xDi));
+            //If the drive is empty all Space should be free
+            Assert.IsTrue(xDi.TotalSize == xDi.TotalFreeSpace, "DiskManager.Format (quick) failed TotalFreeSpace is not the same of TotalSize");
 
-            /* Let's try to create a new file on the Root Directory */
-            FileStreamImpl.InitializeStream(@"C:\newFile.txt", FileMode.Create);
+            //Let's try to create a new file on the Root Directory
+            File.Create(@"0:\newFile.txt");
 
-            Assert.IsTrue(CosmosFileSystem.FileExists(@"C:\newFile.txt"), "Failed to create new file after disk format");
+            Assert.IsTrue(File.Exists(@"0:\newFile.txt") == true, "Failed to create new file after disk format");
 
-            DirectoryImpl.CreateDirectory(@"C:\SYS");
-            Assert.IsTrue(DirectoryImpl.GetDirectories(@"C:\SYS").Length == 0, "Can create new empty directory");
+            Directory.CreateDirectory(@"0:\SYS\");
+
+            Assert.IsTrue(Directory.GetDirectories(@"0:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
         }
     }
 }
