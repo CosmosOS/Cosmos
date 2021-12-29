@@ -411,7 +411,6 @@ namespace Cosmos.Core
                 return null;
             }
 
-            var rawMap = new RawMemoryMapBlock[64];
             var baseMap = (RawMemoryMapBlock*)((uint*)Multiboot2.MemoryMap + (uint)16);
             var currentMap = baseMap;
 
@@ -424,7 +423,6 @@ namespace Cosmos.Core
             ulong bestSize = 0;
             while ((uint)currentMap < ((uint)baseMap + totalSize) && counter < 64)
             {
-                rawMap[counter++] = *currentMap;
                 currentMap = (RawMemoryMapBlock*)((uint)currentMap + entrySize);
 
                 if (currentMap->Type == 1)
