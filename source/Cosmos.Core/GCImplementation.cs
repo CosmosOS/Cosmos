@@ -81,6 +81,8 @@ namespace Cosmos.Core
                 return;
             }
             StartedMemoryManager = true;
+            Multiboot2.Init(); //just in case
+
             var largestBlock = CPU.GetLargestMemoryBlock();
 
             if (largestBlock != null)
