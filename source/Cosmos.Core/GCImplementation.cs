@@ -81,19 +81,18 @@ namespace Cosmos.Core
                 return;
             }
             StartedMemoryManager = true;
-            Multiboot2.Init(); //just in case
 
             var largestBlock = CPU.GetLargestMemoryBlock();
 
             if (largestBlock != null)
             {
-                memPtr = (byte*)largestBlock.Address;
-                memLength = largestBlock.Length;
+                memPtr = (byte*)largestBlock->Address;
+                memLength = largestBlock->Length;
                 if ((uint)memPtr < CPU.GetEndOfKernel() + 1024)
                 {
                     memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                     memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;
-                    memLength = largestBlock.Length - ((uint)memPtr - (uint)largestBlock.Address);
+                    memLength = largestBlock->Length - ((uint)memPtr - (uint)largestBlock->Address);
                     memLength += RAT.PageSize - memLength % RAT.PageSize;
                 }
             }

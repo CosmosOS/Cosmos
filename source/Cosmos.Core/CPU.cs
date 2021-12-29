@@ -363,7 +363,7 @@ namespace Cosmos.Core
             {
                 throw new Exception("No Memory Map was returned by Multiboot");
             }
-          
+
             var rawMap = new RawMemoryMapBlock[64];
             var baseMap = (RawMemoryMapBlock*)((uint*)Multiboot2.MemoryMap + (uint)16);
             var currentMap = baseMap;
@@ -404,25 +404,41 @@ namespace Cosmos.Core
         /// </summary>
         /// <returns>The size of the largest block in bytes</returns>
 
-        public static unsafe MemoryMapBlock GetLargestMemoryBlock()
+        public static unsafe RawMemoryMapBlock* GetLargestMemoryBlock()
         {
-            MemoryMapBlock bestMap = null;
-            ulong bestSize = 0;
-            var maps = GetMemoryMap();
-
-            foreach (var currentMap in maps)
+            if (!Multiboot2.MemoryMapExists())
             {
-                if (currentMap.Type == 1) // Usable ram
+                return null;
+            }
+
+            var rawMap = new RawMemoryMapBlock[64];
+            var baseMap = (RawMemoryMapBlock*)((uint*)Multiboot2.MemoryMap + (uint)16);
+            var currentMap = baseMap;
+
+            uint totalSize = Multiboot2.MemoryMap->Size - 16;
+            uint entrySize = Multiboot2.MemoryMap->EntrySize;
+
+            RawMemoryMapBlock* BestMap = null;
+
+            int counter = 0;
+            ulong bestSize = 0;
+            while ((uint)currentMap < ((uint)baseMap + totalSize) && counter < 64)
+            {
+                rawMap[counter++] = *currentMap;
+                currentMap = (RawMemoryMapBlock*)((uint)currentMap + entrySize);
+
+                if (currentMap->Type == 1)
                 {
-                    if (currentMap.Length > bestSize)
+                    if (currentMap->Length > bestSize)
                     {
-                        bestSize = currentMap.Length;
-                        bestMap = currentMap;
+                        BestMap = currentMap;
+                        bestSize = currentMap->Length;
                     }
                 }
             }
 
-            return bestMap;
+
+            return BestMap;
         }
     }
 
