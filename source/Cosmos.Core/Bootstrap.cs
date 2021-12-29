@@ -33,9 +33,8 @@ namespace Cosmos.Core
         /// </summary>
         public static void Init()
         {
-            //call for IL2CPU
-            Multiboot2.Init();
             // Drag this stuff in to the compiler manually until we add the always include attrib
+            Multiboot2.Init();
             INTs.Dummy();
 
             PIC = new PIC();
