@@ -13,7 +13,8 @@ namespace Cosmos.System.Tests
 {
     class VFSManagerTest
     {
-
+        private ManagedPartition ourPart;
+        private Disk ourDisk;
         [SetUp]
         public void Setup()
         {
@@ -21,10 +22,29 @@ namespace Cosmos.System.Tests
             var xDevice = new TestBlockDevice();
             var xPartition = new Partition(xDevice, 0, xDevice.BlockCount);
             BlockDevice.Devices.Clear();
-            BlockDevice.Devices.Add(xPartition);
+            Partition.Partitions.Clear();
+
+            BlockDevice.Devices.Add(xDevice);
+            Partition.Partitions.Add(xPartition);
             CosmosVFS cosmosVFS = new CosmosVFS();
             VFSManager.RegisterVFS(cosmosVFS, true);
-            cosmosVFS.Initialize(false);
+
+            foreach (var disk in VFSManager.GetDisks())
+            {
+                foreach (var part in disk.Partitions)
+                {
+                    if (part.RootPath == @"0:\")
+                    {
+                        ourDisk = disk;
+                        ourPart = part;
+                        break;
+                    }
+                }
+            }
+            if (ourDisk == null)
+            {
+                throw new Exception("Failed to find our drive.");
+            }
         }
 
         [TearDown]
@@ -36,9 +56,17 @@ namespace Cosmos.System.Tests
         [Test]
         public void Test_Disk_Manager()
         {
-            const string root = @"C:\";
+            var disks = VFSManager.GetDisks();
+            Assert.IsTrue(disks.Count != 0);
+            foreach (var item in disks)
+            {
+                Assert.IsTrue(item.Size != 0);
+                Assert.IsTrue(item.Partitions.Count != 0);
+            }
+
+            const string root = @"0:\";
             long initialSize = VFSManager.GetTotalSize(root);
-            VFSManager.Format("C", "FAT32", true);
+            ourDisk.FormatPartition(0, "FAT32", true);
             Assert.AreEqual(initialSize, VFSManager.GetAvailableFreeSpace(root));
             Assert.AreEqual(0, VFSManager.GetDirectoryListing(root).Count);
             VFSManager.CreateFile(root + "test.txt");
@@ -48,9 +76,9 @@ namespace Cosmos.System.Tests
         [Test]
         public void Test_Disk_Manager_Reformating()
         {
-            const string root = @"C:\";
+            const string root = @"0:\";
             long initialSize = VFSManager.GetTotalSize(root);
-            VFSManager.Format("C", "FAT32", true);
+            ourDisk.FormatPartition(0, "FAT32", true);
             Assert.AreEqual(initialSize, VFSManager.GetAvailableFreeSpace(root));
             Assert.AreEqual(0, VFSManager.GetDirectoryListing(root).Count);
             VFSManager.CreateFile(root + "test.txt");
@@ -67,7 +95,7 @@ namespace Cosmos.System.Tests
             Assert.AreEqual(DirectoryEntryTypeEnum.File, lists[0].mEntryType);
             Assert.AreEqual(DirectoryEntryTypeEnum.File, lists[5].mEntryType);
             Assert.AreEqual(DirectoryEntryTypeEnum.Directory, lists[6].mEntryType);
-            VFSManager.Format("C", "FAT32", true);
+            ourDisk.FormatPartition(0, "FAT32", true);
             Assert.AreEqual(0, VFSManager.GetDirectoryListing(root).Count);
             VFSManager.CreateDirectory(root + "dir");
             Assert.IsNull(VFSManager.GetFile(root + "newfile.txt"));
@@ -79,16 +107,16 @@ namespace Cosmos.System.Tests
         [Test]
         public void Test_Disk_Manager_Reformating_First_Directories()
         {
-            const string root = @"C:\";
+            const string root = @"0:\";
             long initialSize = VFSManager.GetTotalSize(root);
-            VFSManager.Format("C", "FAT32", true);
+            ourDisk.FormatPartition(0, "FAT32", true);
             Assert.AreEqual(initialSize, VFSManager.GetAvailableFreeSpace(root));
             Assert.AreEqual(0, VFSManager.GetDirectoryListing(root).Count);
             VFSManager.CreateDirectory(root + "SubDir");
             VFSManager.CreateFile(root + "SubDir\\filet.txt");
             Assert.IsNotNull(VFSManager.GetFile(root + "SubDir\\filet.txt"));
             Assert.AreEqual(1, VFSManager.GetDirectoryListing(root).Count);
-            VFSManager.Format("C", "FAT32", true);
+            ourDisk.FormatPartition(0, "FAT32", true);
             Assert.AreEqual(0, VFSManager.GetDirectoryListing(root).Count);
             VFSManager.CreateDirectory(root + "dir");
             Assert.AreEqual(1, VFSManager.GetDirectoryListing(root).Count);

@@ -85,65 +85,7 @@ namespace Cosmos.HAL.BlockDevice
                 {
                     mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
 
-                    if (GPT.IsGPTPartition(xPort))
-                    {
-                        var xGPT = new GPT(xPort);
-
-                        mAHCIDebugger.Send($"Number of GPT partitions found on port 0:{xPort.mPortNumber} ");
-                        mAHCIDebugger.SendNumber(xGPT.Partitions.Count);
-                        for (int i = 0; i < xGPT.Partitions.Count; i++)
-                        {
-                            var xPart = xGPT.Partitions[i];
-                            if (xPart == null)
-                            {
-                                Console.WriteLine("Null partition found at idx: " + i);
-                            }
-                            else
-                            {
-                                var xPartDevice = new Partition(xPort, xPart.StartSector, xPart.SectorCount);
-                                BlockDevice.Devices.Add(xPartDevice);
-                                Console.WriteLine("Found partition at idx: " + i);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var xMBRData = new byte[512];
-                        xPort.ReadBlock(0UL, 1U, ref xMBRData);
-                        var xMBR = new MBR(xMBRData);
-
-                        if (xMBR.EBRLocation != 0)
-                        {
-                            // EBR Detected!
-                            mAHCIDebugger.Send("EBR Detected within MBR code");
-                            var xEBRData = new byte[512];
-                            xPort.ReadBlock(xMBR.EBRLocation, 1U, ref xEBRData);
-                            var xEBR = new EBR(xEBRData);
-                            for (int i = 0; i < xEBR.Partitions.Count; i++)
-                            {
-                                //var xPart = xEBR.Partitions[i];
-                                //var xPartDevice = new Partition(xSATA, xPart.StartSector, xPart.SectorCount);
-                                //Devices.Add(xPartDevice);
-                            }
-                        }
-
-                        mAHCIDebugger.Send($"Number of MBR partitions found on port 0:{xPort.mPortNumber} ");
-                        mAHCIDebugger.SendNumber(xMBR.Partitions.Count);
-                        for (int i = 0; i < xMBR.Partitions.Count; i++)
-                        {
-                            var xPart = xMBR.Partitions[i];
-                            if (xPart == null)
-                            {
-                                Console.WriteLine("Null partition found at idx: " + i);
-                            }
-                            else
-                            {
-                                var xPartDevice = new Partition(xPort, xPart.StartSector, xPart.SectorCount);
-                                BlockDevice.Devices.Add(xPartDevice);
-                                Console.WriteLine("Found partition at idx: " + i);
-                            }
-                        }
-                    }
+                    IDE.ScanAndInitPartitions(xPort);
                 }
                 else if (xPort.mPortType == PortType.SATAPI)
                 {

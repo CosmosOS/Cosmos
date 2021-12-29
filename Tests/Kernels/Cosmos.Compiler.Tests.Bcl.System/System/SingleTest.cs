@@ -207,32 +207,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             valueNegated = -value;
             Assert.IsTrue((EqualityHelper.SinglesAreEqual(valueNegated, -42.0f)), "(float) negation of positive float doesn't work");
 
-            #region Parsing
-
-            value = Single.Parse("0.4");
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.4), "simple parsing of float works");
-
-            value = Single.Parse("+0.3");
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.3), "parsing of float with positive sign works!");
-
-            value = Single.Parse("-0.4");
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, -0.4), "parsing of negative float works!");
-
-            value = Single.Parse("    0.7     ");
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.7), "float parsing ignores leading and trailing whitespaces");
-
-            value = Single.Parse("0.4E1");
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 4), "float parsing takes in account E");
-
-            value = Single.Parse("0.4E-1");
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 0.04), "float parsing works with negative E");
-
-            Assert.IsFalse(Single.TryParse("asd4", out value), "float TryParse returns false when it fails");
-
-            Assert.IsTrue(Single.TryParse("2.3", out value), " float TryParse returns true when it works");
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 2.3), "float TryParse returns correct result when it works");
-
-            #endregion Parsing
+            
         }
     }
 }
