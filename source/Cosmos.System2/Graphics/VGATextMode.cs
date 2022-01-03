@@ -35,9 +35,37 @@ namespace Cosmos.System.Graphics
         /// Set text mode.
         /// </summary>
         /// <param name="Size">Text size.</param>
-        public static void SetTextMode(TextSize aSize)
+        public static void SetTextMode(TextSize aSize, bool shouldUpdateConsole = true)
         {
             _Screen.SetTextMode(aSize);
+#pragma warning disable CA1416 // Validate platform compatibility
+            if (shouldUpdateConsole)
+            {
+                switch (aSize)
+                {
+                    case TextSize.Size40x25:
+                        global::System.Console.SetWindowSize(40, 25);
+                        break;
+                    case TextSize.Size40x50:
+                        global::System.Console.SetWindowSize(40, 50);
+                        break;
+                    case TextSize.Size80x25:
+                        global::System.Console.SetWindowSize(80, 25);
+                        break;
+                    case TextSize.Size80x50:
+                        global::System.Console.SetWindowSize(40, 50);
+                        break;
+                    case TextSize.Size90x30:
+                        global::System.Console.SetWindowSize(90, 30);
+                        break;
+                    case TextSize.Size90x60:
+                        global::System.Console.SetWindowSize(90, 60);
+                        break;
+                    default:
+                        break;
+                }
+            }
+#pragma warning restore CA1416 // Validate platform compatibility
         }
 
         /// <summary>

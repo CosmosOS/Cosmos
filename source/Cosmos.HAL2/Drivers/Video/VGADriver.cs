@@ -17,6 +17,9 @@ namespace Cosmos.HAL
 {
     public class VGADriver
     {
+        public static ushort CurrentAmountOfCols = 80;
+        public static ushort CurrentAmountOfRows = 25;
+
         internal Debugger mDebugger = new Debugger("HAL", "VGA");
         private const byte _NumSeqRegs = 5;
         private const byte _NumCRTCRegs = 25;
@@ -394,26 +397,38 @@ namespace Cosmos.HAL
             switch (aSize)
             {
                 case TextSize.Size40x25:
+                    CurrentAmountOfCols = 40;
+                    CurrentAmountOfRows = 25;
                     WriteVGARegisters(_G_40x25_text);
                     WriteFont(_G_8x16_font, 16);
                     break;
                 case TextSize.Size40x50:
+                    CurrentAmountOfCols = 40;
+                    CurrentAmountOfRows = 50;
                     WriteVGARegisters(_G_40x50_text);
                     WriteFont(_G_8x8_font, 8);
                     break;
                 case TextSize.Size80x25:
+                    CurrentAmountOfCols = 80;
+                    CurrentAmountOfRows = 25;
                     WriteVGARegisters(_G_80x25_text);
                     WriteFont(_G_8x16_font, 16);
                     break;
                 case TextSize.Size80x50:
+                    CurrentAmountOfCols = 80;
+                    CurrentAmountOfRows = 50;
                     WriteVGARegisters(_G_80x50_text);
                     WriteFont(_G_8x8_font, 8);
                     break;
                 case TextSize.Size90x30:
+                    CurrentAmountOfCols = 90;
+                    CurrentAmountOfRows = 30;
                     WriteVGARegisters(_G_90x30_text);
                     WriteFont(_G_8x16_font, 16);
                     break;
                 case TextSize.Size90x60:
+                    CurrentAmountOfCols = 90;
+                    CurrentAmountOfRows = 60;
                     WriteVGARegisters(_G_90x60_text);
                     WriteFont(_G_8x8_font, 8);
                     break;

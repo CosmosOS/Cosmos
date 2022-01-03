@@ -27,14 +27,6 @@ namespace Cosmos.HAL
         /// </summary>
         public TextScreen()
         {
-            if (this is TextScreen)
-            {
-                TextScreenHelpers.Debug("this is TextScreen");
-            }
-            else
-            {
-                TextScreenHelpers.Debug("ERROR: This is not of type TextScreen!");
-            }
             mRAM = IO.Memory.Bytes;
             // Set the Console default colors: White foreground on Black background, the default value of mClearCellValue is set there too as it is linked with the Color
             SetColors(ConsoleColor.White, ConsoleColor.Black);
@@ -54,8 +46,8 @@ namespace Cosmos.HAL
             mRow2Addr = (uint)(Cols * 2);
         }
 
-        public override ushort Rows { set; get; } = 25;
-        public override ushort Cols { set; get; } = 80;
+        public override ushort Rows { get { return VGADriver.CurrentAmountOfRows; } set { VGADriver.CurrentAmountOfRows = value; UpdateWindowSize(); } }
+        public override ushort Cols { get { return VGADriver.CurrentAmountOfCols; } set { VGADriver.CurrentAmountOfCols = value; UpdateWindowSize(); } }
 
         /// <summary>
         /// Clear text screen.
