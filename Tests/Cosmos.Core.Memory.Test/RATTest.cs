@@ -1,5 +1,4 @@
 ﻿using System;
-using Cosmos.IL2CPU;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Native = System.UInt32;
 

@@ -3,7 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Compiler.Tests.Bcl.System
+namespace MemoryOperationsTest
 {
     public class SpanTest
     {
