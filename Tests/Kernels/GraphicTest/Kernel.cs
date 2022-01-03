@@ -144,13 +144,11 @@ namespace GraphicTest
             aCanvas.DrawChar('A', font, pen, 0, 16 * 7);
 
             aCanvas.Display();
-            Console.ReadLine();
 
             aCanvas.Disable();
 
             Console.WriteLine("Back in text mode");
             Console.WriteLine("Freed: " + Heap.Collect());
-            Console.ReadLine();
 
             mDebugger.Send($"Test of Canvas with mode {aCanvas.Mode} executed successfully");
         }

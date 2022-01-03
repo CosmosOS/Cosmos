@@ -257,8 +257,6 @@ namespace Cosmos.Core.Memory
         public static uint GetFirstRATIndex(void* aPtr)
         {
             var xPos = (uint)((byte*)aPtr - RamStart) / PageSize;
-            //Debugger.DoSendNumber(0x4A74A7);
-            //Debugger.DoSendNumber(xPos);
             // See note about when mRAT = 0 in Alloc.
             for (byte* p = mRAT + xPos; p >= mRAT; p--)
             {
