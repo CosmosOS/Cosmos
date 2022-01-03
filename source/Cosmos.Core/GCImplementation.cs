@@ -5,7 +5,6 @@
 using System;
 using Cosmos.Core.Memory;
 using Cosmos.Debug.Kernel;
-using Cosmos.IL2CPU;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
