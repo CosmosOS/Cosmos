@@ -14,8 +14,9 @@ namespace Cosmos.Core
     [SuppressMessage("Style", "IDE0011:Add braces")]
     public static partial class VTablesImpl
     {
-        // this field seems to be always empty, but the VTablesImpl class is embedded in the final exe.
+        // this field seems to be always empty, but the VTablesImpl class is embedded in the final bin.
         public static VTable[] mTypes;
+        public static GCTable[] gcTypes;
 
         static VTablesImpl()
         {
@@ -111,12 +112,14 @@ namespace Cosmos.Core
             vTable.InterfaceMethodCount = aInterfaceMethodCount;
             vTable.InterfaceMethodIndexes = aInterfaceMethodIndexes;
             vTable.TargetMethodIndexes = aTargetMethodIndexes;
-            vTable.GCFieldCount = aGCFieldCount;
-            vTable.GCFieldOffsets = aGCFieldOffsets;
-            vTable.GCFieldTypes = aGCFieldTypes;
             vTable.IsValueType = aIsValueType;
             vTable.IsStruct = aIsStruct;
             mTypes[aType] = vTable;
+            var gcTable = new GCTable();
+            gcTable.GCFieldCount = aGCFieldCount;
+            gcTable.GCFieldOffsets = aGCFieldOffsets;
+            gcTable.GCFieldTypes = aGCFieldTypes;
+            gcTypes[aType] = gcTable;
         }
 
         public static void SetInterfaceInfo(int aType, int aInterfaceIndex, uint aInterfaceIdentifier)
@@ -308,7 +311,7 @@ namespace Cosmos.Core
         /// <returns></returns>
         public static uint GetGCFieldCount(uint aType)
         {
-            return mTypes[aType].GCFieldCount;
+            return gcTypes[aType].GCFieldCount;
         }
 
         /// <summary>
@@ -318,7 +321,7 @@ namespace Cosmos.Core
         /// <returns></returns>
         public static uint[] GetGCFieldOffsets(uint aType)
         {
-            return mTypes[aType].GCFieldOffsets;
+            return gcTypes[aType].GCFieldOffsets;
         }
 
         /// <summary>
@@ -328,7 +331,7 @@ namespace Cosmos.Core
         /// <returns></returns>
         public static uint[] GetGCFieldTypes(uint aType)
         {
-            return mTypes[aType].GCFieldTypes;
+            return gcTypes[aType].GCFieldTypes;
         }
 
         /// <summary>
@@ -368,11 +371,14 @@ namespace Cosmos.Core
         public uint[] InterfaceMethodIndexes;
         public uint[] TargetMethodIndexes;
 
+        public bool IsValueType;
+        public bool IsStruct;
+    }
+
+    public struct GCTable
+    {
         public uint GCFieldCount; // Number of fields where objects are stored on the heap
         public uint[] GCFieldOffsets;
         public uint[] GCFieldTypes;
-
-        public bool IsValueType;
-        public bool IsStruct;
     }
 }
