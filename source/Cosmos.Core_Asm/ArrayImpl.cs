@@ -16,8 +16,6 @@ namespace Cosmos.Core_Asm
 
         public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length)
         {
-            Debugger.DoSendNumber(0xC0f7);
-            Debugger.DoSendNumber(length);
             Copy(sourceArray, sourceIndex, destinationArray, destinationIndex, length, false);
         }
 
