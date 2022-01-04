@@ -179,8 +179,6 @@ namespace GraphicTest
             DoTest(vGACanvas);
             vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
             DoTest(vGACanvas);
-            vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
-            DoTest((Canvas)vGACanvas);
             vGACanvas = new VGACanvas(new Mode(640, 480, ColorDepth.ColorDepth4));
             DoTest(vGACanvas);
             Console.BackgroundColor = ConsoleColor.Black;
