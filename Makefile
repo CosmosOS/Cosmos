@@ -1,9 +1,9 @@
 THISDIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 DESTDIR = /opt/cosmos
 
-IL2CPU_URL = https://github.com/CosmosOS/IL2CPU --branch=master
+IL2CPU_URL = https://github.com/CosmosOS/IL2CPU --branch=crossplatform
 XSHARP_URL = https://github.com/CosmosOS/XSharp --branch=master
-COMMON_URL = https://github.com/CosmosOS/Common --branch=master
+COMMON_URL = https://github.com/CosmosOS/Common --branch=crossplatform
 
 IL2CPU_DIR = $(THISDIR)/../IL2CPU
 XSHARP_DIR = $(THISDIR)/../XSharp
