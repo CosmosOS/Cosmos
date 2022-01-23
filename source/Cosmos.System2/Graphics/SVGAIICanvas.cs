@@ -528,7 +528,7 @@ namespace Cosmos.System.Graphics
                 x += aFont.Width;
             }
 
-            _xSVGADriver.Update((uint)x, (uint)y, (uint)(aFont.Width * str.Length), aFont.Height);
+            _xSVGADriver.Update((uint)x, (uint)y, (uint)((aFont.Width + 1) * str.Length ), aFont.Height);
         }
 
         /// <summary>
@@ -578,7 +578,7 @@ namespace Cosmos.System.Graphics
                 }
             }
 
-            _xSVGADriver.Update((uint)x, (uint)y, aFont.Width, aFont.Height);
+            _xSVGADriver.Update((uint)x, (uint)y, (uint)(aFont.Width + 1), aFont.Height);
         }
 
         /// <summary>
