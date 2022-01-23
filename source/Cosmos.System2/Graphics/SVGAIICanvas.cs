@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.Drivers.PCI.Video;
+using Cosmos.System.Graphics.Fonts;
 
 namespace Cosmos.System.Graphics
 {
@@ -94,23 +95,42 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
-            Color xColor = aPen.Color;
-
-            if (xColor.A == 0)
+            if (aPen.Color.A == 0)
             {
                 return;
             }
-            else if (xColor.A < 255)
+            else if (aPen.Color.A < 255)
             {
-                xColor = AlphaBlend(xColor, GetPointColor(aX, aY), xColor.A);
+                aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
             }
 
-            mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {xColor.Name} Color");
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
+            mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {aPen.Color.Name} Color");
+            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.Color.ToArgb());
             mSVGAIIDebugger.SendInternal($"Done drawing point");
             /* No need to refresh all the screen to make the point appear on Screen! */
             //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Columns, (uint)mode.Rows);
             _xSVGADriver.Update((uint)aX, (uint)aY, 1, 1);
+        }
+
+        /// <summary>
+        /// Draw point. Warning: Need to update screen to take effect.
+        /// </summary>
+        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        private void DrawPointFast(Pen aPen, int aX, int aY)
+        {
+            if (aPen.Color.A == 0)
+            {
+                return;
+            }
+            else if (aPen.Color.A < 255)
+            {
+                aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
+            }
+
+            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.Color.ToArgb());
         }
 
         /// <summary>
@@ -399,12 +419,95 @@ namespace Cosmos.System.Graphics
             
         }
 
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="str">string to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public override void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        {
+            for (int i = 0; i < str.Length; i++)
+            {
+                DrawCharFast(str[i], aFont, pen, x, y);
+                x += aFont.Width;
+            }
+
+            _xSVGADriver.Update((uint)x, (uint)y, (uint)(aFont.Width * str.Length), aFont.Height);
+        }
+
+        /// <summary>
+        /// Draw char.
+        /// </summary>
+        /// <param name="str">char to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        private void DrawCharFast(char c, Font aFont, Pen pen, int x, int y)
+        {
+            int p = aFont.Height * (byte)c;
+
+            for (int cy = 0; cy < aFont.Height; cy++)
+            {
+                for (byte cx = 0; cx < aFont.Width; cx++)
+                {
+                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
+                    {
+                        DrawPointFast(pen, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draw char.
+        /// </summary>
+        /// <param name="str">char to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public override void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        {
+            int p = aFont.Height * (byte)c;
+
+            for (int cy = 0; cy < aFont.Height; cy++)
+            {
+                for (byte cx = 0; cx < aFont.Width; cx++)
+                {
+                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
+                    {
+                        DrawPointFast(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
+                    }
+                }
+            }
+
+            _xSVGADriver.Update((uint)x, (uint)y, aFont.Width, aFont.Width);
+        }
+
+        /// <summary>
+        /// Draw image.
+        /// </summary>
+        /// <param name="aImage">Image.</param>
+        /// <param name="aX">X coordinate.</param>
+        /// <param name="aY">Y coordinate.</param>
         public override void DrawImage(Image aImage, int aX, int aY)
         {
-            for (int y = 0; y < aImage.Height; y++)
+            var xBitmap = aImage.rawData;
+            var xWidht = (int)aImage.Width;
+
+            int xOffset = GetPointOffset(aX, aY);
+            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+
+            for (int i = 0; i < aImage.Height; i++)
             {
-                _xSVGADriver.VideoMemory.Copy((int)(aX + (aY + y) * aImage.Width), aImage.rawData, (int)(y * aImage.Width), (int)aImage.Width);
+                _xSVGADriver.VideoMemory.Copy((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
             }
+
+            _xSVGADriver.Update((uint)aX, (uint)aY, aImage.Width, aImage.Height);
         }
     }
 }

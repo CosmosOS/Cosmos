@@ -308,23 +308,7 @@ namespace Cosmos.System.Graphics
 
                 }
             }
-        }
-
-        /// <summary>
-        /// Get point offset.
-        /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <returns>int value.</returns>
-        private int GetPointOffset(int aX, int aY)
-        {
-            Global.mDebugger.SendInternal($"Computing offset for coordinates {aX},{aY}");
-            int xBytePerPixel = (int)Mode.ColorDepth / 8;
-            int stride = (int)Mode.ColorDepth / 8;
-            int pitch = Mode.Columns * xBytePerPixel;
-
-            return (aX * stride) + (aY * pitch);
-        }
+        } 
 
         /// <summary>
         /// Draw filled rectangle.

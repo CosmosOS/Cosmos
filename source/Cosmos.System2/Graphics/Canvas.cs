@@ -123,6 +123,22 @@ namespace Cosmos.System.Graphics
         public abstract Color GetPointColor(int x, int y);
 
         /// <summary>
+        /// Get point offset.
+        /// </summary>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <returns>int value.</returns>
+        internal int GetPointOffset(int aX, int aY)
+        {
+            Global.mDebugger.SendInternal($"Computing offset for coordinates {aX},{aY}");
+            int xBytePerPixel = (int)Mode.ColorDepth / 8;
+            int stride = (int)Mode.ColorDepth / 8;
+            int pitch = Mode.Columns * xBytePerPixel;
+
+            return (aX * stride) + (aY * pitch);
+        }
+
+        /// <summary>
         /// Draw array of colors.
         /// </summary>
         /// <param name="colors">Colors array.</param>
@@ -966,11 +982,11 @@ namespace Cosmos.System.Graphics
         /// <param name="pen">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        public virtual void DrawString(string str, Font aFont, Pen pen, int x, int y)
         {
-            foreach (char c in str)
+            for (int i = 0; i < str.Length; i++)
             {
-                DrawChar(c, aFont, pen, x, y);;
+                DrawChar(str[i], aFont, pen, x, y);;
                 x += aFont.Width;
             }
         }
@@ -995,7 +1011,7 @@ namespace Cosmos.System.Graphics
         /// <param name="pen">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        public virtual void DrawChar(char c, Font aFont, Pen pen, int x, int y)
         {
             int p = aFont.Height * (byte)c;
 
