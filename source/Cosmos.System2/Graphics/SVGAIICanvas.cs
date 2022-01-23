@@ -148,6 +148,99 @@ namespace Cosmos.System.Graphics
             throw new NotImplementedException();
             //xSVGAIIDriver.
         }
+		
+		/// <summary>
+        /// Draw horizontal line.
+        /// </summary>
+        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="dx">Line lenght.</param>
+        /// <param name="x1">Staring point X coordinate.</param>
+        /// <param name="y1">Staring point Y coordinate.</param>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        internal override void DrawHorizontalLine(Pen pen, int dx, int x1, int y1)
+        {
+            int i;
+
+            for (i = 0; i < dx; i++)
+            {
+                DrawPointFast(pen, x1 + i, y1);
+            }
+        }
+
+        /// <summary>
+        /// Draw vertical line.
+        /// </summary>
+        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="dy">Line lenght.</param>
+        /// <param name="x1">Staring point X coordinate.</param>
+        /// <param name="y1">Staring point Y coordinate.</param>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        internal override void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
+        {
+            int i;
+
+            for (i = 0; i < dy; i++)
+            {
+                DrawPointFast(pen, x1, y1 + i);
+            }
+        }
+
+        /*
+         * To draw a diagonal line we use the fast version of the Bresenham's algorithm.
+         * See http://www.brackeen.com/vga/shapes.html#4 for more informations.
+         */
+        /// <summary>
+        /// Draw diagonal line.
+        /// </summary>
+        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="dx">Line lenght on X axis.</param>
+        /// <param name="dy">Line lenght on Y axis.</param>
+        /// <param name="x1">Staring point X coordinate.</param>
+        /// <param name="y1">Staring point Y coordinate.</param>
+        /// <exception cref="OverflowException">Thrown if dx or dy equal to Int32.MinValue.</exception>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        internal override void DrawDiagonalLine(Pen pen, int dx, int dy, int x1, int y1)
+        {
+            int i, sdx, sdy, dxabs, dyabs, x, y, px, py;
+
+            dxabs = Math.Abs(dx);
+            dyabs = Math.Abs(dy);
+            sdx = Math.Sign(dx);
+            sdy = Math.Sign(dy);
+            x = dyabs >> 1;
+            y = dxabs >> 1;
+            px = x1;
+            py = y1;
+
+            if (dxabs >= dyabs) /* the line is more horizontal than vertical */
+            {
+                for (i = 0; i < dxabs; i++)
+                {
+                    y += dyabs;
+                    if (y >= dxabs)
+                    {
+                        y -= dxabs;
+                        py += sdy;
+                    }
+                    px += sdx;
+                    DrawPointFast(pen, px, py);
+                }
+            }
+            else /* the line is more vertical than horizontal */
+            {
+                for (i = 0; i < dyabs; i++)
+                {
+                    x += dxabs;
+                    if (x >= dyabs)
+                    {
+                        x -= dyabs;
+                        px += sdx;
+                    }
+                    py += sdy;
+                    DrawPointFast(pen, px, py);
+                }
+            }
+        }
 
         /// <summary>
         /// Draw point.
@@ -485,7 +578,7 @@ namespace Cosmos.System.Graphics
                 }
             }
 
-            _xSVGADriver.Update((uint)x, (uint)y, aFont.Width, aFont.Width);
+            _xSVGADriver.Update((uint)x, (uint)y, aFont.Width, aFont.Height);
         }
 
         /// <summary>
