@@ -157,7 +157,7 @@ namespace Cosmos.System.Graphics
         /// <param name="x1">Staring point X coordinate.</param>
         /// <param name="y1">Staring point Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        internal override void DrawHorizontalLine(Pen pen, int dx, int x1, int y1)
+        internal override void DrawHorizontalLine(Pen pen, int dx, int dy, int x1, int y1)
         {
             int i;
 
