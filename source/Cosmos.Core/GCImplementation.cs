@@ -4,9 +4,6 @@
 //#define COSMOSDEBUG
 using System;
 using Cosmos.Core.Memory;
-using Cosmos.Debug.Kernel;
-using IL2CPU.API;
-using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
 {
@@ -43,7 +40,7 @@ namespace Cosmos.Core
         /// </summary>
         public unsafe static uint AllocNewObject(uint aSize)
         {
-              return (uint)Heap.Alloc(aSize);
+            return (uint)Heap.Alloc(aSize);
         }
         /// <summary>
         /// Free Object from Memory
@@ -137,8 +134,11 @@ namespace Cosmos.Core
         /// <param name="aPtr"></param>
         public static unsafe void IncRootCount(ushort* aPtr)
         {
-            var rootCount = *(aPtr - 1) >> 1; // lowest bit is used to set if hit
-            *(aPtr - 1) = (ushort)((rootCount + 1) << 1); // loest bit can be zero since we shouldnt be doing this while gc is collecting
+            if (RAT.GetPageType(aPtr) != 0)
+            {
+                var rootCount = *(aPtr - 1) >> 1; // lowest bit is used to set if hit
+                *(aPtr - 1) = (ushort)((rootCount + 1) << 1); // loest bit can be zero since we shouldnt be doing this while gc is collecting
+            }
         }
 
         /// <summary>
@@ -147,8 +147,11 @@ namespace Cosmos.Core
         /// <param name="aPtr"></param>
         public static unsafe void DecRootCount(ushort* aPtr)
         {
-            var rootCount = *(aPtr - 1) >> 1; // lowest bit is used to set if hit
-            *(aPtr - 1) = (ushort)((rootCount - 1) << 1); // loest bit can be zero since we shouldnt be doing this while gc is collecting
+            if (RAT.GetPageType(aPtr) != 0)
+            {
+                var rootCount = *(aPtr - 1) >> 1; // lowest bit is used to set if hit
+                *(aPtr - 1) = (ushort)((rootCount - 1) << 1); // loest bit can be zero since we shouldnt be doing this while gc is collecting
+            }
         }
 
         /// <summary>
