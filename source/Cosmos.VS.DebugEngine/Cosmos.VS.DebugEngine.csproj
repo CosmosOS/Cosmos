@@ -28,6 +28,7 @@
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.0.6" />
         <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
+        <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -58,9 +59,4 @@
         </ItemGroup>
 
     </Target>
-
-    <ItemGroup>
-        <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
-    </ItemGroup>
-
 </Project>

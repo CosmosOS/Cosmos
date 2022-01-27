@@ -86,11 +86,11 @@ namespace Cosmos.Build.Builder
 
             // Restore Build.sln
 
-            yield return new RestoreTask(_msBuildService, buildSlnPath, true);
+            yield return new RestoreTask(_msBuildService, buildSlnPath);
 
             // Build Build.sln
 
-            yield return new BuildTask(_msBuildService, buildSlnPath, vsipDir, vsipDir, true);
+            yield return new BuildTask(_msBuildService, buildSlnPath, vsipDir, vsipDir);
 
             // Publish IL2CPU
 
@@ -107,7 +107,7 @@ namespace Cosmos.Build.Builder
                 "Cosmos.Build.Tasks",
             };
 
-            foreach (var task in PackProject(cosmosPackageProjects, new List<string>(), true))
+            foreach (var task in PackProject(cosmosPackageProjects, new List<string>()))
             {
                 yield return task;
             }
@@ -135,7 +135,7 @@ namespace Cosmos.Build.Builder
                 "IL2CPU.API"
             };
 
-            foreach (var task in PackProject(cosmosPackageProjects, il2cpuPackageProjects, false))
+            foreach (var task in PackProject(cosmosPackageProjects, il2cpuPackageProjects))
             {
                 yield return task;
             }
@@ -169,7 +169,7 @@ namespace Cosmos.Build.Builder
                 }
             }
 
-            IEnumerable<IBuildTask> PackProject(List<string> cosmosProjects, List<string> il2cpuProjects, bool targetNet48)
+            IEnumerable<IBuildTask> PackProject(List<string> cosmosProjects, List<string> il2cpuProjects)
             {
                 var packageProjectPaths = cosmosProjects.Select(p => Path.Combine(cosmosSourceDir, p));
                 packageProjectPaths = packageProjectPaths.Concat(il2cpuProjects.Select(p => Path.Combine(il2cpuSourceDir, p)));
@@ -182,10 +182,10 @@ namespace Cosmos.Build.Builder
                 {
                     if (restore)
                     {
-                        yield return new RestoreTask(_msBuildService, projectPath, targetNet48);
+                        yield return new RestoreTask(_msBuildService, projectPath);
                         restore = false;
                     }
-                    yield return new PackTask(_msBuildService, projectPath, packagesDir, packageVersionLocalBuildSuffix, targetNet48);
+                    yield return new PackTask(_msBuildService, projectPath, packagesDir, packageVersionLocalBuildSuffix);
                 }
             }
         }
