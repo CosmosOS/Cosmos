@@ -32,6 +32,7 @@
         <PackageReference Include="Microsoft.ServiceHub.Framework" Version="3.0.3075" />
         <PackageReference Include="System.Runtime" Version="4.3.1" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
+        <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -62,9 +63,5 @@
         </ItemGroup>
 
     </Target>
-
-    <ItemGroup>
-      <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
-    </ItemGroup>
 
 </Project>
