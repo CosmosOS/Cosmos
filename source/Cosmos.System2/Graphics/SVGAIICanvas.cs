@@ -14,18 +14,10 @@ namespace Cosmos.System.Graphics
     public class SVGAIICanvas : Canvas
     {
         /// <summary>
-        /// Disables the SVGA driver, parent method returns to VGA text mode
-        /// </summary>
-        public override void Disable()
-        {
-            _xSVGADriver.Disable();
-        }
-
-        /// <summary>
         /// Debugger.
         /// </summary>
         internal Debugger mSVGAIIDebugger = new Debugger("System", "SVGAIIScreen");
-        
+
         private static readonly Mode _DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
 
         /// <summary>
@@ -87,6 +79,14 @@ namespace Cosmos.System.Graphics
         public override Mode DefaultGraphicMode => _DefaultMode;
 
         /// <summary>
+        /// Disables the SVGA driver, parent method returns to VGA text mode
+        /// </summary>
+        public override void Disable()
+        {
+            _xSVGADriver.Disable();
+        }
+
+        /// <summary>
         /// Draw point.
         /// </summary>
         /// <param name="pen">Pen to draw with.</param>
@@ -104,12 +104,12 @@ namespace Cosmos.System.Graphics
                 aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
             }
 
-            mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {aPen.Color.Name} Color");
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.Color.ToArgb());
-            mSVGAIIDebugger.SendInternal($"Done drawing point");
-            /* No need to refresh all the screen to make the point appear on Screen! */
-            //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Columns, (uint)mode.Rows);
-            _xSVGADriver.Update((uint)aX, (uint)aY, 1, 1);
+            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.ValueARGB);
+        }
+
+        public void DrawPointFast(uint aColor, uint aX, uint aY)
+        {
+            _xSVGADriver.SetPixel(aX, aY, aColor);
         }
 
         /// <summary>
@@ -121,16 +121,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         private void DrawPointFast(Pen aPen, int aX, int aY)
         {
-            if (aPen.Color.A == 0)
-            {
-                return;
-            }
-            else if (aPen.Color.A < 255)
-            {
-                aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
-            }
-
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.Color.ToArgb());
+            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.ValueARGB);
         }
 
         /// <summary>
@@ -147,99 +138,6 @@ namespace Cosmos.System.Graphics
         {
             throw new NotImplementedException();
             //xSVGAIIDriver.
-        }
-		
-		/// <summary>
-        /// Draw horizontal line.
-        /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
-        /// <param name="dx">Line lenght.</param>
-        /// <param name="x1">Staring point X coordinate.</param>
-        /// <param name="y1">Staring point Y coordinate.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        internal override void DrawHorizontalLine(Pen pen, int dx, int dy, int x1, int y1)
-        {
-            int i;
-
-            for (i = 0; i < dx; i++)
-            {
-                DrawPointFast(pen, x1 + i, y1);
-            }
-        }
-
-        /// <summary>
-        /// Draw vertical line.
-        /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
-        /// <param name="dy">Line lenght.</param>
-        /// <param name="x1">Staring point X coordinate.</param>
-        /// <param name="y1">Staring point Y coordinate.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        internal override void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
-        {
-            int i;
-
-            for (i = 0; i < dy; i++)
-            {
-                DrawPointFast(pen, x1, y1 + i);
-            }
-        }
-
-        /*
-         * To draw a diagonal line we use the fast version of the Bresenham's algorithm.
-         * See http://www.brackeen.com/vga/shapes.html#4 for more informations.
-         */
-        /// <summary>
-        /// Draw diagonal line.
-        /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
-        /// <param name="dx">Line lenght on X axis.</param>
-        /// <param name="dy">Line lenght on Y axis.</param>
-        /// <param name="x1">Staring point X coordinate.</param>
-        /// <param name="y1">Staring point Y coordinate.</param>
-        /// <exception cref="OverflowException">Thrown if dx or dy equal to Int32.MinValue.</exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        internal override void DrawDiagonalLine(Pen pen, int dx, int dy, int x1, int y1)
-        {
-            int i, sdx, sdy, dxabs, dyabs, x, y, px, py;
-
-            dxabs = Math.Abs(dx);
-            dyabs = Math.Abs(dy);
-            sdx = Math.Sign(dx);
-            sdy = Math.Sign(dy);
-            x = dyabs >> 1;
-            y = dxabs >> 1;
-            px = x1;
-            py = y1;
-
-            if (dxabs >= dyabs) /* the line is more horizontal than vertical */
-            {
-                for (i = 0; i < dxabs; i++)
-                {
-                    y += dyabs;
-                    if (y >= dxabs)
-                    {
-                        y -= dxabs;
-                        py += sdy;
-                    }
-                    px += sdx;
-                    DrawPointFast(pen, px, py);
-                }
-            }
-            else /* the line is more vertical than horizontal */
-            {
-                for (i = 0; i < dyabs; i++)
-                {
-                    x += dxabs;
-                    if (x >= dyabs)
-                    {
-                        x -= dyabs;
-                        px += sdx;
-                    }
-                    py += sdy;
-                    DrawPointFast(pen, px, py);
-                }
-            }
         }
 
         /// <summary>
@@ -268,7 +166,12 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void DrawFilledRectangle(Pen aPen, int aX_start, int aY_start, int aWidth, int aHeight)
         {
-            _xSVGADriver.Fill((uint)aX_start, (uint)aY_start, (uint)aWidth, (uint)aHeight, (uint)aPen.Color.ToArgb());
+            var color = aPen.Color.ToArgb();
+
+            for (int i = aY_start; i < aY_start + aHeight; i++)
+            {
+                _xSVGADriver.VideoMemory.Fill(GetPointOffset(aX_start, i) + (int)_xSVGADriver.FrameSize, aWidth, color);
+            }
         }
 
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
@@ -425,12 +328,23 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Clear screen to specified color.
         /// </summary>
+        /// <param name="aColor">Color in ARGB.</param>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
+        public override void Clear(int aColor)
+        {
+            _xSVGADriver.Clear((uint)aColor);
+        }
+
+        /// <summary>
+        /// Clear screen to specified color.
+        /// </summary>
         /// <param name="aColor">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void Clear(Color aColor)
         {
-            _xSVGADriver.Fill(0, 0, (uint)Mode.Columns, (uint)Mode.Rows, (uint)aColor.ToArgb());
+            _xSVGADriver.Clear((uint)aColor.ToArgb());
         }
 
         /// <summary>
@@ -509,7 +423,7 @@ namespace Cosmos.System.Graphics
 
         public override void Display()
         {
-            
+            _xSVGADriver.DoubleBufferUpdate();
         }
 
         /// <summary>
@@ -527,8 +441,6 @@ namespace Cosmos.System.Graphics
                 DrawCharFast(str[i], aFont, pen, x, y);
                 x += aFont.Width;
             }
-
-            _xSVGADriver.Update((uint)x, (uint)y, (uint)((aFont.Width + 1) * str.Length ), aFont.Height);
         }
 
         /// <summary>
@@ -549,7 +461,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        DrawPointFast(pen, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
+                        DrawPointFast(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
                     }
                 }
             }
@@ -573,12 +485,10 @@ namespace Cosmos.System.Graphics
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        DrawPointFast(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
+                        DrawPointFast(pen, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
                     }
                 }
             }
-
-            _xSVGADriver.Update((uint)x, (uint)y, (uint)(aFont.Width + 1), aFont.Height);
         }
 
         /// <summary>
@@ -589,18 +499,13 @@ namespace Cosmos.System.Graphics
         /// <param name="aY">Y coordinate.</param>
         public override void DrawImage(Image aImage, int aX, int aY)
         {
-            var xBitmap = aImage.rawData;
-            var xWidht = (int)aImage.Width;
+            var xWidth = (int)aImage.Width;
+            var xHeight = (int)aImage.Height;
 
-            int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
-
-            for (int i = 0; i < aImage.Height; i++)
+            for (int i = 0; i < xHeight; i++)
             {
-                _xSVGADriver.VideoMemory.Copy((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
+                _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, (i * xWidth), xWidth);
             }
-
-            _xSVGADriver.Update((uint)aX, (uint)aY, aImage.Width, aImage.Height);
         }
     }
 }

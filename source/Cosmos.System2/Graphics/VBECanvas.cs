@@ -174,6 +174,40 @@ namespace Cosmos.System.Graphics
         /// Clear screen to specified color.
         /// </summary>
         /// <param name="color">Color.</param>
+        public override void Clear(int aColor)
+        {
+            Global.mDebugger.SendInternal($"Clearing the Screen with Color {aColor}");
+            //if (color == null)
+            //   throw new ArgumentNullException(nameof(color));
+
+            /*
+             * TODO this version of Clear() works only when mode.ColorDepth == ColorDepth.ColorDepth32
+             * in the other cases you should before convert color and then call the opportune ClearVRAM() overload
+             * (the one that takes ushort for ColorDepth.ColorDepth16 and the one that takes byte for ColorDepth.ColorDepth8)
+             * For ColorDepth.ColorDepth24 you should mask the Alpha byte.
+             */
+            switch (_Mode.ColorDepth)
+            {
+                case ColorDepth.ColorDepth4:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth8:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth16:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth24:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth32:
+                    _VBEDriver.ClearVRAM((uint)aColor);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Clear screen to specified color.
+        /// </summary>
+        /// <param name="color">Color.</param>
         public override void Clear(Color aColor)
         {
             Global.mDebugger.SendInternal($"Clearing the Screen with Color {aColor}");
@@ -308,7 +342,7 @@ namespace Cosmos.System.Graphics
 
                 }
             }
-        } 
+        }
 
         /// <summary>
         /// Draw filled rectangle.
@@ -322,10 +356,11 @@ namespace Cosmos.System.Graphics
         {
             //ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
             aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
+            var color = aPen.Color.ToArgb();
 
             for (int i = aY; i < aY + aHeight; i++)
             {
-                _VBEDriver.ClearVRAM(GetPointOffset(aX, i), aWidth, aPen.Color.ToArgb());
+                _VBEDriver.ClearVRAM(GetPointOffset(aX, i), aWidth, color);
             }
         }
 
@@ -338,18 +373,16 @@ namespace Cosmos.System.Graphics
         public override void DrawImage(Image aImage, int aX, int aY)
         {
             var xBitmap = aImage.rawData;
-            var xWidht = (int)aImage.Width;
+            var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
 
             int xOffset = GetPointOffset(aX, aY);
             int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
 
-            Global.mDebugger.SendInternal($"Drawing image of size {aImage.Width}x{aImage.Height} array size {aImage.rawData.Length}");
             for (int i = 0; i < xHeight; i++)
             {
-                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
+                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidth), xWidth);
             }
-            Global.mDebugger.SendInternal("Done");
         }
 
         #endregion

@@ -48,6 +48,18 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Clear all the Canvas with the specified color.
         /// </summary>
+        /// <param name="color">Color in ARGB.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        public abstract void Clear(int color);
+
+        /*
+         * Clear all the Canvas with the specified color. Please note that it is a very naïve implementation and any
+         * driver should replace it (or with an hardware command or if not possible with a block copy on the IoMemoryBlock)
+         */
+        /// <summary>
+        /// Clear all the Canvas with the specified color.
+        /// </summary>
         /// <param name="color">Color.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
@@ -172,7 +184,7 @@ namespace Cosmos.System.Graphics
         /// <param name="x1">Staring point X coordinate.</param>
         /// <param name="y1">Staring point Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        internal virtual void DrawHorizontalLine(Pen pen, int dx, int dy, int x1, int y1)
+        internal virtual void DrawHorizontalLine(Pen pen, int dx, int x1, int y1)
         {
             int i;
 
@@ -424,7 +436,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int i = x0 - x; i <= x0 + x; i++)
                 {
-                    
+
                     DrawPoint(pen, i, y0 + y);
                     DrawPoint(pen, i, y0 - y);
                 }
@@ -876,7 +888,7 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
-        
+
         private int[] scaleImage(Image image, int newWidth, int newHeight)
         {
             int[] pixels = image.rawData;
@@ -897,7 +909,7 @@ namespace Cosmos.System.Graphics
             }
             return temp;
         }
-                /// <summary>
+        /// <summary>
         /// Draw a Scaled Bitmap.
         /// </summary>
         /// <param name="image">Image to Scale.</param>
@@ -905,7 +917,7 @@ namespace Cosmos.System.Graphics
         /// <param name="y">Y coordinate.</param>
         /// <param name="w">Desired Width.</param>
         /// <param name="h">Desired Height.</param>
-        public virtual void DrawImage(Image image, int x, int y,int w,int h)
+        public virtual void DrawImage(Image image, int x, int y, int w, int h)
         {
             int[] pixels = scaleImage(image, w, h);
             for (int _x = 0; _x < w; _x++)
@@ -917,7 +929,7 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
-        
+
         /// <summary>
         /// Draw image with alpha channel.
         /// </summary>
@@ -986,7 +998,7 @@ namespace Cosmos.System.Graphics
         {
             for (int i = 0; i < str.Length; i++)
             {
-                DrawChar(str[i], aFont, pen, x, y);;
+                DrawChar(str[i], aFont, pen, x, y);
                 x += aFont.Width;
             }
         }
@@ -1042,7 +1054,7 @@ namespace Cosmos.System.Graphics
                 return false;
             }
             */
-          
+
             /* This would have been the more "modern" version but LINQ is not working
 
             if (!availableModes.Exists(element => element == mode))
@@ -1218,6 +1230,5 @@ namespace Cosmos.System.Graphics
             byte B = (byte)((to.B * alpha + from.B * (255 - alpha)) >> 8);
             return Color.FromArgb(R, G, B);
         }
-
     }
 }

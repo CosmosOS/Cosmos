@@ -16,6 +16,7 @@ namespace Cosmos.System.Graphics
     public class Pen
     {
         Color color;
+        int colorValue;
         int width;
 
         /// <summary>
@@ -28,10 +29,11 @@ namespace Cosmos.System.Graphics
         {
             if (width < 1)
                 throw new ArgumentOutOfRangeException($"width ({width}) cannot be less than 1");
-           // Contract.Requires<ArgumentOutOfRangeException>(width >= 1, "thickness");
+            // Contract.Requires<ArgumentOutOfRangeException>(width >= 1, "thickness");
 
             this.color = color;
             this.width = width;
+            colorValue = color.ToArgb();
         }
 
         /// <summary>
@@ -47,6 +49,18 @@ namespace Cosmos.System.Graphics
             set
             {
                 color = value;
+                colorValue = value.ToArgb();
+            }
+        }
+
+        /// <summary>
+        /// Get pen color in ARGB.
+        /// </summary>
+        public int ValueARGB
+        {
+            get
+            {
+                return colorValue;
             }
         }
 
