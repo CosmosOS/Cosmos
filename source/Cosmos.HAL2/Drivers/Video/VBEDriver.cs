@@ -69,9 +69,6 @@ namespace Cosmos.HAL.Drivers
             NoClearMemory = 0x80,
         };
 
-        int mRow2Addr;
-        int mScrollSize;
-
         /// <summary>
         /// Create new instance of the <see cref="VBEDriver"/> class.
         /// </summary>
@@ -81,9 +78,6 @@ namespace Cosmos.HAL.Drivers
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
             PCIDevice videocard;
-
-            mScrollSize = (xres * yres) * (bpp / 8);
-            mRow2Addr = xres * (bpp / 8) * 16;
 
             if (VBE.IsAvailable()) //VBE VESA Enabled Mulitboot Parsing
             {

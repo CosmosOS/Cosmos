@@ -421,6 +421,9 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)_xSVGADriver.GetPixel((uint)aX, (uint)aY));
         }
 
+        /// <summary>
+        /// Display screen
+        /// </summary>
         public override void Display()
         {
             _xSVGADriver.DoubleBufferUpdate();

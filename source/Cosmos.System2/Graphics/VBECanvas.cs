@@ -387,6 +387,9 @@ namespace Cosmos.System.Graphics
 
         #endregion
 
+        /// <summary>
+        /// Display screen
+        /// </summary>
         public override void Display()
         {
             _VBEDriver.Swap();

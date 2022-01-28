@@ -623,16 +623,12 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WaitForFifo();
         }
 
+        /// <summary>
+        /// Update video memory.
+        /// </summary>
         public void DoubleBufferUpdate()
         {
             VideoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
-            /*
-            for(uint i = 0; i <= FrameSize; i++) 
-            {
-                Video_Memory[i] = Video_Memory[i + FrameSize];
-            }
-            */
-
             Update(0, 0, width, height);
         }
 
