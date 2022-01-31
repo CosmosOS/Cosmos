@@ -20,19 +20,10 @@ namespace Cosmos.Build.Builder.BuildTasks
 
         public RestoreTask(
             IMSBuildService msBuildService,
-            string projectFilePath,
-            bool vsixBuild = false)
+            string projectFilePath)
             : base(msBuildService)
         {
             ProjectFilePath = projectFilePath;
-
-            if (vsixBuild)
-            {
-                _properties = new Dictionary<string, string>
-                {
-                    ["Net48"] = "True"
-                };
-            }
         }
     }
 }
