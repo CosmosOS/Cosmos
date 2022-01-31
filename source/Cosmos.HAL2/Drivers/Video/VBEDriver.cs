@@ -295,7 +295,7 @@ namespace Cosmos.HAL.Drivers
         /// <param name="aCount">A count.</param>
         public void CopyVRAM(int aStart, byte[] aData, int aIndex, int aCount)
         {
-            IO.LinearFrameBuffer.Copy(aStart, aData, aIndex, aCount);
+            lastbuffer.Copy(aStart, aData, aIndex, aCount);
         }
 
         /// <summary>
