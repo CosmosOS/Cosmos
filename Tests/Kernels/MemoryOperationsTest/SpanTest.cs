@@ -3,7 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Compiler.Tests.Bcl.System
+namespace MemoryOperationsTest
 {
     public class SpanTest
     {
@@ -52,6 +52,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.AreEqual(0, a, "MemoryMarshal returns correct array data reference");
             arr[0] = 10;
             Assert.AreEqual(10, a, "The reference is updated");
+            Assert.AreEqual(Unsafe.Add(ref a, 1), 1, "Unsafe.Add 1 works for array ref");
+            Assert.AreEqual(Unsafe.Add(ref a, 5), 5, "Unsafe.Add 5 works for array ref");
+            
+        }
+
+        public static void ImplicitSpanTest(ReadOnlySpan<char> aSpan)
+        {
+            Assert.AreEqual(aSpan[0], 'H', "Implicit array to span has correct value at index 0");
+            Assert.AreEqual(aSpan[3], 'p', "Implicit array to span has correct value at index 3");
         }
 
         public static void Execute()
@@ -73,6 +82,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Span<byte> slice = span.Slice(start: 5, length: 3);
             Assert.IsTrue(slice != null, "Spans can be sliced");
             Assert.AreEqual(3, slice.Length, "Sliced Span has correct length");
+
+            var intArr = new int[] { 0, 10, 100 };
+            Span<int> intSpan = new(intArr);
+            Assert.AreEqual(0, intSpan[0], "Int Span get_Item works at index 0");
+            Assert.AreEqual(100, intSpan[2], "Int Span get_Item works at index 2");
+            Assert.IsFalse(intSpan.IsEmpty, "Int Span is not empty");
+
+            var charArr = new char[] { 'H', 'e', 'l', 'p' };
+            ImplicitSpanTest(charArr);
         }
     }
 }
