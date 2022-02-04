@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" PrivateAssets="All" Version="17.0.0" />
     </ItemGroup>
 
     <ItemGroup>
