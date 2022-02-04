@@ -112,6 +112,12 @@ namespace Cosmos.Core_Plugs.Interop
         public static unsafe int GetCalendarInfoEx(string aString, uint aUint, IntPtr aIntPtr, uint aUint2, IntPtr aIntPtr1, int aInt, IntPtr aIntPtr2) {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Boolean__Interop_Kernel32_CloseHandle_System_IntPtr_")]
+        public static bool CloseHandle(IntPtr aIntPtr)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

@@ -34,11 +34,9 @@ namespace Cosmos.Compiler.Tests.Bcl
                 //ThreadTest.Execute();
                 //mDebugger.Send("Thread test end");
 
-                SpanTest.Execute();
                 //DecimalTest.Execute();
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
-                DelegatesTest.Execute();
                 EventsTest.Execute();
                 RandomTests.Execute();
                 ConvertTests.Execute();

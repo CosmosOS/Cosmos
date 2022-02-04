@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.CompilerServices;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
+using Cosmos.IL2CPU;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
@@ -28,10 +30,34 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
             throw new NotImplementedException();
         }
 
-        // TODO: Implement this correctly
         public static bool IsReferenceOrContainsReferences<T>()
         {
-            return false;
+            uint t = ((CosmosRuntimeType)typeof(T)).mTypeId;
+            return ContainsReference(t);   
+        }
+
+        private static bool ContainsReference(uint mType)
+        {
+            if (!VTablesImpl.IsValueType(mType))
+            {
+                return true;
+            }
+            else if (VTablesImpl.IsStruct(mType))
+            {
+                var fields = VTablesImpl.GetGCFieldTypes(mType);
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    if (ContainsReference(fields[i]))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public static bool TryEnsureSufficientExecutionStack()

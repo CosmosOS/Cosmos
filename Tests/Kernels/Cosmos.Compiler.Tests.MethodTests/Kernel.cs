@@ -50,6 +50,7 @@ namespace Cosmos.Compiler.Tests.MethodTests
                 Console.WriteLine("Exception");
                 Console.WriteLine(E.ToString());
             }
+            DelegatesTest.Execute();
         }
     }
 }
