@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 
-namespace Cosmos.Compiler.Tests.Bcl.System
+namespace Cosmos.Compiler.Tests.MethodTests
 {
     public class DelegatesTest
     {

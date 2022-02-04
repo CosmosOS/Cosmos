@@ -1,7 +1,7 @@
 #define COSMOSDEBUG
 using System;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
-using Cosmos.IL2CPU;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
