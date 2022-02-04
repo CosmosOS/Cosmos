@@ -118,6 +118,15 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        public static bool SetThreadErrorMode(
+           uint dwNewMode,
+           out uint lpOldMode)
+        {
+            //TODO
+            lpOldMode = 0;
+            return true;
+        }
     }
 
 }
