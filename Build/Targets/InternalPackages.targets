@@ -12,7 +12,7 @@
     <ItemGroup>
         <IL2CPUPackage Include="IL2CPU.API" ProjectPath="source\IL2CPU.API\IL2CPU.API.csproj" />
         <IL2CPUPackage Include="IL2CPU.Debug.Symbols" ProjectPath="source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.csproj" />
-		<IL2CPUPackage Include="IL2CPU.Debug.Symbols.Net48" ProjectPath="source\IL2CPU.Debug.Symbols\IL2CPU.Debug.Symbols.Net48.csproj" />
+		<IL2CPUPackage Include="IL2CPU.Debug.Symbols.Net48" ProjectPath="source\IL2CPU.Debug.Symbols.Net48\IL2CPU.Debug.Symbols.Net48.csproj" />
     </ItemGroup>
 
     <ItemGroup>
