@@ -377,7 +377,7 @@ namespace Cosmos.System.Graphics
             var xHeight = (int)aImage.Height;
 
             int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+            int xScreenWidthInPixel = Mode.Columns;
 
             for (int i = 0; i < xHeight; i++)
             {

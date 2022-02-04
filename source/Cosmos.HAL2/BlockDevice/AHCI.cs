@@ -6,7 +6,6 @@ using Cosmos.HAL.BlockDevice;
 using Cosmos.HAL.BlockDevice.Ports;
 using Cosmos.HAL.BlockDevice.Registers;
 using Cosmos.Core;
-using Cosmos.Core.Memory.Old;
 
 namespace Cosmos.HAL.BlockDevice
 {
