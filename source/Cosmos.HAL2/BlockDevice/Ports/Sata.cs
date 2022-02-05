@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cosmos.Core;
-using Cosmos.Core.Memory.Old;
 using Cosmos.HAL.BlockDevice.Registers;
 using Cosmos.Debug.Kernel;
 
@@ -10,7 +9,13 @@ namespace Cosmos.HAL.BlockDevice.Ports
     public class SATA : StoragePort
     {
         internal static Debugger mSATADebugger = new Debugger("HAL", "SATA");
-
+        public override BlockDeviceType Type
+        {
+            get
+            {
+                return BlockDeviceType.HardDrive;
+            }
+        }
         public override PortType mPortType => PortType.SATA;
         public override string mPortName => "SATA";
         public override uint mPortNumber => mPortReg.mPortNumber;

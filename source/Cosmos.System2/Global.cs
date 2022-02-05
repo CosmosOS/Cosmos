@@ -72,8 +72,9 @@ namespace Cosmos.System
         /// Init console, screen and keyboard.
         /// </summary>
         /// <param name="textScreen">A screen device.</param>
-        public static void Init(TextScreenBase textScreen)
+        public static void Init(TextScreenBase textScreen, bool InitScroolWheel = true, bool InitPS2 = true, bool InitNetwork = true, bool IDEInit = true)
         {
+           
             // We must init Console before calling Inits.
             // This is part of the "minimal" boot to allow output.
             mDebugger.Send("Creating Console");
@@ -85,7 +86,7 @@ namespace Cosmos.System
             mDebugger.Send("Creating Keyboard");
 
             mDebugger.Send("HW Init");
-            HAL.Global.Init(textScreen);
+            HAL.Global.Init(textScreen, InitScroolWheel, InitPS2, InitNetwork, IDEInit);
 
             Network.NetworkStack.Init();
             mDebugger.Send("Network Stack Init");

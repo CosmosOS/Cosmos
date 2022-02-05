@@ -97,6 +97,7 @@ namespace Cosmos.Build.Builder
             var il2cpuProjectPath = Path.Combine(il2cpuSourceDir, "IL2CPU", "IL2CPU.csproj");
             var il2cpuPublishPath = Path.Combine(vsipDir, "IL2CPU");
 
+            yield return new RestoreTask(_msBuildService, il2cpuProjectPath);
             yield return new PublishTask(_msBuildService, il2cpuProjectPath, il2cpuPublishPath);
 
             // Pack build system and kernel assemblies
@@ -104,11 +105,20 @@ namespace Cosmos.Build.Builder
             var cosmosPackageProjects = new List<string>()
             {
                 "Cosmos.Build.Tasks",
+            };
+
+            foreach (var task in PackProject(cosmosPackageProjects, new List<string>()))
+            {
+                yield return task;
+            }
+
+            cosmosPackageProjects = new List<string>()
+            {
+                "Cosmos.Core_Plugs", // we ned to restore il2cpu.debug.
 
                 "Cosmos.Common",
 
                 "Cosmos.Core",
-                "Cosmos.Core_Plugs",
                 "Cosmos.Core_Asm",
 
                 "Cosmos.HAL2",
@@ -125,15 +135,9 @@ namespace Cosmos.Build.Builder
                 "IL2CPU.API"
             };
 
-            var packageProjectPaths = cosmosPackageProjects.Select(p => Path.Combine(cosmosSourceDir, p));
-            packageProjectPaths = packageProjectPaths.Concat(il2cpuPackageProjects.Select(p => Path.Combine(il2cpuSourceDir, p)));
-
-            var packagesDir = Path.Combine(vsipDir, "packages");
-            var packageVersionLocalBuildSuffix = DateTime.Now.ToString("yyyyMMddhhmmss");
-
-            foreach (var projectPath in packageProjectPaths)
+            foreach (var task in PackProject(cosmosPackageProjects, il2cpuPackageProjects))
             {
-                yield return new PackTask(_msBuildService, projectPath, packagesDir, packageVersionLocalBuildSuffix);
+                yield return task;
             }
 
             var cosmosSetupDir = Path.Combine(_cosmosDir, "setup");
@@ -162,6 +166,26 @@ namespace Cosmos.Build.Builder
                 using (var xKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Cosmos"))
                 {
                     xKey.SetValue("DevKit", _cosmosDir);
+                }
+            }
+
+            IEnumerable<IBuildTask> PackProject(List<string> cosmosProjects, List<string> il2cpuProjects)
+            {
+                var packageProjectPaths = cosmosProjects.Select(p => Path.Combine(cosmosSourceDir, p));
+                packageProjectPaths = packageProjectPaths.Concat(il2cpuProjects.Select(p => Path.Combine(il2cpuSourceDir, p)));
+
+                var packagesDir = Path.Combine(vsipDir, "packages");
+                var packageVersionLocalBuildSuffix = DateTime.Now.ToString("yyyyMMddhhmmss");
+
+                var restore = true;
+                foreach (var projectPath in packageProjectPaths)
+                {
+                    if (restore)
+                    {
+                        yield return new RestoreTask(_msBuildService, projectPath);
+                        restore = false;
+                    }
+                    yield return new PackTask(_msBuildService, projectPath, packagesDir, packageVersionLocalBuildSuffix);
                 }
             }
         }

@@ -10,11 +10,6 @@ namespace Cosmos.HAL.BlockDevice
     public class ATAPI : BlockDevice
     {
         /// <summary>
-        /// Static list of all ATAPI devices. This is usually populated upon boot
-        /// </summary>
-        public static List<BlockDevice> ATAPIDevices = new List<BlockDevice>();
-
-        /// <summary>
         /// CPU IOGroup for all ATA devices, ATAPI uses this group too
         /// </summary>
         protected static Core.IOGroup.ATA IO;
@@ -33,6 +28,7 @@ namespace Cosmos.HAL.BlockDevice
         /// Each IDE channel also has a Master or a Slave. This just gets or sets which position it is at.
         /// </summary>
         private BusPositionEnum BusPosition { get; set; }
+        public override BlockDeviceType Type => BlockDeviceType.RemovableCD;
 
         private ATA_PIO device;
 
@@ -59,9 +55,6 @@ namespace Cosmos.HAL.BlockDevice
             IO = new Core.IOGroup.ATA(!Primary);
             var p = BusPosition == BusPositionEnum.Master;
             Ata.AtaDebugger.Send("ATAPI: Primary controller: " + this.Primary + " Bus postion: IsMaster: " + p);
-
-            Devices.Add(this);
-            ATAPIDevices.Add(this);
 
             Init();
         }

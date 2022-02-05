@@ -8,6 +8,7 @@ namespace Cosmos.System.Tests
     class TestBlockDevice : BlockDevice
     {
         private byte[] mData;
+        public override BlockDeviceType Type => BlockDeviceType.HardDrive;
 
         public TestBlockDevice()
         {

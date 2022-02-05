@@ -9,12 +9,14 @@ namespace Cosmos.Build.Builder.Dependencies
 {
     internal class VisualStudioWorkloadsDependency : IDependency
     {
-        private const string NetCoreToolsWorkload = "Microsoft.VisualStudio.Workload.NetCoreTools";
+        private const string NetCore48SDK = "Microsoft.Net.Component.4.8.SDK";
+        private const string NetCore50Runtime = "Microsoft.NetCore.Component.Runtime.5.0";
         private const string VisualStudioExtensionsWorkload = "Microsoft.VisualStudio.Workload.VisualStudioExtension";
 
         private static readonly string[] RequiredPackages = new string[]
         {
-            NetCoreToolsWorkload,
+            NetCore48SDK,
+            NetCore50Runtime,
             VisualStudioExtensionsWorkload
         };
         public bool ShouldInstallByDefault => false;
@@ -58,9 +60,13 @@ namespace Cosmos.Build.Builder.Dependencies
         }
         private string GetProperName(string packageId)
         {
-            if (packageId == NetCoreToolsWorkload)
+            if (packageId == NetCore48SDK)
             {
-                return ".NET Core cross-platform development";
+                return ".Net Core 4.8 SDK";
+            }
+            else if(packageId == NetCore50Runtime)
+            {
+                return ".Net Core 5.0 Runtime";
             }
             else if (packageId == VisualStudioExtensionsWorkload)
             {

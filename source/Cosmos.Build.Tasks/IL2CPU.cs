@@ -52,12 +52,22 @@ namespace Cosmos.Build.Tasks
 
         public bool EmitDebugSymbols { get; set; }
 
+        public bool CompileVBEMultiboot { get; set; }
+
+        public string VBEResolution { get; set; }
+
         #endregion
 
         protected override string ToolName => IsWindows() ? "IL2CPU.exe" : "IL2CPU";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
+
+        public IL2CPU()
+        {
+            CompileVBEMultiboot = false;
+            VBEResolution = "800x600x32";
+        }
 
         protected override string GenerateFullPathToTool()
         {
@@ -85,6 +95,8 @@ namespace Cosmos.Build.Tasks
                 ["EnableLogging"] = EnableLogging.ToString(),
                 ["EmitDebugSymbols"] = EmitDebugSymbols.ToString(),
                 ["IgnoreDebugStubAttribute"] = IgnoreDebugStubAttribute.ToString(),
+                ["CompileVBEMultiboot"] = CompileVBEMultiboot.ToString(),
+                ["VBEResolution"] = VBEResolution.ToString(),
             }.ToList();
 
             foreach (var reference in References)
