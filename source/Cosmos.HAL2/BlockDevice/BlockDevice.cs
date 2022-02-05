@@ -47,6 +47,8 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
         public ulong BlockSize => mBlockSize;
 
+        public abstract BlockDeviceType Type { get; }
+
         // Only allow reading and writing whole blocks because many of the hardware
         // command work that way and we dont want to add complexity at the BlockDevice level.
         // public abstract void ReadBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData);
@@ -98,5 +100,20 @@ namespace Cosmos.HAL.BlockDevice
                 //throw new Exception("Invalid block number.");
             }
         }
+    }
+    public enum BlockDeviceType
+    {
+        /// <summary>
+        /// This block device is a hard drive
+        /// </summary>
+        HardDrive,
+        /// <summary>
+        /// This block device is a CD or DVD
+        /// </summary>
+        RemovableCD,
+        /// <summary>
+        /// This block device is a removable device. For example, USB flash drive.
+        /// </summary>
+        Removable
     }
 }

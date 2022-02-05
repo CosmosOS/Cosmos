@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Core.Memory.Old;
 using Cosmos.HAL.BlockDevice.Registers;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
+using Cosmos.Core.Memory;
 
 namespace Cosmos.HAL.BlockDevice.Ports
 {
@@ -13,10 +13,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
         internal static Debugger mSATAPIDebugger = new Debugger("HAL", "SATAPI");
 
         public PortRegisters mPortReg;
-
         public override PortType mPortType => PortType.SATAPI;
         public override string mPortName => "SATAPI";
         public override uint mPortNumber => mPortReg.mPortNumber;
+        public override BlockDeviceType Type => BlockDeviceType.RemovableCD;
 
         public SATAPI(PortRegisters aSATAPIPort)
         {
@@ -49,7 +49,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             var aLength = 128 + ((uint)xCMDHeader.PRDTL) * 16;
             mSATAPIDebugger.SendInternal("SendSATAPICommand");
             mSATAPIDebugger.SendInternal(aLength);
-            xCMDHeader.CTBA = Heap.MemAlloc(aLength);
+            xCMDHeader.CTBA = Heap.SafeAlloc(aLength);
 
             HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 

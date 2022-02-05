@@ -23,8 +23,7 @@ namespace Cosmos.Build.Builder.BuildTasks
             IMSBuildService msBuildService,
             string projectFilePath,
             string packageOutputPath,
-            string packageVersionLocalBuildSuffix,
-            bool vsixBuild = false)
+            string packageVersionLocalBuildSuffix)
             : base(msBuildService)
         {
             ProjectFilePath = projectFilePath;
@@ -34,11 +33,6 @@ namespace Cosmos.Build.Builder.BuildTasks
                 ["PackageOutputPath"] = packageOutputPath,
                 ["PackageVersionLocalBuildSuffix"] = packageVersionLocalBuildSuffix
             };
-
-            if (vsixBuild)
-            {
-                _properties["Net48"] = "True";
-            }
         }
     }
 }

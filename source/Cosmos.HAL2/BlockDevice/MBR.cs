@@ -32,8 +32,11 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
 
-        public MBR(byte[] aMBR)
+        public MBR(BlockDevice device)
         {
+            var aMBR = device.NewBlockArray(1);
+            device.ReadBlock(0, 1, ref aMBR);
+
             ParsePartition(aMBR, 446);
             ParsePartition(aMBR, 462);
             ParsePartition(aMBR, 478);

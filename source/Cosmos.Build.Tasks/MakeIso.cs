@@ -75,7 +75,8 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitch("-J");
             xBuilder.AppendSwitch("-R");
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
-            xBuilder.AppendSwitch("-b isolinux.bin");
+            //xBuilder.AppendSwitch("-b isolinux.bin");
+            xBuilder.AppendSwitch(" -b boot/grub/i386-pc/eltorito.img");
             xBuilder.AppendSwitch("-no-emul-boot");
             xBuilder.AppendSwitch("-boot-load-size 4");
             xBuilder.AppendSwitch("-boot-info-table");

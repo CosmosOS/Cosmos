@@ -336,13 +336,12 @@ namespace Cosmos.System.Graphics
         /// <param name="aHeight">Height.</param>
         public override void DrawFilledRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
         {
-            int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
-            aWidth *= (int)Mode.ColorDepth / 8;
+            //ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
+            aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
 
-            for (int i = 0; i < aHeight; i++)
+            for (int i = aY; i < aY + aHeight; i++)
             {
-                _VBEDriver.ClearVRAM((i * xScreenWidthInPixel) + xOffset, aWidth, aPen.Color.ToArgb());
+                _VBEDriver.ClearVRAM(GetPointOffset(aX, i), aWidth, aPen.Color.ToArgb());
             }
         }
 
@@ -355,16 +354,16 @@ namespace Cosmos.System.Graphics
         public override void DrawImage(Image aImage, int aX, int aY)
         {
             var xBitmap = aImage.rawData;
-            var xWidht = (int)aImage.Width;
+            var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
 
             int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+            int xScreenWidthInPixel = Mode.Columns;
 
             Global.mDebugger.SendInternal($"Drawing image of size {aImage.Width}x{aImage.Height} array size {aImage.rawData.Length}");
             for (int i = 0; i < xHeight; i++)
             {
-                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
+                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidth), xWidth);
             }
             Global.mDebugger.SendInternal("Done");
         }

@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿// #define COSMOSDEBUG
 using Cosmos.System;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;

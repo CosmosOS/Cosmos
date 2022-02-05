@@ -60,9 +60,18 @@ namespace Cosmos.TestRunner.Core
             aDebugConnector.CmdSimpleLongNumber += n => LogMessage(
                 "Number from kernel: 0x" + n.ToString("X16").ToUpper());
 
-            aDebugConnector.CmdComplexNumber += f => LogMessage(
-                "Number from kernel: 0x" + f.ToString("X8").ToUpper());
+            aDebugConnector.CmdComplexNumber += f =>
+            {
+                try
+                {
+                    LogMessage(
+                    "Number from kernel: 0x" + f.ToString("X8").ToUpper());
+                }
+                catch(Exception e)
+                {
 
+                }
+            }; 
             aDebugConnector.CmdComplexLongNumber += d => LogMessage(
                 "Number from kernel: 0x" + d.ToString("X16").ToUpper());
 
@@ -196,7 +205,7 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-                OutputHandler.LogMessage($"ChannelPacketReceived, Channel = {arg1}, Command = {arg2}");
+                OutputHandler.LogMessage($"ChannelPacketReceived, Channel = {arg1}, Command = {arg2}, Args = {BitConverter.ToString(arg3)}");
             }
         }
 

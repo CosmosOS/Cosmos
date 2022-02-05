@@ -14,27 +14,19 @@ namespace Cosmos.HAL
         protected byte Color = 0x0F; // White
         protected ushort mBackgroundClearCellValue;
         protected ushort mTextClearCellValue;
-        protected uint mRow2Addr;
-        protected uint mScrollSize;
+        public uint mRow2Addr;
+        public uint mScrollSize;
         protected int mCursorSize = 25; // 25 % as C# Console class
         protected bool mCursorVisible = true;
 
-        protected Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
-        protected readonly MemoryBlock08 mRAM;
+        public Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
+        public MemoryBlock08 mRAM;
 
         /// <summary>
         /// Creat new instance of the <see cref="TextScreen"/> class.
         /// </summary>
         public TextScreen()
         {
-            if (this is TextScreen)
-            {
-                TextScreenHelpers.Debug("this is TextScreen");
-            }
-            else
-            {
-                TextScreenHelpers.Debug("ERROR: This is not of type TextScreen!");
-            }
             mRAM = IO.Memory.Bytes;
             // Set the Console default colors: White foreground on Black background, the default value of mClearCellValue is set there too as it is linked with the Color
             SetColors(ConsoleColor.White, ConsoleColor.Black);
@@ -46,8 +38,16 @@ namespace Cosmos.HAL
             TextScreenHelpers.Debug("End of TextScreen..ctor");
         }
 
-        public override ushort Rows { get { return 25; } }
-        public override ushort Cols { get { return 80; } }
+        public void UpdateWindowSize()
+        {
+            IO.Memory = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(Cols * Rows * 2));
+            mRAM = IO.Memory.Bytes;
+            mScrollSize = (uint)(Cols * (Rows - 1) * 2);
+            mRow2Addr = (uint)(Cols * 2);
+        }
+
+        public override ushort Rows { set; get; } = 25;
+        public override ushort Cols { set; get; } = 80;
 
         /// <summary>
         /// Clear text screen.
@@ -115,7 +115,7 @@ namespace Cosmos.HAL
             IO.Data3.Byte = (byte)(xPos & 0xFF);
             // Cursor high byte to VGA index register
             IO.Idx3.Byte = 0x0E;
-            IO.Data3.Byte = (byte)(xPos >> 8);
+            IO.Data3.Byte = (byte)(xPos >> 8); 
         }
 
         /// <summary>
