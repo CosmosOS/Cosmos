@@ -67,5 +67,10 @@ namespace Cosmos.System_Plugs.System.Threading
         {
             throw new NotImplementedException();
         }
+
+        public static void SpinWait(int aInt)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

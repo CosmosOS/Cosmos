@@ -8,6 +8,7 @@ using System.IO;
 using Cosmos.Compiler.Tests.Bcl;
 using Cosmos.System.Graphics.Fonts;
 using Cosmos.Debug.Kernel;
+using Cosmos.Core.Memory;
 
 /*
  * It is impossible to make assertions here but it is useful in any case to have it runs automatically
@@ -143,9 +144,11 @@ namespace GraphicTest
             aCanvas.DrawChar('A', font, pen, 0, 16 * 7);
 
             aCanvas.Display();
- 
+
             aCanvas.Disable();
+
             Console.WriteLine("Back in text mode");
+            Console.WriteLine("Freed: " + Heap.Collect());
 
             mDebugger.Send($"Test of Canvas with mode {aCanvas.Mode} executed successfully");
         }
@@ -176,8 +179,6 @@ namespace GraphicTest
             DoTest(vGACanvas);
             vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
             DoTest(vGACanvas);
-            vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
-            DoTest((Canvas)vGACanvas);
             vGACanvas = new VGACanvas(new Mode(640, 480, ColorDepth.ColorDepth4));
             DoTest(vGACanvas);
             Console.BackgroundColor = ConsoleColor.Black;

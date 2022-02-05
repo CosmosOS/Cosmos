@@ -59,7 +59,7 @@ namespace Cosmos.Core
             [FieldOffset(12)]
             public readonly uint EntryVersion;
             [FieldOffset(16)]
-            public readonly RawMemoryMap MemoryMapEntries;
+            public readonly RawMemoryMapBlock MemoryMapEntries;
         }
 
         /// <summary>
