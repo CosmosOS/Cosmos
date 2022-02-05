@@ -12,15 +12,14 @@
 ## [Running](Installation/Running.md)
 
 # Kernel
-## [Heap](Kernel/Heap.md)
 ## [Levels](Kernel/Levels.md)
-## [Memory](Kernel/Memory.md)
 ## [Plugs](Kernel/Plugs.md)
 ## [Startup](Kernel/Startup.md)
 ## [Graphics](Kernel/CGS.md)
 ## [Virtual File System](Kernel/VFS.md)
 ## [Network](Kernel/Network.md)
 ## [Resource Files](Kernel/ManifestResouceStream.md)
+## [Memory Management and Garbage Collection](Kernel/MemoryManagement.md)
 
 # Reference
 ## [x86](Reference/x86.md)
