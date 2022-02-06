@@ -13,6 +13,7 @@ namespace Cosmos.HAL.Drivers
     {
 
         private static readonly VBEIOGroup IO = Core.Global.BaseIOGroups.VBE;
+
         protected ManagedMemoryBlock lastbuffer;
 
         /// <summary>
@@ -107,14 +108,14 @@ namespace Cosmos.HAL.Drivers
             }
         }
 
-		/// <summary>
+        /// <summary>
         /// Write value to VBE index.
         /// </summary>
         /// <param name="index">Register index.</param>
         /// <param name="value">Value.</param>
         private static void VBEWrite(RegisterIndex index, ushort value)
         {
-            IO.VbeIndex.Word = (ushort) index;
+            IO.VbeIndex.Word = (ushort)index;
             IO.VbeData.Word = value;
         }
 
@@ -131,8 +132,8 @@ namespace Cosmos.HAL.Drivers
 #endif
             return VBERead(RegisterIndex.DisplayID) == 0xB0C5;
         }
-        
-		/// <summary>
+
+        /// <summary>
         /// Disable display.
         /// </summary>
         public void DisableDisplay()
@@ -192,17 +193,17 @@ namespace Cosmos.HAL.Drivers
             SetXResolution(xres);
             SetYResolution(yres);
             SetDisplayBPP(bpp);
-            if(clear)
+            if (clear)
             {
                 EnableDisplay(EnableValues.Enabled | EnableValues.UseLinearFrameBuffer);
-            
+
             }
             else
             {
                 /*
                 * Re-enable the Display with LinearFrameBuffer and without clearing video memory of previous value 
                 * (this permits to change Mode without losing the previous datas)
-                */ 
+                */
                 EnableDisplay(EnableValues.Enabled | EnableValues.UseLinearFrameBuffer | EnableValues.NoClearMemory);
             }
         }
@@ -214,7 +215,6 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value to set.</param>
         public void SetVRAM(uint index, byte value)
         {
-            Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as byte)");
             lastbuffer[index] = value;
         }
 
@@ -225,7 +225,6 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value to set.</param>
         public void SetVRAM(uint index, ushort value)
         {
-            //Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as ushort)");
             lastbuffer[index] = (byte)((value >> 8) & 0xFF);
             lastbuffer[index + 1] = (byte)((value >> 0) & 0xFF);
         }
@@ -237,7 +236,6 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value to set.</param>
         public void SetVRAM(uint index, uint value)
         {
-            //Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as uint)");
             lastbuffer[index] = (byte)((value >> 24) & 0xFF);
             lastbuffer[index + 1] = (byte)((value >> 16) & 0xFF);
             lastbuffer[index + 2] = (byte)((value >> 8) & 0xFF);
