@@ -95,32 +95,16 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
-            if (aPen.Color.A == 0)
+            if (aPen.Color.A < 255)
             {
-                return;
-            }
-            else if (aPen.Color.A < 255)
-            {
+                if (aPen.Color.A == 0)
+                {
+                    return;
+                }
+
                 aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
             }
 
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.ValueARGB);
-        }
-
-        public void DrawPointFast(uint aColor, uint aX, uint aY)
-        {
-            _xSVGADriver.SetPixel(aX, aY, aColor);
-        }
-
-        /// <summary>
-        /// Draw point. Warning: Need to update screen to take effect.
-        /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        private void DrawPointFast(Pen aPen, int aX, int aY)
-        {
             _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.ValueARGB);
         }
 
@@ -441,32 +425,8 @@ namespace Cosmos.System.Graphics
         {
             for (int i = 0; i < str.Length; i++)
             {
-                DrawCharFast(str[i], aFont, pen, x, y);
+                DrawChar(str[i], aFont, pen, x, y);
                 x += aFont.Width;
-            }
-        }
-
-        /// <summary>
-        /// Draw char.
-        /// </summary>
-        /// <param name="str">char to draw.</param>
-        /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        private void DrawCharFast(char c, Font aFont, Pen pen, int x, int y)
-        {
-            int p = aFont.Height * (byte)c;
-
-            for (int cy = 0; cy < aFont.Height; cy++)
-            {
-                for (byte cx = 0; cx < aFont.Width; cx++)
-                {
-                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
-                    {
-                        DrawPointFast(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
-                    }
-                }
             }
         }
 
@@ -488,7 +448,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        DrawPointFast(pen, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
+                        DrawPoint(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
                     }
                 }
             }
