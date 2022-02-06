@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using sysIO = System.IO;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;

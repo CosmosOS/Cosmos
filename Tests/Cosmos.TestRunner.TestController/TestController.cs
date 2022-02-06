@@ -9,11 +9,12 @@ namespace Cosmos.TestRunner
 {
     public static class TestController
     {
+        static Debugger debugger = new("Tests", "TestController");
         internal static Debugger Debugger
         {
             get
             {
-                return new Debugger("Tests", "TestController");
+                return debugger;
             }
         }
 
