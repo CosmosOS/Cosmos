@@ -152,6 +152,7 @@ namespace Cosmos.System.Graphics
         {
             var color = aPen.Color.ToArgb();
 
+            // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
             for (int i = aY_start; i < aY_start + aHeight; i++)
             {
                 _xSVGADriver.VideoMemory.Fill(GetPointOffset(aX_start, i) + (int)_xSVGADriver.FrameSize, aWidth, color);
