@@ -29,17 +29,17 @@ comme le SDK Cosmos. Cet article se concentre sur le kit utilisateur.
 Créez un nouveau projet comme vous le feriez pour n'importe quel projet C#, mais sélectionnez Cosmos Kernel
 (Précédemment CosmosBoot ; mêmes fonctionnalités) que le type de projet.
 
-![](images/SNAG-0000.png)
+![](images/NEW/0000.png)
 
 Un projet de démarrage sera créé. Il ressemble beaucoup à un C# standard
 application de la console.
 
-![](images/SNAG-0001.png)
+![](images/NEW/0000-1.png)
 
 Program.cs contient le code de démarrage et d'exécution. Au lieu de voir un Windows
 fenêtre de la console, vous verrez ce qui suit :
 
-![](images/SNAG-0003.png)
+![](images/NEW/0003.png)
 
 Il s'agit de votre système d'exploitation exécuté dans VMWare Player ! Cosmos peut bien sûr
 également être démarré dans VMWare Workstation, Oracle VirtualBox, QEMU, Hyper-V, Virtual PC, Bochs ou sur de vrais
@@ -53,20 +53,6 @@ Le débogage est un problème majeur dans le développement du système d'exploi
 n'était pas assez contente pour simplement conquérir la construction et le déploiement, nous voulons
 rendre le développement du système d'exploitation aussi facile que le développement d'applications Windows.
 Le débogage d'un système d'exploitation basé sur Cosmos devrait vous sembler très familier.
-Modifions un peu notre projet pour montrer l'effet et définissons un point d'arrêt.
-
-![](images/SNAG-0005.png)
-
-Maintenant, exécutez à nouveau le projet.
-
-![](images/SNAG-0007.png)
-
-Notez que l'exécution s'est arrêtée à "One" ? C'est parce que dans Visual Studio notre
-projet s'est arrêté sur un point d'arrêt. Appuyez simplement sur F5 pour continuer comme vous
-le ferait dans une application normale !
-
-En plus des points d'arrêt, Cosmos prend également en charge l'étape dans (F11). Trace
-over (F10) n'est pas encore pris en charge.
 
 ## Communication du débogueur
 
@@ -84,30 +70,6 @@ débogueur et utiliser des fonctionnalités supplémentaires. Il est accessible 
 classe dans l'espace de noms Cosmos.Debug dans l'assembly Cosmos.Kernel. Cette
 assembly est utilisé par tous les projets Cosmos.
 
-## Points d'arrêt basés sur le code
-
-    
-    Debugger.Break();
-
-Break peut être utilisé pour émettre un break basé sur le code. Visual Studio s'arrêtera sur la
-ligne après cette déclaration.
-
-![](images/SNAG-0006.png)
-
-Étant donné que Cosmos ne prend pas encore en charge les points d'arrêt conditionnels dans l'IDE, le code
-les sauts de base sont très utiles pour la mise en œuvre de tels. Par example:
-
-    
-    if (x == 5) {
-        Debugger.Break();
-    }
-
-Vous pouvez également appeler le break de bibliothèque de classe .NET :
-
-    System.Diagnostics.Debugger.Break();
-
-Les deux fonctions produiront le même résultat.
-
 ## Sortie de débogage
 
 Les chaînes de débogage peuvent être sorties dans la fenêtre de débogage de l'hôte. Parce que Cosmos
@@ -120,7 +82,7 @@ regarder les valeurs des variables et effectuer un traçage sans points d'arrêt
 Lorsque cette ligne est exécutée, elle enverra un message sur le canal de débogage
 et il apparaîtra dans la fenêtre de sortie de Visual Studio.
 
-![](images/SNAG-0008.png)
+![](images/NEW/0005.png)
 
 ##  Quel est le piège?
 
@@ -133,7 +95,7 @@ intégré dans le développement principal de Cosmos pour le moment.
 ## Quelle était cette chose Syslinux que j'ai vue au démarrage ?
 
 Cosmos ne fonctionne pas sous Linux. Un chargeur de démarrage appelé Syslinux est utilisé pour démarrer
-Cosmos. Après le démarrage, Syslinux n'est pas utilisé. Syslinux est un chargeur de démarrage et est
+Cosmos. Après le démarrage, Syslinux n'est pas utilisé. Syslinux est un chargeur de démarrage et n'est
 pas une distribution Linux. Syslinux simplifie le processus de démarrage en effectuant des tâches telles que l'activation de la porte A20, l'initialisation du matériel et le passage en mode réel (qui sont tous requis par les systèmes d'exploitation modernes).
 
 ## Obtention de Cosmos
