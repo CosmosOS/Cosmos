@@ -252,7 +252,6 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if color depth is not supported (currently only 32 is supported).</exception>
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
-            Color color = aPen.Color;
             uint offset;
 
             /*
@@ -268,33 +267,30 @@ namespace Cosmos.System.Graphics
 
                     offset = (uint)GetPointOffset(aX, aY);
 
-                    Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
-
-                    if (color.A == 0)
+                    if (aPen.Color.A < 255)
                     {
-                        return;
-                    }
-                    else if (color.A < 255)
-                    {
-                        color = AlphaBlend(color, GetPointColor(aX, aY), color.A);
+                        if (aPen.Color.A == 0)
+                        {
+                            return;
+                        }
+
+                        aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
                     }
 
-                    _VBEDriver.SetVRAM(offset, color.B);
-                    _VBEDriver.SetVRAM(offset + 1, color.G);
-                    _VBEDriver.SetVRAM(offset + 2, color.R);
-                    _VBEDriver.SetVRAM(offset + 3, color.A);
+                    _VBEDriver.SetVRAM(offset, aPen.Color.B);
+                    _VBEDriver.SetVRAM(offset + 1, aPen.Color.G);
+                    _VBEDriver.SetVRAM(offset + 2, aPen.Color.R);
+                    _VBEDriver.SetVRAM(offset + 3, aPen.Color.A);
 
-                    Global.mDebugger.SendInternal("Point drawn");
                     break;
                 case ColorDepth.ColorDepth24:
 
                     offset = (uint)GetPointOffset(aX, aY);
-                    Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
-                    _VBEDriver.SetVRAM(offset, color.B);
-                    _VBEDriver.SetVRAM(offset + 1, color.G);
-                    _VBEDriver.SetVRAM(offset + 2, color.R);
 
-                    Global.mDebugger.SendInternal("Point drawn");
+                    _VBEDriver.SetVRAM(offset, aPen.Color.B);
+                    _VBEDriver.SetVRAM(offset + 1, aPen.Color.G);
+                    _VBEDriver.SetVRAM(offset + 2, aPen.Color.R);
+
                     break;
                 default:
                     string errorMsg = "DrawPoint() with ColorDepth " + (int)Mode.ColorDepth + " not yet supported";
