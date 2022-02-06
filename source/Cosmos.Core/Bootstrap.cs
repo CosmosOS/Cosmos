@@ -11,6 +11,8 @@ namespace Cosmos.Core
         // See note in Global - these are a "hack" for now so
         // we dont force static init of Global, and it "pulls" these later till
         // we eventually eliminate them
+
+
         /// <summary>
         /// PIC interrupt.
         /// </summary>
@@ -20,7 +22,7 @@ namespace Cosmos.Core
         /// <summary>
         /// CPU.
         /// </summary>
-        static public readonly CPU CPU = new CPU();
+        //static public readonly CPU CPU = new CPU();
 
         // Bootstrap is a class designed only to get the essentials done.
         // ie the stuff needed to "pre boot". Do only the very minimal here.
@@ -32,6 +34,7 @@ namespace Cosmos.Core
         public static void Init()
         {
             // Drag this stuff in to the compiler manually until we add the always include attrib
+            Multiboot2.Init();
             INTs.Dummy();
 
             PIC = new PIC();
@@ -47,9 +50,6 @@ namespace Cosmos.Core
              * definively this problem.
              */
             CPU.InitFloat();
-
-            //call for IL2CPU
-            Multiboot2.Init();
         }
     }
 }

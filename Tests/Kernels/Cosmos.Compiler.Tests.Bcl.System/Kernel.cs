@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-
+using Cosmos.Core.Memory;
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
@@ -41,6 +41,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 DateTimeTests.Execute();
                 TimeSpanTests.Execute();
 
+                int count = Heap.Collect();
+                mDebugger.Send("Free");
+                mDebugger.Send(count.ToString());
 
                 TestController.Completed();
             }
