@@ -16,6 +16,7 @@ namespace Cosmos.Core
     {
         // this field seems to be always empty, but the VTablesImpl class is embedded in the final bin.
         public static VTable[] mTypes;
+        public static VTable2[] mTypes2;
         public static GCTable[] gcTypes;
 
         static VTablesImpl()
@@ -109,12 +110,16 @@ namespace Cosmos.Core
             vTable.MethodCount = aMethodCount;
             vTable.MethodIndexes = aMethodIndexes;
             vTable.MethodAddresses = aMethodAddresses;
-            vTable.InterfaceMethodCount = aInterfaceMethodCount;
-            vTable.InterfaceMethodIndexes = aInterfaceMethodIndexes;
-            vTable.TargetMethodIndexes = aTargetMethodIndexes;
-            vTable.IsValueType = aIsValueType;
-            vTable.IsStruct = aIsStruct;
             mTypes[aType] = vTable;
+
+            var vTable2 = new VTable2();
+            vTable2.InterfaceMethodCount = aInterfaceMethodCount;
+            vTable2.InterfaceMethodIndexes = aInterfaceMethodIndexes;
+            vTable2.TargetMethodIndexes = aTargetMethodIndexes;
+            vTable2.IsValueType = aIsValueType;
+            vTable2.IsStruct = aIsStruct;
+            mTypes2[aType] = vTable2;
+
             var gcTable = new GCTable();
             gcTable.GCFieldCount = aGCFieldCount;
             gcTable.GCFieldOffsets = aGCFieldOffsets;
@@ -145,8 +150,8 @@ namespace Cosmos.Core
 
         public static void SetInterfaceMethodInfo(int aType, int aMethodIndex, uint aInterfaceMethodId, uint aTargetMethodId)
         {
-            mTypes[aType].InterfaceMethodIndexes[aMethodIndex] = aInterfaceMethodId;
-            mTypes[aType].TargetMethodIndexes[aMethodIndex] = aTargetMethodId;
+            mTypes2[aType].InterfaceMethodIndexes[aMethodIndex] = aInterfaceMethodId;
+            mTypes2[aType].TargetMethodIndexes[aMethodIndex] = aTargetMethodId;
         }
 
         public static uint GetMethodAddressForType(uint aType, uint aMethodId)
@@ -267,7 +272,7 @@ namespace Cosmos.Core
                 while (true) ;
             }
 
-            var xTypeInfo = mTypes[aType];
+            var xTypeInfo = mTypes2[aType];
 
             if (xTypeInfo.InterfaceMethodIndexes == null)
             {
@@ -341,7 +346,7 @@ namespace Cosmos.Core
         /// <returns></returns>
         public static bool IsValueType(uint aType)
         {
-            return mTypes[aType].IsValueType;
+            return mTypes2[aType].IsValueType;
         }
 
         /// <summary>
@@ -351,7 +356,7 @@ namespace Cosmos.Core
         /// <returns></returns>
         public static bool IsStruct(uint aType)
         {
-            return mTypes[aType].IsStruct;
+            return mTypes2[aType].IsStruct;
         }
     }
 
@@ -366,7 +371,10 @@ namespace Cosmos.Core
         public uint MethodCount;
         public uint[] MethodIndexes;
         public uint[] MethodAddresses;
+    }
 
+    public struct VTable2
+    {
         public uint InterfaceMethodCount;
         public uint[] InterfaceMethodIndexes;
         public uint[] TargetMethodIndexes;
