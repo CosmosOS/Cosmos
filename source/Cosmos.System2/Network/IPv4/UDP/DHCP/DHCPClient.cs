@@ -21,7 +21,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         // <summary>
         /// Is DHCP ascked check variable
         /// </summary>
-        private bool asked = false;
+        private bool applied = false;
 
         /// <summary>
         /// Get the IP address of the DHCP server
@@ -72,17 +72,17 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 if (packet.RawData[284] == 0x02) //Offer packet received
                 {
                     Global.mDebugger.Send("Offer received.");
+
+                    var ack = new DHCPAck(packet.RawData); //In fact DHCPOffer
+                    Apply(ack, true);
+
                     return SendRequestPacket(packet.Client);
                 }
                 else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
-                {
-                    var ack = new DHCPAck(packet.RawData);
-                    if (asked)
+                { 
+                    if (applied == false)
                     {
-                        Apply(ack, true);
-                    }
-                    else
-                    {
+                        var ack = new DHCPAck(packet.RawData);
                         Apply(ack);
                     }
                 }
@@ -127,7 +127,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 OutgoingBuffer.AddPacket(dhcp_discover);
                 NetworkStack.Update();
 
-                asked = true;
+                applied = false;
             }
 
             return Receive();
@@ -187,9 +187,10 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                     if (message)
                     {
-                        Global.mDebugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");
-                        asked = false;
+                        Global.mDebugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");   
                     }
+
+                    applied = false;
                 }
             }
 
