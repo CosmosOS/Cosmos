@@ -190,7 +190,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                         Global.mDebugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");   
                     }
 
-                    applied = false;
+                    applied = true;
                 }
             }
 
