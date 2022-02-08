@@ -65,45 +65,17 @@ namespace Cosmos.System.Graphics
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
         private static Canvas GetVideoDriver()
         {
-            if (VBEAvailable())
-            {
-                return new VBECanvas();
-            }
             if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
             {
                 return new SVGAIICanvas();
             }
+            else if (VBEAvailable())
+            {
+                return new VBECanvas();
+            }
             else
             {
                 return new VGACanvas();
-            }
-        }
-
-        /// <summary>
-        /// Checks is VBE is supported exists
-        /// </summary>
-        /// <returns></returns>
-        private static bool VBEAvailable()
-        {
-            if (BGAExists())
-            {
-                return true;
-            }
-            else if (PCI.Exists(VendorID.VirtualBox, DeviceID.VBVGA))
-            {
-                return true;
-            }
-            else if (PCI.Exists(VendorID.Bochs, DeviceID.BGA))
-            {
-                return true;
-            }
-            else if (VBE.IsAvailable())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
 
@@ -115,13 +87,13 @@ namespace Cosmos.System.Graphics
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
         private static Canvas GetVideoDriver(Mode mode)
         {
-            if (VBEAvailable())
-            {
-                return new VBECanvas(mode);
-            }
             if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
             {
                 return new SVGAIICanvas(mode);
+            }
+            else if (VBEAvailable())
+            {
+                return new VBECanvas(mode);
             }
             else
             {
@@ -207,6 +179,34 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal($"GetCurrentFullScreenCanvas()");
 
             return _VideoDriver;
+        }
+
+        /// <summary>
+        /// Checks is VBE is supported exists
+        /// </summary>
+        /// <returns></returns>
+        private static bool VBEAvailable()
+        {
+            if (BGAExists())
+            {
+                return true;
+            }
+            else if (PCI.Exists(VendorID.VirtualBox, DeviceID.VBVGA))
+            {
+                return true;
+            }
+            else if (PCI.Exists(VendorID.Bochs, DeviceID.BGA))
+            {
+                return true;
+            }
+            else if (VBE.IsAvailable())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
