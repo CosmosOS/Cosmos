@@ -91,11 +91,13 @@ namespace NASM
                 }
 
                 string xFormat = IsELF ? "elf" : "bin";
-                string xArgs = string.Format("-g -f {0} -o \"{1}\" -D{3}_COMPILATION -O0 \"{2}\"",
+                string xDebugFormat = IsELF ? "dwarf2" : "null";
+                string xArgs = string.Format("-g {4} -f {0} -o \"{1}\" -D{3}_COMPILATION -O0 \"{2}\"",
                                              xFormat,
                                              Path.Combine(Directory.GetCurrentDirectory(), OutputFile),
                                              Path.Combine(Directory.GetCurrentDirectory(), InputFile),
-                                             xFormat.ToUpper());
+                                             xFormat.ToUpper(),
+                                             xDebugFormat);
 
                 var xProcess = Process.Start(ExePath, xArgs);
 
