@@ -39,17 +39,25 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(uint aSize)
         {
+            CPU.DisableInterrupts();
+
             if (aSize <= HeapSmall.mMaxItemSize)
             {
-                return HeapSmall.Alloc((ushort)aSize);
+                byte* ptr = HeapSmall.Alloc((ushort)aSize);
+                CPU.EnableInterrupts();
+                return ptr;
             }
             else if (aSize <= HeapMedium.MaxItemSize)
             {
-                return HeapMedium.Alloc(aSize);
+                byte* ptr = HeapMedium.Alloc(aSize);
+                CPU.EnableInterrupts();
+                return ptr;
             }
             else
             {
-                return HeapLarge.Alloc(aSize);
+                byte* ptr = HeapLarge.Alloc(aSize);
+                CPU.EnableInterrupts();
+                return ptr;
             }
         }
 
@@ -77,6 +85,8 @@ namespace Cosmos.Core.Memory
         /// </exception>
         public static void Free(void* aPtr)
         {
+            CPU.DisableInterrupts();
+
             //TODO find a better way to remove the double look up here for GetPageType and then again in the
             // .Free methods which actually free the entries in the RAT.
             //Debugger.DoSendNumber(0x77);
@@ -95,6 +105,8 @@ namespace Cosmos.Core.Memory
                 default:
                     throw new Exception("Heap item not found in RAT.");
             }
+
+            CPU.EnableInterrupts();
         }
 
         /// <summary>
