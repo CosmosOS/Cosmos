@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Debug.GDB {
     public partial class FormMain : Form {
         protected class GdbAsmLine {
-            public readonly UInt32 mAddr;
+            public readonly uint mAddr;
             public readonly string mLabel;
             public readonly string mOp;
             public readonly string mData = string.Empty;

@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using static Cosmos.Build.Tasks.OperatingSystem;
 
 namespace Cosmos.Build.Tasks
 {
@@ -13,7 +14,7 @@ namespace Cosmos.Build.Tasks
         [Required]
         public string OutputFile { get; set; }
 
-        protected override string ToolName => "mkisofs.exe";
+        protected override string ToolName => IsWindows() ? "mkisofs.exe" : "mkisofs";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
@@ -74,7 +75,8 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitch("-J");
             xBuilder.AppendSwitch("-R");
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
-            xBuilder.AppendSwitch("-b isolinux.bin");
+            //xBuilder.AppendSwitch("-b isolinux.bin");
+            xBuilder.AppendSwitch(" -b boot/grub/i386-pc/eltorito.img");
             xBuilder.AppendSwitch("-no-emul-boot");
             xBuilder.AppendSwitch("-boot-load-size 4");
             xBuilder.AppendSwitch("-boot-info-table");

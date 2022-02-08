@@ -18,7 +18,7 @@ namespace Cosmos.Build.Builder.Dependencies
 
         public string OtherDependencysThatAreMissing
         {
-            get { return Name; }
+            get { return "install " + Name; }
         }
 
         private readonly IInnoSetupService _innoSetupService;

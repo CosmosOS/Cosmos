@@ -5,4 +5,11 @@
         <RunArguments>msbuild /t:Launch</RunArguments>
     </PropertyGroup>
 
+    <!--https://github.com/dotnet/runtime/blob/master/src/libraries/pkg/Microsoft.NETCore.Platforms/runtimeGroups.props-->
+    <!--https://github.com/dotnet/runtime/blob/master/src/libraries/pkg/Microsoft.NETCore.Platforms/readme.md-->
+    <ItemGroup>
+        <RuntimeGroup Include="cosmos">
+            <Parent>any</Parent>
+        </RuntimeGroup>
+    </ItemGroup>
 </Project>

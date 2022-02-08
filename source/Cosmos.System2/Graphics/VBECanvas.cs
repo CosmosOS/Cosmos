@@ -66,6 +66,11 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public override string Name() => "VBECanvas";
+
+        /// <summary>
         /// Get and set video mode.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">(set) Thrown if mode is not suppoted.</exception>
@@ -169,6 +174,40 @@ namespace Cosmos.System.Graphics
         /// Clear screen to specified color.
         /// </summary>
         /// <param name="color">Color.</param>
+        public override void Clear(int aColor)
+        {
+            Global.mDebugger.SendInternal($"Clearing the Screen with Color {aColor}");
+            //if (color == null)
+            //   throw new ArgumentNullException(nameof(color));
+
+            /*
+             * TODO this version of Clear() works only when mode.ColorDepth == ColorDepth.ColorDepth32
+             * in the other cases you should before convert color and then call the opportune ClearVRAM() overload
+             * (the one that takes ushort for ColorDepth.ColorDepth16 and the one that takes byte for ColorDepth.ColorDepth8)
+             * For ColorDepth.ColorDepth24 you should mask the Alpha byte.
+             */
+            switch (_Mode.ColorDepth)
+            {
+                case ColorDepth.ColorDepth4:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth8:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth16:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth24:
+                    throw new NotImplementedException();
+                case ColorDepth.ColorDepth32:
+                    _VBEDriver.ClearVRAM((uint)aColor);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Clear screen to specified color.
+        /// </summary>
+        /// <param name="color">Color.</param>
         public override void Clear(Color aColor)
         {
             Global.mDebugger.SendInternal($"Clearing the Screen with Color {aColor}");
@@ -213,7 +252,6 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if color depth is not supported (currently only 32 is supported).</exception>
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
-            Color color = aPen.Color;
             uint offset;
 
             /*
@@ -229,33 +267,30 @@ namespace Cosmos.System.Graphics
 
                     offset = (uint)GetPointOffset(aX, aY);
 
-                    Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
-
-                    if (color.A == 0)
+                    if (aPen.Color.A < 255)
                     {
-                        return;
-                    }
-                    else if (color.A < 255)
-                    {
-                        color = AlphaBlend(color, GetPointColor(aX, aY), color.A);
+                        if (aPen.Color.A == 0)
+                        {
+                            return;
+                        }
+
+                        aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
                     }
 
-                    _VBEDriver.SetVRAM(offset, color.B);
-                    _VBEDriver.SetVRAM(offset + 1, color.G);
-                    _VBEDriver.SetVRAM(offset + 2, color.R);
-                    _VBEDriver.SetVRAM(offset + 3, color.A);
+                    _VBEDriver.SetVRAM(offset, aPen.Color.B);
+                    _VBEDriver.SetVRAM(offset + 1, aPen.Color.G);
+                    _VBEDriver.SetVRAM(offset + 2, aPen.Color.R);
+                    _VBEDriver.SetVRAM(offset + 3, aPen.Color.A);
 
-                    Global.mDebugger.SendInternal("Point drawn");
                     break;
                 case ColorDepth.ColorDepth24:
 
                     offset = (uint)GetPointOffset(aX, aY);
-                    Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
-                    _VBEDriver.SetVRAM(offset, color.B);
-                    _VBEDriver.SetVRAM(offset + 1, color.G);
-                    _VBEDriver.SetVRAM(offset + 2, color.R);
 
-                    Global.mDebugger.SendInternal("Point drawn");
+                    _VBEDriver.SetVRAM(offset, aPen.Color.B);
+                    _VBEDriver.SetVRAM(offset + 1, aPen.Color.G);
+                    _VBEDriver.SetVRAM(offset + 2, aPen.Color.R);
+
                     break;
                 default:
                     string errorMsg = "DrawPoint() with ColorDepth " + (int)Mode.ColorDepth + " not yet supported";
@@ -306,22 +341,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Get point offset.
-        /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <returns>int value.</returns>
-        private int GetPointOffset(int aX, int aY)
-        {
-            Global.mDebugger.SendInternal($"Computing offset for coordinates {aX},{aY}");
-            int xBytePerPixel = (int)Mode.ColorDepth / 8;
-            int stride = (int)Mode.ColorDepth / 8;
-            int pitch = Mode.Columns * xBytePerPixel;
-
-            return (aX * stride) + (aY * pitch);
-        }
-
-        /// <summary>
         /// Draw filled rectangle.
         /// </summary>
         /// <param name="aPen">Pen to draw with.</param>
@@ -331,13 +350,13 @@ namespace Cosmos.System.Graphics
         /// <param name="aHeight">Height.</param>
         public override void DrawFilledRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
         {
-            int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
-            aWidth *= (int)Mode.ColorDepth / 8;
+            //ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
+            aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
+            var color = aPen.Color.ToArgb();
 
-            for (int i = 0; i < aHeight; i++)
+            for (int i = aY; i < aY + aHeight; i++)
             {
-                _VBEDriver.ClearVRAM((i * xScreenWidthInPixel) + xOffset, aWidth, aPen.Color.ToArgb());
+                _VBEDriver.ClearVRAM(GetPointOffset(aX, i), aWidth, color);
             }
         }
 
@@ -350,22 +369,23 @@ namespace Cosmos.System.Graphics
         public override void DrawImage(Image aImage, int aX, int aY)
         {
             var xBitmap = aImage.rawData;
-            var xWidht = (int)aImage.Width;
+            var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
 
             int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns * ((int)Mode.ColorDepth / 8);
+            int xScreenWidthInPixel = Mode.Columns;
 
-            Global.mDebugger.SendInternal($"Drawing image of size {aImage.Width}x{aImage.Height} array size {aImage.rawData.Length}");
             for (int i = 0; i < xHeight; i++)
             {
-                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidht), xWidht);
+                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidth), xWidth);
             }
-            Global.mDebugger.SendInternal("Done");
         }
 
         #endregion
 
+        /// <summary>
+        /// Display screen
+        /// </summary>
         public override void Display()
         {
             _VBEDriver.Swap();

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using static Cosmos.Build.Tasks.OperatingSystem;
 
 namespace Cosmos.Build.Tasks
 {
@@ -14,7 +15,7 @@ namespace Cosmos.Build.Tasks
         [Required]
         public bool FormatDrive { get; set; }
 
-        protected override string ToolName => "syslinux.exe";
+        protected override string ToolName => IsWindows() ? "syslinux.exe" : "syslinux";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;

@@ -58,7 +58,7 @@ namespace Cosmos.HAL
         /// <summary>
         /// Initializes the PS/2 controller.
         /// </summary>
-        public void Initialize()
+        public void Initialize(bool InitScrollWheel)
         {
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
 
@@ -133,12 +133,12 @@ namespace Cosmos.HAL
 
             if (FirstPortTestPassed)
             {
-                IdentifyDevice(1, out FirstDevice);
+                IdentifyDevice(1, out FirstDevice, InitScrollWheel);
             }
 
             if (SecondPortTestPassed)
             {
-                IdentifyDevice(2, out SecondDevice);
+                IdentifyDevice(2, out SecondDevice, InitScrollWheel);
             }
         }
 
@@ -147,7 +147,7 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aPort">The port of the PS/2 device to identify.</param>
         /// <param name="aDevice">An instance of the identified device.</param>
-        private void IdentifyDevice(byte aPort, out Device aDevice)
+        private void IdentifyDevice(byte aPort, out Device aDevice, bool InitScrollWheel)
         {
             aDevice = null;
 
@@ -179,7 +179,17 @@ namespace Cosmos.HAL
                      * |  0x50  |  Laptop Touchpad          |
                      * |--------|---------------------------|
                      */
-                    if (xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04 || xFirstByte == 0x50)
+                    bool InitBytes;
+                    if (InitScrollWheel)
+                    {
+                        InitBytes = xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04 || xFirstByte == 0x50;
+                    }
+                    else
+                    {
+                        InitBytes = xFirstByte == 0x00 || xFirstByte == 0x04 || xFirstByte == 0x50;
+                        mDebugger.Send("Mousewheel detection disabled");
+                    }
+                    if (InitBytes)
                     {
                         var xDevice = new PS2Mouse(aPort, xFirstByte);
                         xDevice.Initialize();
@@ -239,6 +249,7 @@ namespace Cosmos.HAL
                     mDebugger.SendInternal("(PS/2 Controller) Device detection failed:");
                     mDebugger.SendInternal("First Byte: " + xFirstByte);
                     mDebugger.SendInternal("Second Byte: " + xSecondByte);
+
                     Console.WriteLine("(PS/2 Controller) Device detection failed.");
                     Console.WriteLine("This is usually Fine for USB to PS / 2 Emulation");
                     Console.WriteLine("Press any key to Resume (Good Luck)");

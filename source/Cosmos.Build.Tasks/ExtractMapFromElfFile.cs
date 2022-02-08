@@ -5,6 +5,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 using IL2CPU.Debug.Symbols;
+using static Cosmos.Build.Tasks.OperatingSystem;
 
 namespace Cosmos.Build.Tasks
 {
@@ -19,7 +20,7 @@ namespace Cosmos.Build.Tasks
         [Required]
         public string DebugInfoFile { get; set; }
 
-        protected override string ToolName => "objdump.bat";
+        protected override string ToolName => IsWindows() ? "objdump.bat" : "objdump.sh";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;

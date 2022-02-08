@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using static Cosmos.Build.Tasks.OperatingSystem;
 
 namespace Cosmos.Build.Tasks
 {
@@ -33,7 +34,7 @@ namespace Cosmos.Build.Tasks
 
         private OutputFormatEnum mOutputFormat;
 
-        protected override string ToolName => "nasm.exe";
+        protected override string ToolName => IsWindows() ? "nasm.exe" : "nasm";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
@@ -93,6 +94,8 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitch("-O0");
 
             xBuilder.AppendFileNameIfNotNull(InputFile);
+
+            Log.LogMessage(MessageImportance.High, xBuilder.ToString());
 
             return xBuilder.ToString();
         }

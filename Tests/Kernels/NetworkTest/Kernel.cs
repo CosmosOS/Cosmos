@@ -3,6 +3,7 @@ using Cosmos.System.Network;
 using Cosmos.System.Network.ARP;
 using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4;
+using Cosmos.System.Network.IPv4.TCP;
 using Cosmos.System.Network.IPv4.UDP;
 using Cosmos.System.Network.IPv4.UDP.DHCP;
 using Cosmos.System.Network.IPv4.UDP.DNS;
@@ -84,6 +85,23 @@ namespace NetworkTest
             DHCPPacket dhcpPacket = new DHCPPacket(dhcpPacketData);
             Equals(dhcpPacketData, dhcpPacket.RawData);
 
+            /** TCP Packet Parsing Test **/
+            byte[] tcpPacketData = new byte[]
+            {
+                0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x08, 0x00, 0x45, 0x00, 0x00, 0x3C, 0x64, 0x92, 0x40, 0x00, 0x40, 0x06, 0x51,
+                0xA2, 0xC0, 0xA8, 0x01, 0xD3, 0xC0, 0xA8, 0x01, 0x64, 0xA8, 0xAB, 0x10, 0x92, 0x67, 0x7C, 0xCE, 0x18, 0x00, 0x00, 0x00, 0x00, 0xA0, 0x02, 0x72, 0x10,
+                0x5F, 0xF0, 0x00, 0x00, 0x02, 0x04, 0x05, 0xB4, 0x04, 0x02, 0x08, 0x0A, 0x58, 0x1A, 0xAA, 0x8A, 0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x03, 0x07
+            };
+            TCPPacket tcpPacket = new TCPPacket(tcpPacketData);
+            Equals(tcpPacket.SourcePort, 43179);
+            Equals(tcpPacket.DestinationPort, 4242);
+            Equals(tcpPacket.SequenceNumber, 0x677CCE18);
+            Equals(tcpPacket.AckNumber, 0);
+            Equals(tcpPacket.TCPFlags, Flags.SYN);
+            Equals(tcpPacket.WindowSize, 29200);
+            Equals(tcpPacket.Checksum, 0x5FF0);
+            Equals(tcpPacket.UrgentPointer, 0);
+
             /** ARP Packet Parsing Test **/
             byte[] arpPacketData = new byte[]
             {
@@ -107,6 +125,9 @@ namespace NetworkTest
 
             var udpClient = new UdpClient();
             udpClient.Close();
+			
+			var tcpClient = new TcpClient(4242);
+            tcpClient.Close();
 
             var icmpClient = new ICMPClient();
             icmpClient.Close();

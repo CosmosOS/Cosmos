@@ -134,7 +134,7 @@ namespace Cosmos.System_Plugs.System
                 s = Sqrt(z);
                 df = s;
                 //__LO(df) = 0;
-                Byte[] bdf = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(df));
+                byte[] bdf = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(df));
                 for (int i = 0; i < 4; i++)
                 {
                     bdf[i + (BitConverter.IsLittleEndian ? 4 : 0)] = 0;
@@ -210,7 +210,7 @@ namespace Cosmos.System_Plugs.System
             {
                 w = s;
                 //__LO(w) = 0;
-                Byte[] bw = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(w));
+                byte[] bw = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(w));
                 for (int i = 0; i < 4; i++)
                 {
                     bw[i + (BitConverter.IsLittleEndian ? 4 : 0)] = 0;
@@ -923,15 +923,6 @@ namespace Cosmos.System_Plugs.System
         }
 
         #endregion Pow
-
-        #region Round
-
-        public static double Round(double d)
-        {
-            return ((Floor(d) % 2 == 0) ? Floor(d) : Ceiling(d));
-        }
-
-        #endregion Round
 
         #region Sin
 

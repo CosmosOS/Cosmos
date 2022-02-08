@@ -16,15 +16,15 @@ namespace Cosmos.HAL.BlockDevice
         // Can make a locked list class which wraps a list<>
         public List<PartInfo> Partitions = new List<PartInfo>();
 
-        public UInt32 EBRLocation = 0;
+        public uint EBRLocation = 0;
 
         public class PartInfo
         {
             public readonly byte SystemID;
-            public readonly UInt32 StartSector;
-            public readonly UInt32 SectorCount;
+            public readonly uint StartSector;
+            public readonly uint SectorCount;
 
-            public PartInfo(byte aSystemID, UInt32 aStartSector, UInt32 aSectorCount)
+            public PartInfo(byte aSystemID, uint aStartSector, uint aSectorCount)
             {
                 SystemID = aSystemID;
                 StartSector = aStartSector;
@@ -32,15 +32,18 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
 
-        public MBR(byte[] aMBR)
+        public MBR(BlockDevice device)
         {
+            var aMBR = device.NewBlockArray(1);
+            device.ReadBlock(0, 1, ref aMBR);
+
             ParsePartition(aMBR, 446);
             ParsePartition(aMBR, 462);
             ParsePartition(aMBR, 478);
             ParsePartition(aMBR, 494);
         }
 
-        protected void ParsePartition(byte[] aMBR, UInt32 aLoc)
+        protected void ParsePartition(byte[] aMBR, uint aLoc)
         {
             byte xSystemID = aMBR[aLoc + 4];
             // SystemID = 0 means no partition
@@ -55,8 +58,8 @@ namespace Cosmos.HAL.BlockDevice
             }
             else if (xSystemID != 0)
             {
-                UInt32 xStartSector = BitConverter.ToUInt32(aMBR, (int)aLoc + 8);
-                UInt32 xSectorCount = BitConverter.ToUInt32(aMBR, (int)aLoc + 12);
+                uint xStartSector = BitConverter.ToUInt32(aMBR, (int)aLoc + 8);
+                uint xSectorCount = BitConverter.ToUInt32(aMBR, (int)aLoc + 12);
 
                 var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
                 Partitions.Add(xPartInfo);

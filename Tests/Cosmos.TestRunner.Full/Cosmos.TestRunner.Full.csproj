@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <TargetLatestRuntimePatch>True</TargetLatestRuntimePatch>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,7 +12,6 @@
         <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
         <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
         <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU\IL2CPU.csproj" ReferenceOutputAssembly="False" />
-        <ProjectReference Include="..\Kernels\MemoryOperationsTest\MemoryOperationsTest.csproj" />
     </ItemGroup>
 
     <ItemGroup>

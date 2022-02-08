@@ -29,6 +29,7 @@ namespace Cosmos.HAL
         /// </summary>
         public abstract ushort Cols
         {
+            set;
             get;
         }
 
@@ -37,6 +38,7 @@ namespace Cosmos.HAL
         /// </summary>
         public abstract ushort Rows
         {
+            set;
             get;
         }
 

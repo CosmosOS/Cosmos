@@ -4,16 +4,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
         mc:Ignorable="d"
         Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         Title="Choose Visual Studio Instance"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        ui:WindowHelper.UseModernWindowStyle="True">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <Style TargetType="Button">
+        <Style TargetType="Button" BasedOn="{ui:StaticResource DefaultButtonStyle}">
             <Setter Property="Margin" Value="4" />
             <Setter Property="MinWidth" Value="48" />
             <Setter Property="Padding" Value="8,3" />
@@ -45,10 +47,10 @@
                         Orientation="Horizontal">
                 <Button Command="{Binding OkCommand}"
                         CommandParameter="{Binding ElementName=visualStudioInstanceDialog}"
-                        Content="OK" />
+                        Content="OK" Margin="0,0,5,0"/>
                 <Button Command="{Binding CancelCommand}"
                         CommandParameter="{Binding ElementName=visualStudioInstanceDialog}"
-                        Content="Cancel" />
+                        Content="Cancel" Margin="0,0,5,0"/>
             </StackPanel>
 
         </StackPanel>
