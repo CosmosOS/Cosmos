@@ -69,6 +69,15 @@ namespace Cosmos.System.Graphics
         /// Clears the screen of all pixels
         /// </summary>
         /// <param name="aColor"></param>
+        public override void Clear(int aColor)
+        {
+            _VGADriver.DrawFilledRectangle(0, 0, _VGADriver.PixelWidth, _VGADriver.PixelHeight, (uint)aColor);
+        }
+
+        /// <summary>
+        /// Clears the screen of all pixels
+        /// </summary>
+        /// <param name="aColor"></param>
         public override void Clear(Color aColor)
         {
             var paletteIndex = _VGADriver.GetClosestColorInPalette(aColor);
