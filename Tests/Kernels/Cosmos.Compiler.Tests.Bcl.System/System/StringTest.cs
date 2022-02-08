@@ -225,8 +225,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // we test if the strigns allocted at the beginning are still correct to ensure that the memory they were allocated in was not incorrectly overwritten
             // we need to test all of the ctors since we have custom code in the NewObj.cs to calculate the correct length for the string to be allocated
-            Assert.AreEqual("hell", aString, "aString is still correct");
-            Assert.AreEqual("hell", spanString, "spanString is still correct");
+            Assert.AreEqual("hello", aString, "aString is still correct");
+            Assert.AreEqual("hello", spanString, "spanString is still correct");
         }
     }
 }
