@@ -14,8 +14,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             char[] charArray = { 'h', 'e', 'l', 'l', 'o', '\u0000' };
             string aString = new string(charArray);
-            Assert.AreEqual("hello\u0000", aString, "String can be created from char array");
-            Assert.AreEqual(6, aString.Length, "Length of string from char array is correct");
+            Assert.AreEqual("hello", aString, "String can be created from char array");
+            Assert.AreEqual(5, aString.Length, "Length of string from char array is correct");
 
             fixed (char* ptr = charArray)
             {
@@ -225,8 +225,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // we test if the strigns allocted at the beginning are still correct to ensure that the memory they were allocated in was not incorrectly overwritten
             // we need to test all of the ctors since we have custom code in the NewObj.cs to calculate the correct length for the string to be allocated
-            Assert.AreEqual("hello", aString, "aString is still correct");
-            Assert.AreEqual("hello", spanString, "spanString is still correct");
+            Assert.AreEqual("hell", aString, "aString is still correct");
+            Assert.AreEqual("hell", spanString, "spanString is still correct");
         }
     }
 }
