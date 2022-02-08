@@ -14,8 +14,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             char[] charArray = { 'h', 'e', 'l', 'l', 'o', '\u0000' };
             string aString = new string(charArray);
-            Assert.AreEqual("hello\u0000", aString, "String can be created from char array");
-            Assert.AreEqual(6, aString.Length, "Length of string from char array is correct");
+            Assert.AreEqual("hello", aString, "String can be created from char array");
+            Assert.AreEqual(5, aString.Length, "Length of string from char array is correct");
 
             fixed (char* ptr = charArray)
             {
