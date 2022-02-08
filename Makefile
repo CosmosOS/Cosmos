@@ -1,13 +1,13 @@
 THISDIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 DESTDIR = /opt/cosmos
 
-IL2CPU_BRANCH=crossplatform
-XSHARP_BRANCH=master
-COMMON_BRANCH=crossplatform
+IL2CPU_URL = https://github.com/CosmosOS/IL2CPU
+XSHARP_URL = https://github.com/CosmosOS/XSharp
+COMMON_URL = https://github.com/CosmosOS/Common
 
-IL2CPU_URL = https://github.com/CosmosOS/IL2CPU --branch=$(IL2CPU_BRANCH)
-XSHARP_URL = https://github.com/CosmosOS/XSharp --branch=$(XSHARP_BRANCH)
-COMMON_URL = https://github.com/CosmosOS/Common --branch=$(COMMON_BRANCH)
+IL2CPU_BRANCH = crossplatform
+XSHARP_BRANCH = master
+COMMON_BRANCH = crossplatform
 
 IL2CPU_DIR = $(THISDIR)/../IL2CPU
 XSHARP_DIR = $(THISDIR)/../XSharp
@@ -27,15 +27,15 @@ all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
 
 $(IL2CPU_DIR):
 	@echo "Cloning Cosmos/IL2CPU"
-	$(GIT) $(GITFLAGS) $(IL2CPU_URL) $(THISDIR)/../IL2CPU
+	$(GIT) $(GITFLAGS) --branch=$(IL2CPU_BRANCH) $(IL2CPU_URL) $(THISDIR)/../IL2CPU
 
 $(XSHARP_DIR):
 	@echo "Cloning Cosmos/XSharp"
-	$(GIT) $(GITFLAGS) $(XSHARP_URL) $(THISDIR)/../XSharp
+	$(GIT) $(GITFLAGS) --branch=$(XSHARP_BRANCH) $(XSHARP_URL) $(THISDIR)/../XSharp
 
 $(COMMON_DIR):
 	@echo "Cloning Cosmos/Common"
-	$(GIT) $(GITFLAGS) $(COMMON_URL) $(THISDIR)/../Common
+	$(GIT) $(GITFLAGS) --branch=$(COMMON_BRANCH) $(COMMON_URL) $(THISDIR)/../Common
 
 .PHONY: build
 build:
@@ -69,11 +69,11 @@ publish:
 .PHONY: install
 install:
 	@echo "Installing to" $(DESTDIR)
-	@mkdir -p $(DESTDIR)/Cosmos/
+	@mkdir -p $(DESTDIR)/Cosmos
 	@mkdir -p $(DESTDIR)/XSharp/DebugStub
 	@mkdir -p $(DESTDIR)/Build/ISO
 	@mkdir -p $(DESTDIR)/Build/IL2CPU
-	@mkdir -p $(DESTDIR)/Build/HyperV/
+	@mkdir -p $(DESTDIR)/Build/HyperV
 	@mkdir -p $(DESTDIR)/Build/VMware/Workstation
 	@mkdir -p $(DESTDIR)/Packages
 	@mkdir -p $(DESTDIR)/Kernel
