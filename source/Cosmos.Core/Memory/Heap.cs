@@ -39,17 +39,25 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(uint aSize)
         {
+            CPU.DisableInterrupts();
+
             if (aSize <= HeapSmall.mMaxItemSize)
             {
-                return HeapSmall.Alloc((ushort)aSize);
+                byte* ptr = HeapSmall.Alloc((ushort)aSize);
+                CPU.EnableInterrupts();
+                return ptr;
             }
             else if (aSize <= HeapMedium.MaxItemSize)
             {
-                return HeapMedium.Alloc(aSize);
+                byte* ptr = HeapMedium.Alloc(aSize);
+                CPU.EnableInterrupts();
+                return ptr;
             }
             else
             {
-                return HeapLarge.Alloc(aSize);
+                byte* ptr = HeapLarge.Alloc(aSize);
+                CPU.EnableInterrupts();
+                return ptr;
             }
         }
 
@@ -103,6 +111,9 @@ namespace Cosmos.Core.Memory
         /// <returns>Number of objects freed</returns>
         public static int Collect()
         {
+			//Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
+			CPU.DisableInterrupts();
+			
             // Mark and sweep objects from roots
             // 1. Check if a page is in use if medium/large mark and sweep object
             // 2. Go throught the SMT table for small objects and go through pages by size
@@ -222,6 +233,9 @@ namespace Cosmos.Core.Memory
 
                 rootSMTPtr = rootSMTPtr->LargerSize;
             }
+			
+			//Enable interrupts back
+			CPU.EnableInterrupts();
 
             return freed;
         }
