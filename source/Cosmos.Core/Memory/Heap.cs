@@ -85,8 +85,6 @@ namespace Cosmos.Core.Memory
         /// </exception>
         public static void Free(void* aPtr)
         {
-            CPU.DisableInterrupts();
-
             //TODO find a better way to remove the double look up here for GetPageType and then again in the
             // .Free methods which actually free the entries in the RAT.
             //Debugger.DoSendNumber(0x77);
@@ -105,8 +103,6 @@ namespace Cosmos.Core.Memory
                 default:
                     throw new Exception("Heap item not found in RAT.");
             }
-
-            CPU.EnableInterrupts();
         }
 
         /// <summary>
@@ -115,6 +111,9 @@ namespace Cosmos.Core.Memory
         /// <returns>Number of objects freed</returns>
         public static int Collect()
         {
+			//Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
+			CPU.DisableInterrupts();
+			
             // Mark and sweep objects from roots
             // 1. Check if a page is in use if medium/large mark and sweep object
             // 2. Go throught the SMT table for small objects and go through pages by size
@@ -234,6 +233,9 @@ namespace Cosmos.Core.Memory
 
                 rootSMTPtr = rootSMTPtr->LargerSize;
             }
+			
+			//Enable interrupts back
+			CPU.EnableInterrupts();
 
             return freed;
         }
