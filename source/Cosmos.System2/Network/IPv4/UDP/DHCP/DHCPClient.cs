@@ -73,17 +73,21 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 {
                     Global.mDebugger.Send("Offer received.");
 
-                    var ack = new DHCPAck(packet.RawData); //In fact DHCPOffer
-                    Apply(ack, true);
+                    Apply(packet, true);
 
-                    return SendRequestPacket(packet.Client);
+                    Global.mDebugger.Send("Apply config.");
+
+                    //var toreturn = SendRequestPacket(packet.Client);
+
+                    Global.mDebugger.Send("Send request packet");
+
+                    return 1;
                 }
                 else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
                 { 
                     if (applied == false)
                     {
-                        var ack = new DHCPAck(packet.RawData);
-                        Apply(ack);
+                        Apply(packet);
                     }
                 }
             }
@@ -115,7 +119,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// Send a packet to find the DHCP server and tell that we want a new IP address
         /// </summary>
         /// <returns>time value (-1 = timeout)</returns>
-        public int SendDiscoverPacket()
+        public void SendDiscoverPacket()
         {
             NetworkStack.RemoveAllConfigIP();
 
@@ -125,12 +129,10 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                 var dhcp_discover = new DHCPDiscover(networkDevice.MACAddress);
                 OutgoingBuffer.AddPacket(dhcp_discover);
-                NetworkStack.Update();
+                //NetworkStack.Update();
 
                 applied = false;
             }
-
-            return Receive();
         }
 
         /// <summary>
@@ -157,44 +159,46 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// <param name="Options">DHCPOption class using the packetData from the received dhcp packet.</param>
         /// <param name="message">Enable/Disable the displaying of messages about DHCP applying and conf. Disabled by default.
         /// </param>
-        private void Apply(DHCPAck packet, bool message = false)
+        private void Apply(DHCPPacket packet, bool message = false)
         {
-            NetworkStack.RemoveAllConfigIP();
-
-            //cf. Roadmap. (have to change this, because some network interfaces are not configured in dhcp mode) [have to be done in 0.5.x]
-            foreach (NetworkDevice networkDevice in NetworkDevice.Devices)
+            if (applied == false)
             {
-                if (packet.Client.ToString() == null ||
-                    packet.Client.ToString() == null ||
-                    packet.Client.ToString() == null ||
-                    packet.Client.ToString() == null)
+                NetworkStack.RemoveAllConfigIP();
+
+                //cf. Roadmap. (have to change this, because some network interfaces are not configured in dhcp mode) [have to be done in 0.5.x]
+                foreach (NetworkDevice networkDevice in NetworkDevice.Devices)
                 {
-                    throw new Exception("Parsing DHCP ACK Packet failed, can't apply network configuration.");
-                }
-                else
-                {
-                    if (message)
+                    if (packet.Client.ToString() == null)
+                    {
+                        throw new Exception("Parsing DHCP ACK Packet failed, can't apply network configuration.");
+                    }
+                    else
                     {
                         Global.mDebugger.Send("[DHCP ACK][" + networkDevice.Name + "] Packet received, applying IP configuration...");
                         Global.mDebugger.Send("   IP Address  : " + packet.Client.ToString());
                         Global.mDebugger.Send("   Subnet mask : " + packet.Subnet.ToString());
                         Global.mDebugger.Send("   Gateway     : " + packet.Server.ToString());
                         Global.mDebugger.Send("   DNS server  : " + packet.DNS.ToString());
+
+                        IPConfig.Enable(networkDevice, packet.Client, packet.Subnet, packet.Server);
+                        DNSConfig.Add(packet.DNS);
+
+                        Global.mDebugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");
+
+                        applied = true;
+
+                        Close();
+
+                        return;
                     }
-
-                    IPConfig.Enable(networkDevice, packet.Client, packet.Subnet, packet.Server);
-                    DNSConfig.Add(packet.DNS);
-
-                    if (message)
-                    {
-                        Global.mDebugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");   
-                    }
-
-                    applied = true;
                 }
-            }
 
-            Close();
+                Global.mDebugger.Send("[DHCP CONFIG] No DHCP Config applied!");
+            }
+            else
+            {
+                Global.mDebugger.Send("[DHCP CONFIG] DHCP already applied.");
+            }
         }
     }
 }

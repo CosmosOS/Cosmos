@@ -107,7 +107,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             //hops
             RawData[45] = 0x00;
 
-            Random rnd = new Random();
+            var rnd = new Random();
             xID = rnd.Next(0, Int32.MaxValue);
             RawData[46] = (byte)((xID >> 24) & 0xFF);
             RawData[47] = (byte)((xID >> 16) & 0xFF);
@@ -164,7 +164,11 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         {
             base.InitFields();
             MessageType = RawData[42];
-            Client = new Address(RawData, 58);
+
+            if (RawData[58] != 0)
+            {
+                Client = new Address(RawData, 58);
+            }  
 
             if (RawData[282] != 0)
             {
@@ -184,6 +188,22 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                     i += option.Length;
                 }
+
+                foreach (var option in Options)
+                {
+                    if (option.Type == 1) //Mask
+                    {
+                        Subnet = new Address(option.Data, 0);
+                    }
+                    else if (option.Type == 3) //Router
+                    {
+                        Server = new Address(option.Data, 0);
+                    }
+                    else if (option.Type == 6) //DNS
+                    {
+                        DNS = new Address(option.Data, 0);
+                    }
+                }
             }
         }
 
@@ -202,5 +222,19 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// </summary>
         internal List<DHCPOption> Options { get; private set; }
 
+        /// <summary>
+        /// Get Subnet IPv4 Address
+        /// </summary>
+        internal Address Subnet { get; private set; }
+
+        /// <summary>
+        /// Get DNS IPv4 Address
+        /// </summary>
+        internal Address DNS { get; private set; }
+
+        /// <summary>
+        /// Get DHCP Server IPv4 Address
+        /// </summary>
+        internal Address Server { get; private set; }
     }
 }
