@@ -113,7 +113,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// Send a packet to find the DHCP server and tell that we want a new IP address
         /// </summary>
         /// <returns>time value (-1 = timeout)</returns>
-        public void SendDiscoverPacket()
+        public int SendDiscoverPacket()
         {
             NetworkStack.RemoveAllConfigIP();
 
