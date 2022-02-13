@@ -127,6 +127,8 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                 applied = false;
             }
+			
+			return Receive();
         }
 
         /// <summary>
