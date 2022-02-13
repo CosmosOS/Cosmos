@@ -75,13 +75,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                     Apply(packet, true);
 
-                    Global.mDebugger.Send("Apply config.");
-
-                    //var toreturn = SendRequestPacket(packet.Client);
-
-                    Global.mDebugger.Send("Send request packet");
-
-                    return 1;
+                    return SendRequestPacket(packet.Client);
                 }
                 else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
                 { 
