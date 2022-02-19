@@ -14,8 +14,8 @@
     <PropertyGroup>
         <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
 
-        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)nasm\win\</NasmToolPath>
-        <NasmToolExe Condition = "'$(NasmToolExe)' == ''">nasm.exe</NasmToolExe>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)yasm\win\</NasmToolPath>
+        <NasmToolExe Condition = "'$(NasmToolExe)' == ''">yasm.exe</NasmToolExe>
 
         <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</LdToolPath>
         <LdToolExe Condition = "'$(LdToolExe)' == '' AND '$(OS)' == 'Windows_NT'">ld.exe</LdToolExe>
