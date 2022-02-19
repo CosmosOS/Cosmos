@@ -140,8 +140,6 @@ namespace Cosmos.Debug.DebugConnectors
 
         private FileStream mKernelFileStream;
 
-        private bool mKernelSent = false;
-
         private bool HandleFileSending(byte[] aPacket)
         {
 
@@ -213,9 +211,9 @@ namespace Cosmos.Debug.DebugConnectors
                 }
 
                 // weird character, just retransmit for now
-                SendTextToConsole("Character value " + aPacket[0] + " found!\r\n");
-                SendRawData(new[] { YModem_EOT });
-                return false;
+                //SendTextToConsole("Character value " + aPacket[0] + " found!\r\n");
+                //SendRawData(new[] { YModem_EOT });
+                //return false;
             }
         }
 

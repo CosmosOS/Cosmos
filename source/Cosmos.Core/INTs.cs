@@ -232,7 +232,7 @@ namespace Cosmos.Core {
         /// Last known address.
         /// </summary>
         [AsmMarker(AsmMarker.Type.Int_LastKnownAddress)]
-        private static uint mLastKnownAddress;
+        private static uint mLastKnownAddress = 0;
 
         /// <summary>
         /// IRQ handlers.
