@@ -544,8 +544,6 @@ namespace Cosmos.System_Plugs.System
             throw new NotImplementedException("Not implemented: SetBufferSize");
         }
 
-        System.ConsolePal::System.ValueTuple`2[System.Int32,System.Int32] GetCursorPosition();
-        
         public static void SetCursorPosition(int left, int top)
         {
             set_CursorLeft(left);
