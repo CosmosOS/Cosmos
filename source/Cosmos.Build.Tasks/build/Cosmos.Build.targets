@@ -27,8 +27,10 @@
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/bin/</ObjdumpToolPath>
 
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
-        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
+        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
+        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</MkisofsToolPath>
+        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' == 'Windows_NT'">mkisofs.exe</MkisofsToolExe>
+        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' != 'Windows_NT'">mkisofs</MkisofsToolExe>
 
         <SyslinuxToolPath Condition = "'$(SyslinuxToolPath)' == ''">$(CosmosToolsPath)syslinux\win\</SyslinuxToolPath>
         <SyslinuxToolExe Condition = "'$(SyslinuxToolExe)' == ''">syslinux.exe</SyslinuxToolExe>
