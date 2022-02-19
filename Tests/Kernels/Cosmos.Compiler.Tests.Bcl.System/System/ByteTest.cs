@@ -17,7 +17,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             result = value.ToString();
             expectedResult = "255";
 
-            Assert.IsTrue((result == expectedResult), "Byte.ToString doesn't work");
+            Assert.AreEqual(result, expectedResult, "Byte.ToString doesn't work");
+            Assert.AreEqual("ff", value.ToString("x"), "Byte.ToString('x') doesn't work");
+            Assert.AreEqual("FF", value.ToString("X"), "Byte.ToString('X') doesn't work");
 
             // Now let's try to concat to a String using '+' operator
             result = "The Maximum value of a Byte is " + value;
@@ -35,14 +37,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // actually the Hash Code of a Byte is the same value expressed as int
             Assert.IsTrue((resultAsInt == value), "Byte.GetHashCode() doesn't work");
-
-#if false
-            // Now let's try ToString() again but printed in hex (this test fails for now!)
-            result = value.ToString("X2");
-            expectedResult = "FF";
-
-            Assert.IsTrue((result == expectedResult), "Byte.ToString(X2) doesn't work");
-#endif
 
             // basic bit operations
 
