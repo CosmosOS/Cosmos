@@ -14,12 +14,13 @@
     <PropertyGroup>
         <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
 
-        <NasmToolPath Condition = "'$(NasmToolPath)' == ' AND '$(OS)' == 'Windows_NT''">$(CosmosToolsPath)yasm\win\</NasmToolPath>
-        <NasmToolPath Condition = "'$(NasmToolPath)' == ' AND '$(OS)' != 'Windows_NT''">/usr/bin/</NasmToolPath>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)yasm\win\</NasmToolPath>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</NasmToolPath>
         <NasmToolExe Condition = "'$(NasmToolExe)' == '' AND '$(OS)' == 'Windows_NT'">yasm.exe</NasmToolExe>
         <NasmToolExe Condition = "'$(NasmToolExe)' == '' AND '$(OS)' != 'Windows_NT'">yasm</NasmToolExe>
 
-        <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</LdToolPath>
+        <LdToolPath Condition = "'$(LdToolPath)' == '' AND '$(OS)' == 'Windows_NT' ">$(CosmosToolsPath)cygwin\win\</LdToolPath>
+        <LdToolPath Condition = "'$(LdToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</LdToolPath>
         <LdToolExe Condition = "'$(LdToolExe)' == '' AND '$(OS)' == 'Windows_NT'">ld.exe</LdToolExe>
         <LdToolExe Condition = "'$(LdToolExe)' == '' AND '$(OS)' != 'Windows_NT'">ld</LdToolExe>
 
