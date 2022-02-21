@@ -142,5 +142,10 @@ namespace Cosmos.Core_Plugs.System
             }
             throw new NotSupportedException("SetValue not supported in this situation!");
         }
+
+        public static object InternalGetValue(Array aThis, IntPtr aIntPtr)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
