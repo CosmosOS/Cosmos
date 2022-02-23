@@ -17,6 +17,18 @@ namespace Cosmos.Core_Plugs
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Assembler = typeof(MathCosASM))]
+        public static double Cos(double d)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Assembler = typeof(MathSinASM))]
+        public static double Sin(double d)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class MathRoundASM : AssemblerMethod
@@ -25,6 +37,28 @@ namespace Cosmos.Core_Plugs
         {
             XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
             XS.FPU.FloatRound();
+            XS.Sub(ESP, 8);
+            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+        }
+    }
+
+    class MathCosASM : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
+            XS.FPU.FloatCosine();
+            XS.Sub(ESP, 8);
+            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+        }
+    }
+
+    class MathSinASM : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
+            XS.FPU.FloatSine();
             XS.Sub(ESP, 8);
             XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
         }
