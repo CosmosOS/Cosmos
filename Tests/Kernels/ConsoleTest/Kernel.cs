@@ -162,6 +162,10 @@ namespace ConsoleTest
             Console.WriteLine("Colored text :)");
             Console.ResetColor();
             Console.Write("Press enter to continue to the next step: "); Console.ReadLine();
+            Console.WriteLine("Press a key to move the cursor up");
+            Console.ReadKey();
+            var cursor = Console.GetCursorPosition();
+            Console.SetCursorPosition(cursor.Left, cursor.Top - 1);
         }
     }
 }

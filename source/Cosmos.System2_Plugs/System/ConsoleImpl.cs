@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.System;
-using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
@@ -338,7 +337,7 @@ namespace Cosmos.System_Plugs.System
         /// Beep() is pure CIL
         /// Default implementation beeps for 200 milliseconds at 800 hertz
         /// In Cosmos, these are Cosmos.System.Duration.Default and Cosmos.System.Notes.Default respectively,
-        /// and are used when there are no params 
+        /// and are used when there are no params
         /// https://docs.microsoft.com/en-us/dotnet/api/system.console.beep?view=netcore-2.0
         /// </summary>
         public static void Beep()
@@ -421,11 +420,11 @@ namespace Cosmos.System_Plugs.System
             }
 
             //TODO: Plug HasFlag and use the next 3 lines instead of the 3 following lines
-            
+
             //bool xShift = key.Modifiers.HasFlag(ConsoleModifiers.Shift);
             //bool xAlt = key.Modifiers.HasFlag(ConsoleModifiers.Alt);
             //bool xControl = key.Modifiers.HasFlag(ConsoleModifiers.Control);
-            
+
             bool xShift = (key.Modifiers & ConsoleModifiers.Shift) == ConsoleModifiers.Shift;
             bool xAlt = (key.Modifiers & ConsoleModifiers.Alt) == ConsoleModifiers.Alt;
             bool xControl = (key.Modifiers & ConsoleModifiers.Control) == ConsoleModifiers.Control;
@@ -549,6 +548,14 @@ namespace Cosmos.System_Plugs.System
         {
             set_CursorLeft(left);
             set_CursorTop(top);
+        }
+
+        public static (int Left, int Top) GetCursorPosition() 
+        {
+            int Left = get_CursorLeft();
+            int Top = get_CursorTop();
+
+            return (Left, Top);
         }
 
         //public static void SetError(TextWriter newError) {
