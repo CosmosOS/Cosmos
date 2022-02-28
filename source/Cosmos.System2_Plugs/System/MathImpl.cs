@@ -438,95 +438,6 @@ namespace Cosmos.System_Plugs.System
 
         #endregion Ceiling
 
-        #region Cos
-
-        public static double Cos(double x)
-        {
-            double[] y = new double[2];
-            double z = 0.0;
-            int n, ix;
-
-            /* High word of x. */
-            ix = HighWord(x);
-
-            /* |x| ~< pi/4 */
-            ix &= 0x7fffffff;
-            if (ix <= 0x3fe921fb) return _cos(x, z);
-
-            /* cos(Inf or NaN) is NaN */
-            else if (ix >= 0x7ff00000) return x - x;
-
-            /* argument reduction needed */
-            else
-            {
-                n = __ieee754_rem_pio2(x, y);
-                switch (n & 3)
-                {
-                    case 0:
-                        return _cos(y[0], y[1]);
-
-                    case 1:
-                        return -_sin(y[0], y[1], 1);
-
-                    case 2:
-                        return -_cos(y[0], y[1]);
-
-                    default:
-                        return _sin(y[0], y[1], 1);
-                }
-            }
-        }
-
-        private static double _cos(double x, double y)
-        {
-            const double one = 1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
-                C1 = 4.16666666666666019037e-02, /* 0x3FA55555, 0x5555554C */
-                C2 = -1.38888888888741095749e-03, /* 0xBF56C16C, 0x16C15177 */
-                C3 = 2.48015872894767294178e-05, /* 0x3EFA01A0, 0x19CB1590 */
-                C4 = -2.75573143513906633035e-07, /* 0xBE927E4F, 0x809C52AD */
-                C5 = 2.08757232129817482790e-09, /* 0x3E21EE9E, 0xBDB4B1C4 */
-                C6 = -1.13596475577881948265e-11; /* 0xBDA8FAE9, 0xBE8838D4 */
-            double a, hz, z, r, qx = 0;
-            int ix;
-            ix = HighWord(x) & 0x7fffffff;  /* ix = |x|'s high word*/
-            if (ix < 0x3e400000)
-            {           /* if x < 2**27 */
-                if (((int)x) == 0)
-                    return one;      /* generate inexact */
-            }
-            z = x * x;
-            r = z * (C1 + z * (C2 + z * (C3 + z * (C4 + z * (C5 + z * C6)))));
-            if (ix < 0x3FD33333)            /* if |x| < 0.3 */
-                return one - (0.5 * z - (z * r - x * y));
-            else
-            {
-                if (ix > 0x3fe90000)
-                {       /* x > 0.78125 */
-                    qx = 0.28125;
-                }
-                else
-                {
-                    //__HI(qx) = ix - 0x00200000; /* x/4 */
-                    Byte[] bqx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(qx));
-                    Byte[] bvh = BitConverter.GetBytes(ix - 0x00200000);
-                    for (int i = 0; i < 4; i++)
-                    {
-                        bqx[i + (BitConverter.IsLittleEndian ? 4 : 0)] = bvh[i];
-                    }
-                    //__LO(qx) = 0;
-                    for (int i = 0; i < 4; i++)
-                    {
-                        bqx[i + (BitConverter.IsLittleEndian ? 4 : 0)] = 0;
-                    }
-                }
-                hz = 0.5 * z - qx;
-                a = one - qx;
-                return a - (hz - (z * r - x * y));
-            }
-        }
-
-        #endregion Cos
-
         #region Cosh
 
         public static double Cosh(double x)
@@ -924,73 +835,6 @@ namespace Cosmos.System_Plugs.System
 
         #endregion Pow
 
-        #region Sin
-
-        public static double Sin(double x)
-        {
-            double[] y = new double[2];
-            double z = 0.0;
-            int n, ix;
-
-            /* High word of x. */
-            ix = HighWord(x);
-
-            /* |x| ~< pi/4 */
-            ix &= 0x7fffffff;
-            if (ix <= 0x3fe921fb)
-                return _sin(x, z, 0);
-
-            /* sin(Inf or NaN) is NaN */
-            else if (ix >= 0x7ff00000)
-                return x - x;
-
-            /* argument reduction needed */
-            else
-            {
-                n = __ieee754_rem_pio2(x, y);
-                switch (n & 3)
-                {
-                    case 0:
-                        return _sin(y[0], y[1], 1);
-
-                    case 1:
-                        return _cos(y[0], y[1]);
-
-                    case 2:
-                        return -_sin(y[0], y[1], 1);
-
-                    default:
-                        return -_cos(y[0], y[1]);
-                }
-            }
-        }
-
-        private static double _sin(double x, double y, int iy)
-        {
-            const double half = 5.00000000000000000000e-01; /* 0x3FE00000; 0x00000000 */
-            const double S1 = -1.66666666666666324348e-01; /* 0xBFC55555; 0x55555549 */
-            const double S2 = 8.33333333332248946124e-03; /* 0x3F811111; 0x1110F8A6 */
-            const double S3 = -1.98412698298579493134e-04; /* 0xBF2A01A0; 0x19C161D5 */
-            const double S4 = 2.75573137070700676789e-06; /* 0x3EC71DE3; 0x57B1FE7D */
-            const double S5 = -2.50507602534068634195e-08; /* 0xBE5AE5E6; 0x8A2B9CEB */
-            const double S6 = 1.58969099521155010221e-10; /* 0x3DE5D93A; 0x5ACFD57C */
-
-            double z, r, v;
-            int ix;
-            ix = HighWord(x) & 0x7fffffff;  /* high word of x */
-            if (ix < 0x3e400000)            /* |x| < 2**-27 */
-            { if ((int)x == 0) return x; }       /* generate inexact */
-            z = x * x;
-            v = z * x;
-            r = S2 + z * (S3 + z * (S4 + z * (S5 + z * S6)));
-            if (iy == 0)
-                return x + v * (S1 + z * r);
-            else
-                return x - ((z * (half * y - v * r) - y) - v * S1);
-        }
-
-        #endregion Sin
-
         #region Sinh
 
         public static double Sinh(double x)
@@ -1156,7 +1000,7 @@ namespace Cosmos.System_Plugs.System
         public static double Tan(double x)
         {
             if (double.IsNegativeInfinity(x) || double.IsInfinity(x)) return double.NaN;
-            return Sin(x) / Cos(x);
+            return Math.Sin(x) / Math.Cos(x);
         }
 
         #endregion Tan
