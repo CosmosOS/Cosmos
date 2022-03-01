@@ -12,49 +12,21 @@ namespace Cosmos.Core
         internal static uint* PML4;
         public static void Enable()
         {
-            PML4 = (uint*)new ManagedMemoryBlock(0x1000, 4096).Offset;
-            for (uint i = 0; i < 0x1000; i++)
+            PML4 = (uint*)0xEEEEEEEE;// new ManagedMemoryBlock(0x1000, 4096).Offset;
+
+            while ((uint)PML4 % 4096 != 0)
             {
-                // This sets the following flags to the pages:
-                //   Supervisor: Only kernel-mode can access them
-                //   Write Enabled: It can be both read from and written to
-                //   Not Present: The page table is not present
-
-
-                PML4[i] = 0;
+                PML4++;
             }
-
-            uint* PageTable = (uint*)new ManagedMemoryBlock(1024 * 4, 4096).Offset;
-
-            //Map the 1st 4mb
-            for (uint i = 0; i < 1024; i++)
-            {
-                // As the address is page aligned, it will always leave 12 bits zeroed.
-                // Those bits are used by the attributes ;)
-                PageTable[i] = (i * 0x1000) | 3; // attributes: supervisor level, read/write, present.
-            }
-
-            // attributes: supervisor level, read/write, present
-            PML4[0] = ((uint)PageTable) | 3;
-
-            uint* PageTable2 = (uint*)new ManagedMemoryBlock(1024 * 4, 4096).Offset;
-
-            //Map the 1st 4mb
-            for (uint i = 0; i < 1024; i++)
-            {
-                // As the address is page aligned, it will always leave 12 bits zeroed.
-                // Those bits are used by the attributes ;)
-                PageTable2[i] = (i * 0x1000) | 3; // attributes: supervisor level, read/write, present.
-            }
-
-            // attributes: supervisor level, read/write, present
-            PML4[1] = ((uint)PageTable2) | 3;
 
             Map(0, 0);
 
             Map(0xB8000, 0xB8000);
 
             DoEnable((uint)PML4);
+            var buf = (byte*)0xB8000;
+            buf[0] = 0x4D;
+            buf[1] = 4;
             while (true) { }
         }
         //plugged
