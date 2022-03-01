@@ -28,7 +28,7 @@ namespace Cosmos.Debug.Hosts
     {
       if (String.IsNullOrWhiteSpace(aHarddisk))
       {
-        _harddiskFile = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\Filesystem.vmdk");
+        _harddiskFile = Path.Combine(CosmosPaths.Build, @"VMware\Workstation\Filesystem.vmdk");
       }
       else
       {
@@ -49,20 +49,20 @@ namespace Cosmos.Debug.Hosts
       var qemuStartInfo = qemuProcess.StartInfo;
       qemuStartInfo.FileName = QemuSupport.QemuExe.FullName;
 
-      string xQemuArguments = "-m 128";
+      string xQemuArguments = "-m 512";
       xQemuArguments += $" -cdrom {_isoFile}";
 
       if (!string.IsNullOrWhiteSpace(_harddiskFile))
       {
-        xQemuArguments += $" -hda {_harddiskFile}";
+        xQemuArguments += $" -hda \"{_harddiskFile}\"";
       }
 
       if (!string.IsNullOrWhiteSpace(_debugPortString))
       {
-        xQemuArguments += @" -chardev console,id=CosmosConsole -chardev pipe,path=\Cosmos\Serial,id=Cosmos -device isa-serial,chardev=Cosmos";
+        xQemuArguments += @" -chardev console,id=CosmosConsole -chardev pipe,path=\Cosmos\Serial,id=Cosmos -device isa-serial,chardev=Cosmos -name Cosmos -device pcnet,netdev=n1 -netdev user,id=n1";
       }
 
-      xQemuArguments += " -vga std -boot d -no-shutdown -no-reboot";
+      xQemuArguments += " -vga cirrus -boot d -no-shutdown -no-reboot";
 
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)

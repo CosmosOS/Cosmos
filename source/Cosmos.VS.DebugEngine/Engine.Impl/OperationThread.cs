@@ -45,7 +45,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl
             SetOperationInternal(op, true);
         }
 
-        [SuppressMessage("AsyncUsage.CSharp.Naming", "AvoidAsyncSuffix:Avoid Async suffix", Scope = "member")]
+        [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "<Pending>")]
         public void RunOperationAsync(Operation op)
         {
             if (op == null)

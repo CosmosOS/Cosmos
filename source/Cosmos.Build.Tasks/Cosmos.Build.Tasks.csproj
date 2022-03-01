@@ -2,15 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
-        <RuntimeIdentifier>win</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
         <PackageDescription>Cosmos build system.</PackageDescription>
         <IsMSBuildExtensionProject>True</IsMSBuildExtensionProject>
-
-
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <Content Include="build\**" Pack="True" PackagePath="build\" />
         <Content Include="tools\**" Pack="True" PackagePath="tools\" />
@@ -19,10 +17,10 @@
 
     <ItemGroup>
         <PackageReference Include="IL2CPU.Debug.Symbols.Net48" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.0.4" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.0.6" />
         <PackageReference Include="System.Runtime" Version="4.3.1" />
 
-        <PackageReference Update="Microsoft.Build.Framework" Version="16.9.0">
+        <PackageReference Update="Microsoft.Build.Framework" Version="17.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

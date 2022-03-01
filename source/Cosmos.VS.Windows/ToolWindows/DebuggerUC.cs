@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 
 namespace Cosmos.VS.Windows
 {
@@ -13,23 +14,24 @@ namespace Cosmos.VS.Windows
 
         public CosmosWindowsPackage Package { get; set; }
 
-        public virtual void Update(string aTag, byte[] aData)
+        public virtual async Task UpdateAsync(string aTag, byte[] aData)
         {
             mData = aData;
-            DoUpdate(aTag);
+            await DoUpdateAsync(aTag);
         }
 
-        protected virtual void DoUpdate(string aTag)
+        protected virtual Task DoUpdateAsync(string aTag)
         {
+            return Task.CompletedTask;
         }
 
         public virtual byte[] GetCurrentState()
         {
             return mData;
         }
-        public virtual void SetCurrentState(byte[] aData)
+        public virtual async Task SetCurrentStateAsync(byte[] aData)
         {
-            Update(null, aData);
+            await UpdateAsync(null, aData);
         }
     }
 }
