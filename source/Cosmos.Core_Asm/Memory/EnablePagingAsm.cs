@@ -14,17 +14,34 @@ namespace Cosmos.Core_Asm.Memory
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            //mov eax, 0x123456A
-            //mov cr3, eax
+          
 
-            //mov eax, cr0
-            //or eax, 0x80000001
-            //mov cr0, eax
+            //Set bit #5 in CR0 to enable PAE
+            new Mov
+            {
+                DestinationReg = RegistersEnum.EAX,
+                SourceReg = RegistersEnum.CR4
+            };
 
+            new LiteralAssemblerCode("bts EAX, 5");
 
-            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8); //EDX has page dir addr
+            new Mov
+            {
+                DestinationReg = RegistersEnum.CR4,
+                SourceReg = RegistersEnum.EAX
+            };
+
 
             //Select our page directory
+            //XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8); //EDX has page dir addr
+
+            new Mov
+            {
+                DestinationReg = RegistersEnum.EAX,
+                SourceValue = 0xDEADBF00
+            };
+
+
             new Mov
             {
                 DestinationReg = RegistersEnum.CR3,
@@ -72,7 +89,7 @@ namespace Cosmos.Core_Asm.Memory
     public class PagingImpl
     {
         [PlugMethod(Assembler = typeof(EnablePagingAsm))]
-        public static void DoEnable(uint pagedir)
+        public static void DoEnable()
         {
             throw new NotImplementedException();
         }
