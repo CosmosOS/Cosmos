@@ -7,7 +7,7 @@ COMMON_URL = https://github.com/CosmosOS/Common
 
 IL2CPU_BRANCH = crossplatform
 XSHARP_BRANCH = master
-COMMON_BRANCH = crossplatform
+COMMON_BRANCH = master
 
 IL2CPU_DIR = $(THISDIR)/../IL2CPU
 XSHARP_DIR = $(THISDIR)/../XSharp
@@ -90,9 +90,9 @@ install:
 	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
 	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
 
-	@cp -r $(THISDIR)/build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
-	@cp -r $(THISDIR)/build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
-	@cp -r $(THISDIR)/build/syslinux/* $(DESTDIR)/Build/ISO/
+	@cp -r $(THISDIR)/Build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
+	@cp -r $(THISDIR)/Build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
+	@cp -r $(THISDIR)/Build/syslinux/* $(DESTDIR)/Build/ISO/
 	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
 
 	$(MAKE) nuget-install
