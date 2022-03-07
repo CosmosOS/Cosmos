@@ -19,26 +19,29 @@ namespace Cosmos.Core
             buf[1] = 0x0f;
 
             //4 page directory entries
-            PageDirPtrTable = (ulong*)0xDEADBF00;// new ManagedMemoryBlock(32, 0x20).Offset;
+            PageDirPtrTable = (ulong*)new ManagedMemoryBlock(32, 0x20).Offset; //(ulong*)0xDEADBF00;// 
 
-            for (int i = 0; i < 3; i++)
+            var PageDir = (ulong*)new ManagedMemoryBlock(4096, 0x1000, true).Offset;
+            PageDir[0] = 0b10000011; //Address=0, 2MIB, RW and present
+            for (int i = 0; i < 4096/8; i++)
             {
-                var PageDir = (ulong*)Align((ulong)(0xDEADBF00 + 32 + (i * 5)), 0x1000);//(ulong*)new ManagedMemoryBlock(4096, 0x1000, true).Offset;
-                PageDir[0] = 0b10000011; //Address=0, 2MIB, RW and present
-
-                // set the page directory into the PDPT and mark it present
-                PageDirPtrTable[i] = (ulong)PageDir | 1;
+                PageDir[i] = 0b10000011; //Address=0, 2MIB, RW and present
             }
 
+            // set the page directory into the PDPT and mark it present
+            PageDirPtrTable[0] = (ulong)PageDir | 1;
+            PageDirPtrTable[1] = 0;
+            PageDirPtrTable[2] = 0;
+            PageDirPtrTable[3] = 0;
 
             //test
             buf[0] = (byte)'B';
             buf[1] = 0x0f;
 
-            DoEnable();
+            DoEnable((uint)PageDirPtrTable);
 
-            buf[0] = (byte)'C';
-            buf[1] = 0x0f;
+            //buf[0] = (byte)'C';
+            //buf[1] = 0x0f;
             while (true) { }
 
             //Map(0, 0);
@@ -74,7 +77,7 @@ namespace Cosmos.Core
             return addr;
         }
         //plugged
-        internal static void DoEnable()
+        internal static void DoEnable(uint addr)
         {
             throw new NotImplementedException();
         }

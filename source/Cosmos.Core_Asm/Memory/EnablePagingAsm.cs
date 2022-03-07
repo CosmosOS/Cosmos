@@ -33,14 +33,7 @@ namespace Cosmos.Core_Asm.Memory
 
 
             //Select our page directory
-            //XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8); //EDX has page dir addr
-
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX,
-                SourceValue = 0xDEADBF00
-            };
-
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8); //EDX has page dir addr
 
             new Mov
             {
@@ -89,7 +82,7 @@ namespace Cosmos.Core_Asm.Memory
     public class PagingImpl
     {
         [PlugMethod(Assembler = typeof(EnablePagingAsm))]
-        public static void DoEnable()
+        public static void DoEnable(uint addr)
         {
             throw new NotImplementedException();
         }
