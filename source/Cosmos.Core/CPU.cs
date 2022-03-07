@@ -13,7 +13,6 @@ namespace Cosmos.Core
     /// </summary>
     public static class CPU
     {
-        static ulong totalRam;
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
@@ -354,6 +353,7 @@ namespace Cosmos.Core
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         internal static ulong ReadFromModelSpecificRegister() => throw new NotImplementedException();
 
+        /// <summary>
         /// Get the Memory Map Information from Multiboot
         /// </summary>
         /// <returns>Returns an array of MemoryMaps containing the Multiboot Memory Map information. The array may have empty values at the end.</returns>
