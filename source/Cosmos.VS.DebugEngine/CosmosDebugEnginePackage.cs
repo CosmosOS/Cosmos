@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Cosmos.VS.DebugEngine.Commands;
+using Microsoft;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
@@ -49,6 +50,7 @@ namespace Cosmos.VS.DebugEngine
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             packageCommandTarget = await GetServiceAsync(typeof(IOleCommandTarget)).ConfigureAwait(true) as IOleCommandTarget;
+            Assumes.Present(packageCommandTarget);
             packageCommandHandler = new DebugCommandHandler(this);
         }
 
