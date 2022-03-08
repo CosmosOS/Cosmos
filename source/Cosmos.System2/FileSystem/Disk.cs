@@ -285,12 +285,5 @@ namespace Cosmos.System.FileSystem
             }
             Kernel.PrintDebug("Cannot find file system for partiton.");
         }
-
-        private class MountedPartInfo
-        {
-            public FileSystem MountedFS;
-            public string RootPath;
-
-        }
     }
 }
