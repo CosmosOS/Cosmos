@@ -100,5 +100,5 @@ install:
 .PHONY: nuget-install
 nuget-install:
 	@echo "Installing Nuget packages"
-	$(DOTNET) nuget remove source "Cosmos Local Package Feed"
+	$(DOTNET) nuget remove source "Cosmos Local Package Feed" || true
 	$(DOTNET) nuget add source $(DESTDIR)/Packages/ -n "Cosmos Local Package Feed"
