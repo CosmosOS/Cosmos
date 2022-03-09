@@ -118,7 +118,6 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-
         /// Get cosmos internal type from object
         /// </summary>
         /// <param name="aObj"></param>

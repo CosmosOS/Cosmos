@@ -458,7 +458,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="ArgumentOutOfRangeException">Thrown when root directory address is smaller then root directory address.</exception>
         public override DirectoryEntry GetVolume(string aPath)
         {
-            if (string.IsNullOrEmpty(aPath))
+            if (String.IsNullOrEmpty(aPath))
             {
                 return null;
             }
@@ -526,7 +526,9 @@ namespace Cosmos.System.FileSystem
             var xEntry = DoGetDirectoryEntry(aPath, xFileSystem);
 
             if (xEntry == null)
+            {
                 throw new Exception($"{aPath} is neither a file neither a directory");
+            }
 
             switch (xEntry.mEntryType)
             {

@@ -60,7 +60,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         /// <summary>
         /// Receive data
         /// </summary>
-        /// <param name="timeout">timeout value, default 5000ms
+        /// <param name="timeout">timeout value, default 5000ms</param>
         /// <returns>Address from Domain Name</returns>
         /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
         public Address Receive(int timeout = 5000)

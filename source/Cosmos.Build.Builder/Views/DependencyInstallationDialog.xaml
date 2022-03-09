@@ -11,16 +11,9 @@
         SizeToContent="WidthAndHeight"
         Title="Cosmos Kit Builder"
         WindowStartupLocation="CenterOwner"
-        xmlns:ui="http://schemas.modernwpf.com/2019"
-        ui:WindowHelper.UseModernWindowStyle="True">
+        xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-
-        <Style TargetType="Button" BasedOn="{ui:StaticResource DefaultButtonStyle}">
-            <Setter Property="Margin" Value="4" />
-            <Setter Property="MinWidth" Value="48" />
-            <Setter Property="Padding" Value="8,3" />
-        </Style>
     </Window.Resources>
 
     <Grid Margin="8"

@@ -34,7 +34,7 @@ namespace Cosmos.System
 
     /// <summary>
     /// Possible duration types.
-    /// <seealso cref="https://en.wikipedia.org/wiki/Duration_(music)"/>
+    /// <seealso href="https://en.wikipedia.org/wiki/Duration_(music)"/>
     /// </summary>
     public enum Durations
     {
@@ -49,8 +49,8 @@ namespace Cosmos.System
 
     /// <summary>
     /// Possible note types.
-    /// <seealso cref="https://en.wikipedia.org/wiki/Musical_note"/>
-    /// <seealso cref="https://en.wikipedia.org/wiki/Audio_frequency"/>
+    /// <seealso href="https://en.wikipedia.org/wiki/Musical_note"/>
+    /// <seealso href="https://en.wikipedia.org/wiki/Audio_frequency"/>
     /// </summary>
     public enum Notes
     {
