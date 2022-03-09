@@ -14,6 +14,7 @@ namespace Cosmos.VS.DebugEngine
 
         public static void MessageBox(string message, string title = "Cosmos Debug Engine")
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (!ThreadHelper.CheckAccess())
             {
                 ThreadHelper.JoinableTaskFactory.Run(async delegate {

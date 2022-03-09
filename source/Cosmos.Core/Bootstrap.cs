@@ -18,12 +18,6 @@ namespace Cosmos.Core
         /// </summary>
         static public PIC PIC;
 
-        // Has to be static for now, ZeroFill gets called before the Init.
-        /// <summary>
-        /// CPU.
-        /// </summary>
-        //static public readonly CPU CPU = new CPU();
-
         // Bootstrap is a class designed only to get the essentials done.
         // ie the stuff needed to "pre boot". Do only the very minimal here.
         // IDT, PIC, and Float

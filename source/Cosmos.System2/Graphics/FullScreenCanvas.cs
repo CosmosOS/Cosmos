@@ -163,7 +163,7 @@ namespace Cosmos.System.Graphics
                 IsInUse = true;
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
             }
             canvas = null;

@@ -16,7 +16,7 @@ namespace Cosmos.Build.Builder.BuildTasks
         public override IEnumerable<string> Targets { get { yield return RestoreTaskName; } }
 
         protected override IReadOnlyDictionary<string, string> Properties => _properties;
-        private readonly Dictionary<string, string> _properties;
+        private readonly Dictionary<string, string> _properties = new Dictionary<string, string>();
 
         public RestoreTask(
             IMSBuildService msBuildService,

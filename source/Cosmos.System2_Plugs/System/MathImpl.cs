@@ -102,16 +102,22 @@ namespace Cosmos.System_Plugs.System
                 if (((ix - 0x3ff00000) | LowWord(x)) == 0)
                 {   /* |x|==1 */
                     if (hx > 0)
+                    {
                         return 0.0;     /* acos(1) = 0  */
+                    }
                     else
+                    {
                         return Math.PI + 2.0 * pio2_lo; /* acos(-1)= pi */
+                    }
                 }
                 return (x - x) / (x - x);       /* acos(|x|>1) is NaN */
             }
             if (ix < 0x3fe00000)
             {   /* |x| < 0.5 */
                 if (ix <= 0x3c600000)
+                {
                     return pio2_hi + pio2_lo;/*if|x|<2**-57*/
+                }
                 z = x * x;
                 p = z * (pS0 + z * (pS1 + z * (pS2 + z * (pS3 + z * (pS4 + z * pS5)))));
                 q = 1 + z * (qS1 + z * (qS2 + z * (qS3 + z * qS4)));
@@ -159,7 +165,7 @@ namespace Cosmos.System_Plugs.System
                pio2_hi = 1.57079632679489655800e+00, /* 0x3FF921FB, 0x54442D18 */
                pio2_lo = 6.12323399573676603587e-17, /* 0x3C91A626, 0x33145C07 */
                pio4_hi = 7.85398163397448278999e-01, /* 0x3FE921FB, 0x54442D18 */
-                                                     /* coefficient for R(x^2) */
+               /* coefficient for R(x^2) */
                pS0 = 1.66666666666666657415e-01, /* 0x3FC55555, 0x55555555 */
                pS1 = -3.25565818622400915405e-01, /* 0xBFD4D612, 0x03EB6F7D */
                pS2 = 2.01212532134862925881e-01, /* 0x3FC9C155, 0x0E884455 */
@@ -178,18 +184,25 @@ namespace Cosmos.System_Plugs.System
             if (ix >= 0x3ff00000)
             {       /* |x|>= 1 */
                 if (((ix - 0x3ff00000) | LowWord(x)) == 0)
+                {
                     /* asin(1)=+-pi/2 with inexact */
                     return x * pio2_hi + x * pio2_lo;
+                }
                 return (x - x) / (x - x);       /* asin(|x|>1) is NaN */
             }
             else if (ix < 0x3fe00000)
             {   /* |x|<0.5 */
                 if (ix < 0x3e400000)
                 {       /* if |x| < 2**-27 */
-                    if (huge + x > 1) return x;/* return x with inexact if x!=0*/
+                    if (huge + x > 1)
+                    {
+                        return x;/* return x with inexact if x!=0*/
+                    }
                 }
                 else
+                {
                     t = x * x;
+                }
                 p = t * (pS0 + t * (pS1 + t * (pS2 + t * (pS3 + t * (pS4 + t * pS5)))));
                 q = 1 + t * (qS1 + t * (qS2 + t * (qS3 + t * qS4)));
                 w = p / q;
@@ -222,7 +235,14 @@ namespace Cosmos.System_Plugs.System
                 q = pio4_hi - 2.0 * w;
                 t = pio4_hi - (p - q);
             }
-            if (hx > 0) return t; else return -t;
+            if (hx > 0)
+            {
+                return t;
+            }
+            else
+            {
+                return -t;
+            }
         }
 
         #endregion Asin
@@ -231,9 +251,18 @@ namespace Cosmos.System_Plugs.System
 
         public static double Atan(double x)
         {
-            if (double.IsNaN(x)) return double.NaN;
-            if (double.IsPositiveInfinity(x)) return Math.PI / 2;
-            if (double.IsNegativeInfinity(x)) return -Math.PI / 2;
+            if (Double.IsNaN(x))
+            {
+                return Double.NaN;
+            }
+            if (Double.IsPositiveInfinity(x))
+            {
+                return Math.PI / 2;
+            }
+            if (Double.IsNegativeInfinity(x))
+            {
+                return -Math.PI / 2;
+            }
 
             double w, s1, s2, z;
             int ix, hx, id;
@@ -272,15 +301,26 @@ namespace Cosmos.System_Plugs.System
             {   /* if |x| >= 2^66 */
                 if (ix > 0x7ff00000 ||
                 (ix == 0x7ff00000 && (LowWord(x) != 0)))
+                {
                     return x + x;       /* NaN */
-                if (hx > 0) return atanhi[3] + atanlo[3];
-                else return -atanhi[3] - atanlo[3];
+                }
+                if (hx > 0)
+                {
+                    return atanhi[3] + atanlo[3];
+                }
+                else
+                {
+                    return -atanhi[3] - atanlo[3];
+                }
             }
             if (ix < 0x3fdc0000)
             {   /* |x| < 0.4375 */
                 if (ix < 0x3e200000)
                 {   /* |x| < 2^-29 */
-                    if (1.0e+300 + x > 1) return x; /* raise inexact */
+                    if (1.0e+300 + x > 1)
+                    {
+                        return x; /* raise inexact */
+                    }
                 }
                 id = -1;
             }
@@ -316,7 +356,10 @@ namespace Cosmos.System_Plugs.System
             /* break sum from i=0 to 10 aT[i]z**(i+1) into odd and even poly */
             s1 = z * (aT[0] + w * (aT[2] + w * (aT[4] + w * (aT[6] + w * (aT[8] + w * aT[10])))));
             s2 = w * (aT[1] + w * (aT[3] + w * (aT[5] + w * (aT[7] + w * aT[9]))));
-            if (id < 0) return x - x * (s1 + s2);
+            if (id < 0)
+            {
+                return x - x * (s1 + s2);
+            }
             else
             {
                 z = atanhi[id] - ((x * (s1 + s2) - atanlo[id]) - x);
@@ -333,15 +376,21 @@ namespace Cosmos.System_Plugs.System
             if ((x + y) == x)
             {
                 if ((x == 0F) & (y == 0F))
+                {
                     return 0F;
+                }
                 if (x >= 0.0F)
+                {
                     return pio2;
+                }
                 return (-pio2);
             }
             if (y < 0.0F)
             {
                 if (x >= 0.0F)
+                {
                     return ((pio2 * 2) - atans((-x) / y));
+                }
                 return (((-pio2) * 2) + atans(x / y));
             }
             if (x > 0.0F)
@@ -359,7 +408,10 @@ namespace Cosmos.System_Plugs.System
 
         public static double Ceiling(double x)
         {
-            if (double.IsNaN(x) || double.IsInfinity(x)) return x;
+            if (Double.IsNaN(x) || Double.IsInfinity(x))
+            {
+                return x;
+            }
 
             double huge = 1.0e+300;
             int i0, i1, j0;
@@ -388,11 +440,16 @@ namespace Cosmos.System_Plugs.System
                 else
                 {
                     i = (uint)(0x000fffff) >> j0;
-                    if (((i0 & i) | i1) == 0) return x; /* x is integral */
+                    if (((i0 & i) | i1) == 0)
+                    {
+                        return x; /* x is integral */
+                    }
                     if (huge + x > 0.0)
                     {   /* raise inexact flag */
                         if (i0 > 0)
+                        {
                             i0 += (0x00100000) >> j0;
+                        }
                         i0 &= (int)~i;
                         i1 = 0;
                     }
@@ -400,31 +457,46 @@ namespace Cosmos.System_Plugs.System
             }
             else if (j0 > 51)
             {
-                if (j0 == 0x400) return x + x;  /* inf or NaN */
-                else return x;      /* x is integral */
+                if (j0 == 0x400)
+                {
+                    return x + x;  /* inf or NaN */
+                }
+                else
+                {
+                    return x;      /* x is integral */
+                }
             }
             else
             {
                 i = 0xffffffff >> (j0 - 20);
-                if ((i1 & i) == 0) return x;    /* x is integral */
+                if ((i1 & i) == 0)
+                {
+                    return x;    /* x is integral */
+                }
                 if (huge + x > 0.0)
                 {       /* raise inexact flag */
                     if (i0 > 0)
                     {
-                        if (j0 == 20) i0 += 1;
+                        if (j0 == 20)
+                        {
+                            i0 += 1;
+                        }
                         else
                         {
                             j = (uint)(i1 + (1 << (52 - j0)));
-                            if (j < i1) i0 += 1;    /* got a carry */
+                            if (j < i1)
+                            {
+                                i0 += 1;    /* got a carry */
+                            }
                             i1 = (int)j;
                         }
                     }
                     i1 &= (int)~i;
                 }
             }
-            Byte[] returnBytes = BitConverter.GetBytes(0d);
-            Byte[] highWord = BitConverter.GetBytes(i0);
-            Byte[] lowWord = BitConverter.GetBytes(i1);
+            var returnBytes = BitConverter.GetBytes(0d);
+            var highWord = BitConverter.GetBytes(i0);
+            var lowWord = BitConverter.GetBytes(i1);
             for (int c = 0; c < 4; c++)
             {
                 returnBytes[c + (BitConverter.IsLittleEndian ? 4 : 0)] = highWord[c];
@@ -443,7 +515,9 @@ namespace Cosmos.System_Plugs.System
         public static double Cosh(double x)
         {
             if (x < 0.0F)
+            {
                 x = -x;
+            }
             return ((x == 0F) ? 1F : ((x <= (ln2 / 2)) ? (1 + (_power((Exp(x) - 1), 2) / (2 * Exp(x)))) : ((x <= 22F) ? ((Exp(x) + (1 / Exp(x))) / 2) : (0.5F * (Exp(x) + Exp(-x))))));
         }
 
@@ -478,14 +552,23 @@ namespace Cosmos.System_Plugs.System
                 if (hx >= 0x7ff00000)
                 {
                     if (((hx & 0xfffff) | LowWord(x)) != 0) //Assume that __Lo(x) is lower word of x
+                    {
                         return x;       /* NaN */
+                    }
                     else
+                    {
                         return (xsb == 0) ? x : 0.0;   /* exp(+-inf)={inf,0} */
+                    }
                 }
                 if (x > o_threshold)
-                    return double.PositiveInfinity; /* overflow */
+                {
+                    return Double.PositiveInfinity; /* overflow */
+                }
+
                 if (x < u_threshold)
+                {
                     return 0; /* underflow */
+                }
             }
 
             /* argument reduction */
@@ -508,9 +591,13 @@ namespace Cosmos.System_Plugs.System
                 else
                 {
                     if (xsb == 0)
+                    {
                         k = (int)(invln2 * x + 0.5);
+                    }
                     else
+                    {
                         k = (int)(invln2 * x + -0.5);
+                    }
                     t = k;
                     hi = x - t * 6.93147180369123816490e-01;
                     lo = t * 1.90821492927058770002e-10;
@@ -520,19 +607,27 @@ namespace Cosmos.System_Plugs.System
             else if (hx < 0x3e300000)
             {   /* when |x|<2**-28 */
                 if (huge + x > 1)
+                {
                     return 1 + x;/* trigger inexact */
+                }
             }
             else
+            {
                 k = 0;
+            }
 
             /* x is now in primary range */
             t = x * x;
             c = x - t * (P1 + t * (P2 + t * (P3 + t * (P4 + t * P5))));
 
             if (k == 0)
+            {
                 return 1 - ((x * c) / (c - 2.0) - x);
+            }
             else
+            {
                 y = 1 - ((lo - (x * c) / (2.0 - c)) - hi);
+            }
 
             if (k >= -1021)
             {
@@ -541,9 +636,14 @@ namespace Cosmos.System_Plugs.System
 
                 /* add k to y's exponent */
                 if (BitConverter.IsLittleEndian)
+                {
                     _y += ((long)k << 52);
+                }
                 else
+                {
                     _y += ((long)k << 20);
+                }
+
                 y = BitConverter.Int64BitsToDouble(_y);
                 return y;
             }
@@ -553,9 +653,13 @@ namespace Cosmos.System_Plugs.System
                 long _y = BitConverter.DoubleToInt64Bits(y);
 
                 if (BitConverter.IsLittleEndian)
+                {
                     _y += ((long)k + 1000 << 52);
+                }
                 else
+                {
                     _y += ((long)k + 1000 << 20);
+                }
                 y = BitConverter.Int64BitsToDouble(_y);
                 return y * twom1000;
             }
@@ -567,7 +671,10 @@ namespace Cosmos.System_Plugs.System
 
         public static double Floor(double x)
         {
-            if (double.IsInfinity(x) || double.IsNaN(x)) return x;
+            if (Double.IsInfinity(x) || Double.IsNaN(x))
+            {
+                return x;
+            }
 
             int i0, i1, j0;
             uint i, j;
@@ -595,11 +702,15 @@ namespace Cosmos.System_Plugs.System
                 {
                     i = (uint)0x000fffff >> j0;
                     if ((((uint)i0 & i) | (uint)i1) == 0)
+                    {
                         return x; /* x is integral */
+                    }
                     if (1.0e+300 + x > 0.0)
                     {   /* raise inexact flag */
                         if (i0 < 0)
+                        {
                             i0 += (0x00100000) >> j0;
+                        }
                         i0 &= (int)~i;
                         i1 = 0;
                     }
@@ -607,31 +718,46 @@ namespace Cosmos.System_Plugs.System
             }
             else if (j0 > 51)
             {
-                if (j0 == 0x400) return x + x;  /* inf or NaN */
-                else return x;      /* x is integral */
+                if (j0 == 0x400)
+                {
+                    return x + x;  /* inf or NaN */
+                }
+                else
+                {
+                    return x;      /* x is integral */
+                }
             }
             else
             {
                 i = ((uint)(0xffffffff)) >> (j0 - 20);
-                if ((i1 & i) == 0) return x;    /* x is integral */
+                if ((i1 & i) == 0)
+                {
+                    return x;    /* x is integral */
+                }
                 if (1.0e+300 + x > 0.0)
                 {       /* raise inexact flag */
                     if (i0 < 0)
                     {
-                        if (j0 == 20) i0 += 1;
+                        if (j0 == 20)
+                        {
+                            i0 += 1;
+                        }
                         else
                         {
                             j = (uint)i1 + (uint)(1 << (52 - j0));
-                            if (j < i1) i0 += 1;    /* got a carry */
+                            if (j < i1)
+                            {
+                                i0 += 1;    /* got a carry */
+                            }
                             i1 = (int)j;
                         }
                     }
                     i1 &= (int)~i;
                 }
             }
-            Byte[] returnBytes = BitConverter.GetBytes(0d);
-            Byte[] highWord = BitConverter.GetBytes(i0);
-            Byte[] lowWord = BitConverter.GetBytes(i1);
+            var returnBytes = BitConverter.GetBytes(0d);
+            var highWord = BitConverter.GetBytes(i0);
+            var lowWord = BitConverter.GetBytes(i1);
             for (int c = 0; c < 4; c++)
             {
                 returnBytes[c + (BitConverter.IsLittleEndian ? 4 : 0)] = highWord[c];
@@ -669,20 +795,30 @@ namespace Cosmos.System_Plugs.System
             k = 0;
             if (hx < 0x00100000)
             {           /* x < 2**-1022  */
-                if (x < 0 || double.IsNaN(x))
-                    return double.NaN;  /* log(-#) = NaN */
+                if (x < 0 || Double.IsNaN(x))
+                {
+                    return Double.NaN;  /* log(-#) = NaN */
+                }
+
                 if (((hx & (uint)0x7fff) | lx) == 0)
-                    return double.NegativeInfinity;       /* log(+-0)=-inf */
+                {
+                    return Double.NegativeInfinity;       /* log(+-0)=-inf */
+                }
+
                 k -= 54; x *= two54; /* subnormal number, scale up x */
                 hx = HighWord(x);       /* high word of x */
             }
-            if (hx >= 0x7ff00000) return x + x;
+            if (hx >= 0x7ff00000)
+            {
+                return x + x;
+            }
+
             k += (hx >> 20) - 1023;
             hx &= 0x000fffff;
             i = (hx + 0x95f64) & 0x100000;
             //__HI(x) = hx | (i ^ 0x3ff00000);    /* normalize x or x/2 */
-            Byte[] bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
-            Byte[] bv = BitConverter.GetBytes(hx | (i ^ 0x3ff00000));
+            var bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
+            var bv = BitConverter.GetBytes(hx | (i ^ 0x3ff00000));
             for (int _i = 0; _i < 4; _i++)
             {
                 bx[_i + (BitConverter.IsLittleEndian ? 4 : 0)] = bv[_i];
@@ -693,16 +829,22 @@ namespace Cosmos.System_Plugs.System
             if ((0x000fffff & (2 + hx)) < 3)
             {   /* |f| < 2**-20 */
                 if (f == 0)
+                {
                     if (k == 0)
+                    {
                         return 0;
+                    }
                     else
                     {
                         dk = k;
                         return dk * ln2_hi + dk * ln2_lo;
                     }
+                }
                 R = f * f * (0.5 - 0.33333333333333333 * f);
                 if (k == 0)
+                {
                     return f - R;
+                }
                 else
                 {
                     dk = k;
@@ -723,16 +865,24 @@ namespace Cosmos.System_Plugs.System
             {
                 hfsq = 0.5 * f * f;
                 if (k == 0)
+                {
                     return f - (hfsq - s * (hfsq + R));
+                }
                 else
+                {
                     return dk * ln2_hi - ((hfsq - (s * (hfsq + R) + dk * ln2_lo)) - f);
+                }
             }
             else
             {
                 if (k == 0)
+                {
                     return f - s * (f - R);
+                }
                 else
+                {
                     return dk * ln2_hi - ((s * (f - R) - dk * ln2_lo) - f);
+                }
             }
         }
 
@@ -742,10 +892,15 @@ namespace Cosmos.System_Plugs.System
 
         public static double Log(double Exponent, double Base)
         {
-            if (double.IsNaN(Exponent) || Exponent < 0)
-                return double.NaN;
+            if (Double.IsNaN(Exponent) || Exponent < 0)
+            {
+                return Double.NaN;
+            }
+
             if (Exponent == 0)
-                return double.NegativeInfinity;
+            {
+                return Double.NegativeInfinity;
+            }
             return Log(Exponent) / Log(Base);
         }
 
@@ -765,57 +920,98 @@ namespace Cosmos.System_Plugs.System
 
         public static double Pow(double b, double e)
         {
-            if (e == 0) return 1;
-            if (e == 1) return b;
-            if (double.IsNaN(b) || double.IsNaN(e)) return double.NaN;
-            if (double.IsNegativeInfinity(b))
+            if (e == 0)
+            {
+                return 1;
+            }
+
+            if (e == 1)
+            {
+                return b;
+            }
+
+            if (Double.IsNaN(b) || Double.IsNaN(e))
+            {
+                return Double.NaN;
+            }
+            if (Double.IsNegativeInfinity(b))
             {
                 if (e < 0)
+                {
                     return 0;
+                }
                 if ((long)e % 2 == 0)
-                    return double.PositiveInfinity;
+                {
+                    return Double.PositiveInfinity;
+                }
                 else
-                    return double.NegativeInfinity;
+                {
+                    return Double.NegativeInfinity;
+                }
             }
-            if (double.IsPositiveInfinity(b))
+            if (Double.IsPositiveInfinity(b))
             {
                 if (e < 0)
+                {
                     return 0;
+                }
                 else
-                    return double.PositiveInfinity;
+                {
+                    return Double.PositiveInfinity;
+                }
             }
-            if (double.IsInfinity(e))
+            if (Double.IsInfinity(e))
             {
                 bool t = -1 < b;
                 bool t1 = 1 > b;
                 if (t && t1)
-
-                    if (double.IsPositiveInfinity(e))
+                {
+                    if (Double.IsPositiveInfinity(e))
+                    {
                         return 0;
+                    }
                     else
-                        return double.PositiveInfinity;
+                    {
+                        return Double.PositiveInfinity;
+                    }
+                }
                 else
                 {
                     bool v = b < -1;
                     bool v1 = 1 < b;
                     if (v || v1)
                     {
-                        if (double.IsPositiveInfinity(e))
-                            return double.PositiveInfinity;
+                        if (Double.IsPositiveInfinity(e))
+                        {
+                            return Double.PositiveInfinity;
+                        }
                         else
+                        {
                             return 0;
+                        }
                     }
                     else
-                        return double.NaN;
+                    {
+                        return Double.NaN;
+                    }
                 }
             }
             if (b < 0)
             {
-                if (Abs(e) - Abs((int)e) > (Double.Epsilon * 100)) return double.NaN;
+                if (Abs(e) - Abs((int)e) > (Double.Epsilon * 100))
+                {
+                    return Double.NaN;
+                }
                 double logedBase = Log(Abs(b));
                 double pow = Exp(logedBase * e);
-                if ((long)e % 2 == 0) return pow;
-                else return -1 * pow;
+                if ((long)e % 2 == 0)
+                {
+                    return pow;
+                }
+                else
+                {
+                    return -1 * pow;
+                }
             }
             else
             {
@@ -840,7 +1036,9 @@ namespace Cosmos.System_Plugs.System
         public static double Sinh(double x)
         {
             if (x < 0F)
+            {
                 x = -x;
+            }
 
             if (x <= 22F)
             {
@@ -880,14 +1078,20 @@ namespace Cosmos.System_Plugs.System
 
             /* take care of Inf and NaN */
             if ((ix0 & 0x7ff00000) == 0x7ff00000)
+            {
                 return x * x + x;       /* sqrt(NaN)=NaN, sqrt(+inf)=+inf sqrt(-inf)=sNaN */
+            }
             /* take care of zero */
             if (ix0 <= 0)
             {
                 if (((ix0 & (~0x80000000)) | ix1) == 0)
+                {
                     return x;/* sqrt(+-0) = +-0 */
+                }
                 else if (ix0 < 0)
+                {
                     return (x - x) / (x - x);       /* sqrt(-ve) = sNaN */
+                }
             }
             /* normalize x */
             m = (ix0 >> 20);
@@ -898,7 +1102,11 @@ namespace Cosmos.System_Plugs.System
                     m -= 21;
                     ix0 |= ((int)ix1 >> 11); ix1 <<= 21;
                 }
-                for (i = 0; (ix0 & 0x00100000) == 0; i++) ix0 <<= 1;
+                for (i = 0; (ix0 & 0x00100000) == 0; i++)
+                {
+                    ix0 <<= 1;
+                }
+
                 m -= i - 1;
                 ix0 |= ((int)ix1 >> (32 - i));
                 ix1 <<= i;
@@ -943,9 +1151,17 @@ namespace Cosmos.System_Plugs.System
                 if ((t < ix0) || ((t == ix0) && (t1 <= ix1)))
                 {
                     s1 = t1 + r;
-                    if (((t1 & sign) == sign) && (s1 & sign) == 0) s0 += 1;
+                    if (((t1 & sign) == sign) && (s1 & sign) == 0)
+                    {
+                        s0 += 1;
+                    }
+
                     ix0 -= t;
-                    if (ix1 < t1) ix0 -= 1;
+                    if (ix1 < t1)
+                    {
+                        ix0 -= 1;
+                    }
+
                     ix1 -= t1;
                     q1 += r;
                 }
@@ -968,23 +1184,31 @@ namespace Cosmos.System_Plugs.System
                     else if (z > 1)
                     {
                         if (q1 == 0xfffffffe)
+                        {
                             q += 1;
+                        }
+
                         q1 += 2;
                     }
                     else
+                    {
                         q1 += (q1 & 1);
+                    }
                 }
             }
             ix0 = (q >> 1) + 0x3fe00000;
             ix1 = q1 >> 1;
-            if ((q & 1) == 1) ix1 |= sign;
+            if ((q & 1) == 1)
+            {
+                ix1 |= sign;
+            }
             ix0 += (m << 20);
 
             long value = BitConverter.DoubleToInt64Bits(x);
-            Byte[] valueBytes = BitConverter.GetBytes(value);
+            var valueBytes = BitConverter.GetBytes(value);
             int offset = BitConverter.IsLittleEndian ? 4 : 0;
-            Byte[] toAddHigher = BitConverter.GetBytes(ix0);
-            Byte[] toAddLower = BitConverter.GetBytes(ix1);
+            var toAddHigher = BitConverter.GetBytes(ix0);
+            var toAddLower = BitConverter.GetBytes(ix1);
             for (int I = 0; I < 4; I++)
             {
                 valueBytes[I + offset] = toAddHigher[I];
@@ -1147,7 +1371,9 @@ namespace Cosmos.System_Plugs.System
                     return -n;
                 }
                 else
+                {
                     return n;
+                }
             }
             /*
              * all other (large) arguments
@@ -1166,9 +1392,9 @@ namespace Cosmos.System_Plugs.System
             long lz = BitConverter.DoubleToInt64Bits(z);
             long lx = BitConverter.DoubleToInt64Bits(x);
             long lv = BitConverter.DoubleToInt64Bits(ix - (e0 << 20));
-            Byte[] bz = BitConverter.GetBytes(lz);
-            Byte[] bx = BitConverter.GetBytes(lx);
-            Byte[] bv = BitConverter.GetBytes(lv);
+            var bz = BitConverter.GetBytes(lz);
+            var bx = BitConverter.GetBytes(lx);
+            var bv = BitConverter.GetBytes(lv);
             for (int l = 0; l < 4; l++)
             {
                 bz[l + lowOffset] = bx[l + lowOffset];
@@ -1183,7 +1409,10 @@ namespace Cosmos.System_Plugs.System
             tx[2] = z;
             nx = 3;
             while (tx[nx - 1] == 0)
+            {
                 nx--;    /* skip zero term */
+            }
+
             n = __kernel_rem_pio2(tx, y, e0, nx, 2, two_over_pi);
             if (hx < 0)
             {
@@ -1224,24 +1453,33 @@ namespace Cosmos.System_Plugs.System
 
             /* determine jx,jv,q0, note that 3>q0 */
             jx = nx - 1;
-            jv = (e0 - 3) / 24; if (jv < 0) jv = 0;
+            jv = (e0 - 3) / 24; if (jv < 0)
+            {
+                jv = 0;
+            }
+
             q0 = e0 - 24 * (jv + 1);
 
             /* set up f[0] to f[jx+jk] where f[jx+jk] = ipio2[jv+jk] */
             j = jv - jx; m = jx + jk;
             for (i = 0; i <= m; i++, j++)
+            {
                 f[i] = (j < 0) ? 0 : ipio2[j];
+            }
 
             /* compute q[0],q[1],...q[jk] */
             for (i = 0; i <= jk; i++)
             {
                 for (j = 0, fw = 0.0; j <= jx; j++)
+                {
                     fw += x[j] * f[jx + i - j];
+                }
+
                 q[i] = fw;
             }
 
             jz = jk;
-            recompute:
+        recompute:
             /* distill q[] into iq[] reversingly */
             for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--)
             {
@@ -1262,8 +1500,14 @@ namespace Cosmos.System_Plugs.System
                 iq[jz - 1] -= i << (24 - q0);
                 ih = iq[jz - 1] >> (23 - q0);
             }
-            else if (q0 == 0) ih = iq[jz - 1] >> 23;
-            else if (z >= 0.5) ih = 2;
+            else if (q0 == 0)
+            {
+                ih = iq[jz - 1] >> 23;
+            }
+            else if (z >= 0.5)
+            {
+                ih = 2;
+            }
 
             if (ih > 0)
             {   /* q > 0.5 */
@@ -1278,7 +1522,10 @@ namespace Cosmos.System_Plugs.System
                             carry = 1; iq[i] = 0x1000000 - j;
                         }
                     }
-                    else iq[i] = 0xffffff - j;
+                    else
+                    {
+                        iq[i] = 0xffffff - j;
+                    }
                 }
                 if (q0 > 0)
                 {       /* rare case: chance is 1 in 12 */
@@ -1293,7 +1540,10 @@ namespace Cosmos.System_Plugs.System
                 if (ih == 2)
                 {
                     z = 1 - z;
-                    if (carry != 0) z -= Scalbn(1, q0);
+                    if (carry != 0)
+                    {
+                        z -= Scalbn(1, q0);
+                    }
                 }
             }
 
@@ -1301,15 +1551,25 @@ namespace Cosmos.System_Plugs.System
             if (z == 0)
             {
                 j = 0;
-                for (i = jz - 1; i >= jk; i--) j |= iq[i];
+                for (i = jz - 1; i >= jk; i--)
+                {
+                    j |= iq[i];
+                }
+
                 if (j == 0)
                 { /* need recomputation */
-                    for (k = 1; iq[jk - k] == 0; k++) ;   /* k = no. of terms needed */
+                    for (k = 1; iq[jk - k] == 0; k++)
+                    {
+                        ;   /* k = no. of terms needed */
+                    }
 
                     for (i = jz + 1; i <= jz + k; i++)
                     {   /* add q[jz+1] to q[jz+k] */
                         f[jx + i] = ipio2[jv + i];
-                        for (j = 0, fw = 0.0; j <= jx; j++) fw += x[j] * f[jx + i - j];
+                        for (j = 0, fw = 0.0; j <= jx; j++)
+                        {
+                            fw += x[j] * f[jx + i - j];
+                        }
                         q[i] = fw;
                     }
                     jz += k;
@@ -1334,7 +1594,9 @@ namespace Cosmos.System_Plugs.System
                     iq[jz] = (int)fw;
                 }
                 else
+                {
                     iq[jz] = (int)z;
+                }
             }
 
             /* convert integer "bit" chunk to floating-point value */
@@ -1349,7 +1611,9 @@ namespace Cosmos.System_Plugs.System
             for (i = jz; i >= 0; i--)
             {
                 for (fw = 0.0, k = 0; k <= jp && k <= jz - i; k++)
+                {
                     fw += PIo2[k] * q[i + k];
+                }
                 fq[jz - i] = fw;
             }
 
@@ -1359,7 +1623,9 @@ namespace Cosmos.System_Plugs.System
                 case 0:
                     fw = 0.0;
                     for (i = jz; i >= 0; i--)
+                    {
                         fw += fq[i];
+                    }
                     y[0] = (ih == 0) ? fw : -fw;
                     break;
 
@@ -1367,11 +1633,15 @@ namespace Cosmos.System_Plugs.System
                 case 2:
                     fw = 0.0;
                     for (i = jz; i >= 0; i--)
+                    {
                         fw += fq[i];
+                    }
                     y[0] = (ih == 0) ? fw : -fw;
                     fw = fq[0] - fw;
                     for (i = 1; i <= jz; i++)
+                    {
                         fw += fq[i];
+                    }
                     y[1] = (ih == 0) ? fw : -fw;
                     break;
 
@@ -1389,7 +1659,9 @@ namespace Cosmos.System_Plugs.System
                         fq[i - 1] = fw;
                     }
                     for (fw = 0.0, i = jz; i >= 2; i--)
+                    {
                         fw += fq[i];
+                    }
                     if (ih == 0)
                     {
                         y[0] = fq[0]; y[1] = fq[1];
@@ -1418,23 +1690,31 @@ namespace Cosmos.System_Plugs.System
             if (k == 0)
             {               /* 0 or subnormal x */
                 if ((lx | (hx & 0x7fffffff)) == 0)
+                {
                     return x; /* +-0 */
+                }
                 x *= two54;
                 hx = HighWord(x);
                 k = ((hx & 0x7ff00000) >> 20) - 54;
                 if (n < -50000)
+                {
                     return tiny * x;    /*underflow*/
+                }
             }
             if (k == 0x7ff)
+            {
                 return x + x;       /* NaN or Inf */
+            }
             k = k + n;
             if (k > 0x7fe)
+            {
                 return huge * (((long)x >> 31) & 1) * huge;// copysign(huge, x); /* overflow  */
+            }
             if (k > 0)              /* normal result */
             {
                 //__HI(x) = (hx & 0x800fffff) | (k << 20);
-                Byte[] _bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
-                Byte[] _bv = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits((hx & 0x800) | (k << 20)));
+                var _bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
+                var _bv = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits((hx & 0x800) | (k << 20)));
                 for (int i = 0; i < 4; i++)
                 {
                     _bx[i + (BitConverter.IsLittleEndian ? 4 : 0)] = _bv[i];
@@ -1442,14 +1722,20 @@ namespace Cosmos.System_Plugs.System
                 return x;
             }
             if (k <= -54)
+            {
                 if (n > 50000)  /* in case integer overflow in n+k */
+                {
                     return huge * (((long)x >> 31) & 1) * huge; //copysign(huge, x);    /*overflow*/
+                }
                 else
+                {
                     return tiny * (((long)x >> 31) & 1) * tiny;//  copysign(tiny, x);    /*underflow*/
+                }
+            }
             k += 54;                /* subnormal result */
             //__HI(x) = (hx & 0x800) | (k << 20);
-            Byte[] bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
-            Byte[] bv = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits((hx & 0x800) | (k << 20)));
+            var bx = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits(x));
+            var bv = BitConverter.GetBytes(BitConverter.DoubleToInt64Bits((hx & 0x800) | (k << 20)));
             for (int i = 0; i < 4; i++)
             {
                 bx[i + (BitConverter.IsLittleEndian ? 4 : 0)] = bv[i];
@@ -1472,7 +1758,9 @@ namespace Cosmos.System_Plugs.System
         private static double _power(double x, int c)
         {
             if (c == 0)
+            {
                 return 1.0F;
+            }
 
             int _c;
             double ret = x;
@@ -1480,12 +1768,16 @@ namespace Cosmos.System_Plugs.System
             if (c >= 0f)
             {
                 for (_c = 1; _c < c; _c++)
+                {
                     ret *= ret;
+                }
             }
             else
             {
                 for (_c = 1; _c < c; _c++)
+                {
                     ret /= ret;
+                }
             }
 
             return ret;
@@ -1549,7 +1841,7 @@ namespace Cosmos.System_Plugs.System
         private static int HighWord(double x)
         {
             long value = BitConverter.DoubleToInt64Bits(x);
-            Byte[] valueBytes = BitConverter.GetBytes(value);
+            var valueBytes = BitConverter.GetBytes(value);
             int offset = BitConverter.IsLittleEndian ? 4 : 0;
             return BitConverter.ToInt32(valueBytes, offset);
         }
@@ -1557,7 +1849,7 @@ namespace Cosmos.System_Plugs.System
         private static int LowWord(double x) //Opposite of high word
         {
             long value = BitConverter.DoubleToInt64Bits(x);
-            Byte[] valueBytes = BitConverter.GetBytes(value);
+            var valueBytes = BitConverter.GetBytes(value);
             return BitConverter.ToInt32(valueBytes, BitConverter.IsLittleEndian ? 0 : 4);
         }
 
