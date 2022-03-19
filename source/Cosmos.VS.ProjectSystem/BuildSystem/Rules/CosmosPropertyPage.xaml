@@ -315,7 +315,7 @@
     </EnumProperty>
 
     <EnumProperty Name="QemuAudioDriver"
-                  DisplayName="Video Driver"
+                  DisplayName="Audio Driver"
                   Category="Qemu">
         <EnumProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
@@ -381,5 +381,40 @@
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
+
+    <StringProperty Name="QemuLocationParameters"
+                    DisplayName="Qemu Location"
+                    Description="Set Qemu Location. (example: C:\qemu\qemu-system-i386.exe)"
+                    Category="Qemu">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+    
+    <StringProperty Name="QemuLocationInfo"
+                    DisplayName="Qemu Download."
+                    Category="Qemu">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuLocationInfo"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="LinkAction">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Action" Value="URL" />
+                    <NameValuePair Name="URL" Value="https://qemu.weilnetz.de/" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
 
 </Rule>
