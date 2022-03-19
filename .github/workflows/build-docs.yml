@@ -11,9 +11,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v1.9.0
+      uses: actions/setup-dotnet@v2.0.0
       with:
-        dotnet-version: 3.1.x
+          dotnet-version: 6.0.x
     - name: Build docs
       uses: nikeee/docfx-action@v1.0.0
       with:

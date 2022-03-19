@@ -17,12 +17,13 @@ namespace Cosmos.Debug.Hosts
 
     private string _debugPortString;
 
+    private string _projectName;
+
     public bool RedirectOutput = false;
 
     public Action<string> LogOutput;
 
     public Action<string> LogError;
-
     public Qemu(Dictionary<string, string> aParams, bool aUseGDB, string aHarddisk = null)
       : base(aParams, aUseGDB)
     {
@@ -34,13 +35,27 @@ namespace Cosmos.Debug.Hosts
       {
         _harddiskFile = aHarddisk;
       }
-
+      /*
+      //This will be removed once Qemu is completly working!
+      string Output = String.Empty;
+      foreach (KeyValuePair<string, string> Pair in aParams)
+      {
+        Output += $" {Pair.Key} : {Pair.Value} ";
+      }
+      using StreamWriter file = new(@"C:\aParamsOutput.txt");
+      file.WriteLine(Output);
+      */
       if (aParams.ContainsKey("ISOFile"))
       {
         _isoFile = aParams["ISOFile"];
+        string _getFileName = Path.GetFileName(_isoFile);
+        _projectName = _getFileName.Replace(".iso", "");
       }
-
-      _debugPortString = "Cosmos\\Serial";
+      else
+      {
+        _projectName = String.Empty;
+      }
+      _debugPortString = @"Cosmos\Serial";
     }
 
     public override void Start()
@@ -59,10 +74,10 @@ namespace Cosmos.Debug.Hosts
 
       if (!string.IsNullOrWhiteSpace(_debugPortString))
       {
-        xQemuArguments += @" -chardev console,id=CosmosConsole -chardev pipe,path=\Cosmos\Serial,id=Cosmos -device isa-serial,chardev=Cosmos -name Cosmos -device pcnet,netdev=n1 -netdev user,id=n1";
+        xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
       }
 
-      xQemuArguments += " -vga cirrus -boot d -no-shutdown -no-reboot";
+      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device pcnet,netdev=n1 -netdev user,id=n1 -vga std -boot d -no-shutdown -no-reboot";
 
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)

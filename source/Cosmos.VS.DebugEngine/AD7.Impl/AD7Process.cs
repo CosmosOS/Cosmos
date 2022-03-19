@@ -530,7 +530,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         bochsConfigurationFileName = Path.Combine(new FileInfo(mDebugInfo["ProjectFile"]).Directory.FullName,
                           mDebugInfo["OutputPath"], bochsConfigurationFileName);
                     }
-                    FileInfo bochsConfigurationFile = new FileInfo(bochsConfigurationFileName);
+                    var bochsConfigurationFile = new FileInfo(bochsConfigurationFileName);
                     // TODO : What if the configuration file doesn't exist ? This will throw a FileNotFoundException in
                     // the Bochs class constructor. Is this appropriate behavior ?
                     mHost = new Bochs(mDebugInfo, xUseGDB, bochsConfigurationFile);

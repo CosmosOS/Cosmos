@@ -29,7 +29,7 @@ namespace Cosmos.Build.Builder.BuildTasks
                 throw new InvalidOperationException("ProjectFilePath is null!");
             }
 
-            var args = $"\"{ProjectFilePath}\" /nologo /maxcpucount /nodeReuse:False /verbosity:minimal /t:\"{String.Join(";", Targets)}\"";
+            var args = $"\"{ProjectFilePath}\" /nologo /maxcpucount /m /nodeReuse:False /verbosity:minimal /t:\"{String.Join(";", Targets)}\"";
 
             if (Properties != null)
             {
