@@ -22,7 +22,11 @@ namespace Cosmos.VS.DebugEngine
 
         public static void ShowMessage(string message, string title = "Cosmos Debug Engine")
         {
-            VSUtilities.MessageBox.Show(title, message);
+            ThreadHelper.JoinableTaskFactory.Run(async delegate
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                VSUtilities.MessageBox.Show(title, message);
+            });
         }
 
         public static async Task ShowWarningAsync(string message, string title = "Cosmos Debug Engine")
