@@ -42,7 +42,6 @@ namespace Cosmos.Debug.Hosts
     public bool RedirectOutput = false;
 
     public Action<string> LogOutput;
-    string Output = String.Empty;
     public Action<string> LogError;
     public Qemu(Dictionary<string, string> aParams, bool aUseGDB, string aHarddisk = null)
       : base(aParams, aUseGDB)
@@ -54,13 +53,6 @@ namespace Cosmos.Debug.Hosts
       else
       {
         _harddiskFile = aHarddisk;
-      }
-      //This will be removed once Qemu is completly working!
-
-
-      foreach (KeyValuePair<string, string> Pair in aParams)
-      {
-        Output += $" {Pair.Key} : {Pair.Value} \n";
       }
 
 
@@ -220,10 +212,7 @@ namespace Cosmos.Debug.Hosts
       }
 
       xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d -no-shutdown -no-reboot " + _customArgs + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
-      Output += _launchExe + " ";
-      Output += xQemuArguments;
-      using StreamWriter file = new(Path.Combine(CosmosPaths.Build, @"aParamsOut.txt"));
-      file.WriteLine(Output);
+
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)
       {
