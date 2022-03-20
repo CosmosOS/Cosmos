@@ -115,7 +115,6 @@ namespace Cosmos.Core.Memory
         /// </exception>
         public static void Init(byte* aStartPtr, uint aSize)
         {
-            CPU.ZeroFill((uint)aStartPtr, aSize);
             if ((uint)aStartPtr % PageSize != 0 && !Debug)
             {
                 Debugger.DoSendNumber(((uint)aStartPtr % PageSize));
@@ -242,6 +241,7 @@ namespace Cosmos.Core.Memory
                 {
                     *p = PageType.Extension;
                 }
+                CPU.ZeroFill((uint)xResult, PageSize * aPageCount);
                 return xResult;
             }
             return null;
