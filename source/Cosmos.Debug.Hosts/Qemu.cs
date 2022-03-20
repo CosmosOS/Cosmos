@@ -56,14 +56,14 @@ namespace Cosmos.Debug.Hosts
         _harddiskFile = aHarddisk;
       }
       //This will be removed once Qemu is completly working!
-      
+
 
       foreach (KeyValuePair<string, string> Pair in aParams)
       {
         Output += $" {Pair.Key} : {Pair.Value} \n";
       }
 
-      
+
       if (aParams.ContainsKey("ISOFile"))
       {
         _isoFile = aParams["ISOFile"];
@@ -74,30 +74,37 @@ namespace Cosmos.Debug.Hosts
       {
         _projectName = String.Empty;
       }
-      if(aParams.ContainsKey("QemuMemory"))
+      if (aParams.ContainsKey("QemuMemory"))
       {
-        _memoryAssign = aParams["QemuMemory"];
+        if (!String.IsNullOrWhiteSpace(aParams["QemuMemory"]))
+        {
+          _memoryAssign = aParams["QemuMemory"];
+        }
+        else
+        {
+          _memoryAssign = "512";
+        }
       }
       else
       {
         _memoryAssign = "512";
       }
-      if(aParams.ContainsKey("QemuUseCustomParameters"))
+      if (aParams.ContainsKey("QemuUseCustomParameters"))
       {
 
-          bool Check;
-          Boolean.TryParse(aParams["QemuUseCustomParameters"], out Check);
-          if (Check)
-          {
-            _customArgs = " " + aParams["QemuCustomParameters"] + " ";
-          }
-          else
-          {
-            _customArgs = String.Empty;
-          }
-        
+        bool Check;
+        Boolean.TryParse(aParams["QemuUseCustomParameters"], out Check);
+        if (Check)
+        {
+          _customArgs = " " + aParams["QemuCustomParameters"] + " ";
+        }
+        else
+        {
+          _customArgs = String.Empty;
+        }
+
       }
-      if(aParams.ContainsKey("QemuHWAccel"))
+      if (aParams.ContainsKey("QemuHWAccel"))
       {
         bool Accel;
         Boolean.TryParse(aParams["QemuHWAccel"], out Accel);
@@ -135,7 +142,14 @@ namespace Cosmos.Debug.Hosts
       }
       if (aParams.ContainsKey("QemuNetworkDevice"))
       {
-        _networkDevice = aParams["QemuNetworkDevice"].ToLower();
+        if (!String.IsNullOrWhiteSpace(aParams["QemuNetworkDevice"]))
+        {
+          _networkDevice = aParams["QemuNetworkDevice"].ToLower();
+        }
+        else
+        {
+          _networkDevice = "e1000";
+        }
       }
       if (aParams.ContainsKey("QemuAudioDriver"))
       {
@@ -149,7 +163,7 @@ namespace Cosmos.Debug.Hosts
         }
 
       }
-          if (aParams.ContainsKey("QemuVideoDriver"))
+      if (aParams.ContainsKey("QemuVideoDriver"))
       {
         if (aParams["QemuVideoDriver"] == "VGA")
         {
@@ -170,26 +184,18 @@ namespace Cosmos.Debug.Hosts
       }
       if (aParams.ContainsKey("QemuLocationParameters"))
       {
-        if (File.Exists(aParams["QemuLocationParameters"]))
+        bool UseCustomExe;
+        Boolean.TryParse(aParams["QemuUseCustomLocation"], out UseCustomExe);
+        if (UseCustomExe)
         {
-          _launchExe = aParams["QemuLocationParameters"];
-        }
-      }
-      else if(!Directory.Exists(Path.GetDirectoryName(_launchExe)))
-      {
-        throw new Exception($"Path {Path.GetDirectoryName(_launchExe)} does not exist at the specified Location!");
-      }
-      else
-      {
-        if (!Directory.Exists(Path.GetDirectoryName(QemuSupport.QemuExe.FullName)))
-        {
-          throw new Exception($"Path {Path.GetDirectoryName(QemuSupport.QemuExe.FullName)} does not Exist!");
+              _launchExe = aParams["QemuLocationParameters"];
         }
         else
         {
-          _launchExe = QemuSupport.QemuExe.FullName;
+            _launchExe = QemuSupport.QemuExe.FullName;
         }
       }
+
       _debugPortString = @"Cosmos\Serial";
     }
 

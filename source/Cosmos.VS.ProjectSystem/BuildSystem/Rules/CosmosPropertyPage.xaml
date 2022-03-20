@@ -249,7 +249,7 @@
 
     <StringProperty Name="QemuDescription"
                     DisplayName="Ignored"
-                    Description="Please note that options in this category are not all implemented in Cosmos and are here for Driver development purposes!"
+                    Description="Please note that options in this category are not all implemented in Cosmos and are here for Driver development purposes! We assume that Qemu is installed to C:\qemu\qemu-system-i386.exe If you have qemu at a different location please define the executable at the end of this page."
                     Category="Qemu">
         <StringProperty.DataSource>
             <DataSource PersistedName="QemuDescription"
@@ -430,7 +430,16 @@
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
-
+    <BoolProperty Name="QemuUseCustomLocation"
+                  DisplayName="Custom Location"
+                  Description="Use Custom Location for Qemu executable."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
     <StringProperty Name="QemuLocationParameters"
                     DisplayName="Qemu Location"
                     Description="Set Qemu Location. (example: C:\qemu\qemu-system-i386.exe)"
