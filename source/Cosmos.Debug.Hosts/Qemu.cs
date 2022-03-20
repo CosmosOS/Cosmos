@@ -43,7 +43,7 @@ namespace Cosmos.Debug.Hosts
       {
         Output += $" {Pair.Key} : {Pair.Value} \n";
       }
-      using StreamWriter file = new(@"C:\users\kmeer\aParamsOutput.txt");
+      using StreamWriter file = new(Path.Combine(CosmosPaths.Build, @"aParamsOut.txt"));
       file.WriteLine(Output);
       
       if (aParams.ContainsKey("ISOFile"))
@@ -58,7 +58,10 @@ namespace Cosmos.Debug.Hosts
       }
       if (aParams.ContainsKey("QemuLocationParameters"))
       {
-        _launchExe = aParams["QemuLocationParameters"];
+        if (File.Exists(aParams["QemuLocationParameters"]))
+        {
+          _launchExe = aParams["QemuLocationParameters"];
+        }
       }
       else if(!Directory.Exists(Path.GetDirectoryName(_launchExe)))
       {
