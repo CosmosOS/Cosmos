@@ -27,8 +27,13 @@ namespace Cosmos.VS.DebugEngine.Utilities
             OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL,
             OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            int result = VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, line2, line1, icon, buttons, defaultButton);
+            int result = 0;
+            ThreadHelper.JoinableTaskFactory.Run(async delegate
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                result = VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, line2, line1, icon, buttons, defaultButton);
+            });
+
 
             return (MessageBoxResult)result;
         }
@@ -60,8 +65,13 @@ namespace Cosmos.VS.DebugEngine.Utilities
         /// <returns>The result of which button on the message box was clicked.</returns>
         public MessageBoxResult ShowError(string line1, string line2 = "")
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            return Show(line1, line2, OLEMSGICON.OLEMSGICON_CRITICAL);
+            MessageBoxResult returnval = 0;
+            ThreadHelper.JoinableTaskFactory.Run(async delegate
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+               returnval = Show(line1, line2, OLEMSGICON.OLEMSGICON_CRITICAL);
+            });
+            return returnval;
         }
 
         /// <summary>

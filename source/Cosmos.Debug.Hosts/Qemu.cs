@@ -19,10 +19,29 @@ namespace Cosmos.Debug.Hosts
 
     private string _projectName;
 
+    private string _launchExe;
+
+    private string _networkDevice;
+
+    private string _videoDriver;
+
+    private string _audioDriver;
+
+    private string _customArgs;
+
+    private string _memoryAssign;
+
+    private string _hardwareAccel;
+
+    private string _useUSBMouse;
+
+    private string _useUSBKeyboard;
+
+    private string _useSerialOutput;
+
     public bool RedirectOutput = false;
 
     public Action<string> LogOutput;
-
     public Action<string> LogError;
     public Qemu(Dictionary<string, string> aParams, bool aUseGDB, string aHarddisk = null)
       : base(aParams, aUseGDB)
@@ -35,16 +54,8 @@ namespace Cosmos.Debug.Hosts
       {
         _harddiskFile = aHarddisk;
       }
-      /*
-      //This will be removed once Qemu is completly working!
-      string Output = String.Empty;
-      foreach (KeyValuePair<string, string> Pair in aParams)
-      {
-        Output += $" {Pair.Key} : {Pair.Value} ";
-      }
-      using StreamWriter file = new(@"C:\aParamsOutput.txt");
-      file.WriteLine(Output);
-      */
+
+
       if (aParams.ContainsKey("ISOFile"))
       {
         _isoFile = aParams["ISOFile"];
@@ -55,6 +66,128 @@ namespace Cosmos.Debug.Hosts
       {
         _projectName = String.Empty;
       }
+      if (aParams.ContainsKey("QemuMemory"))
+      {
+        if (!String.IsNullOrWhiteSpace(aParams["QemuMemory"]))
+        {
+          _memoryAssign = aParams["QemuMemory"];
+        }
+        else
+        {
+          _memoryAssign = "512";
+        }
+      }
+      else
+      {
+        _memoryAssign = "512";
+      }
+      if (aParams.ContainsKey("QemuUseCustomParameters"))
+      {
+
+        bool Check;
+        Boolean.TryParse(aParams["QemuUseCustomParameters"], out Check);
+        if (Check)
+        {
+          _customArgs = " " + aParams["QemuCustomParameters"] + " ";
+        }
+        else
+        {
+          _customArgs = String.Empty;
+        }
+
+      }
+      if (aParams.ContainsKey("QemuHWAccel"))
+      {
+        bool Accel;
+        Boolean.TryParse(aParams["QemuHWAccel"], out Accel);
+        if (Accel)
+        {
+          _hardwareAccel = "-accel hax";
+        }
+      }
+      if (aParams.ContainsKey("QemuUSBKeyboard"))
+      {
+        bool Keyboard;
+        Boolean.TryParse(aParams["QemuUSBKeyboard"], out Keyboard);
+        if (Keyboard)
+        {
+          _useUSBKeyboard = "-usbdevice keyboard";
+        }
+      }
+      if (aParams.ContainsKey("QemuUSBMouse"))
+      {
+        bool Mouse;
+        Boolean.TryParse(aParams["QemuUSBMouse"], out Mouse);
+        if (Mouse)
+        {
+          _useUSBMouse = "-usbdevice mouse";
+        }
+      }
+      if (aParams.ContainsKey("QemuUseSerial"))
+      {
+        bool Serial;
+        Boolean.TryParse(aParams["QemuUseSerial"], out Serial);
+        if (Serial)
+        {
+          _useSerialOutput = "-serial stdio";
+        }
+      }
+      if (aParams.ContainsKey("QemuNetworkDevice"))
+      {
+        if (!String.IsNullOrWhiteSpace(aParams["QemuNetworkDevice"]))
+        {
+          _networkDevice = aParams["QemuNetworkDevice"].ToLower();
+        }
+        else
+        {
+          _networkDevice = "e1000";
+        }
+      }
+      if (aParams.ContainsKey("QemuAudioDriver"))
+      {
+        if (aParams["QemuAudioDriver"] == "SoundBlaster16")
+        {
+          _audioDriver = "-soundhw sb16";
+        }
+        if (aParams["QemuAudioDriver"] == "AC97")
+        {
+          _audioDriver = "-soundhw ac97";
+        }
+
+      }
+      if (aParams.ContainsKey("QemuVideoDriver"))
+      {
+        if (aParams["QemuVideoDriver"] == "VGA")
+        {
+          _videoDriver = String.Empty;
+        }
+        else if (aParams["QemuVideoDriver"] == "VBE")
+        {
+          _videoDriver = "-vga std";
+        }
+        else if (aParams["QemuVideoDriver"] == "VMWare")
+        {
+          _videoDriver = "-vga vmware";
+        }
+        else if (aParams["QemuVideoDriver"] == "Cirrus")
+        {
+          _videoDriver = "-vga cirrus";
+        }
+      }
+      if (aParams.ContainsKey("QemuLocationParameters"))
+      {
+        bool UseCustomExe;
+        Boolean.TryParse(aParams["QemuUseCustomLocation"], out UseCustomExe);
+        if (UseCustomExe)
+        {
+              _launchExe = aParams["QemuLocationParameters"];
+        }
+        else
+        {
+            _launchExe = QemuSupport.QemuExe.FullName;
+        }
+      }
+
       _debugPortString = @"Cosmos\Serial";
     }
 
@@ -62,9 +195,10 @@ namespace Cosmos.Debug.Hosts
     {
       qemuProcess = new Process();
       var qemuStartInfo = qemuProcess.StartInfo;
-      qemuStartInfo.FileName = QemuSupport.QemuExe.FullName;
 
-      string xQemuArguments = "-m 512";
+        qemuStartInfo.FileName = _launchExe;
+
+      string xQemuArguments = "-m " + _memoryAssign;
       xQemuArguments += $" -cdrom {_isoFile}";
 
       if (!string.IsNullOrWhiteSpace(_harddiskFile))
@@ -77,7 +211,7 @@ namespace Cosmos.Debug.Hosts
         xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
       }
 
-      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device pcnet,netdev=n1 -netdev user,id=n1 -vga std -boot d -no-shutdown -no-reboot";
+      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d -no-shutdown -no-reboot " + _customArgs + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
 
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)
