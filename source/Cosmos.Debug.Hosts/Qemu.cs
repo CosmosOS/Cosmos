@@ -19,6 +19,7 @@ namespace Cosmos.Debug.Hosts
 
     private string _projectName;
 
+    private string _launchExe;
     public bool RedirectOutput = false;
 
     public Action<string> LogOutput;
@@ -35,16 +36,16 @@ namespace Cosmos.Debug.Hosts
       {
         _harddiskFile = aHarddisk;
       }
-      /*
       //This will be removed once Qemu is completly working!
+      
       string Output = String.Empty;
       foreach (KeyValuePair<string, string> Pair in aParams)
       {
-        Output += $" {Pair.Key} : {Pair.Value} ";
+        Output += $" {Pair.Key} : {Pair.Value} \n";
       }
-      using StreamWriter file = new(@"C:\aParamsOutput.txt");
+      using StreamWriter file = new(@"C:\users\kmeer\aParamsOutput.txt");
       file.WriteLine(Output);
-      */
+      
       if (aParams.ContainsKey("ISOFile"))
       {
         _isoFile = aParams["ISOFile"];
@@ -55,6 +56,25 @@ namespace Cosmos.Debug.Hosts
       {
         _projectName = String.Empty;
       }
+      if (aParams.ContainsKey("QemuLocationParameters"))
+      {
+        _launchExe = aParams["QemuLocationParameters"];
+      }
+      else if(!Directory.Exists(Path.GetDirectoryName(_launchExe)))
+      {
+        throw new Exception($"Path {Path.GetDirectoryName(_launchExe)} does not exist at the specified Location!");
+      }
+      else
+      {
+        if (!Directory.Exists(Path.GetDirectoryName(QemuSupport.QemuExe.FullName)))
+        {
+          throw new Exception($"Path {Path.GetDirectoryName(QemuSupport.QemuExe.FullName)} does not Exist!");
+        }
+        else
+        {
+          _launchExe = QemuSupport.QemuExe.FullName;
+        }
+      }
       _debugPortString = @"Cosmos\Serial";
     }
 
@@ -62,7 +82,9 @@ namespace Cosmos.Debug.Hosts
     {
       qemuProcess = new Process();
       var qemuStartInfo = qemuProcess.StartInfo;
-      qemuStartInfo.FileName = QemuSupport.QemuExe.FullName;
+
+      //QemuSupport.QemuExe.FullName;
+        qemuStartInfo.FileName = _launchExe;
 
       string xQemuArguments = "-m 512";
       xQemuArguments += $" -cdrom {_isoFile}";
