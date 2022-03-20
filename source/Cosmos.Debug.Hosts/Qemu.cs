@@ -39,6 +39,8 @@ namespace Cosmos.Debug.Hosts
 
     private string _useSerialOutput;
 
+    private string _debugACPIEnable;
+
     public bool RedirectOutput = false;
 
     public Action<string> LogOutput;
@@ -174,6 +176,19 @@ namespace Cosmos.Debug.Hosts
           _videoDriver = "-vga cirrus";
         }
       }
+      if(aParams.ContainsKey("DebugEnabled"))
+      {
+        bool EnableAcpi;
+        Boolean.TryParse(aParams["DebugEnabled"], out EnableAcpi);
+          if(EnableAcpi)
+          {
+            _debugACPIEnable = "-no-acpi";
+          }
+          else
+          {
+            _debugACPIEnable = String.Empty;
+          }
+      }
       if (aParams.ContainsKey("QemuLocationParameters"))
       {
         bool UseCustomExe;
@@ -211,7 +226,7 @@ namespace Cosmos.Debug.Hosts
         xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
       }
 
-      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d -no-reboot -no-shutdown -no-acpi " + _customArgs + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
+      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d -no-reboot -no-shutdown " +_debugACPIEnable+ " " + _customArgs + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
 
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)
