@@ -265,7 +265,22 @@
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
-
+    
+    <EnumProperty Name="QemuMemory"
+                  DisplayName="Assign VM Memory (mb)"
+                  Category="Qemu">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="256"/>
+        <EnumValue Name="512"/>
+        <EnumValue Name="1024"/>
+        <EnumValue Name="3072"/>
+        <EnumValue Name="4096"/>
+</EnumProperty>
+    
     <EnumProperty Name="QemuNetworkDevice"
                   DisplayName="Network Device"
                   Category="Qemu">
@@ -274,9 +289,9 @@
                 <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
-        <EnumValue Name="None"/>
         <EnumValue Name="RTL8139"/>
         <EnumValue Name="E1000"/>
+        <EnumValue Name="PCNet"/>
     </EnumProperty>
 
     <BoolProperty Name="QemuUSBKeyboard"
@@ -309,9 +324,10 @@
                 <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
-        <EnumValue Name="None"/>
+        <EnumValue Name="VMWare"/>
         <EnumValue Name="VBE"/>
         <EnumValue Name="VGA"/>
+        <EnumValue Name="Cirrus"/>
     </EnumProperty>
 
     <EnumProperty Name="QemuAudioDriver"
@@ -324,6 +340,7 @@
         </EnumProperty.Metadata>
         <EnumValue Name="None"/>
         <EnumValue Name="SoundBlaster16"/>
+        <EnumValue Name="AC97"/>
     </EnumProperty>
 
     <BoolProperty Name="QemuUseSerial"
@@ -336,6 +353,38 @@
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
+    <BoolProperty Name="QemuHWAccel"
+                  DisplayName="Qemu Hardware Acceleration"
+                  Description="Use HAXM for Qemu. (needs to be installed)"
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+    <StringProperty Name="QemuHWAccelInfo"
+                    DisplayName="Download HAXM."
+                    Category="Qemu">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuHWAccelInfo"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="LinkAction">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Action" Value="URL" />
+                    <NameValuePair Name="URL" Value="https://github.com/intel/haxm/releases" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
 
     <BoolProperty Name="QemuUseCustomParameters"
                   DisplayName="Custom Parameters"
