@@ -175,6 +175,10 @@ namespace Cosmos.Debug.Hosts
         {
           _videoDriver = "-vga cirrus";
         }
+        else if (aParams["QemuVideoDriver"] == "Bochs")
+        {
+          _videoDriver = "-vga none -device bochs-display";
+        }
       }
       if(aParams.ContainsKey("DebugEnabled"))
       {

@@ -326,6 +326,7 @@
         </EnumProperty.Metadata>
         <EnumValue Name="VMWare"/>
         <EnumValue Name="VBE"/>
+        <EnumValue Name="Bochs"/>
         <EnumValue Name="VGA"/>
         <EnumValue Name="Cirrus"/>
     </EnumProperty>
