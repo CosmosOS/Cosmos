@@ -131,7 +131,7 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["QemuUseSerial"], out Serial);
         if (Serial)
         {
-          _useSerialOutput = "-serial stdio";
+          _useSerialOutput = "-serial file:CON";
         }
       }
       if (aParams.ContainsKey("QemuNetworkDevice"))
