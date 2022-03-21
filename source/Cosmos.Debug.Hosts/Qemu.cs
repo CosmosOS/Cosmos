@@ -230,7 +230,7 @@ namespace Cosmos.Debug.Hosts
         xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
       }
 
-      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d " +_debugACPIEnable+ " " + _customArgs + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
+      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d " +_debugACPIEnable+ " " + _customArgs + " " + _useSerialOutput + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
 
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)
