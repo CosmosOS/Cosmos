@@ -339,7 +339,6 @@
                 <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
             </NameValuePair>
         </EnumProperty.Metadata>
-        <EnumValue Name="None"/>
         <EnumValue Name="SoundBlaster16"/>
         <EnumValue Name="AC97"/>
     </EnumProperty>

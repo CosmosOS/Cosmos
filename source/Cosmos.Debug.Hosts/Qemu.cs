@@ -149,11 +149,11 @@ namespace Cosmos.Debug.Hosts
       {
         if (aParams["QemuAudioDriver"] == "SoundBlaster16")
         {
-          _audioDriver = "-soundhw sb16";
+          _audioDriver = "-device sb16";
         }
         if (aParams["QemuAudioDriver"] == "AC97")
         {
-          _audioDriver = "-soundhw ac97";
+          _audioDriver = "-device ac97";
         }
 
       }
@@ -199,7 +199,8 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["QemuUseCustomLocation"], out UseCustomExe);
         if (UseCustomExe)
         {
-              _launchExe = aParams["QemuLocationParameters"];
+              _launchExe = $"\"{aParams["QemuLocationParameters"]}\"";
+
         }
         else
         {
@@ -230,7 +231,7 @@ namespace Cosmos.Debug.Hosts
         xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
       }
 
-      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d " +_debugACPIEnable+ " " + _customArgs + " " + _useSerialOutput + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
+      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d -soundhw pcspk" +_debugACPIEnable+ " " + _customArgs + " " + _useSerialOutput + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
 
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)
