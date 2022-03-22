@@ -353,6 +353,16 @@
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
+    <BoolProperty Name="QemuHWAccelWHPX"
+                  DisplayName="Qemu Hardware Acceleration"
+                  Description="Use WHPX for Qemu. (Requires Hyper-V to be installed, do not use together with haxm)"
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
     <BoolProperty Name="QemuHWAccel"
                   DisplayName="Qemu Hardware Acceleration"
                   Description="Use HAXM for Qemu. (needs to be installed)"

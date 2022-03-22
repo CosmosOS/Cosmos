@@ -193,6 +193,15 @@ namespace Cosmos.Debug.Hosts
             _debugACPIEnable = String.Empty;
           }
       }
+      if(aParams.ContainsKey("QemuHWAccelWHPX"))
+      {
+        bool WHPX;
+        Boolean.TryParse(aParams["QemuHWAccelWHPX"],out WHPX);
+        if(WHPX)
+        {
+          _hardwareAccel = "-accel whpx";
+        }
+      }
       if (aParams.ContainsKey("QemuLocationParameters"))
       {
         bool UseCustomExe;
