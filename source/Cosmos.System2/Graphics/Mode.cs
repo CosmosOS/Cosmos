@@ -12,6 +12,9 @@ namespace Cosmos.System.Graphics
     /// </summary>
     public struct Mode
     {
+
+        public static Mode Default = default;
+
         int columns;
         int rows;
         ColorDepth color_depth;

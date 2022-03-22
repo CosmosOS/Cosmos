@@ -20,42 +20,12 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Driver for Setting vbe modes and ploting/getting pixels
         /// </summary>
-        private readonly VBEDriver _VBEDriver;
+        private VBEDriver _VBEDriver;
 
         /// <summary>
         /// Video mode.
         /// </summary>
         private Mode _Mode;
-
-        /// <summary>
-        /// Create new instance of the <see cref="VBEScreen"/> class.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if default mode (1024x768x32) is not suppoted.</exception>
-        public VBECanvas() : this(_DefaultMode)
-        {
-        }
-
-        /// <summary>
-        /// Create new instance of the <see cref="VBEScreen"/> class.
-        /// </summary>
-        /// <param name="mode">VBE mode.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
-        public VBECanvas(Mode aMode)
-        {
-            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
-
-            if (Core.VBE.IsAvailable())
-            {
-                Core.VBE.ModeInfo ModeInfo = Core.VBE.getModeInfo();
-                aMode = new Mode(ModeInfo.width, ModeInfo.height, (ColorDepth)ModeInfo.bpp);
-                Global.mDebugger.SendInternal($"Detected VBE VESA with {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
-            }
-
-            ThrowIfModeIsNotValid(aMode);
-
-            _VBEDriver = new VBEDriver((ushort)aMode.Columns, (ushort)aMode.Rows, (ushort)aMode.ColorDepth);
-            Mode = aMode;
-        }
 
         /// <summary>
         /// Disables VBE Graphics mode, parent method returns to VGA text mode (80x25)
@@ -155,7 +125,7 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="Mode">The desired Mode resolution</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
-        private void SetMode(Mode aMode)
+        public override void SetMode(Mode aMode)
         {
             ThrowIfModeIsNotValid(aMode);
 
@@ -404,6 +374,19 @@ namespace Cosmos.System.Graphics
             uint offset = (uint)GetPointOffset(aX, aY);
 
             return Color.FromArgb((int)_VBEDriver.GetVRAM(offset));
+        }
+
+        public override void Init(Mode aMode = default(Mode)) {
+            Global.mDebugger.SendInternal($"Creating VBECanvas() with mode {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
+
+            ThrowIfModeIsNotValid(aMode);
+
+            _VBEDriver = new VBEDriver((ushort)aMode.Columns, (ushort)aMode.Rows, (ushort)aMode.ColorDepth);
+            Mode = aMode;
+        }
+
+        public override bool IsSupported() {
+            return VBEDriver.SystemSupports;
         }
 
         #endregion

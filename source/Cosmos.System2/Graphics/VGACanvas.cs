@@ -427,5 +427,9 @@ namespace Cosmos.System.Graphics
         {
 
         }
+
+        public override void Init(Mode mode = default(Mode)) => throw new NotImplementedException();
+        public override void SetMode(Mode mode) => throw new NotImplementedException();
+        public override bool IsSupported() => throw new NotImplementedException();
     }
 }

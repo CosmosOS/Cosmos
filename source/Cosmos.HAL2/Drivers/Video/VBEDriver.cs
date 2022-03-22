@@ -69,6 +69,21 @@ namespace Cosmos.HAL.Drivers
             NoClearMemory = 0x80,
         };
 
+        public static bool SystemSupports { get {
+            PCIDevice videocard;
+            if(
+                VBE.IsAvailable() || 
+                ISAModeAvailable() || 
+                ((videocard = HAL.PCI.GetDevice(VendorID.VirtualBox, DeviceID.VBVGA)) != null) || 
+                //VirtualBox Video Adapter PCI Mode
+                ((videocard = HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA)) != null)
+            )
+            {
+                return true;
+            }
+            return false;
+        } }
+
         /// <summary>
         /// Create new instance of the <see cref="VBEDriver"/> class.
         /// </summary>

@@ -9,7 +9,7 @@ namespace Cosmos.System.Graphics
     /// <summary>
     /// Canvas abstract class.
     /// </summary>
-    public abstract class Canvas
+    public abstract class Canvas: ICanvas
     {
         /*
          * IReadOnlyList<T> is not working, the Modes inside it become corrupted and then you get Stack Overflow
@@ -1229,5 +1229,9 @@ namespace Cosmos.System.Graphics
             byte B = (byte)((to.B * alpha + from.B * (255 - alpha)) >> 8);
             return Color.FromArgb(R, G, B);
         }
+
+        public abstract void Init(Mode mode = default(Mode));
+        public abstract void SetMode(Mode mode);
+        public abstract bool IsSupported();
     }
 }
