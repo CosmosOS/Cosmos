@@ -4,6 +4,10 @@ using Cosmos.HAL;
 
 namespace Cosmos.System_Plugs.System
 {
+    /*
+     * Code taken from link below and modified to fit the scheme
+     * https://referencesource.microsoft.com/#mscorlib/system/random.cs,62cd8ffb36191d74,references
+     */
     [Plug(Target = typeof(Random))]
     public static class RandomImpl
     {
