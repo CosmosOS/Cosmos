@@ -17,7 +17,7 @@ namespace Cosmos.System_Plugs.System
         private const int MBIG = Int32.MaxValue;
         private const int MSEED = 161803398;
         private const int MZ = 0;
-
+        private static int counter = 0;
 
         //
         // Member Variables
@@ -65,8 +65,17 @@ namespace Cosmos.System_Plugs.System
             seed = 1;
         }
 
-        // TODO: improve this
-        public static int GenerateGlobalSeed() => RTC.Second;
+        public static int GenerateGlobalSeed()
+        {
+            counter++;
+
+            if (counter == Int32.MaxValue - 1)
+            {
+                counter = 0;
+            }
+
+            return counter + RTC.Second * 1000;
+        }
 
         private static double Sample()
         {
