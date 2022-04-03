@@ -23,6 +23,8 @@ namespace Cosmos.Build.Builder.ViewModels
 
         public ICommand CopyCommand { get; }
 
+        public ICommand PostPaste { get; }
+
         public bool CloseWhenCompleted
         {
             get => _closeWhenCompleted;
@@ -61,6 +63,8 @@ namespace Cosmos.Build.Builder.ViewModels
 
             CopyCommand = new RelayCommand(CopyLogToClipboard);
 
+            PostPaste = new RelayCommand(PostPasteCommand);
+
             CloseWhenCompleted = true;
 
             _logger = new MainWindowLogger(this);
@@ -69,6 +73,8 @@ namespace Cosmos.Build.Builder.ViewModels
         }
 
         private void CopyLogToClipboard(object parameter) => Clipboard.SetText(BuildLog());
+
+        private void PostPasteCommand(object parameter) => InternalPostPaste();
 
         private string BuildLog()
         {
@@ -92,6 +98,28 @@ namespace Cosmos.Build.Builder.ViewModels
 
             return log;
         }
+
+        private void InternalPostPaste()
+        {
+            try
+            {
+                string baseUrl = "http://hastebin.com/";
+                var hasteBinClient = new HasteBinClient(baseUrl);
+                HasteBinResult result = hasteBinClient.Post("Hello, World").Result;
+
+                if (result.IsSuccess)
+                {
+                    Views.MessageBox.Show($"{baseUrl}{result.Key}");
+                }
+                else
+                {
+                    Views.MessageBox.Show($"Failed, status code was {result.StatusCode}");
+                }
+            } catch (Exception e)
+            {
+                Views.MessageBox.Show(e.Message);
+            }
+       }
 
         private async Task BuildAsync()
         {
