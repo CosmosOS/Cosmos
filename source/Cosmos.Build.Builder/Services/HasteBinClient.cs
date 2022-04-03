@@ -32,7 +32,7 @@ namespace Cosmos.Build.Builder.Services
 
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri(postUrl));
             request.Content = new StringContent(content);
-            HttpResponseMessage result = await _httpClient.SendAsync(request);
+            HttpResponseMessage result = await _httpClient.SendAsync(request).ConfigureAwait(false);
             
             if (result.IsSuccessStatusCode)
             {

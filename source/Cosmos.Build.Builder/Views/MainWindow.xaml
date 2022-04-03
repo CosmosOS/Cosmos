@@ -29,6 +29,7 @@
             <Grid DockPanel.Dock="Bottom" Height="46">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
@@ -40,14 +41,13 @@
 
                 <Button Grid.Column="1"
                     Command="{Binding PostPaste}"
-                    Content="Publish on Hastebin" Height="46"
-                        Padding="10,10,10,10" Margin="0,0,369,0" HorizontalAlignment="Right" Width="144"/>
+                    Content="Publish on Hastebin" Height="46" MaxWidth="200"
+                        Padding="10,10,10,10" Margin="0,0,319,0" HorizontalAlignment="Right" Width="147"/>
 
-                <CheckBox Grid.Column="2"
+                <CheckBox Grid.Column="3"
                       IsChecked="{Binding CloseWhenCompleted}"
                       Content="Close when finished" Height="39" Margin="0,0,20,7" />
             </Grid>
-
             <Rectangle DockPanel.Dock="Top"
                    Height="5" />
             <TextBlock DockPanel.Dock="Top"

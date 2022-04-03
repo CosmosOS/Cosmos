@@ -103,13 +103,13 @@ namespace Cosmos.Build.Builder.ViewModels
         {
             try
             {
-                string baseUrl = "http://hastebin.com/";
+                string baseUrl = "https://www.toptal.com/developers/hastebin/";
                 var hasteBinClient = new HasteBinClient(baseUrl);
-                HasteBinResult result = hasteBinClient.Post("Hello, World").Result;
+                HasteBinResult result = hasteBinClient.Post(BuildLog()).Result;
 
                 if (result.IsSuccess)
                 {
-                    Views.MessageBox.Show($"{baseUrl}{result.Key}");
+                    Views.MessageBox.Show($"link:{baseUrl}{result.Key}");
                 }
                 else
                 {
