@@ -3,7 +3,11 @@
   <PropertyGroup>
     <Description>DapperExtensions.StrongName</Description>
     <Authors>Rafael.Carvalho</Authors>
+<<<<<<< Updated upstream
     <TargetFrameworks>net5.0;net472</TargetFrameworks>
+=======
+    <TargetFrameworks>net48</TargetFrameworks>
+>>>>>>> Stashed changes
     <PackageId>DapperExtensions.StrongName</PackageId>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>1.50.2</Version>
