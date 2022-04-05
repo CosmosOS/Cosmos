@@ -93,7 +93,14 @@ namespace Cosmos.Debug.DebugConnectors
 
         protected void PacketComplexLongNumber(byte[] aPacket)
         {
-            CmdComplexLongNumber?.Invoke(GetDouble(aPacket, 0));
+            try
+            {
+                CmdComplexLongNumber?.Invoke(GetDouble(aPacket, 0));
+            }
+            catch (System.Exception)
+            {
+                DebugLog($"Failed to parse complex long number {aPacket}");
+            }
             WaitForMessage();
         }
 

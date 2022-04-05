@@ -13,8 +13,8 @@
     <PropertyGroup>
         <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
 
-        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)nasm\win\</NasmToolPath>
-        <NasmToolExe Condition = "'$(NasmToolExe)' == ''">nasm.exe</NasmToolExe>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)yasm\win\</NasmToolPath>
+        <NasmToolExe Condition = "'$(NasmToolExe)' == ''">yasm.exe</NasmToolExe>
 
         <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</LdToolPath>
         <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
@@ -39,6 +39,7 @@
         <BinFormat Condition="'$(BinFormat)' == ''">ELF</BinFormat>
         <DebugMode Condition="'$(DebugMode)' == ''">Source</DebugMode>
         <TraceMode Condition="'$(TraceMode)' == ''">User</TraceMode>
+		<ExtractMapFile Condition="'$(ExtractMapFile)' == ''">False</ExtractMapFile>
         <StackCorruptionDetectionEnabled Condition="'$(StackCorruptionDetectionEnabled)' == ''">True</StackCorruptionDetectionEnabled>
         <StackCorruptionDetectionLevel Condition="'$(StackCorruptionDetectionLevel)' == ''">MethodFooters</StackCorruptionDetectionLevel>
         <IgnoreDebugStubAttribute Condition="'$(IgnoreDebugStubAttribute)' == ''">False</IgnoreDebugStubAttribute>
@@ -53,6 +54,8 @@
 
         <IntermediateIsoDirectory Condition="'$(IntermediateIsoDirectory)' == ''">$(OutputPath)ISO\</IntermediateIsoDirectory>
         <SyslinuxPath Condition="'$(SyslinuxPath)' == ''">$(CosmosToolsPath)syslinux\bios\</SyslinuxPath>
+
+        <GrubPath Condition="'$(GrubPath)' == ''">$(CosmosToolsPath)grub2\</GrubPath>
 
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
 
@@ -109,7 +112,7 @@
     </ItemGroup>
 
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateMbr" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.CreateSyslinuxConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.CreateGrubConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Launch" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -258,7 +261,7 @@
     <Target Name="ExtractMapFromElfFile"
             Inputs="$(BinFile)"
             Outputs="$(CosmosDebugSymbolsFile)"
-            Condition="'$(BinFormat)' == 'ELF'">
+            Condition="'$(BinFormat)' == 'ELF' AND '$(ExtractMapFile)' == 'True'">
 
         <ExtractMapFromElfFile InputFile="$(BinFile)"
                                MapFile="$(MapFile)"
@@ -307,15 +310,15 @@
             Outputs="$(IsoFile)"
             Condition="'$(Deployment)' == 'ISO'">
 			
-		<ItemGroup>
-			<_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
-		</ItemGroup>
+		    <ItemGroup>
+			    <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
+		    </ItemGroup>
+
+        <ItemGroup>
+            <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
+        </ItemGroup>
 		
         <ItemGroup>
-            <_IsoFile Include="$(SyslinuxPath)core\isolinux.bin" />
-            <_IsoFile Include="$(SyslinuxPath)com32\elflink\ldlinux\ldlinux.c32" />
-            <_IsoFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
-            <_IsoFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
             <_IsoFile Include="$(BinFile)" />
             <_IsoFile Include="@(ContentToDeploy)" />
         </ItemGroup>
@@ -324,16 +327,19 @@
         <MakeDir Directories="$(IntermediateIsoDirectory)" />
 
         <Copy SourceFiles="@(_IsoFile)"
-              DestinationFolder="$(IntermediateIsoDirectory)" />
+              DestinationFolder="$(IntermediateIsoDirectory)\boot\" />
 
         <Copy SourceFiles="@(_IsoCustomFiles)"
-             DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)" 
-			 SkipUnchangedFiles="true"
-			 OverwriteReadOnlyFiles="true"
-			 Retries="3"
-			 RetryDelayMilliseconds="300"/>
+              DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)" 
+			        SkipUnchangedFiles="true"
+			        OverwriteReadOnlyFiles="true"
+			        Retries="3"
+			        RetryDelayMilliseconds="300"/>
 
-        <CreateSyslinuxConfig TargetDirectory="$(IntermediateIsoDirectory)"
+        <Copy SourceFiles="@(_i386pcFile)"
+              DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
+
+        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
 
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
@@ -383,16 +389,38 @@
         </PropertyGroup>
 
         <ItemGroup>
-            <_UsbFile Include="$(SyslinuxPath)com32\elflink\ldlinux\ldlinux.c32" />
-            <_UsbFile Include="$(SyslinuxPath)com32\lib\libcom32.c32" />
-            <_UsbFile Include="$(SyslinuxPath)com32\mboot\mboot.c32" />
-            <_UsbFile Include="$(BinFile)" />
+            <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
         </ItemGroup>
 
+        <ItemGroup>
+            <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
+        </ItemGroup>
+
+        <ItemGroup>
+            <_UsbFile Include="$(BinFile)" />
+            <_UsbFile Include="@(ContentToDeploy)" />
+        </ItemGroup>
+
+        <RemoveDir Directories="$(IntermediateIsoDirectory)" />
+        <MakeDir Directories="$(IntermediateIsoDirectory)" />
+
         <Copy SourceFiles="@(_UsbFile)"
+              DestinationFolder="$(IntermediateIsoDirectory)\boot\" />
+
+        <Copy SourceFiles="@(_IsoCustomFiles)"
+              DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)"
+			        SkipUnchangedFiles="true"
+			        OverwriteReadOnlyFiles="true"
+			        Retries="3"
+			        RetryDelayMilliseconds="300"/>
+
+        <Copy SourceFiles="@(_i386pcFile)"
+              DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
+
+        <Copy SourceFiles="@(IntermediateIsoDirectory)"
               DestinationFolder="$(UsbPublishDrive)" />
 
-        <CreateSyslinuxConfig TargetDirectory="$(UsbPublishDrive)"
+        <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
 
         <CreateMbr TargetDrive="$(UsbPublishDrive)"

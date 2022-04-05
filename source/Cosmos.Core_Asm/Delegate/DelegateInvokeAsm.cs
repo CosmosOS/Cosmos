@@ -16,7 +16,7 @@ namespace Cosmos.Core_Asm
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             var xAssembler = aAssembler;
-            var xMethodInfo = (_MethodInfo) aMethodInfo;
+            var xMethodInfo = (Il2cpuMethodInfo) aMethodInfo;
             var xMethodBaseAsInfo = xMethodInfo.MethodBase as global::System.Reflection.MethodInfo;
             if (xMethodBaseAsInfo.ReturnType != typeof(void))
             {

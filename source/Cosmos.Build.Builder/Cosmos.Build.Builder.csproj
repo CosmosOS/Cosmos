@@ -22,12 +22,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30"/>
-        <PackageReference Include="ModernWpfUI" Version="0.9.4" />
+        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="NuGet.Common" />
         <PackageReference Include="NuGet.Configuration" />
         <PackageReference Include="System.Runtime.WindowsRuntime" Version="4.6.0" />
-        <PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.0.1" />
+        <PackageReference Include="WPF-UI" Version="1.2.2-prerelease151" />
     </ItemGroup>
 
 </Project>

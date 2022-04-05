@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Core.Memory.Old;
 using Cosmos.HAL.BlockDevice.Registers;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
+using Cosmos.Core.Memory;
 
 namespace Cosmos.HAL.BlockDevice.Ports
 {
@@ -13,10 +13,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
         internal static Debugger mSATAPIDebugger = new Debugger("HAL", "SATAPI");
 
         public PortRegisters mPortReg;
-
         public override PortType mPortType => PortType.SATAPI;
         public override string mPortName => "SATAPI";
         public override uint mPortNumber => mPortReg.mPortNumber;
+        public override BlockDeviceType Type => BlockDeviceType.RemovableCD;
 
         public SATAPI(PortRegisters aSATAPIPort)
         {
@@ -38,9 +38,12 @@ namespace Cosmos.HAL.BlockDevice.Ports
             mPortReg.IS = unchecked((uint)-1);
 
             int xSlot = FindCMDSlot(mPortReg);
-            if (xSlot == -1) return;
+            if (xSlot == -1)
+            {
+                return;
+            }
 
-            HBACommandHeader xCMDHeader = new HBACommandHeader(mPortReg.CLB, (uint)xSlot);
+            var xCMDHeader = new HBACommandHeader(mPortReg.CLB, (uint)xSlot);
             xCMDHeader.CFL = 5;
             xCMDHeader.ATAPI = 1;
             xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
@@ -49,9 +52,9 @@ namespace Cosmos.HAL.BlockDevice.Ports
             var aLength = 128 + ((uint)xCMDHeader.PRDTL) * 16;
             mSATAPIDebugger.SendInternal("SendSATAPICommand");
             mSATAPIDebugger.SendInternal(aLength);
-            xCMDHeader.CTBA = Heap.MemAlloc(aLength);
+            xCMDHeader.CTBA = Heap.SafeAlloc(aLength);
 
-            HBACommandTable xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
+            var xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 
             uint DataBaseAddress = 0x0046C000;
             for (int i = 0; i < xCMDHeader.PRDTL - 1; i++)
@@ -68,7 +71,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = aCount * 512 - 1;   // 8K bytes (this value should always be set to 1 less than the actual value)
             xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].InterruptOnCompletion = 1;
 
-            FISRegisterH2D xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
+            var xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
             {
                 FISType = (byte)FISType.FIS_Type_RegisterH2D,
                 IsCommand = 1,
@@ -84,10 +87,16 @@ namespace Cosmos.HAL.BlockDevice.Ports
             xATAPICMD[5] = (byte)((aStart >> 0x00) & 0xFF);
             xATAPICMD[9] = (byte)(aCount);
             for (uint i = 0; i < xATAPICMD.Length; i++)
-            new Core.MemoryBlock(xCMDTable.ACMD, 12).Bytes[i] = xATAPICMD[i];
+            {
+                new Core.MemoryBlock(xCMDTable.ACMD, 12).Bytes[i] = xATAPICMD[i];
+            }
             
             int xSpin = 0;
-            do xSpin++; while ((mPortReg.TFD & 0x88) != 0 && xSpin < 1000000);
+            do
+            {
+                xSpin++;
+            }
+            while ((mPortReg.TFD & 0x88) != 0 && xSpin < 1000000);
 
             if (xSpin == 1000000)
             {
@@ -99,13 +108,17 @@ namespace Cosmos.HAL.BlockDevice.Ports
 
             while(true)
             {
-                if((mPortReg.CI & (1 << xSlot)) == 0) break;
+                if((mPortReg.CI & (1 << xSlot)) == 0)
+                {
+                    break;
+                }
+
                 if ((mPortReg.IS & (1 << 30)) != 0)
                 {
                     throw new Exception("SATA Fatal error: Command aborted");
                     //mSATADebugger.Send("[Fatal]: Fatal error occurred while sending command!");
                     //PortReset(mPortReg);
-                    return;
+                    //return;
                 }
             }
 
@@ -125,7 +138,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
             for (int i = 1; i < 32; i++)
             {
                 if ((xSlots & 1) == 0)
+                {
                     return i;
+                }
+
                 xSlots >>= 1;
             }
             mSATAPIDebugger.Send("SATA Error: Cannot find a free command slot!");

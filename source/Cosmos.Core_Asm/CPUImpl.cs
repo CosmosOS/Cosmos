@@ -9,26 +9,26 @@ namespace Cosmos.Core_Asm
     public class CPUImpl
     {
         [PlugMethod(Assembler = typeof(CPUUpdateIDTAsm))]
-        public static void UpdateIDT(CPU aThis, bool aEnableInterruptsImmediately) => throw null;
-
-        [PlugMethod(Assembler = typeof(CPUGetAmountOfRAMAsm))]
-        public static uint GetAmountOfRAM() => throw null;
+        public static void UpdateIDT(bool aEnableInterruptsImmediately) => throw null;
 
         [PlugMethod(Assembler = typeof(CPUGetEndOfKernelAsm))]
         public static uint GetEndOfKernel() => throw null;
-
+        [PlugMethod(Assembler = typeof(CPUGetEBPValue))]
+        public static uint GetEBPValue() => throw null;
+        [PlugMethod(Assembler = typeof(CPUGetStackStart))]
+        public static uint GetStackStart() => throw null;
         [PlugMethod(Assembler = typeof(CPUZeroFillAsm))]
         // TODO: implement this using REP STOSB and REPO STOSD
         public static void ZeroFill(uint aStartAddress, uint aLength) => throw null;
 
         [PlugMethod(Assembler = typeof(CPUInitFloatAsm))]
-        public static void InitFloat(CPU aThis) => throw null;
+        public static void InitFloat() => throw null;
 
         [PlugMethod(Assembler = typeof(CPUInitSSEAsm))]
-        public static void InitSSE(CPU aThis) => throw null;
+        public static void InitSSE() => throw null;
 
         [PlugMethod(Assembler = typeof(CPUHaltAsm))]
-        public static void Halt(CPU aThis) => throw null;
+        public static void Halt() => throw null;
 
         [PlugMethod(Assembler = typeof(CPUDisableINTsAsm))]
         public static void DoDisableInterrupts() => throw null;

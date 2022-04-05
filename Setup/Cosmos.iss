@@ -82,7 +82,7 @@ Type: filesandordirs; Name: "{app}"
 [Files]
 ; Tools
 Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\Tools\Yasm\*.exe"; DestDir: "{app}\Build\Tools\Yasm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly recursesubdirs
@@ -110,22 +110,14 @@ Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion 
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
-Source: ".\Build\syslinux\isolinux.bin"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\ISO\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\ISO\boot\grub\"
 ; USB
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\USB\"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\USB\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\USB\boot\grub\"
 ; PXE
-Source: ".\Build\syslinux\pxelinux.0"; DestDir: "{app}\Build\PXE"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\PXE\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\PXE\boot\grub\"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
@@ -150,6 +142,7 @@ UseRelativePaths=True
 [Run]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "nuget locals all  -Clear"; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Clearing nuget cache"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
@@ -435,4 +428,4 @@ tr.BeveledLabel=Turkish
 uk.BeveledLabel=Ukrainian
 cn.BeveledLabel=Chinese Simplified
 tw.BeveledLabel=Chinese Traditional
-#endif
+#endif 

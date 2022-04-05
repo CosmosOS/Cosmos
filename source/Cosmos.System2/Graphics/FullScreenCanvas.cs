@@ -69,41 +69,13 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas();
             }
-            if (VBEAvailable())
+            else if (VBEAvailable())
             {
                 return new VBECanvas();
             }
             else
             {
                 return new VGACanvas();
-            }
-        }
-
-        /// <summary>
-        /// Checks is VBE is supported exists
-        /// </summary>
-        /// <returns></returns>
-        private static bool VBEAvailable()
-        {
-            if (BGAExists())
-            {
-                return true;
-            }
-            else if (PCI.Exists(VendorID.VirtualBox, DeviceID.VBVGA))
-            {
-                return true;
-            }
-            else if (PCI.Exists(VendorID.Bochs, DeviceID.BGA))
-            {
-                return true;
-            }
-            else if (VBE.IsAvailable())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
 
@@ -119,7 +91,7 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas(mode);
             }
-            if (VBEAvailable())
+            else if (VBEAvailable())
             {
                 return new VBECanvas(mode);
             }
@@ -191,7 +163,7 @@ namespace Cosmos.System.Graphics
                 IsInUse = true;
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
             }
             canvas = null;
@@ -207,6 +179,34 @@ namespace Cosmos.System.Graphics
             Global.mDebugger.SendInternal($"GetCurrentFullScreenCanvas()");
 
             return _VideoDriver;
+        }
+
+        /// <summary>
+        /// Checks is VBE is supported exists
+        /// </summary>
+        /// <returns></returns>
+        private static bool VBEAvailable()
+        {
+            if (BGAExists())
+            {
+                return true;
+            }
+            else if (PCI.Exists(VendorID.VirtualBox, DeviceID.VBVGA))
+            {
+                return true;
+            }
+            else if (PCI.Exists(VendorID.Bochs, DeviceID.BGA))
+            {
+                return true;
+            }
+            else if (VBE.IsAvailable())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

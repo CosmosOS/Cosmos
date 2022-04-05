@@ -13,7 +13,8 @@ namespace Cosmos.HAL.Drivers
     {
 
         private static readonly VBEIOGroup IO = Core.Global.BaseIOGroups.VBE;
-        ManagedMemoryBlock lastbuffer;
+
+        protected ManagedMemoryBlock lastbuffer;
 
         /// <summary>
         /// Register index.
@@ -107,14 +108,14 @@ namespace Cosmos.HAL.Drivers
             }
         }
 
-		/// <summary>
+        /// <summary>
         /// Write value to VBE index.
         /// </summary>
         /// <param name="index">Register index.</param>
         /// <param name="value">Value.</param>
         private static void VBEWrite(RegisterIndex index, ushort value)
         {
-            IO.VbeIndex.Word = (ushort) index;
+            IO.VbeIndex.Word = (ushort)index;
             IO.VbeData.Word = value;
         }
 
@@ -131,8 +132,8 @@ namespace Cosmos.HAL.Drivers
 #endif
             return VBERead(RegisterIndex.DisplayID) == 0xB0C5;
         }
-        
-		/// <summary>
+
+        /// <summary>
         /// Disable display.
         /// </summary>
         public void DisableDisplay()
@@ -186,17 +187,25 @@ namespace Cosmos.HAL.Drivers
         /// <param name="xres">X resolution.</param>
         /// <param name="yres">Y resolution.</param>
         /// <param name="bpp">BPP (color depth).</param>
-        public void VBESet(ushort xres, ushort yres, ushort bpp)
+        public void VBESet(ushort xres, ushort yres, ushort bpp, bool clear = false)
         {
             DisableDisplay();
             SetXResolution(xres);
             SetYResolution(yres);
             SetDisplayBPP(bpp);
-            /*
-             * Re-enable the Display with LinearFrameBuffer and without clearing video memory of previous value 
-             * (this permits to change Mode without losing the previous datas)
-             */ 
-            EnableDisplay(EnableValues.Enabled | EnableValues.UseLinearFrameBuffer | EnableValues.NoClearMemory);
+            if (clear)
+            {
+                EnableDisplay(EnableValues.Enabled | EnableValues.UseLinearFrameBuffer);
+
+            }
+            else
+            {
+                /*
+                * Re-enable the Display with LinearFrameBuffer and without clearing video memory of previous value 
+                * (this permits to change Mode without losing the previous datas)
+                */
+                EnableDisplay(EnableValues.Enabled | EnableValues.UseLinearFrameBuffer | EnableValues.NoClearMemory);
+            }
         }
 
         /// <summary>
@@ -206,7 +215,6 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value to set.</param>
         public void SetVRAM(uint index, byte value)
         {
-            Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as byte)");
             lastbuffer[index] = value;
         }
 
@@ -217,7 +225,6 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value to set.</param>
         public void SetVRAM(uint index, ushort value)
         {
-            //Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as ushort)");
             lastbuffer[index] = (byte)((value >> 8) & 0xFF);
             lastbuffer[index + 1] = (byte)((value >> 0) & 0xFF);
         }
@@ -229,7 +236,6 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value to set.</param>
         public void SetVRAM(uint index, uint value)
         {
-            //Global.mDebugger.SendInternal($"Writing to driver memory in position {index} value {value} (as uint)");
             lastbuffer[index] = (byte)((value >> 24) & 0xFF);
             lastbuffer[index + 1] = (byte)((value >> 16) & 0xFF);
             lastbuffer[index + 2] = (byte)((value >> 8) & 0xFF);
@@ -276,6 +282,18 @@ namespace Cosmos.HAL.Drivers
         /// <param name="aIndex">A index.</param>
         /// <param name="aCount">A count.</param>
         public void CopyVRAM(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            lastbuffer.Copy(aStart, aData, aIndex, aCount);
+        }
+
+        /// <summary>
+        /// Copy VRAM.
+        /// </summary>
+        /// <param name="aStart">A start.</param>
+        /// <param name="aData">A data.</param>
+        /// <param name="aIndex">A index.</param>
+        /// <param name="aCount">A count.</param>
+        public void CopyVRAM(int aStart, byte[] aData, int aIndex, int aCount)
         {
             lastbuffer.Copy(aStart, aData, aIndex, aCount);
         }
