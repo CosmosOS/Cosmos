@@ -84,7 +84,7 @@ namespace Cosmos.TestRunner
             if (!xResult)
             {
                 TestController.Debugger.Send($"Expected value: '{expected}' " + BitConverter.ToString(BitConverter.GetBytes(expected)));
-                TestController.Debugger.Send($"Actual value: '{actual}' " + BitConverter.ToString(BitConverter.GetBytes(expected)));
+                TestController.Debugger.Send($"Actual value: '{actual}' " + BitConverter.ToString(BitConverter.GetBytes(actual)));
                 TestController.Debugger.Send($"Diff: {xResult}");
             }
             IsTrue(xResult, message, file, line);
