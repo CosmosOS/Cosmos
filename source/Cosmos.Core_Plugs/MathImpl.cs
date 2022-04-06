@@ -29,6 +29,12 @@ namespace Cosmos.Core_Plugs
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Assembler = typeof(MathTanASM))]
+        public static double Tan(double d)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class MathRoundASM : AssemblerMethod
@@ -61,6 +67,18 @@ namespace Cosmos.Core_Plugs
             XS.FPU.FloatSine();
             XS.Sub(ESP, 8);
             XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+        }
+    }
+
+    class MathTanASM : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
+            XS.FPU.FloatTan();
+            XS.Sub(ESP, 8);
+            XS.FPU.FloatPop();
+            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64); 
         }
     }
 }

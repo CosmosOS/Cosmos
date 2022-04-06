@@ -1219,16 +1219,6 @@ namespace Cosmos.System_Plugs.System
 
         #endregion Sqrt
 
-        #region Tan
-
-        public static double Tan(double x)
-        {
-            if (double.IsNegativeInfinity(x) || double.IsInfinity(x)) return double.NaN;
-            return Math.Sin(x) / Math.Cos(x);
-        }
-
-        #endregion Tan
-
         #region Tanh
 
         public static double Tanh(double x)
