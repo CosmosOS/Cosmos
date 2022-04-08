@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>DapperExtensions.StrongName</Description>
     <Authors>Rafael.Carvalho</Authors>
-    <TargetFrameworks>net5.0;net472</TargetFrameworks>
+    <TargetFrameworks>net48</TargetFrameworks>
     <PackageId>DapperExtensions.StrongName</PackageId>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>1.50.2</Version>
