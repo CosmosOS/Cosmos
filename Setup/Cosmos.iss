@@ -156,78 +156,7 @@ Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cos
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
-[Code]
-function IsAppRunning(const FileName: string): Boolean;
-var
-  FWMIService: Variant;
-  FSWbemLocator: Variant;
-  FWbemObjectSet: Variant;
-begin
-  Result := false;
-  FSWbemLocator := CreateOleObject('WBEMScripting.SWBEMLocator');
-  FWMIService := FSWbemLocator.ConnectServer('', 'root\CIMV2', '', '');
-  FWbemObjectSet := FWMIService.ExecQuery(Format('SELECT Name FROM Win32_Process Where Name="%s"',[FileName]));
-  Result := (FWbemObjectSet.Count > 0);
-  FWbemObjectSet := Unassigned;
-  FWMIService := Unassigned;
-  FSWbemLocator := Unassigned;
-end;
 
-function IsAppRunningWithResponse(const FileName: string): Boolean;
-var
-  Retry: Integer;
-begin
-  Result := IsAppRunning(FileName);
-  if Result then
-    MsgBox(FileName  + ' is running. Please close the application before running the installer.', mbError, MB_OK);
-end;
-
-function InitializeSetup: boolean;
-var
-  Retry: Integer;
-begin
-for Retry := 0 to 2 do
-  begin
-    Result := not IsAppRunningWithResponse('devenv.exe');
-    if not Result then
-    begin
-      continue;
-    end;
-    Result := not IsAppRunningWithResponse('VSIXInstaller.exe');
-    if not Result then
-    begin
-      continue;
-    end;
-    Result := not IsAppRunningWithResponse('ServiceHub.IdentityHost.exe');
-    if not Result then
-    begin
-      continue;
-    end;
-    Result := not IsAppRunningWithResponse('ServiceHub.VSDetouredHost.exe');
-    if not Result then
-    begin
-      continue;
-    end;
-    Result := not IsAppRunningWithResponse('ServiceHub.Host.Node.x86.exe');
-    if not Result then
-    begin
-      continue;
-    end;
-    Result := not IsAppRunningWithResponse('ServiceHub.SettingsHost.exe');
-    if not Result then
-    begin
-      continue;
-    end;
-    Result := not IsAppRunningWithResponse('ServiceHub.Host.CLR.x86.exe');
-    if not Result then
-    begin
-      continue;
-    end
-    else
-    begin
-      break;
-    end;
-  end;
 end;
 
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
