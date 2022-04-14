@@ -193,7 +193,7 @@ namespace Cosmos.System
         /// <param name="note">A note to play.</param>
         public static void Beep(Notes note)
         {
-            Beep(frequency, (uint) Durations.Default);
+            Beep(note, (uint) Durations.Default);
         }
     }
 }
