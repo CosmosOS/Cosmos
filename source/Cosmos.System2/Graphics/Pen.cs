@@ -88,5 +88,7 @@ namespace Cosmos.System.Graphics
         {
             return $"color: {color} width: {width}";
         }
+
+        public static explicit operator Pen(Color c) => new Pen(c);
     }
 }

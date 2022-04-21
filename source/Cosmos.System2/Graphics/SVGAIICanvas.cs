@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using Cosmos.Debug.Kernel;
+using Cosmos.HAL;
 using Cosmos.HAL.Drivers.PCI.Video;
 using Cosmos.System.Graphics.Fonts;
 
@@ -11,7 +12,7 @@ namespace Cosmos.System.Graphics
     /// <summary>
     /// SVGAIIScreen class. Used to draw ractengales to the screen. See also: <seealso cref="Canvas"/>.
     /// </summary>
-    public class SVGAIICanvas : Canvas
+    public class SVGAIICanvas : BaseCanvas
     {
         /// <summary>
         /// Debugger.
@@ -28,30 +29,36 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// VMWare SVGA 2 driver.
         /// </summary>
-        private readonly VMWareSVGAII _xSVGADriver;
+        private VMWareSVGAII _xSVGADriver;
 
-        /// <summary>
-        /// Create new instance of the <see cref="SVGAIICanvas"/> class.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
-        public SVGAIICanvas()
-            : this(_DefaultMode)
+        public override void Init(Mode mode)
         {
-        }
 
-        /// <summary>
-        /// Create new instance of the <see cref="SVGAIICanvas"/> class.
-        /// </summary>
-        /// <param name="aMode">A graphics mode.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
-        public SVGAIICanvas(Mode aMode)
-        {
-            mSVGAIIDebugger.SendInternal($"Called ctor with mode {aMode}");
-            ThrowIfModeIsNotValid(aMode);
+            mSVGAIIDebugger.SendInternal($"Called ctor with mode {mode}");
+            ThrowIfModeIsNotValid(mode);
 
             _xSVGADriver = new VMWareSVGAII();
-            Mode = aMode;
+
+            SetMode(mode);
         }
+        public override void SetMode(Mode mode)  {
+            Mode = mode;
+        }
+
+        /// <summary>
+        /// SVGA 2 device.
+        /// </summary>
+        private static PCIDevice _SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
+
+        public override bool IsSupported() {
+            if(_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public override CanvasFeature Features => CanvasFeature.IsCosmos;
 
         /// <summary>
         /// Name of the backend
@@ -471,5 +478,6 @@ namespace Cosmos.System.Graphics
                 _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, (i * xWidth), xWidth);
             }
         }
+
     }
 }

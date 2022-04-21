@@ -6,6 +6,17 @@ using Cosmos.System.Graphics.Fonts;
 
 namespace Cosmos.System.Graphics
 {
+
+    [Flags]
+    public enum CanvasFeature
+    {
+        HasExtensions = 1,
+        HasBuffer = 2,
+        HardwareAccelerated = 4,
+        IsOfficial = 7, // is from the HW vender
+        IsCosmos = 15, // is made by the cosmos team
+    }
+
     /// <summary>
     /// Canvas interface.
     /// </summary>
@@ -15,6 +26,11 @@ namespace Cosmos.System.Graphics
          * IReadOnlyList<T> is not working, the Modes inside it become corrupted and then you get Stack Overflow
          */
         //public  IReadOnlyList<Mode> AvailableModes { get; }
+
+        /// <summary>
+        /// denotes if this have method that can be used that are not apart of this interface.
+        /// </summary>
+        public CanvasFeature Features { get; }
 
         /// <summary>
         /// Available graphics modes.
@@ -34,7 +50,12 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// setup the driver.
         /// </summary>
-        public void Init(Mode mode = default);
+        public void Init(Mode mode);
+
+        /// <summary>
+        /// setup the driver.
+        /// </summary>
+        public void Init();
 
         /// <summary>
         /// set the mode.

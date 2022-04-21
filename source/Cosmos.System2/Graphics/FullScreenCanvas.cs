@@ -1,6 +1,8 @@
 //#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
+using System.Security.Cryptography.X509Certificates;
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers;
 
@@ -13,6 +15,7 @@ namespace Cosmos.System.Graphics
     {
 
         public readonly static ICanvas FallBackDriver;
+        public readonly static Mode FakeDefaultMode = new Mode(-1, -1, ColorDepth.ColorDepth4);
 
         static FullScreenCanvas()
         {
@@ -69,30 +72,51 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public static void RemoveDriver(ICanvas canvas)
+        {
+            if(!_Drivers.Contains(canvas))
+            {
+                _Drivers.Remove(canvas);
+            }
+        }
+
         /// <summary>
         /// Get video driver.
         /// </summary>
         /// <param name="mode">Mode.</param>
         /// <returns>Canvas value.</returns>
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
-        private static ICanvas GetVideoDriver(Mode mode = default)
+        private static ICanvas GetVideoDriver(Mode mode)
         {
-            if(mode == default) 
-            {
-                return SupportedDrivers[0]; 
-            }
-            
+            var useFallbackDriver = false;
             foreach (var driver in SupportedDrivers)
             {
+                var targetMode = mode;
+                if(mode == FakeDefaultMode)
+                {
+                    if(driver == FallBackDriver) 
+                    {
+                        useFallbackDriver = true;
+                    }
+                    return driver;
+                }
                 foreach (var m in driver.AvailableModes)
                 {
                     if (m == mode)
                     {
+                        if(driver == FallBackDriver) 
+                        {
+                            useFallbackDriver = true;
+                            continue;
+                        }
                         return driver;
                     }
                 }
             }
-
+            if(useFallbackDriver)
+            {
+                return FallBackDriver;
+            }
             throw new ArgumentOutOfRangeException(nameof(mode), $"Mode {mode} is not supported by any Drivers");
         
         }

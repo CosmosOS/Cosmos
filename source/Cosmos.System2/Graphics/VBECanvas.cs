@@ -10,7 +10,7 @@ namespace Cosmos.System.Graphics
     /// <summary>
     /// VBECanvas class. Used to control screen, by VBE (VESA BIOS Extensions) standard. See also: <seealso cref="Canvas"/>.
     /// </summary>
-    public class VBECanvas : Canvas
+    public class VBECanvas : BaseCanvas
     {
         /// <summary>
         /// Default video mode. 1024x768x32.
@@ -34,6 +34,8 @@ namespace Cosmos.System.Graphics
         {
             _VBEDriver.DisableDisplay();
         }
+
+        public override CanvasFeature Features => CanvasFeature.IsCosmos | CanvasFeature.HasBuffer;
 
         /// <summary>
         /// Name of the backend
@@ -376,7 +378,7 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)_VBEDriver.GetVRAM(offset));
         }
 
-        public override void Init(Mode aMode = default(Mode)) {
+        public override void Init(Mode aMode) {
             Global.mDebugger.SendInternal($"Creating VBECanvas() with mode {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
 
             ThrowIfModeIsNotValid(aMode);

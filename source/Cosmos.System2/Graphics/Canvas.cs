@@ -9,7 +9,7 @@ namespace Cosmos.System.Graphics
     /// <summary>
     /// Canvas abstract class.
     /// </summary>
-    public abstract class Canvas: ICanvas
+    public abstract class BaseCanvas: ICanvas
     {
         /*
          * IReadOnlyList<T> is not working, the Modes inside it become corrupted and then you get Stack Overflow
@@ -30,6 +30,8 @@ namespace Cosmos.System.Graphics
         /// Get and set graphics mode.
         /// </summary>
         public abstract Mode Mode { get; set; }
+
+        public virtual CanvasFeature Features { get; }
 
         /// <summary>
         /// Clear all the Canvas with the Black color.
@@ -1043,7 +1045,7 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="mode">Video mode.</param>
         /// <returns>bool value.</returns>
-        protected bool CheckIfModeIsValid(Mode mode)
+        public bool CheckIfModeIsValid(Mode mode)
         {
             Global.mDebugger.SendInternal($"CheckIfModeIsValid");
 
@@ -1080,7 +1082,7 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="mode">Video mode.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
-        protected void ThrowIfModeIsNotValid(Mode mode)
+        public void ThrowIfModeIsNotValid(Mode mode)
         {
             if (CheckIfModeIsValid(mode))
             {
@@ -1097,7 +1099,7 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="point">Point on the convas.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coordinates are invalid.</exception>
-        protected void ThrowIfCoordNotValid(Point point)
+        public void ThrowIfCoordNotValid(Point point)
         {
             ThrowIfCoordNotValid(point.X, point.Y);
         }
@@ -1108,7 +1110,7 @@ namespace Cosmos.System.Graphics
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coordinates are invalid.</exception>
-        protected void ThrowIfCoordNotValid(int x, int y)
+        public void ThrowIfCoordNotValid(int x, int y)
         {
             if (x < 0 || x >= Mode.Columns)
             {
@@ -1230,8 +1232,14 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb(R, G, B);
         }
 
+        public virtual void Init()
+        {
+            Init(DefaultGraphicMode);
+        }
+
         public abstract void Init(Mode mode = default(Mode));
         public abstract void SetMode(Mode mode);
         public abstract bool IsSupported();
+
     }
 }

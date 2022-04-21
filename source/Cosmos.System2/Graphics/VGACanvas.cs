@@ -10,7 +10,7 @@ namespace Cosmos.System.Graphics
     /// <summary>
     /// VGACanvas class. Used to control screen.
     /// </summary>
-    public class VGACanvas : Canvas
+    public class VGACanvas : BaseCanvas
     {
         /// <summary>
         /// Private boolean whether VGA graphics mode is enabled or not
@@ -20,13 +20,13 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// The HAL VGA driver
         /// </summary>
-        private readonly VGADriver _VGADriver;
+        private VGADriver _VGADriver;
 
         /// <summary>
         /// VGA graphics mode Canvas constructor - see Canvas.cs
         /// </summary>
         /// <param name="aMode"></param>
-        public VGACanvas(Mode aMode) : base()
+        public override void Init(Mode aMode)
         {
             Global.mDebugger.Send("Creating VGACanvas with mode");
             _VGADriver = new VGADriver();
@@ -34,18 +34,10 @@ namespace Cosmos.System.Graphics
             Mode = aMode;
             Enabled = true;
         }
+        public override void SetMode(Mode mode) => throw new NotImplementedException();
+        public override bool IsSupported() => throw new NotImplementedException();
 
-        /// <summary>
-        /// Creates a VGA graphics mode with the default mode
-        /// </summary>
-        public VGACanvas() : base()
-        {
-            Enabled = true;
-            Mode = DefaultGraphicMode;
-            Global.mDebugger.Send("Creating VGACanvas with standard mode");
-            _VGADriver = new VGADriver();
-            _VGADriver.SetGraphicsMode(ModeToScreenSize(DefaultGraphicMode), (VGADriver.ColorDepth)(int)DefaultGraphicMode.ColorDepth);
-        }
+        public override CanvasFeature Features => CanvasFeature.IsCosmos;
 
         /// <summary>
         /// Name of the backend
@@ -428,8 +420,6 @@ namespace Cosmos.System.Graphics
 
         }
 
-        public override void Init(Mode mode = default(Mode)) => throw new NotImplementedException();
-        public override void SetMode(Mode mode) => throw new NotImplementedException();
-        public override bool IsSupported() => throw new NotImplementedException();
+
     }
 }
