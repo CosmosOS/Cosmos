@@ -43,7 +43,7 @@ namespace GraphicTest
         {
         }
 
-        private void DoTest(Canvas aCanvas)
+        private void DoTest(ICanvas aCanvas)
         {
             mDebugger.Send($"Testing Canvas with mode {aCanvas.Mode}");
             aCanvas.Clear(Color.Blue);
@@ -167,7 +167,7 @@ namespace GraphicTest
             TestBitmaps();
 
             /* First test with the DefaultMode */
-            Canvas canvas = FullScreenCanvas.GetFullScreenCanvas();
+            ICanvas canvas = FullScreenCanvas.GetFullScreenCanvas();
             DoTest(canvas);
 
             DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32)));
@@ -175,11 +175,12 @@ namespace GraphicTest
             DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 1024, ColorDepth.ColorDepth32)));
             DoTest(FullScreenCanvas.GetFullScreenCanvas(new Mode(1280, 720, ColorDepth.ColorDepth32)));
 
-            VGACanvas vGACanvas = new VGACanvas(new Mode(320, 200, ColorDepth.ColorDepth8));
+            VGACanvas vGACanvas = new VGACanvas();
+            vGACanvas.Init(new Mode(320, 200, ColorDepth.ColorDepth8));
             DoTest(vGACanvas);
-            vGACanvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
+            vGACanvas.Init(new Mode(720, 480, ColorDepth.ColorDepth4));
             DoTest(vGACanvas);
-            vGACanvas = new VGACanvas(new Mode(640, 480, ColorDepth.ColorDepth4));
+            vGACanvas.Init(new Mode(640, 480, ColorDepth.ColorDepth4));
             DoTest(vGACanvas);
             Console.BackgroundColor = ConsoleColor.Black;
             for (int i = 0; i < 16; i++)
