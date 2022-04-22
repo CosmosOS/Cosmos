@@ -131,7 +131,7 @@ namespace Cosmos.System.Graphics
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
 
-            _VideoDriver = GetVideoDriver();
+            _VideoDriver = GetVideoDriver(FakeDefaultMode);
             _VideoDriver.Init(_VideoDriver.DefaultGraphicMode);
             IsInUse = true;
             return _VideoDriver;
