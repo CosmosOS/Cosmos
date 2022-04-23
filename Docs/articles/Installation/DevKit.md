@@ -5,6 +5,7 @@
    * You must clone the repository using Git. For a detailed walkthrough, [see here](https://help.github.com/articles/fork-a-repo/).
    * When following the tutorial, replace *OctoCat* with *CosmosOS* and *Spoon-Knife* with *Cosmos*.
 * (Free) [Visual Studio 2019 Community](https://visualstudio.microsoft.com/vs/)  
+* * (Optional, Free) [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 * (Free) [InnoSetup QuickStart Kit](http://www.jrsoftware.org/isdl.php#qsp)
    * This is required to build the setup kit which is used to build and install the Visual Studio integration libaries for Cosmos.
     * During install it will ask you about optional components to install. Be sure you check "Install Inno Setup Preprocessor".
@@ -25,3 +26,10 @@ The `install-VS2019.bat` accepts the following parameters :
 - `-NOVSLAUNCH` Don't launch VS after installation.
 - `-IGNOREVS` Ignore running VS during installation.
 - `-VSEXPHIVE` or `/VSEXPHIVE` Use Visual Studio Experimental Hive for installation.
+
+## Installation for Visual Studio 2022
+Installing COSMOS with Visual Studio 2022 takes more effort as it is not fully supported, which is why it is recommended to download Visual Studio 2019 instead. **NOTE:** You can only install the DevKit for VS2022. Running `userkit install.bat` will use VS2019 instead.
+
+* [Download the DevKit on the VS2022 branch](https://github.com/CosmosOS/Cosmos/tree/VS2022)
+* Run `install-VS2022.bat` with admin privileges (UAC will ask for permission), needed for install in system directories.
+* When the installation is complete, Visual Studio will automatically open and you may begin programming with your new, modified copy of Cosmos.
