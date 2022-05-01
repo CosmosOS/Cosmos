@@ -84,7 +84,7 @@ VFSManager.RegisterVFS(fs);
 using(var xServer = new FtpServer(fs, "0:\\"))
 {
     /** Listen for new FTP client connections **/
-    ftpSever.Listen();
+    FtpServer.Listen();
 }
 ```
 
