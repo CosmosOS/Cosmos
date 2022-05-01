@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace Cosmos.Build.Builder.BuildTasks
 {
@@ -74,7 +76,7 @@ namespace Cosmos.Build.Builder.BuildTasks
                     string error = "";
                     foreach (var item in Lines)
                     {
-                        if (item.Contains("error"))
+                        if (item.ToLower().Contains("error"))
                         {
                             error += item + "\n";
                         }
@@ -92,6 +94,8 @@ namespace Cosmos.Build.Builder.BuildTasks
         {
             while (true)
             {
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                         new Action(delegate { }));
                 var line = await reader.ReadLineAsync().ConfigureAwait(false);
 
                 if (line == null)

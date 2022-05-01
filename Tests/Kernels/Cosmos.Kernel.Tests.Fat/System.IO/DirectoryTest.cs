@@ -14,9 +14,9 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
         {
             mDebugger.Send("START TEST: Delete a directory:");
             Directory.CreateDirectory(@"0:\TestDir1");
-            Assert.IsTrue(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't created!");
+            Assert.IsTrue(Directory.Exists(@"0:\TestDir1"), "TestDir1 was created!");
             Directory.Delete(@"0:\TestDir1");
-            Assert.IsFalse(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't deleted!");
+            Assert.IsFalse(Directory.Exists(@"0:\TestDir1"), "TestDir1 was deleted!");
             mDebugger.Send("END TEST");
 
             mDebugger.Send("");

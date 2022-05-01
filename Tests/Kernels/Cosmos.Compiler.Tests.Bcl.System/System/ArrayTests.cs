@@ -8,7 +8,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 {
     class ArrayTests
     {
-        public static void Execute()
+        public static unsafe void Execute()
         {
             byte[] xEmptyByteArray = Array.Empty<byte>();
             object[] xEmptyObjectArray = Array.Empty<object>();
@@ -82,10 +82,45 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             }
             Assert.IsTrue(error && y == 2, "Index out of range exception works correctly for too small positions.");
 
-            //string[] stringArray = new string[10];
-            //stringArray[0] += "asd";
-            //Assert.AreEqual(stringArray[0], "asd", "Adding directly to array works");
+            fixed (int* val = x)
+            {
+                Assert.AreEqual(1, val[0], "Accessing values using pointer works at offset 0");
+                Assert.AreEqual(2, val[1], "Accessing values using pointer works at offset 1");
+                Assert.AreEqual(4, val[3], "Accessing values using pointer works at offset 3");
+                Assert.AreEqual(5, val[4], "Accessing values using pointer works at offset 4");
+            }
+            int[] arr = new int[] { 0, 1, 2, 3, 4 };
 
+            arr[2] = 6;
+
+            // Try reading the values from the array via a pointer
+            fixed (int* val = arr)
+            {
+                Assert.AreEqual(0, val[0], "Accessing values using pointer works at offset 0");
+                Assert.AreEqual(1, val[1], "Accessing values using pointer works at offset 1");
+                Assert.AreEqual(3, val[3], "Accessing values using pointer works at offset 3");
+                Assert.AreEqual(4, val[4], "Accessing values using pointer works at offset 4");
+            }
+
+
+            char[] charArray = new char[] { 'A', 'a', 'Z', 'z', 'l' };
+            charArray[2] = 'k';
+            fixed (char* val = charArray)
+            {
+                Assert.AreEqual('A', val[0], "Accessing values using pointer works at offset 0");
+                Assert.AreEqual('a', val[1], "Accessing values using pointer works at offset 1");
+                Assert.AreEqual('z', val[3], "Accessing values using pointer works at offset 3");
+                Assert.AreEqual('l', val[4], "Accessing values using pointer works at offset 4");
+            }
+
+            string[] stringArray = new string[] { "ABC", "BAB", "TAT", "A", "", "LA" };
+            Array.Resize(ref stringArray, 3);
+            Assert.AreEqual(new string[] { "ABC", "BAB", "TAT" }, stringArray, "Array.Resize works");
+
+            stringArray = new string[10];
+            stringArray[0] += "asd";
+            Assert.AreEqual(stringArray[0], "asd", "Adding directly to array works");
+            
             // Lets test the normal interface methods
             Assert.AreEqual(5, x.Length, "Length of array is correct");
             var objEnumerator = x.GetEnumerator();
@@ -132,7 +167,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             IReadOnlyCollection<int> readOnlyCollection = x;
             Assert.AreEqual(5, readOnlyCollection.Count, "Getting Count from array as IReadOnlyCollection<int> works");
-
         }
     }
 }

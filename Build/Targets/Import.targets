@@ -1,28 +1,28 @@
 <Project>
 
-    <PropertyGroup>
-        <IsToolProject Condition="'$(IsMSBuildExtensionProject)' == 'True'">True</IsToolProject>
-    </PropertyGroup>
+	<PropertyGroup>
+		<IsToolProject Condition="'$(IsMSBuildExtensionProject)' == 'True'">True</IsToolProject>
+	</PropertyGroup>
 
-    <Import Project="InternalsVisibleTo.targets" />
+	<Import Project="InternalsVisibleTo.targets" />
 
-    <Import Project="PackageProperties.targets" />
-        
-    <Import Project="References.targets" />
+	<Import Project="PackageProperties.targets" />
+		
+	<Import Project="References.targets" />
 
-    <Import Project="StrongName.targets" />
+	<Import Project="StrongName.targets" />
 
-    <!-- Project types -->
-    <Import Project="MSBuildExtension.targets" Condition="'$(IsMSBuildExtensionProject)' == 'True'" />
-    <Import Project="Templates.targets" Condition="'$(IsTemplatesProject)' == 'True'" />
-    <Import Project="Tests.targets" Condition="'$(IsTestProject)' == 'True'" />
-    <Import Project="Tool.targets" Condition="'$(IsToolProject)' == 'True'" />
-    <Import Project="VSIX.targets" Condition="'$(IsVsixProject)' == 'True'" />
+	<!-- Project types -->
+	<Import Project="MSBuildExtension.targets" Condition="'$(IsMSBuildExtensionProject)' == 'True'" />
+	<Import Project="Templates.targets" Condition="'$(IsTemplatesProject)' == 'True'" />
+	<Import Project="Tests.targets" Condition="'$(IsTestProject)' == 'True'" />
+	<Import Project="Tool.targets" Condition="'$(IsToolProject)' == 'True'" />
+	<Import Project="VSIX.targets" Condition="'$(IsVsixProject)' == 'True'" />
 
-    <Import Project="Workarounds.targets" />
+	<Import Project="Workarounds.targets" />
 
-    <Import Project="InternalPackages.targets" />
+	<Import Project="InternalPackages.targets" />
 
-    <Import Project="PackageVersions.targets" />
+	<Import Project="PackageVersions.targets" />
 
 </Project>

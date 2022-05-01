@@ -17,8 +17,19 @@ namespace Cosmos.HAL.BlockDevice
 	// initializing another ATA class in favour of AtaPio
 	public class ATA_PIO : Ata
 	{
-		#region Properties
-		protected Core.IOGroup.ATA IO;
+        #region Properties
+        public override BlockDeviceType Type
+        {
+            get
+            {
+                if (DriveType == SpecLevel.ATAPI)
+                {
+                    return BlockDeviceType.RemovableCD;
+                }
+                return BlockDeviceType.HardDrive;
+            }
+        }
+        protected Core.IOGroup.ATA IO;
 
 		protected SpecLevel mDriveType = SpecLevel.Null;
 		public SpecLevel DriveType
@@ -335,7 +346,7 @@ namespace Cosmos.HAL.BlockDevice
 			// At that point, if ERR is clear, the data is ready to read from the Data port (0x1F0). Read 256 words, and store them.
 
 			// Read Identification Space of the Device
-			var xBuff = new UInt16[256];
+			var xBuff = new ushort[256];
 			IO.Data.Read16(xBuff);
 			mSerialNo = GetString(xBuff, 10, 20);
 			mFirmwareRev = GetString(xBuff, 23, 8);
@@ -345,7 +356,7 @@ namespace Cosmos.HAL.BlockDevice
 			//sectors in 28-bit addressing and shall not exceed 0FFFFFFFh.  The content of words (61:60) shall
 			//be greater than or equal to one and less than or equal to 268,435,455.
 			// We need 28 bit addressing - small drives on VMWare and possibly other cases are 28 bit
-			mBlockCount = ((UInt32)xBuff[61] << 16 | xBuff[60]) - 1;
+			mBlockCount = ((uint)xBuff[61] << 16 | xBuff[60]) - 1;
 
 			//Words (103:100) shall contain the value one greater than the total number of user-addressable
 			//sectors in 48-bit addressing and shall not exceed 0000FFFFFFFFFFFFh.
@@ -355,7 +366,7 @@ namespace Cosmos.HAL.BlockDevice
 			// LBA48Bit = mBlockCount > 0x0FFFFFFF;
 			if (LBA48Bit)
 			{
-				mBlockCount = ((UInt64)xBuff[102] << 32 | (UInt64)xBuff[101] << 16 | (UInt64)xBuff[100]) - 1;
+				mBlockCount = ((ulong)xBuff[102] << 32 | (ulong)xBuff[101] << 16 | (ulong)xBuff[100]) - 1;
 			}
 		}
 
@@ -364,7 +375,7 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
         /// <param name="aSectorNo"></param>
         /// <param name="aSectorCount"></param>
-		protected void SelectSector(UInt64 aSectorNo, UInt64 aSectorCount)
+		protected void SelectSector(ulong aSectorNo, ulong aSectorCount)
 		{
 			CheckBlockNo(aSectorNo, aSectorCount);
 			//TODO: Check for 48 bit sectorno mode and select 48 bits
@@ -399,7 +410,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aBlockNo"></param>
         /// <param name="aBlockCount"></param>
         /// <param name="aData"></param>
-		public override void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
+		public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
 		{
 			CheckDataSize(aData, aBlockCount);
 			SelectSector(aBlockNo, aBlockCount);
@@ -414,17 +425,17 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aBlockNo"></param>
         /// <param name="aBlockCount"></param>
         /// <param name="aData"></param>
-		public override void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, ref byte[] aData)
+		public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
 		{
             CheckDataSize(aData, aBlockCount);
             SelectSector(aBlockNo, aBlockCount);
 			SendCmd(LBA48Bit ? Cmd.WritePioExt : Cmd.WritePio);
 
-			UInt16 xValue;
+            ushort xValue;
 
 			for (long i = 0; i < aData.Length / 2; i++)
 			{
-				xValue = (UInt16)((aData[i * 2 + 1] << 8) | aData[i * 2]);
+				xValue = (ushort)((aData[i * 2 + 1] << 8) | aData[i * 2]);
 				IO.Data.Word = xValue;
 				Wait();
 				// There must be a tiny delay between each OUTSW output word. A jmp $+2 size of delay.

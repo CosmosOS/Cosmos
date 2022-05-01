@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -159,9 +159,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             result = Math.Cos(Math.PI);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1), "Cos gives correct answer for PI");
-
+            
             result = Math.Cos(Math.PI / 2);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 6.12323399573677E-17), "Cos gives correct answer for PI / 2");
+            Assert.AreEqual(0.0, result, "Cos gives correct answer for PI / 2");
 
             result = Math.Cos(Math.PI / 3);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.5), "Cos gives correct answer for PI / 3");
@@ -235,10 +235,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(double.IsNaN(result), "Sin works with -INF");
 
             result = Math.Sin(Math.PI);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.22464679914735E-16), "Sin gives correct answer for PI");
+            Assert.AreEqual(0.0, result, "Sin gives correct answer for PI");
 
             result = Math.Sin(Math.PI / 2);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1), "Sin gives correct answer for PI / 2");
+            Assert.AreEqual(1.0, result, "Sin gives correct answer for PI / 2");
 
             result = Math.Sin(Math.PI / 3);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0.866025403784439), "Sin gives correct answer for PI / 3");
@@ -416,12 +416,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             result = Math.Tan(-0.5);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -0.54630248984379), "Tan works with negative doubles");
 
-            result = Math.Tan(Math.PI);
-            Assert.IsTrue(result <= -.22464679914735E-16, "Tan gives matching result for Pi but mathematically inaccurate result. " + result);
-
-            result = Math.Tan(Math.PI / 2);
-            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 1.63312393531954E+16), "Tan gives result matching normal Math function but incorrect in mathematical sense");
-
             result = Math.Tan(Math.PI / 3);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, Math.Sqrt(3)), "Tan gives correct value for PI / 3");
 
@@ -466,6 +460,18 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, -1.5707963267949), "Atan works with -INF");
 
             #endregion Math.Atan
+
+            #region Math.Round
+
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(1, Math.Round(0.8)), "Math.Round works for 0.8");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(0, Math.Round(0.2)), "Math.Round works for 0.2");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(99, Math.Round(99.2)), "Math.Round works for 99.2");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(99, Math.Round(99d)), "Math.Round works for 99");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(0, Math.Round(-0.2)), "Math.Round works for -0.2");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(-1, Math.Round(-0.8)), "Math.Round works for -0.8");
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(0, Math.Round(-0.000000006494348)), "Math.Round works for very small values");
+
+            #endregion
         }
     }
 }

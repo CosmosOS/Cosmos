@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Cosmos.HAL;
 using IL2CPU.API.Attribs;
 
@@ -22,9 +23,54 @@ namespace Cosmos.System_Plugs.System.Threading
             throw new NotImplementedException("Thread.Yield()");
         }
 
-        public static void SpinWaitInternal(object iterations)
+        public static int get_ManagedThreadId(object aItem)
         {
-            throw new NotImplementedException("Thread.SpinWaitInternal()");
+            throw new NotImplementedException();
+        }
+
+        public static int GetCurrentProcessorNumber()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static int GetOptimalMaxSpinWaitsPerSpinIterationInternal()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Thread GetCurrentThreadNative()
+        {
+            return null;
+        }
+
+        public static void MemoryBarrier()
+        {
+
+        }
+
+        public static void SetBackgroundNative(Thread aThis, bool aBool)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void StartupSetApartmentStateInternal(Thread aThis)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void StartInternal(Thread aThis)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void SetStart(Thread aThis, Delegate aDelegate, int aInt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void SpinWait(int aInt)
+        {
+            throw new NotImplementedException();
         }
     }
 }

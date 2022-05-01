@@ -54,6 +54,13 @@ namespace Cosmos.System.Tests
         }
 
         [Test]
+        public void DirectoryOperationTest()
+        {
+            //var xEntry = VFSManager.CreateDirectory(@"0:\TestDir1");
+
+        }
+
+        [Test]
         public void Create_A_Subdirectory_Entry()
         {
             var xRootDirectory = mFS.GetRootDirectory();

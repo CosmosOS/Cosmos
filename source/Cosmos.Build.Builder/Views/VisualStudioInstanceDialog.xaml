@@ -10,12 +10,11 @@
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         Title="Choose Visual Studio Instance"
-        WindowStartupLocation="CenterOwner"
-        ui:WindowHelper.UseModernWindowStyle="True">
+        WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <Style TargetType="Button" BasedOn="{ui:StaticResource DefaultButtonStyle}">
+        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Margin" Value="4" />
             <Setter Property="MinWidth" Value="48" />
             <Setter Property="Padding" Value="8,3" />

@@ -1,8 +1,0 @@
-<Project>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Build.Framework" PrivateAssets="All" ExcludeAssets="Runtime" Version="16.9.0" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" PrivateAssets="All" ExcludeAssets="Runtime" Version="16.9.0" />
-    </ItemGroup>
-
-</Project>

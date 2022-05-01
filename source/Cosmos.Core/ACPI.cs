@@ -84,10 +84,6 @@ namespace Cosmos.Core
         /// </summary>
         private static short SLP_EN;
         /// <summary>
-        /// SCI EN.
-        /// </summary>
-        private static short SCI_EN;
-        /// <summary>
         /// PM1 CNT LEN1
         /// </summary>
         private static byte PM1_CNT_LEN;
@@ -194,7 +190,9 @@ namespace Cosmos.Core
             byte* check = (byte*)address;
 
             for (int i = 0; i < 20; i++)
+            {
                 sum += *(check++);
+            }
 
             return (sum == 0);
         }
@@ -207,10 +205,14 @@ namespace Cosmos.Core
         public static void Start(bool initialize = true, bool enable = true)
         {
             if (initialize)
+            {
                 Init();
+            }
 
             if (enable)
+            {
                 Enable();
+            }
         }
 
         /// <summary>
@@ -221,14 +223,18 @@ namespace Cosmos.Core
         {
             Console.Clear();
             if (PM1a_CNT == null)
+            {
                 Init();
+            }
 
             pm1aIO.Word = (ushort)(SLP_TYPa | SLP_EN);
 
             if (PM1b_CNT != null)
+            {
                 pm1bIO.Word = (ushort)(SLP_TYPb | SLP_EN);
+            }
 
-            Global.CPU.Halt();
+            CPU.Halt();
         }
 
         /// <summary>
@@ -295,7 +301,9 @@ namespace Cosmos.Core
                         while (0 < dsdtLength--)
                         {
                             if (Compare("_S5_", S5Addr) == 0)
+                            {
                                 break;
+                            }
                             S5Addr++;
                         }
 
@@ -306,11 +314,15 @@ namespace Cosmos.Core
                                 S5Addr += 5;
                                 S5Addr += ((*S5Addr & 0xC0) >> 6) + 2;
                                 if (*S5Addr == 0x0A)
+                                {
                                     S5Addr++;
+                                }
                                 SLP_TYPa = (short)(*(S5Addr) << 10);
                                 S5Addr++;
                                 if (*S5Addr == 0x0A)
+                                {
                                     S5Addr++;
+                                }
                                 SLP_TYPb = (short)(*(S5Addr) << 10);
                                 SMI_CMD = facpget(1);
                                 ACPI_ENABLE = facpbget(0);
@@ -319,7 +331,6 @@ namespace Cosmos.Core
                                 PM1b_CNT = facpget(3);
                                 PM1_CNT_LEN = facpbget(3);
                                 SLP_EN = 1 << 13;
-                                SCI_EN = 1;
 
                                 smiIO = new IOPort((ushort)SMI_CMD);
                                 pm1aIO = new IOPort((ushort)PM1a_CNT);
@@ -359,16 +370,26 @@ namespace Cosmos.Core
         private static unsafe uint RSDPAddress()
         {
             for (uint addr = 0xE0000; addr < 0x100000; addr += 4)
+            {
                 if (Compare("RSD PTR ", (byte*)addr) == 0)
+                {
                     if (Check_RSD(addr))
+                    {
                         return addr;
+                    }
+                }
+            }
 
             uint ebda_address = *((uint*)0x040E);
             ebda_address = (ebda_address * 0x10) & 0x000fffff;
 
             for (uint addr = ebda_address; addr < ebda_address + 1024; addr += 4)
+            {
                 if (Compare("RSD PTR ", (byte*)addr) == 0)
+                {
                     return addr;
+                }
+            }
 
             return 0;
         }
@@ -381,7 +402,7 @@ namespace Cosmos.Core
         private static uint* acpiCheckRSDPtr(uint* ptr)
         {
             string sig = "RSD PTR ";
-            RSDPtr* rsdp = (RSDPtr*)ptr;
+            var rsdp = (RSDPtr*)ptr;
 
             byte* bptr;
             byte check = 0;
@@ -402,7 +423,9 @@ namespace Cosmos.Core
                     Compare("RSDT", (byte*)rsdp->RsdtAddress);
 
                     if (rsdp->RsdtAddress != 0)
+                    {
                         return (uint*)rsdp->RsdtAddress;
+                    }
                 }
             }
 

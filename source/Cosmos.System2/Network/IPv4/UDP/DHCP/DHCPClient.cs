@@ -18,7 +18,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     /// </summary>
     public class DHCPClient : UdpClient
     {
-        // <summary>
+        /// <summary>
         /// Is DHCP ascked check variable
         /// </summary>
         private bool asked = false;
@@ -44,7 +44,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// <summary>
         /// Receive data
         /// </summary>
-        /// <param name="timeout">timeout value, default 5000ms
+        /// <param name="timeout">timeout value, default 5000ms</param>
         /// <returns>time value (-1 = timeout)</returns>
         /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
         private int Receive(int timeout = 5000)
@@ -71,7 +71,8 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             {
                 if (packet.RawData[284] == 0x02) //Offer packet received
                 {
-                    return SendRequestPacket(packet.Client, packet.Server);
+                    Global.mDebugger.Send("Offer received.");
+                    return SendRequestPacket(packet.Client);
                 }
                 else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
                 {
@@ -136,11 +137,11 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// Send a request to apply the new IP configuration
         /// </summary>
         /// <returns>time value (-1 = timeout)</returns>
-        private int SendRequestPacket(Address RequestedAddress, Address DHCPServerAddress)
+        private int SendRequestPacket(Address RequestedAddress)
         {
             foreach (NetworkDevice networkDevice in NetworkDevice.Devices)
             {
-                var dhcp_request = new DHCPRequest(networkDevice.MACAddress, RequestedAddress, DHCPServerAddress);
+                var dhcp_request = new DHCPRequest(networkDevice.MACAddress, RequestedAddress);
                 OutgoingBuffer.AddPacket(dhcp_request);
                 NetworkStack.Update();
             }

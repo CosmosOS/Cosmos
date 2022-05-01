@@ -110,14 +110,14 @@ namespace DapperExtensions
                 action();
                 Commit();
             }
-            catch (Exception ex)
+            catch
             {
                 if (HasActiveTransaction)
                 {
                     Rollback();
                 }
 
-                throw ex;
+                throw;
             }
         }
 
@@ -130,14 +130,14 @@ namespace DapperExtensions
                 Commit();
                 return result;
             }
-            catch (Exception ex)
+            catch
             {
                 if (HasActiveTransaction)
                 {
                     Rollback();
                 }
 
-                throw ex;
+                throw;
             }
         }
         

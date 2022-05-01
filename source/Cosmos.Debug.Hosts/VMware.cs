@@ -52,7 +52,7 @@ namespace Cosmos.Debug.Hosts {
     //}
 
     protected string GetPathname(string aKey, string aEXE) {
-      using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\VMware, Inc.\" + aKey, false)) {
+      using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\WOW6432Node\VMware, Inc.\" + aKey, false)) {
         if (xRegKey != null) {
           string xResult = Path.Combine(((string)xRegKey.GetValue("InstallPath")), aEXE);
           if (File.Exists(xResult)) {
@@ -88,7 +88,7 @@ namespace Cosmos.Debug.Hosts {
       }
       xPSI.UseShellExecute = false;  //must be true to allow elevate the process, sometimes needed if vmware only runs with admin rights
       mProcess.EnableRaisingEvents = true;
-      mProcess.Exited += delegate(Object aSender, EventArgs e) {
+      mProcess.Exited += delegate(object aSender, EventArgs e) {
         if (OnShutDown != null) {
           OnShutDown(aSender, e);
         }

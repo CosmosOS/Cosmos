@@ -1,4 +1,6 @@
+#define COSMOSDEBUG
 using System;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Asm
@@ -10,6 +12,11 @@ namespace Cosmos.Core_Asm
         public static int get_Length(Array aThis)
         {
             throw new NotImplementedException();
+        }
+
+        public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length)
+        {
+            Copy(sourceArray, sourceIndex, destinationArray, destinationIndex, length, false);
         }
 
         [PlugMethod(Assembler = typeof(ArrayInternalCopyAsm))]

@@ -10,9 +10,7 @@
         ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
         Title="Cosmos Kit Builder"
-        WindowStartupLocation="CenterOwner"
-        xmlns:ui="http://schemas.modernwpf.com/2019"
-        ui:WindowHelper.UseModernWindowStyle="True">
+        WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 

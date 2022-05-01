@@ -14,7 +14,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
         {
             //TODO: Do application level testing to determine the most frequent comparisons and do those type checks first.
 
-            if (aType == typeof(Byte))
+            if (aType == typeof(byte))
             {
                 return new ByteComparer();
             }
@@ -24,7 +24,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableByteComparer();
             //}
 
-            if (aType == typeof(SByte))
+            if (aType == typeof(sbyte))
             {
                 return new SByteComparer();
             }
@@ -39,7 +39,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
                 return new StringComparer();
             }
 
-            if (aType == typeof(Int32))
+            if (aType == typeof(int))
             {
                 return new Int32Comparer();
             }
@@ -49,7 +49,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableInt32Comparer();
             //}
 
-            if (aType == typeof(UInt32))
+            if (aType == typeof(uint))
             {
                 return new UInt32Comparer();
             }
@@ -59,7 +59,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableUInt32Comparer();
             //}
 
-            if (aType == typeof(Int64))
+            if (aType == typeof(long))
             {
                 return new Int64Comparer();
             }
@@ -69,7 +69,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableInt64Comparer();
             //}
 
-            if (aType == typeof(UInt64))
+            if (aType == typeof(ulong))
             {
                 return new UInt64Comparer();
             }
@@ -79,7 +79,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableUInt64Comparer();
             //}
 
-            if (aType == typeof(Char))
+            if (aType == typeof(char))
             {
                 return new CharComparer();
             }
@@ -89,7 +89,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableCharComparer();
             //}
 
-            if (aType == typeof(Int16))
+            if (aType == typeof(short))
             {
                 return new Int16Comparer();
             }
@@ -99,7 +99,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableInt16Comparer();
             //}
 
-            if (aType == typeof(UInt16))
+            if (aType == typeof(ushort))
             {
                 return new UInt16Comparer();
             }
@@ -153,7 +153,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
         {
             //TODO: Do application level testing to determine the most frequent comparisons and do those type checks first.
 
-            if (aType == typeof(Byte))
+            if (aType == typeof(byte))
             {
                 return new ByteEqualityComparer();
             }
@@ -163,7 +163,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableByteEqualityComparer();
             //}
 
-            if (aType == typeof(SByte))
+            if (aType == typeof(sbyte))
             {
                 return new SByteEqualityComparer();
             }
@@ -173,12 +173,12 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableSByteEqualityComparer();
             //}
 
-            if (aType == typeof(String))
+            if (aType == typeof(string))
             {
                 return new StringEqualityComparer();
             }
 
-            if (aType == typeof(Int32))
+            if (aType == typeof(int))
             {
                 return new Int32EqualityComparer();
             }
@@ -188,7 +188,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableInt32EqualityComparer();
             //}
 
-            if (aType == typeof(UInt32))
+            if (aType == typeof(uint))
             {
                 return new UInt32EqualityComparer();
             }
@@ -198,7 +198,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableUInt32EqualityComparer();
             //}
 
-            if (aType == typeof(Int64))
+            if (aType == typeof(long))
             {
                 return new Int64EqualityComparer();
             }
@@ -208,7 +208,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableInt64EqualityComparer();
             //}
 
-            if (aType == typeof(UInt64))
+            if (aType == typeof(ulong))
             {
                 return new UInt64EqualityComparer();
             }
@@ -218,7 +218,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableUInt64EqualityComparer();
             //}
 
-            if (aType == typeof(Char))
+            if (aType == typeof(char))
             {
                 return new CharEqualityComparer();
             }
@@ -228,7 +228,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableCharEqualityComparer();
             //}
 
-            if (aType == typeof(Int16))
+            if (aType == typeof(short))
             {
                 return new Int16EqualityComparer();
             }
@@ -238,7 +238,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             //    return new NullableInt16EqualityComparer();
             //}
 
-            if (aType == typeof(UInt16))
+            if (aType == typeof(ushort))
             {
                 return new UInt16EqualityComparer();
             }
@@ -300,7 +300,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
         }
     }
 
-    public class CharComparer : Comparer<Char>
+    public class CharComparer : Comparer<char>
     {
         public override int Compare(char x, char y)
         {
@@ -331,9 +331,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class ByteComparer : Comparer<Byte>
+    public class ByteComparer : Comparer<byte>
     {
-        public override int Compare(Byte x, Byte y)
+        public override int Compare(byte x, byte y)
         {
             return x.CompareTo(y);
         }
@@ -362,9 +362,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class SByteComparer : Comparer<SByte>
+    public class SByteComparer : Comparer<sbyte>
     {
-        public override int Compare(SByte x, SByte y)
+        public override int Compare(sbyte x, sbyte y)
         {
             return x.CompareTo(y);
         }
@@ -393,9 +393,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class Int16Comparer : Comparer<Int16>
+    public class Int16Comparer : Comparer<short>
     {
-        public override int Compare(Int16 x, Int16 y)
+        public override int Compare(short x, short y)
         {
             return x.CompareTo(y);
         }
@@ -424,9 +424,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class UInt16Comparer : Comparer<UInt16>
+    public class UInt16Comparer : Comparer<ushort>
     {
-        public override int Compare(UInt16 x, UInt16 y)
+        public override int Compare(ushort x, ushort y)
         {
             return x.CompareTo(y);
         }
@@ -455,9 +455,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class Int32Comparer : Comparer<Int32>
+    public class Int32Comparer : Comparer<int>
     {
-        public override int Compare(Int32 x, Int32 y)
+        public override int Compare(int x, int y)
         {
             return x.CompareTo(y);
         }
@@ -486,9 +486,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class UInt32Comparer : Comparer<UInt32>
+    public class UInt32Comparer : Comparer<uint>
     {
-        public override int Compare(UInt32 x, UInt32 y)
+        public override int Compare(uint x, uint y)
         {
             return x.CompareTo(y);
         }
@@ -517,9 +517,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class Int64Comparer : Comparer<Int64>
+    public class Int64Comparer : Comparer<long>
     {
-        public override int Compare(Int64 x, Int64 y)
+        public override int Compare(long x, long y)
         {
             return x.CompareTo(y);
         }
@@ -548,9 +548,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class UInt64Comparer : Comparer<UInt64>
+    public class UInt64Comparer : Comparer<ulong>
     {
-        public override int Compare(UInt64 x, UInt64 y)
+        public override int Compare(ulong x, ulong y)
         {
             return x.CompareTo(y);
         }
@@ -610,9 +610,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class ObjectComparer : Comparer<Object>
+    public class ObjectComparer : Comparer<object>
     {
-        public override int Compare(Object x, Object y)
+        public override int Compare(object x, object y)
         {
             if (x == null && y == null)
             {
@@ -660,7 +660,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
         }
     }
 
-    public class CharEqualityComparer : EqualityComparer<Char>
+    public class CharEqualityComparer : EqualityComparer<char>
     {
         public override bool Equals(char x, char y)
         {
@@ -698,14 +698,14 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class ByteEqualityComparer : EqualityComparer<Byte>
+    public class ByteEqualityComparer : EqualityComparer<byte>
     {
-        public override bool Equals(Byte x, Byte y)
+        public override bool Equals(byte x, byte y)
         {
             return Byte.Equals(x, y);
         }
 
-        public override int GetHashCode(Byte val)
+        public override int GetHashCode(byte val)
         {
             return val.GetHashCode();
         }
@@ -736,14 +736,14 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class SByteEqualityComparer : EqualityComparer<SByte>
+    public class SByteEqualityComparer : EqualityComparer<sbyte>
     {
-        public override bool Equals(SByte x, SByte y)
+        public override bool Equals(sbyte x, sbyte y)
         {
             return SByte.Equals(x, y);
         }
 
-        public override int GetHashCode(SByte val)
+        public override int GetHashCode(sbyte val)
         {
             return val.GetHashCode();
         }
@@ -774,14 +774,14 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class Int16EqualityComparer : EqualityComparer<Int16>
+    public class Int16EqualityComparer : EqualityComparer<short>
     {
-        public override bool Equals(Int16 x, Int16 y)
+        public override bool Equals(short x, short y)
         {
             return Int16.Equals(x, y);
         }
 
-        public override int GetHashCode(Int16 val)
+        public override int GetHashCode(short val)
         {
             return val.GetHashCode();
         }
@@ -812,14 +812,14 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class UInt16EqualityComparer : EqualityComparer<UInt16>
+    public class UInt16EqualityComparer : EqualityComparer<ushort>
     {
-        public override bool Equals(UInt16 x, UInt16 y)
+        public override bool Equals(ushort x, ushort y)
         {
             return UInt16.Equals(x, y);
         }
 
-        public override int GetHashCode(UInt16 val)
+        public override int GetHashCode(ushort val)
         {
             return val.GetHashCode();
         }
@@ -850,14 +850,14 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class Int32EqualityComparer : EqualityComparer<Int32>
+    public class Int32EqualityComparer : EqualityComparer<int>
     {
-        public override bool Equals(Int32 x, Int32 y)
+        public override bool Equals(int x, int y)
         {
             return Int32.Equals(x, y);
         }
 
-        public override int GetHashCode(Int32 val)
+        public override int GetHashCode(int val)
         {
             return val.GetHashCode();
         }
@@ -888,14 +888,14 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class UInt32EqualityComparer : EqualityComparer<UInt32>
+    public class UInt32EqualityComparer : EqualityComparer<uint>
     {
-        public override bool Equals(UInt32 x, UInt32 y)
+        public override bool Equals(uint x, uint y)
         {
             return UInt32.Equals(x, y);
         }
 
-        public override int GetHashCode(UInt32 val)
+        public override int GetHashCode(uint val)
         {
             return val.GetHashCode();
         }
@@ -926,14 +926,14 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class Int64EqualityComparer : EqualityComparer<Int64>
+    public class Int64EqualityComparer : EqualityComparer<long>
     {
-        public override bool Equals(Int64 x, Int64 y)
+        public override bool Equals(long x, long y)
         {
             return Int64.Equals(x, y);
         }
 
-        public override int GetHashCode(Int64 val)
+        public override int GetHashCode(long val)
         {
             return val.GetHashCode();
         }
@@ -964,14 +964,14 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class UInt64EqualityComparer : EqualityComparer<UInt64>
+    public class UInt64EqualityComparer : EqualityComparer<ulong>
     {
-        public override bool Equals(UInt64 x, UInt64 y)
+        public override bool Equals(ulong x, ulong y)
         {
             return UInt64.Equals(x, y);
         }
 
-        public override int GetHashCode(UInt64 val)
+        public override int GetHashCode(ulong val)
         {
             return val.GetHashCode();
         }
@@ -1040,9 +1040,9 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     //    }
     //}
 
-    public class ObjectEqualityComparer : EqualityComparer<Object>
+    public class ObjectEqualityComparer : EqualityComparer<object>
     {
-        public override bool Equals(Object x, Object y)
+        public override bool Equals(object x, object y)
         {
             if (x != null)
             {
@@ -1059,7 +1059,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
             return true;
         }
 
-        public override int GetHashCode(Object val)
+        public override int GetHashCode(object val)
         {
             return val?.GetHashCode() ?? 0;
         }

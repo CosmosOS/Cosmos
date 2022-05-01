@@ -825,7 +825,6 @@ namespace Cosmos.HAL
         {
             mDebugger.Send("Reading set palette");
             _IO.DACIndex_Read.Word = 0;
-            string values = "";
             for (int i = 0; i < 256; i++)
             {
                 int red = _IO.DAC_Data.Byte << 2;
