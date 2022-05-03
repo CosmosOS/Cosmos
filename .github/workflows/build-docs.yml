@@ -45,4 +45,4 @@ jobs:
         personal_token: ${{ secrets.GH_PAGES }}
         external_repository: CosmosOS/cosmosos.github.io
         publish_branch: master
-        publish_dir: ./Docs/_site
+        publish_dir: ./Cosmos/Docs/_site
