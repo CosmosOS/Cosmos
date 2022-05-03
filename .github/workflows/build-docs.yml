@@ -8,18 +8,36 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Checkout
+    - name: Checkout Cosmos
       uses: actions/checkout@v1
+      with:
+        repository: CosmosOS/Cosmos
+        path: Cosmos
+    - name: Checkout IL2CPU
+      uses: actions/checkout@v1
+      with:
+        repository: CosmosOS/IL2CPU
+        path: IL2CPU
+    - name: Checkout XSharp
+      uses: actions/checkout@v1
+      with:
+        repository: CosmosOS/XSharp
+        path: XSharp
+    - name: Checkout Common
+      uses: actions/checkout@v1
+      with:
+        repository: CosmosOS/Common     
+        path: Common
     - name: Setup dotnet
       uses: actions/setup-dotnet@v2.0.0
       with:
-          dotnet-version: 6.0.x
+        dotnet-version: 6.0.x
     - name: Install DocFX
       shell: pwsh
       run: choco install docfx
     - name: Build Docs
       shell: pwsh
-      run: docfx ./Docs/docfx.json
+      run: docfx ./Cosmos/Docs/docfx.json
       continue-on-error: false
     - name: Publish to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
