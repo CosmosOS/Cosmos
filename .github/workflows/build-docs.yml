@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -14,10 +14,13 @@ jobs:
       uses: actions/setup-dotnet@v2.0.0
       with:
           dotnet-version: 6.0.x
-    - name: Build docs
-      uses: nikeee/docfx-action@v1.0.0
-      with:
-        args: ./Docs/docfx.json
+    - name: Install DocFX
+      shell: pwsh
+      run: choco install docfx
+    - name: Build Docs
+      shell: pwsh
+      run: docfx ./Docs/docfx.json
+      continue-on-error: false
     - name: Publish to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
