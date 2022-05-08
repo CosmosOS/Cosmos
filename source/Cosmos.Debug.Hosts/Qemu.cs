@@ -208,7 +208,7 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["QemuUseCustomLocation"], out UseCustomExe);
         if (UseCustomExe)
         {
-              _launchExe = $"\"{aParams["QemuLocationParameters"]}\"";
+              _launchExe = aParams["QemuLocationParameters"];
 
         }
         else
@@ -239,7 +239,7 @@ namespace Cosmos.Debug.Hosts
       {
         xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
       }
-      xQemuArguments += $"-L {Path.GetDirectoryName(_launchExe)} ";
+      //xQemuArguments += $"-L {Path.GetDirectoryName(_launchExe)} ";
       xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d -soundhw pcspk" +_debugACPIEnable+ " " + _customArgs + " " + _useSerialOutput + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
 
       qemuStartInfo.Arguments = xQemuArguments;
