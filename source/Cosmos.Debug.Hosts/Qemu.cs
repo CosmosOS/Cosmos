@@ -240,7 +240,7 @@ namespace Cosmos.Debug.Hosts
         xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
       }
       //xQemuArguments += $"-L {Path.GetDirectoryName(_launchExe)} ";
-      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d -soundhw pcspk" +_debugACPIEnable+ " " + _customArgs + " " + _useSerialOutput + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
+      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+ ",netdev=n1 -netdev user,id=n1,hostfwd=tcp::8080-:80,hostfwd=tcp::21-:21,hostfwd=tcp::20-:20 " + _videoDriver+" "+_audioDriver+ " -boot d -soundhw pcspk" +_debugACPIEnable+ " " + _customArgs + " " + _useSerialOutput + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
 
       qemuStartInfo.Arguments = xQemuArguments;
       if (RedirectOutput)
@@ -255,7 +255,6 @@ namespace Cosmos.Debug.Hosts
           throw new Exception("No LogError handler specified!");
         }
       }
-
       qemuProcess.EnableRaisingEvents = true;
       qemuProcess.Exited += ExitCallback;
       qemuProcess.Start();
