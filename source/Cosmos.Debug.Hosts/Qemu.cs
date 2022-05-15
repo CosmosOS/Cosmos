@@ -57,7 +57,6 @@ namespace Cosmos.Debug.Hosts
         _harddiskFile = aHarddisk;
       }
 
-
       if (aParams.ContainsKey("ISOFile"))
       {
         _isoFile = aParams["ISOFile"];
@@ -186,7 +185,7 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["DebugEnabled"], out EnableAcpi);
           if(EnableAcpi)
           {
-            _debugACPIEnable = "-no-acpi";
+            _debugACPIEnable = " -no-acpi";
           }
           else
           {
@@ -237,7 +236,7 @@ namespace Cosmos.Debug.Hosts
 
       if (!string.IsNullOrWhiteSpace(_debugPortString))
       {
-        xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
+        xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos ";
       }
       //xQemuArguments += $"-L {Path.GetDirectoryName(_launchExe)} ";
       xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+ ",netdev=n1 -netdev user,id=n1,hostfwd=tcp::8080-:80,hostfwd=tcp::21-:21,hostfwd=tcp::20-:20 " + _videoDriver+" "+_audioDriver+ " -boot d -soundhw pcspk" +_debugACPIEnable+ " " + _customArgs + " " + _useSerialOutput + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
