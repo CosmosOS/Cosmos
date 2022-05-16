@@ -98,5 +98,9 @@ namespace Cosmos.System_Plugs.System
         {
             return new IntPtr();
         }
+
+        public static void ValidateLeapSecond(DateTime aThis)
+        {
+        }
     }
 }
