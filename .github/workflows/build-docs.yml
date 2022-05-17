@@ -6,22 +6,43 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
+    - name: Checkout Cosmos
+      uses: actions/checkout@v2.4.2
+      with:
+        repository: CosmosOS/Cosmos
+        path: Cosmos
+    - name: Checkout IL2CPU
+      uses: actions/checkout@v2.4.2
+      with:
+        repository: CosmosOS/IL2CPU
+        path: IL2CPU
+    - name: Checkout XSharp
+      uses: actions/checkout@v2.4.2
+      with:
+        repository: CosmosOS/XSharp
+        path: XSharp
+    - name: Checkout Common
+      uses: actions/checkout@v2.4.2
+      with:
+        repository: CosmosOS/Common     
+        path: Common
     - name: Setup dotnet
       uses: actions/setup-dotnet@v2.0.0
       with:
-          dotnet-version: 6.0.x
-    - name: Build docs
-      uses: nikeee/docfx-action@v1.0.0
-      with:
-        args: ./Docs/docfx.json
+        dotnet-version: 6.0.x
+    - name: Install DocFX
+      shell: pwsh
+      run: choco install docfx
+    - name: Build Docs
+      shell: pwsh
+      run: docfx ./Cosmos/Docs/docfx.json
+      continue-on-error: false
     - name: Publish to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         personal_token: ${{ secrets.GH_PAGES }}
         external_repository: CosmosOS/cosmosos.github.io
         publish_branch: master
-        publish_dir: ./Docs/_site
+        publish_dir: ./Cosmos/Docs/_site
