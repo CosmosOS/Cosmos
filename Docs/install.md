@@ -1,12 +1,14 @@
+# Installation
+
 ### Prerequisites
   
-*   **Visual Studio 2019** - [Download](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx)
+*   **Visual Studio 2019** - [Download]([https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx](https://visualstudio.microsoft.com/en/vs/older-downloads/)
 *   **Visual Studio 2019 Workload: .NET Core Tools** - .NET Core cross-platform development
-*   **.NET Framework 4.6.2 Developer Pack** - [Download](https://www.microsoft.com/en-us/download/details.aspx?id=53321)
+*   **.NET Framework 4.8 Developer Pack** - [Download]([https://www.microsoft.com/en-us/download/details.aspx?id=53321](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
 *   **VMware Player OR Workstation** VMware Player is free, so that is recommended instead - [Download](https://www.vmware.com/uk/products/workstation-player/workstation-player-evaluation.html)
   
 ### Installing Cosmos
-  
+ 
 First, you need to choose between the User Kit and the Dev Kit. It is recommended that new users start with the User Kit but only move later to the Dev Kit if you need the latest features and want to contribute back to the main project. 
 The Dev Kit is the live source against which the Cosmos Team develops directly. The Dev Kit has the latest and greatest features, but at various times has known issues, and sometimes may not even build. Thus to use the Dev Kit be sure to join our support channels and inquire about the current status before using the Dev Kit or updating it. 
   
@@ -38,13 +40,15 @@ You will need to pull the source for all four repositories and they must exist i
 
 Windows is not case sensitive for files, but many of the ._**NET Core tools used to build are case sensitive even on Windows for file paths**_. Make sure to create the subdirectories exactly as shown. For demonstration purposes let us assume that you will use c:\\source\\Cosmos to install to.   
 This base directory is referred to as the Cosmos directory. Each of the four repositories then must be cloned or extracted to the corresponding sub folder of the Cosmos directory. Using this example, the set up should look like this:  
+
 ```
-c:\\source\\CosmosOS\\
-c:\\source\\CosmosOS\\Cosmos\\ - [Git Repository for Cosmos](https://github.com/CosmosOS/Cosmos) 
-c:\\source\\CosmosOS\\IL2CPU\\ - [Git Repository for IL2CPU](https://github.com/CosmosOS/IL2CPU) 
-c:\\source\\CosmosOS\\XSharp\\ - [Git Repository for XSharp](https://github.com/CosmosOS/XSharp) 
-c:\\source\\CosmosOS\\Common\\ - [Git Repository for Common](https://github.com/CosmosOS/Common) 
+C:\\source\\CosmosOS\\
+C:\\source\\CosmosOS\\Cosmos\\ - [Git Repository for Cosmos](https://github.com/CosmosOS/Cosmos) 
+C:\\source\\CosmosOS\\IL2CPU\\ - [Git Repository for IL2CPU](https://github.com/CosmosOS/IL2CPU) 
+C:\\source\\CosmosOS\\XSharp\\ - [Git Repository for XSharp](https://github.com/CosmosOS/XSharp) 
+C:\\source\\CosmosOS\\Common\\ - [Git Repository for Common](https://github.com/CosmosOS/Common) 
 ```
+
 A tree diagram of the source should look like the following:   
 ![](https://www.gocosmos.org/wp-content/uploads/2021/06/tree-214x300.png)   
   
@@ -53,7 +57,8 @@ We are working to make syncing code easier. We have already experimented with Gi
 For now, it's much easier to handle the 4 repositories as most of the time, new Cosmos developers may only have to work in the Cosmos repository. Only when you are comfortable with the concept of Operating System development and C# should you venture into IL2CPU and XSharp.  
   
 If you want to keep your source up to date in a one-click method, paste this code into a .bat file in the CosmosOS folder ( as shown in the above example). This .bat file will only work after the repositories have been cloned with git at least once.
-  
+
+```cmd
 cd C:\\XSharp  
 git pull  
 cd ..\\IL2CPU  
@@ -63,6 +68,7 @@ git pull
 cd ..\\Common  
 git pull  
 cd ..  
+```
     
 ##### Building and Installing  
   
