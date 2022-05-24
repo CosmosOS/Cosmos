@@ -237,7 +237,7 @@ namespace Cosmos.VS.Windows
             var xWindow = await FindWindowAsync(aWindowType);
 
             xWindow.UserControl.Package = this;
-            xWindow.UserControl.Update(aTag, aData);
+            await xWindow.UserControl.UpdateAsync(aTag, aData);
         }
 
         public void StoreAllStates()
@@ -251,15 +251,15 @@ namespace Cosmos.VS.Windows
             StateStorer.StoreState("RegistersTW", aData == null ? null : (byte[])aData.Clone());
         }
 
-        public void RestoreAllStates()
+        public async Task RestoreAllStatesAsync()
         {
-            var cWindow = FindWindow(typeof(StackTW));
+            var cWindow = await FindWindowAsync(typeof(StackTW));
             byte[] aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "StackTW");
-            cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
+            await cWindow.UserControl.SetCurrentStateAsync(aData == null ? null : (byte[])aData.Clone());
 
-            cWindow = FindWindow(typeof(RegistersToolWindow));
+            cWindow = await FindWindowAsync(typeof(RegistersToolWindow));
             aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "RegistersTW");
-            cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
+            await cWindow.UserControl.SetCurrentStateAsync(aData == null ? null : (byte[])aData.Clone());
         }
     }
 }

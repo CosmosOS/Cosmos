@@ -42,8 +42,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{AA3CAD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\Spruce\Spruce.csproj", "{449E143F-3E7F-46DC-8E65-F1555FB55FAD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VSPropertyPages", "..\Common\source\VSPropertyPages\VSPropertyPages.csproj", "{45028B2F-66EA-4BA6-841E-F339CF54B8A3}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Build.Tasks", "source\Cosmos.Build.Tasks\Cosmos.Build.Tasks.csproj", "{D761BA74-7CB9-4C7F-BD5F-5893A69743C9}"
 EndProject
 Global
