@@ -6,7 +6,7 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl
 {
     public delegate void Operation();
 
-    // This object represents the debugger poll thread to the managed portion of the engine. It allows the engine to perform 
+    // This object represents the debugger poll thread to the managed portion of the engine. It allows the engine to perform
     // operations on the poll thread. This is required because the Win32 debugging API requires thread affinity for several operations.
     public class WorkerThread : IDisposable
     {
@@ -18,13 +18,13 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl
         bool m_fSyncOp;
         Exception m_opException;
         //DebuggedProcess m_debuggedProcess;
-        
+
         public WorkerThread()
         {
             m_opSet = new ManualResetEvent(false);
             m_opComplete = new ManualResetEvent(true);
             m_quitOperation = new Operation(delegate() { });
-            
+
             var thread = new Thread(new ThreadStart(ThreadFunc));
             thread.Start();
         }
@@ -113,8 +113,8 @@ namespace Cosmos.VS.DebugEngine.Engine.Impl
             }
 
             return false;
-        }          
-        
+        }
+
         // Thread routine for the poll loop. It handles calls coming in from the debug engine as well as polling for debug events.
         private void ThreadFunc()
         {
