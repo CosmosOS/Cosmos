@@ -20,11 +20,6 @@ Next, we register our VFS at the VFS manager, this will initiate the VFS and mak
 Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
 ```
 
-After the initialization process is done, a message like this would appear on your screen:
-![Initialize](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Initialize.PNG)
-
-This message is printed by the RegisterVFS() method and it provides info about the partition.
-
 **Note**: From now on, we'll be using some plugged functions from ``System.IO``, so be sure to use that reference to your code. Alright, now, let's get started over some useful functions:
 
 ## Format drive
@@ -137,8 +132,6 @@ catch (Exception e)
 ```
 
 We can also [check our files list](https://github.com/CosmosOS/Cosmos/wiki/FAT-FileSystem#get-files-list) and see our new file in it.
-
-![Create File](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Create%20File.PNG)
 
 ## Write to file
 

@@ -18,7 +18,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     /// </summary>
     public class DHCPClient : UdpClient
     {
-        // <summary>
+        /// <summary>
         /// Is DHCP ascked check variable
         /// </summary>
         private bool asked = false;
@@ -44,7 +44,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// <summary>
         /// Receive data
         /// </summary>
-        /// <param name="timeout">timeout value, default 5000ms
+        /// <param name="timeout">timeout value, default 5000ms</param>
         /// <returns>time value (-1 = timeout)</returns>
         /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
         private int Receive(int timeout = 5000)

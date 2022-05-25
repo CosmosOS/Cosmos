@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.ProjectSystem;
 
 namespace Cosmos.VS.ProjectSystem
@@ -14,7 +15,8 @@ namespace Cosmos.VS.ProjectSystem
         {
             if (propertyValues.Flags.Contains(ProjectTreeFlags.Common.ProjectRoot))
             {
-                propertyValues.Icon = CosmosImagesMonikers.ProjectRootIcon.ToProjectSystemType();
+                //propertyValues.Icon = CosmosImagesMonikers.ProjectRootIcon.ToProjectSystemType();
+                propertyValues.Icon = KnownMonikers.FeedbackSmile.ToProjectSystemType();
             }
         }
     }

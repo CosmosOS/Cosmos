@@ -93,7 +93,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         public static void Send(AD7Engine engine)
         {
-            AD7EngineCreateEvent eventObject = new AD7EngineCreateEvent(engine);
+            var eventObject = new AD7EngineCreateEvent(engine);
             engine.Callback.Send(eventObject, IID, null, null);
         }
 
@@ -114,7 +114,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         internal static void Send(AD7Engine engine)
         {
-            AD7ProgramCreateEvent eventObject = new AD7ProgramCreateEvent();
+            var eventObject = new AD7ProgramCreateEvent();
             engine.Callback.Send(eventObject, IID, null);
         }
     }
@@ -314,7 +314,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         int IDebugBreakpointBoundEvent2.EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
         {
-            IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[1];
+            var boundBreakpoints = new IDebugBoundBreakpoint2[1];
             boundBreakpoints[0] = m_boundBreakpoint;
             ppEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
             return VSConstants.S_OK;

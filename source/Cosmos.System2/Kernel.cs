@@ -174,11 +174,11 @@ namespace Cosmos.System
 
         // Shutdown and restart
         /// <summary>
-        /// Shutdown and restart.
-        /// Not implemented.
+        /// Shutdown and restart. Implemented.
         /// </summary>
         public void Restart()
         {
+            Power.Reboot();
         }
 
         /// <summary>

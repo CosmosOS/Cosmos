@@ -2,31 +2,35 @@
 
 The Cosmos Graphic Subsystem (CGS from now on) is based on the abstraction of Canvas that is an empty space in which the user of CGS can draw its content. CGS is not a widget toolkit as Winforms or Gnome / GTK but is thought to be more lower level and it will be the basic in which widget toolkits will be implemented. CGS hides the graphics driver (so far VGA, VBE and SVGA II) used and it is thought to be the universal way to draw on the screen in Cosmos.
 
-While Canvas could be overwritten (for example to create sub windows) the user of CGS does not have to deal with it directly but they must use the static class FullScreenCanvas.
-
-Let's give a look to its API methods.
 # FullScreenCanvas
+The `FullScreenCanvas` provides two methods to get a canvas instance for the screen. It automatically chooses the best available driver to use.
 
-    public static Canvas GetFullScreenCanvas(Mode mode) gets the instance of Canvas representing the complete screen (actually the instance of the running VGA driver) using the specified mode
-    public static Canvas GetFullScreenCanvas() gets the instance of Canvas representing the complete screen (actually the instance of the running VGA driver) using the VGA driver's preferred mode
+`public static Canvas GetFullScreenCanvas(Mode mode)`: gets the instance of Canvas representing the complete screen in the specified mode
 
-To really draw into the screen we need to use the Canvas class. Let's give a look to the API:
+`public static Canvas GetFullScreenCanvas()`: gets the instance of Canvas representing the complete screen in the best driver available on your platform
+
 # Canvas
 ## List of Properties of the Canvas class
 
-    Mode: get / set the mode of the video card to mode. It throws if the selected mode is not supported by the video card
-    DefaultGraphicMode: default graphic mode this will change based on the underlying hardware
-    AvailableModes: list of the available modes supported this will change based on the underlying hardware
+`Mode`: get / set the mode of the video card to mode. It throws if the selected mode is not supported by the video card
+`DefaultGraphicMode`: default graphic mode this will change based on the underlying hardware
+`AvailableModes`: list of the available modes supported this will change based on the underlying hardware
 
 ## List of Methods of the Canvas class
 
-    Clear(Color color: black) clear the entire Canvas using the specified color as background
-    void DrawPoint(Pen pen, int x, int y) draws a point at the coordinates specified by x and y with the specified pen
-    void DrawLine(Pen pen, int x_start, int y_start, int x_end, int y_end) draws a line at the coordinates specified by x_start, y_start and x_end, y_end with the specified pen
-    void DrawRectangle(Pen pen, int x_start, int y_start,int width, int height) draws a rectangle specified by a coordinate pair, a width, and a height with the specified pen
-    void DrawImage(Image image, int x, int y) draws an image at the x and y specified
-    void DrawString(String string, Font font, Brush brush, int x, int y) draws a string with the specified font and brush at the specified x and y coordinates
-    void Display() only for double buffering, swaps the 2 buffers then display everything to the screen
+`Clear(Color color)` clear the entire Canvas using the specified color as background
+
+`void DrawPoint(Pen pen, int x, int y)` draws a point at the coordinates specified by x and y with the specified pen
+
+`void DrawLine(Pen pen, int x_start, int y_start, int x_end, int y_end)` draws a line at the coordinates specified by x_start, y_start and x_end, y_end with the specified pen
+
+`void DrawRectangle(Pen pen, int x_start, int y_start,int width, int height)` draws a rectangle specified by a coordinate pair, a width, and a height with the specified pen
+
+`void DrawImage(Image image, int x, int y)` draws an image at the x and y specified
+
+`void DrawString(String string, Font font, Brush brush, int x, int y)` draws a string with the specified font and brush at the specified x and y coordinates
+
+`void Display()` is only required when using a double buffered driver, swaps the 2 buffers which causes all changes to be displayed
 
 
 Really simple right?
@@ -101,7 +105,9 @@ namespace GraphicTest
 
                 // A bitmap
                 canvas.DrawImage(bitmap, new Point(100, 150));
-
+                
+                canvas.Display(); // Required for something to be displayed when using a double buffered driver
+                
                 Console.ReadKey();
                 Sys.Power.Shutdown();
             }
@@ -120,6 +126,5 @@ namespace GraphicTest
 
 2. In addition, some other nice things could be implemented:
     - Plugging System.Drawing functions for easier manipulation of colors
-    - A double buffering strategy, to make drawing faster (one is already implemented in the VBE driver, but not VGA or SVGA II)
 
-3. CGS interacts badly with the Kernel.Stop method: the screen will freeze without displaying any error message whatsoever. You must use the Sys.Power.Shutdown() function to properly shut down your computer.
+3. CGS interacts badly with the uncaught exceptions and Kernel.Stop method: the screen will freeze without displaying any error message whatsoever. You must use the Sys.Power.Shutdown() function to properly shut down your computer.

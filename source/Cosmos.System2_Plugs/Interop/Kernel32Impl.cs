@@ -6,9 +6,7 @@ namespace Cosmos.System_Plugs.Interop
 {
     struct SECURITY_ATTRIBUTES
     {
-        public uint Length;
-        public int SecurityDescriptor;
-        public uint InheritHandle;
+
     }
 
     [Plug("Interop+Kernel32, System.IO.FileSystem")]

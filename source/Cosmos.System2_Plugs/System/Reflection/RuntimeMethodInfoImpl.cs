@@ -21,7 +21,7 @@ namespace Cosmos.System_Plugs.System.Reflection
             throw new NotImplementedException();
         }
 
-        public static bool Equals(object aThis, object aOther)
+        public static new bool Equals(object aThis, object aOther)
         {
             throw new NotImplementedException();
         }

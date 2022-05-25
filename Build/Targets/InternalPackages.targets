@@ -2,7 +2,6 @@
 
     <ItemGroup>
         <CommonPackage Include="Cosmos.Build.Common" ProjectPath="source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-        <CommonPackage Include="VSPropertyPages" ProjectPath="source\VSPropertyPages\VSPropertyPages.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -12,7 +12,7 @@
 #endif
 
 #ifndef VSVersion
-  #define VSVersion "vs2019"
+  #define VSVersion "vs2022"
 #endif
 
 #ifndef RealPath
@@ -22,17 +22,19 @@
 #if BuildConfiguration == "DevKit"
 	; devkit releases are not compressed
 	#pragma warning "Building Dev Kit release"
+  #define VerName "Cosmos Dev Kit"
 #else
 	; userkit releases get compressed, and get languages included
 	#pragma message "Building User Kit release"
+  #define VerName "Cosmos User Kit"
 	#define Compress true
 	#define IncludeUILanguages true
 #endif
 
 [Setup]
 AppId=CosmosUserKit
-AppName=Cosmos User Kit
-AppVerName=Cosmos User Kit v{#ChangeSetVersion}
+AppName={#VerName}
+AppVerName={#VerName} v{#ChangeSetVersion}
 AppCopyright=Copyright (c) 2007-2021 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.gocosmos.org/
@@ -142,6 +144,7 @@ UseRelativePaths=True
 [Run]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "nuget locals all  -Clear"; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Clearing nuget cache"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
@@ -271,7 +274,7 @@ var
   ResultText: AnsiString;
 begin
   Command := ExpandConstant('{app}\Build\Tools\vswhere.exe');
-  Params := '-latest -version "[15.0,16.0)" -requires Microsoft.Component.MSBuild -property installationPath';
+  Params := '-latest -version "[17.0,18.0)" -requires Microsoft.Component.MSBuild -property installationPath';
   Success :=
     ExecWithResult(Command, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode, ResultText)
       or (ResultCode <> 0);

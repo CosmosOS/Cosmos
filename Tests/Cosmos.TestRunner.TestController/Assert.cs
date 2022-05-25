@@ -78,6 +78,18 @@ namespace Cosmos.TestRunner
             IsTrue(xResult, message, file, line);
         }
 
+        public static void AreEqual(double expected, double actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
+        {
+            var xResult = Math.Abs(expected - actual) < 0.0001;
+            if (!xResult)
+            {
+                TestController.Debugger.Send($"Expected value: '{expected}' " + BitConverter.ToString(BitConverter.GetBytes(expected)));
+                TestController.Debugger.Send($"Actual value: '{actual}' " + BitConverter.ToString(BitConverter.GetBytes(actual)));
+                TestController.Debugger.Send($"Diff: {xResult}");
+            }
+            IsTrue(xResult, message, file, line);
+        }
+
         public static void AreEqual(string[] expected, string[] actual, string message, [CallerFilePath] string file = null, [CallerLineNumber] int line = 0)
         {
             if(expected.Length != actual.Length)
