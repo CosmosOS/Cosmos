@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
 using Cosmos.VS.Windows.ToolWindows;
+using Microsoft;
 
 namespace Cosmos.VS.Windows
 {
@@ -19,31 +20,38 @@ namespace Cosmos.VS.Windows
         public const int CosmosShowAllCmdID = 0x0104;
 
         private readonly CosmosWindowsPackage _package;
+        private readonly JoinableTaskFactory _joinableTaskFactory;
 
         private CosmosMenuCmdSet(CosmosWindowsPackage package)
         {
             _package = package ?? throw new ArgumentNullException(nameof(package));
+            _joinableTaskFactory = package.JoinableTaskFactory;
 
-            AddCommand(CosmosAssemblyCmdID, ShowWindowAssemblyAsync);
-            AddCommand(CosmosRegistersCmdID, ShowWindowRegistersAsync);
-            AddCommand(CosmosStackCmdID, ShowWindowStackAsync);
-            AddCommand(CosmosInternalCmdID, ShowWindowInternalAsync);
-            AddCommand(CosmosShowAllCmdID, ShowWindowAllAsync);
+            _ = AddCommandsAsync();
         }
 
-        private void AddCommand(int cmdId, EventHandler handler)
+        private async Task AddCommandsAsync()
         {
-            if (ServiceProvider.GetService(typeof(IMenuCommandService)) is OleMenuCommandService commandService)
+            await Task.WhenAll(
+                AddCommandAsync(CosmosAssemblyCmdID, ShowWindowAssemblyAsync),
+                AddCommandAsync(CosmosRegistersCmdID, ShowWindowRegistersAsync),
+                AddCommandAsync(CosmosStackCmdID, ShowWindowStackAsync),
+                AddCommandAsync(CosmosInternalCmdID, ShowWindowInternalAsync),
+                AddCommandAsync(CosmosShowAllCmdID, ShowWindowAllAsync)
+            );
+        }
+
+        private async Task AddCommandAsync(int cmdId, AsyncEventHandler handler) => await AddCommandInternalAsync(cmdId, (object sender, EventArgs e) => _joinableTaskFactory.Run(async () => await handler?.InvokeAsync(sender, e)));
+
+        private async Task AddCommandInternalAsync(int cmdId, EventHandler handler)
+        {
+            if (await _package.GetServiceAsync(typeof(IMenuCommandService)) is IMenuCommandService commandService)
             {
                 var menuCommandID = new CommandID(Guids.CosmosMenuCmdSetGuid, cmdId);
                 var menuItem = new MenuCommand(handler, menuCommandID);
-
                 commandService.AddCommand(menuItem);
             }
         }
-
-        private void AddCommand(int cmdId, AsyncEventHandler handler) =>
-            AddCommand(cmdId, (EventHandler)((sender, e) => handler?.InvokeAsync(sender, e)));
 
         public static CosmosMenuCmdSet Instance { get; private set; }
 
