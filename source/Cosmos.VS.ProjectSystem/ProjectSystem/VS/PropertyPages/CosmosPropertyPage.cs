@@ -1,30 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+﻿using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows;
 using Microsoft.VisualStudio.ProjectSystem;
+using Microsoft.VisualStudio.ProjectSystem.VS.PropertyPages.Designer;
 
-using Cosmos.VS.ProjectSystem.VS.PropertyPages.ViewModels;
-using Cosmos.VS.ProjectSystem.VS.PropertyPages.Views;
-
-using VSPropertyPages;
-
-namespace Cosmos.VS.ProjectSystem.VS.PropertyPages
+namespace Cosmos.VS.ProjectSystem.ProjectSystem.VS.PropertyPages
 {
-    [Guid(PageGuid)]
-    internal class CosmosPropertyPage : PropertyPageBase
+    [Export(typeof(ILinkActionHandler))]
+    [ExportMetadata("CommandName", "AddFilesISO")]
+    internal sealed class MyCommandActionHandler : ILinkActionHandler
     {
-        public const string PageGuid = "18a5712f-d45f-443f-b6ba-5b729fbabde0";
-
-        public override string PageName => "Cosmos (new)";
-
-        public override IPropertyPageUI CreatePropertyPageUI() =>
-            new CosmosPropertyPageControl()
+        public Task HandleAsync(UnconfiguredProject project, IReadOnlyDictionary<string, string> editorMetadata)
+        {
+            var projectFolder = Path.GetDirectoryName(project.FullPath);
+            var isoFolder = Path.Combine(projectFolder, "isoFiles");
+            if (!Directory.Exists(isoFolder))
             {
-                DataContext = new CosmosPropertyPageViewModel(PropertyManager, ProjectThreadingService)
-            };
+                Directory.CreateDirectory(isoFolder);
+            }
 
-        public override IPropertyManager CreatePropertyManager(
-            IReadOnlyCollection<ConfiguredProject> configuredProjects) =>
-            new DynamicConfiguredPropertyManager(UnconfiguredProject, configuredProjects);
+            Process.Start(isoFolder);
+
+            return Task.CompletedTask;
+        }
     }
 }

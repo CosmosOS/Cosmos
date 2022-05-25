@@ -15,7 +15,7 @@ namespace Cosmos.Build.Builder.Dependencies
 
         public bool ShouldInstallByDefault => false;
 
-        public string OtherDependencysThatAreMissing => "rename the directory from where install-VS2019.bat or userkit install.bat is started to Cosmos.";
+        public string OtherDependencysThatAreMissing => "rename the directory from where install-VS2022.bat or userkit install.bat is started to Cosmos.";
         private string CosmosDir;
 
         public ProperRepoNameDependency(string CosmosDir)
