@@ -232,12 +232,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Local EndPoint.
         /// </summary>
-        internal EndPoint LocalEndPoint;
+        public EndPoint LocalEndPoint;
 
         /// <summary>
         /// Remote EndPoint.
         /// </summary>
-        internal EndPoint RemoteEndPoint;
+        public EndPoint RemoteEndPoint;
 
         /// <summary>
         /// Connection Transmission Control Block.
@@ -254,7 +254,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Connection status.
         /// </summary>
-        internal Status Status;
+        public Status Status;
 
         /// <summary>
         /// TCP Received Data.
