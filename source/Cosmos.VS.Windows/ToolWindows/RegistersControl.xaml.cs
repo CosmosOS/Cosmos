@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -15,16 +16,13 @@ namespace Cosmos.VS.Windows
             DataContext = mViewModel = new RegistersViewModel();
         }
 
-        protected override void DoUpdate(string aTag)
+        protected override async Task DoUpdateAsync(string aTag)
         {
-            Application.Current.Dispatcher.Invoke(
-                () =>
-                {
-                    if (mData != null)
-                    {
-                        mViewModel.UpdateData(mData);
-                    }
-                }, DispatcherPriority.Normal);
+            await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
+            if (mData != null)
+            {
+                mViewModel.UpdateData(mData);
+            }
         }
     }
 
