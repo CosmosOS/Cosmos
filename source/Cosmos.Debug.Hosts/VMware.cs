@@ -88,12 +88,22 @@ namespace Cosmos.Debug.Hosts {
       }
       xPSI.UseShellExecute = false;  //must be true to allow elevate the process, sometimes needed if vmware only runs with admin rights
       mProcess.EnableRaisingEvents = true;
-      mProcess.Exited += delegate(object aSender, EventArgs e) {
-        if (OnShutDown != null) {
-          OnShutDown(aSender, e);
-        }
-      };
+      mProcess.Exited += ExitCallback;
       mProcess.Start();
+    }
+
+    private void ExitCallback(object sender, EventArgs e)
+    {
+      if (null != OnShutDown)
+      {
+        try
+        {
+          OnShutDown(sender, e);
+        }
+        catch
+        {
+        }
+      }
     }
 
     public override void Stop() {
@@ -101,7 +111,16 @@ namespace Cosmos.Debug.Hosts {
       {
         try
         {
+          //TODO: Close VMWare properly
+
+          //Force Kill VMWare
           mProcess.Kill();
+
+          //kil vmware-vmx.exe
+          foreach (var process in Process.GetProcessesByName("vmware-vmx.exe"))
+          {
+            process.Kill();
+          }
         }
         catch
         {
