@@ -282,6 +282,11 @@ namespace Cosmos.System_Plugs.System.IO
             return innerStream.CanRead;
         }
 
+        public static bool get_CanSeek(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            return innerStream.CanSeek;
+        }
+
         public static void WriteByte(FileStream aThis, byte aByte)
         {
             throw new NotImplementedException();
