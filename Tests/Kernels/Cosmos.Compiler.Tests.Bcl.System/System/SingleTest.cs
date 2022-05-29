@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -8,9 +7,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            Single value;
-            String result;
-            String expectedResult;
+            float value;
+            string result;
+            string expectedResult;
 
             /* First start with some weird value (not really numbers) that the IEEE standard has */
             value = Single.PositiveInfinity;
@@ -84,11 +83,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((resultAsInt == 1110027796), "Single.GetHashCode() doesn't work");
 
 #if false
-            // Now let's try ToString() again but printed in hex (this test fails for now!)
-            result = value.ToString("X2");
-            expectedResult = "0x7FFFFFFF";
+                        // Now let's try ToString() again but printed in hex (this test fails for now!)
+                        result = value.ToString("X2");
+                        expectedResult = "0x7FFFFFFF";
 
-            Assert.IsTrue((result == expectedResult), "Int32.ToString(X2) doesn't work");
+                        Assert.IsTrue((result == expectedResult), "Int32.ToString(X2) doesn't work");
 #endif
             // OK now some mathematical operations as if we were in school!
 
@@ -207,7 +206,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             valueNegated = -value;
             Assert.IsTrue((EqualityHelper.SinglesAreEqual(valueNegated, -42.0f)), "(float) negation of positive float doesn't work");
 
-            
+
         }
     }
 }
