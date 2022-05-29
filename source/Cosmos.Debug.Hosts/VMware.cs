@@ -97,13 +97,16 @@ namespace Cosmos.Debug.Hosts {
     }
 
     public override void Stop() {
-      //using (var xHost = new VMWareVirtualHost()) {
-      //  ConnectToVMWare(xHost);
-      //  using (var xMachine = xHost.Open(mVmxPath)) {
-      //    xMachine.PowerOff();
-      //  }
-      //  xHost.Close();
-      //}
+      if (null != mProcess)
+      {
+        try
+        {
+          mProcess.Kill();
+        }
+        catch
+        {
+        }
+      }
       Cleanup();
     }
 
