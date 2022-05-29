@@ -60,7 +60,7 @@ namespace Cosmos.System.Network
             {
                 xListener.Start();
                 
-                Con.WriteLine("Waiting for remote debugger connection at " + NetworkConfig.CurrentConfig.Value.IPAddress.ToString() + ":" + Port);
+                Con.WriteLine("Waiting for remote debugger connection at " + NetworkConfiguration.CurrentAddress.ToString() + ":" + Port);
                 xClient = xListener.AcceptTcpClient(); //blocking
             }
             else if (xListener == null)
