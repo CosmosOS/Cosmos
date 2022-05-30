@@ -42,7 +42,7 @@ namespace Cosmos.System
     /// </summary>
     public static class MouseManager
     {
-        private static List<MouseBase> mMouseList = new List<MouseBase>();
+        private static List<MouseBase> mMouseList = new();
 
         /// <summary>
         /// The X location of the mouse.
@@ -63,6 +63,11 @@ namespace Cosmos.System
         /// The state the mouse is currently in.
         /// </summary>
         public static MouseState MouseState;
+
+        /// <summary>
+        /// The state the mouse was in the last frame.
+        /// </summary>
+        public static MouseState LastMouseState;
 
         /// <summary>
         /// The sensitivity of the mouse, 1.0f is the default.
@@ -128,6 +133,7 @@ namespace Cosmos.System
         {
             int x = (int)(X + MouseSensitivity * aDeltaX);
             int y = (int)(Y + MouseSensitivity * aDeltaY);
+            LastMouseState = MouseState;
             MouseState = (MouseState)aMouseState;
 
             if (x <= 0)
@@ -155,6 +161,19 @@ namespace Cosmos.System
             {
                 Y = (uint)y;
             }
+        }
+
+        /// <summary>
+        /// Checks if the mouse is within a specific set of coordinates.
+        /// </summary>
+        /// <param name="aX"></param>
+        /// <param name="aY"></param>
+        /// <param name="aWidth"></param>
+        /// <param name="aHeight"></param>
+        /// <returns></returns>
+        public static bool IsMouseWithin(int aX, int aY, int aWidth, int aHeight)
+        {
+            return (X >= aX && X <= aX + aWidth && Y >= aY && Y <= aY + aHeight);
         }
 
         /// <summary>
