@@ -49,7 +49,10 @@ namespace Cosmos.System_Plugs.System
                 ii = (21 * i) % 55;
                 SeedArray[ii] = mk;
                 mk = mj - mk;
-                if (mk < 0) mk += MBIG;
+                if (mk < 0)
+                {
+                    mk += MBIG;
+                }
                 mj = SeedArray[ii];
             }
             for (int k = 1; k < 5; k++)
@@ -57,7 +60,10 @@ namespace Cosmos.System_Plugs.System
                 for (int i = 1; i < 56; i++)
                 {
                     SeedArray[i] -= SeedArray[1 + (i + 30) % 55];
-                    if (SeedArray[i] < 0) SeedArray[i] += MBIG;
+                    if (SeedArray[i] < 0)
+                    {
+                        SeedArray[i] += MBIG;
+                    }
                 }
             }
             inext = 0;
@@ -74,7 +80,7 @@ namespace Cosmos.System_Plugs.System
                 counter = 0;
             }
 
-            return counter + RTC.Second * 1000;
+            return counter + (int)(Cosmos.Core.CPU.GetCPUUptime() / 50) * 1000;
         }
 
         private static double Sample()
@@ -90,13 +96,25 @@ namespace Cosmos.System_Plugs.System
             int locINext = inext;
             int locINextp = inextp;
 
-            if (++locINext >= 56) locINext = 1;
-            if (++locINextp >= 56) locINextp = 1;
+            if (++locINext >= 56)
+            {
+                locINext = 1;
+            }
+            if (++locINextp >= 56)
+            {
+                locINextp = 1;
+            }
 
             retVal = SeedArray[locINext] - SeedArray[locINextp];
 
-            if (retVal == MBIG) retVal--;
-            if (retVal < 0) retVal += MBIG;
+            if (retVal == MBIG)
+            {
+                retVal--;
+            }
+            if (retVal < 0)
+            {
+                retVal += MBIG;
+            }
 
             SeedArray[locINext] = retVal;
 
@@ -108,7 +126,10 @@ namespace Cosmos.System_Plugs.System
 
         public static int Next(Random aThis, int maxValue)
         {
-            if (maxValue < 0) throw new ArgumentNullException("maxValue", "Argument out of range, must be postive.");
+            if (maxValue < 0)
+            {
+                throw new ArgumentNullException("maxValue", "Argument out of range, must be postive.");
+            }
             return (int)(Sample() * maxValue);
         }
 
@@ -139,7 +160,10 @@ namespace Cosmos.System_Plugs.System
 
         public static int Next(Random aThis, int minValue, int maxValue)
         {
-            if (minValue > maxValue) throw new ArgumentOutOfRangeException("maxValue", "Argument out of range, must be postive");
+            if (minValue > maxValue)
+            {
+                throw new ArgumentOutOfRangeException("maxValue", "Argument out of range, must be postive");
+            }
 
             long range = (long)maxValue - minValue;
             if (range <= (long)Int32.MaxValue)
@@ -154,8 +178,10 @@ namespace Cosmos.System_Plugs.System
 
         public static void NextBytes(Random aThis, byte[] buffer)
         {
-
-            if (buffer == null) return;
+            if (buffer == null)
+            {
+                return;
+            }
 
             for (int i = 0; i < buffer.Length; i++)
             {
