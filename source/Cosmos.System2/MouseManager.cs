@@ -163,18 +163,7 @@ namespace Cosmos.System
             }
         }
 
-        /// <summary>
-        /// Checks if the mouse is within a specific set of coordinates.
-        /// </summary>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        /// <returns></returns>
-        public static bool IsMouseWithin(int aX, int aY, int aWidth, int aHeight)
-        {
-            return (X >= aX && X <= aX + aWidth && Y >= aY && Y <= aY + aHeight);
-        }
+
 
         /// <summary>
         /// Add mouse to the mouse list.
