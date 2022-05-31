@@ -29,7 +29,7 @@ namespace Cosmos.System_Plugs.System
 
         public static void Ctor(Random aThis)
         {
-            Ctor(aThis, RTC.Second);
+            Ctor(aThis, GenerateGlobalSeed());
         }
 
         public static void Ctor(Random aThis, int seed)
@@ -128,7 +128,7 @@ namespace Cosmos.System_Plugs.System
         {
             if (maxValue < 0)
             {
-                throw new ArgumentNullException("maxValue", "Argument out of range, must be postive.");
+                throw new ArgumentNullException(nameof(maxValue), "Argument out of range, must be postive.");
             }
             return (int)(Sample() * maxValue);
         }
@@ -162,7 +162,7 @@ namespace Cosmos.System_Plugs.System
         {
             if (minValue > maxValue)
             {
-                throw new ArgumentOutOfRangeException("maxValue", "Argument out of range, must be postive");
+                throw new ArgumentOutOfRangeException(nameof(maxValue), "Argument out of range, must be postive");
             }
 
             long range = (long)maxValue - minValue;
