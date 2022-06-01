@@ -65,7 +65,7 @@ namespace Cosmos.Build.Builder.Dependencies
             {
                 return ".Net Core 4.8 SDK";
             }
-            else if(packageId == NetCore50Runtime)
+            else if(packageId == NetCore60Runtime)
             {
                 return ".Net Core 6.0 Runtime";
             }
