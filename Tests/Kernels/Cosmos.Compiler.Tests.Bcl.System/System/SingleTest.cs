@@ -83,11 +83,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((resultAsInt == 1110027796), "Single.GetHashCode() doesn't work");
 
 #if false
-                        // Now let's try ToString() again but printed in hex (this test fails for now!)
-                        result = value.ToString("X2");
-                        expectedResult = "0x7FFFFFFF";
+            // Now let's try ToString() again but printed in hex (this test fails for now!)
+            result = value.ToString("X2");
+            expectedResult = "0x7FFFFFFF";
 
-                        Assert.IsTrue((result == expectedResult), "Int32.ToString(X2) doesn't work");
+            Assert.IsTrue((result == expectedResult), "Int32.ToString(X2) doesn't work");
 #endif
             // OK now some mathematical operations as if we were in school!
 

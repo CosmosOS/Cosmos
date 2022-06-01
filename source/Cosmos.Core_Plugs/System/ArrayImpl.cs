@@ -145,7 +145,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static object InternalGetValue(Array aThis, IntPtr aIntPtr)
         {
-            throw new NotImplementedException();
+            return aThis.GetValue((int)aIntPtr);
         }
     }
 }
