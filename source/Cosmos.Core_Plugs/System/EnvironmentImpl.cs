@@ -19,6 +19,8 @@ namespace Cosmos.Core_Plugs.System
 
         public static string GetEnvironmentVariable(string variable) => null;
 
+        public static int get_CurrentManagedThreadId() => 0;
+
         public static void FailFast(string aString)
         {
             throw new NotImplementedException();

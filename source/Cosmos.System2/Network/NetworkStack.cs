@@ -32,6 +32,7 @@ namespace Cosmos.System.Network
         /// Get address dictionary.
         /// </summary>
         internal static Dictionary<uint, NetworkDevice> AddressMap { get; private set; }
+
         /// <summary>
         /// Get address dictionary.
         /// </summary>
@@ -51,10 +52,10 @@ namespace Cosmos.System.Network
         /// Set ConfigIP for NetworkDevice
         /// </summary>
         /// <param name="nic">Network device.</param>
-        ///  /// <param name="config">IP Config</param>
+        /// <param name="config">IP Config</param>
         private static void SetConfigIP(NetworkDevice nic, IPConfig config)
         {
-            NetworkConfig.Add(nic, config);
+            NetworkConfiguration.AddConfig(nic, config);
             AddressMap.Add(config.IPAddress.Hash, nic);
             MACMap.Add(nic.MACAddress.Hash, nic);
             IPConfig.Add(config);
@@ -79,7 +80,7 @@ namespace Cosmos.System.Network
         /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
         public static void ConfigIP(NetworkDevice nic, IPConfig config)
         {
-            if (NetworkConfig.ContainsKey(nic))
+            if (NetworkConfiguration.ConfigsContainsDevice(nic))
             {
                 RemoveIPConfig(nic);
                 SetConfigIP(nic, config);
@@ -88,7 +89,8 @@ namespace Cosmos.System.Network
             {
                 SetConfigIP(nic, config);
             }
-            NetworkConfig.CurrentConfig = new KeyValuePair<NetworkDevice, IPConfig>(nic, config);
+
+            NetworkConfiguration.SetCurrentConfig(nic, config);
         }
 
         /// <summary>
@@ -97,7 +99,7 @@ namespace Cosmos.System.Network
         /// </summary>
         public static bool ConfigEmpty()
         {
-            if (NetworkConfig.Keys.Count == 0)
+            if (NetworkConfiguration.Count == 0)
             {
                 return true;
             }
@@ -115,7 +117,7 @@ namespace Cosmos.System.Network
             AddressMap.Clear();
             MACMap.Clear();
             IPConfig.RemoveAll();
-            NetworkConfig.Clear();
+            NetworkConfiguration.ClearConfigs();
         }
 
         /// <summary>
@@ -124,11 +126,11 @@ namespace Cosmos.System.Network
         /// <param name="nic">Network device.</param>
         public static void RemoveIPConfig(NetworkDevice nic)
         {
-            IPConfig config = NetworkConfig.Get(nic);
+            IPConfig config = NetworkConfiguration.Get(nic);
             AddressMap.Remove(config.IPAddress.Hash);
             MACMap.Remove(nic.MACAddress.Hash);
             IPConfig.Remove(config);
-            NetworkConfig.Remove(nic);
+            NetworkConfiguration.Remove(nic);
         }
 
         /// <summary>

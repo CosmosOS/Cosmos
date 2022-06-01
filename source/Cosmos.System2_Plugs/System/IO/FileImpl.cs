@@ -45,5 +45,13 @@ namespace Cosmos.System_Plugs.System.IO
                 }
             }
         }
+
+        public static void WriteAllBytes(string aFile, byte[] aData)
+        {
+            using (var xSW = new BinaryWriter(new FileStream(aFile, FileMode.OpenOrCreate)))
+            {
+                xSW.Write(aData);
+            }
+        }
     }
 }

@@ -137,5 +137,5 @@ using(var xClient = new DnsClient())
 ```
 ## Get local IP address
 ```csharp
-Console.WriteLine(NetworkConfig.CurrentConfig.Value.IPAddress.ToString());
+Console.WriteLine(NetworkConfiguration.CurrentAddress.ToString());
 ```

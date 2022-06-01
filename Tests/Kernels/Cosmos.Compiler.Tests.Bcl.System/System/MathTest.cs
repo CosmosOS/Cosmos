@@ -89,6 +89,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             result = Math.Ceiling((double)int.MaxValue + 2.5);
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, (double)int.MaxValue + 3), "Ceiling works for values larger than an int can hold. " + result + " expected " + (double)int.MaxValue + 3);
 
+            result = Math.Ceiling(-0.90308998699194354);
+            Assert.IsTrue(EqualityHelper.DoublesAreEqual(result, 0), "Ceiling works for random float (-0.90308998699194354)");
+
             #endregion Ceiling
 
             #region Floor
