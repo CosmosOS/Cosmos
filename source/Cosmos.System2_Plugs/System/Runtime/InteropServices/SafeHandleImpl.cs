@@ -15,5 +15,10 @@ namespace Cosmos.System_Plugs.System.Runtime.InteropServices
         {
             throw new NotImplementedException();
         }
+
+        public static void Dispose(SafeHandle aThis)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

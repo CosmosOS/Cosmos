@@ -9,7 +9,7 @@ using Cosmos.System;
 
 namespace Cosmos.System_Plugs.System.IO
 {
-    [Plug(TargetName = "System.IO.PathInternal, System.IO.FileSystem")]
+   // [Plug(TargetName = "System.IO.PathInternal, System.IO.FileSystem")]
     public static class PathInternalImpl
     {
         /*

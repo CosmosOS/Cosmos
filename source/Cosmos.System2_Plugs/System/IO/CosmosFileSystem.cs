@@ -18,7 +18,7 @@ using Cosmos.System.FileSystem.VFS;
  */
 namespace Cosmos.System_Plugs.System.IO
 {
-    [Plug(TargetName = "System.IO.FileSystem, System.IO.FileSystem")]
+    //[Plug(TargetName = "System.IO.FileSystem, System.IO.FileSystem")]
     public static class CosmosFileSystem
     {
         private static void CreateDirectory(string fullPath)
