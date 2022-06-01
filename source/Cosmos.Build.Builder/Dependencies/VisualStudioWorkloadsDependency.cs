@@ -16,7 +16,7 @@ namespace Cosmos.Build.Builder.Dependencies
         private static readonly string[] RequiredPackages = new string[]
         {
             NetCore48SDK,
-            NetCore50Runtime,
+            NetCore60Runtime,
             VisualStudioExtensionsWorkload
         };
         public string[] arg = Environment.GetCommandLineArgs();
