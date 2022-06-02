@@ -14,10 +14,10 @@ namespace Cosmos.Compiler.Tests.MethodTests
         }
         public static void BranchStackCorruption2()
         {
-             char c = 'l';
-             char c2 = (c <= 'Z' && c >= 'A') ? ((char)(c - 65 + 97)) : c;
-             c = 'L';
-             char c3 = (c <= 'Z' && c >= 'A') ? ((char)(c - 65 + 97)) : c;
+            char c = 'l';
+            char c2 = (c <= 'Z' && c >= 'A') ? ((char)(c - 65 + 97)) : c;
+            c = 'L';
+            char c3 = (c <= 'Z' && c >= 'A') ? ((char)(c - 65 + 97)) : c;
         }
 
         public static void BranchStackCorruption()
