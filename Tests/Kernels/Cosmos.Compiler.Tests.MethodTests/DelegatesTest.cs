@@ -1,11 +1,15 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.MethodTests
 {
+    public struct TestStruct
+    {
+        public int A;
+        public long B;
+        public string C;
+    }
 
     public class DelegatesTest
     {
@@ -26,6 +30,16 @@ namespace Cosmos.Compiler.Tests.MethodTests
             return "Hello World";
         }
 
+        public static TestStruct WithStructReturnValue()
+        {
+            return new TestStruct
+            {
+                A = 5,
+                B = 0x8888888,
+                C = "Test"
+            };
+        }
+
         private void IncreaseCounterTwiceFromInstanceMethod()
         {
             mCount += 2;
@@ -39,6 +53,11 @@ namespace Cosmos.Compiler.Tests.MethodTests
             Func<string> funcString = WithStringReturnValue;
             string retString = funcString();
             Assert.AreEqual("Hello World", retString, "Func<string> works");
+            Func<TestStruct> funcStruct = WithStructReturnValue;
+            TestStruct testStruct = funcStruct();
+            Assert.AreEqual(5, testStruct.A, "Func<Struct> returns first value correctly");
+            Assert.AreEqual(0x8888888, testStruct.B, "Func<Struct> returns second value correctly");
+            Assert.AreEqual("Test", testStruct.C, "Func<Struct> returns third value correctly");
             TestDelegateWithoutArguments();
             TestDelegateWithArguments();
             TestMulticastDelegateWithoutArguments();
