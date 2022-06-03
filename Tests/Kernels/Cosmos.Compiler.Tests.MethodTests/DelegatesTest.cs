@@ -11,6 +11,22 @@ namespace Cosmos.Compiler.Tests.MethodTests
         public string C;
     }
 
+    public class ClassWithDelegates
+    {
+        public int X = 0;
+        public string Y = "";
+
+        public int GetX()
+        {
+            return X;
+        }
+
+        public void IncX()
+        {
+            X++;
+        }
+    }
+
     public class DelegatesTest
     {
         private static int mCount;
@@ -110,11 +126,24 @@ namespace Cosmos.Compiler.Tests.MethodTests
             Assert.AreEqual("String2", testStruct.C, "Func<int, long, string, int, TestStruct> returns third value correctly");
         }
 
+        public static void TestDelegateWithTarget()
+        {
+            ClassWithDelegates class1 = new ();
+            Func<int> getX1 = class1.GetX;
+            Assert.AreEqual(0, getX1(), "Func<int> works with method");
+            class1.X = 10;
+            Assert.AreEqual(10, getX1(), "Func<int> works with method and gets current value");
+            Action incX1 = class1.IncX;
+            incX1();
+            Assert.AreEqual(11, class1.X, "Action works with method");
+        }
+
         public static void Execute()
         {
             TestDelegateWithoutArguments();
             TestDelegateWithArguments();
             TestDelegateWithReturnValue();
+            TestDelegateWithTarget();
             //TestMulticastDelegateWithoutArguments();
         }
 

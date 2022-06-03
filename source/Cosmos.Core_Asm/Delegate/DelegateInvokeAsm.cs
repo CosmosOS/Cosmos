@@ -26,6 +26,7 @@ namespace Cosmos.Core_Asm
             * ESI contains the size of the return value
             * EDI contains the function pointer
             */
+
             XS.ClearInterruptFlag();
 
             XS.Comment("Get Invoke list count");
@@ -65,7 +66,7 @@ namespace Cosmos.Core_Asm
             {
                 XS.Compare(EDX, EBX);
                 XS.Jump(x86.ConditionalTestEnum.GreaterThanOrEqualTo, ".END_OF_INVOKE");
-
+                XS.Exchange(BX, BX);
                 XS.PushAllRegisters();
 
                 XS.Comment("Check if delegate has $this");
@@ -74,15 +75,17 @@ namespace Cosmos.Core_Asm
                 XS.Set(EDI, EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target"));
                 XS.Compare(EDI, 0);
                 XS.Jump(x86.ConditionalTestEnum.Zero, ".NO_THIS");
+                XS.Set(EDX, ECX); // edx contains the size of the arguments including $this
                 XS.Label(".HAS_THIS");
                 XS.Push(EDI);
                 XS.Push(0);
+                XS.Add(EDX, 8);
                 XS.Label(".NO_THIS");
                 XS.Set(EDI, EAX, sourceIsIndirect: true, sourceDisplacement: 4);
                 XS.Set(EDI, EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr"));
 
                 XS.Set(EBX, 0); // initialise required extra space to 0
-                XS.Compare(ESI, ECX);
+                XS.Compare(ESI, EDX);
                 XS.Jump(x86.ConditionalTestEnum.LessThanOrEqualTo, ".NO_RETURN_VALUE_SPACE");
                 XS.Set(EBX, ESI);
                 XS.Sub(EBX, ECX);
