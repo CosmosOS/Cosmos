@@ -15,6 +15,10 @@ namespace Cosmos.Compiler.Tests.MethodTests
             mCount++;
         }
 
+        public static int WithReturnValue()
+        {
+            return 1;
+        }
 
         private void IncreaseCounterTwiceFromInstanceMethod()
         {
@@ -23,6 +27,9 @@ namespace Cosmos.Compiler.Tests.MethodTests
 
         public static void Execute()
         {
+            Func<int> func = WithReturnValue;
+            int val = func();
+            Assert.AreEqual(1, val, "Func<int> works");
             TestDelegateWithoutArguments();
             TestDelegateWithArguments();
             //TestMulticastDelegateWithoutArguments();
