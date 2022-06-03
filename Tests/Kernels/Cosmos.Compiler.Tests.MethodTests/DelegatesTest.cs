@@ -6,6 +6,7 @@ using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.MethodTests
 {
+
     public class DelegatesTest
     {
         private static int mCount;
@@ -20,6 +21,11 @@ namespace Cosmos.Compiler.Tests.MethodTests
             return 1;
         }
 
+        public static string WithStringReturnValue()
+        {
+            return "Hello World";
+        }
+
         private void IncreaseCounterTwiceFromInstanceMethod()
         {
             mCount += 2;
@@ -27,12 +33,15 @@ namespace Cosmos.Compiler.Tests.MethodTests
 
         public static void Execute()
         {
-            Func<int> func = WithReturnValue;
-            int val = func();
+            Func<int> funcInt = WithReturnValue;
+            int val = funcInt();
             Assert.AreEqual(1, val, "Func<int> works");
+            Func<string> funcString = WithStringReturnValue;
+            string retString = funcString();
+            Assert.AreEqual("Hello World", retString, "Func<string> works");
             TestDelegateWithoutArguments();
             TestDelegateWithArguments();
-            //TestMulticastDelegateWithoutArguments();
+            TestMulticastDelegateWithoutArguments();
         }
 
         private static void TestDelegateWithoutArguments()
