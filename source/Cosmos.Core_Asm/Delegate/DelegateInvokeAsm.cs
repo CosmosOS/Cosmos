@@ -26,6 +26,7 @@ namespace Cosmos.Core_Asm
             * ESI contains the size of the return value
             * EDI contains the function pointer
             */
+            XS.Exchange(BX, BX);
             XS.ClearInterruptFlag();
 
             XS.Comment("Get Invoke list count");
@@ -81,8 +82,12 @@ namespace Cosmos.Core_Asm
                 XS.Set(EDI, EAX, sourceIsIndirect: true, sourceDisplacement: 4);
                 XS.Set(EDI, EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr"));
 
-                XS.Sub(ESP, ESI); // make space for the return value
+                XS.Sub(ESI, ECX); // determine how much more space the return value needs than the arguments
+                XS.Compare(ESI, 0);
+                XS.Jump(x86.ConditionalTestEnum.LessThanOrEqualTo, ".HANDLE_ARGUMENTS");
+                XS.Sub(ESP, ESI); // make extra space for the return value
 
+                XS.Label(".HANDLE_ARGUMENTS");
                 XS.Comment("Check if delegate has args");
                 XS.Compare(ECX, 0);
                 XS.Jump(x86.ConditionalTestEnum.Zero, ".NO_ARGS");

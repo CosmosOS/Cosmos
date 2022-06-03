@@ -25,6 +25,11 @@ namespace Cosmos.Compiler.Tests.MethodTests
             return 1;
         }
 
+        public static int Increment(int i)
+        {
+            return i + 1;
+        }
+
         public static string WithStringReturnValue()
         {
             return "Hello World";
@@ -58,6 +63,9 @@ namespace Cosmos.Compiler.Tests.MethodTests
             Assert.AreEqual(5, testStruct.A, "Func<Struct> returns first value correctly");
             Assert.AreEqual(0x8888888, testStruct.B, "Func<Struct> returns second value correctly");
             Assert.AreEqual("Test", testStruct.C, "Func<Struct> returns third value correctly");
+            Func<int, int> funcIntParam = Increment;
+            val = funcIntParam(10);
+            Assert.AreEqual(11, val, "Func<int, int> works");
             TestDelegateWithoutArguments();
             TestDelegateWithArguments();
             TestMulticastDelegateWithoutArguments();
