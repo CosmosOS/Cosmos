@@ -30,6 +30,31 @@ namespace Cosmos.Compiler.Tests.MethodTests
             return i + 1;
         }
 
+        public static int Sub(int a, int b)
+        {
+            return a - b;
+        }
+
+        public static TestStruct LargerReturn(int a, string c)
+        {
+            return new TestStruct
+            {
+                A = a,
+                B = 1,
+                C = c
+            };
+        }
+
+        public static TestStruct SmallerReturn(int a, long b, string c, int d)
+        {
+            return new TestStruct
+            {
+                A = a + d,
+                B = b,
+                C = c
+            };
+        }
+
         public static string WithStringReturnValue()
         {
             return "Hello World";
@@ -50,7 +75,7 @@ namespace Cosmos.Compiler.Tests.MethodTests
             mCount += 2;
         }
 
-        public static void Execute()
+        public static void TestDelegateWithReturnValue()
         {
             Func<int> funcInt = WithReturnValue;
             int val = funcInt();
@@ -66,10 +91,33 @@ namespace Cosmos.Compiler.Tests.MethodTests
             Func<int, int> funcIntParam = Increment;
             val = funcIntParam(10);
             Assert.AreEqual(11, val, "Func<int, int> works");
+            val = funcIntParam(funcIntParam(funcIntParam(0)));
+            Assert.AreEqual(3, val, "Calling same delegate works");
+            Func<int, int, int> funcSub = Sub;
+            val = funcSub(100, 15);
+            Assert.AreEqual(85, val, "Func<int, int, int> works");
+            Debugger.DoBochsBreak();
+            TestStruct testStructa = LargerReturn(33, "String");
+            Func<int, string, TestStruct> largeReturn = LargerReturn;
+            testStruct = largeReturn(33, "String");
+            Assert.AreEqual(33, testStruct.A, "Func<int, string, TestStruct> returns first value correctly");
+            Assert.AreEqual(1, testStruct.B, "Func<int, string, TestStruct> returns second value correctly");
+            Assert.AreEqual("String", testStruct.C, "Func<int, string, TestStruct> returns third value correctly");
+            Func<int, long, string, int, TestStruct> smallerReturn = SmallerReturn;
+            testStruct = smallerReturn(33, 100, "String2", 37);
+            Assert.AreEqual(70, testStruct.A, "Func<int, long, string, int, TestStruct> returns first value correctly");
+            Assert.AreEqual(100, testStruct.B, "Func<int, long, string, int, TestStruct> returns second value correctly");
+            Assert.AreEqual("String2", testStruct.C, "Func<int, long, string, int, TestStruct> returns third value correctly");
+        }
+
+        public static void Execute()
+        {
             TestDelegateWithoutArguments();
             TestDelegateWithArguments();
-            TestMulticastDelegateWithoutArguments();
+            TestDelegateWithReturnValue();
+            //TestMulticastDelegateWithoutArguments();
         }
+
 
         private static void TestDelegateWithoutArguments()
         {

@@ -26,7 +26,6 @@ namespace Cosmos.Core_Asm
             * ESI contains the size of the return value
             * EDI contains the function pointer
             */
-            XS.Exchange(BX, BX);
             XS.ClearInterruptFlag();
 
             XS.Comment("Get Invoke list count");
@@ -82,12 +81,13 @@ namespace Cosmos.Core_Asm
                 XS.Set(EDI, EAX, sourceIsIndirect: true, sourceDisplacement: 4);
                 XS.Set(EDI, EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr"));
 
-                XS.Sub(ESI, ECX); // determine how much more space the return value needs than the arguments
-                XS.Compare(ESI, 0);
-                XS.Jump(x86.ConditionalTestEnum.LessThanOrEqualTo, ".HANDLE_ARGUMENTS");
-                XS.Sub(ESP, ESI); // make extra space for the return value
+                XS.Set(EBX, 0); // initialise required extra space to 0
+                XS.Compare(ESI, ECX);
+                XS.Jump(x86.ConditionalTestEnum.LessThanOrEqualTo, ".NO_RETURN_VALUE_SPACE");
+                XS.Set(EBX, ESI);
+                XS.Sub(EBX, ECX);
+                XS.Label(".NO_RETURN_VALUE_SPACE");
 
-                XS.Label(".HANDLE_ARGUMENTS");
                 XS.Comment("Check if delegate has args");
                 XS.Compare(ECX, 0);
                 XS.Jump(x86.ConditionalTestEnum.Zero, ".NO_ARGS");
@@ -97,10 +97,18 @@ namespace Cosmos.Core_Asm
                 XS.Set(EDI, ESP);
                 XS.Add(EDI, 4);
                 XS.Set(ESI, EBP);
+                XS.Compare(EBX, 0);
+                XS.Jump(x86.ConditionalTestEnum.Equal, ".NO_RETURN_EXTRA");
+                XS.Add(ESI, EBX); // to skip the extra space reserved for the return value
+                XS.Jump(".AFTER_ADJUST_ESI");
+                XS.Label(".NO_RETURN_EXTRA");
                 XS.Add(ESI, 8);
+                XS.Label(".AFTER_ADJUST_ESI");
                 new x86.Movs { Size = 8, Prefixes = x86.InstructionPrefixes.Repeat };
                 XS.Pop(EDI);
                 XS.Label(".NO_ARGS");
+
+                XS.Sub(ESP, EBX); // make extra space for the return value
                 XS.Call(EDI);
 
                 XS.Comment("If there is a return value copy it to holding place now");
