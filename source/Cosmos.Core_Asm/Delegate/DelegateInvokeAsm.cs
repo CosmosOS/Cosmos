@@ -26,7 +26,6 @@ namespace Cosmos.Core_Asm
             * ESI contains the size of the return value
             * EDI contains the function pointer
             */
-            XS.Exchange(BX, BX);
             XS.ClearInterruptFlag();
 
             XS.Comment("Get Invoke list count");
