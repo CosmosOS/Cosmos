@@ -66,20 +66,47 @@ namespace Cosmos.Core_Asm
             {
                 XS.Compare(EDX, EBX);
                 XS.Jump(x86.ConditionalTestEnum.GreaterThanOrEqualTo, ".END_OF_INVOKE");
-                XS.Exchange(BX, BX);
                 XS.PushAllRegisters();
 
                 XS.Comment("Check if delegate has $this");
                 XS.Set(EDI, EBP, sourceDisplacement: Ldarg.GetArgumentDisplacement(xMethodInfo, 0));
                 XS.Add(EDI, 4);
                 XS.Set(EDI, EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target"));
+                XS.Set(EDX, ECX); // edx contains the size of the arguments including $this
                 XS.Compare(EDI, 0);
                 XS.Jump(x86.ConditionalTestEnum.Zero, ".NO_THIS");
-                XS.Set(EDX, ECX); // edx contains the size of the arguments including $this
                 XS.Label(".HAS_THIS");
                 XS.Push(EDI);
+                XS.Set(EDI, EDI, sourceIsIndirect: true); // get type of target object
+                XS.Add(EDX, 4); // we have at least one int of $this
+
+                //TODO: In future we might be able to replace the following call with a check
+                //if the object is boxed and in that case assume its a struct
+
+                // safe info from registers which get trashed
+                XS.Push(EAX);
+                XS.Push(EBX);
+                XS.Push(ECX);
+                XS.Push(EDX);
+
+                XS.Push(EDI);
+                XS.Call(LabelName.Get(VTablesImplRefs.IsStructRef));
+                XS.Pop(EDI);
+
+                // restore values
+                XS.Pop(EDX);
+                XS.Pop(ECX);
+                XS.Pop(EBX);
+                XS.Pop(EAX);
+
+                // now check if target turned out to be struct
+                XS.Compare(EDI, 1);
+                XS.Jump(x86.ConditionalTestEnum.Equal, ".Struct"); //structs are just the pointer so we are already done
                 XS.Push(0);
-                XS.Add(EDX, 8);
+                XS.Add(EDX, 4);
+                XS.Jump(".NO_THIS");
+                XS.Label(".Struct");
+                XS.Add(ESP, ObjectUtils.FieldDataOffset, destinationIsIndirect: true);
                 XS.Label(".NO_THIS");
                 XS.Set(EDI, EAX, sourceIsIndirect: true, sourceDisplacement: 4);
                 XS.Set(EDI, EDI, sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr"));

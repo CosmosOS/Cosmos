@@ -27,6 +27,32 @@ namespace Cosmos.Compiler.Tests.MethodTests
         }
     }
 
+    public struct StructWithDelegates
+    {
+        public int X = 0;
+        
+        public StructWithDelegates()
+        {
+
+        }
+
+        public int GetX()
+        {
+            return X;
+        }
+
+        public void IncX()
+        {
+            X++;
+        }
+
+        public int IncAndReturnX()
+        {
+            X++;
+            return X;
+        }
+    }
+
     public class DelegatesTest
     {
         private static int mCount;
@@ -138,12 +164,28 @@ namespace Cosmos.Compiler.Tests.MethodTests
             Assert.AreEqual(11, class1.X, "Action works with method");
         }
 
+        public static void TestDelegateWithStructTarget()
+        {
+            StructWithDelegates struct1 = new();
+            Func<int> getX1 = struct1.GetX;
+            Assert.AreEqual(0, getX1(), "Func<int> works with method");
+            struct1.X = 10;
+            Assert.AreEqual(0, getX1(), "Func<int> works with method and gets current value of the boxed instance");
+            Action incX1 = struct1.IncX;
+            incX1();
+            Assert.AreEqual(0, getX1(), "Action works with method but changes the value of a different instance");
+            Func<int> incAndGetX1 = struct1.IncAndReturnX;
+            Assert.AreEqual(11, incAndGetX1(), "Creating Func<int> correctly keeps value from before boxing");
+            Assert.AreEqual(12, incAndGetX1(), "Func<int> works on the same instance");
+        }
+
         public static void Execute()
         {
             TestDelegateWithoutArguments();
             TestDelegateWithArguments();
             TestDelegateWithReturnValue();
             TestDelegateWithTarget();
+            TestDelegateWithStructTarget();
             //TestMulticastDelegateWithoutArguments();
         }
 
