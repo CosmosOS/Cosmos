@@ -25,9 +25,16 @@ namespace Cosmos.Core_Plugs.System
             return xTypeA == xTypeB;
         }
 
+<<<<<<< HEAD
         public static int GetHashCode(Delegate aThis, [FieldAccess(Name = "System.IntPtr System.Delegate._methodPtr")] ref IntPtr aAddress)
         {
             return (int)aAddress.ToPointer();
+=======
+        [PlugMethod(Signature = "System_IRuntimeMethodInfo__System_Delegate_FindMethodHandle__")]
+        public static object FindMethodHandle(Delegate aThis)
+        {
+            throw new NotImplementedException();
+>>>>>>> master
         }
     }
 

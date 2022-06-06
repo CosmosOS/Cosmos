@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
-        <RuntimeIdentifier>win</RuntimeIdentifier>
+        <TargetFramework>net48</TargetFramework>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <PackageId>Cosmos.Build</PackageId>
         <PackageDescription>Cosmos build system.</PackageDescription>
         <IsMSBuildExtensionProject>True</IsMSBuildExtensionProject>
-        <AppendTargetFrameworkToToolsPackageFolder>False</AppendTargetFrameworkToToolsPackageFolder>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -16,12 +16,23 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="IL2CPU.Debug.Symbols" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.7" />
+		    <PackageReference Include="IL2CPU.Debug.Symbols.Net48" />
+        <PackageReference Update="Microsoft.Build.Framework" Version="17.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Update="Microsoft.Build.Utilities.Core" Version="16.9.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" PrivateAssets="All" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
+    </ItemGroup>
 </Project>

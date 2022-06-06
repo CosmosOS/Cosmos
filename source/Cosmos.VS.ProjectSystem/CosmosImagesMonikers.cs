@@ -5,9 +5,9 @@ namespace Cosmos.VS.ProjectSystem
 {
     internal static class CosmosImagesMonikers
     {
-        private static readonly Guid ManifestGuid = new Guid("9feaa5d5-9298-4c74-915e-2d0ab67992f9");
+        private static readonly Guid ManifestGuid = new Guid("{4862ad45-3b62-4112-8dcd-cf2df64ff519}");
 
-        private const int ProjectRootIconId = 0;
+        private const int ProjectRootIconId = 2;
 
         public static ImageMoniker ProjectRootIcon => new ImageMoniker { Guid = ManifestGuid, Id = ProjectRootIconId };
     }

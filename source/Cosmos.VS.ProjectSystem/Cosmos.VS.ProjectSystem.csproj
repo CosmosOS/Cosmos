@@ -1,29 +1,27 @@
-﻿<Project>
-
-    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.props" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
+﻿<Project Sdk="Microsoft.NET.SDK">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net48</TargetFramework>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <RootNamespace>Cosmos.VS.ProjectSystem</RootNamespace>
-        <IncludeWpfReferences>True</IncludeWpfReferences>
-        <IncludeWindowsFormsReferences>True</IncludeWindowsFormsReferences>
+        <FileVersion>1.0.0.0</FileVersion>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
 
     <PropertyGroup>
+        <UseCodebase>true</UseCodebase>
         <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
         <ExtensionInstallationFolder>Cosmos\ProjectSystem</ExtensionInstallationFolder>
+        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Remove="ProjectTemplates\**" />
         <Content Include="ProjectTemplates\**" IncludeInVSIX="True" />
         <Content Include="Resources\Icon.png" IncludeInVSIX="True" />
+        <Content Include="Resources\CosmosProjectRootIcon.png" IncludeInVSIX="True" />
         <Content Include="CosmosImages.imagemanifest" IncludeInVSIX="True" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Resource Include="Resources\CosmosProjectRootIcon.png" />
+        <EmbeddedResource Update="VSPackage.resx" MergeWithCTO="True" />
     </ItemGroup>
 
     <ItemGroup>
@@ -37,37 +35,31 @@
         <XamlPropertyRule Include="BuildSystem\Rules\LaunchConfiguration.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\PackageReference.xaml" />
         <XamlPropertyRule Include="BuildSystem\Rules\ResolvedPackageReference.xaml" />
+        <XamlPropertyRule Include="BuildSystem\Rules\CosmosPropertyPage.xaml" />
     </ItemGroup>
 
     <ItemGroup>
-        <Page Include="ProjectSystem\VS\PropertyPages\**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
-        <Compile Update="ProjectSystem\VS\PropertyPages\**\*.xaml.cs" DependentUpon="%(Filename)" />
-    </ItemGroup>
-
-    <!--
-        WinForms
-    -->
-    <ItemGroup>
-        <Compile Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.Designer.cs">
-            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
-        </Compile>
-        <EmbeddedResource Update="ProjectSystem\VS\PropertyPages\OldCosmosPropertyPageControl.resx">
-            <DependentUpon>OldCosmosPropertyPageControl.cs</DependentUpon>
-        </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Reference Include="Microsoft.VisualBasic" />
+        <None Update="BuildSystem\Rules\CosmosPropertyPage.xaml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Generator>MSBuild:Compile</Generator>
+        </None>
+        <None Update="CosmosImages.imagemanifest">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Generator>MSBuild:Compile</Generator>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Cosmos.Build.Common" />
-        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" />
-        <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
-        <PackageReference Include="VSPropertyPages" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Analyzers" PrivateAssets="All" Version="17.0.1313-pre" />
+        <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk" Version="17.0.1313-pre" />
+        <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+        <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.Resources.Extensions" Version="6.0.0" />
     </ItemGroup>
 
     <Target Name="IncludeMissingAssemblies" AfterTargets="GetVsixSourceItems" BeforeTargets="RemoveVSSDKAssemblies">
@@ -76,7 +68,8 @@
         </ItemGroup>
     </Target>
 
-    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-    <Import Project="$(BaseIntermediateOutputPath)*.nuget.g.targets" Condition="'$(MSBuildProjectExtension)' == '.tmp_proj' OR $(MSBuildProjectName.EndsWith('wpftmp'))" />
+    <ItemGroup>
+        <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
+    </ItemGroup>
 
 </Project>

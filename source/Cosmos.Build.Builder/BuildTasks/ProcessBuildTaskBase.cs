@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace Cosmos.Build.Builder.BuildTasks
 {
@@ -12,6 +15,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
         private readonly bool _waitForExit;
         private readonly bool _createWindow;
+        private static List<string> Lines = new List<string>();
 
         protected ProcessBuildTaskBase(bool waitForExit, bool createWindow)
         {
@@ -26,6 +30,7 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             logger.LogMessage($"\"{exePath}\" {args}");
 
+            Lines.Clear();
             var process = new Process();
             var processStartInfo = new ProcessStartInfo(exePath, args);
 
@@ -62,7 +67,26 @@ namespace Cosmos.Build.Builder.BuildTasks
 
             if (process.ExitCode != 0)
             {
-                throw new Exception("The process failed to execute!");
+                if (Lines.Count == 0)
+                {
+                    throw new Exception("The process failed to execute!");
+                }
+                else
+                {
+                    string error = "";
+                    foreach (var item in Lines)
+                    {
+                        if (item.ToLower().Contains("error"))
+                        {
+                            error += item + "\n";
+                        }
+                    }
+                    if (error == "")
+                    {
+                        error = Lines[Lines.Count - 1];
+                    }
+                    throw new Exception("The process failed to execute!\nError: \n"+error);
+                }
             }
         }
 
@@ -70,13 +94,15 @@ namespace Cosmos.Build.Builder.BuildTasks
         {
             while (true)
             {
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                         new Action(delegate { }));
                 var line = await reader.ReadLineAsync().ConfigureAwait(false);
 
                 if (line == null)
                 {
                     return;
                 }
-
+                Lines.Add(line);
                 logger.LogMessage(line);
             }
         }

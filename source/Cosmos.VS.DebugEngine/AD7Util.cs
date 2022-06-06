@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+using VSUtilities = Cosmos.VS.DebugEngine.Utilities.VS;
 
 namespace Cosmos.VS.DebugEngine
 {
@@ -12,25 +15,38 @@ namespace Cosmos.VS.DebugEngine
             //  File.AppendAllText(@"c:\data\sources\ad7.log", DateTime.Now.ToString("HH:mm:ss.ffffff: ") + String.Format(message, args) + Environment.NewLine);
         }
 
-        public static void MessageBox(string message, string title = "Cosmos Debug Engine")
+        public static async Task ShowMessageAsync(string message, string title = "Cosmos Debug Engine")
         {
-            if (!ThreadHelper.CheckAccess())
+            await VSUtilities.MessageBox.ShowAsync(title, message);
+        }
+
+        public static void ShowMessage(string message, string title = "Cosmos Debug Engine")
+        {
+            ThreadHelper.JoinableTaskFactory.Run(async delegate
             {
-                ThreadHelper.JoinableTaskFactory.Run(async delegate {
-                    // Switch to main thread
-                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                VSUtilities.MessageBox.Show(title, message);
+            });
+        }
 
+        public static async Task ShowWarningAsync(string message, string title = "Cosmos Debug Engine")
+        {
+            await VSUtilities.MessageBox.ShowWarningAsync(title, message);
+        }
 
-                    VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, message, title,
-                        OLEMSGICON.OLEMSGICON_NOICON, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                });
+        public static void ShowWarning(string message, string title = "Cosmos Debug Engine")
+        {
+            VSUtilities.MessageBox.ShowWarning(title, message);
+        }
 
-            }
-            else
-            {
-                VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, message, title,
-                    OLEMSGICON.OLEMSGICON_NOICON, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-            }
+        public static async Task ShowErrorAsync(string message, string title = "Cosmos Debug Engine")
+        {
+            await VSUtilities.MessageBox.ShowErrorAsync(title, message);
+        }
+
+        public static void ShowError(string message, string title = "Cosmos Debug Engine")
+        {
+            VSUtilities.MessageBox.ShowError(title, message);
         }
     }
 }

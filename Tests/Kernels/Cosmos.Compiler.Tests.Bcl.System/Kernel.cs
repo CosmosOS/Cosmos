@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
-
+using Cosmos.Core.Memory;
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
-
-using Cosmos.Compiler.Tests.Bcl.CSharp;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
@@ -23,9 +21,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
 
                 // System
-                ObjectTests.Execute();
                 ArrayTests.Execute();
                 StringTest.Execute();
+                ObjectTests.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();
                 Int16Test.Execute();
@@ -43,6 +41,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 DateTimeTests.Execute();
                 TimeSpanTests.Execute();
 
+                int count = Heap.Collect();
+                mDebugger.Send("Free");
+                mDebugger.Send(count.ToString());
 
                 TestController.Completed();
             }

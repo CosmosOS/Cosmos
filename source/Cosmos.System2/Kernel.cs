@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using sysIO = System.IO;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
@@ -84,10 +84,7 @@ namespace Cosmos.System
 
                 Global.mDebugger.Send("HW Bootstrap Init");
                 HAL.Bootstrap.Init();
-
-                Global.mDebugger.Send("Global Init");
-                Global.Init(GetTextScreen());
-
+                OnBoot();
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen)
                 {
@@ -95,6 +92,9 @@ namespace Cosmos.System
                     //Global.Console.Clear();
                 }
 
+
+                //  Global.mDebugger.Send("On Boot");
+                //  OnBoot();
                 Global.mDebugger.Send("Before Run");
                 BeforeRun();
 
@@ -113,9 +113,7 @@ namespace Cosmos.System
                 while (!mStopped)
                 {
                     //Network.NetworkStack.Update();
-                    Global.mDebugger.Send("Really before Run");
                     Run();
-                    Global.mDebugger.Send("Really after Run");
                 }
                 Global.mDebugger.Send("AfterRun");
                 AfterRun();
@@ -131,6 +129,18 @@ namespace Cosmos.System
             }
         }
 
+        /// <summary>
+        /// This Method controls the Driver initialisation process and is intended for
+        /// Advanced users developing their drivers and takes 4 additional booleans.
+        /// 1. Mousewheel, if you experience your mouse cursors being stuck in the lower left corner set this to "false", default: true
+        /// 2. PS2 Driver initialisation, true/false , default: true
+        /// 3. Network Driver initialisation, true/false, default: true
+        /// 4. IDE initialisation, true/false, default: true
+        /// If you need anything else to be initialised really early on, place it here.
+        /// </summary>
+        protected virtual void OnBoot() {
+            Global.Init(GetTextScreen());
+        }
         /// <summary>
         /// Pre-run events
         /// </summary>
@@ -164,11 +174,11 @@ namespace Cosmos.System
 
         // Shutdown and restart
         /// <summary>
-        /// Shutdown and restart.
-        /// Not implemented.
+        /// Shutdown and restart. Implemented.
         /// </summary>
         public void Restart()
         {
+            Power.Reboot();
         }
 
         /// <summary>

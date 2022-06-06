@@ -5,20 +5,14 @@ using System.IO;
 namespace Cosmos.System.FileSystem.VFS
 {
     /// <summary>
-    /// Virtual file system base abstract class. 
+    /// Virtual file system base abstract class.
     /// </summary>
     public abstract class VFSBase
     {
         /// <summary>
         /// Initializes the <see cref="VFSBase"/> system.
         /// </summary>
-        public abstract void Initialize();
-
-        /// <summary>
-        /// Register file system.
-        /// </summary>
-        /// <param name="aFileSystemFactory">A file system to register.</param>
-        public abstract void RegisterFileSystem(FileSystemFactory aFileSystemFactory);
+        public abstract void Initialize(bool aShowInfo);
 
         /// <summary>
         /// Create File.
@@ -168,11 +162,14 @@ namespace Cosmos.System.FileSystem.VFS
         public abstract void SetFileSystemLabel(string aDriveId, string aLabel);
 
         /// <summary>
-        /// Format partition.
+        /// Gets the next available file system letter.
         /// </summary>
-        /// <param name="aDriveId">A drive id.</param>
-        /// <param name="aDriveFormat">A drive format.</param>
-        /// <param name="aQuick">Quick format.</param>
-        public abstract void Format(string aDriveId, string aDriveFormat, bool aQuick);
+        /// <returns>Example: 0 or c</returns>
+        public abstract string GetNextFilesystemLetter();
+        /// <summary>
+        /// Gets all of the disks
+        /// </summary>
+        /// <returns>All of the disks on the system</returns>
+        public abstract List<Disk> GetDisks();
     }
 }

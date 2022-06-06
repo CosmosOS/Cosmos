@@ -27,8 +27,8 @@ so overwhelming like the dev kit. This article focuses on the user kit.
 
 ##  Writing your first Operating System
 
-Create a new project as you would any C# project, but select Cosmos as the
-project type.
+Create a new project as you would any C# project, but select Cosmos Kernel  
+(Previously CosmosBoot; same functionality) as the project type.
 
 ![](images/SNAG-0000.png)
 
@@ -88,7 +88,7 @@ assembly is used by all Cosmos projects.
 ##  Code Based Breakpoints
 
     
-    Debugger.Break();
+    mDebugger.Break();
 
 Break can be used to issue a code based break. Visual Studio will break on the
 line after this statement.
@@ -100,7 +100,7 @@ base breaks are very useful for implementing such. For example:
 
     
     if (x == 5) {
-        Debugger.Break();
+        mDebugger.Break();
     }
 
 Alternatively you can call the .NET class libary break:
@@ -117,7 +117,7 @@ does not support watches yet, this functionality can be very useful for
 watching variable values and for performing tracing without breakpoints.
 
     
-    Debugger.Send("Hello from Cosmos!");
+    mDebugger.Send("Hello from Cosmos!");
 
 When this line is executed, it will send a message over the debugging channel
 and it will appear in the Visual Studio output window.
@@ -126,18 +126,12 @@ and it will appear in the Visual Studio output window.
 
 ##  What's the catch?
 
-There really is no catch. Everything We've shown here is functioning as seen.
+There really is no catch. Everything we've shown here is functioning as seen.
 No mockups were used. However we still have a lot of work to go. Items of
 interest that are on our current task list include interfaces (necessary for
 foreach loops), file systems (partial support exists), threads, networking, and
 graphics. We have prototypes and experimentation for each, but none have been
 rolled into the mainline Cosmos development as of yet.
-
-##  What was that Syslinux thing I saw on boot?
-
-Cosmos does not run on Linux. A boot loader called Syslinux is used to boot
-Cosmos. After booting, Syslinux is not used. Syslinux is a bootloader and is
-not a Linux distro. Syslinux simplifies the booting process by doing tasks such as enabline the A20 gate, initializing hardware, and switching to real mode (all of which are required by modern operating systems).
 
 ##  Obtaining Cosmos
 

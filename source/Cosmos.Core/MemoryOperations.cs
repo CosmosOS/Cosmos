@@ -1,4 +1,5 @@
 ﻿//#define COSMOSDEBUG
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Cosmos.Core
@@ -12,12 +13,17 @@ namespace Cosmos.Core
         /// <summary>
         /// Fill memory block. Plugged.
         /// </summary>
-        /// <param name="dest">A destination.</param>
-        /// <param name="value">A data value.</param>
-        /// <param name="size">A data size.</param>
-        public static unsafe void Fill(byte* dest, int value, int size)
+        /// <param name="aDest">A destination.</param>
+        /// <param name="aValue">A data value.</param>
+        /// <param name="aSize">A data size.</param>
+        public static unsafe void Fill(byte* aDest, int aValue, int aSize)
         {
-            // Plugged
+            // Plugged but we use this for unit tests
+            var bytes = BitConverter.GetBytes(aValue);
+            for (int i = 0; i < aSize; i++)
+            {
+                aDest[i] = bytes[i % 4];
+            }
         }
 
         /// <summary>
@@ -33,11 +39,11 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Fill data to destination.
+        /// Fill destination region with value.
         /// </summary>
-        /// <param name="dest">Destination.</param>
-        /// <param name="value">Data value.</param>
-        /// <param name="size">Data size.</param>
+        /// <param name="dest">Location</param>
+        /// <param name="value">Value</param>
+        /// <param name="size">Number of integers to write</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe void Fill(int* dest, int value, int size)
         {
@@ -198,9 +204,9 @@ namespace Cosmos.Core
                 Copy(destPtr, srcPtr, dest.Length);
             }
         }
-        #endregion Fill
+#endregion Fill
 
-        #region Copy
+#region Copy
         /// <summary>
         /// Copy source to destination.
         /// plugged.
@@ -344,6 +350,21 @@ namespace Cosmos.Core
             fixed (byte* srcPtr = src)
             {
                 Copy(destPtr, srcPtr, dest.Length);
+            }
+        }
+
+        /// <summary>
+        /// Copy source to destination.
+        /// </summary>
+        /// <param name="dest">Destination.</param>
+        /// <param name="src">Source.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Copy(byte[] aDest, int aDestOffset, byte[] aSrc, int aSrcOffset, int aCount)
+        {
+            fixed (byte* destPtr = &aDest[aDestOffset])
+            fixed (byte* srcPtr = &aSrc[aSrcOffset])
+            {
+                Copy(destPtr, srcPtr, aCount);
             }
         }
 

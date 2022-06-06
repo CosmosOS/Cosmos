@@ -1,6 +1,17 @@
-﻿using sys = System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          IPv4 Packet
+* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   Port of Cosmos Code.
+*/
+
+using System;
+using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
+using Cosmos.System.Network.IPv4.TCP;
+using Cosmos.System.Network.IPv4.UDP;
+using Cosmos.System.Network.IPv4.UDP.DHCP;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -23,12 +34,11 @@ namespace Cosmos.System.Network.IPv4
         /// <exception cref="sys.OverflowException">Thrown if packetData array length is greater than Int32.MaxValue.</exception>
         internal static void IPv4Handler(byte[] packetData)
         {
-            IPPacket ip_packet = new IPPacket(packetData);
-            //Sys.Console.WriteLine("Received IP Packet");
-            //Sys.Console.WriteLine(ip_packet.ToString());
+            var ip_packet = new IPPacket(packetData);
+
             if (ip_packet.SourceIP == null)
             {
-                NetworkStack.debugger.Send("SourceIP null in IPv4Handler!");
+                Global.mDebugger.Send("SourceIP null in IPv4Handler!");
             }
             ARPCache.Update(ip_packet.SourceIP, ip_packet.SourceMAC);
 
@@ -41,12 +51,16 @@ namespace Cosmos.System.Network.IPv4
                         ICMPPacket.ICMPHandler(packetData);
                         break;
                     case 6:
-                        //TCPPacket.TCPHandler(packetData);
+                        TCPPacket.TCPHandler(packetData);
                         break;
                     case 17:
                         UDPPacket.UDPHandler(packetData);
                         break;
                 }
+            }
+            else if (NetworkStack.MACMap.ContainsKey(ip_packet.DestinationMAC.Hash))
+            {
+                DHCPPacket.DHCPHandler(packetData);
             }
         }
 
@@ -56,17 +70,17 @@ namespace Cosmos.System.Network.IPv4
         public static ushort NextIPFragmentID => sNextFragmentID++;
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         internal IPPacket()
         {
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
-        internal IPPacket(byte[] rawData)
+        public IPPacket(byte[] rawData)
             : base(rawData)
         {
         }
@@ -75,15 +89,15 @@ namespace Cosmos.System.Network.IPv4
         /// Init IPPacket fields.
         /// </summary>
         /// <exception cref="sys.ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void initFields()
+        protected override void InitFields()
         {
-            base.initFields();
+            base.InitFields();
             IPVersion = (byte)((RawData[14] & 0xF0) >> 4);
             ipHeaderLength = (byte)(RawData[14] & 0x0F);
             TypeOfService = RawData[15];
             IPLength = (ushort)((RawData[16] << 8) | RawData[17]);
             FragmentID = (ushort)((RawData[18] << 8) | RawData[19]);
-            Flags = (byte)((RawData[20] & 0xE0) >> 5);
+            IPFlags = (byte)((RawData[20] & 0xE0) >> 5);
             FragmentOffset = (ushort)(((RawData[20] & 0x1F) << 8) | RawData[21]);
             TTL = RawData[22];
             Protocol = RawData[23];
@@ -94,7 +108,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="dataLength">Data length.</param>
         /// <param name="protocol">Protocol.</param>
@@ -106,7 +120,20 @@ namespace Cosmos.System.Network.IPv4
         { }
 
         /// <summary>
-        /// Create new inctanse of the <see cref="IPPacket"/> class.
+        /// Create new instance of the <see cref="IPPacket"/> class.
+        /// </summary>
+        /// <param name="dataLength">Data length.</param>
+        /// <param name="protocol">Protocol.</param>
+        /// <param name="source">Source address.</param>
+        /// <param name="dest">Destionation address.</param>
+        /// <param name="Flags">Flags.</param>
+        /// /// <param name="broadcast">Mac address</param>
+        protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte Flags, MACAddress broadcast)
+            : this(MACAddress.None, broadcast, dataLength, protocol, source, dest, Flags)
+        { }
+
+        /// <summary>
+        /// Create new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="srcMAC">Source MAC address.</param>
         /// <param name="destMAC">Destination MAC address.</param>
@@ -145,7 +172,7 @@ namespace Cosmos.System.Network.IPv4
             RawData[24] = (byte)((IPCRC >> 8) & 0xFF);
             RawData[25] = (byte)((IPCRC >> 0) & 0xFF);
 
-            initFields();
+            InitFields();
         }
 
         /// <summary>
@@ -165,16 +192,26 @@ namespace Cosmos.System.Network.IPv4
         /// <returns>ushort value.</returns>
         protected static ushort CalcOcCRC(byte[] buffer, ushort offset, int length)
         {
-            uint crc = 0;
+            return (ushort)~SumShortValues(buffer, offset, length);
+        }
 
-            for (ushort w = offset; w < offset + length; w += 2)
+        protected static ushort SumShortValues(byte[] buffer, int offset, int length)
+        {
+            uint chksum = 0;
+            int end = offset + (length & ~1);
+            int i = offset;
+
+            while (i != end)
             {
-                crc += (ushort)((buffer[w] << 8) | buffer[w + 1]);
+                chksum += (uint)((((ushort)buffer[i++]) << 8) + (ushort)buffer[i++]);
             }
-
-            crc = (~((crc & 0xFFFF) + (crc >> 16)));
-
-            return (ushort)crc;
+            if (i != offset + length)
+            {
+                chksum += (uint)(((ushort)buffer[i]) << 8);
+            }
+            chksum = (chksum & 0xFFFF) + (chksum >> 16);
+            chksum = (chksum & 0xFFFF) + (chksum >> 16);
+            return (ushort)chksum;
         }
 
         /// <summary>
@@ -212,7 +249,7 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Get flags.
         /// </summary>
-        internal byte Flags { get; private set; }
+        internal byte IPFlags { get; private set; }
         /// <summary>
         /// Get fragment offset.
         /// </summary>

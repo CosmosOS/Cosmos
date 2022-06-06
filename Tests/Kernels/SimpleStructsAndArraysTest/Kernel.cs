@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
@@ -80,6 +79,20 @@ namespace SimpleStructsAndArraysTest
             Assert.IsTrue(xItem2.C == 3, "xItem2.C == 3");
             Assert.IsTrue(xItem2.D == 4, "xItem2.D == 4");
             Assert.IsTrue(xItem2.E == 5, "xItem2.E == 5");
+        }
+
+        public struct ThreeBytes
+        {
+            public byte A;
+            public byte B;
+            public byte C;
+
+            public ThreeBytes(byte a, byte b, byte c)
+            {
+                A = a;
+                B = b;
+                C = c;
+            }
         }
 
         private class KVPClass
@@ -254,6 +267,16 @@ namespace SimpleStructsAndArraysTest
         //    Assert.IsTrue(xTestMultidimensionalArray[1, 1] == 4, "Index [1, 1] == 4");
         //}
 
+        private void TestRemainder3Structs()
+        {
+            ThreeBytes[] array = new ThreeBytes[1];
+            array[0] = new ThreeBytes(17, 254, 77);
+            Assert.AreEqual(array[0].A, 17, "Three byte struct in array first value read correctly");
+            Assert.AreEqual(array[0].B, 254, "Three byte struct in array second value read correctly");
+            var local = array[0];
+            Assert.AreEqual(local.C, 77, "Three byte struct third value read correctly");
+        }
+
         protected override void Run()
         {
             TestStep1();
@@ -265,6 +288,7 @@ namespace SimpleStructsAndArraysTest
             //Assert.IsTrue(true, "After TestMultidimensionalArray");
             ConstrainedTest.MutateStructTest();
             Assert.IsTrue(true, "After MutateTestStruct");
+            TestRemainder3Structs();
 
             TestController.Completed();
         }

@@ -9,12 +9,12 @@ namespace Cosmos.System.ExtendedASCII
     internal class CP858Enconding : SingleByteEncoding
     {
         /// <summary>
-        /// Debugger inctanse of the "System" ring with the "CP858 Encoding" tag.
+        /// Debugger instance of the "System" ring with the "CP858 Encoding" tag.
         /// </summary>
         private static Debugger myDebugger = new Debugger("System", "CP858 Encoding");
 
         /// <summary>
-        /// Create new inctanse of the <see cref="CP858Enconding"/> class.
+        /// Create new instance of the <see cref="CP858Enconding"/> class.
         /// </summary>
         internal CP858Enconding()
         {

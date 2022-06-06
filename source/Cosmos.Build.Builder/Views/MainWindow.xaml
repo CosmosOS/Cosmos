@@ -3,44 +3,58 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
         mc:Ignorable="d"
         Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
         MinHeight="480"
         MinWidth="800"
         Title="Cosmos Kit Builder"
         WindowStartupLocation="CenterScreen"
-        WindowState="{Binding WindowState}">
+        WindowState="{Binding WindowState}" 
+        Style="{StaticResource UiWindow}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
-    <DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <Grid DockPanel.Dock="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <wpfui:TitleBar Grid.Row="0" ApplicationNavigation="True" Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico" Title="Cosmos Builder"/>
 
-            <Button Grid.Column="0"
+        <DockPanel Grid.Row="1">
+
+            <Grid DockPanel.Dock="Bottom" Height="46">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
                     Command="{Binding CopyCommand}"
-                    Content="Copy" />
+                    Content="Copy log" Width="96" Height="46"
+                        Padding="10,10,10,10"/>
 
-            <CheckBox Grid.Column="2"
+                <Button Grid.Column="1"
+                    Command="{Binding PostPaste}"
+                    Content="Publish on Hastebin" Height="46" MaxWidth="200"
+                        Padding="10,10,10,10" Margin="0,0,319,0" HorizontalAlignment="Right" Width="147"/>
+
+                <CheckBox Grid.Column="3"
                       IsChecked="{Binding CloseWhenCompleted}"
-                      Content="Close window when completed" />
-        </Grid>
-
-        <Rectangle DockPanel.Dock="Top"
+                      Content="Close when finished" Height="39" Margin="0,0,20,7" />
+            </Grid>
+            <Rectangle DockPanel.Dock="Top"
                    Height="5" />
-        <TextBlock DockPanel.Dock="Top"
-                   Background="LightGray"
-                   FontSize="18"
-                   Foreground="Blue"
-                   FontWeight="ExtraBold"
-                   Text="{Binding CurrentSection.Name, StringFormat='Current Task Log Tail - {0}', FallbackValue='Current Task Log Tail'}" />
-        <ItemsControl DockPanel.Dock="Top"
+            <TextBlock DockPanel.Dock="Top"
+                   FontSize="26"
+                   FontWeight="Medium"
+                   Text="{Binding CurrentSection.Name, StringFormat='  Build status: {0}', FallbackValue='  Starting build...'}" />
+            <ItemsControl DockPanel.Dock="Top"
                       Background="Black"
                       BorderBrush="DarkGray"
                       BorderThickness="0.5"
@@ -48,54 +62,82 @@
                       Foreground="Green"
                       Margin="0,4"
                       ItemsSource="{Binding TailItems}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderBrush="DarkGray"
-                            BorderThickness="0.5"
-                            Padding="4,0">
-                        <TextBlock Text="{Binding}" />
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-
-        <Rectangle DockPanel.Dock="Top"
-                   Height="5"
-                   Fill="LightGray"/>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Sections}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <HeaderedContentControl>
-                            <HeaderedContentControl.Header>
-                                <ToggleButton x:Name="sectionToggleButton"
-                                              Background="LightGray"
-                                              FontSize="18"
-                                              FontWeight="Bold"
-                                              HorizontalContentAlignment="Left"
-                                              Content="{Binding Name}">
-                                    <ToggleButton.Style>
-                                        <Style TargetType="ToggleButton">
-                                            <Setter Property="Foreground" Value="Green" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HasLoggedErrors}" Value="True">
-                                                    <Setter Property="Foreground" Value="Red" />
-                                                    <Setter Property="IsChecked" Value="True" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ToggleButton.Style>
-                                </ToggleButton>
-                            </HeaderedContentControl.Header>
-                            <TextBlock Visibility="{Binding IsChecked, ElementName=sectionToggleButton, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                       Text="{Binding Log}" />
-                        </HeaderedContentControl>
+                        <Border BorderBrush="DarkGray"
+                            BorderThickness="0.5"
+                            Padding="4,0">
+                            <TextBlock Text="{Binding}" />
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </ScrollViewer>
 
-    </DockPanel>
+            <Rectangle DockPanel.Dock="Top"
+                   Height="5"
+                   />
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,5,0,0">
+                <ItemsControl ItemsSource="{Binding Sections}" HorizontalAlignment="Stretch">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <HeaderedContentControl>
+                                <HeaderedContentControl.Header>
+                                    <ToggleButton x:Name="sectionToggleButton"
+                                              FontSize="18"
+                                              FontWeight="Bold"
+                                              HorizontalContentAlignment="Left"
+                                              Content="{Binding Name}"
+                                              HorizontalAlignment="Stretch"
+                                              >
+                                        <ToggleButton.Style>
+                                            <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                                <Setter Property="Foreground" Value="Green" />
 
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasLoggedErrors}" Value="True">
+                                                        <Setter Property="Foreground" Value="White" />
+                                                        <Setter Property="IsChecked" Value="True" />
+                                                        <Setter Property= "Background" Value="DarkRed"/>
+
+                                                        <!--Override the background color with Red-->
+                                                        <Setter Property="Template">
+                                                            <Setter.Value >
+                                                                <ControlTemplate TargetType="ToggleButton">
+                                                                    <Border x:Name="border"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            SnapsToDevicePixels="True">
+                                                                        <ContentPresenter x:Name="contentPresenter"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                  Focusable="False"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  RecognizesAccessKey="True"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                    </ToggleButton>
+                                </HeaderedContentControl.Header>
+                                <TextBlock Visibility="{Binding IsChecked, ElementName=sectionToggleButton, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                       Text="{Binding Log}" />
+                            </HeaderedContentControl>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+        </DockPanel>
+    </Grid>
 </Window>

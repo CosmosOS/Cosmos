@@ -4,6 +4,7 @@ using System.Threading;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL
 {
@@ -21,11 +22,11 @@ namespace Cosmos.HAL
 
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
-        /// Init <see cref="Global"/> inctanse.
+        /// Init <see cref="Global"/> instance.
         /// </summary>
         /// <param name="textScreen">Text screen.</param>
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
-        static public void Init(TextScreenBase textScreen)
+        static public void Init(TextScreenBase textScreen, bool InitScrollWheel, bool InitPS2, bool InitNetwork, bool IDEInit)
         {
             if (textScreen != null)
             {
@@ -57,16 +58,43 @@ namespace Cosmos.HAL
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
             mDebugger.Send("PS/2 Controller Init");
-            PS2Controller.Initialize();
-
-            IDE.InitDriver();
+            if (InitPS2)
+            {
+                PS2Controller.Initialize(InitScrollWheel);
+            }
+            else
+            {
+                mDebugger.Send("PS/2 Controller disabled in User Kernel");
+            }
+            if (IDEInit)
+            {
+                IDE.InitDriver();
+            }
+            else
+            {
+                mDebugger.Send("IDE Driver disabled in User Kernel");
+            }
             AHCI.InitDriver();
             //EHCI.InitDriver();
+<<<<<<< HEAD
 
             Console.WriteLine("Starting Processor Scheduler");
             mDebugger.Send("Processor Scheduler");
             Core.Processing.ProcessorScheduler.Initialize();
 
+=======
+            if (InitNetwork)
+            {
+                mDebugger.Send("Network Devices Init");
+                NetworkInit.Init();
+            }
+            else
+            {
+                mDebugger.Send("Network Driver disabled in User Kernel");
+            }
+            Console.WriteLine("Enabling Serial Output on COM1");
+            Debug.Serial.Enable();
+>>>>>>> master
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
         }
@@ -76,7 +104,7 @@ namespace Cosmos.HAL
         /// </summary>
         public static void EnableInterrupts()
         {
-            CPU.EnableInterrupts();
+           CPU.EnableInterrupts();
         }
 
         /// <summary>

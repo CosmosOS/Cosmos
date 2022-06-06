@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <OutputType>WinExe</OutputType>
         <ApplicationIcon>Cosmos.ico</ApplicationIcon>
-        <IncludeWpfReferences>True</IncludeWpfReferences>
+        <UseWPF>true</UseWPF>
     </PropertyGroup>
 
     <ItemGroup>
-        <ApplicationDefinition Include="App.xaml" SubType="Designer" Generator="MSBuild:Compile" />
-        <Page Include="**\*.xaml" Exclude="App.xaml" SubType="Designer" Generator="MSBuild:Compile" />
         <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
         <Resource Include="Cosmos.ico" />
     </ItemGroup>

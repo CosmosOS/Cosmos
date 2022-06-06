@@ -15,7 +15,7 @@
 * Look in the downloaded sources and run **install-VS2019.bat** with admin privileges (UAC will ask for permission), needed for install in system directories.
 * When the installation is complete, Visual Studio will automatically open and you may begin programming with your new, modified copy of Cosmos.
 
-## Arguments for the 'install-VS2015.bat' file
+## Arguments for the 'install-VS2019.bat' file
 The `install-VS2019.bat` accepts the following parameters :
 
 - `-USERKIT` Run installer for the User Kit only. By default installer build and install Dev Kit.

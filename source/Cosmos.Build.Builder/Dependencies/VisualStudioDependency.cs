@@ -9,10 +9,15 @@ namespace Cosmos.Build.Builder.Dependencies
     internal class VisualStudioDependency : IDependency
     {
         private static readonly Version MinimumVsVersion = new Version(15, 9);
-
+        public bool ShouldInstallByDefault => true;
         public string Name => $"Visual Studio {MinimumVsVersion.Major}.{MinimumVsVersion.Minor}+";
+        public string OtherDependencysThatAreMissing
+        {
+            get { return "install " + Name +"+"; }
+        }
 
         private readonly ISetupInstance2 _visualStudioInstance;
+
 
         public VisualStudioDependency(ISetupInstance2 visualStudioInstance)
         {

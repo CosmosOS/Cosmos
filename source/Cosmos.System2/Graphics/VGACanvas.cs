@@ -48,6 +48,11 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public override string Name() => "VGACanvas";
+
+        /// <summary>
         /// Gets or sets the VGA graphics mode
         /// </summary>
         public override Mode Mode { get; set; }
@@ -56,10 +61,19 @@ namespace Cosmos.System.Graphics
         /// Clears the screen of all pixels
         /// </summary>
         /// <param name="aColor"></param>
+        public override void Clear(int aColor)
+        {
+            _VGADriver.DrawFilledRectangle(0, 0, _VGADriver.PixelWidth, _VGADriver.PixelHeight, (uint)aColor);
+        }
+
+        /// <summary>
+        /// Clears the screen of all pixels
+        /// </summary>
+        /// <param name="aColor"></param>
         public override void Clear(Color aColor)
         {
             var paletteIndex = _VGADriver.GetClosestColorInPalette(aColor);
-            _VGADriver.DrawFilledRectangle(0,0, _VGADriver.PixelWidth, _VGADriver.PixelHeight, paletteIndex);
+            _VGADriver.DrawFilledRectangle(0, 0, _VGADriver.PixelWidth, _VGADriver.PixelHeight, paletteIndex);
         }
 
         /// <summary>
@@ -411,7 +425,7 @@ namespace Cosmos.System.Graphics
 
         public override void Display()
         {
-            
+
         }
     }
 }

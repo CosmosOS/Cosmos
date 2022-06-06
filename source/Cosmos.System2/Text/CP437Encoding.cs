@@ -9,12 +9,12 @@ namespace Cosmos.System.ExtendedASCII
     internal class CP437Enconding : SingleByteEncoding
     {
         /// <summary>
-        /// Debugger inctanse of the "System" ring with the "CP437 Encoding" tag.
+        /// Debugger instance of the "System" ring with the "CP437 Encoding" tag.
         /// </summary>
         private static Debugger myDebugger = new Debugger("System", "CP437 Encoding");
 
         /// <summary>
-        /// Create new inctanse of the <see cref="CP437Enconding"/> class.
+        /// Create new instance of the <see cref="CP437Enconding"/> class.
         /// </summary>
         internal CP437Enconding()
         {

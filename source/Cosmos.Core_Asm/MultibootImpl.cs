@@ -5,17 +5,17 @@ using XSharp.Assembler;
 
 namespace Cosmos.Core_Asm
 {
-    [Plug(Target = typeof(Multiboot))]
-    public class MultibootImpl
+    [Plug(Target = typeof(Multiboot2))]
+    public class Multiboot2Impl
     {
-        [PlugMethod(Assembler = typeof(MultibootImplAsm))]
+        [PlugMethod(Assembler = typeof(Multiboot2ImplAsm))]
         public static uint GetMBIAddress()
         {
             return 0;
         }
     }
 
-    public class MultibootImplAsm : AssemblerMethod
+    public class Multiboot2ImplAsm : AssemblerMethod
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {

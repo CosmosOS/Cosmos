@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>Cosmos.System_Plugs</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,6 +17,10 @@
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
         <ProjectReference Include="..\Cosmos.HAL2\Cosmos.HAL2.csproj" />
         <ProjectReference Include="..\Cosmos.System2\Cosmos.System2.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="System\Runtime\CompilerServices\" />
     </ItemGroup>
 
 </Project>

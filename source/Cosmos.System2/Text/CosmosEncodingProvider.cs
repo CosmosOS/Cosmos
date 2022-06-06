@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 using System.Text;
 using Cosmos.Debug.Kernel;
 
@@ -14,12 +14,12 @@ namespace Cosmos.System.ExtendedASCII
         /// </summary>
         private static readonly EncodingProvider s_singleton = new CosmosEncodingProvider();
         /// <summary>
-        /// Debugger inctanse of the "System" ring with the "CosmosEncodingProvider" tag.
+        /// Debugger instance of the "System" ring with the "CosmosEncodingProvider" tag.
         /// </summary>
         private static Debugger myDebugger = new Debugger("System", "CosmosEncodingProvider");
 
         /// <summary>
-        /// Create new inctanse of the <see cref="CosmosEncodingProvider"/> class.
+        /// Create new instance of the <see cref="CosmosEncodingProvider"/> class.
         /// </summary>
         internal CosmosEncodingProvider() { }
 

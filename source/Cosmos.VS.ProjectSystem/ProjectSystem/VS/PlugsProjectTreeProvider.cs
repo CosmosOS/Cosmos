@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.ProjectSystem.Properties;
 
@@ -34,11 +35,11 @@ namespace Cosmos.VS.ProjectSystem.VS
         protected override void Initialize()
         {
             base.Initialize();
-            
-            SubmitTreeUpdateAsync(
+
+            _ = SubmitTreeUpdateAsync(
                 (treeSnapshot, configuredProjectExports, cancellationToken) =>
                 {
-                    return Task.FromResult(new TreeUpdateResult(CreatePlugsFolder(), true));
+                    return Task.FromResult(new TreeUpdateResult(CreatePlugsFolder()));
                 });
 
             var itemsBlock = _activeConfiguredProjectSubscriptionService.ProjectCatalogSource.SourceBlock;
@@ -75,7 +76,7 @@ namespace Cosmos.VS.ProjectSystem.VS
 
         private Task ItemsChangedAsync(IProjectVersionedValue<IProjectCatalogSnapshot> snapshot)
         {
-            SubmitTreeUpdateAsync(
+            return SubmitTreeUpdateAsync(
                 (treeSnapshot, configuredProjectExports, cancellationToken) =>
                 {
                     var dependenciesNode = treeSnapshot.Value.Tree;
@@ -84,11 +85,9 @@ namespace Cosmos.VS.ProjectSystem.VS
                     {
                         dependenciesNode = BuildTree(dependenciesNode, snapshot.Value, cancellationToken);
                     }
-                    
-                    return Task.FromResult(new TreeUpdateResult(dependenciesNode, false));
-                });
 
-            return Task.CompletedTask;
+                    return Task.FromResult(new TreeUpdateResult(dependenciesNode));
+                });
         }
 
         private IProjectTree BuildTree(

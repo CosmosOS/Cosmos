@@ -18,7 +18,8 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static void Init(string aPathname, FileMode aMode, ref Stream innerStream)
         {
-            Global.mFileSystemDebugger.SendInternal("FileStream.Init:");
+            Global.mFileSystemDebugger.SendInternal("-- FileStream.Init --");
+            Global.mFileSystemDebugger.SendInternal("aPathname = " + aPathname);
 
             innerStream = InitializeStream(aPathname, aMode);
         }
@@ -42,11 +43,15 @@ namespace Cosmos.System_Plugs.System.IO
         }
 
         public static int Read(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream) =>
+            aThis.Read(aBuffer.AsSpan().Slice(aOffset, aCount));
+
+        public static int Read(FileStream aThis, Span<byte> aBuffer,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             Global.mFileSystemDebugger.SendInternal("FileStream.Read:");
 
-            return innerStream.Read(aBuffer, aOffset, aCount);
+            return innerStream.Read(aBuffer);
         }
 
         public static int ReadByte(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
@@ -55,11 +60,15 @@ namespace Cosmos.System_Plugs.System.IO
         }
 
         public static void Write(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream) =>
+            aThis.Write(aBuffer.AsSpan().Slice(aOffset, aCount));
+
+        public static void Write(FileStream aThis, ReadOnlySpan<byte> aBuffer,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
-            Global.mFileSystemDebugger.SendInternal($"FileStream.Write: aOffset {aOffset} aCount {aCount}");
+            Global.mFileSystemDebugger.SendInternal($"FileStream.Write:");
 
-            innerStream.Write(aBuffer, aOffset, aCount);
+            innerStream.Write(aBuffer);
         }
 
         public static long get_Length(FileStream aThis,
@@ -113,7 +122,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream CreateNewFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.CreateNewFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.CreateNewFile -- aPath = {aPath} existing = {aPathExists}");
           
             if (aPathExists)
             {
@@ -133,7 +142,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream TruncateFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.TruncateFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.TruncateFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (!aPathExists)
             {
@@ -151,7 +160,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream CreateFile(string aPath, bool aPathExists)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.CreateFile aPath {aPath} existing? {aPathExists}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.CreateFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (aPathExists == false)
             {
@@ -221,7 +230,8 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream InitializeStream(string aPath, FileMode aMode)
         {
-            Global.mFileSystemDebugger.SendInternal($"In FileStream.InitializeStream aPath {aPath}");
+            Global.mFileSystemDebugger.SendInternal($"-- FileStream.InitializeStream --");
+            Global.mFileSystemDebugger.SendInternal($"aPath = {aPath}");
             if (aPath == null)
             {
                 Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path == null is true");
@@ -270,6 +280,11 @@ namespace Cosmos.System_Plugs.System.IO
         public static bool get_CanRead(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             return innerStream.CanRead;
+        }
+
+        public static bool get_CanSeek(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            return innerStream.CanSeek;
         }
 
         public static void WriteByte(FileStream aThis, byte aByte)

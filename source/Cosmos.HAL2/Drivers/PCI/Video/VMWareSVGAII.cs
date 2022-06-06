@@ -447,7 +447,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Video memory block.
         /// </summary>
-        private MemoryBlock Video_Memory;
+        public MemoryBlock VideoMemory;
         /// <summary>
         /// FIFO memory block.
         /// </summary>
@@ -474,8 +474,11 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         private uint capabilities;
 
+        public uint FrameSize;
+        public uint FrameOffset;
+
         /// <summary>
-        /// Create new inctanse of the <see cref="VMWareSVGAII"/> class.
+        /// Create new instance of the <see cref="VMWareSVGAII"/> class.
         /// </summary>
         public VMWareSVGAII()
         {
@@ -491,7 +494,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             if (ReadRegister(Register.ID) != (uint)ID.V2)
                 return;
 
-            Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
+            VideoMemory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
             capabilities = ReadRegister(Register.Capabilities);
             InitializeFIFO();
         }
@@ -517,6 +520,9 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="depth">Depth.</param>
         public void SetMode(uint width, uint height, uint depth = 32)
         {
+            //Disable the Driver before writing new values and initiating it again to avoid a memory exception
+            //Disable();
+
             // Depth is color depth in bytes.
             this.depth = (depth / 8);
             this.width = width;
@@ -524,8 +530,11 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
-            WriteRegister(Register.Enable, 1);
+            Enable();
             InitializeFIFO();
+
+            FrameSize = ReadRegister(Register.FrameBufferSize);
+            FrameOffset = ReadRegister(Register.FrameBufferOffset);
         }
 
         /// <summary>
@@ -615,15 +624,24 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         }
 
         /// <summary>
+        /// Update video memory.
+        /// </summary>
+        public void DoubleBufferUpdate()
+        {
+            VideoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
+            Update(0, 0, width, height);
+        }
+
+        /// <summary>
         /// Set pixel.
         /// </summary>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <param name="color">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public void SetPixel(uint x, uint y,uint color)
+        public void SetPixel(uint x, uint y, uint color)
         {
-            Video_Memory[((y * width + x) * depth)] = color;
+            VideoMemory[((y * width + x) * depth) + FrameSize] = color;
         }
 
         /// <summary>
@@ -635,7 +653,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public uint GetPixel(uint x, uint y)
         {
-            return Video_Memory[((y * width + x) * depth)];
+            return VideoMemory[((y * width + x) * depth)];
         }
 
         /// <summary>
@@ -646,7 +664,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public void Clear(uint color)
         {
-            Fill(0, 0, width, height, color);
+            VideoMemory.Fill(FrameSize, FrameSize, color);
         }
 
         /// <summary>
@@ -753,7 +771,17 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 WriteToFifo(0xFFFFFF);
             WaitForFifo();
         }
-        
+        //Allow to enable the Driver again after it has been disabled (switch between text and graphics mode currently this is SVGA only)
+        /// <summary>
+        /// Enable the SVGA Driver , only needed after Disable() has been called
+        /// </summary>
+        public void Enable()
+        {
+            WriteRegister(Register.Enable, 1);
+        }
+        /// <summary>
+        /// Disable the SVGA Driver , return to text mode
+        /// </summary>
         public void Disable()
         {
             WriteRegister(Register.Enable, 0);

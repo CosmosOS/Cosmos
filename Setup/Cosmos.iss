@@ -12,7 +12,7 @@
 #endif
 
 #ifndef VSVersion
-  #define VSVersion "vs2019"
+  #define VSVersion "vs2022"
 #endif
 
 #ifndef RealPath
@@ -22,22 +22,24 @@
 #if BuildConfiguration == "DevKit"
 	; devkit releases are not compressed
 	#pragma warning "Building Dev Kit release"
+  #define VerName "Cosmos Dev Kit"
 #else
 	; userkit releases get compressed, and get languages included
 	#pragma message "Building User Kit release"
+  #define VerName "Cosmos User Kit"
 	#define Compress true
 	#define IncludeUILanguages true
 #endif
 
 [Setup]
 AppId=CosmosUserKit
-AppName=Cosmos User Kit
-AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright (c) 2007-2019 The Cosmos Project
+AppName={#VerName}
+AppVerName={#VerName} v{#ChangeSetVersion}
+AppCopyright=Copyright (c) 2007-2021 The Cosmos Project
 AppPublisher=Cosmos Project
-AppPublisherURL=http://www.goCosmos.org/
-AppSupportURL=http://www.goCosmos.org/
-AppUpdatesURL=http://www.goCosmos.org/
+AppPublisherURL=http://www.gocosmos.org/
+AppSupportURL=http://www.gocosmos.org/
+AppUpdatesURL=http://www.gocosmos.org/
 AppVersion={#ChangeSetVersion}
 SetupMutex=CosmosSetupMutexName,Global\CosmoSetupMutexName
 UsePreviousAppDir=false
@@ -71,7 +73,7 @@ LicenseFile=LICENSE.txt
 DisableDirPage=no
 
 [Messages]
-SelectDirDesc=If the user installing the Cosmos User Kit is not the admin. Please choose the corresponding AppData/Roaming directory.
+SelectDirDesc=If the user installing the Cosmos User Kit is not the admin, please choose the users AppData/Roaming directory
 
 [Dirs]
 Name: {app}; Flags: uninsalwaysuninstall
@@ -82,10 +84,10 @@ Type: filesandordirs; Name: "{app}"
 [Files]
 ; Tools
 Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\Tools\Yasm\*.exe"; DestDir: "{app}\Build\Tools\Yasm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly recursesubdirs
 ;Source: ".\Build\VSIP\XSharp\*"; DestDir: "{app}\Build\XSharp"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
@@ -105,27 +107,19 @@ Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremo
 ; XSharp
 Source: ".\Artwork\XSharp\XSharp.ico"; DestDir: "{app}\XSharp\"; Flags: ignoreversion uninsremovereadonly
 Source: "..\IL2CPU\source\Cosmos.Core.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
-; VMware
+; HyperV
 Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
-Source: ".\Build\syslinux\isolinux.bin"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\ISO\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\ISO\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\ISO\boot\grub\"
 ; USB
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\USB\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\USB\"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\USB\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\USB\boot\grub\"
 ; PXE
-Source: ".\Build\syslinux\pxelinux.0"; DestDir: "{app}\Build\PXE"
-Source: ".\Build\syslinux\mboot.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\ldlinux.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\libcom32.c32"; DestDir: "{app}\Build\PXE\"
-Source: ".\Build\syslinux\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
+Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\PXE\boot\grub\i386-pc\"
+Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\PXE\boot\grub\"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
@@ -150,6 +144,7 @@ UseRelativePaths=True
 [Run]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "nuget locals all  -Clear"; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Clearing nuget cache"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
@@ -279,7 +274,7 @@ var
   ResultText: AnsiString;
 begin
   Command := ExpandConstant('{app}\Build\Tools\vswhere.exe');
-  Params := '-latest -version "[15.0,16.0)" -requires Microsoft.Component.MSBuild -property installationPath';
+  Params := '-latest -version "[17.0,18.0)" -requires Microsoft.Component.MSBuild -property installationPath';
   Success :=
     ExecWithResult(Command, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode, ResultText)
       or (ResultCode <> 0);
@@ -435,4 +430,4 @@ tr.BeveledLabel=Turkish
 uk.BeveledLabel=Ukrainian
 cn.BeveledLabel=Chinese Simplified
 tw.BeveledLabel=Chinese Traditional
-#endif
+#endif 

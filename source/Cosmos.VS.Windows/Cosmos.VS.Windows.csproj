@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net48</TargetFramework>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <RootNamespace>Cosmos.VS.Windows</RootNamespace>
-        <IncludeWpfReferences>True</IncludeWpfReferences>
         <CreateVsixContainer>False</CreateVsixContainer>
         <DeployExtension>False</DeployExtension>
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Update="VSPackage.resx" MergeWithCTO="True" ManifestResourceName="VSPackage" />        
-        <VSCTCompile Include="VSPackage.vsct" ResourceName="Menus.ctmenu" SubType="Designer" />        
+        <EmbeddedResource Update="VSPackage.resx" MergeWithCTO="True" ManifestResourceName="VSPackage" />
+        <VSCTCompile Include="VSPackage.vsct" ResourceName="Menus.ctmenu" SubType="Designer" />
     </ItemGroup>
 
     <ItemGroup>
@@ -37,8 +37,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.7.27703" />
-        <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.10.0" Version="10.0.30320" />
+        <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" />
+        <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
     </ItemGroup>
 
 </Project>

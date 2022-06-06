@@ -12,11 +12,9 @@ using Microsoft.VisualStudio.Threading;
 
 using Cosmos.Build.Common;
 
-using static Cosmos.VS.ProjectSystem.LaunchConfiguration;
-
 namespace Cosmos.VS.ProjectSystem.VS.Debug
 {
-    [ExportDebugger(CosmosDebugger.SchemaName)]
+    [ExportDebugger("CosmosDebugger")]
     [AppliesTo(ProjectCapability.Cosmos)]
     internal class DebugLaunchProvider : DebugLaunchProviderBase
     {
@@ -53,16 +51,16 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
             var isoFile = await _bootableProperties.GetIsoFileAsync();
             var binFile = await _bootableProperties.GetBinFileAsync();
 
-            if (deploymentType == DeploymentValues.ISO)
+            if (deploymentType == LaunchConfiguration.DeploymentValues.ISO)
             {
                 // ISO is created by the MakeIso target
             }
-            else if (deploymentType == DeploymentValues.USB)
+            else if (deploymentType == LaunchConfiguration.DeploymentValues.USB)
             {
                 Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + binFile + "\"");
 
             }
-            else if (deploymentType == DeploymentValues.PXE)
+            else if (deploymentType == LaunchConfiguration.DeploymentValues.PXE)
             {
                 string projectPath = Path.GetDirectoryName(ConfiguredProject.UnconfiguredProject.FullPath);
                 binFile = Path.Combine(projectPath, binFile);
@@ -71,7 +69,7 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
                 File.Copy(binFile, Path.Combine(pxePath, "Cosmos.bin"), true);
                 Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.exe"), pxeIntf + " \"" + pxePath + "\"");
             }
-            else if (deploymentType == DeploymentValues.BinaryImage)
+            else if (deploymentType == LaunchConfiguration.DeploymentValues.BinaryImage)
             {
                 // prepare?
             }
@@ -80,11 +78,10 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
                 throw new Exception("Unknown deployment type.");
             }
 
-            if (launchType == LaunchValues.None
-                && deploymentType == DeploymentValues.ISO)
+            if (launchType == LaunchConfiguration.LaunchValues.None && deploymentType == LaunchConfiguration.DeploymentValues.ISO)
             {
                 Process.Start(Path.GetDirectoryName(isoFile));
-            } else if(launchType == LaunchValues.None && deploymentType == DeploymentValues.PXE)
+            } else if(launchType == LaunchConfiguration.LaunchValues.None && deploymentType == LaunchConfiguration.DeploymentValues.PXE)
             {
 
             }
@@ -120,11 +117,11 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
         
         private async Task<string> GetPropertyAsync(string propertyName)
         {
-            using (var projectReadLock = await _projectLockService.ReadLockAsync())
+            return await _projectLockService.ReadLockAsync(async (projectReadLock) =>
             {
                 var project = await projectReadLock.GetProjectAsync(ConfiguredProject);
                 return project.GetPropertyValue(propertyName);
-            }
+            });
         }
     }
 }

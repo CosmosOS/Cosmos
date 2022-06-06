@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
+        <AssemblyOriginatorKeyFile>..\..\build\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <DefineConstants>UNIT_TEST</DefineConstants>
+        <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='|AnyCPU'">
@@ -21,6 +24,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\source\Cosmos.HAL2\Cosmos.HAL2.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.System2\Cosmos.System2.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj" />
     </ItemGroup>
 
 </Project>

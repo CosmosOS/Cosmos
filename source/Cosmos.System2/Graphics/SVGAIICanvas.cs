@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.Drivers.PCI.Video;
+using Cosmos.System.Graphics.Fonts;
 
 namespace Cosmos.System.Graphics
 {
@@ -14,18 +14,10 @@ namespace Cosmos.System.Graphics
     public class SVGAIICanvas : Canvas
     {
         /// <summary>
-        /// Disables the SVGA driver, parent method returns to VGA text mode
-        /// </summary>
-        public override void Disable()
-        {
-            _xSVGADriver.Disable();
-        }
-
-        /// <summary>
         /// Debugger.
         /// </summary>
         internal Debugger mSVGAIIDebugger = new Debugger("System", "SVGAIIScreen");
-        
+
         private static readonly Mode _DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
 
         /// <summary>
@@ -62,6 +54,11 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Name of the backend
+        /// </summary>
+        public override string Name() => "VMWareSVGAII";
+
+        /// <summary>
         /// Get and set graphics mode.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">(set) Thrown if mode is not suppoted.</exception>
@@ -82,6 +79,14 @@ namespace Cosmos.System.Graphics
         public override Mode DefaultGraphicMode => _DefaultMode;
 
         /// <summary>
+        /// Disables the SVGA driver, parent method returns to VGA text mode
+        /// </summary>
+        public override void Disable()
+        {
+            _xSVGADriver.Disable();
+        }
+
+        /// <summary>
         /// Draw point.
         /// </summary>
         /// <param name="pen">Pen to draw with.</param>
@@ -90,23 +95,17 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
-            Color xColor = aPen.Color;
-
-            if (xColor.A == 0)
+            if (aPen.Color.A < 255)
             {
-                return;
-            }
-            else if (xColor.A < 255)
-            {
-                xColor = AlphaBlend(xColor, GetPointColor(aX, aY), xColor.A);
+                if (aPen.Color.A == 0)
+                {
+                    return;
+                }
+
+                aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
             }
 
-            mSVGAIIDebugger.SendInternal($"Drawing point to x:{aX}, y:{aY} with {xColor.Name} Color");
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)xColor.ToArgb());
-            mSVGAIIDebugger.SendInternal($"Done drawing point");
-            /* No need to refresh all the screen to make the point appear on Screen! */
-            //xSVGAIIDriver.Update((uint)x, (uint)y, (uint)mode.Columns, (uint)mode.Rows);
-            _xSVGADriver.Update((uint)aX, (uint)aY, 1, 1);
+            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.ValueARGB);
         }
 
         /// <summary>
@@ -151,7 +150,13 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void DrawFilledRectangle(Pen aPen, int aX_start, int aY_start, int aWidth, int aHeight)
         {
-            _xSVGADriver.Fill((uint)aX_start, (uint)aY_start, (uint)aWidth, (uint)aHeight, (uint)aPen.Color.ToArgb());
+            var color = aPen.Color.ToArgb();
+
+            // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
+            for (int i = aY_start; i < aY_start + aHeight; i++)
+            {
+                _xSVGADriver.VideoMemory.Fill(GetPointOffset(aX_start, i) + (int)_xSVGADriver.FrameSize, aWidth, color);
+            }
         }
 
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
@@ -308,12 +313,23 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Clear screen to specified color.
         /// </summary>
+        /// <param name="aColor">Color in ARGB.</param>
+        /// <exception cref="Exception">Thrown on memory access violation.</exception>
+        /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
+        public override void Clear(int aColor)
+        {
+            _xSVGADriver.Clear((uint)aColor);
+        }
+
+        /// <summary>
+        /// Clear screen to specified color.
+        /// </summary>
         /// <param name="aColor">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void Clear(Color aColor)
         {
-            _xSVGADriver.Fill(0, 0, (uint)Mode.Columns, (uint)Mode.Rows, (uint)aColor.ToArgb());
+            _xSVGADriver.Clear((uint)aColor.ToArgb());
         }
 
         /// <summary>
@@ -390,9 +406,70 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)_xSVGADriver.GetPixel((uint)aX, (uint)aY));
         }
 
+        /// <summary>
+        /// Display screen
+        /// </summary>
         public override void Display()
         {
-            
+            _xSVGADriver.DoubleBufferUpdate();
+        }
+
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="str">string to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public override void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        {
+            for (int i = 0; i < str.Length; i++)
+            {
+                DrawChar(str[i], aFont, pen, x, y);
+                x += aFont.Width;
+            }
+        }
+
+        /// <summary>
+        /// Draw char.
+        /// </summary>
+        /// <param name="str">char to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public override void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        {
+            int p = aFont.Height * (byte)c;
+
+            for (int cy = 0; cy < aFont.Height; cy++)
+            {
+                for (byte cx = 0; cx < aFont.Width; cx++)
+                {
+                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
+                    {
+                        DrawPoint(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draw image.
+        /// </summary>
+        /// <param name="aImage">Image.</param>
+        /// <param name="aX">X coordinate.</param>
+        /// <param name="aY">Y coordinate.</param>
+        public override void DrawImage(Image aImage, int aX, int aY)
+        {
+            var xWidth = (int)aImage.Width;
+            var xHeight = (int)aImage.Height;
+
+            for (int i = 0; i < xHeight; i++)
+            {
+                _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, (i * xWidth), xWidth);
+            }
         }
     }
 }

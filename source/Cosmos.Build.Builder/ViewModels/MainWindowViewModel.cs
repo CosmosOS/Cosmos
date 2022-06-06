@@ -23,6 +23,8 @@ namespace Cosmos.Build.Builder.ViewModels
 
         public ICommand CopyCommand { get; }
 
+        public ICommand PostPaste { get; }
+
         public bool CloseWhenCompleted
         {
             get => _closeWhenCompleted;
@@ -61,8 +63,10 @@ namespace Cosmos.Build.Builder.ViewModels
 
             CopyCommand = new RelayCommand(CopyLogToClipboard);
 
+            PostPaste = new RelayCommand(PostPasteCommand);
+
             CloseWhenCompleted = true;
-            
+
             _logger = new MainWindowLogger(this);
 
             _buildTask = BuildAsync();
@@ -70,11 +74,13 @@ namespace Cosmos.Build.Builder.ViewModels
 
         private void CopyLogToClipboard(object parameter) => Clipboard.SetText(BuildLog());
 
+        private void PostPasteCommand(object parameter) => InternalPostPaste();
+
         private string BuildLog()
         {
             var log = @"
 ========================================
-    Builder Log
+    Build Log
 ========================================
 
 ";
@@ -93,12 +99,33 @@ namespace Cosmos.Build.Builder.ViewModels
             return log;
         }
 
-        private async Task BuildAsync()
+        private void InternalPostPaste()
         {
             try
             {
-                _logger.NewSection("Checking Dependencies");
+                string baseUrl = "https://www.toptal.com/developers/hastebin/";
+                var hasteBinClient = new HasteBinClient(baseUrl);
+                HasteBinResult result = hasteBinClient.Post(BuildLog()).Result;
 
+                if (result.IsSuccess)
+                {
+                    Views.MessageBox.Show($"link:{baseUrl}{result.Key}");
+                }
+                else
+                {
+                    Views.MessageBox.Show($"Failed, status code was {result.StatusCode}");
+                }
+            } catch (Exception e)
+            {
+                Views.MessageBox.Show(e.Message);
+            }
+       }
+
+        private async Task BuildAsync()
+        {
+            _logger.NewSection("Checking Dependencies...");
+            try
+            {
                 foreach (var dependency in _buildDefinition.GetDependencies())
                 {
                     if (await dependency.IsInstalledAsync(CancellationToken.None).ConfigureAwait(false))
@@ -107,20 +134,40 @@ namespace Cosmos.Build.Builder.ViewModels
                     }
                     else
                     {
-                        _logger.LogMessage($"{dependency.Name} not found.");
+                        _logger.LogMessage($"{dependency.Name} was not found. Install {dependency.OtherDependencysThatAreMissing.TrimEnd(',')}");
 
-                        using (var viewModel = new DependencyInstallationDialogViewModel(dependency))
+                        if (dependency.ShouldInstallByDefault)
                         {
-                            _dependencyInstallationDialogService.ShowDialog(viewModel);
-
-                            if (!viewModel.InstallationSucceeded)
+                            using (var viewModel = new DependencyInstallationDialogViewModel(dependency))
                             {
-                                throw new Exception($"Dependency installation failed! Dependency name: {dependency.Name}");
+                                _dependencyInstallationDialogService.ShowDialog(viewModel);
+
+                                if (!viewModel.InstallationSucceeded)
+                                {
+                                    throw new Exception($"Dependency installation failed! Dependency name: {dependency.Name}");
+                                }
                             }
+                        }
+                        else
+                        {
+                            Views.MessageBox.Show($"{dependency.Name} is not installed. Please {dependency.OtherDependencysThatAreMissing}");
+                            _logger.SetError();
+                            _logger.NewSection("Error");
+                            _logger.LogMessage($"{dependency.Name} not found.");
+                            _logger.SetError();
+                            return;
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                OnError("Error while installing dependencies: " + e.Message);
+                return;
+            }
 
+            try
+            {
                 foreach (var buildTask in _buildDefinition.GetBuildTasks())
                 {
                     _logger.NewSection(buildTask.Name);
@@ -130,11 +177,8 @@ namespace Cosmos.Build.Builder.ViewModels
             }
             catch (Exception e)
             {
-                _logger.SetError();
-
-                _logger.NewSection("Error");
-                _logger.LogMessage(e.ToString());
-                _logger.SetError();
+                OnError(e.Message);
+                return;
             }
 
             await Task.Delay(5000).ConfigureAwait(false);
@@ -150,6 +194,14 @@ namespace Cosmos.Build.Builder.ViewModels
                     WindowState = WindowState.Normal;
                 }
             }
+        }
+        public void OnError(string message)
+        {
+            _logger.SetError();
+
+            _logger.NewSection("Error");
+            _logger.LogMessage(message);
+            _logger.SetError();
         }
     }
 }
