@@ -22,19 +22,14 @@ Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
 
 **Note**: From now on, we'll be using some plugged functions from ``System.IO``, so be sure to use that reference to your code. Alright, now, let's get started over some useful functions:
 
-## Format drive
+## Format disks
 
 **Note**: You don't have to format your drive if you're debugging your Cosmos project with VMWare. The build will automatically add an already formatted FAT32 VMDK file for your convenience.
 
-**Note 2**: You can only format a drive that already has been formatted with FAT32.
+You can get all available disks using `VFSManager.GetDisks()`. The methods to get information about the disk or format it can be found under the [Disk](https://cosmosos.github.io/api/Cosmos.System.FileSystem.Disk.html) class. To format a disk use the [`FormatDisk(int index, string format, bool quick = true)`](https://cosmosos.github.io/api/Cosmos.System.FileSystem.Disk.html#Cosmos_System_FileSystem_Disk_FormatPartition_System_Int32_System_String_System_Boolean_)
+method.
 
-You can format your drive with the Format() function, just like this:
-
-```C#
-fs.Format("0" /*drive id*/, "FAT32" /*fat type*/, true /*use quick format*/);
-```
-
-**Attention**: **Don't** add anything after the drive id, or formatting won't work. You just need to put the drive id, here we put 0 to format the main drive.
+**TODO**: Extend documentation and add examples
 
 ## Get available free space
 

@@ -39,7 +39,7 @@ namespace Cosmos.Core_Plugs.System
 
     [Plug(Target = typeof(Delegate), Inheritable = true)]
     [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
-    [PlugField(FieldType = typeof(int), FieldId = "$$ReturnsValue$$")]
+    [PlugField(FieldType = typeof(int), FieldId = "$$ReturnSize$$")]
     public static class DelegateImplInherit
     {
         [PlugMethod(Signature = "System_MulticastDelegate__System_Delegate_InternalAllocLike_System_Delegate_")]
