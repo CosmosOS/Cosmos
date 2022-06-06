@@ -76,13 +76,11 @@ namespace Cosmos.HAL
             }
             AHCI.InitDriver();
             //EHCI.InitDriver();
-<<<<<<< HEAD
 
             Console.WriteLine("Starting Processor Scheduler");
             mDebugger.Send("Processor Scheduler");
             Core.Processing.ProcessorScheduler.Initialize();
 
-=======
             if (InitNetwork)
             {
                 mDebugger.Send("Network Devices Init");
@@ -94,7 +92,7 @@ namespace Cosmos.HAL
             }
             Console.WriteLine("Enabling Serial Output on COM1");
             Debug.Serial.Enable();
->>>>>>> master
+
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
         }
