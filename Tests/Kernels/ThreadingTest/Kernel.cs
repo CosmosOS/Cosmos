@@ -2,6 +2,7 @@
 using Sys = Cosmos.System;
 using Cosmos.System;
 using Cosmos.TestRunner;
+using Console = System.Console;
 
 namespace ThreadingTests
 {
@@ -15,21 +16,37 @@ namespace ThreadingTests
 
         protected override void BeforeRun()
         {
-            var threadOne = new Thread(ThreadOne);
-            var threadTwo = new Thread(ThreadTwo);
+            Console.WriteLine("Cosmos booted successfully. Let's Test Threading!");
+        }
 
-            threadOne.Start();
-            threadTwo.Start();
+        protected override void Run()
+        {
+            try
+            {
+                var threadOne = new Thread(ThreadOne);
+                var threadTwo = new Thread(ThreadTwo);
 
-            variableThree = 3;
+                threadOne.Start();
+                threadTwo.Start();
 
-            Thread.Sleep(1000);
+                variableThree = 3;
 
-            Assert.AreEqual(variable, 1, "Changing global variable from thread works");
+                Thread.Sleep(1000);
 
-            Assert.AreEqual(variableTwo, 2, "Changing global variable from second thread works");
+                Assert.AreEqual(variable, 1, "Changing global variable from thread works");
 
-            Assert.AreEqual(variableThree, 3, "Changing global variable from main context works");
+                Assert.AreEqual(variableTwo, 2, "Changing global variable from second thread works");
+
+                Assert.AreEqual(variableThree, 3, "Changing global variable from main context works");
+
+                TestController.Completed();
+            }
+            catch (Exception e)
+            {
+                mDebugger.Send("Exception occurred: " + e.Message);
+                mDebugger.Send(e.Message);
+                TestController.Failed();
+            }
         }
 
         public void ThreadOne()
@@ -40,11 +57,6 @@ namespace ThreadingTests
         public void ThreadTwo()
         {
             variableTwo = 2;
-        }
-
-        protected override void Run()
-        {
-
         }
     }
 }
