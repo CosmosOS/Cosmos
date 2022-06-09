@@ -37,6 +37,7 @@ namespace Cosmos.TestRunner.Full
             // This is a bit slow and works only because ring check is disabled to decide if leave it enabled
             yield return typeof(MemoryOperationsTest.Kernel);
             yield return typeof(ProcessorTests.Kernel);
+            yield return typeof(ThreadingTests.Kernel);
         }
     }
 }
