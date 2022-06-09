@@ -29,9 +29,16 @@ namespace ThreadingTests
                 threadOne.Start();
                 threadTwo.Start();
 
+                Console.WriteLine("Inside Run method!");
+
                 variableThree = 3;
 
-                Thread.Sleep(1000);
+                //Since Run is not a thread call PIT wait
+                System.Threading.Thread.Sleep(3000);
+
+                //Cosmos.HAL.Global.PIT.Wait(3000);
+
+                Console.WriteLine("Waited 3 second.");
 
                 Assert.AreEqual(variable, 1, "Changing global variable from thread works");
 
@@ -51,12 +58,22 @@ namespace ThreadingTests
 
         public void ThreadOne()
         {
+            //Make thread WAITING
+            Thread.Sleep(1000);
+
             variable = 1;
+
+            Console.WriteLine("Inside first thread!");
         }
 
         public void ThreadTwo()
         {
+            //Make thread WAITING
+            Thread.Sleep(1000);
+
             variableTwo = 2;
+
+            Console.WriteLine("Inside second thread!");
         }
     }
 }
