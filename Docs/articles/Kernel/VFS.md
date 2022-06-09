@@ -4,6 +4,7 @@ In this article we will discuss about using Cosmos VFS (virtual file system).
 Cosmos VFS and the VFS manager classes, let you manage your file system.
 
 **Attention**: **Always** format your drive with Cosmos and **only** Cosmos if you plan to use it with Cosmos. Using any other tool such as Parted, FDisk (or any other tool) might lead to weird things when using that drive with Cosmos' VFS. Those tools are much more advanced and might format and read/write to the disk differently than Cosmos.
+**WARNING!**: Please do **not** try this on actual hardware! It may cause **IRREPARBLE DAMAGE** to your data. It is recommended to use a virtual machine like VMware, Hyper-V, just to name a few.
 
 First, we should create and initialize an instance of the VFS, this will initialize the partition and files-system lists, as well as register the new VFS.
 This is essential for using the VFS.
