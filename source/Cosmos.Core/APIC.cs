@@ -15,7 +15,7 @@ namespace Cosmos.Core
         /// <summary>
         /// Local APIC IO group.
         /// </summary>
-        protected APICIOGroup IO;
+        internal APICIOGroup IO;
 
         /// <summary>
         /// End of Interrupt.
@@ -62,10 +62,10 @@ namespace Cosmos.Core
         /// <param name="apic_id">APIC ID.</param>
         public void SendInit(uint apic_id)
         {
-            IO.ICRHI.DWord = apic_id << IO.ICR_DESTINATION_SHIFT;
-            IO.ICRLO.DWord = (uint)(IO.ICR_INIT | IO.ICR_PHYSICAL | IO.ICR_ASSERT | IO.ICR_EDGE | IO.ICR_NO_SHORTHAND);
+            IO.ICRHI.DWord = apic_id << APICIOGroup.ICR_DESTINATION_SHIFT;
+            IO.ICRLO.DWord = (uint)(APICIOGroup.ICR_INIT | APICIOGroup.ICR_PHYSICAL | APICIOGroup.ICR_ASSERT | APICIOGroup.ICR_EDGE | APICIOGroup.ICR_NO_SHORTHAND);
 
-            while ((IO.ICRLO.DWord & IO.ICR_SEND_PENDING) != 0) { }
+            while ((IO.ICRLO.DWord & APICIOGroup.ICR_SEND_PENDING) != 0) { }
         }
 
 
@@ -76,10 +76,10 @@ namespace Cosmos.Core
         /// <param name="vector">Vector.</param>
         public void SendStartup(uint apic_id, ushort vector)
         {
-            IO.ICRHI.DWord = apic_id << IO.ICR_DESTINATION_SHIFT;
-            IO.ICRLO.DWord = (uint)(vector | IO.ICR_STARTUP | IO.ICR_PHYSICAL | IO.ICR_ASSERT | IO.ICR_EDGE | IO.ICR_NO_SHORTHAND);
+            IO.ICRHI.DWord = apic_id << APICIOGroup.ICR_DESTINATION_SHIFT;
+            IO.ICRLO.DWord = (uint)(vector | APICIOGroup.ICR_STARTUP | APICIOGroup.ICR_PHYSICAL | APICIOGroup.ICR_ASSERT | APICIOGroup.ICR_EDGE | APICIOGroup.ICR_NO_SHORTHAND);
 
-            while ((IO.ICRLO.DWord & IO.ICR_SEND_PENDING) != 0) { }
+            while ((IO.ICRLO.DWord & APICIOGroup.ICR_SEND_PENDING) != 0) { }
         }
     }
 }
