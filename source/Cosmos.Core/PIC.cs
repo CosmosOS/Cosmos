@@ -177,5 +177,14 @@ namespace Cosmos.Core
             Master.Data.Byte = aMask;
             IOPort.Wait();
         }
+
+        /// <summary>
+        /// Disable PIC.
+        /// </summary>
+        public void Disable()
+        {
+            Master.Data.Byte = 0xFF;
+            Slave.Data.Byte = 0xFF;
+        }
     }
 }
