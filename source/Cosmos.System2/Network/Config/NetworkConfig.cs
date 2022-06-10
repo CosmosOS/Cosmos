@@ -15,17 +15,17 @@ namespace Cosmos.System.Network.Config
     /// <summary>
     /// Network Configuration (link network device to an ip address)
     /// </summary>
-    internal class NetworkConfig
+    public class NetworkConfig
     {
         /// <summary>
         /// Network device
         /// </summary>
-        internal NetworkDevice Device;
+        public NetworkDevice Device;
 
         /// <summary>
         /// IPv4 Configuration
         /// </summary>
-        internal IPConfig IPConfig;
+        public IPConfig IPConfig;
 
         /// <summary>
         /// NetworkConfig ctor
@@ -47,12 +47,12 @@ namespace Cosmos.System.Network.Config
         /// <summary>
         /// Current network configuration used by the network stack
         /// </summary>
-        private static NetworkConfig CurrentNetworkConfig { get; set; }
+        public static NetworkConfig CurrentNetworkConfig { get; set; }
 
         /// <summary>
         /// Current network configuration used by the network stack
         /// </summary>
-        private static List<NetworkConfig> NetworkConfigs = new List<NetworkConfig>();
+        public static List<NetworkConfig> NetworkConfigs = new List<NetworkConfig>();
 
         /// <summary>
         /// Network congiruations count
@@ -75,7 +75,7 @@ namespace Cosmos.System.Network.Config
         /// </summary>
         /// <param name="device">Network device.</param>
         /// <param name="config">IP Config</param>
-        internal static void SetCurrentConfig(NetworkDevice device, IPConfig config)
+        public static void SetCurrentConfig(NetworkDevice device, IPConfig config)
         {
             CurrentNetworkConfig = new NetworkConfig(device, config);
         }
@@ -85,7 +85,7 @@ namespace Cosmos.System.Network.Config
         /// </summary>
         /// <param name="device">Network device.</param>
         /// <param name="config">IP Config</param>
-        internal static void AddConfig(NetworkDevice device, IPConfig config)
+        public static void AddConfig(NetworkDevice device, IPConfig config)
         {
             NetworkConfigs.Add(new NetworkConfig(device, config));
         }
@@ -116,7 +116,7 @@ namespace Cosmos.System.Network.Config
         /// <summary>
         /// Clear network configurations
         /// </summary>
-        internal static void ClearConfigs()
+        public static void ClearConfigs()
         {
             NetworkConfigs.Clear();
         }
@@ -125,7 +125,7 @@ namespace Cosmos.System.Network.Config
         /// Get ip config for network device
         /// </summary>
         /// <param name="device">Network device.</param>
-        internal static IPConfig Get(NetworkDevice device)
+        public static IPConfig Get(NetworkDevice device)
         {
             foreach (var networkConfig in NetworkConfigs)
             {

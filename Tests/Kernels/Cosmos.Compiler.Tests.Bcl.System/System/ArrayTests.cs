@@ -33,10 +33,18 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Array.Clear(xByteResult, 0, xByteResult.Length);
             for (int i = 0; i < 8; i++)
             {
-                Assert.IsTrue(xByteResult[i] == 0, "Array.Clear works");
+                Assert.IsTrue(xByteResult[i] == 0, "Array.Clear(byte[], int, int) works");
             }
             xByteResult[1] = 1;
             Assert.IsTrue(xByteResult[1] == 1, "Array.Clear does not break the array");
+
+            xByteResult = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            Assert.AreEqual(2, xByteResult[1], "Setting byte array to new array object works");
+            Array.Clear(xByteResult);
+            for (int i = 0; i < 8; i++)
+            {
+                Assert.AreEqual(0, xByteResult[i], "Array.Clear(byte[]) works");
+            }
 
             // Single[] Test
             float[] xSingleResult = { 1.25f, 2.50f, 3.51f, 4.31f, 9.28f, 18.56f };
