@@ -1,6 +1,7 @@
 ﻿using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -168,6 +169,82 @@ namespace Cosmos.Core
             public uint Flags;
         }
 
+        /// <summary>
+        /// MADT struct.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct MADTPtr
+        {
+            /// <summary>
+            /// ACPI Header.
+            /// </summary>
+            public AcpiHeader Header;
+
+            /// <summary>
+            /// Local APIC Address.
+            /// </summary>
+            public uint LocalAPICAddress;
+
+            /// <summary>
+            /// Flags.
+            /// </summary>
+            public uint Flags;
+        }
+
+        /// <summary>
+        /// APIC Header struct.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct ApicHeader
+        {
+            /// <summary>
+            /// APIC Type.
+            /// </summary>
+            public ApicType Type;
+
+            /// <summary>
+            /// Length.
+            /// </summary>
+            public byte Length;
+        }
+
+        /// <summary>
+        /// APIC Type enum.
+        /// </summary>
+        public enum ApicType : byte
+        {
+            LocalAPIC,
+            IOAPIC,
+            InterruptOverride
+        }
+
+        /// <summary>
+        /// ApicLocalApic struct.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct ApicLocalApic
+        {
+            /// <summary>
+            /// APIC Header.
+            /// </summary>
+            public ApicHeader Header;
+
+            /// <summary>
+            /// ACPI Processor ID.
+            /// </summary>
+            public byte AcpiProcessorId;
+
+            /// <summary>
+            /// APIC ID.
+            /// </summary>
+            public byte ApicId;
+
+            /// <summary>
+            /// APIC Flags.
+            /// </summary>
+            public uint Flags;
+        }
+
         // New Port I/O
         /// <summary>
         /// IO port.
@@ -211,6 +288,14 @@ namespace Cosmos.Core
         /// PM1 CNT LEN1
         /// </summary>
         private static byte PM1_CNT_LEN;
+        /// <summary>
+        /// Global MADT.
+        /// </summary>
+        public static MADTPtr* MADT;
+        /// <summary>
+        /// Local APIC CPUID list.
+        /// </summary>
+        public static List<byte> LocalAPIC_CPUIDs;
 
         /// <summary>
         /// Check ACPI header.
@@ -312,6 +397,8 @@ namespace Cosmos.Core
         /// <returns>true on success, false on failure.</returns>
         private static bool Init()
         {
+            LocalAPIC_CPUIDs = new List<byte>();
+
             var rsdp = RSDPAddress();
             byte* ptr = (byte*)rsdp;
 
@@ -327,18 +414,15 @@ namespace Cosmos.Core
             {
                 uint address = *p++;
 
-                if (ParseDT((AcpiHeader*)address) == false)
-                {
-                    return false;
-                }
+                ParseDT((AcpiHeader*)address);
             }
 
             return true;
         }
 
-        private static bool ParseDT(AcpiHeader *header)
+        private static void ParseDT(AcpiHeader *hdr)
         {
-            var signature = Encoding.ASCII.GetString(header->Signature, 4);
+            var signature = Encoding.ASCII.GetString(hdr->Signature, 4);
 
             Global.mDebugger.Send(signature + "detected");
 
@@ -346,7 +430,7 @@ namespace Cosmos.Core
             {
                 Global.mDebugger.Send("Parse FACP");
 
-                var Fadt = (FADTPtr*)header;
+                var Fadt = (FADTPtr*)hdr;
 
                 if (acpiCheckHeader((byte*)Fadt->Dsdt, "DSDT") == 0)
                 {
@@ -390,23 +474,45 @@ namespace Cosmos.Core
                             smiIO = new IOPort((ushort)SMI_CMD);
                             pm1aIO = new IOPort((ushort)PM1a_CNT);
                             pm1bIO = new IOPort((ushort)PM1b_CNT);
-
-                            return true;
                         }
                     }
                 }
-
-                return false;
             }
             else if (signature == "APIC")
             {
-                Global.mDebugger.Send("Parse APIC");
+                Global.mDebugger.Send("Parse ACPI");
 
-                return true;
-            }
-            else
-            {
-                return true;
+                MADT = (MADTPtr*)hdr;
+
+                byte* p = (byte*)(MADT + 1);
+                byte* end = (byte*)MADT + MADT->Header.Length;
+                while (p < end)
+                {
+                    var header = (ApicHeader*)p;
+                    var type = header->Type;
+                    byte length = header->Length;
+
+                    if (type == ApicType.LocalAPIC)
+                    {
+                        Global.mDebugger.Send("Parse local APIC");
+
+                        var pic = (ApicLocalApic*)p;
+                        if (((pic->Flags & 1) ^ ((pic->Flags >> 1) & 1)) == 1)
+                        {
+                            LocalAPIC_CPUIDs.Add(pic->ApicId);
+                        }
+                    }
+                    else if (type == ApicType.IOAPIC)
+                    {
+                        Console.WriteLine("IO APIC not implemented.");
+                    }
+                    else if (type == ApicType.InterruptOverride)
+                    {
+                        Console.WriteLine("InterruptOverride not implemented.");
+                    }
+
+                    p += length;
+                }
             }
         }
 
