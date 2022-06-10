@@ -245,6 +245,70 @@ namespace Cosmos.Core
             public uint Flags;
         }
 
+        /// <summary>
+        /// ApicIOApic struct.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct ApicIOApic
+        {
+            /// <summary>
+            /// APIC Header.
+            /// </summary>
+            public ApicHeader Header;
+
+            /// <summary>
+            /// APIC ID.
+            /// </summary>
+            public byte IOApicId;
+
+            /// <summary>
+            /// Reserved.
+            /// </summary>
+            public byte Reserved;
+
+            /// <summary>
+            /// IO APIC Base Address.
+            /// </summary>
+            public uint IOApicAddress;
+
+            /// <summary>
+            /// Global System Interrupt Base Address.
+            /// </summary>
+            public uint GlobalSystemInterruptBase;
+        }
+
+        /// <summary>
+        /// ApicInterruptOverride struct.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct ApicInterruptOverride
+        {
+            /// <summary>
+            /// APIC Header.
+            /// </summary>
+            public ApicHeader Header;
+
+            /// <summary>
+            /// Bus.
+            /// </summary>
+            public byte Bus;
+
+            /// <summary>
+            /// Source.
+            /// </summary>
+            public byte Source;
+
+            /// <summary>
+            /// Interrupt.
+            /// </summary>
+            public uint Interrupt;
+
+            /// <summary>
+            /// Floags.
+            /// </summary>
+            public ushort Flags;
+        }
+
         // New Port I/O
         /// <summary>
         /// IO port.
@@ -293,9 +357,9 @@ namespace Cosmos.Core
         /// </summary>
         public static MADTPtr* MADT;
         /// <summary>
-        /// Local APIC CPUID list.
+        /// Global IO APIC.
         /// </summary>
-        public static List<byte> LocalAPIC_CPUIDs;
+        public static ApicIOApic* IOAPIC;
 
         /// <summary>
         /// Check ACPI header.
@@ -397,8 +461,6 @@ namespace Cosmos.Core
         /// <returns>true on success, false on failure.</returns>
         private static bool Init()
         {
-            LocalAPIC_CPUIDs = new List<byte>();
-
             var rsdp = RSDPAddress();
             byte* ptr = (byte*)rsdp;
 
@@ -495,20 +557,23 @@ namespace Cosmos.Core
                     if (type == ApicType.LocalAPIC)
                     {
                         Global.mDebugger.Send("Parse local APIC");
-
                         var pic = (ApicLocalApic*)p;
-                        if (((pic->Flags & 1) ^ ((pic->Flags >> 1) & 1)) == 1)
-                        {
-                            LocalAPIC_CPUIDs.Add(pic->ApicId);
-                        }
+                        Global.mDebugger.Send("Found APIC " + (ulong)pic->ApicId + " (Processor ID:" + pic->AcpiProcessorId + ")");
                     }
                     else if (type == ApicType.IOAPIC)
                     {
-                        Console.WriteLine("IO APIC not implemented.");
+                        var ioapic = (ApicIOApic*)p;
+                        if (ioapic == null)
+                        {
+                            IOAPIC = ioapic;
+                        }
+                        Global.mDebugger.Send("Found IO APIC " + (ulong)ioapic->IOApicId + "(Address:" + ((ulong)ioapic->IOApicAddress).ToString("x2") + ", GSIB:" + (ulong)ioapic->GlobalSystemInterruptBase + ")");
                     }
                     else if (type == ApicType.InterruptOverride)
                     {
-                        Console.WriteLine("InterruptOverride not implemented.");
+                        var ovr = (ApicInterruptOverride*)p;
+
+                        Global.mDebugger.Send("Found APIC Interrupt Override (Bus: " + (((ulong)ovr->Bus).ToString()) + ", Source:" + ((ulong)ovr->Source).ToString() + ", Interrupt:" + ((ulong)ovr->Interrupt).ToString("x2") + ", Flags:" + ((ulong)ovr->Flags).ToString() + ")");
                     }
 
                     p += length;
@@ -561,6 +626,33 @@ namespace Cosmos.Core
             }
 
             return null;
+        }
+
+        public static uint RemapIRQ(uint irq)
+        {
+            byte* p = (byte*)(MADT + 1);
+            byte* end = (byte*)MADT + MADT->Header.Length;
+
+            while (p < end)
+            {
+                var header = (ApicHeader*)p;
+                var type = header->Type;
+                byte length = header->Length;
+
+                if (type == ApicType.InterruptOverride)
+                {
+                    var ovr = (ApicInterruptOverride*)p;
+
+                    if (ovr->Source == irq)
+                    {
+                        return ovr->Interrupt;
+                    }
+                }
+
+                p += length;
+            }
+
+            return irq;
         }
     }
 }

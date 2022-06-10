@@ -35,6 +35,8 @@ namespace Cosmos.Core
 
             // Configure Spurious Interrupt Vector Register
             IO.Svr.DWord = 0x100 | 0xff;
+
+            Console.WriteLine("Local APIC initialized");
         }
 
         /// <summary>
