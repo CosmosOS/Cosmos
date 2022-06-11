@@ -12,5 +12,11 @@ namespace Cosmos.System_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Sys_LChflagsCanSetHiddenFlag__")]
+        public static int LChflagsCanSetHiddenFlag()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
