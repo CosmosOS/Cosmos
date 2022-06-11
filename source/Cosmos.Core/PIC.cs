@@ -37,6 +37,7 @@ namespace Cosmos.Core
             EOI = 0x20
         }
 
+        /*
         /// <summary>
         /// Master end of interrupt.
         /// </summary>
@@ -52,7 +53,7 @@ namespace Cosmos.Core
         {
             Master.Cmd.Byte = (byte) Cmd.EOI;
             Slave.Cmd.Byte = (byte) Cmd.EOI;
-        }
+        }*/
 
         /// <summary>
         /// Create new instance of the <see cref="PIC"/> class.
@@ -71,7 +72,7 @@ namespace Cosmos.Core
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
             //for now enable keyboard, mouse(ps2)
-            Remap(0x20, 0xF8 | 0x08, 0x28, 0xEB);
+            //Remap(0x20, 0xF8 | 0x08, 0x28, 0xEB);
         }
 
         /// <summary>
@@ -183,6 +184,16 @@ namespace Cosmos.Core
         /// </summary>
         public void Disable()
         {
+            //init
+            Master.Cmd.Byte = 0x11;
+            Slave.Cmd.Byte = 0x11;
+            Master.Data.Byte = 0x20;
+            Slave.Data.Byte = 40;
+            Master.Data.Byte = 0x04;
+            Slave.Data.Byte = 0x02;
+            Master.Data.Byte = 0x01;
+            Slave.Data.Byte = 0x01;
+
             Master.Data.Byte = 0xFF;
             Slave.Data.Byte = 0xFF;
         }

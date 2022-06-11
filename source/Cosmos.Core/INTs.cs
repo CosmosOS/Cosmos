@@ -258,6 +258,7 @@ namespace Cosmos.Core {
         /// <param name="aIrqNo">IRQ index.</param>
         /// <param name="aHandler">IRQ handler.</param>
         public static void SetIrqHandler(byte aIrqNo, IRQDelegate aHandler) {
+            IOAPIC.SetEntry(aIrqNo);
             SetIntHandler((byte)(0x20 + aIrqNo), aHandler);
         }
 
@@ -278,13 +279,7 @@ namespace Cosmos.Core {
         /// </summary>
         /// <param name="aContext">A IEQ context.</param>
         public static void HandleInterrupt_Default(ref IRQContext aContext) {
-            if (aContext.Interrupt >= 0x20 && aContext.Interrupt <= 0x2F) {
-                if (aContext.Interrupt >= 0x28) {
-                    Global.PIC.EoiSlave();
-                } else {
-                    Global.PIC.EoiMaster();
-                }
-            }
+            LocalAPIC.EndOfInterrupt();
         }
 
         /// <summary>
@@ -307,7 +302,7 @@ namespace Cosmos.Core {
         /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_20(ref IRQContext aContext) {
             IRQ(0x20, ref aContext);
-            Global.PIC.EoiMaster();
+            LocalAPIC.EndOfInterrupt();
         }
 
         //public static IRQDelegate IRQ01;
@@ -318,43 +313,43 @@ namespace Cosmos.Core {
         public static void HandleInterrupt_21(ref IRQContext aContext) {
 
             IRQ(0x21, ref aContext);
-            Global.PIC.EoiMaster();
+            LocalAPIC.EndOfInterrupt();
         }
 
         public static void HandleInterrupt_22(ref IRQContext aContext) {
 
             IRQ(0x22, ref aContext);
-            Global.PIC.EoiMaster();
+            LocalAPIC.EndOfInterrupt();
         }
         public static void HandleInterrupt_23(ref IRQContext aContext) {
 
             IRQ(0x23, ref aContext);
-            Global.PIC.EoiMaster();
+            LocalAPIC.EndOfInterrupt();
         }
         public static void HandleInterrupt_24(ref IRQContext aContext) {
 
             IRQ(0x24, ref aContext);
-            Global.PIC.EoiMaster();
+            LocalAPIC.EndOfInterrupt();
         }
         public static void HandleInterrupt_25(ref IRQContext aContext) {
             IRQ(0x25, ref aContext);
-            Global.PIC.EoiMaster();
+            LocalAPIC.EndOfInterrupt();
         }
         public static void HandleInterrupt_26(ref IRQContext aContext) {
 
             IRQ(0x26, ref aContext);
-            Global.PIC.EoiMaster();
+            LocalAPIC.EndOfInterrupt();
         }
         public static void HandleInterrupt_27(ref IRQContext aContext) {
 
             IRQ(0x27, ref aContext);
-            Global.PIC.EoiMaster();
+            LocalAPIC.EndOfInterrupt();
         }
 
         public static void HandleInterrupt_28(ref IRQContext aContext) {
 
             IRQ(0x28, ref aContext);
-            Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
         /// <summary>
@@ -363,7 +358,7 @@ namespace Cosmos.Core {
         /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_29(ref IRQContext aContext) {
             IRQ(0x29, ref aContext);
-            Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
         /// <summary>
@@ -372,7 +367,7 @@ namespace Cosmos.Core {
         /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2A(ref IRQContext aContext) {
             IRQ(0x2A, ref aContext);
-            Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
         /// <summary>
@@ -381,19 +376,19 @@ namespace Cosmos.Core {
         /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2B(ref IRQContext aContext) {
             IRQ(0x2B, ref aContext);
-            Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
         public static void HandleInterrupt_2C(ref IRQContext aContext) {
 
             IRQ(0x2C, ref aContext);
-            Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
 
         public static void HandleInterrupt_2D(ref IRQContext aContext) {
             IRQ(0x2D, ref aContext);
-            Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
         /// <summary>
@@ -402,7 +397,7 @@ namespace Cosmos.Core {
         /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2E(ref IRQContext aContext) {
             IRQ(0x2E, ref aContext);
-            Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
         /// <summary>
@@ -411,7 +406,7 @@ namespace Cosmos.Core {
         /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2F(ref IRQContext aContext) {
             IRQ(0x2F, ref aContext);
-            Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
         public static event IRQDelegate Interrupt30;

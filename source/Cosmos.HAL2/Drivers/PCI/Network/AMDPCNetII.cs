@@ -124,7 +124,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             }
 
             StatusRegister = cur_status;
-            Cosmos.Core.Global.PIC.EoiSlave();
+            LocalAPIC.EndOfInterrupt();
         }
 
         /// <summary>

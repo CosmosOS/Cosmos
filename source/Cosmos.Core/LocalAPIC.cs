@@ -10,7 +10,7 @@ namespace Cosmos.Core
     /// <summary>
     /// Local APIC class.
     /// </summary>
-    public unsafe partial class LocalAPIC
+    public static unsafe class LocalAPIC
     {
         /// <summary>
         /// Local APIC IO group.
