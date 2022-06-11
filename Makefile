@@ -44,16 +44,16 @@ build:
 	$(DOTNET) pack $(IL2CPU_DIR)  -o $(IL2CPU_DIR)/source/IL2CPU/bin/publish $(DOTNETFLAGS)
 
 	@echo "Building Cosmos"
-	$(DOTNET) build $(THISDIR)/source/Cosmos.Common -o $(THISDIR)/source/Cosmos.Common/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.Debug.Kernel -o $(THISDIR)/source/Cosmos.Debug.Kernel/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm -o $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.Core -o $(THISDIR)/source/Cosmos.Core/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.Core_Asm -o $(THISDIR)/source/Cosmos.Core_Asm/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.Core_Plugs -o $(THISDIR)/source/Cosmos.Core_Plugs/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.HAL2 -o $(THISDIR)/source/Cosmos.HAL2/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.System2 -o $(THISDIR)/source/Cosmos.System2/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.System2_Plugs -o $(THISDIR)/source/Cosmos.System2_Plugs/bin/publish $(DOTNETFLAGS)
-	$(DOTNET) build $(THISDIR)/source/Cosmos.Build.Tasks -o $(THISDIR)/source/Cosmos.Build.Tasks/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Common -o $(THISDIR)/source/Cosmos.Common/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel -o $(THISDIR)/source/Cosmos.Debug.Kernel/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm -o $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core -o $(THISDIR)/source/Cosmos.Core/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Asm -o $(THISDIR)/source/Cosmos.Core_Asm/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Plugs -o $(THISDIR)/source/Cosmos.Core_Plugs/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.HAL2 -o $(THISDIR)/source/Cosmos.HAL2/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2 -o $(THISDIR)/source/Cosmos.System2/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs -o $(THISDIR)/source/Cosmos.System2_Plugs/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks -o $(THISDIR)/source/Cosmos.Build.Tasks/bin/publish $(DOTNETFLAGS)
 
 .PHONY: publish
 publish:
