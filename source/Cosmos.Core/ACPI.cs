@@ -569,7 +569,7 @@ namespace Cosmos.Core
                         {
                             IOAPIC = ioapic;
                         }
-                        Global.mDebugger.Send("Found IO APIC " + (ulong)ioapic->IOApicId + "(Address:0x" + ((ulong)ioapic->IOApicAddress).ToString("X") + ", GSIB:" + (ulong)ioapic->GlobalSystemInterruptBase + ")");
+                        Global.mDebugger.Send("Found IO APIC " + (ulong)ioapic->IOApicId + " (Address:0x" + ((ulong)ioapic->IOApicAddress).ToString("X") + ", GSIB:" + (ulong)ioapic->GlobalSystemInterruptBase + ")");
                     }
                     else if (type == ApicType.InterruptOverride)
                     {

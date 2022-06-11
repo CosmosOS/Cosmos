@@ -25,13 +25,13 @@ namespace Cosmos.Core
         /// <summary>
         /// Create new instance of the <see cref="MMIOBase"/> class.
         /// </summary>
-        /// <param name="aBase">A base address.</param>
+        /// <param name="address">A base address.</param>
         /// <param name="aOffset">An offset from the base address.</param>
-        protected MMIOBase(uint aBase, uint aOffset)
+        protected MMIOBase(uint address, uint aOffset)
         {
             // C# math promotes things to integers, so we have this constructor
             // to relieve the use from having to do so many casts
-            Address = aBase + aOffset;
+            Address = address + aOffset;
         }
 
         /// <summary>

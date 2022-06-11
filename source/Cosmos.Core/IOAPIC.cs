@@ -22,7 +22,7 @@ namespace Cosmos.Core
         /// </summary>
         public static void Initialize()
         {
-            IO = new IOAPICIOGroup((ushort)ACPI.IOAPIC->IOApicAddress);
+            IO = new IOAPICIOGroup(ACPI.IOAPIC->IOApicAddress);
 
             if (ACPI.IOAPIC == null)
             {
@@ -61,7 +61,7 @@ namespace Cosmos.Core
 
         public static void SetEntry(uint irq)
         {
-            IOAPIC.SetEntry((byte)ACPI.RemapIRQ(irq - 0x20), irq);
+            SetEntry((byte)ACPI.RemapIRQ(irq - 0x20), irq);
         }
     }
 }
