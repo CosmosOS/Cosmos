@@ -1,16 +1,18 @@
-﻿using System;
+﻿namespace Cosmos.CPU.x86;
 
-namespace Cosmos.CPU.x86 {
-    static public class TempDebug {
-        unsafe static byte* mPtr = (byte*)(0xB8000 - 1);
-        static public void ShowText(char aChar) {
-            unsafe {
-                mPtr++;
-                *mPtr = (byte)aChar;
+public static class TempDebug
+{
+    private static unsafe byte* mPtr = (byte*)(0xB8000 - 1);
 
-                mPtr++;
-                *mPtr = 0x0A;
-            }
+    public static void ShowText(char aChar)
+    {
+        unsafe
+        {
+            mPtr++;
+            *mPtr = (byte)aChar;
+
+            mPtr++;
+            *mPtr = 0x0A;
         }
     }
 }

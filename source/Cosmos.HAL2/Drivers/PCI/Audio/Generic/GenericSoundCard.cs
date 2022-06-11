@@ -21,7 +21,7 @@
 //                throw new ArgumentException("PCI Device is null. Unable to get "+this.GetType()+" card");
 //            pciCard = device;
 //            mem = device.GetAddressSpace(1) as Cosmos.Kernel.MemoryAddressSpace;
-            
+
 //            dacs = new List<DACManager>();
 //            adcs = new List<ADCManager>();
 //            uarts = new List<UARTManager>();
@@ -41,4 +41,6 @@
 
 //    }
 //}
+
+
 

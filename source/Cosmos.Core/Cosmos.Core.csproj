@@ -9,16 +9,16 @@
 
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Cosmos.Core.Tests" Key="Cosmos" />
-        <InternalsVisibleTo Include="Cosmos.Core.Memory.Test" Key="Cosmos" />
+        <InternalsVisibleTo Include="Cosmos.Core.Tests" Key="Cosmos"/>
+        <InternalsVisibleTo Include="Cosmos.Core.Memory.Test" Key="Cosmos"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="IL2CPU.API" />
+        <PackageReference Include="IL2CPU.API"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj"/>
     </ItemGroup>
 
 </Project>

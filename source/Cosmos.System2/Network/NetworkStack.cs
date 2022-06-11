@@ -14,162 +14,157 @@ using Cosmos.HAL;
 using Cosmos.System.Network.ARP;
 using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4;
-using Cosmos.System.Network.IPv4.UDP;
 
-namespace Cosmos.System.Network
+namespace Cosmos.System.Network;
+
+/// <summary>
+///     Implement a Network Stack for all network devices and protocols
+/// </summary>
+public static class NetworkStack
 {
     /// <summary>
-    /// Implement a Network Stack for all network devices and protocols
+    ///     Debugger instance of the "System" ring, with the "NetworkStack" tag.
     /// </summary>
-    public static class NetworkStack
+    public static Debugger debugger = new("System", "NetworkStack");
+
+    /// <summary>
+    ///     Get address dictionary.
+    /// </summary>
+    internal static Dictionary<uint, NetworkDevice> AddressMap { get; private set; }
+
+    /// <summary>
+    ///     Get address dictionary.
+    /// </summary>
+    internal static Dictionary<uint, NetworkDevice> MACMap { get; private set; }
+
+    /// <summary>
+    ///     Initialize the Network Stack to prepare it for operation.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+    public static void Init()
     {
-        /// <summary>
-        /// Debugger instance of the "System" ring, with the "NetworkStack" tag.
-        /// </summary>
-        public static Debugger debugger = new Debugger("System", "NetworkStack");
+        AddressMap = new Dictionary<uint, NetworkDevice>();
+        MACMap = new Dictionary<uint, NetworkDevice>();
+    }
 
-        /// <summary>
-        /// Get address dictionary.
-        /// </summary>
-        internal static Dictionary<uint, NetworkDevice> AddressMap { get; private set; }
+    /// <summary>
+    ///     Set ConfigIP for NetworkDevice
+    /// </summary>
+    /// <param name="nic">Network device.</param>
+    /// <param name="config">IP Config</param>
+    private static void SetConfigIP(NetworkDevice nic, IPConfig config)
+    {
+        NetworkConfiguration.AddConfig(nic, config);
+        AddressMap.Add(config.IPAddress.Hash, nic);
+        MACMap.Add(nic.MACAddress.Hash, nic);
+        IPConfig.Add(config);
+        nic.DataReceived = HandlePacket;
+    }
 
-        /// <summary>
-        /// Get address dictionary.
-        /// </summary>
-        internal static Dictionary<uint, NetworkDevice> MACMap { get; private set; }
-
-        /// <summary>
-        /// Initialize the Network Stack to prepare it for operation.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public static void Init()
+    /// <summary>
+    ///     Configure a IP configuration on the given network device.
+    ///     <remarks>Multiple IP Configurations can be made, like *nix environments</remarks>
+    /// </summary>
+    /// <param name="nic"><see cref="NetworkDevice" /> that will have the assigned configuration</param>
+    /// <param name="config">
+    ///     <see cref="Config" /> instance that defines the IP Address, Subnet
+    ///     Mask and Default Gateway for the device
+    /// </param>
+    /// <exception cref="ArgumentException">
+    ///     <list type="bullet">
+    ///         <item>Thrown if configuration with the given config.IPAddress.Hash already exists.</item>
+    ///         <item>Thrown on fatal error (contact support).</item>
+    ///     </list>
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+    /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+    /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+    public static void ConfigIP(NetworkDevice nic, IPConfig config)
+    {
+        if (NetworkConfiguration.ConfigsContainsDevice(nic))
         {
-            AddressMap = new Dictionary<uint, NetworkDevice>();
-            MACMap = new Dictionary<uint, NetworkDevice>();
+            RemoveIPConfig(nic);
+            SetConfigIP(nic, config);
+        }
+        else
+        {
+            SetConfigIP(nic, config);
         }
 
-        /// <summary>
-        /// Set ConfigIP for NetworkDevice
-        /// </summary>
-        /// <param name="nic">Network device.</param>
-        /// <param name="config">IP Config</param>
-        private static void SetConfigIP(NetworkDevice nic, IPConfig config)
+        NetworkConfiguration.SetCurrentConfig(nic, config);
+    }
+
+    /// <summary>
+    ///     Check if Config is empty
+    ///     <returns>bool value.</returns>
+    /// </summary>
+    public static bool ConfigEmpty()
+    {
+        if (NetworkConfiguration.Count == 0)
         {
-            NetworkConfiguration.AddConfig(nic, config);
-            AddressMap.Add(config.IPAddress.Hash, nic);
-            MACMap.Add(nic.MACAddress.Hash, nic);
-            IPConfig.Add(config);
-            nic.DataReceived = HandlePacket;
+            return true;
         }
 
-        /// <summary>
-        /// Configure a IP configuration on the given network device.
-        /// <remarks>Multiple IP Configurations can be made, like *nix environments</remarks>
-        /// </summary>
-        /// <param name="nic"><see cref="NetworkDevice"/> that will have the assigned configuration</param>
-        /// <param name="config"><see cref="Config"/> instance that defines the IP Address, Subnet
-        /// Mask and Default Gateway for the device</param>
-        /// <exception cref="ArgumentException">
-        /// <list type="bullet">
-        /// <item>Thrown if configuration with the given config.IPAddress.Hash already exists.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
-        public static void ConfigIP(NetworkDevice nic, IPConfig config)
-        {
-            if (NetworkConfiguration.ConfigsContainsDevice(nic))
-            {
-                RemoveIPConfig(nic);
-                SetConfigIP(nic, config);
-            }
-            else
-            {
-                SetConfigIP(nic, config);
-            }
+        return false;
+    }
 
-            NetworkConfiguration.SetCurrentConfig(nic, config);
+    /// <summary>
+    ///     Remove All IPConfig
+    /// </summary>
+    public static void RemoveAllConfigIP()
+    {
+        AddressMap.Clear();
+        MACMap.Clear();
+        IPConfig.RemoveAll();
+        NetworkConfiguration.ClearConfigs();
+    }
+
+    /// <summary>
+    ///     Remove IPConfig
+    /// </summary>
+    /// <param name="nic">Network device.</param>
+    public static void RemoveIPConfig(NetworkDevice nic)
+    {
+        var config = NetworkConfiguration.Get(nic);
+        AddressMap.Remove(config.IPAddress.Hash);
+        MACMap.Remove(nic.MACAddress.Hash);
+        IPConfig.Remove(config);
+        NetworkConfiguration.Remove(nic);
+    }
+
+    /// <summary>
+    ///     Handle packet.
+    /// </summary>
+    /// <param name="packetData">Packet data array.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+    /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+    /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+    /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+    internal static void HandlePacket(byte[] packetData)
+    {
+        if (packetData == null)
+        {
+            Global.mDebugger.Send("Error packet data null");
+            return;
         }
 
-        /// <summary>
-        /// Check if Config is empty
-        /// <returns>bool value.</returns>
-        /// </summary>
-        public static bool ConfigEmpty()
+        var etherType = (ushort)((packetData[12] << 8) | packetData[13]);
+        switch (etherType)
         {
-            if (NetworkConfiguration.Count == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Remove All IPConfig
-        /// </summary>
-        public static void RemoveAllConfigIP()
-        {
-            AddressMap.Clear();
-            MACMap.Clear();
-            IPConfig.RemoveAll();
-            NetworkConfiguration.ClearConfigs();
-        }
-
-        /// <summary>
-        /// Remove IPConfig
-        /// </summary>
-        /// <param name="nic">Network device.</param>
-        public static void RemoveIPConfig(NetworkDevice nic)
-        {
-            IPConfig config = NetworkConfiguration.Get(nic);
-            AddressMap.Remove(config.IPAddress.Hash);
-            MACMap.Remove(nic.MACAddress.Hash);
-            IPConfig.Remove(config);
-            NetworkConfiguration.Remove(nic);
-        }
-
-        /// <summary>
-        /// Handle packet.
-        /// </summary>
-        /// <param name="packetData">Packet data array.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
-        internal static void HandlePacket(byte[] packetData)
-        {
-            if (packetData == null)
-            {
-                Global.mDebugger.Send("Error packet data null");
-                return;
-            }
-
-            ushort etherType = (ushort)((packetData[12] << 8) | packetData[13]);
-            switch (etherType)
-            {
-                case 0x0806:
-                    ARPPacket.ARPHandler(packetData);
-                    break;
-                case 0x0800:
-                    IPPacket.IPv4Handler(packetData);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Called continously to keep the Network Stack going.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
-        /// <exception cref="OverflowException">Thrown if data length of any packet in the queue is bigger than Int32.MaxValue.</exception>
-        public static void Update()
-        {
-            OutgoingBuffer.Send();
+            case 0x0806:
+                ARPPacket.ARPHandler(packetData);
+                break;
+            case 0x0800:
+                IPPacket.IPv4Handler(packetData);
+                break;
         }
     }
+
+    /// <summary>
+    ///     Called continously to keep the Network Stack going.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
+    /// <exception cref="OverflowException">Thrown if data length of any packet in the queue is bigger than Int32.MaxValue.</exception>
+    public static void Update() => OutgoingBuffer.Send();
 }

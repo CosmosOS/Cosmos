@@ -1,33 +1,35 @@
-using System;
 using System.Diagnostics;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.CPU.x86 {
-    [DebuggerStepThrough]
-    public static class GCImplementation {
-        private static void AcquireLock() {
-        }
+namespace Cosmos.CPU.x86;
 
-        private static void ReleaseLock() {
-        }
+[DebuggerStepThrough]
+public static class GCImplementation
+{
+    private static void AcquireLock()
+    {
+    }
 
-        [PlugMethod(PlugRequired = true)]
-        public static uint AllocNewObject(uint aSize) {
-            return 0;
-        }
+    private static void ReleaseLock()
+    {
+    }
 
-        /// <summary>
-        /// This function gets the pointer to the memory location of where it's stored.
-        /// </summary>
-        /// <param name="aObject"></param>
-        public static unsafe void IncRefCount(uint aObject) {
-        }
+    [PlugMethod(PlugRequired = true)]
+    public static uint AllocNewObject(uint aSize) => 0;
 
-        /// <summary>
-        /// This function gets the pointer to the memory location of where it's stored.
-        /// </summary>
-        /// <param name="aObject"></param>
-        public static unsafe void DecRefCount(uint aObject) {
-        }
+    /// <summary>
+    ///     This function gets the pointer to the memory location of where it's stored.
+    /// </summary>
+    /// <param name="aObject"></param>
+    public static void IncRefCount(uint aObject)
+    {
+    }
+
+    /// <summary>
+    ///     This function gets the pointer to the memory location of where it's stored.
+    /// </summary>
+    /// <param name="aObject"></param>
+    public static void DecRefCount(uint aObject)
+    {
     }
 }

@@ -1,55 +1,51 @@
+using System;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
-using System;
 
-namespace Cosmos.Core_Plugs.System
+namespace Cosmos.Core_Plugs.System;
+
+[Plug(Target = typeof(object))]
+public static class ObjectImpl
 {
-    [Plug(Target = typeof(object))]
-    public static class ObjectImpl
+    private static readonly Debugger mDebugger = new("IL2CPU", "ObjectImpl");
+
+    public static string ToString(object aThis)
     {
-        private static Debugger mDebugger = new Debugger("IL2CPU", "ObjectImpl");
+        mDebugger.Send("<Object.ToString not yet implemented!>");
+        return "<Object.ToString not yet implemented!>";
+    }
 
-        public static string ToString(object aThis)
+    public static void Ctor(object aThis)
+    {
+    }
+
+    public static unsafe Type GetType([ObjectPointerAccess] uint* aThis)
+    {
+        var xType = *aThis;
+        return new CosmosRuntimeType(xType);
+    }
+
+    public static int GetHashCode(object aThis) => (int)aThis;
+
+    public static unsafe ulong MemberwiseClone([ObjectPointerAccess] uint aThis)
+    {
+        var xThisPointer = (uint*)aThis;
+        var xSize = ObjectUtils.FieldDataOffset + xThisPointer[2];
+
+        var xResult = GCImplementation.AllocNewObject(xSize);
+
+        var xThisPointerByte = (byte*)xThisPointer;
+        var xThatPointerByte = (byte*)xResult;
+
+        for (var i = 0; i < xSize; i++)
         {
-            mDebugger.Send("<Object.ToString not yet implemented!>");
-            return "<Object.ToString not yet implemented!>";
+            xThatPointerByte[i] = xThisPointerByte[i];
         }
 
-        public static void Ctor(object aThis)
-        {
-        }
+        var xReturn = (ulong)xResult << (sizeof(ulong) / 2 * 8);
 
-        public static unsafe Type GetType([ObjectPointerAccess] uint* aThis)
-        {
-            uint xType = *aThis;
-            return new CosmosRuntimeType(xType);
-        }
-
-        public static int GetHashCode(object aThis)
-        {
-            return (int)aThis;
-        }
-
-        public static unsafe ulong MemberwiseClone([ObjectPointerAccess] uint aThis)
-        {
-            var xThisPointer = (uint*)aThis;
-            var xSize = ObjectUtils.FieldDataOffset + xThisPointer[2];
-
-            var xResult = GCImplementation.AllocNewObject(xSize);
-
-            var xThisPointerByte = (byte*)xThisPointer;
-            var xThatPointerByte = (byte*)xResult;
-
-            for (int i = 0; i < xSize; i++)
-            {
-                xThatPointerByte[i] = xThisPointerByte[i];
-            }
-
-            ulong xReturn = ((ulong)xResult) << (sizeof(ulong) / 2 * 8);
-
-            return xReturn;
-        }
+        return xReturn;
     }
 }

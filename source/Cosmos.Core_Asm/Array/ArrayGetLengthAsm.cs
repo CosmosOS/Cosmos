@@ -1,16 +1,15 @@
-using XSharp.Assembler;
 using XSharp;
+using XSharp.Assembler;
 
-namespace Cosmos.Core_Asm
+namespace Cosmos.Core_Asm;
+
+public class ArrayGetLengthAsm : AssemblerMethod
 {
-    public class ArrayGetLengthAsm : AssemblerMethod
+    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
     {
-        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
-        {
-            // $this   ebp+8
-            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 12);
-            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceDisplacement: 8, sourceIsIndirect: true); // element count
-            XS.Push(XSRegisters.EAX);
-        }
+        // $this   ebp+8
+        XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 12);
+        XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceDisplacement: 8, sourceIsIndirect: true); // element count
+        XS.Push(XSRegisters.EAX);
     }
 }

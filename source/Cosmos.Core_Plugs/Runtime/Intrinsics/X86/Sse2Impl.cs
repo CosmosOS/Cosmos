@@ -1,21 +1,15 @@
 ﻿using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.Runtime.Intrinsics.X86
+namespace Cosmos.Core_Plugs.Runtime.Intrinsics.X86;
+
+[Plug("System.Runtime.Intrinsics.X86.Sse2, System.Private.CoreLib")]
+internal class Sse2Impl
 {
-    [Plug("System.Runtime.Intrinsics.X86.Sse2, System.Private.CoreLib")]
-    class Sse2Impl
-    {
-        public static bool get_IsSupported()
-        {
-            return false;
-        }
-    }
-    [Plug("System.Runtime.Intrinsics.X86.Sse2+X64, System.Private.CoreLib")]
-    class X86Impl
-    {
-        public static bool get_IsSupported()
-        {
-            return false;
-        }
-    }
+    public static bool get_IsSupported() => false;
+}
+
+[Plug("System.Runtime.Intrinsics.X86.Sse2+X64, System.Private.CoreLib")]
+internal class X86Impl
+{
+    public static bool get_IsSupported() => false;
 }

@@ -1,89 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Cosmos.Common.Extensions;
-using Cosmos.Debug.Kernel;
 
-namespace Cosmos.HAL.BlockDevice
+namespace Cosmos.HAL.BlockDevice;
+
+public class GPT
 {
-    public class GPT
+    // Signature: "EFI PART"
+    private const ulong EFIParitionSignature = 0x5452415020494645;
+
+    public List<GPartInfo> Partitions = new();
+
+    public GPT(BlockDevice aBlockDevice)
     {
-        // Signature: "EFI PART"
-        private const ulong EFIParitionSignature = 0x5452415020494645;
+        var GPTHeader = new byte[512];
+        aBlockDevice.ReadBlock(1, 1, ref GPTHeader);
 
-        public List<GPartInfo> Partitions = new List<GPartInfo>();
+        // Start of parition entries
+        var partEntryStart = BitConverter.ToUInt64(GPTHeader, 72);
+        var numParitions = BitConverter.ToUInt32(GPTHeader, 80);
+        var partSize = BitConverter.ToUInt32(GPTHeader, 84);
 
-        public class GPartInfo
+        var paritionsPerSector = 512 / partSize;
+
+        for (ulong i = 0; i < numParitions / paritionsPerSector; i++)
         {
-            public readonly Guid ParitionType;
-            public readonly Guid ParitionGuid;
-            public readonly ulong StartSector;
-            public readonly ulong SectorCount;
+            var partData = new byte[512];
+            aBlockDevice.ReadBlock(partEntryStart + i, 1, ref partData);
 
-            public GPartInfo(Guid aParitionType, Guid aParitionGuid, ulong aStartSector, ulong aSectorCount)
+            for (uint j = 0; j < paritionsPerSector; j++)
             {
-                ParitionType = aParitionType;
-                ParitionGuid = aParitionGuid;
-                StartSector = aStartSector;
-                SectorCount = aSectorCount;
+                ParseParition(partData, j * partSize);
             }
         }
+    }
 
-        public GPT(BlockDevice aBlockDevice)
+    private void ParseParition(byte[] partData, uint off)
+    {
+        var guidArray = new byte[16];
+
+        Array.Copy(partData, off, guidArray, 0, 16);
+        var partType = new Guid(guidArray);
+
+        Array.Copy(partData, off + 16, guidArray, 0, 16);
+        var partGuid = new Guid(guidArray);
+
+        var startLBA = BitConverter.ToUInt64(partData, (int)(off + 32));
+        var endLBA = BitConverter.ToUInt64(partData, (int)(off + 40));
+
+        // endLBA + 1 because endLBA is inclusive
+        var count = endLBA + 1 - startLBA;
+
+        if (partType != Guid.Empty && partGuid != Guid.Empty)
         {
-            byte[] GPTHeader = new byte[512];
-            aBlockDevice.ReadBlock(1, 1, ref GPTHeader);
-
-            // Start of parition entries
-            ulong partEntryStart = BitConverter.ToUInt64(GPTHeader, 72);
-            uint numParitions = BitConverter.ToUInt32(GPTHeader, 80);
-            uint partSize = BitConverter.ToUInt32(GPTHeader, 84);
-
-            uint paritionsPerSector = 512 / partSize;
-
-            for (ulong i = 0; i < numParitions/paritionsPerSector; i++)
-            {
-
-                byte[] partData = new byte[512];
-                aBlockDevice.ReadBlock(partEntryStart + i, 1, ref partData);
-
-                for (uint j = 0; j < paritionsPerSector; j++)
-                {
-                    ParseParition(partData, j * partSize);
-                }
-            }
+            Partitions.Add(new GPartInfo(partType, partGuid, startLBA, count));
         }
+    }
 
-        private void ParseParition(byte[] partData, uint off)
+    public static bool IsGPTPartition(BlockDevice aBlockDevice)
+    {
+        var GPTHeader = new byte[512];
+        aBlockDevice.ReadBlock(1, 1, ref GPTHeader);
+
+        var signature = BitConverter.ToUInt64(GPTHeader, 0);
+
+        return signature == EFIParitionSignature;
+    }
+
+    public class GPartInfo
+    {
+        public readonly Guid ParitionGuid;
+        public readonly Guid ParitionType;
+        public readonly ulong SectorCount;
+        public readonly ulong StartSector;
+
+        public GPartInfo(Guid aParitionType, Guid aParitionGuid, ulong aStartSector, ulong aSectorCount)
         {
-            byte[] guidArray = new byte[16];
-
-            Array.Copy(partData, off, guidArray, 0, 16);
-            var partType = new Guid(guidArray);
-
-            Array.Copy(partData, off + 16, guidArray, 0, 16);
-            var partGuid = new Guid(guidArray);
-
-            ulong startLBA = BitConverter.ToUInt64(partData, (int)(off + 32));
-            ulong endLBA = BitConverter.ToUInt64(partData, (int)(off + 40));
-
-            // endLBA + 1 because endLBA is inclusive
-            ulong count = (endLBA + 1) - startLBA;
-
-            if (partType != Guid.Empty && partGuid != Guid.Empty)
-            {
-                Partitions.Add(new GPartInfo(partType, partGuid, startLBA, count));
-            }
-        }
-
-        public static bool IsGPTPartition(BlockDevice aBlockDevice)
-        {
-            byte[] GPTHeader = new byte[512];
-            aBlockDevice.ReadBlock(1, 1, ref GPTHeader);
-
-            ulong signature = BitConverter.ToUInt64(GPTHeader, 0);
-
-            return signature == EFIParitionSignature;
+            ParitionType = aParitionType;
+            ParitionGuid = aParitionGuid;
+            StartSector = aStartSector;
+            SectorCount = aSectorCount;
         }
     }
 }

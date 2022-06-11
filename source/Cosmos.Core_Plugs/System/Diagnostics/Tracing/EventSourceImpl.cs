@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics.Tracing;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.System.Diagnostics.Tracing
+namespace Cosmos.Core_Plugs.System.Diagnostics.Tracing;
+
+[Plug(typeof(EventSource))]
+internal class EventSourceImpl
 {
-    [Plug(typeof(global::System.Diagnostics.Tracing.EventSource))]
-    class EventSourceImpl
-    {
-        public static void EnsureDescriptorsInitialized(global::System.Diagnostics.Tracing.EventSource aThis)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    public static void EnsureDescriptorsInitialized(EventSource aThis) => throw new NotImplementedException();
 }

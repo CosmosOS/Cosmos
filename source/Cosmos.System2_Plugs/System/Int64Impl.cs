@@ -1,56 +1,54 @@
 using System;
-
 using Cosmos.Common;
-
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System
+namespace Cosmos.System_Plugs.System;
+
+[Plug(Target = typeof(long))]
+public static class Int64Impl
 {
-    [Plug(Target = typeof(long))]
-    public static class Int64Impl
+    public static string ToString(ref long aThis) => StringHelper.GetNumberString(aThis);
+
+    public static string ToString(ref long aThis, string format, IFormatProvider provider) => aThis.ToString();
+
+    public static long Parse(string s)
     {
-        public static string ToString(ref long aThis) => StringHelper.GetNumberString(aThis);
+        const string digits = "0123456789";
+        var result = 0L;
 
-        public static string ToString(ref long aThis, string format, IFormatProvider provider) => aThis.ToString();
+        var z = 0;
+        var neg = false;
 
-        public static long Parse(string s)
+        if (s.Length >= 1)
         {
-            const string digits = "0123456789";
-            var result = 0L;
-
-            int z = 0;
-            bool neg = false;
-
-            if (s.Length >= 1)
+            if (s[0] == '+')
             {
-                if (s[0] == '+')
-                {
-                    z = 1;
-                }
-
-                if (s[0] == '-')
-                {
-                    z = 1;
-                    neg = true;
-                }
+                z = 1;
             }
 
-            for (int i = z; i < s.Length; i++)
+            if (s[0] == '-')
             {
-                var ind = digits.IndexOf(s[i]);
-                if (ind == -1)
-                {
-                    throw new FormatException();
-                }
-                result = (result * 10) + ind;
+                z = 1;
+                neg = true;
             }
-
-            if (neg)
-            {
-                result *= -1;
-            }
-
-            return result;
         }
+
+        for (var i = z; i < s.Length; i++)
+        {
+            var ind = digits.IndexOf(s[i]);
+            if (ind == -1)
+            {
+                throw new FormatException();
+            }
+
+            result = result * 10 + ind;
+        }
+
+        if (neg)
+        {
+            result *= -1;
+        }
+
+        return result;
     }
 }

@@ -1,52 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.Common.Extensions;
 
-namespace Cosmos.HAL.BlockDevice
+namespace Cosmos.HAL.BlockDevice;
+
+public class EBR
 {
-    public class EBR
+    public List<PartInfo> Partitions = new();
+
+    public EBR(byte[] aEBR)
     {
-        public List<PartInfo> Partitions = new List<PartInfo>();
+        ParsePartition(aEBR, 446);
+        ParsePartition(aEBR, 462);
+    }
 
-        public class PartInfo
+    protected void ParsePartition(byte[] aEBR, uint aLoc)
+    {
+        var xSystemID = aEBR[aLoc + 4];
+        // SystemID = 0 means no partition
+        //TODO: Extended Partition Table
+        if (xSystemID == 0x5 || xSystemID == 0xF || xSystemID == 0x85)
         {
-            public readonly byte SystemID;
-            public readonly uint StartSector;
-            public readonly uint SectorCount;
-
-            public PartInfo(byte aSystemID, uint aStartSector, uint aSectorCount)
-            {
-                SystemID = aSystemID;
-                StartSector = aStartSector;
-                SectorCount = aSectorCount;
-            }
+            //Another EBR Detected
         }
-
-        public EBR(byte[] aEBR)
+        else if (xSystemID != 0)
         {
-            ParsePartition(aEBR, 446);
-            ParsePartition(aEBR, 462);
+            var xStartSector = BitConverter.ToUInt32(aEBR, (int)aLoc + 8);
+            var xSectorCount = BitConverter.ToUInt32(aEBR, (int)aLoc + 12);
+
+            var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
+            Partitions.Add(xPartInfo);
         }
+    }
 
-        protected void ParsePartition(byte[] aEBR, uint aLoc)
+    public class PartInfo
+    {
+        public readonly uint SectorCount;
+        public readonly uint StartSector;
+        public readonly byte SystemID;
+
+        public PartInfo(byte aSystemID, uint aStartSector, uint aSectorCount)
         {
-            byte xSystemID = aEBR[aLoc + 4];
-            // SystemID = 0 means no partition
-            //TODO: Extended Partition Table
-            if (xSystemID == 0x5 || xSystemID == 0xF || xSystemID == 0x85)
-            {
-                //Another EBR Detected
-            }
-            else if (xSystemID != 0)
-            {
-                uint xStartSector = BitConverter.ToUInt32(aEBR, (int)aLoc + 8);
-                uint xSectorCount = BitConverter.ToUInt32(aEBR, (int)aLoc + 12);
-
-                var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
-                Partitions.Add(xPartInfo);
-            }
+            SystemID = aSystemID;
+            StartSector = aStartSector;
+            SectorCount = aSectorCount;
         }
     }
 }

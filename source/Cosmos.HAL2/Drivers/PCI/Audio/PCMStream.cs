@@ -1,26 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace Cosmos.HAL.Drivers.PCI.Audio;
 
-namespace Cosmos.HAL.Drivers.PCI.Audio
+public class PCMStream
 {
-    public class PCMStream
+    private readonly char[] data;
+    private readonly double freq;
+
+    public PCMStream(double freq, char[] data)
     {
-        double freq;
-        char[] data;
-        public PCMStream(double freq, char[] data)
-        {
-            this.freq = freq;
-            this.data = data;
-        }
-        public char[] getData()
-        {
-            return data;
-        }
-        public double getFreq()
-        {
-            return freq;
-        }
+        this.freq = freq;
+        this.data = data;
     }
+
+    public char[] getData() => data;
+
+    public double getFreq() => freq;
 }

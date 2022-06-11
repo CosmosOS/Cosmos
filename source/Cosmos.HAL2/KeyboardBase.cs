@@ -1,26 +1,25 @@
-﻿namespace Cosmos.HAL
+﻿using Cosmos.Core;
+
+namespace Cosmos.HAL;
+
+public abstract class KeyboardBase : Device
 {
-    public abstract class KeyboardBase : Device
-    {
-        /// <summary>
-        /// Initialize the device. Happens before the interrupt is registered, ie before the class is being used.
-        /// </summary>
-        public abstract void Initialize();
+    public delegate void KeyPressedEventHandler(byte ScanCode, bool Released);
 
-        /// <summary>
-        /// Update keyboard LEDs.
-        /// </summary>
-        public abstract void UpdateLeds();
+    public KeyPressedEventHandler OnKeyPressed;
 
-        public delegate void KeyPressedEventHandler(byte ScanCode, bool Released);
-        public KeyPressedEventHandler OnKeyPressed;
+    /// <summary>
+    ///     Initialize the device. Happens before the interrupt is registered, ie before the class is being used.
+    /// </summary>
+    public abstract void Initialize();
 
-        /// <summary>
-        /// Wait for key to be pressed.
-        /// </summary>
-        public static void WaitForKey()
-        {
-            Core.CPU.Halt();
-        }
-    }
+    /// <summary>
+    ///     Update keyboard LEDs.
+    /// </summary>
+    public abstract void UpdateLeds();
+
+    /// <summary>
+    ///     Wait for key to be pressed.
+    /// </summary>
+    public static void WaitForKey() => CPU.Halt();
 }
