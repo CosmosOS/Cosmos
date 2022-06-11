@@ -29,7 +29,7 @@ namespace Cosmos.Core_Plugs.Interop
             throw new NotImplementedException();
         }
         [PlugMethod(Signature = "System_Void__Interop_Globalization_InitOrdinalCasingPage_System_Int32__System_Char__")]
-        public static void InitOrdinalCasingPage()
+        public static unsafe void InitOrdinalCasingPage(int pageNumber, char* pTarget)
         {
             throw new NotImplementedException();
         }
