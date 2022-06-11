@@ -7,7 +7,7 @@ namespace Cosmos.System_Plugs.Interop
     [Plug("Interop+Sys", IsOptional = true)]
     class SysImpl
     {
-        [PlugMethod(Signature = "System_Void__Interop_Sys_GetNonCryptographicallySecureRandomBytes_System_Byte___System_Int32_")]
+        [PlugMethod(Signature = "System_Void__Interop_Sys_GetNonCryptographicallySecureRandomBytes_System_Byte#__System_Int32_")]
         public static unsafe void GetNonCryptographicallySecureRandomBytes(byte* buffer, int length)
         {
             throw new NotImplementedException();
