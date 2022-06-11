@@ -41,22 +41,12 @@ namespace Cosmos.Core
             Console.WriteLine("IO APIC Initialized");
         }
 
-        public static uint In(byte reg)
-        {
-            IO.RegSel.Byte = reg;
-            return IO.Win.DWord;
-        }
-
-        public static void Out(byte reg, uint value)
-        {
-            IO.RegSel.Byte = reg;
-            IO.Win.DWord = value;
-        }
-
         public static void SetEntry(byte index, ulong data)
         {
-            Out((byte)(IOAPICIOGroup.IOREDTBL + index * 2), (uint)data);
-            Out((byte)(IOAPICIOGroup.IOREDTBL + index * 2 + 1), (uint)(data >> 32));
+            var mmio = new MMIO((uint)(IOAPICIOGroup.IOREDTBL + index * 2));
+            mmio.DWord = (uint)data;
+            var mmio2 = new MMIO((uint)(IOAPICIOGroup.IOREDTBL + index * 2 + 1));
+            mmio2.DWord = (uint)(data >> 32);
         }
 
         public static void SetEntry(uint irq)
