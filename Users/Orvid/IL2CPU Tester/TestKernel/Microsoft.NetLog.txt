@@ -1,5 +1,0 @@
-Test 'test_0_pass_float_ret_double' didn't return expected value. Expected: '0' Got: '11'
-Test 'test_0_float_precision' didn't return expected value. Expected: '0' Got: '1'
-Test 'test_0_tan_precision' didn't return expected value. Expected: '0' Got: '1'
-Test 'test_0_atan_precision' didn't return expected value. Expected: '0' Got: '1'
-Test 'test_0_rethrow_stacktrace' didn't return expected value. Expected: '0' Got: '1'
