@@ -1,11 +1,9 @@
-﻿using Cosmos.Core;
-
-namespace Cosmos.Core.IOGroup
+﻿namespace Cosmos.Core.MemoryGroup
 {
     /// <summary>
     /// Local APIC IOGroup class.
     /// </summary>
-    public class APICIOGroup : IOGroup
+    public class APICMMIOGroup
     {
         public const ushort LAPIC_ID = 0x0020;
         public const ushort LAPIC_VER = 0x0030;
@@ -95,7 +93,7 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Create new instance of the <see cref="APIC"/> class.
         /// </summary>
-        internal APICIOGroup(uint baseAddress)
+        internal APICMMIOGroup(uint baseAddress)
         {
             Id = new MMIO(baseAddress, LAPIC_ID);
             EndOfInterrupts = new MMIO(baseAddress, LAPIC_EOI);

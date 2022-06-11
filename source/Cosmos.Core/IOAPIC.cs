@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cosmos.Core.IOGroup;
+using Cosmos.Core.MemoryGroup;
 
 namespace Cosmos.Core
 {

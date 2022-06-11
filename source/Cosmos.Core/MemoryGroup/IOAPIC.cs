@@ -1,11 +1,9 @@
-﻿using Cosmos.Core;
-
-namespace Cosmos.Core.IOGroup
+﻿namespace Cosmos.Core.MemoryGroup
 {
     /// <summary>
     /// IO APIC IOGroup class.
     /// </summary>
-    public class IOAPICIOGroup : IOGroup
+    public class IOAPICMMIOGroup
     {
         public const ushort IOREGSEL = 0x00;
         public const ushort IOWIN = 0x10;
@@ -35,7 +33,7 @@ namespace Cosmos.Core.IOGroup
         /// Create new instance of the <see cref="IOAPIC"/> class.
         /// </summary>
         /// <param name="baseAddress">IO APIC Base Address.</param>
-        internal IOAPICIOGroup(uint baseAddress)
+        internal IOAPICMMIOGroup(uint baseAddress)
         {
             Ver = new MMIO(baseAddress, IOAPICVER);
             RegSel = new MMIO(baseAddress, IOREGSEL);
