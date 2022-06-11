@@ -71,7 +71,7 @@ namespace Cosmos.Core
         /// <returns>byte value.</returns>
         static protected byte Read8(uint address)
         {
-            return (byte)(*(uint*)address);
+            return (byte)*(uint*)address;
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Cosmos.Core
         /// <returns>ushort value.</returns>
         static protected ushort Read16(uint address)
         {
-            return (ushort)(*(uint*)address);
+            return (ushort)*(uint*)address;
         }
 
         /// <summary>

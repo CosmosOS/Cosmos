@@ -15,14 +15,14 @@ namespace Cosmos.Core
         /// <summary>
         /// IO APIC IO group.
         /// </summary>
-        internal static IOAPICIOGroup IO;
+        internal static IOAPICMMIOGroup IO;
 
         /// <summary>
         /// Initialize local APIC.
         /// </summary>
         public static void Initialize()
         {
-            IO = new IOAPICIOGroup(ACPI.IOAPIC->IOApicAddress);
+            IO = new IOAPICMMIOGroup(ACPI.IOAPIC->IOApicAddress);
 
             if (ACPI.IOAPIC == null)
             {
@@ -43,9 +43,9 @@ namespace Cosmos.Core
 
         public static void SetEntry(byte index, ulong data)
         {
-            var mmio = new MMIO((uint)(IOAPICIOGroup.IOREDTBL + index * 2));
+            var mmio = new MMIO((uint)(IOAPICMMIOGroup.IOREDTBL + index * 2));
             mmio.DWord = (uint)data;
-            var mmio2 = new MMIO((uint)(IOAPICIOGroup.IOREDTBL + index * 2 + 1));
+            var mmio2 = new MMIO((uint)(IOAPICMMIOGroup.IOREDTBL + index * 2 + 1));
             mmio2.DWord = (uint)(data >> 32);
         }
 

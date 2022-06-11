@@ -15,7 +15,7 @@ namespace Cosmos.Core
         /// <summary>
         /// Local APIC IO group.
         /// </summary>
-        internal static APICIOGroup IO;
+        internal static APICMMIOGroup IO;
 
         /// <summary>
         /// Initialize local APIC.
@@ -24,7 +24,7 @@ namespace Cosmos.Core
         {
             Global.PIC.Disable();
 
-            IO = new APICIOGroup(ACPI.MADT->LocalAPICAddress);
+            IO = new APICMMIOGroup(ACPI.MADT->LocalAPICAddress);
 
             //Enable All Interrupts
             IO.Tpr.DWord = 0;
@@ -54,31 +54,6 @@ namespace Cosmos.Core
         public static uint GetId()
         {
             return IO.Id.DWord >> 24;
-        }
-
-        /// <summary>
-        /// Send Init Command to Local APIC.
-        /// </summary>
-        /// <param name="apic_id">APIC ID.</param>
-        public static void SendInit(uint apic_id)
-        {
-            IO.ICRHI.DWord = apic_id << APICIOGroup.ICR_DESTINATION_SHIFT;
-            IO.ICRLO.DWord = APICIOGroup.ICR_INIT | APICIOGroup.ICR_PHYSICAL | APICIOGroup.ICR_ASSERT | APICIOGroup.ICR_EDGE | APICIOGroup.ICR_NO_SHORTHAND;
-
-            while ((IO.ICRLO.DWord & APICIOGroup.ICR_SEND_PENDING) != 0) { }
-        }
-
-        /// <summary>
-        /// Send Startup Command to Local APIC.
-        /// </summary>
-        /// <param name="apic_id">APIC ID.</param>
-        /// <param name="vector">Vector.</param>
-        public static void SendStartup(uint apic_id, ushort vector)
-        {
-            IO.ICRHI.DWord = apic_id << APICIOGroup.ICR_DESTINATION_SHIFT;
-            IO.ICRLO.DWord = (uint)(vector | APICIOGroup.ICR_STARTUP | APICIOGroup.ICR_PHYSICAL | APICIOGroup.ICR_ASSERT | APICIOGroup.ICR_EDGE | APICIOGroup.ICR_NO_SHORTHAND);
-
-            while ((IO.ICRLO.DWord & APICIOGroup.ICR_SEND_PENDING) != 0) { }
         }
     }
 }
