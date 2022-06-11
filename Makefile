@@ -40,31 +40,31 @@ $(COMMON_DIR):
 .PHONY: build
 build:
 	@echo "Building IL2CPU"
-	$(DOTNET) build $(IL2CPU_DIR) $(DOTNETFLAGS)
-	$(DOTNET) pack $(IL2CPU_DIR) $(DOTNETFLAGS)
+	$(DOTNET) build $(IL2CPU_DIR) -o $(IL2CPU_DIR)/source/IL2CPU/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(IL2CPU_DIR)  -o $(IL2CPU_DIR)/source/IL2CPU/bin/publish $(DOTNETFLAGS)
 
 	@echo "Building Cosmos"
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Common $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Asm $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Plugs $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2 $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Common -o $(THISDIR)/source/Cosmos.Common/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel -o $(THISDIR)/source/Cosmos.Debug.Kernel/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm -o $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core -o $(THISDIR)/source/Cosmos.Core/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Asm -o $(THISDIR)/source/Cosmos.Core_Asm/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Plugs -o $(THISDIR)/source/Cosmos.Core_Plugs/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.HAL2 -o $(THISDIR)/source/Cosmos.HAL2/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2 -o $(THISDIR)/source/Cosmos.System2/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs -o $(THISDIR)/source/Cosmos.System2_Plugs/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks -o $(THISDIR)/source/Cosmos.Build.Tasks/bin/publish $(DOTNETFLAGS)
 
 .PHONY: publish
 publish:
 	@echo "Publishing IL2CPU"
-	$(DOTNET) publish $(IL2CPU_DIR)/source/IL2CPU -r linux-x64 --self-contained $(DOTNETFLAGS)
+	$(DOTNET) publish $(IL2CPU_DIR)/source/IL2CPU --self-contained -o $(IL2CPU_DIR)/source/IL2CPU/bin/publish --include-symbols $(DOTNETFLAGS)
 
 	@echo "Publishing Cosmos"
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.Core_Plugs $(DOTNETFLAGS)
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
+	$(DOTNET) publish $(THISDIR)/source/Cosmos.Core_Plugs -o $(THISDIR)/source/Cosmos.Core_Plugs/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) publish $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm -o $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) publish $(THISDIR)/source/Cosmos.HAL2 -o $(THISDIR)/source/Cosmos.HAL2/bin/publish $(DOTNETFLAGS)
+	$(DOTNET) publish $(THISDIR)/source/Cosmos.System2_Plugs -o $(THISDIR)/source/Cosmos.System2_Plugs/bin/publish $(DOTNETFLAGS)
 
 .PHONY: install
 install:
@@ -84,16 +84,16 @@ install:
 	@cp -r $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/
 	@cp -r $(THISDIR)/Artwork/Cosmos.ico $(DESTDIR)/
 
-	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Debug/net5.0/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
-	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/publish/* $(DESTDIR)/Build/IL2CPU/
+	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/publish/*.dll $(DESTDIR)/Kernel/
 
 	@cp -r $(THISDIR)/Build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
 	@cp -r $(THISDIR)/Build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
 	@cp -r $(THISDIR)/Build/syslinux/* $(DESTDIR)/Build/ISO/
-	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
+	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg || true # we dont need to update this each time so an error should be okay
 
 	$(MAKE) nuget-install
 
