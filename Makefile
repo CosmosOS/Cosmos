@@ -58,7 +58,7 @@ build:
 .PHONY: publish
 publish:
 	@echo "Publishing IL2CPU"
-	$(DOTNET) publish $(IL2CPU_DIR)/source/IL2CPU --self-contained -o $(IL2CPU_DIR)/source/IL2CPU/bin/publish --include-symbols $(DOTNETFLAGS)
+	$(DOTNET) publish $(IL2CPU_DIR)/source/IL2CPU --self-contained -o $(IL2CPU_DIR)/source/IL2CPU/bin/publish $(DOTNETFLAGS)
 
 	@echo "Publishing Cosmos"
 	$(DOTNET) publish $(THISDIR)/source/Cosmos.Core_Plugs -o $(THISDIR)/source/Cosmos.Core_Plugs/bin/publish $(DOTNETFLAGS)
