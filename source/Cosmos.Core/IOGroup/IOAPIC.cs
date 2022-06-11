@@ -17,30 +17,30 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Ver port.
         /// </summary>
-        public readonly IOPort Ver;
+        public readonly MMIO Ver;
         /// <summary>
         /// RegSel port.
         /// </summary>
-        public readonly IOPort RegSel;
+        public readonly MMIO RegSel;
         /// <summary>
         /// Win port.
         /// </summary>
-        public readonly IOPort Win;
+        public readonly MMIO Win;
         /// <summary>
         /// RedTbl port.
         /// </summary>
-        public readonly IOPort RedTbl;
+        public readonly MMIO RedTbl;
 
         /// <summary>
         /// Create new instance of the <see cref="IOAPIC"/> class.
         /// </summary>
         /// <param name="baseAddress">IO APIC Base Address.</param>
-        internal IOAPICIOGroup(ushort baseAddress)
+        internal IOAPICIOGroup(uint baseAddress)
         {
-            Ver = new IOPort(baseAddress, IOAPICVER);
-            RegSel = new IOPort(baseAddress, IOREGSEL);
-            Win = new IOPort(baseAddress, IOWIN);
-            RedTbl = new IOPort(baseAddress, IOREDTBL);
+            Ver = new MMIO(baseAddress, IOAPICVER);
+            RegSel = new MMIO(baseAddress, IOREGSEL);
+            Win = new MMIO(baseAddress, IOWIN);
+            RedTbl = new MMIO(baseAddress, IOREDTBL);
         }
     }
 }

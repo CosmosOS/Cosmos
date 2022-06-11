@@ -461,6 +461,7 @@ namespace Cosmos.Core
         /// <returns>true on success, false on failure.</returns>
         private static bool Init()
         {
+            IOAPIC = null;
             var rsdp = RSDPAddress();
             byte* ptr = (byte*)rsdp;
 
@@ -486,7 +487,7 @@ namespace Cosmos.Core
         {
             var signature = Encoding.ASCII.GetString(hdr->Signature, 4);
 
-            Global.mDebugger.Send(signature + "detected");
+            Global.mDebugger.Send(signature + " detected");
 
             if (signature == "FACP")
             {
@@ -542,7 +543,7 @@ namespace Cosmos.Core
             }
             else if (signature == "APIC")
             {
-                Global.mDebugger.Send("Parse ACPI");
+                Global.mDebugger.Send("Parse APIC");
 
                 MADT = (MADTPtr*)hdr;
 
@@ -562,18 +563,21 @@ namespace Cosmos.Core
                     }
                     else if (type == ApicType.IOAPIC)
                     {
+                        Global.mDebugger.Send("Parse IO APIC");
                         var ioapic = (ApicIOApic*)p;
-                        if (ioapic == null)
+                        if (IOAPIC == null)
                         {
                             IOAPIC = ioapic;
                         }
-                        Global.mDebugger.Send("Found IO APIC " + (ulong)ioapic->IOApicId + "(Address:" + ((ulong)ioapic->IOApicAddress).ToString("x2") + ", GSIB:" + (ulong)ioapic->GlobalSystemInterruptBase + ")");
+                        Global.mDebugger.Send("Found IO APIC " + (ulong)ioapic->IOApicId + "(Address:0x" + ((ulong)ioapic->IOApicAddress).ToString("X") + ", GSIB:" + (ulong)ioapic->GlobalSystemInterruptBase + ")");
                     }
                     else if (type == ApicType.InterruptOverride)
                     {
+                        Global.mDebugger.Send("Parse Interrupt Override APIC");
+
                         var ovr = (ApicInterruptOverride*)p;
 
-                        Global.mDebugger.Send("Found APIC Interrupt Override (Bus: " + (((ulong)ovr->Bus).ToString()) + ", Source:" + ((ulong)ovr->Source).ToString() + ", Interrupt:" + ((ulong)ovr->Interrupt).ToString("x2") + ", Flags:" + ((ulong)ovr->Flags).ToString() + ")");
+                        Global.mDebugger.Send("Found APIC Interrupt Override (Bus: " + ((ulong)ovr->Bus).ToString() + ", Source:" + ((ulong)ovr->Source).ToString() + ", Interrupt:0x" + ((ulong)ovr->Interrupt).ToString("X") + ", Flags:" + ((ulong)ovr->Flags).ToString() + ")");
                     }
 
                     p += length;

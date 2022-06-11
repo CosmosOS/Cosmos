@@ -62,49 +62,49 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Id port.
         /// </summary>
-        public readonly IOPort Id;
+        public readonly MMIO Id;
         /// <summary>
         /// EndOfInterrupts port.
         /// </summary>
-        public readonly IOPort EndOfInterrupts;
+        public readonly MMIO EndOfInterrupts;
         /// <summary>
         /// EndOfInterrupts port.
         /// </summary>
-        public readonly IOPort Tpr;
+        public readonly MMIO Tpr;
         /// <summary>
         /// EndOfInterrupts port.
         /// </summary>
-        public readonly IOPort Dfr;
+        public readonly MMIO Dfr;
         /// <summary>
         /// EndOfInterrupts port.
         /// </summary>
-        public readonly IOPort Ldr;
+        public readonly MMIO Ldr;
         /// <summary>
         /// EndOfInterrupts port.
         /// </summary>
-        public readonly IOPort Svr;
+        public readonly MMIO Svr;
         /// <summary>
         /// EndOfInterrupts port.
         /// </summary>
-        public readonly IOPort ICRHI;
+        public readonly MMIO ICRHI;
         /// <summary>
         /// EndOfInterrupts port.
         /// </summary>
-        public readonly IOPort ICRLO;
+        public readonly MMIO ICRLO;
 
         /// <summary>
         /// Create new instance of the <see cref="APIC"/> class.
         /// </summary>
-        internal APICIOGroup(ushort baseAddress)
+        internal APICIOGroup(uint baseAddress)
         {
-            Id = new IOPort(baseAddress, LAPIC_ID);
-            EndOfInterrupts = new IOPort(baseAddress, LAPIC_EOI);
-            Tpr = new IOPort(baseAddress, LAPIC_TPR);
-            Dfr = new IOPort(baseAddress, LAPIC_DFR);
-            Ldr = new IOPort(baseAddress, LAPIC_LDR);
-            Svr = new IOPort(baseAddress, LAPIC_SVR);
-            ICRHI = new IOPort(baseAddress, LAPIC_ICRHI);
-            ICRLO = new IOPort(baseAddress, LAPIC_ICRLO);
+            Id = new MMIO(baseAddress, LAPIC_ID);
+            EndOfInterrupts = new MMIO(baseAddress, LAPIC_EOI);
+            Tpr = new MMIO(baseAddress, LAPIC_TPR);
+            Dfr = new MMIO(baseAddress, LAPIC_DFR);
+            Ldr = new MMIO(baseAddress, LAPIC_LDR);
+            Svr = new MMIO(baseAddress, LAPIC_SVR);
+            ICRHI = new MMIO(baseAddress, LAPIC_ICRHI);
+            ICRLO = new MMIO(baseAddress, LAPIC_ICRLO);
         }
     }
 }

@@ -22,6 +22,8 @@ namespace Cosmos.Core
         /// </summary>
         public static void Initialize()
         {
+            IO = new IOAPICIOGroup((ushort)ACPI.IOAPIC->IOApicAddress);
+
             if (ACPI.IOAPIC == null)
             {
                 Console.WriteLine("Can't initialize IO APIC");

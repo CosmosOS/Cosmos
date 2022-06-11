@@ -24,7 +24,7 @@ namespace Cosmos.Core
         {
             Global.PIC.Disable();
 
-            IO = new APICIOGroup((ushort)ACPI.MADT->LocalAPICAddress);
+            IO = new APICIOGroup(ACPI.MADT->LocalAPICAddress);
 
             //Enable All Interrupts
             IO.Tpr.DWord = 0;
@@ -63,7 +63,7 @@ namespace Cosmos.Core
         public static void SendInit(uint apic_id)
         {
             IO.ICRHI.DWord = apic_id << APICIOGroup.ICR_DESTINATION_SHIFT;
-            IO.ICRLO.DWord = (uint)(APICIOGroup.ICR_INIT | APICIOGroup.ICR_PHYSICAL | APICIOGroup.ICR_ASSERT | APICIOGroup.ICR_EDGE | APICIOGroup.ICR_NO_SHORTHAND);
+            IO.ICRLO.DWord = APICIOGroup.ICR_INIT | APICIOGroup.ICR_PHYSICAL | APICIOGroup.ICR_ASSERT | APICIOGroup.ICR_EDGE | APICIOGroup.ICR_NO_SHORTHAND;
 
             while ((IO.ICRLO.DWord & APICIOGroup.ICR_SEND_PENDING) != 0) { }
         }

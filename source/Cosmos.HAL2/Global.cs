@@ -12,13 +12,13 @@ namespace Cosmos.HAL
     {
         public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
 
-        public static PIT PIT = new PIT();
+        public static PIT PIT;
         // Must be static init, other static inits rely on it not being null
 
-        public static TextScreenBase TextScreen = new TextScreen();
+        public static TextScreenBase TextScreen;
         public static PCI Pci;
 
-        public static readonly PS2Controller PS2Controller = new PS2Controller();
+        public static PS2Controller PS2Controller;
 
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
@@ -28,27 +28,17 @@ namespace Cosmos.HAL
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
         static public void Init(TextScreenBase textScreen, bool InitScrollWheel, bool InitPS2, bool InitNetwork, bool IDEInit)
         {
+            textScreen = new TextScreen();
+
             if (textScreen != null)
             {
                 TextScreen = textScreen;
             }
 
+            Console.Clear();
+
             mDebugger.Send("Before Core.Global.Init");
             Core.Global.Init();
-
-            //TODO Redo this - Global init should be other.
-            // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
-            // If we let hardware do it, we need to protect it from being used by System.
-            // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
-            //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
-
-            //TODO: Since this is FCL, its "common". Otherwise it should be
-            // system level and not accessible from Core. Need to think about this
-            // for the future.
-            Console.Clear();
-            Console.WriteLine("Finding PCI Devices");
-            mDebugger.Send("PCI Devices");
-            PCI.Setup();
 
             Console.WriteLine("Starting ACPI");
             mDebugger.Send("ACPI Init");
@@ -61,6 +51,22 @@ namespace Cosmos.HAL
             Console.WriteLine("Starting IO APIC");
             mDebugger.Send("IO APIC Init");
             IOAPIC.Initialize();
+
+            PIT = new PIT();
+            PS2Controller = new PS2Controller();
+
+            //TODO Redo this - Global init should be other.
+            // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
+            // If we let hardware do it, we need to protect it from being used by System.
+            // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
+            //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
+
+            //TODO: Since this is FCL, its "common". Otherwise it should be
+            // system level and not accessible from Core. Need to think about this
+            // for the future.
+            Console.WriteLine("Finding PCI Devices");
+            mDebugger.Send("PCI Devices");
+            PCI.Setup();
 
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
