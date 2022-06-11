@@ -23,4 +23,8 @@
       <Folder Include="System\Runtime\CompilerServices\" />
     </ItemGroup>
 
+    <PropertyGroup Condition=" '$(OS)' == 'Unix' ">
+        <DefineConstants>OS_LINUX</DefineConstants>
+    </PropertyGroup>
+
 </Project>

@@ -1,6 +1,6 @@
-﻿using IL2CPU.API.Attribs;
+﻿#if OS_LINUX
+using IL2CPU.API.Attribs;
 using System;
-using System.IO;
 
 namespace Cosmos.System_Plugs.Interop
 {
@@ -20,3 +20,4 @@ namespace Cosmos.System_Plugs.Interop
         }
     }
 }
+#endif
