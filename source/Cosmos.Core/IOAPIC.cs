@@ -81,10 +81,11 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="index">Entry index.</param>
         /// <param name="data">Data.</param>
-        public static void SetEntry(byte index, ulong data)
+        /// <param name="lapicId">Local APIC Id.</param>
+        public static void SetEntry(byte index, ulong data, uint lapicId = 0)
         {
             Out((byte)(IOREDTBL + index * 2), (uint)data);
-            Out((byte)(IOREDTBL + index * 2 + 1), (uint)(data >> 32));
+            Out((byte)(IOREDTBL + index * 2 + 1), (uint)(lapicId << 24));
         }
 
         /// <summary>
