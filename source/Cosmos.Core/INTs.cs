@@ -380,7 +380,7 @@ namespace Cosmos.Core {
         }
 
         /// <summary>
-        /// IRQ 12 - (Added for PIT Timer).
+        /// IRQ 12 - PS/2 Mouse. Reserved for the system.
         /// </summary>
         /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2C(ref IRQContext aContext) {
@@ -389,6 +389,11 @@ namespace Cosmos.Core {
             LocalAPIC.EndOfInterrupt();
         }
 
+
+        /// <summary>
+        /// IRQ 13 - (Added for PIT Timer).
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2D(ref IRQContext aContext) {
             IRQ(0x2D, ref aContext);
             LocalAPIC.EndOfInterrupt();
