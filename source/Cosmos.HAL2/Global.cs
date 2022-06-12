@@ -44,16 +44,14 @@ namespace Cosmos.HAL
             mDebugger.Send("ACPI Init");
             ACPI.Start();
 
-            Console.WriteLine("Starting Local APIC");
+            Console.WriteLine("Starting APIC");
             mDebugger.Send("Local APIC Init");
             LocalAPIC.Initialize();
-
-            Console.WriteLine("Starting IO APIC");
             mDebugger.Send("IO APIC Init");
             IOAPIC.Initialize();
 
+            Console.WriteLine("Starting PIT");
             PIT = new PIT();
-            PS2Controller = new PS2Controller();
 
             //TODO Redo this - Global init should be other.
             // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
@@ -71,7 +69,9 @@ namespace Cosmos.HAL
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
+            Console.WriteLine("Starting PS/2 Controller");
             mDebugger.Send("PS/2 Controller Init");
+            PS2Controller = new PS2Controller();
             if (InitPS2)
             {
                 PS2Controller.Initialize(InitScrollWheel);

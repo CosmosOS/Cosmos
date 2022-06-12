@@ -135,67 +135,15 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Initialize PIC.
-        /// </summary>
-        /// <param name="aPIC">A PIC.</param>
-        /// <param name="aBase">A base data port.</param>
-        /// <param name="aIDunno">Slave relationship message.</param>
-        /// <param name="aMask">A mask.</param>
-        protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask)
-        {
-            // We need to remap the PIC interrupt lines to the CPU. The BIOS sets
-            // them in a way compatible for 16 bit mode, but in a way that causes problems
-            // for 32 bit mode.
-            // The only way to remap them however is to completely reinitialize the PICs.
-
-            byte xOldMask = aPIC.Data.Byte;
-
-            //#define ICW1_ICW4	0x01		/* ICW4 (not) needed */
-            //#define ICW1_SINGLE	0x02		/* Single (cascade) mode */
-            //#define ICW1_INTERVAL4	0x04		/* Call address interval 4 (8) */
-            //#define ICW1_LEVEL	0x08		/* Level triggered (edge) mode */
-            Master.Cmd.Byte = (byte) Cmd.Init | 0x01;
-            IOPort.Wait();
-
-            // ICW2
-            Master.Data.Byte = aBase;
-            IOPort.Wait();
-
-            // ICW3
-            // Somehow tells them about master/slave relationship
-            Master.Data.Byte = aIDunno;
-            IOPort.Wait();
-
-            //#define ICW4_AUTO	0x02		/C:\Data\Cosmos\source2\Kernel\System\Hardware\Core\Cosmos.Core\CPU.cs* Auto (normal) EOI */
-            //#define ICW4_BUF_SLAVE	0x08		/* Buffered mode/slave */
-            //#define ICW4_BUF_MASTER	0x0C		/* Buffered mode/master */
-            //#define ICW4_SFNM	0x10		/* Special fully nested (not) */
-            //0x01 8086/88 (MCS-80/85) mode
-            Master.Data.Byte = 0x01;
-            IOPort.Wait();
-
-            // Set mask
-            Master.Data.Byte = aMask;
-            IOPort.Wait();
-        }
-
-        /// <summary>
         /// Disable PIC.
         /// </summary>
         public void Disable()
         {
-            //init
-            Master.Cmd.Byte = 0x11;
-            Slave.Cmd.Byte = 0x11;
-            Master.Data.Byte = 0x20;
-            Slave.Data.Byte = 40;
-            Master.Data.Byte = 0x04;
-            Slave.Data.Byte = 0x02;
-            Master.Data.Byte = 0x01;
-            Slave.Data.Byte = 0x01;
-
+            //disable
             Master.Data.Byte = 0xFF;
+            IOPort.Wait();
             Slave.Data.Byte = 0xFF;
+            IOPort.Wait();
         }
     }
 }
