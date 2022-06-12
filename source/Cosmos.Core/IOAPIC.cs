@@ -21,6 +21,9 @@ namespace Cosmos.Core
         public const byte IOAPICARB = 0x02;
         public const byte IOREDTBL = 0x10;
 
+        /// <summary>
+        /// IO APIC Base Address.
+        /// </summary>
         private static uint Address = 0;
 
         /// <summary>
