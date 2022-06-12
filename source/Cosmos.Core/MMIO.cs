@@ -39,7 +39,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="address">An address to write to.</param>
         /// <param name="aData">A data.</param>
-        static protected void Write8(uint address, byte aData)
+        public static void Write8(uint address, byte aData)
         {
             *(uint*)address = aData;
         }
@@ -49,7 +49,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="address">A address to write to.</param>
         /// <param name="aData">A data.</param>
-        static protected void Write16(uint address, ushort aData)
+        public static void Write16(uint address, ushort aData)
         {
             *(uint*)address = aData;
         }
@@ -59,7 +59,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="address">An address to write to.</param>
         /// <param name="aData">A data.</param>
-        static protected void Write32(uint address, uint aData)
+        public static void Write32(uint address, uint aData)
         {
             *(uint*)address = aData;
         }
@@ -69,7 +69,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="address">An address to read from.</param>
         /// <returns>byte value.</returns>
-        static protected byte Read8(uint address)
+        public static byte Read8(uint address)
         {
             return (byte)*(uint*)address;
         }
@@ -79,7 +79,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="address">An address to read from.</param>
         /// <returns>ushort value.</returns>
-        static protected ushort Read16(uint address)
+        public static ushort Read16(uint address)
         {
             return (ushort)*(uint*)address;
         }
@@ -89,7 +89,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="address">An address to read from.</param>
         /// <returns>uint value.</returns>
-        static protected uint Read32(uint address)
+        public static uint Read32(uint address)
         {
             return *(uint*)address;
         }
