@@ -124,7 +124,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             }
 
             StatusRegister = cur_status;
-            LocalAPIC.EndOfInterrupt();
         }
 
         /// <summary>

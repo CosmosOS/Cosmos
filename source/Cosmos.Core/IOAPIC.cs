@@ -52,9 +52,6 @@ namespace Cosmos.Core
                 SetEntry((byte)i, 1 << 16);
             }
 
-            // Enable IO APIC entries
-            SetEntry((byte)ACPI.RemapIRQ(0x00), 0x20);
-
             Global.mDebugger.Send("IO APIC " + GetId() + " Initialized");
         }
 
