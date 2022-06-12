@@ -72,8 +72,10 @@ namespace Cosmos.HAL
 
 		public PIT()
 		{
-			INTs.SetIrqHandler(0x00, HandleIRQ);
-			T0Countdown = 65535;
+            INTs.SetIntHandler(0x20 + 15, HandleIRQ);
+            IOAPIC.SetEntry(2); //PIT is mapped to IOAPIC via IRQ2 instead of IRQ0
+
+            T0Countdown = 65535;
 		}
 
 		public ushort T0Countdown

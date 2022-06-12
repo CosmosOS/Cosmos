@@ -53,6 +53,9 @@ namespace Cosmos.HAL
             Console.WriteLine("Starting PIT");
             PIT = new PIT();
 
+            mDebugger.Send("Local APIC Timer Init");
+            APICTimer.Initialize();
+
             //TODO Redo this - Global init should be other.
             // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
             // If we let hardware do it, we need to protect it from being used by System.
