@@ -16,7 +16,7 @@ namespace Cosmos.HAL
         /// <summary>
         /// Tick Counter.
         /// </summary>
-        //public static uint Tick = 0;
+        public static uint Tick = 0;
 
         /// <summary>
         /// Tick Frequency.
@@ -28,7 +28,7 @@ namespace Cosmos.HAL
         /// </summary>
         public static void Initialize()
         {
-            INTs.SetIrqHandler(0, HandleApicTimer);
+            INTs.SetIntHandler(0x20, HandleApicTimer);
 
             // setup timer, Intel IA manual 10-16 Vol. 3A
             LocalAPIC.Out(LocalAPIC.LAPIC_TDCR, 0xB); // divide timer counts by 1
@@ -40,17 +40,21 @@ namespace Cosmos.HAL
                 throw new Exception("APIC timer is not calibrated");
             }
 
-            //Start timer
             LocalAPIC.Out(LocalAPIC.LAPIC_TIMER, 0x20000 | 0x20); // periodic, bind to corresponding IRQ
             LocalAPIC.Out(LocalAPIC.LAPIC_TDCR, 0xB);
-            SetTimerCount(TickFrequency / 100);
 
             Global.mDebugger.Send("Local APIC Timer Initialized");
         }
 
         public static void HandleApicTimer(ref INTs.IRQContext aContext)
         {
+            Global.mDebugger.Send("APIC Timer IRQ");
             //Tick++;
+        }
+
+        public static void Start()
+        {
+            SetTimerCount(TickFrequency / 100);
         }
 
         /// <summary>
@@ -68,6 +72,8 @@ namespace Cosmos.HAL
 
         public static void Calibrate()
         {
+            Global.mDebugger.Send("Calibrating APIC timer...");
+
             SetTimerCount(0xFFFFFFFF); // Set APIC init counter to -1
 
             Global.PIT.Wait(1000); // PIT sleep for 1000ms (10000µs)

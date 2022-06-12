@@ -46,10 +46,10 @@ namespace Cosmos.Core
 
             Global.mDebugger.Send("IO APIC pins:" + count);
 
-            //Disable All Entries
+            //Disable All Entries, Make all interrupts edge triggered and not routed to any CPUs
             for (uint i = 0; i < count; ++i)
             {
-                SetEntry((byte)i, 1 << 16);
+                SetEntry((byte)i, (1 << 16) | 0x20 + i);
             }
 
             Global.mDebugger.Send("IO APIC " + GetId() + " Initialized");
@@ -85,7 +85,7 @@ namespace Cosmos.Core
         public static void SetEntry(byte index, ulong data, uint lapicId = 0)
         {
             Out((byte)(IOREDTBL + index * 2), (uint)data);
-            Out((byte)(IOREDTBL + index * 2 + 1), (uint)(lapicId << 24));
+            Out((byte)(IOREDTBL + index * 2 + 1), (lapicId << 24));
         }
 
         /// <summary>

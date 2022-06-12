@@ -297,7 +297,7 @@ namespace Cosmos.Core {
         #region Default Interrupt Handlers
 
         /// <summary>
-        /// IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
+        /// IRQ 0 - System (APIC) timer. Reserved for the system. Cannot be changed by a user.
         /// </summary>
         /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_20(ref IRQContext aContext) {
@@ -379,12 +379,15 @@ namespace Cosmos.Core {
             LocalAPIC.EndOfInterrupt();
         }
 
+        /// <summary>
+        /// IRQ 12 - (Added for PIT Timer).
+        /// </summary>
+        /// <param name="aContext">IRQ context.</param>
         public static void HandleInterrupt_2C(ref IRQContext aContext) {
 
             IRQ(0x2C, ref aContext);
             LocalAPIC.EndOfInterrupt();
         }
-
 
         public static void HandleInterrupt_2D(ref IRQContext aContext) {
             IRQ(0x2D, ref aContext);

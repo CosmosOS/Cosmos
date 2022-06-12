@@ -96,6 +96,13 @@ namespace Cosmos.Core
             // Configure Spurious Interrupt Vector Register
             Out(LAPIC_SVR, 0x100 | 0xFF);
 
+            // clear error status
+            Out(LAPIC_ESR, 0);
+            // clear unfinished interrupt
+            Out(LAPIC_EOI, 0);
+            // accept all level of interrupts
+            Out(LAPIC_TPR, 0);
+
             Global.mDebugger.Send("Local APIC " + GetId() + " initialized");
         }
 
