@@ -1,4 +1,5 @@
 ﻿using ACPILib.AML;
+using Cosmos.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,8 +19,6 @@ namespace ACPILib.Parser2
 		public ParseNode Parse()
 		{
 			return PreParse();
-
-			return null;
 		}
 
 		private ParseNode PreParse()
@@ -141,7 +140,8 @@ namespace ACPILib.Parser2
 								break;
 
 							default:
-								throw new Exception("psargs.c / line 913 - Unknown arg: " + op.Op.ParseArgs[x].ToString());
+								Global.mDebugger.Send("psargs.c / line 913 - Unknown arg: " + op.Op.ParseArgs[x].ToString());
+                                break;
 						}
 					}
 				}
@@ -160,10 +160,53 @@ namespace ACPILib.Parser2
 				}
 			}
 
-			return op;
+            Global.mDebugger.Send("OpCode = " + op.Op.ToString());
+            Global.mDebugger.Send("Start = " + op.Start.ToString());
+            Global.mDebugger.Send("Length = " + op.Length.ToString());
+            Global.mDebugger.Send("End = " + op.End.ToString());
+            if (op.ConstantValue != null)
+            {
+                Global.mDebugger.Send("Value = " + ValueToString(op.ConstantValue));
+            }
+
+            return op;
 		}
 
-		private ParseNode ReadField()
+        private static string ValueToString(object val)
+        {
+            if (val == null)
+                return "null";
+
+            if (val is string)
+                return "\"" + val.ToString() + "\"";
+
+            if (val is byte)
+                return "0x" + ((byte)val).ToString("X2");
+
+            if (val.GetType().IsArray)
+            {
+                Array ar = (Array)val;
+
+                string rt = "";
+
+                for (int x = 0; x < ar.Length; x++)
+                    rt += ValueToString(ar.GetValue(x)) + (x < ar.Length - 1 ? ", " : string.Empty);
+
+                return rt;
+            }
+
+            if (val is ParseNode)
+            {
+                ParseNode node = (ParseNode)val;
+
+                if (node.ConstantValue != null)
+                    return ValueToString(node.ConstantValue);
+            }
+
+            return val.ToString();
+        }
+
+        private ParseNode ReadField()
 		{
 			OpCodeEnum opCode;
 			switch ((OpCodeEnum)PeekByte())
@@ -331,7 +374,8 @@ namespace ACPILib.Parser2
 					pos -= 1; //The op code byte is the data itself
 					break;
 				case OpCodeClass.ClassUnknown:
-					throw new Exception("Unknown AML opcode: 0x" + op.ToString("X2"));
+					Global.mDebugger.Send("Unknown AML opcode: 0x" + op.ToString("X"));
+                    break;
 				default:
 					_source.Seek(info.CodeByteSize, SeekOrigin.Current);
 					break;

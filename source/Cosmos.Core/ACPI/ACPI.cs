@@ -573,79 +573,6 @@ namespace Cosmos.Core
             Global.mDebugger.Send("\tCreatorRevision: " + _reader.ReadUInt32().ToString());
         }
 
-        private static string ValueToString(object val)
-        {
-            if (val == null)
-                return "null";
-
-            if (val is string)
-                return "\"" + val.ToString() + "\"";
-
-            if (val is byte)
-                return "0x" + ((byte)val).ToString("X2");
-
-            if (val.GetType().IsArray)
-            {
-                Array ar = (Array)val;
-
-                string rt = "";
-
-                for (int x = 0; x < ar.Length; x++)
-                    rt += ValueToString(ar.GetValue(x)) + (x < ar.Length - 1 ? ", " : string.Empty);
-
-                return rt;
-            }
-
-            if (val is ParseNode)
-            {
-                ParseNode node = (ParseNode)val;
-
-                if (node.ConstantValue != null)
-                    return ValueToString(node.ConstantValue);
-            }
-
-            return val.ToString();
-        }
-
-        private static void PopulateNode(ParseNode op, int depth)
-        {
-            Global.mDebugger.Send("=========== DEPTH " + depth + " ===========");
-
-            if (!string.IsNullOrEmpty(op.Name))
-                Global.mDebugger.Send(op.Name);
-
-            if (op.Op != null)
-            {
-                Global.mDebugger.Send("OpCode = " + op.Op.ToString());
-                Global.mDebugger.Send("Start = " + op.Start.ToString());
-                Global.mDebugger.Send("Length = " + op.Length.ToString());
-                Global.mDebugger.Send("End = " + op.End.ToString());
-                if (op.ConstantValue != null)
-                {
-                    Global.mDebugger.Send("Value = " + ValueToString(op.ConstantValue));
-                }
-            }
-
-            if (op.Arguments.Count > 0)
-            {
-                for (int x = 0; x < op.Op.ParseArgs.Length; x++)
-                {
-                    if (op.Op.ParseArgs[x] == ParseArgFlags.DataObjectList || op.Op.ParseArgs[x] == ParseArgFlags.TermList || op.Op.ParseArgs[x] == ParseArgFlags.ObjectList)
-                        continue;
-
-                    Global.mDebugger.Send(ValueToString(op.Arguments[x]) + " (" + op.Op.ParseArgs[x].ToString() + ")");
-                }
-            }
-
-            if (op.Nodes.Count > 0)
-            {
-                foreach (ParseNode ch in op.Nodes)
-                {
-                    PopulateNode(ch, depth + 1);
-                }
-            }
-        }
-
         private static void ParseDT(AcpiHeader* hdr)
         {
             var signature = Encoding.ASCII.GetString(hdr->Signature, 4);
@@ -685,9 +612,13 @@ namespace Cosmos.Core
 
                     Stream stream = new MemoryStream(dsdtBlock.ToArray());
 
-                    //var root = new Parser(stream).Parse();
+                    Global.mDebugger.Send("Create parser...");
 
-                    //PopulateNode(root, 0);
+                    var root = new Parser(stream);
+
+                    Global.mDebugger.Send("Parse first node...");
+
+                    var node = root.Parse();
                 }
             }
             else if (signature == "APIC")
