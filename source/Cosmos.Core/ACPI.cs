@@ -103,7 +103,7 @@ namespace Cosmos.Core
         /// FADT struct.
         /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        private struct FADTPtr
+        public struct FADTPtr
         {
             /// <summary>
             /// ACPI Header.
@@ -167,7 +167,38 @@ namespace Cosmos.Core
 
             public byte Reserved2;
             public uint Flags;
+
+            // 12 public byte structure; see below for details
+            public GenericAddressStructure ResetReg;
+
+            public byte ResetValue;
+            public byte Reserved3;
+            public byte Reserved34;
+            public byte Reserved35;
+
+            // 64bit pointers - Available on ACPI 2.0+
+            public ulong X_FirmwareControl;
+            public ulong X_Dsdt;
+
+            public GenericAddressStructure X_PM1aEventBlock;
+            public GenericAddressStructure X_PM1bEventBlock;
+            public GenericAddressStructure X_PM1aControlBlock;
+            public GenericAddressStructure X_PM1bControlBlock;
+            public GenericAddressStructure X_PM2ControlBlock;
+            public GenericAddressStructure X_PMTimerBlock;
+            public GenericAddressStructure X_GPE0Block;
+            public GenericAddressStructure X_GPE1Block;
         }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct GenericAddressStructure
+        {
+            public byte AddressSpace;
+            public byte BitWidth;
+            public byte BitOffset;
+            public byte AccessSize;
+            public ulong Address;
+        };
 
         /// <summary>
         /// MADT struct.
@@ -313,7 +344,7 @@ namespace Cosmos.Core
         /// <summary>
         /// IO port.
         /// </summary>
-        private static IOPort smiIO, pm1aIO, pm1bIO;
+        private static IOPort smiIO, pm1aIO, pm1bIO, ResetRegister;
 
         // ACPI variables
         /// <summary>
@@ -328,6 +359,10 @@ namespace Cosmos.Core
         /// ACPI DISABLE.
         /// </summary>
         private static byte ACPI_DISABLE;
+        /// <summary>
+        /// Reset value to write into reset register when you need to reboot
+        /// </summary>
+        private static byte ResetValue;
         /// <summary>
         /// PM1a CNT
         /// </summary>
@@ -360,6 +395,10 @@ namespace Cosmos.Core
         /// Global IO APIC.
         /// </summary>
         public static ApicIOApic* IOAPIC;
+        /// <summary>
+        /// FADT table
+        /// </summary>
+        public static FADTPtr* FADT;
 
         /// <summary>
         /// Check ACPI header.
@@ -429,7 +468,6 @@ namespace Cosmos.Core
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
         public static void Shutdown()
         {
-            Console.Clear();
             if (PM1a_CNT == null)
             {
                 Init();
@@ -452,7 +490,22 @@ namespace Cosmos.Core
         /// <exception cref="NotImplementedException">Thrown always.</exception>
         public static void Reboot()
         {
-            throw new NotImplementedException("ACPI Reset not implemented yet."); //TODO
+            if (PM1a_CNT == null)
+            {
+                Init();
+            }
+
+            var header = FADT->Header;
+            if (header.Revision >= 2 && (FADT->Flags & (1 << 10)) != 0)
+            {
+                ResetRegister.Byte = ResetValue;
+            }
+            else
+            {
+                throw new NotImplementedException("Hardware does not support ACPI reboot.");
+            }
+
+            throw new NotImplementedException("ACPI reboot failed.");
         }
 
         /// <summary>
@@ -493,12 +546,12 @@ namespace Cosmos.Core
             {
                 Global.mDebugger.Send("Parse FACP");
 
-                var Fadt = (FADTPtr*)hdr;
+                FADT = (FADTPtr*)hdr;
 
-                if (acpiCheckHeader((byte*)Fadt->Dsdt, "DSDT") == 0)
+                if (acpiCheckHeader((byte*)FADT->Dsdt, "DSDT") == 0)
                 {
-                    byte* S5Addr = (byte*)Fadt->Dsdt + sizeof(AcpiHeader);
-                    int dsdtLength = *((int*)Fadt->Dsdt + 1) - sizeof(AcpiHeader);
+                    byte* S5Addr = (byte*)FADT->Dsdt + sizeof(AcpiHeader);
+                    int dsdtLength = *((int*)FADT->Dsdt + 1) - sizeof(AcpiHeader);
 
                     while (0 < dsdtLength--)
                     {
@@ -526,17 +579,19 @@ namespace Cosmos.Core
                                 S5Addr++;
                             }
                             SLP_TYPb = (short)(*(S5Addr) << 10);
-                            SMI_CMD = (int*)Fadt->SMI_CommandPort;
-                            ACPI_ENABLE = Fadt->AcpiEnable;
-                            ACPI_DISABLE = Fadt->AcpiDisable;
-                            PM1a_CNT = (int*)Fadt->PM1aControlBlock;
-                            PM1b_CNT = (int*)Fadt->PM1bControlBlock;
-                            PM1_CNT_LEN = Fadt->PM1ControlLength;
+                            SMI_CMD = (int*)FADT->SMI_CommandPort;
+                            ACPI_ENABLE = FADT->AcpiEnable;
+                            ACPI_DISABLE = FADT->AcpiDisable;
+                            PM1a_CNT = (int*)FADT->PM1aControlBlock;
+                            PM1b_CNT = (int*)FADT->PM1bControlBlock;
+                            PM1_CNT_LEN = FADT->PM1ControlLength;
+                            ResetValue = FADT->ResetValue;
                             SLP_EN = 1 << 13;
 
                             smiIO = new IOPort((ushort)SMI_CMD);
                             pm1aIO = new IOPort((ushort)PM1a_CNT);
                             pm1bIO = new IOPort((ushort)PM1b_CNT);
+                            ResetRegister = new IOPort((ushort)FADT->ResetReg.Address);
                         }
                     }
                 }
