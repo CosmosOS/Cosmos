@@ -1,7 +1,9 @@
-﻿using Cosmos.Core;
+﻿using ACPILib.AML;
+using ACPILib.Parser2;
 using Cosmos.Debug.Kernel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -419,7 +421,7 @@ namespace Cosmos.Core
         /// <returns>0 - identical, -1 different.</returns>
         static int Compare(string c1, byte* c2)
         {
-            for (int i = 0; i < c1.Length; i++)
+            for (var i = 0; i < c1.Length; i++)
             {
                 if (c1[i] != c2[i]) { return -1; }
             }
@@ -434,14 +436,14 @@ namespace Cosmos.Core
         static bool Check_RSD(uint address)
         {
             byte sum = 0;
-            byte* check = (byte*)address;
+            var check = (byte*)address;
 
-            for (int i = 0; i < 20; i++)
+            for (var i = 0; i < 20; i++)
             {
-                sum += *(check++);
+                sum += *check++;
             }
 
-            return (sum == 0);
+            return sum == 0;
         }
 
         /// <summary>
@@ -502,10 +504,10 @@ namespace Cosmos.Core
             }
             else
             {
-                throw new NotImplementedException("Hardware does not support ACPI reboot.");
+                throw new Exception("Hardware does not support ACPI reboot.");
             }
 
-            throw new NotImplementedException("ACPI reboot failed.");
+            throw new Exception("ACPI reboot failed.");
         }
 
         /// <summary>
@@ -516,19 +518,19 @@ namespace Cosmos.Core
         {
             IOAPIC = null;
             var rsdp = RSDPAddress();
-            byte* ptr = (byte*)rsdp;
+            var ptr = (byte*)rsdp;
 
             Global.mDebugger.Send("ACPI v" + rsdp->Revision);
 
             var rsdt = (AcpiHeader*)rsdp->RsdtAddress;
             ptr = (byte*)rsdt;
 
-            uint* p = (uint*)(rsdt + 1);
-            uint* end = (uint*)((byte*)rsdt + rsdt->Length);
+            var p = (uint*)(rsdt + 1);
+            var end = (uint*)((byte*)rsdt + rsdt->Length);
 
             while (p < end)
             {
-                uint address = *p++;
+                var address = *p++;
 
                 ParseDT((AcpiHeader*)address);
             }
@@ -536,7 +538,115 @@ namespace Cosmos.Core
             return true;
         }
 
-        private static void ParseDT(AcpiHeader *hdr)
+        private static uint SdtLength = 0;
+
+        private static void ReadHeader(BinaryReader _reader)
+        {
+            Global.mDebugger.Send("SDT header:");
+
+            //Signature
+            Global.mDebugger.Send("\tSignature: " + Encoding.ASCII.GetString(_reader.ReadBytes(4)));
+
+            //Length
+            SdtLength = _reader.ReadUInt32();
+            Global.mDebugger.Send("\tLendth: " + SdtLength.ToString());
+
+            //Revision
+            Global.mDebugger.Send("\tRevision: " + _reader.ReadByte().ToString());
+
+            //Checksum
+            Global.mDebugger.Send("\tChecksum: " + _reader.ReadByte().ToString());
+
+            //OEM ID
+            Global.mDebugger.Send("\tOEM ID: " + Encoding.ASCII.GetString(_reader.ReadBytes(6)));
+
+            //OEMTableID
+            Global.mDebugger.Send("\tOEMTableID: " + Encoding.ASCII.GetString(_reader.ReadBytes(8)));
+
+            //OEMRevision
+            Global.mDebugger.Send("\tOEMRevision: " + _reader.ReadUInt32().ToString());
+
+            //OEMRevision
+            Global.mDebugger.Send("\tCreatorID: " + _reader.ReadUInt32().ToString());
+
+            //OEMRevision
+            Global.mDebugger.Send("\tCreatorRevision: " + _reader.ReadUInt32().ToString());
+        }
+
+        private static string ValueToString(object val)
+        {
+            if (val == null)
+                return "null";
+
+            if (val is string)
+                return "\"" + val.ToString() + "\"";
+
+            if (val is byte)
+                return "0x" + ((byte)val).ToString("X2");
+
+            if (val.GetType().IsArray)
+            {
+                Array ar = (Array)val;
+
+                string rt = "";
+
+                for (int x = 0; x < ar.Length; x++)
+                    rt += ValueToString(ar.GetValue(x)) + (x < ar.Length - 1 ? ", " : string.Empty);
+
+                return rt;
+            }
+
+            if (val is ParseNode)
+            {
+                ParseNode node = (ParseNode)val;
+
+                if (node.ConstantValue != null)
+                    return ValueToString(node.ConstantValue);
+            }
+
+            return val.ToString();
+        }
+
+        private static void PopulateNode(ParseNode op, int depth)
+        {
+            Global.mDebugger.Send("=========== DEPTH " + depth + " ===========");
+
+            if (!string.IsNullOrEmpty(op.Name))
+                Global.mDebugger.Send(op.Name);
+
+            if (op.Op != null)
+            {
+                Global.mDebugger.Send("OpCode = " + op.Op.ToString());
+                Global.mDebugger.Send("Start = " + op.Start.ToString());
+                Global.mDebugger.Send("Length = " + op.Length.ToString());
+                Global.mDebugger.Send("End = " + op.End.ToString());
+                if (op.ConstantValue != null)
+                {
+                    Global.mDebugger.Send("Value = " + ValueToString(op.ConstantValue));
+                }
+            }
+
+            if (op.Arguments.Count > 0)
+            {
+                for (int x = 0; x < op.Op.ParseArgs.Length; x++)
+                {
+                    if (op.Op.ParseArgs[x] == ParseArgFlags.DataObjectList || op.Op.ParseArgs[x] == ParseArgFlags.TermList || op.Op.ParseArgs[x] == ParseArgFlags.ObjectList)
+                        continue;
+
+                    Global.mDebugger.Send(ValueToString(op.Arguments[x]) + " (" + op.Op.ParseArgs[x].ToString() + ")");
+                }
+            }
+
+            if (op.Nodes.Count > 0)
+            {
+                foreach (ParseNode ch in op.Nodes)
+                {
+                    PopulateNode(ch, depth + 1);
+                }
+            }
+        }
+
+        private static void ParseDT(AcpiHeader* hdr)
         {
             var signature = Encoding.ASCII.GetString(hdr->Signature, 4);
 
@@ -548,52 +658,36 @@ namespace Cosmos.Core
 
                 FADT = (FADTPtr*)hdr;
 
+                SMI_CMD = (int*)FADT->SMI_CommandPort;
+                ACPI_ENABLE = FADT->AcpiEnable;
+                ACPI_DISABLE = FADT->AcpiDisable;
+                PM1a_CNT = (int*)FADT->PM1aControlBlock;
+                PM1b_CNT = (int*)FADT->PM1bControlBlock;
+                PM1_CNT_LEN = FADT->PM1ControlLength;
+                SLP_EN = 1 << 13;
+
+                smiIO = new IOPort((ushort)SMI_CMD);
+                pm1aIO = new IOPort((ushort)PM1a_CNT);
+                pm1bIO = new IOPort((ushort)PM1b_CNT);
+                ResetRegister = new IOPort((ushort)FADT->ResetReg.Address);
+
                 if (acpiCheckHeader((byte*)FADT->Dsdt, "DSDT") == 0)
                 {
-                    byte* S5Addr = (byte*)FADT->Dsdt + sizeof(AcpiHeader);
-                    int dsdtLength = *((int*)FADT->Dsdt + 1) - sizeof(AcpiHeader);
+                    uint dsdtAddress = FADT->Dsdt;
+                    uint dsdtLength = (uint)(*((int*)FADT->Dsdt + 1) - sizeof(AcpiHeader));
 
-                    while (0 < dsdtLength--)
-                    {
-                        if (Compare("_S5_", S5Addr) == 0)
-                        {
-                            break;
-                        }
-                        S5Addr++;
-                    }
+                    var dsdtHeader = new MemoryBlock08(dsdtAddress, 36);
+                    var _reader = new BinaryReader(new MemoryStream(dsdtHeader.ToArray()));
 
-                    if (dsdtLength > 0)
-                    {
-                        if ((*(S5Addr - 1) == 0x08 || (*(S5Addr - 2) == 0x08 && *(S5Addr - 1) == '\\')) && *(S5Addr + 4) == 0x12)
-                        {
-                            S5Addr += 5;
-                            S5Addr += ((*S5Addr & 0xC0) >> 6) + 2;
-                            if (*S5Addr == 0x0A)
-                            {
-                                S5Addr++;
-                            }
-                            SLP_TYPa = (short)(*(S5Addr) << 10);
-                            S5Addr++;
-                            if (*S5Addr == 0x0A)
-                            {
-                                S5Addr++;
-                            }
-                            SLP_TYPb = (short)(*(S5Addr) << 10);
-                            SMI_CMD = (int*)FADT->SMI_CommandPort;
-                            ACPI_ENABLE = FADT->AcpiEnable;
-                            ACPI_DISABLE = FADT->AcpiDisable;
-                            PM1a_CNT = (int*)FADT->PM1aControlBlock;
-                            PM1b_CNT = (int*)FADT->PM1bControlBlock;
-                            PM1_CNT_LEN = FADT->PM1ControlLength;
-                            ResetValue = FADT->ResetValue;
-                            SLP_EN = 1 << 13;
+                    ReadHeader(_reader);
 
-                            smiIO = new IOPort((ushort)SMI_CMD);
-                            pm1aIO = new IOPort((ushort)PM1a_CNT);
-                            pm1bIO = new IOPort((ushort)PM1b_CNT);
-                            ResetRegister = new IOPort((ushort)FADT->ResetReg.Address);
-                        }
-                    }
+                    var dsdtBlock = new MemoryBlock08(dsdtAddress, SdtLength);
+
+                    Stream stream = new MemoryStream(dsdtBlock.ToArray());
+
+                    //var root = new Parser(stream).Parse();
+
+                    //PopulateNode(root, 0);
                 }
             }
             else if (signature == "APIC")
@@ -602,13 +696,13 @@ namespace Cosmos.Core
 
                 MADT = (MADTPtr*)hdr;
 
-                byte* p = (byte*)(MADT + 1);
-                byte* end = (byte*)MADT + MADT->Header.Length;
+                var p = (byte*)(MADT + 1);
+                var end = (byte*)MADT + MADT->Header.Length;
                 while (p < end)
                 {
                     var header = (ApicHeader*)p;
                     var type = header->Type;
-                    byte length = header->Length;
+                    var length = header->Length;
 
                     if (type == ApicType.LocalAPIC)
                     {
@@ -660,7 +754,7 @@ namespace Cosmos.Core
         /// Get the RSDP address.
         /// </summary>
         /// <returns>uint value.</returns>
-        private static unsafe RSDPtr *RSDPAddress()
+        private static unsafe RSDPtr* RSDPAddress()
         {
             for (uint addr = 0xE0000; addr < 0x100000; addr += 4)
             {
@@ -673,10 +767,10 @@ namespace Cosmos.Core
                 }
             }
 
-            uint ebda_address = *((uint*)0x040E);
-            ebda_address = (ebda_address * 0x10) & 0x000fffff;
+            var ebda_address = *(uint*)0x040E;
+            ebda_address = ebda_address * 0x10 & 0x000fffff;
 
-            for (uint addr = ebda_address; addr < ebda_address + 1024; addr += 4)
+            for (var addr = ebda_address; addr < ebda_address + 1024; addr += 4)
             {
                 if (Compare("RSD PTR ", (byte*)addr) == 0)
                 {
@@ -689,14 +783,14 @@ namespace Cosmos.Core
 
         public static uint RemapIRQ(uint irq)
         {
-            byte* p = (byte*)(MADT + 1);
-            byte* end = (byte*)MADT + MADT->Header.Length;
+            var p = (byte*)(MADT + 1);
+            var end = (byte*)MADT + MADT->Header.Length;
 
             while (p < end)
             {
                 var header = (ApicHeader*)p;
                 var type = header->Type;
-                byte length = header->Length;
+                var length = header->Length;
 
                 if (type == ApicType.InterruptOverride)
                 {
