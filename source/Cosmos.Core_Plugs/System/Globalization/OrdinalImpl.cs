@@ -2,7 +2,7 @@
 
 namespace Cosmos.Core_Plugs.System.Globalization
 {
-    [Plug(TargetName = "System.Globalization.Ordinal, System.Private.CoreLib")]
+    [Plug(TargetName = "Interop+Globalization, System.Private.CoreLib")]
     class OrdinalImpl
     {
         [PlugMethod(IsOptional =false, PlugRequired =true)]
