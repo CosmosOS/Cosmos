@@ -649,6 +649,8 @@ namespace Cosmos.Core
 
                     if (ovr->Source == irq)
                     {
+                        Global.mDebugger.Send("IRQ" + irq + " remapped to IRQ" + ovr->Interrupt);
+
                         return ovr->Interrupt;
                     }
                 }

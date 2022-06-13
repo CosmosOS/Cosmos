@@ -389,7 +389,6 @@ namespace Cosmos.Core {
             LocalAPIC.EndOfInterrupt();
         }
 
-
         /// <summary>
         /// IRQ 13 - (Added for PIT Timer).
         /// </summary>
