@@ -436,6 +436,11 @@ namespace Cosmos.Core
         public static List<IrqRouting> IrqRoutingTable;
 
         /// <summary>
+        /// PCI IRQ Routing Table.
+        /// </summary>
+        public static List<byte> LocalApicCpus;
+
+        /// <summary>
         /// Check ACPI header.
         /// </summary>
         /// <param name="ptr"></param>
@@ -551,6 +556,8 @@ namespace Cosmos.Core
         {
             IOAPIC = null;
             IrqRoutingTable = new List<IrqRouting>();
+            LocalApicCpus = new List<byte>();
+
             var rsdp = RSDPAddress();
             var ptr = (byte*)rsdp;
 
@@ -567,6 +574,11 @@ namespace Cosmos.Core
                 var address = *p++;
 
                 ParseDT((AcpiHeader*)address);
+            }
+
+            if (LocalApicCpus.Count > 0)
+            {
+                Global.mDebugger.Send("Found " + LocalApicCpus.Count + " CPUs via MADT.");
             }
 
             return true;
@@ -738,7 +750,13 @@ namespace Cosmos.Core
                     if (type == ApicType.LocalAPIC)
                     {
                         var pic = (ApicLocalApic*)p;
-                        Global.mDebugger.Send("Found APIC " + (ulong)pic->ApicId + " (Processor ID:" + pic->AcpiProcessorId + ")");
+
+                        if (((pic->Flags & 1) ^ ((pic->Flags >> 1) & 1)) != 0)
+                        {
+                            LocalApicCpus.Add(pic->ApicId);
+
+                            Global.mDebugger.Send("Found APIC " + (ulong)pic->ApicId + " (Processor ID:" + pic->AcpiProcessorId + ")");
+                        }
                     }
                     else if (type == ApicType.IOAPIC)
                     {
@@ -804,7 +822,7 @@ namespace Cosmos.Core
 
                         var irqRouting = new IrqRouting()
                         {
-                            Address = (uint)((int)package[0].ConstantValue),
+                            Address = (uint)package[0].ConstantValue,
                             Pin = (byte)package[1].ConstantValue,
                             Source = (byte)package[2].ConstantValue,
                             SourceIndex = (byte)package[3].ConstantValue

@@ -96,28 +96,37 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             mTransmitBuffer = new Queue<byte[]>();
             mRecvBuffer = new Queue<byte[]>();
 
-            var deviceAddress = PCIDevice.GetAddressBase(device.bus, device.slot, device.function);
+            //INTs.SetIntHandler((byte)(0x20 + device.InterruptLine), HandleNetworkInterrupt);
+            //IOAPIC.SetEntry(19, (byte)(0x20 + device.InterruptLine));
 
-            Global.mDebugger.Send("PCI Device Address=0x" + deviceAddress.ToString("X"));
+            /*Global.mDebugger.Send("device slot=" + device.slot);
+            Global.mDebugger.Send("device function=" + device.function);
 
             foreach (var irqRouting in ACPI.IrqRoutingTable)
             {
-                Global.mDebugger.Send("Address=0x" + irqRouting.Address.ToString("X"));
+                byte slot = (byte)((irqRouting.Address >> 16) & 0xFFFF);
+                byte function = (byte)(irqRouting.Address & 0xFFFF);
+
+                Global.mDebugger.Send("slot=" + slot);
+                Global.mDebugger.Send("function=" + function);
+                Global.mDebugger.Send("Address=0x" + (irqRouting.Address).ToString("X"));
                 Global.mDebugger.Send("Pin=" + irqRouting.Pin);
                 Global.mDebugger.Send("Source=" + irqRouting.Source);
                 Global.mDebugger.Send("Source Index=" + irqRouting.SourceIndex);
 
-                if (irqRouting.Address == deviceAddress)
+                if (device.slot == slot && device.function == function)
                 {
-                    Global.mDebugger.Send("DEVICE MATCH!");
-                }
-            }
+                    Global.mDebugger.Send("DEVICE FOUND SETTING CUSTOM IRQ " + irqRouting.SourceIndex);
 
-            INTs.SetIrqHandler(device.InterruptLine, HandleNetworkInterrupt);
+                    
+                }
+            }*/
         }
 
         protected void HandleNetworkInterrupt(ref INTs.IRQContext aContext)
         {
+            Global.mDebugger.Send("Network IRQ!");
+
             uint cur_status = StatusRegister;
 
             if ((cur_status & 0x100) != 0)
