@@ -10,6 +10,32 @@ using System.Text;
 namespace Cosmos.Core
 {
     /// <summary>
+    /// PCI IRQ Routing information.
+    /// </summary>
+    public class IrqRouting
+    {
+        /// <summary>
+        /// The address of the PCI device.
+        /// </summary>
+        public uint Address;
+
+        /// <summary>
+        /// The PCI pin number of the device.
+        /// </summary>
+        public byte Pin;
+
+        /// <summary>
+        /// Source.
+        /// </summary>
+        public byte Source;
+
+        /// <summary>
+        /// Source Index.
+        /// </summary>
+        public byte SourceIndex;
+    }
+
+    /// <summary>
     /// ACPI (Advanced Configuration and Power Interface) class.
     /// </summary>
     public unsafe class ACPI
@@ -405,6 +431,11 @@ namespace Cosmos.Core
         public static uint DSDTLenght = 0;
 
         /// <summary>
+        /// PCI IRQ Routing Table.
+        /// </summary>
+        public static List<IrqRouting> IrqRoutingTable;
+
+        /// <summary>
         /// Check ACPI header.
         /// </summary>
         /// <param name="ptr"></param>
@@ -519,6 +550,7 @@ namespace Cosmos.Core
         private static bool Init()
         {
             IOAPIC = null;
+            IrqRoutingTable = new List<IrqRouting>();
             var rsdp = RSDPAddress();
             var ptr = (byte*)rsdp;
 
@@ -606,8 +638,8 @@ namespace Cosmos.Core
                     }
                     SLP_TYPb = (short)(*(S5Addr) << 10);
 
-                    Console.WriteLine("SLP_TYPa=" + SLP_TYPa);
-                    Console.WriteLine("SLP_TYPb=" + SLP_TYPb);
+                    Global.mDebugger.Send("SLP_TYPa=" + SLP_TYPa);
+                    Global.mDebugger.Send("SLP_TYPb=" + SLP_TYPb);
                 }
             }
         }
@@ -631,15 +663,15 @@ namespace Cosmos.Core
 
                 Stream stream = new MemoryStream(dsdtBlock.ToArray());
 
-                Console.WriteLine("Create parser...");
+                Global.mDebugger.Send("Create parser...");
 
                 var root = new Parser(stream);
 
-                Console.WriteLine("Parsing ACPI DST _PRT Method...");
+                Global.mDebugger.Send("Parsing ACPI DST _PRT Method...");
 
                 var node = root.Parse();
 
-                Console.WriteLine("Parsed! Trying to list IRQ Routing Table...");
+                Global.mDebugger.Send("Parsed! Trying to list IRQ Routing Table...");
 
                 PopulateNode(node);
             }
@@ -649,7 +681,7 @@ namespace Cosmos.Core
         {
             var signature = Encoding.ASCII.GetString(hdr->Signature, 4);
 
-            Console.WriteLine(signature + " detected");
+            Global.mDebugger.Send(signature + " detected");
 
             if (signature == "FACP")
             {
@@ -680,11 +712,11 @@ namespace Cosmos.Core
 
                     ReadHeader(_reader);
 
-                    Console.WriteLine("Parsing S5...");
+                    Global.mDebugger.Send("Parsing _S5...");
 
                     ParseS5();
 
-                    Console.WriteLine("Parsing PRT...");
+                    Global.mDebugger.Send("Parsing _PRT...");
 
                     ParsePRT();
                 }
@@ -705,13 +737,11 @@ namespace Cosmos.Core
 
                     if (type == ApicType.LocalAPIC)
                     {
-                        Global.mDebugger.Send("Parse local APIC");
                         var pic = (ApicLocalApic*)p;
                         Global.mDebugger.Send("Found APIC " + (ulong)pic->ApicId + " (Processor ID:" + pic->AcpiProcessorId + ")");
                     }
                     else if (type == ApicType.IOAPIC)
                     {
-                        Global.mDebugger.Send("Parse IO APIC");
                         var ioapic = (ApicIOApic*)p;
                         if (IOAPIC == null)
                         {
@@ -721,8 +751,6 @@ namespace Cosmos.Core
                     }
                     else if (type == ApicType.InterruptOverride)
                     {
-                        Global.mDebugger.Send("Parse Interrupt Override APIC");
-
                         var ovr = (ApicInterruptOverride*)p;
 
                         Global.mDebugger.Send("Found APIC Interrupt Override (Bus: " + ((ulong)ovr->Bus).ToString() + ", Source:" + ((ulong)ovr->Source).ToString() + ", Interrupt:0x" + ((ulong)ovr->Interrupt).ToString("X") + ", Flags:" + ((ulong)ovr->Flags).ToString() + ")");
@@ -770,18 +798,19 @@ namespace Cosmos.Core
                 {
                     var arg = (ParseNode)op.Arguments[x];
 
-                    Console.WriteLine("FOUND PACKAGES");
-
                     for (int y = 0; y < arg.Nodes.Count; y++)
                     {
-                        Console.WriteLine("FOUND PACKAGE " + y);
-
                         List<ParseNode> package = arg.Nodes[y].Nodes;
 
-                        Console.WriteLine("Address=0x" + ((int)package[0].ConstantValue).ToString("X"));
-                        Console.WriteLine("Pin=" + (byte)package[1].ConstantValue);
-                        Console.WriteLine("Source=" + (byte)package[2].ConstantValue);
-                        Console.WriteLine("Source Index=" + (byte)package[3].ConstantValue);
+                        var irqRouting = new IrqRouting()
+                        {
+                            Address = (uint)((int)package[0].ConstantValue),
+                            Pin = (byte)package[1].ConstantValue,
+                            Source = (byte)package[2].ConstantValue,
+                            SourceIndex = (byte)package[3].ConstantValue
+                        };
+
+                        IrqRoutingTable.Add(irqRouting);
                     }
                 }
             }

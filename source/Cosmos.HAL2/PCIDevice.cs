@@ -301,7 +301,7 @@ namespace Cosmos.HAL
         /// <param name="aSlot">A slot.</param>
         /// <param name="aFunction">A function.</param>
         /// <returns>UInt32 value.</returns>
-        protected static uint GetAddressBase(uint aBus, uint aSlot, uint aFunction)
+        public static uint GetAddressBase(uint aBus, uint aSlot, uint aFunction)
         {
             return 0x80000000 | (aBus << 16) | ((aSlot & 0x1F) << 11) | ((aFunction & 0x07) << 8);
         }

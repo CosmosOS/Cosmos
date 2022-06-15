@@ -96,6 +96,23 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             mTransmitBuffer = new Queue<byte[]>();
             mRecvBuffer = new Queue<byte[]>();
 
+            var deviceAddress = PCIDevice.GetAddressBase(device.bus, device.slot, device.function);
+
+            Global.mDebugger.Send("PCI Device Address=0x" + deviceAddress.ToString("X"));
+
+            foreach (var irqRouting in ACPI.IrqRoutingTable)
+            {
+                Global.mDebugger.Send("Address=0x" + irqRouting.Address.ToString("X"));
+                Global.mDebugger.Send("Pin=" + irqRouting.Pin);
+                Global.mDebugger.Send("Source=" + irqRouting.Source);
+                Global.mDebugger.Send("Source Index=" + irqRouting.SourceIndex);
+
+                if (irqRouting.Address == deviceAddress)
+                {
+                    Global.mDebugger.Send("DEVICE MATCH!");
+                }
+            }
+
             INTs.SetIrqHandler(device.InterruptLine, HandleNetworkInterrupt);
         }
 
