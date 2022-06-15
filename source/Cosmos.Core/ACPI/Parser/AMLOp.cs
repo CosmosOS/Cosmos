@@ -57,7 +57,7 @@ namespace ACPILib.Parser
 			if (OpCode != null && OpCode.Code == OpCodeEnum.Method && Name == name)
 				return this;
 
-			foreach(AMLOp node in Nodes)
+			foreach (AMLOp node in Nodes)
 			{
 				AMLOp method = node.FindMethod(name);
 

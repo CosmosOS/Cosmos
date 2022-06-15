@@ -260,7 +260,7 @@ namespace ACPILib.Parser
 
 			//Check if all of the chars are letters
 			bool probalbyString = true;
-			for(int x = 0; x < peek4.Length; x++)
+			for (int x = 0; x < peek4.Length; x++)
 			{
 				if (!char.IsDigit((char)peek4[x]) && !char.IsUpper((char)peek4[x]))
 				{

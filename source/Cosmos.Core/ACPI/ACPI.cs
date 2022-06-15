@@ -402,6 +402,8 @@ namespace Cosmos.Core
         /// </summary>
         public static FADTPtr* FADT;
 
+        public static uint DSDTLenght = 0;
+
         /// <summary>
         /// Check ACPI header.
         /// </summary>
@@ -573,11 +575,81 @@ namespace Cosmos.Core
             Global.mDebugger.Send("\tCreatorRevision: " + _reader.ReadUInt32().ToString());
         }
 
+        private static void ParseS5()
+        {
+            byte* S5Addr = (byte*)FADT->Dsdt;
+
+            while (0 < DSDTLenght--)
+            {
+                if (Compare("_S5_", S5Addr) == 0)
+                {
+                    break;
+                }
+                S5Addr++;
+            }
+
+            if (DSDTLenght > 0)
+            {
+                if ((*(S5Addr - 1) == 0x08 || (*(S5Addr - 2) == 0x08 && *(S5Addr - 1) == '\\')) && *(S5Addr + 4) == 0x12)
+                {
+                    S5Addr += 5;
+                    S5Addr += ((*S5Addr & 0xC0) >> 6) + 2;
+                    if (*S5Addr == 0x0A)
+                    {
+                        S5Addr++;
+                    }
+                    SLP_TYPa = (short)(*(S5Addr) << 10);
+                    S5Addr++;
+                    if (*S5Addr == 0x0A)
+                    {
+                        S5Addr++;
+                    }
+                    SLP_TYPb = (short)(*(S5Addr) << 10);
+
+                    Console.WriteLine("SLP_TYPa=" + SLP_TYPa);
+                    Console.WriteLine("SLP_TYPb=" + SLP_TYPb);
+                }
+            }
+        }
+
+        private static void ParsePRT()
+        {
+            byte* S5Addr = (byte*)FADT->Dsdt;
+
+            while (0 < DSDTLenght--)
+            {
+                if (Compare("_PRT", S5Addr) == 0)
+                {
+                    break;
+                }
+                S5Addr++;
+            }
+
+            if (DSDTLenght > 0)
+            {
+                var dsdtBlock = new MemoryBlock08((uint)S5Addr, SdtLength);
+
+                Stream stream = new MemoryStream(dsdtBlock.ToArray());
+
+                Console.WriteLine("Create parser...");
+
+                var root = new Parser(stream);
+
+                Console.WriteLine("Parsing ACPI DST _PRT Method...");
+
+                var node = root.Parse();
+
+                Console.WriteLine("Parsed! Trying to list IRQ Routing Table...");
+
+                PopulateNode(node);
+            }
+        }
+
         private static void ParseDT(AcpiHeader* hdr)
         {
             var signature = Encoding.ASCII.GetString(hdr->Signature, 4);
 
-            Global.mDebugger.Send(signature + " detected");
+            Console.WriteLine(signature + " detected");
 
             if (signature == "FACP")
             {
@@ -608,17 +680,13 @@ namespace Cosmos.Core
 
                     ReadHeader(_reader);
 
-                    var dsdtBlock = new MemoryBlock08(dsdtAddress, SdtLength);
+                    Console.WriteLine("Parsing S5...");
 
-                    Stream stream = new MemoryStream(dsdtBlock.ToArray());
+                    ParseS5();
 
-                    Global.mDebugger.Send("Create parser...");
+                    Console.WriteLine("Parsing PRT...");
 
-                    var root = new Parser(stream);
-
-                    Global.mDebugger.Send("Parse first node...");
-
-                    var node = root.Parse();
+                    ParsePRT();
                 }
             }
             else if (signature == "APIC")
@@ -661,6 +729,60 @@ namespace Cosmos.Core
                     }
 
                     p += length;
+                }
+            }
+        }
+
+        private static void PopulateNode(ParseNode op)
+        {
+            //Recursive function does a null reference exception trick the matrice with a Stack and iterative function
+            var sthack = new Stack<ParseNode>();
+
+            sthack.Push(op);
+
+            while (sthack.Count != 0)
+            {
+                ParseNode current = sthack.Pop();
+
+                if (current.Arguments.Count > 0)
+                {
+                    SearchPackage(current);
+                }
+
+                if (current != null)
+                {
+                    for (int i = current.Nodes.Count - 1; i >= 0; i--)
+                    {
+                        sthack.Push(current.Nodes[i]);
+                    }
+                }
+            }
+        }
+
+        private static void SearchPackage(ParseNode op)
+        {
+            for (int x = 0; x < op.Op.ParseArgs.Length; x++)
+            {
+                if (op.Op.ParseArgs[x] == ParseArgFlags.DataObjectList || op.Op.ParseArgs[x] == ParseArgFlags.TermList || op.Op.ParseArgs[x] == ParseArgFlags.ObjectList)
+                    continue;
+
+                if (op.Arguments[x].ToString() == "Package")
+                {
+                    var arg = (ParseNode)op.Arguments[x];
+
+                    Console.WriteLine("FOUND PACKAGES");
+
+                    for (int y = 0; y < arg.Nodes.Count; y++)
+                    {
+                        Console.WriteLine("FOUND PACKAGE " + y);
+
+                        List<ParseNode> package = arg.Nodes[y].Nodes;
+
+                        Console.WriteLine("Address=0x" + ((int)package[0].ConstantValue).ToString("X"));
+                        Console.WriteLine("Pin=" + (byte)package[1].ConstantValue);
+                        Console.WriteLine("Source=" + (byte)package[2].ConstantValue);
+                        Console.WriteLine("Source Index=" + (byte)package[3].ConstantValue);
+                    }
                 }
             }
         }
