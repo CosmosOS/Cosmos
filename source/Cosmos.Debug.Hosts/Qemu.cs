@@ -89,7 +89,7 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["QemuUseCustomParameters"], out Check);
         if (Check)
         {
-          _customArgs = " " + aParams["QemuCustomParameters"] + " ";
+          _customArgs = " " + aParams["QemuUseCustomParameters"] + " ";
         }
         else
         {
@@ -208,11 +208,17 @@ namespace Cosmos.Debug.Hosts
         if (UseCustomExe)
         {
               _launchExe = aParams["QemuLocationParameters"];
-
         }
         else
         {
-            _launchExe = QemuSupport.QemuExe.FullName;
+          string defaultPath = @"C:\qemu\qemu-system-i386.exe";
+
+          if (!File.Exists(defaultPath))
+          {
+            throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
+          }
+
+          _launchExe = defaultPath;
         }
       }
 
