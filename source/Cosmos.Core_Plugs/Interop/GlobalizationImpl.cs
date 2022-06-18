@@ -33,6 +33,10 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+        public static unsafe void InitOrdinalCasingPage(int pageNumber, char* pTarget)
+        {
+            throw new NotImplementedException();
+        }
 
         public static void InitICUFunctions(IntPtr aPtr1, IntPtr aPtr2, string aString1, string aString2)
         {
