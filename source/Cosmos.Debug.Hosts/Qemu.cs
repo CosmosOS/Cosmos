@@ -84,12 +84,11 @@ namespace Cosmos.Debug.Hosts
       }
       if (aParams.ContainsKey("QemuUseCustomParameters"))
       {
-
         bool Check;
         Boolean.TryParse(aParams["QemuUseCustomParameters"], out Check);
         if (Check)
         {
-          _customArgs = " " + aParams["QemuUseCustomParameters"] + " ";
+          _customArgs = " " + aParams["QemuCustomParameters"] + " ";
         }
         else
         {
@@ -201,36 +200,45 @@ namespace Cosmos.Debug.Hosts
           _hardwareAccel = "-accel whpx";
         }
       }
-      if (aParams.ContainsKey("QemuLocationParameters"))
+      if (aParams.ContainsKey("QemuUseCustomLocation"))
       {
         bool UseCustomExe;
         Boolean.TryParse(aParams["QemuUseCustomLocation"], out UseCustomExe);
+
         if (UseCustomExe)
         {
-              _launchExe = aParams["QemuLocationParameters"];
+          _launchExe = aParams["QemuLocationParameters"];
         }
         else
         {
-          string defaultPath = @"C:\qemu\qemu-system-i386.exe";
-
-          if (!File.Exists(defaultPath))
-          {
-            throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
-          }
-
-          _launchExe = defaultPath;
+          SetDefaultPath();
         }
+      }
+      else
+      {
+        SetDefaultPath();
       }
 
       _debugPortString = @"Cosmos\Serial";
+    }
+
+    private void SetDefaultPath()
+    {
+      string defaultPath = @"C:\qemu\qemu-system-i386.exe";
+
+      if (!File.Exists(defaultPath))
+      {
+        throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
+      }
+
+      _launchExe = defaultPath;
     }
 
     public override void Start()
     {
       qemuProcess = new Process();
       var qemuStartInfo = qemuProcess.StartInfo;
-
-        qemuStartInfo.FileName = _launchExe;
+      qemuStartInfo.FileName = _launchExe;
 
       string xQemuArguments = "-m " + _memoryAssign;
       xQemuArguments += $" -cdrom {_isoFile}";
