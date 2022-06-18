@@ -304,14 +304,6 @@ namespace Cosmos.Debug.Hosts
         {
         }
       }
-
-      Cleanup();
-    }
-
-    private void Cleanup()
-    {
-      OnShutDown(this, null);
-      qemuProcess.Exited -= ExitCallback;
     }
   }
 }
