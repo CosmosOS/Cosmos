@@ -658,20 +658,10 @@ namespace Cosmos.Core
 
         private static void ParsePRT()
         {
-            byte* S5Addr = (byte*)FADT->Dsdt;
-
-            while (0 < DSDTLenght--)
-            {
-                if (Compare("_PRT", S5Addr) == 0)
-                {
-                    break;
-                }
-                S5Addr++;
-            }
-
+            /*
             if (DSDTLenght > 0)
             {
-                var dsdtBlock = new MemoryBlock08((uint)S5Addr, SdtLength);
+                var dsdtBlock = new MemoryBlock08(FADT->Dsdt + (uint)sizeof(AcpiHeader), SdtLength - (uint)sizeof(AcpiHeader));
 
                 Stream stream = new MemoryStream(dsdtBlock.ToArray());
 
@@ -679,14 +669,14 @@ namespace Cosmos.Core
 
                 var root = new Parser(stream);
 
-                Global.mDebugger.Send("Parsing ACPI DST _PRT Method...");
+                Global.mDebugger.Send("Parse first node...");
 
                 var node = root.Parse();
-
-                Global.mDebugger.Send("Parsed! Trying to list IRQ Routing Table...");
-
-                PopulateNode(node);
-            }
+                foreach (var item in node.Nodes)
+                {
+                    Global.mDebugger.Send("Node: " + item.Name);
+                }
+            }*/
         }
 
         private static void ParseDT(AcpiHeader* hdr)
@@ -779,6 +769,7 @@ namespace Cosmos.Core
             }
         }
 
+        /*
         private static void PopulateNode(ParseNode op)
         {
             //Recursive function does a null reference exception trick the matrice with a Stack and iterative function
@@ -805,6 +796,7 @@ namespace Cosmos.Core
             }
         }
 
+        
         private static void SearchPackage(ParseNode op)
         {
             for (int x = 0; x < op.Op.ParseArgs.Length; x++)
@@ -833,10 +825,10 @@ namespace Cosmos.Core
 
                         IrqRoutingTable.Add(irqRouting);
                     }
-                    */
+                    
                 }
             }
-        }
+        }*/
 
         /// <summary>
         /// Enable ACPI.
