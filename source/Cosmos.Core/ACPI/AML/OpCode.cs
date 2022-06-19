@@ -635,7 +635,7 @@ namespace ACPILib.AML
             return name;
         }
 
-        public override string ToString()
+		public override string ToString()
 		{
 			return Name;
 		}

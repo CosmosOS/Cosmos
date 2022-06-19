@@ -1,4 +1,5 @@
-﻿using ACPILib.AML;
+﻿using ACPIAML.Interupter;
+using ACPILib.AML;
 using System.Collections.Generic;
 
 namespace ACPILib.Parser2
@@ -17,8 +18,8 @@ namespace ACPILib.Parser2
 			get { return Start + Length + Op.CodeByteSize; }
 		}
 
-		public object ConstantValue;
-		public List<object> Arguments = new List<object>();
+		public StackObject? ConstantValue;
+		public List<StackObject> Arguments = new List<StackObject>();
 		public List<ParseNode> Nodes = new List<ParseNode>();
 
 		public override string ToString()

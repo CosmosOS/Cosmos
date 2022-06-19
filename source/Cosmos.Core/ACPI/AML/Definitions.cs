@@ -1,4 +1,4 @@
-﻿namespace ACPILib.AML
+﻿namespace ACPILibs.AML
 {
 	public class Definitions
 	{

@@ -463,7 +463,7 @@ namespace ACPILib.Parser
 						break;
 
 					default:
-						throw new NotImplementedException();
+						throw new NotImplementedException("Unknown opcode");
 				}
 			}
 		}

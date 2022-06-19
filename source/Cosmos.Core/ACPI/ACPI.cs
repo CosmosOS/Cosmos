@@ -814,8 +814,11 @@ namespace Cosmos.Core
 
                 if (op.Arguments[x].ToString() == "Package")
                 {
-                    var arg = (ParseNode)op.Arguments[x];
+                    Global.mDebugger.Send("Package found!");
 
+                    //var arg = (ParseNode)op.Arguments[x];
+
+                    /*
                     for (int y = 0; y < arg.Nodes.Count; y++)
                     {
                         List<ParseNode> package = arg.Nodes[y].Nodes;
@@ -830,6 +833,7 @@ namespace Cosmos.Core
 
                         IrqRoutingTable.Add(irqRouting);
                     }
+                    */
                 }
             }
         }
