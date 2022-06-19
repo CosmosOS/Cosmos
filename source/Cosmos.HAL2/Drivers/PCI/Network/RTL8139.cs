@@ -31,7 +31,15 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             // We are handling this device
             pciCard.Claimed = true;
             // Setup interrupt handling
-            INTs.SetIrqHandler(device.InterruptLine, HandleNetworkInterrupt);
+            INTs.SetIntHandler((byte)(0x20 + device.InterruptLine), HandleNetworkInterrupt);
+
+            //Route IRQ for all IO/APIC PCI IRQ (I16-I20)
+            //We will have to fix this if we use multiple PCI devices that requires interrupts
+            //TODO: Use ACPI to find IRQ route
+            for (byte i = 0; i < 4; i++)
+            {
+                IOAPIC.SetEntry((byte)(16 + i), (ulong)(0x20 + device.InterruptLine));
+            }
             // Get IO Address from PCI Bus
             // Enable the card
             pciCard.EnableDevice();
