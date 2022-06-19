@@ -56,6 +56,14 @@ namespace Cosmos.HAL
             mDebugger.Send("Local APIC Timer Init");
             APICTimer.Initialize();
 
+            Console.WriteLine("Starting Processor Scheduler");
+            mDebugger.Send("Processor Scheduler");
+            Core.Processing.ProcessorScheduler.Initialize();
+
+            Console.WriteLine("Starting APIC Timer");
+            mDebugger.Send("APIC Timer");
+            APICTimer.Start();
+
             //TODO Redo this - Global init should be other.
             // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
             // If we let hardware do it, we need to protect it from being used by System.
@@ -93,10 +101,6 @@ namespace Cosmos.HAL
             }
             AHCI.InitDriver();
             //EHCI.InitDriver();
-
-            Console.WriteLine("Starting Processor Scheduler");
-            mDebugger.Send("Processor Scheduler");
-            Core.Processing.ProcessorScheduler.Initialize();
 
             if (InitNetwork)
             {

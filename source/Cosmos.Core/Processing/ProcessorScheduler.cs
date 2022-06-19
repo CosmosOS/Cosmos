@@ -22,19 +22,6 @@ namespace Cosmos.Core.Processing
             context.parent = 0;
             ProcessContext.m_ContextList = context;
             ProcessContext.m_CurrentContext = context;
-
-            IOPort counter0 = new IOPort(0x40);
-            IOPort cmd = new IOPort(0x43);
-
-            int divisor = 1193182 / 25;
-            cmd.Byte = (0x06 | 0x30);
-            counter0.Byte = (byte)divisor;
-            counter0.Byte = (byte)(divisor >> 8);
-
-            IOPort pA1 = new IOPort(0xA1);
-            IOPort p21 = new IOPort(0xA1);
-            pA1.Byte = 0x00;
-            p21.Byte = 0x00;
         }
 
         public static void EntryPoint()
@@ -45,11 +32,8 @@ namespace Cosmos.Core.Processing
             while (true) { } // remove from thread pool later
         }
 
-        public static int interruptCount;
-
         public static void SwitchTask()
         {
-            interruptCount++;
             if (ProcessContext.m_CurrentContext != null)
             {
                 ProcessContext.Context ctx = ProcessContext.m_ContextList;
@@ -69,7 +53,7 @@ namespace Cosmos.Core.Processing
                 {
                     if (ctx.state == ProcessContext.Thread_State.WAITING_SLEEP)
                     {
-                        ctx.arg -= 1000 / 25;
+                        ctx.arg -= 1; //Since Local APIC Frequency = 1000Hz remove 1ms per interrupt
                         if (ctx.arg <= 0)
                         {
                             ctx.state = ProcessContext.Thread_State.ALIVE;
@@ -79,7 +63,7 @@ namespace Cosmos.Core.Processing
                     ctx = ctx.next;
                 }
                 ProcessContext.m_CurrentContext.esp = INTs.mStackContext;
-            tryagain:;
+            tryagain:
                 if (ProcessContext.m_CurrentContext.next != null)
                 {
                     ProcessContext.m_CurrentContext = ProcessContext.m_CurrentContext.next;
@@ -95,8 +79,8 @@ namespace Cosmos.Core.Processing
                 ProcessContext.m_CurrentContext.age = ProcessContext.m_CurrentContext.priority;
                 INTs.mStackContext = ProcessContext.m_CurrentContext.esp;
             }
-            Global.PIC.EoiMaster();
-            Global.PIC.EoiSlave();
+
+            LocalAPIC.EndOfInterrupt();
         }
     }
 }

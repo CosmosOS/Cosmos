@@ -80,7 +80,7 @@ namespace Cosmos.Core_Asm
                 }
                 XS.Push((uint)j);
 
-                if (j != 0x20)
+                if (j != 0x20) //System timer (Local APIC)
                 {
                     XS.PushAllRegisters();
 
