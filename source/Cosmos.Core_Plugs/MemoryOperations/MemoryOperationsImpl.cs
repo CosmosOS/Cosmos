@@ -16,11 +16,12 @@ namespace Cosmos.Core_Plugs.MemoryOperations
         {
             throw new NotImplementedException();
         }
-        unsafe public static void Fill(byte* dest, int value, int size)
-        {
-            //Console.WriteLine("Filling array of size " + size + " with value 0x" + value.ToString("X"));
-            //Global.mDebugger.SendInternal("Filling array of size " + size + " with value " + value);
 
+        /*
+         * Tiny memory fill with jump table optimized
+         */
+        unsafe private static void FillTiny(byte* dest, int value, int size)
+        {
             /* For very little sizes (until 15 bytes) we hand unroll the loop */
             switch (size)
             {
@@ -112,6 +113,16 @@ namespace Cosmos.Core_Plugs.MemoryOperations
                     *(dest + 14) = (byte)value;
                     return;
             }
+        }
+
+        unsafe public static void Fill(byte* dest, int value, int size)
+        {
+            //Console.WriteLine("Filling array of size " + size + " with value 0x" + value.ToString("X"));
+            //Global.mDebugger.SendInternal("Filling array of size " + size + " with value " + value);
+            if (size < 16)
+            {
+                FillTiny(dest, value, size);
+            }
 
             /*
              * OK size is >= 16 it does not make any sense to do it with primitive types as C#
@@ -122,7 +133,7 @@ namespace Cosmos.Core_Plugs.MemoryOperations
              *    we do the Fill() using a simple managed for() loop of bytes
              */
             
-            int xBlocksNum = size / 16;
+            //int xBlocksNum = size / 16;
             int xByteRemaining = size % 16;
 
             //Global.mDebugger.SendInternal("size " + size + " is composed of " + BlocksNum + " block of 16 bytes with " + ByteRemaining + " remainder");
@@ -140,7 +151,7 @@ namespace Cosmos.Core_Plugs.MemoryOperations
 
             /* Let's call the assembler version now to do the 16 byte block copies */
             //Cosmos.Core.MemoryOperations.Fill16Blocks(dest + xByteRemaining, value, xBlocksNum);
-            Fill16Blocks(dest + xByteRemaining, value, xBlocksNum);
+            Fill16Blocks(dest + xByteRemaining, value, size / 16);
 
             /*
              * If needed there is yet space of optimization here for example:
@@ -739,29 +750,17 @@ namespace Cosmos.Core_Plugs.MemoryOperations
             }
         }
 
+        const int xBlockSize = 128;
+
         unsafe public static void Copy(byte* dest, byte* src, int size)
         {
-            Global.mDebugger.SendInternal("Copying array of size " + size + " ...");
-
             if (size < 129)
             {
-                Global.mDebugger.SendInternal("Size less than 129 bytes Calling CopyTiny...");
                 CopyTiny(dest, src, size);
-                Global.mDebugger.SendInternal("CopyTiny returned");
                 return;
             }
 
-            int xBlocksNum;
-            int xByteRemaining;
-            const int xBlockSize = 128;
-
-#if NETSTANDARD1_5
-            xBlocksNum = size / xBlockSize;
-            xByteRemaining = size % xBlockSize;
-#else
-            xBlocksNum = Math.DivRem(size, xBlockSize, out xByteRemaining);
-#endif
-            Global.mDebugger.SendInternal($"size {size} is composed of {xBlocksNum} blocks of {xBlockSize} bytes with {xByteRemaining} remainder");
+            int xByteRemaining = size % xBlockSize;
 
             // TODO call Copy128Blocks()
             for (int i = 0; i < xByteRemaining; i++)
@@ -769,10 +768,8 @@ namespace Cosmos.Core_Plugs.MemoryOperations
                 *(dest + i) = *(src + i);
             }
 
-            Global.mDebugger.SendInternal("Calling Copy128Blocks...");
             /* Let's call the assembler version now to do the 128 byte block copies */
-            Copy128Blocks(dest + xByteRemaining, src + xByteRemaining, xBlocksNum);
-            Global.mDebugger.SendInternal("Copy128Blocks returned");
+            Copy128Blocks(dest + xByteRemaining, src + xByteRemaining, size / xBlockSize);
         }
     }
 }
