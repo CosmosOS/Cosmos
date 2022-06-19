@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.Core.Processing;
 using Cosmos.Debug.Kernel;
 using IL2CPU.API;
 
@@ -20,6 +21,8 @@ namespace Cosmos.Core.Memory
     public static unsafe class Heap
     {
         private static uint* StackStart;
+        private static Mutex mMemeoryGate = new Mutex();
+        
         /// <summary>
         /// Init heap.
         /// </summary>
@@ -39,25 +42,53 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(uint aSize)
         {
+            if (mMemeoryGate != null)
+            {
+                mMemeoryGate.Lock();
+            }
+
             CPU.DisableInterrupts();
 
             if (aSize <= HeapSmall.mMaxItemSize)
             {
                 byte* ptr = HeapSmall.Alloc((ushort)aSize);
                 CPU.EnableInterrupts();
+
+                if (mMemeoryGate != null)
+                {
+                    mMemeoryGate.Unlock();
+                }
+
                 return ptr;
             }
             else if (aSize <= HeapMedium.MaxItemSize)
             {
                 byte* ptr = HeapMedium.Alloc(aSize);
                 CPU.EnableInterrupts();
+
+                if (mMemeoryGate != null)
+                {
+                    mMemeoryGate.Unlock();
+                }
+
                 return ptr;
             }
             else
             {
                 byte* ptr = HeapLarge.Alloc(aSize);
                 CPU.EnableInterrupts();
+
+                if (mMemeoryGate != null)
+                {
+                    mMemeoryGate.Unlock();
+                }
+
                 return ptr;
+            }
+
+            if (mMemeoryGate != null)
+            {
+                mMemeoryGate.Unlock();
             }
         }
 

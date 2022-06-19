@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using System.Threading;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
@@ -93,6 +93,11 @@ namespace Cosmos.HAL
             }
             AHCI.InitDriver();
             //EHCI.InitDriver();
+
+            Console.WriteLine("Starting Processor Scheduler");
+            mDebugger.Send("Processor Scheduler");
+            Core.Processing.ProcessorScheduler.Initialize();
+
             if (InitNetwork)
             {
                 mDebugger.Send("Network Devices Init");
@@ -104,6 +109,7 @@ namespace Cosmos.HAL
             }
             Console.WriteLine("Enabling Serial Output on COM1");
             Debug.Serial.Enable();
+
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
         }
@@ -120,6 +126,16 @@ namespace Cosmos.HAL
         /// Check if CPU interrupts are enabled.
         /// </summary>
         public static bool InterruptsEnabled => CPU.mInterruptsEnabled;
+
+        public static uint SpawnThread(ThreadStart aStart)
+        {
+            return Core.Processing.ProcessContext.StartContext("", aStart, Core.Processing.ProcessContext.Context_Type.THREAD);
+        }
+
+        public static uint SpawnThread(ParameterizedThreadStart aStart, object param)
+        {
+            return Core.Processing.ProcessContext.StartContext("", aStart, Core.Processing.ProcessContext.Context_Type.THREAD, param);
+        }
 
         /// <summary>
         /// Get keyboard devices.

@@ -234,6 +234,8 @@ namespace Cosmos.Core {
         [AsmMarker(AsmMarker.Type.Int_LastKnownAddress)]
         private static uint mLastKnownAddress = 0;
 
+        public static uint mStackContext;
+
         /// <summary>
         /// IRQ handlers.
         /// </summary>
@@ -847,6 +849,8 @@ namespace Cosmos.Core {
                     HandleInterrupt_47(ref xCtx);
                     HandleInterrupt_48(ref xCtx);
                     HandleInterrupt_49(ref xCtx);
+                    Processing.ProcessorScheduler.SwitchTask();
+                    Processing.ProcessorScheduler.EntryPoint();
                 }
             }
         }
