@@ -98,9 +98,14 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
             INTs.SetIntHandler((byte)(0x20 + device.InterruptLine), HandleNetworkInterrupt);
 
-            //Route IRQ for all IO/APIC PCI IRQ (I16-I20)
-            //We will have to fix this if we use multiple PCI devices that requires interrupts
-            //TODO: Use ACPI to find IRQ route
+            /***
+                Route IRQ for all IO/APIC PCI IRQ (I16-I20)
+            
+                We will have to fix this if we use multiple PCI devices that requires interrupts
+                It will causes interrupts conflicts
+            
+                TODO: Use ACPI to find right IRQ route
+            ***/
             for (byte i = 0; i < 4; i++)
             {
                 IOAPIC.SetEntry((byte)(16 + i), (ulong)(0x20 + device.InterruptLine));
