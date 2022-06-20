@@ -3,7 +3,7 @@
 [![Stato costruzione](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)
 [![Vieni nella chat a (https://discord.com/invite/kwtBwv6jhD](https://img.shields.io/discord/833970409337913344)](https://discord.com/invite/kwtBwv6jhD)
 
-Cosmos è un "kit di costruzione" per SO. Fai il tuo sistema operativo con linguaggi gestiti come C#, VB.NET, e altri!
+Cosmos è un "kit di costruzione" per SO fatto per Visual Studio 2022. Fai il tuo sistema operativo con linguaggi gestiti come C#, VB.NET, e altri!
 
 Per avere informazioni su come usare Cosmos, visita il [sito web di Cosmos](http://www.gocosmos.org).
 
