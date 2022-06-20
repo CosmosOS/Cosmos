@@ -65,18 +65,6 @@ namespace Cosmos.System_Plugs.System
             seed = 1;
         }
 
-        public static int GenerateGlobalSeed()
-        {
-            counter++;
-
-            if (counter == Int32.MaxValue - 1)
-            {
-                counter = 0;
-            }
-
-            return counter + RTC.Second * 1000;
-        }
-
         private static double Sample()
         {
             //Including this division at the end gives us significantly improved

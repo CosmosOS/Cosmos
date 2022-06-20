@@ -32,10 +32,5 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException();
         }
-
-        public static string TryGetLocalizedNameByMuiNativeResource(string aString)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
