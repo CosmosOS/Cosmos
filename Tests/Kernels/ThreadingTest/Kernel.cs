@@ -30,8 +30,7 @@ namespace ThreadingTests
                 threadOne.Start();
                 threadTwo.Start();
 
-                //PIT is broken wait like that for now
-                for (int i = 0; i < 1000000000; i++) ;
+                Cosmos.HAL.Global.PIT.Wait(3000);
 
                 Assert.AreEqual(variable, 1, "Changing global variable from thread works");
 

@@ -1,6 +1,4 @@
-﻿using ACPILib.AML;
-using ACPILib.Parser2;
-using Cosmos.Debug.Kernel;
+﻿using Cosmos.Debug.Kernel;
 using System;
 using System.Collections.Generic;
 using System.IO;
