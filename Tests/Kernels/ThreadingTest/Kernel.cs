@@ -23,22 +23,15 @@ namespace ThreadingTests
         {
             try
             {
+                variableThree = 3;
+
                 var threadOne = new Thread(ThreadOne);
                 var threadTwo = new Thread(ThreadTwo);
-
                 threadOne.Start();
                 threadTwo.Start();
 
-                Console.WriteLine("Inside Run method!");
-
-                variableThree = 3;
-
-                //Since Run is not a thread call PIT wait
-                System.Threading.Thread.Sleep(3000);
-
-                //Cosmos.HAL.Global.PIT.Wait(3000);
-
-                Console.WriteLine("Waited 3 second.");
+                //PIT is broken wait like that for now
+                for (int i = 0; i < 1000000000; i++) ;
 
                 Assert.AreEqual(variable, 1, "Changing global variable from thread works");
 
@@ -58,22 +51,18 @@ namespace ThreadingTests
 
         public void ThreadOne()
         {
-            //Make thread WAITING
+            //Make thread WAITING for 1sec
             Thread.Sleep(1000);
 
             variable = 1;
-
-            Console.WriteLine("Inside first thread!");
         }
 
         public void ThreadTwo()
         {
-            //Make thread WAITING
+            //Make thread WAITING for 1sec
             Thread.Sleep(1000);
 
             variableTwo = 2;
-
-            Console.WriteLine("Inside second thread!");
         }
     }
 }
