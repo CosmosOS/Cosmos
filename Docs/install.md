@@ -29,7 +29,7 @@ The User Kit is a snapshot stable version of Cosmos including a premade installe
   
 *   **Visual Studio 2022 Workload: Visual Studio Extension Development**
 *   **Inno Quick Start Pack (Free)** – Install with defaults, keep Preprocessor option checked [Download](http://www.jrsoftware.org/isdl.php#qsp)
-*   **.NET 5 SDK** - [Download](https://www.microsoft.com/net/download/core)
+*   **.NET 6 SDK** - [Download](https://dotnet.microsoft.com/en-us/download)
   
 ##### Get the Source
   
@@ -51,8 +51,9 @@ C:\\source\\CosmosOS\\Common\\ - [Git Repository for Common](https://github.com/
 ```
 
 A tree diagram of the source should look like the following:   
-![](https://www.gocosmos.org/wp-content/uploads/2021/06/tree-214x300.png)   
-  
+
+<img src="https://raw.githubusercontent.com/ptobuon/Cosmos/patch-1/Docs/images/Dir.png" width="200">
+
 We are working to make syncing code easier. We have already experimented with Git Submodules, however the simple use of submodules presents a few issues, but the biggest of them is that they trigger a fireworks show of problems and errors in every Git UI we tried and would have limited developers options and forced them to the command line in most cases. We are currently investigating subtrees.  
   
 For now, it's much easier to handle the 4 repositories as most of the time, new Cosmos developers may only have to work in the Cosmos repository. Only when you are comfortable with the concept of Operating System development and C# should you venture into IL2CPU and XSharp.  
