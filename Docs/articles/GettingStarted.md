@@ -13,9 +13,7 @@ Cosmos is not an operating system in the traditional sense, but instead it is
 an "Operating System Kit", or as I like to say "Operating System Legos".
 Cosmos lets you create operating systems just as Visual Studio and C# normally
 let you create applications. Most users can write and boot their own operating
-system in just a few minutes, all using Visual Studio. Milestone 5 includes
-new features such as an integrated project type in Visual Studio, and an
-integrated debugger. You can debug your operating system directly from Visual
+system in just a few minutes, all using Visual Studio. You can debug your operating system directly from Visual
 Studio using breakpoints.
 
 Cosmos is available in two distributions, the developer kit (dev kit), and the
