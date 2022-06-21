@@ -26,7 +26,7 @@ Plugs change what happens in step 2. A normal code plug means that rather taking
 
 # Implementing a Plug
 
-While one always plugs individual methods, plugs are defined class wise. Therefore the first step to plugging any method is to define a new static class to contain all the pluggged methods for some certain type. This class must be decorated with the `Plug` attribute. The plug attribute either takes the type it is plugging(`Plug(Tpe target)`) or a string with the target name(`Plug(string targetName)`). Using the string target name is required when plugging internal or private classes. An example for a plugged class is for the Math class. https://github.com/CosmosOS/Cosmos/blob/8a8393353f1957890c5154650e29847fd22bf893/source/Cosmos.System2_Plugs/System/MathImpl.cs#L8-L9
+While one always plugs individual methods, plugs are defined class wise. Therefore the first step to plugging any method is to define a new static class to contain all the pluggged methods for some certain type. This class must be decorated with the `Plug` attribute. The plug attribute either takes the type it is plugging(`Plug(Type target)`) or a string with the target name(`Plug(string targetName)`). Using the string target name is required when plugging internal or private classes. An example for a plugged class is for the Math class. https://github.com/CosmosOS/Cosmos/blob/8a8393353f1957890c5154650e29847fd22bf893/source/Cosmos.System2_Plugs/System/MathImpl.cs#L8-L9
 
 ## Code Plug
 
