@@ -29,7 +29,7 @@ namespace Cosmos.System_Plugs.System
 
         public static void Ctor(Random aThis)
         {
-            Ctor(aThis, GenerateGlobalSeed());
+            Ctor(aThis, GenerateSeed());
         }
 
         public static void Ctor(Random aThis, int seed)
@@ -180,6 +180,18 @@ namespace Cosmos.System_Plugs.System
         public static double NextDouble(Random aThis)
         {
             return Sample();
+        }
+
+        private static int GenerateSeed()
+        {
+            counter++;
+
+            if (counter == Int32.MaxValue - 1)
+            {
+                counter = 0;
+            }
+
+            return counter + (int)(Cosmos.Core.CPU.GetCPUUptime() / 50) * 1000;
         }
     }
 }
