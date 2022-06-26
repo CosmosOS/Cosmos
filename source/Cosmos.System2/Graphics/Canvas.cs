@@ -939,12 +939,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public void DrawImageAlpha(Image image, int x, int y)
         {
+            var _pen = new Pen(Color.White);
+
             for (int _x = 0; _x < image.Width; _x++)
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
-                    DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])), x + _x, y + _y);
+                    _pen.Color = (Color.FromArgb(image.rawData[_x + _y * image.Width]));
+                    DrawPoint(_pen, x + _x, y + _y);
                 }
             }
         }
