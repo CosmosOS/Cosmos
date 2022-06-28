@@ -878,12 +878,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public virtual void DrawImage(Image image, int x, int y)
         {
+            Pen _pen = new Pen(Color.White);
+
             for (int _x = 0; _x < image.Width; _x++)
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
-                    DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])), x + _x, y + _y);
+                    _pen.Color = Color.FromArgb(image.rawData[_x + _y * image.Width]);
+                    DrawPoint(_pen, x + _x, y + _y);
                 }
             }
         }
@@ -918,13 +921,16 @@ namespace Cosmos.System.Graphics
         /// <param name="h">Desired Height.</param>
         public virtual void DrawImage(Image image, int x, int y, int w, int h)
         {
+            Pen _pen = new Pen(Color.White);
+
             int[] pixels = scaleImage(image, w, h);
             for (int _x = 0; _x < w; _x++)
             {
                 for (int _y = 0; _y < h; _y++)
                 {
                     Global.mDebugger.SendInternal(pixels[_x + _y * w]);
-                    DrawPoint(new Pen(Color.FromArgb(pixels[_x + _y * w])), x + _x, y + _y);
+                    _pen.Color = Color.FromArgb(pixels[_x + _y * w]);
+                    DrawPoint(_pen, x + _x, y + _y);
                 }
             }
         }
