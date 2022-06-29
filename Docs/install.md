@@ -52,7 +52,7 @@ C:\\source\\CosmosOS\\Common\\ - [Git Repository for Common](https://github.com/
 
 A tree diagram of the source should look like the following:   
 
-<img src="https://raw.githubusercontent.com/ptobuon/Cosmos/patch-1/Docs/images/Dir.png" width="200">
+<img src="https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/images/Dir.png" width="200">
 
 We are working to make syncing code easier. We have already experimented with Git Submodules, however the simple use of submodules presents a few issues, but the biggest of them is that they trigger a fireworks show of problems and errors in every Git UI we tried and would have limited developers options and forced them to the command line in most cases. We are currently investigating subtrees.  
   
