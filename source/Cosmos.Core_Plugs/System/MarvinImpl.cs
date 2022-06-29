@@ -1,19 +1,21 @@
 ﻿using System;
+
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.System;
-
-[Plug("System.Marvin, System.Private.CoreLib")]
-public static class MarvinImpl
+namespace Cosmos.Core_Plugs.System
 {
-    // todo: maybe plug this at the RandomNumberGeneratorImplementation level
-    public static ulong GenerateSeed()
+    [Plug("System.Marvin, System.Private.CoreLib")]
+    public static class MarvinImpl
     {
-        var random = new Random();
-        var buffer = new byte[8];
+        // todo: maybe plug this at the RandomNumberGeneratorImplementation level
+        public static ulong GenerateSeed()
+        {
+            var random = new Random();
+            var buffer = new byte[8];
 
-        random.NextBytes(buffer);
+            random.NextBytes(buffer);
 
-        return BitConverter.ToUInt64(buffer, 0);
+            return BitConverter.ToUInt64(buffer, 0);
+        }
     }
 }

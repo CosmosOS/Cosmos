@@ -12,15 +12,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.5.0"/>
-        <PackageReference Include="XSharp"/>
+        <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.5.0" />
+        <PackageReference Include="XSharp" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj"/>
-        <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj"/>
-        <ProjectReference Include="..\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj"/>
-        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj"/>
+        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
+        <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
+        <ProjectReference Include="..\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
+        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
     </ItemGroup>
 
 </Project>

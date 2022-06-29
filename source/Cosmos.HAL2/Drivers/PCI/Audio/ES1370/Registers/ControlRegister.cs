@@ -213,6 +213,3 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370.Registers
     #endregion
 }
 */
-
-
-

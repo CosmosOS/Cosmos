@@ -1,39 +1,44 @@
 using System;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System;
-
-[Plug(Target = typeof(ValueType))]
-public static class ValueTypeImpl
+namespace Cosmos.System_Plugs.System
 {
-    public static int GetHashCode(ValueType aThis) => (int)aThis;
-
-    public static int GetHashCodeOfPtr(IntPtr ptr) => throw new NotImplementedException("ValueType.GetHashCodeOfPtr()");
-
-    [PlugMethod(Signature = "System_Boolean__System_ValueType_Equals_System_Object")]
-    public static bool Equals(ValueType aThis, object obj) // value type is just a pointer
+    [Plug(Target = typeof(ValueType))]
+    public static class ValueTypeImpl
     {
-        if (aThis == null && obj == null)
+        public static int GetHashCode(ValueType aThis)
         {
-            return true;
+            return (int)aThis;
         }
 
-        if (obj == null)
+        public static int GetHashCodeOfPtr(IntPtr ptr)
         {
-            return false;
+            throw new NotImplementedException("ValueType.GetHashCodeOfPtr()");
         }
 
-        if (aThis == null)
+        [PlugMethod(Signature = "System_Boolean__System_ValueType_Equals_System_Object")]
+        public static unsafe bool Equals(ValueType aThis, object obj) // value type is just a pointer
         {
-            return false;
+            if (aThis == null && obj == null)
+            {
+                return true;
+            }
+            if (obj == null)
+            {
+                return false;
+            }
+            if (aThis == null)
+            {
+                return false;
+            }
+            return aThis.GetHashCode() == obj.GetHashCode();
         }
 
-        return aThis.GetHashCode() == obj.GetHashCode();
+
+        //public static string ToString(ValueType aThis)
+        //{
+        //    return "<ValueType.ToString not yet implemented!>";
+        //}
     }
-
-
-    //public static string ToString(ValueType aThis)
-    //{
-    //    return "<ValueType.ToString not yet implemented!>";
-    //}
 }

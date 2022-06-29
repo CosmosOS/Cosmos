@@ -1,26 +1,31 @@
-﻿namespace Cosmos.Core.IOGroup;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Cosmos.Core;
 
-/// <summary>
-///     PC Speaker.
-/// </summary>
-public class PCSpeaker : IOGroup
+namespace Cosmos.Core.IOGroup
 {
-    // IO Port 42
     /// <summary>
-    ///     Channel to data IO port.
+    /// PC Speaker.
     /// </summary>
-    public readonly IOPort Channel2Data = new(0x42);
-
-    // These two ports are shared with the PIT, so names are the same
-    // IO Port 43
-    /// <summary>
-    ///     Command register IO port.
-    /// </summary>
-    public readonly IOPort CommandRegister = new(0x43);
-
-    // IO Port 61, channel 2 gate
-    /// <summary>
-    ///     Gate IO port.
-    /// </summary>
-    public readonly IOPort Gate = new(0x61);
+    public class PCSpeaker : IOGroup
+    {
+        // IO Port 61, channel 2 gate
+        /// <summary>
+        /// Gate IO port.
+        /// </summary>
+        public readonly IOPort Gate = new IOPort(0x61);
+        // These two ports are shared with the PIT, so names are the same
+        // IO Port 43
+        /// <summary>
+        /// Command register IO port.
+        /// </summary>
+        public readonly IOPort CommandRegister = new IOPort(0x43);
+        // IO Port 42
+        /// <summary>
+        /// Channel to data IO port.
+        /// </summary>
+        public readonly IOPort Channel2Data = new IOPort(0x42);
+    }
 }

@@ -1,147 +1,152 @@
 //#define COSMOSDEBUG
-
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
+using Cosmos.Debug.Kernel;
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using Cosmos.System;
+using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
-using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System.IO;
-
-[Plug(Target = typeof(Directory))]
-public static class DirectoryImpl
+namespace Cosmos.System_Plugs.System.IO
 {
-    private static string mCurrentDirectory = String.Empty;
-
-    public static string GetCurrentDirectory()
+    [Plug(Target = typeof(Directory))]
+    public static class DirectoryImpl
     {
-        Global.mFileSystemDebugger.SendInternal(
-            $"Directory.GetCurrentDirectory : mCurrentDirectory = {mCurrentDirectory}");
-        return mCurrentDirectory;
-    }
+        private static string mCurrentDirectory = string.Empty;
 
-    public static void SetCurrentDirectory(string aPath)
-    {
-        Global.mFileSystemDebugger.SendInternal($"Directory.SetCurrentDirectory : aPath = {aPath}");
-        mCurrentDirectory = aPath;
-    }
-
-    public static bool Exists(string aPath)
-    {
-        if (aPath == null)
+        public static string GetCurrentDirectory()
         {
-            return false;
+            Global.mFileSystemDebugger.SendInternal($"Directory.GetCurrentDirectory : mCurrentDirectory = {mCurrentDirectory}");
+            return mCurrentDirectory;
         }
 
-        Global.mFileSystemDebugger.SendInternal($"Directory.Exists : aPath = {aPath}");
-        return VFSManager.DirectoryExists(aPath);
-    }
-
-    public static DirectoryInfo CreateDirectory(string aPath)
-    {
-        Global.mFileSystemDebugger.SendInternal("-- Directory.CreateDirectory --");
-        Global.mFileSystemDebugger.SendInternal($"aPath = {aPath}");
-
-        if (aPath == null)
+        public static void SetCurrentDirectory(string aPath)
         {
-            throw new ArgumentNullException("aPath");
+            Global.mFileSystemDebugger.SendInternal($"Directory.SetCurrentDirectory : aPath = {aPath}");
+            mCurrentDirectory = aPath;
         }
 
-        if (aPath.Length == 0)
+        public static bool Exists(string aPath)
         {
-            throw new ArgumentException("Path must not be empty.", "aPath");
-        }
-
-        var xEntry = VFSManager.CreateDirectory(aPath);
-
-        if (xEntry == null)
-        {
-            return null;
-        }
-
-        return new DirectoryInfo(aPath);
-    }
-
-    public static void Delete(string aPath) => Delete(aPath, false);
-
-    public static void Delete(string aPath, bool recursive)
-    {
-        var xFullPath = Path.GetFullPath(aPath);
-
-        VFSManager.DeleteDirectory(xFullPath, recursive);
-    }
-
-    public static DirectoryInfo GetParent(string aPath)
-    {
-        Global.mFileSystemDebugger.SendInternal("Directory.GetParent:");
-
-        if (aPath == null)
-        {
-            Global.mFileSystemDebugger.SendInternal("Directory.GetParent : aPath is null");
-            throw new ArgumentNullException("aPath");
-        }
-
-        if (aPath.Length == 0)
-        {
-            Global.mFileSystemDebugger.SendInternal("Directory.GetParent : aPath is empty");
-            throw new ArgumentException("Path must not be empty.", "aPath");
-        }
-
-        Global.mFileSystemDebugger.SendInternal("aPath =");
-        Global.mFileSystemDebugger.SendInternal(aPath);
-
-        var xFullPath = Path.GetFullPath(aPath);
-        var xParentDirectory = Path.GetDirectoryName(xFullPath);
-        if (xParentDirectory == null)
-        {
-            Global.mFileSystemDebugger.SendInternal("Directory.GetParent : xParentDirectory is null");
-            return null;
-        }
-
-        return new DirectoryInfo(xParentDirectory);
-    }
-
-    public static string[] GetDirectories(string aPath)
-    {
-        Global.mFileSystemDebugger.SendInternal("Directory.GetDirectories");
-        if (aPath == null)
-        {
-            throw new ArgumentNullException(aPath);
-        }
-
-        var xDirectories = new List<string>();
-        var xEntries = VFSManager.GetDirectoryListing(aPath);
-        for (var i = 0; i < xEntries.Count; i++)
-        {
-            if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.Directory)
+            if (aPath == null)
             {
-                xDirectories.Add(xEntries[i].mName);
+                return false;
             }
+
+            Global.mFileSystemDebugger.SendInternal($"Directory.Exists : aPath = {aPath}");
+            return VFSManager.DirectoryExists(aPath);
         }
 
-        return xDirectories.ToArray();
-    }
-
-    public static string[] GetFiles(string aPath)
-    {
-        Global.mFileSystemDebugger.SendInternal("Directory.GetFiles");
-        if (aPath == null)
+        public static DirectoryInfo CreateDirectory(string aPath)
         {
-            throw new ArgumentNullException(aPath);
-        }
+            Global.mFileSystemDebugger.SendInternal($"-- Directory.CreateDirectory --");
+            Global.mFileSystemDebugger.SendInternal($"aPath = {aPath}");
 
-        var xFiles = new List<string>();
-        var xEntries = VFSManager.GetDirectoryListing(aPath);
-        for (var i = 0; i < xEntries.Count; i++)
-        {
-            if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.File)
+            if (aPath == null)
             {
-                xFiles.Add(xEntries[i].mName);
+                throw new ArgumentNullException("aPath");
             }
+
+            if (aPath.Length == 0)
+            {
+                throw new ArgumentException("Path must not be empty.", "aPath");
+            }
+
+            var xEntry = VFSManager.CreateDirectory(aPath);
+
+            if (xEntry == null)
+            {
+                return null;
+            }
+            
+            return new DirectoryInfo(aPath);
         }
 
-        return xFiles.ToArray();
+        public static void Delete(string aPath)
+        {
+            Delete(aPath, false);
+        }
+
+        public static void Delete(string aPath, bool recursive)
+        {
+            String xFullPath = Path.GetFullPath(aPath);
+
+            VFSManager.DeleteDirectory(xFullPath, recursive);
+        }
+
+        public static DirectoryInfo GetParent(string aPath)
+        {
+            Global.mFileSystemDebugger.SendInternal("Directory.GetParent:");
+
+            if (aPath == null)
+            {
+                Global.mFileSystemDebugger.SendInternal("Directory.GetParent : aPath is null");
+                throw new ArgumentNullException("aPath");
+            }
+
+            if (aPath.Length == 0)
+            {
+                Global.mFileSystemDebugger.SendInternal("Directory.GetParent : aPath is empty");
+                throw new ArgumentException("Path must not be empty.", "aPath");
+            }
+
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
+
+            string xFullPath = Path.GetFullPath(aPath);
+            string xParentDirectory = Path.GetDirectoryName(xFullPath);
+            if (xParentDirectory == null)
+            {
+                Global.mFileSystemDebugger.SendInternal("Directory.GetParent : xParentDirectory is null");
+                return null;
+            }
+
+            return new DirectoryInfo(xParentDirectory);
+        }
+
+        public static string[] GetDirectories(string aPath)
+        {
+            Global.mFileSystemDebugger.SendInternal("Directory.GetDirectories");
+            if (aPath == null)
+            {
+                throw new ArgumentNullException(aPath);
+            }
+
+            var xDirectories = new List<string>();
+            var xEntries = VFSManager.GetDirectoryListing(aPath);
+            for (int i = 0; i < xEntries.Count; i++)
+            {
+                if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.Directory)
+                {
+                    xDirectories.Add(xEntries[i].mName);
+                }
+            }
+
+            return xDirectories.ToArray();
+        }
+
+        public static string[] GetFiles(string aPath)
+        {
+            Global.mFileSystemDebugger.SendInternal("Directory.GetFiles");
+            if (aPath == null)
+            {
+                throw new ArgumentNullException(aPath);
+            }
+
+            var xFiles = new List<string>();
+            var xEntries = VFSManager.GetDirectoryListing(aPath);
+            for (int i = 0; i < xEntries.Count; i++)
+            {
+                if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.File)
+                {
+                    xFiles.Add(xEntries[i].mName);
+                }
+            }
+
+            return xFiles.ToArray();
+        }
     }
 }

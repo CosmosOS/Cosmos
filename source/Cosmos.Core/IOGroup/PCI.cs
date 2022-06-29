@@ -1,17 +1,21 @@
-﻿namespace Cosmos.Core.IOGroup;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Cosmos.Core;
 
-/// <summary>
-///     Peripheral Component Interconnect (PCI) class. See also: <seealso cref="IOGroup" />.
-/// </summary>
-public class PCI : IOGroup
-{
+namespace Cosmos.Core.IOGroup {
     /// <summary>
-    ///     Configuration address port.
+    /// Peripheral Component Interconnect (PCI) class. See also: <seealso cref="IOGroup"/>.
     /// </summary>
-    public IOPort ConfigAddressPort = new(0xCF8);
-
-    /// <summary>
-    ///     Configuration data port.
-    /// </summary>
-    public IOPort ConfigDataPort = new(0xCFC);
+    public class PCI : IOGroup {
+        /// <summary>
+        /// Configuration address port.
+        /// </summary>
+        public IOPort ConfigAddressPort = new IOPort(0xCF8);
+        /// <summary>
+        /// Configuration data port.
+        /// </summary>
+        public IOPort ConfigDataPort = new IOPort(0xCFC);
+    }
 }

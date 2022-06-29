@@ -36,7 +36,7 @@
 //        public UInt32 HcRhDescriptorA { get { return regs.Read32Unchecked(0x48); } set { regs.Write32Unchecked(0x48, value); } }
 //        public UInt32 HcRhDescriptorB { get { return regs.Read32Unchecked(0x4C); } set { regs.Write32Unchecked(0x4C, value); } }
 //        public UInt32 HcRhStatus { get { return regs.Read32Unchecked(0x50); } set { regs.Write32Unchecked(0x50, value); } }
-
+                
 //    }
 
 //    public struct HcRevisionReg
@@ -141,6 +141,3 @@
 //        Reset = 0, Resume = 1, Operational = 2, Suspend = 3
 //    }
 //}
-
-
-

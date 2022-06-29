@@ -1,9 +1,13 @@
-using XSharp;
 using XSharp.Assembler;
+using XSharp;
 
-namespace Cosmos.Core_Asm;
-
-public class CPUGetEndOfKernelAsm : AssemblerMethod
+namespace Cosmos.Core_Asm
 {
-    public override void AssembleNew(Assembler aAssembler, object aMethodInfo) => XS.Push("_end_code");
+    public class CPUGetEndOfKernelAsm : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.Push("_end_code");
+        }
+    }
 }

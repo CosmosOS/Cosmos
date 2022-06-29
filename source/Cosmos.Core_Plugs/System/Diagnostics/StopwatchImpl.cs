@@ -1,21 +1,21 @@
+using IL2CPU.API;
+using IL2CPU.API.Attribs;
 using System;
 using System.Diagnostics;
 using Cosmos.Core;
-using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.System.Diagnostics;
-
-[Plug(Target = typeof(Stopwatch))]
-public class StopwatchImpl
+namespace Cosmos.Core_Plugs.System.Diagnostics
 {
-    public static long GetTimestamp()
+    [Plug(Target = typeof(global::System.Diagnostics.Stopwatch))]
+    public class StopwatchImpl
     {
-        if (Stopwatch.IsHighResolution)
-            // see https://msdn.microsoft.com/en-us/library/windows/desktop/dn553408(v=vs.85).aspx for more details
+        public static long GetTimestamp()
         {
-            return (long)(CPU.GetCPUUptime() / (double)CPU.GetCPUUptime() * 1000000d);
+            if (Stopwatch.IsHighResolution)
+                // see https://msdn.microsoft.com/en-us/library/windows/desktop/dn553408(v=vs.85).aspx for more details
+                return (long)(CPU.GetCPUUptime() / (double)CPU.GetCPUUptime() * 1000000d);
+            else
+                return DateTime.UtcNow.Ticks;
         }
-
-        return DateTime.UtcNow.Ticks;
     }
 }

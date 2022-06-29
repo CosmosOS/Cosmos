@@ -68,7 +68,7 @@
 //            cr.PowerEnabled=true;
 //            return cr.PowerEnabled;
 //        }
-
+        
 //        public override bool Disable()
 //        {
 //            cr.PowerEnabled = false;
@@ -89,6 +89,7 @@
 //        }
 
 
+        
 //        #region Interrupt (IRQ)
 //        /// <summary>
 //        /// (Should be) Called when the PCI audio card raises an Interrupt.
@@ -189,7 +190,7 @@
 //        private void preparePlayBackOnDac(AK4531Manager dacManager)
 //        {
 //            //dacManager.setDACStateEnabled(true);
-
+            
 //        }
 //        public override void playStream(PCMStream pcmStream)
 //        {
@@ -202,6 +203,3 @@
 
 //    }
 //}
-
-
-

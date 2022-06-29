@@ -9,6 +9,3 @@
 //        //private Cosmos.Hardware2.Audio.Devices.Generic.Components.UARTEntity uartEntity;
 //    }
 //}
-
-
-

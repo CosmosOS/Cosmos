@@ -1,62 +1,68 @@
-﻿namespace Cosmos.HAL;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-public class PCIDeviceCardbus : PCIDevice
+namespace Cosmos.HAL
 {
-    public PCIDeviceCardbus(uint bus, uint slot, uint function)
-        : base(bus, slot, function)
+    public class PCIDeviceCardbus : PCIDevice
     {
-        CardbusBaseAddress = ReadRegister32(0x10);
+        public uint CardbusBaseAddress { get; private set; }
 
-        OffsetOfCapabilityList = ReadRegister8(0x14);
-        SecondaryStatus = ReadRegister16(0x16);
+        public byte OffsetOfCapabilityList { get; private set; }
+        public ushort SecondaryStatus { get; private set; }
 
-        PCIBusNumber = ReadRegister8(0x18);
-        CardbusBusNumber = ReadRegister8(0x19);
-        SubordinateBusNumber = ReadRegister8(0x1A);
-        CardbusLatencyTimer = ReadRegister8(0x1B);
+        public byte PCIBusNumber { get; private set; }
+        public byte CardbusBusNumber { get; private set; }
+        public byte SubordinateBusNumber { get; private set; }
+        public byte CardbusLatencyTimer { get; private set; }
 
-        MemoryBaseAddress0 = ReadRegister32(0x1C);
-        MemoryLimit0 = ReadRegister32(0x20);
-        MemoryBaseAddress1 = ReadRegister32(0x24);
-        MemoryLimit1 = ReadRegister32(0x28);
+        public uint MemoryBaseAddress0 { get; private set; }
+        public uint MemoryLimit0 { get; private set; }
+        public uint MemoryBaseAddress1 { get; private set; }
+        public uint MemoryLimit1 { get; private set; }
 
-        IOBaseAddress0 = ReadRegister32(0x2C);
-        IOLimit0 = ReadRegister32(0x30);
-        IOBaseAddress1 = ReadRegister32(0x34);
-        IOLimit1 = ReadRegister32(0x38);
+        public uint IOBaseAddress0 { get; private set; }
+        public uint IOLimit0 { get; private set; }
+        public uint IOBaseAddress1 { get; private set; }
+        public uint IOLimit1 { get; private set; }
 
-        BridgeControl = ReadRegister16(0x3C);
+        public ushort BridgeControl { get; private set; }
 
-        SubsystemDeviceID = ReadRegister16(0x40);
-        SubsystemVendorID = ReadRegister16(0x42);
+        public ushort SubsystemDeviceID { get; private set; }
+        public ushort SubsystemVendorID { get; private set; }
 
-        PCCardBaseAddress = ReadRegister32(0x44);
+        public uint PCCardBaseAddress { get; private set; }
+
+        public PCIDeviceCardbus(uint bus, uint slot, uint function)
+            : base(bus, slot, function)
+        {
+            CardbusBaseAddress = ReadRegister32(0x10);
+
+            OffsetOfCapabilityList = ReadRegister8(0x14);
+            SecondaryStatus = ReadRegister16(0x16);
+
+            PCIBusNumber = ReadRegister8(0x18);
+            CardbusBusNumber = ReadRegister8(0x19);
+            SubordinateBusNumber = ReadRegister8(0x1A);
+            CardbusLatencyTimer = ReadRegister8(0x1B);
+
+            MemoryBaseAddress0 = ReadRegister32(0x1C);
+            MemoryLimit0 = ReadRegister32(0x20);
+            MemoryBaseAddress1 = ReadRegister32(0x24);
+            MemoryLimit1 = ReadRegister32(0x28);
+
+            IOBaseAddress0 = ReadRegister32(0x2C);
+            IOLimit0 = ReadRegister32(0x30);
+            IOBaseAddress1 = ReadRegister32(0x34);
+            IOLimit1 = ReadRegister32(0x38);
+
+            BridgeControl = ReadRegister16(0x3C);
+
+            SubsystemDeviceID = ReadRegister16(0x40);
+            SubsystemVendorID = ReadRegister16(0x42);
+
+            PCCardBaseAddress = ReadRegister32(0x44);
+        }
     }
-
-    public uint CardbusBaseAddress { get; }
-
-    public byte OffsetOfCapabilityList { get; }
-    public ushort SecondaryStatus { get; }
-
-    public byte PCIBusNumber { get; }
-    public byte CardbusBusNumber { get; }
-    public byte SubordinateBusNumber { get; }
-    public byte CardbusLatencyTimer { get; }
-
-    public uint MemoryBaseAddress0 { get; }
-    public uint MemoryLimit0 { get; }
-    public uint MemoryBaseAddress1 { get; }
-    public uint MemoryLimit1 { get; }
-
-    public uint IOBaseAddress0 { get; }
-    public uint IOLimit0 { get; }
-    public uint IOBaseAddress1 { get; }
-    public uint IOLimit1 { get; }
-
-    public ushort BridgeControl { get; }
-
-    public ushort SubsystemDeviceID { get; }
-    public ushort SubsystemVendorID { get; }
-
-    public uint PCCardBaseAddress { get; }
 }

@@ -1,17 +1,19 @@
-﻿using XSharp;
-using XSharp.Assembler;
+﻿using XSharp.Assembler;
+using IL2CPU.API;
+using XSharp;
 using CPUx86 = XSharp.Assembler.x86;
 using static XSharp.XSRegisters;
 
-namespace Cosmos.Core_Asm.GCImplementation;
-
-internal class GetPointerAsm : AssemblerMethod
+namespace Cosmos.Core_Asm.GCImplementation
 {
-    public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+    class GetPointerAsm : AssemblerMethod
     {
-        // we get the object as an object size 4 and we just leave it as a uint*
-        // so this is just an illegal cast
-        XS.Set(EAX, EBP, sourceDisplacement: 12);
-        XS.Push(EAX);
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            // we get the object as an object size 4 and we just leave it as a uint*
+            // so this is just an illegal cast
+            XS.Set(EAX, EBP, sourceDisplacement: 12);
+            XS.Push(EAX);
+        }
     }
 }

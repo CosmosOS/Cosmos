@@ -1,17 +1,19 @@
 ﻿using System.IO;
+
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System.IO;
-
-[Plug(Target = typeof(FileInfo))]
-public static class FileInfoImpl
+namespace Cosmos.System_Plugs.System.IO
 {
-    /* Optimize this: CosmosVFS should expose an attribute without the need to open the file for reading... */
-    public static long get_Length(FileInfo aThis)
+    [Plug(Target = typeof(FileInfo))]
+    public static class FileInfoImpl
     {
-        using (var xFs = aThis.OpenRead())
+        /* Optimize this: CosmosVFS should expose an attribute without the need to open the file for reading... */
+        public static long get_Length(FileInfo aThis)
         {
-            return xFs.Length;
+            using (var xFs = aThis.OpenRead())
+            {
+                return xFs.Length;
+            }
         }
     }
 }

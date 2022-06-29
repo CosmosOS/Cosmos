@@ -8,25 +8,25 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TEST|AnyCPU'">
-        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='|AnyCPU'">
-        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IL2CPU.API"/>
+        <PackageReference Include="IL2CPU.API" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj"/>
-        <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj"/>
-        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj"/>
+        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
+        <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
+        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
     </ItemGroup>
 
 </Project>

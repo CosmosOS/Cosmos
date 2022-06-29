@@ -2,20 +2,27 @@ using System;
 using System.Threading;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.System.Threading;
-
-[Plug(Target = typeof(Monitor))]
-public class MonitorImpl
+namespace Cosmos.Core_Plugs.System.Threading
 {
-    public static void Enter(object aObj)
+    [Plug(Target = typeof(Monitor))]
+    public class MonitorImpl
     {
+        public static void Enter(object aObj)
+        {
+        }
+
+        public static void Exit(object aObj)
+        {
+        }
+
+        public static void ReliableEnter(object aObj, ref bool aTookLock)
+        {
+            aTookLock = true;
+        }
+
+        public static void ObjPulseAll(object aObject)
+        {
+            throw new NotImplementedException();
+        }
     }
-
-    public static void Exit(object aObj)
-    {
-    }
-
-    public static void ReliableEnter(object aObj, ref bool aTookLock) => aTookLock = true;
-
-    public static void ObjPulseAll(object aObject) => throw new NotImplementedException();
 }

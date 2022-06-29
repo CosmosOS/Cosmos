@@ -1,790 +1,780 @@
 //#define COSMOSDEBUG
-
 using System;
 using System.Globalization;
 using Cosmos.Common;
-using Cosmos.Debug.Kernel;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
+using Debugger = Cosmos.Debug.Kernel.Debugger;
 
-namespace Cosmos.Core_Plugs.System;
-
-[Plug(Target = typeof(string))]
-public static class StringImpl
+namespace Cosmos.Core_Plugs.System
 {
-    internal static Debugger mDebugger = new("Core", "String Plugs");
-
-    public static unsafe void Ctor(string aThis, char* aChars,
-        [FieldAccess(Name = "System.String System.String.Empty")]
-        ref string aStringEmpty,
-        [FieldAccess(Name = "System.Int32 System.String._stringLength")]
-        ref int aStringLength,
-        [FieldAccess(Name = "System.Char System.String._firstChar")]
-        char* aFirstChar)
+    [Plug(Target = typeof(string))]
+    public static class StringImpl
     {
-        mDebugger.SendInternal("String.Ctor(string, char*)");
-        aStringEmpty = "";
-        while (*aChars != '\0')
+        internal static Debugger mDebugger = new Debugger("Core", "String Plugs");
+
+        public static unsafe void Ctor(string aThis, char* aChars,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
-            mDebugger.SendInternal(*aChars);
-            aFirstChar[aStringLength] = *aChars;
-            aStringLength++;
-            aChars++;
-        }
-
-        mDebugger.SendInternal(aStringLength);
-    }
-
-    public static unsafe void Ctor(string aThis, char* aChars, int start, int length,
-        [FieldAccess(Name = "System.String System.String.Empty")]
-        ref string aStringEmpty,
-        [FieldAccess(Name = "System.Int32 System.String._stringLength")]
-        ref int aStringLength,
-        [FieldAccess(Name = "System.Char System.String._firstChar")]
-        char* aFirstChar)
-    {
-        aStringEmpty = "";
-        aStringLength = length;
-        for (var i = 0; i < length; i++)
-        {
-            aFirstChar[i] = aChars[start + i];
-        }
-    }
-
-    public static unsafe void Ctor(string aThis, char[] aChars,
-        [FieldAccess(Name = "System.String System.String.Empty")]
-        ref string aStringEmpty,
-        [FieldAccess(Name = "System.Int32 System.String._stringLength")]
-        ref int aStringLength,
-        [FieldAccess(Name = "System.Char System.String._firstChar")]
-        char* aFirstChar)
-    {
-        aStringEmpty = "";
-        aStringLength = aChars.Length;
-        for (var i = 0; i < aChars.Length; i++)
-        {
-            aFirstChar[i] = aChars[i];
-        }
-    }
-
-    public static unsafe void Ctor(string aThis, char[] aChars, int start, int length,
-        [FieldAccess(Name = "System.String System.String.Empty")]
-        ref string aStringEmpty,
-        [FieldAccess(Name = "System.Int32 System.String._stringLength")]
-        ref int aStringLength,
-        [FieldAccess(Name = "System.Char System.String._firstChar")]
-        char* aFirstChar)
-    {
-        aStringEmpty = "";
-        aStringLength = length;
-        for (var i = 0; i < length; i++)
-        {
-            aFirstChar[i] = aChars[start + i];
-        }
-    }
-
-    public static unsafe void Ctor(string aThis, char aChar, int aLength,
-        [FieldAccess(Name = "System.String System.String.Empty")]
-        ref string aStringEmpty,
-        [FieldAccess(Name = "System.Int32 System.String._stringLength")]
-        ref int aStringLength,
-        [FieldAccess(Name = "System.Char System.String._firstChar")]
-        char* aFirstChar)
-    {
-        aStringEmpty = "";
-        aStringLength = aLength;
-        for (var i = 0; i < aLength; i++)
-        {
-            aFirstChar[i] = aChar;
-        }
-    }
-
-    /*
-     * These 2 unsafe string Ctor are only "stubs" implemented because Encoding needed them existing but our implementation is not
-     * using them.
-     */
-    public static unsafe void Ctor(string aThis, sbyte* aValue) =>
-        throw new NotImplementedException("String Ctor(sbyte ptr '\0' terminated)");
-
-    public static unsafe void Ctor(string aThis, sbyte* aValue, int aStartIndex, int aLength) =>
-        throw new NotImplementedException("String Ctor(sbyte ptr with lenght)");
-
-    public static unsafe void Ctor(string aThis, ReadOnlySpan<char> value,
-        [FieldAccess(Name = "System.String System.String.Empty")]
-        ref string aStringEmpty,
-        [FieldAccess(Name = "System.Int32 System.String._stringLength")]
-        ref int aStringLength,
-        [FieldAccess(Name = "System.Char System.String._firstChar")]
-        char* aFirstChar)
-    {
-        aStringEmpty = "";
-        aStringLength = value.Length;
-        for (var i = 0; i < value.Length; i++)
-        {
-            aFirstChar[i] = value[i];
-        }
-    }
-
-    public static unsafe int get_Length(
-        [ObjectPointerAccess] uint* aThis,
-        [FieldAccess(Name = "System.Int32 System.String._stringLength")]
-        ref int aLength) =>
-        aLength;
-
-    public static unsafe char get_Chars(
-        [ObjectPointerAccess] uint* aThis, int aIndex,
-        [FieldAccess(Name = "System.Char System.String._firstChar")]
-        char* aFirstChar) =>
-        *(aFirstChar + aIndex);
-
-
-    public static bool IsAscii(string aThis)
-    {
-        for (var i = 0; i < aThis.Length; i++)
-        {
-            if (aThis[i] >= 0x80)
+            mDebugger.SendInternal("String.Ctor(string, char*)");
+            aStringEmpty = "";
+            while (*aChars != '\0')
             {
-                return false;
+                mDebugger.SendInternal(*aChars);
+                aFirstChar[aStringLength] = *aChars;
+                aStringLength++;
+                aChars++;
+            }
+            mDebugger.SendInternal(aStringLength);
+        }
+
+        public static unsafe void Ctor(string aThis, char* aChars, int start, int length,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
+        {
+            aStringEmpty = "";
+            aStringLength = length;
+            for (int i = 0; i < length; i++)
+            {
+                aFirstChar[i] = aChars[start + i];
             }
         }
 
-        return true;
-    }
-
-    public static string Format(string aFormat, object aArg0)
-    {
-        if (aArg0 == null)
+        public static unsafe void Ctor(string aThis, char[] aChars,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
-            throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
-        }
-
-        return FormatHelper(null, aFormat, aArg0);
-    }
-
-    public static string Format(string aFormat, object aArg0, object aArg1)
-    {
-        if (aFormat == null)
-        {
-            throw new ArgumentNullException(nameof(aFormat));
-        }
-
-        if (aArg0 == null)
-        {
-            throw new ArgumentNullException(nameof(aArg0));
-        }
-
-        if (aArg1 == null)
-        {
-            throw new ArgumentNullException(nameof(aArg1));
-        }
-
-        return FormatHelper(null, aFormat, aArg0, aArg1);
-    }
-
-    public static string Format(string aFormat, object aArg0, object aArg1, object aArg2)
-    {
-        if (aArg0 == null || aArg1 == null || aArg2 == null)
-        {
-            throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
-        }
-
-        return FormatHelper(null, aFormat, aArg0, aArg1, aArg2);
-    }
-
-    public static string Format(string aFormat, params object[] aArgs)
-    {
-        if (aArgs == null)
-        {
-            throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
-        }
-
-        return FormatHelper(null, aFormat, aArgs);
-    }
-
-    public static string Format(IFormatProvider aProvider, string aFormat, object aArg0)
-    {
-        if (aArg0 == null)
-        {
-            throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
-        }
-
-        return FormatHelper(aProvider, aFormat, aArg0);
-    }
-
-    public static string Format(IFormatProvider aProvider, string aFormat, object aArg0, object aArg1)
-    {
-        if ((aArg0 == null) | (aArg1 == null))
-        {
-            throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
-        }
-
-        return FormatHelper(aProvider, aFormat, aArg0, aArg1);
-    }
-
-    public static string Format(IFormatProvider aProvider, string aFormat, object aArg0, object aArg1, object aArg2)
-    {
-        if ((aArg0 == null) | (aArg1 == null) || aArg2 == null)
-        {
-            throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
-        }
-
-        return FormatHelper(aProvider, aFormat, aArg0, aArg1, aArg2);
-    }
-
-    public static string Format(IFormatProvider aProvider, string aFormat, params object[] aArgs)
-    {
-        if (aArgs == null)
-        {
-            throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
-        }
-
-        return FormatHelper(aProvider, aFormat, aArgs);
-    }
-
-    internal static string FormatHelper(IFormatProvider aFormatProvider, string aFormat, params object[] aArgs)
-    {
-        var xCharArray = aFormat.ToCharArray();
-        string xFormattedString = String.Empty, xStaticString;
-        bool xFoundPlaceholder = false, xParamNumberDone = true;
-        int xStartParamNumber = -1, xEndParamNumber = -1, xLastPlaceHolder = 0;
-
-        for (var i = 0; i < xCharArray.Length; i++)
-        {
-            if (xFoundPlaceholder)
+            aStringEmpty = "";
+            aStringLength = aChars.Length;
+            for (int i = 0; i < aChars.Length; i++)
             {
-                if (xCharArray[i] == '{')
-                {
-                    throw new FormatException("The format string provided is invalid.");
-                }
+                aFirstChar[i] = aChars[i];
+            }
+        }
 
-                if (xCharArray[i] == '}')
+        public static unsafe void Ctor(string aThis, char[] aChars, int start, int length,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
+        {
+            aStringEmpty = "";
+            aStringLength = length;
+            for (int i = 0; i < length; i++)
+            {
+                aFirstChar[i] = aChars[start + i];
+            }
+        }
+
+        public static unsafe void Ctor(string aThis, char aChar, int aLength,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
+        {
+            aStringEmpty = "";
+            aStringLength = aLength;
+            for (int i = 0; i < aLength; i++)
+            {
+                aFirstChar[i] = aChar;
+            }
+        }
+
+        /*
+         * These 2 unsafe string Ctor are only "stubs" implemented because Encoding needed them existing but our implementation is not
+         * using them.
+         */
+        public unsafe static void Ctor(string aThis, sbyte* aValue)
+        {
+            throw new NotImplementedException("String Ctor(sbyte ptr '\0' terminated)");
+        }
+
+        public unsafe static void Ctor(string aThis, sbyte* aValue, int aStartIndex, int aLength)
+        {
+            throw new NotImplementedException("String Ctor(sbyte ptr with lenght)");
+        }
+
+        public static unsafe void Ctor(string aThis, ReadOnlySpan<char> value,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
+        {
+            aStringEmpty = "";
+            aStringLength = value.Length;
+            for (int i = 0; i < value.Length; i++)
+            {
+                aFirstChar[i] = value[i];
+            }
+        }
+
+        public static unsafe int get_Length(
+            [ObjectPointerAccess] uint* aThis,
+            [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aLength)
+        {
+            return aLength;
+        }
+
+        public static unsafe char get_Chars(
+            [ObjectPointerAccess] uint* aThis, int aIndex,
+            [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
+        {
+            return *(aFirstChar + aIndex);
+        }
+
+
+
+        public static bool IsAscii(string aThis)
+        {
+            for (int i = 0; i < aThis.Length; i++)
+            {
+                if (aThis[i] >= 0x80)
                 {
-                    mDebugger.SendInternal("Found closing placeholder.");
-                    if (xEndParamNumber < 0)
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static string Format(string aFormat, object aArg0)
+        {
+            if (aArg0 == null)
+            {
+                throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
+            }
+
+            return FormatHelper(null, aFormat, aArg0);
+        }
+
+        public static string Format(string aFormat, object aArg0, object aArg1)
+        {
+            if (aFormat == null)
+            {
+                throw new ArgumentNullException(nameof(aFormat));
+            }
+            if (aArg0 == null)
+            {
+                throw new ArgumentNullException(nameof(aArg0));
+            }
+            if (aArg1 == null)
+            {
+                throw new ArgumentNullException(nameof(aArg1));
+            }
+
+            return FormatHelper(null, aFormat, aArg0, aArg1);
+        }
+
+        public static string Format(string aFormat, object aArg0, object aArg1, object aArg2)
+        {
+            if (aArg0 == null || aArg1 == null || aArg2 == null)
+            {
+                throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
+            }
+
+            return FormatHelper(null, aFormat, aArg0, aArg1, aArg2);
+        }
+
+        public static string Format(string aFormat, params object[] aArgs)
+        {
+            if (aArgs == null)
+            {
+                throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
+            }
+
+            return FormatHelper(null, aFormat, aArgs);
+        }
+
+        public static string Format(IFormatProvider aProvider, string aFormat, object aArg0)
+        {
+            if (aArg0 == null)
+            {
+                throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
+            }
+
+            return FormatHelper(aProvider, aFormat, aArg0);
+        }
+
+        public static string Format(IFormatProvider aProvider, string aFormat, object aArg0, object aArg1)
+        {
+            if (aArg0 == null | aArg1 == null)
+            {
+                throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
+            }
+
+            return FormatHelper(aProvider, aFormat, aArg0, aArg1);
+        }
+
+        public static string Format(IFormatProvider aProvider, string aFormat, object aArg0, object aArg1, object aArg2)
+        {
+            if (aArg0 == null | aArg1 == null || aArg2 == null)
+            {
+                throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
+            }
+
+            return FormatHelper(aProvider, aFormat, aArg0, aArg1, aArg2);
+        }
+
+        public static string Format(IFormatProvider aProvider, string aFormat, params object[] aArgs)
+        {
+            if (aArgs == null)
+            {
+                throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
+            }
+
+            return FormatHelper(aProvider, aFormat, aArgs);
+        }
+
+        internal static string FormatHelper(IFormatProvider aFormatProvider, string aFormat, params object[] aArgs)
+        {
+            char[] xCharArray = aFormat.ToCharArray();
+            string xFormattedString = string.Empty, xStaticString;
+            bool xFoundPlaceholder = false, xParamNumberDone = true;
+            int xStartParamNumber = -1, xEndParamNumber = -1, xLastPlaceHolder = 0;
+
+            for (int i = 0; i < xCharArray.Length; i++)
+            {
+                if (xFoundPlaceholder)
+                {
+                    if (xCharArray[i] == '{')
                     {
+                        throw new FormatException("The format string provided is invalid.");
+                    }
+                    if (xCharArray[i] == '}')
+                    {
+                        mDebugger.SendInternal("Found closing placeholder.");
+                        if (xEndParamNumber < 0)
+                        {
+                            xEndParamNumber = i;
+                        }
+                        string xParamNumber = aFormat.Substring(xStartParamNumber, xEndParamNumber - xStartParamNumber);
+                        mDebugger.SendInternal("Calling StringHelper.GetStringToNumber");
+                        mDebugger.SendInternal(xParamNumber);
+                        int xParamIndex = StringHelper.GetStringToNumber(xParamNumber);
+                        mDebugger.SendInternal("Converted paramindex to a number.");
+                        if ((xParamIndex < aArgs.Length) && (aArgs[xParamIndex] != null))
+                        {
+                            string xParamValue = aArgs[xParamIndex].ToString();
+                            xFormattedString = string.Concat(xFormattedString, xParamValue);
+                            mDebugger.SendInternal("xParamValue =");
+                            mDebugger.SendInternal(xParamValue);
+                            mDebugger.SendInternal("xFormattedString =");
+                            mDebugger.SendInternal(xFormattedString);
+
+                        }
+                        xFoundPlaceholder = false;
+                        xParamNumberDone = true;
+                        xStartParamNumber = -1;
+                        xEndParamNumber = -1;
+                        xLastPlaceHolder = i + 1;
+                    }
+                    else if (xCharArray[i] == ':')
+                    {
+                        xParamNumberDone = true;
                         xEndParamNumber = i;
+                        // TODO: Need to handle different formats. (X, N, etc)
                     }
-
-                    var xParamNumber = aFormat.Substring(xStartParamNumber, xEndParamNumber - xStartParamNumber);
-                    mDebugger.SendInternal("Calling StringHelper.GetStringToNumber");
-                    mDebugger.SendInternal(xParamNumber);
-                    var xParamIndex = StringHelper.GetStringToNumber(xParamNumber);
-                    mDebugger.SendInternal("Converted paramindex to a number.");
-                    if (xParamIndex < aArgs.Length && aArgs[xParamIndex] != null)
+                    else if ((char.IsDigit(xCharArray[i])) && (!xParamNumberDone))
                     {
-                        var xParamValue = aArgs[xParamIndex].ToString();
-                        xFormattedString = String.Concat(xFormattedString, xParamValue);
-                        mDebugger.SendInternal("xParamValue =");
-                        mDebugger.SendInternal(xParamValue);
-                        mDebugger.SendInternal("xFormattedString =");
-                        mDebugger.SendInternal(xFormattedString);
+                        mDebugger.SendInternal("Getting param number.");
+                        if (xStartParamNumber < 0)
+                        {
+                            xStartParamNumber = i;
+                        }
                     }
-
-                    xFoundPlaceholder = false;
-                    xParamNumberDone = true;
-                    xStartParamNumber = -1;
-                    xEndParamNumber = -1;
-                    xLastPlaceHolder = i + 1;
                 }
-                else if (xCharArray[i] == ':')
+                else if (xCharArray[i] == '{')
                 {
-                    xParamNumberDone = true;
-                    xEndParamNumber = i;
-                    // TODO: Need to handle different formats. (X, N, etc)
-                }
-                else if (Char.IsDigit(xCharArray[i]) && !xParamNumberDone)
-                {
-                    mDebugger.SendInternal("Getting param number.");
-                    if (xStartParamNumber < 0)
-                    {
-                        xStartParamNumber = i;
-                    }
+                    mDebugger.SendInternal("Found opening placeholder");
+                    xStaticString = aFormat.Substring(xLastPlaceHolder, i - xLastPlaceHolder);
+                    xFormattedString = string.Concat(xFormattedString, xStaticString);
+                    xFoundPlaceholder = true;
+                    xParamNumberDone = false;
                 }
             }
-            else if (xCharArray[i] == '{')
-            {
-                mDebugger.SendInternal("Found opening placeholder");
-                xStaticString = aFormat.Substring(xLastPlaceHolder, i - xLastPlaceHolder);
-                xFormattedString = String.Concat(xFormattedString, xStaticString);
-                xFoundPlaceholder = true;
-                xParamNumberDone = false;
-            }
+
+            xStaticString = aFormat.Substring(xLastPlaceHolder, aFormat.Length - xLastPlaceHolder);
+            xFormattedString = string.Concat(xFormattedString, xStaticString);
+
+            return xFormattedString;
         }
 
-        xStaticString = aFormat.Substring(xLastPlaceHolder, aFormat.Length - xLastPlaceHolder);
-        xFormattedString = String.Concat(xFormattedString, xStaticString);
-
-        return xFormattedString;
-    }
-
-    public static bool StartsWith(string aThis, string aSubstring, StringComparison aComparison)
-    {
-        var di = aThis.AsSpan();
-        var ci = aSubstring.AsSpan();
-        if (aSubstring.Length > aThis.Length)
+        public static bool StartsWith(string aThis, string aSubstring, StringComparison aComparison)
         {
-            return false;
-        }
-
-        for (var i = 0; i < ci.Length; i++)
-        {
-            if (di[i] != ci[i])
+            var di = aThis.AsSpan();
+            var ci = aSubstring.AsSpan();
+            if (aSubstring.Length > aThis.Length)
             {
                 return false;
             }
+            for (int i = 0; i < ci.Length; i++)
+            {
+                if (di[i] != ci[i])
+                {
+                    return false;
+
+                }
+            }
+            return true;
         }
 
-        return true;
-    }
-
-    private static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
-    {
-        var cs = new char[totalWidth];
-
-        var pos = aThis.Length;
-
-        if (isRightPadded)
+        private static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
         {
-            for (var i = 0; i < aThis.Length; i++)
-            {
-                cs[i] = aThis[i];
-            }
+            var cs = new char[totalWidth];
 
-            for (var i = aThis.Length; i < totalWidth; i++)
-            {
-                cs[i] = paddingChar;
-            }
-        }
-        else
-        {
-            var offset = totalWidth - aThis.Length;
-            for (var i = 0; i < aThis.Length; i++)
-            {
-                cs[i + offset] = aThis[i];
-            }
+            int pos = aThis.Length;
 
-            for (var i = 0; i < offset; i++)
+            if (isRightPadded)
             {
-                cs[i] = paddingChar;
-            }
-        }
+                for (int i = 0; i < aThis.Length; i++)
+                {
+                    cs[i] = aThis[i];
+                }
 
-        return new string(cs);
-    }
-
-    public static string Replace(string aThis, char oldValue, char newValue)
-    {
-        var cs = new char[aThis.Length];
-
-        for (var i = 0; i < aThis.Length; i++)
-        {
-            if (aThis[i] != oldValue)
-            {
-                cs[i] = aThis[i];
+                for (int i = aThis.Length; i < totalWidth; i++)
+                {
+                    cs[i] = paddingChar;
+                }
             }
             else
             {
-                cs[i] = newValue;
+                int offset = totalWidth - aThis.Length;
+                for (int i = 0; i < aThis.Length; i++)
+                {
+                    cs[i + offset] = aThis[i];
+                }
+
+                for (int i = 0; i < offset; i++)
+                {
+                    cs[i] = paddingChar;
+                }
             }
+
+            return new string(cs);
         }
 
-        return new string(cs);
-    }
-
-    // HACK: We need to redo this once char support is complete (only returns 0, -1).
-    public static int CompareTo(string aThis, string other)
-    {
-        if (aThis.Length != other.Length)
+        public static string Replace(string aThis, char oldValue, char newValue)
         {
-            return -1;
+            var cs = new char[aThis.Length];
+
+            for (int i = 0; i < aThis.Length; i++)
+            {
+                if (aThis[i] != oldValue)
+                {
+                    cs[i] = aThis[i];
+                }
+                else
+                {
+                    cs[i] = newValue;
+                }
+            }
+
+            return new string(cs);
         }
 
-        for (var i = 0; i < aThis.Length; i++)
+        // HACK: We need to redo this once char support is complete (only returns 0, -1).
+        public static int CompareTo(string aThis, string other)
         {
-            if (aThis[i] != other[i])
+            if (aThis.Length != other.Length)
             {
                 return -1;
             }
-        }
-
-        return 0;
-    }
-
-    public static int IndexOf(string aThis, char value, int startIndex, int count)
-    {
-        var xEndIndex = aThis.Length;
-        if (startIndex + count < xEndIndex)
-        {
-            xEndIndex = startIndex + count;
-        }
-
-        for (var i = startIndex; i < xEndIndex; i++)
-        {
-            if (aThis[i] == value)
+            for (int i = 0; i < aThis.Length; i++)
             {
-                return i;
+                if (aThis[i] != other[i])
+                {
+                    return -1;
+                }
             }
+            return 0;
         }
 
-        return -1;
-    }
-
-    // HACK: TODO - improve efficiency of this.
-    //How do we access the raw memory to copy it into a char array?
-    public static char[] ToCharArray(string aThis)
-    {
-        var result = new char[aThis.Length];
-
-        for (var i = 0; i < aThis.Length; i++)
+        public static int IndexOf(string aThis, char value, int startIndex, int count)
         {
-            result[i] = aThis[i];
-        }
+            int xEndIndex = aThis.Length;
+            if (startIndex + count < xEndIndex)
+            {
+                xEndIndex = startIndex + count;
+            }
+            for (int i = startIndex; i < xEndIndex; i++)
+            {
+                if (aThis[i] == value)
+                {
+                    return i;
+                }
+            }
 
-        return result;
-    }
-
-    [PlugMethod(Enabled = false)]
-    public static uint GetStorage(string aString) => 0;
-
-    private static int[] BuildBadCharTable(char[] needle)
-    {
-        var badShift = new int[256];
-        for (var i = 0; i < 256; i++)
-        {
-            badShift[i] = needle.Length;
-        }
-
-        var last = needle.Length - 1;
-        for (var i = 0; i < last; i++)
-        {
-            badShift[needle[i]] = last - i;
-        }
-
-        return badShift;
-    }
-
-    private static int boyerMooreHorsepool(string pattern, string text)
-    {
-        var needle = pattern.ToCharArray();
-        var haystack = text.ToCharArray();
-
-        if (needle.Length > haystack.Length)
-        {
             return -1;
         }
 
-        var badShift = BuildBadCharTable(needle);
-        var offset = 0;
-        var scan = 0;
-        var last = needle.Length - 1;
-        var maxoffset = haystack.Length - needle.Length;
-        while (offset <= maxoffset)
+        // HACK: TODO - improve efficiency of this.
+        //How do we access the raw memory to copy it into a char array?
+        public static char[] ToCharArray(string aThis)
         {
-            for (scan = last; needle[scan] == haystack[scan + offset]; scan--)
+            var result = new char[aThis.Length];
+
+            for (int i = 0; i < aThis.Length; i++)
             {
-                if (scan == 0)
-                {
-                    //Match found
-                    return offset;
-                }
+                result[i] = aThis[i];
             }
 
-            offset += badShift[haystack[offset + last]];
+            return result;
         }
 
-        return -1;
-    }
-
-    //        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
-
-    public static int IndexOf(string aThis, string aSubstring, int aIdx, int aLength, StringComparison aComparison)
-    {
-        if (aSubstring == String.Empty)
+        [PlugMethod(Enabled = false)]
+        public static uint GetStorage(string aString)
         {
-            return aIdx;
+            return 0;
         }
 
-        var pos = boyerMooreHorsepool(aSubstring, aThis.Substring(aIdx, aLength));
-        if (pos == -1)
+        private static int[] BuildBadCharTable(char[] needle)
         {
-            return pos;
-        }
-
-        return pos + aIdx; //To account for offset
-    }
-
-    public static bool Contains(string aThis, string value)
-    {
-        if (value.Length == aThis.Length)
-        {
-            if (value == aThis)
+            var badShift = new int[256];
+            for (int i = 0; i < 256; i++)
             {
-                return true;
+                badShift[i] = needle.Length;
             }
-
-            return false;
-        }
-
-        if (value.Length > aThis.Length)
-        {
-            return false;
-        }
-
-        var di = aThis.ToCharArray();
-        var ci = value.ToCharArray();
-
-        for (var i = 0; i + value.Length <= aThis.Length; i++)
-        {
-            if (di[i] == ci[0])
+            int last = needle.Length - 1;
+            for (int i = 0; i < last; i++)
             {
-                var equals = true;
+                badShift[needle[i]] = last - i;
+            }
+            return badShift;
+        }
 
-                for (var j = 1; j < value.Length; j++)
+        private static int boyerMooreHorsepool(string pattern, string text)
+        {
+            var needle = pattern.ToCharArray();
+            var haystack = text.ToCharArray();
+
+            if (needle.Length > haystack.Length)
+            {
+                return -1;
+            }
+            var badShift = BuildBadCharTable(needle);
+            int offset = 0;
+            int scan = 0;
+            int last = needle.Length - 1;
+            int maxoffset = haystack.Length - needle.Length;
+            while (offset <= maxoffset)
+            {
+                for (scan = last; needle[scan] == haystack[scan + offset]; scan--)
                 {
-                    if (di[i + j] != ci[j])
+                    if (scan == 0)
                     {
-                        equals = false;
+                        //Match found
+                        return offset;
                     }
                 }
+                offset += badShift[haystack[offset + last]];
+            }
+            return -1;
+        }
 
-                if (equals)
+        //        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
+
+        public static int IndexOf(string aThis, string aSubstring, int aIdx, int aLength, StringComparison aComparison)
+        {
+            if (aSubstring == String.Empty)
+            {
+                return aIdx;
+            }
+            int pos = boyerMooreHorsepool(aSubstring, aThis.Substring(aIdx, aLength));
+            if (pos == -1)
+            {
+                return pos;
+            }
+            else
+            {
+                return pos + aIdx; //To account for offset
+            }
+        }
+
+        public static bool Contains(string aThis, string value)
+        {
+            if (value.Length == aThis.Length)
+            {
+                if (value == aThis)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (value.Length > aThis.Length)
+            {
+                return false;
+            }
+
+            var di = aThis.ToCharArray();
+            var ci = value.ToCharArray();
+
+            for (int i = 0; i + value.Length <= aThis.Length; i++)
+            {
+                if (di[i] == ci[0])
+                {
+                    var equals = true;
+
+                    for (int j = 1; j < value.Length; j++)
+                    {
+                        if (di[i + j] != ci[j])
+                        {
+                            equals = false;
+                        }
+                    }
+
+                    if (equals)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool EndsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture)
+        {
+            return EndsWith(aThis, aSubStr, StringComparison.CurrentCulture);
+        }
+
+        public static bool EndsWith(string aThis, string aSubStr, StringComparison aComparison)
+        {
+            char[] di = aThis.ToCharArray();
+            char[] ci = aSubStr.ToCharArray();
+            if (aThis.Length == aSubStr.Length)
+            {
+                if (aThis == aSubStr)
+                {
+                    return true;
+                }
+                return false;
+            }
+            else if (aThis.Length < aSubStr.Length)
+            {
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < ci.Length; i++)
+                {
+                    if (di[aThis.Length - aSubStr.Length + i] != ci[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        public static bool Equals(string aThis, string aThat, StringComparison aComparison)
+        {
+            // TODO: implement
+            if (aComparison == StringComparison.OrdinalIgnoreCase)
+            {
+                string xLowerThis = aThis.ToLower();
+                string xLowerThat = aThat.ToLower();
+                return EqualsHelper(xLowerThis, xLowerThat);
+            }
+            return EqualsHelper(aThis, aThat);
+        }
+
+        public static bool EqualsHelper(string aStrA, string aStrB)
+        {
+            return aStrA.CompareTo(aStrB) == 0;
+        }
+
+        private static bool CharArrayContainsChar(char[] aArray, char aChar)
+        {
+            for (int i = 0; i < aArray.Length; i++)
+            {
+                if (aArray[i] == aChar)
                 {
                     return true;
                 }
             }
-        }
-
-        return false;
-    }
-
-    public static bool EndsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture) =>
-        EndsWith(aThis, aSubStr, StringComparison.CurrentCulture);
-
-    public static bool EndsWith(string aThis, string aSubStr, StringComparison aComparison)
-    {
-        var di = aThis.ToCharArray();
-        var ci = aSubStr.ToCharArray();
-        if (aThis.Length == aSubStr.Length)
-        {
-            if (aThis == aSubStr)
-            {
-                return true;
-            }
-
             return false;
         }
 
-        if (aThis.Length < aSubStr.Length)
+        public static int IndexOf(string aThis, string aValue)
         {
-            return false;
+            return aThis.IndexOf(aValue, 0, aThis.Length, StringComparison.CurrentCulture);
         }
 
-        for (var i = 0; i < ci.Length; i++)
+        public static int IndexOfAny(string aThis, char[] aSeparators, int aStartIndex, int aLength)
         {
-            if (di[aThis.Length - aSubStr.Length + i] != ci[i])
+            if (aSeparators == null)
             {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static bool Equals(string aThis, string aThat, StringComparison aComparison)
-    {
-        // TODO: implement
-        if (aComparison == StringComparison.OrdinalIgnoreCase)
-        {
-            var xLowerThis = aThis.ToLower();
-            var xLowerThat = aThat.ToLower();
-            return EqualsHelper(xLowerThis, xLowerThat);
-        }
-
-        return EqualsHelper(aThis, aThat);
-    }
-
-    public static bool EqualsHelper(string aStrA, string aStrB) => aStrA.CompareTo(aStrB) == 0;
-
-    private static bool CharArrayContainsChar(char[] aArray, char aChar)
-    {
-        for (var i = 0; i < aArray.Length; i++)
-        {
-            if (aArray[i] == aChar)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static int IndexOf(string aThis, string aValue) =>
-        aThis.IndexOf(aValue, 0, aThis.Length, StringComparison.CurrentCulture);
-
-    public static int IndexOfAny(string aThis, char[] aSeparators, int aStartIndex, int aLength)
-    {
-        if (aSeparators == null)
-        {
-            throw new ArgumentNullException(nameof(aSeparators));
-        }
-
-        var xResult = -1;
-        for (var i = 0; i < aSeparators.Length; i++)
-        {
-            var xValue = IndexOf(aThis, aSeparators[i], aStartIndex, aLength);
-            if (xValue < xResult || xResult == -1)
-            {
-                xResult = xValue;
-            }
-        }
-
-        return xResult;
-    }
-
-    public static string Insert(string aThis, int aStartPos, string aValue) =>
-        aThis.Substring(0, aStartPos) + aValue + aThis.Substring(aStartPos);
-
-    public static int LastIndexOf(string aThis, string aString) => LastIndexOf(aThis, aString, 0, aThis.Length);
-
-    public static int LastIndexOf(string aThis, string aString, int aIndex) =>
-        LastIndexOf(aThis, aString, aIndex, aThis.Length - aIndex);
-
-    public static int LastIndexOf(string aThis, string aString, int aIndex, int aCount)
-    {
-        if (aString == String.Empty)
-        {
-            if (aIndex > aThis.Length)
-            {
-                return aThis.Length;
+                throw new ArgumentNullException(nameof(aSeparators));
             }
 
-            return aIndex;
-        }
-
-        var curr = "";
-        var chars = aThis.ToCharArray();
-        for (var i = 0; i < aCount; i++)
-        {
-            curr = chars[aThis.Length - i - 1] + curr;
-            if (curr.StartsWith(aString))
+            int xResult = -1;
+            for (int i = 0; i < aSeparators.Length; i++)
             {
-                return aThis.Length - i - 1;
-            }
-        }
-
-        return -1;
-    }
-
-    public static int LastIndexOf(string aThis, char aChar, int aStartIndex, int aCount) =>
-        LastIndexOf(aThis, new string(aChar, 1), aStartIndex, aCount);
-
-    public static int LastIndexOfAny(string aThis, char[] aChars, int aStartIndex, int aCount)
-    {
-        for (var i = 0; i < aCount; i++)
-        {
-            if (CharArrayContainsChar(aChars, aThis[aStartIndex - i]))
-            {
-                return aStartIndex - i;
-            }
-        }
-
-        return -1;
-    }
-
-    public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture) =>
-        aThis.StartsWith(aSubStr, aIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
-
-    public static string Replace(string aThis, string oldValue, string newValue)
-    {
-        var skipOffset = 0;
-
-        while (aThis.Substring(skipOffset).IndexOf(oldValue) != -1)
-        {
-            var xIndex = aThis.Substring(skipOffset).IndexOf(oldValue) + skipOffset;
-            aThis = aThis.Remove(xIndex, oldValue.Length);
-            aThis = aThis.Insert(xIndex, newValue);
-
-            skipOffset = xIndex + newValue.Length;
-            if (skipOffset > aThis.Length)
-            {
-                break;
-            }
-        }
-
-        return aThis;
-    }
-
-    public static string ToLower(string aThis) => ToLowerInvariant(aThis);
-
-    public static string ToUpper(string aThis) => ToUpperInvariant(aThis);
-
-    public static string ToLower(string aThis, CultureInfo aCulture) => ToLowerInvariant(aThis);
-
-    public static string ToUpper(string aThis, CultureInfo aCulture) => ToUpperInvariant(aThis);
-
-    public static string ToLowerInvariant(string aThis) => ChangeCasing(aThis, 65, 90, 32);
-
-    public static string ToUpperInvariant(string aThis) => ChangeCasing(aThis, 97, 122, -32);
-
-    private static string ChangeCasing(string aValue, int lowerAscii, int upperAscii, int offset)
-    {
-        var xChars = new char[aValue.Length];
-
-        for (var i = 0; i < aValue.Length; i++)
-        {
-            int xAsciiCode = aValue[i];
-            if (xAsciiCode <= upperAscii && xAsciiCode >= lowerAscii)
-            {
-                xChars[i] = (char)(xAsciiCode + offset);
-            }
-            else
-            {
-                xChars[i] = aValue[i];
-            }
-        }
-
-        return new string(xChars);
-    }
-
-    public static string FastAllocateString(int aLength) => new(new char[aLength]);
-
-    [PlugMethod(IsOptional = true)]
-    public static string TrimStart(string aThis, string aSubStr)
-    {
-        var ci = aThis.ToCharArray();
-        var di = aSubStr.ToCharArray();
-
-        if (aThis.StartsWith(aSubStr))
-        {
-            if (aThis != aSubStr)
-            {
-                var oi = new char[ci.Length - di.Length];
-                for (var i = 0; i < ci.Length - di.Length; i++)
+                int xValue = IndexOf(aThis, aSeparators[i], aStartIndex, aLength);
+                if (xValue < xResult || xResult == -1)
                 {
-                    oi[i] = ci[i + di.Length];
+                    xResult = xValue;
+                }
+            }
+            return xResult;
+        }
+
+        public static string Insert(string aThis, int aStartPos, string aValue)
+        {
+            return aThis.Substring(0, aStartPos) + aValue + aThis.Substring(aStartPos);
+        }
+
+        public static int LastIndexOf(string aThis, string aString)
+        {
+            return LastIndexOf(aThis, aString, 0, aThis.Length);
+        }
+
+        public static int LastIndexOf(string aThis, string aString, int aIndex)
+        {
+            return LastIndexOf(aThis, aString, aIndex, aThis.Length - aIndex);
+        }
+
+        public static int LastIndexOf(string aThis, string aString, int aIndex, int aCount)
+        {
+            if (aString == String.Empty)
+            {
+                if (aIndex > aThis.Length)
+                {
+                    return aThis.Length;
+                }
+                return aIndex;
+            }
+
+            string curr = "";
+            char[] chars = aThis.ToCharArray();
+            for (int i = 0; i < aCount; i++)
+            {
+                curr = chars[aThis.Length - i - 1] + curr;
+                if (curr.StartsWith(aString))
+                {
+                    return aThis.Length - i - 1;
+                }
+            }
+            return -1;
+        }
+
+        public static int LastIndexOf(string aThis, char aChar, int aStartIndex, int aCount)
+        {
+            return LastIndexOf(aThis, new string(aChar, 1), aStartIndex, aCount);
+        }
+
+        public static int LastIndexOfAny(string aThis, char[] aChars, int aStartIndex, int aCount)
+        {
+            for (int i = 0; i < aCount; i++)
+            {
+                if (CharArrayContainsChar(aChars, aThis[aStartIndex - i]))
+                {
+                    return aStartIndex - i;
+                }
+            }
+            return -1;
+        }
+
+        public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture)
+        {
+            return aThis.StartsWith(aSubStr, aIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+        }
+
+        public static string Replace(string aThis, string oldValue, string newValue)
+        {
+            int skipOffset = 0;
+
+            while (aThis.Substring(skipOffset).IndexOf(oldValue) != -1)
+            {
+                int xIndex = aThis.Substring(skipOffset).IndexOf(oldValue) + skipOffset;
+                aThis = aThis.Remove(xIndex, oldValue.Length);
+                aThis = aThis.Insert(xIndex, newValue);
+
+                skipOffset = xIndex + newValue.Length;
+                if (skipOffset > aThis.Length)
+                {
+                    break;
+                }
+            }
+            return aThis;
+        }
+
+        public static string ToLower(string aThis) => ToLowerInvariant(aThis);
+
+        public static string ToUpper(string aThis) => ToUpperInvariant(aThis);
+
+        public static string ToLower(string aThis, CultureInfo aCulture) => ToLowerInvariant(aThis);
+
+        public static string ToUpper(string aThis, CultureInfo aCulture) => ToUpperInvariant(aThis);
+
+        public static string ToLowerInvariant(string aThis) => ChangeCasing(aThis, 65, 90, 32);
+
+        public static string ToUpperInvariant(string aThis) => ChangeCasing(aThis, 97, 122, -32);
+
+        private static string ChangeCasing(string aValue, int lowerAscii, int upperAscii, int offset)
+        {
+            var xChars = new char[aValue.Length];
+
+            for (int i = 0; i < aValue.Length; i++)
+            {
+                int xAsciiCode = aValue[i];
+                if ((xAsciiCode <= upperAscii) && (xAsciiCode >= lowerAscii))
+                {
+                    xChars[i] = (char)(xAsciiCode + offset);
+                }
+                else
+                {
+                    xChars[i] = aValue[i];
+                }
+            }
+
+            return new string(xChars);
+        }
+
+        public static string FastAllocateString(int aLength)
+        {
+            return new string(new char[aLength]);   
+        }
+
+        [PlugMethod(IsOptional = true)]
+        public static string TrimStart(string aThis, string aSubStr)
+        {
+            char[] ci = aThis.ToCharArray();
+            char[] di = aSubStr.ToCharArray();
+
+            if (aThis.StartsWith(aSubStr))
+            {
+                if (aThis != aSubStr)
+                {
+                    char[] oi = new char[ci.Length - di.Length];
+                    for (int i = 0; i < ci.Length - di.Length; i++)
+                    {
+                        oi[i] = ci[i + di.Length];
+                    }
+                    return oi.ToString();
                 }
 
-                return oi.ToString();
+                return string.Empty;
             }
 
-            return String.Empty;
+            throw new ArgumentNullException();
         }
 
-        throw new ArgumentNullException();
-    }
+        internal static unsafe char *GetFirstChar(string aThis, [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+        {
+            return aFirstChar;
+        }
 
-    internal static unsafe char* GetFirstChar(string aThis,
-        [FieldAccess(Name = "System.Char System.String.m_firstChar")]
-        char* aFirstChar) => aFirstChar;
-
-    private static unsafe int FastCompareStringHelper(uint* strAChars, int countA, uint* strBChars, int countB)
-    {
-        var count = countA < countB ? countA : countB;
+        private static unsafe int FastCompareStringHelper(uint* strAChars, int countA, uint* strBChars, int countB)
+        {
+            int count = (countA < countB) ? countA : countB;
 
 #if BIT64
             long diff = (long)((byte*)strAChars - (byte*)strBChars);
 #else
-        var diff = (int)((byte*)strAChars - (byte*)strBChars);
+            int diff = (int)((byte*)strAChars - (byte*)strBChars);
 #endif
 
 #if BIT64
@@ -867,7 +857,7 @@ public static class StringImpl
             }
             else
 #endif // BIT64
-        {
+            {
 #if BIT64
                 if (Math.Abs(alignmentA - alignmentB) == 4)
                 {
@@ -883,40 +873,32 @@ public static class StringImpl
                 }
 #endif // BIT64
 
-            // Loop comparing a DWORD at a time.
-            // Reads are potentially unaligned
-            while ((count -= 2) >= 0)
-            {
-                if (*(uint*)((byte*)strBChars + diff) - *strBChars != 0)
+                // Loop comparing a DWORD at a time.
+                // Reads are potentially unaligned
+                while ((count -= 2) >= 0)
                 {
-                    var ptr1 = (char*)((byte*)strBChars + diff);
-                    var ptr2 = (char*)strBChars;
-                    if (*ptr1 != *ptr2)
+                    if ((*((uint*)((byte*)strBChars + diff)) - *strBChars) != 0)
                     {
-                        return *ptr1 - *ptr2;
+                        char* ptr1 = (char*)((byte*)strBChars + diff);
+                        char* ptr2 = (char*)strBChars;
+                        if (*ptr1 != *ptr2)
+                            return ((int)*ptr1 - (int)*ptr2);
+                        return ((int)*(ptr1 + 1) - (int)*(ptr2 + 1));
                     }
-
-                    return *(ptr1 + 1) - *(ptr2 + 1);
+                    ++strBChars;
                 }
 
-                ++strBChars;
+                int c;
+                if (count == -1)
+                    if ((c = *((char*)((byte*)strBChars + diff)) - *((char*)strBChars)) != 0)
+                        return c;
             }
 
-            int c;
-            if (count == -1)
-            {
-                if ((c = *(char*)((byte*)strBChars + diff) - *(char*)strBChars) != 0)
-                {
-                    return c;
-                }
-            }
+            return countA - countB;
         }
 
-        return countA - countB;
-    }
-
-    public static int CompareOrdinalHelper(string strA, int indexA, int countA, string strB, int indexB, int countB)
-    {
+        public static unsafe int CompareOrdinalHelper(string strA, int indexA, int countA, string strB, int indexB, int countB)
+        {
 #if false
             // Set up the loop variables.
             fixed (char* pStrA = strA, pStrB = strB)
@@ -927,66 +909,70 @@ public static class StringImpl
             }
 #endif
 
-        /* Totally managed version but requires changes to IL2CPU to work */
+            /* Totally managed version but requires changes to IL2CPU to work */
 #if true
-        // Please note that Argument validation should be handled by callers.
-        var count = countA < countB ? countA : countB;
-        var xResult = 0;
+            // Please note that Argument validation should be handled by callers.
+            int count = (countA < countB) ? countA : countB;
+            int xResult = 0;
 
-        strA = strA.Substring(indexA);
-        strB = strB.Substring(indexB);
+            strA = strA.Substring(indexA);
+            strB = strB.Substring(indexB);
 
-        /*
-         * This optimization is not taking effect yet in Cosmos as String.Intern() is not implemented
-         */
-        if (ReferenceEquals(strA, strB))
-        {
-            mDebugger.SendInternal($"strA ({strA}) is the same object of strB ({strB}) returning 0");
-            return 0;
-        }
-
-        mDebugger.SendInternal($"strA ({strA}) is NOT the same object of StrB ({strB})");
-
-        for (var i = 0; i < count; i++)
-        {
-            int a = strA[i];
-            int b = strB[i];
-            //xResult = strA[i] - strB[i];
-            xResult = a - b;
-            // Different characters we have finished
-            if (xResult != 0)
+            /*
+             * This optimization is not taking effect yet in Cosmos as String.Intern() is not implemented
+             */
+            if (ReferenceEquals(strA, strB))
             {
-                break;
+                mDebugger.SendInternal($"strA ({strA}) is the same object of strB ({strB}) returning 0");
+                return 0;
             }
+            else
+            {
+                mDebugger.SendInternal($"strA ({strA}) is NOT the same object of StrB ({strB})");
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                int a = strA[i];
+                int b = strB[i];
+                //xResult = strA[i] - strB[i];
+                xResult = a - b;
+                // Different characters we have finished
+                if (xResult != 0)
+                {
+                    break;
+                }
+            }
+
+            return xResult;
+#endif
         }
 
-        return xResult;
-#endif
-    }
-
-    private static int CompareOrdinalHelperIgnoreCase(string strA, int indexA, int countA, string strB, int indexB,
-        int countB) => CompareOrdinalHelper(strA.ToLower(), indexA, countA, strB.ToLower(), indexB, countB);
-
-    /* It is not really needed to plug GetHashCode! */
-
-    public static int Compare(string strA, int indexA, string strB, int indexB, int length,
-        StringComparison comparisonType)
-    {
-        // TODO Exceptions
-
-        var lengthA = Math.Min(length, strA.Length - indexA);
-        var lengthB = Math.Min(length, strB.Length - indexB);
-
-        switch (comparisonType)
+        private static int CompareOrdinalHelperIgnoreCase(string strA, int indexA, int countA, string strB, int indexB, int countB)
         {
-            case StringComparison.Ordinal:
-                return CompareOrdinalHelper(strA, indexA, lengthA, strB, indexB, lengthB);
+            return CompareOrdinalHelper(strA.ToLower(), indexA, countA, strB.ToLower(), indexB, countB);
+        }
 
-            case StringComparison.OrdinalIgnoreCase:
-                return CompareOrdinalHelperIgnoreCase(strA, indexA, lengthA, strB, indexB, lengthB);
+        /* It is not really needed to plug GetHashCode! */
 
-            default:
-                throw new ArgumentException("Not Supported StringComparison");
+        public static int Compare(string strA, int indexA, string strB, int indexB, int length, StringComparison comparisonType)
+        {
+            // TODO Exceptions
+
+            int lengthA = Math.Min(length, strA.Length - indexA);
+            int lengthB = Math.Min(length, strB.Length - indexB);
+
+            switch (comparisonType)
+            {
+                case StringComparison.Ordinal:
+                    return CompareOrdinalHelper(strA, indexA, lengthA, strB, indexB, lengthB);
+
+                case StringComparison.OrdinalIgnoreCase:
+                    return CompareOrdinalHelperIgnoreCase(strA, indexA, lengthA, strB, indexB, lengthB);
+
+                default:
+                    throw new ArgumentException("Not Supported StringComparison");
+            }
         }
     }
 }

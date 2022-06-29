@@ -8,83 +8,83 @@
 using System;
 using System.Collections.Generic;
 using Cosmos.HAL.Network;
-using Cosmos.System.Network.IPv4;
 
-namespace Cosmos.System.Network.ARP;
-
-/// <summary>
-///     ARPCache class.
-/// </summary>
-internal static class ARPCache
+namespace Cosmos.System.Network.ARP
 {
     /// <summary>
-    ///     Cache.
+    /// ARPCache class.
     /// </summary>
-    public static Dictionary<uint, MACAddress> cache;
-
-    /// <summary>
-    ///     Ensure cache exists.
-    /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-    private static void ensureCacheExists()
+    internal static class ARPCache
     {
-        if (cache == null)
-        {
-            cache = new Dictionary<uint, MACAddress>();
-        }
-    }
+        /// <summary>
+        /// Cache.
+        /// </summary>
+        public static Dictionary<uint, MACAddress> cache;
 
-    /// <summary>
-    ///     Check if ARP cache contains the given IP.
-    /// </summary>
-    /// <param name="ipAddress">IP address to check.</param>
-    /// <returns>bool value.</returns>
-    internal static bool Contains(Address ipAddress)
-    {
-        ensureCacheExists();
-        return cache.ContainsKey(ipAddress.Hash);
-    }
-
-    /// <summary>
-    ///     Update ARP cache.
-    /// </summary>
-    /// <param name="ipAddress">IP address.</param>
-    /// <param name="macAddress">MAC address.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-    /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
-    /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-    internal static void Update(Address ipAddress, MACAddress macAddress)
-    {
-        ensureCacheExists();
-        var ip_hash = ipAddress.Hash;
-        if (ip_hash == 0)
+        /// <summary>
+        /// Ensure cache exists.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        private static void ensureCacheExists()
         {
-            return;
+            if (cache == null)
+            {
+                cache = new Dictionary<uint, MACAddress>();
+            }
         }
 
-        if (cache.ContainsKey(ip_hash) == false)
+        /// <summary>
+        /// Check if ARP cache contains the given IP.
+        /// </summary>
+        /// <param name="ipAddress">IP address to check.</param>
+        /// <returns>bool value.</returns>
+        internal static bool Contains(IPv4.Address ipAddress)
         {
-            cache.Add(ip_hash, macAddress);
-        }
-        else
-        {
-            cache[ip_hash] = macAddress;
-        }
-    }
-
-    /// <summary>
-    ///     Resolve ARP cache.
-    /// </summary>
-    /// <param name="ipAddress">IP address.</param>
-    /// <returns>MAC address.</returns>
-    internal static MACAddress Resolve(Address ipAddress)
-    {
-        ensureCacheExists();
-        if (cache.ContainsKey(ipAddress.Hash) == false)
-        {
-            return null;
+            ensureCacheExists();
+            return cache.ContainsKey(ipAddress.Hash);
         }
 
-        return cache[ipAddress.Hash];
+        /// <summary>
+        /// Update ARP cache.
+        /// </summary>
+        /// <param name="ipAddress">IP address.</param>
+        /// <param name="macAddress">MAC address.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        internal static void Update(IPv4.Address ipAddress, MACAddress macAddress)
+        {
+            ensureCacheExists();
+            uint ip_hash = ipAddress.Hash;
+            if (ip_hash == 0)
+            {
+                return;
+            }
+
+            if (cache.ContainsKey(ip_hash) == false)
+            {
+                cache.Add(ip_hash, macAddress);
+            }
+            else
+            {
+                cache[ip_hash] = macAddress;
+            }
+        }
+
+        /// <summary>
+        /// Resolve ARP cache.
+        /// </summary>
+        /// <param name="ipAddress">IP address.</param>
+        /// <returns>MAC address.</returns>
+        internal static MACAddress Resolve(IPv4.Address ipAddress)
+        {
+            ensureCacheExists();
+            if (cache.ContainsKey(ipAddress.Hash) == false)
+            {
+                return null;
+            }
+
+            return cache[ipAddress.Hash];
+        }
     }
 }

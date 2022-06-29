@@ -1,33 +1,39 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.System.Globalization;
-
-[Plug(Target = typeof(CharUnicodeInfo))]
-internal class CharUnicodeInfoImpl
+namespace Cosmos.Core_Plugs.System.Globalization
 {
-    //TODO: Implement these more correctly
-    [PlugMethod(Signature =
-        "System_Byte__System_Globalization_CharUnicodeInfo_InternalGetCategoryValue_System_Int32__System_Int32_")]
-    public static byte InternalGetCategoryValue(int ch, int offset) => InternalGetUnicodeCategory(ch);
-
-    private static byte InternalGetUnicodeCategory(int ch)
+    [Plug(Target = typeof(CharUnicodeInfo))]
+    class CharUnicodeInfoImpl
     {
-        if (48 <= ch && ch <= 57)
+        //TODO: Implement these more correctly
+        [PlugMethod(Signature = "System_Byte__System_Globalization_CharUnicodeInfo_InternalGetCategoryValue_System_Int32__System_Int32_")]
+        public static byte InternalGetCategoryValue(int ch, int offset)
         {
-            return (byte)UnicodeCategory.DecimalDigitNumber;
+            return InternalGetUnicodeCategory(ch);
         }
 
-        if (65 <= ch && ch <= 90)
+        private static byte InternalGetUnicodeCategory(int ch)
         {
-            return (byte)UnicodeCategory.UppercaseLetter;
-        }
+            if (48 <= ch && ch <= 57)
+            {
+                return (byte)UnicodeCategory.DecimalDigitNumber;
+            }
 
-        if (97 <= ch && ch <= 122)
-        {
-            return (byte)UnicodeCategory.LowercaseLetter;
-        }
+            if (65 <= ch && ch <= 90)
+            {
+                return (byte)UnicodeCategory.UppercaseLetter;
+            }
 
-        return (byte)UnicodeCategory.OtherLetter;
+            if (97 <= ch && ch <= 122)
+            {
+                return (byte)UnicodeCategory.LowercaseLetter;
+            }
+            
+            return (byte)UnicodeCategory.OtherLetter;
+        }
     }
 }

@@ -1,18 +1,24 @@
 using System;
-using System.Diagnostics;
+using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.System.Diagnostics;
-
-[Plug(Target = typeof(Debugger))]
-public static class DebuggerImpl
+namespace Cosmos.Core_Plugs.System.Diagnostics
 {
-    public static bool get_IsAttached() => false;
-
-    public static void Break()
+    [Plug(Target = typeof(global::System.Diagnostics.Debugger))]
+    public static class DebuggerImpl
     {
-        // leave empty, this is handled by a special case..
-    }
+        public static bool get_IsAttached()
+        {
+            return false;
+        }
+        public static void Break()
+        {
+            // leave empty, this is handled by a special case..
+        }
 
-    public static void Log(int aInt, string aString, string aString2) => throw new NotImplementedException();
+        public static void Log(int aInt, string aString, string aString2)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

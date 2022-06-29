@@ -1,5 +1,9 @@
-﻿namespace Cosmos.HAL;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-public abstract class Device
-{
+namespace Cosmos.HAL {
+    public abstract class Device {
+    }
 }

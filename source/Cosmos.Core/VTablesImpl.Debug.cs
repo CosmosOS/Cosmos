@@ -1,40 +1,43 @@
-﻿using Cosmos.Debug.Kernel;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Core;
-
-partial class VTablesImpl
+namespace Cosmos.Core
 {
-    public static bool EnableDebug;
-    private static readonly Debugger mDebugger = new("IL2CPU", "VTablesImpl");
-
-    private static void Debug(string message)
+    partial class VTablesImpl
     {
-        if (!EnableDebug)
+        public static bool EnableDebug = false;
+        private static Debugger mDebugger = new Debugger("IL2CPU", "VTablesImpl");
+
+        private static void Debug(string message)
         {
-            return;
+            if (!EnableDebug)
+            {
+                return;
+            }
+            mDebugger.Send(message);
         }
 
-        mDebugger.Send(message);
-    }
-
-    private static void DebugHex(string message, uint value)
-    {
-        if (!EnableDebug)
+        private static void DebugHex(string message, uint value)
         {
-            return;
+            if (!EnableDebug)
+            {
+                return;
+            }
+            mDebugger.Send(message);
+            mDebugger.SendNumber(value);
         }
 
-        mDebugger.Send(message);
-        mDebugger.SendNumber(value);
-    }
-
-    private static void DebugAndHalt(string message)
-    {
-        Debug(message);
-        while (true)
+        private static void DebugAndHalt(string message)
         {
-        }
+            Debug(message);
+            while (true)
+                ;
 
-        //Debugger.DoRealHalt();
+            //Debugger.DoRealHalt();
+        }
     }
 }

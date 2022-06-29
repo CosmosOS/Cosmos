@@ -1,9 +1,13 @@
-using XSharp;
 using XSharp.Assembler;
+using XSharp;
 
-namespace Cosmos.Core_Asm;
-
-public class CPUEnableINTsAsm : AssemblerMethod
+namespace Cosmos.Core_Asm
 {
-    public override void AssembleNew(Assembler aAssembler, object aMethodInfo) => XS.EnableInterrupts();
+    public class CPUEnableINTsAsm : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.EnableInterrupts();
+        }
+    }
 }

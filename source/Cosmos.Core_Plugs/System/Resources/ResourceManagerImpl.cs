@@ -1,20 +1,25 @@
 using System;
 using System.Resources;
+using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.System.Resources;
-
-[Plug(typeof(ResourceManager))]
-public static class ResourceManagerImpl
+namespace Cosmos.Core_Plugs.System.Resources
 {
-    public static void CCtor()
+    [Plug(typeof(ResourceManager))]
+    public static class ResourceManagerImpl
     {
+        public static void CCtor()
+        {
+        }
+
+
+        public static void Ctor(Type aResourceSource)
+        {
+        }
+
+        public static string GetString(ResourceManager aThis, string aString)
+        {
+            return SRImpl.InternalGetResourceString(aString);
+        }
     }
-
-
-    public static void Ctor(Type aResourceSource)
-    {
-    }
-
-    public static string GetString(ResourceManager aThis, string aString) => SRImpl.InternalGetResourceString(aString);
 }

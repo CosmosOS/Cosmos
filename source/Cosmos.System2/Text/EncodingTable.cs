@@ -1,114 +1,110 @@
 ﻿//#define COSMOSDEBUG
-
 using System.Text;
 using Cosmos.Debug.Kernel;
 
-namespace Cosmos.System.ExtendedASCII;
-
-/*
- * Ideally we should use Dictionary or HashTable here but are yet not working in Cosmos so I have done
- * this replacement class for now...
- */
-/// <summary>
-///     EncodingTable class. Used to manage codepage list.
-/// </summary>
-internal static class EncodingTable
+namespace Cosmos.System.ExtendedASCII
 {
+    /*
+     * Ideally we should use Dictionary or HashTable here but are yet not working in Cosmos so I have done
+     * this replacement class for now...
+     */
     /// <summary>
-    ///     Max codepage cache size.
+    /// EncodingTable class. Used to manage codepage list.
     /// </summary>
-    private const int MaxCodepageChacheSize = 2048;
-
-    /// <summary>
-    ///     Debugger instance of the "System" ring with the "EncodingTable" tag.
-    /// </summary>
-    private static readonly Debugger mDebugger = new("System", "EncodingTable");
-
-    /// <summary>
-    ///     Codepage cache.
-    /// </summary>
-    private static readonly values[] CodepageCache = new values[MaxCodepageChacheSize];
-
-    /// <summary>
-    ///     Create new instance of the <see cref="EncodingTable" /> class.
-    /// </summary>
-    static EncodingTable()
+    internal static class EncodingTable
     {
-        mDebugger.SendInternal("Inizializing Encoding Table");
+        /// <summary>
+        /// Debugger instance of the "System" ring with the "EncodingTable" tag.
+        /// </summary>
+        private static Debugger mDebugger = new Debugger("System", "EncodingTable");
 
-        Add(437, "IBM437", new CP437Enconding());
-        Add(858, "IBM0858", new CP858Enconding());
-    }
-
-    /// <summary>
-    ///     Add encoding to the encoding table.
-    /// </summary>
-    /// <param name="codepage">Codepage.</param>
-    /// <param name="desc">Desciption.</param>
-    /// <param name="encoding">Encoding.</param>
-    public static void Add(int codepage, string desc, Encoding encoding)
-    {
-        mDebugger.SendInternal($"Adding codepage {codepage} desc {desc}");
-        CodepageCache[codepage] = new values(desc, encoding);
-    }
-
-    /// <summary>
-    ///     Get description, using codepage.
-    /// </summary>
-    /// <param name="codepage">Codepage.</param>
-    /// <returns>string value.</returns>
-    public static string GetDescription(int codepage) => CodepageCache[codepage].desc;
-
-    /// <summary>
-    ///     Get encoding, using codepage.
-    /// </summary>
-    /// <param name="codepage">Codepage.</param>
-    /// <returns>Encoding value.</returns>
-    public static Encoding GetEncoding(int codepage) => CodepageCache[codepage].encoding;
-
-    /// <summary>
-    ///     Get code page from description.
-    /// </summary>
-    /// <param name="desc">Description.</param>
-    /// <returns>int value, -1 if not found.</returns>
-    public static int GetCodePageFromDesc(string desc)
-    {
-        for (var idx = 0; idx < MaxCodepageChacheSize; idx++)
+        /// <summary>
+        /// Create new instance of the <see cref="EncodingTable"/> class.
+        /// </summary>
+        static EncodingTable()
         {
-            if (CodepageCache[idx].desc == desc)
-            {
-                return idx;
-            }
+            mDebugger.SendInternal("Inizializing Encoding Table");
+
+            Add(437, "IBM437", new CP437Enconding());
+            Add(858, "IBM0858", new CP858Enconding());
         }
 
-        /* Not found! */
-        return -1;
-    }
-
-    /// <summary>
-    ///     Struct which used to hold description and encoding.
-    /// </summary>
-    private struct values
-    {
         /// <summary>
-        ///     Description.
+        /// Struct which used to hold description and encoding.
         /// </summary>
-        public readonly string desc;
+        private struct values
+        {
+            /// <summary>
+            /// Description.
+            /// </summary>
+            public string   desc;
+            /// <summary>
+            /// Encoding.
+            /// </summary>
+            public Encoding encoding;
+
+            /// <summary>
+            /// Create new instance of the <see cref="values"/> struct.
+            /// </summary>
+            /// <param name="desc">Description.</param>
+            /// <param name="encoding">Encoding.</param>
+            public values(string desc, Encoding encoding)
+            {
+                this.desc = desc;
+                this.encoding = encoding;
+            }
+        };
 
         /// <summary>
-        ///     Encoding.
+        /// Max codepage cache size.
         /// </summary>
-        public readonly Encoding encoding;
+        const int MaxCodepageChacheSize = 2048;
+        /// <summary>
+        /// Codepage cache.
+        /// </summary>
+        static values[] CodepageCache = new values[MaxCodepageChacheSize];
 
         /// <summary>
-        ///     Create new instance of the <see cref="values" /> struct.
+        /// Add encoding to the encoding table.
+        /// </summary>
+        /// <param name="codepage">Codepage.</param>
+        /// <param name="desc">Desciption.</param>
+        /// <param name="encoding">Encoding.</param>
+        public static void Add(int codepage, string desc, Encoding encoding)
+        {
+            mDebugger.SendInternal($"Adding codepage {codepage} desc {desc}");
+            CodepageCache[codepage] = new values(desc, encoding);
+        }
+
+        /// <summary>
+        /// Get description, using codepage.
+        /// </summary>
+        /// <param name="codepage">Codepage.</param>
+        /// <returns>string value.</returns>
+        public static string GetDescription(int codepage) => CodepageCache[codepage].desc;
+
+        /// <summary>
+        /// Get encoding, using codepage.
+        /// </summary>
+        /// <param name="codepage">Codepage.</param>
+        /// <returns>Encoding value.</returns>
+        public static Encoding GetEncoding(int codepage) => CodepageCache[codepage].encoding;
+
+        /// <summary>
+        /// Get code page from description.
         /// </summary>
         /// <param name="desc">Description.</param>
-        /// <param name="encoding">Encoding.</param>
-        public values(string desc, Encoding encoding)
+        /// <returns>int value, -1 if not found.</returns>
+        public static int GetCodePageFromDesc(string desc)
         {
-            this.desc = desc;
-            this.encoding = encoding;
+            for (int idx = 0; idx < MaxCodepageChacheSize; idx++)
+            {
+                if (CodepageCache[idx].desc == desc)
+                    return idx;
+            }
+
+            /* Not found! */
+            return -1;
         }
     }
 }

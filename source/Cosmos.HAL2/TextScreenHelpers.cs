@@ -1,46 +1,65 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 using Debugger = Cosmos.Debug.Kernel.Debugger;
+using Cosmos.Common.Extensions;
 
-namespace Cosmos.HAL;
-
-public static class TextScreenHelpers
+namespace Cosmos.HAL
 {
-    private static readonly Debugger mDebugger = new("TextScreen", "Debug");
-
-    [Conditional("COSMOSDEBUG")]
-    public static void Debug(string aMessage, params object[] aParams)
+    public static class TextScreenHelpers
     {
-        var xMessage = aMessage;
+        private static Debugger mDebugger = new Debugger("TextScreen", "Debug");
 
-        if (aParams != null)
+        [Conditional("COSMOSDEBUG")]
+        public static void Debug(string aMessage, params object[] aParams)
         {
-            aMessage = aMessage + " : ";
-            for (var i = 0; i < aParams.Length; i++)
+            string xMessage = aMessage;
+
+            if (aParams != null)
             {
-                if (aParams[i] != null)
+                aMessage = aMessage + " : ";
+                for (int i = 0; i < aParams.Length; i++)
                 {
-                    var xParam = aParams[i].ToString();
-                    if (!String.IsNullOrWhiteSpace(xParam))
+                    if (aParams[i] != null)
                     {
-                        xMessage = xMessage + " " + xParam;
+                        string xParam = aParams[i].ToString();
+                        if (!string.IsNullOrWhiteSpace(xParam))
+                        {
+                            xMessage = xMessage + " " + xParam;
+                        }
                     }
                 }
             }
+
+            mDebugger.Send("TextScreen Debug: " + xMessage);
         }
 
-        mDebugger.Send("TextScreen Debug: " + xMessage);
+        [Conditional("COSMOSDEBUG")]
+        public static void Debug(string aMessage)
+        {
+            mDebugger.Send("TextScreen Debug: " + aMessage);
+        }
+
+        [Conditional("COSMOSDEBUG")]
+        public static void DebugNumber(uint aValue)
+        {
+            mDebugger.SendNumber(aValue);
+        }
+
+        [Conditional("COSMOSDEBUG")]
+        public static void DebugNumber(ulong aValue)
+        {
+            mDebugger.Send(((uint)aValue).ToString() + ((uint)aValue >> 32).ToString());
+        }
+
+        [Conditional("COSMOSDEBUG")]
+        public static void DevDebug(string message)
+        {
+            mDebugger.Send("TextScreen DevDebug: " + message);
+        }
     }
-
-    [Conditional("COSMOSDEBUG")]
-    public static void Debug(string aMessage) => mDebugger.Send("TextScreen Debug: " + aMessage);
-
-    [Conditional("COSMOSDEBUG")]
-    public static void DebugNumber(uint aValue) => mDebugger.SendNumber(aValue);
-
-    [Conditional("COSMOSDEBUG")]
-    public static void DebugNumber(ulong aValue) => mDebugger.Send((uint)aValue + ((uint)aValue >> 32).ToString());
-
-    [Conditional("COSMOSDEBUG")]
-    public static void DevDebug(string message) => mDebugger.Send("TextScreen DevDebug: " + message);
 }

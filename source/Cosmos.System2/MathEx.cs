@@ -1,24 +1,26 @@
-﻿namespace Cosmos.System;
+﻿using System;
 
-/// <summary>
-///     MathEx class. Provides additional math methods.
-/// </summary>
-public static class MathEx
+namespace Cosmos.System
 {
     /// <summary>
-    ///     Get the remainder on division of a in b.
+    /// MathEx class. Provides additional math methods.
     /// </summary>
-    /// <param name="a">Divided number.</param>
-    /// <param name="b">Divider.</param>
-    /// <returns>long value.</returns>
-    public static long Rem(long a, long b)
+    public static class MathEx
     {
-        var result = a;
-        while (result - b > 0)
+        /// <summary>
+        /// Get the remainder on division of a in b.
+        /// </summary>
+        /// <param name="a">Divided number.</param>
+        /// <param name="b">Divider.</param>
+        /// <returns>long value.</returns>
+        public static long Rem(long a, long b)
         {
-            result = result - b;
+            long result = a;
+            while (result - b > 0)
+            {
+                result = result - b;
+            }
+            return result;
         }
-
-        return result;
     }
 }

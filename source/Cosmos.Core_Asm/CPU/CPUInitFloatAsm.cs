@@ -1,9 +1,13 @@
-using XSharp;
 using XSharp.Assembler;
+using XSharp;
 
-namespace Cosmos.Core_Asm;
-
-public class CPUInitFloatAsm : AssemblerMethod
+namespace Cosmos.Core_Asm
 {
-    public override void AssembleNew(Assembler aAssembler, object aMethodInfo) => XS.FPU.FloatInit();
+    public class CPUInitFloatAsm : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.FPU.FloatInit();
+        }
+    }
 }

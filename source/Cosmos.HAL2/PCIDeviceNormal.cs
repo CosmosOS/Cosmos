@@ -1,47 +1,53 @@
-﻿namespace Cosmos.HAL;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-public class PCIDeviceNormal : PCIDevice
+namespace Cosmos.HAL
 {
-    public PCIDeviceNormal(uint bus, uint slot, uint function)
-        : base(bus, slot, function)
+    public class PCIDeviceNormal : PCIDevice
     {
-        BaseAddresses = new PCIBaseAddressBar[6];
-        BaseAddresses[0] = new PCIBaseAddressBar(ReadRegister32(0x10));
-        BaseAddresses[1] = new PCIBaseAddressBar(ReadRegister32(0x14));
-        BaseAddresses[2] = new PCIBaseAddressBar(ReadRegister32(0x18));
-        BaseAddresses[3] = new PCIBaseAddressBar(ReadRegister32(0x1C));
-        BaseAddresses[4] = new PCIBaseAddressBar(ReadRegister32(0x20));
-        BaseAddresses[5] = new PCIBaseAddressBar(ReadRegister32(0x24));
+        public PCIBaseAddressBar[] BaseAddresses { get; private set; }
 
-        CardbusCISPointer = ReadRegister32(0x28);
+        public uint CardbusCISPointer { get; private set; }
 
-        SubsystemVendorID = ReadRegister16(0x2C);
-        SubsystemID = ReadRegister16(0x2E);
+        public ushort SubsystemVendorID { get; private set; }
+        public ushort SubsystemID { get; private set; }
 
-        ExpansionROMBaseAddress = ReadRegister32(0x30);
+        public uint ExpansionROMBaseAddress { get; private set; }
 
-        CapabilitiesPointer = ReadRegister8(0x34);
+        public byte CapabilitiesPointer { get; private set; }
 
-        MinGrant = ReadRegister8(0x3E);
-        MaxLatency = ReadRegister8(0x3F);
+        public byte MinGrant { get; private set; }
+        public byte MaxLatency { get; private set; }
+
+        public PCIDeviceNormal(uint bus, uint slot, uint function)
+            : base(bus, slot, function)
+        {
+            BaseAddresses = new PCIBaseAddressBar[6];
+            BaseAddresses[0] = new PCIBaseAddressBar(ReadRegister32(0x10));
+            BaseAddresses[1] = new PCIBaseAddressBar(ReadRegister32(0x14));
+            BaseAddresses[2] = new PCIBaseAddressBar(ReadRegister32(0x18));
+            BaseAddresses[3] = new PCIBaseAddressBar(ReadRegister32(0x1C));
+            BaseAddresses[4] = new PCIBaseAddressBar(ReadRegister32(0x20));
+            BaseAddresses[5] = new PCIBaseAddressBar(ReadRegister32(0x24));
+
+            CardbusCISPointer = ReadRegister32(0x28);
+
+            SubsystemVendorID = ReadRegister16(0x2C);
+            SubsystemID = ReadRegister16(0x2E);
+
+            ExpansionROMBaseAddress = ReadRegister32(0x30);
+
+            CapabilitiesPointer = ReadRegister8(0x34);
+
+            MinGrant = ReadRegister8(0x3E);
+            MaxLatency = ReadRegister8(0x3F);
+        }
+
+        //public void EnableDevice()
+        //{
+        //    Command |= PCICommand.Master | PCICommand.IO | PCICommand.Memory;
+        //}
     }
-
-    public PCIBaseAddressBar[] BaseAddresses { get; }
-
-    public uint CardbusCISPointer { get; }
-
-    public ushort SubsystemVendorID { get; }
-    public ushort SubsystemID { get; }
-
-    public uint ExpansionROMBaseAddress { get; }
-
-    public byte CapabilitiesPointer { get; }
-
-    public byte MinGrant { get; }
-    public byte MaxLatency { get; }
-
-    //public void EnableDevice()
-    //{
-    //    Command |= PCICommand.Master | PCICommand.IO | PCICommand.Memory;
-    //}
 }

@@ -1,11 +1,10 @@
-﻿namespace Cosmos.CPU.x86;
+﻿using System;
 
-public class Memory2
-{
-    private int mPtr;
-
-    public Memory2(int aPtr)
-    {
-        mPtr = aPtr;
+namespace Cosmos.CPU.x86 {
+    public class Memory2 {
+        int mPtr;
+        public Memory2(int aPtr) {
+            mPtr = aPtr;
+        }
     }
 }

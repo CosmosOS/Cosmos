@@ -2,10 +2,13 @@
 using XSharp;
 using XSharp.Assembler;
 
-namespace Cosmos.Core_Asm.Memory;
-
-internal class GetStringTypeIDAsm : AssemblerMethod
+namespace Cosmos.Core_Asm.Memory
 {
-    public override void AssembleNew(Assembler aAssembler, object aMethodInfo) =>
-        XS.Push(ILOp.GetTypeIDLabel(typeof(string)));
+    class GetStringTypeIDAsm : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.Push(ILOp.GetTypeIDLabel(typeof(string)));
+        }
+    }
 }

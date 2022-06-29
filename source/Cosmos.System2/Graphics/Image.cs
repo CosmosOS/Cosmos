@@ -1,48 +1,53 @@
-﻿namespace Cosmos.System.Graphics;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-/// <summary>
-///     Image class.
-/// </summary>
-public abstract class Image
+namespace Cosmos.System.Graphics
 {
     /// <summary>
-    ///     Get and set raw data (pixels array).
+    /// Image class.
     /// </summary>
-    public int[] rawData;
-
-    /// <summary>
-    ///     Create new instance of <see cref="Image" /> class.
-    /// </summary>
-    /// <param name="width">Image width.</param>
-    /// <param name="height">Image height.</param>
-    /// <param name="color">Color depth.</param>
-    protected Image(uint width, uint height, ColorDepth color)
+    public abstract class Image
     {
-        Width = width;
-        Height = height;
-        Depth = color;
+        /// <summary>
+        /// Get and set raw data (pixels array).
+        /// </summary>
+        public int[] rawData;
+
+        /// <summary>
+        /// Get and set image width.
+        /// </summary>
+        public uint Width { get; protected set; }
+
+        /// <summary>
+        /// Get and set image height.
+        /// </summary>
+        public uint Height { get; protected set; }
+
+        /// <summary>
+        /// Get and set image color depth.
+        /// </summary>
+        public ColorDepth Depth { get; protected set; }
+
+        /// <summary>
+        /// Create new instance of <see cref="Image"/> class.
+        /// </summary>
+        /// <param name="width">Image width.</param>
+        /// <param name="height">Image height.</param>
+        /// <param name="color">Color depth.</param>
+        protected Image(uint width, uint height, ColorDepth color)
+        {
+            Width = width;
+            Height = height;
+            Depth = color;
+        }
     }
 
     /// <summary>
-    ///     Get and set image width.
+    /// Supported image formats.
     /// </summary>
-    public uint Width { get; protected set; }
-
-    /// <summary>
-    ///     Get and set image height.
-    /// </summary>
-    public uint Height { get; protected set; }
-
-    /// <summary>
-    ///     Get and set image color depth.
-    /// </summary>
-    public ColorDepth Depth { get; protected set; }
+    public enum ImageFormat
+    {
+        bmp
+    } //Add more as more are supported
 }
-
-/// <summary>
-///     Supported image formats.
-/// </summary>
-public enum ImageFormat
-{
-    bmp
-} //Add more as more are supported

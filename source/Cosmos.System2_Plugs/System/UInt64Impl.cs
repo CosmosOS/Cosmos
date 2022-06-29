@@ -1,27 +1,34 @@
 using System;
+
 using Cosmos.Common;
 using Cosmos.Common.Extensions;
+using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System;
-
-[Plug(Target = typeof(ulong))]
-public class UInt64Impl
+namespace Cosmos.System_Plugs.System
 {
-    public static string ToString(ref ulong aThis) => StringHelper.GetNumberString(aThis);
-
-    public static string ToString(ref ulong aThis, string formating)
+    [Plug(Target = typeof(ulong))]
+    public class UInt64Impl
     {
-        if (formating == "X")
+        public static string ToString(ref ulong aThis)
         {
-            return aThis.ToHex(false);
+            return StringHelper.GetNumberString(aThis);
         }
-
-        if (formating == "G")
+        
+        public static string ToString(ref ulong aThis, string formating)
         {
-            return ToString(ref aThis);
+            if(formating == "X")
+            {
+                return ToHexString.ToHex(aThis, false);
+            }
+            else if(formating == "G")
+            {
+                return ToString(ref aThis);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
-
-        throw new NotImplementedException();
     }
 }

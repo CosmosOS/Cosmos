@@ -1,5 +1,5 @@
 <Project>
 
-    <Import Project="build\Targets\Import.targets"/>
+    <Import Project="build\Targets\Import.targets" />
 
 </Project>

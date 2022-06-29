@@ -1,54 +1,56 @@
 using System;
+
 using Cosmos.Common;
+
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System;
-
-[Plug(Target = typeof(long))]
-public static class Int64Impl
+namespace Cosmos.System_Plugs.System
 {
-    public static string ToString(ref long aThis) => StringHelper.GetNumberString(aThis);
-
-    public static string ToString(ref long aThis, string format, IFormatProvider provider) => aThis.ToString();
-
-    public static long Parse(string s)
+    [Plug(Target = typeof(long))]
+    public static class Int64Impl
     {
-        const string digits = "0123456789";
-        var result = 0L;
+        public static string ToString(ref long aThis) => StringHelper.GetNumberString(aThis);
 
-        var z = 0;
-        var neg = false;
+        public static string ToString(ref long aThis, string format, IFormatProvider provider) => aThis.ToString();
 
-        if (s.Length >= 1)
+        public static long Parse(string s)
         {
-            if (s[0] == '+')
+            const string digits = "0123456789";
+            var result = 0L;
+
+            int z = 0;
+            bool neg = false;
+
+            if (s.Length >= 1)
             {
-                z = 1;
+                if (s[0] == '+')
+                {
+                    z = 1;
+                }
+
+                if (s[0] == '-')
+                {
+                    z = 1;
+                    neg = true;
+                }
             }
 
-            if (s[0] == '-')
+            for (int i = z; i < s.Length; i++)
             {
-                z = 1;
-                neg = true;
-            }
-        }
-
-        for (var i = z; i < s.Length; i++)
-        {
-            var ind = digits.IndexOf(s[i]);
-            if (ind == -1)
-            {
-                throw new FormatException();
+                var ind = digits.IndexOf(s[i]);
+                if (ind == -1)
+                {
+                    throw new FormatException();
+                }
+                result = (result * 10) + ind;
             }
 
-            result = result * 10 + ind;
-        }
+            if (neg)
+            {
+                result *= -1;
+            }
 
-        if (neg)
-        {
-            result *= -1;
+            return result;
         }
-
-        return result;
     }
 }

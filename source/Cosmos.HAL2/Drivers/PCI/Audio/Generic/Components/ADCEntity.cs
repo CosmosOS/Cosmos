@@ -10,6 +10,3 @@
 //        //private ADCEntity adcEntity;
 //    }
 //}
-
-
-

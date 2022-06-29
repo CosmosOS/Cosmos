@@ -1,61 +1,65 @@
 using System;
 using System.Globalization;
+
 using Cosmos.Common;
+
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System;
-
-[Plug(Target = typeof(short))]
-public static class Int16Impl
+namespace Cosmos.System_Plugs.System
 {
-    public static string ToString(ref short aThis) => StringHelper.GetNumberString(aThis);
-
-    public static string ToString(ref short aThis, string format, IFormatProvider provider) => aThis.ToString();
-
-    public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out short result) =>
-        throw new NotImplementedException();
-
-    public static short Parse(string s)
+    [Plug(Target = typeof(short))]
+    public static class Int16Impl
     {
-        const string digits = "0123456789";
-        short result = 0;
+        public static string ToString(ref short aThis) => StringHelper.GetNumberString(aThis);
 
-        var z = 0;
-        var neg = false;
+        public static string ToString(ref short aThis, string format, IFormatProvider provider) => aThis.ToString();
 
-        if (s.Length >= 1)
+        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out short result)
         {
-            if (s[0] == '+')
-            {
-                z = 1;
-            }
-
-            if (s[0] == '-')
-            {
-                z = 1;
-                neg = true;
-            }
+            throw new NotImplementedException();
         }
 
-        for (var i = z; i < s.Length; i++)
+        public static short Parse(string s)
         {
-            var ind = (short)digits.IndexOf(s[i]);
-            if (ind == -1)
+            const string digits = "0123456789";
+            short result = 0;
+
+            int z = 0;
+            bool neg = false;
+
+            if (s.Length >= 1)
             {
-                Console.Write("Digit '");
-                Console.Write(s[i]);
-                Console.WriteLine("' not found!");
-                throw new FormatException();
+                if (s[0] == '+')
+                {
+                    z = 1;
+                }
+
+                if (s[0] == '-')
+                {
+                    z = 1;
+                    neg = true;
+                }
             }
 
-            result = (short)(result * 10 + ind);
-        }
+            for (int i = z; i < s.Length; i++)
+            {
+                var ind = (short)digits.IndexOf(s[i]);
+                if (ind == -1)
+                {
+                    Console.Write("Digit '");
+                    Console.Write(s[i]);
+                    Console.WriteLine("' not found!");
+                    throw new FormatException();
+                }
+                result = (short)((result * 10) + ind);
+            }
 
-        if (neg)
-        {
-            result *= -1;
-        }
+            if (neg)
+            {
+                result *= -1;
+            }
 
-        return result;
+            return result;
+        }
     }
 }

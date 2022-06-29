@@ -1,16 +1,20 @@
 ﻿using System;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System;
-
-[Plug(typeof(TimeZoneInfo))]
-public static class TimeZoneInfoImpl
+namespace Cosmos.System_Plugs.System
 {
-    public static bool TryConvertIanaIdToWindowsId(string ianaId, bool allocate, out string windowsId)
+    [Plug(typeof(TimeZoneInfo))]
+    public static class TimeZoneInfoImpl
     {
-        windowsId = null;
-        return false;
-    }
+        public static bool TryConvertIanaIdToWindowsId(string ianaId, bool allocate, out string windowsId)
+        {
+            windowsId = null;
+            return false;
+        }
 
-    public static string GetUtcStandardDisplayName() => "Coordinated Universal Time";
+        public static string GetUtcStandardDisplayName()
+        {
+            return "Coordinated Universal Time";
+        }
+    }
 }

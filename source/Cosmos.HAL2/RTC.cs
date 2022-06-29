@@ -1,265 +1,297 @@
-﻿namespace Cosmos.HAL;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-/// <summary>
-///     This class represents the Real-Time Clock.
-/// </summary>
-public static class RTC
+namespace Cosmos.HAL
 {
-    private static readonly Core.IOGroup.RTC rtc = new();
-
     /// <summary>
-    ///     True if the RTC is using BCD mode.
+    /// This class represents the Real-Time Clock.
     /// </summary>
-    private static readonly bool isBCDMode;
-
-    /// <summary>
-    ///     True if the RTC is using the 24-hour format.
-    /// </summary>
-    private static readonly bool is24HourMode;
-
-    /// <summary>
-    ///     The value of Status Register B that was read on startup.
-    /// </summary>
-    private static readonly byte StatusByteB;
-
-    /// <summary>
-    ///     The static constructor for RTC,
-    ///     initializes all of the options
-    ///     that are possible in the RTC.
-    /// </summary>
-    static RTC()
+    public static class RTC
     {
-        WaitForReady();
-        rtc.Address.Byte = 0x0B;
-        StatusByteB = rtc.Data.Byte;
+        private static Core.IOGroup.RTC rtc = new Core.IOGroup.RTC();
 
-        #region Check 24-Hour Mode
-
-        if ((StatusByteB & 0x02) == 0x02)
-        {
-            is24HourMode = true;
-        }
-        else
-        {
-            is24HourMode = false;
-        }
-
-        #endregion
-
-        #region Check Binary Mode
-
-        if ((StatusByteB & 0x04) == 0x04)
-        {
-            // Binary mode.
-            isBCDMode = false;
-        }
-        else
-        {
-            isBCDMode = true;
-        }
-
-        #endregion
-    }
-
-    /// <summary>
-    ///     The current second.
-    /// </summary>
-    public static byte Second
-    {
-        get
+        /// <summary>
+        /// The static constructor for RTC,
+        /// initializes all of the options
+        /// that are possible in the RTC.
+        /// </summary>
+        static RTC()
         {
             WaitForReady();
-            rtc.Address.Byte = 0;
-            if (isBCDMode)
+            rtc.Address.Byte = 0x0B;
+            StatusByteB = rtc.Data.Byte;
+
+            #region Check 24-Hour Mode
+            if ((StatusByteB & 0x02) == 0x02)
             {
-                return FromBCD(rtc.Data.Byte);
+                is24HourMode = true;
             }
-
-            return rtc.Data.Byte;
-        }
-    }
-
-    /// <summary>
-    ///     The current minute.
-    /// </summary>
-    public static byte Minute
-    {
-        get
-        {
-            WaitForReady();
-            rtc.Address.Byte = 2;
-            if (isBCDMode)
+            else
             {
-                return FromBCD(rtc.Data.Byte);
+                is24HourMode = false;
             }
+            #endregion
 
-            return rtc.Data.Byte;
-        }
-    }
-
-    /// <summary>
-    ///     The current hour. Please note, this is
-    ///     always in 24-hour format.
-    /// </summary>
-    public static byte Hour
-    {
-        get
-        {
-            WaitForReady();
-            rtc.Address.Byte = 4;
-            if (isBCDMode)
+            #region Check Binary Mode
+            if ((StatusByteB & 0x04) == 0x04)
             {
-                if (is24HourMode)
+                // Binary mode.
+                isBCDMode = false;
+            }
+            else
+            {
+                isBCDMode = true;
+            }
+            #endregion
+
+
+        }
+
+        /// <summary>
+        /// True if the RTC is using BCD mode.
+        /// </summary>
+        private static bool isBCDMode;
+        /// <summary>
+        /// True if the RTC is using the 24-hour format.
+        /// </summary>
+        private static bool is24HourMode;
+        /// <summary>
+        /// The value of Status Register B that was read on startup.
+        /// </summary>
+        private static byte StatusByteB;
+
+        /// <summary>
+        /// The current second.
+        /// </summary>
+        public static byte Second
+        {
+            get
+            {
+                WaitForReady();
+                rtc.Address.Byte = 0;
+                if (isBCDMode)
                 {
                     return FromBCD(rtc.Data.Byte);
                 }
-
-                var b = rtc.Data.Byte;
-                if ((b & 0x80) == 0x80)
+                else
                 {
-                    // It's PM.
-                    return (byte)(FromBCD(b) + 12);
+                    return rtc.Data.Byte;
                 }
+            }
+        }
 
-                if (FromBCD(b) == 12)
+        /// <summary>
+        /// The current minute.
+        /// </summary>
+        public static byte Minute
+        {
+            get
+            {
+                WaitForReady();
+                rtc.Address.Byte = 2;
+                if (isBCDMode)
                 {
-                    // It's midnight, so it should actually be 0.
-                    return 0;
+                    return FromBCD(rtc.Data.Byte);
                 }
-
-                return FromBCD(b);
-            }
-
-            if (is24HourMode)
-            {
-                return rtc.Data.Byte;
-            }
-
-            {
-                var b = rtc.Data.Byte;
-                if ((b & 0x80) == 0x80)
+                else
                 {
-                    // It's PM.
-                    return (byte)(b + 12);
+                    return rtc.Data.Byte;
                 }
+            }
+        }
 
-                if (b == 12)
+        /// <summary>
+        /// The current hour. Please note, this is 
+        /// always in 24-hour format.
+        /// </summary>
+        public static byte Hour
+        {
+            get
+            {
+                WaitForReady();
+                rtc.Address.Byte = 4;
+                if (isBCDMode)
                 {
-                    // It's midnight, so it should actually be 0.
-                    return 0;
+                    if (is24HourMode)
+                    {
+                        return FromBCD(rtc.Data.Byte);
+                    }
+                    else
+                    {
+                        byte b = rtc.Data.Byte;
+                        if ((b & 0x80) == 0x80)
+                        {
+                            // It's PM.
+                            return (byte)(FromBCD(b) + 12);
+                        }
+                        else
+                        {
+                            if (FromBCD(b) == 12)
+                            {
+                                // It's midnight, so it should actually be 0.
+                                return 0;
+                            }
+                            else
+                            {
+                                return FromBCD(b);
+                            }
+                        }
+                    }
                 }
-
-                return b;
+                else
+                {
+                    if (is24HourMode)
+                    {
+                        return rtc.Data.Byte;
+                    }
+                    else
+                    {
+                        byte b = rtc.Data.Byte;
+                        if ((b & 0x80) == 0x80)
+                        {
+                            // It's PM.
+                            return (byte)(b + 12);
+                        }
+                        else
+                        {
+                            if (b == 12)
+                            {
+                                // It's midnight, so it should actually be 0.
+                                return 0;
+                            }
+                            else
+                            {
+                                return b;
+                            }
+                        }
+                    }
+                }
             }
         }
-    }
 
-    /// <summary>
-    ///     The current day of the week.
-    /// </summary>
-    public static byte DayOfTheWeek
-    {
-        get
+        /// <summary>
+        /// The current day of the week.
+        /// </summary>
+        public static byte DayOfTheWeek
         {
-            WaitForReady();
-            rtc.Address.Byte = 6;
-            if (isBCDMode)
+            get
             {
-                return FromBCD(rtc.Data.Byte);
+                WaitForReady();
+                rtc.Address.Byte = 6;
+                if (isBCDMode)
+                {
+                    return FromBCD(rtc.Data.Byte);
+                }
+                else
+                {
+                    return rtc.Data.Byte;
+                }
             }
-
-            return rtc.Data.Byte;
         }
-    }
 
-    /// <summary>
-    ///     The current day of the month.
-    /// </summary>
-    public static byte DayOfTheMonth
-    {
-        get
+        /// <summary>
+        /// The current day of the month.
+        /// </summary>
+        public static byte DayOfTheMonth
         {
-            WaitForReady();
-            rtc.Address.Byte = 7;
-            if (isBCDMode)
+            get
             {
-                return FromBCD(rtc.Data.Byte);
+                WaitForReady();
+                rtc.Address.Byte = 7;
+                if (isBCDMode)
+                {
+                    return FromBCD(rtc.Data.Byte);
+                }
+                else
+                {
+                    return rtc.Data.Byte;
+                }
             }
-
-            return rtc.Data.Byte;
         }
-    }
 
-    /// <summary>
-    ///     The current month.
-    /// </summary>
-    public static byte Month
-    {
-        get
+        /// <summary>
+        /// The current month.
+        /// </summary>
+        public static byte Month
         {
-            WaitForReady();
-            rtc.Address.Byte = 8;
-            if (isBCDMode)
+            get
             {
-                return FromBCD(rtc.Data.Byte);
+                WaitForReady();
+                rtc.Address.Byte = 8;
+                if (isBCDMode)
+                {
+                    return FromBCD(rtc.Data.Byte);
+                }
+                else
+                {
+                    return rtc.Data.Byte;
+                }
             }
-
-            return rtc.Data.Byte;
         }
-    }
 
-    /// <summary>
-    ///     The current year in the century.
-    /// </summary>
-    public static byte Year
-    {
-        get
+        /// <summary>
+        /// The current year in the century.
+        /// </summary>
+        public static byte Year
         {
-            WaitForReady();
-            rtc.Address.Byte = 9;
-            if (isBCDMode)
+            get
             {
-                return FromBCD(rtc.Data.Byte);
+                WaitForReady();
+                rtc.Address.Byte = 9;
+                if (isBCDMode)
+                {
+                    return FromBCD(rtc.Data.Byte);
+                }
+                else
+                {
+                    return rtc.Data.Byte;
+                }
             }
-
-            return rtc.Data.Byte;
         }
-    }
 
-    /// <summary>
-    ///     The current century. Beware, this may cause issues
-    ///     on computers from before 1995.
-    /// </summary>
-    public static byte Century
-    {
-        get
+        /// <summary>
+        /// The current century. Beware, this may cause issues 
+        /// on computers from before 1995.
+        /// </summary>
+        public static byte Century
         {
-            WaitForReady();
-            rtc.Address.Byte = 0x32;
-            if (isBCDMode)
+            get
             {
-                return FromBCD(rtc.Data.Byte);
+                WaitForReady();
+                rtc.Address.Byte = 0x32;
+                if (isBCDMode)
+                {
+                    return FromBCD(rtc.Data.Byte);
+                }
+                else
+                {
+                    return rtc.Data.Byte;
+                }
             }
-
-            return rtc.Data.Byte;
         }
-    }
 
-    /// <summary>
-    ///     Converts a BCD coded value to hex coded
-    /// </summary>
-    /// <param name="value">BCD coded</param>
-    /// <returns>Hex coded</returns>
-    private static byte FromBCD(byte value) => (byte)(((value >> 4) & 0x0F) * 10 + (value & 0x0F));
-
-    /// <summary>
-    ///     Waits until the status register says it can accept a value.
-    /// </summary>
-    private static void WaitForReady()
-    {
-        do
+        /// <summary>
+        /// Converts a BCD coded value to hex coded 
+        /// </summary>
+        /// <param name="value">BCD coded</param>
+        /// <returns>Hex coded</returns>
+        private static byte FromBCD(byte value)
         {
-            rtc.Address.Byte = 10;
-        } while ((rtc.Data.Byte & 0x80) != 0);
+            return (byte)(((value >> 4) & 0x0F) * 10 + (value & 0x0F));
+        }
+
+        /// <summary>
+        /// Waits until the status register says it can accept a value.
+        /// </summary>
+        private static void WaitForReady()
+        {
+            do
+            {
+                rtc.Address.Byte = 10;
+            }
+            while ((rtc.Data.Byte & 0x80) != 0);
+        }
     }
 }

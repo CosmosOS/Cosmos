@@ -1,10 +1,15 @@
 ﻿using System.IO;
+
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.System_Plugs.System.IO;
-
-[Plug(Target = typeof(FileNotFoundException))]
-public static class FileNotFoundExceptionImpl
+namespace Cosmos.System_Plugs.System.IO
 {
-    public static string ToString(FileNotFoundException aThis) => "FileNotFoundException";
+    [Plug(Target = typeof(FileNotFoundException))]
+    public static class FileNotFoundExceptionImpl
+    {
+        public static string ToString(FileNotFoundException aThis)
+        {
+            return "FileNotFoundException";
+        }
+    }
 }

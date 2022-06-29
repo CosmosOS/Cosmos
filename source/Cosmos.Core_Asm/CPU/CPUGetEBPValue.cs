@@ -1,10 +1,15 @@
-﻿using XSharp;
+﻿using Cosmos.Debug.Kernel;
+using XSharp;
 using XSharp.Assembler;
 using static XSharp.XSRegisters;
 
-namespace Cosmos.Core_Asm;
-
-public class CPUGetEBPValue : AssemblerMethod
+namespace Cosmos.Core_Asm
 {
-    public override void AssembleNew(Assembler aAssembler, object aMethodInfo) => XS.Push(EBP);
+    public class CPUGetEBPValue : AssemblerMethod
+    {
+        public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+        {
+            XS.Push(EBP);
+        }
+    }
 }

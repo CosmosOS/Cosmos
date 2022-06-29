@@ -37,6 +37,6 @@
         <DeployExtension Condition="'$(CI)' == 'True'">False</DeployExtension>
     </PropertyGroup>
 
-    <Import Project="build\Targets\Import.props"/>
+    <Import Project="build\Targets\Import.props" />
 
 </Project>

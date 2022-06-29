@@ -1,11 +1,16 @@
-﻿using Cosmos.Core_Asm.GCImplementation;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Cosmos.Core;
+using Cosmos.Core_Asm.GCImplementation;
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Asm;
-
-[Plug(Target = typeof(Core.GCImplementation))]
-public static class GCImplementationImpl
+namespace Cosmos.Core_Asm
 {
-    [PlugMethod(Assembler = typeof(GetPointerAsm))]
-    public static unsafe uint* GetPointer(object aObject) => throw null;
+    [Plug(Target =typeof(Core.GCImplementation))]
+    public static class GCImplementationImpl
+    {
+        [PlugMethod(Assembler =typeof(GetPointerAsm))]
+        public static unsafe uint* GetPointer(object aObject) => throw null;
+    }
 }

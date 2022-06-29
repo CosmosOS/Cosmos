@@ -9,18 +9,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IL2CPU.API"/>
+        <PackageReference Include="IL2CPU.API" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj"/>
-        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj"/>
-        <ProjectReference Include="..\Cosmos.HAL2\Cosmos.HAL2.csproj"/>
-        <ProjectReference Include="..\Cosmos.System2\Cosmos.System2.csproj"/>
+        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
+        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference Include="..\Cosmos.HAL2\Cosmos.HAL2.csproj" />
+        <ProjectReference Include="..\Cosmos.System2\Cosmos.System2.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="System\Runtime\CompilerServices\"/>
+      <Folder Include="System\Runtime\CompilerServices\" />
     </ItemGroup>
 
 </Project>
