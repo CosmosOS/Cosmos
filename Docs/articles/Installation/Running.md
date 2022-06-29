@@ -29,7 +29,7 @@ Not officially supported at this time, but can be done. Just use the ISO option 
 
 ### Bochs
 
-Support is underway.
+Bochs is officially supported.
 
 ### PXE
 
