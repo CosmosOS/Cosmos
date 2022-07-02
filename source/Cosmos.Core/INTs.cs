@@ -703,33 +703,15 @@ namespace Cosmos.Core {
             unsafe
             {
                 byte* xAddress = (byte*)0xB8000;
-                PutErrorChar(0, 00, ' ');
-                PutErrorChar(0, 01, '*');
-                PutErrorChar(0, 02, '*');
-                PutErrorChar(0, 03, '*');
-                PutErrorChar(0, 04, ' ');
-                PutErrorChar(0, 05, 'C');
-                PutErrorChar(0, 06, 'P');
-                PutErrorChar(0, 07, 'U');
-                PutErrorChar(0, 08, ' ');
-                PutErrorChar(0, 09, 'E');
-                PutErrorChar(0, 10, 'x');
-                PutErrorChar(0, 11, 'c');
-                PutErrorChar(0, 12, 'e');
-                PutErrorChar(0, 13, 'p');
-                PutErrorChar(0, 14, 't');
-                PutErrorChar(0, 15, 'i');
-                PutErrorChar(0, 16, 'o');
-                PutErrorChar(0, 17, 'n');
-                PutErrorChar(0, 18, ' ');
-                PutErrorChar(0, 19, 'x');
-                PutErrorChar(0, 20, xHex[(int)((ctx.Interrupt >> 4) & 0xF)]);
-                PutErrorChar(0, 21, xHex[(int)(ctx.Interrupt & 0xF)]);
-                PutErrorChar(0, 22, ' ');
-                PutErrorChar(0, 23, '*');
-                PutErrorChar(0, 24, '*');
-                PutErrorChar(0, 25, '*');
-                PutErrorChar(0, 26, ' ');
+
+                PutErrorString(0, 0, "Cosmos CPU Exception");
+
+                PutErrorString(2, 0, "Error Code: 0x");
+                PutErrorChar(2, 14, xHex[(int)((ctx.Interrupt >> 4) & 0xF)]);
+                PutErrorChar(2, 15, xHex[(int)(ctx.Interrupt & 0xF)]);
+
+                PutErrorString(2, 0, aName);
+                PutErrorString(3, 0, aDescription);
 
                 if (lastKnownAddressValue != 0) {
                     PutErrorString(1, 0, "Last known address: 0x");
