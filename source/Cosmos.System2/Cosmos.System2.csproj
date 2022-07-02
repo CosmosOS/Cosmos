@@ -6,6 +6,7 @@
         <RootNamespace>Cosmos.System</RootNamespace>
         <AssemblyOriginatorKeyFile>..\..\build\Cosmos.snk</AssemblyOriginatorKeyFile>
         <Configurations>Debug;Release;TEST</Configurations>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

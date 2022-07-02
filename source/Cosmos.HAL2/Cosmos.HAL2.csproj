@@ -5,10 +5,11 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>Cosmos.HAL</RootNamespace>
         <Configurations>Debug;Release;TEST</Configurations>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TEST|AnyCPU'">
