@@ -61,6 +61,8 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         readonly IOPort pGlobalControl;      // Controls basic AC97 functions
         readonly IOPort pResetRegister;      // Writing any value to port will cause a register reset
 
+        const uint RESET_POLL_LIMIT = 500; // The maximum amount of polls for a reset the driver can perform.
+
         const int TC_RUN_OR_PAUSE = (1 << 0);
         const int TC_TRANSFER_RESET = (1 << 1);
         const int TC_ENABLE_LAST_VALID_BUF_INTERRUPT = (1 << 2);
@@ -135,11 +137,18 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
             pResetRegister.DWord = 0xDEADBEEF; // any value will do here
 
             // Reset PCM out
+            uint polls = 0; // The amount we polled the device for a reset
+
             pTransferControl.Byte = (byte)(pTransferControl.Byte | TC_TRANSFER_RESET);
-            while ((pTransferControl.Byte & TC_TRANSFER_RESET) != 0)
+            while ((pTransferControl.Byte & TC_TRANSFER_RESET) != 0 && polls < RESET_POLL_LIMIT)
             {
                 // Wait until the byte is cleared
+                polls++;
             }
+
+            // The device hasn't responded to our reset request. Probably not a fully-compatible AC97 card.
+            if (polls >= RESET_POLL_LIMIT)
+                throw new InvalidOperationException("No AC97-compatible device could be found - the reset timeout has expired.");
 
             // Volume
             pMasterVolume.Word = CreateMixerVolumeValue(AC97_VOLUME_MAX, AC97_VOLUME_MAX, false);
