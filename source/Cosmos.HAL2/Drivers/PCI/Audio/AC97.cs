@@ -195,16 +195,6 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
                 bufferDescriptorList[i].bufferSize = bufferSize;
                 bufferDescriptorList[i].configuration |= BD_FIRE_INTERRUPT_ON_CLEAR;
             }
-
-            // Tell BDL location
-            fixed (void* ptr = bufferDescriptorList)
-            {
-                pBufferDescriptors.DWord = (uint)ptr;
-            }
-
-            // Set last valid index
-            lastValidIdx = 2;
-            pLastValidEntry.Byte = lastValidIdx;
         }
 
         private void HandleInterrupt(ref INTs.IRQContext aContext)
@@ -274,8 +264,17 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
 
         public override void Enable()
         {
+            if (Enabled)
+                return; // Ignore calls to Enable() if the driver is already enabled
+
+            // Tell BDL location
+            fixed (void* ptr = bufferDescriptorList)
+            {
+                pBufferDescriptors.DWord = (uint)ptr;
+            }
+
             // Set last valid index
-            lastValidIdx = 2;
+            lastValidIdx = 2; // Start at the 3rd buffer. This will give us some headroom and will decrease clicks.
             pLastValidEntry.Byte = lastValidIdx;
 
             uint globalControl = pGlobalControl.DWord;
