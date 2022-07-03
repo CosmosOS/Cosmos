@@ -17,24 +17,6 @@ namespace Cosmos.System.Audio {
         AudioBuffer mixBuffer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AudioMixer"/> class,
-        /// with the specified initial internal mixing buffer size and sample format.
-        /// </summary>
-        /// <remarks>
-        /// This constructor should be used when the sizes and formats of the
-        /// buffers that will be given to the mixer are known. If there is a
-        /// mis-match between the mixing format and/or the buffer size and the given buffer,
-        /// the internal mixing buffer will be re-initialized with the right values.
-        /// </remarks>
-        /// <param name="format">The resulting format of the mixing process.</param>
-        /// <param name="bufferSize">The size of the mixing buffer, in audio samples.</param>
-        public AudioMixer(SampleFormat format, int bufferSize)
-        {
-            mixBuffer = new AudioBuffer(bufferSize, format);
-            streamReader = new AudioBufferReader(mixBuffer);
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="AudioMixer"/> class.
         /// </summary>
         /// <remarks>
@@ -166,10 +148,14 @@ namespace Cosmos.System.Audio {
         {
             if(a > 0) {
                 if (b > short.MaxValue - a)
+                {
                     return short.MaxValue;
+                }
             }
             else if (b < short.MinValue - a)
+            {
                 return short.MinValue;
+            }
 
             return (short)(a + b);
         }
