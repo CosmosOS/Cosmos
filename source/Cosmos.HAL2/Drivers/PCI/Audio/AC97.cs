@@ -168,7 +168,12 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         public static AC97 Initialize(ushort bufferSize)
         {
             if (Instance != null)
+            {
+                if (Instance.bufferSizeSamples != bufferSize)
+                    Instance.ChangeBufferSize(bufferSize);
+
                 return Instance;
+            }
 
             Instance = new AC97(bufferSize);
             return Instance;
@@ -195,6 +200,40 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
                 bufferDescriptorList[i].bufferSize = bufferSize;
                 bufferDescriptorList[i].configuration |= BD_FIRE_INTERRUPT_ON_CLEAR;
             }
+        }
+
+        /// <summary>
+        /// Changes the size of the internal buffers. This will result
+        /// in a slight interruption in audio.
+        /// </summary>
+        /// <param name="newSize">The new buffer size, in samples. This value cannot be an odd number, as per the AC97 specification.</param>
+        /// <exception cref="ArgumentException">Thrown when the given buffer size is invalid.</exception>
+        public void ChangeBufferSize(ushort newSize)
+        {
+            if (newSize % 2 != 0)
+                throw new ArgumentException("The new buffer size must be an even number.", nameof(newSize));
+
+            if (newSize == bufferSizeSamples)
+                return; // No action needed
+
+            CreateBuffers(newSize);
+            ProvideBuffers();
+        }
+
+        /// <summary>
+        /// Provides the buffers to the sound card.
+        /// </summary>
+        private void ProvideBuffers()
+        {
+            // Tell BDL location
+            fixed (void* ptr = bufferDescriptorList)
+            {
+                pBufferDescriptors.DWord = (uint)ptr;
+            }
+
+            // Set last valid index
+            lastValidIdx = 2; // Start at the 3rd buffer. This will give us some headroom and will decrease clicks.
+            pLastValidEntry.Byte = lastValidIdx;
         }
 
         private void HandleInterrupt(ref INTs.IRQContext aContext)
@@ -267,15 +306,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
             if (Enabled)
                 return; // Ignore calls to Enable() if the driver is already enabled
 
-            // Tell BDL location
-            fixed (void* ptr = bufferDescriptorList)
-            {
-                pBufferDescriptors.DWord = (uint)ptr;
-            }
-
-            // Set last valid index
-            lastValidIdx = 2; // Start at the 3rd buffer. This will give us some headroom and will decrease clicks.
-            pLastValidEntry.Byte = lastValidIdx;
+            ProvideBuffers();
 
             uint globalControl = pGlobalControl.DWord;
             globalControl &= ~((0x3U) << 22); // 16-bit output
