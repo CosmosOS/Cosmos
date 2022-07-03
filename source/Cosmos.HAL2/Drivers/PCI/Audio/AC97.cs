@@ -93,7 +93,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         /// given buffer size.
         /// </summary>
         /// <param name="bufferSize">The buffer size in samples to use. This value cannot be an odd number, as per the AC97 specification.</param>
-        /// <exception cref="ArgumentException">Thrown when the given buffer size is incorrect.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given buffer size is invalid.</exception>
         /// <exception cref="InvalidOperationException">Thrown when no AC97-compatible sound card is present.</exception>
         private AC97(ushort bufferSize)
         {
@@ -163,7 +163,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         /// and has a running instance.
         /// </summary>
         /// <param name="bufferSize">The buffer size in samples to use. This value cannot be an odd number, as per the AC97 specification.</param>
-        /// <exception cref="ArgumentException">Thrown when the given buffer size is incorrect.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given buffer size is invalid.</exception>
         /// <exception cref="InvalidOperationException">Thrown when no AC97-compatible sound card is present.</exception>
         public static AC97 Initialize(ushort bufferSize)
         {
