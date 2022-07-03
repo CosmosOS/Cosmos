@@ -72,5 +72,5 @@ audioManager.Enable();
 ```
 The audio manager accepts a `Stream` and an `Output` property - the `Stream` is the audio stream that the audio manager will read samples from, which will in turn be provided to the underlying `Output` audio driver. The audio manager abstracts all hardware handling - however, if you need more control over the devices, you can use the driver classes directly.
 
-> **Note**
-> When interfacing with audio devices, remember to not overload the system when supplying the audio samples. When mixing several streams of audio of different formats, for example, the system can get too overloaded, and this will result in audio crackle, or the system won't be able to respond to the audio device.
+> **Note**<br>
+- > When interfacing with audio devices, remember to not overload the system when supplying the audio samples. When mixing several streams of audio of different formats, for example, the system can get too overloaded, and this will result in audio crackle, or the system won't be able to respond to the audio device.
