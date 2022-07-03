@@ -55,17 +55,8 @@ namespace Cosmos.HAL.Audio {
         /// </summary>
         public void Flush()
         {
-            int calculatedSize = format.size * Size;
-
-            if(buffer != null && buffer.Length == calculatedSize) {
-                // The buffer already exists and the size has not changed -
-                // set all of the bytes of the buffer to 0.
-                MemoryOperations.Fill(buffer, 0);
-            } else {
-                // The buffer either does not exist or the sizes do not match -
-                // allocate a new one in memory and assign it to our variable.
-                buffer = new byte[calculatedSize];
-            }
+            // Set all of the bytes of the buffer to 0.
+            MemoryOperations.Fill(buffer, 0);
         }
 
         /// <summary>
@@ -97,12 +88,15 @@ namespace Cosmos.HAL.Audio {
             if (index >= Size)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
+
             int bufferOffset = index * format.size;
 
             fixed(byte* bufferPtr = buffer) {
-                for (int i = 0; i < format.size; i++) {
-                    *(dest + i) = *(bufferPtr + i);
-                }
+                MemoryOperations.Copy(
+                    dest,
+                    bufferPtr + bufferOffset,
+                    format.size
+                );
             }
         }
 
@@ -131,15 +125,15 @@ namespace Cosmos.HAL.Audio {
         /// <exception cref="ArgumentOutOfRangeException">Thrown when attempting to write to a non-existent channel or sample.</exception>
         public unsafe void ReadSampleChannel(int index, int channel, byte* dest)
         {
-            // Hot path
             int channelByteSize = format.ChannelSize;
             int bufferOffset = (index * format.size) + (channelByteSize * channel);
 
             fixed (byte* bufferPtr = buffer) {
-                for (int i = 0; i < channelByteSize; i++)
-                {
-                    *(dest + i) = *(bufferPtr + bufferOffset + i);
-                }
+                MemoryOperations.Copy(
+                    dest,
+                    bufferPtr + bufferOffset,
+                    channelByteSize
+                );
             }
         }
 
