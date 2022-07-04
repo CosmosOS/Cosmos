@@ -92,11 +92,7 @@ namespace Cosmos.HAL.Audio {
             int bufferOffset = index * format.size;
 
             fixed(byte* bufferPtr = buffer) {
-                MemoryOperations.Copy(
-                    dest,
-                    bufferPtr + bufferOffset,
-                    format.size
-                );
+                MemoryOperations.Copy(dest, bufferPtr + bufferOffset, format.size);
             }
         }
 
