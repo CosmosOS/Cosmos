@@ -30,7 +30,14 @@ namespace Cosmos.System.Audio.IO {
         }
 
         #region Standard AudioStream Members
-        public SampleFormat Format { get; set; }
+        public SampleFormat Format
+        {
+            get => format;
+            set
+            {
+                throw new NotSupportedException("Cannot change the format of a MemoryAudioStream");
+            }
+        }
 
         public override uint SampleRate {
             get => sampleRate;
