@@ -26,7 +26,12 @@ byte[] bytes = GetArrayOfAudioSamplesFromSomewhere();
 var memAudioStream = new MemoryAudioStream(new SampleFormat(AudioBitDepth.Bits16, 2, true), 48000, bytes);
 ```
 
-However, usually, you will have an audio file which contains a header containing information about the audio samples it contains. The MemoryAudioStream class contains support for the 
+However, usually, you will have an audio file which contains a header containing information about the audio samples it contains. The MemoryAudioStream class contains support for the [Waveform Audio File Format (WAVE)](https://en.wikipedia.org/wiki/WAV), commonly used with the .WAV extension. To create an memory audio stream from a .WAV file, simply do:
+```cs
+byte[] bytes = GetWavFileFromSomewhere();
+var wavAudioStream = MemoryAudioStream.FromWave(bytes); 
+```
+The method will parse the file and automatically read the sample format and the sample bytes. Please keep in mind that this method only accepts uncompressed PCM samples, which is the most common encoding used in .WAV files.
 
 ## Audio Mixing
 The CAI includes an `AudioMixer` class out of the box. This class is an infinite `AudioStream` that mixes given streams together. Please keep in mind that the mixing done can result in [signal clipping](https://en.wikipedia.org/wiki/Clipping_(signal_processing)).
