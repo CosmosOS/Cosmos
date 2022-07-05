@@ -63,6 +63,8 @@ namespace Cosmos.System.Audio.IO {
                     buffer = new byte[
                         Math.Max(writeFormat.ChannelSize, target.format.ChannelSize) * Math.Max(writeFormat.channels, target.format.channels)
                     ];
+
+                    mode = OperationMode.Convert;
                 }     
             }
         }
