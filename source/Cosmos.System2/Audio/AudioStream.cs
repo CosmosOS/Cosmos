@@ -52,8 +52,9 @@ namespace Cosmos.System.Audio {
         {
             for (int i = 0; i < PostProcessors.Count; i++)
             {
-                if (PostProcessors[i] is T t)
+                if (PostProcessors[i] is T t) {
                     return t;
+                }
             }
 
             return null;

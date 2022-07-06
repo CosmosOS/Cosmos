@@ -9,8 +9,12 @@ namespace Cosmos.HAL.Audio {
     public class AudioBuffer {
         int size;
         byte[] buffer;
-        public readonly SampleFormat format;
         readonly int sampleAmount;
+
+        /// <summary>
+        /// The audio format of the buffer.
+        /// </summary>
+        public readonly SampleFormat Format;
 
         /// <summary>
         /// Creates an empty <see cref="AudioBuffer"/>.
@@ -19,10 +23,10 @@ namespace Cosmos.HAL.Audio {
         /// <param name="format">The target format of the audio buffer.</param>
         public AudioBuffer(int size, SampleFormat format)
         {
-            this.format = format;
+            Format = format;
             this.size = size;
-            buffer = new byte[format.size * Size];
-            sampleAmount = size * format.channels;
+            buffer = new byte[format.Size * Size];
+            sampleAmount = size * format.Channels;
         }
 
         /// <summary>
@@ -40,7 +44,7 @@ namespace Cosmos.HAL.Audio {
                 if(value != size)
                 {
                     size = value;
-                    buffer = new byte[format.size * Size];
+                    buffer = new byte[Format.Size * Size];
                 }
             }
         }
@@ -69,10 +73,11 @@ namespace Cosmos.HAL.Audio {
         /// <exception cref="ArgumentOutOfRangeException">Thrown when attempting to write to a non-existent sample.</exception>
         public unsafe void ReadSample(int index, byte[] dest, int destOffset = 0)
         {
-            if ((dest.Length - destOffset) - format.size < 0)
+            if ((dest.Length - destOffset) - Format.Size < 0) {
                 throw new ArgumentException("The provided destination array is not large enough to hold all of the bytes.", nameof(dest));
+            }
 
-            fixed(byte* destPtr = dest) {
+            fixed (byte* destPtr = dest) {
                 ReadSample(index, destPtr + destOffset);
             }
         }
@@ -85,14 +90,14 @@ namespace Cosmos.HAL.Audio {
         /// <exception cref="ArgumentOutOfRangeException">Thrown when attempting to write to a non-existent sample.</exception>
         public unsafe void ReadSample(int index, byte* dest)
         {
-            if (index >= Size)
+            if (index >= Size) {
                 throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
-
-            int bufferOffset = index * format.size;
+            int bufferOffset = index * Format.Size;
 
             fixed(byte* bufferPtr = buffer) {
-                MemoryOperations.Copy(dest, bufferPtr + bufferOffset, format.size);
+                MemoryOperations.Copy(dest, bufferPtr + bufferOffset, Format.Size);
             }
         }
 
@@ -121,8 +126,8 @@ namespace Cosmos.HAL.Audio {
         /// <exception cref="ArgumentOutOfRangeException">Thrown when attempting to write to a non-existent channel or sample.</exception>
         public unsafe void ReadSampleChannel(int index, int channel, byte* dest)
         {
-            int channelByteSize = format.ChannelSize;
-            int bufferOffset = (index * format.size) + (channelByteSize * channel);
+            int channelByteSize = Format.ChannelSize;
+            int bufferOffset = (index * Format.Size) + (channelByteSize * channel);
 
             fixed (byte* bufferPtr = buffer) {
                 MemoryOperations.Copy(
@@ -144,8 +149,9 @@ namespace Cosmos.HAL.Audio {
         /// <exception cref="ArgumentOutOfRangeException">Thrown when attempting to write to a non-existent sample.</exception>
         public unsafe void WriteSample(int index, byte[] src, int srcOffset = 0)
         {
-            if ((src.Length - srcOffset) - format.size < 0)
+            if ((src.Length - srcOffset) - Format.Size < 0) {
                 throw new ArgumentException("The provided source array is not large enough to provide all of the bytes.", nameof(src));
+            }
 
             fixed (byte* destPtr = src) {
                 ReadSample(index, destPtr + srcOffset);
@@ -161,13 +167,14 @@ namespace Cosmos.HAL.Audio {
         /// <exception cref="ArgumentOutOfRangeException">Thrown when attempting to write to a non-existent sample.</exception>
         public unsafe void WriteSample(int index, byte* src)
         {
-            if (index >= Size)
+            if (index >= Size) {
                 throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
-            int bufferOffset = index * format.size;
+            int bufferOffset = index * Format.Size;
 
             fixed(byte* bufferPtr = buffer) {
-                for (int i = 0; i < format.size; i++) {
+                for (int i = 0; i < Format.Size; i++) {
                     *(bufferPtr + i) = *(src + i);
                 }
             }
@@ -186,8 +193,9 @@ namespace Cosmos.HAL.Audio {
         /// <exception cref="ArgumentOutOfRangeException">Thrown when attempting to write to a non-existent channel or sample.</exception>
         public unsafe void WriteSampleChannel(int index, int channel, byte[] src, int srcOffset = 0)
         {
-            if ((src.Length - srcOffset) - (int)format.bitDepth < 0)
+            if ((src.Length - srcOffset) - (int)Format.BitDepth < 0) {
                 throw new ArgumentException("The provided source array is not large enough to provide all of the bytes.", nameof(src));
+            }
 
             fixed (byte* destPtr = src) {
                 WriteSampleChannel(index, channel, destPtr + srcOffset);
@@ -205,14 +213,16 @@ namespace Cosmos.HAL.Audio {
         /// <exception cref="ArgumentOutOfRangeException">Thrown when attempting to write to a non-existent channel or sample.</exception>
         public unsafe void WriteSampleChannel(int index, int channel, byte* src)
         {
-            if (index >= Size)
+            if (index >= Size) {
                 throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
-            if (channel > format.channels)
+            if (channel > Format.Channels) {
                 throw new ArgumentOutOfRangeException(nameof(channel));
+            }
 
-            int channelByteSize = (int)format.bitDepth;
-            int bufferOffset = (index * format.size) + (channelByteSize * channel);
+            int channelByteSize = (int)Format.BitDepth;
+            int bufferOffset = (index * Format.Size) + (channelByteSize * channel);
 
             fixed (byte* bufferPtr = buffer) {
                 for (int i = 0; i < channelByteSize; i++) {

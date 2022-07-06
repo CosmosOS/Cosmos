@@ -9,23 +9,23 @@ namespace Cosmos.HAL.Audio {
         /// The audio bit depth, i.e. how many bits are used per a single
         /// channel in a sample.
         /// </summary>
-        public AudioBitDepth bitDepth;
+        public AudioBitDepth BitDepth;
 
         /// <summary>
         /// The amount of channels per a single sample.
         /// </summary>
-        public readonly byte channels;
+        public readonly byte Channels;
 
         /// <summary>
         /// A value indicating whether the audio samples are signed or
         /// unsigned. By convention, only 8-bit audio samples are unsigned.
         /// </summary>
-        public readonly bool signed;
+        public readonly bool Signed;
 
         /// <summary>
         /// The size of a single audio sample (frame).
         /// </summary>
-        public readonly int size;
+        public readonly int Size;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SampleFormat"/> structure.
@@ -35,16 +35,16 @@ namespace Cosmos.HAL.Audio {
         /// <param name="signed">Whether the audio is signed, that is, whether the sample can store negative values. By convention, only 8-bit audio samples are unsigned.</param>
         public SampleFormat(AudioBitDepth bitDepth, byte channels, bool signed)
         {
-            this.bitDepth = bitDepth;
-            this.channels = channels;
-            this.signed = signed;
-            size = ChannelSize * channels;
+            BitDepth = bitDepth;
+            Channels = channels;
+            Signed = signed;
+            Size = ChannelSize * channels;
         }
 
         /// <summary>
         /// The amount of bytes per a single audio channel.
         /// </summary>
-        public int ChannelSize => (int)bitDepth;
+        public int ChannelSize => (int)BitDepth;
 
         /// <summary>
         /// Returns a copy of this <see cref="SampleFormat"/> that represents
@@ -52,14 +52,14 @@ namespace Cosmos.HAL.Audio {
         /// </summary>
         public SampleFormat AsSingleChannel()
         {
-            return new SampleFormat(bitDepth, 1, signed);
+            return new SampleFormat(BitDepth, 1, Signed);
         }
 
         public static bool operator ==(SampleFormat lhs, SampleFormat rhs)
         {
-            return lhs.bitDepth == rhs.bitDepth &&
-                   lhs.signed   == rhs.signed   &&
-                   lhs.channels == rhs.channels;
+            return lhs.BitDepth == rhs.BitDepth &&
+                   lhs.Signed   == rhs.Signed   &&
+                   lhs.Channels == rhs.Channels;
         }
 
         public static bool operator !=(SampleFormat lhs, SampleFormat rhs)
@@ -78,29 +78,29 @@ namespace Cosmos.HAL.Audio {
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(bitDepth, channels, signed);
+            return HashCode.Combine(BitDepth, Channels, Signed);
         }
 
         public override string ToString()
         {
-            string bitDepthEnumName = bitDepth switch
+            string bitDepthEnumName = BitDepth switch
             {
                 AudioBitDepth.Bits8 => "8-bit",
                 AudioBitDepth.Bits16 => "16-bit",
                 AudioBitDepth.Bits24 => "24-bit",
                 AudioBitDepth.Bits32 => "32-bit",
-                _ => $"{(int)bitDepth * 4}-bit"
+                _ => $"{(int)BitDepth * 4}-bit"
             };
 
-            string channelAmountName = channels switch
+            string channelAmountName = Channels switch
             {
                 0 => "no output",
                 1 => "Mono",
                 2 => "Stereo",
-                _ => $"{channels} channels"
+                _ => $"{Channels} channels"
             };
 
-            return $"{(signed ? "Signed" : "Unsigned")} {bitDepthEnumName}, {channelAmountName}";
+            return $"{(Signed ? "Signed" : "Unsigned")} {bitDepthEnumName}, {channelAmountName}";
         }
     }
 }

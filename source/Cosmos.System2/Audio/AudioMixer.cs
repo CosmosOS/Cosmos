@@ -60,8 +60,8 @@ namespace Cosmos.System.Audio {
         public unsafe override void Read(AudioBuffer buffer)
         {
             // Ensure our mixing buffer is the same format and size as the output buffer
-            if(mixBuffer == null || mixBuffer.Size != buffer.Size || mixBuffer.format != buffer.format) {
-                mixBuffer = new AudioBuffer(buffer.Size, buffer.format);
+            if(mixBuffer == null || mixBuffer.Size != buffer.Size || mixBuffer.Format != buffer.Format) {
+                mixBuffer = new AudioBuffer(buffer.Size, buffer.Format);
                 streamReader = new AudioBufferReader(mixBuffer);
             }
 
@@ -112,7 +112,7 @@ namespace Cosmos.System.Audio {
                     {
                         // Iterate through each channel of the output buffer
                         // Our mixing buffer has the same amount of channels as the output buffer
-                        for (int channel = 0; channel < buffer.format.channels; channel++)
+                        for (int channel = 0; channel < buffer.Format.Channels; channel++)
                         {
                             short sum = SaturationAdd(
                                 cachedOutputReader.ReadChannelInt16(j, channel),

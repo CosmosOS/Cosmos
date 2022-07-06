@@ -23,8 +23,12 @@ namespace Cosmos.System.Audio
             get => enabled;
             set
             {
-                if (!enabled && value) Enable();
-                else if (enabled && !value) Disable();
+                if (!enabled && value) {
+                    Enable();
+                }
+                else if (enabled && !value) {
+                    Disable();
+                }
             }
         }
 
@@ -47,8 +51,9 @@ namespace Cosmos.System.Audio
                 {
                     output.BufferProvider = this;
 
-                    if (Enabled)
+                    if (Enabled) {
                         output.Enable();
+                    }
                 }
             }
         }
@@ -78,11 +83,13 @@ namespace Cosmos.System.Audio
 
         public void RequestBuffer(AudioBuffer buffer)
         {
-            if (Stream != null)
+            if (Stream != null) {
                 Stream.Read(buffer);
-            else
+            }
+            else {
                 // No stream defined - flush the buffer so we get silence
                 buffer.Flush();
+            }
         }
     }
 }

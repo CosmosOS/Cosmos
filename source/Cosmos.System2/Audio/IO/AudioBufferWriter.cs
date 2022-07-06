@@ -48,20 +48,20 @@ namespace Cosmos.System.Audio.IO {
             this.target = target ?? throw new ArgumentNullException(nameof(target));
             this.writeFormat = writeFormat;
 
-            if(target.format == writeFormat) {
+            if(target.Format == writeFormat) {
                 mode = OperationMode.DirectCopy;
             } else
             {
-                if(target.format.bitDepth == writeFormat.bitDepth && target.format.signed == writeFormat.signed)
+                if(target.Format.BitDepth == writeFormat.BitDepth && target.Format.Signed == writeFormat.Signed)
                 {
                     mode = OperationMode.ChannelCopy;
                 } else
                 {
-                    shouldMakeSigned = !writeFormat.signed && target.format.signed;     // whether we should make the samples in 'src' signed
-                    shouldChangeSign = shouldMakeSigned || (!target.format.signed && writeFormat.signed);  // whether we should change the sign of the samples
+                    shouldMakeSigned = !writeFormat.Signed && target.Format.Signed;     // whether we should make the samples in 'src' signed
+                    shouldChangeSign = shouldMakeSigned || (!target.Format.Signed && writeFormat.Signed);  // whether we should change the sign of the samples
 
                     buffer = new byte[
-                        Math.Max(writeFormat.ChannelSize, target.format.ChannelSize) * Math.Max(writeFormat.channels, target.format.channels)
+                        Math.Max(writeFormat.ChannelSize, target.Format.ChannelSize) * Math.Max(writeFormat.Channels, target.Format.Channels)
                     ];
 
                     mode = OperationMode.Convert;
@@ -78,27 +78,27 @@ namespace Cosmos.System.Audio.IO {
         {
             if (mode == OperationMode.DirectCopy)
             {
-                int sampleStart = index * target.format.size;
+                int sampleStart = index * target.Format.Size;
 
                 fixed(byte* destPtr = target.RawData)
                 {
-                    MemoryOperations.Copy(destPtr + sampleStart, sample, target.format.size);
+                    MemoryOperations.Copy(destPtr + sampleStart, sample, target.Format.Size);
                 }
             } else
             {
                 // Read the sample to the buffer
-                for (int j = 0; j < writeFormat.size; j++)
+                for (int j = 0; j < writeFormat.Size; j++)
                 {
                     buffer[j] = sample[j];
                 }
 
                 // Pass 1: Upmix/downmix channels
-                if (writeFormat.channels < target.format.channels)
+                if (writeFormat.Channels < target.Format.Channels)
                 {
                     UpmixChannels(
                         buffer,
-                        writeFormat.channels,
-                        target.format.channels,
+                        writeFormat.Channels,
+                        target.Format.Channels,
                         writeFormat
                     );
                 }
@@ -106,27 +106,29 @@ namespace Cosmos.System.Audio.IO {
                 fixed (byte* bufferPtr = buffer, destPtr = target.RawData)
                 {
                     // Pass 2: Change the bit-depth
-                    if (writeFormat.bitDepth != target.format.bitDepth)
+                    if (writeFormat.BitDepth != target.Format.BitDepth)
                     {
                         ChangeBitDepth(
                             bufferPtr,
-                            target.format.channels,
-                            writeFormat.bitDepth,
-                            target.format.bitDepth
+                            target.Format.Channels,
+                            writeFormat.BitDepth,
+                            target.Format.BitDepth
                         );
                     }
 
                     // Pass 3: Change the sign
                     if (shouldChangeSign)
                     {
-                        if (shouldMakeSigned)
-                            MakeSigned(bufferPtr, target.format);
-                        else
-                            MakeUnsigned(bufferPtr, target.format);
+                        if (shouldMakeSigned) {
+                            MakeSigned(bufferPtr, target.Format);
+                        }
+                        else {
+                            MakeUnsigned(bufferPtr, target.Format);
+                        }
                     }
 
-                    int sampleStart = index * target.format.size;
-                    MemoryOperations.Copy(destPtr + sampleStart, bufferPtr, target.format.size);
+                    int sampleStart = index * target.Format.Size;
+                    MemoryOperations.Copy(destPtr + sampleStart, bufferPtr, target.Format.Size);
                 }
             }
         }
@@ -139,10 +141,11 @@ namespace Cosmos.System.Audio.IO {
         /// <exception cref="ArgumentException">The target array is not big enough to contain the sample information.</exception>
         public unsafe void Write(byte[] sample, int index)
         {
-            if (sample.Length < writeFormat.size)
+            if (sample.Length < writeFormat.Size) {
                 throw new ArgumentException("The provided sample array is not large enough to provide all data necessary.", nameof(sample));
+            }
 
-            fixed(byte* samplePtr = sample) {
+            fixed (byte* samplePtr = sample) {
                 Write(samplePtr, index);
             }
         }
@@ -157,10 +160,11 @@ namespace Cosmos.System.Audio.IO {
         /// <exception cref="ArgumentException">The target array is not big enough to provide the sample information with the given offset.</exception>
         public unsafe void Write(byte[] sample, int index, int offset)
         {
-            if(sample.Length - offset < writeFormat.size)
+            if(sample.Length - offset < writeFormat.Size) {
                 throw new ArgumentException("The provided sample array is not large enough to provide all data necessary.", nameof(sample));
+            }
 
-            fixed(byte* samplePtr = sample) {
+            fixed (byte* samplePtr = sample) {
                 Write(samplePtr + offset, index);
             }
         }
@@ -175,11 +179,11 @@ namespace Cosmos.System.Audio.IO {
         {
             if (mode != OperationMode.Convert)
             {
-                int sampleStart = index * target.format.size + channel * target.format.ChannelSize;
+                int sampleStart = index * target.Format.Size + channel * target.Format.ChannelSize;
 
                 fixed (byte* destPtr = target.RawData)
                 {
-                    MemoryOperations.Copy(destPtr + sampleStart, sample, target.format.ChannelSize);
+                    MemoryOperations.Copy(destPtr + sampleStart, sample, target.Format.ChannelSize);
                 }
             } else
             {
@@ -192,28 +196,30 @@ namespace Cosmos.System.Audio.IO {
                 fixed (byte* bufferPtr = buffer, destPtr = target.RawData)
                 {
                     // Pass 1: Change the bit-depth
-                    if (writeFormat.bitDepth != target.format.bitDepth)
+                    if (writeFormat.BitDepth != target.Format.BitDepth)
                     {
                         ChangeBitDepth(
                             bufferPtr,
                             1, // one channel
-                            writeFormat.bitDepth,
-                            target.format.bitDepth
+                            writeFormat.BitDepth,
+                            target.Format.BitDepth
                         );
                     }
 
                     // Pass 2: Change the sign
                     if (shouldChangeSign)
                     {
-                        if (shouldMakeSigned)
-                            MakeSigned(bufferPtr, target.format);
-                        else
-                            MakeUnsigned(bufferPtr, target.format);
+                        if (shouldMakeSigned) {
+                            MakeSigned(bufferPtr, target.Format);
+                        }
+                        else {
+                            MakeUnsigned(bufferPtr, target.Format);
+                        }
                     }
 
-                    int sampleStart = index * target.format.size + channel * target.format.ChannelSize;
+                    int sampleStart = index * target.Format.Size + channel * target.Format.ChannelSize;
 
-                    MemoryOperations.Copy(destPtr + sampleStart, bufferPtr, target.format.ChannelSize);
+                    MemoryOperations.Copy(destPtr + sampleStart, bufferPtr, target.Format.ChannelSize);
                 }
             }
         }

@@ -215,7 +215,7 @@ namespace Cosmos.System.Audio.IO {
         }
 
         protected static unsafe void MakeUnsigned(byte* sourcePtr, SampleFormat format)
-            => MakeUnsigned(sourcePtr, format.bitDepth, format.channels);
+            => MakeUnsigned(sourcePtr, format.BitDepth, format.Channels);
 
         /// <summary>
         /// Makes a single signed audio sample unsigned.
@@ -264,7 +264,7 @@ namespace Cosmos.System.Audio.IO {
         }
 
         protected unsafe static void MakeSigned(byte* sourcePtr, SampleFormat format)
-            => MakeSigned(sourcePtr, format.bitDepth, format.channels);
+            => MakeSigned(sourcePtr, format.BitDepth, format.Channels);
 
         /// <summary>
         /// Makes a single unsigned audio sample signed.
@@ -330,8 +330,8 @@ namespace Cosmos.System.Audio.IO {
                     // srcSampleSize points to the index right after our sample information
                     // offsetting that by srcChannelSize will point where the last channel is
                     // we are adding k to get the appropriate byte (as the channel can be 16-bit, 32-bit, etc)
-                    byte channelByte = buffer[format.size - format.ChannelSize + k];
-                    buffer[format.size + j * format.ChannelSize + k] = channelByte;
+                    byte channelByte = buffer[format.Size - format.ChannelSize + k];
+                    buffer[format.Size + j * format.ChannelSize + k] = channelByte;
                 }
             }
         }

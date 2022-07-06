@@ -193,7 +193,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         {
             transferBuffer = new AudioBuffer(bufferSize, new SampleFormat(AudioBitDepth.Bits16, 2, true));
             bufferSizeSamples = bufferSize;
-            bufferSizeBytes = bufferSize * transferBuffer.format.size;
+            bufferSizeBytes = bufferSize * transferBuffer.Format.Size;
 
             bufferDescriptorList = new BufferDescriptorListEntry[BUFFER_COUNT];
             buffers = new byte[BUFFER_COUNT][];
@@ -295,13 +295,13 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
 
         public override void SetSampleFormat(SampleFormat sampleFormat)
         {
-            if (sampleFormat.bitDepth != AudioBitDepth.Bits16)
+            if (sampleFormat.BitDepth != AudioBitDepth.Bits16)
                 throw new NotSupportedException("The AC97 driver only supports 16-bit audio.");
 
-            if (sampleFormat.channels != 2)
+            if (sampleFormat.Channels != 2)
                 throw new NotSupportedException("The AC97 driver only supports stereo audio.");
 
-            if (!sampleFormat.signed)
+            if (!sampleFormat.Signed)
                 throw new NotSupportedException("The AC97 driver does not support unsigned audio.");
 
             // TODO: The AC97 specification defines support 2/4/6 channel audio. Currently, only stereo audio output is supported.

@@ -15,23 +15,26 @@ namespace Cosmos.System.Audio.IO {
         public AudioBufferReader(AudioBuffer target)
         {
             this.target = target ?? throw new ArgumentNullException(nameof(target));
-            buffer = new byte[4 * target.format.channels];
+            buffer = new byte[4 * target.Format.Channels];
         }
 
         private unsafe void EnsureBufferFormat(byte* bufferPtr, AudioBitDepth bitDepth, bool signed, byte channels)
         {
-            if (target.format.bitDepth != bitDepth)
+            if (target.Format.BitDepth != bitDepth) {
                 ChangeBitDepth(
                     bufferPtr,
                     channels,
-                    target.format.bitDepth,
+                    target.Format.BitDepth,
                     bitDepth
                 );
+            }
 
-            if (target.format.signed && !signed)
+            if (target.Format.Signed && !signed) {
                 MakeUnsigned(bufferPtr, bitDepth, channels);
-            else if (!target.format.signed && signed)
+            }
+            else if (!target.Format.Signed && signed) {
                 MakeSigned(bufferPtr, bitDepth, channels);
+            }
         }
 
         /// <summary>
@@ -113,11 +116,11 @@ namespace Cosmos.System.Audio.IO {
             target.ReadSampleChannel(index, channel, buffer);
 
             fixed (byte* bufferPtr = buffer) {
-                if (!target.format.signed) {
-                    MakeSigned(bufferPtr, target.format.bitDepth, 1);
+                if (!target.Format.Signed) {
+                    MakeSigned(bufferPtr, target.Format.BitDepth, 1);
                 }
 
-                switch (target.format.bitDepth) {
+                switch (target.Format.BitDepth) {
                     case AudioBitDepth.Bits8:
                         sbyte i8 = unchecked((sbyte)buffer[0]);
                         return i8 * (1f / 128f);
@@ -131,7 +134,7 @@ namespace Cosmos.System.Audio.IO {
                         int i32 = *(int*)bufferPtr;
                         return i32 * (1f / 2147483648f);
                     default:
-                        throw new NotImplementedException($"Cannot convert to a floating-point value from bit-depth {target.format.bitDepth}");
+                        throw new NotImplementedException($"Cannot convert to a floating-point value from bit-depth {target.Format.BitDepth}");
                 }
             }
         }

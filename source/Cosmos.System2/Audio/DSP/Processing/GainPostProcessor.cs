@@ -40,8 +40,9 @@ namespace Cosmos.System.Audio.DSP.Processing
             get => gain;
             set
             {
-                if (gain < 0f || gain > 1f)
+                if (gain < 0f || gain > 1f) {
                     throw new ArgumentOutOfRangeException(nameof(value), "The gain property of the GainPostProcessor must be in the range of 0.0 to 1.0.");
+                }
 
                 gain = value;
             }
@@ -63,50 +64,56 @@ namespace Cosmos.System.Audio.DSP.Processing
             {
                 fixed (byte* ptr = buffer.RawData)
                 {
-                    switch (buffer.format.bitDepth)
+                    switch (buffer.Format.BitDepth)
                     {
                         case AudioBitDepth.Bits8:
-                            if (buffer.format.signed)
+                            if (buffer.Format.Signed)
                             {
                                 sbyte* i8ptr = (sbyte*)ptr;
-                                for (int i = 0; i < buffer.SampleAmount; ++i)
+                                for (int i = 0; i < buffer.SampleAmount; ++i) {
                                     i8ptr[i] = (sbyte)(i8ptr[i] * gain);
+                                }
                             }
                             else
                             {
-                                for (int i = 0; i < buffer.SampleAmount; ++i)
+                                for (int i = 0; i < buffer.SampleAmount; ++i) {
                                     ptr[i] = (byte)(ptr[i] * gain);
+                                }
                             }
                             break;
                         case AudioBitDepth.Bits16:
-                            if (buffer.format.signed)
+                            if (buffer.Format.Signed)
                             {
                                 short* i16ptr = (short*)ptr;
-                                for (int i = 0; i < buffer.SampleAmount; ++i)
+                                for (int i = 0; i < buffer.SampleAmount; ++i) {
                                     i16ptr[i] = (short)(i16ptr[i] * gain);
+                                }
                             }
                             else
                             {
                                 ushort* u16ptr = (ushort*)ptr;
-                                for (int i = 0; i < buffer.SampleAmount; ++i)
+                                for (int i = 0; i < buffer.SampleAmount; ++i) {
                                     u16ptr[i] = (ushort)(u16ptr[i] * gain);
+                                }
                             }
                             break;
                         case AudioBitDepth.Bits24:
                             // TODO: 24-bit format support
                             break;
                         case AudioBitDepth.Bits32:
-                            if (buffer.format.signed)
+                            if (buffer.Format.Signed)
                             {
                                 int* i32ptr = (int*)ptr;
-                                for (int i = 0; i < buffer.SampleAmount; ++i)
+                                for (int i = 0; i < buffer.SampleAmount; ++i) {
                                     i32ptr[i] = (int)(i32ptr[i] * gain);
+                                }
                             }
                             else
                             {
                                 uint* u32ptr = (uint*)ptr;
-                                for (int i = 0; i < buffer.SampleAmount; ++i)
+                                for (int i = 0; i < buffer.SampleAmount; ++i) {
                                     u32ptr[i] = (uint)(u32ptr[i] * gain);
+                                }
                             }
                             break;
                     }
@@ -116,8 +123,9 @@ namespace Cosmos.System.Audio.DSP.Processing
 
         private unsafe void AdjustVolume(short* samples, int numSamples)
         {
-            for (int i = 0; i < numSamples; ++i)
+            for (int i = 0; i < numSamples; ++i) {
                 samples[i] = (short)(samples[i] * gain);
+            }
         }
     }
 }
