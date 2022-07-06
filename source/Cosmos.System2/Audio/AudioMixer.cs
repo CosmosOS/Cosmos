@@ -12,7 +12,6 @@ namespace Cosmos.System.Audio {
     /// limiter, and as such, the resulting audio may introduce hard-clipping.
     /// </remarks>
     public class AudioMixer : AudioStream {
-        uint pos = 0;
         uint sampleRate;
         AudioBuffer mixBuffer;
 
@@ -48,16 +47,6 @@ namespace Cosmos.System.Audio {
         }
 
         public override bool Depleted => false;
-
-        /// <summary>
-        /// The position, in samples, of the mixer audio stream. Attempting to set this
-        /// property to another value will result in an <see cref="InvalidOperationException"/>.
-        /// </summary>
-        public uint Position
-        {
-            get => pos;
-            set => throw new InvalidOperationException("Cannot set the position of an AudioMixer.");
-        }
         #endregion
 
         AudioBufferWriter cachedOutputWriter;
@@ -138,8 +127,6 @@ namespace Cosmos.System.Audio {
                     }
                 }
             }
-
-            pos += (uint)buffer.Size;
 
             ApplyPostProcessing(buffer);
         }
