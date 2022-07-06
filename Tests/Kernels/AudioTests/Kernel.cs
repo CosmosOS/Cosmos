@@ -96,9 +96,9 @@ namespace AudioTests
         {
             var memStream = MemoryAudioStream.FromWave(Mono16BitWAVFile);
 
-            Assert.AreEqual(1, memStream.Format.channels, $"Channel amount parsing (parsed: {memStream.Format.channels} channels)");
-            Assert.IsTrue(memStream.Format.signed, "Signed/unsigned parsing");
-            Assert.IsTrue(memStream.Format.bitDepth == AudioBitDepth.Bits16, $"Bit-depth parsing (parsed: ID {(int)memStream.Format.bitDepth})");
+            Assert.AreEqual(1, memStream.Format.Channels, $"Channel amount parsing (parsed: {memStream.Format.Channels} channels)");
+            Assert.IsTrue(memStream.Format.Signed, "Signed/unsigned parsing");
+            Assert.IsTrue(memStream.Format.BitDepth == AudioBitDepth.Bits16, $"Bit-depth parsing (parsed: ID {(int)memStream.Format.BitDepth})");
 
             Success("Format check correct!", "     ");
 
@@ -187,20 +187,20 @@ namespace AudioTests
         unsafe void TestConverting(AudioBuffer from, SampleFormat to, byte[] shouldBe)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("Converting " + from.format.ToString() + " -> " + to.ToString());
+            Console.WriteLine("Converting " + from.Format.ToString() + " -> " + to.ToString());
 
             var convertBuffer = new AudioBuffer(from.Size, to);
-            var writer = new AudioBufferWriter(convertBuffer, new SampleFormat(AudioBitDepth.Bits32, from.format.channels, true));
+            var writer = new AudioBufferWriter(convertBuffer, new SampleFormat(AudioBitDepth.Bits32, from.Format.Channels, true));
             var reader = new AudioBufferReader(from);
 
-            int[] normalized = new int[from.format.channels];
+            int[] normalized = new int[from.Format.Channels];
 
             fixed(int* normalizedPtr = normalized)
             {
                 byte* normBytePtr = (byte*)normalizedPtr;
                 for (int i = 0; i < from.Size; i++)
                 {
-                    for (int channel = 0; channel < from.format.channels; channel++)
+                    for (int channel = 0; channel < from.Format.Channels; channel++)
                     {
                         normalized[channel] = reader.ReadChannelInt32(i, channel);
                     }
@@ -212,7 +212,7 @@ namespace AudioTests
             Console.WriteLine($"Converted: {ByteArrayToString(convertBuffer.RawData)}");
             Console.WriteLine($"Expected:  {ByteArrayToString(shouldBe)}");
 
-            Assert.AreEqual(shouldBe, convertBuffer.RawData, $"Conversion from format " + from.format.ToString() + " to " + to.ToString());
+            Assert.AreEqual(shouldBe, convertBuffer.RawData, $"Conversion from format " + from.Format.ToString() + " to " + to.ToString());
 
             Success("Data check correct!", "     ");
             Console.WriteLine();
