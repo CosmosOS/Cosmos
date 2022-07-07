@@ -55,17 +55,18 @@ namespace Cosmos.System.Audio.IO {
                 if(target.Format.BitDepth == writeFormat.BitDepth && target.Format.Signed == writeFormat.Signed)
                 {
                     mode = OperationMode.ChannelCopy;
-                } else
+                }
+                else
                 {
                     shouldMakeSigned = !writeFormat.Signed && target.Format.Signed;     // whether we should make the samples in 'src' signed
                     shouldChangeSign = shouldMakeSigned || (!target.Format.Signed && writeFormat.Signed);  // whether we should change the sign of the samples
 
-                    buffer = new byte[
-                        Math.Max(writeFormat.ChannelSize, target.Format.ChannelSize) * Math.Max(writeFormat.Channels, target.Format.Channels)
-                    ];
-
                     mode = OperationMode.Convert;
-                }     
+                }
+
+                buffer = new byte[
+                    Math.Max(writeFormat.ChannelSize, target.Format.ChannelSize) * Math.Max(writeFormat.Channels, target.Format.Channels)
+                ];
             }
         }
 
