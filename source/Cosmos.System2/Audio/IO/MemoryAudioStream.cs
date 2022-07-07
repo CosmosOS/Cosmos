@@ -72,9 +72,10 @@ namespace Cosmos.System.Audio.IO {
                 throw new ArgumentException("The first subchunk is expected to be the sample format.", nameof(waveFile));
             }
 
-            if (!ValidateValues(waveFile, 16, 0x10, 0x00, 0x00, 0x00)) {
-                throw new ArgumentException("Only PCM encoding is supported.", nameof(waveFile));
-            }
+            // This is usually 16 for standard PCM audio, but some old encoding software will
+            // include extra, non-standard metadata entries at the end, changing the size.
+            // Normally, this is fine, if the metadata is at the end of the chunk and we can safely ignore it.
+            int metadataSize = BitConverter.ToInt32(waveFile, 16);
 
             if (!ValidateValues(waveFile, 20, 0x01, 0x00)) {
                 throw new ArgumentException("WAVE compression is not supported.", nameof(waveFile));
@@ -100,16 +101,17 @@ namespace Cosmos.System.Audio.IO {
             };
 
             // ExtraParamSize and ExtraParams would be here for encodings different than PCM
+            int dataStart = 20 + metadataSize;
 
-            if (!ValidateValues(waveFile, 36, 0x64, 0x61, 0x74, 0x61)) {
+            if (!ValidateValues(waveFile, dataStart, 0x64, 0x61, 0x74, 0x61)) {
                 throw new ArgumentException("Expected a 'data' block");
             }
 
-            uint dataSize = BitConverter.ToUInt32(waveFile, 40);
+            uint dataSize = BitConverter.ToUInt32(waveFile, dataStart + 4);
             byte[] data = new byte[dataSize];
 
             fixed (byte* inputPtr = waveFile, outputPtr = data) {
-                MemoryOperations.Copy(outputPtr, inputPtr + 44, data.Length);
+                MemoryOperations.Copy(outputPtr, inputPtr + dataStart + 8, data.Length);
             }
 
             SampleFormat format = new(
