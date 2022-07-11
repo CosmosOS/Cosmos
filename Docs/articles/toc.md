@@ -19,6 +19,7 @@
 ## [Network](Kernel/Network.md)
 ## [Resource Files](Kernel/ManifestResouceStream.md)
 ## [Memory Management and Garbage Collection](Kernel/MemoryManagement.md)
+## [Audio](Kernel/Audio.md)
 
 # Reference
 ## [x86](Reference/x86.md)
