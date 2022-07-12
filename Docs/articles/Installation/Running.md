@@ -42,6 +42,18 @@ Bochs can be downloaded [here](https://bochs.sourceforge.io/getcurrent.html)
 ## PXE
 
 For PXE, no special software is required. Only an ethernet connection to your router. However, if you have a computer that does not support network booting, or if you must perform the action over WiFi, you may need to look at a PXE chainloader such as [gPXE](http://etherboot.org/wiki/).
+To run your Cosmos kernel in PXE you need to follow these steps:
+
+Step #1: disable Cosmos Remote Debugger, activate PXE and compilation in bin format.
+Go to Properties and copy these settings:
+
+![image](https://user-images.githubusercontent.com/98218366/178479237-a22a7b5f-250e-432d-ba74-0da502e82f7b.png)
+
+Boot the machine and connect it via Ethernet and will show this screen:
+
+![image](https://user-images.githubusercontent.com/98218366/178479800-c70faa5d-1fab-4da4-8f27-05eefee89b75.png)
+
+Wait and your os will boot up.
 
 ## Hyper-V
 
