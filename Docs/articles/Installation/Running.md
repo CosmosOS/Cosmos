@@ -38,10 +38,11 @@ QEMU can be downloaded [here](https://qemu.weilnetz.de/w64/)
 Bochs is officially supported.
 
 Bochs can be downloaded [here](https://bochs.sourceforge.io/getcurrent.html)
-### PXE
+
+## PXE
 
 For PXE, no special software is required. Only an ethernet connection to your router. However, if you have a computer that does not support network booting, or if you must perform the action over WiFi, you may need to look at a PXE chainloader such as [gPXE](http://etherboot.org/wiki/).
 
-### Hyper-V
+## Hyper-V
 
 Not supported at this time.
