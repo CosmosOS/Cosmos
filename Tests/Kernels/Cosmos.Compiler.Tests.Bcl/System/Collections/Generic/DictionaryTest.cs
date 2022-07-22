@@ -586,6 +586,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
                 Assert.IsTrue(dictionary.ContainsKey(t), "Dictionary<string, bool> ContainsKey works for length 3");
 				Assert.IsTrue(dictionary.ContainsKey(alt), "Dictionary<string, bool> ContainsKey works for length 3 allocated on the heap");
 				Assert.IsTrue(dictionary.ContainsKey("abab"), "Dictionary<string, bool> ContainsKey works for length 4");
+                t = "ababa";
+				Assert.IsTrue(dictionary.ContainsKey(t), "Dictionary<string, bool> ContainsKey works for length 5");
+				alt += "ba";
+                Assert.IsTrue(dictionary.ContainsKey(alt), "Dictionary<string, bool> ContainsKey works for length 5 allocated on the heap");
             }
         }
     }
