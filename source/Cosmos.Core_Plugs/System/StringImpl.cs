@@ -986,7 +986,7 @@ namespace Cosmos.Core_Plugs.System
                 uint num2 = num;
                 uint* ptr2 = (uint*)ptr;
                 int num3 = aString.Length;
-                while (num3 > 4)
+                while (num3 >= 4)
                 {
                     num3 -= 4;
                     num = (global::System.Numerics.BitOperations.RotateLeft(num, 5) + num) ^ *ptr2;
@@ -996,7 +996,7 @@ namespace Cosmos.Core_Plugs.System
 				if (num3 == 3)
                 {
                     num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ *ptr2;
-					num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ ((char*)ptr2)[3];
+					num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ ((char*)ptr2)[2];
                 }
                 else if (num3 == 2)
                 {
