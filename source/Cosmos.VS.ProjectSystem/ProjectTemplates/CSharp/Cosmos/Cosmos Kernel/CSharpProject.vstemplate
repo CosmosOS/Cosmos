@@ -5,6 +5,9 @@
         <Description Package="{29194faf-90ce-454b-bc53-08b722f1dadf}" ID="2" />
         <Icon Package="{29194faf-90ce-454b-bc53-08b722f1dadf}" ID="3" />
         <ProjectType>CSharp</ProjectType>
+        <LanguageTag>csharp</LanguageTag>
+        <PlatformTag>Bare Metal</PlatformTag>
+        <ProjectTypeTag>Cosmos</ProjectTypeTag>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>CosmosKernel</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
