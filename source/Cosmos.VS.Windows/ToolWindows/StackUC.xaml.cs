@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace Cosmos.VS.Windows
@@ -29,7 +30,7 @@ namespace Cosmos.VS.Windows
         }
 
 
-        public override void Update(string aTag, byte[] aData)
+        public override async Task UpdateAsync(string aTag, byte[] aData)
         {
             if (aTag == "FRAME")
             {
@@ -39,82 +40,77 @@ namespace Cosmos.VS.Windows
             {
                 stackData = aData;
             }
-            DoUpdate(aTag);
+
+            await DoUpdateAsync(aTag);
         }
 
-        protected override void DoUpdate(string aTag)
+        protected override async Task DoUpdateAsync(string aTag)
         {
             if (aTag == "STACK")
             {
-                UpdateStack(stackData);
+                await UpdateStackAsync(stackData);
             }
             else if (aTag == "FRAME")
             {
-                UpdateFrame(mData);
+                await UpdateFrameAsync(mData);
             }
         }
 
-        public void UpdateFrame(byte[] aData)
+        public async Task UpdateFrameAsync(byte[] aData)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
+            await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            if (aData == null)
+            {
+                memvEBP.Clear();
+            }
+            else
+            {
+                try
                 {
-                    if (aData == null)
+                    var xValues = MemoryViewUC.Split(aData);
+                    int xCount = xValues.Count;
+                    memvEBP.Clear();
+                    for (int i = 0; i < xCount; i++)
                     {
-                        memvEBP.Clear();
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var xValues = MemoryViewUC.Split(aData);
-                            int xCount = xValues.Count;
-                            memvEBP.Clear();
-                            for (int i = 0; i < xCount; i++)
-                            {
-                                // We start at EBP + 8, because lower is not transmitted
-                                // [EBP] is old EBP - not needed
-                                // [EBP + 4] is saved EIP - not needed
-                                memvEBP.Add("[EBP + " + (i * 4 + 8) + "]", xValues[i]);
-                            }
-                        }
-                        catch
-                        {
-                            memvEBP.Clear();
-                        }
+                        // We start at EBP + 8, because lower is not transmitted
+                        // [EBP] is old EBP - not needed
+                        // [EBP + 4] is saved EIP - not needed
+                        memvEBP.Add("[EBP + " + (i * 4 + 8) + "]", xValues[i]);
                     }
                 }
-            );
+                catch
+                {
+                    memvEBP.Clear();
+                }
+            }
         }
 
-        public void UpdateStack(byte[] aData)
+        public async Task UpdateStackAsync(byte[] aData)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
+            await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            if (aData == null)
+            {
+                memvESP.Clear();
+            }
+            else
+            {
+                try
                 {
-                    if (aData == null)
+                    var xValues = MemoryViewUC.Split(aData);
+                    int xCount = xValues.Count;
+                    memvESP.Clear();
+                    for (int i = 0; i < xCount; i++)
                     {
-                        memvESP.Clear();
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var xValues = MemoryViewUC.Split(aData);
-                            int xCount = xValues.Count;
-                            memvESP.Clear();
-                            for (int i = 0; i < xCount; i++)
-                            {
-                                memvESP.Add(("[EBP - " + ((xCount - i) * 4) + "]").PadRight(10) + " [ESP + " + (i * 4) + "]", xValues[i]);
-                            }
-                        }
-                        catch
-                        {
-                            memvESP.Clear();
-                        }
+                        memvESP.Add(("[EBP - " + ((xCount - i) * 4) + "]").PadRight(10) + " [ESP + " + (i * 4) + "]", xValues[i]);
                     }
                 }
-            );
+                catch
+                {
+                    memvESP.Clear();
+                }
+            }
         }
 
         public override byte[] GetCurrentState()
@@ -123,12 +119,12 @@ namespace Cosmos.VS.Windows
             byte[] aStackData = stackData ?? new byte[0];
             return BitConverter.GetBytes(aFrameData.Length).Concat(aFrameData.Concat(aStackData)).ToArray();
         }
-        public override void SetCurrentState(byte[] aData)
+        public override async Task SetCurrentStateAsync(byte[] aData)
         {
             if (aData == null)
             {
-                Update("FRAME", null);
-                Update("STACK", null);
+                await UpdateAsync("FRAME", null);
+                await UpdateAsync("STACK", null);
             }
             else
             {
@@ -137,8 +133,8 @@ namespace Cosmos.VS.Windows
                 byte[] aStackData = new byte[aData.Length - mDataLength - 4];
                 Array.Copy(aData, 4, aFrameData, 0, aFrameData.Length);
                 Array.Copy(aData, 4 + mDataLength, aStackData, 0, aStackData.Length);
-                Update("FRAME", aFrameData);
-                Update("STACK", aStackData);
+                await UpdateAsync("FRAME", aFrameData);
+                await UpdateAsync("STACK", aStackData);
             }
         }
     }

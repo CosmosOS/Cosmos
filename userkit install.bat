@@ -1,3 +1,3 @@
 @echo off
 
-install-VS2019 -USERKIT %*
+install-VS2022 -USERKIT %*

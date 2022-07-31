@@ -23,7 +23,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Tcp State machine.
         /// </summary>
-        internal Tcp StateMachine;
+        public Tcp StateMachine;
 
         /// <summary>
         /// Create new instance of the <see cref="TcpClient"/> class.

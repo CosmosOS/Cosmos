@@ -1,0 +1,481 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+    
+<Rule Name="CosmosPropertyPage"
+      Description="Cosmos Project Property Page"
+      DisplayName="Cosmos"
+      PageTemplate="generic"
+      Order="1"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <Rule.DataSource>
+        <DataSource Persistence="ProjectFile"
+                  SourceOfDefaultValue="AfterContext"
+                  HasConfigurationCondition="False" />
+    </Rule.DataSource>
+
+    <Rule.Categories>
+        <Category Name="Profile"
+              DisplayName="Profile"/>
+        <Category Name="Compile"
+              DisplayName="Compile" />
+        <Category Name="Debug"
+              DisplayName="Debug" />
+        <Category Name="VMWare"
+              DisplayName="VMWare" />
+        <Category Name="Bochs"
+              DisplayName="Bochs" />
+        <Category Name="Qemu"
+              DisplayName="Qemu" />
+    </Rule.Categories>
+
+    <EnumProperty Name="Launch"
+                  Category="Profile"
+                  Description="Choose which deployment profile you want to use.">
+        <EnumValue Name="ISO" DisplayName="ISO Image"/>
+        <EnumValue Name="USB" DisplayName="USB Bootable Drive"/>
+        <EnumValue Name="PXE" DisplayName="PXE Network Boot"/>
+        <EnumValue Name="VMware" DisplayName="VMware"/>
+        <EnumValue Name="Bochs" DisplayName="Bochs"/>
+        <EnumValue Name="Qemu" DisplayName="Qemu"/>
+        <EnumValue Name="IntelEdison" DisplayName="Intel Edison Serial boot"/>
+        <EnumValue Name="HyperV" DisplayName="Hyper-V"/>
+    </EnumProperty>
+
+    <EnumProperty Name="BinFormat"
+                  DisplayName="Binary Format"
+                  Category="Compile">
+        <EnumValue Name="Elf" DisplayName="Elf"/>
+        <EnumValue Name="Bin" DisplayName="Bin"/>
+    </EnumProperty>
+
+    <BoolProperty Name="CompileVBEMultiboot"
+                  DisplayName="VBE Multiboot"
+                  Description="Compile Cosmos with VBE information specified in Multiboot structure."
+                  Category="Compile">
+    </BoolProperty>
+
+    <StringProperty Name="VBEResolution"
+                    DisplayName="VBE Resolution"
+                    Description="Example format: 800x600x32"
+                    Category="Compile">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "CompileVBEMultiboot" true)</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
+    <StringProperty Name="AddFilesToISO"
+                    DisplayName="Add files to ISO."
+                    Category="Compile">
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="LinkAction">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Action" Value="Command" />
+                    <NameValuePair Name="Command" Value="AddFilesISO" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+    </StringProperty>
+
+    <BoolProperty Name="ExtractMapFile"
+                  DisplayName="Map file"
+                  Description="Extract ELF Map File."
+                  Category="Debug">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "BinFormat" "Elf")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="DebugEnabled"
+                  DisplayName="Remote Debugging"
+                  Description="Enable Cosmos Remote Debugger."
+                  Category="Debug"/>
+
+    <EnumProperty Name="DebugCom"
+                  DisplayName="Debug COM Port"
+                  Category="Debug">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="1" DisplayName="Serial: COM1"/>
+        <EnumValue Name="2" DisplayName="Serial: COM2"/>
+        <EnumValue Name="3" DisplayName="Serial: COM3"/>
+        <EnumValue Name="4" DisplayName="Serial: COM4"/>
+    </EnumProperty>
+
+    <EnumProperty Name="DebugMode"
+                  DisplayName="Debug mode:"
+                  Category="Debug">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="None"/>
+        <EnumValue Name="IL"/>
+        <EnumValue Name="Source"/>
+    </EnumProperty>
+
+    <EnumProperty Name="TraceMode"
+                  DisplayName="Trace mode:"
+                  Category="Debug">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="None"/>
+        <EnumValue Name="User"/>
+        <EnumValue Name="Cosmos"/>
+        <EnumValue Name="All"/>
+    </EnumProperty>
+
+    <StringProperty Name="VisualStudioDebugPort"
+                    DisplayName="Visual Studio debug port:"
+                    Description="Example format: Pipe: Cosmos\Serial"
+                    Category="Debug">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
+    <BoolProperty Name="IgnoreDebugStubAttribute"
+                  DisplayName="Debug Stub"
+                  Description="Ignore Debug Stub Attribute."
+                  Category="Debug">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="StackCorruptionDetectionEnabled"
+                  DisplayName="Stack Corruption Detection"
+                  Description="Enable Stack Corruption Detection."
+                  Category="Debug">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <EnumProperty Name="StackCorruptionDetectionLevel"
+                  DisplayName="Stack Corruption detection level:"
+                  Category="Debug">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true) (has-evaluated-value "CosmosPropertyPage" "StackCorruptionDetectionEnabled" true))</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="AllInstructions" DisplayName="All Instructions"/>
+        <EnumValue Name="MethodFooters" DisplayName="Method Footers"/>
+    </EnumProperty>
+
+    <StringProperty Name="CosmosDebugPort"
+                    DisplayName="Cosmos debug port:"
+                    Description="Example format: Serial: COM1"
+                    Category="Debug">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "DebugEnabled" true)</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
+    <EnumProperty Name="VMWareEdition"
+                  DisplayName="Edition"
+                  Category="VMWare">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "VMware")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="Workstation"/>
+        <EnumValue Name="Player"/>
+    </EnumProperty>
+
+    <BoolProperty Name="EnableGDB"
+                  DisplayName="GDB Debugger"
+                  Description="Use GDB Debugger."
+                  Category="VMWare">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "VMware")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="StartCosmosGDB"
+                  DisplayName="Cosmos GDB"
+                  Description="Use Cosmos GDB Client."
+                  Category="VMWare">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "EnableGDB" true)</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="EnableBochsDebug"
+                  DisplayName="Bochs Debugger"
+                  Description="Enable Bochs Debugger."
+                  Category="Bochs">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Bochs")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="StartBochsDebugGui"
+                  DisplayName="Bochs Debugger GUI"
+                  Description="Use Bochs Debugger GUI."
+                  Category="Bochs">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Launch" "Bochs") (has-evaluated-value "CosmosPropertyPage" "EnableBochsDebug" true))</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <StringProperty Name="QemuDescription"
+                    DisplayName="Ignored"
+                    Description="Please note that options in this category are not all implemented in Cosmos and are here for Driver development purposes! We assume that Qemu is installed to C:\qemu\qemu-system-i386.exe If you have qemu at a different location please define the executable at the end of this page."
+                    Category="Qemu">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuDescription"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="Description" />
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+    
+    <EnumProperty Name="QemuMemory"
+                  DisplayName="Assign VM Memory (mb)"
+                  Category="Qemu">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="256"/>
+        <EnumValue Name="512"/>
+        <EnumValue Name="1024"/>
+        <EnumValue Name="3072"/>
+        <EnumValue Name="4096"/>
+    </EnumProperty>
+    
+    <EnumProperty Name="QemuNetworkDevice"
+                  DisplayName="Network Device"
+                  Category="Qemu">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="RTL8139"/>
+        <EnumValue Name="E1000"/>
+        <EnumValue Name="PCNet"/>
+    </EnumProperty>
+
+    <BoolProperty Name="QemuUSBKeyboard"
+                  DisplayName="USB Keyboard"
+                  Description="Use Qemu USB Keyboard."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <BoolProperty Name="QemuUSBMouse"
+                  DisplayName="USB Mouse"
+                  Description="Use Qemu USB Mouse."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <EnumProperty Name="QemuVideoDriver"
+                  DisplayName="Video Driver"
+                  Category="Qemu">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="VMWare"/>
+        <EnumValue Name="VBE"/>
+        <EnumValue Name="Bochs"/>
+        <EnumValue Name="VGA"/>
+        <EnumValue Name="Cirrus"/>
+    </EnumProperty>
+
+    <EnumProperty Name="QemuAudioDriver"
+                  DisplayName="Audio Driver"
+                  Category="Qemu">
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+        <EnumValue Name="SoundBlaster16"/>
+        <EnumValue Name="AC97"/>
+    </EnumProperty>
+
+    <BoolProperty Name="QemuUseSerial"
+                  DisplayName="Serial"
+                  Description="Use Qemu Serial."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+    
+    <BoolProperty Name="QemuHWAccelWHPX"
+                  DisplayName="Qemu Hardware Acceleration"
+                  Description="Use WHPX for Qemu. (Requires Hyper-V to be installed, do not use together with haxm)"
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+    
+    <BoolProperty Name="QemuHWAccel"
+                  DisplayName="Qemu Hardware Acceleration"
+                  Description="Use HAXM for Qemu. (needs to be installed)"
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+    
+    <StringProperty Name="QemuHWAccelInfo"
+                    DisplayName="Download HAXM."
+                    Category="Qemu">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuHWAccelInfo"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="LinkAction">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Action" Value="URL" />
+                    <NameValuePair Name="URL" Value="https://github.com/intel/haxm/releases" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
+    <BoolProperty Name="QemuUseCustomParameters"
+                  DisplayName="Custom Parameters"
+                  Description="Use Custom Parameters for Qemu launch."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+
+    <StringProperty Name="QemuCustomParametersInfo"
+                    DisplayName="Qemu Documentation for custom parameters."
+                    Category="Qemu">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuCustomParametersInfo"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="LinkAction">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Action" Value="URL" />
+                    <NameValuePair Name="URL" Value="https://www.qemu.org/docs/master/system/invocation.html" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu") (has-evaluated-value "CosmosPropertyPage" "QemuUseCustomParameters" true))</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+    
+    <BoolProperty Name="QemuUseCustomLocation"
+                  DisplayName="Custom Location"
+                  Description="Use Custom Location for Qemu executable."
+                  Category="Qemu">
+        <BoolProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </BoolProperty.Metadata>
+    </BoolProperty>
+    
+    <StringProperty Name="QemuLocationParameters"
+                    DisplayName="Qemu Location"
+                    Description="Set Qemu Location. (example: C:\qemu\qemu-system-i386.exe)"
+                    Category="Qemu">
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu") (has-evaluated-value "CosmosPropertyPage" "QemuUseCustomLocation" true))</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+    
+    <StringProperty Name="QemuLocationInfo"
+                    DisplayName="Qemu Download."
+                    Category="Qemu">
+        <StringProperty.DataSource>
+            <DataSource PersistedName="QemuLocationInfo"
+                  Persistence="ProjectFileWithInterception"
+                  HasConfigurationCondition="False" />
+        </StringProperty.DataSource>
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="LinkAction">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Action" Value="URL" />
+                    <NameValuePair Name="URL" Value="https://qemu.weilnetz.de/" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+        <StringProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+            </NameValuePair>
+        </StringProperty.Metadata>
+    </StringProperty>
+
+</Rule>

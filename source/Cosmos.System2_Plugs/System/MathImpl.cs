@@ -413,99 +413,22 @@ namespace Cosmos.System_Plugs.System
                 return x;
             }
 
-            double huge = 1.0e+300;
-            int i0, i1, j0;
-            uint i, j;
-            i0 = HighWord(x);
-            i1 = LowWord(x);
-            j0 = ((i0 >> 20) & 0x7ff) - 0x3ff;
-            if (j0 < 20)
+            if(x > 0)
             {
-                if (j0 < 0)
-                {   /* raise inexact if x != 0 */
-                    if (huge + x > 0.0)
-                    {/* return 0*sign(x) if |x|<1 */
-                        if (i0 < 0)
-                        {
-                            i0 = (int)(0x80000000 - 1); //Cant set 0x80000000 to int
-                            i1 = 0;
-                        }
-                        else if ((i0 | i1) != 0)
-                        {
-                            i0 = 0x3ff00000;
-                            i1 = 0;
-                        }
-                    }
+                double val = (long)x;
+                if(val == x)
+                {
+                    return x;
                 }
                 else
                 {
-                    i = (uint)(0x000fffff) >> j0;
-                    if (((i0 & i) | i1) == 0)
-                    {
-                        return x; /* x is integral */
-                    }
-                    if (huge + x > 0.0)
-                    {   /* raise inexact flag */
-                        if (i0 > 0)
-                        {
-                            i0 += (0x00100000) >> j0;
-                        }
-                        i0 &= (int)~i;
-                        i1 = 0;
-                    }
-                }
-            }
-            else if (j0 > 51)
-            {
-                if (j0 == 0x400)
-                {
-                    return x + x;  /* inf or NaN */
-                }
-                else
-                {
-                    return x;      /* x is integral */
+                    return val + 1;
                 }
             }
             else
             {
-                i = 0xffffffff >> (j0 - 20);
-                if ((i1 & i) == 0)
-                {
-                    return x;    /* x is integral */
-                }
-                if (huge + x > 0.0)
-                {       /* raise inexact flag */
-                    if (i0 > 0)
-                    {
-                        if (j0 == 20)
-                        {
-                            i0 += 1;
-                        }
-                        else
-                        {
-                            j = (uint)(i1 + (1 << (52 - j0)));
-                            if (j < i1)
-                            {
-                                i0 += 1;    /* got a carry */
-                            }
-                            i1 = (int)j;
-                        }
-                    }
-                    i1 &= (int)~i;
-                }
+                return -1 * (double)(long)(-1 * x);
             }
-            var returnBytes = BitConverter.GetBytes(0d);
-            var highWord = BitConverter.GetBytes(i0);
-            var lowWord = BitConverter.GetBytes(i1);
-            for (int c = 0; c < 4; c++)
-            {
-                returnBytes[c + (BitConverter.IsLittleEndian ? 4 : 0)] = highWord[c];
-            }
-            for (int c = 0; c < 4; c++)
-            {
-                returnBytes[c + (BitConverter.IsLittleEndian ? 0 : 4)] = lowWord[c];
-            }
-            return BitConverter.ToDouble(returnBytes, 0);
         }
 
         #endregion Ceiling
@@ -676,97 +599,22 @@ namespace Cosmos.System_Plugs.System
                 return x;
             }
 
-            int i0, i1, j0;
-            uint i, j;
-            i0 = HighWord(x);
-            i1 = LowWord(x);
-            j0 = ((i0 >> 20) & 0x7ff) - 0x3ff;
-            if (j0 < 20)
+            if (x > 0)
             {
-                if (j0 < 0)
-                {   /* raise inexact if x != 0 */
-                    if (1.0e+300 + x > 0.0)
-                    {/* return 0*sign(x) if |x|<1 */
-                        if (i0 >= 0)
-                        {
-                            i0 = i1 = 0;
-                        }
-                        else if (((i0 & 0x7fffffff) | i1) != 0)
-                        {
-                            i0 = Int32.MaxValue;
-                            i1 = 0;
-                        }
-                    }
-                }
-                else
-                {
-                    i = (uint)0x000fffff >> j0;
-                    if ((((uint)i0 & i) | (uint)i1) == 0)
-                    {
-                        return x; /* x is integral */
-                    }
-                    if (1.0e+300 + x > 0.0)
-                    {   /* raise inexact flag */
-                        if (i0 < 0)
-                        {
-                            i0 += (0x00100000) >> j0;
-                        }
-                        i0 &= (int)~i;
-                        i1 = 0;
-                    }
-                }
-            }
-            else if (j0 > 51)
-            {
-                if (j0 == 0x400)
-                {
-                    return x + x;  /* inf or NaN */
-                }
-                else
-                {
-                    return x;      /* x is integral */
-                }
+                return (long)x;
             }
             else
             {
-                i = ((uint)(0xffffffff)) >> (j0 - 20);
-                if ((i1 & i) == 0)
+                double val = -1 * (double)(long)(-1 * x);
+                if(val == x)
                 {
-                    return x;    /* x is integral */
+                    return x;
                 }
-                if (1.0e+300 + x > 0.0)
-                {       /* raise inexact flag */
-                    if (i0 < 0)
-                    {
-                        if (j0 == 20)
-                        {
-                            i0 += 1;
-                        }
-                        else
-                        {
-                            j = (uint)i1 + (uint)(1 << (52 - j0));
-                            if (j < i1)
-                            {
-                                i0 += 1;    /* got a carry */
-                            }
-                            i1 = (int)j;
-                        }
-                    }
-                    i1 &= (int)~i;
+                else
+                {
+                    return val - 1;
                 }
             }
-            var returnBytes = BitConverter.GetBytes(0d);
-            var highWord = BitConverter.GetBytes(i0);
-            var lowWord = BitConverter.GetBytes(i1);
-            for (int c = 0; c < 4; c++)
-            {
-                returnBytes[c + (BitConverter.IsLittleEndian ? 4 : 0)] = highWord[c];
-            }
-            for (int c = 0; c < 4; c++)
-            {
-                returnBytes[c + (BitConverter.IsLittleEndian ? 0 : 4)] = lowWord[c];
-            }
-            return BitConverter.ToDouble(returnBytes, 0);
         }
 
         #endregion Floor

@@ -117,11 +117,11 @@ namespace Cosmos.VS.ProjectSystem.VS.Debug
         
         private async Task<string> GetPropertyAsync(string propertyName)
         {
-            using (var projectReadLock = await _projectLockService.ReadLockAsync())
+            return await _projectLockService.ReadLockAsync(async (projectReadLock) =>
             {
                 var project = await projectReadLock.GetProjectAsync(ConfiguredProject);
                 return project.GetPropertyValue(propertyName);
-            }
+            });
         }
     }
 }

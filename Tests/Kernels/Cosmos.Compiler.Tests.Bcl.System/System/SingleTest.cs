@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -8,9 +7,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            Single value;
-            String result;
-            String expectedResult;
+            float value;
+            string result;
+            string expectedResult;
 
             /* First start with some weird value (not really numbers) that the IEEE standard has */
             value = Single.PositiveInfinity;
@@ -207,7 +206,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             valueNegated = -value;
             Assert.IsTrue((EqualityHelper.SinglesAreEqual(valueNegated, -42.0f)), "(float) negation of positive float doesn't work");
 
-            
+
         }
     }
 }

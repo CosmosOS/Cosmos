@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29728.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DAEF99B5-22F0-4885-B45B-9B600B857E1C}"
 EndProject
@@ -171,6 +171,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DapperExtensions.StrongName", "Resources\Dependencies\DapperExtensions.StrongName\DapperExtensions.StrongName.csproj", "{AC45D5B2-0D02-49B8-A88E-EABF34AE62B5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{A45F0D24-1AF3-42BC-91A6-0262AFB1234D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioTests", "Tests\Kernels\AudioTests\AudioTests.csproj", "{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -889,6 +891,18 @@ Global
 		{AC45D5B2-0D02-49B8-A88E-EABF34AE62B5}.TEST|Any CPU.Build.0 = Debug|Any CPU
 		{AC45D5B2-0D02-49B8-A88E-EABF34AE62B5}.TEST|x86.ActiveCfg = Debug|Any CPU
 		{AC45D5B2-0D02-49B8-A88E-EABF34AE62B5}.TEST|x86.Build.0 = Debug|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.Debug|x86.Build.0 = Debug|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.Release|x86.ActiveCfg = Release|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.Release|x86.Build.0 = Release|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.TEST|Any CPU.ActiveCfg = TEST|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.TEST|Any CPU.Build.0 = TEST|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.TEST|x86.ActiveCfg = TEST|Any CPU
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C}.TEST|x86.Build.0 = TEST|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -970,6 +984,7 @@ Global
 		{30D9FA9C-0B4D-40FF-8903-6B9E9C825729} = {ECEA7778-E786-4317-90B9-A2D4427CB91C}
 		{96855A39-A96B-4BDB-A6AE-29676DFEF637} = {29EEC029-6A2B-478A-B6E5-D63A91388ABA}
 		{AC45D5B2-0D02-49B8-A88E-EABF34AE62B5} = {A45F0D24-1AF3-42BC-91A6-0262AFB1234D}
+		{8455DCAE-275E-47B3-B89B-2D9F3AB9977C} = {29EEC029-6A2B-478A-B6E5-D63A91388ABA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4418C803-277E-448F-A0A0-52788FA215AD}

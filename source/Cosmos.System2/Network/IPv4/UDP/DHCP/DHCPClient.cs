@@ -29,7 +29,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// <returns></returns>
         public static Address DHCPServerAddress(NetworkDevice networkDevice)
         {
-            return NetworkConfig.Get(networkDevice).DefaultGateway;
+            return NetworkConfiguration.Get(networkDevice).DefaultGateway;
         }
 
         /// <summary>
