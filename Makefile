@@ -84,10 +84,10 @@ install:
 	@cp -r $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/
 	@cp -r $(THISDIR)/Artwork/Cosmos.ico $(DESTDIR)/
 
-	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Debug/net5.0/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
-	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Debug/net6.0/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
+	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/net6.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/net6.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/net6.0/publish/*.dll $(DESTDIR)/Kernel/
 	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
 
 	@cp -r $(THISDIR)/Build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
