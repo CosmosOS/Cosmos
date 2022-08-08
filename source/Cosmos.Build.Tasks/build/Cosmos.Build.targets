@@ -455,12 +455,12 @@
         <Copy SourceFiles="@(IntermediateIsoDirectory)"
               DestinationFolder="$(UsbPublishDrive)" />
 
-        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
+        <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
                               Modules="gzio"
                               Condition="'$(CompressionType)' == 'Gzip'" />
 
-        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
+        <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
                               Condition="'$(CompressionType)' == 'None'" />
 
