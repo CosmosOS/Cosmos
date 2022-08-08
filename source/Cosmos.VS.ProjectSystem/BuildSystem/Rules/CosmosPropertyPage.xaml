@@ -48,6 +48,14 @@
         <EnumValue Name="Bin" DisplayName="Bin"/>
     </EnumProperty>
 
+    <EnumProperty Name="CompressionType"
+                  DisplayName="Compression"
+                  Category="Compile"
+                  Description="Apply compression to the kernel.">
+        <EnumValue Name="None" DisplayName="None"/>
+        <EnumValue Name="Gzip" DisplayName="Gzip"/>
+    </EnumProperty>
+
     <BoolProperty Name="CompileVBEMultiboot"
                   DisplayName="VBE Multiboot"
                   Description="Compile Cosmos with VBE information specified in Multiboot structure."
