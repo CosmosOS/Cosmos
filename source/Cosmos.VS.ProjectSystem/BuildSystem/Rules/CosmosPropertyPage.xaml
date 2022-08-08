@@ -53,7 +53,7 @@
                   Category="Compile"
                   Description="Apply compression to the kernel.">
         <EnumValue Name="None" DisplayName="None"/>
-        <EnumValue Name="Gzip" DisplayName="Gzip"/>
+        <EnumValue Name="Gzip" DisplayName="gzip"/>
     </EnumProperty>
 
     <BoolProperty Name="CompileVBEMultiboot"
