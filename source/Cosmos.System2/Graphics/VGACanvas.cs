@@ -254,6 +254,26 @@ namespace Cosmos.System.Graphics
         /// <param name="aY"></param>
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
+            if(aX > Mode.Columns)
+            {
+                aX = Mode.Columns;
+            }
+
+            if(aY > Mode.Rows)
+            {
+                aY = Mode.Rows;
+            }
+
+            if(aY < 0)
+            {
+                aY = 0;
+            }
+
+            if(aX < 0)
+            {
+                 aX = 0;
+            }
+
             _VGADriver.SetPixel((uint)aX, (uint)aY, aPen.Color);
         }
 
@@ -265,6 +285,26 @@ namespace Cosmos.System.Graphics
         /// <param name="aY"></param>
         public void DrawPoint(uint aColor, int aX, int aY)
         {
+            if(aX > Mode.Columns)
+            {
+                aX = Mode.Columns;
+            }
+
+            if(aY > Mode.Rows)
+            {
+                aY = Mode.Rows;
+            }
+
+            if(aY < 0)
+            {
+                aY = 0;
+            }
+
+            if(aX < 0)
+            {
+                 aX = 0;
+            }
+            
             _VGADriver.SetPixel((uint)aX, (uint)aY, aColor);
         }
 

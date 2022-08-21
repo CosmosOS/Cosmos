@@ -9,7 +9,7 @@ using Cosmos.System.Graphics.Fonts;
 namespace Cosmos.System.Graphics
 {
     /// <summary>
-    /// SVGAIIScreen class. Used to draw ractengales to the screen. See also: <seealso cref="Canvas"/>.
+    /// SVGAIIScreen class. Used to draw rectangles to the screen. See also: <seealso cref="Canvas"/>.
     /// </summary>
     public class SVGAIICanvas : Canvas
     {
@@ -95,6 +95,26 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
+            /*if(aX > Mode.Columns)
+            {
+                aX = Mode.Columns;
+            }
+
+            if(aY > Mode.Rows)
+            {
+                aY = Mode.Rows;
+            }
+
+            if(aY < 0)
+            {
+                aY = 0;
+            }
+
+            if(aX < 0)
+            {
+                 aX = 0;
+            }*/
+
             if (aPen.Color.A < 255)
             {
                 if (aPen.Color.A == 0)
@@ -104,7 +124,7 @@ namespace Cosmos.System.Graphics
 
                 aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
             }
-
+                            
             _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.ValueARGB);
         }
 
@@ -139,6 +159,21 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Crop the width of Shapes / Images / Etc
+        /// </summary>
+        public byte[] Crop(byte[] data, uint width, uint height, uint cropWidth, uint pixelSize)
+        {
+            var output = new byte[height*cropWidth*pixelSize];
+            for(int y = 0; y<height; y++)
+            {
+                var old_offset = y * width;
+                var new_offset = y * cropWidth;
+                Array.Copy(data, old_offset, output, new_offset, new_offset);
+            }
+            return output;
+        }
+
+        /// <summary>
         /// Draw filled rectangle.
         /// </summary>
         /// <param name="aPen">Pen to draw with.</param>
@@ -150,13 +185,46 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
         public override void DrawFilledRectangle(Pen aPen, int aX_start, int aY_start, int aWidth, int aHeight)
         {
-            var color = aPen.Color.ToArgb();
-
-            // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
-            for (int i = aY_start; i < aY_start + aHeight; i++)
+            try
             {
-                _xSVGADriver.VideoMemory.Fill(GetPointOffset(aX_start, i) + (int)_xSVGADriver.FrameSize, aWidth, color);
+                var color = aPen.Color.ToArgb();
+                if(aHeight > 0 && aWidth > 0 && aX_start > 0 && aY_start > 0 && (aX_start + aWidth) < Mode.Columns && (aY_start + aHeight) < Mode.Rows)
+                {                
+                    
+                }
+                else
+                {
+                    if((aX_start + aWidth) > Mode.Columns)
+                    {
+                        aWidth = Mode.Columns - aX_start;
+                    }
+                    if((aY_start + aHeight) > Mode.Rows)
+                    {
+                        aHeight = Mode.Rows - aY_start;
+                    }
+
+                    if((aX_start) < 0)
+                    {                    
+                        aWidth += aX_start;
+                        aX_start = 0;
+                    }
+                    if((aY_start) < 0)
+                    {
+                        aHeight += aY_start;
+                        aY_start = 0;
+                    }
+                }
+
+                // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
+                for (int i = aY_start; i < aY_start + aHeight; i++)
+                {
+                    _xSVGADriver.VideoMemory.Fill(GetPointOffset(aX_start, i) + (int)_xSVGADriver.FrameSize, aWidth, color);
+                }           
             }
+            catch
+            {
+
+            } 
         }
 
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
@@ -376,6 +444,46 @@ namespace Cosmos.System.Graphics
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectangle copy capability</exception>
         public void CopyPixel(int aX, int aY, int aNewX, int aNewY, int aWidth = 1, int aHeight = 1)
         {
+            if(aX > Mode.Columns)
+            {
+                aX = Mode.Columns;
+            }
+
+            if(aY > Mode.Rows)
+            {
+                aY = Mode.Rows;
+            }
+
+            if(aY < 0)
+            {
+                aY = 0;
+            }
+
+            if(aX < 0)
+            {
+                 aX = 0;
+            }
+
+            if(aNewX > Mode.Columns)
+            {
+                aNewX = Mode.Columns;
+            }
+
+            if(aNewY > Mode.Rows)
+            {
+                aNewY = Mode.Rows;
+            }
+
+            if(aNewY < 0)
+            {
+                aNewY = 0;
+            }
+
+            if(aNewX < 0)
+            {
+                 aNewX = 0;
+            }
+
             _xSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, (uint)aWidth, (uint)aHeight);
         }
 
@@ -390,6 +498,46 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public void MovePixel(int aX, int aY, int aNewX, int aNewY)
         {
+            if(aX > Mode.Columns)
+            {
+                aX = Mode.Columns;
+            }
+
+            if(aY > Mode.Rows)
+            {
+                aY = Mode.Rows;
+            }
+
+            if(aY < 0)
+            {
+                aY = 0;
+            }
+
+            if(aX < 0)
+            {
+                 aX = 0;
+            }
+
+            if(aNewX > Mode.Columns)
+            {
+                aNewX = Mode.Columns;
+            }
+
+            if(aNewY > Mode.Rows)
+            {
+                aNewY = Mode.Rows;
+            }
+
+            if(aNewY < 0)
+            {
+                aNewY = 0;
+            }
+
+            if(aNewX < 0)
+            {
+                 aNewX = 0;
+            }
+            
             _xSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, 1, 1);
             _xSVGADriver.SetPixel((uint)aX, (uint)aY, 0);
         }
@@ -447,6 +595,21 @@ namespace Cosmos.System.Graphics
             {
                 for (byte cx = 0; cx < aFont.Width; cx++)
                 {
+                    if(cx + x > Mode.Columns)
+                    {
+                        continue;
+                    }
+
+                    if(cy + y > Mode.Rows)
+                    {
+                        continue;
+                    }
+
+                    if(y < 0 || x < 0 || cx < 0 || cy < 0)
+                    {
+                        continue;
+                    }
+
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
                         DrawPoint(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
@@ -456,19 +619,48 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draw image.
+        /// Draw an image.
         /// </summary>
         /// <param name="aImage">Image.</param>
         /// <param name="aX">X coordinate.</param>
         /// <param name="aY">Y coordinate.</param>
         public override void DrawImage(Image aImage, int aX, int aY)
         {
-            var xWidth = (int)aImage.Width;
-            var xHeight = (int)aImage.Height;
-
-            for (int i = 0; i < xHeight; i++)
+            try
             {
-                _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, (i * xWidth), xWidth);
+                var xWidth = (int)aImage.Width;
+                var xHeight = (int)aImage.Height;
+
+                if((aX + aImage.Width) > Mode.Columns)
+                {
+                    aX = Convert.ToInt32(Mode.Columns - aImage.Width);
+                    aImage = Cosmos.System.Graphics.Bitmap.ResizeBitmap(Convert.ToUInt32(Mode.Columns - aX), aImage.Height, (Bitmap)aImage);
+                }
+                if((aY + aImage.Height) > Mode.Rows)
+                {
+                    aY = Convert.ToInt32(Mode.Rows - aImage.Height);
+                    aImage = Cosmos.System.Graphics.Bitmap.ResizeBitmap(aImage.Width, Convert.ToUInt32(Mode.Rows - aY), (Bitmap)aImage);
+                }
+
+                if((aX) < 0)
+                {                    
+                    aImage = Cosmos.System.Graphics.Bitmap.ResizeBitmap(Convert.ToUInt32(aImage.Width + aX), aImage.Height, (Bitmap)aImage);
+                    aX = 0;
+                }
+                if((aY) < 0)
+                {
+                    aImage = Cosmos.System.Graphics.Bitmap.ResizeBitmap(aImage.Width, Convert.ToUInt32(aImage.Height + aY), (Bitmap)aImage);
+                    aY = 0;
+                }
+
+                for (int i = 0; i < xHeight; i++)
+                {
+                    _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, (i * xWidth), xWidth);
+                }
+            }
+            catch
+            {
+
             }
         }
     }

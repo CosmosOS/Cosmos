@@ -261,6 +261,28 @@ namespace Cosmos.System.Graphics
              * ColorDepth.ColorDepth16 and ColorDepth.ColorDepth8 need a conversion from color (an ARGB32 color) to the RGB16 and RGB8
              * how to do this conversion faster maybe using pre-computed tables? What happens if the color cannot be converted? We will throw?
              */
+
+
+            if(aX > Mode.Columns)
+            {
+                aX = Mode.Columns;
+            }
+
+            if(aY > Mode.Rows)
+            {
+                aY = Mode.Rows;
+            }
+
+            if(aY < 0)
+            {
+                aY = 0;
+            }
+
+            if(aX < 0)
+            {
+                 aX = 0;
+            }
+            
             switch (Mode.ColorDepth)
             {
                 case ColorDepth.ColorDepth32:

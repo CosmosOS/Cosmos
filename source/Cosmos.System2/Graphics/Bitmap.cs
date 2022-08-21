@@ -518,5 +518,32 @@ namespace Cosmos.System.Graphics
             Array.Copy(imageData, 0, file, position, imageData.Length);
             stream.Write(file, 0, file.Length);
         }
+
+        /// <summary>
+        /// Resize a bitmap
+        /// </summary>
+        /// <param name="Width">New Bitmap Width.</param>
+        /// <param name="Height">New Bitmap Height.</param>
+        /// <param name="Image">The bitmap to resize.</param>
+        /// <returns>The resized bitmap.</returns>
+        public static Cosmos.System.Graphics.Bitmap ResizeBitmap(uint Width, uint Height, Cosmos.System.Graphics.Bitmap Image)
+        {
+            if (Width <= 0 || Height <= 0 || Width == Image.Width || Height == Image.Height)
+            {
+                return Image;
+            }
+
+            Cosmos.System.Graphics.Bitmap B = new(Width, Height, Cosmos.System.Graphics.ColorDepth.ColorDepth32);
+            for (int IX = 0; IX < Image.Width; IX++)
+            {
+                for (int IY = 0; IY < Image.Height; IY++)
+                {
+                    long X = IX / (Image.Width / Width);
+                    long Y = IY / (Image.Height / Height);
+                    B.rawData[(B.Width * Y) + X] = Image.rawData[(Image.Width * IY) + IX];
+                }
+            }
+            return B;
+        }
     }
 }
