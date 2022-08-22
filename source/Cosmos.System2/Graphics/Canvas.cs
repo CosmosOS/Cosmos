@@ -185,38 +185,6 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         internal void DrawHorizontalLine(Pen pen, int dx, int x1, int y1)
         {
-            /*
-            if(x1 > Mode.Columns)
-            {
-                x1 = Mode.Columns;
-            }
-
-            if(y1 > Mode.Rows)
-            {
-                y1 = Mode.Rows;
-            }
-
-            if(y1 < 0)
-            {
-                y1 = 0;
-            }
-
-            if(x1 < 0)
-            {
-                 x1 = 0;
-            }
-
-            if(dx > Mode.Columns)
-            {
-                dx = Mode.Columns;
-            }
-
-            if(dx < 0)
-            {
-                 dx = 0;
-            }
-            */
-            
             int i;
 
             for (i = 0; i < dx; i++)
@@ -235,38 +203,6 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         internal void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
         {
-            /*
-            if(x1 > Mode.Columns)
-            {
-                x1 = Mode.Columns;
-            }
-
-            if(y1 > Mode.Rows)
-            {
-                y1 = Mode.Rows;
-            }
-
-            if(y1 < 0)
-            {
-                y1 = 0;
-            }
-
-            if(x1 < 0)
-            {
-                 x1 = 0;
-            }
-
-            if(dy > Mode.Rows)
-            {
-                dy = Mode.Rows;
-            }
-
-            if(dy < 0)
-            {
-                 dy = 0;
-            }
-            */
-
             int i;
 
             for (i = 0; i < dy; i++)
@@ -291,48 +227,6 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         internal void DrawDiagonalLine(Pen pen, int dx, int dy, int x1, int y1)
         {
-            /*
-            if(x1 > Mode.Columns)
-            {
-                x1 = Mode.Columns;
-            }
-
-            if(y1 > Mode.Rows)
-            {
-                y1 = Mode.Rows;
-            }
-
-            if(y1 < 0)
-            {
-                y1 = 0;
-            }
-
-            if(x1 < 0)
-            {
-                 x1 = 0;
-            }
-
-            if(dx > Mode.Columns)
-            {
-                dx = Mode.Columns;
-            }
-
-            if(dx < 0)
-            {
-                 dx = 0;
-            }
-
-            if(dy > Mode.Rows)
-            {
-                dy = Mode.Rows;
-            }
-
-            if(dy < 0)
-            {
-                 dy = 0;
-            }
-            */
-
             int i, sdx, sdy, dxabs, dyabs, x, y, px, py;
 
             dxabs = Math.Abs(dx);
@@ -475,41 +369,18 @@ namespace Cosmos.System.Graphics
             if (pen == null)
             {
                 throw new ArgumentNullException(nameof(pen));
-            }            
-
-            ThrowIfCoordNotValid(x_center + radius, y_center);
-            ThrowIfCoordNotValid(x_center - radius, y_center);
-            ThrowIfCoordNotValid(x_center, y_center + radius);
-            ThrowIfCoordNotValid(x_center, y_center - radius);
+            }  
 
             while (x >= y)
             {
-                //DrawString(CheckIfCoordNotValid(x_center + radius, y_center) + ":" + CheckIfCoordNotValid(x_center - radius, y_center) + ":" + CheckIfCoordNotValid(x_center, y_center + radius) + ":" + CheckIfCoordNotValid(x_center, y_center - radius), Cosmos.System.Graphics.Fonts.PCScreenFont.Default, pen, new Cosmos.System.Graphics.Point(10, 10));
-                //DrawString("[X:" + x + "] [Y:" + y + "] [E:" + e + "]", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, pen, new Cosmos.System.Graphics.Point(10, 10));
-
-                /*if(CheckIfCoordNotValid(x_center + radius, y_center) == true)
-                {
-                    DrawPoint(pen, x_center + x, y_center + y);     
-                    DrawPoint(pen, x_center + y, y_center - x);
-                }               
-
-                if(CheckIfCoordNotValid(x_center - radius, y_center) == true)
-                {                            
-                    DrawPoint(pen, x_center - x, y_center + y);  
-                    DrawPoint(pen, x_center + y, y_center + x);
-                }
-
-                if(CheckIfCoordNotValid(x_center, y_center + radius) == true)
-                {                    
-                    DrawPoint(pen, x_center - x, y_center - y);     
-                    DrawPoint(pen, x_center - y, y_center + x);
-                }
-
-                if(CheckIfCoordNotValid(x_center, y_center - radius) == true)
-                {
-                    DrawPoint(pen, x_center + x, y_center - y);
-                    DrawPoint(pen, x_center - y, y_center - x);
-                }*/
+                DrawPoint(pen, x_center + x, y_center + y);     
+                DrawPoint(pen, x_center + y, y_center - x);
+                DrawPoint(pen, x_center - x, y_center + y);  
+                DrawPoint(pen, x_center + y, y_center + x);
+                DrawPoint(pen, x_center - x, y_center - y);     
+                DrawPoint(pen, x_center - y, y_center + x);
+                DrawPoint(pen, x_center + x, y_center - y);
+                DrawPoint(pen, x_center - y, y_center - x);
 
                 y++;
                 if (e <= 0)
@@ -579,38 +450,6 @@ namespace Cosmos.System.Graphics
                     xChange += 2;
                 }
             }
-
-            /*
-            for (int y = -radius; y <= radius; y++)
-                for (int x = -radius; x <= radius; x++)
-                    if (x * x + y * y <= radius * radius)
-                        (origin.x + x, origin.y + y);
-
-
-            if (pen == null)
-                throw new ArgumentNullException(nameof(pen));
-            ThrowIfCoordNotValid(x_center + radius, y_center);
-            ThrowIfCoordNotValid(x_center - radius, y_center);
-            ThrowIfCoordNotValid(x_center, y_center + radius);
-            ThrowIfCoordNotValid(x_center, y_center - radius);
-            int x = radius;
-            int y = 0;
-            int e = 0;
-
-            while (x >= y)
-            {
-                DrawLine(pen, x_center - x, y_center + y, x_center + x, y_center + y);
-                y++;
-                if (e <= 0)
-                {
-                    e += 2 * y + 1;
-                }
-                if (e > 0)
-                {
-                    x--;
-                    e -= 2 * x + 1;
-                }
-            }*/
         }
 
         /// <summary>
@@ -645,10 +484,7 @@ namespace Cosmos.System.Graphics
             {
                 throw new ArgumentNullException(nameof(pen));
             }
-            ThrowIfCoordNotValid(x_center + x_radius, y_center);
-            ThrowIfCoordNotValid(x_center - x_radius, y_center);
-            ThrowIfCoordNotValid(x_center, y_center + y_radius);
-            ThrowIfCoordNotValid(x_center, y_center - y_radius);
+
             int a = 2 * x_radius;
             int b = 2 * y_radius;
             int b1 = b & 1;
@@ -1008,23 +844,6 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
-                    /*
-                    if(_x + x + 2> Mode.Columns)
-                    {
-                        continue;
-                    }
-
-                    if(_y + y + 2> Mode.Rows)
-                    {
-                        continue;
-                    }
-
-                    if(y < 0 || x < 0)
-                    {
-                        continue;
-                    }
-                    */
-
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
                     _pen.Color = Color.FromArgb(image.rawData[_x + _y * image.Width]);
                     DrawPoint(_pen, x + _x, y + _y);
@@ -1052,6 +871,7 @@ namespace Cosmos.System.Graphics
             }
             return temp;
         }
+
         /// <summary>
         /// Draw a Scaled Bitmap.
         /// </summary>
@@ -1109,7 +929,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
-                    if(_x + x + 2> Mode.Columns)
+                    /*if(_x + x + 2> Mode.Columns)
                     {
                         continue;
                     }
@@ -1122,7 +942,7 @@ namespace Cosmos.System.Graphics
                     if(y < 0 || x < 0)
                     {
                         continue;
-                    }
+                    }*/
 
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
                     _pen.Color = (Color.FromArgb(image.rawData[_x + _y * image.Width]));

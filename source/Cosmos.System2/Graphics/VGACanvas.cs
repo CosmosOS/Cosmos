@@ -287,21 +287,25 @@ namespace Cosmos.System.Graphics
         {
             if(aX > Mode.Columns)
             {
+                return;
                 aX = Mode.Columns;
             }
 
             if(aY > Mode.Rows)
             {
+                return;
                 aY = Mode.Rows;
             }
 
             if(aY < 0)
             {
+                return;
                 aY = 0;
             }
 
             if(aX < 0)
             {
+                return;
                  aX = 0;
             }
             

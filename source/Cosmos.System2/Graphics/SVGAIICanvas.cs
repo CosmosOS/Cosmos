@@ -95,25 +95,10 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public override void DrawPoint(Pen aPen, int aX, int aY)
         {
-            /*if(aX > Mode.Columns)
+            if(aX >= Mode.Columns || aY >= Mode.Rows || aY <= 0 || aX <= 0)
             {
-                aX = Mode.Columns;
+                return;
             }
-
-            if(aY > Mode.Rows)
-            {
-                aY = Mode.Rows;
-            }
-
-            if(aY < 0)
-            {
-                aY = 0;
-            }
-
-            if(aX < 0)
-            {
-                 aX = 0;
-            }*/
 
             if (aPen.Color.A < 255)
             {
@@ -198,6 +183,7 @@ namespace Cosmos.System.Graphics
                     {
                         aWidth = Mode.Columns - aX_start;
                     }
+
                     if((aY_start + aHeight) > Mode.Rows)
                     {
                         aHeight = Mode.Rows - aY_start;
@@ -208,6 +194,7 @@ namespace Cosmos.System.Graphics
                         aWidth += aX_start;
                         aX_start = 0;
                     }
+
                     if((aY_start) < 0)
                     {
                         aHeight += aY_start;
@@ -665,3 +652,4 @@ namespace Cosmos.System.Graphics
         }
     }
 }
+
