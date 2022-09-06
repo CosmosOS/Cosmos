@@ -40,10 +40,23 @@ $(COMMON_DIR):
 .PHONY: build
 build:
 	@echo "Building IL2CPU"
+	$(DOTNET) clean $(IL2CPU_DIR)
 	$(DOTNET) build $(IL2CPU_DIR) $(DOTNETFLAGS)
 	$(DOTNET) pack $(IL2CPU_DIR) $(DOTNETFLAGS)
 
 	@echo "Building Cosmos"
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.Common
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.Core
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.Core_Asm
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.Core_Plugs
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.HAL2
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.System2
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.System2_Plugs
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.Build.Tasks
+
+
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.Common $(DOTNETFLAGS)
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel $(DOTNETFLAGS)
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
@@ -84,10 +97,10 @@ install:
 	@cp -r $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/
 	@cp -r $(THISDIR)/Artwork/Cosmos.ico $(DESTDIR)/
 
-	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Debug/net5.0/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
-	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/net5.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Debug/*/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
+	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
 	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
 
 	@cp -r $(THISDIR)/Build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
