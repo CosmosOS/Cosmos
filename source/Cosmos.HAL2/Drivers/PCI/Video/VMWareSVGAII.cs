@@ -653,7 +653,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public uint GetPixel(uint x, uint y)
         {
-            return VideoMemory[((y * width + x) * depth)];
+            return VideoMemory[((y * width + x) * depth) + FrameSize];
         }
 
         /// <summary>
