@@ -37,7 +37,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             foreach (var item in registeredFileSystems)
             {
-                if(item.Name == factory.Name)
+                if(item.Name == factoryName)
                 {
                     registeredFileSystems.Remove(item);
                     return true;
