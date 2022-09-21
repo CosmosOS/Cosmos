@@ -5,12 +5,17 @@ namespace Cosmos.System.FileSystem.VFS
 {
     public static class FileSystemManager
     {
-        private static List<FileSystemFactory> registeredFileSystems = 
-            new List<FileSystemFactory>() { 
-                new FAT.FatFileSystemFactory(), 
-                new ISO9660.ISO9660FileSystemFactory()
-            };
-        
+        private static List<FileSystemFactory> registeredFileSystems = DefaultFileSystems;
+
+        public static List<FileSystemFactory> DefaultFileSystems { 
+            get { 
+                return new List<FileSystemFactory>() { 
+                    new FAT.FatFileSystemFactory(), 
+                    new ISO9660.ISO9660FileSystemFactory()
+                };
+            } 
+        }
+         
         public static List<FileSystemFactory> RegisteredFileSystems { get {
             return registeredFileSystems;
         }}
