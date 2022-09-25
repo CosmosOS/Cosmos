@@ -59,6 +59,11 @@ namespace Cosmos.HAL
                 Recuring = recurring;
             }
 
+            /// <inheritdoc cref="PITTimer(OnTrigger, UInt64, Boolean)"/>
+            public PITTimer(Action callback, ulong nanosecondsTimeout, bool recurring)
+                : this(_ => callback(), nanosecondsTimeout, recurring)
+            { }
+
             /// <summary>
             /// Initializes a new recurring <see cref="PITTimer"/>, with the specified
             /// callback method and amount of nanoseconds left until the next timer cycle.
@@ -73,6 +78,11 @@ namespace Cosmos.HAL
                 NSRemaining = nanosecondsLeft;
                 Recuring = true;
             }
+
+            /// <inheritdoc cref="PITTimer(OnTrigger, UInt64, UInt64)"/>
+            public PITTimer(Action callback, ulong nanosecondsTimeout, ulong nanosecondsLeft)
+                : this(_ => callback(), nanosecondsTimeout, nanosecondsLeft)
+            { }
 
             ~PITTimer()
             {
