@@ -15,13 +15,13 @@ namespace Cosmos.HAL
         /// </summary>
         public class PITTimer : IDisposable
         {
-            internal int NSRemaining;
+            internal ulong NSRemaining;
             internal int ID = -1;
 
             /// <summary>
             /// The delay between each timer cycle.
             /// </summary>
-            public int NanosecondsTimeout;
+            public ulong NanosecondsTimeout;
 
             /// <summary>
             /// Whether this timer will fire once, or will fire indefinetly until unregistered.
@@ -51,7 +51,7 @@ namespace Cosmos.HAL
             /// <param name="callback">The method to invoke for each timer cycle.</param>
             /// <param name="nanosecondsTimeout">The delay between timer cycles.</param>
             /// <param name="recurring">Whether this timer will fire once, or will fire indefinetly until unregistered.</param>
-            public PITTimer(OnTrigger callback, int nanosecondsTimeout, bool recurring)
+            public PITTimer(OnTrigger callback, ulong nanosecondsTimeout, bool recurring)
             {
                 HandleTrigger = callback;
                 NanosecondsTimeout = nanosecondsTimeout;
@@ -66,7 +66,7 @@ namespace Cosmos.HAL
             /// <param name="callback">The method to invoke for each timer cycle.</param>
             /// <param name="nanosecondsTimeout">The delay between timer cycles.</param>
             /// <param name="nanosecondsLeft">The amount of time left before the first timer cycle is fired.</param>
-            public PITTimer(OnTrigger callback, int nanosecondsTimeout, int nanosecondsLeft)
+            public PITTimer(OnTrigger callback, ulong nanosecondsTimeout, ulong nanosecondsLeft)
             {
                 HandleTrigger = callback;
                 NanosecondsTimeout = nanosecondsTimeout;
@@ -212,11 +212,11 @@ namespace Cosmos.HAL
         {
             waitSignaled = false;
 
-            RegisterTimer(new PITTimer(SignalWait, (int)(timeoutMs * 1000000), false));
+            RegisterTimer(new PITTimer(SignalWait, timeoutMs * 1000000UL, false));
 
             while (!waitSignaled)
             {
-                Core.CPU.Halt();
+                CPU.Halt();
             }
         }
 
@@ -224,7 +224,7 @@ namespace Cosmos.HAL
         /// Halts the CPU for the specified amount of nanoseconds.
         /// </summary>
         /// <param name="timeoutNs">The amount of nanoseconds to halt the CPU for.</param>
-        public void WaitNS(int timeoutNs)
+        public void WaitNS(ulong timeoutNs)
         {
             waitSignaled = false;
 
@@ -238,7 +238,7 @@ namespace Cosmos.HAL
 
         private void HandleIRQ(ref INTs.IRQContext aContext)
         {
-            int T0Delay = (int)T0DelyNS;
+            ulong T0Delay = T0DelyNS;
 
             if (activeHandlers.Count > 0)
             {
@@ -249,10 +249,8 @@ namespace Cosmos.HAL
             for (int i = activeHandlers.Count - 1; i >= 0; i--)
             {
                 handler = activeHandlers[i];
-
-                handler.NSRemaining -= T0Delay;
-
-                if (handler.NSRemaining < 1)
+				
+                if (handler.NSRemaining <= T0Delay)
                 {
                     if (handler.Recuring)
                     {
@@ -265,7 +263,9 @@ namespace Cosmos.HAL
                     }
 
                     handler.HandleTrigger(aContext);
-                }
+                } else {
+					handler.NSRemaining -= T0Delay;
+				}
             }
 
         }
