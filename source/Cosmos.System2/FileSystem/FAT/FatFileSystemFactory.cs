@@ -3,7 +3,7 @@
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 
-namespace Cosmos.System.FileSystem
+namespace Cosmos.System.FileSystem.FAT
 {
     public class FatFileSystemFactory : FileSystemFactory
     {

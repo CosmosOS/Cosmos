@@ -11,7 +11,6 @@ namespace Cosmos.System.FileSystem
     public class Disk
     {
         private List<ManagedPartition> parts = new List<ManagedPartition>();
-        private static List<FileSystemFactory> registeredFileSystems = new List<FileSystemFactory>() { new FatFileSystemFactory(), new ISO9660.ISO9660FileSystemFactory()};
         public bool IsMBR { get { return !GPT.IsGPTPartition(Host); } }
         /// <summary>
         /// The size of the disk in bytes.
@@ -66,7 +65,8 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// List of file systems.
         /// </summary>
-        public static List<FileSystemFactory> RegisteredFileSystemsTypes { get { return registeredFileSystems; } }
+        [Obsolete("use FileSystemManager.RegisteredFileSystems")]
+        public static List<FileSystemFactory> RegisteredFileSystemsTypes { get { return FileSystemManager.RegisteredFileSystems; } }
         /// <summary>
         /// Main blockdevice that has all of the partitions.
         /// </summary>
@@ -272,7 +272,7 @@ namespace Cosmos.System.FileSystem
             string xRootPath = String.Concat(VFSManager.GetNextFilesystemLetter(), VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
-            foreach (var item in Disk.RegisteredFileSystemsTypes)
+            foreach (var item in FileSystemManager.RegisteredFileSystems)
             {
                 if (item.IsType(part.Host))
                 {
