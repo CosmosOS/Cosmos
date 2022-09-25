@@ -26,7 +26,7 @@ namespace Cosmos.HAL
             /// <summary>
             /// Whether this timer will fire once, or will fire indefinetly until unregistered.
             /// </summary>
-            public bool Recuring; // TODO: Replace with "Recurring" (typo). This would be a breaking API change.
+            public bool Recurring;
 
             /// <summary>
             /// The ID of the timer.
@@ -56,7 +56,7 @@ namespace Cosmos.HAL
                 HandleTrigger = callback;
                 NanosecondsTimeout = nanosecondsTimeout;
                 NSRemaining = NanosecondsTimeout;
-                Recuring = recurring;
+                Recurring = recurring;
             }
 
             /// <inheritdoc cref="PITTimer(OnTrigger, UInt64, Boolean)"/>
@@ -76,7 +76,7 @@ namespace Cosmos.HAL
                 HandleTrigger = callback;
                 NanosecondsTimeout = nanosecondsTimeout;
                 NSRemaining = nanosecondsLeft;
-                Recuring = true;
+                Recurring = true;
             }
 
             /// <inheritdoc cref="PITTimer(OnTrigger, UInt64, UInt64)"/>
@@ -96,6 +96,13 @@ namespace Cosmos.HAL
                     Global.PIT.UnregisterTimer(ID);
                 }
             }
+
+            #region (deprecated)
+
+            [Obsolete($"Use the {nameof(Recurring)} property instead.")]
+            public bool Recuring => Recurring;
+
+            #endregion
         }
 
         public const uint PITFrequency = 1193180;
@@ -127,6 +134,7 @@ namespace Cosmos.HAL
                 IO.Data0.Byte = (byte)(value >> 8);
             }
         }
+
         public uint T0Frequency
         {
             get => PITFrequency / (uint)_T0Countdown;
@@ -138,13 +146,14 @@ namespace Cosmos.HAL
                 T0Countdown = (ushort)(PITFrequency / value);
             }
         }
-        public uint T0DelyNS
+
+        public uint T0DelayNS
         {
             get => PITDelayNS * _T0Countdown;
-            set
-            {
-                if (value > 54918330)
+            set {
+                if (value > 54918330) {
                     throw new ArgumentException("Delay must be no greater that 54918330");
+                }
 
                 T0Countdown = (ushort)(value / PITDelayNS);
             }
@@ -162,6 +171,7 @@ namespace Cosmos.HAL
                 IO.Data0.Byte = (byte)(value >> 8);
             }
         }
+
         public uint T2Frequency
         {
             get => PITFrequency / ((uint)_T2Countdown);
@@ -176,13 +186,14 @@ namespace Cosmos.HAL
             }
         }
 
-        public uint T2DelyNS
+        public uint T2DelayNS
         {
             get => (PITDelayNS * _T2Countdown);
             set
             {
-                if (value > 54918330)
+                if (value > 54918330) {
                     throw new ArgumentException("Delay must be no greater than 54918330");
+                }
 
                 T2Countdown = (ushort)(value / PITDelayNS);
             }
@@ -248,7 +259,7 @@ namespace Cosmos.HAL
 
         private void HandleIRQ(ref INTs.IRQContext aContext)
         {
-            ulong T0Delay = T0DelyNS;
+            ulong T0Delay = T0DelayNS;
 
             if (activeHandlers.Count > 0)
             {
@@ -262,7 +273,7 @@ namespace Cosmos.HAL
 				
                 if (handler.NSRemaining <= T0Delay)
                 {
-                    if (handler.Recuring)
+                    if (handler.Recurring)
                     {
                         handler.NSRemaining = handler.NanosecondsTimeout;
                     }
@@ -316,5 +327,15 @@ namespace Cosmos.HAL
                 }
             }
         }
+
+        #region (deprecated)
+
+        [Obsolete($"Use the {nameof(T0DelayNS)} property instead.")]
+        public uint T0DelyNS => T0DelayNS;
+
+        [Obsolete($"Use the {nameof(T2DelayNS)} property instead.")]
+        public uint T2DelyNS => T2DelayNS;
+
+        #endregion
     }
 }
