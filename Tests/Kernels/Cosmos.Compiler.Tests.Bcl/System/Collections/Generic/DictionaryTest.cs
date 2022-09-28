@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Cosmos.TestRunner;
 
@@ -566,6 +567,30 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
 
             //TODO: Add GUID test once newGUID returns something other than a zero initialized guid.
 
+            //We need to ensure that string hashing is the same for constant strings and strings on the heap
+            {
+                var dictionary = new Dictionary<string, bool>
+                {
+                    {"a", true },
+                    {"ab", true },
+                    {"abab", true},
+                    {"ababa", true},
+                    {"aba", true }
+                };
+                string t = "aba";
+                string a = "ab";
+                string b = "a";
+                string alt = a + b;
+
+                Assert.IsTrue(dictionary.ContainsKey("a"), "Dictionary<string, bool> ContainsKey works for length 1");
+                Assert.IsTrue(dictionary.ContainsKey(t), "Dictionary<string, bool> ContainsKey works for length 3");
+				Assert.IsTrue(dictionary.ContainsKey(alt), "Dictionary<string, bool> ContainsKey works for length 3 allocated on the heap");
+				Assert.IsTrue(dictionary.ContainsKey("abab"), "Dictionary<string, bool> ContainsKey works for length 4");
+                t = "ababa";
+				Assert.IsTrue(dictionary.ContainsKey(t), "Dictionary<string, bool> ContainsKey works for length 5");
+				alt += "ba";
+                Assert.IsTrue(dictionary.ContainsKey(alt), "Dictionary<string, bool> ContainsKey works for length 5 allocated on the heap");
+            }
         }
     }
 }

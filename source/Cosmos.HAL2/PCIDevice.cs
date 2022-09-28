@@ -241,14 +241,14 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aRegister">A register to read.</param>
         /// <returns>byte value.</returns>
-        protected byte ReadRegister8(byte aRegister)
+        public byte ReadRegister8(byte aRegister)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             return (byte)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFF);
         }
 
-        protected void WriteRegister8(byte aRegister, byte value)
+        public void WriteRegister8(byte aRegister, byte value)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
@@ -260,7 +260,7 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aRegister">A register.</param>
         /// <returns>UInt16 value.</returns>
-        protected ushort ReadRegister16(byte aRegister)
+        public ushort ReadRegister16(byte aRegister)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
@@ -272,21 +272,21 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="aRegister">A register.</param>
         /// <param name="value">A value.</param>
-        protected void WriteRegister16(byte aRegister, ushort value)
+        public void WriteRegister16(byte aRegister, ushort value)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             IO.ConfigDataPort.Word = value;
         }
 
-        protected uint ReadRegister32(byte aRegister)
+        public uint ReadRegister32(byte aRegister)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
             return IO.ConfigDataPort.DWord;
         }
 
-        protected void WriteRegister32(byte aRegister, uint value)
+        public void WriteRegister32(byte aRegister, uint value)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
             IO.ConfigAddressPort.DWord = xAddr;
