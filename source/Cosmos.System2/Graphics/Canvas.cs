@@ -616,7 +616,7 @@ namespace Cosmos.System.Graphics
 		/// <param name="EndAngle"></param>
         public virtual void DrawArc(int x, int y, int width, int height, Pen pen, int StartAngle = 0, int EndAngle = 360)
         {
-            if (Radius == 0)
+            if (width == 0 || height == 0)
             {
                 return;
             }
