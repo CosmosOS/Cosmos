@@ -626,7 +626,7 @@ namespace Cosmos.System.Graphics
                 double Angle1 = Math.PI * Angle / 180;
                 int IX = (int)(width * Math.Cos(Angle1));
                 int IY = (int)(height * Math.Sin(Angle1));
-                DrawPoint(pen, X + IX, Y + IY);
+                DrawPoint(pen, x + IX, y + IY);
             }
         }
         
