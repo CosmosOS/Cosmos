@@ -13,6 +13,10 @@ namespace Cosmos.System
         /// </summary>
         public static void Reboot()
         {
+            // Try QEMU method
+            new IOPort(0x64).Byte = 0xFE;
+            
+            // Try normal method
             HAL.Power.CPUReboot();
         }
 
@@ -31,29 +35,11 @@ namespace Cosmos.System
                 IOPort P = new(0x4004);
                 P.DWord = 0x3400;
             }
-
+            // Try QEMU method
+            new IOPort(0x604).Word = 0x2000;
+            
             // Try Normal Method
             HAL.Power.ACPIShutdown();
-        }
-
-        /// <summary>
-        /// Shutdown Qemu.
-        /// Qemu does not support ACPI at the current moment due to multiboot2 and SeaBios being to old.
-        /// This Provides a shutdown functionality.
-        /// </summary>
-        public static void QemuShutdown()
-        {
-            new IOPort(0x604).Word = 0x2000;
-        }
-
-        /// <summary>
-        /// Reboot Qemu.
-        /// Qemu does not support ACPI at the current moment due to multiboot2 and SeaBios being to old.
-        /// This Provides a Reboot functionality.
-        /// </summary>
-        public static void QemuReboot()
-        {
-            new IOPort(0x64).Byte = 0xFE;
         }
     }
 }
