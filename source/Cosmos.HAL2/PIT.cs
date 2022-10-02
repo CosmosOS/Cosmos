@@ -282,10 +282,10 @@ namespace Cosmos.HAL
                         handler.ID = -1;
                         activeHandlers.RemoveAt(i);
                     }
-
+                    
                     handler.HandleTrigger(aContext);
                 } else {
-					handler.NSRemaining -= T0Delay;
+                    handler.NSRemaining -= T0Delay;
 				}
             }
 
