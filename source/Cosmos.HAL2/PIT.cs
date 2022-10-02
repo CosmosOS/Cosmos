@@ -199,11 +199,13 @@ namespace Cosmos.HAL
             }
         }
 
+        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
         public void EnableSound()
         {
             //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0x03);
         }
 
+        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
         public void DisableSound()
         {
             //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
