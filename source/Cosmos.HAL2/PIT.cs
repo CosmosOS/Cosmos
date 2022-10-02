@@ -217,6 +217,7 @@ namespace Cosmos.HAL
             T2Frequency = (uint)aFreq;
         }
 
+        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
         public void MuteSound()
         {
             DisableSound();
