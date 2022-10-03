@@ -80,7 +80,7 @@ namespace GraphicTest
             aCanvas.DrawCircle(pen, 69, 69, 10);
 
             pen.Color = Color.CadetBlue;
-            aCanvas.DrawArc(45, 45, 35, 35, pen, 90, 270)
+            aCanvas.DrawArc(45, 45, 35, 35, pen, 90, 270);
 
             pen.Color = Color.DimGray;
             aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
