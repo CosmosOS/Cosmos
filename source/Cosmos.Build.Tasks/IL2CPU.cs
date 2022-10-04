@@ -54,6 +54,8 @@ namespace Cosmos.Build.Tasks
 
         public bool CompileVBEMultiboot { get; set; }
 
+        public bool EnableFastBoost { get; set; }
+
         public string VBEResolution { get; set; }
 
         #endregion
@@ -97,6 +99,7 @@ namespace Cosmos.Build.Tasks
                 ["IgnoreDebugStubAttribute"] = IgnoreDebugStubAttribute.ToString(),
                 ["CompileVBEMultiboot"] = CompileVBEMultiboot.ToString(),
                 ["VBEResolution"] = VBEResolution.ToString(),
+                ["EnableFastBoost"] = EnableFastBoost.ToString()
             }.ToList();
 
             foreach (var reference in References)

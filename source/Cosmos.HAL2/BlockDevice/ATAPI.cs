@@ -2,6 +2,7 @@
 using Cosmos.HAL.BlockDevice;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using static Cosmos.HAL.BlockDevice.Ata;
 using static Cosmos.HAL.BlockDevice.ATA_PIO;
 
@@ -22,7 +23,12 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Is the ATAPI drive on the Primary or Secondary channel of the IDE controller.
         /// </summary>
-        private bool Primary { get; set; }
+        public bool Primary { get; private set; }
+
+        /// <summary>
+        /// Get The max lba
+        /// </summary>
+        public ulong MaxLBA { get; private set; }
 
         /// <summary>
         /// Each IDE channel also has a Master or a Slave. This just gets or sets which position it is at.
@@ -30,7 +36,7 @@ namespace Cosmos.HAL.BlockDevice
         private BusPositionEnum BusPosition { get; set; }
         public override BlockDeviceType Type => BlockDeviceType.RemovableCD;
 
-        private ATA_PIO device;
+        public ATA_PIO device;
 
         /// <summary>
         /// Collection of predefined command packets to be sent to the ATAPI device
@@ -39,6 +45,7 @@ namespace Cosmos.HAL.BlockDevice
         {
             public static byte[] ReadSector = { (byte)ATA_PIO.Cmd.Read, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
             public static byte[] Unload = { (byte)ATA_PIO.Cmd.Eject, 0, 0, 0, 0x02, 0, 0, 0, 0, 0, 0, 0 };
+            public static byte[] GetMaxLBA = { 0x25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         }
 
         /// <summary>
@@ -56,6 +63,7 @@ namespace Cosmos.HAL.BlockDevice
             var p = BusPosition == BusPositionEnum.Master;
             Ata.AtaDebugger.Send("ATAPI: Primary controller: " + this.Primary + " Bus postion: IsMaster: " + p);
 
+            MaxLBA = GetMaxLBA();
             Init();
         }
 
@@ -263,6 +271,45 @@ namespace Cosmos.HAL.BlockDevice
             {
                 //throw new Exception("ATAPI DRQ not set");
             }
+        }
+        /// <summary>
+        ///  This is a good function to get max LBA I took it from https://forum.osdev.org/viewtopic.php?f=1&t=14604
+        /// </summary>
+        /// <returns></returns>
+        private ulong GetMaxLBA()
+        {
+            //Select the ATAPI device
+            IO.DeviceSelect.Byte = (byte)(((byte)BusPosition << 4) +(1 << 6));
+
+            //Wait for the select complete
+            IO.Wait();
+
+            // get max lba
+            ulong Max_LBA;
+            if (device.LBA48Bit)
+            {
+                device.SendCmd(Cmd.ReadNativeMaxAdressExt,false); // says not check errors
+
+                Max_LBA = (ulong)IO.LBA0.Byte;
+                Max_LBA += (ulong)(IO.LBA1.Byte << 8);
+                Max_LBA += (ulong)(IO.LBA2.Byte << 16);
+
+                IO.Control.Byte = 0x80; // Set HOB to 1
+
+                Max_LBA += (ulong)(IO.LBA0.Byte << 24);
+                Max_LBA += (ulong)(IO.LBA1.Byte << 32);
+                Max_LBA += (ulong)(IO.LBA2.Byte << 40);
+            }
+            else
+            {
+                device.SendCmd(Cmd.ReadNativeMaxAdress,false); // says not check errors
+
+                Max_LBA = (ulong)(IO.LBA0.Byte);
+                Max_LBA += (ulong)(IO.LBA1.Byte << 8);
+                Max_LBA += (ulong)(IO.LBA2.Byte << 16);
+                Max_LBA += ((ulong)(IO.DeviceSelect.Byte & 0xF) << 24);
+            }
+            return Max_LBA;
         }
     }
 }

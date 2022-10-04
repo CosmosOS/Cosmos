@@ -62,6 +62,12 @@
                   Category="Compile">
     </BoolProperty>
 
+    <BoolProperty Name="EnableFastBoost"
+                  DisplayName="Enable Fast Boost"
+                  Description="Use Fast boost to your machine. by skip write video and get the code shoter"
+                  Category="Compile">
+    </BoolProperty>
+
     <StringProperty Name="VBEResolution"
                     DisplayName="VBE Resolution"
                     Description="Example format: 800x600x32"
