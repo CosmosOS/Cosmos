@@ -42,10 +42,10 @@ namespace Cosmos.Core
         /// </summary>
         /// <returns></returns>
         [PlugMethod(PlugRequired = true)]
-        public static uint GetESPValue() => throw null;
+        internal static uint GetESPValue() => throw null;
 
         [PlugMethod(PlugRequired = true)]
-        public static void SetESPValue(uint val) => throw null;
+        internal static void SetESPValue(uint val) => throw null;
 
         /// <summary>
         /// Get the address at which the stack starts
