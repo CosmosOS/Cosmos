@@ -23,45 +23,46 @@ namespace Cosmos.System.FileSystem
         {
             get
             {
-                //var converted = new List<ManagedPartition>();
-                //if (GPT.IsGPTPartition(Host))
-                //{
-                //    var gpt = new GPT(Host);
-                //    int i = 0;
-                //    foreach (var item in gpt.Partitions)
-                //    {
-                //        var part = new ManagedPartition(new Partition(Host, item.StartSector, item.SectorCount));
-                //        if (MountedPartitions[i] != null)
-                //        {
-                //            var data = MountedPartitions[i];
-                //            part.RootPath = data.RootPath;
-                //            part.MountedFS = data;
-                //        }
-                //        converted.Add(part);
-                //        i++;
-                //    }
-                //}
-                //else
-                //{
-                //    var mbr = new MBR(Host);
-                //    int i = 0;
-                //    foreach (var item in mbr.Partitions)
-                //    {
-                //        var part = new ManagedPartition(new Partition(Host, item.StartSector, item.SectorCount));
-                //        if (MountedPartitions[i] != null)
-                //        {
-                //            var data = MountedPartitions[i];
-                //            part.RootPath = data.RootPath;
-                //            part.MountedFS = data;
-                //        }
-                //        converted.Add(part);
-                //        i++;
-                //    }
-                //}
+                var converted = new List<ManagedPartition>();
+                if (GPT.IsGPTPartition(Host))
+                {
+                    var gpt = new GPT(Host);
+                    int i = 0;
+                    foreach (var item in gpt.Partitions)
+                    {
+                        var part = new ManagedPartition(new Partition(Host, item.StartSector, item.SectorCount));
+                        if (MountedPartitions[i] != null)
+                        {
+                            var data = MountedPartitions[i];
+                            part.RootPath = data.RootPath;
+                            part.MountedFS = data;
+                        }
+                        converted.Add(part);
+                        i++;
+                    }
+                }
+                else
+                {
+                    var mbr = new MBR(Host);
+                    int i = 0;
+                    foreach (var item in mbr.Partitions)
+                    {
+                        var part = new ManagedPartition(new Partition(Host, item.StartSector, item.SectorCount));
+                        if (MountedPartitions[i] != null)
+                        {
+                            var data = MountedPartitions[i];
+                            part.RootPath = data.RootPath;
+                            part.MountedFS = data;
+                        }
+                        converted.Add(part);
+                        i++;
+                    }
+                }
 
                 return parts;
             }
         }
+        
         /// <summary>
         /// List of file systems.
         /// </summary>
@@ -272,8 +273,8 @@ namespace Cosmos.System.FileSystem
         {
             var part = Partitions[index];
             //Don't remount
-            //if (MountedPartitions[index] != null)
-            if (part.MountedFS != null) // Thank to ME i saved your time
+            if (MountedPartitions[index] != null)
+            //if (part.MountedFS != null) // Thank to ME i saved your time
             {
                 //We already mounted this partiton
                 return;
@@ -288,9 +289,9 @@ namespace Cosmos.System.FileSystem
                     Kernel.PrintDebug("Mounted partition.");
 
                     //We would have done Partitions[i].MountedFS = item.Create(...), but since the array is not cached, we need to store the mounted partitions in a list
-                    //MountedPartitions[index] = item.Create(part.Host, xRootPath, xSize);
+                    MountedPartitions[index] = item.Create(part.Host, xRootPath, xSize);
                     // the array is now chased
-                    part.MountedFS = item.Create(part.Host, xRootPath, xSize);
+                    //part.MountedFS = item.Create(part.Host, xRootPath, xSize);
                     return;
                 }
             }
