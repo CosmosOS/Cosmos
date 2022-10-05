@@ -3,7 +3,6 @@ using sysIO = System.IO;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
-using Cosmos.Core;
 
 namespace Cosmos.System
 {
@@ -11,7 +10,7 @@ namespace Cosmos.System
     /// <summary>
     /// Provides a base kernel class for a Cosmos-based system
     /// </summary>
-    public abstract class Kernel : AdvancedObject
+    public abstract class Kernel
     {
         /// <summary>
         /// User ring debugger instance, with the tag "Kernel".
