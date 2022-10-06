@@ -62,9 +62,9 @@
                   Category="Compile">
     </BoolProperty>
 
-    <BoolProperty Name="EnableFastBoost"
-                  DisplayName="Enable Fast Boost"
-                  Description="Use Fast boost to your machine. by skip write video and get the code shoter"
+    <BoolProperty Name="EnableLittleOptimization"
+                  DisplayName="Enable Little Optimization"
+                  Description="Use This if you have trouble with bootload heap or somthing else"
                   Category="Compile">
     </BoolProperty>
 

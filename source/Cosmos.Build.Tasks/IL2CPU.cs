@@ -54,7 +54,7 @@ namespace Cosmos.Build.Tasks
 
         public bool CompileVBEMultiboot { get; set; }
 
-        public bool EnableFastBoost { get; set; }
+        public bool EnableLittleOptimization { get; set; }
 
         public string VBEResolution { get; set; }
 
@@ -99,7 +99,7 @@ namespace Cosmos.Build.Tasks
                 ["IgnoreDebugStubAttribute"] = IgnoreDebugStubAttribute.ToString(),
                 ["CompileVBEMultiboot"] = CompileVBEMultiboot.ToString(),
                 ["VBEResolution"] = VBEResolution.ToString(),
-                ["EnableFastBoost"] = EnableFastBoost.ToString()
+                ["EnableLittleOptimization"] = EnableLittleOptimization.ToString()
             }.ToList();
 
             foreach (var reference in References)

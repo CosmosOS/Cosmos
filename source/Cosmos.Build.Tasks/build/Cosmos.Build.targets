@@ -64,7 +64,7 @@
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
 
 
-        <EnableFastBoost Condition="'$(EnableFastBoost)' == ''">ELF</EnableFastBoost>
+        <EnableLittleOptimization Condition="'$(EnableLittleOptimization)' == ''">ELF</EnableLittleOptimization>
 
     </PropertyGroup>
 
