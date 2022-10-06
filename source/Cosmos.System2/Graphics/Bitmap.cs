@@ -55,6 +55,15 @@ namespace Cosmos.System.Graphics
             }
         }
         
+        public Bitmap(uint Width, uint Height, int[] pixelData, ColorDepth colorDepth) : base(Width, Height, colorDepth)
+        {
+            if (colorDepth != ColorDepth.ColorDepth32 && colorDepth != ColorDepth.ColorDepth24)
+            {
+                Global.mDebugger.Send("Only color depths 24 and 32 are supported!");
+                throw new NotImplementedException("Only color depths 24 and 32 are supported!");
+            }
+            rawData = pixelData;
+        }
         /// <summary>
         /// Create new instance of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
         /// </summary>
