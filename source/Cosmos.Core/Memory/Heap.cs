@@ -33,6 +33,40 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
+		/// Re-allocates or "re-sizes" data asigned to a pointer.
+		/// </summary>
+		/// <param name="aPtr">Existing pointer</param>
+		/// <param name="NewSize">Size to extend to</param>
+		/// <returns>New pointer with specified size while maintaining old data.</returns>
+        public static byte* Realloc(byte* aPtr, uint NewSize)
+		{
+            // Get existing size
+            uint Size = (RAT.GetPageType(aPtr) == RAT.PageType.HeapSmall ? ((ushort*)aPtr)[-2] : ((uint*)aPtr)[-4]); 
+
+            if (Size == NewSize)
+			{
+                // Return existing pointer as nothing needs to be done.
+                return aPtr;
+			}
+            if (Size > NewSize)
+			{
+                Size -= (NewSize - Size);
+			}
+
+            // Allocate a new buffer to use
+			byte* ToReturn = Alloc(NewSize);
+
+            // Copy the old buffer to the new one
+            MemoryOperations.Copy(ToReturn, aPtr, (int)Size);
+            // Copy the GC state
+            ((ushort*)ToReturn)[-1] = ((ushort*)aPtr)[-1];
+
+            // Free the old data and return
+            Free(aPtr);
+            return ToReturn;
+		}
+
+        /// <summary>
         /// Alloc memory block, of a given size.
         /// </summary>
         /// <param name="aSize">A size of block to alloc, in bytes.</param>
@@ -123,7 +157,7 @@ namespace Cosmos.Core.Memory
             for (int ratIndex = 0; ratIndex < RAT.TotalPageCount; ratIndex++)
             {
                 var pageType = *(RAT.mRAT + ratIndex);
-                if (pageType == RAT.PageType.HeapMedium || pageType == RAT.PageType.HeapLarge)
+                if (pageType == (byte)RAT.PageType.HeapMedium || pageType == (byte)RAT.PageType.HeapLarge)
                 {
                     var pagePtr = RAT.RamStart + ratIndex * RAT.PageSize;
                     if (*(ushort*)(pagePtr + 3) != 0)
@@ -184,7 +218,7 @@ namespace Cosmos.Core.Memory
             for (int ratIndex = 0; ratIndex < RAT.TotalPageCount; ratIndex++)
             {
                 var pageType = *(RAT.mRAT + ratIndex);
-                if (pageType == RAT.PageType.HeapMedium || pageType == RAT.PageType.HeapLarge)
+                if (pageType == (byte)RAT.PageType.HeapMedium || pageType == (byte)RAT.PageType.HeapLarge)
                 {
                     var pagePointer = RAT.RamStart + ratIndex * RAT.PageSize;
                     if (*((ushort*)(pagePointer + HeapLarge.PrefixBytes) - 1) == 0)
