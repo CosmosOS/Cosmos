@@ -59,7 +59,7 @@ namespace Cosmos.System.FileSystem
                     }
                 }
 
-                return parts;
+                return converted;
             }
         }
         
