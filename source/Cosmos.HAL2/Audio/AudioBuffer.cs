@@ -133,7 +133,7 @@ namespace Cosmos.HAL.Audio {
                 MemoryOperations.Copy(
                     dest,
                     bufferPtr + bufferOffset,
-                    (uint)channelByteSize
+                    channelByteSize
                 );
             }
         }
