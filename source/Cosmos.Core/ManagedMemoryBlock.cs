@@ -96,7 +96,7 @@ namespace Cosmos.Core
         {
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             uint* xDest = (uint*)(Offset + aByteOffset);
-            MemoryOperations.Fill(xDest, aData, (int)aCount);
+            MemoryOperations.Fill(xDest, aData, aCount);
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Cosmos.Core
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             fixed (byte* aArrayPtr = memory)
             {
-                MemoryOperations.Fill(aArrayPtr + aByteOffset, aData, aCount * 4);
+                MemoryOperations.Fill(aArrayPtr + aByteOffset, aData, (uint)aCount * 4);
             }
         }
 
@@ -122,7 +122,7 @@ namespace Cosmos.Core
         {
             fixed (byte* destPtr = memory)
             {
-                MemoryOperations.Fill(destPtr, (int)aData, (int)Size);
+                MemoryOperations.Fill(destPtr, (int)aData, Size);
             }
         }
 
@@ -136,7 +136,7 @@ namespace Cosmos.Core
             }
             fixed (byte* aDataPtr = aData)
             {
-                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, (uint)aCount);
             }
         }
 
@@ -150,7 +150,7 @@ namespace Cosmos.Core
             }
             fixed (int* aDataPtr = aData)
             {
-                MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
+                MemoryOperations.Copy(xDest, aDataPtr + aIndex, (uint)aCount);
             }
         }
 
@@ -163,7 +163,7 @@ namespace Cosmos.Core
             byte* xDest = (byte*)(Offset);
             byte* aDataPtr = (byte*)block.Base;
 
-            MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
+            MemoryOperations.Copy(xDest, aDataPtr, block.Size);
         }
 
         /// <summary>
