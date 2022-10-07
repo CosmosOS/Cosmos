@@ -14,6 +14,7 @@
 
 * .NET 6 SDK: [Download .NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
 * Make
+* Yasm (`apt install yasm`)
 * QEMU or any other virtual machine
 
 ###  Installation on Windows
