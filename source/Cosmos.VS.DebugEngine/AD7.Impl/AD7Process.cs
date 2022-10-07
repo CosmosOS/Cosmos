@@ -538,10 +538,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     //((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
                     break;
                 case LaunchType.Qemu:
-                    if (!QemuSupport.QemuEnabled)
-                    {
-                        throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
-                    }
                     mHost = new Qemu(mDebugInfo, xUseGDB);
                     break;
                 case LaunchType.IntelEdison:

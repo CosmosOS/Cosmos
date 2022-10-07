@@ -21,10 +21,6 @@ namespace Cosmos.System_Plugs.System
         // TODO: get timezone
         public static DateTime UtcNow => Now;
 
-
-
-        public static long GetSystemTimeAsFileTime() => Now.Ticks;
-
         private static readonly string[] DaysOfWeekStrings = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
         private static readonly string[] MonthsStrings = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 

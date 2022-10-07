@@ -48,6 +48,14 @@
         <EnumValue Name="Bin" DisplayName="Bin"/>
     </EnumProperty>
 
+    <EnumProperty Name="CompressionType"
+                  DisplayName="Compression"
+                  Category="Compile"
+                  Description="Apply compression to the kernel.">
+        <EnumValue Name="None" DisplayName="None"/>
+        <EnumValue Name="Gzip" DisplayName="gzip"/>
+    </EnumProperty>
+
     <BoolProperty Name="CompileVBEMultiboot"
                   DisplayName="VBE Multiboot"
                   Description="Compile Cosmos with VBE information specified in Multiboot structure."
@@ -279,7 +287,7 @@
         <EnumValue Name="1024"/>
         <EnumValue Name="3072"/>
         <EnumValue Name="4096"/>
-</EnumProperty>
+    </EnumProperty>
     
     <EnumProperty Name="QemuNetworkDevice"
                   DisplayName="Network Device"
@@ -353,6 +361,7 @@
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
+    
     <BoolProperty Name="QemuHWAccelWHPX"
                   DisplayName="Qemu Hardware Acceleration"
                   Description="Use WHPX for Qemu. (Requires Hyper-V to be installed, do not use together with haxm)"
@@ -363,6 +372,7 @@
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
+    
     <BoolProperty Name="QemuHWAccel"
                   DisplayName="Qemu Hardware Acceleration"
                   Description="Use HAXM for Qemu. (needs to be installed)"
@@ -373,6 +383,7 @@
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
+    
     <StringProperty Name="QemuHWAccelInfo"
                     DisplayName="Download HAXM."
                     Category="Qemu">
@@ -407,17 +418,6 @@
         </BoolProperty.Metadata>
     </BoolProperty>
 
-    <StringProperty Name="QemuCustomParameters"
-                    DisplayName="Custom Parameters"
-                    Description="Use Custom Parameters for Qemu launch."
-                    Category="Qemu">
-        <StringProperty.Metadata>
-            <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
-            </NameValuePair>
-        </StringProperty.Metadata>
-    </StringProperty>
-
     <StringProperty Name="QemuCustomParametersInfo"
                     DisplayName="Qemu Documentation for custom parameters."
                     Category="Qemu">
@@ -436,10 +436,11 @@
         </StringProperty.ValueEditors>
         <StringProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu") (has-evaluated-value "CosmosPropertyPage" "QemuUseCustomParameters" true))</NameValuePair.Value>
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
+    
     <BoolProperty Name="QemuUseCustomLocation"
                   DisplayName="Custom Location"
                   Description="Use Custom Location for Qemu executable."
@@ -450,13 +451,14 @@
             </NameValuePair>
         </BoolProperty.Metadata>
     </BoolProperty>
+    
     <StringProperty Name="QemuLocationParameters"
                     DisplayName="Qemu Location"
                     Description="Set Qemu Location. (example: C:\qemu\qemu-system-i386.exe)"
                     Category="Qemu">
         <StringProperty.Metadata>
             <NameValuePair Name="VisibilityCondition">
-                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu")</NameValuePair.Value>
+                <NameValuePair.Value>(and (has-evaluated-value "CosmosPropertyPage" "Launch" "Qemu") (has-evaluated-value "CosmosPropertyPage" "QemuUseCustomLocation" true))</NameValuePair.Value>
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
@@ -483,6 +485,5 @@
             </NameValuePair>
         </StringProperty.Metadata>
     </StringProperty>
-
 
 </Rule>

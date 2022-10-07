@@ -1,280 +1,344 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Cosmos.Core;
 
 namespace Cosmos.HAL
 {
-	/// <summary>
-	/// Programmable Interval Timer
-	/// with 1,193181818... MHz
-	/// </summary>
-	public class PIT : Device
-	{
-		public class PITTimer : IDisposable
-		{
-			internal int NSRemaining;
-			public int NanosecondsTimeout;
-			public bool Recuring;
-			internal int ID = -1;
+    /// <summary>
+    /// Handles the Programmable Interval Timer (PIT).
+    /// </summary>
+    public class PIT : Device
+    {
+        /// <summary>
+        /// Represents a virtual timer that can be handled using the
+        /// Programmable Interrupt Timer (PIT).
+        /// </summary>
+        public class PITTimer : IDisposable
+        {
+            internal ulong NSRemaining;
+            internal int ID = -1;
 
-			public int TimerID
-			{
-				get
-				{
-					return ID;
+            /// <summary>
+            /// The delay between each timer cycle.
+            /// </summary>
+            public ulong NanosecondsTimeout;
+
+            /// <summary>
+            /// Whether this timer will fire once, or will fire indefinetly until unregistered.
+            /// </summary>
+            public bool Recurring;
+
+            /// <summary>
+            /// The ID of the timer.
+            /// </summary>
+            public int TimerID => ID;
+
+            /// <summary>
+            /// The method to invoke for each cycle of the timer.
+            /// </summary>
+            public OnTrigger HandleTrigger;
+
+            /// <summary>
+            /// Represents the trigger handler for a <see cref="PITTimer"/>.
+            /// </summary>
+            /// <param name="irqContext">The state of the CPU when the PIT interrupt has occured.</param>
+            public delegate void OnTrigger(INTs.IRQContext irqContext);
+
+            /// <summary>
+            /// Initializes a new <see cref="PITTimer"/>, with the specified
+            /// callback method and properties.
+            /// </summary>
+            /// <param name="callback">The method to invoke for each timer cycle.</param>
+            /// <param name="nanosecondsTimeout">The delay between timer cycles.</param>
+            /// <param name="recurring">Whether this timer will fire once, or will fire indefinetly until unregistered.</param>
+            public PITTimer(OnTrigger callback, ulong nanosecondsTimeout, bool recurring)
+            {
+                HandleTrigger = callback;
+                NanosecondsTimeout = nanosecondsTimeout;
+                NSRemaining = NanosecondsTimeout;
+                Recurring = recurring;
+            }
+
+            /// <inheritdoc cref="PITTimer(OnTrigger, UInt64, Boolean)"/>
+            public PITTimer(Action callback, ulong nanosecondsTimeout, bool recurring)
+                : this(_ => callback(), nanosecondsTimeout, recurring)
+            { }
+
+            /// <summary>
+            /// Initializes a new recurring <see cref="PITTimer"/>, with the specified
+            /// callback method and amount of nanoseconds left until the next timer cycle.
+            /// </summary>
+            /// <param name="callback">The method to invoke for each timer cycle.</param>
+            /// <param name="nanosecondsTimeout">The delay between timer cycles.</param>
+            /// <param name="nanosecondsLeft">The amount of time left before the first timer cycle is fired.</param>
+            public PITTimer(OnTrigger callback, ulong nanosecondsTimeout, ulong nanosecondsLeft)
+            {
+                HandleTrigger = callback;
+                NanosecondsTimeout = nanosecondsTimeout;
+                NSRemaining = nanosecondsLeft;
+                Recurring = true;
+            }
+
+            /// <inheritdoc cref="PITTimer(OnTrigger, UInt64, UInt64)"/>
+            public PITTimer(Action callback, ulong nanosecondsTimeout, ulong nanosecondsLeft)
+                : this(_ => callback(), nanosecondsTimeout, nanosecondsLeft)
+            { }
+
+            ~PITTimer()
+            {
+                Dispose();
+            }
+
+            public void Dispose()
+            {
+                if (ID != -1)
+                {
+                    Global.PIT.UnregisterTimer(ID);
+                }
+            }
+
+            #region (deprecated)
+
+            [Obsolete($"Use the {nameof(Recurring)} property instead.")]
+            public bool Recuring => Recurring;
+
+            #endregion
+        }
+
+        public const uint PITFrequency = 1193180;
+        public const uint PITDelayNS = 838;
+
+        public bool T0RateGen = false;
+
+        protected Core.IOGroup.PIT IO = Core.Global.BaseIOGroups.PIT;
+        private List<PITTimer> activeHandlers = new();
+        private ushort _T0Countdown = 65535;
+        private ushort _T2Countdown = 65535;
+        private int timerCounter = 0;
+        private bool waitSignaled = false;
+
+        public PIT()
+        {
+            INTs.SetIrqHandler(0x00, HandleIRQ);
+            T0Countdown = 65535;
+        }
+
+        public ushort T0Countdown
+        {
+            get => _T0Countdown;
+            set {
+                _T0Countdown = value;
+
+                IO.Command.Byte = (byte)(T0RateGen ? 0x34 : 0x30);
+                IO.Data0.Byte = (byte)(value & 0xFF);
+                IO.Data0.Byte = (byte)(value >> 8);
+            }
+        }
+
+        public uint T0Frequency
+        {
+            get => PITFrequency / (uint)_T0Countdown;
+            set {
+                if (value < 19 || value > 1193180) {
+                    throw new ArgumentException("Frequency must be between 19 and 1193180!");
+                }
+
+                T0Countdown = (ushort)(PITFrequency / value);
+            }
+        }
+
+        public uint T0DelayNS
+        {
+            get => PITDelayNS * _T0Countdown;
+            set {
+                if (value > 54918330) {
+                    throw new ArgumentException("Delay must be no greater that 54918330");
+                }
+
+                T0Countdown = (ushort)(value / PITDelayNS);
+            }
+        }
+
+        public ushort T2Countdown
+        {
+            get => _T2Countdown;
+            set
+            {
+                _T2Countdown = value;
+
+                IO.Command.Byte = 0xB6;
+                IO.Data0.Byte = (byte)(value & 0xFF);
+                IO.Data0.Byte = (byte)(value >> 8);
+            }
+        }
+
+        public uint T2Frequency
+        {
+            get => PITFrequency / ((uint)_T2Countdown);
+            set
+            {
+                if (value < 19 || value > 1193180)
+                {
+                    throw new ArgumentException("Frequency must be between 19 and 1193180!");
+                }
+
+                T2Countdown = (ushort)(PITFrequency / value);
+            }
+        }
+
+        public uint T2DelayNS
+        {
+            get => (PITDelayNS * _T2Countdown);
+            set
+            {
+                if (value > 54918330) {
+                    throw new ArgumentException("Delay must be no greater than 54918330");
+                }
+
+                T2Countdown = (ushort)(value / PITDelayNS);
+            }
+        }
+
+        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
+        public void EnableSound()
+        {
+            //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0x03);
+        }
+
+        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
+        public void DisableSound()
+        {
+            //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
+        }
+
+        public void PlaySound(int aFreq)
+        {
+            EnableSound();
+            T2Frequency = (uint)aFreq;
+        }
+
+        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
+        public void MuteSound()
+        {
+            DisableSound();
+        }
+
+        private void SignalWait(INTs.IRQContext irqContext)
+        {
+            waitSignaled = true;
+        }
+
+        /// <summary>
+        /// Halts the CPU for the specified amount of milliseconds.
+        /// </summary>
+        /// <param name="timeoutMs">The amount of milliseconds to halt the CPU for.</param>
+        public void Wait(uint timeoutMs)
+        {
+            waitSignaled = false;
+
+            RegisterTimer(new PITTimer(SignalWait, timeoutMs * 1000000UL, false));
+
+            while (!waitSignaled)
+            {
+                CPU.Halt();
+            }
+        }
+
+        /// <summary>
+        /// Halts the CPU for the specified amount of nanoseconds.
+        /// </summary>
+        /// <param name="timeoutNs">The amount of nanoseconds to halt the CPU for.</param>
+        public void WaitNS(ulong timeoutNs)
+        {
+            waitSignaled = false;
+
+            RegisterTimer(new PITTimer(SignalWait, timeoutNs, false));
+
+            while (!waitSignaled)
+            {
+                CPU.Halt();
+            }
+        }
+
+        private void HandleIRQ(ref INTs.IRQContext aContext)
+        {
+            ulong T0Delay = T0DelayNS;
+
+            if (activeHandlers.Count > 0)
+            {
+                T0Countdown = 65535;
+            }
+
+            PITTimer handler;
+            for (int i = activeHandlers.Count - 1; i >= 0; i--)
+            {
+                handler = activeHandlers[i];
+				
+                if (handler.NSRemaining <= T0Delay)
+                {
+                    if (handler.Recurring)
+                    {
+                        handler.NSRemaining = handler.NanosecondsTimeout;
+                    }
+                    else
+                    {
+                        handler.ID = -1;
+                        activeHandlers.RemoveAt(i);
+                    }
+                    
+                    handler.HandleTrigger(aContext);
+                } else {
+                    handler.NSRemaining -= T0Delay;
 				}
-			}
+            }
 
-			public delegate void dOnTrigger();
-			public dOnTrigger HandleTrigger;
+        }
 
-			public PITTimer(dOnTrigger HandleOnTrigger, int NanosecondsTimeout, bool Recuring)
-			{
-				this.HandleTrigger = HandleOnTrigger;
-				this.NanosecondsTimeout = NanosecondsTimeout;
-				this.NSRemaining = this.NanosecondsTimeout;
-				this.Recuring = Recuring;
-			}
+        /// <summary>
+        /// Registers a timer to this <see cref="PIT"/> object. 
+        /// </summary>
+        /// <param name="timer">The target timer.</param>
+        /// <returns>The newly assigned ID to the timer.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the given timer has already been registered.</exception>
+        public int RegisterTimer(PITTimer timer)
+        {
+            if (timer.ID != -1)
+            {
+                throw new InvalidOperationException("The provided timer has already been registered.");
+            }
 
-			public PITTimer(dOnTrigger HandleOnTrigger, int NanosecondsTimeout, int NanosecondsLeft)
-			{
-				this.HandleTrigger = HandleOnTrigger;
-				this.NanosecondsTimeout = NanosecondsTimeout;
-				this.NSRemaining = NanosecondsLeft;
-				this.Recuring = true;
-			}
+            timer.ID = (timerCounter++);
+            activeHandlers.Add(timer);
+            T0Countdown = 65535;
+            return timer.ID;
+        }
 
-			~PITTimer()
-			{
-				Dispose();
-			}
+        /// <summary>
+        /// Unregisters a timer that has been previously registered to this
+        /// <see cref="PIT"/> object.
+        /// </summary>
+        /// <param name="timerId">The ID of the timer to unregister.</param>
+        public void UnregisterTimer(int timerId)
+        {
+            for (int i = 0; i < activeHandlers.Count; i++)
+            {
+                if (activeHandlers[i].ID == timerId)
+                {
+                    activeHandlers[i].ID = -1;
+                    activeHandlers.RemoveAt(i);
+                    return;
+                }
+            }
+        }
 
-			public void Dispose()
-			{
-				if (ID != -1)
-				{
-					Global.PIT.UnregisterTimer(ID);
-				}
-			}
-		}
+        #region (deprecated)
 
-		protected Core.IOGroup.PIT IO = Core.Global.BaseIOGroups.PIT;
-		private List<PITTimer> ActiveHandlers = new List<PITTimer>();
-		private ushort _T0Countdown = 65535;
-		private ushort _T2Countdown = 65535;
-		private int TimerCounter = 0;
-		private bool WaitSignaled = false;
-		public const uint PITFrequency = 1193180;
-		public const uint PITDelayNS = 838;
-		public bool T0RateGen = false;
+        [Obsolete($"Use the {nameof(T0DelayNS)} property instead.")]
+        public uint T0DelyNS => T0DelayNS;
 
-		public PIT()
-		{
-			INTs.SetIrqHandler(0x00, HandleIRQ);
-			T0Countdown = 65535;
-		}
+        [Obsolete($"Use the {nameof(T2DelayNS)} property instead.")]
+        public uint T2DelyNS => T2DelayNS;
 
-		public ushort T0Countdown
-		{
-			get
-			{
-				return _T0Countdown;
-			}
-			set
-			{
-				_T0Countdown = value;
-
-				IO.Command.Byte = (byte)(T0RateGen ? 0x34 : 0x30);
-				IO.Data0.Byte = (byte)(value & 0xFF);
-				IO.Data0.Byte = (byte)(value >> 8);
-			}
-		}
-		public uint T0Frequency
-		{
-			get
-			{
-				return (PITFrequency / ((uint)_T0Countdown));
-			}
-			set
-			{
-				if (value < 19 || value > 1193180)
-				{
-					throw new ArgumentException("Frequency must be between 19 and 1193180!");
-				}
-
-				T0Countdown = (ushort)(PITFrequency / value);
-			}
-		}
-		public uint T0DelyNS
-		{
-			get
-			{
-				return (PITDelayNS * _T0Countdown);
-			}
-			set
-			{
-				if (value > 54918330)
-					throw new ArgumentException("Delay must be no greater that 54918330");
-
-				T0Countdown = (ushort)(value / PITDelayNS);
-			}
-		}
-
-		public ushort T2Countdown
-		{
-			get
-			{
-				return _T2Countdown;
-			}
-			set
-			{
-				_T2Countdown = value;
-
-				IO.Command.Byte = 0xB6;
-				IO.Data0.Byte = (byte)(value & 0xFF);
-				IO.Data0.Byte = (byte)(value >> 8);
-			}
-		}
-		public uint T2Frequency
-		{
-			get
-			{
-				return (PITFrequency / ((uint)_T2Countdown));
-			}
-			set
-			{
-				if (value < 19 || value > 1193180)
-				{
-					throw new ArgumentException("Frequency must be between 19 and 1193180!");
-				}
-
-				T2Countdown = (ushort)(PITFrequency / value);
-			}
-		}
-		public uint T2DelyNS
-		{
-			get
-			{
-				return (PITDelayNS * _T2Countdown);
-			}
-			set
-			{
-				if (value > 54918330)
-					throw new ArgumentException("Delay must be no greater than 54918330");
-
-				T2Countdown = (ushort)(value / PITDelayNS);
-			}
-		}
-
-		//TODO: Why is sound in PIT? Is it a function of the PIT?
-		//Channel 3 is for the pc speaker ^
-		public void EnableSound()
-		{
-			//IO.Port61.Byte = (byte)(IO.Port61.Byte | 0x03);
-		}
-		public void DisableSound()
-		{
-			//IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
-		}
-		public void PlaySound(int aFreq)
-		{
-			EnableSound();
-			T2Frequency = (uint)aFreq;
-		}
-		public void MuteSound()
-		{
-			DisableSound();
-		}
-
-		private void SignalWait()
-		{
-			WaitSignaled = true;
-		}
-
-		public void Wait(uint TimeoutMS)
-		{
-			WaitSignaled = false;
-
-			RegisterTimer(new PITTimer(SignalWait, (int)(TimeoutMS * 1000000), false));
-
-			while (!WaitSignaled)
-			{
-				Core.CPU.Halt();
-			}
-		}
-
-		public void WaitNS(int TimeoutNS)
-		{
-			WaitSignaled = false;
-
-			RegisterTimer(new PITTimer(SignalWait, TimeoutNS, false));
-
-			while (!WaitSignaled)
-			{
-				Core.CPU.Halt();
-			}
-		}
-
-		private void HandleIRQ(ref INTs.IRQContext aContext)
-		{
-			int T0Delay = (int)T0DelyNS;
-			PITTimer hndlr = null;
-
-			if (ActiveHandlers.Count > 0)
-			{
-				T0Countdown = 65535;
-			}
-
-			for (int i = ActiveHandlers.Count - 1; i >= 0; i--)
-			{
-				hndlr = ActiveHandlers[i];
-
-				hndlr.NSRemaining -= T0Delay;
-
-				if (hndlr.NSRemaining < 1)
-				{
-					if (hndlr.Recuring)
-					{
-						hndlr.NSRemaining = hndlr.NanosecondsTimeout;
-					}
-					else
-					{
-						hndlr.ID = -1;
-						ActiveHandlers.RemoveAt(i);
-					}
-
-					hndlr.HandleTrigger();
-				}
-			}
-
-		}
-
-		public int RegisterTimer(PITTimer timer)
-		{
-			if (timer.ID != -1)
-			{
-				throw new InvalidOperationException("Timer has already been registered!");
-			}
-
-			timer.ID = (TimerCounter++);
-			ActiveHandlers.Add(timer);
-			T0Countdown = 65535;
-			return timer.ID;
-		}
-		public void UnregisterTimer(int timerid)
-		{
-			for (int i = 0; i < ActiveHandlers.Count; i++)
-			{
-				if (ActiveHandlers[i].ID == timerid)
-				{
-					ActiveHandlers[i].ID = -1;
-					ActiveHandlers.RemoveAt(i);
-					return;
-				}
-			}
-		}
-
-	}
+        #endregion
+    }
 }

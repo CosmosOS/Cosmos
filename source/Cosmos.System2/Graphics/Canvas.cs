@@ -605,6 +605,32 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+		/// Draws an arc.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="pen"></param>
+		/// <param name="StartAngle"></param>
+		/// <param name="EndAngle"></param>
+        public virtual void DrawArc(int x, int y, int width, int height, Pen pen, int StartAngle = 0, int EndAngle = 360)
+        {
+            if (width == 0 || height == 0)
+            {
+                return;
+            }
+
+            for (double Angle = StartAngle; Angle < EndAngle; Angle += 0.5)
+            {
+                double Angle1 = Math.PI * Angle / 180;
+                int IX = (int)(width * Math.Cos(Angle1));
+                int IY = (int)(height * Math.Sin(Angle1));
+                DrawPoint(pen, x + IX, y + IY);
+            }
+        }
+        
+        /// <summary>
         /// Draw polygon.
         /// </summary>
         /// <param name="pen">Pen to draw with.</param>
@@ -878,12 +904,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public virtual void DrawImage(Image image, int x, int y)
         {
+            Pen _pen = new Pen(Color.White);
+
             for (int _x = 0; _x < image.Width; _x++)
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
-                    DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])), x + _x, y + _y);
+                    _pen.Color = Color.FromArgb(image.rawData[_x + _y * image.Width]);
+                    DrawPoint(_pen, x + _x, y + _y);
                 }
             }
         }
@@ -918,13 +947,16 @@ namespace Cosmos.System.Graphics
         /// <param name="h">Desired Height.</param>
         public virtual void DrawImage(Image image, int x, int y, int w, int h)
         {
+            Pen _pen = new Pen(Color.White);
+
             int[] pixels = scaleImage(image, w, h);
             for (int _x = 0; _x < w; _x++)
             {
                 for (int _y = 0; _y < h; _y++)
                 {
                     Global.mDebugger.SendInternal(pixels[_x + _y * w]);
-                    DrawPoint(new Pen(Color.FromArgb(pixels[_x + _y * w])), x + _x, y + _y);
+                    _pen.Color = Color.FromArgb(pixels[_x + _y * w]);
+                    DrawPoint(_pen, x + _x, y + _y);
                 }
             }
         }
@@ -939,12 +971,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public void DrawImageAlpha(Image image, int x, int y)
         {
+            var _pen = new Pen(Color.White);
+
             for (int _x = 0; _x < image.Width; _x++)
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
-                    DrawPoint(new Pen(Color.FromArgb(image.rawData[_x + _y * image.Width])), x + _x, y + _y);
+                    _pen.Color = (Color.FromArgb(image.rawData[_x + _y * image.Width]));
+                    DrawPoint(_pen, x + _x, y + _y);
                 }
             }
         }
