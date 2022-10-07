@@ -181,6 +181,7 @@ namespace MemoryOperationsTest
                 TestCopy();
                 TestMemoryBlock(new MemoryBlock(0x60000, 128)); //we are testing in SVGA video memory which should not be in use
                 TestManagedMemoryBlock(new ManagedMemoryBlock(128));
+                TestRealloc();
                 SpanTest.Execute();
                 TestController.Completed();
             }

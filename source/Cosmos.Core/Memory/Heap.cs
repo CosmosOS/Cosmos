@@ -47,18 +47,18 @@ namespace Cosmos.Core.Memory
             // Get existing size
             uint Size = (RAT.GetPageType(aPtr) == RAT.PageType.HeapSmall ? ((ushort*)aPtr)[-2] : ((uint*)aPtr)[-4]); 
 
-            if (Size == NewSize)
+            if (Size == newSize)
 			{
                 // Return existing pointer as nothing needs to be done.
                 return aPtr;
 			}
-            if (Size > NewSize)
+            if (Size > newSize)
 			{
-                Size -= (NewSize - Size);
+                Size -= (newSize - Size);
 			}
 
             // Allocate a new buffer to use
-			byte* ToReturn = Alloc(NewSize);
+			byte* ToReturn = Alloc(newSize);
 
             // Copy the old buffer to the new one
             MemoryOperations.Copy(ToReturn, aPtr, (int)Size);
