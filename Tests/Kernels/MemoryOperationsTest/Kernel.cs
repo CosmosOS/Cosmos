@@ -161,7 +161,7 @@ namespace MemoryOperationsTest
 		{
             // Allocate initial pointer and fill with value 32
             byte* aPtr = Heap.Alloc(16);
-            MemoryOperations.Fill(aPtr, (byte)32, 16);
+            MemoryOperations.Fill(aPtr, 32, 16);
 
             // Resize/realloc to 17 bytes
             aPtr = Heap.Realloc(aPtr, 17);

@@ -10,14 +10,13 @@ namespace Cosmos.Core
     public unsafe class MemoryOperations
     {
         #region Fill
-
         /// <summary>
         /// Fill memory block. Plugged.
         /// </summary>
         /// <param name="aDest">A destination.</param>
         /// <param name="aValue">A data value.</param>
         /// <param name="aSize">A data size.</param>
-        public static unsafe void Fill(byte* aDest, int aValue, uint aSize)
+        public static unsafe void Fill(byte* aDest, int aValue, int aSize)
         {
             // Plugged but we use this for unit tests
             var bytes = BitConverter.GetBytes(aValue);
@@ -34,7 +33,7 @@ namespace Cosmos.Core
         /// <param name="value">Data value.</param>
         /// <param name="size">Data size.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Fill(uint* dest, uint value, uint size)
+        public static unsafe void Fill(uint* dest, uint value, int size)
         {
             Fill((byte*)dest, (int)value, size * 4);
         }
@@ -46,7 +45,7 @@ namespace Cosmos.Core
         /// <param name="value">Value</param>
         /// <param name="size">Number of integers to write</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Fill(int* dest, int value, uint size)
+        public static unsafe void Fill(int* dest, int value, int size)
         {
             Fill((byte*)dest, value, size * 4);
         }
@@ -86,7 +85,7 @@ namespace Cosmos.Core
         /// <param name="value">Data value.</param>
         /// <param name="size">Data size.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Fill(ushort* dest, ushort value, uint size)
+        public static unsafe void Fill(ushort* dest, ushort value, int size)
         {
             /* Broadcast 'value' to fill all the integer register (0x42 --> 0x42424242) */
             int valueFiller = value * 0x10001;
@@ -100,7 +99,7 @@ namespace Cosmos.Core
         /// <param name="value">Data value.</param>
         /// <param name="size">Data size.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Fill(short* dest, short value, uint size)
+        public static unsafe void Fill(short* dest, short value, int size)
         {
             /* Broadcast 'value' to fill all the integer register (0x42 --> 0x42424242) */
             int valueFiller = (ushort)value * 0x10001;
@@ -142,7 +141,7 @@ namespace Cosmos.Core
         /// <param name="value">Data value.</param>
         /// <param name="size">Data size.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Fill(byte* dest, byte value, uint size)
+        public static unsafe void Fill(byte* dest, byte value, int size)
         {
             /* Broadcast 'value' fill all the integer register (0x42 --> 0x42424242) */
             int valueFiller = value * 0x1010101;
@@ -156,7 +155,7 @@ namespace Cosmos.Core
         /// <param name="value">Data value.</param>
         /// <param name="size">Data size.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Fill(sbyte* dest, sbyte value, uint size)
+        public static unsafe void Fill(sbyte* dest, sbyte value, int size)
         {
             /* Broadcast 'value' fill all the integer register (0x42 --> 0x42424242) */
             int valueFiller = (byte)value * 0x1010101;
@@ -205,9 +204,9 @@ namespace Cosmos.Core
                 Copy(destPtr, srcPtr, (uint)dest.Length);
             }
         }
-        #endregion Fill
+#endregion Fill
 
-        #region Copy
+#region Copy
         /// <summary>
         /// Copy source to destination.
         /// plugged.
@@ -215,7 +214,7 @@ namespace Cosmos.Core
         /// <param name="dest">Destination.</param>
         /// <param name="src">Source.</param>
         /// <param name="size">Size of data.</param>
-        public static unsafe void Copy(byte *dest, byte *src, uint size)
+        public static unsafe void Copy(byte *dest, byte *src, int size)
         {
             // Plugged
         }
@@ -227,7 +226,7 @@ namespace Cosmos.Core
         /// <param name="src">Source.</param>
         /// <param name="size">Size of data.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Copy(uint* dest, uint *src, uint size)
+        public static unsafe void Copy(uint* dest, uint *src, int size)
         {
             Copy((byte*)dest, (byte *)src, size * 4);
         }
@@ -239,7 +238,7 @@ namespace Cosmos.Core
         /// <param name="src">Source.</param>
         /// <param name="size">Size of data.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Copy(int* dest, int *src, uint size)
+        public static unsafe void Copy(int* dest, int *src, int size)
         {
             Copy((byte*)dest, (byte*)src, size * 4);
         }
@@ -281,7 +280,7 @@ namespace Cosmos.Core
         /// <param name="src">Source.</param>
         /// <param name="size">Size of data.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Copy(ushort* dest, ushort* src, uint size)
+        public static unsafe void Copy(ushort* dest, ushort* src, int size)
         {
             Copy((byte*)dest, (byte*)src, size * 2);
         }
@@ -293,7 +292,7 @@ namespace Cosmos.Core
         /// <param name="src">Source.</param>
         /// <param name="size">Size of data.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Copy(short* dest, short* src, uint size)
+        public static unsafe void Copy(short* dest, short* src, int size)
         {
             Copy((byte*)dest, (byte*)src, size * 2);
         }
@@ -334,7 +333,7 @@ namespace Cosmos.Core
         /// <param name="src">Source.</param>
         /// <param name="size">Size of data.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void Copy(sbyte* dest, sbyte *src, uint size)
+        public static unsafe void Copy(sbyte* dest, sbyte *src, int size)
         {
             Copy((byte*)dest, (byte*)src, size);
         }
