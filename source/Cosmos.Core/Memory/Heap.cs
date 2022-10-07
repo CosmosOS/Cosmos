@@ -34,12 +34,16 @@ namespace Cosmos.Core.Memory
 
         /// <summary>
 		/// Re-allocates or "re-sizes" data asigned to a pointer.
+		/// The pointer specified must be the start of an allocated block in the heap.
+		/// This shouldn't be used with objects as a new address is given when realocating memory.
 		/// </summary>
 		/// <param name="aPtr">Existing pointer</param>
 		/// <param name="NewSize">Size to extend to</param>
 		/// <returns>New pointer with specified size while maintaining old data.</returns>
-        public static byte* Realloc(byte* aPtr, uint NewSize)
+        public static byte* Realloc(byte* aPtr, uint newSize)
 		{
+            // TODO: don't move memory position if there is enough space in the current one.
+
             // Get existing size
             uint Size = (RAT.GetPageType(aPtr) == RAT.PageType.HeapSmall ? ((ushort*)aPtr)[-2] : ((uint*)aPtr)[-4]); 
 
@@ -58,8 +62,11 @@ namespace Cosmos.Core.Memory
 
             // Copy the old buffer to the new one
             MemoryOperations.Copy(ToReturn, aPtr, (int)Size);
+
+            // Comented out to help in the future if we use objects with realloc
             // Copy the GC state
-            ((ushort*)ToReturn)[-1] = ((ushort*)aPtr)[-1];
+            //((ushort*)ToReturn)[-1] = ((ushort*)aPtr)[-1];
+            ((ushort*)ToReturn)[-1] = 0;
 
             // Free the old data and return
             Free(aPtr);
