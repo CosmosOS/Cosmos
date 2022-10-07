@@ -94,7 +94,7 @@ namespace Cosmos.HAL.Audio {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            int bufferOffset = index * (int)Format.Size;
+            int bufferOffset = index * Format.Size;
 
             fixed(byte* bufferPtr = buffer) {
                 MemoryOperations.Copy(dest, bufferPtr + bufferOffset, Format.Size);
@@ -127,7 +127,7 @@ namespace Cosmos.HAL.Audio {
         public unsafe void ReadSampleChannel(int index, int channel, byte* dest)
         {
             int channelByteSize = Format.ChannelSize;
-            int bufferOffset = (index * (int)Format.Size) + (channelByteSize * channel);
+            int bufferOffset = (index * Format.Size) + (channelByteSize * channel);
 
             fixed (byte* bufferPtr = buffer) {
                 MemoryOperations.Copy(
@@ -171,7 +171,7 @@ namespace Cosmos.HAL.Audio {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            int bufferOffset = index * (int)Format.Size;
+            int bufferOffset = index * Format.Size;
 
             fixed(byte* bufferPtr = buffer) {
                 for (int i = 0; i < Format.Size; i++) {
@@ -222,7 +222,7 @@ namespace Cosmos.HAL.Audio {
             }
 
             int channelByteSize = (int)Format.BitDepth;
-            int bufferOffset = (index * (int)Format.Size) + (channelByteSize * channel);
+            int bufferOffset = (index * Format.Size) + (channelByteSize * channel);
 
             fixed (byte* bufferPtr = buffer) {
                 for (int i = 0; i < channelByteSize; i++) {
