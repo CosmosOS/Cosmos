@@ -61,7 +61,7 @@ namespace Cosmos.Core.Memory
 			byte* ToReturn = Alloc(newSize);
 
             // Copy the old buffer to the new one
-            MemoryOperations.Copy(ToReturn, aPtr, (int)Size);
+            MemoryOperations.Copy(ToReturn, aPtr, Size);
 
             // Comented out to help in the future if we use objects with realloc
             // Copy the GC state
