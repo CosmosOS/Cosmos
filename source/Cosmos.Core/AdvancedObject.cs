@@ -9,7 +9,7 @@ using IL2CPU.API;
 namespace Cosmos.Core
 {
     /// <summary>
-    /// This Class was Created by TheFocusMan to help pepole
+    /// This Class is created for Add more methods to objects by add this to base class
     /// </summary>
     public class AdvancedObject
     {
@@ -18,7 +18,8 @@ namespace Cosmos.Core
             return GCImplementation.GetType(this);
         }
         /// <summary>
-        /// Do this function to help yourself
+        /// If you stuck on a problem run this function
+        /// <c>Waring: Runnig this function may get to crash</c>
         /// </summary>
         public void FixStackPoint()
         {
@@ -30,8 +31,10 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Do this function to help yourself
+        /// This function is set the stack point to the target type
+        /// <c>Waring: Runnig this function may get to crash</c>
         /// </summary>
+        /// <param name="stack">The target type id</param>
         public void FixStackPointTo(uint stack)
         {
             CPU.DisableInterrupts();
@@ -39,6 +42,9 @@ namespace Cosmos.Core
             CPU.EnableInterrupts();
         }
 
+        /// <summary>
+        /// Check if the stack type is match to the object type
+        /// </summary>
         public bool NeedToFixStackPoint()
         {
             return CPU.GetESPValue() != GetTypeId();
