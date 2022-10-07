@@ -25,7 +25,7 @@ namespace Cosmos.HAL.Audio {
         /// <summary>
         /// The size of a single audio sample (frame).
         /// </summary>
-        public readonly int Size;
+        public readonly uint Size;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SampleFormat"/> structure.
