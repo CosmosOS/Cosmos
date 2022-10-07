@@ -193,7 +193,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         {
             transferBuffer = new AudioBuffer(bufferSize, new SampleFormat(AudioBitDepth.Bits16, 2, true));
             bufferSizeSamples = bufferSize;
-            bufferSizeBytes = bufferSize * transferBuffer.Format.Size;
+            bufferSizeBytes = bufferSize * (int)transferBuffer.Format.Size;
 
             bufferDescriptorList = new BufferDescriptorListEntry[BUFFER_COUNT];
             buffers = new byte[BUFFER_COUNT][];
@@ -268,7 +268,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
                     MemoryOperations.Copy(
                         dest: bufferDescriptorList[next].pointer,
                         src: mainBufPtr,
-                        size: bufferSizeBytes
+                        size: (uint)bufferSizeBytes
                     );
                 }
 

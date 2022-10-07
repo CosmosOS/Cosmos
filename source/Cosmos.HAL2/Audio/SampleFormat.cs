@@ -38,7 +38,7 @@ namespace Cosmos.HAL.Audio {
             BitDepth = bitDepth;
             Channels = channels;
             Signed = signed;
-            Size = ChannelSize * channels;
+            Size = (uint)(ChannelSize * channels);
         }
 
         /// <summary>
