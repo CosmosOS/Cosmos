@@ -60,7 +60,7 @@ namespace Cosmos.Core
         {
             fixed (uint* destPtr = dest)
             {
-                Fill(destPtr, value, (uint)dest.Length);
+                Fill(destPtr, value, dest.Length);
             }
         }
 
@@ -74,7 +74,7 @@ namespace Cosmos.Core
         {
             fixed (int* destPtr = dest)
             {
-                Fill(destPtr, value, (uint)dest.Length);
+                Fill(destPtr, value, dest.Length);
             }
         }
 
@@ -116,7 +116,7 @@ namespace Cosmos.Core
         {
             fixed (ushort* destPtr = dest)
             {
-                Fill(destPtr, value, (uint)dest.Length);
+                Fill(destPtr, value, dest.Length);
             }
         }
 
@@ -130,7 +130,7 @@ namespace Cosmos.Core
         {
             fixed (short* destPtr = dest)
             {
-                Fill(destPtr, value, (uint)dest.Length);
+                Fill(destPtr, value, dest.Length);
             }
         }
 
@@ -172,7 +172,7 @@ namespace Cosmos.Core
         {
             fixed (byte* destPtr = dest)
             {
-                Fill(destPtr, value, (uint)dest.Length);
+                Fill(destPtr, value, dest.Length);
             }
         }
 
@@ -186,7 +186,7 @@ namespace Cosmos.Core
         {
             fixed (sbyte* destPtr = dest)
             {
-                Fill(destPtr, value, (uint)dest.Length);
+                Fill(destPtr, value, dest.Length);
             }
         }
 
@@ -201,7 +201,7 @@ namespace Cosmos.Core
             fixed (sbyte* destPtr = dest)
             fixed (sbyte* srcPtr = src)
             {
-                Copy(destPtr, srcPtr, (uint)dest.Length);
+                Copy(destPtr, srcPtr, dest.Length);
             }
         }
 #endregion Fill
@@ -254,7 +254,7 @@ namespace Cosmos.Core
             fixed (uint* destPtr = dest)
             fixed (uint *srcPtr = src)
             {
-                Copy(destPtr, srcPtr, (uint)dest.Length);
+                Copy(destPtr, srcPtr, dest.Length);
             }
         }
 
@@ -269,7 +269,7 @@ namespace Cosmos.Core
             fixed (int* destPtr = dest)
             fixed (int* srcPtr = src)
             {
-                Copy(destPtr, srcPtr, (uint)dest.Length);
+                Copy(destPtr, srcPtr, dest.Length);
             }
         }
 
@@ -308,7 +308,7 @@ namespace Cosmos.Core
             fixed (ushort* destPtr = dest)
             fixed (ushort* srcPtr = src)
             {
-                Copy(destPtr, srcPtr, (uint)dest.Length);
+                Copy(destPtr, srcPtr, dest.Length);
             }
         }
 
@@ -322,7 +322,7 @@ namespace Cosmos.Core
         {
             fixed (short* destPtr = dest)
             {
-                Fill(destPtr, value, (uint)dest.Length);
+                Fill(destPtr, value, dest.Length);
             }
         }
 
@@ -349,7 +349,7 @@ namespace Cosmos.Core
             fixed (byte* destPtr = dest)
             fixed (byte* srcPtr = src)
             {
-                Copy(destPtr, srcPtr, (uint)dest.Length);
+                Copy(destPtr, srcPtr, dest.Length);
             }
         }
 
@@ -364,7 +364,7 @@ namespace Cosmos.Core
             fixed (byte* destPtr = &aDest[aDestOffset])
             fixed (byte* srcPtr = &aSrc[aSrcOffset])
             {
-                Copy(destPtr, srcPtr, (uint)aCount);
+                Copy(destPtr, srcPtr, aCount);
             }
         }
 
