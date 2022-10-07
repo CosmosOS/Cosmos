@@ -54,7 +54,8 @@ Debugging is a major issue with operating system development. The Cosmos team
 was not content enough to simply conquer building and deployment, we want to
 make developing operating system as easy as developing Windows applications.
 Debugging a Cosmos based operating system should feel very familiar to you.
-Lets modify our project a little bit to show the effect, and set a breakpoint.
+Lets modify our project a little bit to show the effect, and set a breakpoint. 
+**Note that the debugger only works in Visual Studio, and not Linux**
 
 ![](images/SNAG-0005.png)
 

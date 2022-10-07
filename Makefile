@@ -23,7 +23,6 @@ DOTNETFLAGS = -v:q -nologo
 all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
 	$(MAKE) build
 	$(MAKE) publish
-	$(MAKE) install
 
 $(IL2CPU_DIR):
 	@echo "Cloning Cosmos/IL2CPU"
@@ -107,8 +106,6 @@ install:
 	@cp -r $(THISDIR)/Build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
 	@cp -r $(THISDIR)/Build/syslinux/* $(DESTDIR)/Build/ISO/
 	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
-
-	$(MAKE) nuget-install
 
 .PHONY: nuget-install
 nuget-install:
