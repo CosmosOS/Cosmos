@@ -62,7 +62,7 @@
                   Category="Compile">
     </BoolProperty>
 
-    <BoolProperty Name="EnableLittleOptimization"
+    <BoolProperty Name="RemoveBootDebugOutput"
                   DisplayName="Enable Little Optimization"
                   Description="Use This if you have trouble with bootload heap or somthing else"
                   Category="Compile">
