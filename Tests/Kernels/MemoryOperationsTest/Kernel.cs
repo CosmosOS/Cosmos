@@ -171,7 +171,7 @@ namespace MemoryOperationsTest
 			{
                 Assert.AreEqual(aPtr[i], 32, $"Expected value 32 not found in index {i} of aPtr.");
 			}
-            Assert.AreEqual(aPtr[16], 0, "Expected value 0 not found at the end of aPtr.")
+            Assert.AreEqual(aPtr[16], 0, "Expected value 0 not found at the end of aPtr.");
 		}
 
         protected override void Run()
