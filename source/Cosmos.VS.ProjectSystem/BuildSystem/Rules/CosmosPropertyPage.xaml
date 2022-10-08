@@ -63,8 +63,8 @@
     </BoolProperty>
 
     <BoolProperty Name="RemoveBootDebugOutput"
-                  DisplayName="Enable Little Optimization"
-                  Description="Use This if you have trouble with bootload heap or somthing else"
+                  DisplayName="Remove Boot Debug Output"
+                  Description="Removes The boot Debug output for faster startup"
                   Category="Compile">
     </BoolProperty>
 
