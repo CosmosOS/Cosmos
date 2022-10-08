@@ -9,10 +9,14 @@ using IL2CPU.API;
 namespace Cosmos.Core
 {
     /// <summary>
-    /// This Class is created for Add more methods to objects by add this to base class
+    /// This Class is created for Add more useful methods to object by add this to base class
     /// </summary>
     public class AdvancedObject
     {
+        /// <summary>
+        /// Get the type id dierectly instead of Run GetType
+        /// </summary>
+        /// <returns>Type id</returns>
         public unsafe uint GetTypeId()
         {
             return GCImplementation.GetType(this);
