@@ -274,7 +274,6 @@ namespace Cosmos.System.FileSystem
             var part = Partitions[index];
             //Don't remount
             if (MountedPartitions[index] != null)
-            //if (part.MountedFS != null) // Thank to ME i saved your time
             {
                 //We already mounted this partiton
                 return;
