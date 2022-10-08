@@ -9,7 +9,7 @@ using IL2CPU.API;
 namespace Cosmos.Core
 {
     /// <summary>
-    /// This Class is created for Add more useful methods to object by add this to base class
+    /// This Class is created for Add Add-ons methods to object by add this to base class
     /// </summary>
     public class AdvancedObject
     {
