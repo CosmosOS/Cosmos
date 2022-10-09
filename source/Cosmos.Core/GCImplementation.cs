@@ -65,7 +65,7 @@ namespace Cosmos.Core
         /// <returns>Returns the used PageSize by the MemoryManager in Bytes.</returns>
         public static uint GetUsedRAM()
         {
-            return (RAT.TotalPageCount - RAT.GetPageCount(RAT.PageType.Empty)) * RAT.PageSize;
+            return (RAT.TotalPageCount - RAT.GetPageCount((byte)RAT.PageType.Empty)) * RAT.PageSize;
         }
         /// <summary>
         /// Initialise the Memory Manager, this should not be called anymore since it is done very early during the boot process.
