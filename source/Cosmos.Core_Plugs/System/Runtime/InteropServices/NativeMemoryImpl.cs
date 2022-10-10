@@ -5,7 +5,7 @@ using Cosmos.Core;
 namespace System.Runtime.InteropServices
 {
     [Plug("System.Runtime.InteropServices.NativeMemory, System.Private.CoreLib")]
-    public static class NativeMemory
+    public static unsafe class NativeMemory
 	{
         public static void* Realloc(void* ptr, nuint byteCount)
 		{
