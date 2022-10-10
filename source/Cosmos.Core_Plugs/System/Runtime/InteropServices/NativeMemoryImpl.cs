@@ -9,7 +9,7 @@ namespace System.Runtime.InteropServices
 	{
         public static void* Realloc(void* ptr, nuint byteCount)
 		{
-            return Heap.Realloc(ptr, byteCount);
+            return Heap.Realloc((byte*)ptr, (uint)byteCount);
 		}
 
         public static void* Alloc(nuint elementCount, nuint elementSize)
