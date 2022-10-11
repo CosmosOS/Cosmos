@@ -13,22 +13,17 @@ Sets VGA-compatible video modes without using the BIOS
  * by Stephen Remde
 //*/
 
-namespace Cosmos.HAL
+namespace Cosmos.HAL.Drivers.Video
 {
-    public class VGADriver
+    public class VGADriver : VideoDriver
     {
-        internal Debugger mDebugger = new Debugger("HAL", "VGA");
+        internal Debugger mDebugger = new("HAL", "VGA");
         private const byte _NumSeqRegs = 5;
         private const byte _NumCRTCRegs = 25;
         private const byte _NumGCRegs = 9;
         private const byte _NumACRegs = 21;
 
-        Mode _Mode;
-        ScreenSize _ScreenSize;
-        ColorDepth _ColorDepth;
-
-
-        private readonly Core.IOGroup.VGA _IO = new Core.IOGroup.VGA();
+        private readonly Core.IOGroup.VGA _IO = new();
 
         private void WriteVGARegisters(byte[] aRegisters)
         {
@@ -188,7 +183,7 @@ namespace Cosmos.HAL
             _IO.GraphicsController_Data.Byte = gc6;
         }
 
-        public VGADriver()
+        public VGADriver() : base()
         {
 
         }
@@ -219,7 +214,7 @@ namespace Cosmos.HAL
 
             uint index = 0;
             double diff = 1000000;
-            for (uint i = 0; i < 2 << ((int)_ColorDepth - 1); i++) //iterate over the total palette
+            for (uint i = 0; i < 2 << (Depth - 1); i++) //iterate over the total palette
             {
                 var paletteColor = _Palette[i];
                 var colorDiff = (aColor.R - paletteColor.R) * (aColor.R - paletteColor.R) * 0.3 + //Taken from https://stackoverflow.com/questions/1847092/given-an-rgb-value-what-would-be-the-best-way-to-find-the-closest-match-in-the-d
@@ -729,94 +724,6 @@ namespace Cosmos.HAL
         /// Get and set colors.
         /// </summary>
         public int Colors { private set; get; }
-
-        /// <summary>
-        /// Draw Filled Rectangle
-        /// </summary>
-        /// <param name="aX">X Position.</param>
-        /// <param name="aY">Y Position.</param>
-		/// <param name="aW">Rectangle width</param>
-        /// <param name="aH">Rectangle height</param>
-		/// <param name="aColor">Rectangle color.</param>
-        /// <exception cref="Exception">Thrown when Textmode enabled.</exception>
-		public void DrawFilledRectangle(int aX, int aY, int aW, int aH, uint aColor)
-        {
-            if (_Mode == Mode.Text)
-            {
-                throw new Exception("Cannot draw filled rectangle in text mode");
-            }
-            switch (_ScreenSize)
-            {
-                case ScreenSize.Size640x480:
-                    switch (_ColorDepth)
-                    {
-                        case ColorDepth.BitDepth2:
-                            throw new NotImplementedException();
-                        case ColorDepth.BitDepth4:
-                            for (uint x = (uint)aX; x < aX + aW; x++)
-                            {
-                                for (uint y = (uint)aY; y < aY + aH; y++)
-                                {
-                                    SetPixel640x480x4(x, y, aColor);
-                                }
-                            }
-                            break;
-                        case ColorDepth.BitDepth8:
-                            throw new NotImplementedException();
-                        case ColorDepth.BitDepth16:
-                            throw new NotImplementedException();
-                        default:
-                            throw new NotImplementedException();
-                    }
-                    break;
-                case ScreenSize.Size720x480:
-                    switch (_ColorDepth)
-                    {
-                        case ColorDepth.BitDepth2:
-                            throw new NotImplementedException();
-                        case ColorDepth.BitDepth4:
-                            for (uint x = (uint)aX; x < aX + aW; x++)
-                            {
-                                for (uint y = (uint)aY; y < aY + aH; y++)
-                                {
-                                    SetPixel720x480x4(x, y, aColor);
-                                }
-                            }
-                            break;
-                        case ColorDepth.BitDepth8:
-                            throw new NotImplementedException();
-                        case ColorDepth.BitDepth16:
-                            throw new NotImplementedException();
-                        default:
-                            throw new NotImplementedException();
-                    }
-                    break;
-                case ScreenSize.Size320x200:
-                    switch (_ColorDepth)
-                    {
-                        case ColorDepth.BitDepth2:
-                            throw new NotImplementedException();
-                        case ColorDepth.BitDepth4:
-                            throw new NotImplementedException();
-                        case ColorDepth.BitDepth8:
-                            for (uint x = (uint)aX; x < aX + aW; x++)
-                            {
-                                for (uint y = (uint)aY; y < aY + aH; y++)
-                                {
-                                    SetPixel320x200x8(x, y, aColor);
-                                }
-                            }
-                            break;
-                        case ColorDepth.BitDepth16:
-                            throw new NotImplementedException();
-                        default:
-                            throw new NotImplementedException();
-                    }
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
 
         private readonly Color[] _Palette = new Color[256];
 

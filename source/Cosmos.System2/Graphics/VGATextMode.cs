@@ -1,6 +1,5 @@
+using Cosmos.HAL.Drivers.Video;
 using System;
-using Cosmos.HAL;
-using static Cosmos.HAL.VGADriver;
 
 namespace Cosmos.System.Graphics
 {
@@ -9,7 +8,7 @@ namespace Cosmos.System.Graphics
     /// </summary>
     public class VGAScreen
     {
-        private static readonly VGADriver _Screen = new VGADriver();
+        private static readonly VGADriver _Screen = new();
 
         /// <summary>
         /// Set graphics mode.
@@ -17,7 +16,7 @@ namespace Cosmos.System.Graphics
         /// <param name="screenSize">Screen size.</param>
         /// <param name="colorDepth">Color depth.</param>
         /// <exception cref="Exception">Thrown if screen size / color depth not supported.</exception>
-        public static void SetGraphicsMode(ScreenSize aScreenSize, ColorDepth aColorDepth)
+        public static void SetGraphicsMode(Mode aMode, ColorDepth aColorDepth)
         {
             var vgaColorDepth = aColorDepth switch
             {
@@ -28,7 +27,7 @@ namespace Cosmos.System.Graphics
                 ColorDepth.ColorDepth32 => throw new NotImplementedException(),
                 _ => throw new NotImplementedException(),
             };
-            _Screen.SetGraphicsMode(aScreenSize, vgaColorDepth);
+            _Screen.SetGraphicsMode(aMode, vgaColorDepth);
         }
 
         /// <summary>

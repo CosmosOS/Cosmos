@@ -42,7 +42,7 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// SVGA 2 device.
         /// </summary>
-        private static Cosmos.HAL.Drivers.Video _SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
+        private static PCIDevice _SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
         /// <summary>
         /// Checks whether the Bochs Graphics Adapter exists (not limited to Bochs)
@@ -85,21 +85,7 @@ namespace Cosmos.System.Graphics
         /// <param name="mode">Mode.</param>
         /// <returns>Canvas value.</returns>
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
-        private static Canvas GetVideoDriver(Mode mode)
-        {
-            if (_SVGAIIDevice != null && PCI.Exists(_SVGAIIDevice))
-            {
-                return new SVGAIICanvas(mode);
-            }
-            else if (VBEAvailable())
-            {
-                return new VBECanvas(mode);
-            }
-            else
-            {
-                return new VGACanvas(mode);
-            }
-        }
+        
 
         /// <summary>
         /// Get full screen canvas.

@@ -1,12 +1,12 @@
 ﻿using System;
 using Cosmos.Core;
 
-namespace Cosmos.HAL.Drivers.Video
+namespace Cosmos.HAL.Drivers.PCI.Video
 {
     /// <summary>
     /// VMWareSVGAII class.
     /// </summary>
-    public class VMWareSVGAII : VideoDriver
+    public class VMWareSVGAII
     {
         /// <summary>
         /// Register values.
@@ -480,7 +480,7 @@ namespace Cosmos.HAL.Drivers.Video
         /// <summary>
         /// Create new instance of the <see cref="VMWareSVGAII"/> class.
         /// </summary>
-        public VMWareSVGAII(uint aWidth, uint aHeight) : base(aWidth, aHeight, 4)
+        public VMWareSVGAII()
         {
             device = (HAL.PCI.GetDevice(HAL.VendorID.VMWare, HAL.DeviceID.SVGAIIAdapter));
             device.EnableMemory(true);
@@ -518,13 +518,13 @@ namespace Cosmos.HAL.Drivers.Video
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
         /// <param name="depth">Depth.</param>
-        public void SetMode(uint aWidth, uint aHeight, uint aDepth = 32)
+        public void SetMode(uint width, uint height, uint depth = 32)
         {
             //Disable the Driver before writing new values and initiating it again to avoid a memory exception
             //Disable();
 
             // Depth is color depth in bytes.
-            this.depth = (aDepth / 8);
+            this.depth = (depth / 8);
             this.width = width;
             this.height = height;
             WriteRegister(Register.Width, width);

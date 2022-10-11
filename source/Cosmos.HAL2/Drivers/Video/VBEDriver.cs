@@ -72,29 +72,29 @@ namespace Cosmos.HAL.Drivers.Video
         /// <param name="xres">X resolution.</param>
         /// <param name="yres">Y resolution.</param>
         /// <param name="bpp">BPP (color depth).</param>
-        public VBEDriver(ushort xres, ushort yres, ushort bpp) : base(xres, yres, (byte)bpp)
+        public VBEDriver(ushort aXres, ushort aYres, ushort bpp) : base(aXres, aYres, (byte)bpp)
         {
             PCIDevice videocard;
 
             if (VBE.IsAvailable()) //VBE VESA Enabled Mulitboot Parsing
             {
-                Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {xres}*{yres}@{bpp}");
-                _IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
+                Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {aXres}*{aYres}@{bpp}");
+                _IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)aXres * aYres * (uint)(bpp / 8));
             }
             else if (ISAModeAvailable()) //Bochs Graphics Adaptor ISA Mode
             {
-                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}.");
+                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {aXres}*{aYres}@{bpp}.");
 
                 _IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
-                VBESet(xres, yres, bpp);
+                VBESet(aXres, aYres, bpp);
             }
             else if (((videocard = HAL.PCI.GetDevice(VendorID.VirtualBox, DeviceID.VBVGA)) != null) || //VirtualBox Video Adapter PCI Mode
             ((videocard = HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA)) != null)) // Bochs Graphics Adaptor PCI Mode
             {
-                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}. Framebuffer address=" + videocard.BAR0);
+                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {aXres}*{aYres}@{bpp}. Framebuffer address=" + videocard.BAR0);
 
                 _IO.LinearFrameBuffer = new MemoryBlock(videocard.BAR0, 1920 * 1200 * 4);
-                VBESet(xres, yres, bpp);
+                VBESet(aXres, aYres, bpp);
             }
             else
             {
@@ -107,10 +107,10 @@ namespace Cosmos.HAL.Drivers.Video
         /// </summary>
         /// <param name="index">Register index.</param>
         /// <param name="value">Value.</param>
-        private static void VBEWrite(RegisterIndex index, ushort value)
+        private static void VBEWrite(RegisterIndex aIndex, ushort aValue)
         {
-            _IO.VbeIndex.Word = (ushort)index;
-            _IO.VbeData.Word = value;
+            _IO.VbeIndex.Word = (ushort)aIndex;
+            _IO.VbeData.Word = aValue;
         }
 
         private static ushort VBERead(RegisterIndex index)
@@ -130,7 +130,7 @@ namespace Cosmos.HAL.Drivers.Video
         /// <summary>
         /// Disable display.
         /// </summary>
-        public void DisableDisplay()
+        public override void Disable()
         {
             Global.mDebugger.SendInternal($"Disabling VBE display");
             VBEWrite(RegisterIndex.DisplayEnable, (ushort)EnableValues.Disabled);
@@ -183,7 +183,7 @@ namespace Cosmos.HAL.Drivers.Video
         /// <param name="bpp">BPP (color depth).</param>
         public void VBESet(ushort xres, ushort yres, ushort bpp, bool clear = false)
         {
-            DisableDisplay();
+            Disable();
             SetXResolution(xres);
             SetYResolution(yres);
             SetDisplayBPP(bpp);

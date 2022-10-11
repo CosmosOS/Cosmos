@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using Cosmos.Debug.Kernel;
-using Cosmos.HAL.Drivers.PCI.Video;
+using Cosmos.HAL.Drivers.Video;
 using Cosmos.System.Graphics.Fonts;
 
 namespace Cosmos.System.Graphics
@@ -27,8 +27,7 @@ namespace Cosmos.System.Graphics
         /// Create new instance of the <see cref="SVGAIICanvas"/> class.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
-        public SVGAIICanvas()
-            : this(DefaultMode)
+        public SVGAIICanvas() : this(DefaultMode)
         {
         }
 
@@ -37,39 +36,18 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="aMode">A graphics mode.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
-        public SVGAIICanvas(Mode aMode)
+        public SVGAIICanvas(Mode aMode) : base(aMode)
         {
             mSVGAIIDebugger.SendInternal($"Called ctor with mode {aMode}");
-            ThrowIfModeIsNotValid(aMode);
+            aMode.ThrowIfNotValid();
 
-            _xSVGADriver = new VMWareSVGAII();
-            Mode = aMode;
+            _xSVGADriver = new();
         }
 
         /// <summary>
         /// Name of the backend
         /// </summary>
-        public override string Name() => "VMWareSVGAII";
-
-        /// <summary>
-        /// Get and set graphics mode.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">(set) Thrown if mode is not suppoted.</exception>
-        public override Mode Mode
-        {
-            get => _Mode;
-            set
-            {
-                _Mode = value;
-                mSVGAIIDebugger.SendInternal($"Called Mode set property with mode {_Mode}");
-                SetGraphicsMode(_Mode);
-            }
-        }
-
-        /// <summary>
-        /// Override canvas dufault graphics mode.
-        /// </summary>
-        public override Mode DefaultGraphicMode => _DefaultMode;
+        public override string GetName() => "VMWareSVGAII";
 
         /// <summary>
         /// Disables the SVGA driver, parent method returns to VGA text mode
@@ -77,27 +55,6 @@ namespace Cosmos.System.Graphics
         public override void Disable()
         {
             _xSVGADriver.Disable();
-        }
-
-        /// <summary>
-        /// Draw filled rectangle.
-        /// </summary>
-        /// <param name="aPen">Pen to draw with.</param>
-        /// <param name="aX_start">starting X coordinate.</param>
-        /// <param name="aY_start">starting Y coordinate.</param>
-        /// <param name="aWidth">Width.</param>
-        /// <param name="aHeight">Height.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public override void DrawFilledRectangle(int aX_start, int aY_start, uint aWidth, uint aHeight, Color aColor)
-        {
-            uint color = (uint)aColor.ToArgb();
-
-            // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
-            for (int i = aY_start; i < aY_start + aHeight; i++)
-            {
-                Driver.Fill((uint)(GetIndex(aX_start, i) + (int)_xSVGADriver.FrameSize), aWidth, color);
-            }
         }
 
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
