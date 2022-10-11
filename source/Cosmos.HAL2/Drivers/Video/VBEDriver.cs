@@ -13,6 +13,8 @@ namespace Cosmos.HAL.Drivers.Video
     {
         private static readonly VBEIOGroup _IO = Core.Global.BaseIOGroups.VBE;
 
+        #region Structure
+
         /// <summary>
         /// Register index.
         /// <para>
@@ -66,35 +68,37 @@ namespace Cosmos.HAL.Drivers.Video
             NoClearMemory = 0x80,
         };
 
+        #endregion
+
         /// <summary>
         /// Create new instance of the <see cref="VBEDriver"/> class.
         /// </summary>
         /// <param name="xres">X resolution.</param>
         /// <param name="yres">Y resolution.</param>
         /// <param name="bpp">BPP (color depth).</param>
-        public VBEDriver(ushort aXres, ushort aYres, ushort bpp) : base(aXres, aYres, (byte)bpp)
+        public VBEDriver(ushort aXres, ushort aYres, ushort aBpp) : base(aXres, aYres, (byte)aBpp)
         {
             PCIDevice videocard;
 
             if (VBE.IsAvailable()) //VBE VESA Enabled Mulitboot Parsing
             {
-                Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {aXres}*{aYres}@{bpp}");
-                _IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)aXres * aYres * (uint)(bpp / 8));
+                Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {aXres}*{aYres}@{aBpp}");
+                _IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)aXres * aYres * (uint)(aBpp / 8));
             }
             else if (ISAModeAvailable()) //Bochs Graphics Adaptor ISA Mode
             {
-                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {aXres}*{aYres}@{bpp}.");
+                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {aXres}*{aYres}@{aBpp}.");
 
                 _IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
-                VBESet(aXres, aYres, bpp);
+                VBESet(aXres, aYres, aBpp);
             }
             else if (((videocard = HAL.PCI.GetDevice(VendorID.VirtualBox, DeviceID.VBVGA)) != null) || //VirtualBox Video Adapter PCI Mode
             ((videocard = HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA)) != null)) // Bochs Graphics Adaptor PCI Mode
             {
-                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {aXres}*{aYres}@{bpp}. Framebuffer address=" + videocard.BAR0);
+                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {aXres}*{aYres}@{aBpp}. Framebuffer address=" + videocard.BAR0);
 
                 _IO.LinearFrameBuffer = new MemoryBlock(videocard.BAR0, 1920 * 1200 * 4);
-                VBESet(aXres, aYres, bpp);
+                VBESet(aXres, aYres, aBpp);
             }
             else
             {
@@ -105,25 +109,26 @@ namespace Cosmos.HAL.Drivers.Video
         /// <summary>
         /// Write value to VBE index.
         /// </summary>
-        /// <param name="index">Register index.</param>
-        /// <param name="value">Value.</param>
+        /// <param name="aIndex">Register index.</param>
+        /// <param name="aValue">Value to write.</param>
         private static void VBEWrite(RegisterIndex aIndex, ushort aValue)
         {
             _IO.VbeIndex.Word = (ushort)aIndex;
             _IO.VbeData.Word = aValue;
         }
 
-        private static ushort VBERead(RegisterIndex index)
+        /// <summary>
+        /// Read value from VBE index.
+        /// </summary>
+        /// <param name="aIndex">Register index.</param>
+        /// <returns>Value at index.</returns>
+        private static ushort VBERead(RegisterIndex aIndex)
         {
-            _IO.VbeIndex.Word = (ushort)index;
-            return _IO.VbeData.Word;
+            return _IO.VbeData.Word = (ushort)aIndex;
         }
+
         public static bool ISAModeAvailable()
-        {
-            //This code wont work as long as Bochs uses BGA ISA, since it wont discover it in PCI
-#if false
-            return HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA) != null;
-#endif
+        { 
             return VBERead(RegisterIndex.DisplayID) == 0xB0C5;
         }
 
@@ -137,42 +142,12 @@ namespace Cosmos.HAL.Drivers.Video
         }
 
         /// <summary>
-        /// Set X resolution.
-        /// </summary>
-        /// <param name="xres">X resolution.</param>
-        private void SetXResolution(ushort xres)
-        {
-            Global.mDebugger.SendInternal($"VBE Setting X resolution to {xres}");
-            VBEWrite(RegisterIndex.DisplayXResolution, xres);
-        }
-
-        /// <summary>
-        /// Set Y resolution.
-        /// </summary>
-        /// <param name="yres">Y resolution.</param>
-        private void SetYResolution(ushort yres)
-        {
-            Global.mDebugger.SendInternal($"VBE Setting Y resolution to {yres}");
-            VBEWrite(RegisterIndex.DisplayYResolution, yres);
-        }
-
-        /// <summary>
-        /// Set BPP.
-        /// </summary>
-        /// <param name="bpp">BPP (color depth).</param>
-        private void SetDisplayBPP(ushort bpp)
-        {
-            Global.mDebugger.SendInternal($"VBE Setting BPP to {bpp}");
-            VBEWrite(RegisterIndex.DisplayBPP, bpp);
-        }
-
-        /// <summary>
         /// Enable display.
         /// </summary>
-        private void EnableDisplay(EnableValues EnableFlags)
+        private void EnableDisplay(EnableValues aEnableFlags)
         {
             //Global.mDebugger.SendInternal($"VBE Enabling display with EnableFlags (ushort){EnableFlags}");
-            VBEWrite(RegisterIndex.DisplayEnable, (ushort)EnableFlags);
+            VBEWrite(RegisterIndex.DisplayEnable, (ushort)aEnableFlags);
         }
 
         /// <summary>
@@ -181,13 +156,13 @@ namespace Cosmos.HAL.Drivers.Video
         /// <param name="xres">X resolution.</param>
         /// <param name="yres">Y resolution.</param>
         /// <param name="bpp">BPP (color depth).</param>
-        public void VBESet(ushort xres, ushort yres, ushort bpp, bool clear = false)
+        public void VBESet(ushort aXres, ushort aYres, ushort aBpp, bool aDoClear = false)
         {
             Disable();
-            SetXResolution(xres);
-            SetYResolution(yres);
-            SetDisplayBPP(bpp);
-            if (clear)
+            VBEWrite(RegisterIndex.DisplayXResolution, aXres);
+            VBEWrite(RegisterIndex.DisplayYResolution, aYres);
+            VBEWrite(RegisterIndex.DisplayBPP, aBpp);
+            if (aDoClear)
             {
                 EnableDisplay(EnableValues.Enabled | EnableValues.UseLinearFrameBuffer);
 
@@ -205,9 +180,9 @@ namespace Cosmos.HAL.Drivers.Video
         /// <summary>
         /// Swap back buffer to video memory
         /// </summary>
-        public unsafe void Swap()
+        public override unsafe void Update()
         {
-            MemoryOperations.Copy((uint*)_IO.LinearFrameBuffer.Base, Buffer, (int)(Width * Height * BitDepth));
+            MemoryOperations.Copy((uint*)_IO.LinearFrameBuffer.Base, Buffer, (int)(Width * Height * Depth));
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System;
 using Cosmos.Core;
 
-namespace Cosmos.HAL.Drivers.PCI.Video
+namespace Cosmos.HAL.Drivers.Video
 {
     /// <summary>
     /// VMWareSVGAII class.
     /// </summary>
-    public class VMWareSVGAII
+    public class VMWareSVGAII : VideoDriver
     {
         /// <summary>
         /// Register values.
@@ -480,9 +480,9 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Create new instance of the <see cref="VMWareSVGAII"/> class.
         /// </summary>
-        public VMWareSVGAII()
+        public VMWareSVGAII() : base(0, 0, 32)
         {
-            device = (HAL.PCI.GetDevice(HAL.VendorID.VMWare, HAL.DeviceID.SVGAIIAdapter));
+            device = HAL.PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
             device.EnableMemory(true);
             uint basePort = device.BaseAddressBar[0].BaseAddress;
             IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));
@@ -492,7 +492,9 @@ namespace Cosmos.HAL.Drivers.PCI.Video
 
             WriteRegister(Register.ID, (uint)ID.V2);
             if (ReadRegister(Register.ID) != (uint)ID.V2)
+            {
                 return;
+            }
 
             VideoMemory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
             capabilities = ReadRegister(Register.Capabilities);
@@ -518,19 +520,19 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
         /// <param name="depth">Depth.</param>
-        public void SetMode(uint width, uint height, uint depth = 32)
+        public void SetMode(uint aWidth, uint aHeight, uint aDepth = 32)
         {
             //Disable the Driver before writing new values and initiating it again to avoid a memory exception
             //Disable();
 
             // Depth is color depth in bytes.
-            this.depth = (depth / 8);
-            this.width = width;
-            this.height = height;
+            depth = aDepth / 8;
+            width = aWidth;
+            height = aHeight;
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
-            Enable();
+            Display();
             InitializeFIFO();
 
             FrameSize = ReadRegister(Register.FrameBufferSize);
@@ -593,17 +595,21 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// Write to FIFO.
         /// </summary>
         /// <param name="value">Value to write.</param>
-        protected void WriteToFifo(uint value)
+        protected void WriteToFifo(uint aValue)
         {
             if (((GetFIFO(FIFO.NextCmd) == GetFIFO(FIFO.Max) - 4) && GetFIFO(FIFO.Stop) == GetFIFO(FIFO.Min)) ||
                 (GetFIFO(FIFO.NextCmd) + 4 == GetFIFO(FIFO.Stop)))
+            {
                 WaitForFifo();
+            }
 
-            SetFIFO((FIFO)GetFIFO(FIFO.NextCmd), value);
+            SetFIFO((FIFO)GetFIFO(FIFO.NextCmd), aValue);
             SetFIFO(FIFO.NextCmd, GetFIFO(FIFO.NextCmd) + 4);
 
             if (GetFIFO(FIFO.NextCmd) == GetFIFO(FIFO.Max))
+            {
                 SetFIFO(FIFO.NextCmd, GetFIFO(FIFO.Min));
+            }
         }
 
         /// <summary>
@@ -626,45 +632,10 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Update video memory.
         /// </summary>
-        public void DoubleBufferUpdate()
+        public override void Update()
         {
             VideoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
             Update(0, 0, width, height);
-        }
-
-        /// <summary>
-        /// Set pixel.
-        /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="color">Color.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public void SetPixel(uint x, uint y, uint color)
-        {
-            VideoMemory[((y * width + x) * depth) + FrameSize] = color;
-        }
-
-        /// <summary>
-        /// Get pixel.
-        /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <returns>uint value.</returns>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public uint GetPixel(uint x, uint y)
-        {
-            return VideoMemory[((y * width + x) * depth) + FrameSize];
-        }
-
-        /// <summary>
-        /// Clear screen to specified color.
-        /// </summary>
-        /// <param name="color">Color.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public void Clear(uint color)
-        {
-            VideoMemory.Fill(FrameSize, FrameSize, color);
         }
 
         /// <summary>
@@ -677,21 +648,23 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public void Copy(uint x, uint y, uint newX, uint newY, uint width, uint height)
+        public void Copy(uint aX, uint aY, uint aNewX, uint aNewY, uint aWidth, uint aHeight)
         {
             if ((capabilities & (uint)Capability.RectCopy) != 0)
             {
                 WriteToFifo((uint)FIFOCommand.RECT_COPY);
-                WriteToFifo(x);
-                WriteToFifo(y);
-                WriteToFifo(newX);
-                WriteToFifo(newY);
-                WriteToFifo(width);
-                WriteToFifo(height);
+                WriteToFifo(aX);
+                WriteToFifo(aY);
+                WriteToFifo(aNewX);
+                WriteToFifo(aNewY);
+                WriteToFifo(aWidth);
+                WriteToFifo(aHeight);
                 WaitForFifo();
             }
             else
-                throw new NotImplementedException("VMWareSVGAII Copy()");
+            {
+                throw new NotImplementedException("VMWareSVGAII.Copy()");
+            }
         }
 
         /// <summary>
@@ -704,16 +677,16 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="color">Color.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public void Fill(uint x, uint y, uint width, uint height, uint color)
+        public void Fill(uint aX, uint aY, uint aWidth, uint aHeight, uint aColor)
         {
             if ((capabilities & (uint)Capability.RectFill) != 0)
             {
                 WriteToFifo((uint)FIFOCommand.RECT_FILL);
-                WriteToFifo(color);
-                WriteToFifo(x);
-                WriteToFifo(y);
-                WriteToFifo(width);
-                WriteToFifo(height);
+                WriteToFifo(aColor);
+                WriteToFifo(aX);
+                WriteToFifo(aY);
+                WriteToFifo(aWidth);
+                WriteToFifo(aHeight);
                 WaitForFifo();
             }
             else
@@ -721,32 +694,32 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 if ((capabilities & (uint)Capability.RectCopy) != 0)
                 {
                     // fill first line and copy it to all other
-                    uint xTarget = (x + width);
-                    uint yTarget = (y + height);
+                    uint xTarget = (aX + width);
+                    uint yTarget = (aY + height);
 
-                    for (uint xTmp = x; xTmp < xTarget; xTmp++)
+                    for (uint xTmp = aX; xTmp < xTarget; xTmp++)
                     {
-                        SetPixel(xTmp, y, color);
+                        SetPixel(xTmp, aY, aColor);
                     }
                     // refresh first line for copy process
-                    Update(x, y, width, 1);
-                    for (uint yTmp = y + 1; yTmp < yTarget; yTmp++)
+                    Update(aX, aY, width, 1);
+                    for (uint yTmp = aY + 1; yTmp < yTarget; yTmp++)
                     {
-                        Copy(x, y, x, yTmp, width, 1);
+                        Copy(aX, aY, aX, yTmp, width, 1);
                     }
                 }
                 else
                 {
-                    uint xTarget = (x + width);
-                    uint yTarget = (y + height);
-                    for (uint xTmp = x; xTmp < xTarget; xTmp++)
+                    uint xTarget = (aX + width);
+                    uint yTarget = (aY + height);
+                    for (uint xTmp = aX; xTmp < xTarget; xTmp++)
                     {
-                        for (uint yTmp = y; yTmp < yTarget; yTmp++)
+                        for (uint yTmp = aY; yTmp < yTarget; yTmp++)
                         {
-                            SetPixel(xTmp, yTmp, color);
+                            SetPixel(xTmp, yTmp, aColor);
                         }
                     }
-                    Update(x, y, width, height);
+                    Update(aX, aY, width, height);
                 }
             }
         }
@@ -766,23 +739,29 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WriteToFifo(1);
             WriteToFifo(1);
             for (int i = 0; i < 4; i++)
+            {
                 WriteToFifo(0);
+            }
+
             for (int i = 0; i < 4; i++)
+            {
                 WriteToFifo(0xFFFFFF);
+            }
+
             WaitForFifo();
         }
         //Allow to enable the Driver again after it has been disabled (switch between text and graphics mode currently this is SVGA only)
         /// <summary>
         /// Enable the SVGA Driver , only needed after Disable() has been called
         /// </summary>
-        public void Enable()
+        public override void Display()
         {
             WriteRegister(Register.Enable, 1);
         }
         /// <summary>
         /// Disable the SVGA Driver , return to text mode
         /// </summary>
-        public void Disable()
+        public override void Disable()
         {
             WriteRegister(Register.Enable, 0);
         }

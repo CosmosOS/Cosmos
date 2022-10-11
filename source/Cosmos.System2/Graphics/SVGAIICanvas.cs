@@ -1,10 +1,7 @@
-//#define COSMOSDEBUG
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using Cosmos.Debug.Kernel;
 using Cosmos.HAL.Drivers.Video;
-using Cosmos.System.Graphics.Fonts;
+using Cosmos.Debug.Kernel;
+using System;
 
 namespace Cosmos.System.Graphics
 {
@@ -21,41 +18,22 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// VMWare SVGA 2 driver.
         /// </summary>
-        private readonly VMWareSVGAII _xSVGADriver;
+        private readonly VMWareSVGAII _SVGADriver;
 
         /// <summary>
         /// Create new instance of the <see cref="SVGAIICanvas"/> class.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
-        public SVGAIICanvas() : this(DefaultMode)
-        {
-        }
-
-        /// <summary>
-        /// Create new instance of the <see cref="SVGAIICanvas"/> class.
-        /// </summary>
-        /// <param name="aMode">A graphics mode.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
         public SVGAIICanvas(Mode aMode) : base(aMode)
         {
-            mSVGAIIDebugger.SendInternal($"Called ctor with mode {aMode}");
             aMode.ThrowIfNotValid();
-
-            _xSVGADriver = new();
+            _SVGADriver = new();
         }
 
         /// <summary>
         /// Name of the backend
         /// </summary>
         public override string GetName() => "VMWareSVGAII";
-
-        /// <summary>
-        /// Disables the SVGA driver, parent method returns to VGA text mode
-        /// </summary>
-        public override void Disable()
-        {
-            _xSVGADriver.Disable();
-        }
 
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
         /// <summary>
@@ -112,9 +90,11 @@ namespace Cosmos.System.Graphics
         /// </list>
         /// </para>
         /// </summary>
-        public override List<Mode> AvailableModes { get; } = new List<Mode>
+        public static List<Mode> GetAvailableModes()
         {
-            /*  VmWare maybe supports 16 bit resolutions but CGS not yet (we should need to do RGB32->RGB16 conversion) */
+            return new()
+            {
+                /*  VmWare maybe supports 16 bit resolutions but CGS not yet (we should need to do RGB32->RGB16 conversion) */
 #if false
             /* 16-bit Depth Resolutions*/
 
@@ -154,8 +134,8 @@ namespace Cosmos.System.Graphics
             new Mode(3200, 2400, ColorDepth.ColorDepth16), // QUXGA
             new Mode(3840, 2400, ColorDepth.ColorDepth16), // WQUXGA
 #endif
-            /* 32-bit Depth Resolutions*/
-            /* SD Resolutions */
+                /* 32-bit Depth Resolutions*/
+                /* SD Resolutions */
                 new Mode(320, 200, ColorDepth.ColorDepth32),
                 new Mode(320, 240, ColorDepth.ColorDepth32),
                 new Mode(640, 480, ColorDepth.ColorDepth32),
@@ -190,184 +170,15 @@ namespace Cosmos.System.Graphics
                 new Mode(3200, 2048, ColorDepth.ColorDepth32), // WQXGA+
                 new Mode(3200, 2400, ColorDepth.ColorDepth32), // QUXGA
                 new Mode(3840, 2400, ColorDepth.ColorDepth32), // WQUXGA
-        };
-
-        /// <summary>
-        /// Set graphics mode.
-        /// </summary>
-        /// <param name="aMode">A mode.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
-        private void SetGraphicsMode(Mode aMode)
-        {
-            ThrowIfModeIsNotValid(aMode);
-
-            var xWidth = (uint)aMode.Columns;
-            var xHeight = (uint)aMode.Rows;
-            var xColorDepth = (uint)aMode.ColorDepth;
-
-            _xSVGADriver.SetMode(xWidth, xHeight, xColorDepth);
-        }
-
-        /// <summary>
-        /// Clear screen to specified color.
-        /// </summary>
-        /// <param name="aColor">Color in ARGB.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public override void Clear(int aColor)
-        {
-            _xSVGADriver.Clear((uint)aColor);
-        }
-
-        /// <summary>
-        /// Clear screen to specified color.
-        /// </summary>
-        /// <param name="aColor">Color.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public override void Clear(Color aColor)
-        {
-            _xSVGADriver.Clear((uint)aColor.ToArgb());
-        }
-
-        /// <summary>
-        /// Get pixel color.
-        /// </summary>
-        /// <param name="aX">A X coordinate.</param>
-        /// <param name="aY">A Y coordinate.</param>
-        /// <returns>Color value.</returns>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public Color GetPixel(int aX, int aY)
-        {
-            var xColorARGB = _xSVGADriver.GetPixel((uint)aX, (uint)aY);
-            return Color.FromArgb((int)xColorARGB);
-        }
-
-        /// <summary>
-        /// Set cursor.
-        /// </summary>
-        /// <param name="aVisible">Visible.</param>
-        /// <param name="aX">A X coordinate.</param>
-        /// <param name="aY">A Y coordinate.</param>
-        public void SetCursor(bool aVisible, int aX, int aY)
-        {
-            _xSVGADriver.SetCursor(aVisible, (uint)aX, (uint)aY);
-        }
-
-        /// <summary>
-        /// Create cursor.
-        /// </summary>
-        public void CreateCursor()
-        {
-            _xSVGADriver.DefineCursor();
-        }
-
-        /// <summary>
-        /// Copy pixel
-        /// </summary>
-        /// <param name="aX">A source X coordinate.</param>
-        /// <param name="aY">A source Y coordinate.</param>
-        /// <param name="aNewX">A destination X coordinate.</param>
-        /// <param name="aNewY">A destination Y coordinate.</param>
-        /// <param name="aWidth">A width.</param>
-        /// <param name="aHeight">A height.</param>
-        /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectangle copy capability</exception>
-        public void CopyPixel(int aX, int aY, int aNewX, int aNewY, int aWidth = 1, int aHeight = 1)
-        {
-            _xSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, (uint)aWidth, (uint)aHeight);
-        }
-
-        /// <summary>
-        /// Move pixel
-        /// </summary>
-        /// <param name="aX">A X coordinate.</param>
-        /// <param name="aY">A Y coordinate.</param>
-        /// <param name="aNewX">A new X coordinate.</param>
-        /// <param name="aNewY">A new Y coordinate.</param>
-        /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public void MovePixel(int aX, int aY, int aNewX, int aNewY)
-        {
-            _xSVGADriver.Copy((uint)aX, (uint)aY, (uint)aNewX, (uint)aNewY, 1, 1);
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, 0);
-        }
-
-        /// <summary>
-        /// Get point color.
-        /// </summary>
-        /// <param name="aX">X coordinate.</param>
-        /// <param name="aY">Y coordinate.</param>
-        /// <returns>Color value.</returns>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public override Color GetPointColor(int aX, int aY)
-        {
-            return Color.FromArgb((int)_xSVGADriver.GetPixel((uint)aX, (uint)aY));
+            };
         }
 
         /// <summary>
         /// Display screen
         /// </summary>
-        public override void Display()
+        public unsafe override void Update()
         {
-            _xSVGADriver.DoubleBufferUpdate();
-        }
-
-        /// <summary>
-        /// Draw string.
-        /// </summary>
-        /// <param name="str">string to draw.</param>
-        /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        public override void DrawString(string str, Font aFont, Pen pen, int x, int y)
-        {
-            for (int i = 0; i < str.Length; i++)
-            {
-                DrawChar(str[i], aFont, pen, x, y);
-                x += aFont.Width;
-            }
-        }
-
-        /// <summary>
-        /// Draw char.
-        /// </summary>
-        /// <param name="str">char to draw.</param>
-        /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        public override void DrawChar(char c, Font aFont, Pen pen, int x, int y)
-        {
-            int p = aFont.Height * (byte)c;
-
-            for (int cy = 0; cy < aFont.Height; cy++)
-            {
-                for (byte cx = 0; cx < aFont.Width; cx++)
-                {
-                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
-                    {
-                        DrawPoint(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Draw image.
-        /// </summary>
-        /// <param name="aImage">Image.</param>
-        /// <param name="aX">X coordinate.</param>
-        /// <param name="aY">Y coordinate.</param>
-        public override void DrawImage(Image aImage, int aX, int aY)
-        {
-            var xWidth = (int)aImage.Width;
-            var xHeight = (int)aImage.Height;
-
-            for (int i = 0; i < xHeight; i++)
-            {
-                _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, (i * xWidth), xWidth);
-            }
+            Driver.Copy(_SVGADriver.Buffer);
         }
     }
 }

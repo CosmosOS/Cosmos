@@ -1,4 +1,5 @@
 ﻿using Cosmos.System.Graphics.Extensions;
+using Cosmos.System.Graphics.Fonts;
 using Cosmos.HAL.Drivers.Video;
 using System.Drawing;
 using Cosmos.HAL;
@@ -234,6 +235,51 @@ namespace Cosmos.System.Graphics
 
         #endregion
 
+        #region Text
+
+        /// <summary>
+        /// Draw string.
+        /// </summary>
+        /// <param name="aX">X coordinate.</param>
+        /// <param name="aY">Y coordinate.</param>
+        /// <param name="aText">string to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="aColor">Color.</param>
+        public virtual void DrawString(int aX, int aY, string aText, Font aFont, Color aColor)
+        {
+            for (int i = 0; i < aText.Length; i++)
+            {
+                DrawChar(aX, aY, aText[i], aFont, aColor);
+                aX += aFont.Width;
+            }
+        }
+
+        /// <summary>
+        /// Draw char.
+        /// </summary>
+        /// <param name="str">char to draw.</param>
+        /// <param name="aFont">Font used.</param>
+        /// <param name="pen">Color.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        public virtual void DrawChar(int aX, int aY, char aChar, Font aFont, Color aColor)
+        {
+            int p = aFont.Height * (byte)aChar;
+
+            for (int cy = 0; cy < aFont.Height; cy++)
+            {
+                for (byte cx = 0; cx < aFont.Width; cx++)
+                {
+                    if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
+                    {
+                        SetPixel((ushort)(aX + (aFont.Width - cx)), (ushort)(aY + cy), aColor);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region Misc
 
         /// <summary>
@@ -280,6 +326,13 @@ namespace Cosmos.System.Graphics
             {
                 return new VGACanvas(aMode);
             }
+        }
+        /// <summary>
+        /// Update the canvas.
+        /// </summary>
+        public virtual void Update()
+        {
+            Driver.Update();
         }
         /// <summary>
         /// Clears the canvas with the specified color.
