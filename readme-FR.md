@@ -8,7 +8,7 @@ Pour obtenir des instructions sur l'installation et l'utilisation de Cosmos, veu
 
 Pour obtenir de la documentation et des informations techniques, consultez la [documentation Cosmos](https://cosmosos.github.io).
 
-Si vous avez des questions sur l'utilisation de Cosmos, si vous souhaitez montrer ce que vous avez fait ou si vous avez des questions générales, consultez les [discussions Github](https://github.com/CosmosOS/Cosmos/discussions). Si vous pensez avoir trouvé un bug dans Cosmos, veuillez d'abord vérifier les [issues](https://github.com/CosmosOS/Cosmos/issues) existants avant d'en ouvrir un nouveau.
+Si vous avez des questions sur l'utilisation de Cosmos, si vous souhaitez montrer ce que vous avez fait ou si vous avez des questions générales, consultez les [discussions Github](https://github.com/CosmosOS/Cosmos/discussions). Si vous pensez avoir trouvé un bug dans Cosmos, veuillez d'abord vérifier les [problèmes](https://github.com/CosmosOS/Cosmos/issues) existants avant d'en ouvrir un nouveau.
 
 Nous avons aussi un [serveur Discord](https://discord.com/invite/kwtBwv6jhD)!
 
