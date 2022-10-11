@@ -289,9 +289,7 @@ namespace Cosmos.System.FileSystem
                     Kernel.PrintDebug("Mounted partition.");
 
                     //We would have done Partitions[i].MountedFS = item.Create(...), but since the array is not cached, we need to store the mounted partitions in a list
-                    MountedPartitions[index] = item.Create(part.Host, xRootPath, xSize);
-                    // the array is now chased
-                    //part.MountedFS = item.Create(part.Host, xRootPath, xSize);
+                    MountedPartitions[index] = item.Create(part.Host, xRootPath, xSize);                  
                     return;
                 }
             }

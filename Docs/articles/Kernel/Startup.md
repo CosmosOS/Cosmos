@@ -2,4 +2,4 @@ On startup, there is some hand-coded assembly that runs before the Cosmos layer 
 
 Cosmos.System.Kernel is an abstract class that forms the Cosmos framework upon which your OS is built upon.
 
-You Can override the more method to add your code When Kernel.Start() is called.
+You can override the Kernel.Start() method to suppress the standard Cosmos boot routines.

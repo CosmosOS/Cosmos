@@ -138,17 +138,13 @@ namespace Cosmos.System
         /// 4. IDE initialisation, true/false, default: true
         /// If you need anything else to be initialised really early on, place it here.
         /// </summary>
-        protected virtual void OnBoot()
-        {
+        protected virtual void OnBoot() {
             Global.Init(GetTextScreen());
         }
-
-
         /// <summary>
         /// Pre-run events
         /// </summary>
         protected virtual void BeforeRun() { }
-
 
         /// <summary>
         /// Main kernel loop
