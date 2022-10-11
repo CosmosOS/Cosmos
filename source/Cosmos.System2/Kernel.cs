@@ -140,7 +140,7 @@ namespace Cosmos.System
         /// </summary>
         protected virtual void OnBoot() {
             Global.Init(GetTextScreen());
-        }   
+        }
         /// <summary>
         /// Pre-run events
         /// </summary>
