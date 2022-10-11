@@ -227,7 +227,8 @@ namespace Cosmos.System.FileSystem
             {
                 mbr[i] = 0;
             }
-            Host.WriteBlock(0, 1, ref mbr); 
+            Host.WriteBlock(0, 1, ref mbr);
+
             var part = parts[index];
             Partition.Partitions.Remove(part.Host);
             parts.RemoveAt(index);
