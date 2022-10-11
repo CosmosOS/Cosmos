@@ -54,7 +54,19 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
-        
+       
+        /// <summary>
+        /// Create a bitmap from a int array representing the pixels.
+        /// </summary>
+        /// <param name="Width">Width of the bitmap.</param>
+        /// <param name="Height">Height of the bitmap.</param>
+        /// <param name="pixelData">Byte array which includes the values for each pixel.</param>
+        /// <param name="colorDepth">Format of pixel data.</param>
+        /// <exception cref="NotImplementedException">Thrwon if color depth is not 32.</exception>
+        /// <exception cref="OverflowException">Thrown if bitmap size is bigger than Int32.MaxValue.</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         public Bitmap(uint Width, uint Height, int[] pixelData, ColorDepth colorDepth) : base(Width, Height, colorDepth)
         {
             if (colorDepth != ColorDepth.ColorDepth32 && colorDepth != ColorDepth.ColorDepth24)
