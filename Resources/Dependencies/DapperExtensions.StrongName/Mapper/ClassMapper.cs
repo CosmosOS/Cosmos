@@ -40,10 +40,7 @@ namespace DapperExtensions.Mapper
         /// </summary>
         public IList<IPropertyMap> Properties { get; private set; }
 
-        public Type EntityType
-        {
-            get { return typeof(T); }
-        }
+        public Type EntityType => typeof(T);
 
         public ClassMapper()
         {
@@ -67,14 +64,14 @@ namespace DapperExtensions.Mapper
 
         protected Dictionary<Type, KeyType> PropertyTypeKeyTypeMapping { get; private set; }
 
-        public virtual void Schema(string schemaName)
+        public virtual void Schema(string aSchemaName)
         {
-            SchemaName = schemaName;
+            SchemaName = aSchemaName;
         }
 
-        public virtual void Table(string tableName)
+        public virtual void Table(string aTableName)
         {
-            TableName = tableName;
+            TableName = aTableName;
         }
 
         protected virtual void AutoMap()
@@ -82,19 +79,19 @@ namespace DapperExtensions.Mapper
             AutoMap(null);
         }
 
-        protected virtual void AutoMap(Func<Type, PropertyInfo, bool> canMap)
+        protected virtual void AutoMap(Func<Type, PropertyInfo, bool> aCanMap)
         {
             Type type = typeof(T);
-            bool hasDefinedKey = Properties.Any(p => p.KeyType != KeyType.NotAKey);
+            bool hasDefinedKey = Properties.Any(aP => aP.KeyType != KeyType.NotAKey);
             PropertyMap keyMap = null;
             foreach (var propertyInfo in type.GetProperties())
             {
-                if (Properties.Any(p => p.Name.Equals(propertyInfo.Name, StringComparison.CurrentCultureIgnoreCase)))
+                if (Properties.Any(aP => aP.Name.Equals(propertyInfo.Name, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     continue;
                 }
 
-                if ((canMap != null && !canMap(type, propertyInfo)))
+                if ((aCanMap != null && !aCanMap(type, propertyInfo)))
                 {
                     continue;
                 }
@@ -102,7 +99,7 @@ namespace DapperExtensions.Mapper
                 PropertyMap map = Map(propertyInfo);
                 if (!hasDefinedKey)
                 {
-                    if (string.Equals(map.PropertyInfo.Name, "id", StringComparison.CurrentCultureIgnoreCase))
+                    if (String.Equals(map.PropertyInfo.Name, "id", StringComparison.CurrentCultureIgnoreCase))
                     {
                         keyMap = map;
                     }
@@ -126,28 +123,27 @@ namespace DapperExtensions.Mapper
         /// <summary>
         /// Fluently, maps an entity property to a column
         /// </summary>
-        protected PropertyMap Map(Expression<Func<T, object>> expression)
+        protected PropertyMap Map(Expression<Func<T, object>> aExpression)
         {
-            PropertyInfo propertyInfo = ReflectionHelper.GetProperty(expression) as PropertyInfo;
-            return Map(propertyInfo);
+            return Map(ReflectionHelper.GetProperty(aExpression) as PropertyInfo);
         }
 
         /// <summary>
         /// Fluently, maps an entity property to a column
         /// </summary>
-        protected PropertyMap Map(PropertyInfo propertyInfo)
+        protected PropertyMap Map(PropertyInfo aPropertyInfo)
         {
-            PropertyMap result = new PropertyMap(propertyInfo);
-            this.GuardForDuplicatePropertyMap(result);
+            PropertyMap result = new(aPropertyInfo);
+            GuardForDuplicatePropertyMap(result);
             Properties.Add(result);
             return result;
         }
 
-        private void GuardForDuplicatePropertyMap(PropertyMap result)
+        private void GuardForDuplicatePropertyMap(PropertyMap aResult)
         {
-            if (Properties.Any(p => p.Name.Equals(result.Name)))
+            if (Properties.Any(aP => aP.Name.Equals(aResult.Name)))
             {
-                throw new ArgumentException(string.Format("Duplicate mapping for property {0} detected.",result.Name));
+                throw new ArgumentException(String.Format("Duplicate mapping for property {0} detected.",aResult.Name));
             }
         }
     }

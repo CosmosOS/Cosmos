@@ -16,14 +16,7 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Debugger.
         /// </summary>
-        internal Debugger mSVGAIIDebugger = new Debugger("System", "SVGAIIScreen");
-
-        private static readonly Mode _DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
-
-        /// <summary>
-        /// Graphics mode.
-        /// </summary>
-        private Mode _Mode;
+        internal Debugger mSVGAIIDebugger = new("System", "SVGAIIScreen");
 
         /// <summary>
         /// VMWare SVGA 2 driver.
@@ -35,7 +28,7 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
         public SVGAIICanvas()
-            : this(_DefaultMode)
+            : this(DefaultMode)
         {
         }
 
@@ -87,58 +80,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draw point.
-        /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public override void DrawPoint(Pen aPen, int aX, int aY)
-        {
-            if (aPen.Color.A < 255)
-            {
-                if (aPen.Color.A == 0)
-                {
-                    return;
-                }
-
-                aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
-            }
-
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.ValueARGB);
-        }
-
-        /// <summary>
-        /// Draw array of colors.
-        /// Not implemented.
-        /// </summary>
-        /// <param name="colors">Array of colors.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="width">Width.</param>
-        /// <param name="height">Height.</param>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
-        public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
-        {
-            throw new NotImplementedException();
-            //xSVGAIIDriver.
-        }
-
-        /// <summary>
-        /// Draw point.
-        /// Not implemented.
-        /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <exception cref="NotImplementedException">Thrown always (only int coordinates supported).</exception>
-        public override void DrawPoint(Pen aPen, float aX, float aY)
-        {
-            //xSVGAIIDriver.
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Draw filled rectangle.
         /// </summary>
         /// <param name="aPen">Pen to draw with.</param>
@@ -148,14 +89,14 @@ namespace Cosmos.System.Graphics
         /// <param name="aHeight">Height.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public override void DrawFilledRectangle(Pen aPen, int aX_start, int aY_start, int aWidth, int aHeight)
+        public override void DrawFilledRectangle(int aX_start, int aY_start, uint aWidth, uint aHeight, Color aColor)
         {
-            var color = aPen.Color.ToArgb();
+            uint color = (uint)aColor.ToArgb();
 
             // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
             for (int i = aY_start; i < aY_start + aHeight; i++)
             {
-                _xSVGADriver.VideoMemory.Fill(GetPointOffset(aX_start, i) + (int)_xSVGADriver.FrameSize, aWidth, color);
+                Driver.Fill((uint)(GetIndex(aX_start, i) + (int)_xSVGADriver.FrameSize), aWidth, color);
             }
         }
 

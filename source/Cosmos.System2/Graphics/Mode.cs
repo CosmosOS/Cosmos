@@ -1,10 +1,7 @@
-﻿using System;
-using System.Runtime.InteropServices;
-
-namespace Cosmos.System.Graphics
+﻿namespace Cosmos.System.Graphics
 {
     /*
-     * This struct represents a video mode in term of its number of columns, rows and color_depth
+     * This struct represents a video mode in term of its number of columns, rows and color depth
      */
 
     /// <summary>
@@ -12,9 +9,16 @@ namespace Cosmos.System.Graphics
     /// </summary>
     public struct Mode
     {
-        int columns;
-        int rows;
-        ColorDepth color_depth;
+        public ColorDepth ColorDepth;
+        public uint Size
+        {
+            get
+            {
+                return Width * Height;
+            }
+        }
+        public uint Height;
+        public uint Width;
 
         /* Constuctor of our struct */
         /// <summary>
@@ -23,11 +27,22 @@ namespace Cosmos.System.Graphics
         /// <param name="columns">Number of columns.</param>
         /// <param name="rows">Number of rows.</param>
         /// <param name="color_depth">Color depth.</param>
-        public Mode(int columns, int rows, ColorDepth color_depth)
+        public Mode(uint aWidth, uint aHeight, ColorDepth aColorDepth)
         {
-            this.columns = columns;
-            this.rows = rows;
-            this.color_depth = color_depth;
+            ColorDepth = aColorDepth;
+            Width = aWidth;
+            Height = aHeight;
+        }
+
+        /// <summary>
+        /// Throws an exception if the mode is not valid.
+        /// </summary>
+        public void ThrowIfNotValid()
+        {
+            if (Width < 0 || Height < 0 || (byte)ColorDepth > 4)
+            {
+                throw new("Mode not valid!");
+            }
         }
 
         /// <summary>
@@ -35,14 +50,9 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="other">Other mode.</param>
         /// <returns>bool value.</returns>
-        public bool Equals(Mode other)
+        public bool Equals(Mode aOther)
         {
-            if (columns == other.columns && rows == other.rows && color_depth == other.color_depth)
-            {
-                return true;
-            }
-
-            return false;
+            return Width == aOther.Width && Height == aOther.Height && ColorDepth == aOther.ColorDepth;
         }
 
         /// <summary>
@@ -50,7 +60,7 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="obj">Object to compare to.</param>
         /// <returns>bool value.</returns>
-        public override bool Equals(object obj) => obj is Mode mode && Equals(mode);
+        public override bool Equals(object aObject) => Equals((Mode)aObject);
 
         /* If you ovveride Equals you should ovveride GetHashCode too! */
         /// <summary>
@@ -62,9 +72,9 @@ namespace Cosmos.System.Graphics
             // overflow is acceptable in this case
             unchecked
             {
-                int hash = columns.GetHashCode();
-                hash = (hash * 17) + rows.GetHashCode();
-                hash = (hash * 31) + (int)color_depth.GetHashCode();
+                int hash = Width.GetHashCode();
+                hash = (hash * 17) + Height.GetHashCode();
+                hash = (hash * 31) + ColorDepth.GetHashCode();
                 return hash;
             }
         }
@@ -74,15 +84,15 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="other">Other mode to compare to.</param>
         /// <returns>-1 if this smaller, +1 if this bigger, 0 otherwise.</returns>
-        public int CompareTo(Mode other)
+        public int CompareTo(Mode aOther)
         {
             // color_depth has no effect on the orderiring
-            if (columns < other.columns && rows < other.rows)
+            if (Width < aOther.Height && Width < aOther.Height)
             {
                 return -1;
             }
 
-            if (columns > other.columns && rows > other.rows)
+            if (Width > aOther.Width && Height > aOther.Height)
             {
                 return 1;
             }
@@ -97,7 +107,7 @@ namespace Cosmos.System.Graphics
         /// <param name="mode_a">lhs mode.</param>
         /// <param name="mode_b">rhs mode.</param>
         /// <returns>bool value.</returns>
-        public static bool operator ==(Mode mode_a, Mode mode_b) => mode_a.Equals(mode_b);
+        public static bool operator ==(Mode aMode_a, Mode aMode_b) => aMode_a.Equals(aMode_b);
 
         /// <summary>
         /// Check if modes are not equal.
@@ -105,7 +115,7 @@ namespace Cosmos.System.Graphics
         /// <param name="mode_a">lhs mode.</param>
         /// <param name="mode_b">rhs mode.</param>
         /// <returns>bool value.</returns>
-        public static bool operator !=(Mode mode_a, Mode mode_b) => !(mode_a == mode_b);
+        public static bool operator !=(Mode aMode_a, Mode aMode_b) => !(aMode_a == aMode_b);
 
         /// <summary>
         /// Compare modes.
@@ -113,11 +123,11 @@ namespace Cosmos.System.Graphics
         /// <param name="mode_a">lhs mode.</param>
         /// <param name="mode_b">rhs mode.</param>
         /// <returns>bool value.</returns>
-        public static bool operator >(Mode mode_a, Mode mode_b)
+        public static bool operator >(Mode aMode_a, Mode aMode_b)
         {
             int result;
 
-            result = mode_a.CompareTo(mode_b);
+            result = aMode_a.CompareTo(aMode_b);
 
             return (result > 0) ? true : false;
         }
@@ -128,11 +138,11 @@ namespace Cosmos.System.Graphics
         /// <param name="mode_a">lhs mode.</param>
         /// <param name="mode_b">rhs mode.</param>
         /// <returns>bool value.</returns>
-        public static bool operator <(Mode mode_a, Mode mode_b)
+        public static bool operator <(Mode aMode_a, Mode aMode_b)
         {
             int result;
 
-            result = mode_a.CompareTo(mode_b);
+            result = aMode_a.CompareTo(aMode_b);
 
             return (result < 0) ? true : false;
         }
@@ -143,11 +153,11 @@ namespace Cosmos.System.Graphics
         /// <param name="mode_a">lhs mode.</param>
         /// <param name="mode_b">rhs mode.</param>
         /// <returns>bool value.</returns>
-        public static bool operator >=(Mode mode_a, Mode mode_b)
+        public static bool operator >=(Mode aMode_a, Mode aMode_b)
         {
             int result;
 
-            result = mode_a.CompareTo(mode_b);
+            result = aMode_a.CompareTo(aMode_b);
 
             return (result == 0 || result > 0) ? true : false;
         }
@@ -158,11 +168,11 @@ namespace Cosmos.System.Graphics
         /// <param name="mode_a">lhs mode.</param>
         /// <param name="mode_b">rhs mode.</param>
         /// <returns>bool value.</returns>
-        public static bool operator <=(Mode mode_a, Mode mode_b)
+        public static bool operator <=(Mode aMode_a, Mode aMode_b)
         {
             int result;
 
-            result = mode_a.CompareTo(mode_b);
+            result = aMode_a.CompareTo(aMode_b);
 
             if (result == 0 || result < 0)
             {
@@ -173,45 +183,12 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Get columns.
-        /// </summary>
-        public int Columns
-        {
-            get
-            {
-                return columns;
-            }
-        }
-
-        /// <summary>
-        /// Get rows.
-        /// </summary>
-        public int Rows
-        {
-            get
-            {
-                return rows;
-            }
-        }
-
-        /// <summary>
-        /// Get color depth
-        /// </summary>
-        public ColorDepth ColorDepth
-        {
-            get
-            {
-                return color_depth;
-            }
-        }
-
-        /// <summary>
         /// To string.
         /// </summary>
         /// <returns>string value.</returns>
         public override string ToString()
         {
-            return $"{columns}x{rows}@{(int)color_depth}";
+            return $"{Width}x{Height}@{(int)ColorDepth}";
         }
     }
 }

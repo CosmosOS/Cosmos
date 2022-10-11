@@ -42,7 +42,7 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// SVGA 2 device.
         /// </summary>
-        private static PCIDevice _SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
+        private static Cosmos.HAL.Drivers.Video _SVGAIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
         /// <summary>
         /// Checks whether the Bochs Graphics Adapter exists (not limited to Bochs)

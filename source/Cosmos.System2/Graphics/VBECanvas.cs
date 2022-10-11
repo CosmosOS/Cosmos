@@ -12,26 +12,17 @@ namespace Cosmos.System.Graphics
     /// </summary>
     public class VBECanvas : Canvas
     {
-        /// <summary>
-        /// Default video mode. 1024x768x32.
-        /// </summary>
-        private static readonly Mode _DefaultMode = new Mode(1024, 768, ColorDepth.ColorDepth32);
-
+        
         /// <summary>
         /// Driver for Setting vbe modes and ploting/getting pixels
         /// </summary>
         private readonly VBEDriver _VBEDriver;
 
         /// <summary>
-        /// Video mode.
-        /// </summary>
-        private Mode _Mode;
-
-        /// <summary>
         /// Create new instance of the <see cref="VBEScreen"/> class.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if default mode (1024x768x32) is not suppoted.</exception>
-        public VBECanvas() : this(_DefaultMode)
+        public VBECanvas() : this(DefaultMode)
         {
         }
 
@@ -40,20 +31,20 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="mode">VBE mode.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
-        public VBECanvas(Mode aMode)
+        public VBECanvas(Mode aMode) : base(aMode)
         {
-            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
+            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Width}x{aMode.Height}x{(uint)aMode.ColorDepth}");
 
             if (Core.VBE.IsAvailable())
             {
                 Core.VBE.ModeInfo ModeInfo = Core.VBE.getModeInfo();
                 aMode = new Mode(ModeInfo.width, ModeInfo.height, (ColorDepth)ModeInfo.bpp);
-                Global.mDebugger.SendInternal($"Detected VBE VESA with {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
+                Global.mDebugger.SendInternal($"Detected VBE VESA with {aMode.Width}x{aMode.Height}x{(uint)aMode.ColorDepth}");
             }
 
             ThrowIfModeIsNotValid(aMode);
 
-            _VBEDriver = new VBEDriver((ushort)aMode.Columns, (ushort)aMode.Rows, (ushort)aMode.ColorDepth);
+            _VBEDriver = new VBEDriver((ushort)aMode.Width, (ushort)aMode.Height, (ushort)aMode.ColorDepth);
             Mode = aMode;
         }
 
@@ -63,25 +54,6 @@ namespace Cosmos.System.Graphics
         public override void Disable()
         {
             _VBEDriver.DisableDisplay();
-        }
-
-        /// <summary>
-        /// Name of the backend
-        /// </summary>
-        public override string Name() => "VBECanvas";
-
-        /// <summary>
-        /// Get and set video mode.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">(set) Thrown if mode is not suppoted.</exception>
-        public override Mode Mode
-        {
-            get => _Mode;
-            set
-            {
-                _Mode = value;
-                SetMode(_Mode);
-            }
         }
 
         #region Display
@@ -126,7 +98,7 @@ namespace Cosmos.System.Graphics
         /// </list>
         /// </para>
         /// </summary>
-        public override List<Mode> AvailableModes { get; } = new List<Mode>
+        public List<Mode> AvailableModes { get; } = new List<Mode>
         {
             new Mode(320, 240, ColorDepth.ColorDepth32),
             new Mode(640, 480, ColorDepth.ColorDepth32),
@@ -146,21 +118,16 @@ namespace Cosmos.System.Graphics
         };
 
         /// <summary>
-        /// Override Canvas default graphics mode.
-        /// </summary>
-        public override Mode DefaultGraphicMode => _DefaultMode;
-
-        /// <summary>
         /// Use this to setup the screen, this will disable the console.
         /// </summary>
         /// <param name="Mode">The desired Mode resolution</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
         private void SetMode(Mode aMode)
         {
-            ThrowIfModeIsNotValid(aMode);
+            aMode.ThrowIfNotValid();
 
-            ushort xres = (ushort)Mode.Columns;
-            ushort yres = (ushort)Mode.Rows;
+            ushort xres = (ushort)Mode.Width;
+            ushort yres = (ushort)Mode.Height;
             ushort bpp = (ushort)Mode.ColorDepth;
 
             //set the screen
@@ -169,40 +136,6 @@ namespace Cosmos.System.Graphics
         #endregion
 
         #region Drawing
-
-        /// <summary>
-        /// Clear screen to specified color.
-        /// </summary>
-        /// <param name="color">Color.</param>
-        public override void Clear(int aColor)
-        {
-            Global.mDebugger.SendInternal($"Clearing the Screen with Color {aColor}");
-            //if (color == null)
-            //   throw new ArgumentNullException(nameof(color));
-
-            /*
-             * TODO this version of Clear() works only when mode.ColorDepth == ColorDepth.ColorDepth32
-             * in the other cases you should before convert color and then call the opportune ClearVRAM() overload
-             * (the one that takes ushort for ColorDepth.ColorDepth16 and the one that takes byte for ColorDepth.ColorDepth8)
-             * For ColorDepth.ColorDepth24 you should mask the Alpha byte.
-             */
-            switch (_Mode.ColorDepth)
-            {
-                case ColorDepth.ColorDepth4:
-                    throw new NotImplementedException();
-                case ColorDepth.ColorDepth8:
-                    throw new NotImplementedException();
-                case ColorDepth.ColorDepth16:
-                    throw new NotImplementedException();
-                case ColorDepth.ColorDepth24:
-                    throw new NotImplementedException();
-                case ColorDepth.ColorDepth32:
-                    _VBEDriver.ClearVRAM((uint)aColor);
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
 
         /// <summary>
         /// Clear screen to specified color.
@@ -220,7 +153,7 @@ namespace Cosmos.System.Graphics
              * (the one that takes ushort for ColorDepth.ColorDepth16 and the one that takes byte for ColorDepth.ColorDepth8)
              * For ColorDepth.ColorDepth24 you should mask the Alpha byte.
              */
-            switch (_Mode.ColorDepth)
+            switch (Mode.ColorDepth)
             {
                 case ColorDepth.ColorDepth4:
                     throw new NotImplementedException();
@@ -229,7 +162,8 @@ namespace Cosmos.System.Graphics
                 case ColorDepth.ColorDepth16:
                     throw new NotImplementedException();
                 case ColorDepth.ColorDepth24:
-                    throw new NotImplementedException();
+                    _VBEDriver.ClearVRAM((uint)aColor.ToArgb());
+                    break;
                 case ColorDepth.ColorDepth32:
                     _VBEDriver.ClearVRAM((uint)aColor.ToArgb());
                     break;
@@ -238,125 +172,22 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        /*
-         * As DrawPoint() is the basic block of DrawLine() and DrawRect() and in theory of all the future other methods that will
-         * be implemented is better to not check the validity of the arguments here or it will repeat the check for any point
-         * to be drawn slowing down all.
-         */
-        /// <summary>
-        /// Draw point to the screen.
-        /// </summary>
-        /// <param name="aPen">Pen to draw the point with.</param>
-        /// <param name="aX">X coordinate.</param>
-        /// <param name="aY">Y coordinate.</param>
-        /// <exception cref="NotImplementedException">Thrown if color depth is not supported (currently only 32 is supported).</exception>
-        public override void DrawPoint(Pen aPen, int aX, int aY)
-        {
-            uint offset;
-
-            /*
-             * For now we can Draw only if the ColorDepth is 32 bit, we will throw otherwise.
-             *
-             * How to support other ColorDepth? The offset calculation should be the same (and so could be done out of the switch)
-             * ColorDepth.ColorDepth16 and ColorDepth.ColorDepth8 need a conversion from color (an ARGB32 color) to the RGB16 and RGB8
-             * how to do this conversion faster maybe using pre-computed tables? What happens if the color cannot be converted? We will throw?
-             */
-            switch (Mode.ColorDepth)
-            {
-                case ColorDepth.ColorDepth32:
-
-                    offset = (uint)GetPointOffset(aX, aY);
-
-                    if (aPen.Color.A < 255)
-                    {
-                        if (aPen.Color.A == 0)
-                        {
-                            return;
-                        }
-
-                        aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
-                    }
-
-                    _VBEDriver.SetVRAM(offset, aPen.Color.B);
-                    _VBEDriver.SetVRAM(offset + 1, aPen.Color.G);
-                    _VBEDriver.SetVRAM(offset + 2, aPen.Color.R);
-                    _VBEDriver.SetVRAM(offset + 3, aPen.Color.A);
-
-                    break;
-                case ColorDepth.ColorDepth24:
-
-                    offset = (uint)GetPointOffset(aX, aY);
-
-                    _VBEDriver.SetVRAM(offset, aPen.Color.B);
-                    _VBEDriver.SetVRAM(offset + 1, aPen.Color.G);
-                    _VBEDriver.SetVRAM(offset + 2, aPen.Color.R);
-
-                    break;
-                default:
-                    string errorMsg = "DrawPoint() with ColorDepth " + (int)Mode.ColorDepth + " not yet supported";
-                    throw new NotImplementedException(errorMsg);
-            }
-        }
-
-        /// <summary>
-        /// Draw point to the screen. 
-        /// Not implemented.
-        /// </summary>
-        /// <param name="aPen">Pen to draw the point with.</param>
-        /// <param name="aX">X coordinate.</param>
-        /// <param name="aY">Y coordinate.</param>
-        /// <exception cref="NotImplementedException">Thrown always (only int coordinats supported).</exception>
-        public override void DrawPoint(Pen aPen, float aX, float aY)
-        {
-            throw new NotImplementedException();
-        }
-
-        /* This is just temp */
-        /// <summary>
-        /// Draw array of colors.
-        /// </summary>
-        /// <param name="aColors">Colors array.</param>
-        /// <param name="aX">X coordinate.</param>
-        /// <param name="aY">Y coordinate.</param>
-        /// <param name="aWidth">Width.</param>
-        /// <param name="aHeight">unused.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if coordinates are invalid, or width is less than 0.</exception>
-        /// <exception cref="NotImplementedException">Thrown if color depth is not supported.</exception>
-        public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
-        {
-            ThrowIfCoordNotValid(aX, aY);
-
-            ThrowIfCoordNotValid(aX + aWidth, aY + aHeight);
-
-            for (int i = 0; i < aX; i++)
-            {
-
-                for (int ii = 0; ii < aY; ii++)
-                {
-
-                    DrawPoint(new Pen(aColors[i + (ii * aWidth)]), i, ii);
-
-                }
-            }
-        }
-
         /// <summary>
         /// Draw filled rectangle.
         /// </summary>
-        /// <param name="aPen">Pen to draw with.</param>
         /// <param name="aX">X coordinate.</param>
         /// <param name="aY">Y coordinate.</param>
         /// <param name="aWidth">Width.</param>
         /// <param name="aHeight">Height.</param>
-        public override void DrawFilledRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
+        /// <param name="aColor">Color to draw with.</param>
+        public override void DrawFilledRectangle(int aX, int aY, uint aWidth, uint aHeight, Color aColor)
         {
             //ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
-            aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
-            var color = aPen.Color.ToArgb();
+            aWidth = (uint)(Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32);
 
             for (int i = aY; i < aY + aHeight; i++)
             {
-                _VBEDriver.ClearVRAM(GetPointOffset(aX, i), aWidth, color);
+                _VBEDriver.ClearVRAM((int)GetIndex(aX, i), (int)aWidth, aColor.ToArgb());
             }
         }
 
@@ -366,18 +197,15 @@ namespace Cosmos.System.Graphics
         /// <param name="aImage">Image.</param>
         /// <param name="aX">X coordinate.</param>
         /// <param name="aY">Y coordinate.</param>
-        public override void DrawImage(Image aImage, int aX, int aY)
+        public override void DrawImage(int aX, int aY, Canvas aImage)
         {
-            var xBitmap = aImage.rawData;
-            var xWidth = (int)aImage.Width;
-            var xHeight = (int)aImage.Height;
-
-            int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns;
+            var xBitmap = aImage.Buffer;
+            var xWidth = (int)aImage.Mode.Width;
+            var xHeight = (int)aImage.Mode.Height;
 
             for (int i = 0; i < xHeight; i++)
             {
-                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidth), xWidth);
+                _VBEDriver.CopyVRAM((int)((i * Mode.Width) + (int)GetIndex(aX, aY)), (int[])(object)xBitmap, (i * xWidth), xWidth);
             }
         }
 
@@ -390,23 +218,5 @@ namespace Cosmos.System.Graphics
         {
             _VBEDriver.Swap();
         }
-
-        #region Reading
-
-        /// <summary>
-        /// Get point color.
-        /// </summary>
-        /// <param name="aX">X coordinate.</param>
-        /// <param name="aY">Y coordinate.</param>
-        /// <returns>Color value.</returns>
-        public override Color GetPointColor(int aX, int aY)
-        {
-            uint offset = (uint)GetPointOffset(aX, aY);
-
-            return Color.FromArgb((int)_VBEDriver.GetVRAM(offset));
-        }
-
-        #endregion
-
     }
 }
