@@ -62,6 +62,7 @@ namespace Cosmos.System.FileSystem
                 return converted;
             }
         }
+        
         /// <summary>
         /// List of file systems.
         /// </summary>
@@ -200,6 +201,11 @@ namespace Cosmos.System.FileSystem
             mbrData[510] = boot[0];
             mbrData[511] = boot[1];
 
+            var partion = new Partition(Host, (ulong)startingSector, amountOfSectors);
+
+            Partition.Partitions.Add(partion);
+            parts.Add(new ManagedPartition(partion));
+
             //Save the data
             Host.WriteBlock(0, 1, ref mbrData);
         }
@@ -222,6 +228,10 @@ namespace Cosmos.System.FileSystem
                 mbr[i] = 0;
             }
             Host.WriteBlock(0, 1, ref mbr);
+
+            var part = parts[index];
+            Partition.Partitions.Remove(part.Host);
+            parts.RemoveAt(index);
         }
         /// <summary>
         /// Deletes all partitions on the disk.
@@ -279,7 +289,7 @@ namespace Cosmos.System.FileSystem
                     Kernel.PrintDebug("Mounted partition.");
 
                     //We would have done Partitions[i].MountedFS = item.Create(...), but since the array is not cached, we need to store the mounted partitions in a list
-                    MountedPartitions[index] = item.Create(part.Host, xRootPath, xSize);
+                    MountedPartitions[index] = item.Create(part.Host, xRootPath, xSize);                  
                     return;
                 }
             }
