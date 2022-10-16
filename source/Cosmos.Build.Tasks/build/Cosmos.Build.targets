@@ -63,6 +63,9 @@
 
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
 
+
+        <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
+
     </PropertyGroup>
 
     <PropertyGroup>

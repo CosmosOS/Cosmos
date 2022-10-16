@@ -103,7 +103,7 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(allocated, afterFree, "Free causes one object to be freed again");
 
             var testString = "asd";
-            Assert.AreEqual(RAT.PageType.Empty, RAT.GetPageType(GCImplementation.GetPointer(testString)), "String is created statically and not managed by GC");
+            Assert.AreEqual((byte)RAT.PageType.Empty, (byte)RAT.GetPageType(GCImplementation.GetPointer(testString)), "String is created statically and not managed by GC");
 
             Assert.IsTrue(Heap.Collect() >= 0, "Running GC Collect first time does not crash and returns non-negative value");
         }
