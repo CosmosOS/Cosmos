@@ -68,6 +68,9 @@ namespace Cosmos.Kernel.Tests.DiskManager
             Directory.CreateDirectory(@"0:\SYS\");
             Assert.IsTrue(Directory.GetDirectories(@"0:\SYS\").Length == 0, "Can create a directory and its content is emtpy");
 
+            ourDisk.DeletePartition(0);
+            mDebugger.Send("Partion is Deleted");
+
             mDebugger.Send("END TEST");
         }
     }
