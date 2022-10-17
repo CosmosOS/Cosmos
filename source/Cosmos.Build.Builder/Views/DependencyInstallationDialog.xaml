@@ -9,15 +9,16 @@
         ResizeMode="NoResize"
         ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
+        UseLayoutRounding="True"
         Title="Cosmos Kit Builder"
         WindowStartupLocation="CenterOwner"
-        xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI">
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
-
-    <Grid Margin="8"
-          MinWidth="400">
+    <Grid Margin="8" MinWidth="400">
 
         <StackPanel Grid.Row="0"
                     Margin="8"
@@ -85,5 +86,4 @@
         </StackPanel>
 
     </Grid>
-
 </Window>
