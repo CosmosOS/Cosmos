@@ -54,9 +54,9 @@ namespace Cosmos.HAL.BlockDevice
 		{
 			get { return mModelNo; }
 		}
-		#endregion
-		#region Enums
-		[Flags]
+        #endregion
+        #region Enums
+        [Flags]
 		public enum Status : byte
 		{
 			None = 0x00,
@@ -102,6 +102,7 @@ namespace Cosmos.HAL.BlockDevice
 			ReadPioExt = 0x24,
 			ReadDma = 0xC8,
 			ReadDmaExt = 0x25,
+            ReadNativeMaxAdressExt =0x27,
 			WritePio = 0x30,
 			WritePioExt = 0x34,
 			WriteDma = 0xCA,
@@ -112,8 +113,9 @@ namespace Cosmos.HAL.BlockDevice
 			IdentifyPacket = 0xA1,
 			Identify = 0xEC,
 			Read = 0xA8,
-			Eject = 0x1B
-		}
+			Eject = 0x1B,
+            ReadNativeMaxAdress = 0xF8
+        }
 
 		public enum Ident : byte
 		{
