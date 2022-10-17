@@ -9,7 +9,7 @@ clone_folder: c:\Cosmos
 init:
 - cmd: |
     git clone https://github.com/CosmosOS/IL2CPU.git c:\IL2CPU --depth 1
-    git clone https://github.com/CosmosOS/Common.git c:\IL2CPU --depth 1
+    git clone https://github.com/CosmosOS/Common.git c:\Common --depth 1
 
 install:
   - ps: |
