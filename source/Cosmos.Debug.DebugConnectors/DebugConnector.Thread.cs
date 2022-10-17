@@ -178,7 +178,8 @@ namespace Cosmos.Debug.DebugConnectors
             {
                 if (!SendRawData(xPendingWrite.Packet))
                 {
-                    throw new Exception("SendRawData returned false!");
+                    // the os got closed unexpectatly
+                    //throw new Exception("SendRawData returned false!");
                 }
                 if (xPendingWrite.Completed != null)
                 {

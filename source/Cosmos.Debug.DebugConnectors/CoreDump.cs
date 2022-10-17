@@ -48,7 +48,7 @@ namespace Cosmos.Debug.DebugConnectors
             {
                 stack.Push(BitConverter.ToUInt32(stackBytes, i));
             }
-            if(stack.Count != 9)
+            if(stack.Count < 9)
             {
                 return null;
             }
