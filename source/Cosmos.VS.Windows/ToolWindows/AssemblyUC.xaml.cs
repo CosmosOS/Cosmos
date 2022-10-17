@@ -600,6 +600,11 @@ namespace Cosmos.VS.Windows
 
         protected override async Task DoUpdateAsync(string aTag)
         {
+            if(Package is null)
+            {
+                Log("Package is null. Returning");
+                return;
+            }
             Log("DoUpdate");
             mLines.Clear();
 
