@@ -258,7 +258,10 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             {
                 mProcess.Terminate();
 
-                Callback.OnProcessExit(0);
+                if(Callback != null)
+                {
+                    Callback.OnProcessExit(0);
+                }
                 mProgram = null;
             }
             catch (Exception e)
@@ -276,10 +279,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             // but have stepping state remain. An example is when a tracepoint is executed,
             // and the debugger does not want to actually enter break mode.
 
-            var xThread = (AD7Thread)pThread;
-            //if (AfterBreak) {
-            //Callback.OnBreak(xThread);
-            //}
             return VSConstants.S_OK;
         }
 
