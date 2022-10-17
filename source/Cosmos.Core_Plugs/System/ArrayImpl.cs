@@ -1,4 +1,5 @@
 using System;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
@@ -146,6 +147,11 @@ namespace Cosmos.Core_Plugs.System
         public static object InternalGetValue(Array aThis, IntPtr aIntPtr)
         {
             return aThis.GetValue((int)aIntPtr);
+        }
+
+        public static Array CreateInstance(Type type, int size)
+        {
+            return GCImpl.CreateNewArray((int)VTablesImpl.GetSize(((CosmosRuntimeType)type).mTypeId), size);
         }
     }
 }
