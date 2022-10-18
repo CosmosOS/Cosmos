@@ -11,5 +11,11 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Sys_LStat__System_Byte___Interop_Sys_FileStatus_")]
+        public static int LStat(string path, out object output)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
