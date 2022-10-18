@@ -74,7 +74,7 @@ namespace Cosmos.Build.Builder.Dependencies
         {
             if (useGit)
             {
-                var process = Process.Start("git", $"clone \"{repo.Url}.git\" \"{repo.LocalPath}\"");
+                var process = Process.Start("git", $"clone \"{repo.Url}.git\" \"{repo.LocalPath}\" --depth=1");
                 await Task.Run(process.WaitForExit).ConfigureAwait(false);
 
                 if (process.ExitCode != 0)

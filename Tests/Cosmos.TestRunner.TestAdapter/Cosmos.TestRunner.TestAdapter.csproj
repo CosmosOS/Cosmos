@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <PackageDescription>Test adapter for Cosmos kernels.</PackageDescription>
         <IsToolProject>True</IsToolProject>
         <AppendTargetFrameworkToToolsPackageFolder>False</AppendTargetFrameworkToToolsPackageFolder>
@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" PrivateAssets="All" Version="17.0.0" />
     </ItemGroup>
 
     <ItemGroup>

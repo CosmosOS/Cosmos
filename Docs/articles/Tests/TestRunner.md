@@ -19,7 +19,8 @@ To add a kernel to the TestRunner, open the TestKernelSets file and add a line t
 
 `yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);`
 
-Note: This can be used to test your own kernel for debug purposes. Simply add a reference to your kernel csproj to Cosmos.TestRunner.Full and add it to TestKernelSets.
+Note: This can be used to test your own kernel for debug purposes. Add your kernel to the Test solution, add a project reference to your kernel to Cosmos.TestRunner.Full and add the kernel to the TestKernelSets list.
+You will also need to modify the .csproj file by removing the platform line. You also need to replace the nuget references with references to the actual projects (System2, Core etc) and import the `/Tests/Kernels/Directory.Build.targets` file. If you are still faced with the .refs file not generating, comment out the Cosmos related parts of the csproj.
 
 ### Time Out
 To set the period before the TestRunner registers an error, change the line: `engine.AllowedSecondsInKernel = 1800;` This means that, in this case, if the Kernel runs for more that 30 minutes then it will register a failure.

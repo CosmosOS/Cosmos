@@ -1,4 +1,5 @@
-﻿The security model of Cosmos will evolve and mature as
+# Levels
+The security model of Cosmos will evolve and mature as
 Cosmos does, however the base model is presented here.
 
 ###  Goals

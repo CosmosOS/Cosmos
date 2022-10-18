@@ -50,7 +50,6 @@ namespace Cosmos.HAL.BlockDevice
             else if (xATA.DriveType == ATA_PIO.SpecLevel.ATAPI)
             {
                 var atapi = new ATAPI(xATA);
-
                 //TODO: Replace 1000000 with proper size once ATAPI driver implements it
                 //Add the atapi device to an array so we reorder them to be last
                 ATAPIDevices.Add(atapi);

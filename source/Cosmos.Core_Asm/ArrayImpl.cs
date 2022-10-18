@@ -24,5 +24,11 @@ namespace Cosmos.Core_Asm
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Assembler = typeof(ArrayClearAsm))]
+        public static void Clear(Array array)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

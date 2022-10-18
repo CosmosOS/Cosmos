@@ -7,6 +7,7 @@
 
     <PropertyGroup>
         <BinFile Condition="'$(BinFile)' == ''">$(OutputPath)$(AssemblyName).bin</BinFile>
+        <BinGzFile Condition="'$(BinGzFile)' == ''">$(OutputPath)$(AssemblyName).bin.gz</BinGzFile>
         <IsoFile Condition="'$(IsoFile)' == ''">$(OutputPath)$(AssemblyName).iso</IsoFile>
     </PropertyGroup>
 
@@ -37,9 +38,10 @@
         <DebugCom Condition="'$(DebugEnabled)' == 'False'">0</DebugCom>
 
         <BinFormat Condition="'$(BinFormat)' == ''">ELF</BinFormat>
+        <CompressionType Condition="'$(CompressionType)' == ''">None</CompressionType>
         <DebugMode Condition="'$(DebugMode)' == ''">Source</DebugMode>
         <TraceMode Condition="'$(TraceMode)' == ''">User</TraceMode>
-		<ExtractMapFile Condition="'$(ExtractMapFile)' == ''">False</ExtractMapFile>
+        <ExtractMapFile Condition="'$(ExtractMapFile)' == ''">False</ExtractMapFile>
         <StackCorruptionDetectionEnabled Condition="'$(StackCorruptionDetectionEnabled)' == ''">True</StackCorruptionDetectionEnabled>
         <StackCorruptionDetectionLevel Condition="'$(StackCorruptionDetectionLevel)' == ''">MethodFooters</StackCorruptionDetectionLevel>
         <IgnoreDebugStubAttribute Condition="'$(IgnoreDebugStubAttribute)' == ''">False</IgnoreDebugStubAttribute>
@@ -61,7 +63,10 @@
 
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
 
-</PropertyGroup>
+
+        <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
+
+    </PropertyGroup>
 
     <PropertyGroup>
         <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)net48\Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
@@ -117,6 +122,7 @@
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Launch" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.Gzip" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ReadNasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -135,6 +141,7 @@
             Ld;
             ExtractMapFromElfFile;
             ReadNasmMapToDebugInfo;
+            Gzip;
             MakeIso
         </CosmosBuildDependsOn>
     </PropertyGroup>
@@ -295,6 +302,28 @@
 
     <!--
     ================================================================================
+                                         Gzip
+
+        [IN]
+        $(BinFile) - a binary file.
+
+        [OUT]
+		$(BinGzFile) - a gzipped binary file.
+
+    ================================================================================
+    -->
+    <Target Name="Gzip"
+            Inputs="$(BinFile)"
+            Outputs="$(BinGzFile)"
+            Condition="'$(CompressionType)' == 'Gzip'">
+
+        <Gzip BinFile="$(BinFile)"
+              OutputFile="$(BinGzFile)" />
+
+    </Target>
+
+    <!--
+    ================================================================================
                                          MakeISO
 
         [IN]
@@ -310,16 +339,17 @@
             Outputs="$(IsoFile)"
             Condition="'$(Deployment)' == 'ISO'">
 
-		    <ItemGroup>
-			    <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
-		    </ItemGroup>
+        <ItemGroup>
+            <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
+        </ItemGroup>
 
         <ItemGroup>
             <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
         </ItemGroup>
 
         <ItemGroup>
-            <_IsoFile Include="$(BinFile)" />
+            <_IsoFile Include="$(BinGzFile)" Condition="'$(CompressionType)' == 'Gzip'" />
+            <_IsoFile Include="$(BinFile)" Condition="'$(CompressionType)' == 'None'" />
             <_IsoFile Include="@(ContentToDeploy)" />
         </ItemGroup>
 
@@ -339,9 +369,16 @@
         <Copy SourceFiles="@(_i386pcFile)"
               DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
 
-        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
 
+        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
+                              BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
+                              Modules="gzio"
+                              Condition="'$(CompressionType)' == 'Gzip'" />
+        
+        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
+                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                              Condition="'$(CompressionType)' == 'None'" />
+        
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
                  OutputFile="$(IsoFile)"
                  ToolPath="$(MkisofsToolPath)"
@@ -397,7 +434,8 @@
         </ItemGroup>
 
         <ItemGroup>
-            <_UsbFile Include="$(BinFile)" />
+            <_UsbFile Include="$(BinGzFile)" Condition="'$(CompressionType)' == 'Gzip'" />
+            <_UsbFile Include="$(BinFile)" Condition="'$(CompressionType)' == 'None'" />
             <_UsbFile Include="@(ContentToDeploy)" />
         </ItemGroup>
 
@@ -421,7 +459,13 @@
               DestinationFolder="$(UsbPublishDrive)" />
 
         <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
+                              BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
+                              Modules="gzio"
+                              Condition="'$(CompressionType)' == 'Gzip'" />
+
+        <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
+                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                              Condition="'$(CompressionType)' == 'None'" />
 
         <CreateMbr TargetDrive="$(UsbPublishDrive)"
                    FormatDrive="$(UsbPublishFormatDrive)"

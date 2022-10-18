@@ -200,8 +200,6 @@ namespace Cosmos.System_Plugs.System.IO
 
             if (!aPathExists)
             {
-                Global.mFileSystemDebugger.SendInternal("Open Mode with aPath not existing");
-                //throw new FileNotFoundException("File not existing but Open Requested");
                 throw new IOException("File not existing but Open Requested");
             }
 
@@ -280,6 +278,11 @@ namespace Cosmos.System_Plugs.System.IO
         public static bool get_CanRead(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             return innerStream.CanRead;
+        }
+
+        public static bool get_CanSeek(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            return innerStream.CanSeek;
         }
 
         public static void WriteByte(FileStream aThis, byte aByte)
