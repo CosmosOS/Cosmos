@@ -1,6 +1,4 @@
-﻿
-
-### IL2CPU
+# IL2CPU
 
 This is one of the most important pieces of code in Cosmos. It's an AOT
 (Ahead-Of-Time) compiler.
