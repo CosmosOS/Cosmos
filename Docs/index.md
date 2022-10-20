@@ -11,6 +11,8 @@ For the up-to-date API documentation generated from the master branch, please vi
   
 If you're looking for general information about Cosmos e.g. our goals and various links to chat with us or for help with using Cosmos that can't be answered with existing documentation, please visit the [Cosmos website](https://gocosmos.org)  
 
+If you need a translation for this documentation, click [here](https://cosmosos-github-io.translate.goog/?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp).
+
 
 You can find the latest and previous build statuses on [AppVeyor](https://ci.appveyor.com/project/CosmosOS/cosmos)  
 
