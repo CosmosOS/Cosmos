@@ -30,8 +30,14 @@ namespace Cosmos.Build.Builder.BuildTasks
             {
                 ["BuildConfiguration"] = configuration,
                 ["ChangeSetVersion"] = releaseVersion,
-                ["RealPath"] = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
             };
+
+            // when building the userkit we want to let innosetup determine the installation location
+            // see https://github.com/CosmosOS/Cosmos/issues/2329
+            if (configuration == "DevKit")
+            {
+                _defines["RealPath"] = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            }
         }
 
         protected override string GetExePath()
