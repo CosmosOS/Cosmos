@@ -110,8 +110,6 @@ catch(Exception e)
 }
 ```
 
-![Read File](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Read%20File.PNG)
-
 ## Create new file
 Reading and writing is working on existing files, but it's much more useful to write to our own files.
 Let's jump right into it:
