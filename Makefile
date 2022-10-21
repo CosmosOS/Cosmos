@@ -1,5 +1,5 @@
 THISDIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-DESTDIR = /opt/cosmos
+DESTDIR ?= /opt/cosmos
 
 IL2CPU_URL = https://github.com/CosmosOS/IL2CPU
 XSHARP_URL = https://github.com/CosmosOS/XSharp
