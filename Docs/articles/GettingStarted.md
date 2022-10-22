@@ -34,7 +34,7 @@ console application.
 
 ![](images/SNAG-0001.png)
 
-Program.cs contains the boot and execution code. Instead of seeing a Windows
+Kernel.cs contains the boot and execution code. Instead of seeing a Windows
 console window, you will see the following:
 
 ![](images/SNAG-0003.png)
@@ -126,9 +126,9 @@ and it will appear in the Visual Studio output window.
 There really is no catch. Everything we've shown here is functioning as seen.
 No mockups were used. However we still have a lot of work to go. Items of
 interest that are on our current task list include interfaces (necessary for
-foreach loops), file systems (partial support exists), threads, networking, and
-graphics. We have prototypes and experimentation for each, but none have been
-rolled into the mainline Cosmos development as of yet.
+foreach loops), threads and networking. We have prototypes and 
+experimentation for each, but none have been rolled into the mainline Cosmos 
+development as of yet.
 
 ##  Obtaining Cosmos
 
