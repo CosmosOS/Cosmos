@@ -1003,7 +1003,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 mDebugInfoDb.Dispose();
                 mDebugInfoDb = null;
             }
-            IL2CPU.Debug.Symbols.Metadata.MetadataHelper.DisposeReaders();
+            IL2CPU.Debug.Symbols.Metadata.MetadataHelper.DisposeStatic();
         }
 
         internal void Continue()
