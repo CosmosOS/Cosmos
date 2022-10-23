@@ -19,13 +19,13 @@
     <ItemGroup>
         <PackageReference Include="IL2CPU.Debug.Symbols.Net48" />
         <PackageReference Include="Cosmos.Build.Common" />
+        <PackageReference Include="Microsoft.VisualStudio.Debugger.Engine" Version="17.0.2012801" />
         <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" />
         <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
         <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.0.6" />
         <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
         <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />

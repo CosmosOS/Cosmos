@@ -457,13 +457,22 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         try
                         {
                             var xMethod = mDebugInfoDb.GetMethod(connection, address);
+                            var xLabels = mDebugInfoDb.GetLabels(address);
                             var xDocument = mDebugInfoDb.GetDocumentById(connection, xMethod.DocumentID);
-                            var xLabel = mDebugInfoDb.GetLabels(address)[0];
-                            var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
-                            var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
-                            var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
-
-                            entry += $"in {xDocument.Pathname}:line {xLine}";
+                            int? xLine = null; 
+                            if (xLabels != null && xLabels.Length > 0)
+                            {
+                                xLine = GetLabelLine(xMethod,xLabels[0]);
+                            }
+                            else
+                            {
+                                var xLabel = mDebugInfoDb.GetMethodLabels(connection, address)
+                                    .OrderBy(x => Math.Abs(address - x.Address)).First(); // Get closest address
+                                xLabel.Name = xLabel.Name.Remove(xLabel.Name.LastIndexOf('.')) == xMethod.LabelCall ? xLabel.Name + ".AfterCall" : xLabel.Name; // Verify label name
+                                xLine = GetLabelLine(xMethod, xLabel.Name);
+                            }
+                            
+                            entry += xLine != null ? $" in {Environment.NewLine}{xDocument.Pathname}:line {xLine}" : "";
                         }
                         catch (InvalidOperationException)
                         {
@@ -473,6 +482,20 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 }
 
                 return entry;
+            }
+
+            int? GetLabelLine(Method xMethod, string xLabel)
+            {
+                try
+                {
+                    var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
+                    var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
+                    return xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 
@@ -980,6 +1003,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 mDebugInfoDb.Dispose();
                 mDebugInfoDb = null;
             }
+            IL2CPU.Debug.Symbols.Metadata.MetadataHelper.DisposeReaders();
         }
 
         internal void Continue()
