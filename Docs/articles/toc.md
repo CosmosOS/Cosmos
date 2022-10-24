@@ -5,8 +5,6 @@
 # Debugger
 ## [Debug Commands](Debugger/DebugCommands.md)
 
-# [Express](Express/Compile.md)
-
 # Installation
 ## [Dev Kit](Installation/DevKit.md)
 ## [Running](Installation/Running.md)
@@ -15,6 +13,7 @@
 ## [Levels](Kernel/Levels.md)
 ## [Plugs](Kernel/Plugs.md)
 ## [Startup](Kernel/Startup.md)
+## [OnBoot](Kernel/OnBoot.md)
 ## [Graphics](Kernel/CGS.md)
 ## [Virtual File System](Kernel/VFS.md)
 ## [Network](Kernel/Network.md)

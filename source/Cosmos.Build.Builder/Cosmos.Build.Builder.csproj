@@ -6,6 +6,7 @@
         <ApplicationIcon>Resources\Cosmos.ico</ApplicationIcon>
         <IncludeWpfReferences>True</IncludeWpfReferences>
         <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+        <SignAssembly>False</SignAssembly>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,7 +28,7 @@
         <PackageReference Include="NuGet.Common" />
         <PackageReference Include="NuGet.Configuration" />
         <PackageReference Include="System.Runtime.WindowsRuntime" Version="4.6.0" />
-        <PackageReference Include="WPF-UI" Version="1.2.2-prerelease151" />
+        <PackageReference Include="WPF-UI" Version="2.0.3" />
     </ItemGroup>
 
 </Project>

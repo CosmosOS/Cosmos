@@ -83,5 +83,11 @@ namespace Cosmos.Debug.DebugConnectors
         private static extern bool PeekNamedPipe(IntPtr handle,
                                                  byte[] buffer, uint nBufferSize, IntPtr bytesRead,
                                                  ref uint bytesAvail, IntPtr BytesLeftThisMessage);
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            mPipe.Dispose();
+        }
     }
 }

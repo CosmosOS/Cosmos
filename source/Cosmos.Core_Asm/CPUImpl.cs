@@ -15,6 +15,13 @@ namespace Cosmos.Core_Asm
         public static uint GetEndOfKernel() => throw null;
         [PlugMethod(Assembler = typeof(CPUGetEBPValue))]
         public static uint GetEBPValue() => throw null;
+
+        [PlugMethod(Assembler = typeof(CPUGetESPValue))]
+        public static uint GetESPValue() => throw null;
+
+        [PlugMethod(Assembler = typeof(CPUSetESPValue))]
+        public static void SetESPValue(uint val) => throw null;
+
         [PlugMethod(Assembler = typeof(CPUGetStackStart))]
         public static uint GetStackStart() => throw null;
         [PlugMethod(Assembler = typeof(CPUZeroFillAsm))]

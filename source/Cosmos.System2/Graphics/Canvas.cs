@@ -605,6 +605,32 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+		/// Draws an arc.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="pen"></param>
+		/// <param name="StartAngle"></param>
+		/// <param name="EndAngle"></param>
+        public virtual void DrawArc(int x, int y, int width, int height, Pen pen, int StartAngle = 0, int EndAngle = 360)
+        {
+            if (width == 0 || height == 0)
+            {
+                return;
+            }
+
+            for (double Angle = StartAngle; Angle < EndAngle; Angle += 0.5)
+            {
+                double Angle1 = Math.PI * Angle / 180;
+                int IX = (int)(width * Math.Cos(Angle1));
+                int IY = (int)(height * Math.Sin(Angle1));
+                DrawPoint(pen, x + IX, y + IY);
+            }
+        }
+        
+        /// <summary>
         /// Draw polygon.
         /// </summary>
         /// <param name="pen">Pen to draw with.</param>
