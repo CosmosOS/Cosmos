@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Documents;
+using Wpf.Ui.Controls;
+using Hyperlink = System.Windows.Documents.Hyperlink;
 
 namespace Cosmos.Build.Builder.Views
 {
@@ -8,6 +10,11 @@ namespace Cosmos.Build.Builder.Views
         public MessageBox(string Content)
         {
             InitializeComponent();
+            Loaded += (sender, args) =>
+            {
+                Wpf.Ui.Appearance.Watcher.Watch(this, Wpf.Ui.Appearance.BackgroundType.Mica, true);
+            };
+
             if (Content.StartsWith("link:"))
             {
                 Content = Content.Replace("link:", "");

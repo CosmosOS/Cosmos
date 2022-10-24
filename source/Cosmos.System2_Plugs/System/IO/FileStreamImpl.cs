@@ -200,8 +200,6 @@ namespace Cosmos.System_Plugs.System.IO
 
             if (!aPathExists)
             {
-                Global.mFileSystemDebugger.SendInternal("Open Mode with aPath not existing");
-                //throw new FileNotFoundException("File not existing but Open Requested");
                 throw new IOException("File not existing but Open Requested");
             }
 

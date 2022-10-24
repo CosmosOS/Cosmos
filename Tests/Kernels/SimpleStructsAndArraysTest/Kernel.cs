@@ -277,6 +277,17 @@ namespace SimpleStructsAndArraysTest
             Assert.AreEqual(local.C, 77, "Three byte struct third value read correctly");
         }
 
+        private void TestArrayRange()
+        {
+            byte[] array = new byte[16];
+            for (int i = 0; i < 16; i++)
+            {
+                array[i] = (byte)i;
+            }
+            byte[] slice = array[1..5];
+            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, slice, "Taking the slice of a byte array works");
+        }
+
         protected override void Run()
         {
             TestStep1();
@@ -289,6 +300,7 @@ namespace SimpleStructsAndArraysTest
             ConstrainedTest.MutateStructTest();
             Assert.IsTrue(true, "After MutateTestStruct");
             TestRemainder3Structs();
+            TestArrayRange();
 
             TestController.Completed();
         }
