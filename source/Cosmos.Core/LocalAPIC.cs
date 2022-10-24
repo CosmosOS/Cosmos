@@ -74,15 +74,18 @@ namespace Cosmos.Core
         /// </summary>
         public static void Initialize()
         {
-            if (ACPI.MADT == null)
-            {
-                Global.mDebugger.Send("Can't initialize Local APIC");
-                return;
-            }
-
             Global.PIC.Disable();
 
-            Address = ACPI.MADT->LocalAPICAddress;
+            //TODO: Fix ACPI tables on Bochs
+            if (ACPI.LocalApicCpus.Count == 0)
+            {
+                //No APIC detected, hardcode APIC address
+                Address = 0xFEE00000;
+            }
+            else
+            {
+                Address = ACPI.MADT->LocalAPICAddress;
+            }
 
             Global.mDebugger.Send("Local APIC address:0x" + Address.ToString("X"));
 

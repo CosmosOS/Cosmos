@@ -33,11 +33,14 @@ namespace Cosmos.Core
         {
             if (ACPI.IOAPIC == null)
             {
-                Global.mDebugger.Send("Can't initialize IO APIC");
-                return;
+                //TODO: Fix ACPI tables on Bochs
+                //No APIC detected, hardcode APIC address
+                Address = 0xFEC00000;
             }
-
-            Address = ACPI.IOAPIC->IOApicAddress;
+            else
+            {
+                Address = ACPI.IOAPIC->IOApicAddress;
+            }
 
             Global.mDebugger.Send("IO APIC address:0x" + Address.ToString("X"));
 
