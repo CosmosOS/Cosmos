@@ -19,6 +19,7 @@
     <ItemGroup>
         <PackageReference Include="IL2CPU.Debug.Symbols.Net48" />
         <PackageReference Include="Cosmos.Build.Common" />
+        <PackageReference Include="Microsoft.VisualStudio.Debugger.Engine" Version="17.0.2012801" />
         <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" />
         <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
         <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">

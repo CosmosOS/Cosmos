@@ -160,7 +160,7 @@ namespace DapperExtensions
         {
             IClassMapper classMap = SqlGenerator.Configuration.GetMap<T>();
             IPredicate wherePredicate = GetPredicate(classMap, predicate);
-            return GetList<T>(connection, classMap, wherePredicate, sort, transaction, commandTimeout, true);
+            return GetList<T>(connection, classMap, wherePredicate, sort, transaction, commandTimeout, buffered);
         }
 
         public IEnumerable<T> GetPage<T>(DbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, DbTransaction transaction, int? commandTimeout, bool buffered) where T : class
