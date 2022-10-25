@@ -20,7 +20,10 @@ namespace Cosmos.Build.Tasks
         [Required]
         public string DebugInfoFile { get; set; }
 
-        protected override string ToolName => IsWindows() ? "objdump.bat" : "objdump.sh";
+        [Required]
+        public string ActualToolPath { get; set; }
+
+        protected override string ToolName => IsWindows() ? "objdump.bat" : "sh";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
         protected override MessageImportance StandardOutputLoggingImportance => MessageImportance.High;
@@ -56,12 +59,16 @@ namespace Cosmos.Build.Tasks
 
             string xPathToTool = Path.GetDirectoryName(GenerateFullPathToTool());
 
+            if (!IsWindows())
+            {
+                xBuilder.AppendFileNameIfNotNull(ActualToolPath + "/objdump.sh");
+            }
             xBuilder.AppendFileNameIfNotNull(xPathToTool);
 
             xBuilder.AppendFileNameIfNotNull(InputFile);
 
             xBuilder.AppendFileNameIfNotNull(MapFile);
-            
+
             return xBuilder.ToString();
         }
 
