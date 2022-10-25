@@ -6,6 +6,7 @@
         <RootNamespace>Cosmos.System_Plugs</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Configurations>Debug;Release;TEST</Configurations>
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>
