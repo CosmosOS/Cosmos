@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Cosmos.Core_Plugs.Interop
 {
-    [Plug("Interop+Globalization, System.Private.CoreLib")]
+    [Plug("Interop+Globalization, System.Private.CoreLib", IsOptional = true)]
 
     class GlobalizationImpl
     {
