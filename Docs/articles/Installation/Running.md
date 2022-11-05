@@ -11,7 +11,7 @@ mounted and booted by most virtualization technologies. In addition, a physical
 optical disk can be burned and used to boot physical hardware.
 
 # Linux/Posix
-
+### DISCLAIMER: This article assumes that you are using a debian based operating system
 Here you can use a generic run file, you can run it by using `sh run.sh -i <ISO> -m <memory size> -h <hdd image>`.
 It has to be at the root directory of the project
 
