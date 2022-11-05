@@ -10,17 +10,17 @@ The ISO option creates an ISO image of the Cosmos output. This ISO file can be
 mounted and booted by most virtualization technologies. In addition, a physical
 optical disk can be burned and used to boot physical hardware.
 
-# Linux
+# Linux/Posix
 
 Here you can use a generic run file, you can run it by using `sh run.sh -i <ISO> -m <memory size> -h <hdd image>`.
+It has to be at the root directory of the project
 
 QEMU is required and can be installed with `apt-get install qemu-system`.
 
-To create an hdd image, you have to use the following command (mtools packaage is required) 
-`dd if=/dev/zero of=disk.img bs=1M count=512
-mformat -i disk.img ::` it is recommended to use atleast 512Mb.
-### NOTE: currently it is impossible to use the filesystem on linux sadly :(
+To create an hdd image, you have to convert this [.vmdk](https://github.com/CosmosOS/Cosmos/blob/master/Build/VMWare/Workstation/Filesystem.vmdk?raw=true) file to a .img wich can then be used by QEMU using the following command
+`qemu-img convert -f vmdk -O raw Filesystem.vmdk cosmos.img`
 
+`run.sh:`
 ```sh
 #!/bin/bash
 
@@ -51,7 +51,10 @@ then
    helpFunction
 fi
 
-# Run the ISO
+# Build the project
+dotnet build
+
+# Emulate the ISO
 qemu-system-x86_64 -boot d -cdrom $ISO -m $MEMORY_SIZE -hda $HDD_IMAGE
 ```
 
