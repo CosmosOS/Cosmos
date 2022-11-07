@@ -16,7 +16,7 @@
 #endif
 
 #ifndef RealPath
-  #define RealPath {userappdata}
+  #define RealPath
 #endif
 
 #if BuildConfiguration == "DevKit"
