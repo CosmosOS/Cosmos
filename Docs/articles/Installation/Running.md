@@ -12,6 +12,8 @@ optical disk can be burned and used to boot physical hardware.
 
 # Linux/Posix
 ### DISCLAIMER: This article assumes that you are using a debian based operating system
+
+## QEMU
 Here you can use a generic run file, you can run it by using `sh run.sh -i <ISO> -m <memory size> -h <hdd image>`.
 It has to be at the root directory of the project
 
@@ -57,6 +59,9 @@ dotnet build
 # Emulate the ISO
 qemu-system-x86_64 -boot d -cdrom $ISO -m $MEMORY_SIZE -hda $HDD_IMAGE
 ```
+
+## Virtualbox
+Create a virtual machine and use this [.vmdk](https://github.com/CosmosOS/Cosmos/blob/master/Build/VMWare/Workstation/Filesystem.vmdk?raw=true) as HDD image
 
 # Windows
 
