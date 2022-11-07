@@ -396,10 +396,11 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(ushort aSize)
         {
-            var pageBlock = GetFirstWithSpace(aSize);
+            var smtblock = GetFirstBlock(SMT, aSize);
+            var pageBlock = GetFirstWithSpace(aSize, smtblock);
             if (pageBlock == null) // This happens when the page is full and we need to allocate a new page for this size
             {
-                CreatePage(GetLastPage(), GetRoundedSize(aSize));
+                CreatePage(GetLastPage(), smtblock->Size);
                 pageBlock = GetFirstWithSpace(aSize);
                 if (pageBlock == null)
                 {
@@ -410,7 +411,7 @@ namespace Cosmos.Core.Memory
 
             //now find position in the block
             var page = (ushort*)pageBlock->PagePtr;
-            var elementSize = GetRoundedSize(aSize) + PrefixItemBytes;
+            var elementSize = smtblock->Size + PrefixItemBytes;
             var positions = RAT.PageSize / elementSize;
             for (int i = 0; i < positions; i++)
             {
