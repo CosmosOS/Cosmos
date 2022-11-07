@@ -12,10 +12,10 @@ Have you checked Github Issues for similar errors?
 **Exception**
 Post the exception returned by Visual Studio
 
-** Visual Studio Output Logs **
+**Visual Studio Output Logs**
 Post the entire output log given by Visual Studio for the build
 
-**To Reproduce**
+**How To Reproduce**
 Describe any changes done to a clean kernel for this error to occur.
 
 **Screenshots**
