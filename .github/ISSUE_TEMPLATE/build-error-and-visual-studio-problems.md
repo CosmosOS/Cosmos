@@ -1,6 +1,6 @@
 ---
 name: Build Error and Visual Studio Problems
-about: For errors when trying to build or modify a Cosmos Kernel code
+about: For errors when trying to build or modify a Cosmos Kernel
 title: ''
 labels: 'Area: Build, Area: Visual Studio Integration'
 assignees: ''
