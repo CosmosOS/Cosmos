@@ -98,7 +98,7 @@ namespace Cosmos.Build.Tasks
                 xBuilder.AppendSwitch("-dBIN_COMPILATION");
             }
 
-            xBuilder.AppendSwitch("-O0");
+            xBuilder.AppendSwitch("-O2");
 
             xBuilder.AppendFileNameIfNotNull(InputFile);
 
