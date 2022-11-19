@@ -92,6 +92,29 @@
         </StringProperty.ValueEditors>
     </StringProperty>
 
+    <BoolProperty Name="UseCompilerOptimizations"
+                  DisplayName="Use compiler optimizations"
+                  Description="Enables compiler optimizations (This may increase performance)"
+                  Category="Compile">
+    </BoolProperty>
+
+    <EnumProperty Name="OptimizationLevel"
+		  DisplayName="Optimization Level"
+                  Description="Choose the optimization level that you want to use."
+		  Category="Compile">
+        <EnumValue Name="1" DisplayName="O1"/>
+        <EnumValue Name="2" DisplayName="O2"/>
+        <EnumValue Name="3" DisplayName="O3 (Unstable)"/>
+	<EnumValue Name="s" DisplayName="Os (Unstable)"/>
+	<EnumValue Name="fast" DisplayName="Ofast (Unstable)"/>
+
+        <EnumProperty.Metadata>
+            <NameValuePair Name="VisibilityCondition">
+                <NameValuePair.Value>(has-evaluated-value "CosmosPropertyPage" "UseCompilerOptimizations" true)</NameValuePair.Value>
+            </NameValuePair>
+        </EnumProperty.Metadata>
+    </EnumProperty>
+
     <BoolProperty Name="ExtractMapFile"
                   DisplayName="Map file"
                   Description="Extract ELF Map File."

@@ -73,6 +73,9 @@
 
         <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
 
+        <UseCompilerOptimizations Condition="'$(UseCompilerOptimizations)' == ''">True</UseCompilerOptimizations>
+	<OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
+
     </PropertyGroup>
 
     <PropertyGroup>
@@ -229,7 +232,9 @@
               OutputFile="$(NasmOutput)"
               OutputFormat="$(BinFormat)"
               ToolPath="$(NasmToolPath)"
-              ToolExe="$(NasmToolExe)" />
+              ToolExe="$(NasmToolExe)"
+              UseCompilerOptimizations="$(UseCompilerOptimizations)"
+	      OptimizationLevel="$(OptimizationLevel)" />
 
     </Target>
 
