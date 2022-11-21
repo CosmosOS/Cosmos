@@ -30,6 +30,8 @@ namespace Cosmos.Build.Tasks
             set => mOutputFormat = (OutputFormatEnum)Enum.Parse(typeof(OutputFormatEnum), value, true);
         }
 
+        public string OptimizationLevel { get; set; }
+
         #endregion
 
         private OutputFormatEnum mOutputFormat;
@@ -98,7 +100,9 @@ namespace Cosmos.Build.Tasks
                 xBuilder.AppendSwitch("-dBIN_COMPILATION");
             }
 
-            xBuilder.AppendSwitch("-O0");
+            /* Apply the optimization level that the user chose */
+            xBuilder.AppendSwitch("-O" + OptimizationLevel);
+
 
             xBuilder.AppendFileNameIfNotNull(InputFile);
 
