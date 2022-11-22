@@ -22,11 +22,11 @@ jobs:
           repository: CosmosOS/Cosmos
           path: Cosmos
 
-#      - name: Checkout Common
-#        uses: actions/checkout@v3
-#        with:
-#          repository: CosmosOS/Common
-#          path: Common
+      - name: Checkout Common
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/Common
+          path: Common
 
       - name: Checkout IL2CPU
         uses: actions/checkout@v3
