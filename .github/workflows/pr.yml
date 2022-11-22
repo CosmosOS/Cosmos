@@ -34,11 +34,11 @@ jobs:
           repository: CosmosOS/IL2CPU
           path: IL2CPU
 
-#      - name: Checkout XSharp
-#        uses: actions/checkout@v3
-#        with:
-#          repository: CosmosOS/XSharp
-#          path: XSharp
+      - name: Checkout XSharp
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/XSharp
+          path: XSharp
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1.3
