@@ -43,12 +43,11 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1.3
 
       - name: Setup Registry
+        shell: cmd
         run: |
-          Write-Host "Setting Cosmos User Kit Path to $($env:USER_KIT_PATH)"
           reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d "$($env:USER_KIT_PATH)"
           reg query HKLM\SOFTWARE\WOW6432Node\Cosmos
 
-          Write-Host "Setting Bochs Run Command to $($env:BOCHS_RUN_CMD)"
           reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
           reg query HKCR\BochsConfigFile\shell\Run\command
 
