@@ -46,7 +46,7 @@ jobs:
           reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d $($env:USER_KIT_PATH)
           
           Write-Host "Setting Bochs Run Command to $($env:BOCHS_RUN_CMD)"
-          reg add HKCR\BochsConfigFile\shell\Run\command /ve /d $($env:BOCHS_RUN_CMD)
+          reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "$($env:BOCHS_RUN_CMD)"
 
       - name: Build
         run: |
