@@ -13,7 +13,7 @@ jobs:
 
     env:
       USER_KIT_PATH: 'C:\\CosmosRun\\'
-      BOCHS_RUN_CMD: '"C:\\Program Files (x86)\\Bochs-2.6.8\\Bochs.exe" -q -f "%1"'
+      BOCHS_RUN_CMD: '"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe" -q -f "%1"'
 
     steps:
       - name: Checkout Cosmos
