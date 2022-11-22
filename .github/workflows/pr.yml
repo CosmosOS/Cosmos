@@ -51,21 +51,31 @@ jobs:
           Write-Host "Setting Bochs Run Command to $($env:BOCHS_RUN_CMD)"
           reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "$($env:BOCHS_RUN_CMD)"
 
-      - name: Build
+      - name: Nuget Restore
         run: |
           msbuild Cosmos\Build.sln /t:Restore /maxcpucount /verbosity:normal /p:Net48=True
+
+      - name: Build - Cosmos
+        run: |
           msbuild Cosmos\Build.sln /t:Build /maxcpucount /verbosity:normal /p:Net48=True
 
+      - name: Build - IL2CPU
+        run: |
           dotnet publish IL2CPU\source\IL2CPU -r win7-x86 -o "$($env:USER_KIT_PATH)Build\IL2CPU\"
-          xcopy /Y    "IL2CPU\source\Cosmos.Core.DebugStub\*.xs" "$($env:USER_KIT_PATH)XSharp\DebugStub\"
 
-          xcopy /Y    "Cosmos\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*.*" "$($env:USER_KIT_PATH)Build\ISO\boot\grub\i386-pc\"
-          xcopy /Y    "Cosmos\Build\grub2\boot\grub\grub.cfg" "$($env:USER_KIT_PATH)Build\ISO\boot\grub"
+      - name: Copy Output - Cosmos
+        run: |
+          xcopy /Y "Cosmos\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*.*" "$($env:USER_KIT_PATH)Build\ISO\boot\grub\i386-pc\"
+          xcopy /Y "Cosmos\Build\grub2\boot\grub\grub.cfg" "$($env:USER_KIT_PATH)Build\ISO\boot\grub"
           xcopy /Y /S "Cosmos\Build\VMware\*" "$($env:USER_KIT_PATH)Build\VMware\"
           xcopy /Y /S "Cosmos\Build\Tools" "$($env:USER_KIT_PATH)Build\Tools\"
           xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
-      - name: Test
+      - name: Copy Output - IL2CPU
+        run: |
+          xcopy /Y "IL2CPU\source\Cosmos.Core.DebugStub\*.xs" "$($env:USER_KIT_PATH)XSharp\DebugStub\"
+          
+      - name: Test - Cosmos
         run: |
           dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml"
 
