@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0": {
+      "cosmos.common": {
+        "type": "Project",
+        "dependencies": {
+          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )"
+        }
+      },
+      "cosmos.core": {
+        "type": "Project",
+        "dependencies": {
+          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
+          "IL2CPU.API": "[0.1.0-localbuild, )"
+        }
+      },
+      "cosmos.debug.kernel": {
+        "type": "Project"
+      },
+      "il2cpu.api": {
+        "type": "Project"
+      }
+    }
+  }
+}

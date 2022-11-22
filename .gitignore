@@ -34,7 +34,6 @@ Docs/log.txt
 *.docstates
 *.vsp
 *.pdb
-*.lock.json
 Thumbs.db
 build.force
 
