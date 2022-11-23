@@ -70,9 +70,9 @@
 
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
 
-
         <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
-	      <OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
+
+        <OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
 
     </PropertyGroup>
 
@@ -383,10 +383,12 @@
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
                               Modules="gzio"
+                              timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'Gzip'" />
         
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                              timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'None'" />
         
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
