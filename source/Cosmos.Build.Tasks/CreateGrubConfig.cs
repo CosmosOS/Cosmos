@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -28,7 +29,7 @@ namespace Cosmos.Build.Tasks
             }
 
             var xBinName = BinName;
-            var xLabelName = Path.GetFileNameWithoutExtension(xBinName).remove;
+            var xLabelName = Path.GetFileNameWithoutExtension(xBinName);
 
             using (var xWriter = File.CreateText(Path.Combine(TargetDirectory + "/boot/grub/", "grub.cfg")))
             {
