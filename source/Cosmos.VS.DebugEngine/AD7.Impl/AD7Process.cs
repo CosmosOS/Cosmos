@@ -676,7 +676,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         void DbgCmdKernelPanic(uint nr)
         {
-            AD7Util.ShowError("Kernel panic: 0x" + nr.ToString());
+            AD7Util.ShowError("Kernel panic: 0x" + nr.ToString("X").ToUpper());
         }
 
         void DbgCmdSimpleLongNumber(ulong nr)
