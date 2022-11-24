@@ -450,9 +450,10 @@ namespace Cosmos.Core.Memory
             if (size == 0)
             {
                 // double free, this object has already been freed
-                Debugger.DoBochsBreak();
-                Debugger.DoSendNumber((uint)heapObject);
-                Debugger.SendKernelPanic(0x99);
+                //Debugger.DoBochsBreak();
+                //Debugger.DoSendNumber((uint)heapObject);
+                //Debugger.SendKernelPanic(0x99);
+                return;
             }
 
             var allocated = (uint*)aPtr;
@@ -484,7 +485,7 @@ namespace Cosmos.Core.Memory
                 {
                     blockPtr = blockPtr->NextBlock;
                 }
-                if(blockPtr->PagePtr == allocatedOnPage)
+                if (blockPtr != null && blockPtr->PagePtr == allocatedOnPage)
                 {
                     break;
                 }
