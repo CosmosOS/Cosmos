@@ -1,6 +1,6 @@
 ---
 name: Build Error and Visual Studio Problems
-about: For errors when trying to build a Cosmos Kernel or use VS
+about: For errors when trying to build or modify a Cosmos Kernel
 title: ''
 labels: 'Area: Build, Area: Visual Studio Integration'
 assignees: ''
@@ -12,10 +12,10 @@ Have you checked Github Issues for similar errors?
 **Exception**
 Post the exception returned by Visual Studio
 
-** VS Output Logs **
+**Visual Studio Output Logs**
 Post the entire output log given by Visual Studio for the build
 
-**To Reproduce**
+**How To Reproduce**
 Describe any changes done to a clean kernel for this error to occur.
 
 **Screenshots**
