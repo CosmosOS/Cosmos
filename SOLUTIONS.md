@@ -29,6 +29,10 @@ PCI, PIT, etc.
 Contains the most basic things that used by NET BCL
 and Cosmos, such as Plugs and XSharp snippets.
 
+## `Demos.sln`
+Currently contains user-made Cosmos project examples.
+Also, it can be used as test solution
+
 ## `Test.sln`
 Currently contains all unit tests that Cosmos uses
 to ensure that there are no bugs.
