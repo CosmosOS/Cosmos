@@ -18,7 +18,7 @@ namespace Cosmos.Build.Tasks
 
         private string Indentation = "    ";
 
-        public string timeout { get; set; }
+        public string Timeout { get; set; }
         
         public override bool Execute()
         {
@@ -33,9 +33,9 @@ namespace Cosmos.Build.Tasks
 
             using (var xWriter = File.CreateText(Path.Combine(TargetDirectory + "/boot/grub/", "grub.cfg")))
             {
-                if (!String.IsNullOrWhiteSpace(timeout) && !String.IsNullOrEmpty(timeout))
+                if (!String.IsNullOrWhiteSpace(Timeout) && !String.IsNullOrEmpty(Timeout))
                 {
-                    xWriter.WriteLine("set timeout=" + timeout);
+                    xWriter.WriteLine("set timeout=" + Timeout);
                 }
                 else
                 {
