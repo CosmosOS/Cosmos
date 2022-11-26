@@ -383,12 +383,12 @@
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
                               Modules="gzio"
-                              timeout="$(Timeout)"
+                              Timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'Gzip'" />
         
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
-                              timeout="$(Timeout)"
+                              Timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'None'" />
         
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
