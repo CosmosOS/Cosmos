@@ -52,7 +52,13 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
         public static void Free(void* aPtr)
         {
+            var heapObject = (uint*)aPtr;
             var xPageIdx = RAT.GetFirstRATIndex(aPtr);
+            if (heapObject[-4] == 0 && xPageIdx == 0)
+            {
+                // The object is not allocated
+                return;
+            }
             RAT.Free(xPageIdx);
         }
     }
