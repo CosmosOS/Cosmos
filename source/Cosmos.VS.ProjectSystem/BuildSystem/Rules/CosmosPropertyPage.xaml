@@ -76,9 +76,16 @@
                   <EnumValue Name="1" DisplayName="O1"/>
                   <EnumValue Name="2" DisplayName="O2"/>
                   <EnumValue Name="3" DisplayName="O3 (Unstable)"/>
-	      <EnumValue Name="s" DisplayName="Os (Unstable)"/>
-	      <EnumValue Name="fast" DisplayName="Ofast (Unstable)"/>
+	          <EnumValue Name="s" DisplayName="Os (Unstable)"/>
+	          <EnumValue Name="fast" DisplayName="Ofast (Unstable)"/>
     </EnumProperty>
+
+    <StringProperty Name="Timeout"
+                    DisplayName="GRUB Menu Timeout"
+                    Description="The time to wait (in seconds) before the kernel is automatically started."
+                    Category="Compile"
+		    Default="0">
+    </StringProperty>
 
     <StringProperty Name="VBEResolution"
                     DisplayName="VBE Resolution"
