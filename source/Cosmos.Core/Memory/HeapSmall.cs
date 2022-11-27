@@ -389,6 +389,28 @@ namespace Cosmos.Core.Memory
             smtBlock->PagePtr = xPtr;
         }
 
+
+
+        /// <summary>
+        /// Get the first block for this size, which has space left to allocate to And 
+        /// </summary>
+        /// <param name="aSize">The size</param>
+        /// <param name="block">the Output block</param>
+        /// <returns>The parent of the block</returns>
+        private static RootSMTBlock* GetFirstWithSpaceAndParent(uint aSize, out SMTBlock* block)
+        {
+            var page = SMT;
+            RootSMTBlock* rootblock = null;
+            do
+            {
+                rootblock = GetFirstBlock(page, aSize);
+                block = GetFirstWithSpace(aSize, rootblock);
+
+                page = page->Next;
+            } while (rootblock == null && page != null);
+            return rootblock;
+        }
+
         /// <summary>
         /// Alloc memory block, of a given size.
         /// </summary>
@@ -396,8 +418,7 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(ushort aSize)
         {
-            var smtblock = GetFirstBlock(SMT, aSize);
-            var pageBlock = GetFirstWithSpace(aSize, smtblock);
+            var smtblock = GetFirstWithSpaceAndParent(aSize, out SMTBlock* pageBlock);
             if (pageBlock == null) // This happens when the page is full and we need to allocate a new page for this size
             {
                 CreatePage(GetLastPage(), smtblock->Size);
