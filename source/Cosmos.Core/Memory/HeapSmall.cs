@@ -392,7 +392,7 @@ namespace Cosmos.Core.Memory
 
 
         /// <summary>
-        /// Get the first block for this size, which has space left to allocate to And 
+        /// Get the first block for this size, which has space left to allocate to And get the root block
         /// </summary>
         /// <param name="aSize">The size</param>
         /// <param name="block">the Output block</param>
