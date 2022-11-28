@@ -35,4 +35,5 @@ Also, it can be used as test solution
 
 ## `Test.sln`
 Currently contains all unit tests that Cosmos uses
-to ensure that there are no bugs.
+to ensure that there are no bugs. You can use it while
+development of new features of DevKit to test new changes
