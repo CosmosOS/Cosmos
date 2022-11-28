@@ -69,13 +69,11 @@ namespace Cosmos.System.Graphics
             //if (color == null)
             //    throw new ArgumentNullException(nameof(color));
 
-            Pen pen = new Pen(color);
-
             for (int x = 0; x < Mode.Rows; x++)
             {
                 for (int y = 0; y < Mode.Columns; y++)
                 {
-                    DrawPoint(pen, x, y);
+                    DrawPoint(color, x, y);
                 }
             }
         }
@@ -88,32 +86,32 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw point.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="point">Point.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public void DrawPoint(Pen pen, Point point)
+        public void DrawPoint(Color color, Point point)
         {
-            DrawPoint(pen, point.X, point.Y);
+            DrawPoint(color, point.X, point.Y);
         }
 
         /// <summary>
         /// Draw point.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public abstract void DrawPoint(Pen pen, int x, int y);
+        public abstract void DrawPoint(Color color, int x, int y);
 
         /// <summary>
         /// Draw point to the screen. 
         /// Not implemented.
         /// </summary>
-        /// <param name="pen">Pen to draw the point with.</param>
+        /// <param name="color">Color to draw the point with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="NotImplementedException">Thrown always (only int coordinats supported).</exception>
-        public abstract void DrawPoint(Pen pen, float x, float y);
+        public abstract void DrawPoint(Color color, float x, float y);
 
         /// <summary>
         /// Name of the backend
@@ -178,36 +176,36 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw horizontal line.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="dx">Line lenght.</param>
         /// <param name="x1">Staring point X coordinate.</param>
         /// <param name="y1">Staring point Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        internal void DrawHorizontalLine(Pen pen, int dx, int x1, int y1)
+        internal void DrawHorizontalLine(Color color, int dx, int x1, int y1)
         {
             int i;
 
             for (i = 0; i < dx; i++)
             {
-                DrawPoint(pen, x1 + i, y1);
+                DrawPoint(color, x1 + i, y1);
             }
         }
 
         /// <summary>
         /// Draw vertical line.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="dy">Line lenght.</param>
         /// <param name="x1">Staring point X coordinate.</param>
         /// <param name="y1">Staring point Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        internal void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
+        internal void DrawVerticalLine(Color color, int dy, int x1, int y1)
         {
             int i;
 
             for (i = 0; i < dy; i++)
             {
-                DrawPoint(pen, x1, y1 + i);
+                DrawPoint(color, x1, y1 + i);
             }
         }
 
@@ -218,14 +216,14 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw diagonal line.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="dx">Line lenght on X axis.</param>
         /// <param name="dy">Line lenght on Y axis.</param>
         /// <param name="x1">Staring point X coordinate.</param>
         /// <param name="y1">Staring point Y coordinate.</param>
         /// <exception cref="OverflowException">Thrown if dx or dy equal to Int32.MinValue.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        internal void DrawDiagonalLine(Pen pen, int dx, int dy, int x1, int y1)
+        internal void DrawDiagonalLine(Color color, int dx, int dy, int x1, int y1)
         {
             int i, sdx, sdy, dxabs, dyabs, x, y, px, py;
 
@@ -249,7 +247,7 @@ namespace Cosmos.System.Graphics
                         py += sdy;
                     }
                     px += sdx;
-                    DrawPoint(pen, px, py);
+                    DrawPoint(color, px, py);
                 }
             }
             else /* the line is more vertical than horizontal */
@@ -263,7 +261,7 @@ namespace Cosmos.System.Graphics
                         px += sdx;
                     }
                     py += sdy;
-                    DrawPoint(pen, px, py);
+                    DrawPoint(color, px, py);
                 }
             }
         }
@@ -271,24 +269,24 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw line.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="x1">Staring point X coordinate.</param>
         /// <param name="y1">Staring point Y coordinate.</param>
         /// <param name="x2">End point X coordinate.</param>
         /// <param name="y2">End point Y coordinate.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if x1-x2 or y1-y2 equal to Int32.MinValue.</exception>
-        public virtual void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
+        public virtual void DrawLine(Color color, int x1, int y1, int x2, int y2)
         {
-            if (pen == null)
+            if (color == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(pen));
+                throw new ArgumentOutOfRangeException(nameof(color));
             }
 
             // trim the given line to fit inside the canvas boundries
@@ -301,50 +299,50 @@ namespace Cosmos.System.Graphics
 
             if (dy == 0) /* The line is horizontal */
             {
-                DrawHorizontalLine(pen, dx, x1, y1);
+                DrawHorizontalLine(color, dx, x1, y1);
                 return;
             }
 
             if (dx == 0) /* the line is vertical */
             {
-                DrawVerticalLine(pen, dy, x1, y1);
+                DrawVerticalLine(color, dy, x1, y1);
                 return;
             }
 
             /* the line is neither horizontal neither vertical, is diagonal then! */
-            DrawDiagonalLine(pen, dx, dy, x1, y1);
+            DrawDiagonalLine(color, dx, dy, x1, y1);
         }
 
         /// <summary>
         /// Draw line.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="p1">Staring point.</param>
         /// <param name="p2">End point.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if x1-x2 or y1-y2 equal to Int32.MinValue.</exception>
-        public void DrawLine(Pen pen, Point p1, Point p2)
+        public void DrawLine(Color color, Point p1, Point p2)
         {
-            DrawLine(pen, p1.X, p1.Y, p2.X, p2.Y);
+            DrawLine(color, p1.X, p1.Y, p2.X, p2.Y);
         }
 
         /// <summary>
         /// Draw line.
         /// Not implemented.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="x1">Staring point X coordinate.</param>
         /// <param name="y1">Staring point Y coordinate.</param>
         /// <param name="x2">End point X coordinate.</param>
         /// <param name="y2">End point Y coordinate.</param>
         /// <exception cref="NotImplementedException">Thrown always.</exception>
-        public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
+        public void DrawLine(Color color, float x1, float y1, float x2, float y2)
         {
             throw new NotImplementedException();
         }
@@ -353,18 +351,18 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw Circle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="x_center">X center coordinate.</param>
         /// <param name="y_center">Y center coordinate.</param>
         /// <param name="radius">Radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawCircle(Pen pen, int x_center, int y_center, int radius)
+        public virtual void DrawCircle(Color color, int x_center, int y_center, int radius)
         {
-            if (pen == null)
+            if (color == null)
             {
-                throw new ArgumentNullException(nameof(pen));
+                throw new ArgumentNullException(nameof(color));
             }
             ThrowIfCoordNotValid(x_center + radius, y_center);
             ThrowIfCoordNotValid(x_center - radius, y_center);
@@ -376,14 +374,14 @@ namespace Cosmos.System.Graphics
 
             while (x >= y)
             {
-                DrawPoint(pen, x_center + x, y_center + y);
-                DrawPoint(pen, x_center + y, y_center + x);
-                DrawPoint(pen, x_center - y, y_center + x);
-                DrawPoint(pen, x_center - x, y_center + y);
-                DrawPoint(pen, x_center - x, y_center - y);
-                DrawPoint(pen, x_center - y, y_center - x);
-                DrawPoint(pen, x_center + y, y_center - x);
-                DrawPoint(pen, x_center + x, y_center - y);
+                DrawPoint(color, x_center + x, y_center + y);
+                DrawPoint(color, x_center + y, y_center + x);
+                DrawPoint(color, x_center - y, y_center + x);
+                DrawPoint(color, x_center - x, y_center + y);
+                DrawPoint(color, x_center - x, y_center - y);
+                DrawPoint(color, x_center - y, y_center - x);
+                DrawPoint(color, x_center + y, y_center - x);
+                DrawPoint(color, x_center + x, y_center - y);
 
                 y++;
                 if (e <= 0)
@@ -401,28 +399,28 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw Circle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="point">center point.</param>
         /// <param name="radius">Radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawCircle(Pen pen, Point point, int radius)
+        public virtual void DrawCircle(Color color, Point point, int radius)
         {
-            DrawCircle(pen, point.X, point.Y, radius);
+            DrawCircle(color, point.X, point.Y, radius);
         }
 
         /// <summary>
         /// Draw Filled Circle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">Color to draw with.</param>
         /// <param name="x_center">X center coordinate.</param>
         /// <param name="y_center">Y center coordinate.</param>
         /// <param name="radius">Radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawFilledCircle(Pen pen, int x0, int y0, int radius)
+        public virtual void DrawFilledCircle(Color color, int x0, int y0, int radius)
         {
 
             int x = radius;
@@ -436,13 +434,13 @@ namespace Cosmos.System.Graphics
                 for (int i = x0 - x; i <= x0 + x; i++)
                 {
 
-                    DrawPoint(pen, i, y0 + y);
-                    DrawPoint(pen, i, y0 - y);
+                    DrawPoint(color, i, y0 + y);
+                    DrawPoint(color, i, y0 - y);
                 }
                 for (int i = x0 - y; i <= x0 + y; i++)
                 {
-                    DrawPoint(pen, i, y0 + x);
-                    DrawPoint(pen, i, y0 - x);
+                    DrawPoint(color, i, y0 + x);
+                    DrawPoint(color, i, y0 - x);
                 }
 
                 y++;
@@ -463,8 +461,8 @@ namespace Cosmos.System.Graphics
                         (origin.x + x, origin.y + y);
 
 
-            if (pen == null)
-                throw new ArgumentNullException(nameof(pen));
+            if (color == null)
+                throw new ArgumentNullException(nameof(color));
             ThrowIfCoordNotValid(x_center + radius, y_center);
             ThrowIfCoordNotValid(x_center - radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + radius);
@@ -475,7 +473,7 @@ namespace Cosmos.System.Graphics
 
             while (x >= y)
             {
-                DrawLine(pen, x_center - x, y_center + y, x_center + x, y_center + y);
+                DrawLine(color, x_center - x, y_center + y, x_center + x, y_center + y);
                 y++;
                 if (e <= 0)
                 {
@@ -492,34 +490,34 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw Filled Circle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="point">center point.</param>
         /// <param name="radius">Radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawFilledCircle(Pen pen, Point point, int radius)
+        public virtual void DrawFilledCircle(Color color, Point point, int radius)
         {
-            DrawFilledCircle(pen, point.X, point.Y, radius);
+            DrawFilledCircle(color, point.X, point.Y, radius);
         }
 
         //http://members.chello.at/~easyfilter/bresenham.html
         /// <summary>
         /// Draw ellipse.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="x_center">X center coordinate.</param>
         /// <param name="y_center">Y center coordinate.</param>
         /// <param name="x_radius">X radius.</param>
         /// <param name="y_radius">Y radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
+        public virtual void DrawEllipse(Color color, int x_center, int y_center, int x_radius, int y_radius)
         {
-            if (pen == null)
+            if (color == null)
             {
-                throw new ArgumentNullException(nameof(pen));
+                throw new ArgumentNullException(nameof(color));
             }
             ThrowIfCoordNotValid(x_center + x_radius, y_center);
             ThrowIfCoordNotValid(x_center - x_radius, y_center);
@@ -539,10 +537,10 @@ namespace Cosmos.System.Graphics
 
             while (x >= 0)
             {
-                DrawPoint(pen, x_center + x, y_center + y);
-                DrawPoint(pen, x_center - x, y_center + y);
-                DrawPoint(pen, x_center - x, y_center - y);
-                DrawPoint(pen, x_center + x, y_center - y);
+                DrawPoint(color, x_center + x, y_center + y);
+                DrawPoint(color, x_center - x, y_center + y);
+                DrawPoint(color, x_center - x, y_center - y);
+                DrawPoint(color, x_center + x, y_center - y);
                 e2 = 2 * err;
                 if (e2 <= dy) { y++; err += dy += a; }
                 if (e2 >= dx || 2 * err > dy) { x--; err += dx += b1; }
@@ -552,29 +550,29 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw ellipse.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="point">Center point.</param>
         /// <param name="x_radius">X radius.</param>
         /// <param name="y_radius">Y radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawEllipse(Pen pen, Point point, int x_radius, int y_radius)
+        public virtual void DrawEllipse(Color color, Point point, int x_radius, int y_radius)
         {
-            DrawEllipse(pen, point.X, point.Y, x_radius, y_radius);
+            DrawEllipse(color, point.X, point.Y, x_radius, y_radius);
         }
 
         /// <summary>
         /// Draw Filled Ellipse.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="point">Center point.</param>
         /// <param name="height">Height.</param>
         /// <param name="width">Width.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawFilledEllipse(Pen pen, Point point, int height, int width)
+        public virtual void DrawFilledEllipse(Color color, Point point, int height, int width)
         {
             for (int y = -height; y <= height; y++)
             {
@@ -582,7 +580,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (x * x * height * height + y * y * width * width <= height * height * width * width)
                     {
-                        DrawPoint(pen, point.X + x, point.Y + y);
+                        DrawPoint(color, point.X + x, point.Y + y);
                     }
                 }
             }
@@ -591,17 +589,17 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw Filled Ellipse.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="x">X Position.</param>
         /// <param name="y">Y Position.</param>
         /// <param name="height">Height.</param>
         /// <param name="width">Width.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawFilledEllipse(Pen pen, int x, int y, int height, int width)
+        public virtual void DrawFilledEllipse(Color color, int x, int y, int height, int width)
         {
-            DrawFilledEllipse(pen, new Point(x, y), height, width);
+            DrawFilledEllipse(color, new Point(x, y), height, width);
         }
 
         /// <summary>
@@ -611,10 +609,10 @@ namespace Cosmos.System.Graphics
 		/// <param name="y"></param>
 		/// <param name="width"></param>
 		/// <param name="height"></param>
-		/// <param name="pen"></param>
+		/// <param name="color"></param>
 		/// <param name="StartAngle"></param>
 		/// <param name="EndAngle"></param>
-        public virtual void DrawArc(int x, int y, int width, int height, Pen pen, int StartAngle = 0, int EndAngle = 360)
+        public virtual void DrawArc(int x, int y, int width, int height, Color color, int StartAngle = 0, int EndAngle = 360)
         {
             if (width == 0 || height == 0)
             {
@@ -626,130 +624,130 @@ namespace Cosmos.System.Graphics
                 double Angle1 = Math.PI * Angle / 180;
                 int IX = (int)(width * Math.Cos(Angle1));
                 int IY = (int)(height * Math.Sin(Angle1));
-                DrawPoint(pen, x + IX, y + IY);
+                DrawPoint(color, x + IX, y + IY);
             }
         }
         
         /// <summary>
         /// Draw polygon.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="points">Points array.</param>
         /// <exception cref="ArgumentException">Thrown if point array is smaller then 3.</exception>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawPolygon(Pen pen, params Point[] points)
+        public virtual void DrawPolygon(Color color, params Point[] points)
         {
             if (points.Length < 3)
             {
                 throw new ArgumentException("A polygon requires more than 3 points.");
             }
-            if (pen == null)
+            if (color == null)
             {
-                throw new ArgumentNullException(nameof(pen));
+                throw new ArgumentNullException(nameof(color));
             }
             for (int i = 0; i < points.Length - 1; i++)
             {
-                DrawLine(pen, points[i], points[i + 1]);
+                DrawLine(color, points[i], points[i + 1]);
             }
-            DrawLine(pen, points[0], points[points.Length - 1]);
+            DrawLine(color, points[0], points[points.Length - 1]);
         }
 
         /// <summary>
         /// Draw square.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="point">Starting point.</param>
         /// <param name="size">size.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawSquare(Pen pen, Point point, int size)
+        public virtual void DrawSquare(Color color, Point point, int size)
         {
-            DrawRectangle(pen, point.X, point.Y, size, size);
+            DrawRectangle(color, point.X, point.Y, size, size);
         }
 
         /// <summary>
         /// Draw square.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <param name="size">size.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawSquare(Pen pen, int x, int y, int size)
+        public virtual void DrawSquare(Color color, int x, int y, int size)
         {
-            DrawRectangle(pen, x, y, size, size);
+            DrawRectangle(color, x, y, size, size);
         }
 
         /// <summary>
         /// Draw rectangle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="point">Staring point.</param>
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawRectangle(Pen pen, Point point, int width, int height)
+        public virtual void DrawRectangle(Color color, Point point, int width, int height)
         {
-            DrawRectangle(pen, point.X, point.Y, width, height);
+            DrawRectangle(color, point.X, point.Y, width, height);
         }
 
         /// <summary>
         /// Draw rectangle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
-        /// <exception cref="ArgumentNullException">Thrown if pen is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height)
+        public virtual void DrawRectangle(Color color, int x, int y, int width, int height)
         {
             /*
              * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
              * vertex (we call these vertexes A, B, C, D as for geometric convention)
              */
-            if (pen == null)
+            if (color == null)
             {
-                throw new ArgumentNullException(nameof(pen));
+                throw new ArgumentNullException(nameof(color));
             }
             /* The check of the validity of x and y are done in DrawLine() */
 
@@ -770,55 +768,55 @@ namespace Cosmos.System.Graphics
             int yd = y + height;
 
             /* Draw a line betwen A and B */
-            DrawLine(pen, xa, ya, xb, yb);
+            DrawLine(color, xa, ya, xb, yb);
 
             /* Draw a line between A and C */
-            DrawLine(pen, xa, ya, xc, yc);
+            DrawLine(color, xa, ya, xc, yc);
 
             /* Draw a line between B and D */
-            DrawLine(pen, xb, yb, xd, yd);
+            DrawLine(color, xb, yb, xd, yd);
 
             /* Draw a line between C and D */
-            DrawLine(pen, xc, yc, xd, yd);
+            DrawLine(color, xc, yc, xd, yd);
         }
 
         /// <summary>
         /// Draw filled rectangle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="point">Starting point.</param>
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawFilledRectangle(Pen pen, Point point, int width, int height)
+        public virtual void DrawFilledRectangle(Color color, Point point, int width, int height)
         {
-            DrawFilledRectangle(pen, point.X, point.Y, width, height);
+            DrawFilledRectangle(color, point.X, point.Y, width, height);
         }
 
         /// <summary>
         /// Draw filled rectangle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="x_start">Starting point X coordinate.</param>
         /// <param name="y_start">Starting point Y coordinate.</param>
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
+        public virtual void DrawFilledRectangle(Color color, int x_start, int y_start, int width, int height)
         {
             if (height == -1)
             {
@@ -827,34 +825,34 @@ namespace Cosmos.System.Graphics
 
             for (int y = y_start; y < y_start + height; y++)
             {
-                DrawLine(pen, x_start, y, x_start + width - 1, y);
+                DrawLine(color, x_start, y, x_start + width - 1, y);
             }
         }
 
         /// <summary>
         /// Draw triangle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="point0">First point.</param>
         /// <param name="point1">Second point.</param>
         /// <param name="point2">Third point.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines lengths are invalid.</exception>
-        public virtual void DrawTriangle(Pen pen, Point point0, Point point1, Point point2)
+        public virtual void DrawTriangle(Color color, Point point0, Point point1, Point point2)
         {
-            DrawTriangle(pen, point0.X, point0.Y, point1.X, point1.Y, point2.X, point2.Y);
+            DrawTriangle(color, point0.X, point0.Y, point1.X, point1.Y, point2.X, point2.Y);
         }
 
         /// <summary>
         /// Draw triangle.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="v1x">First point X coordinate.</param>
         /// <param name="v1y">First point Y coordinate.</param>
         /// <param name="v2x">Second point X coordinate.</param>
@@ -863,30 +861,30 @@ namespace Cosmos.System.Graphics
         /// <param name="v3y">Third point Y coordinate.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type="bullet">
-        /// <item>Thrown if pen is null.</item>
+        /// <item>Thrown if color is null.</item>
         /// <item>Coordinates invalid.</item>
         /// </list>
         /// </exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="OverflowException">Thrown if lines lengths are invalid.</exception>
-        public virtual void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
+        public virtual void DrawTriangle(Color color, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
         {
-            DrawLine(pen, v1x, v1y, v2x, v2y);
-            DrawLine(pen, v1x, v1y, v3x, v3y);
-            DrawLine(pen, v2x, v2y, v3x, v3y);
+            DrawLine(color, v1x, v1y, v2x, v2y);
+            DrawLine(color, v1x, v1y, v3x, v3y);
+            DrawLine(color, v2x, v2y, v3x, v3y);
         }
 
         /// <summary>
         /// Draw rectangle.
         /// Not implemented.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="color">color to draw with.</param>
         /// <param name="x_start">starting X coordinate.</param>
         /// <param name="y_start">starting Y coordinate.</param>
         /// <param name="width">Width.</param>
         /// <param name="height">Height.</param>
         /// <exception cref="NotImplementedException">Thrown always.</exception>
-        public virtual void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
+        public virtual void DrawRectangle(Color color, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
         }
@@ -904,15 +902,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public virtual void DrawImage(Image image, int x, int y)
         {
-            Pen _pen = new Pen(Color.White);
+            Color _color = Color.White;
 
             for (int _x = 0; _x < image.Width; _x++)
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
-                    _pen.Color = Color.FromArgb(image.rawData[_x + _y * image.Width]);
-                    DrawPoint(_pen, x + _x, y + _y);
+                    _color = Color.FromArgb(image.rawData[_x + _y * image.Width]);
+                    DrawPoint(_color, x + _x, y + _y);
                 }
             }
         }
@@ -947,7 +945,7 @@ namespace Cosmos.System.Graphics
         /// <param name="h">Desired Height.</param>
         public virtual void DrawImage(Image image, int x, int y, int w, int h)
         {
-            Pen _pen = new Pen(Color.White);
+            Color _color = Color.White;
 
             int[] pixels = scaleImage(image, w, h);
             for (int _x = 0; _x < w; _x++)
@@ -955,8 +953,8 @@ namespace Cosmos.System.Graphics
                 for (int _y = 0; _y < h; _y++)
                 {
                     Global.mDebugger.SendInternal(pixels[_x + _y * w]);
-                    _pen.Color = Color.FromArgb(pixels[_x + _y * w]);
-                    DrawPoint(_pen, x + _x, y + _y);
+                    _color = Color.FromArgb(pixels[_x + _y * w]);
+                    DrawPoint(_color, x + _x, y + _y);
                 }
             }
         }
@@ -971,15 +969,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public void DrawImageAlpha(Image image, int x, int y)
         {
-            var _pen = new Pen(Color.White);
+            var _color = Color.White;
 
             for (int _x = 0; _x < image.Width; _x++)
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
-                    _pen.Color = (Color.FromArgb(image.rawData[_x + _y * image.Width]));
-                    DrawPoint(_pen, x + _x, y + _y);
+                    _color = (Color.FromArgb(image.rawData[_x + _y * image.Width]));
+                    DrawPoint(_color, x + _x, y + _y);
                 }
             }
         }
@@ -1013,11 +1011,11 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="str">string to draw.</param>
         /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
+        /// <param name="color">Color.</param>
         /// <param name="point">Point of the top left corner of the string.</param>
-        public void DrawString(string str, Font aFont, Pen pen, Point point)
+        public void DrawString(string str, Font aFont, Color color, Point point)
         {
-            DrawString(str, aFont, pen, point.X, point.Y);
+            DrawString(str, aFont, color, point.X, point.Y);
         }
 
         /// <summary>
@@ -1025,14 +1023,14 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="str">string to draw.</param>
         /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
+        /// <param name="color">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public virtual void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        public virtual void DrawString(string str, Font aFont, Color color, int x, int y)
         {
             for (int i = 0; i < str.Length; i++)
             {
-                DrawChar(str[i], aFont, pen, x, y);
+                DrawChar(str[i], aFont, color, x, y);
                 x += aFont.Width;
             }
         }
@@ -1042,11 +1040,11 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="str">char to draw.</param>
         /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
+        /// <param name="color">Color.</param>
         /// <param name="point">Point of the top left corner of the char.</param>
-        public void DrawChar(char c, Font aFont, Pen pen, Point point)
+        public void DrawChar(char c, Font aFont, Color color, Point point)
         {
-            DrawChar(c, aFont, pen, point.X, point.Y);
+            DrawChar(c, aFont, color, point.X, point.Y);
         }
 
         /// <summary>
@@ -1054,10 +1052,10 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="str">char to draw.</param>
         /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
+        /// <param name="color">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public virtual void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        public virtual void DrawChar(char c, Font aFont, Color color, int x, int y)
         {
             int p = aFont.Height * (byte)c;
 
@@ -1067,7 +1065,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        DrawPoint(pen, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
+                        DrawPoint(color, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
                     }
                 }
             }

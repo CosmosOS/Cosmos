@@ -8,10 +8,10 @@ namespace Cosmos.System.Graphics.Extensions
     public static class ColorEx
     {
 
-        public static Pen ToPen(this Color color, int width)
+        /*public static Pen ToPen(this Color color, int width)
         {
             return new Pen(color, width);
-        }
+        }*/
 
     }
 }
