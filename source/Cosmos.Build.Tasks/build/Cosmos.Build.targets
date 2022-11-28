@@ -70,8 +70,9 @@
 
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
 
-
         <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
+
+        <OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
 
     </PropertyGroup>
 
@@ -229,7 +230,8 @@
               OutputFile="$(NasmOutput)"
               OutputFormat="$(BinFormat)"
               ToolPath="$(NasmToolPath)"
-              ToolExe="$(NasmToolExe)" />
+              ToolExe="$(NasmToolExe)"
+	            OptimizationLevel="$(OptimizationLevel)" />
 
     </Target>
 
@@ -381,10 +383,12 @@
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
                               Modules="gzio"
+                              Timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'Gzip'" />
         
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                              Timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'None'" />
         
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"

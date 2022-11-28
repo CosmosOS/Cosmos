@@ -1,8 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <RuntimeIdentifier>cosmos</RuntimeIdentifier>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <Profile>Bochs</Profile>
         <BinFormat>ELF</BinFormat>
         <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
