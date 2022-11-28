@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -16,6 +17,8 @@ namespace Cosmos.Build.Tasks
         public string[] Modules { get; set; }
 
         private string Indentation = "    ";
+
+        public string Timeout { get; set; }
         
         public override bool Execute()
         {
@@ -30,7 +33,14 @@ namespace Cosmos.Build.Tasks
 
             using (var xWriter = File.CreateText(Path.Combine(TargetDirectory + "/boot/grub/", "grub.cfg")))
             {
-                xWriter.WriteLine("set timeout=0");
+                if (!String.IsNullOrWhiteSpace(Timeout) && !String.IsNullOrEmpty(Timeout))
+                {
+                    xWriter.WriteLine("set timeout=" + Timeout);
+                }
+                else
+                {
+                    xWriter.WriteLine("set timeout=0");
+                }
                 if (Modules != null)
                 {
                     foreach (var module in Modules)
@@ -38,6 +48,7 @@ namespace Cosmos.Build.Tasks
                         xWriter.WriteLine($"insmod {module}");
                     }
                 }
+
                 xWriter.WriteLine();
                 xWriter.WriteLine("menuentry '" + xLabelName + "' {");
                 WriteIndentedLine(xWriter, "multiboot2 /boot/" + xBinName);
