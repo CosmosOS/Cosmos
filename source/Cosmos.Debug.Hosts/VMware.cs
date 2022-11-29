@@ -117,7 +117,7 @@ namespace Cosmos.Debug.Hosts {
           mProcess.Kill();
 
           //kil vmware-vmx.exe
-          foreach (var process in Process.GetProcessesByName("vmware-vmx.exe"))
+          foreach (var process in Process.GetProcessesByName("vmware-vmx"))
           {
             process.Kill();
           }

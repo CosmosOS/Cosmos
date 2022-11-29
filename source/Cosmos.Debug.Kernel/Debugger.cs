@@ -21,6 +21,8 @@ namespace Cosmos.Debug.Kernel
 
     public class Debugger
     {
+        public static bool IgnoreAssert = false;
+
         public Debugger(string aRing, string aSection)
         {
             Ring = aRing;
@@ -31,11 +33,13 @@ namespace Cosmos.Debug.Kernel
 
         public string Section { get; }
 
+        #region Break
         public void Break() { }
 
         public static void DoBochsBreak() { }
 
         internal static void DoRealHalt() { }
+        #endregion
 
         private static unsafe void ActualSend(int aLength, char* aText) { }
 
@@ -53,22 +57,22 @@ namespace Cosmos.Debug.Kernel
 
         public static void DoSendNumber(double aNumber) { }
 
-        internal static void DoSendCoreDump() { }
-
         public void SendNumber(uint aNumber) => DoSendNumber(aNumber);
-        
+
         public void SendNumber(int aNumber) => DoSendNumber(aNumber);
-        
+
         public void SendNumber(ulong aNumber) => DoSendNumber(aNumber);
-        
+
         public void SendNumber(long aNumber) => DoSendNumber(aNumber);
 
         public void SendNumber(float aNumber) => DoSendNumber(aNumber);
-        
+
         public void SendNumber(double aNumber) => DoSendNumber(aNumber);
-        
-        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData) {
-            fixed (byte* xPtr = &aData[0]) {
+
+        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData)
+        {
+            fixed (byte* xPtr = &aData[0])
+            {
                 SendChannelCommand(aChannel, aCommand, aData.Length, xPtr);
             }
         }
@@ -77,28 +81,138 @@ namespace Cosmos.Debug.Kernel
 
         public static void SendChannelCommand(byte aChannel, byte aCommand) { }
 
+        #region Assert
+        private static void SendKernelPanic(uint id) { }
+
+        public static void SendCoreDump() { }
+
+        #region Assert Function
+
+        public static void DoAssert(int code)
+        {
+            DoAssert(true, code);
+        }
+
+        public static void DoAssert(bool condition)
+        {
+            DoAssert(condition, -1);
+        }
+
+        public static void DoAssert(bool condition, int code)
+        {
+            DoAssert(condition, code, false);
+        }
+        public static void DoAssert(bool condition, int code, string message)
+        {
+            DoAssert(condition, code, false, message);
+        }
+        public static void DoAssert(bool condition, bool DoBreak)
+        {
+            DoAssert(condition, -1, DoBreak, null);
+        }
+        public static void DoAssert(bool condition, bool DoBreak, string message)
+        {
+            DoAssert(condition, -1, DoBreak, message);
+        }
+
+        public static void DoAssert(bool condition, string message)
+        {
+            DoAssert(condition, -1, false, message);
+        }
+
+        public static void DoAssert(bool condition, int code, bool DoBreak)
+        {
+            DoAssert(condition, code, DoBreak, null);
+        }
+
+        public static void DoAssert(bool condition, int code, bool DoBreak, string message)
+        {
+            if (condition && !IgnoreAssert)
+            {
+                if (message != null) { DoSend(message); }
+                if (DoBreak)
+                {
+                    DoBochsBreak();
+                }
+                if (code > -1)
+                {
+                    SendKernelPanic((uint)code);
+                }
+                else { SendCoreDump(); }
+            }
+        }
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Assert(bool condition) => DoAssert(condition);
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Assert(bool condition, int code) => DoAssert(condition, code);
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Assert(bool condition, int code, string message) => DoAssert(condition, code, message);
+        #endregion
+
+        #region Fail Function
+
+        public static void DoFail(uint code)
+        {
+            DoFail((int)code);
+        }
+
+        public static void DoFail(int code)
+        {
+            DoFail(code, null);
+        }
+
+        public static void DoFail(string message)
+        {
+            DoFail(-1, message);
+        }
+
+        public static void DoFail(int code, string message)
+        {
+            if (message != null) { DoSend(message); }
+            if (code > -1)
+            {
+                SendKernelPanic((uint)code);
+            }
+            else { SendCoreDump(); } //  behave like assert function
+            // halt
+            while (true) { }
+        }
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Fail(string message) => DoFail(message);
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Fail(int code) => DoFail(code);
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Fail(int code, string message) => DoFail(code, message);
+        #endregion
+
+        #endregion
+
+        #region Trace
+
         internal static void DoSend(string aText) { }
 
-        public static void SendKernelPanic(uint id) { }
         public void Send(string aText) => DoSend(aText);
 
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(string aText) => DoSend(aText);
-        
+
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(uint aNumber) => DoSendNumber(aNumber);
-        
+
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(int aNumber) => DoSendNumber(aNumber);
 
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(ulong aNumber) => DoSendNumber(aNumber);
-        
+
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(long aNumber) => DoSendNumber(aNumber);
 
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(float aNumber)  => DoSendNumber(aNumber);
+        public virtual void SendInternal(float aNumber) => DoSendNumber(aNumber);
 
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(double aNumber) => DoSendNumber(aNumber);
@@ -120,21 +234,25 @@ namespace Cosmos.Debug.Kernel
 
         public unsafe void SendMessageBox(int aLength, char* aText) { } // Plugged
 
-        public unsafe void SendMessageBox(string aText) {
+        public unsafe void SendMessageBox(string aText)
+        {
             // TODO: Need to fix this so it can send empty strings.
             // Sending empty strings locks it up right now
-            if (aText.Length == 0) {
+            if (aText.Length == 0)
+            {
                 return;
             }
 
             var xChars = aText.ToCharArray();
-            fixed (char* xPtr = &xChars[0]) {
+            fixed (char* xPtr = &xChars[0])
+            {
                 SendMessageBox(xChars.Length, xPtr);
             }
         }
 
         // TODO: Kudzu replacement methods for Cosmos.HAL.DebugUtil
-        public unsafe void SendMessage(string aModule, string aData) {
+        public unsafe void SendMessage(string aModule, string aData)
+        {
             //string xSingleString;
             //xSingleString = "Message Module: \"" + aModule + "\"";
             //xSingleString += " Data: \"" + aData + "\"";
@@ -145,34 +263,42 @@ namespace Cosmos.Debug.Kernel
             DoSend("Data:");
             DoSend(aData);
         }
+        #endregion
 
-        public unsafe void SendError(string aModule, string aData) {
+        #region Not Implement
+        public unsafe void SendError(string aModule, string aData)
+        {
             //string xSingleString;
             //xSingleString = "Error Module: \"" + aModule + "\"";
             //xSingleString += " Data: \"" + aData + "\"";
             //Send(xSingleString);
         }
 
-        public unsafe void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
+        public unsafe void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits)
+        {
             //string xSingleString;
             //xSingleString = "Number Module: \"" + aModule + "\"";
             //xSingleString += " Description: \"" + aDescription + "\"";
             //xSingleString += " Number: \"" + CreateNumber(aNumber, aBits) + "\"";
         }
 
-        public unsafe void WriteNumber(uint aNumber, byte aBits) {
+        public unsafe void WriteNumber(uint aNumber, byte aBits)
+        {
             WriteNumber(aNumber, aBits, true);
         }
 
-        public unsafe void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix) {
+        public unsafe void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix)
+        {
             Send(CreateNumber(aNumber, aBits, aWritePrefix));
         }
 
-        public unsafe string CreateNumber(uint aNumber, byte aBits) {
+        public unsafe string CreateNumber(uint aNumber, byte aBits)
+        {
             return CreateNumber(aNumber, aBits, true);
         }
 
-        public unsafe string CreateNumber(uint aNumber, byte aBits, bool aWritePrefix) {
+        public unsafe string CreateNumber(uint aNumber, byte aBits, bool aWritePrefix)
+        {
             return "Cosmos.Debug.Debugger.CreateNumber(aNumber, aBits, aWritePrefix) not implemented";
             //string xNumberString = null;
             //uint xValue = aNumber;
@@ -244,11 +370,13 @@ namespace Cosmos.Debug.Kernel
             //return xNumberString;
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue) {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue)
+        {
             WriteBinary(aModule, aMessage, aValue, 0, aValue.Length);
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength) {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength)
+        {
             //string xSingleString;
             //xSingleString = "Binary Module = \"" + aModule + "\"";
             //xSingleString += " Message = " + aMessage + "\"";
@@ -261,7 +389,8 @@ namespace Cosmos.Debug.Kernel
             //Send(xSingleString);
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength) {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength)
+        {
             //string xSingleString;
             //xSingleString = "Binary Module = \"" + aModule + "\"";
             //xSingleString += " Message = " + aMessage + "\"";
@@ -274,11 +403,13 @@ namespace Cosmos.Debug.Kernel
             //Send(xSingleString);
         }
 
-        public unsafe void ViewMemory() {
+        public unsafe void ViewMemory()
+        {
             ViewMemory(0);
         }
 
-        public unsafe void ViewMemory(int addr) {
+        public unsafe void ViewMemory(int addr)
+        {
             //while (true) {
             //    Console.Clear();
             //    Console.WriteLine();
@@ -316,16 +447,17 @@ namespace Cosmos.Debug.Kernel
             //    addr = FromHex(s);
             //}
         }
+        #endregion
 
-        public void SendCoreDump() => DoSendCoreDump();
-
-        private int FromHex(string p) {
+        private int FromHex(string p)
+        {
             p = p.ToLower();
             string hex = "0123456789abcdef";
 
             int ret = 0;
 
-            for (int i = 0; i < p.Length; i++) {
+            for (int i = 0; i < p.Length; i++)
+            {
                 ret = ret * 16 + hex.IndexOf(p[i]);
             }
             return ret;

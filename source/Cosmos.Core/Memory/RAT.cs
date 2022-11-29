@@ -124,7 +124,7 @@ namespace Cosmos.Core.Memory
             if (aSize % PageSize != 0)
             {
                 Debugger.DoSendNumber((aSize % PageSize));
-                Debugger.SendKernelPanic(11);
+                Debugger.DoAssert(11);
                 throw new Exception("RAM size must be page aligned.");
             }
 
