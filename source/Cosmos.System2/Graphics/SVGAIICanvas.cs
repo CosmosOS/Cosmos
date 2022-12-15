@@ -89,23 +89,23 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw point.
         /// </summary>
-        /// <param name="acolor">Color to draw with.</param>
+        /// <param name="aColor">Color to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public override void DrawPoint(Color acolor, int aX, int aY)
+        public override void DrawPoint(Color aColor, int aX, int aY)
         {
-            if (acolor.A < 255)
+            if (aColor.A < 255)
             {
-                if (acolor.A == 0)
+                if (aColor.A == 0)
                 {
                     return;
                 }
 
-                acolor = AlphaBlend(acolor, GetPointColor(aX, aY), acolor.A);
+                aColor = AlphaBlend(aColor, GetPointColor(aX, aY), aColor.A);
             }
 
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)acolor.ToArgb());
+            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aColor.ToArgb());
         }
 
         /// <summary>
@@ -128,11 +128,11 @@ namespace Cosmos.System.Graphics
         /// Draw point.
         /// Not implemented.
         /// </summary>
-        /// <param name="acolor">Color to draw with.</param>
+        /// <param name="aColor">Color to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="NotImplementedException">Thrown always (only int coordinates supported).</exception>
-        public override void DrawPoint(Color acolor, float aX, float aY)
+        public override void DrawPoint(Color aColor, float aX, float aY)
         {
             //xSVGAIIDriver.
             throw new NotImplementedException();
@@ -141,16 +141,16 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw filled rectangle.
         /// </summary>
-        /// <param name="acolor">color to draw with.</param>
+        /// <param name="aColor">color to draw with.</param>
         /// <param name="aX_start">starting X coordinate.</param>
         /// <param name="aY_start">starting Y coordinate.</param>
         /// <param name="aWidth">Width.</param>
         /// <param name="aHeight">Height.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public override void DrawFilledRectangle(Color acolor, int aX_start, int aY_start, int aWidth, int aHeight)
+        public override void DrawFilledRectangle(Color aColor, int aX_start, int aY_start, int aWidth, int aHeight)
         {
-            var color = acolor.ToArgb();
+            var color = aColor.ToArgb();
 
             // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
             for (int i = aY_start; i < aY_start + aHeight; i++)

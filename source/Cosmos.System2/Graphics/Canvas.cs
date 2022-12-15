@@ -66,8 +66,6 @@ namespace Cosmos.System.Graphics
         public virtual void Clear(Color color)
         {
             Global.mDebugger.SendInternal($"Clearing the Screen with Color {color}");
-            //if (color == null)
-            //    throw new ArgumentNullException(nameof(color));
 
             for (int x = 0; x < Mode.Rows; x++)
             {
@@ -284,11 +282,6 @@ namespace Cosmos.System.Graphics
         /// <exception cref="OverflowException">Thrown if x1-x2 or y1-y2 equal to Int32.MinValue.</exception>
         public virtual void DrawLine(Color color, int x1, int y1, int x2, int y2)
         {
-            if (color == null)
-            {
-                throw new ArgumentOutOfRangeException(nameof(color));
-            }
-
             // trim the given line to fit inside the canvas boundries
             TrimLine(ref x1, ref y1, ref x2, ref y2);
 
@@ -355,15 +348,10 @@ namespace Cosmos.System.Graphics
         /// <param name="x_center">X center coordinate.</param>
         /// <param name="y_center">Y center coordinate.</param>
         /// <param name="radius">Radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public virtual void DrawCircle(Color color, int x_center, int y_center, int radius)
         {
-            if (color == null)
-            {
-                throw new ArgumentNullException(nameof(color));
-            }
             ThrowIfCoordNotValid(x_center + radius, y_center);
             ThrowIfCoordNotValid(x_center - radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + radius);
@@ -902,7 +890,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public virtual void DrawImage(Image image, int x, int y)
         {
-            Color _color = Color.White;
+            Color _color;
 
             for (int _x = 0; _x < image.Width; _x++)
             {
@@ -969,7 +957,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public void DrawImageAlpha(Image image, int x, int y)
         {
-            var _color = Color.White;
+            var _color;
 
             for (int _x = 0; _x < image.Width; _x++)
             {
