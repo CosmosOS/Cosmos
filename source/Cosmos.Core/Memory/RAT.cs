@@ -116,14 +116,14 @@ namespace Cosmos.Core.Memory
         {
             if ((uint)aStartPtr % PageSize != 0 && !Debug)
             {
-                Debugger.DoSendNumber(((uint)aStartPtr % PageSize));
+                Debugger.DoSendNumber((uint)aStartPtr % PageSize);
                 Debugger.DoBochsBreak();
                 throw new Exception("RAM start must be page aligned.");
             }
 
             if (aSize % PageSize != 0)
             {
-                Debugger.DoSendNumber((aSize % PageSize));
+                Debugger.DoSendNumber(aSize % PageSize);
                 Debugger.SendKernelPanic(11);
                 throw new Exception("RAM size must be page aligned.");
             }
@@ -193,7 +193,7 @@ namespace Cosmos.Core.Memory
         public static void* AllocPages(PageType aType, uint aPageCount = 1)
         {
             byte* xPos = null;
-            
+
             // Could combine with an external method or delegate, but will slow things down
             // unless we can force it to be inlined.
             // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
@@ -229,7 +229,7 @@ namespace Cosmos.Core.Memory
                     }
                 }
             }
-            
+
             // If we found enough space, mark it as used.
             if (xPos != null)
             {
@@ -244,7 +244,7 @@ namespace Cosmos.Core.Memory
                 return xResult;
             }
             return null;
-           
+
         }
 
         /// <summary>

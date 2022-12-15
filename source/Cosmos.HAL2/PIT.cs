@@ -129,9 +129,9 @@ namespace Cosmos.HAL
             set {
                 _T0Countdown = value;
 
-                IO.Command.Byte = (byte)(T0RateGen ? 0x34 : 0x30);
-                IO.Data0.Byte = (byte)(value & 0xFF);
-                IO.Data0.Byte = (byte)(value >> 8);
+                IOPort.Write8(IO.Command, (byte)(T0RateGen ? 0x34 : 0x30));
+                IOPort.Write8(IO.Data0, (byte)(value & 0xFF));
+                IOPort.Write8(IO.Data0, (byte)(value >> 8));
             }
         }
 
@@ -166,15 +166,15 @@ namespace Cosmos.HAL
             {
                 _T2Countdown = value;
 
-                IO.Command.Byte = 0xB6;
-                IO.Data0.Byte = (byte)(value & 0xFF);
-                IO.Data0.Byte = (byte)(value >> 8);
+                IOPort.Write8(IO.Command, 0xB6);
+                IOPort.Write8(IO.Data0, (byte)(value & 0xFF));
+                IOPort.Write8(IO.Data0, (byte)(value >> 8));
             }
         }
 
         public uint T2Frequency
         {
-            get => PITFrequency / ((uint)_T2Countdown);
+            get => PITFrequency / (uint)_T2Countdown;
             set
             {
                 if (value < 19 || value > 1193180)
@@ -188,7 +188,7 @@ namespace Cosmos.HAL
 
         public uint T2DelayNS
         {
-            get => (PITDelayNS * _T2Countdown);
+            get => PITDelayNS * _T2Countdown;
             set
             {
                 if (value > 54918330) {
@@ -273,7 +273,7 @@ namespace Cosmos.HAL
             for (int i = activeHandlers.Count - 1; i >= 0; i--)
             {
                 handler = activeHandlers[i];
-				
+
                 if (handler.NSRemaining <= T0Delay)
                 {
                     if (handler.Recurring)
@@ -285,7 +285,7 @@ namespace Cosmos.HAL
                         handler.ID = -1;
                         activeHandlers.RemoveAt(i);
                     }
-                    
+
                     handler.HandleTrigger(aContext);
                 } else {
                     handler.NSRemaining -= T0Delay;
@@ -295,7 +295,7 @@ namespace Cosmos.HAL
         }
 
         /// <summary>
-        /// Registers a timer to this <see cref="PIT"/> object. 
+        /// Registers a timer to this <see cref="PIT"/> object.
         /// </summary>
         /// <param name="timer">The target timer.</param>
         /// <returns>The newly assigned ID to the timer.</returns>
@@ -307,7 +307,7 @@ namespace Cosmos.HAL
                 throw new InvalidOperationException("The provided timer has already been registered.");
             }
 
-            timer.ID = (timerCounter++);
+            timer.ID = timerCounter++;
             activeHandlers.Add(timer);
             T0Countdown = 65535;
             return timer.ID;

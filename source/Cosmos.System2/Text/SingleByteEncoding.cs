@@ -46,7 +46,7 @@ namespace Cosmos.System.ExtendedASCII
                 throw new ArgumentNullException("chars", "Null Array");
 
             if (index < 0 || count < 0)
-                throw new ArgumentOutOfRangeException((index < 0 ? "index" : "count"), "negative number");
+                throw new ArgumentOutOfRangeException(index < 0 ? "index" : "count", "negative number");
 
             if (chars.Length - index < count)
                 throw new ArgumentOutOfRangeException("chars", "count more that what is in array");
@@ -135,7 +135,7 @@ namespace Cosmos.System.ExtendedASCII
                 throw new ArgumentNullException("chars", "Null Array");
 
             if (charIndex < 0 || charCount < 0)
-                throw new ArgumentOutOfRangeException((charIndex < 0 ? "charIndex" : "charCount"), "negative number");
+                throw new ArgumentOutOfRangeException(charIndex < 0 ? "charIndex" : "charCount", "negative number");
 
             if (chars.Length - charIndex < charCount)
                 throw new ArgumentOutOfRangeException("chars", "count more that what is in array");
@@ -169,7 +169,7 @@ namespace Cosmos.System.ExtendedASCII
                 throw new ArgumentNullException("bytes", "Null Array");
 
             if (index < 0 || count < 0)
-                throw new ArgumentOutOfRangeException((index < 0 ? "index" : "count"), "negative number");
+                throw new ArgumentOutOfRangeException(index < 0 ? "index" : "count", "negative number");
 
             if (bytes.Length - index < count)
                 throw new ArgumentOutOfRangeException("bytes", "count more that what is in array");
@@ -220,7 +220,7 @@ namespace Cosmos.System.ExtendedASCII
                 throw new ArgumentNullException("bytes", "Null Array");
 
             if (byteIndex < 0 || byteCount < 0)
-                throw new ArgumentOutOfRangeException((byteIndex < 0 ? "byteIndex" : "byteCount"), "negative number");
+                throw new ArgumentOutOfRangeException(byteIndex < 0 ? "byteIndex" : "byteCount", "negative number");
 
             if (bytes.Length - byteIndex < byteCount)
                 throw new ArgumentOutOfRangeException("bytes", "count more that what is in array");

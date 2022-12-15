@@ -141,7 +141,7 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
         public void Send(byte[] data)
         {
-            if ((destination == null) || (destinationPort == 0))
+            if (destination == null || destinationPort == 0)
             {
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }

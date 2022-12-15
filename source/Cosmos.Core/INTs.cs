@@ -742,7 +742,7 @@ namespace Cosmos.Core {
             {
                 byte* xAddress = (byte*)0xB8000;
 
-                xAddress += ((line * 80) + col) * 2;
+                xAddress += (line * 80 + col) * 2;
 
                 xAddress[0] = (byte)c;
                 xAddress[1] = 0x0C;

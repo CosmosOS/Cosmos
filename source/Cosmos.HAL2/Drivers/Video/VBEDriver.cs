@@ -93,8 +93,8 @@ namespace Cosmos.HAL.Drivers
                 lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
                 VBESet(xres, yres, bpp);
             }
-            else if (((videocard = HAL.PCI.GetDevice(VendorID.VirtualBox, DeviceID.VBVGA)) != null) || //VirtualBox Video Adapter PCI Mode
-            ((videocard = HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA)) != null)) // Bochs Graphics Adaptor PCI Mode
+            else if ((videocard = HAL.PCI.GetDevice(VendorID.VirtualBox, DeviceID.VBVGA)) != null || //VirtualBox Video Adapter PCI Mode
+            (videocard = HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA)) != null) // Bochs Graphics Adaptor PCI Mode
             {
                 Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}. Framebuffer address=" + videocard.BAR0);
 
@@ -115,14 +115,14 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value.</param>
         private static void VBEWrite(RegisterIndex index, ushort value)
         {
-            IO.VbeIndex.Word = (ushort)index;
-            IO.VbeData.Word = value;
+            IOPort.Write16(IO.VbeIndex, (ushort)index);
+            IOPort.Write16(IO.VbeData, value);
         }
 
         private static ushort VBERead(RegisterIndex index)
         {
-            IO.VbeIndex.Word = (ushort)index;
-            return IO.VbeData.Word;
+            IOPort.Write16(IO.VbeIndex, (ushort)index);
+            return IOPort.Read16(IO.VbeData);
         }
         public static bool ISAModeAvailable()
         {
@@ -201,7 +201,7 @@ namespace Cosmos.HAL.Drivers
             else
             {
                 /*
-                * Re-enable the Display with LinearFrameBuffer and without clearing video memory of previous value 
+                * Re-enable the Display with LinearFrameBuffer and without clearing video memory of previous value
                 * (this permits to change Mode without losing the previous datas)
                 */
                 EnableDisplay(EnableValues.Enabled | EnableValues.UseLinearFrameBuffer | EnableValues.NoClearMemory);

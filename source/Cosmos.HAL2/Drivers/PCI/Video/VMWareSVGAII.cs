@@ -430,24 +430,24 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <summary>
         /// Index port.
         /// </summary>
-        private IOPort IndexPort;
+        private readonly ushort IndexPort;
         /// <summary>
         /// Value port.
         /// </summary>
-        private IOPort ValuePort;
+        private readonly ushort ValuePort;
         /// <summary>
         /// BIOS port.
         /// </summary>
-        private IOPort BiosPort;
+        private ushort BiosPort;
         /// <summary>
         /// IRQ port.
         /// </summary>
-        private IOPort IRQPort;
+        private ushort IRQPort;
 
         /// <summary>
         /// Video memory block.
         /// </summary>
-        public MemoryBlock VideoMemory;
+        public readonly MemoryBlock VideoMemory;
         /// <summary>
         /// FIFO memory block.
         /// </summary>
@@ -482,13 +482,13 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// </summary>
         public VMWareSVGAII()
         {
-            device = (HAL.PCI.GetDevice(HAL.VendorID.VMWare, HAL.DeviceID.SVGAIIAdapter));
+            device = HAL.PCI.GetDevice(HAL.VendorID.VMWare, HAL.DeviceID.SVGAIIAdapter);
             device.EnableMemory(true);
             uint basePort = device.BaseAddressBar[0].BaseAddress;
-            IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));
-            ValuePort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Value));
-            BiosPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Bios));
-            IRQPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.IRQ));
+            IndexPort = (ushort)(basePort + (uint)IOPortOffset.Index);
+            ValuePort = (ushort)(basePort + (uint)IOPortOffset.Value);
+            BiosPort = (ushort)(basePort + (uint)IOPortOffset.Bios);
+            IRQPort = (ushort)(basePort + (uint)IOPortOffset.IRQ);
 
             WriteRegister(Register.ID, (uint)ID.V2);
             if (ReadRegister(Register.ID) != (uint)ID.V2)
@@ -524,7 +524,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             //Disable();
 
             // Depth is color depth in bytes.
-            this.depth = (depth / 8);
+            this.depth = depth / 8;
             this.width = width;
             this.height = height;
             WriteRegister(Register.Width, width);
@@ -544,8 +544,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="value">A value.</param>
         protected void WriteRegister(Register register, uint value)
         {
-            IndexPort.DWord = (uint)register;
-            ValuePort.DWord = value;
+            IOPort.Write32(IndexPort, (uint)register);
+            IOPort.Write32(ValuePort, value);
         }
 
         /// <summary>
@@ -555,8 +555,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <returns>uint value.</returns>
         protected uint ReadRegister(Register register)
         {
-            IndexPort.DWord = (uint)register;
-            return ValuePort.DWord;
+            IOPort.Write32(IndexPort, (uint)register);
+            return IOPort.Read32(ValuePort);
         }
 
         /// <summary>
@@ -595,8 +595,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="value">Value to write.</param>
         protected void WriteToFifo(uint value)
         {
-            if (((GetFIFO(FIFO.NextCmd) == GetFIFO(FIFO.Max) - 4) && GetFIFO(FIFO.Stop) == GetFIFO(FIFO.Min)) ||
-                (GetFIFO(FIFO.NextCmd) + 4 == GetFIFO(FIFO.Stop)))
+            if ((GetFIFO(FIFO.NextCmd) == GetFIFO(FIFO.Max) - 4 && GetFIFO(FIFO.Stop) == GetFIFO(FIFO.Min)) ||
+                GetFIFO(FIFO.NextCmd) + 4 == GetFIFO(FIFO.Stop))
                 WaitForFifo();
 
             SetFIFO((FIFO)GetFIFO(FIFO.NextCmd), value);
@@ -641,7 +641,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public void SetPixel(uint x, uint y, uint color)
         {
-            VideoMemory[((y * width + x) * depth) + FrameSize] = color;
+            VideoMemory[(y * width + x) * depth + FrameSize] = color;
         }
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public uint GetPixel(uint x, uint y)
         {
-            return VideoMemory[((y * width + x) * depth) + FrameSize];
+            return VideoMemory[(y * width + x) * depth + FrameSize];
         }
 
         /// <summary>
@@ -721,8 +721,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 if ((capabilities & (uint)Capability.RectCopy) != 0)
                 {
                     // fill first line and copy it to all other
-                    uint xTarget = (x + width);
-                    uint yTarget = (y + height);
+                    uint xTarget = x + width;
+                    uint yTarget = y + height;
 
                     for (uint xTmp = x; xTmp < xTarget; xTmp++)
                     {
@@ -737,8 +737,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 }
                 else
                 {
-                    uint xTarget = (x + width);
-                    uint yTarget = (y + height);
+                    uint xTarget = x + width;
+                    uint yTarget = y + height;
                     for (uint xTmp = x; xTmp < xTarget; xTmp++)
                     {
                         for (uint yTmp = y; yTmp < yTarget; yTmp++)

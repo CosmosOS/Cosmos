@@ -26,14 +26,14 @@ namespace Cosmos.HAL
         /// </summary>
         private static void EnableSound()
         {
-            IO.Gate.Byte = (byte)(IO.Gate.Byte | 0x03);
+            IOPort.Write8(IO.Gate, (byte)(IOPort.Read8(IO.Gate) | 0x03));
         }
         /// <summary>
         /// Disable sound.
         /// </summary>
         private static void DisableSound()
         {
-            IO.Gate.Byte = (byte)(IO.Gate.Byte & ~3);
+            IOPort.Write8(IO.Gate, (byte)(IOPort.Read8(IO.Gate) & ~3));
             //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
         }
 
@@ -50,14 +50,13 @@ namespace Cosmos.HAL
             }
 
             uint divisor = 1193180 / frequency;
-            byte temp;
-            IO.CommandRegister.Byte = 0xB6;
-            IO.Channel2Data.Byte = (byte)(divisor & 0xFF);
-            IO.Channel2Data.Byte = (byte)((divisor >> 8) & 0xFF);
-            temp = IO.Gate.Byte;
+            IOPort.Write8(IO.CommandRegister, 0xB6);
+            IOPort.Write8(IO.Channel2Data, (byte)(divisor & 0xFF));
+            IOPort.Write8(IO.Channel2Data, (byte)((divisor >> 8) & 0xFF));
+            var temp = IOPort.Read8(IO.Gate);
             if (temp != (temp | 3))
             {
-                IO.Gate.Byte = (byte)(temp | 3);
+                IOPort.Write8(IO.Gate, (byte)(temp | 3));
             }
             EnableSound();
         }

@@ -16,7 +16,7 @@ namespace Cosmos.System_Plugs.System.IO
     [Plug(Target = typeof(FileSystemInfo))]
     public static class CosmosFileSystemInfo
     {
-        [PlugMethod(Signature = "System_Boolean__System_IO_FileSystemInfo_System_IO_IFileSystemObject_get_Exists__")]                               
+        [PlugMethod(Signature = "System_Boolean__System_IO_FileSystemInfo_System_IO_IFileSystemObject_get_Exists__")]
         public static bool get_Exists(FileSystemInfo aThis)
         {
             Global.mFileSystemDebugger.SendInternal($"FileSystemInfo.get_Exists : fullPath = {aThis.FullName}");

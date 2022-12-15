@@ -96,8 +96,8 @@ namespace Cosmos.HAL
             // TODO: Use Real Mode to clear in Mode Control Register Index 10
             //       the third bit to disable blinking and use the seventh bit
             //       as the bright bit on background color for brighter colors :)
-            Color = (byte)(((byte)(aForeground) | ((byte)(aBackground) << 4)) & 0x7F);
-            
+            Color = (byte)(((byte)aForeground | ((byte)aBackground << 4)) & 0x7F);
+
             // The Color | the NUL character this is used to Clear the Screen
             mTextClearCellValue = (ushort)(Color << 8 | 0x00);
         }
@@ -109,13 +109,13 @@ namespace Cosmos.HAL
         /// <param name="aY">A position on Y axis.</param>
         public override void SetCursorPos(int aX, int aY)
         {
-            char xPos = (char)((aY * Cols) + aX);
+            char xPos = (char)(aY * Cols + aX);
             // Cursor low byte to VGA index register
-            IO.Idx3.Byte = 0x0F;
-            IO.Data3.Byte = (byte)(xPos & 0xFF);
+            IOPort.Write8(IO.Idx3, 0x0F);
+            IOPort.Write8(IO.Data3, (byte)(xPos & 0xFF));
             // Cursor high byte to VGA index register
-            IO.Idx3.Byte = 0x0E;
-            IO.Data3.Byte = (byte)(xPos >> 8); 
+            IOPort.Write8(IO.Idx3, 0x0E);
+            IOPort.Write8(IO.Data3, (byte)(xPos >> 8));
         }
 
         /// <summary>
@@ -145,17 +145,17 @@ namespace Cosmos.HAL
             mCursorSize = value;
             TextScreenHelpers.Debug("Changing cursor size to", value, "%");
             // We need to transform value from a percentage to a value from 15 to 0
-            value = 16 - ((16 * value) / 100);
+            value = 16 - 16 * value / 100;
             // This is the case in which value is in reality 1% and a for a truncation error we get 16 (invalid value)
             if (value >= 16)
                 value = 15;
             TextScreenHelpers.Debug("verticalSize is", value);
             // Cursor Vertical Size Register here a value between 0x00 and 0x0F must be set with 0x00 meaning maximum size and 0x0F minimum
-            IO.Idx3.Byte = 0x0A;
-            IO.Data3.Byte = (byte)value;
+            IOPort.Write8(IO.Idx3, 0x0A);
+            IOPort.Write8(IO.Data3, (byte)value);
             // Cursor Horizontal Size Register we set it to 0x0F (100%) as a security measure is probably so already
-            IO.Idx3.Byte = 0x0B;
-            IO.Data3.Byte = 0x0F;
+            IOPort.Write8(IO.Idx3, 0x0B);
+            IOPort.Write8(IO.Data3, 0x0F);
         }
 
         /// <summary>
@@ -173,20 +173,15 @@ namespace Cosmos.HAL
         /// <param name="value">TRUE - visible.</param>
         public override void SetCursorVisible(bool value)
         {
-            byte cursorDisable;
-
             mCursorVisible = value;
 
             // The VGA Cursor is disabled when the value is 1 and enabled when is 0 so we need to invert 'value', sadly the ConvertToByte() function is not working
             // so we need to do the if by hand...
-            if (value == true)
-                cursorDisable = 0;
-            else
-                cursorDisable = 1;
+            var cursorDisable = value ? (byte)0 : (byte)1;
 
             // Cursor Vertical Size Register if the bit 5 is set to 1 the cursor is disabled, if 0 is enabled
-            IO.Idx3.Byte = 0x0A;
-            IO.Data3.Byte |= (byte)(cursorDisable << 5);
+            IOPort.Write8(IO.Idx3, 0x0A);
+            IOPort.Write8(IO.Data3, (byte)(IOPort.Read8(IO.Data3) | (byte)(cursorDisable << 5)));
         }
     }
 }

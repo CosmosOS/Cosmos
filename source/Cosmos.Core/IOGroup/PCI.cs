@@ -12,10 +12,10 @@ namespace Cosmos.Core.IOGroup {
         /// <summary>
         /// Configuration address port.
         /// </summary>
-        public IOPort ConfigAddressPort = new IOPort(0xCF8);
+        public readonly ushort ConfigAddressPort = 0xCF8;
         /// <summary>
         /// Configuration data port.
         /// </summary>
-        public IOPort ConfigDataPort = new IOPort(0xCFC);
+        public readonly ushort ConfigDataPort = 0xCFC;
     }
 }

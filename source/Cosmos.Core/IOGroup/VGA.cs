@@ -13,59 +13,59 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Attribute controller index port.
         /// </summary>
-        public readonly IOPortWrite AttributeController_Index = new IOPortWrite(0x3C0);
+        public readonly ushort AttributeController_Index = 0x3C0;
         /// <summary>
         /// Attribute controller write port.
         /// </summary>
-        public readonly IOPortWrite AttributeController_Write = new IOPortWrite(0x3C0);
+        public readonly ushort AttributeController_Write = 0x3C0;
         /// <summary>
         /// Attribute controller read port.
         /// </summary>
-        public readonly IOPortRead AttributeController_Read = new IOPortRead(0x3C1);
+        public readonly ushort AttributeController_Read = 0x3C1;
         /// <summary>
         /// Miscellaneous output write port.
         /// </summary>
-        public readonly IOPortWrite MiscellaneousOutput_Write = new IOPortWrite(0x3C2);
+        public readonly ushort MiscellaneousOutput_Write = 0x3C2;
         /// <summary>
         /// Sequencer index port.
         /// </summary>
-        public readonly IOPortWrite Sequencer_Index = new IOPortWrite(0x3C4);
+        public readonly ushort Sequencer_Index = 0x3C4;
         /// <summary>
         /// Sequencer data port.
         /// </summary>
-        public readonly IOPort Sequencer_Data = new IOPort(0x3C5);
+        public readonly ushort Sequencer_Data = 0x3C5;
         /// <summary>
         /// DAC index read port.
         /// </summary>
-        public readonly IOPortWrite DACIndex_Read = new IOPortWrite(0x3C7);
+        public readonly ushort DACIndex_Read = 0x3C7;
         /// <summary>
         /// DAC index write port.
         /// </summary>
-        public readonly IOPortWrite DACIndex_Write = new IOPortWrite(0x3C8);
+        public readonly ushort DACIndex_Write = 0x3C8;
         /// <summary>
         /// DAC data port.
         /// </summary>
-        public readonly IOPort DAC_Data = new IOPort(0x3C9);
+        public readonly ushort DAC_Data = 0x3C9;
         /// <summary>
         /// Graphics controller index port.
         /// </summary>
-        public readonly IOPortWrite GraphicsController_Index = new IOPortWrite(0x3CE);
+        public readonly ushort GraphicsController_Index = 0x3CE;
         /// <summary>
         /// Graphics controller data port.
         /// </summary>
-        public readonly IOPort GraphicsController_Data = new IOPort(0x3CF);
+        public readonly ushort GraphicsController_Data = 0x3CF;
         /// <summary>
         /// CRT controller index port.
         /// </summary>
-        public readonly IOPortWrite CRTController_Index = new IOPortWrite(0x3D4);
+        public readonly ushort CRTController_Index = 0x3D4;
         /// <summary>
         /// CRT controller data port.
         /// </summary>
-        public readonly IOPort CRTController_Data = new IOPort(0x3D5);
+        public readonly ushort CRTController_Data = 0x3D5;
         /// <summary>
         /// Instant read port.
         /// </summary>
-        public readonly IOPortRead Instat_Read = new IOPortRead(0x3DA);
+        public readonly ushort Instat_Read = 0x3DA;
 
         /// <summary>
         /// 128KB at 0xA0000

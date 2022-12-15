@@ -15,23 +15,23 @@ namespace Cosmos.Core.IOGroup.Network
         /// <summary>
         /// Register address port.
         /// </summary>
-        public readonly IOPort RegisterAddress;
+        public readonly ushort RegisterAddress;
         /// <summary>
         /// Register data port.
         /// </summary>
-        public readonly IOPort RegisterData;
+        public readonly ushort RegisterData;
         /// <summary>
         /// Bus data port.
         /// </summary>
-        public readonly IOPort BusData;
+        public readonly ushort BusData;
         /// <summary>
         /// MAC1 port.
         /// </summary>
-        public readonly IOPortRead MAC1;
+        public readonly ushort MAC1;
         /// <summary>
         /// MAC2 port.
         /// </summary>
-        public readonly IOPortRead MAC2;
+        public readonly ushort MAC2;
 
         /// <summary>
         /// Create new instance of the AMDPCNetIIIOGroup class.
@@ -39,11 +39,11 @@ namespace Cosmos.Core.IOGroup.Network
         /// <param name="baseAddress">Chip base address.</param>
         public AMDPCNetIIIOGroup(ushort baseAddress)
         {
-            RegisterAddress = new IOPort(baseAddress, 0x14);
-            RegisterData = new IOPort(baseAddress, 0x10);
-            BusData = new IOPort(baseAddress, 0x1C);
-            MAC1 = new IOPortRead(baseAddress, 0x00);
-            MAC2 = new IOPortRead(baseAddress, 0x04);
+            RegisterAddress = (ushort)(baseAddress + 0x14);
+            RegisterData = (ushort)(baseAddress + 0x10);
+            BusData = (ushort)(baseAddress + 0x1C);
+            MAC1 = baseAddress;
+            MAC2 = (ushort)(baseAddress + 0x04);
         }
     }
 }

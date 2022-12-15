@@ -17,30 +17,30 @@ namespace Cosmos.Core.IOGroup {
         /// <summary>
         /// Misc. output.
         /// </summary>
-        public readonly IOPort MiscOutput = new IOPort(0x03C2);
+        public readonly ushort MiscOutput = 0x03C2;
         /// <summary>
         /// First IOPort index.
         /// </summary>
-        public readonly IOPort Idx1 = new IOPort(0x03C4);
+        public readonly ushort Idx1 = 0x03C4;
         /// <summary>
         /// First IOPort data.
         /// </summary>
-        public readonly IOPort Data1 = new IOPort(0x03C5);
+        public readonly ushort Data1 = 0x03C5;
         /// <summary>
         /// Second IOPort index.
         /// </summary>
-        public readonly IOPort Idx2 = new IOPort(0x03CE);
+        public readonly ushort Idx2 = 0x03CE;
         /// <summary>
         /// Second IOPort data.
         /// </summary>
-        public readonly IOPort Data2 = new IOPort(0x03CF);
+        public readonly ushort Data2 = 0x03CF;
         /// <summary>
         /// Third IOPort index.
         /// </summary>
-        public readonly IOPort Idx3 = new IOPort(0x03D4);
+        public readonly ushort Idx3 = 0x03D4;
         /// <summary>
         /// Third IOPort data.
         /// </summary>
-        public readonly IOPort Data3 = new IOPort(0x03D5);
+        public readonly ushort Data3 = 0x03D5;
     }
 }

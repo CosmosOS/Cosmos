@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Core.IOGroup;
 using Cosmos.Common.Extensions;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
@@ -168,8 +169,8 @@ namespace Cosmos.HAL
         public static ushort GetHeaderType(ushort Bus, ushort Slot, ushort Function)
         {
             uint xAddr = GetAddressBase(Bus, Slot, Function) | 0xE & 0xFC;
-            IO.ConfigAddressPort.DWord = xAddr;
-            return (byte)(IO.ConfigDataPort.DWord >> ((0xE % 4) * 8) & 0xFF);
+            IOPort.Write32(IO.ConfigAddressPort, xAddr);
+            return (byte)(IOPort.Read32(IO.ConfigDataPort) >> (0xE % 4 * 8) & 0xFF);
         }
 
         /// <summary>
@@ -182,8 +183,8 @@ namespace Cosmos.HAL
         public static ushort GetVendorID(ushort Bus, ushort Slot, ushort Function)
         {
             uint xAddr = GetAddressBase(Bus, Slot, Function) | 0x0 & 0xFC;
-            IO.ConfigAddressPort.DWord = xAddr;
-            return (ushort)(IO.ConfigDataPort.DWord >> ((0x0 % 4) * 8) & 0xFFFF);
+            IOPort.Write32(IO.ConfigAddressPort, xAddr);
+            return (ushort)(IOPort.Read32(IO.ConfigDataPort) >> (0x0 % 4 * 8) & 0xFFFF);
         }
 
         #region IOReadWrite
@@ -194,16 +195,16 @@ namespace Cosmos.HAL
         /// <returns>byte value.</returns>
         public byte ReadRegister8(byte aRegister)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            return (byte)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFF);
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(IO.ConfigAddressPort, xAddr);
+            return (byte)(IOPort.Read32(IO.ConfigDataPort) >> (aRegister % 4 * 8) & 0xFF);
         }
 
         public void WriteRegister8(byte aRegister, byte value)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            IO.ConfigDataPort.Byte = value;
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(IO.ConfigAddressPort, xAddr);
+            IOPort.Write8(IO.ConfigDataPort, value);
         }
 
         /// <summary>
@@ -213,9 +214,9 @@ namespace Cosmos.HAL
         /// <returns>UInt16 value.</returns>
         public ushort ReadRegister16(byte aRegister)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            return (ushort)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFFFF);
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(IO.ConfigAddressPort, xAddr);
+            return (ushort)(IOPort.Read32(IO.ConfigDataPort) >> (aRegister % 4 * 8) & 0xFFFF);
         }
 
         /// <summary>
@@ -225,23 +226,23 @@ namespace Cosmos.HAL
         /// <param name="value">A value.</param>
         public void WriteRegister16(byte aRegister, ushort value)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            IO.ConfigDataPort.Word = value;
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(IO.ConfigAddressPort, xAddr);
+            IOPort.Write16(IO.ConfigDataPort, value);
         }
 
         public uint ReadRegister32(byte aRegister)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            return IO.ConfigDataPort.DWord;
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(IO.ConfigAddressPort, xAddr);
+            return IOPort.Read32(IO.ConfigDataPort);
         }
 
         public void WriteRegister32(byte aRegister, uint value)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            IO.ConfigDataPort.DWord = value;
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(IO.ConfigAddressPort, xAddr);
+            IOPort.Write32(IO.ConfigDataPort, value);
         }
         #endregion
 
@@ -279,7 +280,7 @@ namespace Cosmos.HAL
         {
             ushort command = ReadRegister16(0x04);
 
-            ushort flags = (1 << 2);
+            ushort flags = 1 << 2;
 
             if (enable)
                 command |= flags;
@@ -855,18 +856,16 @@ namespace Cosmos.HAL
 
     public class PCIBaseAddressBar
     {
-        private uint baseAddress = 0;
         private ushort prefetchable = 0;
         private ushort type = 0;
-        private bool isIO = false;
 
         public PCIBaseAddressBar(uint raw)
         {
-            isIO = (raw & 0x01) == 1;
+            IsIO = (raw & 0x01) == 1;
 
-            if (isIO)
+            if (IsIO)
             {
-                baseAddress = raw & 0xFFFFFFFC;
+                BaseAddress = raw & 0xFFFFFFFC;
             }
             else
             {
@@ -875,23 +874,17 @@ namespace Cosmos.HAL
                 switch (type)
                 {
                     case 0x00:
-                        baseAddress = raw & 0xFFFFFFF0;
+                        BaseAddress = raw & 0xFFFFFFF0;
                         break;
                     case 0x01:
-                        baseAddress = raw & 0xFFFFFFF0;
+                        BaseAddress = raw & 0xFFFFFFF0;
                         break;
                 }
             }
         }
 
-        public uint BaseAddress
-        {
-            get { return baseAddress; }
-        }
+        public uint BaseAddress { get; } = 0;
 
-        public bool IsIO
-        {
-            get { return isIO; }
-        }
+        public bool IsIO { get; } = false;
     }
 }

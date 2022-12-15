@@ -14,35 +14,35 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Data register port.
         /// </summary>
-        public readonly IOPort Data;
+        public readonly ushort Data;
         /// <summary>
         /// Interrupt enable register port.
         /// </summary>
-        public readonly IOPort InterruptEnable;
+        public readonly ushort InterruptEnable;
         /// <summary>
         /// FIFO control register port.
         /// </summary>
-        public readonly IOPort FIFOControl;
+        public readonly ushort FIFOControl;
         /// <summary>
         /// Line control register port.
         /// </summary>
-        public readonly IOPort LineControl;
+        public readonly ushort LineControl;
         /// <summary>
         /// Modem control register port.
         /// </summary>
-        public readonly IOPort ModemControl;
+        public readonly ushort ModemControl;
         /// <summary>
         /// Line status register port.
         /// </summary>
-        public readonly IOPort LineStatus;
+        public readonly ushort LineStatus;
         /// <summary>
         /// Modem status register port.
         /// </summary>
-        public readonly IOPort ModemStatus;
+        public readonly ushort ModemStatus;
         /// <summary>
         /// Scratch register port.
         /// </summary>
-        public readonly IOPort Scratch;
+        public readonly ushort Scratch;
 
         /// <summary>
         /// Initializes a new set of IOPorts for the specified COM port number.
@@ -70,14 +70,14 @@ namespace Cosmos.Core.IOGroup
                     portBase = 0x2E8;
                     break;
             }
-            Data = new IOPort(portBase);
-            InterruptEnable = new IOPort(unchecked((ushort)(portBase + 1)));
-            FIFOControl = new IOPort(unchecked((ushort)(portBase + 2)));
-            LineControl = new IOPort(unchecked((ushort)(portBase + 3)));
-            ModemControl = new IOPort(unchecked((ushort)(portBase + 4)));
-            LineStatus = new IOPort(unchecked((ushort)(portBase + 5)));
-            ModemStatus = new IOPort(unchecked((ushort)(portBase + 6)));
-            Scratch = new IOPort(unchecked((ushort)(portBase + 7)));
+            Data = portBase;
+            InterruptEnable = unchecked((ushort)(portBase + 1));
+            FIFOControl = unchecked((ushort)(portBase + 2));
+            LineControl = unchecked((ushort)(portBase + 3));
+            ModemControl = unchecked((ushort)(portBase + 4));
+            LineStatus = unchecked((ushort)(portBase + 5));
+            ModemStatus = unchecked((ushort)(portBase + 6));
+            Scratch = unchecked((ushort)(portBase + 7));
         }
     }
 }

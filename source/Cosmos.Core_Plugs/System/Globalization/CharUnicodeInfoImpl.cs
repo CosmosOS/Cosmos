@@ -32,7 +32,7 @@ namespace Cosmos.Core_Plugs.System.Globalization
             {
                 return (byte)UnicodeCategory.LowercaseLetter;
             }
-            
+
             return (byte)UnicodeCategory.OtherLetter;
         }
     }

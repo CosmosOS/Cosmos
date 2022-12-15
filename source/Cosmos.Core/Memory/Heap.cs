@@ -45,7 +45,7 @@ namespace Cosmos.Core.Memory
             // TODO: don't move memory position if there is enough space in the current one.
 
             // Get existing size
-            uint Size = (RAT.GetPageType(aPtr) == RAT.PageType.HeapSmall ? ((ushort*)aPtr)[-2] : ((uint*)aPtr)[-4]); 
+            uint Size = RAT.GetPageType(aPtr) == RAT.PageType.HeapSmall ? ((ushort*)aPtr)[-2] : ((uint*)aPtr)[-4];
 
             if (Size == newSize)
 			{
@@ -54,7 +54,7 @@ namespace Cosmos.Core.Memory
 			}
             if (Size > newSize)
 			{
-                Size -= (newSize - Size);
+                Size -= newSize - Size;
 			}
 
             // Allocate a new buffer to use
@@ -118,7 +118,7 @@ namespace Cosmos.Core.Memory
         /// Free a heap item.
         /// </summary>
         /// <param name="aPtr">A pointer to the heap item to be freed.</param>
-        /// <exception cref="Exception">Thrown if: 
+        /// <exception cref="Exception">Thrown if:
         /// <list type="bullet">
         /// <item>Page type is not found.</item>
         /// <item>Heap item not found in RAT.</item>
@@ -154,7 +154,7 @@ namespace Cosmos.Core.Memory
         {
 			//Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
 			CPU.DisableInterrupts();
-			
+
             // Mark and sweep objects from roots
             // 1. Check if a page is in use if medium/large mark and sweep object
             // 2. Go throught the SMT table for small objects and go through pages by size
@@ -274,7 +274,7 @@ namespace Cosmos.Core.Memory
 
                 rootSMTPtr = rootSMTPtr->LargerSize;
             }
-			
+
 			//Enable interrupts back
 			CPU.EnableInterrupts();
 
@@ -396,7 +396,7 @@ namespace Cosmos.Core.Memory
         private static uint _StringType = 0;
 
         /// <summary>
-        /// This is plugged using asm and gets the value for _StringType 
+        /// This is plugged using asm and gets the value for _StringType
         /// </summary>
         /// <returns></returns>
         private static uint GetStringTypeID()

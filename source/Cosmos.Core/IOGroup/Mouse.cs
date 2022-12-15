@@ -13,10 +13,10 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Data port.
         /// </summary>
-        public readonly IOPort p60 = new IOPort(0x60);
+        public readonly ushort p60 = 0x60;
         /// <summary>
         /// Indicator port, used to tell if data came from keyboard or mouse.
         /// </summary>
-        public readonly IOPort p64 = new IOPort(0x64);
+        public readonly ushort p64 = 0x64;
     }
 }

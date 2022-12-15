@@ -36,16 +36,16 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             this.pciCard.EnableDevice();
 
             this.io = new AMDPCNetIIIOGroup((ushort)this.pciCard.BaseAddressBar[0].BaseAddress);
-            this.io.RegisterData.DWord = 0;
+            IOPort.Write32(io.RegisterData, 0);
 
             // Get the EEPROM MAC Address and set it as the devices MAC
             byte[] eeprom_mac = new byte[6];
-            uint result = io.MAC1.DWord;
+            uint result = IOPort.Read32(io.MAC1);
             eeprom_mac[0] = BinaryHelper.GetByteFrom32bit(result, 0);
             eeprom_mac[1] = BinaryHelper.GetByteFrom32bit(result, 8);
             eeprom_mac[2] = BinaryHelper.GetByteFrom32bit(result, 16);
             eeprom_mac[3] = BinaryHelper.GetByteFrom32bit(result, 24);
-            result = io.MAC2.DWord;
+            result = IOPort.Read32(io.MAC2);
             eeprom_mac[4] = BinaryHelper.GetByteFrom32bit(result, 0);
             eeprom_mac[5] = BinaryHelper.GetByteFrom32bit(result, 8);
 
@@ -75,7 +75,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
                 ManagedMemoryBlock buffer = new ManagedMemoryBlock(2048);
                 mRxDescriptor.Write32(xOffset + 8, (uint)buffer.Offset);
-                ushort buffer_len = (ushort)(~buffer.Size);
+                ushort buffer_len = (ushort)~buffer.Size;
                 buffer_len++;
                 uint flags = (uint)(buffer_len & 0x0FFF) | 0xF000 | 0x80000000;
                 mRxDescriptor.Write32(xOffset + 4, flags);
@@ -151,13 +151,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                io.RegisterAddress.DWord = 0x00;
-                return io.RegisterData.DWord;
+                IOPort.Write32(io.RegisterAddress, 0x00);
+                return IOPort.Read32(io.RegisterData);
             }
             set
             {
-                io.RegisterAddress.DWord = 0x00;
-                io.RegisterData.DWord = value;
+                IOPort.Write32(io.RegisterAddress, 0x00);
+                IOPort.Write32(io.RegisterData, value);
             }
         }
 
@@ -165,21 +165,19 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                uint result;
-
-                io.RegisterAddress.DWord = 0x01;
-                result = io.RegisterData.DWord;
-                io.RegisterAddress.DWord = 0x02;
-                result |= (io.RegisterData.DWord << 16);
+                IOPort.Write32(io.RegisterAddress, 0x01);
+                var result = IOPort.Read32(io.RegisterData);
+                IOPort.Write32(io.RegisterAddress, 0x02);
+                result |= IOPort.Read32(io.RegisterData) << 16;
 
                 return result;
             }
             set
             {
-                io.RegisterAddress.DWord = 0x01;
-                io.RegisterData.DWord = (value & 0xFFFF);
-                io.RegisterAddress.DWord = 0x02;
-                io.RegisterData.DWord = (value >> 16);
+                IOPort.Write32(io.RegisterAddress, 0x01);
+                IOPort.Write32(io.RegisterData, value & 0xFFFF);
+                IOPort.Write32(io.RegisterAddress, 0x02);
+                IOPort.Write32(io.RegisterData, value >> 16);
             }
         }
 
@@ -187,13 +185,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                io.RegisterAddress.DWord = 0x14;
-                return io.BusData.DWord;
+                IOPort.Write32(io.RegisterAddress, 0x14);
+                return IOPort.Read32(io.BusData);
             }
             set
             {
-                io.RegisterAddress.DWord = 0x14;
-                io.BusData.DWord = value;
+                IOPort.Write32(io.RegisterAddress, 0x14);
+                IOPort.Write32(io.BusData, value);
             }
         }
 
@@ -312,10 +310,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 }
                 //UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
                 ushort buffer_len = (ushort)aData.Length;
-                buffer_len = (ushort)(~buffer_len);
+                buffer_len = (ushort)~buffer_len;
                 buffer_len++;
 
-                uint flags = (uint)((buffer_len) & 0x0FFF) | 0x0300F000 | 0x80000000;
+                uint flags = (uint)(buffer_len & 0x0FFF) | 0x0300F000 | 0x80000000;
 
                 mTxDescriptor.Write32(xOffset + 4, flags);
 

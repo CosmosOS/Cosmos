@@ -61,7 +61,7 @@ namespace Cosmos.System_Plugs.System.IO
             {
                 return null;
             }
-            
+
             return new DirectoryInfo(aPath);
         }
 

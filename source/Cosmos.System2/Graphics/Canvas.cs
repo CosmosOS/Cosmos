@@ -67,9 +67,9 @@ namespace Cosmos.System.Graphics
         {
             Global.mDebugger.SendInternal($"Clearing the Screen with Color {color}");
 
-            for (int x = 0; x < Mode.Rows; x++)
+            for (int x = 0; x < Mode.Width; x++)
             {
-                for (int y = 0; y < Mode.Columns; y++)
+                for (int y = 0; y < Mode.Height; y++)
                 {
                     DrawPoint(color, x, y);
                 }
@@ -85,24 +85,13 @@ namespace Cosmos.System.Graphics
         /// Draw point.
         /// </summary>
         /// <param name="color">Color to draw with.</param>
-        /// <param name="point">Point.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public void DrawPoint(Color color, Point point)
-        {
-            DrawPoint(color, point.X, point.Y);
-        }
-
-        /// <summary>
-        /// Draw point.
-        /// </summary>
-        /// <param name="color">Color to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public abstract void DrawPoint(Color color, int x, int y);
 
         /// <summary>
-        /// Draw point to the screen. 
+        /// Draw point to the screen.
         /// Not implemented.
         /// </summary>
         /// <param name="color">Color to draw the point with.</param>
@@ -140,23 +129,9 @@ namespace Cosmos.System.Graphics
         {
             int xBytePerPixel = (int)Mode.ColorDepth / 8;
             int stride = (int)Mode.ColorDepth / 8;
-            int pitch = Mode.Columns * xBytePerPixel;
+            int pitch = Mode.Width * xBytePerPixel;
 
-            return (aX * stride) + (aY * pitch);
-        }
-
-        /// <summary>
-        /// Draw array of colors.
-        /// </summary>
-        /// <param name="colors">Colors array.</param>
-        /// <param name="point">Starting point.</param>
-        /// <param name="width">Width.</param>
-        /// <param name="height">unused.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if coordinates are invalid, or width is less than 0.</exception>
-        /// <exception cref="NotImplementedException">Thrown if color depth is not supported.</exception>
-        public virtual void DrawArray(Color[] colors, Point point, int width, int height)
-        {
-            DrawArray(colors, point.X, point.Y, width, height);
+            return aX * stride + aY * pitch;
         }
 
         /// <summary>
@@ -223,16 +198,16 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         internal void DrawDiagonalLine(Color color, int dx, int dy, int x1, int y1)
         {
-            int i, sdx, sdy, dxabs, dyabs, x, y, px, py;
+            int i;
 
-            dxabs = Math.Abs(dx);
-            dyabs = Math.Abs(dy);
-            sdx = Math.Sign(dx);
-            sdy = Math.Sign(dy);
-            x = dyabs >> 1;
-            y = dxabs >> 1;
-            px = x1;
-            py = y1;
+            var dxabs = Math.Abs(dx);
+            var dyabs = Math.Abs(dy);
+            var sdx = Math.Sign(dx);
+            var sdy = Math.Sign(dy);
+            var x = dyabs >> 1;
+            var y = dxabs >> 1;
+            var px = x1;
+            var py = y1;
 
             if (dxabs >= dyabs) /* the line is more horizontal than vertical */
             {
@@ -285,10 +260,8 @@ namespace Cosmos.System.Graphics
             // trim the given line to fit inside the canvas boundries
             TrimLine(ref x1, ref y1, ref x2, ref y2);
 
-            int dx, dy;
-
-            dx = x2 - x1;      /* the horizontal distance of the line */
-            dy = y2 - y1;      /* the vertical distance of the line */
+            var dx = x2 - x1 /* the horizontal distance of the line */;
+            var dy = y2 - y1 /* the vertical distance of the line */;
 
             if (dy == 0) /* The line is horizontal */
             {
@@ -304,25 +277,6 @@ namespace Cosmos.System.Graphics
 
             /* the line is neither horizontal neither vertical, is diagonal then! */
             DrawDiagonalLine(color, dx, dy, x1, y1);
-        }
-
-        /// <summary>
-        /// Draw line.
-        /// </summary>
-        /// <param name="color">Color to draw with.</param>
-        /// <param name="p1">Staring point.</param>
-        /// <param name="p2">End point.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <list type="bullet">
-        /// <item>Thrown if color is null.</item>
-        /// <item>Coordinates invalid.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="OverflowException">Thrown if x1-x2 or y1-y2 equal to Int32.MinValue.</exception>
-        public void DrawLine(Color color, Point p1, Point p2)
-        {
-            DrawLine(color, p1.X, p1.Y, p2.X, p2.Y);
         }
 
         /// <summary>
@@ -385,20 +339,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draw Circle.
-        /// </summary>
-        /// <param name="color">Color to draw with.</param>
-        /// <param name="point">center point.</param>
-        /// <param name="radius">Radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawCircle(Color color, Point point, int radius)
-        {
-            DrawCircle(color, point.X, point.Y, radius);
-        }
-
-        /// <summary>
         /// Draw Filled Circle.
         /// </summary>
         /// <param name="color">Color to draw with.</param>
@@ -434,7 +374,7 @@ namespace Cosmos.System.Graphics
                 y++;
                 radiusError += yChange;
                 yChange += 2;
-                if (((radiusError << 1) + xChange) > 0)
+                if ((radiusError << 1) + xChange > 0)
                 {
                     x--;
                     radiusError += xChange;
@@ -471,20 +411,6 @@ namespace Cosmos.System.Graphics
                     e -= 2 * x + 1;
                 }
             }*/
-        }
-
-        /// <summary>
-        /// Draw Filled Circle.
-        /// </summary>
-        /// <param name="color">color to draw with.</param>
-        /// <param name="point">center point.</param>
-        /// <param name="radius">Radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawFilledCircle(Color color, Point point, int radius)
-        {
-            DrawFilledCircle(color, point.X, point.Y, radius);
         }
 
         //http://members.chello.at/~easyfilter/bresenham.html
@@ -530,21 +456,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draw ellipse.
-        /// </summary>
-        /// <param name="color">color to draw with.</param>
-        /// <param name="point">Center point.</param>
-        /// <param name="x_radius">X radius.</param>
-        /// <param name="y_radius">Y radius.</param>
-        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawEllipse(Color color, Point point, int x_radius, int y_radius)
-        {
-            DrawEllipse(color, point.X, point.Y, x_radius, y_radius);
-        }
-
-        /// <summary>
         /// Draw Filled Ellipse.
         /// </summary>
         /// <param name="color">color to draw with.</param>
@@ -554,7 +465,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawFilledEllipse(Color color, Point point, int height, int width)
+        public virtual void DrawFilledEllipse(Color color, int xx, int yy, int height, int width)
         {
             for (int y = -height; y <= height; y++)
             {
@@ -562,26 +473,10 @@ namespace Cosmos.System.Graphics
                 {
                     if (x * x * height * height + y * y * width * width <= height * height * width * width)
                     {
-                        DrawPoint(color, point.X + x, point.Y + y);
+                        DrawPoint(color, xx + x, yy + y);
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Draw Filled Ellipse.
-        /// </summary>
-        /// <param name="color">color to draw with.</param>
-        /// <param name="x">X Position.</param>
-        /// <param name="y">Y Position.</param>
-        /// <param name="height">Height.</param>
-        /// <param name="width">Width.</param>
-        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if coorinates invalid.</exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public virtual void DrawFilledEllipse(Color color, int x, int y, int height, int width)
-        {
-            DrawFilledEllipse(color, new Point(x, y), height, width);
         }
 
         /// <summary>
@@ -609,7 +504,7 @@ namespace Cosmos.System.Graphics
                 DrawPoint(color, x + IX, y + IY);
             }
         }
-        
+
         /// <summary>
         /// Draw polygon.
         /// </summary>
@@ -627,35 +522,20 @@ namespace Cosmos.System.Graphics
         /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
         public virtual void DrawPolygon(Color color, params Point[] points)
         {
+            // Using an array of points here is better than using something like a Dictionary of ints.
             if (points.Length < 3)
             {
                 throw new ArgumentException("A polygon requires more than 3 points.");
             }
             for (int i = 0; i < points.Length - 1; i++)
             {
-                DrawLine(color, points[i], points[i + 1]);
+                var pointA = points[i];
+                var pointB = points[i + 1];
+                DrawLine(color, pointA.X, pointA.Y, pointB.X, pointB.Y);
             }
-            DrawLine(color, points[0], points[points.Length - 1]);
-        }
-
-        /// <summary>
-        /// Draw square.
-        /// </summary>
-        /// <param name="color">color to draw with.</param>
-        /// <param name="point">Starting point.</param>
-        /// <param name="size">size.</param>
-        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <list type="bullet">
-        /// <item>Thrown if color is null.</item>
-        /// <item>Coordinates invalid.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawSquare(Color color, Point point, int size)
-        {
-            DrawRectangle(color, point.X, point.Y, size, size);
+            var firstPoint = points[0];
+            var lastPoint = points[^1];
+            DrawLine(color, firstPoint.X, firstPoint.Y, lastPoint.X, lastPoint.Y);
         }
 
         /// <summary>
@@ -677,27 +557,6 @@ namespace Cosmos.System.Graphics
         public virtual void DrawSquare(Color color, int x, int y, int size)
         {
             DrawRectangle(color, x, y, size, size);
-        }
-
-        /// <summary>
-        /// Draw rectangle.
-        /// </summary>
-        /// <param name="color">color to draw with.</param>
-        /// <param name="point">Staring point.</param>
-        /// <param name="width">Width.</param>
-        /// <param name="height">Height.</param>
-        /// <exception cref="ArgumentNullException">Thrown if color is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <list type="bullet">
-        /// <item>Thrown if color is null.</item>
-        /// <item>Coordinates invalid.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawRectangle(Color color, Point point, int width, int height)
-        {
-            DrawRectangle(color, point.X, point.Y, width, height);
         }
 
         /// <summary>
@@ -759,26 +618,6 @@ namespace Cosmos.System.Graphics
         /// Draw filled rectangle.
         /// </summary>
         /// <param name="color">color to draw with.</param>
-        /// <param name="point">Starting point.</param>
-        /// <param name="width">Width.</param>
-        /// <param name="height">Height.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <list type="bullet">
-        /// <item>Thrown if color is null.</item>
-        /// <item>Coordinates invalid.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="OverflowException">Thrown if lines length are invalid.</exception>
-        public virtual void DrawFilledRectangle(Color color, Point point, int width, int height)
-        {
-            DrawFilledRectangle(color, point.X, point.Y, width, height);
-        }
-
-        /// <summary>
-        /// Draw filled rectangle.
-        /// </summary>
-        /// <param name="color">color to draw with.</param>
         /// <param name="x_start">Starting point X coordinate.</param>
         /// <param name="y_start">Starting point Y coordinate.</param>
         /// <param name="width">Width.</param>
@@ -802,26 +641,6 @@ namespace Cosmos.System.Graphics
             {
                 DrawLine(color, x_start, y, x_start + width - 1, y);
             }
-        }
-
-        /// <summary>
-        /// Draw triangle.
-        /// </summary>
-        /// <param name="color">color to draw with.</param>
-        /// <param name="point0">First point.</param>
-        /// <param name="point1">Second point.</param>
-        /// <param name="point2">Third point.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <list type="bullet">
-        /// <item>Thrown if color is null.</item>
-        /// <item>Coordinates invalid.</item>
-        /// </list>
-        /// </exception>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="OverflowException">Thrown if lines lengths are invalid.</exception>
-        public virtual void DrawTriangle(Color color, Point point0, Point point1, Point point2)
-        {
-            DrawTriangle(color, point0.X, point0.Y, point1.X, point1.Y, point2.X, point2.Y);
         }
 
         /// <summary>
@@ -903,9 +722,9 @@ namespace Cosmos.System.Graphics
             {
                 for (int j = 0; j < newWidth; j++)
                 {
-                    x2 = ((j * x_ratio) >> 16);
-                    y2 = ((i * y_ratio) >> 16);
-                    temp[(i * newWidth) + j] = pixels[(y2 * w1) + x2];
+                    x2 = (j * x_ratio) >> 16;
+                    y2 = (i * y_ratio) >> 16;
+                    temp[i * newWidth + j] = pixels[y2 * w1 + x2];
                 }
             }
             return temp;
@@ -951,46 +770,10 @@ namespace Cosmos.System.Graphics
                 for (int _y = 0; _y < image.Height; _y++)
                 {
                     Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
-                    _color = (Color.FromArgb(image.rawData[_x + _y * image.Width]));
+                    _color = Color.FromArgb(image.rawData[_x + _y * image.Width]);
                     DrawPoint(_color, x + _x, y + _y);
                 }
             }
-        }
-
-        /// <summary>
-        /// Draw image.
-        /// </summary>
-        /// <param name="image">Image to draw.</param>
-        /// <param name="point">Point of the top left corner of the image.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
-        public void DrawImage(Image image, Point point)
-        {
-            DrawImage(image, point.X, point.Y);
-        }
-
-        /// <summary>
-        /// Draw image with alpha channel.
-        /// </summary>
-        /// <param name="image">Image to draw.</param>
-        /// <param name="point">Point of the top left corner of the image.</param>
-        /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
-        public void DrawImageAlpha(Image image, Point point)
-        {
-            DrawImageAlpha(image, point.X, point.Y);
-        }
-
-        /// <summary>
-        /// Draw string.
-        /// </summary>
-        /// <param name="str">string to draw.</param>
-        /// <param name="aFont">Font used.</param>
-        /// <param name="color">Color.</param>
-        /// <param name="point">Point of the top left corner of the string.</param>
-        public void DrawString(string str, Font aFont, Color color, Point point)
-        {
-            DrawString(str, aFont, color, point.X, point.Y);
         }
 
         /// <summary>
@@ -1011,18 +794,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draw string.
-        /// </summary>
-        /// <param name="str">char to draw.</param>
-        /// <param name="aFont">Font used.</param>
-        /// <param name="color">Color.</param>
-        /// <param name="point">Point of the top left corner of the char.</param>
-        public void DrawChar(char c, Font aFont, Color color, Point point)
-        {
-            DrawChar(c, aFont, color, point.X, point.Y);
-        }
-
-        /// <summary>
         /// Draw char.
         /// </summary>
         /// <param name="str">char to draw.</param>
@@ -1040,7 +811,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        DrawPoint(color, (ushort)((x) + (aFont.Width - cx)), (ushort)((y) + cy));
+                        DrawPoint(color, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
                     }
                 }
             }
@@ -1103,29 +874,19 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Check if coordinats are valid. Throw exception if not.
         /// </summary>
-        /// <param name="point">Point on the convas.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if coordinates are invalid.</exception>
-        protected void ThrowIfCoordNotValid(Point point)
-        {
-            ThrowIfCoordNotValid(point.X, point.Y);
-        }
-
-        /// <summary>
-        /// Check if coordinats are valid. Throw exception if not.
-        /// </summary>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if coordinates are invalid.</exception>
         protected void ThrowIfCoordNotValid(int x, int y)
         {
-            if (x < 0 || x >= Mode.Columns)
+            if (x < 0 || x >= Mode.Width)
             {
-                throw new ArgumentOutOfRangeException(nameof(x), $"x ({x}) is not between 0 and {Mode.Columns}");
+                throw new ArgumentOutOfRangeException(nameof(x), $"x ({x}) is not between 0 and {Mode.Width}");
             }
 
-            if (y < 0 || y >= Mode.Rows)
+            if (y < 0 || y >= Mode.Height)
             {
-                throw new ArgumentOutOfRangeException(nameof(y), $"y ({y}) is not between 0 and {Mode.Rows}");
+                throw new ArgumentOutOfRangeException(nameof(y), $"y ({y}) is not between 0 and {Mode.Height}");
             }
         }
 
@@ -1141,10 +902,10 @@ namespace Cosmos.System.Graphics
             // in case of vertical lines, no need to perform complex operations
             if (x1 == x2)
             {
-                x1 = Math.Min(Mode.Columns - 1, Math.Max(0, x1));
+                x1 = Math.Min(Mode.Width - 1, Math.Max(0, x1));
                 x2 = x1;
-                y1 = Math.Min(Mode.Rows - 1, Math.Max(0, y1));
-                y2 = Math.Min(Mode.Rows - 1, Math.Max(0, y2));
+                y1 = Math.Min(Mode.Height - 1, Math.Max(0, y1));
+                y2 = Math.Min(Mode.Height - 1, Math.Max(0, y2));
 
                 return;
             }
@@ -1164,10 +925,10 @@ namespace Cosmos.System.Graphics
                 x1_out = 0;
                 y1_out = c;
             }
-            else if (x1_out >= Mode.Columns)
+            else if (x1_out >= Mode.Width)
             {
-                x1_out = Mode.Columns - 1;
-                y1_out = (Mode.Columns - 1) * m + c;
+                x1_out = Mode.Width - 1;
+                y1_out = (Mode.Width - 1) * m + c;
             }
 
             // handle x2
@@ -1176,10 +937,10 @@ namespace Cosmos.System.Graphics
                 x2_out = 0;
                 y2_out = c;
             }
-            else if (x2_out >= Mode.Columns)
+            else if (x2_out >= Mode.Width)
             {
-                x2_out = Mode.Columns - 1;
-                y2_out = (Mode.Columns - 1) * m + c;
+                x2_out = Mode.Width - 1;
+                y2_out = (Mode.Width - 1) * m + c;
             }
 
             // handle y1
@@ -1188,10 +949,10 @@ namespace Cosmos.System.Graphics
                 x1_out = -c / m;
                 y1_out = 0;
             }
-            else if (y1_out >= Mode.Rows)
+            else if (y1_out >= Mode.Height)
             {
-                x1_out = (Mode.Rows - 1 - c) / m;
-                y1_out = Mode.Rows - 1;
+                x1_out = (Mode.Height - 1 - c) / m;
+                y1_out = Mode.Height - 1;
             }
 
             // handle y2
@@ -1200,20 +961,20 @@ namespace Cosmos.System.Graphics
                 x2_out = -c / m;
                 y2_out = 0;
             }
-            else if (y2_out >= Mode.Rows)
+            else if (y2_out >= Mode.Height)
             {
-                x2_out = (Mode.Rows - 1 - c) / m;
-                y2_out = Mode.Rows - 1;
+                x2_out = (Mode.Height - 1 - c) / m;
+                y2_out = Mode.Height - 1;
             }
 
             // final check, to avoid lines that are totally outside bounds
-            if (x1_out < 0 || x1_out >= Mode.Columns || y1_out < 0 || y1_out >= Mode.Rows)
+            if (x1_out < 0 || x1_out >= Mode.Width || y1_out < 0 || y1_out >= Mode.Height)
             {
                 x1_out = 0; x2_out = 0;
                 y1_out = 0; y2_out = 0;
             }
 
-            if (x2_out < 0 || x2_out >= Mode.Columns || y2_out < 0 || y2_out >= Mode.Rows)
+            if (x2_out < 0 || x2_out >= Mode.Width || y2_out < 0 || y2_out >= Mode.Height)
             {
                 x1_out = 0; x2_out = 0;
                 y1_out = 0; y2_out = 0;

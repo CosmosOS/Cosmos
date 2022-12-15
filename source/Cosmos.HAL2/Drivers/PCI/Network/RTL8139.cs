@@ -62,29 +62,29 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         }
         private static byte Inb(uint port)
         {
-            return new IOPort((ushort)port).Byte;
+            return IOPort.Read8((ushort)port);
         }
         private static void OutB(uint port, byte val)
         {
-            new IOPort((ushort)port).Byte = val;
+            IOPort.Write8((ushort)port, val);
         }
 
         private static ushort Inb16(uint port)
         {
-            return new IOPort((ushort)port).Word;
+            return IOPort.Read16((ushort)port);
         }
         private static void Out16(uint port, ushort val)
         {
-            new IOPort((ushort)port).Word = val;
+            IOPort.Write16((ushort)port, val);
         }
 
         private static uint Inb32(uint port)
         {
-            return new IOPort((ushort)port).DWord;
+            return IOPort.Read32((ushort)port);
         }
         private static void Out32(uint port, uint val)
         {
-            new IOPort((ushort)port).DWord = val;
+            IOPort.Write32((ushort)port, val);
         }
         public static List<RTL8139> FindAll()
         {
@@ -93,7 +93,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             List<RTL8139> cards = new List<RTL8139>();
             foreach (var xDevice in HAL.PCI.Devices)
             {
-                if ((xDevice.VendorID == 0x10EC) && (xDevice.DeviceID == 0x8139) && (xDevice.Claimed == false))
+                if (xDevice.VendorID == 0x10EC && xDevice.DeviceID == 0x8139 && xDevice.Claimed == false)
                 {
                     RTL8139 nic = new RTL8139(xDevice);
                     cards.Add(nic);
@@ -226,7 +226,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         #endregion
         protected bool CmdBufferEmpty
         {
-            get { return ((CommandRegister & 0x01) == 0x01); }
+            get { return (CommandRegister & 0x01) == 0x01; }
         }
         #region Network Device Implementation
         public override MACAddress MACAddress
@@ -243,7 +243,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         }
         public override bool Ready
         {
-            get { return ((Config1Register & 0x20) == 0); }
+            get { return (Config1Register & 0x20) == 0; }
         }
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {

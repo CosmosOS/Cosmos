@@ -54,7 +54,7 @@ namespace Cosmos.HAL
 
         private void HandleIRQ(ref INTs.IRQContext aContext)
         {
-            byte xScanCode = IO.Data.Byte;
+            byte xScanCode = IOPort.Read8(IO.Data);
             bool xReleased = (xScanCode & 0x80) == 0x80;
 
             if (xReleased)
@@ -124,7 +124,7 @@ namespace Cosmos.HAL
             }
 
             mPS2Controller.WaitToWrite();
-            IO.Data.Byte = (byte)aCommand;
+            IOPort.Write8(IO.Data, (byte)aCommand);
 
             mPS2Controller.WaitForAck();
 
@@ -142,7 +142,7 @@ namespace Cosmos.HAL
                 }
 
                 mPS2Controller.WaitToWrite();
-                IO.Data.Byte = aByte.Value;
+                IOPort.Write8(IO.Data, aByte.Value);
 
                 mPS2Controller.WaitForAck();
             }

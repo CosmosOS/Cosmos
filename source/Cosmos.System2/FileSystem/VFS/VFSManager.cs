@@ -162,8 +162,8 @@ namespace Cosmos.System.FileSystem.VFS
             for (int i = 0; i < xList.Count; i++)
             {
                 var xEntry = xList[i];
-                if ((xEntry != null) && (xEntry.mEntryType == DirectoryEntryTypeEnum.File)
-                    && (xEntry.mName.ToUpper() == xFileName.ToUpper()))
+                if (xEntry != null && xEntry.mEntryType == DirectoryEntryTypeEnum.File
+                                   && xEntry.mName.ToUpper() == xFileName.ToUpper())
                 {
                     return xEntry;
                 }

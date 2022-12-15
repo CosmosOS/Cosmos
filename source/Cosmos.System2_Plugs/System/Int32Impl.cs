@@ -27,7 +27,7 @@ namespace Cosmos.System_Plugs.System
 
                 while (aThis != 0)
                 {
-                    if ((aThis % 16) < 10)
+                    if (aThis % 16 < 10)
                     {
                         result = aThis % 16 + result;
                     }
@@ -92,7 +92,7 @@ namespace Cosmos.System_Plugs.System
                 {
                     throw new FormatException();
                 }
-                result = (result * 10) + ind;
+                result = result * 10 + ind;
             }
 
             if (neg)

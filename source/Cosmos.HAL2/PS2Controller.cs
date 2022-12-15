@@ -3,6 +3,7 @@
 using System;
 
 using Cosmos.Common.Extensions;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
@@ -80,7 +81,7 @@ namespace Cosmos.HAL
             IsDualChannel = (xConfigurationByte & (1 << 5)) != 0;
             // clear bits 0 and 1
             // TODO: when we support the scan code set 2, clear bit 6 too, to disable translation
-            xConfigurationByte = (byte)(xConfigurationByte & ~(0b0000_0011));
+            xConfigurationByte = (byte)(xConfigurationByte & ~0b0000_0011);
 
             SendCommand(Command.SetConfigurationByte, xConfigurationByte);
 
@@ -210,7 +211,7 @@ namespace Cosmos.HAL
                     {
                         // TODO: replace xTest with (xSecondByte == 0x41 || xSecondByte == 0xC1)
                         //       when the stack corruption detection works better for complex conditions
-                        var xTest = (xSecondByte == 0x41 || xSecondByte == 0xC1);
+                        var xTest = xSecondByte == 0x41 || xSecondByte == 0xC1;
 
                         if (xTest && aPort == 1)
                         {
@@ -344,7 +345,7 @@ namespace Cosmos.HAL
             mDebugger.SendInternal(xMask);
 
             WaitToWrite();
-            IO.Command.Byte = (byte)((byte)Command.PulseOutputLineBase | xMask);
+            IOPort.Write8(IO.Command, (byte)((byte)Command.PulseOutputLineBase | xMask));
 
             mDebugger.SendInternal("Output line pulsed.");
         }
@@ -357,7 +358,7 @@ namespace Cosmos.HAL
         {
             int i = 0;
 
-            while (IO.Data.Byte != Ack)
+            while (IOPort.Read8(IO.Data) != Ack)
             {
                 i++;
 
@@ -383,7 +384,7 @@ namespace Cosmos.HAL
 
             do
             {
-                xByte = IO.Data.Byte;
+                xByte = IOPort.Read8(IO.Data);
 
                 i++;
 
@@ -409,7 +410,7 @@ namespace Cosmos.HAL
 
             do
             {
-                aByte = IO.Data.Byte;
+                aByte = IOPort.Read8(IO.Data);
 
                 i++;
 
@@ -446,7 +447,7 @@ namespace Cosmos.HAL
 
             WaitToReadData();
 
-            byte xByte = IO.Data.Byte;
+            byte xByte = IOPort.Read8(IO.Data);
 
             mDebugger.SendInternal("(PS/2 Controller) Device reset reponse byte: " + xByte);
 
@@ -470,13 +471,13 @@ namespace Cosmos.HAL
         {
             int i = 0;
 
-            while ((IO.Status.Byte & 1) == 0)
+            while ((IOPort.Read8(IO.Status) & 1) == 0)
             {
                 i++;
 
                 if (i >= WAIT_TIMEOUT)
                 {
-                    mDebugger.SendInternal("Timeout expired in PS2Controller.WaitToReadData(), IO.Status.Byte: " + IO.Status.Byte);
+                    mDebugger.SendInternal("Timeout expired in PS2Controller.WaitToReadData(), IO.Status.Byte: " + IOPort.Read8(IO.Status));
                     return false;
                 }
             }
@@ -492,7 +493,7 @@ namespace Cosmos.HAL
         {
             int i = 0;
 
-            while ((IO.Status.Byte & (1 << 1)) != 0)
+            while ((IOPort.Read8(IO.Status) & (1 << 1)) != 0)
             {
                 i++;
 
@@ -512,7 +513,7 @@ namespace Cosmos.HAL
         {
             WaitToReadData();
 
-            var xByte = IO.Data.Byte;
+            var xByte = IOPort.Read8(IO.Data);
 
             mDebugger.SendInternal("(PS/2 Controller) Reading data:");
             mDebugger.SendInternal("(PS/2 Controller) Returned byte:");
@@ -527,8 +528,8 @@ namespace Cosmos.HAL
 
             if (WaitToReadData())
             {
-                aByte = IO.Data.Byte;
-                
+                aByte = IOPort.Read8(IO.Data);
+
                 mDebugger.SendInternal("(PS/2 Controller) Returned byte:");
                 mDebugger.SendInternal(aByte);
 
@@ -543,7 +544,7 @@ namespace Cosmos.HAL
         private void WriteData(byte aByte)
         {
             WaitToWrite();
-            IO.Data.Byte = aByte;
+            IOPort.Write8(IO.Data, aByte);
         }
 
         private void SendCommand(Command aCommand, byte? aByte = null)
@@ -553,7 +554,7 @@ namespace Cosmos.HAL
             mDebugger.SendInternal((byte)aCommand);
 
             WaitToWrite();
-            IO.Command.Byte = (byte)aCommand;
+            IOPort.Write8(IO.Command, (byte)aCommand);
 
             mDebugger.SendInternal("Command sent.");
 
@@ -564,7 +565,7 @@ namespace Cosmos.HAL
                 mDebugger.SendInternal(aByte.Value);
 
                 WaitToWrite();
-                IO.Data.Byte = aByte.Value;
+                IOPort.Write8(IO.Data, aByte.Value);
             }
         }
 
@@ -580,7 +581,7 @@ namespace Cosmos.HAL
             }
 
             WaitToWrite();
-            IO.Data.Byte = (byte)aDeviceCommand;
+            IOPort.Write8(IO.Data, (byte)aDeviceCommand);
 
             WaitForAck();
 
@@ -598,12 +599,12 @@ namespace Cosmos.HAL
                 }
 
                 WaitToWrite();
-                IO.Data.Byte = aByte.Value;
+                IOPort.Write8(IO.Data, aByte.Value);
 
                 WaitForAck();
             }
         }
-        
+
         #endregion
     }
 }
