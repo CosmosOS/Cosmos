@@ -449,8 +449,6 @@ namespace Cosmos.System.Graphics
                         (origin.x + x, origin.y + y);
 
 
-            if (color == null)
-                throw new ArgumentNullException(nameof(color));
             ThrowIfCoordNotValid(x_center + radius, y_center);
             ThrowIfCoordNotValid(x_center - radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + radius);
@@ -503,10 +501,6 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public virtual void DrawEllipse(Color color, int x_center, int y_center, int x_radius, int y_radius)
         {
-            if (color == null)
-            {
-                throw new ArgumentNullException(nameof(color));
-            }
             ThrowIfCoordNotValid(x_center + x_radius, y_center);
             ThrowIfCoordNotValid(x_center - x_radius, y_center);
             ThrowIfCoordNotValid(x_center, y_center + y_radius);
@@ -637,10 +631,6 @@ namespace Cosmos.System.Graphics
             {
                 throw new ArgumentException("A polygon requires more than 3 points.");
             }
-            if (color == null)
-            {
-                throw new ArgumentNullException(nameof(color));
-            }
             for (int i = 0; i < points.Length - 1; i++)
             {
                 DrawLine(color, points[i], points[i + 1]);
@@ -733,10 +723,7 @@ namespace Cosmos.System.Graphics
              * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
              * vertex (we call these vertexes A, B, C, D as for geometric convention)
              */
-            if (color == null)
-            {
-                throw new ArgumentNullException(nameof(color));
-            }
+
             /* The check of the validity of x and y are done in DrawLine() */
 
             /* The vertex A is where x,y are */
