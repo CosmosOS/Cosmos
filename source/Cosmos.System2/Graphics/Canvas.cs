@@ -944,7 +944,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public void DrawImageAlpha(Image image, int x, int y)
         {
-            var _color;
+            Color _color;
 
             for (int _x = 0; _x < image.Width; _x++)
             {
