@@ -15,7 +15,7 @@ namespace Cosmos.Core
         /// <param name="aPort">A port to write to.</param>
         /// <param name="aData">A data.</param>
         [PlugMethod(PlugRequired = true)]
-        public static void Write8(ushort aPort, byte aData) => throw null;
+        public static void Write8(int aPort, byte aData) => throw null;
 
         /// <summary>
         /// Write Word to port.
@@ -24,7 +24,7 @@ namespace Cosmos.Core
         /// <param name="aPort">A port to write to.</param>
         /// <param name="aData">A data.</param>
         [PlugMethod(PlugRequired = true)]
-        public static void Write16(ushort aPort, ushort aData) => throw null;
+        public static void Write16(int aPort, ushort aData) => throw null;
 
         /// <summary>
         /// Write DWord to port.
@@ -33,7 +33,7 @@ namespace Cosmos.Core
         /// <param name="aPort">A port to write to.</param>
         /// <param name="aData">A data.</param>
         [PlugMethod(PlugRequired = true)]
-        public static void Write32(ushort aPort, uint aData) => throw null;
+        public static void Write32(int aPort, uint aData) => throw null;
 
         /// <summary>
         /// Read byte from port.
@@ -42,7 +42,7 @@ namespace Cosmos.Core
         /// <param name="aPort">A port to read from.</param>
         /// <returns>byte value.</returns>
         [PlugMethod(PlugRequired = true)]
-        public static byte Read8(ushort aPort) => throw null;
+        public static byte Read8(int aPort) => throw null;
 
         /// <summary>
         /// Read Word from port.
@@ -51,7 +51,7 @@ namespace Cosmos.Core
         /// <param name="aPort">A port to read from.</param>
         /// <returns>ushort value.</returns>
         [PlugMethod(PlugRequired = true)]
-        public static ushort Read16(ushort aPort) => throw null;
+        public static ushort Read16(int aPort) => throw null;
 
         /// <summary>
         /// Read DWord from port.
@@ -60,7 +60,7 @@ namespace Cosmos.Core
         /// <param name="aPort">A port to read from.</param>
         /// <returns>uint value.</returns>
         [PlugMethod(PlugRequired = true)]
-        public static uint Read32(ushort aPort) => throw null;
+        public static uint Read32(int aPort) => throw null;
 
         //TODO: Plug these Reads with asm to read directly to RAM
         // REP INSW
@@ -69,7 +69,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="aData">Output data array.</param>
         /// <exception cref="System.OverflowException">Thrown if aData lenght is greater than Int32.MaxValue.</exception>
-        public static void Read8(ushort aPort, byte[] aData)
+        public static void Read8(int aPort, byte[] aData)
         {
             for (int i = 0; i < aData.Length / 2; i++)
             {
@@ -84,7 +84,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="aData">Output data array.</param>
         /// <exception cref="System.OverflowException">Thrown if aData lenght is greater than Int32.MaxValue.</exception>
-        public static void Read16(ushort aPort, ushort[] aData)
+        public static void Read16(int aPort, ushort[] aData)
         {
             for (int i = 0; i < aData.Length; i++)
             {
@@ -97,7 +97,7 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="aData">Output data array.</param>
         /// <exception cref="System.OverflowException">Thrown if aData lenght is greater than Int32.MaxValue.</exception>
-        public static void Read32(ushort aPort, uint[] aData)
+        public static void Read32(int aPort, uint[] aData)
         {
             for (int i = 0; i < aData.Length; i++)
             {

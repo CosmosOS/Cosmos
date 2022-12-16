@@ -14,35 +14,35 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Data register port.
         /// </summary>
-        public readonly ushort Data;
+        public readonly int Data;
         /// <summary>
         /// Interrupt enable register port.
         /// </summary>
-        public readonly ushort InterruptEnable;
+        public readonly int InterruptEnable;
         /// <summary>
         /// FIFO control register port.
         /// </summary>
-        public readonly ushort FIFOControl;
+        public readonly int FIFOControl;
         /// <summary>
         /// Line control register port.
         /// </summary>
-        public readonly ushort LineControl;
+        public readonly int LineControl;
         /// <summary>
         /// Modem control register port.
         /// </summary>
-        public readonly ushort ModemControl;
+        public readonly int ModemControl;
         /// <summary>
         /// Line status register port.
         /// </summary>
-        public readonly ushort LineStatus;
+        public readonly int LineStatus;
         /// <summary>
         /// Modem status register port.
         /// </summary>
-        public readonly ushort ModemStatus;
+        public readonly int ModemStatus;
         /// <summary>
         /// Scratch register port.
         /// </summary>
-        public readonly ushort Scratch;
+        public readonly int Scratch;
 
         /// <summary>
         /// Initializes a new set of IOPorts for the specified COM port number.
@@ -50,34 +50,28 @@ namespace Cosmos.Core.IOGroup
         /// <param name="comPortNumber">Can be either 1,2,3, or 4.</param>
         public COM(byte comPortNumber)
         {
-            if (comPortNumber > 4 && comPortNumber != 0)
+            if (comPortNumber > 4)
             {
                 throw new Exception("Cosmos.Core->IOGroup->COM.cs-> ERROR: Unknown COM Port.");
             }
-            ushort portBase = 0;
-            switch (comPortNumber)
+
+            ushort portBase = comPortNumber switch
             {
-                case 1:
-                    portBase = 0x3F8;
-                    break;
-                case 2:
-                    portBase = 0x2F8;
-                    break;
-                case 3:
-                    portBase = 0x3E8;
-                    break;
-                case 4:
-                    portBase = 0x2E8;
-                    break;
-            }
+                1 => 0x3F8,
+                2 => 0x2F8,
+                3 => 0x3E8,
+                4 => 0x2E8,
+                _ => 0
+            };
+
             Data = portBase;
-            InterruptEnable = unchecked((ushort)(portBase + 1));
-            FIFOControl = unchecked((ushort)(portBase + 2));
-            LineControl = unchecked((ushort)(portBase + 3));
-            ModemControl = unchecked((ushort)(portBase + 4));
-            LineStatus = unchecked((ushort)(portBase + 5));
-            ModemStatus = unchecked((ushort)(portBase + 6));
-            Scratch = unchecked((ushort)(portBase + 7));
+            InterruptEnable = unchecked(portBase + 1);
+            FIFOControl = unchecked(portBase + 2);
+            LineControl = unchecked(portBase + 3);
+            ModemControl = unchecked(portBase + 4);
+            LineStatus = unchecked(portBase + 5);
+            ModemStatus = unchecked(portBase + 6);
+            Scratch = unchecked(portBase + 7);
         }
     }
 }

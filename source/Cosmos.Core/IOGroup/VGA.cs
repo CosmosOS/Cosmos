@@ -13,59 +13,59 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Attribute controller index port.
         /// </summary>
-        public readonly ushort AttributeController_Index = 0x3C0;
+        public readonly int AttributeController_Index = 0x3C0;
         /// <summary>
         /// Attribute controller write port.
         /// </summary>
-        public readonly ushort AttributeController_Write = 0x3C0;
+        public readonly int AttributeController_Write = 0x3C0;
         /// <summary>
         /// Attribute controller read port.
         /// </summary>
-        public readonly ushort AttributeController_Read = 0x3C1;
+        public readonly int AttributeController_Read = 0x3C1;
         /// <summary>
         /// Miscellaneous output write port.
         /// </summary>
-        public readonly ushort MiscellaneousOutput_Write = 0x3C2;
+        public readonly int MiscellaneousOutput_Write = 0x3C2;
         /// <summary>
         /// Sequencer index port.
         /// </summary>
-        public readonly ushort Sequencer_Index = 0x3C4;
+        public readonly int Sequencer_Index = 0x3C4;
         /// <summary>
         /// Sequencer data port.
         /// </summary>
-        public readonly ushort Sequencer_Data = 0x3C5;
+        public readonly int Sequencer_Data = 0x3C5;
         /// <summary>
         /// DAC index read port.
         /// </summary>
-        public readonly ushort DACIndex_Read = 0x3C7;
+        public readonly int DACIndex_Read = 0x3C7;
         /// <summary>
         /// DAC index write port.
         /// </summary>
-        public readonly ushort DACIndex_Write = 0x3C8;
+        public readonly int DACIndex_Write = 0x3C8;
         /// <summary>
         /// DAC data port.
         /// </summary>
-        public readonly ushort DAC_Data = 0x3C9;
+        public readonly int DAC_Data = 0x3C9;
         /// <summary>
         /// Graphics controller index port.
         /// </summary>
-        public readonly ushort GraphicsController_Index = 0x3CE;
+        public readonly int GraphicsController_Index = 0x3CE;
         /// <summary>
         /// Graphics controller data port.
         /// </summary>
-        public readonly ushort GraphicsController_Data = 0x3CF;
+        public readonly int GraphicsController_Data = 0x3CF;
         /// <summary>
         /// CRT controller index port.
         /// </summary>
-        public readonly ushort CRTController_Index = 0x3D4;
+        public readonly int CRTController_Index = 0x3D4;
         /// <summary>
         /// CRT controller data port.
         /// </summary>
-        public readonly ushort CRTController_Data = 0x3D5;
+        public readonly int CRTController_Data = 0x3D5;
         /// <summary>
         /// Instant read port.
         /// </summary>
-        public readonly ushort Instat_Read = 0x3DA;
+        public readonly int Instat_Read = 0x3DA;
 
         /// <summary>
         /// 128KB at 0xA0000

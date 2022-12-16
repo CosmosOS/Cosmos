@@ -12,18 +12,18 @@ namespace Cosmos.Core.IOGroup {
         /// <summary>
         /// Channel 0 data port.
         /// </summary>
-        public readonly ushort Data0 = 0x40;
+        public readonly int Data0 = 0x40;
         /// <summary>
         /// Channel 1 data port.
         /// </summary>
-        public readonly ushort Data1 = 0x41;
+        public readonly int Data1 = 0x41;
         /// <summary>
         /// Channel 2 data port.
         /// </summary>
-        public readonly ushort Data2 = 0x42;
+        public readonly int Data2 = 0x42;
         /// <summary>
         /// Command register port.
         /// </summary>
-        public readonly ushort Command = 0x43;
+        public readonly int Command = 0x43;
     }
 }

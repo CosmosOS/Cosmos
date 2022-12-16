@@ -8,11 +8,11 @@
         /// <summary>
         /// Command port.
         /// </summary>
-        public readonly ushort Cmd;
+        public readonly int Cmd;
         /// <summary>
         /// Data port.
         /// </summary>
-        public readonly ushort Data;
+        public readonly int Data;
 
         /// <summary>
         /// Create new instance of the <see cref="PIC"/> class.
@@ -20,9 +20,9 @@
         /// <param name="aSlave">True if slave.</param>
         internal PIC(bool aSlave)
         {
-            ushort aBase = (ushort) (aSlave ? 0xA0 : 0x20);
+            int aBase = aSlave ? 0xA0 : 0x20;
             Cmd = aBase;
-            Data = (ushort)(aBase + 1);
+            Data = aBase + 1;
         }
     }
 }

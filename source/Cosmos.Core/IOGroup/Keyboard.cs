@@ -12,6 +12,6 @@ namespace Cosmos.Core.IOGroup {
         /// <summary>
         /// Data port.
         /// </summary>
-        public readonly ushort Port60 = 0x60;
+        public readonly int Port60 = 0x60;
     }
 }

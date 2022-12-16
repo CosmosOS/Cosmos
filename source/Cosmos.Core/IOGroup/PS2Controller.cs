@@ -8,14 +8,14 @@
         /// <summary>
         /// Data IO port.
         /// </summary>
-        public readonly ushort Data = 0x60;
+        public readonly int Data = 0x60;
         /// <summary>
         /// Status IO port.
         /// </summary>
-        public readonly ushort Status = 0x64;
+        public readonly int Status = 0x64;
         /// <summary>
         /// Command IO port.
         /// </summary>
-        public readonly ushort Command = 0x64;
+        public readonly int Command = 0x64;
     }
 }

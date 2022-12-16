@@ -15,11 +15,11 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Index IOPort.
         /// </summary>
-        public readonly ushort VbeIndex = 0x01CE;
+        public readonly int VbeIndex = 0x01CE;
         /// <summary>
         /// Data IOPort.
         /// </summary>
-        public readonly ushort VbeData = 0x01CF;
+        public readonly int VbeData = 0x01CF;
 
         /*
          * This not a lot optimal as we are taking a lot of memory and then maybe the driver is configured to go at 320*240!
