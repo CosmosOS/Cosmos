@@ -272,9 +272,9 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Get CPU cycle speed.
+        /// Get CPU branding name.
         /// </summary>
-        /// <returns>long value.</returns>
+        /// <returns>CPU's full name</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="NotSupportedException">Thrown if can not read CPU ID.</exception>
         public static string GetCPUBrandString()

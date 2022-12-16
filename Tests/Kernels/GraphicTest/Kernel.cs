@@ -49,55 +49,55 @@ namespace GraphicTest
             aCanvas.Clear(Color.Blue);
 
             /* A red Point */
-            Pen pen = new Pen(Color.Red);
-            aCanvas.DrawPoint(pen, 69, 69);
+            var color = Color.Red;
+            aCanvas.DrawPoint(color, 69, 69);
 
-            Color color = aCanvas.GetPointColor(69, 69);
-            Assert.AreEqual(color.ToArgb(), Color.Red.ToArgb(), "GetPointColor returns correct value");
+            Color fetchedColor = aCanvas.GetPointColor(69, 69);
+            Assert.AreEqual(fetchedColor.ToArgb(), Color.Red.ToArgb(), "GetPointColor returns correct value");
 
             /* A GreenYellow horizontal line */
-            pen.Color = Color.GreenYellow;
-            aCanvas.DrawLine(pen, 250, 100, 400, 100);
+            color = Color.GreenYellow;
+            aCanvas.DrawLine(color, 250, 100, 400, 100);
 
             /* A Black Lines larger than the canvas */
-            pen.Color = Color.Black;
-            aCanvas.DrawLine(pen, -20, 100, aCanvas.Mode.Columns + 20, 100);
-            aCanvas.DrawLine(pen, -20, -20, aCanvas.Mode.Columns + 20, aCanvas.Mode.Rows + 20);
+            color = Color.Black;
+            aCanvas.DrawLine(color, -20, 100, aCanvas.Mode.Columns + 20, 100);
+            aCanvas.DrawLine(color, -20, -20, aCanvas.Mode.Columns + 20, aCanvas.Mode.Rows + 20);
 
             /* An IndianRed vertical line */
-            pen.Color = Color.IndianRed;
-            aCanvas.DrawLine(pen, 350, 150, 350, 250);
+            color = Color.IndianRed;
+            aCanvas.DrawLine(color, 350, 150, 350, 250);
 
             /* A MintCream diagonal line */
-            pen.Color = Color.MintCream;
-            aCanvas.DrawLine(pen, 250, 150, 400, 250);
+            color = Color.MintCream;
+            aCanvas.DrawLine(color, 250, 150, 400, 250);
 
             /* Rectangles of various colors */
-            pen.Color = Color.PaleVioletRed;
-            aCanvas.DrawRectangle(pen, 350, 350, 80, 60);
+            color = Color.PaleVioletRed;
+            aCanvas.DrawRectangle(color, 350, 350, 80, 60);
 
-            pen.Color = Color.Chartreuse;
-            aCanvas.DrawCircle(pen, 69, 69, 10);
+            color = Color.Chartreuse;
+            aCanvas.DrawCircle(color, 69, 69, 10);
 
-            pen.Color = Color.CadetBlue;
-            aCanvas.DrawArc(45, 45, 35, 35, pen, 90, 270);
+            color = Color.CadetBlue;
+            aCanvas.DrawArc(45, 45, 35, 35, color, 90, 270);
 
-            pen.Color = Color.DimGray;
-            aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
+            color = Color.DimGray;
+            aCanvas.DrawEllipse(color, 100, 69, 10, 50);
 
-            pen.Color = Color.MediumPurple;
-            aCanvas.DrawPolygon(pen, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
+            color = Color.MediumPurple;
+            aCanvas.DrawPolygon(color, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
 
             /* Color.FromName */
             aCanvas.Clear(Color.FromName("Navy"));
-            
+
             /* A LimeGreen rectangle */
-            pen.Color = Color.LimeGreen;
-            aCanvas.DrawRectangle(pen, 450, 300, 80, 60);
+            color = Color.LimeGreen;
+            aCanvas.DrawRectangle(color, 450, 300, 80, 60);
 
             /* A filled rectange */
-            pen.Color = Color.Chocolate;
-            aCanvas.DrawFilledRectangle(pen, 200, 150, 400, 300);
+            color = Color.Chocolate;
+            aCanvas.DrawFilledRectangle(color, 200, 150, 400, 300);
 
             /* A Bitmap image */
             aCanvas.DrawImage(bitmap, new Point(10, 10));
@@ -131,20 +131,20 @@ namespace GraphicTest
             aCanvas.DrawImageAlpha(bitmap3, new Point(0, 300));
 
             /* Drawing ellipses */
-            aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
-            aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
-            aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
+            aCanvas.DrawEllipse(color, 100, 69, 10, 50);
+            aCanvas.DrawEllipse(color, 100, 69, 10, 50);
+            aCanvas.DrawEllipse(color, 100, 69, 10, 50);
 
             /* Create a PC Screen Font */
-            pen = new Pen(Color.White);
+            color = Color.White;
             Font font = PCScreenFont.Default;
 
             /* Draw text */
-            aCanvas.DrawString("Hello Cosmos World!", font, pen, 0, 16 * 5);
-            aCanvas.DrawString("font data test=" + font.Width + "x" + font.Height, font, pen, 0, 16 * 6);
+            aCanvas.DrawString("Hello Cosmos World!", font, color, 0, 16 * 5);
+            aCanvas.DrawString("font data test=" + font.Width + "x" + font.Height, font, color, 0, 16 * 6);
 
             /* Draw char */
-            aCanvas.DrawChar('A', font, pen, 0, 16 * 7);
+            aCanvas.DrawChar('A', font, color, 0, 16 * 7);
 
             aCanvas.Display();
 
@@ -215,7 +215,7 @@ namespace GraphicTest
                 }
             }
 
-            vGACanvas.DrawLine(new Pen(Color.Red), 10, 10, 10, 50);
+            vGACanvas.DrawLine(Color.Red, 10, 10, 10, 50);
 
             vGACanvas.Disable();
             for (int i = 0; i < 10; i++)
