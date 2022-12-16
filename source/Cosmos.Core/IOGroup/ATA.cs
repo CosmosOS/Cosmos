@@ -7,7 +7,7 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.IOGroup
 {
-    public class ATA : IOGroup
+    public class ATA
     {
         /// <summary>
         /// Error IOPort

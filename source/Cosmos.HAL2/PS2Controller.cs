@@ -53,7 +53,6 @@ namespace Cosmos.HAL
         public Device FirstDevice;
         public Device SecondDevice;
 
-        private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
         private Debugger mDebugger = new Debugger("HAL", "PS2Controller");
 
         /// <summary>
@@ -345,7 +344,7 @@ namespace Cosmos.HAL
             mDebugger.SendInternal(xMask);
 
             WaitToWrite();
-            IOPort.Write8(IO.Command, (byte)((byte)Command.PulseOutputLineBase | xMask));
+            IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Command, (byte)((byte)Command.PulseOutputLineBase | xMask));
 
             mDebugger.SendInternal("Output line pulsed.");
         }
@@ -358,7 +357,7 @@ namespace Cosmos.HAL
         {
             int i = 0;
 
-            while (IOPort.Read8(IO.Data) != Ack)
+            while (IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data) != Ack)
             {
                 i++;
 
@@ -384,7 +383,7 @@ namespace Cosmos.HAL
 
             do
             {
-                xByte = IOPort.Read8(IO.Data);
+                xByte = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
 
                 i++;
 
@@ -410,7 +409,7 @@ namespace Cosmos.HAL
 
             do
             {
-                aByte = IOPort.Read8(IO.Data);
+                aByte = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
 
                 i++;
 
@@ -447,7 +446,7 @@ namespace Cosmos.HAL
 
             WaitToReadData();
 
-            byte xByte = IOPort.Read8(IO.Data);
+            byte xByte = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
 
             mDebugger.SendInternal("(PS/2 Controller) Device reset reponse byte: " + xByte);
 
@@ -471,13 +470,13 @@ namespace Cosmos.HAL
         {
             int i = 0;
 
-            while ((IOPort.Read8(IO.Status) & 1) == 0)
+            while ((IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Status) & 1) == 0)
             {
                 i++;
 
                 if (i >= WAIT_TIMEOUT)
                 {
-                    mDebugger.SendInternal("Timeout expired in PS2Controller.WaitToReadData(), IO.Status.Byte: " + IOPort.Read8(IO.Status));
+                    mDebugger.SendInternal("Timeout expired in PS2Controller.WaitToReadData(), Cosmos.Core.IOGroup.PS2Controller.Status.Byte: " + IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Status));
                     return false;
                 }
             }
@@ -493,7 +492,7 @@ namespace Cosmos.HAL
         {
             int i = 0;
 
-            while ((IOPort.Read8(IO.Status) & (1 << 1)) != 0)
+            while ((IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Status) & (1 << 1)) != 0)
             {
                 i++;
 
@@ -513,7 +512,7 @@ namespace Cosmos.HAL
         {
             WaitToReadData();
 
-            var xByte = IOPort.Read8(IO.Data);
+            var xByte = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
 
             mDebugger.SendInternal("(PS/2 Controller) Reading data:");
             mDebugger.SendInternal("(PS/2 Controller) Returned byte:");
@@ -528,7 +527,7 @@ namespace Cosmos.HAL
 
             if (WaitToReadData())
             {
-                aByte = IOPort.Read8(IO.Data);
+                aByte = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
 
                 mDebugger.SendInternal("(PS/2 Controller) Returned byte:");
                 mDebugger.SendInternal(aByte);
@@ -544,7 +543,7 @@ namespace Cosmos.HAL
         private void WriteData(byte aByte)
         {
             WaitToWrite();
-            IOPort.Write8(IO.Data, aByte);
+            IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, aByte);
         }
 
         private void SendCommand(Command aCommand, byte? aByte = null)
@@ -554,7 +553,7 @@ namespace Cosmos.HAL
             mDebugger.SendInternal((byte)aCommand);
 
             WaitToWrite();
-            IOPort.Write8(IO.Command, (byte)aCommand);
+            IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Command, (byte)aCommand);
 
             mDebugger.SendInternal("Command sent.");
 
@@ -565,7 +564,7 @@ namespace Cosmos.HAL
                 mDebugger.SendInternal(aByte.Value);
 
                 WaitToWrite();
-                IOPort.Write8(IO.Data, aByte.Value);
+                IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, aByte.Value);
             }
         }
 
@@ -581,7 +580,7 @@ namespace Cosmos.HAL
             }
 
             WaitToWrite();
-            IOPort.Write8(IO.Data, (byte)aDeviceCommand);
+            IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, (byte)aDeviceCommand);
 
             WaitForAck();
 
@@ -599,7 +598,7 @@ namespace Cosmos.HAL
                 }
 
                 WaitToWrite();
-                IOPort.Write8(IO.Data, aByte.Value);
+                IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, aByte.Value);
 
                 WaitForAck();
             }

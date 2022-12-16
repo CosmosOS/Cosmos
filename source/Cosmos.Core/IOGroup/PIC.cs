@@ -3,7 +3,7 @@
     /// <summary>
     /// PIC class. Represent PIC.
     /// </summary>
-    public class PIC : IOGroup
+    public class PIC
     {
         /// <summary>
         /// Command port.

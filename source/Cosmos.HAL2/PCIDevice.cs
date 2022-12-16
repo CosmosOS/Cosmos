@@ -97,9 +97,7 @@ namespace Cosmos.HAL
         public const ushort ConfigAddressPort = 0xCF8;
         public const ushort ConfigDataPort = 0xCFC;
 
-        public PCIBaseAddressBar[] BaseAddressBar;
-
-        protected static Core.IOGroup.PCI IO = new Core.IOGroup.PCI();
+        public readonly PCIBaseAddressBar[] BaseAddressBar;
 
         public byte InterruptLine { get; private set; }
         public PCICommand Command { get { return (PCICommand)ReadRegister16(0x04); } set { WriteRegister16(0x04, (ushort)value); } }
@@ -169,8 +167,8 @@ namespace Cosmos.HAL
         public static ushort GetHeaderType(ushort Bus, ushort Slot, ushort Function)
         {
             uint xAddr = GetAddressBase(Bus, Slot, Function) | 0xE & 0xFC;
-            IOPort.Write32(IO.ConfigAddressPort, xAddr);
-            return (byte)(IOPort.Read32(IO.ConfigDataPort) >> (0xE % 4 * 8) & 0xFF);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return (byte)(IOPort.Read32(ConfigDataPort) >> (0xE % 4 * 8) & 0xFF);
         }
 
         /// <summary>
@@ -183,8 +181,8 @@ namespace Cosmos.HAL
         public static ushort GetVendorID(ushort Bus, ushort Slot, ushort Function)
         {
             uint xAddr = GetAddressBase(Bus, Slot, Function) | 0x0 & 0xFC;
-            IOPort.Write32(IO.ConfigAddressPort, xAddr);
-            return (ushort)(IOPort.Read32(IO.ConfigDataPort) >> (0x0 % 4 * 8) & 0xFFFF);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return (ushort)(IOPort.Read32(ConfigDataPort) >> (0x0 % 4 * 8) & 0xFFFF);
         }
 
         #region IOReadWrite
@@ -196,15 +194,15 @@ namespace Cosmos.HAL
         public byte ReadRegister8(byte aRegister)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
-            IOPort.Write32(IO.ConfigAddressPort, xAddr);
-            return (byte)(IOPort.Read32(IO.ConfigDataPort) >> (aRegister % 4 * 8) & 0xFF);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return (byte)(IOPort.Read32(ConfigDataPort) >> (aRegister % 4 * 8) & 0xFF);
         }
 
         public void WriteRegister8(byte aRegister, byte value)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
-            IOPort.Write32(IO.ConfigAddressPort, xAddr);
-            IOPort.Write8(IO.ConfigDataPort, value);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            IOPort.Write8(ConfigDataPort, value);
         }
 
         /// <summary>
@@ -215,8 +213,8 @@ namespace Cosmos.HAL
         public ushort ReadRegister16(byte aRegister)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
-            IOPort.Write32(IO.ConfigAddressPort, xAddr);
-            return (ushort)(IOPort.Read32(IO.ConfigDataPort) >> (aRegister % 4 * 8) & 0xFFFF);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return (ushort)(IOPort.Read32(ConfigDataPort) >> (aRegister % 4 * 8) & 0xFFFF);
         }
 
         /// <summary>
@@ -227,22 +225,22 @@ namespace Cosmos.HAL
         public void WriteRegister16(byte aRegister, ushort value)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
-            IOPort.Write32(IO.ConfigAddressPort, xAddr);
-            IOPort.Write16(IO.ConfigDataPort, value);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            IOPort.Write16(ConfigDataPort, value);
         }
 
         public uint ReadRegister32(byte aRegister)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
-            IOPort.Write32(IO.ConfigAddressPort, xAddr);
-            return IOPort.Read32(IO.ConfigDataPort);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return IOPort.Read32(ConfigDataPort);
         }
 
         public void WriteRegister32(byte aRegister, uint value)
         {
             uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
-            IOPort.Write32(IO.ConfigAddressPort, xAddr);
-            IOPort.Write32(IO.ConfigDataPort, value);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            IOPort.Write32(ConfigDataPort, value);
         }
         #endregion
 

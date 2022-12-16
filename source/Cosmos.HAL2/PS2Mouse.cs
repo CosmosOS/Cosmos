@@ -40,7 +40,6 @@ namespace Cosmos.HAL
             }
         }
 
-        private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
         private PS2Controller mPS2Controller = Global.PS2Controller;
         private Debugger mDebugger = new Debugger("HAL", "PS2Mouse");
 
@@ -121,7 +120,7 @@ namespace Cosmos.HAL
         {
             if (mMouseCycle == 0)
             {
-                mMouseByte[0] = IOPort.Read8(IO.Data);
+                mMouseByte[0] = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
 
                 //Bit 3 of byte 0 is 1, then we have a good package
                 if ((mMouseByte[0] & (1 << 3)) == 1 << 3)
@@ -131,12 +130,12 @@ namespace Cosmos.HAL
             }
             else if (mMouseCycle == 1)
             {
-                mMouseByte[1] = IOPort.Read8(IO.Data);
+                mMouseByte[1] = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
                 mMouseCycle++;
             }
             else if (mMouseCycle == 2)
             {
-                mMouseByte[2] = IOPort.Read8(IO.Data);
+                mMouseByte[2] = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
 
                 if (HasScrollWheel)
                 {
@@ -208,7 +207,7 @@ namespace Cosmos.HAL
             }
 
             mPS2Controller.WaitToWrite();
-            IOPort.Write8(IO.Data, (byte)aCommand);
+            IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, (byte)aCommand);
 
             mPS2Controller.WaitForAck();
 
@@ -226,7 +225,7 @@ namespace Cosmos.HAL
                 }
 
                 mPS2Controller.WaitToWrite();
-                IOPort.Write8(IO.Data, aByte.Value);
+                IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, aByte.Value);
 
                 mPS2Controller.WaitForAck();
             }

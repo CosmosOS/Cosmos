@@ -110,12 +110,28 @@ namespace Cosmos.HAL
 
         public bool T0RateGen = false;
 
-        protected Core.IOGroup.PIT IO = Core.Global.BaseIOGroups.PIT;
-        private List<PITTimer> activeHandlers = new();
+        private readonly List<PITTimer> activeHandlers = new();
         private ushort _T0Countdown = 65535;
         private ushort _T2Countdown = 65535;
-        private int timerCounter = 0;
-        private bool waitSignaled = false;
+        private int timerCounter;
+        private bool waitSignaled;
+
+        /// <summary>
+        /// Channel 0 data port.
+        /// </summary>
+        public const int Data0 = 0x40;
+        /// <summary>
+        /// Channel 1 data port.
+        /// </summary>
+        public const int Data1 = 0x41;
+        /// <summary>
+        /// Channel 2 data port.
+        /// </summary>
+        public const int Data2 = 0x42;
+        /// <summary>
+        /// Command register port.
+        /// </summary>
+        public const int Command = 0x43;
 
         public PIT()
         {
@@ -129,9 +145,9 @@ namespace Cosmos.HAL
             set {
                 _T0Countdown = value;
 
-                IOPort.Write8(IO.Command, (byte)(T0RateGen ? 0x34 : 0x30));
-                IOPort.Write8(IO.Data0, (byte)(value & 0xFF));
-                IOPort.Write8(IO.Data0, (byte)(value >> 8));
+                IOPort.Write8(Command, (byte)(T0RateGen ? 0x34 : 0x30));
+                IOPort.Write8(Data0, (byte)(value & 0xFF));
+                IOPort.Write8(Data0, (byte)(value >> 8));
             }
         }
 
@@ -166,9 +182,9 @@ namespace Cosmos.HAL
             {
                 _T2Countdown = value;
 
-                IOPort.Write8(IO.Command, 0xB6);
-                IOPort.Write8(IO.Data0, (byte)(value & 0xFF));
-                IOPort.Write8(IO.Data0, (byte)(value >> 8));
+                IOPort.Write8(Command, 0xB6);
+                IOPort.Write8(Data0, (byte)(value & 0xFF));
+                IOPort.Write8(Data0, (byte)(value >> 8));
             }
         }
 

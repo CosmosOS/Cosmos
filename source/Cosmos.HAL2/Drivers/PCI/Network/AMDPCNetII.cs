@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Cosmos.Common;
 using Cosmos.Core;
-using Cosmos.Core.IOGroup.Network;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
@@ -10,7 +9,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
     public class AMDPCNetII : NetworkDevice
     {
         protected PCIDevice pciCard;
-        protected AMDPCNetIIIOGroup io;
         protected MACAddress mac;
         protected bool mInitDone;
 
@@ -22,6 +20,27 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         protected Queue<byte[]> mRecvBuffer;
         protected Queue<byte[]> mTransmitBuffer;
         private int mNextTXDesc;
+
+        /// <summary>
+        /// Register address port.
+        /// </summary>
+        public readonly int RegisterAddress;
+        /// <summary>
+        /// Register data port.
+        /// </summary>
+        public readonly int RegisterData;
+        /// <summary>
+        /// Bus data port.
+        /// </summary>
+        public readonly int BusData;
+        /// <summary>
+        /// MAC1 port.
+        /// </summary>
+        public readonly int MAC1;
+        /// <summary>
+        /// MAC2 port.
+        /// </summary>
+        public readonly int MAC2;
 
         public AMDPCNetII(PCIDevice device)
             : base()
@@ -35,17 +54,23 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             this.pciCard.Claimed = true;
             this.pciCard.EnableDevice();
 
-            this.io = new AMDPCNetIIIOGroup((ushort)this.pciCard.BaseAddressBar[0].BaseAddress);
-            IOPort.Write32(io.RegisterData, 0);
+            int baseAddress = (int)this.pciCard.BaseAddressBar[0].BaseAddress;
+            RegisterAddress = baseAddress + 0x14;
+            RegisterData = baseAddress + 0x10;
+            BusData = baseAddress + 0x1C;
+            MAC1 = baseAddress;
+            MAC2 = baseAddress + 0x04;
+
+            IOPort.Write32(RegisterData, 0);
 
             // Get the EEPROM MAC Address and set it as the devices MAC
             byte[] eeprom_mac = new byte[6];
-            uint result = IOPort.Read32(io.MAC1);
+            uint result = IOPort.Read32(MAC1);
             eeprom_mac[0] = BinaryHelper.GetByteFrom32bit(result, 0);
             eeprom_mac[1] = BinaryHelper.GetByteFrom32bit(result, 8);
             eeprom_mac[2] = BinaryHelper.GetByteFrom32bit(result, 16);
             eeprom_mac[3] = BinaryHelper.GetByteFrom32bit(result, 24);
-            result = IOPort.Read32(io.MAC2);
+            result = IOPort.Read32(MAC2);
             eeprom_mac[4] = BinaryHelper.GetByteFrom32bit(result, 0);
             eeprom_mac[5] = BinaryHelper.GetByteFrom32bit(result, 8);
 
@@ -151,13 +176,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                IOPort.Write32(io.RegisterAddress, 0x00);
-                return IOPort.Read32(io.RegisterData);
+                IOPort.Write32(RegisterAddress, 0x00);
+                return IOPort.Read32(RegisterData);
             }
             set
             {
-                IOPort.Write32(io.RegisterAddress, 0x00);
-                IOPort.Write32(io.RegisterData, value);
+                IOPort.Write32(RegisterAddress, 0x00);
+                IOPort.Write32(RegisterData, value);
             }
         }
 
@@ -165,19 +190,19 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                IOPort.Write32(io.RegisterAddress, 0x01);
-                var result = IOPort.Read32(io.RegisterData);
-                IOPort.Write32(io.RegisterAddress, 0x02);
-                result |= IOPort.Read32(io.RegisterData) << 16;
+                IOPort.Write32(RegisterAddress, 0x01);
+                var result = IOPort.Read32(RegisterData);
+                IOPort.Write32(RegisterAddress, 0x02);
+                result |= IOPort.Read32(RegisterData) << 16;
 
                 return result;
             }
             set
             {
-                IOPort.Write32(io.RegisterAddress, 0x01);
-                IOPort.Write32(io.RegisterData, value & 0xFFFF);
-                IOPort.Write32(io.RegisterAddress, 0x02);
-                IOPort.Write32(io.RegisterData, value >> 16);
+                IOPort.Write32(RegisterAddress, 0x01);
+                IOPort.Write32(RegisterData, value & 0xFFFF);
+                IOPort.Write32(RegisterAddress, 0x02);
+                IOPort.Write32(RegisterData, value >> 16);
             }
         }
 
@@ -185,13 +210,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                IOPort.Write32(io.RegisterAddress, 0x14);
-                return IOPort.Read32(io.BusData);
+                IOPort.Write32(RegisterAddress, 0x14);
+                return IOPort.Read32(BusData);
             }
             set
             {
-                IOPort.Write32(io.RegisterAddress, 0x14);
-                IOPort.Write32(io.BusData, value);
+                IOPort.Write32(RegisterAddress, 0x14);
+                IOPort.Write32(BusData, value);
             }
         }
 

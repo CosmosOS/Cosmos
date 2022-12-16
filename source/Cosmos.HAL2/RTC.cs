@@ -11,7 +11,14 @@ namespace Cosmos.HAL
     /// </summary>
     public static class RTC
     {
-        private static Core.IOGroup.RTC rtc = new Core.IOGroup.RTC();
+        /// <summary>
+        /// Address IOPort.
+        /// </summary>
+        public const int Address = 0x70;
+        /// <summary>
+        /// Data IOPort.
+        /// </summary>
+        public const int Data = 0x71;
 
         /// <summary>
         /// The static constructor for RTC,
@@ -21,8 +28,8 @@ namespace Cosmos.HAL
         static RTC()
         {
             WaitForReady();
-            IOPort.Write8(rtc.Address, 0x0B);
-            StatusByteB = IOPort.Read8(rtc.Data);
+            IOPort.Write8(Address, 0x0B);
+            StatusByteB = IOPort.Read8(Data);
 
             #region Check 24-Hour Mode
             if ((StatusByteB & 0x02) == 0x02)
@@ -71,14 +78,14 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                IOPort.Write8(rtc.Address, 0);
+                IOPort.Write8(Address, 0);
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(rtc.Data));
+                    return FromBCD(IOPort.Read8(Data));
                 }
                 else
                 {
-                    return IOPort.Read8(rtc.Data);
+                    return IOPort.Read8(Data);
                 }
             }
         }
@@ -91,14 +98,14 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                IOPort.Write8(rtc.Address, 2);
+                IOPort.Write8(Address, 2);
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(rtc.Data));
+                    return FromBCD(IOPort.Read8(Data));
                 }
                 else
                 {
-                    return IOPort.Read8(rtc.Data);
+                    return IOPort.Read8(Data);
                 }
             }
         }
@@ -112,16 +119,16 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                IOPort.Write8(rtc.Address, 4);
+                IOPort.Write8(Address, 4);
                 if (isBCDMode)
                 {
                     if (is24HourMode)
                     {
-                        return FromBCD(IOPort.Read8(rtc.Data));
+                        return FromBCD(IOPort.Read8(Data));
                     }
                     else
                     {
-                        byte b = IOPort.Read8(rtc.Data);
+                        byte b = IOPort.Read8(Data);
                         if ((b & 0x80) == 0x80)
                         {
                             // It's PM.
@@ -145,11 +152,11 @@ namespace Cosmos.HAL
                 {
                     if (is24HourMode)
                     {
-                        return IOPort.Read8(rtc.Data);
+                        return IOPort.Read8(Data);
                     }
                     else
                     {
-                        byte b = IOPort.Read8(rtc.Data);
+                        byte b = IOPort.Read8(Data);
                         if ((b & 0x80) == 0x80)
                         {
                             // It's PM.
@@ -180,14 +187,14 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                IOPort.Write8(rtc.Address, 6);
+                IOPort.Write8(Address, 6);
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(rtc.Data));
+                    return FromBCD(IOPort.Read8(Data));
                 }
                 else
                 {
-                    return IOPort.Read8(rtc.Data);
+                    return IOPort.Read8(Data);
                 }
             }
         }
@@ -200,14 +207,14 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                IOPort.Write8(rtc.Address, 7);
+                IOPort.Write8(Address, 7);
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(rtc.Data));
+                    return FromBCD(IOPort.Read8(Data));
                 }
                 else
                 {
-                    return IOPort.Read8(rtc.Data);
+                    return IOPort.Read8(Data);
                 }
             }
         }
@@ -220,14 +227,14 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                IOPort.Write8(rtc.Address, 8);
+                IOPort.Write8(Address, 8);
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(rtc.Data));
+                    return FromBCD(IOPort.Read8(Data));
                 }
                 else
                 {
-                    return IOPort.Read8(rtc.Data);
+                    return IOPort.Read8(Data);
                 }
             }
         }
@@ -240,14 +247,14 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                IOPort.Write8(rtc.Address, 9);
+                IOPort.Write8(Address, 9);
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(rtc.Data));
+                    return FromBCD(IOPort.Read8(Data));
                 }
                 else
                 {
-                    return IOPort.Read8(rtc.Data);
+                    return IOPort.Read8(Data);
                 }
             }
         }
@@ -261,14 +268,14 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                IOPort.Write8(rtc.Address, 0x32);
+                IOPort.Write8(Address, 0x32);
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(rtc.Data));
+                    return FromBCD(IOPort.Read8(Data));
                 }
                 else
                 {
-                    return IOPort.Read8(rtc.Data);
+                    return IOPort.Read8(Data);
                 }
             }
         }
@@ -290,9 +297,9 @@ namespace Cosmos.HAL
         {
             do
             {
-                IOPort.Write8(rtc.Address, 10);
+                IOPort.Write8(Address, 10);
             }
-            while ((IOPort.Read8(rtc.Data) & 0x80) != 0);
+            while ((IOPort.Read8(Data) & 0x80) != 0);
         }
     }
 }

@@ -11,10 +11,25 @@ namespace Cosmos.HAL.Drivers
     /// </summary>
     public class VBEDriver
     {
+        /// <summary>
+        /// Index IOPort.
+        /// </summary>
+        public const int VbeIndex = 0x01CE;
+        /// <summary>
+        /// Data IOPort.
+        /// </summary>
+        public const int VbeData = 0x01CF;
 
-        private static readonly VBEIOGroup IO = Core.Global.BaseIOGroups.VBE;
+        /*
+         * This not a lot optimal as we are taking a lot of memory and then maybe the driver is configured to go at 320*240!
+         */
+        /// <summary>
+        /// Frame buffer memory block.
+        /// </summary>
+        public MemoryBlock LinearFrameBuffer;
+        //public MemoryBlock LinearFrameBuffer = new MemoryBlock(0xE0000000, 1024 * 768 * 4);
 
-        protected ManagedMemoryBlock lastbuffer;
+        protected readonly ManagedMemoryBlock lastbuffer;
 
         /// <summary>
         /// Register index.
@@ -82,14 +97,14 @@ namespace Cosmos.HAL.Drivers
             if (VBE.IsAvailable()) //VBE VESA Enabled Mulitboot Parsing
             {
                 Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {xres}*{yres}@{bpp}");
-                IO.LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
+                LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
                 lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
             }
             else if (ISAModeAvailable()) //Bochs Graphics Adaptor ISA Mode
             {
                 Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}.");
 
-                IO.LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
+                LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
                 lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
                 VBESet(xres, yres, bpp);
             }
@@ -98,7 +113,7 @@ namespace Cosmos.HAL.Drivers
             {
                 Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}. Framebuffer address=" + videocard.BAR0);
 
-                IO.LinearFrameBuffer = new MemoryBlock(videocard.BAR0, 1920 * 1200 * 4);
+                LinearFrameBuffer = new MemoryBlock(videocard.BAR0, 1920 * 1200 * 4);
                 lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
                 VBESet(xres, yres, bpp);
             }
@@ -115,14 +130,14 @@ namespace Cosmos.HAL.Drivers
         /// <param name="value">Value.</param>
         private static void VBEWrite(RegisterIndex index, ushort value)
         {
-            IOPort.Write16(IO.VbeIndex, (ushort)index);
-            IOPort.Write16(IO.VbeData, value);
+            IOPort.Write16(VbeIndex, (ushort)index);
+            IOPort.Write16(VbeData, value);
         }
 
         private static ushort VBERead(RegisterIndex index)
         {
-            IOPort.Write16(IO.VbeIndex, (ushort)index);
-            return IOPort.Read16(IO.VbeData);
+            IOPort.Write16(VbeIndex, (ushort)index);
+            return IOPort.Read16(VbeData);
         }
         public static bool ISAModeAvailable()
         {
@@ -303,7 +318,7 @@ namespace Cosmos.HAL.Drivers
         /// </summary>
         public void Swap()
         {
-            IO.LinearFrameBuffer.Copy(lastbuffer);
+            LinearFrameBuffer.Copy(lastbuffer);
         }
     }
 }

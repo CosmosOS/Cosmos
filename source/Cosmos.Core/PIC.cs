@@ -16,11 +16,11 @@ namespace Cosmos.Core
         /// <summary>
         /// Master PIC.
         /// </summary>
-        protected IOGroup.PIC Master = new IOGroup.PIC(false);
+        protected readonly IOGroup.PIC Master = new IOGroup.PIC(false);
         /// <summary>
         /// Slave PIC.
         /// </summary>
-        protected IOGroup.PIC Slave = new IOGroup.PIC(true);
+        protected readonly IOGroup.PIC Slave = new IOGroup.PIC(true);
 
         /// <summary>
         /// Commands.
