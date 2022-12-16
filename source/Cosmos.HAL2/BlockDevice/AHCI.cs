@@ -129,20 +129,18 @@ namespace Cosmos.HAL.BlockDevice
 
         public static void Wait(int microsecondsTimeout)
         {
-            byte xVoid;
             for (int i = 0; i < microsecondsTimeout; i++)
             {
-                // Random IOPort
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
-                xVoid = IOPort.Read8(Core.Global.BaseIOGroups.TextScreen.Data1);
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
             }
         }
 

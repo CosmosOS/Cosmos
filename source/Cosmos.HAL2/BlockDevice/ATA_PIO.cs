@@ -176,9 +176,9 @@ namespace Cosmos.HAL.BlockDevice
 			mControllerID = aControllerId;
 			mBusPosition = aBusPosition;
 			// Disable IRQs, we use polling currently
-            IOPort.Write8(IO.Control, 0x02);
+			IOPort.Write8(IO.Control, 0x02);
 
-			mDriveType = DiscoverDrive();
+            mDriveType = DiscoverDrive();
 			if (mDriveType != SpecLevel.Null)
 			{
 				InitDrive();
@@ -242,11 +242,10 @@ namespace Cosmos.HAL.BlockDevice
 		// Since we read status again later, we wait by reading it 4 times.
 		protected void Wait()
 		{
-			// Wait 400 ns
-            var xVoid = IOPort.Read8(IO.Status);
-			xVoid = IOPort.Read8(IO.Status);
-			xVoid = IOPort.Read8(IO.Status);
-			xVoid = IOPort.Read8(IO.Status);
+            IOPort.Wait();
+            IOPort.Wait();
+            IOPort.Wait();
+            IOPort.Wait();
 		}
 
         /// <summary>

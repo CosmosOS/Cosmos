@@ -55,7 +55,7 @@ namespace Cosmos.System.Graphics
             {
                 int hash = Width.GetHashCode();
                 hash = hash * 17 + Height.GetHashCode();
-                hash = hash * 31 + (int)ColorDepth.GetHashCode();
+                hash = hash * 31 + ColorDepth.GetHashCode();
                 return hash;
             }
         }
@@ -132,9 +132,7 @@ namespace Cosmos.System.Graphics
         /// <returns>bool value.</returns>
         public static bool operator >=(Mode mode_a, Mode mode_b)
         {
-            var result = mode_a.CompareTo(mode_b);
-
-            return result == 0 || result > 0;
+            return mode_a.CompareTo(mode_b) >= 0;
         }
 
         /// <summary>
@@ -145,9 +143,7 @@ namespace Cosmos.System.Graphics
         /// <returns>bool value.</returns>
         public static bool operator <=(Mode mode_a, Mode mode_b)
         {
-            var result = mode_a.CompareTo(mode_b);
-
-            return result == 0 || result < 0;
+            return mode_a.CompareTo(mode_b) <= 0;
         }
 
         /// <summary>

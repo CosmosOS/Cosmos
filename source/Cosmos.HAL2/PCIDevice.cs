@@ -856,8 +856,7 @@ namespace Cosmos.HAL
 
     public class PCIBaseAddressBar
     {
-        private ushort prefetchable = 0;
-        private ushort type = 0;
+        private ushort prefetchable, type;
 
         public PCIBaseAddressBar(uint raw)
         {
@@ -883,8 +882,8 @@ namespace Cosmos.HAL
             }
         }
 
-        public uint BaseAddress { get; } = 0;
+        public uint BaseAddress { get; }
 
-        public bool IsIO { get; } = false;
+        public bool IsIO { get; }
     }
 }

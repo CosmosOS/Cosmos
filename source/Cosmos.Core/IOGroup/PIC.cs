@@ -1,6 +1,4 @@
-﻿using Cosmos.Core;
-
-namespace Cosmos.Core.IOGroup
+﻿namespace Cosmos.Core.IOGroup
 {
     /// <summary>
     /// PIC class. Represent PIC.
@@ -10,11 +8,11 @@ namespace Cosmos.Core.IOGroup
         /// <summary>
         /// Command port.
         /// </summary>
-        public readonly ushort Cmd = 0x20;
+        public readonly ushort Cmd;
         /// <summary>
         /// Data port.
         /// </summary>
-        public readonly ushort Data = 0x21;
+        public readonly ushort Data;
 
         /// <summary>
         /// Create new instance of the <see cref="PIC"/> class.
@@ -22,11 +20,9 @@ namespace Cosmos.Core.IOGroup
         /// <param name="aSlave">True if slave.</param>
         internal PIC(bool aSlave)
         {
-            if (aSlave)
-            {
-                Cmd = 0xA0;
-                Data = 0xA1;
-            }
+            ushort aBase = (ushort) (aSlave ? 0xA0 : 0x20);
+            Cmd = aBase;
+            Data = (ushort)(aBase + 1);
         }
     }
 }
