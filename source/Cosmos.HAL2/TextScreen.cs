@@ -179,7 +179,7 @@ namespace Cosmos.HAL
 
             // The VGA Cursor is disabled when the value is 1 and enabled when is 0 so we need to invert 'value', sadly the ConvertToByte() function is not working
             // so we need to do the if by hand...
-            byte cursorDisable = mCursorVisible ? 0 : 1;
+            byte cursorDisable = (byte)(mCursorVisible ? 0 : 1);
 
             // Cursor Vertical Size Register if the bit 5 is set to 1 the cursor is disabled, if 0 is enabled
             IO.Idx3.Byte = 0x0A;
