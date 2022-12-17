@@ -19,7 +19,7 @@ namespace Cosmos.HAL
         protected int mCursorSize = 25; // 25 % as C# Console class
         protected bool mCursorVisible = true;
 
-        public Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
+        public Core.IOGroup.TextScreen IO = new();
         public MemoryBlock08 mRAM;
 
         /// <summary>
@@ -148,7 +148,9 @@ namespace Cosmos.HAL
             value = 16 - ((16 * value) / 100);
             // This is the case in which value is in reality 1% and a for a truncation error we get 16 (invalid value)
             if (value >= 16)
+            {
                 value = 15;
+            }
             TextScreenHelpers.Debug("verticalSize is", value);
             // Cursor Vertical Size Register here a value between 0x00 and 0x0F must be set with 0x00 meaning maximum size and 0x0F minimum
             IO.Idx3.Byte = 0x0A;
@@ -180,13 +182,18 @@ namespace Cosmos.HAL
             // The VGA Cursor is disabled when the value is 1 and enabled when is 0 so we need to invert 'value', sadly the ConvertToByte() function is not working
             // so we need to do the if by hand...
             if (value == true)
+            {
                 cursorDisable = 0;
+            }
             else
+            {
                 cursorDisable = 1;
+            }
 
             // Cursor Vertical Size Register if the bit 5 is set to 1 the cursor is disabled, if 0 is enabled
             IO.Idx3.Byte = 0x0A;
             IO.Data3.Byte |= (byte)(cursorDisable << 5);
+            SetCursorSize(mCursorSize);
         }
     }
 }
