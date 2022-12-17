@@ -246,11 +246,11 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw point to the screen.
         /// </summary>
-        /// <param name="aPen">Pen to draw the point with.</param>
+        /// <param name="aColor">Color to draw the point with.</param>
         /// <param name="aX">X coordinate.</param>
         /// <param name="aY">Y coordinate.</param>
         /// <exception cref="NotImplementedException">Thrown if color depth is not supported (currently only 32 is supported).</exception>
-        public override void DrawPoint(Pen aPen, int aX, int aY)
+        public override void DrawPoint(Color aColor, int aX, int aY)
         {
             uint offset;
 
@@ -267,29 +267,29 @@ namespace Cosmos.System.Graphics
 
                     offset = (uint)GetPointOffset(aX, aY);
 
-                    if (aPen.Color.A < 255)
+                    if (aColor.A < 255)
                     {
-                        if (aPen.Color.A == 0)
+                        if (aColor.A == 0)
                         {
                             return;
                         }
 
-                        aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
+                        aColor = AlphaBlend(aColor, GetPointColor(aX, aY), aColor.A);
                     }
 
-                    _VBEDriver.SetVRAM(offset, aPen.Color.B);
-                    _VBEDriver.SetVRAM(offset + 1, aPen.Color.G);
-                    _VBEDriver.SetVRAM(offset + 2, aPen.Color.R);
-                    _VBEDriver.SetVRAM(offset + 3, aPen.Color.A);
+                    _VBEDriver.SetVRAM(offset, aColor.B);
+                    _VBEDriver.SetVRAM(offset + 1, aColor.G);
+                    _VBEDriver.SetVRAM(offset + 2, aColor.R);
+                    _VBEDriver.SetVRAM(offset + 3, aColor.A);
 
                     break;
                 case ColorDepth.ColorDepth24:
 
                     offset = (uint)GetPointOffset(aX, aY);
 
-                    _VBEDriver.SetVRAM(offset, aPen.Color.B);
-                    _VBEDriver.SetVRAM(offset + 1, aPen.Color.G);
-                    _VBEDriver.SetVRAM(offset + 2, aPen.Color.R);
+                    _VBEDriver.SetVRAM(offset, aColor.B);
+                    _VBEDriver.SetVRAM(offset + 1, aColor.G);
+                    _VBEDriver.SetVRAM(offset + 2, aColor.R);
 
                     break;
                 default:
@@ -302,11 +302,11 @@ namespace Cosmos.System.Graphics
         /// Draw point to the screen. 
         /// Not implemented.
         /// </summary>
-        /// <param name="aPen">Pen to draw the point with.</param>
+        /// <param name="aColor">Color to draw the point with.</param>
         /// <param name="aX">X coordinate.</param>
         /// <param name="aY">Y coordinate.</param>
         /// <exception cref="NotImplementedException">Thrown always (only int coordinats supported).</exception>
-        public override void DrawPoint(Pen aPen, float aX, float aY)
+        public override void DrawPoint(Color aColor, float aX, float aY)
         {
             throw new NotImplementedException();
         }
@@ -334,7 +334,7 @@ namespace Cosmos.System.Graphics
                 for (int ii = 0; ii < aY; ii++)
                 {
 
-                    DrawPoint(new Pen(aColors[i + (ii * aWidth)]), i, ii);
+                    DrawPoint((aColors[i + (ii * aWidth)]), i, ii);
 
                 }
             }
@@ -343,16 +343,16 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw filled rectangle.
         /// </summary>
-        /// <param name="aPen">Pen to draw with.</param>
+        /// <param name="aColor">Color to draw with.</param>
         /// <param name="aX">X coordinate.</param>
         /// <param name="aY">Y coordinate.</param>
         /// <param name="aWidth">Width.</param>
         /// <param name="aHeight">Height.</param>
-        public override void DrawFilledRectangle(Pen aPen, int aX, int aY, int aWidth, int aHeight)
+        public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight)
         {
             //ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
             aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
-            var color = aPen.Color.ToArgb();
+            var color = aColor.ToArgb();
 
             for (int i = aY; i < aY + aHeight; i++)
             {
