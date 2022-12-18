@@ -232,7 +232,7 @@ namespace Cosmos.Debug.Hosts
         
         if (!File.Exists(defaultPath))
         {
-          throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
+          throw new Exception("Checked paths C:\\Program Files\\qemu and C:\\qemu and could not find QEMU.");
         }
       }
 
