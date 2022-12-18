@@ -1,0 +1,7 @@
+# Drivers
+
+Dynamically loaded drivers are contained in this folder. In the future they may 
+be in different assemblies which are loaded on demand. The drivers in the root 
+folder are not dynamic, and are drivers that are required for all systems, or 
+are common bases used by dynamic drivers. For example, ATA exists in the root, 
+but actual ATA chipsets should exist in this directory.
