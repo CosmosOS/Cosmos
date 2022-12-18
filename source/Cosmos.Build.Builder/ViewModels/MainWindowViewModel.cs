@@ -194,7 +194,7 @@ namespace Cosmos.Build.Builder.ViewModels
                 }
                 if (CloseWhenCompleted)
                 {
-                    Window.Close();
+                    System.Windows.Application.Current.Dispatcher.Invoke(() => System.Windows.Application.Current?.MainWindow?.Close());
                 }
             }
             catch (Exception e)
