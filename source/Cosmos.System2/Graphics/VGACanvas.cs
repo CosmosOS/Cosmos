@@ -88,18 +88,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draws an array of colors
-        /// </summary>
-        /// <param name="aColors"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawArray(Color[] aColors, Point aPoint, int aWidth, int aHeight)
-        {
-            base.DrawArray(aColors, aPoint, aWidth, aHeight);
-        }
-
-        /// <summary>
         /// Draws an array of colors, specifiying X and Y coords
         /// </summary>
         /// <param name="aColors"></param>
@@ -113,114 +101,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draws a circle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aXCenter"></param>
-        /// <param name="aYCenter"></param>
-        /// <param name="aRadius"></param>
-        public override void DrawCircle(Color aColor, int aXCenter, int aYCenter, int aRadius)
-        {
-            base.DrawCircle(aColor, aXCenter, aYCenter, aRadius);
-        }
-
-        /// <summary>
-        /// Draws a circle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aRadius"></param>
-        public override void DrawCircle(Color aColor, Point aPoint, int aRadius)
-        {
-            base.DrawCircle(aColor, aPoint, aRadius);
-        }
-
-        /// <summary>
-        /// Draws an ellipse
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aXCenter"></param>
-        /// <param name="aYCenter"></param>
-        /// <param name="aXRadius"></param>
-        /// <param name="aYRadius"></param>
-        public override void DrawEllipse(Color aColor, int aXCenter, int aYCenter, int aXRadius, int aYRadius)
-        {
-            base.DrawEllipse(aColor, aXCenter, aYCenter, aXRadius, aYRadius);
-        }
-
-        /// <summary>
-        /// Draws an ellipse
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aXRadius"></param>
-        /// <param name="aYRadius"></param>
-        public override void DrawEllipse(Color aColor, Point aPoint, int aXRadius, int aYRadius)
-        {
-            base.DrawEllipse(aColor, aPoint, aXRadius, aYRadius);
-        }
-
-        /// <summary>
-        /// Draws a filled circle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX0"></param>
-        /// <param name="aY0"></param>
-        /// <param name="aRadius"></param>
-        public override void DrawFilledCircle(Color aColor, int aX0, int aY0, int aRadius)
-        {
-            base.DrawFilledCircle(aColor, aX0, aY0, aRadius);
-        }
-
-        /// <summary>
-        /// Draws a filled circle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aRadius"></param>
-        public override void DrawFilledCircle(Color aColor, Point aPoint, int aRadius)
-        {
-            base.DrawFilledCircle(aColor, aPoint, aRadius);
-        }
-
-        /// <summary>
-        /// Draws a filled ellipse
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aHeight"></param>
-        /// <param name="aWidth"></param>
-        public override void DrawFilledEllipse(Color aColor, Point aPoint, int aHeight, int aWidth)
-        {
-            base.DrawFilledEllipse(aColor, aPoint, aHeight, aWidth);
-        }
-
-        /// <summary>
-        /// Draws a filled ellipse
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aHeight"></param>
-        /// <param name="aWidth"></param>
-        public override void DrawFilledEllipse(Color aColor, int aX, int aY, int aHeight, int aWidth)
-        {
-            base.DrawFilledEllipse(aColor, aX, aY, aHeight, aWidth);
-        }
-
-        /// <summary>
-        /// Draws a filled rectangle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawFilledRectangle(Color aColor, Point aPoint, int aWidth, int aHeight)
-        {
-            DrawFilledRectangle(aColor, aPoint.X, aPoint.Y, aWidth, aHeight);
-        }
-
-        /// <summary>
         /// Draws a filled rectangle
         /// </summary>
         /// <param name="aColor"></param>
@@ -231,19 +111,6 @@ namespace Cosmos.System.Graphics
         public override void DrawFilledRectangle(Color aColor, int aXStart, int aYStart, int aWidth, int aHeight)
         {
             _VGADriver.DrawFilledRectangle(aXStart, aYStart, aWidth, aHeight, _VGADriver.GetClosestColorInPalette(aColor));
-        }
-
-        /// <summary>
-        /// Draws a line (in the sand?)
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX1"></param>
-        /// <param name="aY1"></param>
-        /// <param name="aX2"></param>
-        /// <param name="aY2"></param>
-        public override void DrawLine(Color aColor, int aX1, int aY1, int aX2, int aY2)
-        {
-            base.DrawLine(aColor, aX1, aY1, aX2, aY2);
         }
 
         /// <summary>
@@ -280,91 +147,6 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draws a polygon
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoints"></param>
-        public override void DrawPolygon(Color aColor, params Point[] aPoints)
-        {
-            base.DrawPolygon(aColor, aPoints);
-        }
-
-        /// <summary>
-        /// Draws a rectangle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawRectangle(Color aColor, Point aPoint, int aWidth, int aHeight)
-        {
-            base.DrawRectangle(aColor, aPoint, aWidth, aHeight);
-        }
-
-        /// <summary>
-        /// Draws a rectangle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight)
-        {
-            base.DrawRectangle(aColor, aX, aY, aWidth, aHeight);
-        }
-
-        /// <summary>
-        /// Draws a square
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoint"></param>
-        /// <param name="aSize"></param>
-        public override void DrawSquare(Color aColor, Point aPoint, int aSize)
-        {
-            base.DrawSquare(aColor, aPoint, aSize);
-        }
-
-        /// <summary>
-        /// Draws a square
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aSize"></param>
-        public override void DrawSquare(Color aColor, int aX, int aY, int aSize)
-        {
-            base.DrawSquare(aColor, aX, aY, aSize);
-        }
-
-        /// <summary>
-        /// Draws a triangle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aPoint0"></param>
-        /// <param name="aPoint1"></param>
-        /// <param name="aPoint2"></param>
-        public override void DrawTriangle(Color aColor, Point aPoint0, Point aPoint1, Point aPoint2)
-        {
-            base.DrawTriangle(aColor, aPoint0, aPoint1, aPoint2);
-        }
-
-        /// <summary>
-        /// Draws a triangle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aV1x"></param>
-        /// <param name="aV1y"></param>
-        /// <param name="aV2x"></param>
-        /// <param name="aV2y"></param>
-        /// <param name="aV3x"></param>
-        /// <param name="aV3y"></param>
-        public override void DrawTriangle(Color aColor, int aV1x, int aV1y, int aV2x, int aV2y, int aV3x, int aV3y)
-        {
-            base.DrawTriangle(aColor, aV1x, aV1y, aV2x, aV2y, aV3x, aV3y);
-        }
-
-        /// <summary>
         /// List of available resolutions
         /// </summary>
         private static readonly List<Mode> _AvailableModes = new List<Mode>
@@ -390,7 +172,7 @@ namespace Cosmos.System.Graphics
         /// <returns></returns>
         public override Color GetPointColor(int aX, int aY)
         {
-            return Color.FromArgb((int)(_VGADriver.GetPixel((uint)aX, (uint)aY)));
+            return Color.FromArgb((int)_VGADriver.GetPixel((uint)aX, (uint)aY));
         }
 
         /// <summary>
@@ -405,15 +187,15 @@ namespace Cosmos.System.Graphics
 
         private ScreenSize ModeToScreenSize(Mode aMode)
         {
-            if (aMode.Columns == 320 && aMode.Rows == 200)
+            if (aMode.Width == 320 && aMode.Height == 200)
             {
                 return ScreenSize.Size320x200;
             }
-            else if (aMode.Columns == 640 && aMode.Rows == 480)
+            else if (aMode.Width == 640 && aMode.Height == 480)
             {
                 return ScreenSize.Size640x480;
             }
-            else if (aMode.Columns == 720 && aMode.Rows == 480)
+            else if (aMode.Width == 720 && aMode.Height == 480)
             {
                 return ScreenSize.Size720x480;
             }

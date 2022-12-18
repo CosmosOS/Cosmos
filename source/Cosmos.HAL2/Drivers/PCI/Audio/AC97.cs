@@ -52,28 +52,28 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         int bufferSizeSamples, bufferSizeBytes;
 
         // Private variables prefixed with a "p" indicate an I/O port.
-        readonly IOPort pTransferControl;    // Allows us to start/stop transfers and control what IRQs are fired
-        readonly IOPort pMasterVolume;       // Mixer volume setting
-        readonly IOPort pPCMOutVolume;       // Speaker output volume setting
-        readonly IOPort pBufferDescriptors;  // Buffer Descriptor List base address
-        readonly IOPort pLastValidEntry;     // Contains the number of the last Buffer Entry that will be processed
-        readonly IOPort pTransferStatus;     // Used to query the DMA transfer status and for IRQ acknowledgment
-        readonly IOPort pGlobalControl;      // Controls basic AC97 functions
-        readonly IOPort pResetRegister;      // Writing any value to port will cause a register reset
+        readonly ushort pTransferControl;    // Allows us to start/stop transfers and control what IRQs are fired
+        readonly ushort pMasterVolume;       // Mixer volume setting
+        readonly ushort pPCMOutVolume;       // Speaker output volume setting
+        readonly ushort pBufferDescriptors;  // Buffer Descriptor List base address
+        readonly ushort pLastValidEntry;     // Contains the number of the last Buffer Entry that will be processed
+        readonly ushort pTransferStatus;     // Used to query the DMA transfer status and for IRQ acknowledgment
+        readonly ushort pGlobalControl;      // Controls basic AC97 functions
+        readonly ushort pResetRegister;      // Writing any value to port will cause a register reset
 
         const uint RESET_POLL_LIMIT = 500; // The maximum amount of polls for a reset the driver can perform.
 
-        const int TC_RUN_OR_PAUSE = (1 << 0);
-        const int TC_TRANSFER_RESET = (1 << 1);
-        const int TC_ENABLE_LAST_VALID_BUF_INTERRUPT = (1 << 2);
-        const int TC_ENABLE_FIFO_ERROR_INTERRUPT = (1 << 3);
-        const int TC_ENABLE_COMPLETION_INTERRUPT = (1 << 4);
+        const int TC_RUN_OR_PAUSE = 1 << 0;
+        const int TC_TRANSFER_RESET = 1 << 1;
+        const int TC_ENABLE_LAST_VALID_BUF_INTERRUPT = 1 << 2;
+        const int TC_ENABLE_FIFO_ERROR_INTERRUPT = 1 << 3;
+        const int TC_ENABLE_COMPLETION_INTERRUPT = 1 << 4;
 
-        const ushort IRQ_LVBCI = (1 << 2);
-        const ushort IRQ_BCIS = (1 << 3);
-        const ushort IRQ_FIFO_ERROR = (1 << 4);
+        const ushort IRQ_LVBCI = 1 << 2;
+        const ushort IRQ_BCIS = 1 << 3;
+        const ushort IRQ_FIFO_ERROR = 1 << 4;
 
-        const ushort BD_FIRE_INTERRUPT_ON_CLEAR = (1 << 15);
+        const ushort BD_FIRE_INTERRUPT_ON_CLEAR = 1 << 15;
 
         const int GC_GLOBAL_INTERRUPT_ENABLE = 0x1;
 
@@ -123,24 +123,24 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
             ushort NAMbar = (ushort)pci.BaseAddressBar[0].BaseAddress;  // Native Audio Mixer
             ushort NABMbar = (ushort)pci.BaseAddressBar[1].BaseAddress; // Native Audio Bus Master
 
-            pTransferControl = new IOPort((ushort)(NABMbar + 0x1B));
-            pMasterVolume = new IOPort((ushort)(NAMbar + 0x02));
-            pPCMOutVolume = new IOPort((ushort)(NAMbar + 0x18));
-            pBufferDescriptors = new IOPort((ushort)(NABMbar + 0x10));
-            pTransferStatus = new IOPort((ushort)(NABMbar + 0x16));
-            pLastValidEntry = new IOPort((ushort)(NABMbar + 0x15));
-            pGlobalControl = new IOPort((ushort)(NABMbar + 0x2C));
-            pResetRegister = new IOPort((ushort)(NAMbar + 0x00));
+            pTransferControl = (ushort)(NABMbar + 0x1B);
+            pMasterVolume = (ushort)(NAMbar + 0x02);
+            pPCMOutVolume = (ushort)(NAMbar + 0x18);
+            pBufferDescriptors = (ushort)(NABMbar + 0x10);
+            pTransferStatus = (ushort)(NABMbar + 0x16);
+            pLastValidEntry = (ushort)(NABMbar + 0x15);
+            pGlobalControl = (ushort)(NABMbar + 0x2C);
+            pResetRegister = (ushort)(NAMbar + 0x00);
 
             // Reset device
-            pGlobalControl.Byte = 0x2;
-            pResetRegister.DWord = 0xDEADBEEF; // any value will do here
+            IOPort.Write8(pGlobalControl, 0x2);
+            IOPort.Write32(pResetRegister, 0xDEADBEEF); // any value will do here
 
             // Reset PCM out
             uint polls = 0; // The amount we polled the device for a reset
 
-            pTransferControl.Byte = (byte)(pTransferControl.Byte | TC_TRANSFER_RESET);
-            while ((pTransferControl.Byte & TC_TRANSFER_RESET) != 0 && polls < RESET_POLL_LIMIT)
+            IOPort.Write8(pTransferControl, (byte)(IOPort.Read8(pTransferControl) | TC_TRANSFER_RESET));
+            while ((IOPort.Read8(pTransferControl) & TC_TRANSFER_RESET) != 0 && polls < RESET_POLL_LIMIT)
             {
                 // Wait until the byte is cleared
                 polls++;
@@ -151,8 +151,8 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
                 throw new InvalidOperationException("No AC97-compatible device could be found - the reset timeout has expired.");
 
             // Volume
-            pMasterVolume.Word = CreateMixerVolumeValue(AC97_VOLUME_MAX, AC97_VOLUME_MAX, false);
-            pPCMOutVolume.Word = CreateMixerVolumeValue(AC97_VOLUME_MAX, AC97_VOLUME_MAX, false);
+            IOPort.Write16(pMasterVolume, CreateMixerVolumeValue(AC97_VOLUME_MAX, AC97_VOLUME_MAX, false));
+            IOPort.Write16(pPCMOutVolume, CreateMixerVolumeValue(AC97_VOLUME_MAX, AC97_VOLUME_MAX, false));
 
             // Create all needed buffers
             CreateBuffers(bufferSize);
@@ -237,22 +237,22 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
             // Tell BDL location
             fixed (void* ptr = bufferDescriptorList)
             {
-                pBufferDescriptors.DWord = (uint)ptr;
+                IOPort.Write32(pBufferDescriptors, (uint)ptr);
             }
 
             // Set last valid index
             lastValidIdx = 2; // Start at the 3rd buffer. This will give us some headroom and will decrease clicks.
-            pLastValidEntry.Byte = lastValidIdx;
+            IOPort.Write8(pLastValidEntry, lastValidIdx);
         }
 
         private void HandleInterrupt(ref INTs.IRQContext aContext)
         {
-            ushort sr = pTransferStatus.Word;
+            ushort sr = IOPort.Read16(pTransferStatus);
 
             if ((sr & IRQ_LVBCI) > 0)
             {
                 // Last Valid Buffer interrupt
-                pTransferStatus.Word = IRQ_LVBCI;
+                IOPort.Write16(pTransferStatus, IRQ_LVBCI);
             }
             else if ((sr & IRQ_BCIS) > 0)
             {
@@ -277,12 +277,12 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
                 if (lastValidIdx == BUFFER_COUNT)
                     lastValidIdx = 0;
 
-                pLastValidEntry.Byte = lastValidIdx;
-                pTransferStatus.Word = IRQ_BCIS;
+                IOPort.Write8(pLastValidEntry, lastValidIdx);
+                IOPort.Write16(pTransferStatus, IRQ_BCIS);
             }
             else if ((sr & IRQ_FIFO_ERROR) > 0)
             {
-                pTransferStatus.Word = IRQ_FIFO_ERROR;
+                IOPort.Write16(pTransferStatus, IRQ_FIFO_ERROR);
             }
         }
 
@@ -308,7 +308,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         }
 
         public override bool Enabled =>
-            (pTransferControl.Byte & TC_RUN_OR_PAUSE) != 0;
+            (IOPort.Read8(pTransferControl) & TC_RUN_OR_PAUSE) != 0;
 
         public override void Enable()
         {
@@ -317,24 +317,23 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
 
             ProvideBuffers();
 
-            uint globalControl = pGlobalControl.DWord;
-            globalControl &= ~((0x3U) << 22); // 16-bit output
-            globalControl &= ~((0x3U) << 20); // 2 channels
+            uint globalControl = IOPort.Read32(pGlobalControl);
+            globalControl &= ~(0x3U << 22); // 16-bit output
+            globalControl &= ~(0x3U << 20); // 2 channels
             globalControl |= GC_GLOBAL_INTERRUPT_ENABLE;
-            pGlobalControl.DWord = globalControl;
+            IOPort.Write32(pGlobalControl, globalControl);
 
-            pTransferControl.Byte =
-                TC_ENABLE_COMPLETION_INTERRUPT |
-                TC_ENABLE_FIFO_ERROR_INTERRUPT |
-                TC_ENABLE_LAST_VALID_BUF_INTERRUPT;
+            IOPort.Write8(pTransferControl, TC_ENABLE_COMPLETION_INTERRUPT |
+                                            TC_ENABLE_FIFO_ERROR_INTERRUPT |
+                                            TC_ENABLE_LAST_VALID_BUF_INTERRUPT);
 
-            pTransferControl.Byte = (byte)(pTransferControl.Byte | TC_RUN_OR_PAUSE);
+            IOPort.Write8(pTransferControl, (byte)(IOPort.Read8(pTransferControl) | TC_RUN_OR_PAUSE));
         }
 
         public override void Disable()
         {
             // Set audio to paused
-            pTransferControl.Byte = (byte)(pTransferControl.Byte | 0b1111_1110);
+            IOPort.Write8(pTransferControl, (byte)(IOPort.Read8(pTransferControl) | 0b1111_1110));
         }
     }
 }

@@ -36,14 +36,14 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             // Enable the card
             pciCard.EnableDevice();
             // Turn on the card
-            OutB(Base + 0x52, 0x01);
+            IOPort.Write8((ushort)(Base + 0x52), 0x01);
             //Do a software reset
             SoftwareReset();
             // Get the MAC Address
             byte[] eeprom_mac = new byte[6];
             for (uint b = 0; b < 6; b++)
             {
-                eeprom_mac[b] = Inb(Base + b);
+                eeprom_mac[b] = IOPort.Read8((ushort)(Base + b));
             }
             this.mac = new MACAddress(eeprom_mac);
             // Get a receive buffer and assign it to the card
@@ -60,32 +60,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             mRecvBuffer = new Queue<byte[]>();
             mTransmitBuffer = new Queue<byte[]>();
         }
-        private static byte Inb(uint port)
-        {
-            return new IOPort((ushort)port).Byte;
-        }
-        private static void OutB(uint port, byte val)
-        {
-            new IOPort((ushort)port).Byte = val;
-        }
-
-        private static ushort Inb16(uint port)
-        {
-            return new IOPort((ushort)port).Word;
-        }
-        private static void Out16(uint port, ushort val)
-        {
-            new IOPort((ushort)port).Word = val;
-        }
-
-        private static uint Inb32(uint port)
-        {
-            return new IOPort((ushort)port).DWord;
-        }
-        private static void Out32(uint port, uint val)
-        {
-            new IOPort((ushort)port).DWord = val;
-        }
         public static List<RTL8139> FindAll()
         {
             //Console.WriteLine("Scanning for Realtek 8139 cards...");
@@ -93,7 +67,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             List<RTL8139> cards = new List<RTL8139>();
             foreach (var xDevice in HAL.PCI.Devices)
             {
-                if ((xDevice.VendorID == 0x10EC) && (xDevice.DeviceID == 0x8139) && (xDevice.Claimed == false))
+                if (xDevice.VendorID == 0x10EC && xDevice.DeviceID == 0x8139 && xDevice.Claimed == false)
                 {
                     RTL8139 nic = new RTL8139(xDevice);
                     cards.Add(nic);
@@ -135,98 +109,98 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         #region Register Access
         protected uint RBStartRegister
         {
-            get { return Inb32(Base + 0x30); }
-            set { Out32(Base + 0x30, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x30)); }
+            set { IOPort.Write32((ushort)(Base + 0x30), value); }
         }
         internal uint RecvConfigRegister
         {
-            get { return Inb32(Base + 0x44); }
-            set { Out32(Base + 0x44, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x44)); }
+            set { IOPort.Write32((ushort)(Base + 0x44), value); }
         }
         internal ushort CurAddressPointerReadRegister
         {
-            get { return Inb16(Base + 0x38); }
-            set { Out16(Base + 0x38, value); }
+            get { return IOPort.Read16((ushort)(Base + 0x38)); }
+            set { IOPort.Write16((ushort)(Base + 0x38), value); }
         }
         internal ushort CurBufferAddressRegister
         {
-            get { return Inb16(Base + 0x3A); }
-            set { Out16(Base + 0x3A, value); }
+            get { return IOPort.Read16((ushort)(Base + 0x3A)); }
+            set { IOPort.Write16((ushort)(Base + 0x3A), value); }
         }
         internal ushort IntMaskRegister
         {
-            get { return Inb16(Base + 0x3C); }
-            set { Out16(Base + 0x3C, value); }
+            get { return IOPort.Read16((ushort)(Base + 0x3C)); }
+            set { IOPort.Write16((ushort)(Base + 0x3C), value); }
         }
         internal ushort IntStatusRegister
         {
-            get { return Inb16(Base + 0x3E); }
-            set { Out16(Base + 0x3E, value); }
+            get { return IOPort.Read16((ushort)(Base + 0x3E)); }
+            set { IOPort.Write16((ushort)(Base + 0x3E), value); }
         }
         internal byte CommandRegister
         {
-            get { return Inb(Base + 0x37); }
-            set { OutB(Base + 0x37, value); }
+            get { return IOPort.Read8((ushort)(Base + 0x37)); }
+            set { IOPort.Write8((ushort)(Base + 0x37), value); }
         }
         protected byte MediaStatusRegister
         {
-            get { return Inb(Base + 0x58); }
-            set { OutB(Base + 0x58, value); }
+            get { return IOPort.Read8((ushort)(Base + 0x58)); }
+            set { IOPort.Write8((ushort)(Base + 0x58), value); }
         }
         protected byte Config1Register
         {
-            get { return Inb(Base + 0x52); }
-            set { OutB(Base + 0x52, value); }
+            get { return IOPort.Read8((ushort)(Base + 0x52)); }
+            set { IOPort.Write8((ushort)(Base + 0x52), value); }
         }
         internal uint TransmitConfigRegister
         {
-            get { return Inb32(Base + 0x40); }
-            set { Out32(Base + 0x40, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x40)); }
+            set { IOPort.Write32((ushort)(Base + 0x40), value); }
         }
         internal uint TransmitAddress1Register
         {
-            get { return Inb32(Base + 0x20); }
-            set { Out32(Base + 0x20, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x20)); }
+            set { IOPort.Write32((ushort)(Base + 0x20), value); }
         }
         internal uint TransmitAddress2Register
         {
-            get { return Inb32(Base + 0x24); }
-            set { Out32(Base + 0x24, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x24)); }
+            set { IOPort.Write32((ushort)(Base + 0x24), value); }
         }
         internal uint TransmitAddress3Register
         {
-            get { return Inb32(Base + 0x28); }
-            set { Out32(Base + 0x28, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x28)); }
+            set { IOPort.Write32((ushort)(Base + 0x28), value); }
         }
         internal uint TransmitAddress4Register
         {
-            get { return Inb32(Base + 0x2C); }
-            set { Out32(Base + 0x2C, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x2C)); }
+            set { IOPort.Write32((ushort)(Base + 0x2C), value); }
         }
         internal uint TransmitDescriptor1Register
         {
-            get { return Inb32(Base + 0x10); }
-            set { Out32(Base + 0x10, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x10)); }
+            set { IOPort.Write32((ushort)(Base + 0x10), value); }
         }
         internal uint TransmitDescriptor2Register
         {
-            get { return Inb32(Base + 0x14); }
-            set { Out32(Base + 0x14, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x14)); }
+            set { IOPort.Write32((ushort)(Base + 0x14), value); }
         }
         internal uint TransmitDescriptor3Register
         {
-            get { return Inb32(Base + 0x18); }
-            set { Out32(Base + 0x18, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x18)); }
+            set { IOPort.Write32((ushort)(Base + 0x18), value); }
         }
         internal uint TransmitDescriptor4Register
         {
-            get { return Inb32(Base + 0x1C); }
-            set { Out32(Base + 0x1C, value); }
+            get { return IOPort.Read32((ushort)(Base + 0x1C)); }
+            set { IOPort.Write32((ushort)(Base + 0x1C), value); }
         }
         #endregion
         protected bool CmdBufferEmpty
         {
-            get { return ((CommandRegister & 0x01) == 0x01); }
+            get { return (CommandRegister & 0x01) == 0x01; }
         }
         #region Network Device Implementation
         public override MACAddress MACAddress
@@ -243,7 +217,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         }
         public override bool Ready
         {
-            get { return ((Config1Register & 0x20) == 0); }
+            get { return (Config1Register & 0x20) == 0; }
         }
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {

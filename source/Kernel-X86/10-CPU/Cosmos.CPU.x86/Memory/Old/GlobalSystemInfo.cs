@@ -17,7 +17,7 @@ namespace Cosmos.CPU.x86.Memory.Old {
                 // todo: should we align this structure somehow?
 
                 var xEndOfKernel = Processor.GetEndOfKernel();
-                xEndOfKernel = xEndOfKernel + (1024 * 1024); // for now, skip 1 MB
+                xEndOfKernel = xEndOfKernel + 1024 * 1024; // for now, skip 1 MB
                 Processor.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + TotalDataLookupTableSize) * 4);
                 mGlobalInformationTable = (GlobalInformationTable*)xEndOfKernel;
                 uint xFirstDataLookupLocation = (uint)(xEndOfKernel + sizeof(GlobalInformationTable));
@@ -31,7 +31,7 @@ namespace Cosmos.CPU.x86.Memory.Old {
 
         public static uint TotalDataLookupTableSize {
             get {
-                return (uint)(sizeof(DataLookupTable) + (DataLookupTable.EntriesPerTable * sizeof(DataLookupEntry)));
+                return (uint)(sizeof(DataLookupTable) + DataLookupTable.EntriesPerTable * sizeof(DataLookupEntry));
             }
         }
     }

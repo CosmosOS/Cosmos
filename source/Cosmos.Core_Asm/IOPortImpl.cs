@@ -7,7 +7,7 @@ using XSharp.Assembler;
 
 namespace Cosmos.Core_Asm
 {
-    [Plug(Target = typeof(IOPortBase))]
+    [Plug(Target = typeof(IOPort))]
     public class IOPortImpl
     {
 

@@ -8,7 +8,7 @@ namespace Cosmos.System_Plugs.Interop
     {
 
     }
-  
+
     [Plug("Interop+Kernel32, System.IO.FileSystem", IsOptional = true)]
     class Kernel32Impl
     {

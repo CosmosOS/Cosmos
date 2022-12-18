@@ -160,7 +160,7 @@ namespace Cosmos.Core
         /// <param name="block">MemoryBlock to copy.</param>
         public unsafe void Copy(MemoryBlock block)
         {
-            byte* xDest = (byte*)(Offset);
+            byte* xDest = (byte*)Offset;
             byte* aDataPtr = (byte*)block.Base;
 
             MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
@@ -192,7 +192,7 @@ namespace Cosmos.Core
                 throw new ArgumentOutOfRangeException(nameof(aByteOffset));
             }
 
-            return *((ushort*)(Offset + aByteOffset));
+            return *(ushort*)(Offset + aByteOffset);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Cosmos.Core
             {
                 throw new ArgumentOutOfRangeException(nameof(aByteOffset));
             }
-            *((ushort*)(Offset + aByteOffset)) = value;
+            *(ushort*)(Offset + aByteOffset) = value;
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Cosmos.Core
                 throw new ArgumentOutOfRangeException(nameof(aByteOffset));
             }
 
-            return *((uint*)(Offset + aByteOffset));
+            return *(uint*)(Offset + aByteOffset);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Cosmos.Core
             {
                 throw new ArgumentOutOfRangeException(nameof(aByteOffset));
             }
-            *((uint*)(Offset + aByteOffset)) = value;
+            *(uint*)(Offset + aByteOffset) = value;
         }
 
         /// <summary>

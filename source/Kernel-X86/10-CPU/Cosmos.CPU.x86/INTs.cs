@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.CPU.x86 {
-    
+
     [ForceInclude]
     public class INTs {
         #region Enums
@@ -472,7 +472,7 @@ namespace Cosmos.CPU.x86 {
             {
                 byte* xAddress = (byte*)0xB8000;
 
-                xAddress += ((line * 80) + col) * 2;
+                xAddress += (line * 80 + col) * 2;
 
                 xAddress[0] = (byte)c;
                 xAddress[1] = 0x0C;

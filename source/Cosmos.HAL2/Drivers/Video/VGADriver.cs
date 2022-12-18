@@ -27,8 +27,77 @@ namespace Cosmos.HAL
         ScreenSize _ScreenSize;
         ColorDepth _ColorDepth;
 
+        /// <summary>
+        /// Attribute controller index port.
+        /// </summary>
+        public const int AttributeController_Index = 0x3C0;
+        /// <summary>
+        /// Attribute controller write port.
+        /// </summary>
+        public const int AttributeController_Write = 0x3C0;
+        /// <summary>
+        /// Attribute controller read port.
+        /// </summary>
+        public const int AttributeController_Read = 0x3C1;
+        /// <summary>
+        /// Miscellaneous output write port.
+        /// </summary>
+        public const int MiscellaneousOutput_Write = 0x3C2;
+        /// <summary>
+        /// Sequencer index port.
+        /// </summary>
+        public const int Sequencer_Index = 0x3C4;
+        /// <summary>
+        /// Sequencer data port.
+        /// </summary>
+        public const int Sequencer_Data = 0x3C5;
+        /// <summary>
+        /// DAC index read port.
+        /// </summary>
+        public const int DACIndex_Read = 0x3C7;
+        /// <summary>
+        /// DAC index write port.
+        /// </summary>
+        public const int DACIndex_Write = 0x3C8;
+        /// <summary>
+        /// DAC data port.
+        /// </summary>
+        public const int DAC_Data = 0x3C9;
+        /// <summary>
+        /// Graphics controller index port.
+        /// </summary>
+        public const int GraphicsController_Index = 0x3CE;
+        /// <summary>
+        /// Graphics controller data port.
+        /// </summary>
+        public const int GraphicsController_Data = 0x3CF;
+        /// <summary>
+        /// CRT controller index port.
+        /// </summary>
+        public const int CRTController_Index = 0x3D4;
+        /// <summary>
+        /// CRT controller data port.
+        /// </summary>
+        public const int CRTController_Data = 0x3D5;
+        /// <summary>
+        /// Instant read port.
+        /// </summary>
+        public const int Instat_Read = 0x3DA;
 
-        private readonly Core.IOGroup.VGA _IO = new Core.IOGroup.VGA();
+        /// <summary>
+        /// 128KB at 0xA0000
+        /// </summary>
+        public readonly MemoryBlock VGAMemoryBlock = new MemoryBlock(0xA0000, 1024 * 128);
+
+        /// <summary>
+        /// 32KB at 0xB0000
+        /// </summary>
+        public readonly MemoryBlock MonochromeTextMemoryBlock = new MemoryBlock(0xB0000, 1024 * 32);
+
+        /// <summary>
+        /// 32KB at 0xB8000
+        /// </summary>
+        public readonly MemoryBlock CGATextMemoryBlock = new MemoryBlock(0xB8000, 1024 * 32);
 
         private void WriteVGARegisters(byte[] aRegisters)
         {
@@ -36,18 +105,18 @@ namespace Cosmos.HAL
             byte i;
 
             /* write MISCELLANEOUS reg */
-            _IO.MiscellaneousOutput_Write.Byte = aRegisters[xIdx++];
+            IOPort.Write8(MiscellaneousOutput_Write, aRegisters[xIdx++]);
             /* write SEQUENCER regs */
             for (i = 0; i < _NumSeqRegs; i++)
             {
-                _IO.Sequencer_Index.Byte = i;
-                _IO.Sequencer_Data.Byte = aRegisters[xIdx++];
+                IOPort.Write8(Sequencer_Index, i);
+                IOPort.Write8(Sequencer_Data, aRegisters[xIdx++]);
             }
             /* unlock CRTC registers */
-            _IO.CRTController_Index.Byte = 0x03;
-            _IO.CRTController_Data.Byte = (byte)(_IO.CRTController_Data.Byte | 0x80);
-            _IO.CRTController_Index.Byte = 0x11;
-            _IO.CRTController_Data.Byte = (byte)(_IO.CRTController_Data.Byte & 0x7F);
+            IOPort.Write8(CRTController_Index, 0x03);
+            IOPort.Write8(CRTController_Data, (byte)(IOPort.Read8(CRTController_Data) | 0x80));
+            IOPort.Write8(CRTController_Index, 0x11);
+            IOPort.Write8(CRTController_Data, (byte)(IOPort.Read8(CRTController_Data) & 0x7F));
 
             /* make sure they remain unlocked */
             aRegisters[0x03] |= 0x80;
@@ -56,25 +125,25 @@ namespace Cosmos.HAL
             /* write CRTC regs */
             for (i = 0; i < _NumCRTCRegs; i++)
             {
-                _IO.CRTController_Index.Byte = i;
-                _IO.CRTController_Data.Byte = aRegisters[xIdx++];
+                IOPort.Write8(CRTController_Index, i);
+                IOPort.Write8(CRTController_Data, aRegisters[xIdx++]);
             }
             /* write GRAPHICS CONTROLLER regs */
             for (i = 0; i < _NumGCRegs; i++)
             {
-                _IO.GraphicsController_Index.Byte = i;
-                _IO.GraphicsController_Data.Byte = aRegisters[xIdx++];
+                IOPort.Write8(GraphicsController_Index, i);
+                IOPort.Write8(GraphicsController_Data, aRegisters[xIdx++]);
             }
             /* write ATTRIBUTE CONTROLLER regs */
             for (i = 0; i < _NumACRegs; i++)
             {
-                var _ = _IO.Instat_Read.Byte;
-                _IO.AttributeController_Index.Byte = i;
-                _IO.AttributeController_Write.Byte = aRegisters[xIdx++];
+                var _ = IOPort.Read8(Instat_Read);
+                IOPort.Write8(AttributeController_Index, i);
+                IOPort.Write8(AttributeController_Write, aRegisters[xIdx++]);
             }
             /* lock 16-color palette and unblank display */
-            _ = _IO.Instat_Read.Byte;
-            _IO.AttributeController_Index.Byte = 0x20;
+            _ = IOPort.Read8(Instat_Read);
+            IOPort.Write8(AttributeController_Index, 0x20);
             mDebugger.Send("Finished writing VGA registers");
         }
 
@@ -84,16 +153,14 @@ namespace Cosmos.HAL
         /// <param name="p">p to set.</param>
         private void SetPlane(byte aP)
         {
-            byte pmask;
-
             aP &= 3;
-            pmask = (byte)(1 << aP);
+            var pmask = (byte)(1 << aP);
             /* set read plane */
-            _IO.GraphicsController_Index.Byte = 4;
-            _IO.GraphicsController_Data.Byte = aP;
+            IOPort.Write8(GraphicsController_Index, 4);
+            IOPort.Write8(GraphicsController_Data, aP);
             /* set write plane */
-            _IO.Sequencer_Index.Byte = 2;
-            _IO.Sequencer_Data.Byte = pmask;
+            IOPort.Write8(Sequencer_Index, 2);
+            IOPort.Write8(Sequencer_Data, pmask);
         }
 
         //int offset = 0xb8000;
@@ -104,8 +171,8 @@ namespace Cosmos.HAL
         /// <exception cref="Exception">Thrown when unable to determine memory segment.</exception>
         private MemoryBlock GetFramebufferSegment()
         {
-            _IO.GraphicsController_Index.Byte = 6;
-            int seg = _IO.GraphicsController_Data.Byte;
+            IOPort.Write8(GraphicsController_Index, 6);
+            int seg = IOPort.Read8(GraphicsController_Data);
             mDebugger.Send($"VGA: raw seg value: {seg}");
             seg >>= 2;
 
@@ -114,11 +181,11 @@ namespace Cosmos.HAL
             {
                 case 0:
                 case 1:
-                    return _IO.VGAMemoryBlock;
+                    return VGAMemoryBlock;
                 case 2:
-                    return _IO.MonochromeTextMemoryBlock;
+                    return MonochromeTextMemoryBlock;
                 case 3:
-                    return _IO.CGATextMemoryBlock;
+                    return CGATextMemoryBlock;
             }
             throw new Exception("Unable to determine memory segment!");
         }
@@ -131,34 +198,32 @@ namespace Cosmos.HAL
         /// <exception cref="Exception">Thrown when unable to determine memory segment.</exception>
         public void WriteFont(byte[] aFont, byte aFontHeight)
         {
-            byte seq2, seq4, gc4, gc5, gc6;
-
             /* save registers
                 set_plane() modifies GC 4 and SEQ 2, so save them as well */
-            _IO.Sequencer_Index.Byte = 2;
-            seq2 = _IO.Sequencer_Data.Byte;
+            IOPort.Write8(Sequencer_Index, 2);
+            var seq2 = IOPort.Read8(Sequencer_Data);
 
-            _IO.Sequencer_Index.Byte = 4;
-            seq4 = _IO.Sequencer_Data.Byte;
+            IOPort.Write8(Sequencer_Index, 4);
+            var seq4 = IOPort.Read8(Sequencer_Data);
 
             /* turn off even-odd addressing (set flat addressing)
             assume: chain-4 addressing already off */
-            _IO.Sequencer_Data.Byte = (byte)(seq4 | 0x04);
+            IOPort.Write8(Sequencer_Data, (byte)(seq4 | 0x04));
 
-            _IO.GraphicsController_Index.Byte = 4;
-            gc4 = _IO.GraphicsController_Data.Byte;
+            IOPort.Write8(GraphicsController_Index, 4);
+            var gc4 = IOPort.Read8(GraphicsController_Data);
 
-            _IO.GraphicsController_Index.Byte = 5;
-            gc5 = _IO.GraphicsController_Data.Byte;
-
-            /* turn off even-odd addressing */
-            _IO.GraphicsController_Data.Byte = (byte)(gc5 & ~0x10);
-
-            _IO.GraphicsController_Index.Byte = 6;
-            gc6 = _IO.GraphicsController_Data.Byte;
+            IOPort.Write8(GraphicsController_Index, 5);
+            var gc5 = IOPort.Read8(GraphicsController_Data);
 
             /* turn off even-odd addressing */
-            _IO.GraphicsController_Data.Byte = (byte)(gc6 & ~0x02);
+            IOPort.Write8(GraphicsController_Data, (byte)(gc5 & ~0x10));
+
+            IOPort.Write8(GraphicsController_Index, 6);
+            var gc6 = IOPort.Read8(GraphicsController_Data);
+
+            /* turn off even-odd addressing */
+            IOPort.Write8(GraphicsController_Data, (byte)(gc6 & ~0x02));
 
             /* write font to plane P4 */
             SetPlane(2);
@@ -171,21 +236,21 @@ namespace Cosmos.HAL
             {
                 for (uint j = 0; j < aFontHeight; j++)
                 {
-                    seg[(i * 32) + j] = aFont[(i * aFontHeight) + j];
+                    seg[i * 32 + j] = aFont[i * aFontHeight + j];
                 }
             }
 
             /* restore registers */
-            _IO.Sequencer_Index.Byte = 2;
-            _IO.Sequencer_Data.Byte = seq2;
-            _IO.Sequencer_Index.Byte = 4;
-            _IO.Sequencer_Data.Byte = seq4;
-            _IO.GraphicsController_Index.Byte = 4;
-            _IO.GraphicsController_Data.Byte = gc4;
-            _IO.GraphicsController_Index.Byte = 5;
-            _IO.GraphicsController_Data.Byte = gc5;
-            _IO.GraphicsController_Index.Byte = 6;
-            _IO.GraphicsController_Data.Byte = gc6;
+            IOPort.Write8(Sequencer_Index, 2);
+            IOPort.Write8(Sequencer_Data, seq2);
+            IOPort.Write8(Sequencer_Index, 4);
+            IOPort.Write8(Sequencer_Data, seq4);
+            IOPort.Write8(GraphicsController_Index, 4);
+            IOPort.Write8(GraphicsController_Data, gc4);
+            IOPort.Write8(GraphicsController_Index, 5);
+            IOPort.Write8(GraphicsController_Data, gc5);
+            IOPort.Write8(GraphicsController_Index, 6);
+            IOPort.Write8(GraphicsController_Data, gc6);
         }
 
         public VGADriver()
@@ -242,7 +307,7 @@ namespace Cosmos.HAL
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="aX"></param>
         /// <param name="aY"></param>
@@ -422,7 +487,7 @@ namespace Cosmos.HAL
             }
 
             //Clear the memory
-            _IO.CGATextMemoryBlock.Fill(0);
+            CGATextMemoryBlock.Fill(0);
 
             int[] colors = new int[]
             {
@@ -580,7 +645,7 @@ namespace Cosmos.HAL
                         0x000000,0x000000,0x000000,0x000000,0x000000,0x000000
                     };
                     for (int i = 0; i < 256; i++)
-                    { 
+                    {
                         _Palette[i] = Color.FromArgb(colors[i]);
                     }
                     break;
@@ -590,7 +655,7 @@ namespace Cosmos.HAL
                     break;
             }
 
-            for (int i = 0; i < (2 << ((int)aDepth - 1)); i++)
+            for (int i = 0; i < 2 << ((int)aDepth - 1); i++)
             {
                 SetPaletteEntry(i, _Palette[i]);
             }
@@ -598,22 +663,22 @@ namespace Cosmos.HAL
 
         public void SetPixel320x200x8(uint aX, uint aY, uint aC)
         {
-            uint where = (aY * 320) + aX;
+            uint where = aY * 320 + aX;
             byte color = (byte)(aC & 0xFF);
 
-            _IO.VGAMemoryBlock.Bytes[where] = color;
+            VGAMemoryBlock.Bytes[where] = color;
         }
 
         public uint GetPixel320x200x8(uint aX, uint aY)
         {
             mDebugger.Send($"GetPixel320x200x8({aX},{aY})");
-            return _IO.VGAMemoryBlock.Bytes[(aY * 320) + aX];
+            return VGAMemoryBlock.Bytes[aY * 320 + aX];
         }
 
 
         public void SetPixel640x480x4(uint aX, uint aY, uint aC)
         {
-            uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
+            uint offset = (uint)(aX / 8 + PixelWidth / 8 * aY);
 
             aX = (aX & 7) * 1;
 
@@ -626,12 +691,12 @@ namespace Cosmos.HAL
 
                 if ((pmask & aC) != 0)
                 {
-                    _IO.VGAMemoryBlock.Bytes[offset] = (byte)(_IO.VGAMemoryBlock.Bytes[offset] | mask);
+                    VGAMemoryBlock.Bytes[offset] = (byte)(VGAMemoryBlock.Bytes[offset] | mask);
                 }
 
                 else
                 {
-                    _IO.VGAMemoryBlock.Bytes[offset] = (byte)(_IO.VGAMemoryBlock.Bytes[offset] & ~mask);
+                    VGAMemoryBlock.Bytes[offset] = (byte)(VGAMemoryBlock.Bytes[offset] & ~mask);
                 }
 
                 pmask <<= 1;
@@ -641,7 +706,7 @@ namespace Cosmos.HAL
         public uint GetPixel640x480x4(uint aX, uint aY)
         {
             mDebugger.Send($"GetPixel640x480x4({aX},{aY})");
-            uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
+            uint offset = (uint)(aX / 8 + PixelWidth / 8 * aY);
 
             uint pmask = 1;
 
@@ -651,7 +716,7 @@ namespace Cosmos.HAL
             {
                 SetPlane(p);
 
-                if (_IO.VGAMemoryBlock.Bytes[offset] == 255)
+                if (VGAMemoryBlock.Bytes[offset] == 255)
                 {
                     color += pmask;
                 }
@@ -664,7 +729,7 @@ namespace Cosmos.HAL
 
         public void SetPixel720x480x4(uint aX, uint aY, uint aC)
         {
-            uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
+            uint offset = (uint)(aX / 8 + PixelWidth / 8 * aY);
 
             aX = (aX & 7) * 1;
 
@@ -677,12 +742,12 @@ namespace Cosmos.HAL
 
                 if ((pmask & aC) != 0)
                 {
-                    _IO.VGAMemoryBlock.Bytes[offset] = (byte)(_IO.VGAMemoryBlock.Bytes[offset] | mask);
+                    VGAMemoryBlock.Bytes[offset] = (byte)(VGAMemoryBlock.Bytes[offset] | mask);
                 }
 
                 else
                 {
-                    _IO.VGAMemoryBlock.Bytes[offset] = (byte)(_IO.VGAMemoryBlock.Bytes[offset] & ~mask);
+                    VGAMemoryBlock.Bytes[offset] = (byte)(VGAMemoryBlock.Bytes[offset] & ~mask);
                 }
 
                 pmask <<= 1;
@@ -693,7 +758,7 @@ namespace Cosmos.HAL
         {
             mDebugger.Send($"GetPixel720x480x4({aX},{aY})");
 
-            uint offset = (uint)(aX / 8 + (PixelWidth / 8) * aY);
+            uint offset = (uint)(aX / 8 + PixelWidth / 8 * aY);
             int pixelOffset = (int)(7 - aX % 8);
             uint pmask = 1;
 
@@ -703,7 +768,7 @@ namespace Cosmos.HAL
             {
                 SetPlane(p);
 
-                var v = _IO.VGAMemoryBlock.Bytes[offset];
+                var v = VGAMemoryBlock.Bytes[offset];
                 if ((v & (1 << pixelOffset)) != 0)
                 {
                     color += pmask;
@@ -824,12 +889,12 @@ namespace Cosmos.HAL
         public void ReadPalette()
         {
             mDebugger.Send("Reading set palette");
-            _IO.DACIndex_Read.Word = 0;
+            IOPort.Write16(DACIndex_Read, 0);
             for (int i = 0; i < 256; i++)
             {
-                int red = _IO.DAC_Data.Byte << 2;
-                int green = _IO.DAC_Data.Byte << 2;
-                int blue = _IO.DAC_Data.Byte << 2;
+                int red = IOPort.Read8(DAC_Data) << 2;
+                int green = IOPort.Read8(DAC_Data) << 2;
+                int blue = IOPort.Read8(DAC_Data) << 2;
                 var argb = (red << 16) | (green << 8) | blue;
                 _Palette[i] = Color.FromArgb(argb);
             }
@@ -839,7 +904,7 @@ namespace Cosmos.HAL
         {
             return _Palette[aIndex];
         }
-        
+
         public void SetPaletteEntry(int aIndex, Color aColor)
         {
             _Palette[aIndex] = aColor;
@@ -856,10 +921,10 @@ namespace Cosmos.HAL
         public void SetPaletteEntry(int aIndex, byte aR, byte aG, byte aB)
         {
             _Palette[aIndex] = Color.FromArgb(aR, aG, aB);
-            _IO.DACIndex_Write.Byte = (byte)aIndex;
-            _IO.DAC_Data.Byte = (byte)(aR >> 2);
-            _IO.DAC_Data.Byte = (byte)(aG >> 2);
-            _IO.DAC_Data.Byte = (byte)(aB >> 2);
+            IOPort.Write8(DACIndex_Write, (byte)aIndex);
+            IOPort.Write8(DAC_Data, (byte)(aR >> 2));
+            IOPort.Write8(DAC_Data, (byte)(aG >> 2));
+            IOPort.Write8(DAC_Data, (byte)(aB >> 2));
         }
 
         #region FONTS
