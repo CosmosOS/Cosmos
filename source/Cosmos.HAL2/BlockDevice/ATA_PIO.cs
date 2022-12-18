@@ -394,10 +394,10 @@ namespace Cosmos.HAL.BlockDevice
 			else
 			{
 				// Number of sectors to read
-                IOPort.Write16(IO.SectorCount, (byte)aSectorCount);
-                IOPort.Write16(IO.LBA0, (byte)aSectorNo);
-                IOPort.Write16(IO.LBA1, (byte)(aSectorNo >> 8));
-                IOPort.Write16(IO.LBA2, (byte)(aSectorNo >> 16));
+                IOPort.Write8(IO.SectorCount, (byte)aSectorCount);
+                IOPort.Write8(IO.LBA0, (byte)aSectorNo);
+                IOPort.Write8(IO.LBA1, (byte)(aSectorNo >> 8));
+                IOPort.Write8(IO.LBA2, (byte)(aSectorNo >> 16));
 				//IO.LBA0.Byte = (byte)(aSectorNo & 0xFF);
 				//IO.LBA1.Byte = (byte)((aSectorNo & 0xFF00) >> 8);
 				//IO.LBA2.Byte = (byte)((aSectorNo & 0xFF0000) >> 16);
