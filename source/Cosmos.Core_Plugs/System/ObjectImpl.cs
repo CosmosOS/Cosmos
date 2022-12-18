@@ -47,7 +47,7 @@ namespace Cosmos.Core_Plugs.System
                 xThatPointerByte[i] = xThisPointerByte[i];
             }
 
-            ulong xReturn = ((ulong)xResult) << (sizeof(ulong) / 2 * 8);
+            ulong xReturn = (ulong)xResult << (sizeof(ulong) / 2 * 8);
 
             return xReturn;
         }

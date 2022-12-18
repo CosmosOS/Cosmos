@@ -14,7 +14,7 @@ namespace Cosmos.System_Plugs.System
         {
             return StringHelper.GetNumberString(aThis);
         }
-        
+
         public static string ToString(ref ulong aThis, string formating)
         {
             if(formating == "X")

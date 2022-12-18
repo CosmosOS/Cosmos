@@ -30,7 +30,7 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// List of all video drivers (BGA, 
+        /// List of all video drivers (BGA/VBE, VGA, VMware SVGA II)
         /// </summary>
         private enum VideoDriver
         {

@@ -110,12 +110,28 @@ namespace Cosmos.HAL
 
         public bool T0RateGen = false;
 
-        protected Core.IOGroup.PIT IO = Core.Global.BaseIOGroups.PIT;
-        private List<PITTimer> activeHandlers = new();
+        private readonly List<PITTimer> activeHandlers = new();
         private ushort _T0Countdown = 65535;
         private ushort _T2Countdown = 65535;
-        private int timerCounter = 0;
-        private bool waitSignaled = false;
+        private int timerCounter;
+        private bool waitSignaled;
+
+        /// <summary>
+        /// Channel 0 data port.
+        /// </summary>
+        public const int Data0 = 0x40;
+        /// <summary>
+        /// Channel 1 data port.
+        /// </summary>
+        public const int Data1 = 0x41;
+        /// <summary>
+        /// Channel 2 data port.
+        /// </summary>
+        public const int Data2 = 0x42;
+        /// <summary>
+        /// Command register port.
+        /// </summary>
+        public const int Command = 0x43;
 
         public PIT()
         {
@@ -129,9 +145,9 @@ namespace Cosmos.HAL
             set {
                 _T0Countdown = value;
 
-                IO.Command.Byte = (byte)(T0RateGen ? 0x34 : 0x30);
-                IO.Data0.Byte = (byte)(value & 0xFF);
-                IO.Data0.Byte = (byte)(value >> 8);
+                IOPort.Write8(Command, (byte)(T0RateGen ? 0x34 : 0x30));
+                IOPort.Write8(Data0, (byte)(value & 0xFF));
+                IOPort.Write8(Data0, (byte)(value >> 8));
             }
         }
 
@@ -166,15 +182,15 @@ namespace Cosmos.HAL
             {
                 _T2Countdown = value;
 
-                IO.Command.Byte = 0xB6;
-                IO.Data0.Byte = (byte)(value & 0xFF);
-                IO.Data0.Byte = (byte)(value >> 8);
+                IOPort.Write8(Command, 0xB6);
+                IOPort.Write8(Data0, (byte)(value & 0xFF));
+                IOPort.Write8(Data0, (byte)(value >> 8));
             }
         }
 
         public uint T2Frequency
         {
-            get => PITFrequency / ((uint)_T2Countdown);
+            get => PITFrequency / (uint)_T2Countdown;
             set
             {
                 if (value < 19 || value > 1193180)
@@ -188,7 +204,7 @@ namespace Cosmos.HAL
 
         public uint T2DelayNS
         {
-            get => (PITDelayNS * _T2Countdown);
+            get => PITDelayNS * _T2Countdown;
             set
             {
                 if (value > 54918330) {
@@ -273,7 +289,7 @@ namespace Cosmos.HAL
             for (int i = activeHandlers.Count - 1; i >= 0; i--)
             {
                 handler = activeHandlers[i];
-				
+
                 if (handler.NSRemaining <= T0Delay)
                 {
                     if (handler.Recurring)
@@ -285,7 +301,7 @@ namespace Cosmos.HAL
                         handler.ID = -1;
                         activeHandlers.RemoveAt(i);
                     }
-                    
+
                     handler.HandleTrigger(aContext);
                 } else {
                     handler.NSRemaining -= T0Delay;
@@ -295,7 +311,7 @@ namespace Cosmos.HAL
         }
 
         /// <summary>
-        /// Registers a timer to this <see cref="PIT"/> object. 
+        /// Registers a timer to this <see cref="PIT"/> object.
         /// </summary>
         /// <param name="timer">The target timer.</param>
         /// <returns>The newly assigned ID to the timer.</returns>
@@ -307,7 +323,7 @@ namespace Cosmos.HAL
                 throw new InvalidOperationException("The provided timer has already been registered.");
             }
 
-            timer.ID = (timerCounter++);
+            timer.ID = timerCounter++;
             activeHandlers.Add(timer);
             T0Countdown = 65535;
             return timer.ID;
