@@ -8,7 +8,7 @@ namespace Cosmos.HAL.Audio
     /// </summary>
     public abstract class AudioDriver {
         /// <summary>
-        /// The buffer provider to use. 
+        /// The buffer provider to use.
         /// </summary>
         public abstract IAudioBufferProvider BufferProvider { get; set; }
 

@@ -151,11 +151,11 @@ namespace Cosmos.System.Audio.IO {
 
             fixed (byte* dataPtr = data) {
                 for (int i = 0; i < actualCopySize; i++) {
-                    cachedWriter.Write(dataPtr + (i * format.Size) + (Position * format.Size), i);
+                    cachedWriter.Write(dataPtr + i * format.Size + Position * format.Size, i);
                 }
             }
 
-            uint delta = ((uint)buffer.Size) / buffer.Format.Channels;
+            uint delta = (uint)buffer.Size / buffer.Format.Channels;
 
             if (actualCopySize < buffer.Size)
             {
