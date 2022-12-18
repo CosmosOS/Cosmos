@@ -252,12 +252,12 @@ namespace Cosmos.Core {
             if (aIRQLine < 8)
             {
                 // Read PIC1 Data
-                Port = IOPort.Read8(0x20);
+                Port = IOPort.Read8(0x21);
             }
             else
             {
                 // Read PIC2 Data
-                Port = IOPort.Read8(0xA0);
+                Port = IOPort.Read8(0xA1);
                 aIRQLine -= 8;
             }
 
