@@ -20,32 +20,32 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// No more data from sender.
         /// </summary>
-        FIN = (1 << 0),
+        FIN = 1 << 0,
 
         /// <summary>
         /// Synchronize sequence numbers.
         /// </summary>
-        SYN = (1 << 1),
+        SYN = 1 << 1,
 
         /// <summary>
         /// Reset the connection.
         /// </summary>
-        RST = (1 << 2),
+        RST = 1 << 2,
 
         /// <summary>
         /// Push Function.
         /// </summary>
-        PSH = (1 << 3),
+        PSH = 1 << 3,
 
         /// <summary>
         /// Acknowledgment field significant.
         /// </summary>
-        ACK = (1 << 4),
+        ACK = 1 << 4,
 
         /// <summary>
         /// Urgent Pointer field significant.
         /// </summary>
-        URG = (1 << 5)
+        URG = 1 << 5
     }
 
     /// <summary>
@@ -305,7 +305,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>byte array value.</returns>
         internal byte[] MakeHeader()
         {
-            byte[] header = new byte[12 + (TCPHeaderLength + TCP_DataLength)];
+            byte[] header = new byte[12 + TCPHeaderLength + TCP_DataLength];
 
             /* Pseudo Header */
             //Addresses
@@ -468,7 +468,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 flags += "URG|";
             }
-            
+
             return flags.Remove(flags.Length - 1);
         }
 

@@ -27,13 +27,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public const ulong RegularSectorSize = 512UL;
 
         // Properties
-        private string mSerialNo;
-        private string mFirmwareRev;
-        private string mModelNo;
 
-        public string SerialNo { get => mSerialNo; }
-        public string FirmwareRev { get => mFirmwareRev; }
-        public string ModelNo { get => mModelNo; }
+        public string SerialNo { get; }
+        public string FirmwareRev { get; }
+        public string ModelNo { get; }
 
         public SATA(PortRegisters aSATAPort)
         {
@@ -56,10 +53,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
             SendSATA28Command((ATACommands)0x00, 0, 0);
             ushort[] xBuffer = new ushort[256];
             Mem.DataBlock.Read16(xBuffer);
-            
-            mSerialNo = GetString(xBuffer, 10, 20);
-            mFirmwareRev = GetString(xBuffer, 23, 8);
-            mModelNo = GetString(xBuffer, 27, 40);
+
+            SerialNo = GetString(xBuffer, 10, 20);
+            FirmwareRev = GetString(xBuffer, 23, 8);
+            ModelNo = GetString(xBuffer, 27, 40);
 
             mBlockCount = ((uint)xBuffer[61] << 16 | xBuffer[60]) - 1;
 
@@ -80,10 +77,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
             xCMDHeader.PRDTL = 1;
             xCMDHeader.Write = 0;
 
-            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + (0x2000 * mPortNumber) + (0x100 * xSlot));
+            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + 0x2000 * mPortNumber + 0x100 * xSlot);
 
             var xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
-            
+
             uint DataBaseAddress = Mem.DataBlock.Base;
             xCMDTable.PRDTEntry[0].DBA = DataBaseAddress;
             xCMDTable.PRDTEntry[0].DBC = 511;
@@ -96,10 +93,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 Command = (byte)aCommand,
                 Device = 0
             };
-            
+
             int xSpin = 0;
-            
-            while (((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000)
+
+            while ((mPortReg.TFD & 0x88) != 0 && xSpin < 1000000)
             {
                 xSpin++;
             }
@@ -109,7 +106,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 mSATADebugger.Send($"Port {mPortNumber} timed out!");
                 return;
             };
-            
+
             mPortReg.CI = 1U;
 
             while (true)
@@ -145,19 +142,19 @@ namespace Cosmos.HAL.BlockDevice.Ports
             }
 
             mPortReg.IS = 0xFFFF;
-            
+
             int xSlot = FindCMDSlot();
             if (xSlot == -1)
             {
                 return;
             }
-            
+
             var xCMDHeader = new HBACommandHeader(mPortReg.CLB, (uint)xSlot);
             xCMDHeader.CFL = 5;
             xCMDHeader.PRDTL = 1;
             xCMDHeader.Write = 0;
-            
-            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + (0x2000 * mPortNumber) + (0x100 * xSlot));
+
+            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + 0x2000 * mPortNumber + 0x100 * xSlot);
 
             var xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 
@@ -195,7 +192,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
                     IsCommand = 1,
                     Command = (byte)aCommand,
 
-                    LBA0 = (byte)((aStart) & 0xFF),
+                    LBA0 = (byte)(aStart & 0xFF),
                     LBA1 = (byte)((aStart >> 8) & 0xFF),
                     LBA2 = (byte)((aStart >> 16) & 0xFF),
                     Device = (byte)(0x40 | ((aStart >> 24) & 0x0F)),
@@ -203,10 +200,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
                     CountL = (byte)(aCount & 0xFF)
                 };
             }
-            
+
             int xSpin = 0;
-            
-            while (((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000)
+
+            while ((mPortReg.TFD & 0x88) != 0 && xSpin < 1000000)
             {
                 xSpin++;
             }
@@ -216,7 +213,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 mSATADebugger.Send($"Port {mPortNumber} timed out!");
                 return;
             };
-            
+
             mPortReg.CI = 1U;
 
             while (true)
@@ -233,7 +230,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
                     //return;
                 }
             }
-            
+
             //Console.ForegroundColor = ConsoleColor.Green;
             //Console.Write("[Success]: ");
             //Console.Write("Command has been sent successfully!\n");
@@ -251,13 +248,13 @@ namespace Cosmos.HAL.BlockDevice.Ports
             {
                 return;
             }
-            
+
             var xCMDHeader = new HBACommandHeader(mPortReg.CLB, (uint)xSlot);
             xCMDHeader.CFL = 5;
             xCMDHeader.PRDTL = 1;
             xCMDHeader.Write = 0;
 
-            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + (0x2000 * mPortNumber) + (0x100 * xSlot));
+            xCMDHeader.CTBA = (uint)((uint)(Base.AHCI + 0xA000) + 0x2000 * mPortNumber + 0x100 * xSlot);
 
             var xCMDTable = new HBACommandTable(xCMDHeader.CTBA, xCMDHeader.PRDTL);
 
@@ -265,7 +262,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
 
             // Last entry
             xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBA = DataBaseAddress;
-            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = (aCount * 512) - 1;   // 8K bytes (this value should always be set to 1 less than the actual value)
+            xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].DBC = aCount * 512 - 1;   // 8K bytes (this value should always be set to 1 less than the actual value)
             xCMDTable.PRDTEntry[xCMDHeader.PRDTL - 1].InterruptOnCompletion = 1;
 
             var xCMDFIS = new FISRegisterH2D(xCMDTable.CFIS)
@@ -286,10 +283,10 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 CountL = (byte)(aCount & 0xFF),
                 CountH = (byte)((aCount >> 8) & 0xFF)
             };
-            
+
             int xSpin = 0;
-            
-            while (((mPortReg.TFD & 0x88) != 0) && xSpin < 1000000)
+
+            while ((mPortReg.TFD & 0x88) != 0 && xSpin < 1000000)
             {
                 xSpin++;
             }
@@ -299,7 +296,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
                 mSATADebugger.Send($"Port {mPortNumber} timed out!");
                 return;
             };
-            
+
             mPortReg.CI = 1U;
 
             while (true)
@@ -361,8 +358,8 @@ namespace Cosmos.HAL.BlockDevice.Ports
         private int FindCMDSlot()
         {
             // If not set in SACT and CI, the slot is free
-            var xSlots = (mPortReg.SACT | mPortReg.CI);
-        
+            var xSlots = mPortReg.SACT | mPortReg.CI;
+
             for (int i = 0; i < 32; i++)
             {
                 if ((xSlots & 1) == 0)
@@ -406,7 +403,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public override void WriteBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
             Mem.DataBlock.Write8(aData);
-            SendSATA48Command(ATACommands.WriteDmaExt, (uint)(aBlockNo), (uint)aBlockCount);
+            SendSATA48Command(ATACommands.WriteDmaExt, (uint)aBlockNo, (uint)aBlockCount);
             SendSATACommand(ATACommands.CacheFlush);
         }
     }

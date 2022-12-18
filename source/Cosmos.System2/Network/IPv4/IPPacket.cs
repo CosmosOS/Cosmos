@@ -42,8 +42,8 @@ namespace Cosmos.System.Network.IPv4
             }
             ARPCache.Update(ip_packet.SourceIP, ip_packet.SourceMAC);
 
-            if ((NetworkStack.AddressMap.ContainsKey(ip_packet.DestinationIP.Hash) == true) ||
-                (ip_packet.DestinationIP.address[3] == 255))
+            if (NetworkStack.AddressMap.ContainsKey(ip_packet.DestinationIP.Hash) == true ||
+                ip_packet.DestinationIP.address[3] == 255)
             {
                 switch (ip_packet.Protocol)
                 {
@@ -203,11 +203,11 @@ namespace Cosmos.System.Network.IPv4
 
             while (i != end)
             {
-                chksum += (uint)((((ushort)buffer[i++]) << 8) + (ushort)buffer[i++]);
+                chksum += (uint)(((ushort)buffer[i++] << 8) + (ushort)buffer[i++]);
             }
             if (i != offset + length)
             {
-                chksum += (uint)(((ushort)buffer[i]) << 8);
+                chksum += (uint)((ushort)buffer[i] << 8);
             }
             chksum = (chksum & 0xFFFF) + (chksum >> 16);
             chksum = (chksum & 0xFFFF) + (chksum >> 16);

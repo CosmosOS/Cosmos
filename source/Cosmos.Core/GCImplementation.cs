@@ -18,7 +18,7 @@ namespace Cosmos.Core
         private static ulong memLength = 0;
         private static bool StartedMemoryManager = false;
         /// <summary>
-        /// 
+        ///
         /// Acquire lock. Not implemented.
         /// </summary>
         /// <exception cref="NotImplementedException">Thrown always.</exception>
@@ -96,7 +96,7 @@ namespace Cosmos.Core
             {
                 memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                 memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;
-                memLength = (128 * 1024 * 1024);
+                memLength = 128 * 1024 * 1024;
             }
             RAT.Init(memPtr, (uint)memLength);
         }

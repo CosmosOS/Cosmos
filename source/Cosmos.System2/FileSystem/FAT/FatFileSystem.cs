@@ -19,7 +19,7 @@ namespace Cosmos.System.FileSystem.FAT
     internal class FatFileSystem : FileSystem
     {
         /// <summary>
-        /// FAT class. Used to manage individual FAT entry. 
+        /// FAT class. Used to manage individual FAT entry.
         /// </summary>
         internal class Fat
         {
@@ -462,7 +462,7 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xEntryOffset = aEntryNumber * xEntrySize;
 
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
-                ulong xSectorOffset = (xSector * mFileSystem.BytesPerSector) - xEntryOffset;
+                ulong xSectorOffset = xSector * mFileSystem.BytesPerSector - xEntryOffset;
 
                 byte[] xData;
                 ReadFatSector(xSectorOffset, out xData);
@@ -853,7 +853,7 @@ namespace Cosmos.System.FileSystem.FAT
             mFats = new Fat[NumberOfFATs];
             for (ulong i = 0; i < NumberOfFATs; i++)
             {
-                mFats[i] = new Fat(this, (ReservedSectorCount + i * FatSectorCount));
+                mFats[i] = new Fat(this, ReservedSectorCount + i * FatSectorCount);
             }
         }
 
@@ -1628,7 +1628,7 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 throw new NotImplementedException("Unknown FAT type.");
             }
-            
+
             firstFat.Write8(0, 0xF8); //hard disk (0xF0 is floppy)
 
             /* Clean sectors */
@@ -1643,7 +1643,7 @@ namespace Cosmos.System.FileSystem.FAT
                 //Clean FATs
                 for (uint fat = 0; fat < NumberOfFATs; fat++)
                 {
-                    Device.WriteBlock((ulong)ReservedSectorCount + (FatSectorCount * fat), FatSectorCount, ref emptyFat.memory);
+                    Device.WriteBlock((ulong)ReservedSectorCount + FatSectorCount * fat, FatSectorCount, ref emptyFat.memory);
                 }
 
                 //Clear out root cluster to remove old data
@@ -1663,7 +1663,7 @@ namespace Cosmos.System.FileSystem.FAT
             /* Write FAT sectors */
             for (uint i = 0; i < NumberOfFATs; i++)
             {
-                Device.WriteBlock(ReservedSectorCount + (i * FatSectorCount), 1, ref firstFat.memory);
+                Device.WriteBlock(ReservedSectorCount + i * FatSectorCount, 1, ref firstFat.memory);
             }
 
             FileSystemExists = true;

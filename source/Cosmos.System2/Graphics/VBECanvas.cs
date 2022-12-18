@@ -42,18 +42,18 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
         public VBECanvas(Mode aMode)
         {
-            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
+            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Width}x{aMode.Height}x{(uint)aMode.ColorDepth}");
 
             if (Core.VBE.IsAvailable())
             {
                 Core.VBE.ModeInfo ModeInfo = Core.VBE.getModeInfo();
                 aMode = new Mode(ModeInfo.width, ModeInfo.height, (ColorDepth)ModeInfo.bpp);
-                Global.mDebugger.SendInternal($"Detected VBE VESA with {aMode.Columns}x{aMode.Rows}x{(uint)aMode.ColorDepth}");
+                Global.mDebugger.SendInternal($"Detected VBE VESA with {aMode.Width}x{aMode.Height}x{(uint)aMode.ColorDepth}");
             }
 
             ThrowIfModeIsNotValid(aMode);
 
-            _VBEDriver = new VBEDriver((ushort)aMode.Columns, (ushort)aMode.Rows, (ushort)aMode.ColorDepth);
+            _VBEDriver = new VBEDriver((ushort)aMode.Width, (ushort)aMode.Height, (ushort)aMode.ColorDepth);
             Mode = aMode;
         }
 
@@ -159,8 +159,8 @@ namespace Cosmos.System.Graphics
         {
             ThrowIfModeIsNotValid(aMode);
 
-            ushort xres = (ushort)Mode.Columns;
-            ushort yres = (ushort)Mode.Rows;
+            ushort xres = (ushort)Mode.Width;
+            ushort yres = (ushort)Mode.Height;
             ushort bpp = (ushort)Mode.ColorDepth;
 
             //set the screen
@@ -299,7 +299,7 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Draw point to the screen. 
+        /// Draw point to the screen.
         /// Not implemented.
         /// </summary>
         /// <param name="aColor">Color to draw the point with.</param>
@@ -334,7 +334,7 @@ namespace Cosmos.System.Graphics
                 for (int ii = 0; ii < aY; ii++)
                 {
 
-                    DrawPoint((aColors[i + (ii * aWidth)]), i, ii);
+                    DrawPoint(aColors[i + ii * aWidth], i, ii);
 
                 }
             }
@@ -351,7 +351,7 @@ namespace Cosmos.System.Graphics
         public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight)
         {
             //ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
-            aWidth = Math.Min(aWidth, Mode.Columns - aX) * (int)Mode.ColorDepth / 32;
+            aWidth = Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32;
             var color = aColor.ToArgb();
 
             for (int i = aY; i < aY + aHeight; i++)
@@ -373,11 +373,11 @@ namespace Cosmos.System.Graphics
             var xHeight = (int)aImage.Height;
 
             int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Columns;
+            int xScreenWidthInPixel = Mode.Width;
 
             for (int i = 0; i < xHeight; i++)
             {
-                _VBEDriver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, (i * xWidth), xWidth);
+                _VBEDriver.CopyVRAM(i * xScreenWidthInPixel + xOffset, xBitmap, i * xWidth, xWidth);
             }
         }
 
