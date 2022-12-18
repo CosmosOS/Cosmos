@@ -279,7 +279,7 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown on fatal error, contact support.</exception>
         static public void Init()
         {
-            //TODO Adjust for new page and header sizes 
+            //TODO Adjust for new page and header sizes
             // 4 slots, ~1k ea
             uint xMaxItemSize = RAT.PageSize / 4 - PrefixItemBytes;
             // Word align it
@@ -307,7 +307,7 @@ namespace Cosmos.Core.Memory
             var page = (SMTPage*)RAT.AllocPages(RAT.PageType.SMT, 1);
             page->First = (RootSMTBlock*)(page + 1);
 
-            // TODO Change these sizes after further study and also when page size changes. 
+            // TODO Change these sizes after further study and also when page size changes.
             // SMT can be grown as needed. Also can adjust and create new ones dynamicaly as it runs.
             // The current algorithm only works if we create the inital pages in increasing order
             AddRootSMTBlock(page, 16);

@@ -17,11 +17,11 @@ namespace Cosmos.Core_Asm
             // calculate entire size into eax and move to exc
             // load start into edi
             // clear ecx bytes starting at edi
-            
+
             // load element size into eax
             XS.Set(EAX, EBP, sourceDisplacement: SourceArrayDisplacement);
             XS.Add(EAX, 8);
-            XS.Set(EAX, EAX, sourceIsIndirect: true); 
+            XS.Set(EAX, EAX, sourceIsIndirect: true);
 
             // load length into ebx
             XS.Set(EBX, EBP, sourceDisplacement: SourceArrayDisplacement);

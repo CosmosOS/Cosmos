@@ -40,7 +40,7 @@ namespace Cosmos.System_Plugs.System.IO
         {
             Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path {aThis.FullName}");
             var xEntries = VFSManager.GetDirectoryListing(aThis.FullName);
- 
+
             var result = new List<FileInfo>();
 
             for (int i = 0; i < xEntries.Count; i++)

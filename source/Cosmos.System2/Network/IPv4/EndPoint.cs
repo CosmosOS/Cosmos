@@ -55,7 +55,7 @@ namespace Cosmos.System.Network.IPv4
             {
                 var other = (EndPoint)obj;
 
-                if ((other.Address.CompareTo(Address) != 0) || (other.Port != Port))
+                if (other.Address.CompareTo(Address) != 0 || other.Port != Port)
                 {
                     return -1;
                 }

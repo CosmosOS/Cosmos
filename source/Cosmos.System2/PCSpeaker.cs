@@ -185,7 +185,7 @@ namespace Cosmos.System
         {
             Beep((uint)note, (uint) duration);
         }
-        
+
         // TODO: continue exception list, once HAL is documented.
         /// <summary>
         /// Play beep sound, at a specified frequency for one eighth.
