@@ -239,6 +239,44 @@ namespace Cosmos.Core {
         /// </summary>
         private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
 
+
+        /// <summary>
+        /// Masks or Un-Masks an interupt address.
+        /// Source: https://wiki.osdev.org/8259_PIC
+        /// </summary>
+        /// <param name="aIRQLine">Interupt to unmask.</param>
+        /// <param name="aDoMask">True = Mask, False = Unmask.</param>
+        public static void SetIRQMaskState(byte aIRQLine, bool aDoMask)
+        {
+            ushort Port;
+            byte Value;
+            IOPort PIC1_Data = new(0x20);
+            IOPort PIC2_Data = new(0xA0);
+
+            if (aIRQLine < 8)
+            {
+                Port = PIC1_Data.Byte;
+            }
+            else
+            {
+                Port = PIC2_Data.Byte;
+                aIRQLine -= 8;
+            }
+
+            IOPort IO = new(Port);
+
+            if (aDoMask)
+            {
+                Value = (byte)(IO.Byte | (1 << IRQLine));
+            }
+            else
+            {
+                Value = (byte)(IO.Byte & ~(1 << aIRQLine));
+            }
+
+            IO.Byte = Value;
+        }
+
         // We used to use:
         //Interrupts.IRQ01 += HandleKeyboardInterrupt;
         // But at one point we had issues with multi cast delegates, so we changed to this single cast option.
