@@ -24,7 +24,7 @@
 * When the installation is complete, Visual Studio will automatically open and you may begin programming with your new, modified copy of Cosmos.
 
 ## Arguments for the 'install-VS2019.bat' file
-The `install-VS2019.bat` accepts the following parameters :
+The `install-VS2022.bat` accepts the following parameters :
 
 - `-USERKIT` Run installer for the User Kit only. By default installer build and install Dev Kit.
 - `-RESETHIVE` Reset Visual Studio Experimental Hive after installation.
