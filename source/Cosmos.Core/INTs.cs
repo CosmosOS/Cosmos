@@ -239,8 +239,6 @@ namespace Cosmos.Core {
         /// </summary>
         private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
 
-
-        /// <summary>
         /// Masks or Un-Masks an interupt address.
         /// Source: https://wiki.osdev.org/8259_PIC
         /// </summary>
@@ -250,31 +248,29 @@ namespace Cosmos.Core {
         {
             ushort Port;
             byte Value;
-            IOPort PIC1_Data = new(0x20);
-            IOPort PIC2_Data = new(0xA0);
 
             if (aIRQLine < 8)
             {
-                Port = PIC1_Data.Byte;
+                // Read PIC1 Data
+                Port = IOPort.Read8(0x20);
             }
             else
             {
-                Port = PIC2_Data.Byte;
+                // Read PIC2 Data
+                Port = IOPort.Read8(0xA0);
                 aIRQLine -= 8;
             }
 
-            IOPort IO = new(Port);
-
             if (aDoMask)
             {
-                Value = (byte)(IO.Byte | (1 << IRQLine));
+                Value = (byte)(IOPort.Read8(Port) | (1 << aIRQLine));
             }
             else
             {
-                Value = (byte)(IO.Byte & ~(1 << aIRQLine));
+                Value = (byte)(IOPort.Read8(Port) & ~(1 << aIRQLine));
             }
 
-            IO.Byte = Value;
+            IOPort.Write8(Port, Value);
         }
 
         // We used to use:
