@@ -282,7 +282,7 @@ namespace Cosmos.Debug.Hosts
       {
         xQemuArguments.Append(" -device ");
         xQemuArguments.Append(_networkDevice);
-        xQemuArguments.Append(",netdev=n1 -netdev user,id=n1,hostfwd=tcp::8080-:80,hostfwd=tcp::21-:21,hostfwd=tcp::20-:20");
+        xQemuArguments.Append(",netdev=n1 -netdev user,id=n1");
       }
 
       qemuStartInfo.Arguments = xQemuArguments.ToString();
