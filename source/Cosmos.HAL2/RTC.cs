@@ -79,13 +79,15 @@ namespace Cosmos.HAL
             {
                 WaitForReady();
                 IOPort.Write8(Address, 0);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(Data));
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return IOPort.Read8(Data);
+                    return data;
                 }
             }
         }
@@ -99,13 +101,15 @@ namespace Cosmos.HAL
             {
                 WaitForReady();
                 IOPort.Write8(Address, 2);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(Data));
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return IOPort.Read8(Data);
+                    return data;
                 }
             }
         }
@@ -120,30 +124,31 @@ namespace Cosmos.HAL
             {
                 WaitForReady();
                 IOPort.Write8(Address, 4);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
                     if (is24HourMode)
                     {
-                        return FromBCD(IOPort.Read8(Data));
+                        return FromBCD(data);
                     }
                     else
                     {
-                        byte b = IOPort.Read8(Data);
-                        if ((b & 0x80) == 0x80)
+                        if ((data & 0x80) == 0x80)
                         {
                             // It's PM.
-                            return (byte)(FromBCD(b) + 12);
+                            return (byte)(FromBCD(data) + 12);
                         }
                         else
                         {
-                            if (FromBCD(b) == 12)
+                            if (FromBCD(data) == 12)
                             {
                                 // It's midnight, so it should actually be 0.
                                 return 0;
                             }
                             else
                             {
-                                return FromBCD(b);
+                                return FromBCD(data);
                             }
                         }
                     }
@@ -152,26 +157,25 @@ namespace Cosmos.HAL
                 {
                     if (is24HourMode)
                     {
-                        return IOPort.Read8(Data);
+                        return data;
                     }
                     else
                     {
-                        byte b = IOPort.Read8(Data);
-                        if ((b & 0x80) == 0x80)
+                        if ((data & 0x80) == 0x80)
                         {
                             // It's PM.
-                            return (byte)(b + 12);
+                            return (byte)(data + 12);
                         }
                         else
                         {
-                            if (b == 12)
+                            if (data == 12)
                             {
                                 // It's midnight, so it should actually be 0.
                                 return 0;
                             }
                             else
                             {
-                                return b;
+                                return data;
                             }
                         }
                     }
@@ -188,13 +192,15 @@ namespace Cosmos.HAL
             {
                 WaitForReady();
                 IOPort.Write8(Address, 6);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(Data));
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return IOPort.Read8(Data);
+                    return data;
                 }
             }
         }
@@ -208,13 +214,15 @@ namespace Cosmos.HAL
             {
                 WaitForReady();
                 IOPort.Write8(Address, 7);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(Data));
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return IOPort.Read8(Data);
+                    return data;
                 }
             }
         }
@@ -228,13 +236,15 @@ namespace Cosmos.HAL
             {
                 WaitForReady();
                 IOPort.Write8(Address, 8);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(Data));
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return IOPort.Read8(Data);
+                    return data;
                 }
             }
         }
@@ -248,13 +258,15 @@ namespace Cosmos.HAL
             {
                 WaitForReady();
                 IOPort.Write8(Address, 9);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(Data));
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return IOPort.Read8(Data);
+                    return data;
                 }
             }
         }
@@ -269,13 +281,15 @@ namespace Cosmos.HAL
             {
                 WaitForReady();
                 IOPort.Write8(Address, 0x32);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(IOPort.Read8(Data));
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return IOPort.Read8(Data);
+                    return data;
                 }
             }
         }
@@ -287,7 +301,7 @@ namespace Cosmos.HAL
         /// <returns>Hex coded</returns>
         private static byte FromBCD(byte value)
         {
-            return (byte)(((value >> 4) & 0x0F) * 10 + (value & 0x0F));
+            return (byte)((value / 16 * 10) + (value & 0xF));
         }
 
         /// <summary>
