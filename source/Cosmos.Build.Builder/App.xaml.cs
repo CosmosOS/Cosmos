@@ -87,7 +87,7 @@ namespace Cosmos.Build.Builder
 
             // show first, or setting owner on dialog windows may fail, as the main window may have not been shown yet.
             MainWindow.Show();
-            MainWindow.DataContext = new MainWindowViewModel(dependencyInstallationDialogService, buildDefinition);
+            MainWindow.DataContext = new MainWindowViewModel(dependencyInstallationDialogService, buildDefinition, (MainWindow)MainWindow);
 
             base.OnStartup(e);
         }

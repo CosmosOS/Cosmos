@@ -53,7 +53,7 @@ namespace Cosmos.System.Network.IPv4
         /// <exception cref="ArgumentException">Thrown if buffer is invalid or null.</exception>
         public Address(byte[] buffer, int offset)
         {
-            if (buffer == null || buffer.Length < (offset + 4))
+            if (buffer == null || buffer.Length < offset + 4)
                 throw new ArgumentException("buffer does not contain enough data starting at offset", "buffer");
 
             address[0] = buffer[offset];
@@ -141,7 +141,7 @@ namespace Cosmos.System.Network.IPv4
         /// <returns></returns>
         public bool IsAPIPA()
         {
-            if ((address[0] == 169) && (address[1] == 254))
+            if (address[0] == 169 && address[1] == 254)
             {
                 return true;
             }

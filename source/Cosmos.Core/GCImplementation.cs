@@ -18,7 +18,7 @@ namespace Cosmos.Core
         private static ulong memLength = 0;
         private static bool StartedMemoryManager = false;
         /// <summary>
-        /// 
+        ///
         /// Acquire lock. Not implemented.
         /// </summary>
         /// <exception cref="NotImplementedException">Thrown always.</exception>
@@ -65,7 +65,7 @@ namespace Cosmos.Core
         /// <returns>Returns the used PageSize by the MemoryManager in Bytes.</returns>
         public static uint GetUsedRAM()
         {
-            return (RAT.TotalPageCount - RAT.GetPageCount(RAT.PageType.Empty)) * RAT.PageSize;
+            return (RAT.TotalPageCount - RAT.GetPageCount((byte)RAT.PageType.Empty)) * RAT.PageSize;
         }
         /// <summary>
         /// Initialise the Memory Manager, this should not be called anymore since it is done very early during the boot process.
@@ -96,7 +96,7 @@ namespace Cosmos.Core
             {
                 memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
                 memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;
-                memLength = (128 * 1024 * 1024);
+                memLength = 128 * 1024 * 1024;
             }
             RAT.Init(memPtr, (uint)memLength);
         }

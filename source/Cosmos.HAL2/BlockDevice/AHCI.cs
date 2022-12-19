@@ -51,7 +51,7 @@ namespace Cosmos.HAL.BlockDevice
         public string SerialNo;
         public string Version
         {
-            get => ((byte)mGeneric.AHCIVersion >> 24) + (byte)(mGeneric.AHCIVersion >> 16) + "." + (byte)(mGeneric.AHCIVersion >> 8) + ((byte)(mGeneric.AHCIVersion) > 0 ? "." + (byte)mGeneric.AHCIVersion : "");
+            get => ((byte)mGeneric.AHCIVersion >> 24) + (byte)(mGeneric.AHCIVersion >> 16) + "." + (byte)(mGeneric.AHCIVersion >> 8) + ((byte)mGeneric.AHCIVersion > 0 ? "." + (byte)mGeneric.AHCIVersion : "");
         }
 
         internal static void InitDriver()
@@ -72,7 +72,7 @@ namespace Cosmos.HAL.BlockDevice
 
             mABAR = aAHCIDevice.BaseAddressBar[5].BaseAddress;
             mGeneric = new GenericRegisters(aAHCIDevice.BaseAddressBar[5].BaseAddress);
-            mGeneric.GlobalHostControl |= (1U << 31); // Enable AHCI
+            mGeneric.GlobalHostControl |= 1U << 31; // Enable AHCI
 
             GetCapabilities();
             mPorts.Capacity = (int)NumOfPorts;
@@ -129,20 +129,18 @@ namespace Cosmos.HAL.BlockDevice
 
         public static void Wait(int microsecondsTimeout)
         {
-            byte xVoid;
             for (int i = 0; i < microsecondsTimeout; i++)
             {
-                // Random IOPort
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
-                xVoid = Core.Global.BaseIOGroups.TextScreen.Data1.Byte;
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
+                IOPort.Wait();
             }
         }
 
@@ -182,7 +180,7 @@ namespace Cosmos.HAL.BlockDevice
                     PortRegisters xPortReg = new PortRegisters((uint)mABAR + 0x100, (uint)xPort);
                     PortType PortType = CheckPortType(xPortReg);
                     xPortReg.mPortType = PortType;
-                    var xPortString = "0:" + ((xPort.ToString().Length <= 1) ? xPort.ToString().PadLeft(1, '0') : xPort.ToString());
+                    var xPortString = "0:" + (xPort.ToString().Length <= 1 ? xPort.ToString().PadLeft(1, '0') : xPort.ToString());
                     if (PortType == PortType.SATA) // If Port type was SATA.
                     {
                         mAHCIDebugger.Send("Initializing Port " + xPortString + " with type SATA");
@@ -243,8 +241,8 @@ namespace Cosmos.HAL.BlockDevice
             mAHCIDebugger.Send("Stop");
             if (!StopCMD(aPort)) SATA.PortReset(aPort);
 
-            aPort.CLB = (uint)Base.AHCI + (0x400 * aPortNumber);
-            aPort.FB = (uint)Base.AHCI + 0x8000 + (0x100 * aPortNumber);
+            aPort.CLB = (uint)Base.AHCI + 0x400 * aPortNumber;
+            aPort.FB = (uint)Base.AHCI + 0x8000 + 0x100 * aPortNumber;
 
             aPort.SERR = 1;
             aPort.IS = 0;
@@ -272,7 +270,7 @@ namespace Cosmos.HAL.BlockDevice
                 {
                     PRDTL = 8,
 
-                    CTBA = (uint)(Base.AHCI + 0xA000) + (0x2000 * aPort.mPortNumber) + (0x100 * i),
+                    CTBA = (uint)(Base.AHCI + 0xA000) + 0x2000 * aPort.mPortNumber + 0x100 * i,
 
                     CTBAU = 0
                 };
@@ -291,8 +289,8 @@ namespace Cosmos.HAL.BlockDevice
             }
             if (xSpin == 101) return false;
 
-            aPort.CMD |= (1 << 4);
-            aPort.CMD |= (1 << 0);
+            aPort.CMD |= 1 << 4;
+            aPort.CMD |= 1 << 0;
 
             return true;
         }
@@ -312,7 +310,7 @@ namespace Cosmos.HAL.BlockDevice
 
             for (xSpin = 0; xSpin < 101; xSpin++)
             {
-                if ((aPort.CI == 0)) break;
+                if (aPort.CI == 0) break;
                 Wait(50);
             }
             if (xSpin == 101) return false;
@@ -323,7 +321,7 @@ namespace Cosmos.HAL.BlockDevice
             {
                 if ((aPort.TFD & (uint)ATADeviceStatus.Busy) != 0)
                 {
-                    aPort.CMD |= (1U << 3);
+                    aPort.CMD |= 1U << 3;
                 }
             }
 
@@ -338,7 +336,7 @@ namespace Cosmos.HAL.BlockDevice
             if (xSpin == 101)
             {
                 if (SupportsCommandListOverride)
-                    aPort.CMD |= (1U << 3);
+                    aPort.CMD |= 1U << 3;
                 else
                     aPort.CMD &= ~(1U << 3);
                 return false;

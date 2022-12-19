@@ -12,7 +12,7 @@ namespace Cosmos.System_Plugs.System
     public static class RandomImpl
     {
         //
-        // Private Constants 
+        // Private Constants
         //
         private const int MBIG = Int32.MaxValue;
         private const int MSEED = 161803398;
@@ -36,17 +36,16 @@ namespace Cosmos.System_Plugs.System
         {
             //empty ATM
             int ii;
-            int mj, mk;
 
             //Initialize our Seed array.
             //This algorithm comes from Numerical Recipes in C (2nd Ed.)
-            int subtraction = (seed == Int32.MinValue) ? Int32.MaxValue : Math.Abs(seed);
-            mj = MSEED - subtraction;
+            int subtraction = seed == Int32.MinValue ? Int32.MaxValue : Math.Abs(seed);
+            var mj = MSEED - subtraction;
             SeedArray[55] = mj;
-            mk = 1;
+            var mk = 1;
             for (int i = 1; i < 55; i++)
             {  //Apparently the range [1..55] is special (Knuth) and so we're wasting the 0'th position.
-                ii = (21 * i) % 55;
+                ii = 21 * i % 55;
                 SeedArray[ii] = mk;
                 mk = mj - mk;
                 if (mk < 0)
@@ -75,12 +74,11 @@ namespace Cosmos.System_Plugs.System
         {
             //Including this division at the end gives us significantly improved
             //random number distribution.
-            return (InternalSample() * (1.0 / MBIG));
+            return InternalSample() * (1.0 / MBIG);
         }
 
         private static int InternalSample()
         {
-            int retVal;
             int locINext = inext;
             int locINextp = inextp;
 
@@ -93,7 +91,7 @@ namespace Cosmos.System_Plugs.System
                 locINextp = 1;
             }
 
-            retVal = SeedArray[locINext] - SeedArray[locINextp];
+            var retVal = SeedArray[locINext] - SeedArray[locINextp];
 
             if (retVal == MBIG)
             {
@@ -128,20 +126,20 @@ namespace Cosmos.System_Plugs.System
 
         private static double GetSampleForLargeRange()
         {
-            // The distribution of double value returned by Sample 
+            // The distribution of double value returned by Sample
             // is not distributed well enough for a large range.
             // If we use Sample for a range [Int32.MinValue..Int32.MaxValue)
             // We will end up getting even numbers only.
 
             int result = InternalSample();
             // Note we can't use addition here. The distribution will be bad if we do that.
-            bool negative = (InternalSample() % 2 == 0) ? true : false;  // decide the sign based on second sample
+            bool negative = InternalSample() % 2 == 0 ? true : false;  // decide the sign based on second sample
             if (negative)
             {
                 result = -result;
             }
             double d = result;
-            d += (Int32.MaxValue - 1); // get a number in range [0 .. 2 * Int32MaxValue - 1)
+            d += Int32.MaxValue - 1; // get a number in range [0 .. 2 * Int32MaxValue - 1)
             d /= 2 * (uint)Int32.MaxValue - 1;
             return d;
         }
@@ -156,7 +154,7 @@ namespace Cosmos.System_Plugs.System
             long range = (long)maxValue - minValue;
             if (range <= (long)Int32.MaxValue)
             {
-                return ((int)(Sample() * range) + minValue);
+                return (int)(Sample() * range) + minValue;
             }
             else
             {

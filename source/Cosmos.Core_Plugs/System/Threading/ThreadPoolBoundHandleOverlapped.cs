@@ -13,7 +13,7 @@ namespace Cosmos.Core_Plugs.System.Threading
     {
         public static void Cctor()
         {
-            
+
         }
     }
 }
