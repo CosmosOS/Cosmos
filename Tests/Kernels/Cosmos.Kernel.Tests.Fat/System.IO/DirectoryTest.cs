@@ -87,6 +87,15 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
 
             mDebugger.Send("");
 
+            mDebugger.Send("START TEST: Create Directory with a dot");
+            var xDirectoryDot = Directory.CreateDirectory(@"0:\folder.system");
+            Assert.IsTrue(xDirectoryDot != null, "Directory.CreateDirectory with dot failed: Directory is null");
+            bool xDirExists = Directory.Exists(@"0:\folder.system");
+            Assert.IsTrue(xDirExists, "Directory.CreateDirectory with dot failed: Directory doesn't exist after create call");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
             mDebugger.Send("START TEST: Delete a directory:");
             Directory.CreateDirectory(@"0:\TestDir1");
             Assert.IsTrue(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't created!");
