@@ -15,7 +15,7 @@ namespace Cosmos.TestRunner.Full
         // Stable kernel types: the ones that are stable and will run in AppVeyor
         public static IEnumerable<Type> GetStableKernelTypes()
         {
-            /*yield return typeof(BoxingTests.Kernel);
+            yield return typeof(BoxingTests.Kernel);
             yield return typeof(Compiler.Tests.TypeSystem.Kernel);
             yield return typeof(Compiler.Tests.Bcl.Kernel);
             yield return typeof(Compiler.Tests.Bcl.System.Kernel);
@@ -26,17 +26,17 @@ namespace Cosmos.TestRunner.Full
             yield return typeof(Kernel.Tests.Fat.Kernel);
             yield return typeof(Kernel.Tests.IO.Kernel);
             yield return typeof(SimpleStructsAndArraysTest.Kernel);
-            yield return typeof(Kernel.Tests.DiskManager.Kernel);*/
+            yield return typeof(Kernel.Tests.DiskManager.Kernel);
 
             //yield return typeof(KernelGen3.Boot);
-            /*yield return typeof(GraphicTest.Kernel);
+            yield return typeof(GraphicTest.Kernel);
             yield return typeof(NetworkTest.Kernel);
-            yield return typeof(AudioTests.Kernel);*/
+            yield return typeof(AudioTests.Kernel);
             // Please see the notes on the kernel itself before enabling it
             yield return typeof(ConsoleTest.Kernel);
             // This is a bit slow and works only because ring check is disabled to decide if leave it enabled
-            /*yield return typeof(MemoryOperationsTest.Kernel);
-            yield return typeof(ProcessorTests.Kernel);*/
+            yield return typeof(MemoryOperationsTest.Kernel);
+            yield return typeof(ProcessorTests.Kernel);
         }
     }
 }
