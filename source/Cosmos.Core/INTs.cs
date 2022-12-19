@@ -246,7 +246,7 @@ namespace Cosmos.Core {
         /// <param name="aDoMask">True = Mask, False = Unmask.</param>
         public static void SetIRQMaskState(byte aIRQLine, bool aDoMask)
         {
-            ushort Port = (aIRQLine < 8 ? 0x21 : 0xA1);
+            ushort Port = (ushort)(aIRQLine < 8 ? 0x21 : 0xA1);
 
             if (aIRQLine !< 8)
             {
