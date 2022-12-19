@@ -192,9 +192,12 @@ namespace Cosmos.Build.Builder.ViewModels
 
                     await buildTask.RunAsync(_logger).ConfigureAwait(false);
                 }
+
+                Window.AllTasksCompleted = true;
+
                 if (CloseWhenCompleted)
                 {
-                    Window.Close();
+                    Application.Current.Dispatcher.Invoke(() => Application.Current?.MainWindow?.Close());
                 }
             }
             catch (Exception e)
@@ -207,7 +210,7 @@ namespace Cosmos.Build.Builder.ViewModels
 
             if (CloseWhenCompleted)
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() => System.Windows.Application.Current?.MainWindow?.Close());
+                Application.Current.Dispatcher.Invoke(() => Application.Current?.MainWindow?.Close());
             }
             else
             {
