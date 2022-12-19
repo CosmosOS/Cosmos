@@ -101,8 +101,8 @@ namespace Cosmos.Build.Tasks
             }
 
             /* Apply the optimization level that the user chose */
-            xBuilder.AppendSwitch("-O" + OptimizationLevel);
-
+	    if(!String.IsNullOrWhiteSpace(OptimizationLevel) && !String.IsNullOrWhiteSpace(OptimizationLevel))
+            	xBuilder.AppendSwitch($"-O{OptimizationLevel}");
 
             xBuilder.AppendFileNameIfNotNull(InputFile);
 
