@@ -75,9 +75,7 @@
                   <EnumValue Name="0" DisplayName="O0"/>
                   <EnumValue Name="1" DisplayName="O1"/>
                   <EnumValue Name="2" DisplayName="O2"/>
-                  <EnumValue Name="3" DisplayName="O3 (Unstable)"/>
-	          <EnumValue Name="s" DisplayName="Os (Unstable)"/>
-	          <EnumValue Name="fast" DisplayName="Ofast (Unstable)"/>
+                  <EnumValue Name="3" DisplayName="O3"/>
     </EnumProperty>
 
     <StringProperty Name="Timeout"
