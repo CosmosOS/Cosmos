@@ -33,8 +33,16 @@
         <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' == 'Windows_NT'">mkisofs.exe</MkisofsToolExe>
         <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' != 'Windows_NT'">mkisofs</MkisofsToolExe>
 
+        <XorrisoToolPath Condition = "'$(XorrisoToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)xorriso\win\</XorrisoToolPath>
+        <XorrisoToolPath Condition = "'$(XorrisoToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</XorrisoToolPath>
+        <XorrisoToolExe Condition = "'$(XorrisoToolExe)' == '' AND '$(OS)' == 'Windows_NT'">xorriso.exe</XorrisoToolExe>
+        <XorrisoToolExe Condition = "'$(XorrisoToolExe)' == '' AND '$(OS)' != 'Windows_NT'">xorriso</XorrisoToolExe>
+
         <SyslinuxToolPath Condition = "'$(SyslinuxToolPath)' == ''">$(CosmosToolsPath)syslinux\win\</SyslinuxToolPath>
         <SyslinuxToolExe Condition = "'$(SyslinuxToolExe)' == ''">syslinux.exe</SyslinuxToolExe>
+
+        <LimineToolPath Condition = "'$(LimineToolPath)' == ''">$(CosmosToolsPath)limine\boot\</LimineToolPath>
+        <LimineToolExe Condition = "'$(LimineToolExe)' == ''">limine-deploy.exe</LimineToolExe>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -65,6 +73,7 @@
         <SyslinuxPath Condition="'$(SyslinuxPath)' == ''">$(CosmosToolsPath)syslinux\bios\</SyslinuxPath>
 
         <GrubPath Condition="'$(GrubPath)' == ''">$(CosmosToolsPath)grub2\</GrubPath>
+        <LiminePath Condition="'$(LiminePath)' == ''">$(CosmosToolsPath)limine\</LiminePath>
 
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
 
@@ -125,13 +134,14 @@
     </ItemGroup>
 
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateMbr" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.CreateGrubConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.CreateLimineConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Launch" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Gzip" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.LimineDeploy" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ReadNasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.TheRingMaster" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -354,7 +364,8 @@
         </ItemGroup>
 
         <ItemGroup>
-            <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
+            <_IsoFile Include="$(LiminePath)boot\limine-cd.bin" />
+            <_IsoFile Include="$(LiminePath)boot\limine.sys" />
         </ItemGroup>
 
         <ItemGroup>
@@ -376,26 +387,30 @@
 			        Retries="3"
 			        RetryDelayMilliseconds="300"/>
 
-        <Copy SourceFiles="@(_i386pcFile)"
-              DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
-
-
-        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
+        <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
                               Modules="gzio"
                               Timeout="$(Timeout)"
+                              LimineWallpaperPath="$(LimineWallpaperPath)"
+                              LimineBackDrop="$(LimineBackDrop)"
                               Condition="'$(CompressionType)' == 'Gzip'" />
-        
-        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
+
+        <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
                               Timeout="$(Timeout)"
+                              LimineWallpaperPath="$(LimineWallpaperPath)"
+                              LimineBackDrop="$(LimineBackDrop)"
                               Condition="'$(CompressionType)' == 'None'" />
-        
+
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
                  OutputFile="$(IsoFile)"
-                 ToolPath="$(MkisofsToolPath)"
-                 ToolExe="$(MkisofsToolExe)" />
+                 ToolPath="$(XorrisoToolPath)"
+                 ToolExe="$(XorrisoToolExe)" />
 
+        <LimineDeploy IsoFile="$(IsoFile)"
+                      OutputFile="$(LimineIsoFile)"
+                      ToolPath="$(LimineDeployToolPath)"
+                      ToolExe="$(LimineDeployToolExe)" />
     </Target>
 
     <!--
@@ -442,7 +457,8 @@
         </ItemGroup>
 
         <ItemGroup>
-            <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
+            <_IsoFile Include="$(LiminePath)boot\limine-cd.bin" />
+            <_IsoFile Include="$(LiminePath)boot\limine.sys" />
         </ItemGroup>
 
         <ItemGroup>
@@ -464,20 +480,23 @@
 			        Retries="3"
 			        RetryDelayMilliseconds="300"/>
 
-        <Copy SourceFiles="@(_i386pcFile)"
-              DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
-
         <Copy SourceFiles="@(IntermediateIsoDirectory)"
               DestinationFolder="$(UsbPublishDrive)" />
 
-        <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
-                              Modules="gzio"
-                              Condition="'$(CompressionType)' == 'Gzip'" />
+        <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
+                            BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
+                            Modules="gzio"
+                            Timeout="$(Timeout)"
+                            LimineWallpaperPath="$(LimineWallpaperPath)"
+                            LimineBackDrop="$(LimineBackDrop)"
+                            Condition="'$(CompressionType)' == 'Gzip'" />
 
-        <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
-                              Condition="'$(CompressionType)' == 'None'" />
+        <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
+                            BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                            Timeout="$(Timeout)"
+                            LimineWallpaperPath="$(LimineWallpaperPath)"
+                            LimineBackDrop="$(LimineBackDrop)"
+                            Condition="'$(CompressionType)' == 'None'" />
 
         <CreateMbr TargetDrive="$(UsbPublishDrive)"
                    FormatDrive="$(UsbPublishFormatDrive)"
