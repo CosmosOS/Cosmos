@@ -33,20 +33,19 @@ public class CreateLimineConfig : Task
 
         var xBinName = BinName;
         var xLabelName = Path.GetFileNameWithoutExtension(xBinName);
-        using var xWriter = File.CreateText(Path.Combine($"{TargetDirectory}boot/limine/", "limine.cfg"));
+        using var xWriter = File.CreateText(Path.Combine($"{TargetDirectory}boot/", "limine.cfg"));
 
         xWriter.WriteLine(!IsNull(Timeout) ? $"TIMEOUT={Timeout}" : "TIMEOUT=0");
-        xWriter.WriteLine("DEFAULT_ENTRY=3");
         xWriter.WriteLine("VERBOSE=yes");
         xWriter.WriteLine();
         xWriter.WriteLine(IsNull(LimineWallpaperPath) ? $"TERM_WALLPAPER={LimineWallpaperPath}" : "");
         xWriter.WriteLine(IsNull(LimineBackDrop) ? $"TERM_BACKDROP={LimineBackDrop}" : "TERM_BACKDROP=008080");
 
-        xWriter.WriteLine($":Multiboot2 {xLabelName}");
-        WriteIndentedLine(xWriter, $"COMMENT={xLabelName} Cosmos kernel");
+        xWriter.WriteLine($":Cosmos {xLabelName}");
+        WriteIndentedLine(xWriter, $"COMMENT=Boot {xLabelName} Cosmos kernel using multiboot2");
         xWriter.WriteLine();
         WriteIndentedLine(xWriter, "PROTOCOL=multiboot2");
-        WriteIndentedLine(xWriter, $"KERNEL_PATH=boot:///{xBinName}");
+        WriteIndentedLine(xWriter, $"KERNEL_PATH=boot:///boot/{xBinName}");
         WriteIndentedLine(xWriter, "KERNEL_CMDLINE= Cosmos Kernel");
 
         if (Modules == null) return true;

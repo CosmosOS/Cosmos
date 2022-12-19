@@ -405,9 +405,28 @@
                  OutputFile="$(IsoFile)"
                  ToolPath="$(XorrisoToolPath)"
                  ToolExe="$(XorrisoToolExe)" />
+    </Target>
+
+    <!--
+    ================================================================================
+                                       LimineDeploy
+
+        [IN]
+        $(IsoFile) - an ISO file.
+
+        [OUT]
+        $(LimineIsoFile) - a Limine bootable ISO file.
+
+    ================================================================================
+    -->
+
+    <Target Name="LimineDeploy"
+            Inputs="IsoFile"
+            Outputs="LimineIsoFile"
+            Condition="'$(Deployment)' == 'ISO'">
 
         <LimineDeploy IsoFile="$(IsoFile)"
-                      OutputFile="$(LimineIsoFile)"
+                      LimineIsoFile="$(LimineIsoFile)"
                       ToolPath="$(LimineDeployToolPath)"
                       ToolExe="$(LimineDeployToolExe)" />
     </Target>

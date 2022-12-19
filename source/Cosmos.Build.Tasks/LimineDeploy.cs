@@ -9,7 +9,10 @@ namespace Cosmos.Build.Tasks;
 public class LimineDeploy : ToolTask
 {
     [Required]
-    public string IsoOutputFile { get; set; }
+    public string IsoFile { get; set; }
+
+    [Required]
+    public string LimineIsoFile { get; set; }
 
     protected override string ToolName => IsWindows() ? "limine-deploy.exe" : "limine-deploy";
 
@@ -21,7 +24,7 @@ public class LimineDeploy : ToolTask
     protected override string GenerateCommandLineCommands()
     {
         var xBuilder = new CommandLineBuilder();
-        xBuilder.AppendSwitch($"{IsoOutputFile}");
+        xBuilder.AppendSwitch($"{IsoFile}");
 
         return xBuilder.ToString();
     }
