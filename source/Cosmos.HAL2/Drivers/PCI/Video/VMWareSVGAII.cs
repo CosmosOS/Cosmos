@@ -126,6 +126,10 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             /// </summary>
             CursorOn = 27,
             /// <summary>
+            /// Cursor count.
+            /// </summary>
+            CursorCount = 0x0C,
+            /// <summary>
             /// Host bits per pixel.
             /// </summary>
             HostBitsPerPixel = 28,
@@ -758,19 +762,48 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         {
             WaitForFifo();
             WriteToFifo((uint)FIFOCommand.DEFINE_CURSOR);
-            WriteToFifo(1);
-            WriteToFifo(0);
-            WriteToFifo(0);
+            WriteToFifo(0); // ID
+            WriteToFifo(0); // Hotspot X
+            WriteToFifo(0); // Hotspot Y
             WriteToFifo(2);
             WriteToFifo(2);
             WriteToFifo(1);
             WriteToFifo(1);
+
             for (int i = 0; i < 4; i++)
+            {
                 WriteToFifo(0);
+            }
+
             for (int i = 0; i < 4; i++)
+            {
                 WriteToFifo(0xFFFFFF);
+            }
+
             WaitForFifo();
         }
+
+        /// <summary>
+        /// Define alpha cursor.
+        /// </summary>
+        public void DefineAlphaCursor(uint width, uint height, int[] data)
+        {
+            WaitForFifo();
+            WriteToFifo((uint)FIFOCommand.DEFINE_ALPHA_CURSOR);
+            WriteToFifo(0); // ID
+            WriteToFifo(0); // Hotspot X
+            WriteToFifo(0); // Hotspot Y
+            WriteToFifo(width); // Width
+            WriteToFifo(height); // Height
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                WriteToFifo((uint)data[i]);
+            }
+
+            WaitForFifo();
+        }
+
         //Allow to enable the Driver again after it has been disabled (switch between text and graphics mode currently this is SVGA only)
         /// <summary>
         /// Enable the SVGA Driver , only needed after Disable() has been called
@@ -779,6 +812,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         {
             WriteRegister(Register.Enable, 1);
         }
+
         /// <summary>
         /// Disable the SVGA Driver , return to text mode
         /// </summary>
@@ -795,15 +829,10 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="y">Y coordinate.</param>
         public void SetCursor(bool visible, uint x, uint y)
         {
-            WriteRegister(Register.CursorID, 1);
-            if (visible)
-            {
-                WaitForFifo();
-                WriteToFifo((uint)FIFOCommand.MOVE_CURSOR);
-                WriteToFifo(x);
-                WriteToFifo(y);
-            }
             WriteRegister(Register.CursorOn, (uint)(visible ? 1 : 0));
+            WriteRegister(Register.CursorX, x);
+            WriteRegister(Register.CursorY, y);
+            WriteRegister(Register.CursorCount, ReadRegister(Register.CursorCount) + 1);
         }
     }
 }
