@@ -19,7 +19,7 @@ namespace Cosmos.System
             */
             if (VMTools.IsQEMU)
 			{
-                new IOPort(0x64).Byte = 0xFE;
+                IOPort.Write8(0x64, 0xFE);
 			}
 
             HAL.Power.CPUReboot();
@@ -37,8 +37,7 @@ namespace Cosmos.System
              */
             if (VMTools.IsVirtualBox)
             {
-                IOPort P = new(0x4004);
-                P.DWord = 0x3400;
+                IOPort.Write32(0x4004, 0x3400);
             }
             /*
              * Qemu does not support ACPI at the current moment due to multiboot2 and SeaBios being to old.
@@ -46,7 +45,7 @@ namespace Cosmos.System
             */
             if (VMTools.IsQEMU)
 			{
-                new IOPort(0x604).Word = 0x2000;
+                IOPort.Write16(0x604, 0x2000);
 			}
 
             // Try Normal Method

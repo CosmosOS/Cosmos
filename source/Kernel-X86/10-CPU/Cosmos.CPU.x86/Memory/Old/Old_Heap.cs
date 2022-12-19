@@ -161,7 +161,7 @@ namespace Cosmos.CPU.x86.Memory.Old
                         //mDebugger.Trace($"aTableAddr", xTableAddr);
                         var xTotalTableSize = GlobalSystemInfo.TotalDataLookupTableSize;
                         //mDebugger.Trace($"TotalTableSize", xTotalTableSize);
-                        xDataBlock = (void*)(((uint)aTable) + GlobalSystemInfo.TotalDataLookupTableSize);
+                        xDataBlock = (void*)((uint)aTable + GlobalSystemInfo.TotalDataLookupTableSize);
                     }
                     else
                     {

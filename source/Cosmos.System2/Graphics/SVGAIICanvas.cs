@@ -303,8 +303,8 @@ namespace Cosmos.System.Graphics
         {
             ThrowIfModeIsNotValid(aMode);
 
-            var xWidth = (uint)aMode.Columns;
-            var xHeight = (uint)aMode.Rows;
+            var xWidth = (uint)aMode.Width;
+            var xHeight = (uint)aMode.Height;
             var xColorDepth = (uint)aMode.ColorDepth;
 
             _xSVGADriver.SetMode(xWidth, xHeight, xColorDepth);
@@ -468,7 +468,7 @@ namespace Cosmos.System.Graphics
 
             for (int i = 0; i < xHeight; i++)
             {
-                _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, (i * xWidth), xWidth);
+                _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, i * xWidth, xWidth);
             }
         }
     }

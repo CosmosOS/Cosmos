@@ -93,11 +93,11 @@ namespace Cosmos.Core
             // Disable all interrupts
             DisableInterrupts();
 
-            var myPort = new IOPort(0x64);
-            while ((myPort.Byte & 0x02) != 0)
+            const ushort myPort = 0x64;
+            while ((IOPort.Read8(myPort) & 0x02) != 0)
             {
             }
-            myPort.Byte = 0xFE;
+            IOPort.Write8(myPort, 0xFE);
             Halt(); // If it didn't work, Halt the CPU
         }
 
@@ -128,7 +128,7 @@ namespace Cosmos.Core
             DoEnableInterrupts();
         }
 
-        /// <summary>                                                                                                                                                                    
+        /// <summary>
         /// Returns if the interrupts were actually enabled.
         /// </summary>
         /// <returns>bool value.</returns>
@@ -161,11 +161,11 @@ namespace Cosmos.Core
                 s += (char)((ebx >> 8) & 0xff);
                 s += (char)((ebx >> 16) & 0xff);
                 s += (char)(ebx >> 24);
-                s += (char)((edx) & 0xff);
+                s += (char)(edx & 0xff);
                 s += (char)((edx >> 8) & 0xff);
                 s += (char)((edx >> 16) & 0xff);
                 s += (char)(edx >> 24);
-                s += (char)((ecx) & 0xff);
+                s += (char)(ecx & 0xff);
                 s += (char)((ecx >> 8) & 0xff);
                 s += (char)((ecx >> 16) & 0xff);
                 s += (char)(ecx >> 24);
@@ -177,7 +177,7 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Get CPU up time. 
+        /// Get CPU up time.
         /// </summary>
         /// <returns>ulong value.</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
@@ -272,9 +272,9 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Get CPU cycle speed.
+        /// Get CPU branding name.
         /// </summary>
-        /// <returns>long value.</returns>
+        /// <returns>CPU's full name</returns>
         /// <exception cref="NotImplementedException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="NotSupportedException">Thrown if can not read CPU ID.</exception>
         public static string GetCPUBrandString()
@@ -293,22 +293,22 @@ namespace Cosmos.Core
                 for (uint i = 0; i < 3; i++)
                 {
                     ReadCPUID(0x80000002 + i, ref eax, ref ebx, ref ecx, ref edx);
-                    s[(i * 16) + 0] = (eax % 256);
-                    s[(i * 16) + 1] = ((eax >> 8) % 256);
-                    s[(i * 16) + 2] = ((eax >> 16) % 256);
-                    s[(i * 16) + 3] = ((eax >> 24) % 256);
-                    s[(i * 16) + 4] = (ebx % 256);
-                    s[(i * 16) + 5] = ((ebx >> 8) % 256);
-                    s[(i * 16) + 6] = ((ebx >> 16) % 256);
-                    s[(i * 16) + 7] = ((ebx >> 24) % 256);
-                    s[(i * 16) + 8] = (ecx % 256);
-                    s[(i * 16) + 9] = ((ecx >> 8) % 256);
-                    s[(i * 16) + 10] = ((ecx >> 16) % 256);
-                    s[(i * 16) + 11] = ((ecx >> 24) % 256);
-                    s[(i * 16) + 12] = (edx % 256);
-                    s[(i * 16) + 13] = ((edx >> 8) % 256);
-                    s[(i * 16) + 14] = ((edx >> 16) % 256);
-                    s[(i * 16) + 15] = ((edx >> 24) % 256);
+                    s[i * 16 + 0] = eax % 256;
+                    s[i * 16 + 1] = (eax >> 8) % 256;
+                    s[i * 16 + 2] = (eax >> 16) % 256;
+                    s[i * 16 + 3] = (eax >> 24) % 256;
+                    s[i * 16 + 4] = ebx % 256;
+                    s[i * 16 + 5] = (ebx >> 8) % 256;
+                    s[i * 16 + 6] = (ebx >> 16) % 256;
+                    s[i * 16 + 7] = (ebx >> 24) % 256;
+                    s[i * 16 + 8] = ecx % 256;
+                    s[i * 16 + 9] = (ecx >> 8) % 256;
+                    s[i * 16 + 10] = (ecx >> 16) % 256;
+                    s[i * 16 + 11] = (ecx >> 24) % 256;
+                    s[i * 16 + 12] = edx % 256;
+                    s[i * 16 + 13] = (edx >> 8) % 256;
+                    s[i * 16 + 14] = (edx >> 16) % 256;
+                    s[i * 16 + 15] = (edx >> 24) % 256;
                 }
                 for (int i = 0; i < s.Length; i++)
                 {
@@ -382,7 +382,7 @@ namespace Cosmos.Core
             uint entrySize = Multiboot2.MemoryMap->EntrySize;
 
             int counter = 0;
-            while ((uint)currentMap < ((uint)baseMap + totalSize) && counter < 64)
+            while ((uint)currentMap < (uint)baseMap + totalSize && counter < 64)
             {
                 rawMap[counter++] = *currentMap;
                 currentMap = (RawMemoryMapBlock*)((uint)currentMap + entrySize);
@@ -431,7 +431,7 @@ namespace Cosmos.Core
 
             int counter = 0;
             ulong bestSize = 0;
-            while ((uint)currentMap < ((uint)baseMap + totalSize) && counter < 64)
+            while ((uint)currentMap < (uint)baseMap + totalSize && counter < 64)
             {
                 currentMap = (RawMemoryMapBlock*)((uint)currentMap + entrySize);
 

@@ -1,20 +1,18 @@
-﻿using Cosmos.Core;
-
-namespace Cosmos.Core.IOGroup
+﻿namespace Cosmos.Core.IOGroup
 {
     /// <summary>
     /// PIC class. Represent PIC.
     /// </summary>
-    public class PIC : IOGroup
+    public class PIC
     {
         /// <summary>
         /// Command port.
         /// </summary>
-        public readonly IOPort Cmd = new IOPort(0x20);
+        public readonly int Cmd;
         /// <summary>
         /// Data port.
         /// </summary>
-        public readonly IOPort Data = new IOPort(0x21);
+        public readonly int Data;
 
         /// <summary>
         /// Create new instance of the <see cref="PIC"/> class.
@@ -22,9 +20,9 @@ namespace Cosmos.Core.IOGroup
         /// <param name="aSlave">True if slave.</param>
         internal PIC(bool aSlave)
         {
-            byte aBase = (byte) (aSlave ? 0xA0 : 0x20);
-            Cmd = new IOPort(aBase);
-            Data = new IOPort((byte) (aBase + 1));
+            int aBase = aSlave ? 0xA0 : 0x20;
+            Cmd = aBase;
+            Data = aBase + 1;
         }
     }
 }

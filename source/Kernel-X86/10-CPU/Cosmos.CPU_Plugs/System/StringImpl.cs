@@ -231,7 +231,7 @@ namespace Cosmos.CPU_Plugs.System {
                         mDebugger.SendInternal(xParamNumber);
                         int xParamIndex = GetStringToNumber(xParamNumber);
                         mDebugger.SendInternal("Converted paramindex to a number.");
-                        if ((xParamIndex < aArgs.Length) && (aArgs[xParamIndex] != null)) {
+                        if (xParamIndex < aArgs.Length && aArgs[xParamIndex] != null) {
                             string xParamValue = aArgs[xParamIndex].ToString();
                             xFormattedString = string.Concat(xFormattedString, xParamValue);
                             mDebugger.SendInternal("xParamValue =");
@@ -249,7 +249,7 @@ namespace Cosmos.CPU_Plugs.System {
                         xParamNumberDone = true;
                         xEndParamNumber = i;
                         // TODO: Need to handle different formats. (X, N, etc)
-                    } else if ((char.IsDigit(xCharArray[i])) && (!xParamNumberDone)) {
+                    } else if (char.IsDigit(xCharArray[i]) && !xParamNumberDone) {
                         mDebugger.SendInternal("Getting param number.");
                         if (xStartParamNumber < 0) {
                             xStartParamNumber = i;
@@ -492,7 +492,7 @@ namespace Cosmos.CPU_Plugs.System {
                 } else {
                     return false;
                 }
-            } else if (!(value.Length > aThis.Length) && (value.Length != aThis.Length)) {
+            } else if (!(value.Length > aThis.Length) && value.Length != aThis.Length) {
                 for (int i = 0; i < aThis.Length; i++) {
                     if (di[i] == ci[0]) {
                         for (int j = 1; j < value.Length; j++) {
@@ -695,7 +695,7 @@ namespace Cosmos.CPU_Plugs.System {
 
             for (int i = 0; i < aValue.Length; i++) {
                 int xAsciiCode = aValue[i];
-                if ((xAsciiCode <= upperAscii) && (xAsciiCode >= lowerAscii)) {
+                if (xAsciiCode <= upperAscii && xAsciiCode >= lowerAscii) {
                     xChars[i] = (char)(xAsciiCode + offset);
                 } else {
                     xChars[i] = aValue[i];

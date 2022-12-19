@@ -111,7 +111,7 @@ namespace Cosmos.System.Network.IPv4
             RawData[DataOffset + 6] = (byte)((seq >> 8) & 0xFF);
             RawData[DataOffset + 7] = (byte)((seq >> 0) & 0xFF);
 
-            icmpCRC = CalcICMPCRC((ushort)(icmpDataSize));
+            icmpCRC = CalcICMPCRC((ushort)icmpDataSize);
 
             RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
@@ -294,7 +294,7 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="request">ICMP echo request.</param>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         internal ICMPEchoReply(ICMPEchoRequest request)
-            : base(request.DestinationIP, request.SourceIP, 0, 0, request.ICMPID, request.ICMPSequence, (ushort)(request.ICMPDataLength))
+            : base(request.DestinationIP, request.SourceIP, 0, 0, request.ICMPID, request.ICMPSequence, (ushort)request.ICMPDataLength)
         {
             for (int b = 0; b < ICMPDataLength; b++)
             {

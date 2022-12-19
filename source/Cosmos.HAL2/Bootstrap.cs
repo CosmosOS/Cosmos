@@ -5,7 +5,7 @@ using System.Text;
 using Cosmos.Core;
 
 namespace Cosmos.HAL {
-    // This and Core.Bootstrap are static on purpose to prevent 
+    // This and Core.Bootstrap are static on purpose to prevent
     // memalloc. Although kernel has already used it, in the future we should call this pre kernel alloc so we
     // can better control the heap init.
     public static class Bootstrap {
