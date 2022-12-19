@@ -223,6 +223,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(EqualityHelper.DoublesAreEqual(value, 2.3), "double TryParse returns correct result when it works");
 
             #endregion
+
+            double doubleA = 3;
+            double doubleB = 3;
+
+            Assert.IsTrue(doubleA % doubleB == 0, "Double: 3 % 3 should be equal to 0");
         }
     }
 }
