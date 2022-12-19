@@ -9,7 +9,13 @@ namespace Cosmos.System_Plugs.System
     {
         public static Guid NewGuid()
         {
-            return new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            Random rnd = new Random();
+            var guid = new byte[16];
+            rnd.NextBytes(guid);
+            guid[6] = (byte) (0x40 | ((int) guid[6] & 0xf));
+            guid[8] = (byte) (0x80 | ((int) guid[8] & 0x3f));
+
+            return new Guid(guid);
         }
     }
 }
