@@ -246,31 +246,21 @@ namespace Cosmos.Core {
         /// <param name="aDoMask">True = Mask, False = Unmask.</param>
         public static void SetIRQMaskState(byte aIRQLine, bool aDoMask)
         {
-            ushort Port;
-            byte Value;
+            ushort Port = (aIRQLine < 8 ? 0x21 : 0xA1);
 
-            if (aIRQLine < 8)
+            if (aIRQLine !< 8)
             {
-                // Read PIC1 Data
-                Port = IOPort.Read8(0x21);
-            }
-            else
-            {
-                // Read PIC2 Data
-                Port = IOPort.Read8(0xA1);
                 aIRQLine -= 8;
             }
 
             if (aDoMask)
             {
-                Value = (byte)(IOPort.Read8(Port) | (1 << aIRQLine));
+                IOPort.Write8(Port, (byte)(IOPort.Read8(Port) | (1 << aIRQLine)));
             }
             else
             {
-                Value = (byte)(IOPort.Read8(Port) & ~(1 << aIRQLine));
+                IOPort.Write8(Port, (byte)(IOPort.Read8(Port) & ~(1 << aIRQLine)));
             }
-
-            IOPort.Write8(Port, Value);
         }
 
         // We used to use:
