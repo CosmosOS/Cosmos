@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -49,8 +50,10 @@ public class CreateLimineConfig : Task
         WriteIndentedLine(xWriter, $"COMMENT=Boot {xLabelName} Cosmos kernel using multiboot2");
         xWriter.WriteLineAsync();
         WriteIndentedLine(xWriter, "PROTOCOL=multiboot2");
-        WriteIndentedLine(xWriter, $"KERNEL_PATH=boot:///boot/{xBinName}");
-        WriteIndentedLine(xWriter, "KERNEL_CMDLINE= Cosmos Kernel");
+        WriteIndentedLine(xWriter,
+            xBinName.EndsWith(".gz")
+                ? $"KERNEL_PATH=$boot:///boot/{xBinName}"
+                : $"KERNEL_PATH=boot:///boot/{xBinName}");
 
         if (Modules == null) return true;
 
