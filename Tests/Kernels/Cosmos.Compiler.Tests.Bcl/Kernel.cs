@@ -52,6 +52,8 @@ namespace Cosmos.Compiler.Tests.Bcl
                 // System.Text
                 StringBuilderTest.Execute();
                 EncodingTest.Execute();
+				
+				GuidTest.Execute();
 
                 TestController.Completed();
             }
