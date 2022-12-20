@@ -96,10 +96,18 @@ namespace Cosmos.Debug.Hosts {
       mProcessesBefore = Process.GetProcessesByName("vmware-vmx");
       mProcess.Start();
 
+      Stopwatch watch = Stopwatch.StartNew();
+
       // Wait for the process to spawn
       mProcessesAfter = Process.GetProcessesByName("vmware-vmx");
       while (mProcessesAfter.Length == mProcessesBefore.Length)
       {
+        if (watch.Elapsed.Seconds == 15)
+        {
+          watch.Stop();
+          throw new TimeoutException("VMware Workstation took too long to launch!");
+        }
+
         mProcessesAfter = Process.GetProcessesByName("vmware-vmx");
       }
 
