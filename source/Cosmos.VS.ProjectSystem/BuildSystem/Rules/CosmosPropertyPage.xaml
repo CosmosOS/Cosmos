@@ -68,6 +68,12 @@
                   Category="Compile">
     </BoolProperty>
 
+    <BoolProperty Name="AllowComments"
+                  DisplayName="Allow X# Comments"
+                  Description="Include comments in the final assembly. Enabling this will increase compile times."
+                  Category="Compile">
+    </BoolProperty>
+
     <EnumProperty Name="OptimizationLevel"
 		  DisplayName="Optimization Level"
                   Description="Choose the optimization level that you want to use."
