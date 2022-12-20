@@ -1,9 +1,7 @@
 using System;
-using System.Drawing;
 using sysIO = System.IO;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
-using Cosmos.System.ScanMaps;
 
 namespace Cosmos.System;
 
@@ -27,13 +25,13 @@ public abstract class Kernel
     /// <summary>
     /// Kernel started.
     /// </summary>
-    protected bool mStarted = false;
+    protected bool mStarted;
 
     // Set to signal stopped
     /// <summary>
     /// Kernel stopped.
     /// </summary>
-    protected bool mStopped = false;
+    protected bool mStopped;
 
     /// <summary>
     /// Get text screen device.

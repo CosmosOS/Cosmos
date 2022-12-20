@@ -112,16 +112,11 @@ Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion 
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
-;Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\ISO\boot\grub\i386-pc\"
-;Source: ".\source\Cosmos.Build.Tasks\tools\limine\boot\*"; DestDir: "{app}\Build\ISO\boot\limine\"
 Source: ".\Build\limine\boot\limine.cfg"; DestDir: "{app}\Build\ISO\boot\limine\"
-Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\ISO\boot\grub\"
 ; USB
-Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\USB\boot\grub\i386-pc\"
-Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\USB\boot\grub\"
+Source: ".\Build\limine\boot\limine.cfg"; DestDir: "{app}\Build\USB\boot\limine\"
 ; PXE
-Source: ".\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*"; DestDir: "{app}\Build\PXE\boot\grub\i386-pc\"
-Source: ".\Build\grub2\boot\grub\grub.cfg"; DestDir: "{app}\Build\PXE\boot\grub\"
+Source: ".\Build\limine\boot\limine.cfg"; DestDir: "{app}\Build\PXE\boot\limine\"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
