@@ -46,15 +46,15 @@ namespace Cosmos.System.Graphics
             {
                 if (colorDepth == ColorDepth.ColorDepth32)
                 {
-                    rawData[i] = BitConverter.ToInt32(new byte[] { pixelData[(i * 4)], pixelData[(i * 4) + 1], pixelData[(i * 4) + 2], pixelData[(i * 4) + 3] }, 0);
+                    rawData[i] = BitConverter.ToInt32(new byte[] { pixelData[i * 4], pixelData[i * 4 + 1], pixelData[i * 4 + 2], pixelData[i * 4 + 3] }, 0);
                 }
                 else
                 {
-                    rawData[i] = BitConverter.ToInt32(new byte[] { 0, pixelData[(i * 3)], pixelData[(i * 3) + 1], pixelData[(i * 3) + 2] }, 0);
+                    rawData[i] = BitConverter.ToInt32(new byte[] { 0, pixelData[i * 3], pixelData[i * 3 + 1], pixelData[i * 3 + 2] }, 0);
                 }
             }
         }
-        
+
         /// <summary>
         /// Create new instance of the <see cref="Bitmap"/> class, with a specified path to a BMP file.
         /// </summary>
@@ -143,9 +143,9 @@ namespace Cosmos.System.Graphics
                 CreateBitmap(fs, colorOrder);
             }
         }
-        
+
         /// <summary>
-        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array.
         /// </summary>
         /// <param name="imageData">byte array.</param>
         /// <exception cref="ArgumentNullException">Thrown if imageData is null / memory error.</exception>
@@ -168,7 +168,7 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array. 
+        /// Create new instance of the <see cref="Bitmap"/> class, with a specified image data byte array.
         /// </summary>
         /// <param name="imageData">byte array.</param>
         /// <param name="colorOrder">Order of colors in each pixel.</param>
@@ -291,7 +291,7 @@ namespace Cosmos.System.Graphics
             uint totalImageSize = BitConverter.ToUInt32(_int, 0);
             if (totalImageSize == 0)
             {
-                totalImageSize = (uint)((((imageWidth * pixelSize) + 31) & ~31) >> 3) * imageHeight; // Look at the link above for the explanation
+                totalImageSize = (uint)(((imageWidth * pixelSize + 31) & ~31) >> 3) * imageHeight; // Look at the link above for the explanation
                 Global.mDebugger.SendInternal("Calcualted image size: " + totalImageSize);
             }
 
@@ -410,7 +410,7 @@ namespace Cosmos.System.Graphics
         public void Save(Stream stream, ImageFormat imageFormat)
         {
             //Calculate padding
-            int padding = 4 - (((int)Width * (int)Depth) % 32) / 8;
+            int padding = 4 - (int)Width * (int)Depth % 32 / 8;
             if (padding == 4)
             {
                 padding = 0;

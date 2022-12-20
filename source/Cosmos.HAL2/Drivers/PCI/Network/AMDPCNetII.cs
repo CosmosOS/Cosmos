@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Cosmos.Common;
 using Cosmos.Core;
-using Cosmos.Core.IOGroup.Network;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
@@ -10,7 +9,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
     public class AMDPCNetII : NetworkDevice
     {
         protected PCIDevice pciCard;
-        protected AMDPCNetIIIOGroup io;
         protected MACAddress mac;
         protected bool mInitDone;
 
@@ -22,6 +20,27 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         protected Queue<byte[]> mRecvBuffer;
         protected Queue<byte[]> mTransmitBuffer;
         private int mNextTXDesc;
+
+        /// <summary>
+        /// Register address port.
+        /// </summary>
+        public readonly int RegisterAddress;
+        /// <summary>
+        /// Register data port.
+        /// </summary>
+        public readonly int RegisterData;
+        /// <summary>
+        /// Bus data port.
+        /// </summary>
+        public readonly int BusData;
+        /// <summary>
+        /// MAC1 port.
+        /// </summary>
+        public readonly int MAC1;
+        /// <summary>
+        /// MAC2 port.
+        /// </summary>
+        public readonly int MAC2;
 
         public AMDPCNetII(PCIDevice device)
             : base()
@@ -35,17 +54,23 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             this.pciCard.Claimed = true;
             this.pciCard.EnableDevice();
 
-            this.io = new AMDPCNetIIIOGroup((ushort)this.pciCard.BaseAddressBar[0].BaseAddress);
-            this.io.RegisterData.DWord = 0;
+            int baseAddress = (int)this.pciCard.BaseAddressBar[0].BaseAddress;
+            RegisterAddress = baseAddress + 0x14;
+            RegisterData = baseAddress + 0x10;
+            BusData = baseAddress + 0x1C;
+            MAC1 = baseAddress;
+            MAC2 = baseAddress + 0x04;
+
+            IOPort.Write32(RegisterData, 0);
 
             // Get the EEPROM MAC Address and set it as the devices MAC
             byte[] eeprom_mac = new byte[6];
-            uint result = io.MAC1.DWord;
+            uint result = IOPort.Read32(MAC1);
             eeprom_mac[0] = BinaryHelper.GetByteFrom32bit(result, 0);
             eeprom_mac[1] = BinaryHelper.GetByteFrom32bit(result, 8);
             eeprom_mac[2] = BinaryHelper.GetByteFrom32bit(result, 16);
             eeprom_mac[3] = BinaryHelper.GetByteFrom32bit(result, 24);
-            result = io.MAC2.DWord;
+            result = IOPort.Read32(MAC2);
             eeprom_mac[4] = BinaryHelper.GetByteFrom32bit(result, 0);
             eeprom_mac[5] = BinaryHelper.GetByteFrom32bit(result, 8);
 
@@ -75,7 +100,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
                 ManagedMemoryBlock buffer = new ManagedMemoryBlock(2048);
                 mRxDescriptor.Write32(xOffset + 8, (uint)buffer.Offset);
-                ushort buffer_len = (ushort)(~buffer.Size);
+                ushort buffer_len = (ushort)~buffer.Size;
                 buffer_len++;
                 uint flags = (uint)(buffer_len & 0x0FFF) | 0xF000 | 0x80000000;
                 mRxDescriptor.Write32(xOffset + 4, flags);
@@ -151,13 +176,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                io.RegisterAddress.DWord = 0x00;
-                return io.RegisterData.DWord;
+                IOPort.Write32(RegisterAddress, 0x00);
+                return IOPort.Read32(RegisterData);
             }
             set
             {
-                io.RegisterAddress.DWord = 0x00;
-                io.RegisterData.DWord = value;
+                IOPort.Write32(RegisterAddress, 0x00);
+                IOPort.Write32(RegisterData, value);
             }
         }
 
@@ -165,21 +190,19 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                uint result;
-
-                io.RegisterAddress.DWord = 0x01;
-                result = io.RegisterData.DWord;
-                io.RegisterAddress.DWord = 0x02;
-                result |= (io.RegisterData.DWord << 16);
+                IOPort.Write32(RegisterAddress, 0x01);
+                var result = IOPort.Read32(RegisterData);
+                IOPort.Write32(RegisterAddress, 0x02);
+                result |= IOPort.Read32(RegisterData) << 16;
 
                 return result;
             }
             set
             {
-                io.RegisterAddress.DWord = 0x01;
-                io.RegisterData.DWord = (value & 0xFFFF);
-                io.RegisterAddress.DWord = 0x02;
-                io.RegisterData.DWord = (value >> 16);
+                IOPort.Write32(RegisterAddress, 0x01);
+                IOPort.Write32(RegisterData, value & 0xFFFF);
+                IOPort.Write32(RegisterAddress, 0x02);
+                IOPort.Write32(RegisterData, value >> 16);
             }
         }
 
@@ -187,13 +210,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get
             {
-                io.RegisterAddress.DWord = 0x14;
-                return io.BusData.DWord;
+                IOPort.Write32(RegisterAddress, 0x14);
+                return IOPort.Read32(BusData);
             }
             set
             {
-                io.RegisterAddress.DWord = 0x14;
-                io.BusData.DWord = value;
+                IOPort.Write32(RegisterAddress, 0x14);
+                IOPort.Write32(BusData, value);
             }
         }
 
@@ -312,10 +335,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 }
                 //UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
                 ushort buffer_len = (ushort)aData.Length;
-                buffer_len = (ushort)(~buffer_len);
+                buffer_len = (ushort)~buffer_len;
                 buffer_len++;
 
-                uint flags = (uint)((buffer_len) & 0x0FFF) | 0x0300F000 | 0x80000000;
+                uint flags = (uint)(buffer_len & 0x0FFF) | 0x0300F000 | 0x80000000;
 
                 mTxDescriptor.Write32(xOffset + 4, flags);
 

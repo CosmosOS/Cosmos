@@ -49,7 +49,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
             xCMDHeader.PRDTL = (ushort)(((aCount - 1) >> 4) + 1);
             xCMDHeader.Write = 0;
 
-            var aLength = 128 + ((uint)xCMDHeader.PRDTL) * 16;
+            var aLength = 128 + (uint)xCMDHeader.PRDTL * 16;
             mSATAPIDebugger.SendInternal("SendSATAPICommand");
             mSATAPIDebugger.SendInternal(aLength);
             xCMDHeader.CTBA = Heap.SafeAlloc(aLength);
@@ -85,12 +85,12 @@ namespace Cosmos.HAL.BlockDevice.Ports
             xATAPICMD[3] = (byte)((aStart >> 0x10) & 0xFF);
             xATAPICMD[4] = (byte)((aStart >> 0x08) & 0xFF);
             xATAPICMD[5] = (byte)((aStart >> 0x00) & 0xFF);
-            xATAPICMD[9] = (byte)(aCount);
+            xATAPICMD[9] = (byte)aCount;
             for (uint i = 0; i < xATAPICMD.Length; i++)
             {
                 new Core.MemoryBlock(xCMDTable.ACMD, 12).Bytes[i] = xATAPICMD[i];
             }
-            
+
             int xSpin = 0;
             do
             {
@@ -133,7 +133,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
         public int FindCMDSlot(PortRegisters aPort)
         {
             // If not set in SACT and CI, the slot is free
-            var xSlots = (aPort.SACT | aPort.CI);
+            var xSlots = aPort.SACT | aPort.CI;
 
             for (int i = 1; i < 32; i++)
             {

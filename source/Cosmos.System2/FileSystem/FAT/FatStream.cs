@@ -125,7 +125,7 @@ namespace Cosmos.System.FileSystem.FAT
         }
 
         /// <summary>
-        /// Seek the position in the stream. 
+        /// Seek the position in the stream.
         /// </summary>
         /// <param name="offset">The offset.</param>
         /// <param name="origin">The position in the stream to start the seek from.
@@ -387,7 +387,7 @@ namespace Cosmos.System.FileSystem.FAT
             long xClusterSize = mFS.BytesPerCluster;
             long xOffset = aOffset;
 
-            long xTotalLength = (mPosition + xCount);
+            long xTotalLength = mPosition + xCount;
 
             if (xTotalLength > Length)
             {

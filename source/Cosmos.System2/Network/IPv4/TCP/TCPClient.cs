@@ -84,7 +84,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             //Generate Random Sequence Number
             var rnd = new Random();
-            var SequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
+            var SequenceNumber = (uint)(rnd.Next(0, Int32.MaxValue) << 32) | (uint)rnd.Next(0, Int32.MaxValue);
 
             //Fill TCB
             StateMachine.TCB.SndUna = SequenceNumber;
@@ -147,7 +147,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public void Send(byte[] data)
         {
-            if ((StateMachine.RemoteEndPoint.Address == null) || (StateMachine.RemoteEndPoint.Port == 0))
+            if (StateMachine.RemoteEndPoint.Address == null || StateMachine.RemoteEndPoint.Port == 0)
             {
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
@@ -161,7 +161,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                 for (int i = 0; i < chunks.Length; i++)
                 {
-                    var packet = new TCPPacket(StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address, StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)(Flags.ACK), StateMachine.TCB.SndWnd, 0, chunks[i]);
+                    var packet = new TCPPacket(StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address, StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)Flags.ACK, StateMachine.TCB.SndWnd, 0, chunks[i]);
                     OutgoingBuffer.AddPacket(packet);
                     NetworkStack.Update();
 

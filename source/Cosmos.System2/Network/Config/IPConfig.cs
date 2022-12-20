@@ -76,7 +76,7 @@ namespace Cosmos.System.Network.Config
                 {
                     return ipConfig.IPAddress;
                 }
-                if ((default_gw == null) && (ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0))
+                if (default_gw == null && ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0)
                 {
                     default_gw = ipConfig.IPAddress;
                 }

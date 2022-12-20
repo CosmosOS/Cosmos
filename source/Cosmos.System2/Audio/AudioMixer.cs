@@ -12,7 +12,6 @@ namespace Cosmos.System.Audio {
     /// limiter, and as such, the resulting audio may introduce hard-clipping.
     /// </remarks>
     public class AudioMixer : AudioStream {
-        uint sampleRate;
         AudioBuffer mixBuffer;
 
         /// <summary>
@@ -41,10 +40,7 @@ namespace Cosmos.System.Audio {
         public int BufferSize => mixBuffer.Size;
 
         #region Standard AudioStream Members
-        public override uint SampleRate {
-            get => sampleRate;
-            set => sampleRate = value;
-        }
+        public override uint SampleRate { get; set; }
 
         public override bool Depleted => false;
         #endregion
