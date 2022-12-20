@@ -16,8 +16,7 @@ namespace Cosmos.Debug.Hosts {
     protected string mDir;
     protected string mVmxPath;
     protected Process mProcess;
-    protected Process[] mProcessesBefore, mProcessesAfter;
-    protected List<Process> mProcesses;
+    protected Process[] mProcessesBefore, mProcessesAfter, mProcesses;
     protected string mWorkstationPath;
     protected string mPlayerPath;
     protected string mHarddisk;
@@ -26,8 +25,6 @@ namespace Cosmos.Debug.Hosts {
       mHarddisk = harddisk;
       mDir = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\");
       mVmxPath = Path.Combine(mDir, @"Debug.vmx");
-
-      mProcesses = new List<Process>();
 
       mWorkstationPath = GetPathname("VMware Workstation", "vmware.exe");
       mPlayerPath = GetPathname("VMware Player", "vmplayer.exe");
@@ -107,14 +104,7 @@ namespace Cosmos.Debug.Hosts {
       }
 
       // Get the new processes
-      for (int i = 0; i < mProcessesAfter.Length; i++)
-      {
-        Process process = mProcessesAfter[i];
-        if (process.Id != mProcessesBefore[i].Id)
-        {
-          mProcesses.Add(process);
-        }
-      }
+      mProcesses = mProcessesBefore.Concat(mProcessesAfter).Distinct().ToArray();
     }
 
     private void ExitCallback(object sender, EventArgs e)
