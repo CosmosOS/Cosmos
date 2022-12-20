@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Microsoft.Win32;
@@ -106,9 +107,13 @@ namespace Cosmos.Debug.Hosts {
       }
 
       // Get the new processes
-      for (int i = mProcessesBefore.Length; i < mProcessesAfter.Length; i++)
+      for (int i = 0; i < mProcessesAfter.Length; i++)
       {
-        mProcesses.Add(mProcessesAfter[i]);
+        Process process = mProcessesAfter[i];
+        if (process.Id != mProcessesBefore[i].Id)
+        {
+          mProcesses.Add(process);
+        }
       }
     }
 
