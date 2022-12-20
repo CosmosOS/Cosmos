@@ -248,7 +248,7 @@ namespace Cosmos.Core {
         {
             ushort Port = (ushort)(aIRQLine < 8 ? 0x21 : 0xA1);
 
-            if (aIRQLine !< 8)
+            if (aIRQLine >= 8)
             {
                 aIRQLine -= 8;
             }
