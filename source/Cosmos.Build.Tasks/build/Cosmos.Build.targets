@@ -72,6 +72,8 @@
 
         <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
 
+        <AllowComments Condition="'$(AllowComments)' == ''">False</AllowComments>
+
         <OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
     </PropertyGroup>
 
@@ -205,7 +207,8 @@
                 ToolPath="$(Il2cpuToolPath)"
                 ToolExe="$(Il2cpuToolExe)"
                 CompileVBEMultiboot="$(CompileVBEMultiboot)"
-				VBEResolution="$(VBEResolution)"/>
+				AllowComments="$(AllowComments)"
+                VBEResolution="$(VBEResolution)"/>
 
     </Target>
 
