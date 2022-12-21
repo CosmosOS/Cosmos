@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <Configurations>Debug;Release;TEST</Configurations>
+    </PropertyGroup>
+  
+    <ItemGroup>
+        <PackageReference Include="IL2CPU.API" />
+        <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    </ItemGroup>
+
+</Project>
