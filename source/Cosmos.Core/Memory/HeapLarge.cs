@@ -36,6 +36,7 @@ namespace Cosmos.Core.Memory
             if (xPtr == null)
             {
                 Debugger.DoFail(0x67); // out of pages
+
             }
             xPtr[0] = xPages * RAT.PageSize - PrefixBytes; // Allocated data size
             xPtr[1] = aSize; // Actual data size

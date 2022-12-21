@@ -22,7 +22,6 @@ namespace Cosmos.Debug.Kernel
     public class Debugger
     {
         public static bool IgnoreAssert = false;
-
         public Debugger(string aRing, string aSection)
         {
             Ring = aRing;

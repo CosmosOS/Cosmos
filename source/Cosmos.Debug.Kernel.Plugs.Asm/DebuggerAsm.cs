@@ -60,6 +60,7 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
       new LiteralAssemblerCode("%endif");
     }
 
+
     [Inline]
     public static void SendCoreDump()
     {

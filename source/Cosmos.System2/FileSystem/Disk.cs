@@ -58,6 +58,23 @@ namespace Cosmos.System.FileSystem
                         i++;
                     }
                 }
+                // Partitions is lost
+                if (converted.Count == 0)
+                {
+                    int i = 0;
+                    foreach (var item in FindLostPartitions())
+                    {
+                        var part = new ManagedPartition(item);
+                        if (MountedPartitions[i] != null)
+                        {
+                            var data = MountedPartitions[i];
+                            part.RootPath = data.RootPath;
+                            part.MountedFS = data;
+                        }
+                        converted.Add(part);
+                        i++;
+                    } 
+                }
 
                 return converted;
             }
@@ -263,6 +280,20 @@ namespace Cosmos.System.FileSystem
             {
                 throw new NotImplementedException(format + " formatting not supported.");
             }
+        }
+
+        private List<Partition> FindLostPartitions()
+        {
+            List<Partition> list = new();
+            foreach (var p in Partition.Partitions)
+            {
+                if (p.Host == Host)
+                {
+                    // start mount
+                    list.Add(p);
+                }
+            }
+            return list;
         }
 
         private FileSystem[] MountedPartitions = new FileSystem[4];
