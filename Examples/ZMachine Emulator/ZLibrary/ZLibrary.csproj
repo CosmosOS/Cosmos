@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Cosmos.Common" Version="0-*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.System2" Version="0-*" NoWarn="NU1604" />
     </ItemGroup>
 
 </Project>
