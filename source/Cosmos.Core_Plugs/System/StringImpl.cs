@@ -252,7 +252,7 @@ namespace Cosmos.Core_Plugs.System
                         mDebugger.SendInternal(xParamNumber);
                         int xParamIndex = StringHelper.GetStringToNumber(xParamNumber);
                         mDebugger.SendInternal("Converted paramindex to a number.");
-                        if ((xParamIndex < aArgs.Length) && (aArgs[xParamIndex] != null))
+                        if (xParamIndex < aArgs.Length && aArgs[xParamIndex] != null)
                         {
                             string xParamValue = aArgs[xParamIndex].ToString();
                             xFormattedString = string.Concat(xFormattedString, xParamValue);
@@ -274,7 +274,7 @@ namespace Cosmos.Core_Plugs.System
                         xEndParamNumber = i;
                         // TODO: Need to handle different formats. (X, N, etc)
                     }
-                    else if ((char.IsDigit(xCharArray[i])) && (!xParamNumberDone))
+                    else if (char.IsDigit(xCharArray[i]) && !xParamNumberDone)
                     {
                         mDebugger.SendInternal("Getting param number.");
                         if (xStartParamNumber < 0)
@@ -720,7 +720,7 @@ namespace Cosmos.Core_Plugs.System
             for (int i = 0; i < aValue.Length; i++)
             {
                 int xAsciiCode = aValue[i];
-                if ((xAsciiCode <= upperAscii) && (xAsciiCode >= lowerAscii))
+                if (xAsciiCode <= upperAscii && xAsciiCode >= lowerAscii)
                 {
                     xChars[i] = (char)(xAsciiCode + offset);
                 }
@@ -735,7 +735,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static string FastAllocateString(int aLength)
         {
-            return new string(new char[aLength]);   
+            return new string(new char[aLength]);
         }
 
         [PlugMethod(IsOptional = true)]
@@ -769,7 +769,7 @@ namespace Cosmos.Core_Plugs.System
 
         private static unsafe int FastCompareStringHelper(uint* strAChars, int countA, uint* strBChars, int countB)
         {
-            int count = (countA < countB) ? countA : countB;
+            int count = countA < countB ? countA : countB;
 
 #if BIT64
             long diff = (long)((byte*)strAChars - (byte*)strBChars);
@@ -877,20 +877,20 @@ namespace Cosmos.Core_Plugs.System
                 // Reads are potentially unaligned
                 while ((count -= 2) >= 0)
                 {
-                    if ((*((uint*)((byte*)strBChars + diff)) - *strBChars) != 0)
+                    if (*(uint*)((byte*)strBChars + diff) - *strBChars != 0)
                     {
                         char* ptr1 = (char*)((byte*)strBChars + diff);
                         char* ptr2 = (char*)strBChars;
                         if (*ptr1 != *ptr2)
-                            return ((int)*ptr1 - (int)*ptr2);
-                        return ((int)*(ptr1 + 1) - (int)*(ptr2 + 1));
+                            return (int)*ptr1 - (int)*ptr2;
+                        return (int)*(ptr1 + 1) - (int)*(ptr2 + 1);
                     }
                     ++strBChars;
                 }
 
                 int c;
                 if (count == -1)
-                    if ((c = *((char*)((byte*)strBChars + diff)) - *((char*)strBChars)) != 0)
+                    if ((c = *(char*)((byte*)strBChars + diff) - *(char*)strBChars) != 0)
                         return c;
             }
 
@@ -912,7 +912,7 @@ namespace Cosmos.Core_Plugs.System
             /* Totally managed version but requires changes to IL2CPU to work */
 #if true
             // Please note that Argument validation should be handled by callers.
-            int count = (countA < countB) ? countA : countB;
+            int count = countA < countB ? countA : countB;
             int xResult = 0;
 
             strA = strA.Substring(indexA);

@@ -19,11 +19,10 @@ namespace Cosmos.System.FileSystem
     /// <seealso cref="Cosmos.System.FileSystem.VFS.VFSBase" />
     public class CosmosVFS : VFSBase
     {
-        private List<Disk> disks = new List<Disk>();
         /// <summary>
         /// List of disks.
         /// </summary>
-        public List<Disk> Disks { get { return disks; } }
+        public List<Disk> Disks { get; } = new List<Disk>();
 
         private int CurrentFSLetter;
 
@@ -385,7 +384,7 @@ namespace Cosmos.System.FileSystem
             {
                 var xFileSystem = GetFileSystemFromPath(aPath);
                 var xEntry = DoGetDirectoryEntry(aPath, xFileSystem);
-                if ((xEntry != null) && (xEntry.mEntryType == DirectoryEntryTypeEnum.Directory))
+                if (xEntry != null && xEntry.mEntryType == DirectoryEntryTypeEnum.Directory)
                 {
                     return xEntry;
                 }
@@ -410,7 +409,7 @@ namespace Cosmos.System.FileSystem
             {
                 var xFileSystem = GetFileSystemFromPath(aPath);
                 var xEntry = DoGetDirectoryEntry(aPath, xFileSystem);
-                if ((xEntry != null) && (xEntry.mEntryType == DirectoryEntryTypeEnum.File))
+                if (xEntry != null && xEntry.mEntryType == DirectoryEntryTypeEnum.File)
                 {
                     return xEntry;
                 }
@@ -862,7 +861,7 @@ namespace Cosmos.System.FileSystem
 
         public override List<Disk> GetDisks()
         {
-            return disks;
+            return Disks;
         }
     }
 }

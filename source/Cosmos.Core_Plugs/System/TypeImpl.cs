@@ -71,5 +71,16 @@ namespace Cosmos.Core_Plugs.System
         {
             return aThis.BaseType;
         }
+
+        [PlugMethod(Signature = "System_Type__System_Type_get_Type_System_String", IsOptional = false)]
+        public static CosmosRuntimeType GetType(string aName)
+        {
+            int typeId = VTablesImpl.GetType(aName);
+            if(typeId == -1)
+            {
+                return null;
+            }
+            return new CosmosRuntimeType((uint)typeId);
+        }
     }
 }

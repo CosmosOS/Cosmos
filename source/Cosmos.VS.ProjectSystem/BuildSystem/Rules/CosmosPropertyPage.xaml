@@ -68,6 +68,12 @@
                   Category="Compile">
     </BoolProperty>
 
+    <BoolProperty Name="AllowComments"
+                  DisplayName="Allow X# Comments"
+                  Description="Include comments in the final assembly. Enabling this will increase compile times."
+                  Category="Compile">
+    </BoolProperty>
+
     <EnumProperty Name="OptimizationLevel"
 		  DisplayName="Optimization Level"
                   Description="Choose the optimization level that you want to use."
@@ -75,9 +81,7 @@
                   <EnumValue Name="0" DisplayName="O0"/>
                   <EnumValue Name="1" DisplayName="O1"/>
                   <EnumValue Name="2" DisplayName="O2"/>
-                  <EnumValue Name="3" DisplayName="O3 (Unstable)"/>
-	          <EnumValue Name="s" DisplayName="Os (Unstable)"/>
-	          <EnumValue Name="fast" DisplayName="Ofast (Unstable)"/>
+                  <EnumValue Name="3" DisplayName="O3"/>
     </EnumProperty>
 
     <StringProperty Name="Timeout"
