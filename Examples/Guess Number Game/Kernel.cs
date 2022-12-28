@@ -6,16 +6,16 @@ namespace Guess
 {
     public class GuessOS : Sys.Kernel
     {
-        private Random mRandom;
-        private int mCount;
-        private int mNumber;
+        private Random _Random;
+        private int _Count;
+        private int _Number;
         
         protected override void BeforeRun()
         {
-            mRandom = new Random();
+            _Random = new Random(); // random works
 
-            mCount = 0;
-            mNumber = mRandom.Next(1, 101);
+            _Count = 0;
+            _Number = _Random.Next(1, 101);
 
             Console.Clear();
 
@@ -28,18 +28,18 @@ namespace Guess
 
         protected override void Run()
         {
-            mCount++;
+            _Count++;
             
-            Console.Write($"Guess #{mCount}: ");
+            Console.Write($"Guess #{_Count}: ");
             
             var xGuess = Int32.Parse(Console.ReadLine());
-            mDebugger.Send($"Guess#{mCount}: {xGuess}");
+            mDebugger.Send($"Guess#{_Count}: {xGuess}");
 
-            if (xGuess < mNumber)
+            if (xGuess < _Number)
             {
                 Console.WriteLine("Too low.");
             }
-            else if (xGuess > mNumber)
+            else if (xGuess > _Number)
             {
                 Console.WriteLine("Too high.");
             }
@@ -53,8 +53,8 @@ namespace Guess
                     Stop();
                 }
 
-                mNumber = mRandom.Next(1, 100);
-                mCount = 0;
+                _Number = _Random.Next(1, 100);
+                _Count = 0;
             }
         }
 
