@@ -29,13 +29,13 @@ namespace Cosmos.HAL.BlockDevice
         {
             if (xDevice != null)
             {
-                Console.WriteLine("ATA Primary Master");
+                Console.WriteLine("Initializing ATA Primary Master...");
                 Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-                Console.WriteLine("ATA Primary Slave");
+                Console.WriteLine("Initializing ATA Primary Slave...");
                 Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
-                Console.WriteLine("ATA Secondary Master");
+                Console.WriteLine("Initializing ATA Secondary Master...");
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-                Console.WriteLine("ATA Secondary Slave");
+                Console.WriteLine("Initializing ATA Secondary Slave...");
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
             }
 
