@@ -7,7 +7,6 @@ using IL2CPU.API;
 using IL2CPU.API.Attribs;
 using Cosmos.System;
 using Cosmos.System.FileSystem;
-using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System_Plugs.System.IO

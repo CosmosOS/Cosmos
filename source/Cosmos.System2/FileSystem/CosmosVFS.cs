@@ -7,7 +7,7 @@ using System.IO;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.ISO9660;
-using Cosmos.System.FileSystem.Listing;
+using Cosmos.System.FileSystem.Ramdisk;
 using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
@@ -441,6 +441,10 @@ namespace Cosmos.System.FileSystem
                         xVolumes.Add(GetVolume(part.MountedFS));
                     }
                 }
+            }
+            foreach (var ramdisk in RamdiskFileSystem.AllRamdisks)
+            {
+                xVolumes.Add(GetVolume(ramdisk));
             }
 
             return xVolumes;

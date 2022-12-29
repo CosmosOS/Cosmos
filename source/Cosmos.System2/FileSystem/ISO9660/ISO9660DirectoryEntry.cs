@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem.ISO9660
 {

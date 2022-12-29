@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Cosmos.System.FileSystem.Listing;
-
 namespace Cosmos.System.FileSystem.VFS
 {
     /// <summary>

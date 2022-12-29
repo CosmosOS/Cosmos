@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Cosmos.System.FileSystem.Listing;
 using System.IO;
 
 namespace Cosmos.System.FileSystem.VFS

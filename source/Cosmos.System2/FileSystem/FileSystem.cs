@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
-using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem
 {
@@ -187,17 +186,17 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Get device.
         /// </summary>
-        protected Partition Device { get; }
+        protected virtual Partition Device { get; }
 
         /// <summary>
         /// Get root path.
         /// </summary>
-        public string RootPath { get; }
+        public virtual string RootPath { get; }
 
         /// <summary>
         /// Get size.
         /// </summary>
-        public long Size { get; }
+        public virtual long Size { get; }
 
         /// <summary>
         /// Get available free space.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Cosmos.System.FileSystem.Listing
+namespace Cosmos.System.FileSystem
 {
     /// <summary>
     /// Enumeration for the directory entry type.
