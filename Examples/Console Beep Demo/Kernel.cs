@@ -54,9 +54,9 @@ namespace BeepDemo
         }
 
         // Play the notes in a song.
-        protected static void Play(Note[] tune)
+        protected static void Play(Note[] aTune)
         {
-            foreach (Note n in tune)
+            foreach (Note n in aTune)
             {
                 if (n.NoteTone == Tone.REST)
                 {
@@ -99,23 +99,23 @@ namespace BeepDemo
             SIXTEENTH = EIGHTH / 2,
         }
 
-        // Define a note as a frequency (tone) and the amount of 
-        // time (duration) the note plays.
-        protected struct Note
+        // Define a note as a aFrequency (tone) and the amount of 
+        // aTime (duration) the note plays.
+        protected readonly struct Note
         {
-            Tone toneVal;
-            Duration durVal;
+            readonly Tone _ToneVal;
+            readonly Duration _DurVal;
 
             // Define a constructor to create a specific note.
-            public Note(Tone frequency, Duration time)
+            public Note(Tone aFrequency, Duration aTime)
             {
-                toneVal = frequency;
-                durVal = time;
+                _ToneVal = aFrequency;
+                _DurVal = aTime;
             }
 
             // Define properties to return the note's tone and duration.
-            public Tone NoteTone { get { return toneVal; } }
-            public Duration NoteDuration { get { return durVal; } }
+            public Tone NoteTone => _ToneVal;
+            public Duration NoteDuration => _DurVal;
         }
     }
     /*
