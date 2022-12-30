@@ -11,7 +11,7 @@ namespace Cosmos.HAL
         /// <summary>
         /// IO port for COM1 port
         /// </summary>
-        public const ushort COM1 = 0x3f8;
+        public const ushort COM1 = 0x3F8;
         /// <summary>
         /// IO port for COM2 port
         /// </summary>
@@ -19,27 +19,27 @@ namespace Cosmos.HAL
         /// <summary>
         /// IO port for COM3 port
         /// </summary>
-        public const ushort COM3 = 0x3f8;
+        public const ushort COM3 = 0x3E8;
         /// <summary>
         /// IO port for COM4 port
         /// </summary>
-        public const ushort COM4 = 0x3f8;
+        public const ushort COM4 = 0x2E8;
         /// <summary>
         /// IO port for COM5 port
         /// </summary>
-        public const ushort COM5 = 0x3f8;
+        public const ushort COM5 = 0x5F8;
         /// <summary>
         /// IO port for COM6 port
         /// </summary>
-        public const ushort COM6 = 0x3f8;
+        public const ushort COM6 = 0x4F8;
         /// <summary>
         /// IO port for COM7 port
         /// </summary>
-        public const ushort COM7 = 0x3f8;
+        public const ushort COM7 = 0x5E8;
         /// <summary>
         /// IO port for COM8 port
         /// </summary>
-        public const ushort COM8 = 0x3f8; 
+        public const ushort COM8 = 0x4E8; 
 
         /// <summary>
         /// Enables certain COM port
