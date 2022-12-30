@@ -43,9 +43,9 @@ namespace RamdiskTest
         }
         public static void TestCreation()
         {
+            VFSManager.RegisterVFS(new CosmosVFS());
             mRamdisk = RamdiskFileSystem.CreateRamdisk();
             mRamdisk1 = RamdiskFileSystem.CreateRamdisk();
-            VFSManager.RegisterVFS(new CosmosVFS());
             Assert.Succeed("No errors!");
         }
         public static void TestFileCreation()
