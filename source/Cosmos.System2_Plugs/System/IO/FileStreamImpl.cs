@@ -4,7 +4,6 @@ using global::System.IO;
 using Cosmos.System;
 using IL2CPU.API.Attribs;
 using Cosmos.System.FileSystem.VFS;
-using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System_Plugs.System.IO
 {

@@ -33,6 +33,7 @@
         <ProjectReference Include="..\Kernels\NetworkTest\NetworkTest.csproj" />
         <ProjectReference Include="..\Kernels\ProcessorTests\ProcessorTests.csproj" />
         <ProjectReference Include="..\Kernels\MemoryOperationsTest\MemoryOperationsTest.csproj" />
+        <ProjectReference Include="..\Kernels\RamdiskTest\RamdiskTest.csproj" />
         <ProjectReference Include="..\Kernels\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
     </ItemGroup>
 

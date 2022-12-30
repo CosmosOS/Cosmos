@@ -9,14 +9,12 @@ namespace Cosmos.System.FileSystem.Ramdisk
 {
     public class RamdiskDirectoryEntry : DirectoryEntry
     {
-        public FileSystem mFileSystem;
         public List<RamdiskDirectoryEntry> mEntries;
         public RamdiskDirectoryEntry _parent;
         public MemoryStream _stream;
         public DirectoryEntryTypeEnum _entryType;
         public RamdiskDirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aFullPath, string aName, long aSize, DirectoryEntryTypeEnum aEntryType) : base(aFileSystem, aParent, aFullPath, aName, aSize, aEntryType)
         {
-            mFileSystem = aFileSystem;
             _parent = (RamdiskDirectoryEntry)aParent;
             _parent.mEntries.Add(this);
             _entryType = aEntryType;
