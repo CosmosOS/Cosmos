@@ -4,7 +4,6 @@ using Cosmos.Debug.Kernel;
 using System;
 using Cosmos.System.FileSystem;
 using System.Collections.Generic;
-using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 using Cosmos.HAL.BlockDevice;
 

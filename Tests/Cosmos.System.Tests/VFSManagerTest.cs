@@ -2,7 +2,6 @@
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.FAT;
-using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 using NUnit.Framework;
 using System;
