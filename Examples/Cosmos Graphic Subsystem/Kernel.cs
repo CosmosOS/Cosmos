@@ -3,7 +3,6 @@ using System.Drawing;
 using Cosmos.System.Graphics;
 using Sys = Cosmos.System;
 using Cosmos.Debug.Kernel;
-using Point = Cosmos.System.Graphics.Point;
 
 /*
  * Beware Demo Kernels are not recompiled when its dependencies changes!
@@ -15,7 +14,7 @@ namespace Cosmos_Graphic_Subsytem
     public class Kernel : Sys.Kernel
     {
 
-        public Debugger debugger = new Debugger("System", "CGS");
+        public Debugger debugger = new ("System", "CGS");
 
         private Canvas canvas;
         private Bitmap bitmap;
@@ -94,39 +93,31 @@ namespace Cosmos_Graphic_Subsytem
                 mDebugger.Send("Run");
 
                 /* A red Point */
-                var pen = new Pen(Color.Red);
-                canvas.DrawPoint(pen, 69, 69);
+                canvas.DrawPoint(Color.Red, 69, 69);
 
                 /* A GreenYellow horizontal line */
-                pen.Color = Color.GreenYellow;
-                canvas.DrawLine(pen, 250, 100, 400, 100);
+                canvas.DrawLine(Color.GreenYellow, 250, 100, 400, 100);
 
                 /* An IndianRed vertical line */
-                pen.Color = Color.IndianRed;
-                canvas.DrawLine(pen, 350, 150, 350, 250);
+                canvas.DrawLine(Color.IndianRed, 350, 150, 350, 250);
 
                 /* A MintCream diagonal line */
-                pen.Color = Color.MintCream;
-                canvas.DrawLine(pen, 250, 150, 400, 250);
+                canvas.DrawLine(Color.MintCream, 250, 150, 400, 250);
 
                 /* A PaleVioletRed rectangle */
-                pen.Color = Color.PaleVioletRed;
-                canvas.DrawRectangle(pen, 350, 350, 80, 60);
+                canvas.DrawRectangle(Color.PaleVioletRed, 350, 350, 80, 60);
 
-                pen.Color = Color.Chartreuse;
-                canvas.DrawCircle(pen, 69, 69, 10);
+                canvas.DrawCircle(Color.Chartreuse, 69, 69, 10);
 
-                pen.Color = Color.LightSalmon;
-                canvas.DrawEllipse(pen, 400, 300, 100, 150);
+                canvas.DrawEllipse(Color.LightSalmon, 400, 300, 100, 150);
 
-                pen.Color = Color.MediumPurple;
-                canvas.DrawPolygon(pen, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
+                canvas.DrawPolygon(Color.MediumPurple, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
 
+                canvas.DrawFilledEllipse(Color.LightSalmon, 400, 300, 100, 150);
+                canvas.DrawImage(bitmap, 20, 20);
 
-                pen.Color = Color.LightSalmon;
-                canvas.DrawFilledEllipse(pen, 400, 300, 100, 150);
-                canvas.DrawImage(bitmap, new Point(20, 20));
-
+                /* Cosmos graphics is double-buffered so you need to swap buffers every time user needs to see a picture */
+                canvas.Display();
 
                 /*
                  * It will be really beautiful to do here:
@@ -154,18 +145,14 @@ namespace Cosmos_Graphic_Subsytem
                 canvas.Clear(Color.Blue);
 
                 /* A LimeGreen rectangle */
-                pen.Color = Color.LimeGreen;
-                canvas.DrawRectangle(pen, 450, 450, 80, 60);
+                canvas.DrawRectangle(Color.LimeGreen, 450, 450, 80, 60);
 
                 /* A filled rectange */
-                pen.Color = Color.Chocolate;
-                canvas.DrawFilledRectangle(pen, 200, 150, 400, 300);
+                canvas.DrawFilledRectangle(Color.Chocolate, 200, 150, 400, 300);
 
-                pen.Color = Color.Aquamarine;
-                canvas.DrawFilledRectangle(pen, 0, 0, 1024, 150);
+                canvas.DrawFilledRectangle(Color.Aquamarine, 0, 0, 1024, 150);
 
-                pen.Color = Color.Blue;
-                canvas.DrawFilledCircle(pen, 69, 69, 10);
+                canvas.DrawFilledCircle(Color.Blue, 69, 69, 10);
                 /*
                  * It will be really beautiful to do here:
                  * canvas.DrawString(pen, "Please press any key to end the Demo...");
