@@ -16,11 +16,11 @@ namespace Cosmos.Core
         /// <summary>
         /// Master PIC.
         /// </summary>
-        protected IOGroup.PIC Master = new IOGroup.PIC(false);
+        protected readonly IOGroup.PIC Master = new IOGroup.PIC(false);
         /// <summary>
         /// Slave PIC.
         /// </summary>
-        protected IOGroup.PIC Slave = new IOGroup.PIC(true);
+        protected readonly IOGroup.PIC Slave = new IOGroup.PIC(true);
 
         /// <summary>
         /// Commands.
@@ -37,13 +37,12 @@ namespace Cosmos.Core
             EOI = 0x20
         }
 
-        /*
         /// <summary>
         /// Master end of interrupt.
         /// </summary>
         public void EoiMaster()
         {
-            Master.Cmd.Byte = (byte) Cmd.EOI;
+            IOPort.Write8(Master.Cmd, (byte)Cmd.EOI);
         }
 
         /// <summary>
@@ -51,9 +50,9 @@ namespace Cosmos.Core
         /// </summary>
         public void EoiSlave()
         {
-            Master.Cmd.Byte = (byte) Cmd.EOI;
-            Slave.Cmd.Byte = (byte) Cmd.EOI;
-        }*/
+            IOPort.Write8(Master.Cmd, (byte)Cmd.EOI);
+            IOPort.Write8(Slave.Cmd, (byte)Cmd.EOI);
+        }
 
         /// <summary>
         /// Create new instance of the <see cref="PIC"/> class.
@@ -72,7 +71,7 @@ namespace Cosmos.Core
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
             //for now enable keyboard, mouse(ps2)
-            //Remap(0x20, 0xF8 | 0x08, 0x28, 0xE3);
+            Remap(0x20, 0xF8 | 0x08, 0x28, 0xE3);
         }
 
         /// <summary>
@@ -104,45 +103,78 @@ namespace Cosmos.Core
 
             #endregion
 
-            var xOldMasterMask = Master.Data.Byte;
-            var xOldSlaveMask = Slave.Data.Byte;
-            Master.Cmd.Byte = ICW1_INIT + ICW1_ICW4;
+            var xOldMasterMask = IOPort.Read8(Master.Data);
+            var xOldSlaveMask = IOPort.Read8(Slave.Data);
+            IOPort.Write8(Master.Cmd, ICW1_INIT + ICW1_ICW4);
             IOPort.Wait();
-            Slave.Cmd.Byte = ICW1_INIT + ICW1_ICW4;
+            IOPort.Write8(Slave.Cmd, ICW1_INIT + ICW1_ICW4);
             IOPort.Wait();
-            Master.Data.Byte = masterStart;
+            IOPort.Write8(Master.Data, masterStart);
             IOPort.Wait();
-            Slave.Data.Byte = slaveStart;
+            IOPort.Write8(Slave.Data, slaveStart);
             IOPort.Wait();
 
             // magic:
-            Master.Data.Byte = 4;
+            IOPort.Write8(Master.Data, 4);
             IOPort.Wait();
-            Slave.Data.Byte = 2;
+            IOPort.Write8(Slave.Data, 2);
             IOPort.Wait();
 
             // set modes:
-            Master.Data.Byte = ICW4_8086;
+            IOPort.Write8(Master.Data, ICW4_8086);
             IOPort.Wait();
-            Slave.Data.Byte = ICW4_8086;
+            IOPort.Write8(Slave.Data, ICW4_8086);
             IOPort.Wait();
 
             // set masks:
-            Master.Data.Byte = masterMask;
+            IOPort.Write8(Master.Data, masterMask);
             IOPort.Wait();
             //Slave.Data.Byte = slaveMask;
             //IOPort.Wait();
         }
 
         /// <summary>
-        /// Disable PIC.
+        /// Initialize PIC.
         /// </summary>
-        public void Disable()
+        /// <param name="aPIC">A PIC.</param>
+        /// <param name="aBase">A base data port.</param>
+        /// <param name="aIDunno">Slave relationship message.</param>
+        /// <param name="aMask">A mask.</param>
+        protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask)
         {
-            //disable
-            Master.Data.Byte = 0xFF;
+            // We need to remap the PIC interrupt lines to the CPU. The BIOS sets
+            // them in a way compatible for 16 bit mode, but in a way that causes problems
+            // for 32 bit mode.
+            // The only way to remap them however is to completely reinitialize the PICs.
+
+            byte xOldMask = IOPort.Read8(aPIC.Data);
+
+            //#define ICW1_ICW4	0x01		/* ICW4 (not) needed */
+            //#define ICW1_SINGLE	0x02		/* Single (cascade) mode */
+            //#define ICW1_INTERVAL4	0x04		/* Call address interval 4 (8) */
+            //#define ICW1_LEVEL	0x08		/* Level triggered (edge) mode */
+            IOPort.Write8(Master.Cmd, (byte)Cmd.Init | 0x01);
             IOPort.Wait();
-            Slave.Data.Byte = 0xFF;
+
+            // ICW2
+            IOPort.Write8(Master.Data, aBase);
+            IOPort.Wait();
+
+            // ICW3
+            // Somehow tells them about master/slave relationship
+            IOPort.Write8(Master.Data, aIDunno);
+            IOPort.Wait();
+
+            //#define ICW4_AUTO	0x02		/C:\Data\Cosmos\source2\Kernel\System\Hardware\Core\Cosmos.Core\CPU.cs* Auto (normal) EOI */
+            //#define ICW4_BUF_SLAVE	0x08		/* Buffered mode/slave */
+            //#define ICW4_BUF_MASTER	0x0C		/* Buffered mode/master */
+            //#define ICW4_SFNM	0x10		/* Special fully nested (not) */
+            //0x01 8086/88 (MCS-80/85) mode
+            IOPort.Write8(Master.Data, 0x01);
+            IOPort.Wait();
+
+            // Set mask
+            IOPort.Write8(Master.Data, aMask);
             IOPort.Wait();
         }
     }

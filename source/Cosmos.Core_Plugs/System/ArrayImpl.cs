@@ -48,7 +48,7 @@ namespace Cosmos.Core_Plugs.System
         {
             aArray = (uint*) aArray[0];
             aArray += 4;
-            for (uint i = (sourceIndex + count); i > sourceIndex; i--)
+            for (uint i = sourceIndex + count; i > sourceIndex; i--)
             {
                 if (aArray[i - 1] == value)
                 {
@@ -65,7 +65,7 @@ namespace Cosmos.Core_Plugs.System
         {
             aArray = (uint*) aArray[0];
             aArray += 4;
-            for (uint i = sourceIndex; i < (sourceIndex + count); i++)
+            for (uint i = sourceIndex; i < sourceIndex + count; i++)
             {
                 if (aArray[i] == value)
                 {
@@ -102,11 +102,11 @@ namespace Cosmos.Core_Plugs.System
             switch (xElementSize)
             {
                 case 1:
-                    return *(aArray);
+                    return *aArray;
                 case 2:
-                    return *((ushort*)aArray);
+                    return *(ushort*)aArray;
                 case 3:
-                    return (*(uint*)aArray) & 0x0FFFFFFF;
+                    return *(uint*)aArray & 0x0FFFFFFF;
                 case 4:
                     return *aArray;
             }
@@ -125,20 +125,20 @@ namespace Cosmos.Core_Plugs.System
             aThis += 3;
             uint xElementSize = *aThis;
             aThis += 1;
-            aThis = ((uint*) (((byte*) aThis) + aIndex * xElementSize));
+            aThis = (uint*) ((byte*) aThis + aIndex * xElementSize);
             switch (xElementSize)
             {
                 case 1:
-                    *((byte*) aThis) = (byte) aValue;
+                    *(byte*) aThis = (byte) aValue;
                     return;
                 case 2:
-                    *((ushort*) aThis) = (ushort) aValue;
+                    *(ushort*) aThis = (ushort) aValue;
                     return;
                 case 3:
-                    *((uint*) aThis) = (uint) aValue;
+                    *(uint*) aThis = (uint) aValue;
                     return;
                 case 4:
-                    *((uint*) aThis) = (uint) aValue;
+                    *(uint*) aThis = (uint) aValue;
                     return;
             }
             throw new NotSupportedException("SetValue not supported in this situation!");

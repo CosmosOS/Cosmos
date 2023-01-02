@@ -205,8 +205,8 @@ namespace Cosmos.Common
             int hexVal = BitConverter.ToInt32(singleBytes, 0);
 
             /* Let's extract the parts that compose our single: sign, exponent and mantissa */
-            bool isNeg = (hexVal >> 31) != 0;
-            int exp = ((hexVal >> 23) & 0xFF);
+            bool isNeg = hexVal >> 31 != 0;
+            int exp = (hexVal >> 23) & 0xFF;
             ulong mantissa = (ulong)(hexVal & 0x7FFFFF);
 
             ulong intPart = 0, fracPart = 0;
@@ -256,7 +256,7 @@ namespace Cosmos.Common
             }
             else
             {
-                fracPart = (mantissa & 0xFFFFFF) >> (-(exp + 1));
+                fracPart = (mantissa & 0xFFFFFF) >> -(exp + 1);
             }
 
             string result = "";
@@ -289,7 +289,7 @@ namespace Cosmos.Common
             }
             fracPart = (fracPart << 3) + (fracPart << 1);
             char remain = (char)((fracPart >> 24) + '0');
-            if ((remain > '5') && (result[result.Length - 1] > '0'))
+            if (remain > '5' && result[result.Length - 1] > '0')
             {
                 char[] answer = result.ToCharArray();
                 int digitPos = answer.Length - 1;
@@ -341,7 +341,7 @@ namespace Cosmos.Common
             mDebugger.SendInternal(hexVal);
 
             /* Let's extract the parts that compose our double: sign, exponent and mantissa */
-            bool isNeg = (hexVal >> 63) != 0;
+            bool isNeg = hexVal >> 63 != 0;
             int exp = (int)((hexVal >> 52) & 0x07FF);
             ulong mantissa = (ulong)(hexVal & 0x0FFFFFFFFFFFFF);
             mDebugger.SendInternal("isNeg = ");
@@ -395,7 +395,7 @@ namespace Cosmos.Common
             }
             else
             {
-                fracPart = (mantissa & 0x1FFFFFFFFFFFFF) >> (-(exp + 1));
+                fracPart = (mantissa & 0x1FFFFFFFFFFFFF) >> -(exp + 1);
             }
 
             string result = "";
@@ -427,7 +427,7 @@ namespace Cosmos.Common
             }
             fracPart = (fracPart << 3) + (fracPart << 1);
             char remain = (char)((fracPart >> 53) + '0');
-            if ((remain > '5') && (result[result.Length - 1] > '0'))
+            if (remain > '5' && result[result.Length - 1] > '0')
             {
                 char[] answer = result.ToCharArray();
                 int digitPos = answer.Length - 1;

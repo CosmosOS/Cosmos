@@ -78,33 +78,28 @@ namespace GraphicTest
         {
             try
             {
-                Pen pen = new Pen(Color.Red);
+                Pen pen = new Pen();
 
                 // A red Point
-                canvas.DrawPoint(pen, 69, 69);
+                canvas.DrawPoint(Color.Red, 69, 69);
 
                 // A GreenYellow horizontal line
-                pen.Color = Color.GreenYellow;
-                canvas.DrawLine(pen, 250, 100, 400, 100);
+                canvas.DrawLine(Color.GreenYellow, 250, 100, 400, 100);
 
                 // An IndianRed vertical line
-                pen.Color = Color.IndianRed;
-                canvas.DrawLine(pen, 350, 150, 350, 250);
+                canvas.DrawLine(Color.IndianRed, 350, 150, 350, 250);
 
                 // A MintCream diagonal line
-                pen.Color = Color.MintCream;
-                canvas.DrawLine(pen, 250, 150, 400, 250);
+                canvas.DrawLine(Color.MintCream, 250, 150, 400, 250);
 
                 // A PaleVioletRed rectangle
-                pen.Color = Color.PaleVioletRed;
-                canvas.DrawRectangle(pen, 350, 350, 80, 60);
+                canvas.DrawRectangle(Color.PaleVioletRed, 350, 350, 80, 60);
 
                 // A LimeGreen rectangle
-                pen.Color = Color.LimeGreen;
-                canvas.DrawRectangle(pen, 450, 450, 80, 60);
+                canvas.DrawRectangle(Color.LimeGreen, 450, 450, 80, 60);
 
                 // A bitmap
-                canvas.DrawImage(bitmap, new Point(100, 150));
+                canvas.DrawImage(bitmap, 100, 150);
                 
                 canvas.Display(); // Required for something to be displayed when using a double buffered driver
                 

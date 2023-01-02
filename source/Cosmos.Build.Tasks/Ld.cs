@@ -138,9 +138,10 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
 
             xBuilder.AppendFileNamesIfNotNull(InputFiles, " ");
+            xBuilder.AppendSwitch("-m elf_i386");
 
             Log.LogMessage(MessageImportance.High, xBuilder.ToString());
-
+            
             return xBuilder.ToString();
         }
 

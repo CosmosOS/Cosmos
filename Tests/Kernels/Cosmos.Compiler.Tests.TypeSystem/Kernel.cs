@@ -89,6 +89,10 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(((CosmosRuntimeType)typeof(object)).mTypeId, types[0], "GetGCFieldTypes returns object at offset 0");
             Assert.AreEqual(((CosmosRuntimeType)typeof(TestStruct)).mTypeId, types[1], "GetGCFieldTypes returns TestStruct at offset 1");
             Assert.AreEqual(((CosmosRuntimeType)typeof(object)).mTypeId, types[2], "GetGCFieldTypes returns object at offset 2");
+
+            // check that classes have the correct name
+            Assert.AreEqual("Int32", ((CosmosRuntimeType)typeof(int)).Name, "Name of Int32 is correctly stored");
+            Assert.AreEqual("Object", ((CosmosRuntimeType)typeof(object)).Name, "Name of Object is correctly stored");
         }
 
         private unsafe void TestGarbageCollectorMethods()
@@ -139,6 +143,7 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual(0, collected, "Storing elements in static class keeps them referenced");
         }
 
+        #region Test Methods
         public void TestMethod1()
         {
             object a = new object();
@@ -208,6 +213,8 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Console.WriteLine("Test: " + 3 + " vs " + 5);
         }
 
+        #endregion
+
         protected override void Run()
         {
             try
@@ -262,6 +269,7 @@ namespace Cosmos.Compiler.Tests.TypeSystem
                 TestGarbageCollectorMethods();
                 TestGarbageCollector();
                 RealMethodsTest();
+                TestReflection();
 
                 TestController.Completed();
             }
@@ -275,6 +283,21 @@ namespace Cosmos.Compiler.Tests.TypeSystem
 
                 TestController.Failed();
             }
+        }
+
+        private static void TestReflection()
+        {
+            Assert.AreEqual("Int32", typeof(int).Name, "Plug for Name of Int32 works");
+            Assert.AreEqual("Object", typeof(object).Name, "Plug for Name of Object works");
+            string intAQN = typeof(int).AssemblyQualifiedName;
+            Assert.IsTrue(intAQN.StartsWith("System.Int32, System.Private.CoreLib"), $"Plug for AssemblyQualifiedName of Int32 works ({intAQN})");
+            string objectAQN = typeof(object).AssemblyQualifiedName;
+            Assert.IsTrue(objectAQN.StartsWith("System.Object, System.Private.CoreLib"), $"Plug for AssemblyQualifiedName of Object works ({objectAQN})");
+
+            Assert.AreEqual("Int32", Type.GetType("Int32").Name, "GetType works on Int32");
+            Assert.AreEqual("Int32", Type.GetType(typeof(int).AssemblyQualifiedName).Name, "GetType works on Int32 using assembly qualified name");
+            Assert.AreEqual("Int32", Type.GetType("System.Int32, System.Private.CoreLib").Name, "GetType works on Int32 with shortened assembly qualified name");
+            Assert.AreEqual("Int32", Type.GetType("System.Int32").Name, "GetType works on Int32 with shortened assembly qualified name");
         }
     }
 }

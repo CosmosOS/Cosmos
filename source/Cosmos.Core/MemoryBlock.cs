@@ -264,7 +264,7 @@ namespace Cosmos.Core
         /// <param name="block">ManagedMemoryBlock to copy.</param>
         public unsafe void Copy(ManagedMemoryBlock block)
         {
-            byte* xDest = (byte*)(Base);
+            byte* xDest = (byte*)Base;
             byte* aDataPtr = (byte*)block.Offset;
 
             MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
@@ -433,7 +433,7 @@ namespace Cosmos.Core
         {
             return ToArray(0, 0, (int)Size);
         }
-            
+
     }
 
     /// <summary>

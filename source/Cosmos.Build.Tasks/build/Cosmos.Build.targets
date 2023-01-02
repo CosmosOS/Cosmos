@@ -1,8 +1,9 @@
 ﻿<Project>
 
     <PropertyGroup>
-        <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
-        <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
+        <CosmosDir Condition="$(CosmosDir) == '' AND '$(OS)' == 'Windows_NT'">$(AppData)\Cosmos User Kit</CosmosDir>
+        <CosmosDir Condition="$(CosmosDir) == '' AND '$(OS)' != 'Windows_NT'">/opt/cosmos</CosmosDir>
+        <KernelAssembliesDir>$(CosmosDir)/Kernel/</KernelAssembliesDir>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -14,17 +15,23 @@
     <PropertyGroup>
         <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
 
-        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)yasm\win\</NasmToolPath>
-        <NasmToolExe Condition = "'$(NasmToolExe)' == ''">yasm.exe</NasmToolExe>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)yasm\win\</NasmToolPath>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</NasmToolPath>
+        <NasmToolExe Condition = "'$(NasmToolExe)' == '' AND '$(OS)' == 'Windows_NT'">yasm.exe</NasmToolExe>
+        <NasmToolExe Condition = "'$(NasmToolExe)' == '' AND '$(OS)' != 'Windows_NT'">yasm</NasmToolExe>
 
-        <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</LdToolPath>
-        <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
+        <LdToolPath Condition = "'$(LdToolPath)' == '' AND '$(OS)' == 'Windows_NT' ">$(CosmosToolsPath)cygwin\win\</LdToolPath>
+        <LdToolPath Condition = "'$(LdToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</LdToolPath>
+        <LdToolExe Condition = "'$(LdToolExe)' == '' AND '$(OS)' == 'Windows_NT'">ld.exe</LdToolExe>
+        <LdToolExe Condition = "'$(LdToolExe)' == '' AND '$(OS)' != 'Windows_NT'">ld</LdToolExe>
 
-        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.bat</ObjdumpToolExe>
+        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
+        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/bin/</ObjdumpToolPath>
 
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
-        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
+        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
+        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</MkisofsToolPath>
+        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' == 'Windows_NT'">mkisofs.exe</MkisofsToolExe>
+        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' != 'Windows_NT'">mkisofs</MkisofsToolExe>
 
         <SyslinuxToolPath Condition = "'$(SyslinuxToolPath)' == ''">$(CosmosToolsPath)syslinux\win\</SyslinuxToolPath>
         <SyslinuxToolExe Condition = "'$(SyslinuxToolExe)' == ''">syslinux.exe</SyslinuxToolExe>
@@ -63,9 +70,11 @@
 
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
 
-
         <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
 
+        <AllowComments Condition="'$(AllowComments)' == ''">False</AllowComments>
+
+        <OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -198,7 +207,8 @@
                 ToolPath="$(Il2cpuToolPath)"
                 ToolExe="$(Il2cpuToolExe)"
                 CompileVBEMultiboot="$(CompileVBEMultiboot)"
-				VBEResolution="$(VBEResolution)"/>
+				AllowComments="$(AllowComments)"
+                VBEResolution="$(VBEResolution)"/>
 
     </Target>
 
@@ -222,7 +232,8 @@
               OutputFile="$(NasmOutput)"
               OutputFormat="$(BinFormat)"
               ToolPath="$(NasmToolPath)"
-              ToolExe="$(NasmToolExe)" />
+              ToolExe="$(NasmToolExe)"
+	      OptimizationLevel="$(OptimizationLevel)"/>
 
     </Target>
 
@@ -274,7 +285,8 @@
                                MapFile="$(MapFile)"
                                DebugInfoFile="$(CosmosDebugSymbolsFile)"
                                ToolPath="$(ObjdumpToolPath)"
-                               ToolExe="$(ObjdumpToolExe)" />
+                               ToolExe="$(ObjdumpToolExe)"
+                               ActualToolPath="$(CosmosToolsPath)cygwin\win\"/>
 
     </Target>
 
@@ -373,10 +385,12 @@
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
                               Modules="gzio"
+                              Timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'Gzip'" />
         
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                              Timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'None'" />
         
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"

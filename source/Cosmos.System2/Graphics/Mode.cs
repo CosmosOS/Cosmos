@@ -12,10 +12,6 @@ namespace Cosmos.System.Graphics
     /// </summary>
     public struct Mode
     {
-        int columns;
-        int rows;
-        ColorDepth color_depth;
-
         /* Constuctor of our struct */
         /// <summary>
         /// Create new instance of the <see cref="Mode"/> struct.
@@ -25,9 +21,9 @@ namespace Cosmos.System.Graphics
         /// <param name="color_depth">Color depth.</param>
         public Mode(int columns, int rows, ColorDepth color_depth)
         {
-            this.columns = columns;
-            this.rows = rows;
-            this.color_depth = color_depth;
+            this.Width = columns;
+            this.Height = rows;
+            this.ColorDepth = color_depth;
         }
 
         /// <summary>
@@ -37,12 +33,7 @@ namespace Cosmos.System.Graphics
         /// <returns>bool value.</returns>
         public bool Equals(Mode other)
         {
-            if (columns == other.columns && rows == other.rows && color_depth == other.color_depth)
-            {
-                return true;
-            }
-
-            return false;
+            return Width == other.Width && Height == other.Height && ColorDepth == other.ColorDepth;
         }
 
         /// <summary>
@@ -62,9 +53,9 @@ namespace Cosmos.System.Graphics
             // overflow is acceptable in this case
             unchecked
             {
-                int hash = columns.GetHashCode();
-                hash = (hash * 17) + rows.GetHashCode();
-                hash = (hash * 31) + (int)color_depth.GetHashCode();
+                int hash = Width.GetHashCode();
+                hash = hash * 17 + Height.GetHashCode();
+                hash = hash * 31 + ColorDepth.GetHashCode();
                 return hash;
             }
         }
@@ -77,12 +68,12 @@ namespace Cosmos.System.Graphics
         public int CompareTo(Mode other)
         {
             // color_depth has no effect on the orderiring
-            if (columns < other.columns && rows < other.rows)
+            if (Width < other.Width && Height < other.Height)
             {
                 return -1;
             }
 
-            if (columns > other.columns && rows > other.rows)
+            if (Width > other.Width && Height > other.Height)
             {
                 return 1;
             }
@@ -115,11 +106,9 @@ namespace Cosmos.System.Graphics
         /// <returns>bool value.</returns>
         public static bool operator >(Mode mode_a, Mode mode_b)
         {
-            int result;
+            var result = mode_a.CompareTo(mode_b);
 
-            result = mode_a.CompareTo(mode_b);
-
-            return (result > 0) ? true : false;
+            return result > 0;
         }
 
         /// <summary>
@@ -130,11 +119,9 @@ namespace Cosmos.System.Graphics
         /// <returns>bool value.</returns>
         public static bool operator <(Mode mode_a, Mode mode_b)
         {
-            int result;
+            var result = mode_a.CompareTo(mode_b);
 
-            result = mode_a.CompareTo(mode_b);
-
-            return (result < 0) ? true : false;
+            return result < 0;
         }
 
         /// <summary>
@@ -145,11 +132,7 @@ namespace Cosmos.System.Graphics
         /// <returns>bool value.</returns>
         public static bool operator >=(Mode mode_a, Mode mode_b)
         {
-            int result;
-
-            result = mode_a.CompareTo(mode_b);
-
-            return (result == 0 || result > 0) ? true : false;
+            return mode_a.CompareTo(mode_b) >= 0;
         }
 
         /// <summary>
@@ -160,50 +143,23 @@ namespace Cosmos.System.Graphics
         /// <returns>bool value.</returns>
         public static bool operator <=(Mode mode_a, Mode mode_b)
         {
-            int result;
-
-            result = mode_a.CompareTo(mode_b);
-
-            if (result == 0 || result < 0)
-            {
-                return true;
-            }
-
-            return false;
+            return mode_a.CompareTo(mode_b) <= 0;
         }
 
         /// <summary>
         /// Get columns.
         /// </summary>
-        public int Columns
-        {
-            get
-            {
-                return columns;
-            }
-        }
+        public int Width { get; }
 
         /// <summary>
         /// Get rows.
         /// </summary>
-        public int Rows
-        {
-            get
-            {
-                return rows;
-            }
-        }
+        public int Height { get; }
 
         /// <summary>
         /// Get color depth
         /// </summary>
-        public ColorDepth ColorDepth
-        {
-            get
-            {
-                return color_depth;
-            }
-        }
+        public ColorDepth ColorDepth { get; }
 
         /// <summary>
         /// To string.
@@ -211,7 +167,7 @@ namespace Cosmos.System.Graphics
         /// <returns>string value.</returns>
         public override string ToString()
         {
-            return $"{columns}x{rows}@{(int)color_depth}";
+            return $"{Width}x{Height}@{(int)ColorDepth}";
         }
     }
 }

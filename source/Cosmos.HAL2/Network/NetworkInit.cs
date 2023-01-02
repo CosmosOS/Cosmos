@@ -15,7 +15,7 @@ namespace Cosmos.HAL.Network
 
             foreach (PCIDevice device in PCI.Devices)
             {
-                if ((device.ClassCode == 0x02) && (device.Subclass == 0x00) && // is Ethernet Controller
+                if (device.ClassCode == 0x02 && device.Subclass == 0x00 && // is Ethernet Controller
                     device == PCI.GetDevice(device.bus, device.slot, device.function))
                 {
 
@@ -30,7 +30,7 @@ namespace Cosmos.HAL.Network
 
                         var AMDPCNetIIDevice = new AMDPCNetII(device);
 
-                        AMDPCNetIIDevice.NameID = ("eth" + NetworkDeviceID);
+                        AMDPCNetIIDevice.NameID = "eth" + NetworkDeviceID;
 
                         Console.WriteLine("Registered at " + AMDPCNetIIDevice.NameID + " (" + AMDPCNetIIDevice.MACAddress.ToString() + ")");
 
@@ -46,7 +46,7 @@ namespace Cosmos.HAL.Network
                     {
                         var RTL8139Device = new RTL8139(device);
 
-                        RTL8139Device.NameID = ("eth" + NetworkDeviceID);
+                        RTL8139Device.NameID = "eth" + NetworkDeviceID;
 
                         RTL8139Device.Enable();
 

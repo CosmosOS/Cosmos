@@ -1,0 +1,96 @@
+name: Build and Test
+
+on:
+  workflow_dispatch:
+#  pull_request:
+#    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: windows-2022
+
+    env:
+      USER_KIT_PATH: 'C:\CosmosRun\'
+      BOCHS_RUN_CMD: '\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\"'
+
+    steps:
+      - name: Checkout Cosmos
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/Cosmos
+          path: Cosmos
+
+#      - name: Checkout Common
+#        uses: actions/checkout@v3
+#        with:
+#          repository: CosmosOS/Common
+#          path: Common
+
+      - name: Checkout IL2CPU
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/IL2CPU
+          path: IL2CPU
+
+#      - name: Checkout XSharp
+#        uses: actions/checkout@v3
+#        with:
+#          repository: CosmosOS/XSharp
+#          path: XSharp
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1.3
+
+      - name: Setup Registry
+        run: |
+          Write-Host "Setting Cosmos User Kit Path to $($env:USER_KIT_PATH)"
+          reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d "$($env:USER_KIT_PATH)"
+          reg query HKLM\SOFTWARE\WOW6432Node\Cosmos
+
+          Write-Host "Setting Bochs Run Command to $($env:BOCHS_RUN_CMD)"
+          reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "$($env:BOCHS_RUN_CMD)"
+          reg query HKCR\BochsConfigFile\shell\Run\command
+
+      - name: Nuget - Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget
+
+      - name: Nuget - Restore
+        run: |
+          msbuild Cosmos\Build.sln /t:Restore /maxcpucount /verbosity:normal /p:Net48=True
+
+      - name: Build - Cosmos
+        run: |
+          msbuild Cosmos\Build.sln /t:Build /maxcpucount /verbosity:normal /p:Net48=True
+
+      - name: Build - IL2CPU
+        run: |
+          dotnet publish IL2CPU\source\IL2CPU -r win7-x86 -o "$($env:USER_KIT_PATH)Build\IL2CPU\"
+
+      - name: Copy Output - Cosmos
+        run: |
+          xcopy /Y "Cosmos\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*.*" "$($env:USER_KIT_PATH)Build\ISO\boot\grub\i386-pc\"
+          xcopy /Y "Cosmos\Build\grub2\boot\grub\grub.cfg" "$($env:USER_KIT_PATH)Build\ISO\boot\grub"
+          xcopy /Y /S "Cosmos\Build\VMware\*" "$($env:USER_KIT_PATH)Build\VMware\"
+          xcopy /Y /S "Cosmos\Build\Tools" "$($env:USER_KIT_PATH)Build\Tools\"
+          xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
+
+      - name: Copy Output - IL2CPU
+        run: |
+          xcopy /Y "IL2CPU\source\Cosmos.Core.DebugStub\*.xs" "$($env:USER_KIT_PATH)XSharp\DebugStub\"
+          
+      - name: Test - Cosmos
+        run: |
+          dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml"
+
+      - name: Upload Test Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-logs
+          path: $($env:USER_KIT_PATH)TestResult.xml

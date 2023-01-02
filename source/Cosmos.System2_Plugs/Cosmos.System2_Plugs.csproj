@@ -6,6 +6,7 @@
         <RootNamespace>Cosmos.System_Plugs</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Configurations>Debug;Release;TEST</Configurations>
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,5 +23,9 @@
     <ItemGroup>
       <Folder Include="System\Runtime\CompilerServices\" />
     </ItemGroup>
+
+    <PropertyGroup Condition=" '$(OS)' == 'Unix' ">
+        <DefineConstants>OS_LINUX</DefineConstants>
+    </PropertyGroup>
 
 </Project>

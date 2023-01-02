@@ -2,7 +2,7 @@
 using System;
 namespace Cosmos.Core_Plugs.Interop
 {
-    [Plug("Interop+Kernel32, System.Private.CoreLib")]
+    [Plug("Interop+Kernel32, System.Private.CoreLib", IsOptional = true)]
     class Kernel32Impl
     {
         [PlugMethod(Signature = "System_Int32__Interop_Kernel32_LCMapStringEx_System_String__System_UInt32__System_Char___System_Int32__System_Void___System_Int32__System_Void___System_Void___System_IntPtr_")]

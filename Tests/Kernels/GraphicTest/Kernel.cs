@@ -3,7 +3,6 @@ using Sys = Cosmos.System;
 using Cosmos.TestRunner;
 using Cosmos.System.Graphics;
 using System.Drawing;
-using Point = Cosmos.System.Graphics.Point;
 using System.IO;
 using Cosmos.Compiler.Tests.Bcl;
 using Cosmos.System.Graphics.Fonts;
@@ -49,59 +48,59 @@ namespace GraphicTest
             aCanvas.Clear(Color.Blue);
 
             /* A red Point */
-            Pen pen = new Pen(Color.Red);
-            aCanvas.DrawPoint(pen, 69, 69);
+            var color = Color.Red;
+            aCanvas.DrawPoint(color, 69, 69);
 
-            Color color = aCanvas.GetPointColor(69, 69);
-            Assert.AreEqual(color.ToArgb(), Color.Red.ToArgb(), "GetPointColor returns correct value");
+            Color fetchedColor = aCanvas.GetPointColor(69, 69);
+            Assert.AreEqual(fetchedColor.ToArgb(), Color.Red.ToArgb(), "GetPointColor returns correct value");
 
             /* A GreenYellow horizontal line */
-            pen.Color = Color.GreenYellow;
-            aCanvas.DrawLine(pen, 250, 100, 400, 100);
+            color = Color.GreenYellow;
+            aCanvas.DrawLine(color, 250, 100, 400, 100);
 
             /* A Black Lines larger than the canvas */
-            pen.Color = Color.Black;
-            aCanvas.DrawLine(pen, -20, 100, aCanvas.Mode.Columns + 20, 100);
-            aCanvas.DrawLine(pen, -20, -20, aCanvas.Mode.Columns + 20, aCanvas.Mode.Rows + 20);
+            color = Color.Black;
+            aCanvas.DrawLine(color, -20, 100, aCanvas.Mode.Width + 20, 100);
+            aCanvas.DrawLine(color, -20, -20, aCanvas.Mode.Width + 20, aCanvas.Mode.Height + 20);
 
             /* An IndianRed vertical line */
-            pen.Color = Color.IndianRed;
-            aCanvas.DrawLine(pen, 350, 150, 350, 250);
+            color = Color.IndianRed;
+            aCanvas.DrawLine(color, 350, 150, 350, 250);
 
             /* A MintCream diagonal line */
-            pen.Color = Color.MintCream;
-            aCanvas.DrawLine(pen, 250, 150, 400, 250);
+            color = Color.MintCream;
+            aCanvas.DrawLine(color, 250, 150, 400, 250);
 
             /* Rectangles of various colors */
-            pen.Color = Color.PaleVioletRed;
-            aCanvas.DrawRectangle(pen, 350, 350, 80, 60);
+            color = Color.PaleVioletRed;
+            aCanvas.DrawRectangle(color, 350, 350, 80, 60);
 
-            pen.Color = Color.Chartreuse;
-            aCanvas.DrawCircle(pen, 69, 69, 10);
+            color = Color.Chartreuse;
+            aCanvas.DrawCircle(color, 69, 69, 10);
 
-            pen.Color = Color.CadetBlue;
-            aCanvas.DrawArc(45, 45, 35, 35, pen, 90, 270);
+            color = Color.CadetBlue;
+            aCanvas.DrawArc(45, 45, 35, 35, color, 90, 270);
 
-            pen.Color = Color.DimGray;
-            aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
+            color = Color.DimGray;
+            aCanvas.DrawEllipse(color, 100, 69, 10, 50);
 
-            pen.Color = Color.MediumPurple;
-            aCanvas.DrawPolygon(pen, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
+            color = Color.MediumPurple;
+            aCanvas.DrawPolygon(color, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
 
             /* Color.FromName */
             aCanvas.Clear(Color.FromName("Navy"));
-            
+
             /* A LimeGreen rectangle */
-            pen.Color = Color.LimeGreen;
-            aCanvas.DrawRectangle(pen, 450, 300, 80, 60);
+            color = Color.LimeGreen;
+            aCanvas.DrawRectangle(color, 450, 300, 80, 60);
 
             /* A filled rectange */
-            pen.Color = Color.Chocolate;
-            aCanvas.DrawFilledRectangle(pen, 200, 150, 400, 300);
+            color = Color.Chocolate;
+            aCanvas.DrawFilledRectangle(color, 200, 150, 400, 300);
 
             /* A Bitmap image */
-            aCanvas.DrawImage(bitmap, new Point(10, 10));
-            aCanvas.DrawImage(letter, new Point(50, 10));
+            aCanvas.DrawImage(bitmap, 10, 10);
+            aCanvas.DrawImage(letter, 50, 10);
 
             /* Drawing BitmapHeaderV5 image */
             Bitmap v5header = new Bitmap(Convert.FromBase64String(parrot));
@@ -123,28 +122,28 @@ namespace GraphicTest
                 "/9bU0f/Dwb3/KCYk/z06OP8uLCr/pqSh/9XT0P/c2db/UVBO/z07OP89Ozf/Ozk2/zEwLv/W09D/1dPQ/9XT0f86OTf/PDo3/zo4Nf94dXP/19XS/6Sin/8vLiv/PTo4/z06N/89Ojf/PTo3/z06N/89Ojf/PTo3/z06N/89Ojf/PTo3/z06N/89Ojj/JyYj/6yqp//W09D/1dPQ/8vJxv9oZmT/rayp/9LPzP/V0tD/1dPQ/8jGw/9XVlP/OTg1/z06N/8qKif/xcPA/9XT0P/V09D/pKKf/yAgIGYKCAqFv726/9XT0P/Z19T/m5qX/zU0Mv8+PTr/Pj06/z49Ov8+PTr/Pj06/z49Ov8wLy3/zczK/9bU0f/W1NH/0M3K/z09Ov8+PTn/Pj06/z49Ov8+PTr/Pj06/z49Ov8+PTr/Pj06/z49Ov8+PTr/Pj06/z49Ov88Ozj/Xl1b/9bT0f/W1NH/19XS/9fV0v/W1NH/1tTR/9bU0f/W1NH/vLq3/ygmJP8+PTr/OTc1/15cWv/Y1dL/z83K/ysqKP8+PTr/MjEu/5ual//Y1dL/xMK//y4tK/8+PTr/JyUk/zIwLv8vLiv/tLGv/9fV0v/X1dL/NzY1/z08Of85ODX/h4aD/9fV0v/Sz8z/QkA//z08Of8+PTr/Pj06/z49Ov8+PTr/Pj06/z49Ov8+PTr/Pj06/z49Ov8+PTr/Pj06/zw7OP9VVFL/09HO/9bU0f/W1NH/19XS/9fV0v/W1NH/1tTR/9bU0f/W1NH/sK6s/y8uLP8+PTr/MzIw/6mnpP/X1NL/1tTR/7i2s/8zMzN6KikpmMfFw//X1dL/29jV/4yLiP87Ojf/QD87/0A/O/9APzv/QD87/0A/O/9APzv/Ozo4/97b2P/X1dL/19XS/9rY1f9NS0r/Pz46/0A/O/9APzv/QD87/0A/O/9APzv/QD87/0A/O/9APzv/QD87/0A/O/9APzv/QD87/ycmI//CwL3/19XS/9fV0v/X1dL/19XS/9fV0v/X1dL/3NnW/4aEgv8xLyz/QD87/zg2M/9qaWb/2dfT/9jW0/8yMjD/Pz47/zY1Mf+SkI7/2tjV/6Ohnv8vLiv/PDs4/01MSv80MzH/PDs3/318ef/Y1tP/2dbT/zY1M/9APzv/OTg1/5WTkf/Y1tP/2dfU/1RSUf8+PTr/QD87/0A/O/9APzv/QD87/0A/O/9APzv/QD87/0A/O/9APzv/QD87/0A/O/9APzv/JSQi/7u5tv/X1dL/19XS/9fV0v/X1dL/19XS/9fV0v/X1dL/1NLP/3Fvbf87Ojb/QD87/zMyL/+zsq//19XS/9fV0v+0sq//MC8wdjc2NaLNysf/2NXS/9rX1P9/fnv/Pj07/0JAPv9CQD7/QkA+/0JAPv9CQD7/QT88/0ZEQ//c2db/2NXS/9jV0v/Mysj/Ojk2/0JAPv9CQD7/QkA+/0JAPv9CQD7/QkA+/0JAPv9CQD7/QkA+/0JAPv9CQD7/QkA+/0JAPv8uLSr/oJ2b/9jV0v/Y1dL/2NXS/9jW0//Y1dL/vLq3/2hnZf8vLSv/QkA9/0JAPf8wLiv/oZ+e/9nW0//b2NX/QkA//0E/Pf86OTb/iYeE/+He2/9lZGL/Ojk2/zg2M/+SkY7/UlFP/0E/PP9DQkH/2NbT/9rX1P81NDL/Q0E//zo3Nf+ioJ7/2dbT/9DOy/8+PTr/QkA9/0JAPv9CQD7/QkA+/0JAPv9CQD7/QkA+/0JAPv9CQD7/QkA+/0JAPv9CQD7/QkA+/zAvLP+YlpP/2NXS/9jV0v/Y1dL/2NXS/9nX1P/W09D/srCt/1FQTv8xLyz/QkA9/0NAPv8rKSf/y8nG/9jV0v/Z1dL/oJ+c/xYXF186OTmnz83K/9jW0//a2NX/fHl4/0A/PP9EQj//REI+/0RCPv9EQj7/REI+/0JBPv9MS0n/3NrX/9jX1P/Z19T/xsTB/zY0Mv9FQz//REI+/0RCPv9EQj7/REI+/0RCPv9EQj7/REI+/0RCPv9EQj7/REI+/0RCPv9EQj//Nzcz/4uJh//Y1tP/2NfU/9nX1P+rqab/U1JP/zAvLP87OTf/REM//0RCP/88Ozf/Y2Jg/9TSz//Z19T/29nW/1NTUP9CQD3/Pz06/318ev/f3dn/MzEv/0NCPv8yMS7/v7y5/4OCgP8/Pjr/LSwq/7Syr//c2tf/NTQy/0RDP/84NzT/qqmm/9nX1P/Mycb/NjYz/0VDP/9EQj//REI//0RCP/9EQj//REI//0RCPv9EQj//REI+/0RCPv9EQj7/Q0I+/0RCP/86ODX/hIOA/9nX1P/Z19T/2dfU/9nW0/+Zl5T/SkhH/zAvLP8+PDn/REM//0VDP/80My//dHJw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" +
                 "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"));
 
-            aCanvas.DrawImage(bitmap, new Point(0, 0));
-            aCanvas.DrawImage(bitmap2, new Point(200, 0));
+            aCanvas.DrawImage(bitmap, 0, 0);
+            aCanvas.DrawImage(bitmap2,200, 0);
             //Scale Bitmap
             aCanvas.DrawImage(bitmap,0,0,50,50);
-            
-            aCanvas.DrawImageAlpha(bitmap3, new Point(0, 300));
+
+            aCanvas.DrawImageAlpha(bitmap3, 0, 300);
 
             /* Drawing ellipses */
-            aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
-            aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
-            aCanvas.DrawEllipse(pen, 100, 69, 10, 50);
+            aCanvas.DrawEllipse(color, 100, 69, 10, 50);
+            aCanvas.DrawEllipse(color, 100, 69, 10, 50);
+            aCanvas.DrawEllipse(color, 100, 69, 10, 50);
 
             /* Create a PC Screen Font */
-            pen = new Pen(Color.White);
+            color = Color.White;
             Font font = PCScreenFont.Default;
 
             /* Draw text */
-            aCanvas.DrawString("Hello Cosmos World!", font, pen, 0, 16 * 5);
-            aCanvas.DrawString("font data test=" + font.Width + "x" + font.Height, font, pen, 0, 16 * 6);
+            aCanvas.DrawString("Hello Cosmos World!", font, color, 0, 16 * 5);
+            aCanvas.DrawString("font data test=" + font.Width + "x" + font.Height, font, color, 0, 16 * 6);
 
             /* Draw char */
-            aCanvas.DrawChar('A', font, pen, 0, 16 * 7);
+            aCanvas.DrawChar('A', font, color, 0, 16 * 7);
 
             aCanvas.Display();
 
@@ -191,7 +190,7 @@ namespace GraphicTest
                 Console.WriteLine("Back in text mode 2");
             }
             Console.ForegroundColor = ConsoleColor.White;
-                
+
             TestController.Completed();
         }
 
@@ -215,7 +214,7 @@ namespace GraphicTest
                 }
             }
 
-            vGACanvas.DrawLine(new Pen(Color.Red), 10, 10, 10, 50);
+            vGACanvas.DrawLine(Color.Red, 10, 10, 10, 50);
 
             vGACanvas.Disable();
             for (int i = 0; i < 10; i++)

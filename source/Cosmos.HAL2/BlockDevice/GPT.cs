@@ -68,7 +68,7 @@ namespace Cosmos.HAL.BlockDevice
             ulong endLBA = BitConverter.ToUInt64(partData, (int)(off + 40));
 
             // endLBA + 1 because endLBA is inclusive
-            ulong count = (endLBA + 1) - startLBA;
+            ulong count = endLBA + 1 - startLBA;
 
             if (partType != Guid.Empty && partGuid != Guid.Empty)
             {

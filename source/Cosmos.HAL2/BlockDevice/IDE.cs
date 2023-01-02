@@ -1,26 +1,41 @@
 using System;
 using System.Collections.Generic;
+using Cosmos.Core.IOGroup;
 using Cosmos.HAL.BlockDevice;
 
 namespace Cosmos.HAL.BlockDevice
 {
     public class IDE
     {
-        private static PCIDevice xDevice = HAL.PCI.GetDeviceClass(HAL.ClassID.MassStorageController,
+        private static readonly PCIDevice xDevice = HAL.PCI.GetDeviceClass(HAL.ClassID.MassStorageController,
                                                                   HAL.SubclassID.IDEInterface);
-        private static List<BlockDevice> ATAPIDevices = new List<BlockDevice>();
-        private static List<Partition> ATAPIPartitions = new List<Partition>();
+        private static readonly List<BlockDevice> ATAPIDevices = new List<BlockDevice>();
+        private static readonly List<Partition> ATAPIPartitions = new List<Partition>();
+
+        // These are common/fixed pieces of hardware. PCI, USB etc should be self discovering
+        // and not hardcoded like this.
+        // Further more some kind of security needs to be applied to these, but even now
+        // at least we have isolation between the consumers that use these.
+        /// <summary>
+        /// Primary ATA.
+        /// </summary>
+        public static readonly ATA PrimayATA = new ATA(false);
+        /// <summary>
+        /// Secondary ATA.
+        /// </summary>
+        public static readonly ATA SecondaryATA = new ATA(true);
+
         internal static void InitDriver()
         {
             if (xDevice != null)
             {
-                Console.WriteLine("ATA Primary Master");
+                Console.WriteLine("Initializing ATA Primary Master...");
                 Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-                Console.WriteLine("ATA Primary Slave");
+                Console.WriteLine("Initializing ATA Primary Slave...");
                 Initialize(Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Slave);
-                Console.WriteLine("ATA Secondary Master");
+                Console.WriteLine("Initializing ATA Secondary Master...");
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Master);
-                Console.WriteLine("ATA Secondary Slave");
+                Console.WriteLine("Initializing ATA Secondary Slave...");
                 Initialize(Ata.ControllerIdEnum.Secondary, Ata.BusPositionEnum.Slave);
             }
 
@@ -36,7 +51,7 @@ namespace Cosmos.HAL.BlockDevice
         }
         private static void Initialize(Ata.ControllerIdEnum aControllerID, Ata.BusPositionEnum aBusPosition)
         {
-            var xIO = aControllerID == Ata.ControllerIdEnum.Primary ? Core.Global.BaseIOGroups.ATA1 : Core.Global.BaseIOGroups.ATA2;
+            var xIO = aControllerID == Ata.ControllerIdEnum.Primary ? PrimayATA : SecondaryATA;
             var xATA = new ATA_PIO(xIO, aControllerID, aBusPosition);
             if (xATA.DriveType == ATA_PIO.SpecLevel.Null)
             {
