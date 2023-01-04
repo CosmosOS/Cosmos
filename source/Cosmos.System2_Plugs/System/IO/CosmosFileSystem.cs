@@ -79,8 +79,11 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void DeleteFile(string fullPath)
         {
-            Global.mFileSystemDebugger.SendInternal($"DeleteFile : fullPath = {fullPath}");
-            VFSManager.DeleteFile(fullPath);
+            if (File.Exists(fullPath))
+            {
+                Global.mFileSystemDebugger.SendInternal($"DeleteFile : fullPath = {fullPath}");
+                VFSManager.DeleteFile(fullPath);
+            }
         }
 
         public static void CopyFile(string sourceFullPath, string destFullPath, bool overwrite)
