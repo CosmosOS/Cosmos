@@ -36,3 +36,8 @@ The `install-VS2022.bat` accepts the following parameters :
 
 ###  Installation on Linux
 Run `make all` to build Cosmos. Run `sudo make install`. Make sure to run `make nuget-install` under your user account, and not as sudo.
+
+### dotnet Project Templates
+If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install .\source\templates\csharp\` assuming you are currently in the Cosmos base directory.
+After installing the template use `dotnet new cosmosCSKernel -n {name}` to create a new Cosmos Kernel project. 
+The dotnet template can be removed at a later time using `dotnet new --uninstall .\source\templates\csharp\`.
