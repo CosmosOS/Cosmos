@@ -93,19 +93,21 @@ namespace Cosmos.System_Plugs.System.IO
             {
                 destFullPath = Path.Combine(destFullPath, Path.GetFileName(sourceFullPath));
             }
-
-            // Copy the contents of the file from the source to the destination, creating the destination in the process
-            using (var src = new FileStream(sourceFullPath, FileMode.Open))
-            using (var dst = new FileStream(destFullPath, overwrite ? FileMode.Create : FileMode.CreateNew))
+            if (!File.Exists(destFullPath) || overwrite)
             {
-                int xSize = (int)src.Length;
-                Global.mFileSystemDebugger.SendInternal($"size of {sourceFullPath} is {xSize} bytes");
-                byte[] content = new byte[xSize];
-                Global.mFileSystemDebugger.SendInternal($"content byte buffer allocated");
-                src.Read(content, 0, xSize);
-                Global.mFileSystemDebugger.SendInternal($"content byte buffer read");
-                dst.Write(content, 0, xSize);
-                Global.mFileSystemDebugger.SendInternal($"content byte buffer written");
+                // Copy the contents of the file from the source to the destination, creating the destination in the process
+                using (var src = new FileStream(sourceFullPath, FileMode.Open))
+                using (var dst = new FileStream(destFullPath, overwrite ? FileMode.Create : FileMode.CreateNew))
+                {
+                    int xSize = (int)src.Length;
+                    Global.mFileSystemDebugger.SendInternal($"size of {sourceFullPath} is {xSize} bytes");
+                    byte[] content = new byte[xSize];
+                    Global.mFileSystemDebugger.SendInternal($"content byte buffer allocated");
+                    src.Read(content, 0, xSize);
+                    Global.mFileSystemDebugger.SendInternal($"content byte buffer read");
+                    dst.Write(content, 0, xSize);
+                    Global.mFileSystemDebugger.SendInternal($"content byte buffer written");
+                }
             }
         }
     }
