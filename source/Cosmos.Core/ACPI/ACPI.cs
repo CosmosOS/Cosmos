@@ -366,12 +366,6 @@ namespace Cosmos.Core
             public ushort Flags;
         }
 
-        // New Port I/O
-        /// <summary>
-        /// IO port.
-        /// </summary>
-        private static IOPort smiIO, pm1aIO, pm1bIO, ResetRegister;
-
         // ACPI variables
         /// <summary>
         /// SMI CMD.
@@ -511,11 +505,11 @@ namespace Cosmos.Core
                 Init();
             }
 
-            pm1aIO.Word = (ushort)(SLP_TYPa | SLP_EN);
+            IOPort.Write16((ushort)PM1a_CNT, (ushort)(SLP_TYPa | SLP_EN));
 
             if (PM1b_CNT != null)
             {
-                pm1bIO.Word = (ushort)(SLP_TYPb | SLP_EN);
+                IOPort.Write16((ushort)PM1b_CNT, (ushort)(SLP_TYPb | SLP_EN));
             }
 
             CPU.Halt();
@@ -536,7 +530,7 @@ namespace Cosmos.Core
             var header = FADT->Header;
             if (header.Revision >= 2 && (FADT->Flags & (1 << 10)) != 0)
             {
-                ResetRegister.Byte = ResetValue;
+                IOPort.Write16((ushort)FADT->ResetReg.Address, ResetValue);
             }
             else
             {
@@ -697,10 +691,6 @@ namespace Cosmos.Core
                 PM1_CNT_LEN = FADT->PM1ControlLength;
                 SLP_EN = 1 << 13;
 
-                smiIO = new IOPort((ushort)SMI_CMD);
-                pm1aIO = new IOPort((ushort)PM1a_CNT);
-                pm1bIO = new IOPort((ushort)PM1b_CNT);
-                ResetRegister = new IOPort((ushort)FADT->ResetReg.Address);
 
                 if (acpiCheckHeader((byte*)FADT->Dsdt, "DSDT") == 0)
                 {
@@ -833,7 +823,6 @@ namespace Cosmos.Core
         /// </summary>
         public static void Enable()
         {
-            smiIO = new IOPort(ACPI_ENABLE);
         }
 
         /// <summary>
@@ -841,7 +830,6 @@ namespace Cosmos.Core
         /// </summary>
         public static void Disable()
         {
-            smiIO = new IOPort(ACPI_DISABLE);
         }
 
         /// <summary>

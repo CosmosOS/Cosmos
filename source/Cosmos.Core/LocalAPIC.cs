@@ -74,7 +74,7 @@ namespace Cosmos.Core
         /// </summary>
         public static void Initialize()
         {
-            Global.PIC.Disable();
+            //Global.PIC.Disable();
 
             //TODO: Fix ACPI tables on Bochs
             if (ACPI.LocalApicCpus.Count == 0)

@@ -60,7 +60,6 @@ namespace Cosmos.HAL
 			}
 		}
 
-		protected Core.IOGroup.PIT IO = Core.Global.BaseIOGroups.PIT;
 		private List<PITTimer> ActiveHandlers = new List<PITTimer>();
 		private ushort _T0Countdown = 65535;
 		private ushort _T2Countdown = 65535;
@@ -70,7 +69,24 @@ namespace Cosmos.HAL
 		public const uint PITDelayNS = 838;
 		public bool T0RateGen = false;
 
-		public PIT()
+        /// <summary>
+        /// Channel 0 data port.
+        /// </summary>
+        public const int Data0 = 0x40;
+        /// <summary>
+        /// Channel 1 data port.
+        /// </summary>
+        public const int Data1 = 0x41;
+        /// <summary>
+        /// Channel 2 data port.
+        /// </summary>
+        public const int Data2 = 0x42;
+        /// <summary>
+        /// Command register port.
+        /// </summary>
+        public const int Command = 0x43;
+
+        public PIT()
 		{
             INTs.SetIntHandler(0x20 + 13, HandleIRQ);
             IOAPIC.SetEntry(2, 0x20 + 13); //PIT is mapped to IOAPIC via IRQ2 instead of IRQ0
@@ -88,10 +104,10 @@ namespace Cosmos.HAL
 			{
 				_T0Countdown = value;
 
-				IO.Command.Byte = (byte)(T0RateGen ? 0x34 : 0x30);
-				IO.Data0.Byte = (byte)(value & 0xFF);
-				IO.Data0.Byte = (byte)(value >> 8);
-			}
+                IOPort.Write8(Command, (byte)(T0RateGen ? 0x34 : 0x30));
+                IOPort.Write8(Data0, (byte)(value & 0xFF));
+                IOPort.Write8(Data0, (byte)(value >> 8));
+            }
 		}
 		public uint T0Frequency
 		{
@@ -134,10 +150,10 @@ namespace Cosmos.HAL
 			{
 				_T2Countdown = value;
 
-				IO.Command.Byte = 0xB6;
-				IO.Data0.Byte = (byte)(value & 0xFF);
-				IO.Data0.Byte = (byte)(value >> 8);
-			}
+                IOPort.Write8(Command, 0xB6);
+                IOPort.Write8(Data0, (byte)(value & 0xFF));
+                IOPort.Write8(Data0, (byte)(value >> 8));
+            }
 		}
 		public uint T2Frequency
 		{
