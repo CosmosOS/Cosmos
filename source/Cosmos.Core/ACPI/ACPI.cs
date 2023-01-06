@@ -1,4 +1,5 @@
-﻿using Cosmos.Debug.Kernel;
+﻿using Cosmos.Core.Memory;
+using Cosmos.Debug.Kernel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -573,7 +574,18 @@ namespace Cosmos.Core
                 Global.mDebugger.Send("Found " + LocalApicCpus.Count + " CPUs via MADT.");
             }
 
+            MarkRSDTAsUnusable();
+
             return true;
+        }
+
+        public static void MarkRSDTAsUnusable()
+        {
+            var ptr = RSDPAddress();
+            var hdr = (AcpiHeader*)ptr->RsdtAddress;
+
+            RAT.MarkAsUnusable(ptr, (uint)sizeof(RSDPtr));
+            RAT.MarkAsUnusable(hdr, hdr->Length);
         }
 
         private static uint SdtLength = 0;
@@ -755,6 +767,8 @@ namespace Cosmos.Core
                     p += length;
                 }
             }
+
+            RAT.MarkAsUnusable(hdr, hdr->Length);
         }
 
         /*

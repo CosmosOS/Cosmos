@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
 using Native = System.UInt32;
@@ -28,6 +30,11 @@ namespace Cosmos.Core.Memory
             /// Can also indicate invalid page.
             /// </summary>
 			Empty = 0,
+
+            /// <summary>
+            /// Indicates that page is not usable,
+            /// </summary>
+            Unusable = 16,
 
             // Data Types from 1, special meanings from 255 down.
             /// <summary>
@@ -223,6 +230,10 @@ namespace Cosmos.Core.Memory
                             break;
                         }
                     }
+                    else if (*p == (byte)PageType.Unusable)
+                    {
+                        xCount = 0;
+                    }
                     else
                     {
                         xCount = 0;
@@ -244,7 +255,21 @@ namespace Cosmos.Core.Memory
                 return xResult;
             }
             return null;
+        }
 
+        /// <summary>
+        /// Marks a specified memory region as unusable for allocator
+        /// </summary>
+        /// <param name="ptr">Pointer to memory region</param>
+        /// <param name="size">Size of memory region</param>
+        public static void MarkAsUnusable(void* ptr, uint size)
+        {
+            byte* rat0 = (byte*)GetFirstRATIndex(ptr);
+            uint count = GetFirstRATIndex((void*)((uint)ptr + size)) - (uint)rat0 + 1;
+            for (int i = 0; i < count; i++)
+            {
+                *(rat0 + i) = (byte)PageType.Unusable;
+            }
         }
 
         /// <summary>
