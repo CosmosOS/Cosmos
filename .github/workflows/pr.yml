@@ -13,6 +13,7 @@ jobs:
 
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
+      BochsPath: 'C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe'
 
     steps:
       - name: Checkout Cosmos
@@ -47,9 +48,6 @@ jobs:
         run: |
           reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d %USER_KIT_PATH%
           reg query HKLM\SOFTWARE\WOW6432Node\Cosmos
-
-          reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
-          reg query HKCR\BochsConfigFile\shell\Run\command
 
       - name: Nuget - Cache
         uses: actions/cache@v3
