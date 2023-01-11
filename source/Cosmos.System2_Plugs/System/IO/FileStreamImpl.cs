@@ -123,20 +123,19 @@ namespace Cosmos.System_Plugs.System.IO
         private static Stream CreateNewFile(string aPath, bool aPathExists)
         {
             Global.mFileSystemDebugger.SendInternal($"-- FileStream.CreateNewFile -- aPath = {aPath} existing = {aPathExists}");
-          
+
             if (aPathExists)
             {
                 Global.mFileSystemDebugger.SendInternal("CreateNew Mode with aPath already existing");
                 throw new IOException("File already existing but CreateNew Requested");
             }
 
-            DirectoryEntry xEntry;
-            xEntry = VFSManager.CreateFile(aPath);
+            var xEntry = VFSManager.CreateFile(aPath);
             if (xEntry == null)
             {
                 return null;
             }
-            
+
             return VFSManager.GetFileStream(aPath);
         }
 
@@ -151,7 +150,7 @@ namespace Cosmos.System_Plugs.System.IO
             }
 
             Global.mFileSystemDebugger.SendInternal("Truncate Mode: change file lenght to 0 bytes");
-           
+
             var aStream = VFSManager.GetFileStream(aPath);
             aStream.SetLength(0);
 
@@ -183,7 +182,7 @@ namespace Cosmos.System_Plugs.System.IO
                 Global.mFileSystemDebugger.SendInternal("Append mode with aPath already existing let's seek to end of the file");
                 var aStream = VFSManager.GetFileStream(aPath);
                 Global.mFileSystemDebugger.SendInternal("Actual aStream Lenght: " + aStream.Length);
-                
+
                 aStream.Seek(0, SeekOrigin.End);
                 return aStream;
             }

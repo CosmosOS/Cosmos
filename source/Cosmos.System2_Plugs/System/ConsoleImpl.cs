@@ -535,7 +535,7 @@ namespace Cosmos.System_Plugs.System
                         Write(chars[x]);
                     }
 
-                    GetConsole().X -= (chars.Count - currentCount) - 1;
+                    GetConsole().X -= chars.Count - currentCount - 1;
                     currentCount++;
                 }
             }
@@ -562,7 +562,7 @@ namespace Cosmos.System_Plugs.System
             set_CursorTop(top);
         }
 
-        public static (int Left, int Top) GetCursorPosition() 
+        public static (int Left, int Top) GetCursorPosition()
         {
             int Left = get_CursorLeft();
             int Top = get_CursorTop();
@@ -665,7 +665,7 @@ namespace Cosmos.System_Plugs.System
         public static void Write(long aLong) => Write(aLong.ToString());
 
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
-        public static void Write(object value) => Write((value ?? String.Empty));
+        public static void Write(object value) => Write(value ?? String.Empty);
 
         public static void Write(string aText)
         {
@@ -706,7 +706,7 @@ namespace Cosmos.System_Plugs.System
             {
                 throw new ArgumentOutOfRangeException("aCount");
             }
-            if ((aBuffer.Length - aIndex) < aCount)
+            if (aBuffer.Length - aIndex < aCount)
             {
                 throw new ArgumentException();
             }

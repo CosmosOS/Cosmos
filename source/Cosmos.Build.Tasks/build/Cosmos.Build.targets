@@ -70,10 +70,11 @@
 
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
 
-
         <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
-	      <OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
 
+        <AllowComments Condition="'$(AllowComments)' == ''">False</AllowComments>
+
+        <OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -206,7 +207,8 @@
                 ToolPath="$(Il2cpuToolPath)"
                 ToolExe="$(Il2cpuToolExe)"
                 CompileVBEMultiboot="$(CompileVBEMultiboot)"
-				VBEResolution="$(VBEResolution)"/>
+				AllowComments="$(AllowComments)"
+                VBEResolution="$(VBEResolution)"/>
 
     </Target>
 
@@ -231,7 +233,7 @@
               OutputFormat="$(BinFormat)"
               ToolPath="$(NasmToolPath)"
               ToolExe="$(NasmToolExe)"
-	            OptimizationLevel="$(OptimizationLevel)" />
+	      OptimizationLevel="$(OptimizationLevel)"/>
 
     </Target>
 
@@ -383,10 +385,12 @@
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
                               Modules="gzio"
+                              Timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'Gzip'" />
         
         <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
                               BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                              Timeout="$(Timeout)"
                               Condition="'$(CompressionType)' == 'None'" />
         
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"

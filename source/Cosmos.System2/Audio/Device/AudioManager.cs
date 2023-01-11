@@ -62,7 +62,7 @@ namespace Cosmos.System.Audio
         /// The audio stream to use when reading to the buffer.
         /// </summary>
         public AudioStream Stream { get; set; }
-    
+
         /// <summary>
         /// Enables this audio manager.
         /// </summary>

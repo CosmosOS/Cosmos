@@ -7,7 +7,7 @@ namespace Cosmos.System_Plugs.System.Text
 {
     [Plug(Target = typeof(DecoderReplacementFallbackBuffer))]
     public static class DecoderReplacementFallbackBufferImpl
-    { 
+    {
         public static bool Fallback(DecoderReplacementFallbackBuffer aThis, byte[] bytesUnknown, int index)
         {
             Debugger debugger = new Debugger("SystemPlugs", "Decoder");

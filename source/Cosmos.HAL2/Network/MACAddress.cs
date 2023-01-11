@@ -35,7 +35,7 @@ namespace Cosmos.HAL.Network
             if (address == null || address.Length != 6)
             {
                 throw new ArgumentException("MACAddress is null or has wrong length", "address");
-            }    
+            }
 
             bytes[0] = address[0];
             bytes[1] = address[1];
@@ -53,7 +53,7 @@ namespace Cosmos.HAL.Network
         /// <param name="offset">offset in buffer to start from</param>
         public MACAddress(byte[] buffer, int offset)
         {
-            if (buffer == null || buffer.Length < (offset + 6))
+            if (buffer == null || buffer.Length < offset + 6)
             {
                 throw new ArgumentException("buffer does not contain enough data starting at offset", "buffer");
             }
@@ -120,7 +120,7 @@ namespace Cosmos.HAL.Network
             else
             {
                 throw new ArgumentException("obj is not a MACAddress", "obj");
-            } 
+            }
         }
 
         public override int GetHashCode()

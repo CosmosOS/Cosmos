@@ -13,6 +13,8 @@ namespace Cosmos.Core
             : this()
         {
             mTypeId = aTypeId;
+            Name = VTablesImpl.GetName(aTypeId);
+            AssemblyQualifiedName = VTablesImpl.GetAssemblyQualifiedName(aTypeId);
         }
 
         protected CosmosRuntimeType()
