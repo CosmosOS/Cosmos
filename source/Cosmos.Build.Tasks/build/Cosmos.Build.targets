@@ -489,8 +489,8 @@
 
         <CreateMbr TargetDrive="$(UsbPublishDrive)"
                    FormatDrive="$(UsbPublishFormatDrive)"
-                   ToolPath="$(SyslinuxToolPath)"
-                   ToolExe="$(SyslinuxToolExe)" />
+                   ToolPath="$(XorrisoToolPath)"
+                   ToolExe="$(XorrisoToolExe)" />
 
     </Target>
 

@@ -60,8 +60,8 @@ namespace Cosmos.System.ScanMaps
             _keys.Add(new KeyMapping(0x1A, '[', '{', '[', '{', '[', '{', ConsoleKeyEx.LBracket));
             _keys.Add(new KeyMapping(0x1B, ']', '}', ']', '}', ']', '}', ConsoleKeyEx.RBracket));
             /* ENTER, CTRL */
-            _keys.Add(new KeyMapping(0x9C, ConsoleKeyEx.Enter));
-            _keys.Add(new KeyMapping(0x9D, ConsoleKeyEx.LCtrl));
+            _keys.Add(new KeyMapping(0x1C, ConsoleKeyEx.Enter));
+            _keys.Add(new KeyMapping(0x1D, ConsoleKeyEx.LCtrl));
             /* ASDFGHJKL;'` */
             _keys.Add(new KeyMapping(0x1E, 'a', 'A', 'a', 'A', 'a', 'A', ConsoleKeyEx.A));
             _keys.Add(new KeyMapping(0x1F, 's', 'S', 's', 'S', 's', 'S', ConsoleKeyEx.S));
