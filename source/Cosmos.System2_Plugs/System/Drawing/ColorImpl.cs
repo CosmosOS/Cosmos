@@ -11,7 +11,7 @@ namespace Cosmos.System_Plugs.System.Drawing
     class ColorImpl
     {
         /// <summary>Implements System.Drawing.Color.FromName
-        /// <para>See https://learn.microsoft.com/en-us/dotnet/api/system.drawing.color.fromname?view=net-6.0&viewFallbackFrom=netcore-3.1%20for%20Usage%20Explanation</para>
+        /// <para>See https://learn.microsoft.com/en-us/dotnet/api/system.drawing.color.fromname?view=net-6.0&viewFallbackFrom=netcore-3.1 for usage explanation</para>
         /// </summary>
         public static Color FromName(string name)
         {
