@@ -154,7 +154,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
                 url.Append('.');
             }
             index++; //End 0x00
-            return (url.ToString().Remove(url.Length - 1, 1));
+            return url.ToString().Remove(url.Length - 1, 1);
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core;
 
 namespace Cosmos.HAL
 {
@@ -10,7 +11,14 @@ namespace Cosmos.HAL
     /// </summary>
     public static class RTC
     {
-        private static Core.IOGroup.RTC rtc = new Core.IOGroup.RTC();
+        /// <summary>
+        /// Address IOPort.
+        /// </summary>
+        public const int Address = 0x70;
+        /// <summary>
+        /// Data IOPort.
+        /// </summary>
+        public const int Data = 0x71;
 
         /// <summary>
         /// The static constructor for RTC,
@@ -20,8 +28,8 @@ namespace Cosmos.HAL
         static RTC()
         {
             WaitForReady();
-            rtc.Address.Byte = 0x0B;
-            StatusByteB = rtc.Data.Byte;
+            IOPort.Write8(Address, 0x0B);
+            StatusByteB = IOPort.Read8(Data);
 
             #region Check 24-Hour Mode
             if ((StatusByteB & 0x02) == 0x02)
@@ -70,14 +78,16 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                rtc.Address.Byte = 0;
+                IOPort.Write8(Address, 0);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(rtc.Data.Byte);
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return rtc.Data.Byte;
+                    return data;
                 }
             }
         }
@@ -90,20 +100,22 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                rtc.Address.Byte = 2;
+                IOPort.Write8(Address, 2);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(rtc.Data.Byte);
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return rtc.Data.Byte;
+                    return data;
                 }
             }
         }
 
         /// <summary>
-        /// The current hour. Please note, this is 
+        /// The current hour. Please note, this is
         /// always in 24-hour format.
         /// </summary>
         public static byte Hour
@@ -111,31 +123,32 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                rtc.Address.Byte = 4;
+                IOPort.Write8(Address, 4);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
                     if (is24HourMode)
                     {
-                        return FromBCD(rtc.Data.Byte);
+                        return FromBCD(data);
                     }
                     else
                     {
-                        byte b = rtc.Data.Byte;
-                        if ((b & 0x80) == 0x80)
+                        if ((data & 0x80) == 0x80)
                         {
                             // It's PM.
-                            return (byte)(FromBCD(b) + 12);
+                            return (byte)(FromBCD(data) + 12);
                         }
                         else
                         {
-                            if (FromBCD(b) == 12)
+                            if (FromBCD(data) == 12)
                             {
                                 // It's midnight, so it should actually be 0.
                                 return 0;
                             }
                             else
                             {
-                                return FromBCD(b);
+                                return FromBCD(data);
                             }
                         }
                     }
@@ -144,26 +157,25 @@ namespace Cosmos.HAL
                 {
                     if (is24HourMode)
                     {
-                        return rtc.Data.Byte;
+                        return data;
                     }
                     else
                     {
-                        byte b = rtc.Data.Byte;
-                        if ((b & 0x80) == 0x80)
+                        if ((data & 0x80) == 0x80)
                         {
                             // It's PM.
-                            return (byte)(b + 12);
+                            return (byte)(data + 12);
                         }
                         else
                         {
-                            if (b == 12)
+                            if (data == 12)
                             {
                                 // It's midnight, so it should actually be 0.
                                 return 0;
                             }
                             else
                             {
-                                return b;
+                                return data;
                             }
                         }
                     }
@@ -179,14 +191,16 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                rtc.Address.Byte = 6;
+                IOPort.Write8(Address, 6);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(rtc.Data.Byte);
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return rtc.Data.Byte;
+                    return data;
                 }
             }
         }
@@ -199,14 +213,16 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                rtc.Address.Byte = 7;
+                IOPort.Write8(Address, 7);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(rtc.Data.Byte);
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return rtc.Data.Byte;
+                    return data;
                 }
             }
         }
@@ -219,14 +235,16 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                rtc.Address.Byte = 8;
+                IOPort.Write8(Address, 8);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(rtc.Data.Byte);
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return rtc.Data.Byte;
+                    return data;
                 }
             }
         }
@@ -239,20 +257,22 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                rtc.Address.Byte = 9;
+                IOPort.Write8(Address, 9);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(rtc.Data.Byte);
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return rtc.Data.Byte;
+                    return data;
                 }
             }
         }
 
         /// <summary>
-        /// The current century. Beware, this may cause issues 
+        /// The current century. Beware, this may cause issues
         /// on computers from before 1995.
         /// </summary>
         public static byte Century
@@ -260,26 +280,28 @@ namespace Cosmos.HAL
             get
             {
                 WaitForReady();
-                rtc.Address.Byte = 0x32;
+                IOPort.Write8(Address, 0x32);
+                var data = IOPort.Read8(Data);
+
                 if (isBCDMode)
                 {
-                    return FromBCD(rtc.Data.Byte);
+                    return FromBCD(data);
                 }
                 else
                 {
-                    return rtc.Data.Byte;
+                    return data;
                 }
             }
         }
 
         /// <summary>
-        /// Converts a BCD coded value to hex coded 
+        /// Converts a BCD coded value to hex coded
         /// </summary>
         /// <param name="value">BCD coded</param>
         /// <returns>Hex coded</returns>
         private static byte FromBCD(byte value)
         {
-            return (byte)(((value >> 4) & 0x0F) * 10 + (value & 0x0F));
+            return (byte)((value / 16 * 10) + (value & 0xF));
         }
 
         /// <summary>
@@ -289,9 +311,9 @@ namespace Cosmos.HAL
         {
             do
             {
-                rtc.Address.Byte = 10;
+                IOPort.Write8(Address, 10);
             }
-            while ((rtc.Data.Byte & 0x80) != 0);
+            while ((IOPort.Read8(Data) & 0x80) != 0);
         }
     }
 }

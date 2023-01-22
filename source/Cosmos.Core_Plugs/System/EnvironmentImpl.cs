@@ -19,6 +19,8 @@ namespace Cosmos.Core_Plugs.System
 
         public static string GetEnvironmentVariable(string variable) => null;
 
+        public static int get_CurrentManagedThreadId() => 0;
+
         public static void FailFast(string aString)
         {
             throw new NotImplementedException();
@@ -35,7 +37,7 @@ namespace Cosmos.Core_Plugs.System
         }
     }
 
-    [Plug(TargetName = "System.Environment+WindowsVersion, System.Private.CoreLib")]
+    [Plug(TargetName = "System.Environment+WindowsVersion, System.Private.CoreLib", IsOptional = true)]
     public static class WindowsVersionImpl
     {
         public static bool GetIsWindows8OrAbove()

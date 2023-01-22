@@ -29,9 +29,9 @@ namespace Cosmos.Core.Memory
         /// </summary>
         /// <param name="aSize">A size of block to alloc, in bytes.</param>
         /// <returns>Byte pointer to the start of the block.</returns>
-        public static byte* Alloc(uint aSize, byte aType = RAT.PageType.HeapLarge)
+        public static byte* Alloc(uint aSize, RAT.PageType aType = RAT.PageType.HeapLarge)
         {
-            uint xPages = ((aSize + PrefixBytes) / RAT.PageSize) + 1;
+            uint xPages = (aSize + PrefixBytes) / RAT.PageSize + 1;
             var xPtr = (uint*)RAT.AllocPages(aType, xPages);
             if (xPtr == null)
             {

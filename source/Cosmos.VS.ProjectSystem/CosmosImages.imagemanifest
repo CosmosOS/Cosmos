@@ -2,20 +2,17 @@
 <ImageManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                xmlns="http://schemas.microsoft.com/VisualStudio/ImageManifestSchema/2014">
-
     <Symbols>
         <String Name="Resources" Value="/Cosmos.VS.ProjectSystem;Component/Resources" />
-        <Guid Name="CosmosImagesGuid" Value="9feaa5d5-9298-4c74-915e-2d0ab67992f9" />
-        <ID Name="ProjectRootIcon" Value="0" />
+        <Guid Name="ManagedImagesGuid" Value="{4862ad45-3b62-4112-8dcd-cf2df64ff519}" />
+        <ID Name="CosmosProjectRootIcon" Value="2" />
     </Symbols>
-
     <Images>
-        <Image Guid="$(CosmosImagesGuid)" ID="$(ProjectRootIcon)">
-            <!--<Source Uri="$(Resources)/CosmosProjectRootIcon.xaml" />-->
-            <Source Uri="$(Resources)/CosmosProjectRootIcon.png" >
+        <Image Guid="$(ManagedImagesGuid)" ID="$(CosmosProjectRootIcon)">
+            <Source Uri="$(Resources)/CosmosProjectRootIcon.png">
                 <Size Value="16" />
             </Source>
         </Image>
     </Images>
-
+    <ImageLists />
 </ImageManifest>

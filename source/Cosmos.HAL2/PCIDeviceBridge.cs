@@ -30,7 +30,7 @@ namespace Cosmos.HAL
 
         public ushort IOBaseUpper16 { get; private set; }
         public ushort IOLimitUpper16 { get; private set; }
-        
+
         public byte CapabilityPointer { get; private set; }
 
         public uint ExpansionROMBaseAddress { get; private set; }

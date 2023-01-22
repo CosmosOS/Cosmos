@@ -2,6 +2,7 @@
 using Cosmos.HAL.BlockDevice;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using static Cosmos.HAL.BlockDevice.Ata;
 using static Cosmos.HAL.BlockDevice.ATA_PIO;
 
@@ -22,7 +23,12 @@ namespace Cosmos.HAL.BlockDevice
         /// <summary>
         /// Is the ATAPI drive on the Primary or Secondary channel of the IDE controller.
         /// </summary>
-        private bool Primary { get; set; }
+        public bool Primary { get; private set; }
+
+        /// <summary>
+        /// Get The max lba
+        /// </summary>
+        public ulong MaxLBA { get; private set; }
 
         /// <summary>
         /// Each IDE channel also has a Master or a Slave. This just gets or sets which position it is at.
@@ -30,7 +36,7 @@ namespace Cosmos.HAL.BlockDevice
         private BusPositionEnum BusPosition { get; set; }
         public override BlockDeviceType Type => BlockDeviceType.RemovableCD;
 
-        private ATA_PIO device;
+        public ATA_PIO device;
 
         /// <summary>
         /// Collection of predefined command packets to be sent to the ATAPI device
@@ -39,10 +45,11 @@ namespace Cosmos.HAL.BlockDevice
         {
             public static byte[] ReadSector = { (byte)ATA_PIO.Cmd.Read, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
             public static byte[] Unload = { (byte)ATA_PIO.Cmd.Eject, 0, 0, 0, 0x02, 0, 0, 0, 0, 0, 0, 0 };
+            public static byte[] GetMaxLBA = { 0x25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         }
 
         /// <summary>
-        /// Constructor for ATAPI speclevel device. 
+        /// Constructor for ATAPI speclevel device.
         /// </summary>
         /// <param name="parentDevice"></param>
         public ATAPI(ATA_PIO parentDevice)
@@ -56,6 +63,7 @@ namespace Cosmos.HAL.BlockDevice
             var p = BusPosition == BusPositionEnum.Master;
             Ata.AtaDebugger.Send("ATAPI: Primary controller: " + this.Primary + " Bus postion: IsMaster: " + p);
 
+            MaxLBA = GetMaxLBA();
             Init();
         }
 
@@ -74,7 +82,7 @@ namespace Cosmos.HAL.BlockDevice
                 INTs.SetIrqHandler(0x0F, HandleIRQ);
             }
 
-            IO.Control.Byte = 0; //Enable IRQs
+            IOPort.Write8(IO.Control, 0); //Enable IRQs
         }
 
         /// <summary>
@@ -127,7 +135,7 @@ namespace Cosmos.HAL.BlockDevice
             //Convert the buffer into bytes
             byte[] array = new byte[SectorSize];
             int counter = 0;
-            for (int i = 0; i < (SectorSize / 2); i++)
+            for (int i = 0; i < SectorSize / 2; i++)
             {
                 var item = buffer[i];
                 var bytes = BitConverter.GetBytes(item);
@@ -161,16 +169,16 @@ namespace Cosmos.HAL.BlockDevice
         private void SendCmd(byte[] AtapiPacket, int size, ref ushort[] outputData)
         {
             //Select the ATAPI device
-            IO.DeviceSelect.Byte = (byte)((byte)(DvcSelVal.Default | DvcSelVal.LBA | (BusPosition == BusPositionEnum.Slave ? DvcSelVal.Slave : 0)) | 0);
+            IOPort.Write8(IO.DeviceSelect, (byte)((byte)(DvcSelVal.Default | DvcSelVal.LBA | (BusPosition == BusPositionEnum.Slave ? DvcSelVal.Slave : 0)) | 0));
 
             //Wait for the select complete
             IO.Wait();
 
-            IO.Features.Byte = 0x00; //PIO Mode
+            IOPort.Write8(IO.Features, 0x00); //PIO Mode
 
             //Set commmand size
-            IO.LBA1.Byte = (byte)((SectorSize) & 0xFF);
-            IO.LBA2.Byte = (byte)((SectorSize >> 8) & 0xFF);
+            IOPort.Write8(IO.LBA1, SectorSize & 0xFF);
+            IOPort.Write8(IO.LBA2, (SectorSize >> 8) & 0xFF);
 
             //Send ATAPI packet command
             device.SendCmd(Cmd.Packet);
@@ -186,15 +194,15 @@ namespace Cosmos.HAL.BlockDevice
                 var b2 = AtapiPacket[i + 1];
 
                 var toSend = BitConverter.ToUInt16(new byte[] { b1, b2 }, 0);
-                IO.Data.Word = toSend;
+                IOPort.Write16(IO.Data, toSend);
 
                 i++;
             }
             Poll(true);
             CheckForErrors();
-            var a = (IO.LBA2.Byte << 8);
+            var a = IOPort.Read8(IO.LBA2) << 8;
 
-            var size2 = a | IO.LBA1.Byte;
+            var size2 = a | IOPort.Read8(IO.LBA1);
             if (size != size2)
             {
                 throw new Exception("[ATAPI] Packet size mismatch. Expected: " + size + " but got " + size2);
@@ -203,7 +211,7 @@ namespace Cosmos.HAL.BlockDevice
             outputData = new ushort[size2 / 2];
             if (size2 != 0)
             {
-                IO.Data.Read16(outputData);
+                IOPort.Read16(IO.Data, outputData);
             }
         }
 
@@ -230,14 +238,14 @@ namespace Cosmos.HAL.BlockDevice
                 // Wait for the ATAPI Device to no longer be busy...
                 if (checkDRQ)
                 {
-                    if ((IO.Status.Byte & (byte)ATA_PIO.Status.Busy) == 0 && (IO.Status.Byte & (byte)ATA_PIO.Status.DRQ) != 0)
+                    if ((IOPort.Read8(IO.Status) & (byte)ATA_PIO.Status.Busy) == 0 && (IOPort.Read8(IO.Status) & (byte)ATA_PIO.Status.DRQ) != 0)
                     {
                         break;
                     }
                 }
                 else
                 {
-                    if ((IO.Status.Byte & (byte)ATA_PIO.Status.Busy) == 0)
+                    if ((IOPort.Read8(IO.Status) & (byte)ATA_PIO.Status.Busy) == 0)
                     {
                         break;
                     }
@@ -250,19 +258,58 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
         private void CheckForErrors()
         {
-            if ((IO.Status.Byte & (byte)ATA_PIO.Status.Error) != 0)
+            if ((IOPort.Read8(IO.Status) & (byte)ATA_PIO.Status.Error) != 0)
             {
                 throw new Exception("ATA Error occured!");
             }
 
-            if ((IO.Status.Byte & (byte)ATA_PIO.Status.ATA_SR_DF) != 0)
+            if ((IOPort.Read8(IO.Status) & (byte)ATA_PIO.Status.ATA_SR_DF) != 0)
             {
                 throw new Exception("ATA device fault encountered!");
             }
-            if ((IO.Status.Byte & (byte)ATA_PIO.Status.DRQ) == 0)
+            if ((IOPort.Read8(IO.Status) & (byte)ATA_PIO.Status.DRQ) == 0)
             {
                 //throw new Exception("ATAPI DRQ not set");
             }
+        }
+        /// <summary>
+        ///  The function returns the max LBA value of the ATAPI device. Code is based on https://forum.osdev.org/viewtopic.php?f=1&t=14604"
+        /// </summary>
+        /// <returns>The maximum LBA</returns>
+        private ulong GetMaxLBA()
+        {
+            //Select the ATAPI device
+            IOPort.Write8(IO.DeviceSelect, (byte)(((byte)BusPosition << 4) + (1 << 6)));
+
+            //Wait for the select complete
+            IO.Wait();
+
+            // get max lba
+            ulong Max_LBA;
+            if (device.LBA48Bit)
+            {
+                device.SendCmd(Cmd.ReadNativeMaxAdressExt,false); // says not check errors
+
+                Max_LBA = IOPort.Read8(IO.LBA0);
+                Max_LBA += (ulong)(IOPort.Read8(IO.LBA1) << 8);
+                Max_LBA += (ulong)(IOPort.Read8(IO.LBA2) << 16);
+
+                IOPort.Write8(IO.Control, 0x80); // Set HOB to 1
+
+                Max_LBA += (ulong)(IOPort.Read8(IO.LBA0) << 24);
+                Max_LBA += (ulong)(IOPort.Read8(IO.LBA1) << 32);
+                Max_LBA += (ulong)(IOPort.Read8(IO.LBA2) << 40);
+            }
+            else
+            {
+                device.SendCmd(Cmd.ReadNativeMaxAdress,false); // says not check errors
+
+                Max_LBA = IOPort.Read8(IO.LBA0);
+                Max_LBA += (ulong)(IOPort.Read8(IO.LBA1) << 8);
+                Max_LBA += (ulong)(IOPort.Read8(IO.LBA2) << 16);
+                Max_LBA += (ulong)(IOPort.Read8(IO.DeviceSelect) & 0xF) << 24;
+            }
+            return Max_LBA;
         }
     }
 }

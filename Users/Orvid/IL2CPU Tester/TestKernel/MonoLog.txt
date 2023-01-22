@@ -1,2 +1,0 @@
-Test 'test_0_pass_float_ret_double' didn't return expected value. Expected: '0' Got: '11'
-Test 'test_0_multiple_cctor_calls_regress_679467' didn't return expected value. Expected: '0' Got: '0'

@@ -51,7 +51,7 @@ namespace Cosmos.System_Plugs.System
                     Console.WriteLine("' not found!");
                     throw new FormatException();
                 }
-                result = (short)((result * 10) + ind);
+                result = (short)(result * 10 + ind);
             }
 
             if (neg)

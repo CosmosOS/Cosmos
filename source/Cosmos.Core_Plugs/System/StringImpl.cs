@@ -252,7 +252,7 @@ namespace Cosmos.Core_Plugs.System
                         mDebugger.SendInternal(xParamNumber);
                         int xParamIndex = StringHelper.GetStringToNumber(xParamNumber);
                         mDebugger.SendInternal("Converted paramindex to a number.");
-                        if ((xParamIndex < aArgs.Length) && (aArgs[xParamIndex] != null))
+                        if (xParamIndex < aArgs.Length && aArgs[xParamIndex] != null)
                         {
                             string xParamValue = aArgs[xParamIndex].ToString();
                             xFormattedString = string.Concat(xFormattedString, xParamValue);
@@ -274,7 +274,7 @@ namespace Cosmos.Core_Plugs.System
                         xEndParamNumber = i;
                         // TODO: Need to handle different formats. (X, N, etc)
                     }
-                    else if ((char.IsDigit(xCharArray[i])) && (!xParamNumberDone))
+                    else if (char.IsDigit(xCharArray[i]) && !xParamNumberDone)
                     {
                         mDebugger.SendInternal("Getting param number.");
                         if (xStartParamNumber < 0)
@@ -677,78 +677,10 @@ namespace Cosmos.Core_Plugs.System
             return -1;
         }
 
-        //public static int nativeCompareOrdinalEx(string aStrA, int aIndexA, string aStrB, int aIndexB, int aCount)
-        //{
-        //    mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrA|aIndexA = {aStrA}|{aIndexA}, aStrB|aIndexB = {aStrB}|{aIndexB}, aCount = {aCount}");
-        //    if (aCount < 0)
-        //    {
-        //        throw new ArgumentOutOfRangeException(nameof(aCount));
-        //    }
-
-        //    if (aIndexA < 0 || aIndexA > aStrA.Length)
-        //    {
-        //        throw new ArgumentOutOfRangeException(nameof(aIndexA));
-        //    }
-
-        //    if (aIndexB < 0 || aIndexB > aStrB.Length)
-        //    {
-        //        throw new ArgumentOutOfRangeException(nameof(aIndexB));
-        //    }
-
-        //    if (aStrA == null)
-        //    {
-        //        mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is null");
-        //        if (aStrB == null)
-        //        {
-        //            mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is null");
-        //            mDebugger.SendInternal($"nativeCompareOrdinalEx : returning 0");
-        //            return 0;
-        //        }
-        //        mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is not null");
-        //        mDebugger.SendInternal($"nativeCompareOrdinalEx : returning -1");
-        //        return -1;
-        //    }
-        //    if (aStrB == null)
-        //    {
-        //        mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is not null");
-        //        mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is null");
-        //        mDebugger.SendInternal($"nativeCompareOrdinalEx : returning 1");
-        //        return 1;
-        //    }
-        //    int xLengthA = Math.Min(aStrA.Length, aCount - aIndexA);
-        //    int xLengthB = Math.Min(aStrB.Length, aCount - aIndexB);
-        //    //mDebugger.SendInternal($"nativeCompareOrdinalEx : xLengthA = {xLengthA}");
-        //    //mDebugger.SendInternal($"nativeCompareOrdinalEx : xLengthB = {xLengthB}");
-
-        //    if (xLengthA == xLengthB && aIndexA == aIndexB && ReferenceEquals(aStrA, aStrB))
-        //    {
-        //        mDebugger.SendInternal("nativeCompareOrdinalEx : xLengthA == xLengthB && aIndexA == aIndexB && aStrA is the same object asaStrB, returning 0");
-        //        return 0;
-        //    }
-
-        //    int xResult = 0;
-        //    if (xLengthA != xLengthB)
-        //    {
-        //        xResult = xLengthA - xLengthB;
-        //        mDebugger.SendInternal("nativeCompareOrdinalEx : xLengthA != xLengthB, returning " + xResult);
-        //    }
-
-        //    for (int i = 0; i < xLengthA; i++)
-        //    {
-        //        if (aStrA != aStrB)
-        //        {
-        //            xResult = (byte)aStrA[i] - (byte)aStrB[i];
-        //            mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA[i] != aStrB[i], returning " + xResult);
-        //            return xResult;
-        //        }
-        //    }
-
-        //    mDebugger.SendInternal("nativeCompareOrdinalEx (end of func) : aStrA[i] != aStrB[i], returning " + xResult);
-        //    return xResult;
-        //}
-
-        public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture) =>
-            aThis.StartsWith(aSubStr, aIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+        public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture)
+        {
+            return aThis.StartsWith(aSubStr, aIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+        }
 
         public static string Replace(string aThis, string oldValue, string newValue)
         {
@@ -788,7 +720,7 @@ namespace Cosmos.Core_Plugs.System
             for (int i = 0; i < aValue.Length; i++)
             {
                 int xAsciiCode = aValue[i];
-                if ((xAsciiCode <= upperAscii) && (xAsciiCode >= lowerAscii))
+                if (xAsciiCode <= upperAscii && xAsciiCode >= lowerAscii)
                 {
                     xChars[i] = (char)(xAsciiCode + offset);
                 }
@@ -803,7 +735,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static string FastAllocateString(int aLength)
         {
-            return new string(new char[aLength]);   
+            return new string(new char[aLength]);
         }
 
         [PlugMethod(IsOptional = true)]
@@ -837,7 +769,7 @@ namespace Cosmos.Core_Plugs.System
 
         private static unsafe int FastCompareStringHelper(uint* strAChars, int countA, uint* strBChars, int countB)
         {
-            int count = (countA < countB) ? countA : countB;
+            int count = countA < countB ? countA : countB;
 
 #if BIT64
             long diff = (long)((byte*)strAChars - (byte*)strBChars);
@@ -945,20 +877,20 @@ namespace Cosmos.Core_Plugs.System
                 // Reads are potentially unaligned
                 while ((count -= 2) >= 0)
                 {
-                    if ((*((uint*)((byte*)strBChars + diff)) - *strBChars) != 0)
+                    if (*(uint*)((byte*)strBChars + diff) - *strBChars != 0)
                     {
                         char* ptr1 = (char*)((byte*)strBChars + diff);
                         char* ptr2 = (char*)strBChars;
                         if (*ptr1 != *ptr2)
-                            return ((int)*ptr1 - (int)*ptr2);
-                        return ((int)*(ptr1 + 1) - (int)*(ptr2 + 1));
+                            return (int)*ptr1 - (int)*ptr2;
+                        return (int)*(ptr1 + 1) - (int)*(ptr2 + 1);
                     }
                     ++strBChars;
                 }
 
                 int c;
                 if (count == -1)
-                    if ((c = *((char*)((byte*)strBChars + diff)) - *((char*)strBChars)) != 0)
+                    if ((c = *(char*)((byte*)strBChars + diff) - *(char*)strBChars) != 0)
                         return c;
             }
 
@@ -980,7 +912,7 @@ namespace Cosmos.Core_Plugs.System
             /* Totally managed version but requires changes to IL2CPU to work */
 #if true
             // Please note that Argument validation should be handled by callers.
-            int count = (countA < countB) ? countA : countB;
+            int count = countA < countB ? countA : countB;
             int xResult = 0;
 
             strA = strA.Substring(indexA);
@@ -1040,6 +972,41 @@ namespace Cosmos.Core_Plugs.System
 
                 default:
                     throw new ArgumentException("Not Supported StringComparison");
+            }
+        }
+
+        public static unsafe int GetNonRandomizedHashCode(string aString)
+        {
+            // the code is the same as the one used in .net except for the explicit == 2 and == 1 cases
+            // we need this since a new object can start directly behind the string in memory, so the standard
+            // implementation would read the allocated size of the next object and use it for the hash
+            fixed (char* ptr = &aString.AsSpan()[0])
+            {
+                uint num = 352654597u;
+                uint num2 = num;
+                uint* ptr2 = (uint*)ptr;
+                int num3 = aString.Length;
+                while (num3 >= 4)
+                {
+                    num3 -= 4;
+                    num = (global::System.Numerics.BitOperations.RotateLeft(num, 5) + num) ^ *ptr2;
+                    num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ ptr2[1];
+                    ptr2 += 2;
+                }
+				if (num3 == 3)
+                {
+                    num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ *ptr2;
+					num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ ((char*)ptr2)[2];
+                }
+                else if (num3 == 2)
+                {
+                    num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ *ptr2;
+                }
+                else if (num3 == 1)
+                {
+                    num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ *(char*)ptr2;
+                }
+                return (int)(num + num2 * 1566083941);
             }
         }
     }

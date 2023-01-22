@@ -185,5 +185,15 @@ namespace Cosmos.System
         {
             Beep((uint)note, (uint) duration);
         }
+
+        // TODO: continue exception list, once HAL is documented.
+        /// <summary>
+        /// Play beep sound, at a specified frequency for one eighth.
+        /// </summary>
+        /// <param name="note">A note to play.</param>
+        public static void Beep(Notes note)
+        {
+            Beep((uint)note, (uint) Durations.Default);
+        }
     }
 }
