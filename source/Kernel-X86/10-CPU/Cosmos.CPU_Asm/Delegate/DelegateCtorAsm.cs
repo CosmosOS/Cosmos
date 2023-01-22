@@ -9,7 +9,7 @@ namespace Cosmos.CPU_Asm {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo) {
             // method signature: $this, object @object, IntPtr method
             var xAssembler = aAssembler;
-            var xMethodInfo = (_MethodInfo)aMethodInfo;
+            var xMethodInfo = (Il2cpuMethodInfo)aMethodInfo;
             XS.Comment("Save target ($this) to field");
             XS.Comment("-- ldarg 0");
             Ldarg.DoExecute(xAssembler, xMethodInfo, 0);

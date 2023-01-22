@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.Win32;
 
 //using Vestris.VMWareLib;
@@ -14,6 +16,7 @@ namespace Cosmos.Debug.Hosts {
     protected string mDir;
     protected string mVmxPath;
     protected Process mProcess;
+    protected Process[] mProcessesBefore, mProcessesAfter, mProcesses;
     protected string mWorkstationPath;
     protected string mPlayerPath;
     protected string mHarddisk;
@@ -88,22 +91,64 @@ namespace Cosmos.Debug.Hosts {
       }
       xPSI.UseShellExecute = false;  //must be true to allow elevate the process, sometimes needed if vmware only runs with admin rights
       mProcess.EnableRaisingEvents = true;
-      mProcess.Exited += delegate(object aSender, EventArgs e) {
-        if (OnShutDown != null) {
-          OnShutDown(aSender, e);
-        }
-      };
+      mProcess.Exited += ExitCallback;
+
+      mProcessesBefore = Process.GetProcessesByName("vmware-vmx");
       mProcess.Start();
+
+      Stopwatch watch = Stopwatch.StartNew();
+
+      // Wait for the process to spawn
+      mProcessesAfter = Process.GetProcessesByName("vmware-vmx");
+      while (mProcessesAfter.Length == mProcessesBefore.Length)
+      {
+        if (watch.Elapsed.Seconds == 15)
+        {
+          watch.Stop();
+          throw new TimeoutException("VMware Workstation took too long to launch!");
+        }
+
+        mProcessesAfter = Process.GetProcessesByName("vmware-vmx");
+      }
+
+      // Get the new processes
+      mProcesses = mProcessesBefore.Concat(mProcessesAfter).Distinct().ToArray();
+    }
+
+    private void ExitCallback(object sender, EventArgs e)
+    {
+      if (null != OnShutDown)
+      {
+        try
+        {
+          OnShutDown(sender, e);
+        }
+        catch
+        {
+        }
+      }
     }
 
     public override void Stop() {
-      //using (var xHost = new VMWareVirtualHost()) {
-      //  ConnectToVMWare(xHost);
-      //  using (var xMachine = xHost.Open(mVmxPath)) {
-      //    xMachine.PowerOff();
-      //  }
-      //  xHost.Close();
-      //}
+      if (null != mProcess)
+      {
+        try
+        {
+          //TODO: Close VMWare properly
+
+          // Kill the VMware GUI
+          mProcess.Kill();
+
+          // Kill the actual VM instance
+          foreach (var process in mProcesses)
+          {
+            process.Kill();
+          }
+        }
+        catch
+        {
+        }
+      }
       Cleanup();
     }
 

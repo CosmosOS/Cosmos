@@ -8,125 +8,153 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cosmos.HAL;
+using Cosmos.System.Network.IPv4;
 
 namespace Cosmos.System.Network.Config
 {
+    /// <summary>
+    /// Network Configuration (link network device to an ip address)
+    /// </summary>
     public class NetworkConfig
     {
-        public static List<NetworkDevice> Keys = new List<NetworkDevice>();
-        public static List<IPConfig> Values = new List<IPConfig>();
-        public static KeyValuePair<NetworkDevice, IPConfig> CurrentConfig;
+        /// <summary>
+        /// Network device
+        /// </summary>
+        public NetworkDevice Device;
 
-        public IPConfig this[NetworkDevice key]
+        /// <summary>
+        /// IPv4 Configuration
+        /// </summary>
+        public IPConfig IPConfig;
+
+        /// <summary>
+        /// NetworkConfig ctor
+        /// </summary>
+        /// <param name="device">Network device.</param>
+        /// <param name="config">IP Config</param>
+        internal NetworkConfig(NetworkDevice device, IPConfig config)
         {
-            get
-            {
-                return Get(key);
-            }
-            set
-            {
-                Values[Keys.IndexOf(key)] = value;
-            }
+            Device = device;
+            IPConfig = config;
         }
+    }
 
+    /// <summary>
+    /// Network stack configuration
+    /// </summary>
+    public static class NetworkConfiguration
+    {
+        /// <summary>
+        /// Current network configuration used by the network stack
+        /// </summary>
+        public static NetworkConfig CurrentNetworkConfig { get; set; }
+
+        /// <summary>
+        /// Current network configuration used by the network stack
+        /// </summary>
+        public static List<NetworkConfig> NetworkConfigs = new List<NetworkConfig>();
+
+        /// <summary>
+        /// Network congiruations count
+        /// </summary>
         public static int Count
         {
-            get
+            get { return NetworkConfigs.Count; }
+        }
+
+        /// <summary>
+        /// Current IPv4 address
+        /// </summary>
+        public static Address CurrentAddress
+        {
+            get { return CurrentNetworkConfig.IPConfig.IPAddress; }
+        }
+
+        /// <summary>
+        /// Set current network config
+        /// </summary>
+        /// <param name="device">Network device.</param>
+        /// <param name="config">IP Config</param>
+        public static void SetCurrentConfig(NetworkDevice device, IPConfig config)
+        {
+            CurrentNetworkConfig = new NetworkConfig(device, config);
+        }
+
+        /// <summary>
+        /// Add new network config
+        /// </summary>
+        /// <param name="device">Network device.</param>
+        /// <param name="config">IP Config</param>
+        public static void AddConfig(NetworkDevice device, IPConfig config)
+        {
+            NetworkConfigs.Add(new NetworkConfig(device, config));
+        }
+
+        /// <summary>
+        /// Network stack contains device
+        /// </summary>
+        /// <param name="device">Network device.</param>
+        public static bool ConfigsContainsDevice(NetworkDevice k)
+        {
+            if (NetworkConfigs == null)
             {
-                return Keys.Count;
+                return false;
+            }
+            else
+            {
+                foreach (var device in NetworkConfigs)
+                {
+                    if (k == device.Device)
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 
-        public static bool ContainsKey(NetworkDevice k)
+        /// <summary>
+        /// Clear network configurations
+        /// </summary>
+        public static void ClearConfigs()
         {
-            foreach (var device in Keys)
+            NetworkConfigs.Clear();
+        }
+
+        /// <summary>
+        /// Get ip config for network device
+        /// </summary>
+        /// <param name="device">Network device.</param>
+        public static IPConfig Get(NetworkDevice device)
+        {
+            foreach (var networkConfig in NetworkConfigs)
             {
-                if (k == device)
+                if (device == networkConfig.Device)
                 {
-                    return true;
+                    return networkConfig.IPConfig;
                 }
             }
-            return false;
+
+            return null;
         }
 
-        public static IPConfig Get(NetworkDevice key)
-        {
-            int index = 0;
-
-            foreach (var device in Keys)
-            {
-                if (key == device)
-                {
-                    break;
-                }
-                index++;
-            }
-
-            return Values[index];
-        }
-
-        public static void Add(NetworkDevice key, IPConfig value)
-        {
-            Keys.Add(key);
-            Values.Add(value);
-        }
-
-        public static NetworkDevice[] GetKeys()
-        {
-            return Keys.ToArray();
-        }
-
-        public static IPConfig[] GetValues()
-        {
-            return Values.ToArray();
-        }
-
-        public static NetworkDevice GetKeyByValue(IPConfig value)
-        {
-            var x = Values.IndexOf(value);
-            var x_ = Keys[x];
-            return x_;
-        }
-
+        /// <summary>
+        /// Remove Config for network device
+        /// </summary>
+        /// <param name="device">Network device.</param>
         public static void Remove(NetworkDevice key)
         {
             int index = 0;
 
-            foreach (var device in Keys)
+            foreach (var networkConfig in NetworkConfigs)
             {
-                if (key == device)
+                if (key == networkConfig.Device)
                 {
                     break;
                 }
                 index++;
             }
-            Keys.RemoveAt(index);
-            Values.RemoveAt(index);
+            NetworkConfigs.RemoveAt(index);
         }
-
-        public static void Clear()
-        {
-            Keys = new List<NetworkDevice>();
-            Values = new List<IPConfig>();
-        }
-
-        /// <summary>
-        /// Get Values
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerator GetEnumerator_V()
-        {
-            return ((IEnumerable)Values).GetEnumerator();
-        }
-
-        /// <summary>
-        /// Default GetEnumerator (Keys)
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerator GetEnumerator()
-        {
-            return ((IEnumerable)Keys).GetEnumerator();
-        }
-
     }
 }

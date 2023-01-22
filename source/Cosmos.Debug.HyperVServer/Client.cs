@@ -42,18 +42,6 @@ namespace Cosmos.Debug.HyperVServer
                 PipeDirection.InOut,
                 PipeOptions.Asynchronous);
 
-            var pipeSecurity = new PipeSecurity();
-
-            var identity = WindowsIdentity.GetCurrent().User;
-
-            var pipeAccessRule = new PipeAccessRule(
-                identity,
-                PipeAccessRights.ReadWrite | PipeAccessRights.CreateNewInstance,
-                AccessControlType.Allow);
-
-            pipeSecurity.AddAccessRule(pipeAccessRule);
-            pipeSecurity.SetOwner(identity);
-
             _namedPipeServer = new NamedPipeServerStream(
                 "CosmosSerial",
                 PipeDirection.InOut,
@@ -61,9 +49,7 @@ namespace Cosmos.Debug.HyperVServer
                 PipeTransmissionMode.Byte,
                 PipeOptions.Asynchronous,
                 256,
-                256,
-                pipeSecurity,
-                HandleInheritability.None);
+                256);
 
             var namedPipeConnectionTask = Task.Run(WaitForNamedPipeConnections);
 

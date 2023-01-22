@@ -98,8 +98,8 @@ namespace Cosmos.Core
 
         public static void SetTypeInfo(int aType, uint aBaseType, uint aSize, uint aInterfaceCount, uint[] aInterfaceIndexes,
           uint aMethodCount, uint[] aMethodIndexes, uint[] aMethodAddresses,
-          uint aInterfaceMethodCount, uint[] aInterfaceMethodIndexes, uint[] aTargetMethodIndexes, uint aGCFieldCount, uint[] aGCFieldOffsets, uint[] aGCFieldTypes,
-          bool aIsValueType, bool aIsStruct)
+          uint aInterfaceMethodCount, uint[] aInterfaceMethodIndexes, uint[] aTargetMethodIndexes, uint aGCFieldCount,
+          uint[] aGCFieldOffsets, uint[] aGCFieldTypes, bool aIsValueType, bool aIsStruct, string aName, string aAssemblyQualifiedName)
         {
             var vTable = new VTable();
             vTable.BaseTypeIdentifier = aBaseType;
@@ -114,6 +114,8 @@ namespace Cosmos.Core
             vTable.TargetMethodIndexes = aTargetMethodIndexes;
             vTable.IsValueType = aIsValueType;
             vTable.IsStruct = aIsStruct;
+            vTable.Name = aName;
+            vTable.AssemblyQualifiedName = aAssemblyQualifiedName;
             mTypes[aType] = vTable;
             var gcTable = new GCTable();
             gcTable.GCFieldCount = aGCFieldCount;
@@ -353,10 +355,68 @@ namespace Cosmos.Core
         {
             return mTypes[aType].IsStruct;
         }
+
+        /// <summary>
+        /// Gets the Name of the type
+        /// </summary>
+        /// <param name="aType"></param>
+        /// <returns></returns>
+        public static string GetName(uint aType)
+        {
+            return mTypes[aType].Name;
+        }
+
+        /// <summary>
+        /// Gets the Assembly Qualified Name for the type
+        /// </summary>
+        /// <param name="aType"></param>
+        /// <returns></returns>
+        public static string GetAssemblyQualifiedName(uint aType)
+        {
+            return mTypes[aType].AssemblyQualifiedName;
+        }
+
+        /// <summary>
+        /// Get type id of type matching the name
+        /// The name can either be name of the class or the assembly qualified name
+        /// Only inlcuding the first or first two parts of the assembly qualified name also works
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>Returns -1 if no type can be found</returns>
+        public static int GetType(string name)
+        {
+            for (int i = 0; i < mTypes.Length; i++)
+            {
+                var currType = mTypes[i];
+                if (currType.Name == name || currType.AssemblyQualifiedName == name)
+                {
+                    return i;
+                }
+                else
+                {
+                    bool difference = false;
+                    for (int k = 0; k < name.Length; k++)
+                    {
+                        if (name[k] != currType.AssemblyQualifiedName[k])
+                        {
+                            difference = true;
+                            break;
+                        }
+                    }
+                    if (!difference)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return -1;
+        }
     }
 
     public struct VTable
     {
+        public string Name;
+        public string AssemblyQualifiedName;
         public uint BaseTypeIdentifier;
         public uint Size;
 

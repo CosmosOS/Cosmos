@@ -2,7 +2,7 @@
 using System;
 namespace Cosmos.Core_Plugs.Interop
 {
-    [Plug("Interop+Kernel32, System.Private.CoreLib")]
+    [Plug("Interop+Kernel32, System.Private.CoreLib", IsOptional = true)]
     class Kernel32Impl
     {
         [PlugMethod(Signature = "System_Int32__Interop_Kernel32_LCMapStringEx_System_String__System_UInt32__System_Char___System_Int32__System_Void___System_Int32__System_Void___System_Void___System_IntPtr_")]
@@ -118,6 +118,20 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
-    }
 
+        public static bool SetThreadErrorMode(
+           uint dwNewMode,
+           out uint lpOldMode)
+        {
+            //TODO
+            lpOldMode = 0;
+            return true;
+        }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Kernel32_WriteFile_System_Runtime_InteropServices_SafeHandle__System_Byte___System_Int32___System_Int32__System_Threading_NativeOverlapped__")]
+        public static unsafe int WriteFile(global::System.Runtime.InteropServices.SafeHandle aSafeHandle, byte* aBytePtr, int aInt, ref int aRefInt, global::System.Threading.NativeOverlapped* aNativeOverlappedPtr)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

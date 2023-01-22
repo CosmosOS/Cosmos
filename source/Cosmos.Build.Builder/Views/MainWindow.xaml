@@ -1,17 +1,20 @@
-﻿<Window x:Class="Cosmos.Build.Builder.Views.MainWindow"
+﻿<ui:UiWindow x:Class="Cosmos.Build.Builder.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
         Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
         MinHeight="480"
         MinWidth="800"
         Title="Cosmos Kit Builder"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         WindowStartupLocation="CenterScreen"
-        WindowState="{Binding WindowState}" 
-        Style="{StaticResource UiWindow}">
+        WindowState="{Binding WindowState}"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        WindowCornerPreference="Round">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
@@ -21,52 +24,72 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
-        <wpfui:TitleBar Grid.Row="0" ApplicationNavigation="True" Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico" Title="Cosmos Builder"/>
-
-        <DockPanel Grid.Row="1">
+        <ui:TitleBar Grid.Row="0" Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico" Title="Cosmos Builder"/>
+        <DockPanel Grid.Row="1" Margin="5">
 
             <Grid DockPanel.Dock="Bottom" Height="46">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="96" />
+                    <!--Padding-->
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="144" />
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="101"/>
+                    <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="15" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0"
+                <Button Grid.Column="1"
                     Command="{Binding CopyCommand}"
-                    Content="Copy log" Width="96" Height="46"
-                        Padding="10,10,10,10"/>
+                    Content="Copy log" Width="96" Height="36"
+                        Padding="5,5,5,5" HorizontalAlignment="Center"/>
 
-                <CheckBox Grid.Column="2"
+                <Button Grid.Column="3"
+                    Command="{Binding PostPaste}"
+                    Content="Publish on Hastebin" Height="36"
+                        Padding="5,5,5,5" Width="144" HorizontalAlignment="Center"/>
+
+                <Button Grid.Column="5"
+                    Command="{Binding RetryBuild}"
+                    Content="Rebuild" Height="36"
+                        Padding="5,5,5,5" Width="101" HorizontalAlignment="Center"/>
+
+                <CheckBox Grid.Column="7"
                       IsChecked="{Binding CloseWhenCompleted}"
-                      Content="Close when finished" Height="39" Margin="0,0,20,7" />
+                      Content="Close when finished" Height="39" VerticalAlignment="Top" HorizontalAlignment="Center" Width="153" Margin="0,10,0,0" />
             </Grid>
-
             <Rectangle DockPanel.Dock="Top"
                    Height="5" />
             <TextBlock DockPanel.Dock="Top"
+                   Margin="5"
                    FontSize="26"
                    FontWeight="Medium"
-                   Text="{Binding CurrentSection.Name, StringFormat='  Build status: {0}', FallbackValue='  Starting build...'}" />
-            <ItemsControl DockPanel.Dock="Top"
-                      Background="Black"
-                      BorderBrush="DarkGray"
-                      BorderThickness="0.5"
-                      FontSize="16"
-                      Foreground="Green"
-                      Margin="0,4"
-                      ItemsSource="{Binding TailItems}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="DarkGray"
+                   Text="{Binding CurrentSection.Name, StringFormat='Build status: {0}', FallbackValue='Starting build...'}" />
+            <Border
+                DockPanel.Dock="Top"
+                Background="Black"
+                BorderBrush="DarkGray"
+                BorderThickness="0.5"
+                CornerRadius="5"
+                Margin="5,5,5,5"
+                Padding="5,5,5,5">
+                <ItemsControl 
+                    FontSize="14"
+                    Foreground="DarkGray"
+                    ItemsSource="{Binding TailItems}" FontFamily="Cascadia Code">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="DarkGray"
                             BorderThickness="0.5"
                             Padding="4,0">
-                            <TextBlock Text="{Binding}" />
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                                <TextBlock Text="{Binding}" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
 
             <Rectangle DockPanel.Dock="Top"
                    Height="5"
@@ -76,7 +99,7 @@
                 <ItemsControl ItemsSource="{Binding Sections}" HorizontalAlignment="Stretch">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <HeaderedContentControl>
+                            <HeaderedContentControl Margin="5,0,5,5">
                                 <HeaderedContentControl.Header>
                                     <ToggleButton x:Name="sectionToggleButton"
                                               FontSize="18"
@@ -87,9 +110,7 @@
                                               >
                                         <ToggleButton.Style>
                                             <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                                <Setter Property="Foreground" Value="Green" />
-
-
+                                                
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding HasLoggedErrors}" Value="True">
                                                         <Setter Property="Foreground" Value="White" />
@@ -125,8 +146,20 @@
                                         </ToggleButton.Style>
                                     </ToggleButton>
                                 </HeaderedContentControl.Header>
-                                <TextBlock Visibility="{Binding IsChecked, ElementName=sectionToggleButton, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                       Text="{Binding Log}" />
+                                <Border
+                                    Background="Black"
+                                    CornerRadius="5,5,5,5">
+                                    <StackPanel>
+                                        <TextBlock
+                                            Margin="5,5,5,5"
+                                            Visibility="{Binding IsChecked, ElementName=sectionToggleButton, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            FontSize="14"
+                                            ToolTip="Click to copy"
+                                            FontFamily="Cascadia Code"
+                                            Foreground="DarkGray"
+                                            Text="{Binding Log}" MouseUp="SectionTextCopyHandler"/>
+                                    </StackPanel>
+                                </Border>
                             </HeaderedContentControl>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -135,4 +168,4 @@
 
         </DockPanel>
     </Grid>
-</Window>
+</ui:UiWindow>

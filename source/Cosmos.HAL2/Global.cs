@@ -85,6 +85,8 @@ namespace Cosmos.HAL
             {
                 mDebugger.Send("Network Driver disabled in User Kernel");
             }
+            Console.WriteLine("Enabling Serial Output on COM1");
+            SerialPort.Enable(SerialPort.COM1);
             mDebugger.Send("Done initializing Cosmos.HAL.Global");
 
         }

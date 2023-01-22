@@ -39,6 +39,8 @@ namespace Cosmos.Debug.Hosts
 
     private string _useSerialOutput;
 
+    private string _debugACPIEnable;
+
     public bool RedirectOutput = false;
 
     public Action<string> LogOutput;
@@ -54,7 +56,6 @@ namespace Cosmos.Debug.Hosts
       {
         _harddiskFile = aHarddisk;
       }
-
 
       if (aParams.ContainsKey("ISOFile"))
       {
@@ -83,7 +84,6 @@ namespace Cosmos.Debug.Hosts
       }
       if (aParams.ContainsKey("QemuUseCustomParameters"))
       {
-
         bool Check;
         Boolean.TryParse(aParams["QemuUseCustomParameters"], out Check);
         if (Check)
@@ -102,7 +102,7 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["QemuHWAccel"], out Accel);
         if (Accel)
         {
-          _hardwareAccel = "-accel hax";
+          _hardwareAccel = " -accel hax";
         }
       }
       if (aParams.ContainsKey("QemuUSBKeyboard"))
@@ -111,7 +111,7 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["QemuUSBKeyboard"], out Keyboard);
         if (Keyboard)
         {
-          _useUSBKeyboard = "-usbdevice keyboard";
+          _useUSBKeyboard = " -usbdevice keyboard";
         }
       }
       if (aParams.ContainsKey("QemuUSBMouse"))
@@ -120,7 +120,7 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["QemuUSBMouse"], out Mouse);
         if (Mouse)
         {
-          _useUSBMouse = "-usbdevice mouse";
+          _useUSBMouse = " -usbdevice mouse";
         }
       }
       if (aParams.ContainsKey("QemuUseSerial"))
@@ -129,7 +129,7 @@ namespace Cosmos.Debug.Hosts
         Boolean.TryParse(aParams["QemuUseSerial"], out Serial);
         if (Serial)
         {
-          _useSerialOutput = "-serial stdio";
+          _useSerialOutput = " -serial file:CON";
         }
       }
       if (aParams.ContainsKey("QemuNetworkDevice"))
@@ -147,11 +147,11 @@ namespace Cosmos.Debug.Hosts
       {
         if (aParams["QemuAudioDriver"] == "SoundBlaster16")
         {
-          _audioDriver = "-soundhw sb16";
+          _audioDriver = " -device sb16";
         }
         if (aParams["QemuAudioDriver"] == "AC97")
         {
-          _audioDriver = "-soundhw ac97";
+          _audioDriver = " -device ac97";
         }
 
       }
@@ -163,57 +163,129 @@ namespace Cosmos.Debug.Hosts
         }
         else if (aParams["QemuVideoDriver"] == "VBE")
         {
-          _videoDriver = "-vga std";
+          _videoDriver = " -vga std";
         }
         else if (aParams["QemuVideoDriver"] == "VMWare")
         {
-          _videoDriver = "-vga vmware";
+          _videoDriver = " -vga vmware";
         }
         else if (aParams["QemuVideoDriver"] == "Cirrus")
         {
-          _videoDriver = "-vga cirrus";
+          _videoDriver = " -vga cirrus";
+        }
+        else if (aParams["QemuVideoDriver"] == "Bochs")
+        {
+          _videoDriver = " -vga none -device bochs-display";
         }
       }
-      if (aParams.ContainsKey("QemuLocationParameters"))
+      if(aParams.ContainsKey("DebugEnabled"))
+      {
+        bool EnableAcpi;
+        Boolean.TryParse(aParams["DebugEnabled"], out EnableAcpi);
+          if(EnableAcpi)
+          {
+            _debugACPIEnable = " -no-acpi";
+          }
+          else
+          {
+            _debugACPIEnable = String.Empty;
+          }
+      }
+      if(aParams.ContainsKey("QemuHWAccelWHPX"))
+      {
+        bool WHPX;
+        Boolean.TryParse(aParams["QemuHWAccelWHPX"],out WHPX);
+        if(WHPX)
+        {
+          _hardwareAccel = " -accel whpx";
+        }
+      }
+      if (aParams.ContainsKey("QemuUseCustomLocation"))
       {
         bool UseCustomExe;
         Boolean.TryParse(aParams["QemuUseCustomLocation"], out UseCustomExe);
+
         if (UseCustomExe)
         {
-              _launchExe = aParams["QemuLocationParameters"];
+          _launchExe = aParams["QemuLocationParameters"];
         }
         else
         {
-            _launchExe = QemuSupport.QemuExe.FullName;
+          SetDefaultPath();
         }
+      }
+      else
+      {
+        SetDefaultPath();
       }
 
       _debugPortString = @"Cosmos\Serial";
+    }
+
+    private void SetDefaultPath()
+    {
+      string defaultPath = @"C:\qemu\qemu-system-i386.exe";
+
+      if (!File.Exists(defaultPath))
+      {
+        defaultPath = @"C:\Program Files\qemu\qemu-system-i386.exe";
+
+        if (!File.Exists(defaultPath))
+        {
+          throw new Exception("Checked paths C:\\Program Files\\qemu and C:\\qemu and could not find QEMU.");
+        }
+      }
+
+      _launchExe = defaultPath;
     }
 
     public override void Start()
     {
       qemuProcess = new Process();
       var qemuStartInfo = qemuProcess.StartInfo;
+      qemuStartInfo.FileName = _launchExe;
 
-        qemuStartInfo.FileName = _launchExe;
-
-      string xQemuArguments = "-m " + _memoryAssign;
-      xQemuArguments += $" -cdrom {_isoFile}";
+      StringBuilder xQemuArguments = new StringBuilder();
+      xQemuArguments.Append("-m ");
+      xQemuArguments.Append(_memoryAssign);
+      xQemuArguments.Append(" -cdrom \"");
+      xQemuArguments.Append(_isoFile);
+      xQemuArguments.Append("\" -name \"Cosmos Project: ");
+      xQemuArguments.Append(_projectName);
+      xQemuArguments.Append('"');
+      xQemuArguments.Append(_videoDriver);
+      xQemuArguments.Append(_audioDriver);
+      xQemuArguments.Append(" -boot d");
+      xQemuArguments.Append(_debugACPIEnable);
+      xQemuArguments.Append(_useSerialOutput);
+      xQemuArguments.Append(_useUSBKeyboard);
+      xQemuArguments.Append(_useUSBMouse);
+      xQemuArguments.Append(_hardwareAccel);
+      xQemuArguments.Append(' ');
+      xQemuArguments.Append(_customArgs);
 
       if (!string.IsNullOrWhiteSpace(_harddiskFile))
       {
-        xQemuArguments += $" -hda \"{_harddiskFile}\"";
+        xQemuArguments.Append(" -hda \"");
+        xQemuArguments.Append(_harddiskFile);
+        xQemuArguments.Append('"');
       }
 
       if (!string.IsNullOrWhiteSpace(_debugPortString))
       {
-        xQemuArguments += @" -chardev pipe,path="+_debugPortString+",id=Cosmos -device isa-serial,chardev=Cosmos";
+        xQemuArguments.Append(" -chardev pipe,path=");
+        xQemuArguments.Append(_debugPortString);
+        xQemuArguments.Append(",id=Cosmos -device isa-serial,chardev=Cosmos");
       }
 
-      xQemuArguments += " -name \"Cosmos Project: " + _projectName + "\"  -device "+_networkDevice+",netdev=n1 -netdev user,id=n1 "+_videoDriver+" "+_audioDriver+ " -boot d -no-shutdown -no-reboot " + _customArgs + " " + _useUSBKeyboard + " " + _useUSBMouse + " " + _hardwareAccel;
+      if (!string.IsNullOrWhiteSpace(_networkDevice))
+      {
+        xQemuArguments.Append(" -device ");
+        xQemuArguments.Append(_networkDevice);
+        xQemuArguments.Append(",netdev=n1 -netdev user,id=n1");
+      }
 
-      qemuStartInfo.Arguments = xQemuArguments;
+      qemuStartInfo.Arguments = xQemuArguments.ToString();
       if (RedirectOutput)
       {
         if (LogOutput == null)
@@ -226,7 +298,6 @@ namespace Cosmos.Debug.Hosts
           throw new Exception("No LogError handler specified!");
         }
       }
-
       qemuProcess.EnableRaisingEvents = true;
       qemuProcess.Exited += ExitCallback;
       qemuProcess.Start();
@@ -263,14 +334,6 @@ namespace Cosmos.Debug.Hosts
         {
         }
       }
-
-      Cleanup();
-    }
-
-    private void Cleanup()
-    {
-      OnShutDown(this, null);
-      qemuProcess.Exited -= ExitCallback;
     }
   }
 }

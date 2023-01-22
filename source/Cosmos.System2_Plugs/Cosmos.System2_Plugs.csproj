@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>Cosmos.System_Plugs</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Configurations>Debug;Release;TEST</Configurations>
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,5 +19,13 @@
         <ProjectReference Include="..\Cosmos.HAL2\Cosmos.HAL2.csproj" />
         <ProjectReference Include="..\Cosmos.System2\Cosmos.System2.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="System\Runtime\CompilerServices\" />
+    </ItemGroup>
+
+    <PropertyGroup Condition=" '$(OS)' == 'Unix' ">
+        <DefineConstants>OS_LINUX</DefineConstants>
+    </PropertyGroup>
 
 </Project>

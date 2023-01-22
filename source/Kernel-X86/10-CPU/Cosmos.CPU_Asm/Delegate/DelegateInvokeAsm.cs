@@ -13,7 +13,7 @@ namespace Cosmos.CPU_Asm {
     public class DelegateInvokeAsm : AssemblerMethod {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo) {
             var xAssembler = aAssembler;
-            var xMethodInfo = (_MethodInfo)aMethodInfo;
+            var xMethodInfo = (Il2cpuMethodInfo)aMethodInfo;
             var xMethodBaseAsInfo = xMethodInfo.MethodBase as global::System.Reflection.MethodInfo;
             if (xMethodBaseAsInfo.ReturnType != typeof(void)) {
                 throw new Exception("Events with return type not yet supported!");

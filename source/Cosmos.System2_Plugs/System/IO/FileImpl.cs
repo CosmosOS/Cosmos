@@ -40,9 +40,17 @@ namespace Cosmos.System_Plugs.System.IO
             using (var xSW = new StreamWriter(aFile))
             {
                 foreach (var current in contents)
-                { 
+                {
                     xSW.WriteLine(current);
                 }
+            }
+        }
+
+        public static void WriteAllBytes(string aFile, byte[] aData)
+        {
+            using (var xSW = new BinaryWriter(new FileStream(aFile, FileMode.OpenOrCreate)))
+            {
+                xSW.Write(aData);
             }
         }
     }

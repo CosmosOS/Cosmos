@@ -138,7 +138,7 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// Handle received packets according to current TCP connection Status. Also contains TCB (Transmission Control Block) information.
     /// See <a href="https://datatracker.ietf.org/doc/html/rfc793">RFC 793</a> for more information.
     /// </summary>
-    internal class Tcp
+    public class Tcp
     {
         /// <summary>
         /// TCP Window Size.
@@ -232,12 +232,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Local EndPoint.
         /// </summary>
-        internal EndPoint LocalEndPoint;
+        public EndPoint LocalEndPoint;
 
         /// <summary>
         /// Remote EndPoint.
         /// </summary>
-        internal EndPoint RemoteEndPoint;
+        public EndPoint RemoteEndPoint;
 
         /// <summary>
         /// Connection Transmission Control Block.
@@ -254,7 +254,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Connection status.
         /// </summary>
-        internal Status Status;
+        public Status Status;
 
         /// <summary>
         /// TCP Received Data.
@@ -371,7 +371,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 RemoteEndPoint.Port = packet.SourcePort;
 
                 var rnd = new Random();
-                var sequenceNumber = (uint)((rnd.Next(0, Int32.MaxValue)) << 32) | (uint)(rnd.Next(0, Int32.MaxValue));
+                var sequenceNumber = (uint)(rnd.Next(0, Int32.MaxValue) << 32) | (uint)rnd.Next(0, Int32.MaxValue);
 
                 //Fill TCB
                 TCB.SndUna = sequenceNumber;
@@ -454,7 +454,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             else if (packet.ACK)
             {
                 //Check for bad ACK packet
-                if ((packet.AckNumber - TCB.ISS) < 0 || (packet.AckNumber - TCB.SndNxt) > 0)
+                if (packet.AckNumber - TCB.ISS < 0 || packet.AckNumber - TCB.SndNxt > 0)
                 {
                     SendEmptyPacket(Flags.RST, packet.AckNumber);
 
@@ -664,7 +664,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
             while (Status != status)
             {
-                if (second > (timeout / 1000))
+                if (second > timeout / 1000)
                 {
                     return false;
                 }

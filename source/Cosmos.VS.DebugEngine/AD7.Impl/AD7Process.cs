@@ -382,13 +382,17 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 {
                     try
                     {
-                        var xMethod = mDebugInfoDb.GetMethod(lastEIPAddress);
+                        var connection = mDebugInfoDb.GetNewConnection();
+                        var xMethod = mDebugInfoDb.GetMethod(connection, lastEIPAddress);
                         var xLabel = mDebugInfoDb.GetLabels(lastEIPAddress)[0];
                         var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
                         var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
                         var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
 
-                        AD7Util.ShowError($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(xMethod.DocumentID).Pathname}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
+
+                        AD7Util.ShowError($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(connection, xMethod.DocumentID).Pathname}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
+
+                        connection.Close();
                         return;
                     }
                     catch (InvalidOperationException)
@@ -407,6 +411,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         private void DbgCmdCoreDump(CoreDump dump)
         {
+            if(dump is null)
+            {
+                return;
+            }
+
             var eax = GetRegister("EAX", dump.EAX);
             var ebx = GetRegister("EBX", dump.EBX);
             var ecx = GetRegister("ECX", dump.ECX);
@@ -444,24 +453,49 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 {
                     if (xDebugMode == "Source")
                     {
+                        var connection = mDebugInfoDb.GetNewConnection();
                         try
                         {
-                            var xMethod = mDebugInfoDb.GetMethod(address);
-                            var xDocument = mDebugInfoDb.GetDocumentById(xMethod.DocumentID);
-                            var xLabel = mDebugInfoDb.GetLabels(address)[0];
-                            var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
-                            var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
-                            var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
-
-                            entry += $"in {xDocument.Pathname}:line {xLine}";
+                            var xMethod = mDebugInfoDb.GetMethod(connection, address);
+                            var xLabels = mDebugInfoDb.GetLabels(address);
+                            var xDocument = mDebugInfoDb.GetDocumentById(connection, xMethod.DocumentID);
+                            int? xLine = null; 
+                            if (xLabels != null && xLabels.Length > 0)
+                            {
+                                xLine = GetLabelLine(xMethod,xLabels[0]);
+                            }
+                            else
+                            {
+                                var xLabel = mDebugInfoDb.GetMethodLabels(connection, address)
+                                    .OrderBy(x => Math.Abs(address - x.Address)).First(); // Get closest address
+                                xLabel.Name = xLabel.Name.Remove(xLabel.Name.LastIndexOf('.')) == xMethod.LabelCall ? xLabel.Name + ".AfterCall" : xLabel.Name; // Verify label name
+                                xLine = GetLabelLine(xMethod, xLabel.Name);
+                            }
+                            
+                            entry += xLine != null ? $" in {Environment.NewLine}{xDocument.Pathname}:line {xLine}" : "";
                         }
                         catch (InvalidOperationException)
                         {
                         }
+                        connection.Close();
                     }
                 }
 
                 return entry;
+            }
+
+            int? GetLabelLine(Method xMethod, string xLabel)
+            {
+                try
+                {
+                    var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
+                    var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
+                    return xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 
@@ -538,10 +572,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     //((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
                     break;
                 case LaunchType.Qemu:
-                    if (!QemuSupport.QemuEnabled)
-                    {
-                        throw new Exception("The Qemu emulator doesn't seem to be installed on this machine.");
-                    }
                     mHost = new Qemu(mDebugInfo, xUseGDB);
                     break;
                 case LaunchType.IntelEdison:
@@ -973,6 +1003,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 mDebugInfoDb.Dispose();
                 mDebugInfoDb = null;
             }
+            IL2CPU.Debug.Symbols.Metadata.MetadataHelper.DisposeStatic();
         }
 
         internal void Continue()
@@ -1094,10 +1125,14 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         {
             if (mCurrentAddress.HasValue)
             {
-                var currMethod = mDebugInfoDb.GetMethod(mCurrentAddress.Value);
+                var connection = mDebugInfoDb.GetNewConnection();
+                var currMethod = mDebugInfoDb.GetMethod(connection, mCurrentAddress.Value);
                 //Clear out the full list so we don't accidentally accumulate INT3s all over the place
                 //Or set INT3s for all places in current method
-                var tpAdresses = clear ? new List<KeyValuePair<uint, string>>(INT3sSet.Count) : mDebugInfoDb.GetAllINT3AddressesForMethod(currMethod, true);
+
+                var tpAdresses = clear ? new List<KeyValuePair<uint, string>>(INT3sSet.Count) : mDebugInfoDb.GetAllINT3AddressesForMethod(connection, currMethod, true);
+                connection.Close();
+
                 //If we just do a stright assigment then we get a collection modified exception in foreach loop below
                 if (clear)
                 {
@@ -1201,8 +1236,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 // - We take the current address amd find the method it is part of
                 // - We use the method header label as a start point and find all asm labels till the method footer label
                 // - We then find all the asm for these labels and display it.
-
-                Label[] xLabels = mDebugInfoDb.GetMethodLabels(xAddress);
+                var connection = mDebugInfoDb.GetNewConnection();
+                Label[] xLabels = mDebugInfoDb.GetMethodLabels(connection, xAddress);
+                connection.Close();
                 AD7Util.Log("SendAssembly - MethodLabels retrieved");
                 // get the label of our current position, or the closest one before
                 var curPosLabel = xLabels.Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address).FirstOrDefault();

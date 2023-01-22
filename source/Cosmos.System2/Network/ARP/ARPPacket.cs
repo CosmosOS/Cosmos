@@ -53,7 +53,7 @@ namespace Cosmos.System.Network.ARP
             //Sys.Console.WriteLine(arp_packet.ToString());
             if (arp_packet.Operation == 0x01)
             {
-                if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
+                if (arp_packet.HardwareType == 1 && arp_packet.ProtocolType == 0x0800)
                 {
                     ARPRequest_Ethernet arp_request = new ARPRequest_Ethernet(packetData);
                     if (arp_request.SenderIP == null)
@@ -78,7 +78,7 @@ namespace Cosmos.System.Network.ARP
             }
             else if (arp_packet.Operation == 0x02)
             {
-                if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
+                if (arp_packet.HardwareType == 1 && arp_packet.ProtocolType == 0x0800)
                 {
                     ARPReply_Ethernet arp_reply = new ARPReply_Ethernet(packetData);
                     Global.mDebugger.Send("Received ARP Reply");
