@@ -5,25 +5,26 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Cosmos.Core;
+using Cosmos.Core.Memory;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
 {
     public unsafe class E1000 : NetworkDevice
     {
-        private uint BAR0;
+        private readonly uint BAR0;
         private uint RXDescs;
         private uint TXDescs;
         public uint RXCurr = 0;
         public uint TXCurr = 0;
-        private MACAddress address;
-        private PCIDevice dev;
+        private readonly MACAddress address;
+        private readonly PCIDevice dev;
         public override CardType CardType => CardType.Ethernet;
         public override MACAddress MACAddress => address;
         public override string Name => "Intel Gigabit Ethernet";
         public override bool Ready => true;
 
-        //Register defenitions
+        #region Constants
         private const ushort REG_CTRL = 0x0000;
         private const ushort REG_STATUS = 0x0008;
         private const ushort REG_EEPROM = 0x0014;
@@ -46,12 +47,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         private const ushort REG_RXDESCTAIL = 0x2818;
 
         private const ushort REG_TIPG = 0x0410;
-        public E1000(PCIDevice dev)
+        #endregion
+        public E1000(PCIDevice device)
         {
-            this.dev = dev;
-            dev.EnableDevice();
-            BAR0 = (uint)(dev.BAR0 & (~3));
-            INTs.SetIrqHandler(dev.InterruptLine, HandleIRQ);
+            dev = device;
+            device.EnableDevice();
+            BAR0 = (uint)(device.BAR0 & (~3));
+            INTs.SetIrqHandler(device.InterruptLine, HandleIRQ);
 
             var HasEEPROM = DetectEEPROM();
 
@@ -150,13 +152,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         }
         private void RXInitialize()
         {
-            var tmp = Cosmos.Core.Memory.Old.Heap.MemAlloc(32 * 16 + 16);
+            var tmp = Heap.SafeAlloc(32 * 16 + 16);
             RXDescs = (tmp % 16 != 0) ? (tmp + 16 - (tmp % 16)) : tmp;
 
             for (uint i = 0; i < 32; i++)
             {
                 var desc = (RXDesc*)(RXDescs + (i * 16));
-                desc->addr = Cosmos.Core.Memory.Old.Heap.MemAlloc(2048 + 16);
+                desc->addr = Heap.SafeAlloc(2048 + 16);
                 desc->status = 0;
             }
 
@@ -183,7 +185,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         }
         private void TXInitialize()
         {
-            var tmp = (uint)Cosmos.Core.Memory.Old.Heap.MemAlloc(8 * 16 + 16);
+            var tmp = Heap.SafeAlloc(8 * 16 + 16);
             TXDescs = (tmp % 16 != 0) ? (tmp + 16 - (tmp % 16)) : tmp;
 
             for (int i = 0; i < 8; i++)
@@ -214,18 +216,18 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             if (dev.BaseAddressBar[0].IsIO)
             {
-                return new IOPort((ushort)a).Byte;
+                return IOPort.Read8((ushort)a);
             }
             else
             {
-                return *(byte*)(a);
+                return *(byte*)a;
             }
         }
         public void WriteRegister(ushort reg, uint val)
         {
             if (dev.BaseAddressBar[0].IsIO)
             {
-                new IOPort((ushort)(BAR0 + reg)).DWord = val;
+                IOPort.Write32((int)(BAR0 + reg), val);
             }
             else
             {
@@ -236,7 +238,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             if (dev.BaseAddressBar[0].IsIO)
             {
-                return new IOPort((ushort)(BAR0 + reg)).DWord;
+                return IOPort.Read32((int)(BAR0 + reg));
             }
             else
             {
@@ -259,7 +261,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             //send bytes
 
             //Copy Buffer[offset] to ptr
-            byte* ptr = (byte*)Cosmos.Core.Memory.Old.Heap.MemAlloc((uint)length);
+            byte* ptr = Heap.Alloc((uint)length);
             int a = 0;
             for (int i = offset; i < offset + length; i++)
             {
