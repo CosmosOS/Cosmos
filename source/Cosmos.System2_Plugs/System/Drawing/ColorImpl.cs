@@ -11,7 +11,7 @@ namespace Cosmos.System_Plugs.System.Drawing
     class ColorImpl
     {
         /// <summary>Implements System.Drawing.Color.FromName
-        /// <para>See https://docs.microsoft.com/de-de/dotnet/api/system.drawing.color.fromname?view=netcore-3.1 for Usage Explanation</para>
+        /// <para>See https://learn.microsoft.com/en-us/dotnet/api/system.drawing.color.fromname?view=net-6.0&viewFallbackFrom=netcore-3.1 for usage explanation</para>
         /// </summary>
         public static Color FromName(string name)
         {
@@ -429,10 +429,10 @@ namespace Cosmos.System_Plugs.System.Drawing
                     return Color.YellowGreen;
 
                 case "":
-                    throw new ArgumentException("Color Name must be passed to FromName");
+                    throw new ArgumentException("Color Name must be passed to the 'System.Drawing.Color.FromName' method.");
 
                 default:
-                    throw new ArgumentException("{0} is not a valid Color Name", name);
+                    throw new ArgumentException("{0} is not a valid color Name", name);
 
             }
         }
