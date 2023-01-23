@@ -12,29 +12,15 @@ namespace Cosmos.Core_Asm.Memory
 {
     class EnablePagingAsm : AssemblerMethod
     {
+        //static void DoEnable(uint addr)
+        //addr: EBP+8 ?
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-          
-
-            //Set bit #5 in CR0 to enable PAE
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX,
-                SourceReg = RegistersEnum.CR4
-            };
-
-            new LiteralAssemblerCode("bts EAX, 5");
-
-            new Mov
-            {
-                DestinationReg = RegistersEnum.CR4,
-                SourceReg = RegistersEnum.EAX
-            };
-
-
+            //EAX: adddr
             //Select our page directory
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8); //EDX has page dir addr
 
+            //Set CR3 to the address
             new Mov
             {
                 DestinationReg = RegistersEnum.CR3,
