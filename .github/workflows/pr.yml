@@ -90,4 +90,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-logs
-          path: $($env:USER_KIT_PATH)TestResult.xml
+          path: ${{ $env.USER_KIT_PATH }}TestResult.xml
