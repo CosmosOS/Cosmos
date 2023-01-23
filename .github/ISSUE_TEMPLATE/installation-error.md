@@ -19,10 +19,10 @@ A clear and concise description of what you expected to happen.
 **Logs**
 Please post the entire log given by Cosmos. For long logs please use pastebin.
 
-**Steup (please complete the following information):**
+**Setup (please complete the following information):**
  - Cosmos Version (Userkit/Devkit)
- - Are you using an admin account?
- - VS Version if applicable
+ - Are you running installer as administrator?
+ - Visual Studio Version if applicable
 
 **Additional context**
 Add any other context about the problem here.

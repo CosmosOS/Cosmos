@@ -78,7 +78,7 @@ namespace Cosmos.Core_Plugs
             XS.FPU.FloatTan();
             XS.Sub(ESP, 8);
             XS.FPU.FloatPop();
-            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64); 
+            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
         }
     }
 }

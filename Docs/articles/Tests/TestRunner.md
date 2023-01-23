@@ -9,7 +9,7 @@ TestRunner generates a result file upon completion to detail the results of the 
 To use the TestRunnner open the `Test.sln`, set the Target Project to `Cosmos.TestRunner` and run the solution.
 
 ## Configuration
-Editing the configuration for TestRunner via [DefaultEngineConfiguration](https://github.com/CosmosOS/Cosmos/blob/master/Tests/Cosmos.TestRunner.Core/DefaultEngineConfiguration.cs#L6) in ..\Tests\TestRunner\TestRunner.Core
+Edit the configuration for TestRunner via [DefaultEngineConfiguration.cs](https://github.com/CosmosOS/Cosmos/blob/9d0ccc2be22938424d8992611b11409aaabf74ea/Tests/Cosmos.TestRunner.Full/DefaultEngineConfiguration.cs#L9). in ..\Tests\TestRunner\TestRunner.Core
 This allows one to choose which emulator to use and at what level the kernel is debugged.
 
 To select which Test Kernels to run, edit `GetStableKernelTypes()` in `TestKernelSets.cs`.

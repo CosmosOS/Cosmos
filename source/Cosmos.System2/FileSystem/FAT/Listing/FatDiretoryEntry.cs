@@ -123,7 +123,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFileSystem --");
 
-            return ((FatFileSystem)mFileSystem);
+            return (FatFileSystem)mFileSystem;
         }
 
         /// <summary>
@@ -338,15 +338,15 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             Global.mFileSystemDebugger.SendInternal("aName = " + aName);
             Global.mFileSystemDebugger.SendInternal($"aEntryType = {(uint)aEntryType}");
 
-            if ((aEntryType == DirectoryEntryTypeEnum.Directory) || (aEntryType == DirectoryEntryTypeEnum.File))
+            if (aEntryType == DirectoryEntryTypeEnum.Directory || aEntryType == DirectoryEntryTypeEnum.File)
             {
                 string xShortName = aName;
                 uint[] xDirectoryEntriesToAllocate = null;
 
                 #region Long Name
 
-                if ((aEntryType == DirectoryEntryTypeEnum.File && (aName.Contains(".") && (aName.Substring(0, aName.LastIndexOf('.')).Contains(".")
-                    || (aName.Substring(0, aName.IndexOf('.')).Length > 8 || aName.Substring(aName.IndexOf('.') + 1).Length > 3)))) ||
+                if ((aEntryType == DirectoryEntryTypeEnum.File && aName.Contains(".") && (aName.Substring(0, aName.LastIndexOf('.')).Contains(".")
+                        || aName.Substring(0, aName.IndexOf('.')).Length > 8 || aName.Substring(aName.IndexOf('.') + 1).Length > 3)) ||
                     (aEntryType == DirectoryEntryTypeEnum.Directory && aName.Length > 11))
                 {
                     string xLongName = aName;
@@ -436,7 +436,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                     {
                         uint xEntry = xDirectoryEntriesToAllocate[xNumEntries - i - 1];
 
-                        SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.SequenceNumberAndAllocationStatus, (i + 1) | (i == xNumEntries - 1 ? (1 << 6) : 0));
+                        SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.SequenceNumberAndAllocationStatus, (i + 1) | (i == xNumEntries - 1 ? 1 << 6 : 0));
                         SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.Attributes, FatDirectoryEntryAttributeConsts.LongName);
                         SetLongFilenameEntryMetadataValue(xEntry, FatDirectoryEntryMetadata.LongFilenameEntryMetadata.Checksum, xChecksum);
 
@@ -477,7 +477,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         /// Check if given entry is a root directory.
         /// </summary>
         /// <returns>True if it is root directory.</returns>
-        private bool IsRootDirectory() => (mParent == null) ? true : false;
+        private bool IsRootDirectory() => mParent == null ? true : false;
 
         /// <summary>
         /// Delete directory entry.
@@ -709,7 +709,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                 }
 
                                 string xFullPath = Path.Combine(mFullPath, xName);
-                                var xEntry = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
+                                var xEntry = new FatDirectoryEntry((FatFileSystem)mFileSystem, xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
                                 xResult.Add(xEntry);
                                 Global.mFileSystemDebugger.SendInternal(xEntry.mName + " - " + xEntry.mSize + " bytes");
                             }
@@ -717,7 +717,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                             {
                                 string xFullPath = Path.Combine(mFullPath, xName);
                                 uint xSize = BitConverter.ToUInt32(xData, (int)i + 28);
-                                var xEntry = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
+                                var xEntry = new FatDirectoryEntry((FatFileSystem)mFileSystem, xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
                                 Global.mFileSystemDebugger.SendInternal(xEntry.mName + " <DIR> " + xEntry.mSize + " bytes : Attrib = " + xAttrib + ", Status = " + xStatus);
                                 xResult.Add(xEntry);
                             }
@@ -782,7 +782,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
                 Global.mFileSystemDebugger.SendInternal($"VolumeID Found xName {xName} xFullPath {xFullPath} xSize {xSize} xFirstCluster {xFirstCluster}");
 
-                xResult = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
+                xResult = new FatDirectoryEntry((FatFileSystem)mFileSystem, xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
                 break;
             }
 
@@ -837,7 +837,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 uint x2 = BitConverter.ToUInt32(xData, (int)i + 8);
                 uint x3 = BitConverter.ToUInt32(xData, (int)i + 16);
                 uint x4 = BitConverter.ToUInt32(xData, (int)i + 24);
-                if ((x1 == 0) && (x2 == 0) && (x3 == 0) && (x4 == 0))
+                if (x1 == 0 && x2 == 0 && x3 == 0 && x4 == 0)
                 {
                     Global.mFileSystemDebugger.SendInternal("Returning i =" + i);
                     Global.mFileSystemDebugger.SendInternal("-- -------------------------------------------------- --");
@@ -870,7 +870,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 uint x2 = BitConverter.ToUInt32(xData, (int)i + 8);
                 uint x3 = BitConverter.ToUInt32(xData, (int)i + 16);
                 uint x4 = BitConverter.ToUInt32(xData, (int)i + 24);
-                if ((x1 == 0) && (x2 == 0) && (x3 == 0) && (x4 == 0))
+                if (x1 == 0 && x2 == 0 && x3 == 0 && x4 == 0)
                 {
                     xEntries[xCount] = i;
                     xCount++;

@@ -70,7 +70,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
 
             while (rxBuffer.Count < 1)
             {
-                if (second > (timeout / 1000))
+                if (second > timeout / 1000)
                 {
                     return null;
                 }

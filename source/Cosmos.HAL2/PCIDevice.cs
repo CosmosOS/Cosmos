@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Core.IOGroup;
 using Cosmos.Common.Extensions;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
@@ -96,9 +97,7 @@ namespace Cosmos.HAL
         public const ushort ConfigAddressPort = 0xCF8;
         public const ushort ConfigDataPort = 0xCFC;
 
-        public PCIBaseAddressBar[] BaseAddressBar;
-
-        protected static Core.IOGroup.PCI IO = new Core.IOGroup.PCI();
+        public readonly PCIBaseAddressBar[] BaseAddressBar;
 
         public byte InterruptLine { get; private set; }
         public PCICommand Command { get { return (PCICommand)ReadRegister16(0x04); } set { WriteRegister16(0x04, (ushort)value); } }
@@ -168,8 +167,8 @@ namespace Cosmos.HAL
         public static ushort GetHeaderType(ushort Bus, ushort Slot, ushort Function)
         {
             uint xAddr = GetAddressBase(Bus, Slot, Function) | 0xE & 0xFC;
-            IO.ConfigAddressPort.DWord = xAddr;
-            return (byte)(IO.ConfigDataPort.DWord >> ((0xE % 4) * 8) & 0xFF);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return (byte)(IOPort.Read32(ConfigDataPort) >> (0xE % 4 * 8) & 0xFF);
         }
 
         /// <summary>
@@ -182,8 +181,8 @@ namespace Cosmos.HAL
         public static ushort GetVendorID(ushort Bus, ushort Slot, ushort Function)
         {
             uint xAddr = GetAddressBase(Bus, Slot, Function) | 0x0 & 0xFC;
-            IO.ConfigAddressPort.DWord = xAddr;
-            return (ushort)(IO.ConfigDataPort.DWord >> ((0x0 % 4) * 8) & 0xFFFF);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return (ushort)(IOPort.Read32(ConfigDataPort) >> (0x0 % 4 * 8) & 0xFFFF);
         }
 
         #region IOReadWrite
@@ -194,16 +193,16 @@ namespace Cosmos.HAL
         /// <returns>byte value.</returns>
         public byte ReadRegister8(byte aRegister)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            return (byte)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFF);
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return (byte)(IOPort.Read32(ConfigDataPort) >> (aRegister % 4 * 8) & 0xFF);
         }
 
         public void WriteRegister8(byte aRegister, byte value)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            IO.ConfigDataPort.Byte = value;
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            IOPort.Write8(ConfigDataPort, value);
         }
 
         /// <summary>
@@ -213,9 +212,9 @@ namespace Cosmos.HAL
         /// <returns>UInt16 value.</returns>
         public ushort ReadRegister16(byte aRegister)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            return (ushort)(IO.ConfigDataPort.DWord >> ((aRegister % 4) * 8) & 0xFFFF);
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return (ushort)(IOPort.Read32(ConfigDataPort) >> (aRegister % 4 * 8) & 0xFFFF);
         }
 
         /// <summary>
@@ -225,23 +224,23 @@ namespace Cosmos.HAL
         /// <param name="value">A value.</param>
         public void WriteRegister16(byte aRegister, ushort value)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            IO.ConfigDataPort.Word = value;
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            IOPort.Write16(ConfigDataPort, value);
         }
 
         public uint ReadRegister32(byte aRegister)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            return IO.ConfigDataPort.DWord;
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            return IOPort.Read32(ConfigDataPort);
         }
 
         public void WriteRegister32(byte aRegister, uint value)
         {
-            uint xAddr = GetAddressBase(bus, slot, function) | ((uint)(aRegister & 0xFC));
-            IO.ConfigAddressPort.DWord = xAddr;
-            IO.ConfigDataPort.DWord = value;
+            uint xAddr = GetAddressBase(bus, slot, function) | (uint)(aRegister & 0xFC);
+            IOPort.Write32(ConfigAddressPort, xAddr);
+            IOPort.Write32(ConfigDataPort, value);
         }
         #endregion
 
@@ -279,7 +278,7 @@ namespace Cosmos.HAL
         {
             ushort command = ReadRegister16(0x04);
 
-            ushort flags = (1 << 2);
+            ushort flags = 1 << 2;
 
             if (enable)
                 command |= flags;
@@ -855,18 +854,15 @@ namespace Cosmos.HAL
 
     public class PCIBaseAddressBar
     {
-        private uint baseAddress = 0;
-        private ushort prefetchable = 0;
-        private ushort type = 0;
-        private bool isIO = false;
+        private ushort prefetchable, type;
 
         public PCIBaseAddressBar(uint raw)
         {
-            isIO = (raw & 0x01) == 1;
+            IsIO = (raw & 0x01) == 1;
 
-            if (isIO)
+            if (IsIO)
             {
-                baseAddress = raw & 0xFFFFFFFC;
+                BaseAddress = raw & 0xFFFFFFFC;
             }
             else
             {
@@ -875,23 +871,17 @@ namespace Cosmos.HAL
                 switch (type)
                 {
                     case 0x00:
-                        baseAddress = raw & 0xFFFFFFF0;
+                        BaseAddress = raw & 0xFFFFFFF0;
                         break;
                     case 0x01:
-                        baseAddress = raw & 0xFFFFFFF0;
+                        BaseAddress = raw & 0xFFFFFFF0;
                         break;
                 }
             }
         }
 
-        public uint BaseAddress
-        {
-            get { return baseAddress; }
-        }
+        public uint BaseAddress { get; }
 
-        public bool IsIO
-        {
-            get { return isIO; }
-        }
+        public bool IsIO { get; }
     }
 }

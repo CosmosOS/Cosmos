@@ -39,6 +39,7 @@ namespace Cosmos.Build.Builder.ViewModels
             {
                 _viewModel.CurrentSection.SetError();
                 _viewModel.CloseWhenCompleted = false;
+                _viewModel.AnErrorOccurred = true;
             });
     }
 }
