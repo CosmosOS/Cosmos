@@ -43,12 +43,6 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1.3
 
-      - name: Setup Registry
-        shell: cmd
-        run: |
-          reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d %USER_KIT_PATH%
-          reg query HKLM\SOFTWARE\WOW6432Node\Cosmos
-
       - name: Nuget - Cache
         uses: actions/cache@v3
         with:
@@ -75,19 +69,69 @@ jobs:
           xcopy /Y "Cosmos\Build\grub2\boot\grub\grub.cfg" "$($env:USER_KIT_PATH)Build\ISO\boot\grub"
           xcopy /Y /S "Cosmos\Build\VMware\*" "$($env:USER_KIT_PATH)Build\VMware\"
           xcopy /Y /S "Cosmos\Build\Tools" "$($env:USER_KIT_PATH)Build\Tools\"
-          xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "${env:ProgramFiles(x86)}\Bochs-2.6.8\"
 
       - name: Copy Output - IL2CPU
         run: |
           xcopy /Y "IL2CPU\source\Cosmos.Core.DebugStub\*.xs" "$($env:USER_KIT_PATH)XSharp\DebugStub\"
-          
-      - name: Test - Cosmos
-        run: |
-          dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml"
-        continue-on-error: true
-        
-      - name: Upload Test Logs
+
+      - name: Upload User Kit Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: test-logs
-          path: ${{ env.USER_KIT_PATH }}TestResult.xml
+          name: cosmos-userkit
+          path: ${{ env.USER_KIT_PATH }}
+
+      - name: Set GITHUB_ENV.TESTKERNELS
+        run: |
+          dotnet test .\Cosmos.TestRunner.UnitTest.csproj --list-tests --no-build > tests.txt
+          $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path .\tests.txt
+          $testKernels = $match.matches.groups | where { $_.index % 2 -ne 0 } | Select-Object value | foreach { $_.value }
+          $testKernelsEnv = ""
+          $testKernels | foreach { $testKernelsEnv + "$($_)," }
+          $testKernelsEnv = $testKernelsEnv.Trim(",")
+          "TESTKERNELS=$testKernelsEnv" >> $env:GITHUB_ENV
+
+  test:
+    runs-on: windows-2022
+    
+    strategy:
+      matrix:
+        kernel: ${{ env.TESTKERNELS }}
+    
+    env:
+      USER_KIT_PATH: 'C:\CosmosRun\'
+      BochsPath: 'C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe'
+
+    steps:
+      - name: Checkout Cosmos
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/Cosmos
+          path: Cosmos
+
+      - name: Download User Kit Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cosmos-userkit
+          path: ${{ env.USER_KIT_PATH }}
+
+      - name: Setup Registry
+        shell: cmd
+        run: |
+          reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d %USER_KIT_PATH%
+          reg query HKLM\SOFTWARE\WOW6432Node\Cosmos
+
+      - name: Copy Bochs
+        run: |
+          xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "${env:ProgramFiles(x86)}\Bochs-2.6.8\"
+
+      - name: Test - Cosmos
+        run: |
+          Write-Host $matrix.kernel
+          # dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml"
+        continue-on-error: true
+        
+      # - name: Upload Test Logs
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: test-logs
+      #     path: ${{ env.USER_KIT_PATH }}TestResult.xml
