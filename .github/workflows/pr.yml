@@ -155,8 +155,7 @@ jobs:
 
       - name: Test - Cosmos
         run: |
-          Write-Host $matrix.kernel
-          # dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml"
+          dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml" --filter "FullyQualifiedName~${{ matrix.kernel }}"
         continue-on-error: true
         
       # - name: Upload Test Logs
