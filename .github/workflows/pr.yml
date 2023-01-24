@@ -62,21 +62,6 @@ jobs:
         run: |
           msbuild Cosmos\Build.sln /t:Build /maxcpucount /verbosity:normal /p:Net48=True
 
-      - name: Send test kernels to GITHUB_OUTPUT
-        id: testkernels_output
-        run: |
-          $testList = dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --list-tests
-          Write-Host $testList
-          $testList >> tests.txt
-          $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path tests.txt
-          Write-Host $match
-          $testKernels = $match.matches.groups | where { $_.index % 2 -ne 0 } | Select-Object value | foreach { $_.value }
-          Write-Host $testKernels
-          $testKernelsEnv = ""
-          $testKernels | foreach { $testKernelsEnv += "$($_)," }
-          $testKernelsEnv = $testKernelsEnv.Trim(",")
-          Write-Host $testKernelsEnv
-          "testkernels=[$($testKernelsEnv)]" >> $env:GITHUB_OUTPUT
 
       - name: Build - IL2CPU
         run: |
@@ -102,7 +87,7 @@ jobs:
       # - name: Send test kernels to GITHUB_OUTPUT
       #   id: testkernels_output
       #   run: |
-      #     $testList = dotnet test Cosmos\Tests\Cosmos.TestRunner\Cosmos.TestRunner.UnitTest.csproj --list-tests --no-build
+      #     $testList = dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --list-tests
       #     Write-Host $testList
       #     $testList >> tests.txt
       #     $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path tests.txt
@@ -113,7 +98,7 @@ jobs:
       #     $testKernels | foreach { $testKernelsEnv += "$($_)," }
       #     $testKernelsEnv = $testKernelsEnv.Trim(",")
       #     Write-Host $testKernelsEnv
-      #     "$($testKernelsEnv)" >> $env:GITHUB_OUTPUT
+      #     "testkernels=[$($testKernelsEnv)]" >> $env:GITHUB_OUTPUT
 
   test:
     if: ${{ success() }}
@@ -122,7 +107,24 @@ jobs:
     
     strategy:
       matrix:
-        kernel: ${{ needs.build.outputs.testkernels }}
+        kernel: [
+          "BoxingTests.Kernel",
+          "Cosmos.Compiler.Tests.TypeSystem.Kernel",
+          "Cosmos.Compiler.Tests.Bcl.Kernel",
+          "Cosmos.Compiler.Tests.Bcl.System.Kernel",
+          "Cosmos.Compiler.Tests.Exceptions.Kernel",
+          "Cosmos.Compiler.Tests.MethodTests.Kernel",
+          "Cosmos.Compiler.Tests.SingleEchoTest.Kernel",
+          "Cosmos.Kernel.Tests.Fat.Kernel",
+          "Cosmos.Kernel.Tests.IO.Kernel",
+          "SimpleStructsAndArraysTest.Kernel",
+          "Cosmos.Kernel.Tests.DiskManager.Kernel",
+          "GraphicTest.Kernel",
+          "NetworkTest.Kernel",
+          "AudioTests.Kernel",
+          "MemoryOperationsTest.Kernel",
+          "ProcessorTests.Kernel"
+        ]
     
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
