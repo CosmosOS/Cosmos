@@ -75,6 +75,7 @@ jobs:
           $testKernelsEnv = ""
           $testKernels | foreach { $testKernelsEnv += "$($_)," }
           $testKernelsEnv = $testKernelsEnv.Trim(",")
+          $testKernelsEnv = ${{ toJSON($testKernelsEnv) }}
           Write-Host $testKernelsEnv
           "testkernels=$($testKernelsEnv)" >> $env:GITHUB_OUTPUT
 
@@ -122,7 +123,7 @@ jobs:
     
     strategy:
       matrix:
-        kernel: [ ${{ needs.build.outputs.testkernels }} ]
+        kernel: ${{ needs.build.outputs.testkernels }}
     
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
