@@ -90,9 +90,9 @@ jobs:
           $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path .\tests.txt
           $testKernels = $match.matches.groups | where { $_.index % 2 -ne 0 } | Select-Object value | foreach { $_.value }
           $testKernelsEnv = ""
-          $testKernels | foreach { $testKernelsEnv + "$($_)," }
+          $testKernels | foreach { $testKernelsEnv += "$($_)," }
           $testKernelsEnv = $testKernelsEnv.Trim(",")
-          "TESTKERNELS=$testKernelsEnv" >> $env:GITHUB_OUTPUT
+          "$($testKernelsEnv)" >> $env:GITHUB_OUTPUT
 
   test:
     if: ${{ success() }}
