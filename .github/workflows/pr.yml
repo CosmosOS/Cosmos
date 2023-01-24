@@ -62,6 +62,22 @@ jobs:
         run: |
           msbuild Cosmos\Build.sln /t:Build /maxcpucount /verbosity:normal /p:Net48=True
 
+      - name: Send test kernels to GITHUB_OUTPUT
+        id: testkernels_output
+        run: |
+          $testList = dotnet test Cosmos\Tests\Cosmos.TestRunner\Cosmos.TestRunner.UnitTest.csproj --list-tests
+          Write-Host $testList
+          $testList >> tests.txt
+          $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path tests.txt
+          Write-Host $match
+          $testKernels = $match.matches.groups | where { $_.index % 2 -ne 0 } | Select-Object value | foreach { $_.value }
+          Write-Host $testKernels
+          $testKernelsEnv = ""
+          $testKernels | foreach { $testKernelsEnv += "$($_)," }
+          $testKernelsEnv = $testKernelsEnv.Trim(",")
+          Write-Host $testKernelsEnv
+          "$($testKernelsEnv)" >> $env:GITHUB_OUTPUT
+
       - name: Build - IL2CPU
         run: |
           dotnet publish IL2CPU\source\IL2CPU -r win7-x86 -o "$($env:USER_KIT_PATH)Build\IL2CPU\"
@@ -83,16 +99,21 @@ jobs:
           name: cosmos-userkit
           path: ${{ env.USER_KIT_PATH }}
 
-      - name: Send test kernels to GITHUB_OUTPUT
-        id: testkernels_output
-        run: |
-          dotnet test Cosmos\Tests\Cosmos.TestRunner\Cosmos.TestRunner.UnitTest.csproj --list-tests --no-build > tests.txt
-          $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path .\tests.txt
-          $testKernels = $match.matches.groups | where { $_.index % 2 -ne 0 } | Select-Object value | foreach { $_.value }
-          $testKernelsEnv = ""
-          $testKernels | foreach { $testKernelsEnv += "$($_)," }
-          $testKernelsEnv = $testKernelsEnv.Trim(",")
-          "$($testKernelsEnv)" >> $env:GITHUB_OUTPUT
+      # - name: Send test kernels to GITHUB_OUTPUT
+      #   id: testkernels_output
+      #   run: |
+      #     $testList = dotnet test Cosmos\Tests\Cosmos.TestRunner\Cosmos.TestRunner.UnitTest.csproj --list-tests --no-build
+      #     Write-Host $testList
+      #     $testList >> tests.txt
+      #     $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path tests.txt
+      #     Write-Host $match
+      #     $testKernels = $match.matches.groups | where { $_.index % 2 -ne 0 } | Select-Object value | foreach { $_.value }
+      #     Write-Host $testKernels
+      #     $testKernelsEnv = ""
+      #     $testKernels | foreach { $testKernelsEnv += "$($_)," }
+      #     $testKernelsEnv = $testKernelsEnv.Trim(",")
+      #     Write-Host $testKernelsEnv
+      #     "$($testKernelsEnv)" >> $env:GITHUB_OUTPUT
 
   test:
     if: ${{ success() }}
