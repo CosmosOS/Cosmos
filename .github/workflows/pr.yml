@@ -83,10 +83,10 @@ jobs:
           name: cosmos-userkit
           path: ${{ env.USER_KIT_PATH }}
 
-      - name: Set GITHUB_ENV.TESTKERNELS
+      - name: Send test kernels to GITHUB_OUTPUT
         id: testkernels_output
         run: |
-          dotnet test .\Cosmos.TestRunner.UnitTest.csproj --list-tests --no-build > tests.txt
+          dotnet test Cosmos\Tests\Cosmos.TestRunner\Cosmos.TestRunner.UnitTest.csproj --list-tests --no-build > tests.txt
           $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path .\tests.txt
           $testKernels = $match.matches.groups | where { $_.index % 2 -ne 0 } | Select-Object value | foreach { $_.value }
           $testKernelsEnv = ""
