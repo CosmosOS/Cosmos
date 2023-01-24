@@ -65,7 +65,7 @@ jobs:
       - name: Send test kernels to GITHUB_OUTPUT
         id: testkernels_output
         run: |
-          $testList = dotnet test Cosmos\Tests\Cosmos.TestRunner\Cosmos.TestRunner.UnitTest.csproj --list-tests
+          $testList = dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --list-tests
           Write-Host $testList
           $testList >> tests.txt
           $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path tests.txt
