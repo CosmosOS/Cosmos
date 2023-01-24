@@ -1,7 +1,7 @@
 <Project>
 
     <PropertyGroup>
-        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <SelfContained>True</SelfContained>
         <_UsingDefaultForHasRuntimeOutput>False</_UsingDefaultForHasRuntimeOutput>
         <HasRuntimeOutput>False</HasRuntimeOutput>

@@ -64,7 +64,7 @@ jobs:
 
       - name: Build - IL2CPU
         run: |
-          dotnet publish IL2CPU\source\IL2CPU -r win7-x86 -o "$($env:USER_KIT_PATH)Build\IL2CPU\"
+          dotnet publish IL2CPU\source\IL2CPU -o "$($env:USER_KIT_PATH)Build\IL2CPU\"
 
       - name: Build - Kernel Tests
         run: |

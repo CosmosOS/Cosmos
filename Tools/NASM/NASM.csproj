@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <OutputType>Exe</OutputType>
         <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
