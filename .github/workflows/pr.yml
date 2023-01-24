@@ -75,7 +75,8 @@ jobs:
           $testKernelsEnv = ""
           $testKernels | foreach { $testKernelsEnv += "$($_)," }
           $testKernelsEnv = $testKernelsEnv.Trim(",")
-          $testKernelsEnv = ${{ toJSON($testKernelsEnv) }}
+          $env:TestKernels = $testKernelsEnv
+          $testKernelsEnv = ${{ toJSON(env.testKernelsEnv) }}
           Write-Host $testKernelsEnv
           "testkernels=$($testKernelsEnv)" >> $env:GITHUB_OUTPUT
 
