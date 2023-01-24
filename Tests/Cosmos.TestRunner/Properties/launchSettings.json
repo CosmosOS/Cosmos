@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Cosmos.TestRunner": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "BochsPath": "C:\\Program Files\\Bochs-2.7\\Bochs.exe"
+      }
+    }
+  }
+}

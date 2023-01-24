@@ -11,6 +11,9 @@ jobs:
 
     runs-on: windows-2022
 
+    outputs:
+      testkernels: ${{ steps.testkernels_output.outputs.testkernels }}
+
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
       BochsPath: 'C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe'
@@ -81,6 +84,7 @@ jobs:
           path: ${{ env.USER_KIT_PATH }}
 
       - name: Set GITHUB_ENV.TESTKERNELS
+        id: testkernels_output
         run: |
           dotnet test .\Cosmos.TestRunner.UnitTest.csproj --list-tests --no-build > tests.txt
           $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path .\tests.txt
@@ -88,14 +92,16 @@ jobs:
           $testKernelsEnv = ""
           $testKernels | foreach { $testKernelsEnv + "$($_)," }
           $testKernelsEnv = $testKernelsEnv.Trim(",")
-          "TESTKERNELS=$testKernelsEnv" >> $env:GITHUB_ENV
+          "TESTKERNELS=$testKernelsEnv" >> $env:GITHUB_OUTPUT
 
   test:
+    if: ${{ success() }}
+    needs: [build]
     runs-on: windows-2022
     
     strategy:
       matrix:
-        kernel: ${{ env.TESTKERNELS }}
+        kernel: ${{ needs.build.outputs.testkernels }}
     
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
