@@ -68,7 +68,8 @@ jobs:
 
       - name: Build - Kernel Tests
         run: |
-          dotnet publish Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj -o "$($env:USER_KIT_PATH)Tests\"
+          dotnet build Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj -o "$($env:USER_KIT_PATH)Tests\"
+          dotnet publish Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj -o "$($env:USER_KIT_PATH)Tests\" --no-build
 
       - name: Copy Output - Cosmos
         run: |
