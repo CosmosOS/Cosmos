@@ -122,7 +122,7 @@ jobs:
     
     strategy:
       matrix:
-        kernel: ${{ needs.build.outputs.testkernels }}
+        kernel: [ ${{ needs.build.outputs.testkernels }} ]
     
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
