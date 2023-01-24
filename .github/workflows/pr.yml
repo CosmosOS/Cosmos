@@ -75,10 +75,8 @@ jobs:
           $testKernelsEnv = ""
           $testKernels | foreach { $testKernelsEnv += "$($_)," }
           $testKernelsEnv = $testKernelsEnv.Trim(",")
-          $env:TestKernels = $testKernelsEnv
-          $testKernelsEnv = ${{ toJSON(env.TestKernels) }}
           Write-Host $testKernelsEnv
-          "testkernels=$($testKernelsEnv)" >> $env:GITHUB_OUTPUT
+          "testkernels=[$($testKernelsEnv)]" >> $env:GITHUB_OUTPUT
 
       - name: Build - IL2CPU
         run: |
