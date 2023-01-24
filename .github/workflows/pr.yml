@@ -158,7 +158,7 @@ jobs:
 
       - name: Test - Cosmos
         run: |
-          dotnet test "$($env:USER_KIT_PATH)Tests\Cosmos.TestRunner.UnitTest.dll --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml" --filter "FullyQualifiedName~${{ matrix.kernel }}"
+          dotnet test "$($env:USER_KIT_PATH)Tests\Cosmos.TestRunner.UnitTest.dll" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml" --filter "FullyQualifiedName~${{ matrix.kernel }}"
         continue-on-error: true
       
       # - name: Upload Test Logs
