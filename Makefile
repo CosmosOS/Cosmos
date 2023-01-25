@@ -67,6 +67,9 @@ build:
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks $(DOTNETFLAGS)
 
+	$(DOTNET) pack $(XSHARP_DIR)/source/XSharp/XSharp $(DOTNETFLAGS)
+	$(DOTNET) pack $(XSHARP_DIR)/source/Spruce $(DOTNETFLAGS)
+
 .PHONY: publish
 publish:
 	@echo "Publishing IL2CPU"
@@ -77,6 +80,9 @@ publish:
 	$(DOTNET) publish $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
 	$(DOTNET) publish $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
 	$(DOTNET) publish $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
+
+	$(DOTNET) publish $(XSHARP_DIR)/source/XSharp/XSharp $(DOTNETFLAGS)
+	$(DOTNET) publish $(XSHARP_DIR)/source/Spruce $(DOTNETFLAGS)
 
 .PHONY: install
 install:
@@ -91,6 +97,7 @@ install:
 	@mkdir -p $(DESTDIR)/Kernel
 	@cp -r $(IL2CPU_DIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
 	@cp -r $(THISDIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
+	@cp -r $(XSHARP_DIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
 	@cp -r $(IL2CPU_DIR)/source/Cosmos.Core.DebugStub/*.xs $(DESTDIR)/XSharp/DebugStub/
 
 	@cp -r $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/
