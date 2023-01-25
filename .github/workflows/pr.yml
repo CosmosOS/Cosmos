@@ -172,11 +172,11 @@ jobs:
 
       - name: Test - Cosmos
         run: |
-          dotnet test "Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml" --filter "FullyQualifiedName~${{ matrix.kernel }}"
+          dotnet test "Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResults\${{ matrix.kernel }}-TestResult.trx" --filter "FullyQualifiedName~${{ matrix.kernel }}"
         continue-on-error: true
       
-      # - name: Upload Test Logs
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: test-logs
-      #     path: ${{ env.USER_KIT_PATH }}TestResult.xml
+      - name: Upload Test Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-logs
+          path: ${{ env.USER_KIT_PATH }}TestResults
