@@ -1737,7 +1737,7 @@
         }
       }
     },
-    "net6.0/win-x64": {
+    "net6.0/win-x86": {
       "Microsoft.Win32.Primitives": {
         "type": "Transitive",
         "resolved": "4.3.0",

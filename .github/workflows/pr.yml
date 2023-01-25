@@ -66,11 +66,6 @@ jobs:
         run: |
           dotnet publish IL2CPU\source\IL2CPU -o "$($env:USER_KIT_PATH)Build\IL2CPU\"
 
-      - name: Build - Kernel Tests
-        run: |
-          dotnet build Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj -o "$($env:USER_KIT_PATH)Tests\"
-          dotnet publish Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj -o "$($env:USER_KIT_PATH)Tests\"
-
       - name: Copy Output - Cosmos
         run: |
           xcopy /Y "Cosmos\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*.*" "$($env:USER_KIT_PATH)Build\ISO\boot\grub\i386-pc\"
@@ -141,6 +136,24 @@ jobs:
           repository: CosmosOS/Cosmos
           path: Cosmos
 
+      - name: Checkout Common
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/Common
+          path: Common
+
+      - name: Checkout IL2CPU
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/IL2CPU
+          path: IL2CPU
+
+      - name: Checkout XSharp
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/XSharp
+          path: XSharp
+
       - name: Download User Kit Artifact
         uses: actions/download-artifact@v3
         with:
@@ -159,7 +172,7 @@ jobs:
 
       - name: Test - Cosmos
         run: |
-          dotnet test "$($env:USER_KIT_PATH)Tests\Cosmos.TestRunner.UnitTest.dll" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml" --filter "FullyQualifiedName~${{ matrix.kernel }}"
+          dotnet test "Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml" --filter "FullyQualifiedName~${{ matrix.kernel }}"
         continue-on-error: true
       
       # - name: Upload Test Logs
