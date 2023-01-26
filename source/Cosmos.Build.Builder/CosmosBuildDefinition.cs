@@ -75,9 +75,6 @@ namespace Cosmos.Build.Builder
             var cosmosSourceDir = Path.Combine(_cosmosDir, "source");
             var il2cpuSourceDir = Path.Combine(il2cpuDir, "source");
 
-            var xsharpDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "XSharp"));
-            var xsharpSourceDir = Path.Combine(il2cpuDir, "source");
-
             var buildSlnPath = Path.Combine(_cosmosDir, "Build.sln");
 
             var vsipDir = Path.Combine(_cosmosDir, "Build", "VSIP") + '\\';
@@ -142,19 +139,6 @@ namespace Cosmos.Build.Builder
             {
                 yield return task;
             }
-
-            // Publish XSharp
-            var xsharpProjectPath = Path.Combine(xsharpDir, "XSharp/XSharp", "XSharp.csproj");
-            var xsharpPublishPath = Path.Combine(vsipDir, "XSharp");
-
-            yield return new RestoreTask(_msBuildService, xsharpProjectPath);
-            yield return new PublishTask(_msBuildService, xsharpProjectPath, xsharpPublishPath);
-
-            var spruceProjectPath = Path.Combine(xsharpDir, "Spruce", "Spruce.csproj");
-            var sprucePublishPath = Path.Combine(vsipDir, "XSharp");
-
-            yield return new RestoreTask(_msBuildService, spruceProjectPath);
-            yield return new PublishTask(_msBuildService, spruceProjectPath, sprucePublishPath);
 
             var cosmosSetupDir = Path.Combine(_cosmosDir, "setup");
 
