@@ -13,11 +13,12 @@ namespace Cosmos.Core_Asm.Memory
     class EnablePagingAsm : AssemblerMethod
     {
         //static void DoEnable(uint addr)
-        //addr: EBP+8 ?
+        //addr: EBP+8
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             //EAX: adddr
-            XS.Set(XSRegisters.CR3, XSRegisters.EBP, sourceDisplacement: 8); //EDX has page dir addr
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
+            XS.Set(XSRegisters.CR3, XSRegisters.EAX);
             //Set the paging bit
             new Mov
             {
