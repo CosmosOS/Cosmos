@@ -17,16 +17,6 @@ namespace Cosmos.Core_Asm.Memory
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             //EAX: adddr
-            //Select our page directory
-            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8); //EDX has page dir addr
-
-            //Set CR3 to the address
-            new Mov
-            {
-                DestinationReg = RegistersEnum.CR3,
-                SourceReg = RegistersEnum.EAX
-            };
-
             //Set the paging bit
             new Mov
             {
@@ -45,6 +35,8 @@ namespace Cosmos.Core_Asm.Memory
                 DestinationReg = RegistersEnum.CR0,
                 SourceReg = RegistersEnum.EAX
             };
+
+            XS.Set(XSRegisters.CR3, XSRegisters.EBP, sourceDisplacement: 8); //EDX has page dir addr
         }
     }
     class RefreshPagesAsm : AssemblerMethod
