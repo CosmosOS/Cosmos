@@ -37,8 +37,6 @@ namespace Cosmos.Core_Asm.Memory
                 DestinationReg = RegistersEnum.CR0,
                 SourceReg = RegistersEnum.EAX
             };
-
-  
         }
     }
     class RefreshPagesAsm : AssemblerMethod
