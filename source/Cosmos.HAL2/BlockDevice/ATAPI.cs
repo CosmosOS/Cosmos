@@ -273,7 +273,7 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
         /// <summary>
-        ///  The function returns the max LBA value of the ATAPI device. Code is based on https://forum.osdev.org/viewtopic.php?f=1&t=14604"
+        ///  The function returns the max LBA value of the ATAPI device. Code is based on <a href="https://forum.osdev.org/viewtopic.php?f=1&amp;t=14604">this</a>
         /// </summary>
         /// <returns>The maximum LBA</returns>
         private ulong GetMaxLBA()

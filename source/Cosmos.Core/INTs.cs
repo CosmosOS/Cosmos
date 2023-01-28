@@ -239,6 +239,7 @@ namespace Cosmos.Core {
         /// </summary>
         private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
 
+        /// <summary>
         /// Masks or Un-Masks an interupt address.
         /// Source: https://wiki.osdev.org/8259_PIC
         /// </summary>
