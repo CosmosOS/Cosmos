@@ -1,53 +1,39 @@
-# Solution File ReadMe
+# Visual Studio Solutions
 
-### Cosmos
-- Old monolithic solution.
-- Will be removed after all smaller parts split out.
-- Use of this solution is necessary for some users until all parts are split out.
+## `Build.sln`
+Currently contains every used Cosmos component for
+using by Cosmos Builder to compile and pack code.
+Do not use it in Visual Studio directly and do not
+modify it, unless you know what you're doing.
 
-### Build
-- Used by the build process (Builder).
-- Not meant for direct end user use.
-- Do not change unless you know what you are doing.
+## `Builder.sln`
+Currently contains only Cosmos Builder app project 
+that used to compile, pack and install Cosmos.
 
-### Builder
+## `IDE.sln`
+Currently contains Visual Studio extensions for VS
+integration. Do not confuse with `Kernel.sln`.
 
-Projects used to build Cosmos itself. Essentially this is what makes User Kit go.
+## `Kernel.sln`
+Currently contains the main Cosmos code that runs on
+target virtual machines. If you want to modify OS
+behavior more percisely, contribute to this solution.
+### Cosmos.System2
+Contains the highest library, that controls entire
+system abstractly, as another manage mostly hardware.
+### Cosmos.HAL2
+Contains Hardware Abstraction Layer and most of 
+system drivers used by Cosmos. These include PS/2,
+PCI, PIT, etc.
+### Cosmos.Core
+Contains the most basic things that used by NET BCL
+and Cosmos, such as Plugs and XSharp snippets.
 
-- C.B.Builder - Essentially the user kit. A C# program which automates the building and installation of Cosmos wtih a GUI.
+## `Demos.sln`
+Currently contains user-made Cosmos project examples.
+Also, it can be used as test solution
 
-- C.B.Insaller - This is the UAC workaround task?
-
-- Add C.B.Common & C.B.MSBuild or to compiler?
-
-### Compiler
-
-Parts:
-- Assembler
-- Compiler
-- XSharp (Compiler Parts)
-- Tools (Compiler Parts)
-
-Notes:
-- In future XSharp may be separated or a SLN with only XSharp parts in it. But it is needed often when using compiler.
-
-Bin Cache Dependencies:
-
-### IDE
-
-TODO Exists, but needs cleaned up still a lot.
-
-Debug, Deploy, Visual Studio, XSharp (IDE Parts), Tools (IDE Parts)
-
-### Kernel
-
-- Kernel, Demos (not  User), Tests
-
-### Tests
-
-- All unit tests
-
-### Tools
-
-- Misc Tools 
-
+## `Test.sln`
+Currently contains all unit tests that Cosmos uses
+to ensure that there are no bugs. You can use it while
+development of new features of DevKit to test new changes

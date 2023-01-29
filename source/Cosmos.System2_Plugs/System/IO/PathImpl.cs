@@ -64,7 +64,7 @@ namespace Cosmos.System_Plugs.System.IO
         {
             if (aPath1 == null || aPath2 == null)
             {
-                throw new ArgumentNullException((aPath1 == null) ? "path1" : "path2");
+                throw new ArgumentNullException(aPath1 == null ? "path1" : "path2");
             }
 
             CheckInvalidPathChars(aPath1);
@@ -407,7 +407,7 @@ namespace Cosmos.System_Plugs.System.IO
                     {
                         string text2 = aPath;
                         int num = 0;
-                        while ((num < text2.Length) && (text2[num] != '?') && (text2[num] != '*'))
+                        while (num < text2.Length && text2[num] != '?' && text2[num] != '*')
                         {
                             num++;
                         }
@@ -436,7 +436,7 @@ namespace Cosmos.System_Plugs.System.IO
                     {
                         return null;
                     }
-                    while ((num2 > rootLength) && (aPath[--num2] != Path.DirectorySeparatorChar) && (aPath[num2] != Path.AltDirectorySeparatorChar))
+                    while (num2 > rootLength && aPath[--num2] != Path.DirectorySeparatorChar && aPath[num2] != Path.AltDirectorySeparatorChar)
                     {
                     }
                     return aPath.Substring(0, num2);
@@ -452,16 +452,16 @@ namespace Cosmos.System_Plugs.System.IO
 
             int i = 0;
             int xLength = aPath.Length;
-            if ((xLength >= 1) && IsDirectorySeparator(aPath[0]))
+            if (xLength >= 1 && IsDirectorySeparator(aPath[0]))
             {
                 i = 1;
-                if ((xLength >= 2) && IsDirectorySeparator(aPath[1]))
+                if (xLength >= 2 && IsDirectorySeparator(aPath[1]))
                 {
                     i = 2;
                     int xNum = 2;
                     while (i < xLength)
                     {
-                        if (((aPath[i] == Path.DirectorySeparatorChar) || (aPath[i] == Path.AltDirectorySeparatorChar)) && (--xNum <= 0))
+                        if ((aPath[i] == Path.DirectorySeparatorChar || aPath[i] == Path.AltDirectorySeparatorChar) && --xNum <= 0)
                         {
                             break;
                         }
@@ -469,10 +469,10 @@ namespace Cosmos.System_Plugs.System.IO
                     }
                 }
             }
-            else if ((xLength >= 2) && (aPath[1] == VFSManager.GetVolumeSeparatorChar()))
+            else if (xLength >= 2 && aPath[1] == VFSManager.GetVolumeSeparatorChar())
             {
                 i = 2;
-                if ((xLength >= 3) && IsDirectorySeparator(aPath[2]))
+                if (xLength >= 3 && IsDirectorySeparator(aPath[2]))
                 {
                     i++;
                 }

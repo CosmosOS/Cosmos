@@ -89,34 +89,34 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw point.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="aColor">Color to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
-        public override void DrawPoint(Pen aPen, int aX, int aY)
+        public override void DrawPoint(Color aColor, int aX, int aY)
         {
-            if (aPen.Color.A < 255)
+            if (aColor.A < 255)
             {
-                if (aPen.Color.A == 0)
+                if (aColor.A == 0)
                 {
                     return;
                 }
 
-                aPen.Color = AlphaBlend(aPen.Color, GetPointColor(aX, aY), aPen.Color.A);
+                aColor = AlphaBlend(aColor, GetPointColor(aX, aY), aColor.A);
             }
 
-            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aPen.ValueARGB);
+            _xSVGADriver.SetPixel((uint)aX, (uint)aY, (uint)aColor.ToArgb());
         }
 
         /// <summary>
         /// Draw array of colors.
         /// Not implemented.
         /// </summary>
-        /// <param name="colors">Array of colors.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="width">Width.</param>
-        /// <param name="height">Height.</param>
+        /// <param name="aColors">Array of colors.</param>
+        /// <param name="aX">X coordinate.</param>
+        /// <param name="aY">Y coordinate.</param>
+        /// <param name="aWidth">Width.</param>
+        /// <param name="aHeight">Height.</param>
         /// <exception cref="NotImplementedException">Thrown always.</exception>
         public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
         {
@@ -128,11 +128,11 @@ namespace Cosmos.System.Graphics
         /// Draw point.
         /// Not implemented.
         /// </summary>
-        /// <param name="pen">Pen to draw with.</param>
+        /// <param name="aColor">Color to draw with.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <exception cref="NotImplementedException">Thrown always (only int coordinates supported).</exception>
-        public override void DrawPoint(Pen aPen, float aX, float aY)
+        public override void DrawPoint(Color aColor, float aX, float aY)
         {
             //xSVGAIIDriver.
             throw new NotImplementedException();
@@ -141,16 +141,16 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Draw filled rectangle.
         /// </summary>
-        /// <param name="aPen">Pen to draw with.</param>
+        /// <param name="aColor">color to draw with.</param>
         /// <param name="aX_start">starting X coordinate.</param>
         /// <param name="aY_start">starting Y coordinate.</param>
         /// <param name="aWidth">Width.</param>
         /// <param name="aHeight">Height.</param>
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         /// <exception cref="NotImplementedException">Thrown if VMWare SVGA 2 has no rectange copy capability</exception>
-        public override void DrawFilledRectangle(Pen aPen, int aX_start, int aY_start, int aWidth, int aHeight)
+        public override void DrawFilledRectangle(Color aColor, int aX_start, int aY_start, int aWidth, int aHeight)
         {
-            var color = aPen.Color.ToArgb();
+            var color = aColor.ToArgb();
 
             // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
             for (int i = aY_start; i < aY_start + aHeight; i++)
@@ -303,8 +303,8 @@ namespace Cosmos.System.Graphics
         {
             ThrowIfModeIsNotValid(aMode);
 
-            var xWidth = (uint)aMode.Columns;
-            var xHeight = (uint)aMode.Rows;
+            var xWidth = (uint)aMode.Width;
+            var xHeight = (uint)aMode.Height;
             var xColorDepth = (uint)aMode.ColorDepth;
 
             _xSVGADriver.SetMode(xWidth, xHeight, xColorDepth);
@@ -419,14 +419,14 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="str">string to draw.</param>
         /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
+        /// <param name="color">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public override void DrawString(string str, Font aFont, Pen pen, int x, int y)
+        public override void DrawString(string str, Font aFont, Color color, int x, int y)
         {
             for (int i = 0; i < str.Length; i++)
             {
-                DrawChar(str[i], aFont, pen, x, y);
+                DrawChar(str[i], aFont, color, x, y);
                 x += aFont.Width;
             }
         }
@@ -436,10 +436,10 @@ namespace Cosmos.System.Graphics
         /// </summary>
         /// <param name="str">char to draw.</param>
         /// <param name="aFont">Font used.</param>
-        /// <param name="pen">Color.</param>
+        /// <param name="color">Color.</param>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public override void DrawChar(char c, Font aFont, Pen pen, int x, int y)
+        public override void DrawChar(char c, Font aFont, Color color, int x, int y)
         {
             int p = aFont.Height * (byte)c;
 
@@ -449,7 +449,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (aFont.ConvertByteToBitAddres(aFont.Data[p + cy], cx + 1))
                     {
-                        DrawPoint(pen, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
+                        DrawPoint(color, (ushort)(x + (aFont.Width - cx)), (ushort)(y + cy));
                     }
                 }
             }
@@ -468,7 +468,7 @@ namespace Cosmos.System.Graphics
 
             for (int i = 0; i < xHeight; i++)
             {
-                _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, (i * xWidth), xWidth);
+                _xSVGADriver.VideoMemory.Copy(GetPointOffset(aX, aY + i) + (int)_xSVGADriver.FrameSize, aImage.rawData, i * xWidth, xWidth);
             }
         }
     }

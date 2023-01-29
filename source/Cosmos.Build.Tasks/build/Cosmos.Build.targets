@@ -1,32 +1,48 @@
 ﻿<Project>
 
     <PropertyGroup>
-        <CosmosDir Condition="$(CosmosDir) == ''">$(AppData)\Cosmos User Kit</CosmosDir>
-        <KernelAssembliesDir>$(CosmosDir)\Kernel\</KernelAssembliesDir>
+        <CosmosDir Condition="$(CosmosDir) == '' AND '$(OS)' == 'Windows_NT'">$(AppData)\Cosmos User Kit</CosmosDir>
+        <CosmosDir Condition="$(CosmosDir) == '' AND '$(OS)' != 'Windows_NT'">/opt/cosmos</CosmosDir>
+        <KernelAssembliesDir>$(CosmosDir)/Kernel/</KernelAssembliesDir>
     </PropertyGroup>
 
     <PropertyGroup>
         <BinFile Condition="'$(BinFile)' == ''">$(OutputPath)$(AssemblyName).bin</BinFile>
+        <BinGzFile Condition="'$(BinGzFile)' == ''">$(OutputPath)$(AssemblyName).bin.gz</BinGzFile>
         <IsoFile Condition="'$(IsoFile)' == ''">$(OutputPath)$(AssemblyName).iso</IsoFile>
     </PropertyGroup>
 
     <PropertyGroup>
         <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
 
-        <NasmToolPath Condition = "'$(NasmToolPath)' == ''">$(CosmosToolsPath)yasm\win\</NasmToolPath>
-        <NasmToolExe Condition = "'$(NasmToolExe)' == ''">yasm.exe</NasmToolExe>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)yasm\win\</NasmToolPath>
+        <NasmToolPath Condition = "'$(NasmToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</NasmToolPath>
+        <NasmToolExe Condition = "'$(NasmToolExe)' == '' AND '$(OS)' == 'Windows_NT'">yasm.exe</NasmToolExe>
+        <NasmToolExe Condition = "'$(NasmToolExe)' == '' AND '$(OS)' != 'Windows_NT'">yasm</NasmToolExe>
 
-        <LdToolPath Condition = "'$(LdToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</LdToolPath>
-        <LdToolExe Condition = "'$(LdToolExe)' == ''">ld.exe</LdToolExe>
+        <LdToolPath Condition = "'$(LdToolPath)' == '' AND '$(OS)' == 'Windows_NT' ">$(CosmosToolsPath)cygwin\win\</LdToolPath>
+        <LdToolPath Condition = "'$(LdToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</LdToolPath>
+        <LdToolExe Condition = "'$(LdToolExe)' == '' AND '$(OS)' == 'Windows_NT'">ld.exe</LdToolExe>
+        <LdToolExe Condition = "'$(LdToolExe)' == '' AND '$(OS)' != 'Windows_NT'">ld</LdToolExe>
 
-        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == ''">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
-        <ObjdumpToolExe Condition = "'$(ObjdumpToolExe)' == ''">objdump.bat</ObjdumpToolExe>
+        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
+        <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/bin/</ObjdumpToolPath>
 
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == ''">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
-        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == ''">mkisofs.exe</MkisofsToolExe>
+        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
+        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</MkisofsToolPath>
+        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' == 'Windows_NT'">mkisofs.exe</MkisofsToolExe>
+        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' != 'Windows_NT'">mkisofs</MkisofsToolExe>
+
+        <XorrisoToolPath Condition = "'$(XorrisoToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)xorriso\win\</XorrisoToolPath>
+        <XorrisoToolPath Condition = "'$(XorrisoToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</XorrisoToolPath>
+        <XorrisoToolExe Condition = "'$(XorrisoToolExe)' == '' AND '$(OS)' == 'Windows_NT'">xorriso.exe</XorrisoToolExe>
+        <XorrisoToolExe Condition = "'$(XorrisoToolExe)' == '' AND '$(OS)' != 'Windows_NT'">xorriso</XorrisoToolExe>
 
         <SyslinuxToolPath Condition = "'$(SyslinuxToolPath)' == ''">$(CosmosToolsPath)syslinux\win\</SyslinuxToolPath>
         <SyslinuxToolExe Condition = "'$(SyslinuxToolExe)' == ''">syslinux.exe</SyslinuxToolExe>
+
+        <LimineToolPath Condition = "'$(LimineToolPath)' == ''">$(CosmosToolsPath)limine\boot\</LimineToolPath>
+        <LimineToolExe Condition = "'$(LimineToolExe)' == ''">limine-deploy.exe</LimineToolExe>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -37,9 +53,10 @@
         <DebugCom Condition="'$(DebugEnabled)' == 'False'">0</DebugCom>
 
         <BinFormat Condition="'$(BinFormat)' == ''">ELF</BinFormat>
+        <CompressionType Condition="'$(CompressionType)' == ''">None</CompressionType>
         <DebugMode Condition="'$(DebugMode)' == ''">Source</DebugMode>
         <TraceMode Condition="'$(TraceMode)' == ''">User</TraceMode>
-		<ExtractMapFile Condition="'$(ExtractMapFile)' == ''">False</ExtractMapFile>
+        <ExtractMapFile Condition="'$(ExtractMapFile)' == ''">False</ExtractMapFile>
         <StackCorruptionDetectionEnabled Condition="'$(StackCorruptionDetectionEnabled)' == ''">True</StackCorruptionDetectionEnabled>
         <StackCorruptionDetectionLevel Condition="'$(StackCorruptionDetectionLevel)' == ''">MethodFooters</StackCorruptionDetectionLevel>
         <IgnoreDebugStubAttribute Condition="'$(IgnoreDebugStubAttribute)' == ''">False</IgnoreDebugStubAttribute>
@@ -56,12 +73,18 @@
         <SyslinuxPath Condition="'$(SyslinuxPath)' == ''">$(CosmosToolsPath)syslinux\bios\</SyslinuxPath>
 
         <GrubPath Condition="'$(GrubPath)' == ''">$(CosmosToolsPath)grub2\</GrubPath>
+        <LiminePath Condition="'$(LiminePath)' == ''">$(CosmosToolsPath)limine\</LiminePath>
 
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
 
         <CompileVBEMultiboot Condition="'$(CompileVBEMultiboot)' == ''">False</CompileVBEMultiboot>
 
-</PropertyGroup>
+        <RemoveBootDebugOutput Condition="'$(RemoveBootDebugOutput)' == ''">ELF</RemoveBootDebugOutput>
+
+        <AllowComments Condition="'$(AllowComments)' == ''">False</AllowComments>
+
+        <OptimizationLevel Condition="'$(OptimizationLevel)' == ''">1</OptimizationLevel>
+    </PropertyGroup>
 
     <PropertyGroup>
         <CosmosBuildTasksAssembly Condition="'$(CosmosBuildTasksAssembly)' == '' OR !Exists('$(CosmosBuildTasksAssembly)')">$(CosmosToolsPath)net48\Cosmos.Build.Tasks.dll</CosmosBuildTasksAssembly>
@@ -112,12 +135,14 @@
     </ItemGroup>
 
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateMbr" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.CreateGrubConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.CreateLimineConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Launch" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Ld" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.Gzip" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.LimineDeploy" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ReadNasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.TheRingMaster" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -135,6 +160,7 @@
             Ld;
             ExtractMapFromElfFile;
             ReadNasmMapToDebugInfo;
+            Gzip;
             MakeIso
         </CosmosBuildDependsOn>
     </PropertyGroup>
@@ -191,7 +217,8 @@
                 ToolPath="$(Il2cpuToolPath)"
                 ToolExe="$(Il2cpuToolExe)"
                 CompileVBEMultiboot="$(CompileVBEMultiboot)"
-				VBEResolution="$(VBEResolution)"/>
+				AllowComments="$(AllowComments)"
+                VBEResolution="$(VBEResolution)"/>
 
     </Target>
 
@@ -215,7 +242,8 @@
               OutputFile="$(NasmOutput)"
               OutputFormat="$(BinFormat)"
               ToolPath="$(NasmToolPath)"
-              ToolExe="$(NasmToolExe)" />
+              ToolExe="$(NasmToolExe)"
+	      OptimizationLevel="$(OptimizationLevel)"/>
 
     </Target>
 
@@ -267,7 +295,8 @@
                                MapFile="$(MapFile)"
                                DebugInfoFile="$(CosmosDebugSymbolsFile)"
                                ToolPath="$(ObjdumpToolPath)"
-                               ToolExe="$(ObjdumpToolExe)" />
+                               ToolExe="$(ObjdumpToolExe)"
+                               ActualToolPath="$(CosmosToolsPath)cygwin\win\"/>
 
     </Target>
 
@@ -295,6 +324,28 @@
 
     <!--
     ================================================================================
+                                         Gzip
+
+        [IN]
+        $(BinFile) - a binary file.
+
+        [OUT]
+		$(BinGzFile) - a gzipped binary file.
+
+    ================================================================================
+    -->
+    <Target Name="Gzip"
+            Inputs="$(BinFile)"
+            Outputs="$(BinGzFile)"
+            Condition="'$(CompressionType)' == 'Gzip'">
+
+        <Gzip BinFile="$(BinFile)"
+              OutputFile="$(BinGzFile)" />
+
+    </Target>
+
+    <!--
+    ================================================================================
                                          MakeISO
 
         [IN]
@@ -310,16 +361,19 @@
             Outputs="$(IsoFile)"
             Condition="'$(Deployment)' == 'ISO'">
 
-		    <ItemGroup>
-			    <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
-		    </ItemGroup>
-
         <ItemGroup>
-            <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
+            <_IsoCustomFiles Include="$(MSBuildProjectDirectory)\isoFiles\**\*.*"/>
         </ItemGroup>
 
         <ItemGroup>
-            <_IsoFile Include="$(BinFile)" />
+            <_IsoFile Include="$(LiminePath)boot\limine-cd.bin" />
+            <_IsoFile Include="$(LiminePath)boot\limine.sys" />
+            <_IsoFile Include="$(LiminePath)boot\liminewp.bmp" />
+        </ItemGroup>
+
+        <ItemGroup>
+            <_IsoFile Include="$(BinGzFile)" Condition="'$(CompressionType)' == 'Gzip'" />
+            <_IsoFile Include="$(BinFile)" Condition="'$(CompressionType)' == 'None'" />
             <_IsoFile Include="@(ContentToDeploy)" />
         </ItemGroup>
 
@@ -336,17 +390,20 @@
 			        Retries="3"
 			        RetryDelayMilliseconds="300"/>
 
-        <Copy SourceFiles="@(_i386pcFile)"
-              DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
+        <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
+                              BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
+                              Timeout="$(Timeout)"
+                              Condition="'$(CompressionType)' == 'Gzip'" />
 
-        <CreateGrubConfig TargetDirectory="$(IntermediateIsoDirectory)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
+        <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
+                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                              Timeout="$(Timeout)"
+                              Condition="'$(CompressionType)' == 'None'" />
 
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
                  OutputFile="$(IsoFile)"
-                 ToolPath="$(MkisofsToolPath)"
-                 ToolExe="$(MkisofsToolExe)" />
-
+                 ToolPath="$(XorrisoToolPath)"
+                 ToolExe="$(XorrisoToolExe)" />
     </Target>
 
     <!--
@@ -393,11 +450,14 @@
         </ItemGroup>
 
         <ItemGroup>
-            <_i386pcFile Include="$(GrubPath)boot\grub\i386-pc\*" />
+            <_IsoFile Include="$(LiminePath)boot\limine-cd.bin" />
+            <_IsoFile Include="$(LiminePath)boot\limine.sys" />
+            <_IsoFile Include="$(LiminePath)boot\liminewp.bmp" />
         </ItemGroup>
 
         <ItemGroup>
-            <_UsbFile Include="$(BinFile)" />
+            <_UsbFile Include="$(BinGzFile)" Condition="'$(CompressionType)' == 'Gzip'" />
+            <_UsbFile Include="$(BinFile)" Condition="'$(CompressionType)' == 'None'" />
             <_UsbFile Include="@(ContentToDeploy)" />
         </ItemGroup>
 
@@ -414,20 +474,48 @@
 			        Retries="3"
 			        RetryDelayMilliseconds="300"/>
 
-        <Copy SourceFiles="@(_i386pcFile)"
-              DestinationFolder="$(IntermediateIsoDirectory)\boot\grub\i386-pc\" />
-
         <Copy SourceFiles="@(IntermediateIsoDirectory)"
               DestinationFolder="$(UsbPublishDrive)" />
 
-        <CreateGrubConfig TargetDirectory="$(UsbPublishDrive)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))" />
+        <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
+                            BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
+                            Timeout="$(Timeout)"
+                            Condition="'$(CompressionType)' == 'Gzip'" />
+
+        <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
+                            BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                            Timeout="$(Timeout)"
+                            Condition="'$(CompressionType)' == 'None'" />
 
         <CreateMbr TargetDrive="$(UsbPublishDrive)"
                    FormatDrive="$(UsbPublishFormatDrive)"
-                   ToolPath="$(SyslinuxToolPath)"
-                   ToolExe="$(SyslinuxToolExe)" />
+                   ToolPath="$(XorrisoToolPath)"
+                   ToolExe="$(XorrisoToolExe)" />
 
+    </Target>
+
+    <!--
+    ================================================================================
+                                       LimineDeploy
+
+        [IN]
+        $(IsoFile) - an ISO file.
+
+        [OUT]
+        $(LimineIsoFile) - a Limine bootable ISO file.
+
+    ================================================================================
+    -->
+
+    <Target Name="LimineDeploy"
+            Inputs="IsoFile"
+            Outputs="LimineIsoFile"
+            Condition="'$(Deployment)' == 'ISO'">
+
+        <LimineDeploy IsoFile="$(IsoFile)"
+                      LimineIsoFile="$(LimineIsoFile)"
+                      ToolPath="$(LimineDeployToolPath)"
+                      ToolExe="$(LimineDeployToolExe)" />
     </Target>
 
     <Target Name="Launch">

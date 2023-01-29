@@ -42,7 +42,7 @@ namespace Cosmos.System_Plugs.System
                 {
                     throw new FormatException();
                 }
-                result = (result * 10) + ind;
+                result = result * 10 + ind;
             }
 
             if (neg)

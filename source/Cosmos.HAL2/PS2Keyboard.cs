@@ -23,7 +23,6 @@ namespace Cosmos.HAL
 
         public byte PS2Port { get; }
 
-        private Core.IOGroup.PS2Controller IO = Core.Global.BaseIOGroups.PS2Controller;
         private PS2Controller mPS2Controller = Global.PS2Controller;
         private Debugger mDebugger = new Debugger("HAL", "PS2Keyboard");
 
@@ -54,7 +53,7 @@ namespace Cosmos.HAL
 
         private void HandleIRQ(ref INTs.IRQContext aContext)
         {
-            byte xScanCode = IO.Data.Byte;
+            byte xScanCode = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
             bool xReleased = (xScanCode & 0x80) == 0x80;
 
             if (xReleased)
@@ -124,7 +123,7 @@ namespace Cosmos.HAL
             }
 
             mPS2Controller.WaitToWrite();
-            IO.Data.Byte = (byte)aCommand;
+            IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, (byte)aCommand);
 
             mPS2Controller.WaitForAck();
 
@@ -142,7 +141,7 @@ namespace Cosmos.HAL
                 }
 
                 mPS2Controller.WaitToWrite();
-                IO.Data.Byte = aByte.Value;
+                IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, aByte.Value);
 
                 mPS2Controller.WaitForAck();
             }

@@ -36,7 +36,7 @@ namespace Cosmos.System.FileSystem.ISO9660
             //Read primary descriptor
             var primaryDescriptor = aDevice.NewBlockArray(1);
             aDevice.ReadBlock(0x10, 1, ref primaryDescriptor);
-            var r = new BinaryReader(new MemoryStream(primaryDescriptor));
+            using var r = new BinaryReader(new MemoryStream(primaryDescriptor));
 
             var volType = r.ReadByte();
             var id = r.ReadBytes(5);
@@ -54,7 +54,7 @@ namespace Cosmos.System.FileSystem.ISO9660
 
             r.BaseStream.Position = 156;
             var b = r.ReadBytes(34);
-            BinaryReader rootdir = new BinaryReader(new MemoryStream(b));
+            using BinaryReader rootdir = new BinaryReader(new MemoryStream(b));
             RootDir = ReadDirectoryEntry(rootdir);
         }
         /// <summary>

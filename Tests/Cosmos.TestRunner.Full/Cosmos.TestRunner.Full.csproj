@@ -12,6 +12,7 @@
         <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
         <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
         <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU\IL2CPU.csproj" ReferenceOutputAssembly="False" />
+        <ProjectReference Include="..\Kernels\AudioTests\AudioTests.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -116,7 +116,7 @@ namespace Cosmos.System.Network.IPv4
 
             while (rxBuffer.Count < 1)
             {
-                if (second > (timeout / 1000))
+                if (second > timeout / 1000)
                 {
                     return -1;
                 }

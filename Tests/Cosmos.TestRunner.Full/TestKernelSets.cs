@@ -29,9 +29,9 @@ namespace Cosmos.TestRunner.Full
             yield return typeof(Kernel.Tests.DiskManager.Kernel);
 
             //yield return typeof(KernelGen3.Boot);
-
             yield return typeof(GraphicTest.Kernel);
             yield return typeof(NetworkTest.Kernel);
+            yield return typeof(AudioTests.Kernel);
             // Please see the notes on the kernel itself before enabling it
             //yield return typeof(ConsoleTest.Kernel);
             // This is a bit slow and works only because ring check is disabled to decide if leave it enabled
