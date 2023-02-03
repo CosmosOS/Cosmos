@@ -14,7 +14,7 @@ A clear and concise description of where the plug is needed
 Can this plug be added without requiring new drivers or a lot of work? (Methods requiring Linq, Reflection or Networking etc. are too complex for this request)
 
 **Describe alternatives you've considered**
-Are there ways to work around this plug not existing?
+Are there workarounds for this plug?
 
 **Additional context**
 Add any other context about the plug request here.

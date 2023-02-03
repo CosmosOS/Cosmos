@@ -5,11 +5,13 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Cosmos.HAL;
 
-namespace Cosmos.System {
+namespace Cosmos.System
+{
     /// <summary>
     /// Standard output stream.
     /// </summary>
-    public class Console {
+    public class Console
+    {
         /// <summary>
         /// Line feed.
         /// </summary>
@@ -35,9 +37,11 @@ namespace Cosmos.System {
         /// <summary>
         /// Get and set cursor location on X axis.
         /// </summary>
-        public int X {
+        public int X
+        {
             get { return mX; }
-            set {
+            set
+            {
                 mX = value;
                 UpdateCursor();
             }
@@ -51,9 +55,11 @@ namespace Cosmos.System {
         /// <summary>
         /// Get and set cursor location on Y axis.
         /// </summary>
-        public int Y {
+        public int Y
+        {
             get { return mY; }
-            set {
+            set
+            {
                 mY = value;
                 UpdateCursor();
             }
@@ -62,7 +68,8 @@ namespace Cosmos.System {
         /// <summary>
         /// Get window width.
         /// </summary>
-        public int Cols {
+        public int Cols
+        {
             set { }
             get { return mText.Cols; }
         }
@@ -70,7 +77,8 @@ namespace Cosmos.System {
         /// <summary>
         /// Get window height.
         /// </summary>
-        public int Rows {
+        public int Rows
+        {
             set { }
             get { return mText.Rows; }
         }
@@ -99,7 +107,8 @@ namespace Cosmos.System {
         /// <summary>
         /// Clear console and return cursor to (0,0).
         /// </summary>
-        public void Clear() {
+        public void Clear()
+        {
             mText.Clear();
             mX = 0;
             mY = 0;
@@ -110,17 +119,20 @@ namespace Cosmos.System {
         /// <summary>
         /// Update cursor position.
         /// </summary>
-        protected void UpdateCursor() {
+        protected void UpdateCursor()
+        {
             mText.SetCursorPos(mX, mY);
         }
 
         /// <summary>
         /// Scroll the console up and move crusor to the start of the line.
         /// </summary>
-        private void DoLineFeed() {
+        private void DoLineFeed()
+        {
             mY++;
             mX = 0;
-            if (mY == mText.Rows) {
+            if (mY == mText.Rows)
+            {
                 mText.ScrollUp();
                 mY--;
             }
@@ -131,7 +143,8 @@ namespace Cosmos.System {
         /// Move cursor to the start of the line.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void DoCarriageReturn() {
+        private void DoCarriageReturn()
+        {
             mX = 0;
             UpdateCursor();
         }
@@ -226,10 +239,13 @@ namespace Cosmos.System {
         public int CursorSize
         {
             get { return mText.GetCursorSize(); }
-            set {
+            set
+            {
                 // Value should be a percentage from [1, 100].
                 if (value < 1 || value > 100)
+                {
                     throw new ArgumentOutOfRangeException("value", value, "CursorSize value " + value + " out of range (1 - 100)");
+                }
 
                 mText.SetCursorSize(value);
             }
@@ -238,9 +254,10 @@ namespace Cosmos.System {
         /// <summary>
         /// Get and set cursor visiblty.
         /// </summary>
-        public bool CursorVisible {
+        public bool CursorVisible
+        {
             get { return mText.GetCursorVisible(); }
-            set { mText.SetCursorVisible(value);  }
+            set { mText.SetCursorVisible(value); }
         }
     }
 }

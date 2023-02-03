@@ -12,7 +12,7 @@ namespace Cosmos.Core_Asm
         {
             // method signature: $this, object @object, IntPtr method
             var xAssembler = aAssembler;
-            var xMethodInfo = (_MethodInfo)aMethodInfo;
+            var xMethodInfo = (Il2cpuMethodInfo)aMethodInfo;
             XS.Comment("Save target ($this) to field");
             XS.Comment("-- ldarg 0");
             Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
@@ -40,6 +40,19 @@ namespace Cosmos.Core_Asm
             XS.Push(xSize);
             XS.Comment("-- stfld ArgSize");
             Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodBase.DeclaringType, true, false);
+
+            uint returnSize = 0;
+            if(xMethodInfo.MethodBase.DeclaringType.GetMethod("Invoke").ReturnType != typeof(void))
+            {
+                returnSize = ILOp.Align(ILOp.SizeOfType(xMethodInfo.MethodBase.DeclaringType.GetMethod("Invoke").ReturnType), 4);
+            }
+
+            XS.Comment("-- ldarg 0");
+            Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
+            XS.Comment("-- push returnSize");
+            XS.Push(returnSize);
+            XS.Comment("-- stfld ArgSize");
+            Stfld.DoExecute(xAssembler, xMethodInfo, "$$ReturnSize$$", xMethodInfo.MethodBase.DeclaringType, true, false);
         }
     }
 }

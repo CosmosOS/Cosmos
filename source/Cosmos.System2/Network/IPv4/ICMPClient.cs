@@ -97,7 +97,7 @@ namespace Cosmos.System.Network.IPv4
         public void SendEcho()
         {
             Address source = IPConfig.FindNetwork(destination);
-            ICMPEchoRequest request = new ICMPEchoRequest(source, destination, 0x0001, 0x50); //this is working
+            var request = new ICMPEchoRequest(source, destination, 0x0001, 0x50); //this is working
             OutgoingBuffer.AddPacket(request); //Aura doesn't work when this is called.
             NetworkStack.Update();
         }
@@ -106,7 +106,7 @@ namespace Cosmos.System.Network.IPv4
         /// Receive data
         /// </summary>
         /// <param name="source">Source end point.</param>
-        /// <param name="timeout">timeout value, default 5000ms
+        /// <param name="timeout">timeout value, default 5000ms</param>
         /// <returns>Address from Domain Name</returns>
         /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
         public int Receive(ref EndPoint source, int timeout = 5000)
@@ -116,7 +116,7 @@ namespace Cosmos.System.Network.IPv4
 
             while (rxBuffer.Count < 1)
             {
-                if (second > (timeout / 1000))
+                if (second > timeout / 1000)
                 {
                     return -1;
                 }
@@ -127,7 +127,7 @@ namespace Cosmos.System.Network.IPv4
                 }
             }
 
-            ICMPEchoReply packet = new ICMPEchoReply(rxBuffer.Dequeue().RawData);
+            var packet = new ICMPEchoReply(rxBuffer.Dequeue().RawData);
             source.Address = packet.SourceIP;
 
             return second;

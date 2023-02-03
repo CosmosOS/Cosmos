@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Cosmos.Build.Builder.Collections;
 using Cosmos.Build.Builder.Models;
 using Cosmos.Build.Builder.Services;
+using Cosmos.Build.Builder.Views;
 
 namespace Cosmos.Build.Builder.ViewModels
 {
@@ -21,18 +22,20 @@ namespace Cosmos.Build.Builder.ViewModels
 
         public Section CurrentSection => Sections.LastOrDefault();
 
-        public ICommand CopyCommand { get; }
+        public ICommand CopyCommand { get; set; }
 
-        public bool CloseWhenCompleted
-        {
-            get => _closeWhenCompleted;
-            set => SetAndRaiseIfChanged(ref _closeWhenCompleted, value);
-        }
+        public ICommand PostPaste { get; set; }
 
-        public WindowState WindowState
+        public ICommand RetryBuild { get; set; }
+
+        public bool CloseWhenCompleted { get; set; }
+
+        public bool AnErrorOccurred { get; set; }
+
+        public MainWindow Window
         {
-            get => _windowState;
-            set => SetAndRaiseIfChanged(ref _windowState, value);
+            get => _window;
+            set => SetAndRaiseIfChanged(ref _window, value);
         }
 
         private readonly ILogger _logger;
@@ -40,16 +43,19 @@ namespace Cosmos.Build.Builder.ViewModels
         private readonly IDialogService<DependencyInstallationDialogViewModel> _dependencyInstallationDialogService;
 
         private readonly IBuildDefinition _buildDefinition;
-        private readonly Task _buildTask;
 
-        private bool _closeWhenCompleted;
+        private bool _buildCancel;
 
-        private WindowState _windowState;
+        private Task _buildTask;
+
+        private MainWindow _window;
 
         public MainWindowViewModel(
             IDialogService<DependencyInstallationDialogViewModel> dependencyInstallationDialogService,
-            IBuildDefinition buildDefinition)
+            IBuildDefinition buildDefinition, MainWindow win)
         {
+            _window = win;
+
             _dependencyInstallationDialogService = dependencyInstallationDialogService;
 
             _buildDefinition = buildDefinition;
@@ -61,14 +67,29 @@ namespace Cosmos.Build.Builder.ViewModels
 
             CopyCommand = new RelayCommand(CopyLogToClipboard);
 
-            CloseWhenCompleted = true;
+            PostPaste = new RelayCommand(PostPasteCommand);
+
+            RetryBuild = new RelayCommand(RetryBuildCommand);
 
             _logger = new MainWindowLogger(this);
 
             _buildTask = BuildAsync();
         }
 
+        private void RetryBuildCommand(object obj)
+        {
+            _buildCancel = true;
+            MainWindow win = new();
+            win.Show();
+            _dependencyInstallationDialogService.SetAnotherOwner(win);
+            Window.AppShutdown = false;
+            Window.Close();
+            win.DataContext = new MainWindowViewModel(_dependencyInstallationDialogService, _buildDefinition, win);
+        }
+
         private void CopyLogToClipboard(object parameter) => Clipboard.SetText(BuildLog());
+
+        private void PostPasteCommand(object parameter) => InternalPostPaste();
 
         private string BuildLog()
         {
@@ -91,6 +112,29 @@ namespace Cosmos.Build.Builder.ViewModels
             }
 
             return log;
+        }
+
+        private void InternalPostPaste()
+        {
+            try
+            {
+                string baseUrl = "https://www.toptal.com/developers/hastebin/";
+                var hasteBinClient = new HasteBinClient(baseUrl);
+                HasteBinResult result = hasteBinClient.Post(BuildLog()).Result;
+
+                if (result.IsSuccess)
+                {
+                    Views.MessageBox.Show($"link:{baseUrl}{result.Key}");
+                }
+                else
+                {
+                    Views.MessageBox.Show($"Failed, status code was {result.StatusCode}");
+                }
+            }
+            catch (Exception e)
+            {
+                Views.MessageBox.Show(e.Message);
+            }
         }
 
         private async Task BuildAsync()
@@ -142,9 +186,18 @@ namespace Cosmos.Build.Builder.ViewModels
             {
                 foreach (var buildTask in _buildDefinition.GetBuildTasks())
                 {
+                    if (_buildCancel) { throw new TaskCanceledException(); }
+
                     _logger.NewSection(buildTask.Name);
 
                     await buildTask.RunAsync(_logger).ConfigureAwait(false);
+                }
+
+                Window.AllTasksCompleted = true;
+
+                if (CloseWhenCompleted)
+                {
+                    Application.Current.Dispatcher.Invoke(() => Application.Current?.MainWindow?.Close());
                 }
             }
             catch (Exception e)
@@ -161,9 +214,9 @@ namespace Cosmos.Build.Builder.ViewModels
             }
             else
             {
-                if (WindowState == WindowState.Maximized)
+                if (Window.WindowState == WindowState.Maximized)
                 {
-                    WindowState = WindowState.Normal;
+                    Window.WindowState = WindowState.Normal;
                 }
             }
         }

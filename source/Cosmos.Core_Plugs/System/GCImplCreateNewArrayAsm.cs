@@ -20,8 +20,6 @@ namespace Cosmos.Core_Plugs.System
             XS.Set(ECX, EBP, sourceDisplacement: 8); // size
             XS.Set(EDX, EBP, sourceDisplacement: 12); // length
 
-
-
             XS.Push(ECX);  // size of element
             XS.Set(EAX, ECX);
             XS.Multiply(EDX); // total element size

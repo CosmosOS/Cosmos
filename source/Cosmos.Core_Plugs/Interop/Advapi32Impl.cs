@@ -7,7 +7,7 @@ using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.Interop
 {
-    [Plug("Interop+Advapi32, System.Private.CoreLib")]
+    [Plug("Interop+Advapi32, System.Private.CoreLib", IsOptional = true)]
     class Advapi32Impl
     {
         [PlugMethod(Signature = "System_Int32__Interop_Advapi32_EventActivityIdControl_Interop_Advapi32_ActivityControl___System_Guid_")]

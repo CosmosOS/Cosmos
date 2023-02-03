@@ -5,6 +5,7 @@ using Cosmos.System.Graphics;
 using System.Text;
 using Cosmos.System.ExtendedASCII;
 using Cosmos.System.ScanMaps;
+using Cosmos.Core.Memory;
 using Cosmos.Core;
 using System.Runtime.InteropServices;
 
@@ -156,6 +157,22 @@ namespace MemoryOperationsTest
             memoryBlock.Read32(read);
             Assert.AreEqual(values, read, "Using Fill(int, int, int) works");
         }
+        static unsafe void TestRealloc()
+		{
+            // Allocate initial pointer and fill with value 32
+            byte* aPtr = Heap.Alloc(16);
+            MemoryOperations.Fill(aPtr, (byte)32, 16);
+
+            // Resize/realloc to 17 bytes
+            aPtr = Heap.Realloc(aPtr, 17);
+
+            // Test for first 16 being 32 and last being 0
+            for (int i = 0; i < 15; i++)
+			{
+                Assert.AreEqual(aPtr[i], 32, $"Expected value 32 not found in index {i} of aPtr.");
+			}
+            Assert.AreEqual(aPtr[16], 0, "Expected value 0 not found at the end of aPtr.");
+		}
 
         protected override void Run()
         {
@@ -164,6 +181,7 @@ namespace MemoryOperationsTest
                 TestCopy();
                 TestMemoryBlock(new MemoryBlock(0x60000, 128)); //we are testing in SVGA video memory which should not be in use
                 TestManagedMemoryBlock(new ManagedMemoryBlock(128));
+                TestRealloc();
                 SpanTest.Execute();
                 TestController.Completed();
             }

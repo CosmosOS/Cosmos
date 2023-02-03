@@ -30,7 +30,10 @@ namespace Cosmos.System_Plugs.System
         {
             mBackground = value;
             //Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
-            if (GetConsole() != null) GetConsole().Background = value;
+            if (GetConsole() != null)
+            {
+                GetConsole().Background = value;
+            }
         }
 
         public static int get_BufferHeight()
@@ -186,7 +189,10 @@ namespace Cosmos.System_Plugs.System
         {
             mForeground = value;
             //Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
-            if (GetConsole() != null) GetConsole().Foreground = value;
+            if (GetConsole() != null)
+            {
+                GetConsole().Foreground = value;
+            }
         }
 
         //public static TextReader get_In()
@@ -360,7 +366,7 @@ namespace Cosmos.System_Plugs.System
         //  MoveBufferArea(int, int, int, int, int, int) is pure CIL
 
         public static void MoveBufferArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight,
-            int targetLeft, int targetTop, Char sourceChar, ConsoleColor sourceForeColor, ConsoleColor sourceBackColor)
+            int targetLeft, int targetTop, char sourceChar, ConsoleColor sourceForeColor, ConsoleColor sourceBackColor)
         {
             throw new NotImplementedException("Not implemented: MoveBufferArea");
         }
@@ -432,7 +438,7 @@ namespace Cosmos.System_Plugs.System
             return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), xShift, xAlt, xControl);
         }
 
-        public static String ReadLine()
+        public static string ReadLine()
         {
             var xConsole = GetConsole();
             if (xConsole == null)
@@ -440,13 +446,16 @@ namespace Cosmos.System_Plugs.System
                 // for now:
                 return null;
             }
-            List<char> chars = new List<char>(32);
+            var chars = new List<char>(32);
             KeyEvent current;
             int currentCount = 0;
 
             while ((current = KeyboardManager.ReadKey()).Key != ConsoleKeyEx.Enter)
             {
-                if (current.Key == ConsoleKeyEx.NumEnter) break;
+                if (current.Key == ConsoleKeyEx.NumEnter)
+                {
+                    break;
+                }
                 //Check for "special" keys
                 if (current.Key == ConsoleKeyEx.Backspace) // Backspace
                 {
@@ -489,7 +498,10 @@ namespace Cosmos.System_Plugs.System
                     continue;
                 }
 
-                if (current.KeyChar == '\0') continue;
+                if (current.KeyChar == '\0')
+                {
+                    continue;
+                }
 
                 //Write the character to the screen
                 if (currentCount == chars.Count)
@@ -503,7 +515,7 @@ namespace Cosmos.System_Plugs.System
                     //Insert the new character in the correct location
                     //For some reason, List.Insert() doesn't work properly
                     //so the character has to be inserted manually
-                    List<char> temp = new List<char>();
+                    var temp = new List<char>();
 
                     for (int x = 0; x < chars.Count; x++)
                     {
@@ -523,7 +535,7 @@ namespace Cosmos.System_Plugs.System
                         Write(chars[x]);
                     }
 
-                    GetConsole().X -= (chars.Count - currentCount) - 1;
+                    GetConsole().X -= chars.Count - currentCount - 1;
                     currentCount++;
                 }
             }
@@ -550,7 +562,7 @@ namespace Cosmos.System_Plugs.System
             set_CursorTop(top);
         }
 
-        public static (int Left, int Top) GetCursorPosition() 
+        public static (int Left, int Top) GetCursorPosition()
         {
             int Left = get_CursorLeft();
             int Top = get_CursorTop();
@@ -653,7 +665,7 @@ namespace Cosmos.System_Plugs.System
         public static void Write(long aLong) => Write(aLong.ToString());
 
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
-        public static void Write(object value) => Write((value ?? String.Empty));
+        public static void Write(object value) => Write(value ?? String.Empty);
 
         public static void Write(string aText)
         {
@@ -694,7 +706,7 @@ namespace Cosmos.System_Plugs.System
             {
                 throw new ArgumentOutOfRangeException("aCount");
             }
-            if ((aBuffer.Length - aIndex) < aCount)
+            if (aBuffer.Length - aIndex < aCount)
             {
                 throw new ArgumentException();
             }
@@ -719,7 +731,7 @@ namespace Cosmos.System_Plugs.System
 
         public static void WriteLine(char aChar) => WriteLine(aChar.ToString());
 
-        public static void WriteLine(char[] aBuffer) => WriteLine(new String(aBuffer));
+        public static void WriteLine(char[] aBuffer) => WriteLine(new string(aBuffer));
 
         /* Decimal type is not working yet... */
         //public static void WriteLine(decimal aDecimal) => WriteLine(aDecimal.ToString());

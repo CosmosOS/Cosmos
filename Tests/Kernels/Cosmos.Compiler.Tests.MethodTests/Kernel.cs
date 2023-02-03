@@ -40,6 +40,7 @@ namespace Cosmos.Compiler.Tests.MethodTests
         {
             BranchStackCorruption();
             BranchStackCorruption2();
+            DelegatesTest.Execute();
             try
             {
                 ReturnTests.Execute();
@@ -50,7 +51,6 @@ namespace Cosmos.Compiler.Tests.MethodTests
                 Console.WriteLine("Exception");
                 Console.WriteLine(E.ToString());
             }
-            DelegatesTest.Execute();
         }
     }
 }

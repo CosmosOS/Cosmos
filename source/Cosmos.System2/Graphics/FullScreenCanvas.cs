@@ -30,7 +30,7 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// List of all video drivers (BGA, 
+        /// List of all video drivers (BGA/VBE, VGA, VMware SVGA II)
         /// </summary>
         private enum VideoDriver
         {
@@ -163,7 +163,7 @@ namespace Cosmos.System.Graphics
                 IsInUse = true;
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
             }
             canvas = null;

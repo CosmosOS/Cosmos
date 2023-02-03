@@ -21,8 +21,6 @@ namespace Cosmos.System_Plugs.System
         // TODO: get timezone
         public static DateTime UtcNow => Now;
 
-        public static long GetSystemTimeAsFileTime() => Now.Ticks;
-
         private static readonly string[] DaysOfWeekStrings = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
         private static readonly string[] MonthsStrings = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 
@@ -90,6 +88,15 @@ namespace Cosmos.System_Plugs.System
         public static bool TryFormat(DateTime aThis, Span<char> aCharSpan, ref int aInt, ReadOnlySpan<char> aReadOnlySpan, IFormatProvider aFormatProvider)
         {
             throw new NotImplementedException();
+        }
+
+        public static IntPtr GetGetSystemTimeAsFileTimeFnPtr()
+        {
+            return new IntPtr();
+        }
+
+        public static void ValidateLeapSecond(DateTime aThis)
+        {
         }
     }
 }

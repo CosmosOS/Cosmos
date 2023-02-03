@@ -48,7 +48,7 @@ namespace Cosmos.Core
         /// <summary>
         /// IO port.
         /// </summary>
-        private static IOPort smiIO, pm1aIO, pm1bIO;
+        private static ushort smiIO, pm1aIO, pm1bIO;
 
         // ACPI variables
         /// <summary>
@@ -83,10 +83,6 @@ namespace Cosmos.Core
         /// SLP EN.
         /// </summary>
         private static short SLP_EN;
-        /// <summary>
-        /// SCI EN.
-        /// </summary>
-        private static short SCI_EN;
         /// <summary>
         /// PM1 CNT LEN1
         /// </summary>
@@ -194,9 +190,11 @@ namespace Cosmos.Core
             byte* check = (byte*)address;
 
             for (int i = 0; i < 20; i++)
-                sum += *(check++);
+            {
+                sum += *check++;
+            }
 
-            return (sum == 0);
+            return sum == 0;
         }
 
         /// <summary>
@@ -207,10 +205,14 @@ namespace Cosmos.Core
         public static void Start(bool initialize = true, bool enable = true)
         {
             if (initialize)
+            {
                 Init();
+            }
 
             if (enable)
+            {
                 Enable();
+            }
         }
 
         /// <summary>
@@ -221,12 +223,16 @@ namespace Cosmos.Core
         {
             Console.Clear();
             if (PM1a_CNT == null)
+            {
                 Init();
+            }
 
-            pm1aIO.Word = (ushort)(SLP_TYPa | SLP_EN);
+            IOPort.Write16(pm1aIO, (ushort)(SLP_TYPa | SLP_EN));
 
             if (PM1b_CNT != null)
-                pm1bIO.Word = (ushort)(SLP_TYPb | SLP_EN);
+            {
+                IOPort.Write16(pm1bIO, (ushort)(SLP_TYPb | SLP_EN));
+            }
 
             CPU.Halt();
         }
@@ -252,8 +258,8 @@ namespace Cosmos.Core
 
             for (int i = 19; i >= 16; i--)
             {
-                addr += (*(ptr + i));
-                addr = (i == 16) ? addr : addr << 8;
+                addr += *(ptr + i);
+                addr = i == 16 ? addr : addr << 8;
             }
 
             ptr = (byte*)addr;
@@ -261,8 +267,8 @@ namespace Cosmos.Core
 
             for (int i = 3; i >= 0; i--)
             {
-                addr += (*(ptr + i));
-                addr = (i == 0) ? addr : addr << 8;
+                addr += *(ptr + i);
+                addr = i == 0 ? addr : addr << 8;
             }
 
             int length = addr;
@@ -280,8 +286,8 @@ namespace Cosmos.Core
                 {
                     for (int i = 3; i >= 0; i--)
                     {
-                        addr += (*(ptr + i));
-                        addr = (i == 0) ? addr : addr << 8;
+                        addr += *(ptr + i);
+                        addr = i == 0 ? addr : addr << 8;
                     }
 
                     yeuse = (byte*)addr;
@@ -295,7 +301,9 @@ namespace Cosmos.Core
                         while (0 < dsdtLength--)
                         {
                             if (Compare("_S5_", S5Addr) == 0)
+                            {
                                 break;
+                            }
                             S5Addr++;
                         }
 
@@ -306,12 +314,16 @@ namespace Cosmos.Core
                                 S5Addr += 5;
                                 S5Addr += ((*S5Addr & 0xC0) >> 6) + 2;
                                 if (*S5Addr == 0x0A)
+                                {
                                     S5Addr++;
-                                SLP_TYPa = (short)(*(S5Addr) << 10);
+                                }
+                                SLP_TYPa = (short)(*S5Addr << 10);
                                 S5Addr++;
                                 if (*S5Addr == 0x0A)
+                                {
                                     S5Addr++;
-                                SLP_TYPb = (short)(*(S5Addr) << 10);
+                                }
+                                SLP_TYPb = (short)(*S5Addr << 10);
                                 SMI_CMD = facpget(1);
                                 ACPI_ENABLE = facpbget(0);
                                 ACPI_DISABLE = facpbget(1);
@@ -319,11 +331,10 @@ namespace Cosmos.Core
                                 PM1b_CNT = facpget(3);
                                 PM1_CNT_LEN = facpbget(3);
                                 SLP_EN = 1 << 13;
-                                SCI_EN = 1;
 
-                                smiIO = new IOPort((ushort)SMI_CMD);
-                                pm1aIO = new IOPort((ushort)PM1a_CNT);
-                                pm1bIO = new IOPort((ushort)PM1b_CNT);
+                                smiIO = (ushort)SMI_CMD;
+                                pm1aIO = (ushort)PM1a_CNT;
+                                pm1bIO = (ushort)PM1b_CNT;
 
                                 return true;
                             }
@@ -341,7 +352,7 @@ namespace Cosmos.Core
         /// </summary>
         public static void Enable()
         {
-            smiIO = new IOPort(ACPI_ENABLE);
+            smiIO = ACPI_ENABLE;
         }
 
         /// <summary>
@@ -349,7 +360,7 @@ namespace Cosmos.Core
         /// </summary>
         public static void Disable()
         {
-            smiIO = new IOPort(ACPI_DISABLE);
+            smiIO = ACPI_DISABLE;
         }
 
         /// <summary>
@@ -359,16 +370,26 @@ namespace Cosmos.Core
         private static unsafe uint RSDPAddress()
         {
             for (uint addr = 0xE0000; addr < 0x100000; addr += 4)
+            {
                 if (Compare("RSD PTR ", (byte*)addr) == 0)
+                {
                     if (Check_RSD(addr))
+                    {
                         return addr;
+                    }
+                }
+            }
 
-            uint ebda_address = *((uint*)0x040E);
+            uint ebda_address = *(uint*)0x040E;
             ebda_address = (ebda_address * 0x10) & 0x000fffff;
 
             for (uint addr = ebda_address; addr < ebda_address + 1024; addr += 4)
+            {
                 if (Compare("RSD PTR ", (byte*)addr) == 0)
+                {
                     return addr;
+                }
+            }
 
             return 0;
         }
@@ -381,7 +402,7 @@ namespace Cosmos.Core
         private static uint* acpiCheckRSDPtr(uint* ptr)
         {
             string sig = "RSD PTR ";
-            RSDPtr* rsdp = (RSDPtr*)ptr;
+            var rsdp = (RSDPtr*)ptr;
 
             byte* bptr;
             byte check = 0;
@@ -402,7 +423,9 @@ namespace Cosmos.Core
                     Compare("RSDT", (byte*)rsdp->RsdtAddress);
 
                     if (rsdp->RsdtAddress != 0)
+                    {
                         return (uint*)rsdp->RsdtAddress;
+                    }
                 }
             }
 
@@ -412,7 +435,7 @@ namespace Cosmos.Core
         /// <summary>
         /// Get data from the FACP table.
         /// </summary>
-        /// <param name="number">Index number of the data to get. 
+        /// <param name="number">Index number of the data to get.
         /// <list type="bullet">
         /// <item>0 - ACPI ENABLE</item>
         /// <item>1 - ACPI DISABLE</item>
@@ -439,7 +462,7 @@ namespace Cosmos.Core
         /// <summary>
         /// Get pointer to the data on the FACP.
         /// </summary>
-        /// <param name="number">Index number of the data to get. 
+        /// <param name="number">Index number of the data to get.
         /// <list type="bullet">
         /// <item>0 - DSDT</item>
         /// <item>1 - SMI CMD</item>
@@ -454,13 +477,13 @@ namespace Cosmos.Core
             switch (number)
             {
                 case 0:
-                    return (int*)*((int*)(Facp + 40));
+                    return (int*)*(int*)(Facp + 40);
                 case 1:
-                    return (int*)*((int*)(Facp + 48));
+                    return (int*)*(int*)(Facp + 48);
                 case 2:
-                    return (int*)*((int*)(Facp + 64));
+                    return (int*)*(int*)(Facp + 64);
                 case 3:
-                    return (int*)*((int*)(Facp + 68));
+                    return (int*)*(int*)(Facp + 68);
                 default:
                     return null;
             }

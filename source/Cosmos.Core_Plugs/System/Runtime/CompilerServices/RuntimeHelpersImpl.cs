@@ -15,7 +15,9 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         {
         }
 
+#pragma warning disable CS0108
         public static bool Equals(object aO1, object aO2)
+#pragma warning restore CS0108
         {
             return aO1 == aO2; //we cant use object.Equals since it just calls this
         }
@@ -33,7 +35,7 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         public static bool IsReferenceOrContainsReferences<T>()
         {
             uint t = ((CosmosRuntimeType)typeof(T)).mTypeId;
-            return ContainsReference(t);   
+            return ContainsReference(t);
         }
 
         private static bool ContainsReference(uint mType)

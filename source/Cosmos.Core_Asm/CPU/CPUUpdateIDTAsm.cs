@@ -58,13 +58,13 @@ namespace Cosmos.Core_Asm
                 }
 
                 XS.Set(EAX, "__ISR_Handler_" + i.ToString("X2"));
-                XS.Set("_NATIVE_IDT_Contents", AL, destinationDisplacement: (i * 8) + 0);
-                XS.Set("_NATIVE_IDT_Contents", AH, destinationDisplacement: (i * 8) + 1);
-                XS.Set("_NATIVE_IDT_Contents", 0x8, destinationDisplacement: (i * 8) + 2, size: RegisterSize.Byte8);
-                XS.Set("_NATIVE_IDT_Contents", 0x8E, destinationDisplacement: (i * 8) + 5, size: RegisterSize.Byte8);
+                XS.Set("_NATIVE_IDT_Contents", AL, destinationDisplacement: i * 8 + 0);
+                XS.Set("_NATIVE_IDT_Contents", AH, destinationDisplacement: i * 8 + 1);
+                XS.Set("_NATIVE_IDT_Contents", 0x8, destinationDisplacement: i * 8 + 2, size: RegisterSize.Byte8);
+                XS.Set("_NATIVE_IDT_Contents", 0x8E, destinationDisplacement: i * 8 + 5, size: RegisterSize.Byte8);
                 XS.ShiftRight(EAX, 16);
-                XS.Set("_NATIVE_IDT_Contents", AL, destinationDisplacement: (i * 8) + 6);
-                XS.Set("_NATIVE_IDT_Contents", AH, destinationDisplacement: (i * 8) + 7);
+                XS.Set("_NATIVE_IDT_Contents", AL, destinationDisplacement: i * 8 + 6);
+                XS.Set("_NATIVE_IDT_Contents", AH, destinationDisplacement: i * 8 + 7);
             }
 
             XS.Jump("__AFTER__ALL__ISR__HANDLER__STUBS__");

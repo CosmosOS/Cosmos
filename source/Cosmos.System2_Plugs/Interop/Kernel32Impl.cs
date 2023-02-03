@@ -6,12 +6,10 @@ namespace Cosmos.System_Plugs.Interop
 {
     struct SECURITY_ATTRIBUTES
     {
-        public uint Length;
-        public int SecurityDescriptor;
-        public uint InheritHandle;
+
     }
 
-    [Plug("Interop+Kernel32, System.IO.FileSystem")]
+    [Plug("Interop+Kernel32, System.IO.FileSystem", IsOptional = true)]
     class Kernel32Impl
     {
         [PlugMethod(Signature = "System_Boolean__Interop_Kernel32_CreateDirectoryPrivate_System_String___Interop_Kernel32_SECURITY_ATTRIBUTES_")]

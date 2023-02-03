@@ -19,15 +19,48 @@ namespace Cosmos.HAL
         protected int mCursorSize = 25; // 25 % as C# Console class
         protected bool mCursorVisible = true;
 
-        public Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
         public MemoryBlock08 mRAM;
+
+        /// <summary>
+        /// Memory.
+        /// </summary>
+        public MemoryBlock Memory = new MemoryBlock(0xB8000, 80 * 25 * 2);
+        // These should probably move to a VGA class later, or this class should be remade into a VGA class
+        /// <summary>
+        /// Misc. output.
+        /// </summary>
+        public const int MiscOutput = 0x03C2;
+        /// <summary>
+        /// First IOPort index.
+        /// </summary>
+        public const int Idx1 = 0x03C4;
+        /// <summary>
+        /// First IOPort data.
+        /// </summary>
+        public const int Data1 = 0x03C5;
+        /// <summary>
+        /// Second IOPort index.
+        /// </summary>
+        public const int Idx2 = 0x03CE;
+        /// <summary>
+        /// Second IOPort data.
+        /// </summary>
+        public const int Data2 = 0x03CF;
+        /// <summary>
+        /// Third IOPort index.
+        /// </summary>
+        public const int Idx3 = 0x03D4;
+        /// <summary>
+        /// Third IOPort data.
+        /// </summary>
+        public const int Data3 = 0x03D5;
 
         /// <summary>
         /// Creat new instance of the <see cref="TextScreen"/> class.
         /// </summary>
         public TextScreen()
         {
-            mRAM = IO.Memory.Bytes;
+            mRAM = Memory.Bytes;
             // Set the Console default colors: White foreground on Black background, the default value of mClearCellValue is set there too as it is linked with the Color
             SetColors(ConsoleColor.White, ConsoleColor.Black);
             mBackgroundClearCellValue = mTextClearCellValue;
@@ -40,8 +73,8 @@ namespace Cosmos.HAL
 
         public void UpdateWindowSize()
         {
-            IO.Memory = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(Cols * Rows * 2));
-            mRAM = IO.Memory.Bytes;
+            Memory = new Cosmos.Core.MemoryBlock(0xB8000, (uint)(Cols * Rows * 2));
+            mRAM = Memory.Bytes;
             mScrollSize = (uint)(Cols * (Rows - 1) * 2);
             mRow2Addr = (uint)(Cols * 2);
         }
@@ -56,7 +89,7 @@ namespace Cosmos.HAL
         {
             TextScreenHelpers.Debug("Clearing screen with value ");
             TextScreenHelpers.DebugNumber(mTextClearCellValue);
-            IO.Memory.Fill(mTextClearCellValue);
+            Memory.Fill(mTextClearCellValue);
             mBackgroundClearCellValue = mTextClearCellValue;
         }
 
@@ -65,9 +98,8 @@ namespace Cosmos.HAL
         /// </summary>
         public override void ScrollUp()
         {
-            IO.Memory.MoveDown(0, mRow2Addr, mScrollSize);
-            //IO.Memory.Fill(mScrollSize, mRowSize32, mClearCellValue32);
-            IO.Memory.Fill(mScrollSize, mRow2Addr, mBackgroundClearCellValue);
+            Memory.MoveDown(0, mRow2Addr, mScrollSize);
+            Memory.Fill(mScrollSize, mRow2Addr, mBackgroundClearCellValue);
         }
 
         public override byte this[int aX, int aY]
@@ -96,8 +128,8 @@ namespace Cosmos.HAL
             // TODO: Use Real Mode to clear in Mode Control Register Index 10
             //       the third bit to disable blinking and use the seventh bit
             //       as the bright bit on background color for brighter colors :)
-            Color = (byte)(((byte)(aForeground) | ((byte)(aBackground) << 4)) & 0x7F);
-            
+            Color = (byte)(((byte)aForeground | ((byte)aBackground << 4)) & 0x7F);
+
             // The Color | the NUL character this is used to Clear the Screen
             mTextClearCellValue = (ushort)(Color << 8 | 0x00);
         }
@@ -109,13 +141,13 @@ namespace Cosmos.HAL
         /// <param name="aY">A position on Y axis.</param>
         public override void SetCursorPos(int aX, int aY)
         {
-            char xPos = (char)((aY * Cols) + aX);
+            char xPos = (char)(aY * Cols + aX);
             // Cursor low byte to VGA index register
-            IO.Idx3.Byte = 0x0F;
-            IO.Data3.Byte = (byte)(xPos & 0xFF);
+            IOPort.Write8(Idx3, 0x0F);
+            IOPort.Write8(Data3, (byte)(xPos & 0xFF));
             // Cursor high byte to VGA index register
-            IO.Idx3.Byte = 0x0E;
-            IO.Data3.Byte = (byte)(xPos >> 8); 
+            IOPort.Write8(Idx3, 0x0E);
+            IOPort.Write8(Data3, (byte)(xPos >> 8));
         }
 
         /// <summary>
@@ -145,17 +177,19 @@ namespace Cosmos.HAL
             mCursorSize = value;
             TextScreenHelpers.Debug("Changing cursor size to", value, "%");
             // We need to transform value from a percentage to a value from 15 to 0
-            value = 16 - ((16 * value) / 100);
+            value = 16 - 16 * value / 100;
             // This is the case in which value is in reality 1% and a for a truncation error we get 16 (invalid value)
             if (value >= 16)
+            {
                 value = 15;
+            }
             TextScreenHelpers.Debug("verticalSize is", value);
             // Cursor Vertical Size Register here a value between 0x00 and 0x0F must be set with 0x00 meaning maximum size and 0x0F minimum
-            IO.Idx3.Byte = 0x0A;
-            IO.Data3.Byte = (byte)value;
+            IOPort.Write8(Idx3, 0x0A);
+            IOPort.Write8(Data3, (byte)value);
             // Cursor Horizontal Size Register we set it to 0x0F (100%) as a security measure is probably so already
-            IO.Idx3.Byte = 0x0B;
-            IO.Data3.Byte = 0x0F;
+            IOPort.Write8(Idx3, 0x0B);
+            IOPort.Write8(Data3, 0x0F);
         }
 
         /// <summary>
@@ -173,20 +207,16 @@ namespace Cosmos.HAL
         /// <param name="value">TRUE - visible.</param>
         public override void SetCursorVisible(bool value)
         {
-            byte cursorDisable;
-
             mCursorVisible = value;
 
             // The VGA Cursor is disabled when the value is 1 and enabled when is 0 so we need to invert 'value', sadly the ConvertToByte() function is not working
             // so we need to do the if by hand...
-            if (value == true)
-                cursorDisable = 0;
-            else
-                cursorDisable = 1;
+            byte cursorDisable = (byte)(mCursorVisible ? 0 : 1);
 
             // Cursor Vertical Size Register if the bit 5 is set to 1 the cursor is disabled, if 0 is enabled
-            IO.Idx3.Byte = 0x0A;
-            IO.Data3.Byte |= (byte)(cursorDisable << 5);
+            IOPort.Write8(Idx3, 0x0A);
+            IOPort.Write8(Data3, (byte)(IOPort.Read8(Data3) | (byte)(cursorDisable << 5)));
+            SetCursorSize(mCursorSize);
         }
     }
 }

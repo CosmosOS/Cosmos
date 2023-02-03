@@ -19,11 +19,10 @@ namespace Cosmos.System.FileSystem
     /// <seealso cref="Cosmos.System.FileSystem.VFS.VFSBase" />
     public class CosmosVFS : VFSBase
     {
-        private List<Disk> disks = new List<Disk>();
         /// <summary>
         /// List of disks.
         /// </summary>
-        public List<Disk> Disks { get { return disks; } }
+        public List<Disk> Disks { get; } = new List<Disk>();
 
         private int CurrentFSLetter;
 
@@ -385,7 +384,7 @@ namespace Cosmos.System.FileSystem
             {
                 var xFileSystem = GetFileSystemFromPath(aPath);
                 var xEntry = DoGetDirectoryEntry(aPath, xFileSystem);
-                if ((xEntry != null) && (xEntry.mEntryType == DirectoryEntryTypeEnum.Directory))
+                if (xEntry != null && xEntry.mEntryType == DirectoryEntryTypeEnum.Directory)
                 {
                     return xEntry;
                 }
@@ -410,7 +409,7 @@ namespace Cosmos.System.FileSystem
             {
                 var xFileSystem = GetFileSystemFromPath(aPath);
                 var xEntry = DoGetDirectoryEntry(aPath, xFileSystem);
-                if ((xEntry != null) && (xEntry.mEntryType == DirectoryEntryTypeEnum.File))
+                if (xEntry != null && xEntry.mEntryType == DirectoryEntryTypeEnum.File)
                 {
                     return xEntry;
                 }
@@ -458,7 +457,7 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="ArgumentOutOfRangeException">Thrown when root directory address is smaller then root directory address.</exception>
         public override DirectoryEntry GetVolume(string aPath)
         {
-            if (string.IsNullOrEmpty(aPath))
+            if (String.IsNullOrEmpty(aPath))
             {
                 return null;
             }
@@ -526,7 +525,9 @@ namespace Cosmos.System.FileSystem
             var xEntry = DoGetDirectoryEntry(aPath, xFileSystem);
 
             if (xEntry == null)
+            {
                 throw new Exception($"{aPath} is neither a file neither a directory");
+            }
 
             switch (xEntry.mEntryType)
             {
@@ -860,7 +861,7 @@ namespace Cosmos.System.FileSystem
 
         public override List<Disk> GetDisks()
         {
-            return disks;
+            return Disks;
         }
     }
 }

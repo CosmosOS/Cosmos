@@ -34,7 +34,7 @@ namespace Cosmos.HAL
 
     public enum SubclassID
     {
-        // MassStorageController: 
+        // MassStorageController:
         SCSIStorageController = 0x00,
         IDEInterface = 0x01,
         FloppyDiskController = 0x02,
