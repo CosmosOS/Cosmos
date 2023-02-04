@@ -75,6 +75,10 @@ article h4 {
   border: none;
 }
 
+.navbar #logo {
+  width: 50px;
+}
+
 .subnav {
   border-top: 1px solid var(--color-underline);
   background-color: var(--color-background-subnav);
