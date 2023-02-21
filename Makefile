@@ -107,7 +107,7 @@ install:
 	@cp -r $(THISDIR)/Build/syslinux/* $(DESTDIR)/Build/ISO/
 	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
 	@echo "if this is your first time installing cosmos you will want to run 'make nuget-install'"
-    
+
 .PHONY: nuget-install
 nuget-install:
 	@echo "Installing Nuget packages"
