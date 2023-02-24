@@ -10,6 +10,6 @@ namespace Cosmos.Core_Plugs
     {
         public static float Tan(float x) => (float)Math.Tan(x);
         
-        punlic static float Sin(float a) => (float)Math.Sin(a);
+        public static float Sin(float a) => (float)Math.Sin(a);
     }
 }
