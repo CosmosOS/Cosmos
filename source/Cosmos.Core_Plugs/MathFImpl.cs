@@ -1,4 +1,4 @@
-﻿using IL2CPU.Attribs;
+using IL2CPU.API.Attribs;
 using System;
 
 namespace Cosmos.Core_Plugs
