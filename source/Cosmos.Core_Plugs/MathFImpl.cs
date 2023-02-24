@@ -9,5 +9,7 @@ namespace Cosmos.Core_Plugs
     public static class MathFImpl
     {
         public static float Tan(float x) => (float)Math.Tan(x);
+        
+        punlic static float Sin(float a) => (float)Math.Sin(a);
     }
 }
