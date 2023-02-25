@@ -8,7 +8,7 @@ namespace Cosmos.Core_Plugs
     [Plug(Target = typeof(MathF))]
     public static class MathFImpl
     {
-    		public static float Sqrt(float d) => (float)Math.Sqrt(d);
+    	public static float Sqrt(float d) => (float)Math.Sqrt(d);
         
         public static float Tan(float x) => (float)Math.Tan(x);
         
