@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cosmos.HAL;
+using System;
 
 namespace Cosmos.System
 {
@@ -13,6 +14,8 @@ namespace Cosmos.System
         /// </summary>
         static MouseManager()
         {
+            MouseSensitivity = 1f;
+
             foreach (var mouse in HAL.Global.GetMouseDevices())
             {
                 AddMouse(mouse);
@@ -22,28 +25,18 @@ namespace Cosmos.System
         #region Properties
 
         /// <summary>
-        /// The 'delta' mouse movement for X.
-        /// </summary>
-        public static int DeltaX { get; internal set; }
-
-        /// <summary>
-        /// The 'delta' mouse movement for Y.
-        /// </summary>
-        public static int DeltaY { get; internal set; }
-
-        /// <summary>
         /// The screen width (i.e. max value of X).
         /// </summary>
         public static uint ScreenWidth
         {
-            get => mScreenWidth;
+            get => _ScreenWidth;
             set
             {
-                mScreenWidth = value;
+                _ScreenWidth = value;
 
-                if (X >= mScreenWidth)
+                if (X >= _ScreenWidth)
                 {
-                    X = mScreenWidth - 1;
+                    X = _ScreenWidth - 1;
                 }
             }
         }
@@ -53,15 +46,63 @@ namespace Cosmos.System
         /// </summary>
         public static uint ScreenHeight
         {
-            get => mScreenHeight;
+            get => _ScreenHeight;
             set
             {
-                mScreenHeight = value;
+                _ScreenHeight = value;
 
-                if (Y >= mScreenHeight)
+                if (Y >= _ScreenHeight)
                 {
-                    Y = mScreenHeight - 1;
+                    Y = _ScreenHeight - 1;
                 }
+            }
+        }
+
+        /// <summary>
+        /// The 'delta' mouse movement for X.
+        /// </summary>
+        public static int DeltaX
+        {
+            get
+            {
+                // If the delta has been read already, return 0.
+                // This is a workaround for the PS/2 mouse not updating it's delta values when movement has stopped.
+                if (_HasReadDeltaX)
+                {
+                    return 0;
+                }
+
+                _HasReadDeltaX = true;
+                return _DeltaX;
+            }
+            internal set
+            {
+                _HasReadDeltaX = false;
+                _DeltaX = value;
+            }
+        }
+
+        /// <summary>
+        /// The 'delta' mouse movement for Y.
+        /// </summary>
+        public static int DeltaY
+        {
+            get
+            {
+                // If the delta has been read already, return 0.
+                // This is a workaround for the PS/2 mouse not updating it's delta values when movement has stopped.
+                if (_HasReadDeltaY)
+                {
+                    return 0;
+                }
+
+                _HasReadDeltaY = true;
+                return _DeltaY;
+            }
+            internal set
+            {
+                _HasReadDeltaY = false;
+                _DeltaY = value;
             }
         }
 
@@ -78,40 +119,20 @@ namespace Cosmos.System
         /// <param name="aScrollWheel">unused</param>
         public static void HandleMouse(int aDeltaX, int aDeltaY, int aMouseState, int aScrollWheel)
         {
+            // Mouse should be disabled if nothing has been set.
+            if (ScreenHeight == 0 || ScreenWidth == 0)
+			{
+                return;
+			}
+
             // Assign new dleta values.
             DeltaX = aDeltaX;
             DeltaY = aDeltaY;
 
-            int x = (int)(X + MouseSensitivity * aDeltaX);
-            int y = (int)(Y + MouseSensitivity * aDeltaY);
+            X = (uint)Math.Clamp(X + (MouseSensitivity * aDeltaX), 0, ScreenWidth - 1);
+            Y = (uint)Math.Clamp(Y + (MouseSensitivity * aDeltaY), 0, ScreenHeight - 1);
             LastMouseState = MouseState;
             MouseState = (MouseState)aMouseState;
-
-            if (x <= 0)
-            {
-                X = 0;
-            }
-            else if (x >= ScreenWidth)
-            {
-                X = ScreenWidth - 1;
-            }
-            else
-            {
-                X = (uint)x;
-            }
-
-            if (y <= 0)
-            {
-                Y = 0;
-            }
-            else if (y >= ScreenHeight)
-            {
-                Y = ScreenHeight - 1;
-            }
-            else
-            {
-                Y = (uint)y;
-            }
         }
 
         /// <summary>
@@ -121,14 +142,14 @@ namespace Cosmos.System
         private static void AddMouse(MouseBase aMouse)
         {
             aMouse.OnMouseChanged = HandleMouse;
-            mMouseList.Add(aMouse);
+            _MouseList.Add(aMouse);
         }
 
         #endregion
 
         #region Fields
 
-        private static List<MouseBase> mMouseList = new();
+        private static List<MouseBase> _MouseList = new();
 
         /// <summary>
         /// The state the mouse was in the last frame.
@@ -143,10 +164,18 @@ namespace Cosmos.System
         /// <summary>
         /// The sensitivity of the mouse, 1.0f is the default.
         /// </summary>
-        public static float MouseSensitivity = 1.0f;
+        public static float MouseSensitivity;
 
-        private static uint mScreenWidth;
-        private static uint mScreenHeight;
+        private static uint _ScreenWidth;
+        private static uint _ScreenHeight;
+
+        // These values are used as flags for the Delta X and Y properties, explained more there.
+        private static bool _HasReadDeltaX;
+        private static bool _HasReadDeltaY;
+
+        // Temporary 'cache' delta values.
+        private static int _DeltaX;
+        private static int _DeltaY;
 
         /// <summary>
         /// The X location of the mouse.
