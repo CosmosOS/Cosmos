@@ -1,81 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿using System.Collections.Generic;
 using Cosmos.HAL;
 
 namespace Cosmos.System
 {
     /// <summary>
-    /// The possible states of a mouse.
-    /// </summary>
-    [Flags]
-    public enum MouseState
-    {
-        /// <summary>
-        /// No button is pressed.
-        /// </summary>
-        None = 0b0000_0000,
-        /// <summary>
-        /// The left mouse button is pressed.
-        /// </summary>
-        Left = 0b0000_0001,
-        /// <summary>
-        /// The right mouse button is pressed.
-        /// </summary>
-        Right = 0b0000_0010,
-        /// <summary>
-        /// The middle mouse button is pressed.
-        /// </summary>
-        Middle = 0b0000_0100,
-        /// <summary>
-        /// The fourth mouse button is pressed.
-        /// </summary>
-        FourthButton = 0b0000_1000,
-        /// <summary>
-        /// The fifth mouse button is pressed.
-        /// </summary>
-        FifthButton = 0b0001_0000
-    }
-
-    /// <summary>
     /// Mouse manager class.
     /// </summary>
     public static class MouseManager
     {
-        private static List<MouseBase> mMouseList = new();
+        /// <summary>
+        /// Mouse manager constructor.
+        /// </summary>
+        static MouseManager()
+        {
+            foreach (var mouse in HAL.Global.GetMouseDevices())
+            {
+                AddMouse(mouse);
+            }
+        }
+
+        #region Properties
 
         /// <summary>
-        /// The X location of the mouse.
+        /// The 'delta' mouse movement for X.
         /// </summary>
-        public static uint X;
+        public static int DeltaX { get; internal set; }
 
         /// <summary>
-        /// The Y location of the mouse.
+        /// The 'delta' mouse movement for Y.
         /// </summary>
-        public static uint Y;
-
-        // /// <summary>
-        // /// The Point of the mouse.
-        // /// </summary>
-        // public static Point GetPoint() {return new Point((int)MouseManager.X, (int)MouseManager.Y);}
-
-        /// <summary>
-        /// The state the mouse is currently in.
-        /// </summary>
-        public static MouseState MouseState;
-
-        /// <summary>
-        /// The state the mouse was in the last frame.
-        /// </summary>
-        public static MouseState LastMouseState;
-
-        /// <summary>
-        /// The sensitivity of the mouse, 1.0f is the default.
-        /// </summary>
-        public static float MouseSensitivity = 1.0f;
-
-        private static uint mScreenWidth;
-        private static uint mScreenHeight;
+        public static int DeltaY { get; internal set; }
 
         /// <summary>
         /// The screen width (i.e. max value of X).
@@ -111,16 +65,9 @@ namespace Cosmos.System
             }
         }
 
-        /// <summary>
-        /// Mouse manager constructor.
-        /// </summary>
-        static MouseManager()
-        {
-            foreach (var mouse in HAL.Global.GetMouseDevices())
-            {
-                AddMouse(mouse);
-            }
-        }
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Mouse handler.
@@ -131,6 +78,10 @@ namespace Cosmos.System
         /// <param name="aScrollWheel">unused</param>
         public static void HandleMouse(int aDeltaX, int aDeltaY, int aMouseState, int aScrollWheel)
         {
+            // Assign new dleta values.
+            DeltaX = aDeltaX;
+            DeltaY = aDeltaY;
+
             int x = (int)(X + MouseSensitivity * aDeltaX);
             int y = (int)(Y + MouseSensitivity * aDeltaY);
             LastMouseState = MouseState;
@@ -163,8 +114,6 @@ namespace Cosmos.System
             }
         }
 
-
-
         /// <summary>
         /// Add mouse to the mouse list.
         /// </summary>
@@ -174,5 +123,41 @@ namespace Cosmos.System
             aMouse.OnMouseChanged = HandleMouse;
             mMouseList.Add(aMouse);
         }
+
+        #endregion
+
+        #region Fields
+
+        private static List<MouseBase> mMouseList = new();
+
+        /// <summary>
+        /// The state the mouse was in the last frame.
+        /// </summary>
+        public static MouseState LastMouseState;
+
+        /// <summary>
+        /// The state the mouse is currently in.
+        /// </summary>
+        public static MouseState MouseState;
+
+        /// <summary>
+        /// The sensitivity of the mouse, 1.0f is the default.
+        /// </summary>
+        public static float MouseSensitivity = 1.0f;
+
+        private static uint mScreenWidth;
+        private static uint mScreenHeight;
+
+        /// <summary>
+        /// The X location of the mouse.
+        /// </summary>
+        public static uint X;
+
+        /// <summary>
+        /// The Y location of the mouse.
+        /// </summary>
+        public static uint Y;
+
+        #endregion
     }
 }
