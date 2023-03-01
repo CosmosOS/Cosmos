@@ -53,12 +53,12 @@ on_finish:
       $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
     }
 
-notifications:
-- provider: Webhook
-  url: https://webhooks.gitter.im/e/d5c57ffb9a04b1b180be
-  on_build_success: true
-  on_build_failure: true
-  on_build_status_changed: true
+#notifications:
+#- provider: Webhook
+#  url: https://webhooks.gitter.im/e/d5c57ffb9a04b1b180be
+#  on_build_success: true
+#  on_build_failure: true
+#  on_build_status_changed: true
 
 matrix:
   fast_finish: true
