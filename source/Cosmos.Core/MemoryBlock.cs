@@ -11,28 +11,6 @@ namespace Cosmos.Core
     public class MemoryBlock
     {
         /// <summary>
-        /// Memory block base address.
-        /// </summary>
-        public readonly uint Base;
-        /// <summary>
-        /// Memory block size.
-        /// </summary>
-        public readonly uint Size;
-
-        /// <summary>
-        /// Bytes memory block.
-        /// </summary>
-        public readonly MemoryBlock08 Bytes;
-        /// <summary>
-        /// Words memory block.
-        /// </summary>
-        public readonly MemoryBlock16 Words;
-        /// <summary>
-        /// DWords memory block.
-        /// </summary>
-        public readonly MemoryBlock32 DWords;
-
-        /// <summary>
         /// Create new instance of the <see cref="MemoryBlock"/> class.
         /// </summary>
         /// <param name="aBase">A base.</param>
@@ -45,6 +23,35 @@ namespace Cosmos.Core
             Words = new MemoryBlock16(aBase, aByteSize);
             DWords = new MemoryBlock32(aBase, aByteSize);
         }
+
+        #region Properties
+
+        /// <summary>
+        /// Memory block base address.
+        /// </summary>
+        public uint Base { get; internal set; }
+
+        /// <summary>
+        /// Memory block size.
+        /// </summary>
+        public uint Size { get; internal set; }
+
+        /// <summary>
+        /// Bytes memory block.
+        /// </summary>
+        public readonly MemoryBlock08 Bytes;
+
+        /// <summary>
+        /// Words memory block.
+        /// </summary>
+        public readonly MemoryBlock16 Words;
+
+        /// <summary>
+        /// DWords memory block.
+        /// </summary>
+        public readonly MemoryBlock32 DWords;
+
+        #endregion
 
         //TODO: Fill all these methods with fast ASM
         //TODO: Make an attribute that can be applied to methods to tell the copmiler to inline them to save
@@ -75,6 +82,8 @@ namespace Cosmos.Core
                 (*(uint*)(Base + aByteOffset)) = value;
             }
         }
+
+        #region Methods
 
         /// <summary>
         /// Fill memory block.
@@ -183,7 +192,8 @@ namespace Cosmos.Core
             // TODO thow exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
             uint* xDest = (uint*)(Base + aByteOffset);
 
-            fixed (uint* aDataPtr = aData) {
+            fixed (uint* aDataPtr = aData)
+            {
                 MemoryOperations.Copy(xDest, aDataPtr + aIndex, aCount);
             }
         }
@@ -234,7 +244,7 @@ namespace Cosmos.Core
         /// <exception cref="OverflowException">Thrown if aData length in greater then Int32.MaxValue.</exception>
         public void Copy(int[] aData, int aIndex, int aCount)
         {
-            if(aData.Length < aCount)
+            if (aData.Length < aCount)
             {
                 throw new IndexOutOfRangeException();
             }
@@ -268,6 +278,20 @@ namespace Cosmos.Core
             byte* aDataPtr = (byte*)block.Offset;
 
             MemoryOperations.Copy(xDest, aDataPtr, (int)block.Size);
+        }
+
+        /// <summary>
+        /// Swaps the internal pointer for a replacement and the replacement becomes the current pointer.
+        /// </summary>
+        /// <param name="toSwap">The pointer value to swap with.</param>
+        /// <param name="newSize">The new size that the memory block should have.</param>
+        public unsafe void Swap(ref uint toSwap, uint newSize, out uint oldSize)
+        {
+            // Assign the old size to the output size and set the new block size.
+            (oldSize, Size) = (Size, newSize);
+
+            // Swap both pointer values.
+            (Base, toSwap) = (toSwap, Base);
         }
 
         /// <summary>
@@ -306,7 +330,7 @@ namespace Cosmos.Core
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe void Read8(byte[] aBuffer)
         {
-            if(aBuffer.Length >= Size)
+            if (aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
@@ -324,7 +348,7 @@ namespace Cosmos.Core
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe void Write8(byte[] aBuffer)
         {
-            if(aBuffer.Length >= Size)
+            if (aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
@@ -342,7 +366,7 @@ namespace Cosmos.Core
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe void Read16(ushort[] aBuffer)
         {
-            if(aBuffer.Length >= Size)
+            if (aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
@@ -360,7 +384,7 @@ namespace Cosmos.Core
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe void Write16(ushort[] aBuffer)
         {
-            if(aBuffer.Length >= Size)
+            if (aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
@@ -378,7 +402,7 @@ namespace Cosmos.Core
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe void Read32(uint[] aBuffer)
         {
-            if(aBuffer.Length >= Size)
+            if (aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
@@ -396,7 +420,7 @@ namespace Cosmos.Core
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public unsafe void Write32(uint[] aBuffer)
         {
-            if(aBuffer.Length >= Size)
+            if (aBuffer.Length >= Size)
             {
                 throw new Exception("Memory access violation");
             }
@@ -434,6 +458,7 @@ namespace Cosmos.Core
             return ToArray(0, 0, (int)Size);
         }
 
+        #endregion
     }
 
     /// <summary>
