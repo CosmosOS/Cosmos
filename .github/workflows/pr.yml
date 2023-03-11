@@ -75,8 +75,6 @@ jobs:
 
       - name: Copy Output - Cosmos
         run: |
-          xcopy /Y "Cosmos\source\Cosmos.Build.Tasks\tools\grub2\boot\grub\i386-pc\*.*" "$($env:USER_KIT_PATH)Build\ISO\boot\grub\i386-pc\"
-          xcopy /Y "Cosmos\Build\grub2\boot\grub\grub.cfg" "$($env:USER_KIT_PATH)Build\ISO\boot\grub"
           xcopy /Y /S "Cosmos\Build\VMware\*" "$($env:USER_KIT_PATH)Build\VMware\"
           xcopy /Y /S "Cosmos\Build\Tools" "$($env:USER_KIT_PATH)Build\Tools\"
           xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"

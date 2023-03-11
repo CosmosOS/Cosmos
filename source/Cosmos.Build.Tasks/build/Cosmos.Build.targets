@@ -28,11 +28,6 @@
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/bin/</ObjdumpToolPath>
 
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</MkisofsToolPath>
-        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' == 'Windows_NT'">mkisofs.exe</MkisofsToolExe>
-        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' != 'Windows_NT'">mkisofs</MkisofsToolExe>
-
         <XorrisoToolPath Condition = "'$(XorrisoToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)xorriso\win\</XorrisoToolPath>
         <XorrisoToolPath Condition = "'$(XorrisoToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</XorrisoToolPath>
         <XorrisoToolExe Condition = "'$(XorrisoToolExe)' == '' AND '$(OS)' == 'Windows_NT'">xorriso.exe</XorrisoToolExe>
@@ -72,7 +67,6 @@
         <IntermediateIsoDirectory Condition="'$(IntermediateIsoDirectory)' == ''">$(OutputPath)ISO\</IntermediateIsoDirectory>
         <SyslinuxPath Condition="'$(SyslinuxPath)' == ''">$(CosmosToolsPath)syslinux\bios\</SyslinuxPath>
 
-        <GrubPath Condition="'$(GrubPath)' == ''">$(CosmosToolsPath)grub2\</GrubPath>
         <LiminePath Condition="'$(LiminePath)' == ''">$(CosmosToolsPath)limine\</LiminePath>
 
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
