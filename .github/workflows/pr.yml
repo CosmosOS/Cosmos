@@ -75,6 +75,7 @@ jobs:
 
       - name: Copy Output - Cosmos
         run: |
+          mkdir "$($env:USER_KIT_PATH)Build\ISO\boot\"
           xcopy /Y /S "Cosmos\Build\VMware\*" "$($env:USER_KIT_PATH)Build\VMware\"
           xcopy /Y /S "Cosmos\Build\Tools" "$($env:USER_KIT_PATH)Build\Tools\"
           xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
