@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmos.HAL;
-using Cosmos.System;
 
-namespace CosmosKernel5.Maps
+namespace Cosmos.System.ScanMaps
 {
     /// <summary>
     /// ES_Standard class. Represent ES_Standard keyboard layout.
@@ -89,7 +88,7 @@ namespace CosmosKernel5.Maps
             _keys.Add(new KeyMapping(0x32, 'm', 'M', 'm', 'M', 'm', 'M', ConsoleKeyEx.M));
             _keys.Add(new KeyMapping(0x33, ',', ';', ',', ',', ';', ';', ConsoleKeyEx.Comma));
             _keys.Add(new KeyMapping(0x34, '.', ':', '.', '.', ':', ':', ConsoleKeyEx.Period));
-            _keys.Add(new KeyMapping(0x35, '-', '_', '-', '-', '_', '_', ConsoleKeyEx.Slash));
+            _keys.Add(new KeyMapping(0x36, '-', '_', '-', '-', '_', '_', ConsoleKeyEx.Slash)); //
             /* Right Shift */
             _keys.Add(new KeyMapping(0x36, ConsoleKeyEx.RShift));
             /* Print Screen */
