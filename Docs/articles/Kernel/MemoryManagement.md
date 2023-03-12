@@ -43,6 +43,8 @@ Small Objects are managed using the SMT (Size Map Table), which is initalised us
 
 The garbage collector has to be manually triggerd using the call `int Heap.Collect()` which returns the number of objects freed. 
 
+Note that the GC does not track objects only pointed to by pointers. To ensure that the GC nevertheless does not incorrectly free objects, you can use `void GCImplementation.IncRootCount(ushort* aPtr)` to manually increase the references of your object by 1. Once you no longer need the object you can use `void GCImplementation.DecRootCount(ushort* aPtr)` to remove the manual reference, which allows the next `Heap.Collect` call to free the object. 
+
 ### Internals
 
 The garbage collector uses the tracing approach, which means that during collection a graph of all reachable objects is created and all non-discovered objects are freed. The garbage collector will only check objects on pages which have a type where the `GCManaged` bit is set. The graph is created by starting from "root" objects which are either stored in static variables or part of the current stack. Each of these objects is "marked" and all objects referenced by this object are recursivly also "marked" and "swept". This is done using the methods `void Heap.MarkAndSweepObject(void* aPtr)` for objects and `void Heap.SweepTypedObject(uint* obj, uint type)` for structures. For this to work each allocated object holds a 1bit flag if the object was discovered during the marking phase and a 7bit value counter for the number of static references it has. The number of static references an object has is updated using `void GCImplementation.IncRootCount(ushort* aPtr)` and similar methods, which are called from the Stsfld opcode.
