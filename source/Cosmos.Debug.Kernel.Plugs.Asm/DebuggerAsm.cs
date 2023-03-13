@@ -16,6 +16,9 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
     [PlugMethod(Assembler = typeof(DebugDoSend))]
     public static void DoSend(string aText) { }
 
+    [PlugMethod(Assembler = typeof(DebugDoSend))]
+    public static void DoSend(string[] aStringArray) { }
+
     [PlugMethod(Assembler = typeof(DebugDoSendNumber))]
     public static void DoSendNumber(int aNumber) { }
 
