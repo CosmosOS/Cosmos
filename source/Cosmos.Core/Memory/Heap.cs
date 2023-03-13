@@ -26,6 +26,8 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown on fatal error, contact support.</exception>
         public static unsafe void Init()
         {
+            _StringType = GetStringTypeID();
+
             StackStart = (uint*)CPU.GetStackStart();
             HeapSmall.Init();
             HeapMedium.Init();
@@ -152,9 +154,10 @@ namespace Cosmos.Core.Memory
         /// <returns>Number of objects freed</returns>
         public static int Collect()
         {
-			//Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
-			CPU.DisableInterrupts();
+            //Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
+            CPU.DisableInterrupts();
 
+            Debugger.DoBochsBreak();
             // Mark and sweep objects from roots
             // 1. Check if a page is in use if medium/large mark and sweep object
             // 2. Go throught the SMT table for small objects and go through pages by size
@@ -163,11 +166,11 @@ namespace Cosmos.Core.Memory
             // Medium and large objects
             for (int ratIndex = 0; ratIndex < RAT.TotalPageCount; ratIndex++)
             {
-                var pageType = *(RAT.mRAT + ratIndex);
+                byte pageType = *(RAT.mRAT + ratIndex);
                 if (pageType == (byte)RAT.PageType.HeapMedium || pageType == (byte)RAT.PageType.HeapLarge)
                 {
-                    var pagePtr = RAT.RamStart + ratIndex * RAT.PageSize;
-                    if (*(ushort*)(pagePtr + 3) != 0)
+                    byte* pagePtr = RAT.RamStart + ratIndex * RAT.PageSize;
+                    if (*(ushort*)(pagePtr + 3 * sizeof(int) + 2) != 0) // the math is kinda messy but we have 4 int space and the last ushort of that space is for the gc info
                     {
                         MarkAndSweepObject(pagePtr + HeapLarge.PrefixBytes);
                     }
@@ -217,6 +220,8 @@ namespace Cosmos.Core.Memory
                 currentStackPointer += 1;
             }
 
+            Debugger.DoBochsBreak();
+
             // Free all unreferenced and reset hit flag
             // This means we do the same transversal as we did before of the heap
             // but we done have to touch the stack again
@@ -227,15 +232,17 @@ namespace Cosmos.Core.Memory
                 var pageType = *(RAT.mRAT + ratIndex);
                 if (pageType == (byte)RAT.PageType.HeapMedium || pageType == (byte)RAT.PageType.HeapLarge)
                 {
-                    var pagePointer = RAT.RamStart + ratIndex * RAT.PageSize;
-                    if (*((ushort*)(pagePointer + HeapLarge.PrefixBytes) - 1) == 0)
+                    byte* pagePointer = RAT.RamStart + ratIndex * RAT.PageSize;
+                    Debugger.DoSendNumber((int)(pagePointer + HeapLarge.PrefixBytes - 2));
+                    Debugger.DoSendNumber(*((ushort*)(pagePointer + HeapLarge.PrefixBytes - 2)));
+                    if (*((ushort*)(pagePointer + HeapLarge.PrefixBytes - 2)) == 0)
                     {
                         Free(pagePointer + HeapLarge.PrefixBytes);
                         freed += 1;
                     }
                     else
                     {
-                        *((ushort*)(pagePointer + HeapLarge.PrefixBytes) - 1) &= (ushort)~ObjectGCStatus.Hit;
+                        *((ushort*)(pagePointer + HeapLarge.PrefixBytes - 2)) &= (ushort)~ObjectGCStatus.Hit;
                     }
                 }
             }
@@ -303,10 +310,6 @@ namespace Cosmos.Core.Memory
             // Check what we are dealing with
             if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
             {
-                if (_StringType == 0)
-                {
-                    _StringType = GetStringTypeID();
-                }
                 var type = *obj;
                 // Deal with strings first
                 if (type == _StringType)
