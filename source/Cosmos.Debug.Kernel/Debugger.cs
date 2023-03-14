@@ -79,7 +79,12 @@ namespace Cosmos.Debug.Kernel
 
         internal static void DoSend(string aText) { }
 
-        internal static void DoSend(string[] aStringArray) { }
+        internal static void DoSend(string[] aStringArray) {
+            for (int i = 0; i < aStringArray.Length; ++i)
+            {
+                DoSend(aStringArray[i]);
+            }
+        }
 
         public static void SendKernelPanic(uint id) { }
         public void Send(string aText) => DoSend(aText);
