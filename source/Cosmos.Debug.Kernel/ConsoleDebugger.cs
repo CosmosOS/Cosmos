@@ -35,6 +35,14 @@ namespace Cosmos.Debug.Kernel
         {
             WriteText(aText);
         }
+
+        public override void SendInternal(string[] aStringArray)
+        {
+            for(int i = 0; i < aStringArray.Length; ++i)
+            {
+                WriteText(aStringArray[i]);
+            }
+        }
         public override void SendInternal(uint aNumber)
         {
             WriteText(aNumber.ToString());
