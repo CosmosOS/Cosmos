@@ -10,7 +10,7 @@ using IL2CPU.Debug.Symbols;
 
 namespace Cosmos.Build.Tasks
 {
-    public class ReadNasmMapToDebugInfo : Task
+    public class ReadYasmMapToDebugInfo : Task
     {
         [Required]
         public string MapFile { get; set; }
@@ -50,7 +50,7 @@ namespace Cosmos.Build.Tasks
             finally
             {
                 xSW.Stop();
-                Log.LogMessage(MessageImportance.High, "ReadNasmMapToDebugInfo task took {0}", xSW.Elapsed);
+                Log.LogMessage(MessageImportance.High, "ReadYasmMapToDebugInfo task took {0}", xSW.Elapsed);
             }
         }
 
@@ -60,6 +60,7 @@ namespace Cosmos.Build.Tasks
             var xSource = new List<Label>();
             uint xIndex = 0;
             DebugInfo.SetRange(DebugInfo.NAsmMapExtractionRange);
+
             for (xIndex = 0; xIndex < xSourceStrings.Length; xIndex++)
             {
                 if (xSourceStrings[xIndex].StartsWith("Real "))

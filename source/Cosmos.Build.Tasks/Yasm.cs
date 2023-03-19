@@ -7,7 +7,7 @@ using static Cosmos.Build.Tasks.OperatingSystem;
 
 namespace Cosmos.Build.Tasks
 {
-    public class Nasm : ToolTask
+    public class Yasm : ToolTask
     {
         enum OutputFormatEnum
         {

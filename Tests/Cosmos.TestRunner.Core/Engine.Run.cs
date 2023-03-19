@@ -23,8 +23,10 @@ namespace Cosmos.TestRunner.Core
             {
                 RunTask("TheRingMaster", () => RunTheRingMaster(assemblyFileName));
             }
+
             RunTask("IL2CPU", () => RunIL2CPU(assemblyFileName, xAssemblyFile));
-            RunTask("Nasm", () => RunNasm(xAssemblyFile, xObjectFile, configuration.IsELF));
+            RunTask("Yasm", () => RunYasm(xAssemblyFile, xObjectFile, configuration.IsELF));
+
             if (configuration.IsELF)
             {
                 File.Move(xObjectFile, xTempObjectFile);
@@ -33,7 +35,8 @@ namespace Cosmos.TestRunner.Core
                 RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(workingDirectory, xObjectFile));
             }
 
-            string xHarddiskPath;
+            string xHarddiskPath = string.Empty;
+
             if (configuration.RunTarget == RunTargetEnum.HyperV)
             {
                 xHarddiskPath = Path.Combine(workingDirectory, "Harddisk.vhdx");

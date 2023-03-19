@@ -16,7 +16,6 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
         public int Offset { get; set; }
 
-        [SuppressMessage("Naming", "CA1720:Identifier contains type name", Scope = "member")]
         public uint Pointer { get; set; }
 
         public int Index { get; set; }

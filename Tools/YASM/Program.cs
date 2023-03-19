@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace NASM
+namespace YASM
 {
     public class Program
     {
