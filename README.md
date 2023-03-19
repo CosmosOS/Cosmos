@@ -42,8 +42,6 @@ In a project, cosmos can be thought of as a compiler and a sort-of standard libr
 
 <hr/>
 
-<center>
-
 ## Some of the included features
 
 These are some of the (optinal) features that can be used in cosmos:
@@ -58,8 +56,6 @@ These are some of the (optinal) features that can be used in cosmos:
 | A basic network interface                            |
 | A basic audio interface                              |
 > Note: Use [embeded resources](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html) instead of the FS for now.
-
-</center>
 
 <hr/>
 
