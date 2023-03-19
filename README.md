@@ -5,13 +5,13 @@
 <h1 align="center">Cosmos</h1>
 
 <p align="center">
-  <img src="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true" />
+  <img src="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true" href="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master" />
   <img src="https://img.shields.io/github/languages/code-size/CosmosOS/Cosmos" />
   <img src="https://img.shields.io/github/downloads/CosmosOS/Cosmos/total" />
-  <img src="https://img.shields.io/github/v/release/CosmosOS/Cosmos" />
-  <img src="https://img.shields.io/github/license/CosmosOS/Cosmos" />
-  <img src="https://img.shields.io/github/issues/CosmosOS/Cosmos" />
-  <img src="https://img.shields.io/discord/833970409337913344" />
+  <img src="https://img.shields.io/github/v/release/CosmosOS/Cosmos" href="https://github.com/CosmosOS/Cosmos/releases/latest" />
+  <img src="https://img.shields.io/github/license/CosmosOS/Cosmos" href="https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt" />
+  <img src="https://img.shields.io/github/issues/CosmosOS/Cosmos" href="https://github.com/CosmosOS/Cosmos/issues" />
+  <img src="https://img.shields.io/discord/833970409337913344" href="https://discord.com/invite/kwtBwv6jhD" />
 </p>
 
 <hr/>
