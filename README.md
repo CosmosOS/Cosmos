@@ -1,8 +1,12 @@
-<center>
+<p align="center">
 
   <img src="https://cosmosos.github.io/images/logo.png" width="25%" />
-  
-  <h1>Cosmos</h1>
+
+</p>
+
+<h1 align="center">Cosmos</h1>
+
+<p align="center">
 
   <a href="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master">
     <img src="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true" />
@@ -27,7 +31,7 @@
     <img src="https://img.shields.io/discord/833970409337913344" />
   </a>
 
-</center>
+</p>
 
 <hr/>
 
@@ -40,7 +44,7 @@ In a project, cosmos can be thought of as a compiler and a sort-of standard libr
 
 <center>
 
-<h2>Some of the included features</h2>
+## Some of the included features
 
 These are some of the (optinal) features that can be used in cosmos:
 
