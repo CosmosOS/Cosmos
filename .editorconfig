@@ -10,7 +10,7 @@ root = true
 # Trim trailing whitespace
 [*]
 insert_final_newline = false
-indent_style = tabs
+indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
