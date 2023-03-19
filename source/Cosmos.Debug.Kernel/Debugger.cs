@@ -79,11 +79,23 @@ namespace Cosmos.Debug.Kernel
 
         internal static void DoSend(string aText) { }
 
+        internal static void DoSend(string[] aStringArray) {
+            for (int i = 0; i < aStringArray.Length; ++i)
+            {
+                DoSend(aStringArray[i]);
+            }
+        }
+
         public static void SendKernelPanic(uint id) { }
         public void Send(string aText) => DoSend(aText);
 
+        public void Send(string[] aStringArray) => DoSend(aStringArray);
+
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(string aText) => DoSend(aText);
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(string[] aStringArray) => DoSend(aStringArray);
         
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(uint aNumber) => DoSendNumber(aNumber);
