@@ -1,7 +1,20 @@
-# Cosmos
+<p align="center">
+  <img src="https://cosmosos.github.io/images/logo.png" width="25%" />
+</p>
 
-[![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)
-[![Join the chat at (https://discord.com/invite/kwtBwv6jhD](https://img.shields.io/discord/833970409337913344)](https://discord.com/invite/kwtBwv6jhD)
+<h1 align="center">Cosmos</h1>
+
+<p align="center">
+  <img src="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true" />
+  <img src="https://img.shields.io/github/languages/code-size/CosmosOS/Cosmos" />
+  <img src="https://img.shields.io/github/downloads/CosmosOS/Cosmos/total" />
+  <img src="https://img.shields.io/github/v/release/CosmosOS/Cosmos" />
+  <img src="https://img.shields.io/github/license/CosmosOS/Cosmos" />
+  <img src="https://img.shields.io/github/issues/CosmosOS/Cosmos" />
+  <img src="https://img.shields.io/discord/833970409337913344" />
+</p>
+
+<hr/>
 
 Cosmos is an operating system "construction kit" made for Visual Studio 2022. Build your own OS using managed languages such as C#, VB.NET, and more!
 
