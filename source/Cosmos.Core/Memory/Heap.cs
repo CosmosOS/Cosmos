@@ -4,7 +4,6 @@ using IL2CPU.API;
 
 namespace Cosmos.Core.Memory
 {
-
     /// <summary>
     /// Flags to track an object status
     /// All higher values in the ushort are used to track count of static counts
@@ -14,12 +13,14 @@ namespace Cosmos.Core.Memory
         None = 0,
         Hit = 1
     }
+
     /// <summary>
     /// Heap class.
     /// </summary>
     public static unsafe class Heap
     {
         private static uint* StackStart;
+
         /// <summary>
         /// Init heap.
         /// </summary>
@@ -38,18 +39,23 @@ namespace Cosmos.Core.Memory
 		/// This shouldn't be used with objects as a new address is given when realocating memory.
 		/// </summary>
 		/// <param name="aPtr">Existing pointer</param>
-		/// <param name="NewSize">Size to extend to</param>
+		/// <param name="newSize">Size to extend to</param>
 		/// <returns>New pointer with specified size while maintaining old data.</returns>
         public static byte* Realloc(byte* aPtr, uint newSize)
 		{
             // TODO: don't move memory position if there is enough space in the current one.
+
+            // Disable interupts to prevent issues.
+            CPU.DisableInterrupts();
 
             // Get existing size
             uint Size = RAT.GetPageType(aPtr) == RAT.PageType.HeapSmall ? ((ushort*)aPtr)[-2] : ((uint*)aPtr)[-4];
 
             if (Size == newSize)
 			{
-                // Return existing pointer as nothing needs to be done.
+                // Return existing pointer after zeroing it as nothing needs to be done.
+                CPU.ZeroFill((uint)aPtr, newSize);
+                CPU.EnableInterrupts();
                 return aPtr;
 			}
             if (Size > newSize)
@@ -70,6 +76,7 @@ namespace Cosmos.Core.Memory
 
             // Free the old data and return
             Free(aPtr);
+            CPU.EnableInterrupts();
             return ToReturn;
 		}
 
@@ -401,7 +408,7 @@ namespace Cosmos.Core.Memory
         /// <returns></returns>
         private static uint GetStringTypeID()
         {
-            return UInt32.MaxValue; // so that tests still pass return bogus value
+            return uint.MaxValue; // so that tests still pass return bogus value
         }
     }
 }
