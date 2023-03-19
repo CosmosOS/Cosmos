@@ -1,19 +1,33 @@
 <center>
 
   <img src="https://cosmosos.github.io/images/logo.png" width="25%" />
+  
+  <h1>Cosmos</h1>
 
-  # Cosmos
+  <a href="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master">
+    <img src="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true" />
+  </a>
 
-  <!-- Some of these are clickable links. More can be made like so: -->
-  <!-- [![name](link to image on GH)](link to your URL) -->
+  <img src="https://img.shields.io/github/languages/code-size/CosmosOS/Cosmos" />
+  <img src="https://img.shields.io/github/downloads/CosmosOS/Cosmos/total" />
 
-  [![Appveyor](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master)
-  ![Code Size](https://img.shields.io/github/languages/code-size/CosmosOS/Cosmos)
-  ![Download Count](https://img.shields.io/github/downloads/CosmosOS/Cosmos/total)
-  [![Latest Release](https://img.shields.io/github/v/release/CosmosOS/Cosmos)](https://github.com/CosmosOS/Cosmos/releases/latest)
-  [![License](https://img.shields.io/github/license/CosmosOS/Cosmos)](https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt)
-  [![Issues](https://img.shields.io/github/issues/CosmosOS/Cosmos)](https://github.com/CosmosOS/Cosmos/issues)
-  [![Discord](https://img.shields.io/discord/833970409337913344)](https://discord.com/invite/kwtBwv6jhD)
+  <a href="https://github.com/CosmosOS/Cosmos/releases/latest">
+    <img src="https://img.shields.io/github/v/release/CosmosOS/Cosmos" />
+  </a>
+
+  <a href="https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt">
+    <img src="https://img.shields.io/github/license/CosmosOS/Cosmos" />
+  </a>
+
+  <a href="https://github.com/CosmosOS/Cosmos/issues">
+    <img src="https://img.shields.io/github/issues/CosmosOS/Cosmos" />
+  </a>
+
+  <a href="https://discord.com/invite/kwtBwv6jhD">
+    <img src="https://img.shields.io/discord/833970409337913344" />
+  </a>
+
+</center>
 
 <hr/>
 
@@ -24,7 +38,9 @@ In a project, cosmos can be thought of as a compiler and a sort-of standard libr
 
 <hr/>
 
-## Some of the included features
+<center>
+
+<h2>Some of the included features</h2>
 
 These are some of the (optinal) features that can be used in cosmos:
 
@@ -39,6 +55,8 @@ These are some of the (optinal) features that can be used in cosmos:
 | A basic audio interface                              |
 > Note: Use [embeded resources](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html) instead of the FS for now.
 
+</center>
+
 <hr/>
 
 ## Documentation
@@ -48,6 +66,4 @@ For documentation and technical information, see the [Cosmos Documentation](http
 
 If you have questions about how to use Cosmos, want to show off what you have made or have general questions, go check out [GitHub Discussions](https://github.com/CosmosOS/Cosmos/discussions). Alternatavely, you cal also join our [discord server](https://discord.com/invite/kwtBwv6jhD)! If you think you found a bug in Cosmos, please check existing [issues](https://github.com/CosmosOS/Cosmos/issues) first before opening a new one. 
 
-
-
-</center>
+</p>
