@@ -5,60 +5,51 @@ using Cosmos.Debug.Kernel;
 namespace Cosmos.System.ExtendedASCII
 {
     /// <summary>
-    /// CosmosEncodingProvider class. Used to provide <see cref="Encoder"/>, by using its name or codepage. See also: <seealso cref="EncodingProvider"/>.
+    /// Used to provide an <see cref="Encoder"/> by using its name or codepage.
     /// </summary>
+    /// <remarks>
+    /// See also: <seealso cref="EncodingProvider"/>.
+    /// </remarks>
     public class CosmosEncodingProvider : EncodingProvider
     {
-        /// <summary>
-        /// Encoding provider.
-        /// </summary>
-        private static readonly EncodingProvider s_singleton = new CosmosEncodingProvider();
-        /// <summary>
-        /// Debugger instance of the "System" ring with the "CosmosEncodingProvider" tag.
-        /// </summary>
-        private static Debugger myDebugger = new Debugger("System", "CosmosEncodingProvider");
+        static readonly EncodingProvider singleton = new CosmosEncodingProvider();
+        static readonly Debugger debugger = new("System", "CosmosEncodingProvider");
 
         /// <summary>
-        /// Create new instance of the <see cref="CosmosEncodingProvider"/> class.
+        /// Initializes a new instance of the <see cref="CosmosEncodingProvider"/> class.
         /// </summary>
         internal CosmosEncodingProvider() { }
 
         /// <summary>
-        /// Get CosmosEncodingProvider instance. Returns EncodingProvider.
+        /// Gets the main <see cref="CosmosEncodingProvider"/> instance.
+        /// Returns an <see cref="EncodingProvider"/>.
         /// </summary>
-        public static EncodingProvider Instance
-        {
-            get { return s_singleton; }
-        }
+        public static EncodingProvider Instance => singleton;
 
         /// <summary>
-        /// Get encoding, using its codepage.
+        /// Gets an encoding by its codepage.
         /// </summary>
-        /// <param name="codepage">Codepage.</param>
-        /// <returns>Encoding value.</returns>
+        /// <param name="codepage">The codepage.</param>
         public override Encoding GetEncoding(int codepage)
         {
-            myDebugger.SendInternal($"Getting Encoding for codepage {codepage}");
-            if (codepage < 0 || codepage > 65535)
+            debugger.SendInternal($"Getting Encoding for codepage {codepage}");
+            if (codepage is < 0 or > 65535) {
                 return null;
+            }
 
-            /* Let's check on our EncodingTable, if codepage is not found null is returned */
+            // Let's check on our EncodingTable, if codepage is not found null is returned
             return EncodingTable.GetEncoding(codepage);
         }
 
         /// <summary>
-        /// Get encoding, using its name.
+        /// Gets an encoding by using its name.
         /// </summary>
-        /// <param name="name">Name.</param>
-        /// <returns>Encoding value.</returns>
+        /// <param name="name">The name of the target encoding.</param>
         public override Encoding GetEncoding(string name)
         {
-            myDebugger.SendInternal($"Getting Encoding for codepage with name {name}");
+            debugger.SendInternal($"Getting Encoding for codepage with name {name}");
             int codepage = EncodingTable.GetCodePageFromDesc(name);
-            if (codepage == -1)
-                return null;
-
-            return GetEncoding(codepage);
+            return codepage == -1 ? null : GetEncoding(codepage);
         }
     }
 }
