@@ -90,7 +90,7 @@ namespace Cosmos.System.Graphics.Fonts
             //Check the header
             if (!version1 && !version2)
             {
-                Global.mDebugger.Send($"Invalid magic {aFontData[0]} {aFontData[1]} {aFontData[2]} {aFontData[3]}");
+                Global.Debugger.Send($"Invalid magic {aFontData[0]} {aFontData[1]} {aFontData[2]} {aFontData[3]}");
                 throw new Exception($"Invalid magic {aFontData[0]} {aFontData[1]} {aFontData[2]} {aFontData[3]}");
             }
             if (version1)

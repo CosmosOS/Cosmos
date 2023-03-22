@@ -62,8 +62,8 @@ namespace Cosmos.System
             if ((scan & 0x80) != 0)
                 scan = (byte)(scan ^ 0x80);
 
-            Global.mDebugger.Send("Number of keys: ");
-            Global.mDebugger.SendNumber((uint) _keys.Count);
+            Global.Debugger.Send("Number of keys: ");
+            Global.Debugger.SendNumber((uint) _keys.Count);
 
             for (int index = 0; index < _keys.Count; index++)
             {
@@ -71,7 +71,7 @@ namespace Cosmos.System
 
                 if (t == null)
                 {
-                    Global.mDebugger.Send("Key received but item is NULL");
+                    Global.Debugger.Send("Key received but item is NULL");
                     continue;
                 }
                 else if (t.Scancode == scan)

@@ -18,7 +18,7 @@ namespace Cosmos.System_Plugs.System.IO
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
         public static DirectoryInfo[] GetDirectories(DirectoryInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.GetDirectories() on path {aThis.FullName}");
+            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetDirectories() on path {aThis.FullName}");
             var xEntries = VFSManager.GetDirectoryListing(aThis.FullName);
 
             //var result = new DirectoryInfo[xEntries.Count];
@@ -38,14 +38,14 @@ namespace Cosmos.System_Plugs.System.IO
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
         public static FileInfo[] GetFiles(DirectoryInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path {aThis.FullName}");
+            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path {aThis.FullName}");
             var xEntries = VFSManager.GetDirectoryListing(aThis.FullName);
 
             var result = new List<FileInfo>();
 
             for (int i = 0; i < xEntries.Count; i++)
             {
-                Global.mFileSystemDebugger.SendInternal($"Found entry of type {(int)xEntries[i].mEntryType} and name {xEntries[i].mFullPath}");
+                Global.FileSystemDebugger.SendInternal($"Found entry of type {(int)xEntries[i].mEntryType} and name {xEntries[i].mFullPath}");
                 if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.File)
                 {
                     //result[i] = new FileInfo(xEntries[i].mFullPath);
@@ -58,14 +58,14 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static FileSystemInfo[] GetFileSystemInfos(DirectoryInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path {aThis.FullName}");
+            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path {aThis.FullName}");
             var xEntries = VFSManager.GetDirectoryListing(aThis.FullName);
 
             var result = new List<FileSystemInfo>();
 
             for (int i = 0; i < xEntries.Count; i++)
             {
-                Global.mFileSystemDebugger.SendInternal($"Found entry of type {(int)xEntries[i].mEntryType} and name {xEntries[i].mFullPath}");
+                Global.FileSystemDebugger.SendInternal($"Found entry of type {(int)xEntries[i].mEntryType} and name {xEntries[i].mFullPath}");
                 if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.Directory)
                 {
                     result.Add(new DirectoryInfo(xEntries[i].mFullPath));

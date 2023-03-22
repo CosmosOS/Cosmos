@@ -88,7 +88,7 @@ namespace Cosmos.System
         /// <exception cref="IOException">An I/O error occurred.</exception>
         private static void HandleScanCode(byte aScanCode, bool aReleased)
         {
-            Global.mDebugger.Send("KeyboardManager.HandleScanCode");
+            Global.Debugger.Send("KeyboardManager.HandleScanCode");
 
             byte key = aScanCode;
             if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased)
@@ -156,7 +156,7 @@ namespace Cosmos.System
         {
             if (mScanMap == null)
             {
-                Global.mDebugger.Send("No KeyLayout");
+                Global.Debugger.Send("No KeyLayout");
             }
 
             keyInfo = mScanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
@@ -226,7 +226,7 @@ namespace Cosmos.System
         /// <exception cref="IOException">An I/O error occurred.</exception>
         private static void AddKeyboard(KeyboardBase aKeyboard)
         {
-            Global.mDebugger.Send("KeyboardManager.AddKeyboard");
+            Global.Debugger.Send("KeyboardManager.AddKeyboard");
 
             aKeyboard.OnKeyPressed = HandleScanCode;
             mKeyboardList.Add(aKeyboard);

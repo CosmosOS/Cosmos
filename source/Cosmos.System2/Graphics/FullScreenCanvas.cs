@@ -109,15 +109,15 @@ namespace Cosmos.System.Graphics
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if default graphics mode is not suppoted.</exception>
         public static Canvas GetFullScreenCanvas()
         {
-            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
+            Global.Debugger.SendInternal($"GetFullScreenCanvas() with default mode");
             if (_VideoDriver == null)
             {
-                Global.mDebugger.SendInternal($"_VideoDriver is null creating new object");
+                Global.Debugger.SendInternal($"_VideoDriver is null creating new object");
                 _VideoDriver = GetVideoDriver();
             }
             else
             {
-                Global.mDebugger.SendInternal($"_VideoDriver is NOT null using the old one changing mode to DefaultMode");
+                Global.Debugger.SendInternal($"_VideoDriver is NOT null using the old one changing mode to DefaultMode");
                 _VideoDriver.Mode = _VideoDriver.DefaultGraphicMode;
             }
             IsInUse = true;
@@ -133,7 +133,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
         public static Canvas GetFullScreenCanvas(Mode mode)
         {
-            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);
+            Global.Debugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);
 
             if (_VideoDriver == null)
             {
@@ -155,7 +155,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="sys.ArgumentOutOfRangeException">Thrown if graphics mode is not suppoted.</exception>
         public static bool TryGetFullScreenCanvas(Mode mode, out Canvas canvas)
         {
-            Global.mDebugger.SendInternal($"TryGetFullScreenCanvas() with mode" + mode);
+            Global.Debugger.SendInternal($"TryGetFullScreenCanvas() with mode" + mode);
 
             try
             {
@@ -176,7 +176,7 @@ namespace Cosmos.System.Graphics
         /// <returns>Canvas value.</returns>
         public static Canvas GetCurrentFullScreenCanvas()
         {
-            Global.mDebugger.SendInternal($"GetCurrentFullScreenCanvas()");
+            Global.Debugger.SendInternal($"GetCurrentFullScreenCanvas()");
 
             return _VideoDriver;
         }

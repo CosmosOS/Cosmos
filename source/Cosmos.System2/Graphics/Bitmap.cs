@@ -38,7 +38,7 @@ namespace Cosmos.System.Graphics
             rawData = new int[Width * Height];
             if (colorDepth != ColorDepth.ColorDepth32 && colorDepth != ColorDepth.ColorDepth24)
             {
-                Global.mDebugger.Send("Only color depths 24 and 32 are supported!");
+                Global.Debugger.Send("Only color depths 24 and 32 are supported!");
                 throw new NotImplementedException("Only color depths 24 and 32 are supported!");
             }
 
@@ -292,7 +292,7 @@ namespace Cosmos.System.Graphics
             if (totalImageSize == 0)
             {
                 totalImageSize = (uint)(((imageWidth * pixelSize + 31) & ~31) >> 3) * imageHeight; // Look at the link above for the explanation
-                Global.mDebugger.SendInternal("Calcualted image size: " + totalImageSize);
+                Global.Debugger.SendInternal("Calcualted image size: " + totalImageSize);
             }
 
             #endregion BMP Header
@@ -301,9 +301,9 @@ namespace Cosmos.System.Graphics
             Width = imageWidth;
             Height = imageHeight;
             Depth = (ColorDepth)pixelSize;
-            Global.mDebugger.SendInternal("Width: " + Width);
-            Global.mDebugger.SendInternal("Height: " + Height);
-            Global.mDebugger.SendInternal("Depth: " + pixelSize);
+            Global.Debugger.SendInternal("Width: " + Width);
+            Global.Debugger.SendInternal("Height: " + Height);
+            Global.Debugger.SendInternal("Depth: " + pixelSize);
 
             rawData = new int[Width * Height];
 

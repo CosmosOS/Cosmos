@@ -65,7 +65,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="Exception">Thrown on memory access violation.</exception>
         public virtual void Clear(Color color)
         {
-            Global.mDebugger.SendInternal($"Clearing the Screen with Color {color}");
+            Global.Debugger.SendInternal($"Clearing the Screen with Color {color}");
 
             for (int x = 0; x < Mode.Width; x++)
             {
@@ -702,7 +702,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
-                    Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
+                    Global.Debugger.SendInternal(image.rawData[_x + _y * image.Width]);
                     _color = Color.FromArgb(image.rawData[_x + _y * image.Width]);
                     DrawPoint(_color, x + _x, y + _y);
                 }
@@ -746,7 +746,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < h; _y++)
                 {
-                    Global.mDebugger.SendInternal(pixels[_x + _y * w]);
+                    Global.Debugger.SendInternal(pixels[_x + _y * w]);
                     _color = Color.FromArgb(pixels[_x + _y * w]);
                     DrawPoint(_color, x + _x, y + _y);
                 }
@@ -769,7 +769,7 @@ namespace Cosmos.System.Graphics
             {
                 for (int _y = 0; _y < image.Height; _y++)
                 {
-                    Global.mDebugger.SendInternal(image.rawData[_x + _y * image.Width]);
+                    Global.Debugger.SendInternal(image.rawData[_x + _y * image.Width]);
                     _color = Color.FromArgb(image.rawData[_x + _y * image.Width]);
                     DrawPoint(_color, x + _x, y + _y);
                 }
@@ -824,7 +824,7 @@ namespace Cosmos.System.Graphics
         /// <returns>bool value.</returns>
         protected bool CheckIfModeIsValid(Mode mode)
         {
-            Global.mDebugger.SendInternal($"CheckIfModeIsValid");
+            Global.Debugger.SendInternal($"CheckIfModeIsValid");
 
             /* To keep or not to keep, that is the question~
             if (mode == null)
@@ -842,15 +842,15 @@ namespace Cosmos.System.Graphics
 
             foreach (var elem in AvailableModes)
             {
-                Global.mDebugger.SendInternal($"elem is {elem} mode is {mode}");
+                Global.Debugger.SendInternal($"elem is {elem} mode is {mode}");
                 if (elem == mode)
                 {
-                    Global.mDebugger.SendInternal($"Mode {mode} found");
+                    Global.Debugger.SendInternal($"Mode {mode} found");
                     return true; // All OK mode does exists in availableModes
                 }
             }
 
-            Global.mDebugger.SendInternal($"Mode {mode} found");
+            Global.Debugger.SendInternal($"Mode {mode} found");
             return false;
         }
 
@@ -866,7 +866,7 @@ namespace Cosmos.System.Graphics
                 return;
             }
 
-            Global.mDebugger.SendInternal($"Mode {mode} is not found! Raising exception...");
+            Global.Debugger.SendInternal($"Mode {mode} is not found! Raising exception...");
             /* 'mode' was not in the 'availableModes' List ==> 'mode' in NOT Valid */
             throw new ArgumentOutOfRangeException(nameof(mode), $"Mode {mode} is not supported by this Driver");
         }

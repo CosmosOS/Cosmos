@@ -42,13 +42,13 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mode is not suppoted.</exception>
         public VBECanvas(Mode aMode)
         {
-            Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Width}x{aMode.Height}x{(uint)aMode.ColorDepth}");
+            Global.Debugger.SendInternal($"Creating new VBEScreen() with mode {aMode.Width}x{aMode.Height}x{(uint)aMode.ColorDepth}");
 
             if (Core.VBE.IsAvailable())
             {
                 Core.VBE.ModeInfo ModeInfo = Core.VBE.getModeInfo();
                 aMode = new Mode(ModeInfo.width, ModeInfo.height, (ColorDepth)ModeInfo.bpp);
-                Global.mDebugger.SendInternal($"Detected VBE VESA with {aMode.Width}x{aMode.Height}x{(uint)aMode.ColorDepth}");
+                Global.Debugger.SendInternal($"Detected VBE VESA with {aMode.Width}x{aMode.Height}x{(uint)aMode.ColorDepth}");
             }
 
             ThrowIfModeIsNotValid(aMode);
@@ -176,7 +176,7 @@ namespace Cosmos.System.Graphics
         /// <param name="color">Color.</param>
         public override void Clear(int aColor)
         {
-            Global.mDebugger.SendInternal($"Clearing the Screen with Color {aColor}");
+            Global.Debugger.SendInternal($"Clearing the Screen with Color {aColor}");
             //if (color == null)
             //   throw new ArgumentNullException(nameof(color));
 
@@ -210,7 +210,7 @@ namespace Cosmos.System.Graphics
         /// <param name="color">Color.</param>
         public override void Clear(Color aColor)
         {
-            Global.mDebugger.SendInternal($"Clearing the Screen with Color {aColor}");
+            Global.Debugger.SendInternal($"Clearing the Screen with Color {aColor}");
             //if (color == null)
             //   throw new ArgumentNullException(nameof(color));
 

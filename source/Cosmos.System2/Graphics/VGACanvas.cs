@@ -28,7 +28,7 @@ namespace Cosmos.System.Graphics
         /// <param name="aMode"></param>
         public VGACanvas(Mode aMode) : base()
         {
-            Global.mDebugger.Send("Creating VGACanvas with mode");
+            Global.Debugger.Send("Creating VGACanvas with mode");
             _VGADriver = new VGADriver();
             _VGADriver.SetGraphicsMode(ModeToScreenSize(aMode), (VGADriver.ColorDepth)(int)aMode.ColorDepth);
             Mode = aMode;
@@ -42,7 +42,7 @@ namespace Cosmos.System.Graphics
         {
             Enabled = true;
             Mode = DefaultGraphicMode;
-            Global.mDebugger.Send("Creating VGACanvas with standard mode");
+            Global.Debugger.Send("Creating VGACanvas with standard mode");
             _VGADriver = new VGADriver();
             _VGADriver.SetGraphicsMode(ModeToScreenSize(DefaultGraphicMode), (VGADriver.ColorDepth)(int)DefaultGraphicMode.ColorDepth);
         }
