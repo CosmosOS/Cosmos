@@ -1,87 +1,61 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          UDP Client
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using Cosmos.System.Network.Config;
+﻿using Cosmos.System.Network.Config;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Cosmos.System.Network.IPv4.UDP
 {
     /// <summary>
-    /// UdpClient class. Used to manage the UDP connection to a client.
+    /// Used to manage the UDP connection to a client.
     /// </summary>
     public class UdpClient : IDisposable
     {
-        /// <summary>
-        /// Clients dictionary.
-        /// </summary>
-        private static Dictionary<uint, UdpClient> clients;
-
-        /// <summary>
-        /// Local port.
-        /// </summary>
-        private int localPort;
-        /// <summary>
-        /// Destination address.
-        /// </summary>
-        internal Address destination;
-        /// <summary>
-        /// Destination port.
-        /// </summary>
+        private readonly static Dictionary<uint, UdpClient> clients;
+        private readonly int localPort;
         private int destinationPort;
 
         /// <summary>
-        /// RX buffer queue.
+        /// The destination address.
+        /// </summary>
+        internal Address destination;
+
+        /// <summary>
+        /// The RX buffer queue.
         /// </summary>
         internal Queue<UDPPacket> rxBuffer;
 
-        /// <summary>
-        /// Assign clients dictionary.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         static UdpClient()
         {
             clients = new Dictionary<uint, UdpClient>();
         }
 
         /// <summary>
-        /// Get client.
+        /// Gets a UDP client running on the given port.
         /// </summary>
-        /// <param name="destPort">Destination port.</param>
-        /// <returns>UdpClient</returns>
+        /// <param name="destPort">The destination port.</param>
+        /// <returns>If a client is running on the given port, the <see cref="UdpClient"/>; otherwise, <see langword="null"/>.</returns>
         internal static UdpClient GetClient(ushort destPort)
         {
-            UdpClient client;
-
-            if (clients.TryGetValue(destPort, out client))
-            {
+            if (clients.TryGetValue(destPort, out var client)) {
                 return client;
-            }
-            else
-            {
+            } else {
                 return null;
             }
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="UdpClient"/> class.
+        /// Initializes a new instance of the <see cref="UdpClient"/> class.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 0 exists.</exception>
         public UdpClient()
             : this(0)
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="UdpClient"/> class.
+        /// Initializes a new instance of the <see cref="UdpClient"/> class.
         /// </summary>
         /// <param name="localPort">Local port.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
         public UdpClient(int localPort)
         {
@@ -95,11 +69,11 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="UdpClient"/> class.
+        /// Initializes a new instance of the <see cref="UdpClient"/> class.
         /// </summary>
         /// <param name="dest">Destination address.</param>
         /// <param name="destPort">Destination port.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if UdpClient with localPort 0 exists.</exception>
         public UdpClient(Address dest, int destPort)
             : this(0)
@@ -109,10 +83,10 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Connect to client.
+        /// Connects to the given client.
         /// </summary>
-        /// <param name="dest">Destination address.</param>
-        /// <param name="destPort">Destination port.</param>
+        /// <param name="dest">The destination address.</param>
+        /// <param name="destPort">The destination port.</param>
         public void Connect(Address dest, int destPort)
         {
             destination = dest;
@@ -120,9 +94,9 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Close connection.
+        /// Closes the active connection.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public void Close()
         {
             if (clients.ContainsKey((uint)localPort) == true)
@@ -132,13 +106,13 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Send data to client.
+        /// Sends data to the client.
         /// </summary>
-        /// <param name="data">Data array to send.</param>
+        /// <param name="data">The data to send.</param>
         /// <exception cref="Exception">Thrown if destination is null or destinationPort is 0.</exception>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         public void Send(byte[] data)
         {
             if (destination == null || destinationPort == 0)
@@ -151,14 +125,14 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Send data.
+        /// Sends data to a remote host.
         /// </summary>
-        /// <param name="data">Data array.</param>
-        /// <param name="dest">Destination address.</param>
-        /// <param name="destPort">Destination port.</param>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <param name="data">The data to send.</param>
+        /// <param name="dest">The destination address.</param>
+        /// <param name="destPort">The destination port.</param>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         public void Send(byte[] data, Address dest, int destPort)
         {
             Address source = IPConfig.FindNetwork(dest);
@@ -167,11 +141,10 @@ namespace Cosmos.System.Network.IPv4.UDP
         }
 
         /// <summary>
-        /// Receive data from end point.
+        /// Receives data from the given end-point.
         /// </summary>
-        /// <param name="source">Source end point.</param>
-        /// <returns>byte array value.</returns>
-        /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        /// <param name="source">The source end point.</param>
+        /// <exception cref="InvalidOperationException">Thrown on fatal error.</exception>
         public byte[] NonBlockingReceive(ref EndPoint source)
         {
             if (rxBuffer.Count < 1)
@@ -183,40 +156,38 @@ namespace Cosmos.System.Network.IPv4.UDP
             source.Address = packet.SourceIP;
             source.Port = packet.SourcePort;
 
-            return packet.UDP_Data;
+            return packet.UDPData;
         }
 
         /// <summary>
-        /// Receive data from end point.
+        /// Receives data from the given end-point.
         /// </summary>
-        /// <param name="source">Source end point.</param>
-        /// <returns>byte array value.</returns>
-        /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        /// <param name="source">The source end point.</param>
+        /// <exception cref="InvalidOperationException">Thrown on fatal error.</exception>
         public byte[] Receive(ref EndPoint source)
         {
-            while (rxBuffer.Count < 1) ;
+            while (rxBuffer.Count < 1) {
+                ;
+            }
 
             var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
             source.Address = packet.SourceIP;
             source.Port = packet.SourcePort;
 
-            return packet.UDP_Data;
+            return packet.UDPData;
         }
 
         /// <summary>
-        /// Receive data from packet.
+        /// Receives data from the given packet.
         /// </summary>
         /// <param name="packet">Packet to receive.</param>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(UDPPacket packet)
         {
             rxBuffer.Enqueue(packet);
         }
 
-        /// <summary>
-        /// Close Client
-        /// </summary>
         public void Dispose()
         {
             Close();
