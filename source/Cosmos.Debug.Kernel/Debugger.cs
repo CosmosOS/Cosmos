@@ -195,6 +195,8 @@ namespace Cosmos.Debug.Kernel
 
         public void Send(string aText) => DoSend(aText);
 
+        public void Send(string[] aStringArray) => DoSend(aStringArray);
+
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(string aText) => DoSend(aText);
 
