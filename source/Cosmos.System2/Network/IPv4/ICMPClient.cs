@@ -1,68 +1,47 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          ICMP Client
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using Cosmos.System.Network.Config;
+﻿using Cosmos.System.Network.Config;
 using Cosmos.HAL;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Cosmos.System.Network.IPv4
 {
     /// <summary>
-    /// ICMPClient class. Used to manage the ICMP connection to a client.
+    /// Used to manage the ICMP connection to a client.
     /// </summary>
     public class ICMPClient : IDisposable
     {
-        /// <summary>
-        /// Clients dictionary.
-        /// </summary>
-        private static Dictionary<uint, ICMPClient> clients;
+        private readonly static Dictionary<uint, ICMPClient> clients;
 
         /// <summary>
-        /// Destination address.
+        /// The destination address.
         /// </summary>
         protected Address destination;
 
         /// <summary>
-        /// RX buffer queue.
+        /// The RX buffer queue.
         /// </summary>
         protected Queue<ICMPPacket> rxBuffer;
 
-        /// <summary>
-        /// Assign clients dictionary.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         static ICMPClient()
         {
             clients = new Dictionary<uint, ICMPClient>();
         }
 
         /// <summary>
-        /// Get client.
+        /// Gets a client by its IP address hash.
         /// </summary>
         /// <param name="iphash">IP Hash.</param>
-        /// <returns>ICMPClient</returns>
         internal static ICMPClient GetClient(uint iphash)
         {
-            ICMPClient client;
-
-            if (clients.TryGetValue(iphash, out client))
-            {
+            if (clients.TryGetValue(iphash, out var client)) {
                 return client;
-            }
-            else
-            {
+            } else {
                 return null;
             }
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPClient"/> class.
+        /// Initializes a new instance of the <see cref="ICMPClient"/> class.
         /// </summary>
         public ICMPClient()
         {
@@ -70,9 +49,9 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Connect to client.
+        /// Connects to the given client.
         /// </summary>
-        /// <param name="dest">Destination address.</param>
+        /// <param name="dest">The destination address.</param>
         public void Connect(Address dest)
         {
             destination = dest;
@@ -80,9 +59,9 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Close connection.
+        /// Closes the active connection.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public void Close()
         {
             if (clients.ContainsKey(destination.Hash) == true)
@@ -92,7 +71,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Send ICMP Echo
+        /// Sends an ICMP echo.
         /// </summary>
         public void SendEcho()
         {
@@ -103,16 +82,16 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Receive data
+        /// Receives data from the remote host.
         /// </summary>
-        /// <param name="source">Source end point.</param>
-        /// <param name="timeout">timeout value, default 5000ms</param>
-        /// <returns>Address from Domain Name</returns>
-        /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        /// <param name="source">The source end point.</param>
+        /// <param name="timeout">The timeout value; by default, 5000ms.</param>
+        /// <returns>The address from the domain name.</returns>
+        /// <exception cref="InvalidOperationException">Thrown on fatal error.</exception>
         public int Receive(ref EndPoint source, int timeout = 5000)
         {
             int second = 0;
-            int _deltaT = 0;
+            int deltaT = 0;
 
             while (rxBuffer.Count < 1)
             {
@@ -120,10 +99,11 @@ namespace Cosmos.System.Network.IPv4
                 {
                     return -1;
                 }
-                if (_deltaT != RTC.Second)
+
+                if (deltaT != RTC.Second)
                 {
                     second++;
-                    _deltaT = RTC.Second;
+                    deltaT = RTC.Second;
                 }
             }
 
@@ -134,19 +114,16 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Receive data from packet.
+        /// Receives data from the given packet.
         /// </summary>
-        /// <param name="packet">Packet to receive.</param>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <param name="packet">The packet to receive.</param>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         public void ReceiveData(ICMPPacket packet)
         {
             rxBuffer.Enqueue(packet);
         }
 
-        /// <summary>
-        /// Close Client
-        /// </summary>
         public void Dispose()
         {
             Close();

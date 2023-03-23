@@ -10,25 +10,29 @@ using System;
 namespace Cosmos.System.Network.IPv4
 {
     /// <summary>
-    /// Address class, used to define a IPv4 address.
-    /// <remarks>Should actually be using System.Net.IPAddress, but gives problems.</remarks>
+    /// Represents a IPv4 address.
     /// </summary>
+    // Should actually be using System.Net.IPAddress, but gives problems.
     public class Address : IComparable
     {
-        /// <summary>
-        /// Predefined 0.0.0.0 address.
-        /// </summary>
-        public static Address Zero = new Address(0, 0, 0, 0);
+        private uint hash;
 
         /// <summary>
-        /// Broadcast address (255.255.255.255).
+        /// The parts of the address.
         /// </summary>
-        public static Address Broadcast = new Address(255, 255, 255, 255);
+        internal byte[] Parts = new byte[4];
 
         /// <summary>
-        /// address as byte array.
+        /// The <c>0.0.0.0</c> IP address.
         /// </summary>
-        internal byte[] address = new byte[4];
+        public static readonly Address Zero = new(0, 0, 0, 0);
+
+        /// <summary>
+        /// The broadcast address <c>(255.255.255.255)</c>.
+        /// </summary>
+        public static readonly Address Broadcast = new(255, 255, 255, 255);
+
+
 
         /// <summary>
         /// Create new instance of the <see cref="Address"/> class, with specified IP address.
@@ -39,10 +43,10 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="aFourth">Fourth block of the address.</param>
         public Address(byte aFirst, byte aSecond, byte aThird, byte aFourth)
         {
-            address[0] = aFirst;
-            address[1] = aSecond;
-            address[2] = aThird;
-            address[3] = aFourth;
+            Parts[0] = aFirst;
+            Parts[1] = aSecond;
+            Parts[2] = aThird;
+            Parts[3] = aFourth;
         }
 
         /// <summary>
@@ -53,27 +57,28 @@ namespace Cosmos.System.Network.IPv4
         /// <exception cref="ArgumentException">Thrown if buffer is invalid or null.</exception>
         public Address(byte[] buffer, int offset)
         {
-            if (buffer == null || buffer.Length < offset + 4)
-                throw new ArgumentException("buffer does not contain enough data starting at offset", "buffer");
+            if (buffer == null || buffer.Length < offset + 4) {
+                throw new ArgumentException("The buffer does not contain enough data starting at 'offset'.", nameof(buffer));
+            }
 
-            address[0] = buffer[offset];
-            address[1] = buffer[offset + 1];
-            address[2] = buffer[offset + 2];
-            address[3] = buffer[offset + 3];
+            Parts[0] = buffer[offset];
+            Parts[1] = buffer[offset + 1];
+            Parts[2] = buffer[offset + 2];
+            Parts[3] = buffer[offset + 3];
         }
 
         /// <summary>
-        /// Parse a IP address in string representation.
+        /// Parses a IP address in its string representation.
         /// </summary>
-        /// <param name="adr">IP address as string.</param>
-        /// <returns>Address value.</returns>
-        /// <exception cref="OverflowException">Thrown if adr is longer than Int32.MaxValue.</exception>
-        /// <exception cref="ArgumentNullException">Thrown if adr is null.</exception>
-        /// <exception cref="FormatException">Thrown if adr is not in the right format.</exception>
-        /// <exception cref="OverflowException">Thrown if adr represents a number less than Byte.MinValue or greater than Byte.MaxValue.</exception>
-        public static Address Parse(string adr)
+        /// <param name="addr">The IP address as string.</param>
+        /// <returns>The parsed address value.</returns>
+        /// <exception cref="OverflowException">Thrown if addr is longer than <see cref="Int32.MaxValue"/>.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if addr is null.</exception>
+        /// <exception cref="FormatException">Thrown if addr is not in the right format.</exception>
+        /// <exception cref="OverflowException">Thrown if addr represents a number less than Byte.MinValue or greater than <see cref="Byte.MaxValue"/>.</exception>
+        public static Address Parse(string addr)
         {
-            string[] fragments = adr.Split('.');
+            string[] fragments = addr.Split('.');
             if (fragments.Length == 4)
             {
                 try
@@ -96,10 +101,9 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Convert CIDR number to IPv4 Address
+        /// Convert a CIDR number to an IPv4 address.
         /// </summary>
-        /// <param name="cidr">CIDR number.</param>
-        /// <returns></returns>
+        /// <param name="cidr">The CIDR number.</param>
         public static Address CIDRToAddress(int cidr)
         {
             try
@@ -114,120 +118,80 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Check if address is a loopback address.
+        /// Check if this address is a loopback address.
         /// </summary>
-        /// <returns></returns>
-        public bool IsLoopbackAddress()
-        {
-            if (address[0] == 127)
-                return true;
-            else
-                return false;
-        }
+        public bool IsLoopbackAddress() => Parts[0] == 127;
 
         /// <summary>
-        /// Check if address is a broadcast address.
+        /// Check if this address is a broadcast address.
         /// </summary>
-        /// <returns></returns>
         public bool IsBroadcastAddress() =>
-            address[0] == 0xFF
-            && address[1] == 0xFF
-            && address[2] == 0xFF
-            && address[3] == 0xFF;
+            Parts[0] == 0xFF
+            && Parts[1] == 0xFF
+            && Parts[2] == 0xFF
+            && Parts[3] == 0xFF;
 
         /// <summary>
-        /// Check if address is a APIPA address.
+        /// Check if this address is an APIPA address.
         /// </summary>
-        /// <returns></returns>
-        public bool IsAPIPA()
-        {
-            if (address[0] == 169 && address[1] == 254)
-            {
-                return true;
-            }
+        public bool IsAPIPA() => Parts[0] == 169 && Parts[1] == 254;
 
-            return false;
-        }
-
-        /// <summary>
-        /// Converts IP Address to String.
-        /// </summary>
-        /// <returns>String with IP Address in dotted notation</returns>
         public override string ToString()
         {
             return
-                address[0] +
+                Parts[0] +
                 "." +
-                address[1] +
+                Parts[1] +
                 "." +
-                address[2] +
+                Parts[2] +
                 "." +
-                address[3];
+                Parts[3];
         }
 
         /// <summary>
-        /// Convert address to byte array.
+        /// Returns the underlying parts array. Modifying the returned
+        /// array will also modify the address.
         /// </summary>
-        /// <returns></returns>
         public byte[] ToByteArray()
         {
-            return address;
+            return Parts;
         }
 
         /// <summary>
-        /// Convert address to 32 bit number.
+        /// Convert this address to a 32-bit number.
         /// </summary>
-        /// <returns>UInt32 value.</returns>
-        private UInt32 to32BitNumber()
+        private uint ToUInt32()
         {
-            return (UInt32)((address[0] << 24) | (address[1] << 16) | (address[2] << 8) | (address[3] << 0));
+            return (uint)((Parts[0] << 24) | (Parts[1] << 16) | (Parts[2] << 8) | (Parts[3] << 0));
         }
 
         /// <summary>
-        /// Hashed value for the IP.
+        /// The hash value for this IP. Used to uniquely identify each IP.
         /// </summary>
-        private UInt32 hash;
-
-        /// <summary>
-        /// Hash value for this IP. Used to uniquely identify each IP
-        /// </summary>
-        public UInt32 Hash
+        public uint Hash
         {
             get
             {
                 if (hash == 0)
                 {
-                    hash = to32BitNumber();
+                    hash = ToUInt32();
                 }
 
                 return hash;
             }
         }
 
-        #region IComparable Members
-
-        /// <summary>
-        /// Compare 2 IP Address objects for equality
-        /// </summary>
-        /// <param name="obj">Other IP to compare with.</param>
-        /// <returns>0 if equal, or non-zero otherwise</returns>
-        /// <exception cref="ArgumentException">Thrown if obj is not a IPv4Address.</exception>
         public int CompareTo(object obj)
         {
-            if (obj is Address)
-            {
-                Address other = (Address)obj;
-                if (other.hash != this.hash)
-                {
+            if (obj is Address other) {
+                if (other.hash != hash) {
                     return -1;
                 }
 
                 return 0;
-            }
-            else
+            } else {
                 throw new ArgumentException("obj is not a IPv4Address", "obj");
+            }
         }
-
-        #endregion
     }
 }
