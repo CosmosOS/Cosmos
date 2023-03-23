@@ -1,10 +1,14 @@
 namespace Cosmos.System
 {
     /// <summary>
-    /// ConsoleKeyEx enum.
+    /// Specifies the recognized virtual console keys, that are independent
+    /// from physical keyboard scan-codes.
     /// </summary>
     public enum ConsoleKeyEx
     {
+        /// <summary>
+        /// An unknown, undefined, or otherwise unrecognized key.
+        /// </summary>
         NoName,
 
         Escape,

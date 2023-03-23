@@ -1,57 +1,55 @@
 using System.Collections.Generic;
 using Cosmos.HAL;
 using Cosmos.System.ScanMaps;
+using System;
 
 namespace Cosmos.System
 {
     /// <summary>
-    /// Keyboard manager class. Used to manage keyboard.
+    /// Manages the physical keyboard.
     /// </summary>
     public static class KeyboardManager
     {
+        readonly static List<KeyboardBase> keyboardList = new();
+        readonly static Queue<KeyEvent> queuedKeys = new();
+        static ScanMapBase scanMap = new USStandardLayout();
+
         /// <summary>
-        /// Get and set NumLock.
+        /// The num-lock state.
         /// </summary>
         public static bool NumLock { get; set; }
 
         /// <summary>
-        /// Get and set CapsLock.
+        /// The caps-lock state.
         /// </summary>
         public static bool CapsLock { get; set; }
 
         /// <summary>
-        /// Get and set ScrollLock.
+        /// The scroll-lock state.
         /// </summary>
         public static bool ScrollLock { get; set; }
 
         /// <summary>
-        /// Get and set Ctrl pressed.
+        /// Whether the Control (Ctrl) key is currently pressed.
         /// </summary>
         public static bool ControlPressed { get; set; }
 
         /// <summary>
-        /// Get and set Shift pressed.
+        /// Whether the Shift key is currently pressed.
         /// </summary>
         public static bool ShiftPressed { get; set; }
 
         /// <summary>
-        /// Get and set Alt pressed.
+        /// Whether the Alt key is currently pressed.
         /// </summary>
         public static bool AltPressed { get; set; }
 
         /// <summary>
-        /// Get if queued keys exists.
+        /// Whether a keyboard input is pending to be processed; i.e, whether the queued
+        /// key-press buffer is not empty.
         /// </summary>
-        public static bool KeyAvailable => mQueuedKeys.Count > 0;
+        public static bool KeyAvailable => queuedKeys.Count > 0;
 
-        private static List<KeyboardBase> mKeyboardList = new List<KeyboardBase>();
-        private static ScanMapBase mScanMap = new US_Standard();
-        private static Queue<KeyEvent> mQueuedKeys = new Queue<KeyEvent>();
-
-        /// <summary>
-        /// Create new instance of the <see cref="KeyboardManager"/> class.
-        /// </summary>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
         static KeyboardManager()
         {
             foreach (var keyboard in HAL.Global.GetKeyboardDevices())
@@ -61,74 +59,61 @@ namespace Cosmos.System
         }
 
         /// <summary>
-        /// Enqueue keyEvent.
+        /// Enqueues the given key-press event to the internal keyboard buffer.
         /// </summary>
-        /// <param name="keyEvent">KeyEvent to enqueue.</param>
+        /// <param name="keyEvent">The <see cref="KeyEvent"/> to enqueue.</param>
         private static void Enqueue(KeyEvent keyEvent)
         {
-            mQueuedKeys.Enqueue(keyEvent);
+            queuedKeys.Enqueue(keyEvent);
         }
 
         /// <summary>
-        /// Allow faking scancodes. Used for test kernels
+        /// Handles an emulated key-press by its scan-code. Used for test kernels
         /// </summary>
-        /// <param name="aScancode">A scan code.</param>
-        /// <param name="aReleased">Key released.</param>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
-        internal static void HandleFakeScanCode(byte aScancode, bool aReleased)
+        /// <param name="scanCode">The scan code of the virtual key-press.</param>
+        /// <param name="released">Whether the key has been pressed or released.</param>
+        /// <exception cref="global::System.IO.IOException">An I/O error has occurred.</exception>
+        internal static void HandleFakeScanCode(byte scanCode, bool released)
         {
-            HandleScanCode(aScancode, aReleased);
+            HandleScanCode(scanCode, released);
         }
 
         /// <summary>
-        /// Handle scan code. Used to update LEDs, 
+        /// Handles a key-press by its physical key scan-code.
         /// </summary>
-        /// <param name="aScanCode">A scan code.</param>
-        /// <param name="aReleased">Key released.</param>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <param name="aScanCode">The physical scan code of the key-press.</param>
+        /// <param name="aReleased">Whether the key has been pressed or released.</param>
+        /// <exception cref="global::System.IO.IOException">An I/O error occurred.</exception>
         private static void HandleScanCode(byte aScanCode, bool aReleased)
         {
-            Global.Debugger.Send("KeyboardManager.HandleScanCode");
-
             byte key = aScanCode;
-            if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased)
-            {
+            if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased) {
                 // caps lock
                 CapsLock = !CapsLock;
                 UpdateLeds();
             }
-            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased)
-            {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased) {
                 // num lock
                 NumLock = !NumLock;
                 UpdateLeds();
             }
-            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased)
-            {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased) {
                 // scroll lock
                 ScrollLock = !ScrollLock;
                 UpdateLeds();
             }
-            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl))
-            {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl)) {
                 ControlPressed = !aReleased;
             }
-            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift))
-            {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift)) {
                 ShiftPressed = !aReleased;
             }
-            else if (mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || mScanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt))
-            {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt)) {
                 AltPressed = !aReleased;
             }
-            else
-            {
-                if (!aReleased)
-                {
-                    KeyEvent keyInfo;
-
-                    if (GetKey(key, out keyInfo))
-                    {
+            else {
+                if (!aReleased) {
+                    if (GetKey(key, out var keyInfo)) {
                         Enqueue(keyInfo);
                     }
                 }
@@ -136,100 +121,92 @@ namespace Cosmos.System
         }
 
         /// <summary>
-        /// Update keyboard LEDs.
+        /// Updates the keyboard's LEDs.
         /// </summary>
         private static void UpdateLeds()
         {
-            foreach (KeyboardBase keyboard in mKeyboardList)
+            foreach (KeyboardBase keyboard in keyboardList)
             {
                 keyboard.UpdateLeds();
             }
         }
 
         /// <summary>
-        /// Get key pressed.
+        /// Attempts to convert the given physical key scan-code to a
+        /// <see cref="KeyEvent"/> instance.
         /// </summary>
-        /// <param name="aScancode">A scan code.</param>
-        /// <param name="keyInfo">KeyEvent output.</param>
-        /// <returns>bool value.</returns>
-        public static bool GetKey(byte aScancode, out KeyEvent keyInfo)
+        /// <param name="scanCode">The scan-code of the physical key.</param>
+        /// <param name="keyInfo">The resulting <see cref="KeyEvent"/>.</param>
+        /// <returns><see langword="true"/> if the operation succeded and <paramref name="keyInfo"/> holds a non-null value; otherwise, <see langword="false"/>.</returns>
+        public static bool GetKey(byte scanCode, out KeyEvent keyInfo)
         {
-            if (mScanMap == null)
-            {
-                Global.Debugger.Send("No KeyLayout");
-            }
-
-            keyInfo = mScanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
-
+            keyInfo = scanMap.ConvertScanCode(scanCode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
             return keyInfo != null;
         }
 
         /// <summary>
-        /// Try read key.
+        /// If available, reads the next key from the pending key-press keyboard buffer,
+        /// and removes it from said buffer.
         /// </summary>
-        /// <param name="oKey">Output KeyEvent.</param>
-        /// <returns>bool value.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when queue is empty.</exception>
-        public static bool TryReadKey(out KeyEvent oKey)
+        /// <param name="key">The pending key-press.</param>
+        /// <returns><see langword="true"/> if a key-press was pending and has been dequeued to <paramref name="key"/>; otherwise, <see langword="false"/>.</returns>
+        public static bool TryReadKey(out KeyEvent key)
         {
-            if (mQueuedKeys.Count > 0)
+            if (queuedKeys.Count > 0)
             {
-                oKey = mQueuedKeys.Dequeue();
+                key = queuedKeys.Dequeue();
                 return true;
             }
 
-            oKey = default(KeyEvent);
-
+            key = default;
             return false;
         }
 
         /// <summary>
-        /// Read key.
+        /// Reads the next key from the pending key-press keyboard buffer, and
+        /// removes it from said buffer.
         /// </summary>
-        /// <returns>KeyEvent value.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when queue is empty.</exception>
+        /// <returns>The pending key-press.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the queue is empty.</exception>
         public static KeyEvent ReadKey()
         {
-            while (mQueuedKeys.Count == 0)
+            while (queuedKeys.Count == 0)
             {
                 KeyboardBase.WaitForKey();
             }
 
-            return mQueuedKeys.Dequeue();
+            return queuedKeys.Dequeue();
         }
 
         /// <summary>
-        /// Get key layout.
+        /// Gets the currently used keyboard layout.
         /// </summary>
-        /// <returns>ScanMapBase value.</returns>
         public static ScanMapBase GetKeyLayout()
         {
-            return mScanMap;
+            return scanMap;
         }
 
         /// <summary>
-        /// Set key layout.
+        /// Sets the currently used keyboard layout.
         /// </summary>
-        /// <param name="aScanMap">A scan map</param>
-        public static void SetKeyLayout(ScanMapBase aScanMap)
+        /// <param name="scanMap">The keyboard scan map to use.</param>
+        public static void SetKeyLayout(ScanMapBase scanMap)
         {
-            if (aScanMap != null)
+            if (scanMap != null)
             {
-                mScanMap = aScanMap;
+                KeyboardManager.scanMap = scanMap;
             }
         }
 
         /// <summary>
-        /// Add keyboard
+        /// Registers the given physical keyboard device.
         /// </summary>
-        /// <param name="aKeyboard">A keyboard to add.</param>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
-        private static void AddKeyboard(KeyboardBase aKeyboard)
+        /// <param name="keyboard">The keyboard device to add.</param>
+        private static void AddKeyboard(KeyboardBase keyboard)
         {
-            Global.Debugger.Send("KeyboardManager.AddKeyboard");
-
-            aKeyboard.OnKeyPressed = HandleScanCode;
-            mKeyboardList.Add(aKeyboard);
+            Global.Debugger.Send($"Registering physical keyboard device #{keyboardList.Count + 1}.");
+            keyboard.OnKeyPressed = HandleScanCode;
+            keyboardList.Add(keyboard);
         }
     }
 }

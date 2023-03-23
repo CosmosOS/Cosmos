@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Cosmos.Debug.Kernel;
-using Cosmos.HAL;
-
 namespace Cosmos.System
 {
     /// <summary>
-    /// ScanMapBase abstract class.
+    /// Represents the base class for keyboard layout scan-maps.
     /// </summary>
     public abstract class ScanMapBase
     {
         /// <summary>
-        /// Keys list.
+        /// The available key mappings.
         /// </summary>
-        protected List<KeyMapping> _keys;
+        protected List<KeyMapping> Keys;
 
         /// <summary>
-        /// Init keys list.
+        /// Initializes the key list.
         /// </summary>
         protected abstract void InitKeys();
 
         /// <summary>
-        /// Create new instance of the <see cref="ScanMapBase"/> class.
+        /// Initializes a new instance of the <see cref="ScanMapBase"/> class.
         /// </summary>
         protected ScanMapBase()
         {
@@ -30,93 +27,88 @@ namespace Cosmos.System
         }
 
         /// <summary>
-        /// Convert scan code to KeyEvent.
+        /// Converts the given scan code to a <see cref="KeyEvent"/> instance.
         /// </summary>
-        /// <param name="scan2">Scaned key.</param>
-        /// <param name="ctrl">Ctrl pressed.</param>
-        /// <param name="shift">Shift pressed.</param>
-        /// <param name="alt">Alt pressed.</param>
-        /// <param name="num">Num pressed.</param>
-        /// <param name="caps">Caps pressed.</param>
-        /// <param name="scroll">Scroll pressed.</param>
-        /// <returns>KeyEvent value.</returns>
-        public KeyEvent ConvertScanCode(byte scan2, bool ctrl, bool shift, bool alt, bool num, bool caps, bool scroll)
+        /// <param name="scanKey">The scanned (pressed) key.</param>
+        /// <param name="ctrl">Whether the Control (Ctrl) key is pressed.</param>
+        /// <param name="shift">Whether the Shift key is pressed.</param>
+        /// <param name="alt">Whether the Alt key is pressed.</param>
+        /// <param name="numLock">Whether num-lock is active.</param>
+        /// <param name="capsLock">Whether caps-lock is active.</param>
+        /// <param name="scrollLock">Whether scroll-lock is active.</param>
+        /// <returns>The translated <see cref="KeyEvent"/>.</returns>
+        public KeyEvent ConvertScanCode(byte scanKey, bool ctrl, bool shift, bool alt, bool numLock, bool capsLock, bool scrollLock)
         {
-            KeyEvent keyev = new KeyEvent();
+            var keyEvent = new KeyEvent();
             bool found = false;
 
-            if (scan2 == 0)
+            if (scanKey == 0)
             {
-                found = true;
-                return keyev;
+                return keyEvent;
             }
 
-            byte scan = scan2;
+            byte scan = scanKey;
 
-            if (alt) keyev.Modifiers |= ConsoleModifiers.Alt;
-            if (ctrl) keyev.Modifiers |= ConsoleModifiers.Control;
-            if (shift) keyev.Modifiers |= ConsoleModifiers.Shift;
+            if (alt)   keyEvent.Modifiers |= ConsoleModifiers.Alt;
+            if (ctrl)  keyEvent.Modifiers |= ConsoleModifiers.Control;
+            if (shift) keyEvent.Modifiers |= ConsoleModifiers.Shift;
 
-            keyev.Type = (scan & 0x80) != 0 ? KeyEvent.KeyEventType.Break : KeyEvent.KeyEventType.Make;
+            keyEvent.Type = (scan & 0x80) != 0 ? KeyEvent.KeyEventType.Break : KeyEvent.KeyEventType.Make;
 
-            if ((scan & 0x80) != 0)
+            if ((scan & 0x80) != 0) {
                 scan = (byte)(scan ^ 0x80);
+            }
 
-            Global.Debugger.Send("Number of keys: ");
-            Global.Debugger.SendNumber((uint) _keys.Count);
-
-            for (int index = 0; index < _keys.Count; index++)
+            for (int index = 0; index < Keys.Count; index++)
             {
-                KeyMapping t = _keys[index];
+                KeyMapping t = Keys[index];
 
                 if (t == null)
                 {
-                    Global.Debugger.Send("Key received but item is NULL");
+                    Global.Debugger.Send("An unmapped key input has been received; ignoring.");
                     continue;
                 }
-                else if (t.Scancode == scan)
+                else if (t.ScanCode == scan)
                 {
                     found = true;
                     KeyMapping map = t;
-                    char key = '\0';
+                    char key;
 
-                    if (ctrl)
-                        if (alt)
-                            key = shift ^ caps ? map.ControlAltShift : map.ControlAlt;
-                        else
-                            key = shift ^ caps ? map.ControlShift : map.Control;
-                    else if (shift)
-                        key = caps ? map.ShiftCaps
-                            : num ? map.ShiftNum
+                    if (ctrl) {
+                        if (alt) {
+                            key = shift ^ capsLock ? map.ControlAltShift : map.ControlAlt;
+                        } else {
+                            key = shift ^ capsLock ? map.ControlShift : map.Control;
+                        }
+                    } else if (shift) {
+                        key = capsLock ? map.ShiftCapsLock
+                            : numLock ? map.ShiftNumLock
                             : map.Shift;
-                    else if (caps)
-                        key = map.Caps;
-                    else if (num)
-                        key = map.Num;
-                    else
-                        key = map.Value;
+                    } else if (capsLock) {
+                        key = map.CapsLock;
+                    } else {
+                        key = numLock ? map.NumLock : map.Value;
+                    }
 
-                    keyev.KeyChar = key;
-                    keyev.Key = num ? t.NumLockKey : t.Key;
-
+                    keyEvent.KeyChar = key;
+                    keyEvent.Key = numLock ? t.NumLockKey : t.Key;
                     break;
                 }
             }
 
-            return found ? keyev : null;
+            return found ? keyEvent : null;
         }
 
         /// <summary>
-        /// Check if scan code matches key.
+        /// Checks if the given scan code matches the specified key.
         /// </summary>
-        /// <param name="ScanCode">Scan code.</param>
-        /// <param name="Key">Key.</param>
-        /// <returns>bool value.</returns>
-        public bool ScanCodeMatchesKey(byte ScanCode, ConsoleKeyEx Key)
+        /// <param name="scanCode">The physical keyboard scan-code.</param>
+        /// <param name="key">The virtual mapping key.</param>
+        public bool ScanCodeMatchesKey(byte scanCode, ConsoleKeyEx key)
         {
-            for (int i = 0; i < _keys.Count; i++)
+            for (int i = 0; i < Keys.Count; i++)
             {
-                if (_keys[i].Scancode == ScanCode && _keys[i].Key == Key)
+                if (Keys[i].ScanCode == scanCode && Keys[i].Key == key)
                 {
                     return true;
                 }
