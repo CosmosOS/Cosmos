@@ -1,35 +1,25 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          TCP Client
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using Cosmos.HAL;
 using Cosmos.System.Helpers;
 using Cosmos.System.Network.Config;
 
 namespace Cosmos.System.Network.IPv4.TCP
 {
     /// <summary>
-    /// TcpClient class. Used to manage the TCP connection to a server.
+    /// Represents a TCP client. Used to manage the TCP connection to a server.
     /// </summary>
     public class TcpClient : IDisposable
     {
         /// <summary>
-        /// Tcp State machine.
+        /// The TCP state machine.
         /// </summary>
         public Tcp StateMachine;
 
         /// <summary>
-        /// Create new instance of the <see cref="TcpClient"/> class.
+        /// Initializes a new instance of the <see cref="TcpClient"/> class.
         /// </summary>
-        /// <param name="stateMachine">Tcp state machine.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <param name="stateMachine">The TCP state machine.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
         internal TcpClient(Tcp stateMachine)
         {
@@ -37,26 +27,24 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="TcpClient"/> class.
+        /// Initializes a new instance of the <see cref="TcpClient"/> class.
         /// </summary>
-        /// <param name="localPort">Local port.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <param name="localPort">The local port.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
         public TcpClient(int localPort)
         {
-            StateMachine = new Tcp((ushort)localPort, 0, Address.Zero, Address.Zero);
-
-            StateMachine.rxBuffer = new Queue<TCPPacket>(8);
-
+            StateMachine = new((ushort)localPort, 0, Address.Zero, Address.Zero);
+            StateMachine.RxBuffer = new Queue<TCPPacket>(8);
             StateMachine.Status = Status.CLOSED;
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="TcpClient"/> class.
+        /// Initializes a new instance of the <see cref="TcpClient"/> class.
         /// </summary>
         /// <param name="dest">Destination address.</param>
         /// <param name="destPort">Destination port.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if TcpClient with localPort 0 exists.</exception>
         public TcpClient(Address dest, int destPort)
             : this(0)
@@ -66,7 +54,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Connect to client.
+        /// Connects the client to the given server.
         /// </summary>
         /// <param name="dest">Destination address.</param>
         /// <param name="destPort">Destination port.</param>
@@ -113,9 +101,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Close connection.
+        /// Closes the connection.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="Exception">Thrown if TCP Status is CLOSED.</exception>
         public void Close()
         {
@@ -137,13 +125,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Send data to client.
+        /// Sends data to the connected server.
         /// </summary>
         /// <param name="data">Data array to send.</param>
         /// <exception cref="Exception">Thrown if destination is null or destinationPort is 0.</exception>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public void Send(byte[] data)
         {
@@ -179,11 +167,10 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Receive data from end point.
+        /// Receives data from the end-point.
         /// </summary>
         /// <param name="source">Source end point.</param>
-        /// <returns>byte array value.</returns>
-        /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidOperationException">Thrown on fatal error.</exception>
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] NonBlockingReceive(ref EndPoint source)
         {
@@ -191,12 +178,13 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 throw new Exception("Client must be connected before receiving data.");
             }
-            if (StateMachine.rxBuffer.Count < 1)
+
+            if (StateMachine.RxBuffer.Count < 1)
             {
                 return null;
             }
 
-            var packet = StateMachine.rxBuffer.Dequeue();
+            var packet = StateMachine.RxBuffer.Dequeue();
             source.Address = packet.SourceIP;
             source.Port = packet.SourcePort;
 
@@ -206,15 +194,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Receive data from end point.
+        /// Receives data from the end-point.
         /// </summary>
         /// <param name="source">Source end point.</param>
-        /// <returns>byte array value.</returns>
-        /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="InvalidOperationException">Thrown on fatal error.</exception>
         /// <exception cref="Exception">Thrown if TCP Status is not ESTABLISHED.</exception>
         public byte[] Receive(ref EndPoint source)
         {
-            while (StateMachine.rxBuffer.Count < 1)
+            while (StateMachine.RxBuffer.Count < 1)
             {
                 if (StateMachine.Status != Status.ESTABLISHED)
                 {
@@ -222,7 +209,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 }
             }
 
-            var packet = StateMachine.rxBuffer.Dequeue();
+            var packet = StateMachine.RxBuffer.Dequeue();
             source.Address = packet.SourceIP;
             source.Port = packet.SourcePort;
 
@@ -232,41 +219,23 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Get distant computer EndPoint (IP adress and port).
+        /// Gets the remote hosts end-point (IP address and port).
         /// </summary>
-        /// <returns>Remote EndPoint.</returns>
-        public EndPoint RemoteEndPoint
-        {
-            get
-            {
-                return StateMachine.RemoteEndPoint;
-            }
-        }
+        public EndPoint RemoteEndPoint => StateMachine.RemoteEndPoint;
 
         /// <summary>
-        /// Get local computer EndPoint (IP adress and port).
+        /// Gets the remote hosts end-point (IP address and port).
         /// </summary>
-        /// <returns>Remote EndPoint.</returns>
-        public EndPoint LocalEndPoint
-        {
-            get
-            {
-                return StateMachine.LocalEndPoint;
-            }
-        }
+        public EndPoint LocalEndPoint => StateMachine.LocalEndPoint;
 
         /// <summary>
-        /// Is TCP Connected.
+        /// Returns a value whether the TCP client is connected to a remote host.
         /// </summary>
-        /// <returns>Boolean value.</returns>
         public bool IsConnected()
         {
             return StateMachine.Status == Status.ESTABLISHED;
         }
 
-        /// <summary>
-        /// Close Client
-        /// </summary>
         public void Dispose()
         {
             Close();
