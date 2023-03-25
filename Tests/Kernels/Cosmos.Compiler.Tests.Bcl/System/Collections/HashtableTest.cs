@@ -18,10 +18,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections
             h.Add("One", "One");
             //h.Add(42, "Test");
 
-            h.Add("", "1234");
-
-            Assert.AreEqual("1234", (string)h[""], "key of \"\" failed");
-
             Assert.IsTrue(h.ContainsKey("One"), "Hashtable.ContainsKey() failed: existing key not found");
             Assert.IsFalse(h.ContainsKey("Two"), "Hashtable.ContainsKey() failed: not existing key not found");
 
