@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="b0db3ac7-544a-478d-b6b5-9993447f3e91" name="Changes" comment="" />
+    <list default="true" id="b0db3ac7-544a-478d-b6b5-9993447f3e91" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Kernel/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Kernel/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/Cosmos.Core_Plugs/System/StringImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/source/Cosmos.Core_Plugs/System/StringImpl.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,6 +25,11 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/zarlo/projects/github/zarlo/Cosmos/Test.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   },
@@ -40,6 +51,7 @@
       <updated>1676967806483</updated>
       <workItem from="1676967807508" duration="618000" />
       <workItem from="1677016778689" duration="1523000" />
+      <workItem from="1679740394762" duration="3268000" />
     </task>
     <servers />
   </component>
