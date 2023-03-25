@@ -18,6 +18,10 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections
             h.Add("One", "One");
             //h.Add(42, "Test");
 
+            h.Add("", "1234");
+
+            Assert.AreEqual("1234", (string)h[""], "key of \"\" failed");
+
             Assert.IsTrue(h.ContainsKey("One"), "Hashtable.ContainsKey() failed: existing key not found");
             Assert.IsFalse(h.ContainsKey("Two"), "Hashtable.ContainsKey() failed: not existing key not found");
 
@@ -57,7 +61,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections
 
             Assert.IsTrue((string)h2[43] == "FortyThree", "h2 indexer failed: existing value (II) not found");
 
-            Assert.IsTrue(h2.Count == 2, "h2 Count failed: value != 2"); 
+            Assert.IsTrue(h2.Count == 2, "h2 Count failed: value != 2");
 
             foreach (var k in h2.Keys)
             {
@@ -97,7 +101,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections
                 Assert.IsTrue((int)k.Value == 41 || (int)k.Value == 42, "h3 enumeration returns invalid values");
             }
 
-            
+
+
         }
     }
 }

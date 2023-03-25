@@ -977,6 +977,12 @@ namespace Cosmos.Core_Plugs.System
 
         public static unsafe int GetNonRandomizedHashCode(string aString)
         {
+
+            if (String.IsNullOrEmpty(aString))
+            {
+                return 0;
+            }
+
             // the code is the same as the one used in .net except for the explicit == 2 and == 1 cases
             // we need this since a new object can start directly behind the string in memory, so the standard
             // implementation would read the allocated size of the next object and use it for the hash
