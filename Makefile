@@ -112,7 +112,7 @@ ifneq ($(shell id -u), 0)
 	@rm -rf ~/.nuget/packages/ip2cpu.*
 	@rm -rf ~/.nuget/packages/spruce
 	@rm -rf ~/.nuget/packages/xsharp
-ifneq ("$(wildcard $(/bin/sudo))","")
+ifeq ("$(wildcard $(/bin/sudo))","")
 	@sudo echo $(DESTDIR) > /etc/CosmosUserKit.cfg
 else
 ifneq ("$(wildcard $(/etc/CosmosUserKit.cfg))","")
