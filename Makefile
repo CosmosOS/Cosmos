@@ -54,7 +54,7 @@ build:
 	$(DOTNET) clean $(THISDIR)/source/Cosmos.System2
 	$(DOTNET) clean $(THISDIR)/source/Cosmos.System2_Plugs
 	$(DOTNET) clean $(THISDIR)/source/Cosmos.Build.Tasks
-
+	$(DOTNET) clean $(THISDIR)/source/Cosmos.Plugs
 
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.Common $(DOTNETFLAGS)
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel $(DOTNETFLAGS)
@@ -66,6 +66,7 @@ build:
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2 $(DOTNETFLAGS)
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
 	$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks $(DOTNETFLAGS)
+	$(DOTNET) pack $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
 
 .PHONY: publish
 publish:
@@ -77,6 +78,7 @@ publish:
 	$(DOTNET) publish $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
 	$(DOTNET) publish $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
 	$(DOTNET) publish $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
+	$(DOTNET) publish $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
 
 .PHONY: install
 install:
