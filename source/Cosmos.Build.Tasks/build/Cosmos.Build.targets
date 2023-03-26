@@ -106,14 +106,6 @@
         <UpToDateCheckOutput Include="$(IsoFile)" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(KernelPkg)' == ''">
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Plugs.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Debug.Kernel.Plugs.Asm.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.System2_Plugs.dll" />
-    </ItemGroup>
-
-
     <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
         <PackageReference>
             <IsPlugsReference>False</IsPlugsReference>
