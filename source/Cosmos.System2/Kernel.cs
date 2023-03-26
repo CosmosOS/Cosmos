@@ -38,7 +38,7 @@ public abstract class Kernel
     /// Set the keyboard key layout.
     /// </summary>
     /// <param name="scanMap">Keyboard key layout.</param>
-    [Obsolete("Use KeyboardManager.SetKeyboardScanMap instead.")]
+    [Obsolete("Use KeyboardManager.SetKeyLayout instead.")]
     protected void SetKeyboardScanMap(ScanMapBase scanMap) => KeyboardManager.SetKeyLayout(scanMap);
 
     /// <summary>
