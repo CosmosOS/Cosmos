@@ -97,8 +97,8 @@ namespace Cosmos.System.FileSystem
         /// </list>
         /// </exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         /// <exception cref="PathTooLongException">Thrown when The aPath is longer than the system defined maximum length.</exception>
         public override DirectoryEntry CreateFile(string aPath)
@@ -174,8 +174,8 @@ namespace Cosmos.System.FileSystem
         /// </list>
         /// </exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         /// <exception cref="PathTooLongException">Thrown when The aPath is longer than the system defined maximum length.</exception>
         public override DirectoryEntry CreateDirectory(string aPath)

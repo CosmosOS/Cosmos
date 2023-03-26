@@ -84,7 +84,7 @@ namespace Cosmos.System.FileSystem.FAT
             /// </list>
             /// </exception>
             /// <exception cref="ArgumentException">Thrown when bad aFirstEntry passed.</exception>
-            /// <exception cref="ArgumentNullException">Thrown on fatal error (contact support).</exception>
+            /// <exception cref="ArgumentNullException">Thrown on fatal error.</exception>
             /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
             public uint[] GetFatChain(uint aFirstEntry, long aDataSize = 0)
             {
@@ -168,9 +168,9 @@ namespace Cosmos.System.FileSystem.FAT
             /// <returns>The index of the next unallocated FAT entry.</returns>
             /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
             /// <exception cref="Exception">Thrown when data size invalid / Failed to find an unallocated FAT entry.</exception>
-            /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-            /// <exception cref="ArgumentNullException">Thrown on fatal error (contact support).</exception>
-            /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+            /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
+            /// <exception cref="ArgumentNullException">Thrown on fatal error.</exception>
+            /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
             /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
             public uint GetNextUnallocatedFatEntry()
             {
@@ -244,8 +244,8 @@ namespace Cosmos.System.FileSystem.FAT
             /// <item>Out of memory.</item>
             /// </list>
             /// </exception>
-            /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-            /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+            /// <exception cref="RankException">Thrown on fatal error.</exception>
+            /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
             /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
             /// <exception cref="ArgumentOutOfRangeException">
             /// <list type = "bullet" >
@@ -345,7 +345,7 @@ namespace Cosmos.System.FileSystem.FAT
             /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
             /// <exception cref="Exception">Thrown when data size invalid.</exception>
             /// <exception cref="ArgumentException">Thrown when bad aEntryNumber passed.</exception>
-            /// <exception cref="ArgumentNullException">Thrown on fatal error (contact support).</exception>
+            /// <exception cref="ArgumentNullException">Thrown on fatal error.</exception>
             /// <exception cref="ArgumentOutOfRangeException">Thrown when bad aEntryNumber passed.</exception>
             /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
             internal void GetFatEntry(uint aEntryNumber, out uint aValue)
@@ -688,23 +688,23 @@ namespace Cosmos.System.FileSystem.FAT
         /// <list type="bullet">
         /// <item>Thrown when aDevice is null.</item>
         /// <item>Thrown when FatFileSystem is null.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <list type="bullet">
         /// <item>Thrown when aRootPath is null.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
         /// <exception cref="Exception">
         /// <list type="bullet">
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// <item>>FAT signature not found.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public FatFileSystem(Partition aDevice, string aRootPath, long aSize, bool fileSystemExists = true)
             : base(aDevice, aRootPath, aSize)
         {
@@ -738,23 +738,23 @@ namespace Cosmos.System.FileSystem.FAT
         /// <list type="bullet">
         /// <item>Thrown when aDevice is null.</item>
         /// <item>Thrown when FatFileSystem is null.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <list type="bullet">
         /// <item>Thrown when aRootPath is null.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
         /// <exception cref="Exception">
         /// <list type="bullet">
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// <item>>FAT signature not found.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public static FatFileSystem CreateFatFileSystem(Partition aDevice, string aRootPath, long aSize, string aDriveFormat)
         {
             if (aDevice == null)
@@ -777,14 +777,14 @@ namespace Cosmos.System.FileSystem.FAT
         /// <summary>
         /// Parse BPB
         /// </summary>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
         /// <exception cref="Exception">
         /// <list type="bullet">
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// <item>>FAT signature not found.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         internal void ReadBootSector()
         {
             var xBPB = Device.NewBlockArray(1);
@@ -926,8 +926,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// <item>Out of memory.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
@@ -1092,8 +1092,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type / memory error.</exception>
         /// <exception cref="ArgumentException">Thrown on memory error.</exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         public override DirectoryEntry CreateDirectory(DirectoryEntry aParentDirectory, string aNewDirectory)
         {
@@ -1135,8 +1135,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type / memory error.</exception>
         /// <exception cref="ArgumentException">Thrown on memory error.</exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         public override DirectoryEntry CreateFile(DirectoryEntry aParentDirectory, string aNewFile)
         {
@@ -1182,8 +1182,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// <item>Out of memory.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
@@ -1236,8 +1236,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// <item>Out of memory.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
@@ -1302,8 +1302,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// </list>
         /// </exception>
         /// <exception cref="EncoderFallbackException">Thrown when encoder fallback operation on aValue fails / memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
@@ -1355,7 +1355,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// <summary>
         /// Get size of free space available.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentNullException">Thrown when filesystem is null.</exception>
         /// <exception cref="ArgumentException">
         /// <list type="bullet">
@@ -1386,7 +1386,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// <summary>
         /// Get total free space.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentNullException">Thrown when filesystem is null.</exception>
         /// <exception cref="ArgumentException">
         /// <list type="bullet">
@@ -1436,7 +1436,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// <list type = "bullet" >
         /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
         /// <item>Entrys matadata offset value is invalid.</item>
-        /// <item>Fatal error (contact support).</item>
+        /// <item>Fatal error.</item>
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when filesystem is null / memory error.</exception>
@@ -1451,14 +1451,14 @@ namespace Cosmos.System.FileSystem.FAT
         /// <list type="bullet">
         /// <item>Thrown when data size invalid.</item>
         /// <item>Thrown on unknown file system type.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// </list>
         /// </exception>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         /// <exception cref="NotImplementedException">Thrown when FAT type is unknown.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Format(string aDriveFormat, bool aQuick)

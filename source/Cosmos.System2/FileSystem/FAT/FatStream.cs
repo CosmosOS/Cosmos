@@ -183,8 +183,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// <item>Out of memory.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
@@ -338,8 +338,8 @@ namespace Cosmos.System.FileSystem.FAT
         /// <item>Out of memory.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aValue is corrupted.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
