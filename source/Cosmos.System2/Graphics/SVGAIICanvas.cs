@@ -9,7 +9,7 @@ using Cosmos.System.Graphics.Fonts;
 namespace Cosmos.System.Graphics
 {
     /// <summary>
-    /// Represents a VMWare SVGAII canvas. Please note that this implementation
+    /// Defines a VMWare SVGAII canvas implementation. Please note that this implementation
     /// of <see cref="Canvas"/> can only be used with virtualizers that do implement
     /// SVGAII, meaning that this class will not work on regular hardware.
     /// </summary>
