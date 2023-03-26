@@ -113,7 +113,8 @@ ifneq ($(shell id -u), 0)
 	@rm -rf ~/.nuget/packages/spruce
 	@rm -rf ~/.nuget/packages/xsharp
 ifeq ("$(wildcard $(/bin/sudo))","")
-	@sudo echo $(DESTDIR) > /etc/CosmosUserKit.cfg
+	@echo "using sudo to update /etc/CosmosUserKit.cfg"
+	@echo $(DESTDIR) | sudo tee /etc/CosmosUserKit.cfg > /dev/null
 else
 ifneq ("$(wildcard $(/etc/CosmosUserKit.cfg))","")
 	@echo "not running as root you need to make a file at /etc/CosmosUserKit.cfg with the content >" $(DESTDIR)
