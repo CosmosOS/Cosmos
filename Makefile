@@ -105,7 +105,25 @@ install:
 	@cp -r $(THISDIR)/Build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
 	@cp -r $(THISDIR)/Build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
 	@cp -r $(THISDIR)/Build/syslinux/* $(DESTDIR)/Build/ISO/
-	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
+ifneq ($(shell id -u), 0)
+# remove old packages from cache
+# change this when https://github.com/NuGet/Home/issues/5713 is done
+	@rm -rf ~/.nuget/packages/cosmos.*
+	@rm -rf ~/.nuget/packages/ip2cpu.*
+	@rm -rf ~/.nuget/packages/spruce
+	@rm -rf ~/.nuget/packages/xsharp
+ifneq ("$(wildcard $(/bin/sudo))","")
+	@sudo echo $(DESTDIR) > /etc/CosmosUserKit.cfg
+else
+ifneq ("$(wildcard $(/etc/CosmosUserKit.cfg))","")
+	@echo "not running as root you need to make a file at /etc/CosmosUserKit.cfg with the content >" $(DESTDIR)
+else
+	@echo "/etc/CosmosUserKit.cfg not updated"
+endif
+endif
+else
+	@sudo echo $(DESTDIR) > /etc/CosmosUserKit.cfg
+endif
 	@echo "if this is your first time installing cosmos you will want to run 'make nuget-install'"
 
 .PHONY: nuget-install
