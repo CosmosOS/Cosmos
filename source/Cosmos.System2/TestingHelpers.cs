@@ -11,7 +11,7 @@ namespace Cosmos.System
     {
         /// <summary>
         /// Add fake scan codes to the keyboard, fake pressing keys.
-        /// Used to test kernals.
+        /// Used to test kernels.
         /// </summary>
         /// <param name="scanCode">A key code.</param>
         /// <param name="released">Is key pressed.</param>

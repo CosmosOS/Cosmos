@@ -121,7 +121,7 @@ namespace ConsoleTest
             //Console.WriteLine("Test Format (hex) {0:x}", 42);
 
             Console.WriteLine("Layout switched to DE...");
-            SetKeyboardScanMap(new DE_Standard());
+            Sys.KeyboardManager.SetKeyLayout(new DEStandardLayout());
             Console.WriteLine("Write in german now I'll read it with Console.ReadLine()...");
 
             var str = Console.ReadLine();
