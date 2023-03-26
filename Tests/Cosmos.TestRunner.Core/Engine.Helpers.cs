@@ -310,7 +310,7 @@ namespace Cosmos.TestRunner.Core
 
             var xArgsString = arguments.Aggregate("", (a, b) => a + " \"" + b + "\"");
 
-            var xProcess = Process.Start(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"), xArgsString);
+            var xProcess = Process.Start(Path.Combine(GetCosmosUserkitFolder(), "Build", "tools", "cygwin", "ld.exe"), xArgsString);
 
             xProcess.WaitForExit(10000);
 
