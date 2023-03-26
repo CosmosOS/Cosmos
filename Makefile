@@ -123,7 +123,8 @@ else
 endif
 endif
 else
-	@sudo echo $(DESTDIR) > /etc/CosmosUserKit.cfg
+	# no need for sudo when root
+	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
 endif
 	@echo "if this is your first time installing cosmos you will want to run 'make nuget-install'"
 
