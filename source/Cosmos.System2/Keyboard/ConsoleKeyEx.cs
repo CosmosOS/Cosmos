@@ -79,6 +79,7 @@ namespace Cosmos.System
         LShift,
         RShift,
         OEM102, // <<=== This key does not exist on a US keyboard, but on the german one. It contains the characters `|`, `<` and `>`
+        OEM5, // This one is registered as \ and | on a British keyboard. however US use the one registered as # and ~ to us.
         Z,
         X,
         C,
