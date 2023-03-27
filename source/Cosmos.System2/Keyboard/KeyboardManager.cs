@@ -87,33 +87,42 @@ namespace Cosmos.System
         private static void HandleScanCode(byte aScanCode, bool aReleased)
         {
             byte key = aScanCode;
-            if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased) {
+            if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased)
+            {
                 // caps lock
                 CapsLock = !CapsLock;
                 UpdateLeds();
             }
-            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased) {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased)
+            {
                 // num lock
                 NumLock = !NumLock;
                 UpdateLeds();
             }
-            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased) {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased)
+            {
                 // scroll lock
                 ScrollLock = !ScrollLock;
                 UpdateLeds();
             }
-            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl)) {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl))
+            {
                 ControlPressed = !aReleased;
             }
-            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift)) {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift))
+            {
                 ShiftPressed = !aReleased;
             }
-            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt)) {
+            else if (scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt))
+            {
                 AltPressed = !aReleased;
             }
-            else {
-                if (!aReleased) {
-                    if (GetKey(key, out var keyInfo)) {
+            else
+            {
+                if (!aReleased)
+                {
+                    if (GetKey(key, out var keyInfo))
+                    {
                         Enqueue(keyInfo);
                     }
                 }

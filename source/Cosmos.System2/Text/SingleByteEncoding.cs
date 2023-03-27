@@ -24,25 +24,30 @@ namespace Cosmos.System.ExtendedASCII
         public override int GetByteCount(char[] chars, int index, int count)
         {
             // Validate input parameters
-            if (chars == null) {
+            if (chars == null)
+            {
                 throw new ArgumentNullException(nameof(chars));
             }
 
-            if (index < 0 || count < 0) {
+            if (index < 0 || count < 0)
+            {
                 throw new ArgumentOutOfRangeException(index < 0 ? nameof(index) : nameof(count), "negative number");
             }
 
-            if (chars.Length - index < count) {
+            if (chars.Length - index < count)
+            {
                 throw new ArgumentOutOfRangeException(nameof(count), "The 'count' parameter is greater than the length of the 'chars' array.");
             }
 
             // If no input, return 0, avoid fixed empty array problem
-            if (count == 0) {
+            if (count == 0)
+            {
                 return 0;
             }
 
             // If no input just return 0, fixed doesn't like 0 length arrays
-            if (count == 0) {
+            if (count == 0)
+            {
                 return 0;
             }
 
@@ -101,15 +106,18 @@ namespace Cosmos.System.ExtendedASCII
         {
             mDebugger.SendInternal($"GetBytes of chars {new string(chars)} index {charIndex} count {charCount}");
             // Validate input parameters
-            if (chars == null) {
+            if (chars == null)
+            {
                 throw new ArgumentNullException(nameof(chars));
             }
 
-            if (charIndex < 0 || charCount < 0) {
+            if (charIndex < 0 || charCount < 0)
+            {
                 throw new ArgumentOutOfRangeException(charIndex < 0 ? nameof(charIndex) : nameof(charCount), "A negative number was given.");
             }
 
-            if (chars.Length - charIndex < charCount) {
+            if (chars.Length - charIndex < charCount)
+            {
                 throw new ArgumentOutOfRangeException(nameof(chars), "'count' is greater than the length of the array.");
             }
 
@@ -124,15 +132,18 @@ namespace Cosmos.System.ExtendedASCII
         public override int GetCharCount(byte[] bytes, int index, int count)
         {
             // Validate Parameters
-            if (bytes == null) {
+            if (bytes == null)
+            {
                 throw new ArgumentNullException(nameof(bytes));
             }
 
-            if (index < 0 || count < 0) {
+            if (index < 0 || count < 0)
+            {
                 throw new ArgumentOutOfRangeException(index < 0 ? nameof(index) : nameof(count), "The given number was negative.");
             }
 
-            if (bytes.Length - index < count) {
+            if (bytes.Length - index < count)
+            {
                 throw new ArgumentOutOfRangeException(nameof(bytes), "count more that what is in array");
             }
 
@@ -159,21 +170,26 @@ namespace Cosmos.System.ExtendedASCII
         public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex)
         {
             // Validate Parameters
-            if (bytes == null) {
+            if (bytes == null)
+            {
                 throw new ArgumentNullException(nameof(bytes));
             }
 
-            if (byteIndex < 0 || byteCount < 0) {
+            if (byteIndex < 0 || byteCount < 0)
+            {
                 throw new ArgumentOutOfRangeException(byteIndex < 0 ? nameof(byteIndex) : nameof(byteCount), "The given number was negative.");
             }
 
-            if (bytes.Length - byteIndex < byteCount) {
+            if (bytes.Length - byteIndex < byteCount)
+            {
                 throw new ArgumentOutOfRangeException(nameof(bytes), "'count' is greater than the length of the array.");
             }
 
             // If no input just return 0, fixed doesn't like 0 length arrays
             if (byteCount == 0)
+            {
                 return 0;
+            }
 
             for (int i = byteIndex; i < byteCount; i++)
             {
@@ -185,7 +201,8 @@ namespace Cosmos.System.ExtendedASCII
 
         public override int GetMaxByteCount(int charCount)
         {
-            if (charCount < 0) {
+            if (charCount < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(charCount), "The given number was negative.");
             }
 

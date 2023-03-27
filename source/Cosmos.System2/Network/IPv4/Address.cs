@@ -32,8 +32,6 @@ namespace Cosmos.System.Network.IPv4
         /// </summary>
         public static readonly Address Broadcast = new(255, 255, 255, 255);
 
-
-
         /// <summary>
         /// Create new instance of the <see cref="Address"/> class, with specified IP address.
         /// </summary>
@@ -183,14 +181,18 @@ namespace Cosmos.System.Network.IPv4
 
         public int CompareTo(object obj)
         {
-            if (obj is Address other) {
-                if (other.hash != hash) {
+            if (obj is Address other)
+            {
+                if (other.hash != hash)
+                {
                     return -1;
                 }
 
                 return 0;
-            } else {
-                throw new ArgumentException("obj is not a IPv4Address", "obj");
+            }
+            else
+            {
+                throw new ArgumentException("obj is not a IPv4Address", nameof(obj));
             }
         }
     }

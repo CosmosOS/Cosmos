@@ -35,9 +35,12 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// <returns>If a client is running on the given port, the <see cref="UdpClient"/>; otherwise, <see langword="null"/>.</returns>
         internal static UdpClient GetClient(ushort destPort)
         {
-            if (clients.TryGetValue(destPort, out var client)) {
+            if (clients.TryGetValue(destPort, out var client))
+            {
                 return client;
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
@@ -166,7 +169,8 @@ namespace Cosmos.System.Network.IPv4.UDP
         /// <exception cref="InvalidOperationException">Thrown on fatal error.</exception>
         public byte[] Receive(ref EndPoint source)
         {
-            while (rxBuffer.Count < 1) {
+            while (rxBuffer.Count < 1)
+            {
                 ;
             }
 

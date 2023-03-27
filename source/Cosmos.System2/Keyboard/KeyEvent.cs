@@ -64,15 +64,18 @@ namespace Cosmos.System
             Key = key;
             Modifiers = (ConsoleModifiers)0;
 
-            if (shift) {
+            if (shift)
+            {
                 Modifiers |= ConsoleModifiers.Shift;
             }
 
-            if (alt) {
+            if (alt)
+            {
                 Modifiers |= ConsoleModifiers.Alt;
             }
 
-            if (control) {
+            if (control)
+            {
                 Modifiers |= ConsoleModifiers.Control;
             }
 

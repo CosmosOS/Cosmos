@@ -33,9 +33,12 @@ namespace Cosmos.System.Network.IPv4
         /// <param name="iphash">IP Hash.</param>
         internal static ICMPClient GetClient(uint iphash)
         {
-            if (clients.TryGetValue(iphash, out var client)) {
+            if (clients.TryGetValue(iphash, out var client))
+            {
                 return client;
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }

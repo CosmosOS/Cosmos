@@ -55,7 +55,8 @@ namespace Cosmos.System
 
             keyEvent.Type = (scan & 0x80) != 0 ? KeyEvent.KeyEventType.Break : KeyEvent.KeyEventType.Make;
 
-            if ((scan & 0x80) != 0) {
+            if ((scan & 0x80) != 0)
+            {
                 scan = (byte)(scan ^ 0x80);
             }
 
@@ -74,19 +75,29 @@ namespace Cosmos.System
                     KeyMapping map = t;
                     char key;
 
-                    if (ctrl) {
-                        if (alt) {
+                    if (ctrl)
+                    {
+                        if (alt)
+                        {
                             key = shift ^ capsLock ? map.ControlAltShift : map.ControlAlt;
-                        } else {
+                        }
+                        else
+                        {
                             key = shift ^ capsLock ? map.ControlShift : map.Control;
                         }
-                    } else if (shift) {
+                    }
+                    else if (shift)
+                    {
                         key = capsLock ? map.ShiftCapsLock
                             : numLock ? map.ShiftNumLock
                             : map.Shift;
-                    } else if (capsLock) {
+                    }
+                    else if (capsLock)
+                    {
                         key = map.CapsLock;
-                    } else {
+                    }
+                    else
+                    {
                         key = numLock ? map.NumLock : map.Value;
                     }
 

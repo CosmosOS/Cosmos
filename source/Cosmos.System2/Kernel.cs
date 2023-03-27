@@ -48,14 +48,16 @@ public abstract class Kernel
     {
         try {
             Global.Debugger.Send("Starting the kernel...");
-            if (mStarted) {
+            if (mStarted)
+            {
                 Global.Debugger.Send("ERROR: The kernel has already been started.");
                 throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
             }
 
             mStarted = true;
 
-            if (String.Empty == null) {
+            if (String.Empty == null)
+            {
                 throw new Exception("Compiler didn't initialize System.String.Empty!");
             }
 
@@ -68,14 +70,16 @@ public abstract class Kernel
             // now enable interrupts:
             HAL.Global.EnableInterrupts();
 
-            while (!mStopped) {
+            while (!mStopped)
+            {
                 Run();
             }
 
             Global.Debugger.Send("The main kernel loop has stopped.");
             AfterRun();
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             // todo: better ways to handle?
             Global.Debugger.Send($"Kernel Exception {e}");
             global::System.Console.ForegroundColor = ConsoleColor.Red;

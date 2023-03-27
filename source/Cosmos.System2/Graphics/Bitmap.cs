@@ -19,11 +19,13 @@ namespace Cosmos.System.Graphics
         /// <exception cref="ArgumentOutOfRangeException">Thrown when either the width or height is lower than 0.</exception>
         public Bitmap(uint width, uint height, ColorDepth colorDepth) : base(width, height, colorDepth)
         {
-            if(width < 0) {
+            if(width < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(width));
             }
 
-            if(height < 0) {
+            if(height < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(height));
             }
 

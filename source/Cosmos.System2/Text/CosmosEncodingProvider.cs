@@ -33,7 +33,8 @@ namespace Cosmos.System.ExtendedASCII
         public override Encoding GetEncoding(int codepage)
         {
             debugger.SendInternal($"Getting Encoding for codepage {codepage}");
-            if (codepage is < 0 or > 65535) {
+            if (codepage is < 0 or > 65535)
+            {
                 return null;
             }
 

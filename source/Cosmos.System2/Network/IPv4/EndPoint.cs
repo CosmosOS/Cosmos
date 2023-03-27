@@ -35,13 +35,17 @@ namespace Cosmos.System.Network.IPv4
 
         public int CompareTo(object obj)
         {
-            if (obj is EndPoint other) {
-                if (other.Address.CompareTo(Address) != 0 || other.Port != Port) {
+            if (obj is EndPoint other)
+            {
+                if (other.Address.CompareTo(Address) != 0 || other.Port != Port)
+                {
                     return -1;
                 }
 
                 return 0;
-            } else {
+            }
+            else
+            {
                 throw new ArgumentException("'obj' is not an EndPoint instance", nameof(obj));
             }
         }
