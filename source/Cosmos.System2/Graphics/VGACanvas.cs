@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.HAL;
@@ -16,6 +16,7 @@ namespace Cosmos.System.Graphics
         /// Private boolean whether VGA graphics mode is enabled or not
         /// </summary>
         bool _Enabled;
+        private Mode _Mode;
 
         /// <summary>
         /// The HAL VGA driver
@@ -55,7 +56,14 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Gets or sets the VGA graphics mode
         /// </summary>
-        public override Mode Mode { get; set; }
+        public override Mode Mode
+        {
+            get => _Mode; set
+            {
+                _VGADriver.SetGraphicsMode(ModeToScreenSize(_Mode), (VGADriver.ColorDepth)(int)_Mode.ColorDepth);
+                _Mode = value;
+            }
+        }
 
         /// <summary>
         /// Clears the screen of all pixels
@@ -83,6 +91,7 @@ namespace Cosmos.System.Graphics
         {
             if (Enabled)
             {
+                VGAScreen.SetTextMode(TextSize.Size80x25);
                 Enabled = false;
             }
         }
