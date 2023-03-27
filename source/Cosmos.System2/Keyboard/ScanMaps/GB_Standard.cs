@@ -12,7 +12,7 @@ namespace Cosmos.System.ScanMaps
     public class GB_Standard : ScanMapBase
     {
         /// <summary>
-        /// Create new instance of the <see cref="US_Standard"/> class.
+        /// Create new instance of the <see cref="GB_Standard"/> class.
         /// </summary>
         public GB_Standard()
         {
