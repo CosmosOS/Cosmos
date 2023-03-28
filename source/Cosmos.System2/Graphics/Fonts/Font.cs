@@ -1,45 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Cosmos.System.Graphics.Fonts
 {
     /// <summary>
-    /// Base class for fonts.
+    /// Represents a bitmap font.
     /// </summary>
     public abstract class Font
     {
         /// <summary>
-        /// Get font pure data.
+        /// Gets the raw pixel data of the bitmap font.
         /// </summary>
         public byte[] Data { get; }
 
         /// <summary>
-        /// Get font height.
+        /// The height of a single character in pixels.
         /// </summary>
         public byte Height { get; }
 
         /// <summary>
-        /// Get font Width.
+        /// The width of a single character in pixels.
         /// </summary>
         public byte Width { get; }
 
         /// <summary>
-        /// Used to draw font.
+        /// Converts a byte to its byte address.
         /// </summary>
-        /// <param name="byteToConvert">byteToConvert</param>
-        /// <param name="bitToReturn">bitToReturn</param>
-        public bool ConvertByteToBitAddres(byte byteToConvert, int bitToReturn)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool ConvertByteToBitAddress(byte byteToConvert, int bitToReturn)
         {
             int mask = 1 << (bitToReturn - 1);
             return (byteToConvert & mask) != 0;
         }
 
-        public Font(byte aWidth, byte aHeight, byte[] aData)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Font"/> class.
+        /// </summary>
+        /// <param name="width">The width of a single character in pixels</param>
+        /// <param name="height">The height of a single character in pixels</param>
+        /// <param name="data">The raw pixel data.</param>
+        public Font(byte width, byte height, byte[] data)
         {
-            Width = aWidth;
-            Height = aHeight;
-            Data = aData;
+            Width = width;
+            Height = height;
+            Data = data;
         }
     }
 }

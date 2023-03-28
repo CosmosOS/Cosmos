@@ -11,16 +11,16 @@ namespace Cosmos.System
     {
         /// <summary>
         /// Add fake scan codes to the keyboard, fake pressing keys.
-        /// Used to test kernals.
+        /// Used to test kernels.
         /// </summary>
-        /// <param name="aScanCode">A key code.</param>
-        /// <param name="aReleased">Is key pressed.</param>
+        /// <param name="scanCode">A key code.</param>
+        /// <param name="released">Is key pressed.</param>
         /// <exception cref="sysIO.IOException">An I/O error occurred.</exception>
-        internal static void KeyboardAddFakeScanCode(byte aScanCode, bool aReleased)
+        internal static void KeyboardAddFakeScanCode(byte scanCode, bool released)
         {
-            Global.mDebugger.Send("Before HandleFakeScanCode");
-            KeyboardManager.HandleFakeScanCode(aScanCode, aReleased);
-            Global.mDebugger.Send("After HandleFakeScanCode");
+            Global.Debugger.Send("Before HandleFakeScanCode");
+            KeyboardManager.HandleFakeScanCode(scanCode, released);
+            Global.Debugger.Send("After HandleFakeScanCode");
         }
     }
 }

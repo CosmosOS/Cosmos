@@ -1,11 +1,4 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          ARP Packet
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using System;
+﻿using System;
 using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.IPv4;
@@ -13,114 +6,104 @@ using Cosmos.System.Network.IPv4;
 namespace Cosmos.System.Network.ARP
 {
     /// <summary>
-    /// ARPPacket class. See also: <seealso cref="EthernetPacket"/>.
+    /// Represents an ARP (Address Resolution Protocol) packet.
     /// </summary>
+    /// <remarks>
+    /// See also: <seealso cref="EthernetPacket"/>.
+    /// </remarks>
     public class ARPPacket : EthernetPacket
     {
-        /// <summary>
-        /// Hardware type.
-        /// </summary>
-        protected ushort aHardwareType;
-        /// <summary>
-        /// Protocol type.
-        /// </summary>
-        protected ushort aProtocolType;
-        /// <summary>
-        /// Hardware address length.
-        /// </summary>
-        protected byte aHardwareLen;
-        /// <summary>
-        /// Protocol address length.
-        /// </summary>
-        protected byte aProtocolLen;
-        /// <summary>
-        /// Operation code.
-        /// </summary>
-        protected ushort aOperation;
+        protected ushort hardwareType;
+        protected ushort protocolType;
+        protected byte hardwareAddrLength;
+        protected byte protocolAddrLength;
+        protected ushort opCode;
 
         /// <summary>
-        /// ARP handler.
+        /// Handles ARP packets.
         /// </summary>
         /// <param name="packetData">Packet data.</param>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="sys.IO.IOException">Thrown on IO error.</exception>
-        /// <exception cref="sys.ArgumentException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="sys.OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
         internal static void ARPHandler(byte[] packetData)
         {
-            ARPPacket arp_packet = new ARPPacket(packetData);
+            var arpPacket = new ARPPacket(packetData);
             //Sys.Console.WriteLine("Received ARP Packet");
             //Sys.Console.WriteLine(arp_packet.ToString());
-            if (arp_packet.Operation == 0x01)
+            if (arpPacket.Operation == 0x01)
             {
-                if (arp_packet.HardwareType == 1 && arp_packet.ProtocolType == 0x0800)
+                if (arpPacket.HardwareType == 1 && arpPacket.ProtocolType == 0x0800)
                 {
-                    ARPRequest_Ethernet arp_request = new ARPRequest_Ethernet(packetData);
-                    if (arp_request.SenderIP == null)
+                    var arpRequest = new ARPRequestEthernet(packetData);
+                    if (arpRequest.SenderIP == null)
                     {
-                        Global.mDebugger.Send("SenderIP null in ARPHandler!");
+                        NetworkStack.Debugger.Send("SenderIP null in ARPHandler!");
                     }
-                    arp_request = new ARPRequest_Ethernet(packetData);
 
-                    ARPCache.Update(arp_request.SenderIP, arp_request.SenderMAC);
+                    arpRequest = new ARPRequestEthernet(packetData);
 
-                    if (NetworkStack.AddressMap.ContainsKey(arp_request.TargetIP.Hash) == true)
+                    ARPCache.Update(arpRequest.SenderIP, arpRequest.SenderMAC);
+
+                    if (NetworkStack.AddressMap.ContainsKey(arpRequest.TargetIP.Hash) == true)
                     {
-                        Global.mDebugger.Send("ARP Request Recvd from " + arp_request.SenderIP.ToString());
-                        NetworkDevice nic = NetworkStack.AddressMap[arp_request.TargetIP.Hash];
+                        NetworkStack.Debugger.Send("ARP request received from " + arpRequest.SenderIP.ToString());
+                        NetworkDevice nic = NetworkStack.AddressMap[arpRequest.TargetIP.Hash];
 
-                        ARPReply_Ethernet reply =
-                            new ARPReply_Ethernet(nic.MACAddress, arp_request.TargetIP, arp_request.SenderMAC, arp_request.SenderIP);
+                        var reply = new ARPReplyEthernet(
+                            nic.MACAddress,
+                            arpRequest.TargetIP,
+                            arpRequest.SenderMAC,
+                            arpRequest.SenderIP
+                        );
 
                         nic.QueueBytes(reply.RawData);
                     }
                 }
             }
-            else if (arp_packet.Operation == 0x02)
+            else if (arpPacket.Operation == 0x02)
             {
-                if (arp_packet.HardwareType == 1 && arp_packet.ProtocolType == 0x0800)
+                if (arpPacket.HardwareType == 1 && arpPacket.ProtocolType == 0x0800)
                 {
-                    ARPReply_Ethernet arp_reply = new ARPReply_Ethernet(packetData);
-                    Global.mDebugger.Send("Received ARP Reply");
-                    Global.mDebugger.Send(arp_reply.ToString());
-                    Global.mDebugger.Send("ARP Reply Recvd from " + arp_reply.SenderIP.ToString());
-                    ARPCache.Update(arp_reply.SenderIP, arp_reply.SenderMAC);
+                    var arpReply = new ARPReplyEthernet(packetData);
+                    NetworkStack.Debugger.Send("Received ARP reply:");
+                    NetworkStack.Debugger.Send(arpReply.ToString());
+                    NetworkStack.Debugger.Send("ARP reply received from " + arpReply.SenderIP.ToString());
+                    ARPCache.Update(arpReply.SenderIP, arpReply.SenderMAC);
 
-                    OutgoingBuffer.ARPCache_Update(arp_reply);
+                    OutgoingBuffer.UpdateARPCache(arpReply);
                 }
             }
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="ARPPacket"/> class.
+        /// Initializes a new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         internal ARPPacket()
             : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="ARPPacket"/> class.
+        /// Initializes a new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public ARPPacket(byte[] rawData)
             : base(rawData)
         { }
 
-        /// <summary>
-        /// Init ARPPacket fields.
-        /// </summary>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
-            base.InitFields();
-            aHardwareType = (ushort)((RawData[14] << 8) | RawData[15]);
-            aProtocolType = (ushort)((RawData[16] << 8) | RawData[17]);
-            aHardwareLen = RawData[18];
-            aProtocolLen = RawData[19];
-            aOperation = (ushort)((RawData[20] << 8) | RawData[21]);
+            base.InitializeFields();
+            hardwareType = (ushort)((RawData[14] << 8) | RawData[15]);
+            protocolType = (ushort)((RawData[16] << 8) | RawData[17]);
+            hardwareAddrLength = RawData[18];
+            protocolAddrLength = RawData[19];
+            opCode = (ushort)((RawData[20] << 8) | RawData[21]);
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="ARPPacket"/> class.
+        /// Initializes a new instance of the <see cref="ARPPacket"/> class.
         /// </summary>
         /// <param name="dest">Destination MAC address.</param>
         /// <param name="src">Source MAC address.</param>
@@ -143,29 +126,27 @@ namespace Cosmos.System.Network.ARP
             RawData[20] = (byte)(operation >> 8);
             RawData[21] = (byte)(operation >> 0);
 
-            InitFields();
+            InitializeFields();
         }
 
         /// <summary>
-        /// Get operation.
+        /// Gets the operation code.
         /// </summary>
-        internal ushort Operation => aOperation;
-        /// <summary>
-        /// Get hardware type.
-        /// </summary>
-        internal ushort HardwareType => aHardwareType;
-        /// <summary>
-        /// Get protocol type.
-        /// </summary>
-        internal ushort ProtocolType => aProtocolType;
+        internal ushort Operation => opCode;
 
         /// <summary>
-        /// To string.
+        /// Get the hardware type.
         /// </summary>
-        /// <returns>string value.</returns>
+        internal ushort HardwareType => hardwareType;
+
+        /// <summary>
+        /// Gets the protocol type.
+        /// </summary>
+        internal ushort ProtocolType => protocolType;
+
         public override string ToString()
         {
-            return "ARP Packet Src=" + srcMAC + ", Dest=" + destMAC + ", HWType=" + aHardwareType + ", Protocol=" + aProtocolType +
+            return "ARP Packet Src=" + srcMAC + ", Dest=" + destMAC + ", HWType=" + hardwareType + ", Protocol=" + protocolType +
                 ", Operation=" + Operation;
         }
     }

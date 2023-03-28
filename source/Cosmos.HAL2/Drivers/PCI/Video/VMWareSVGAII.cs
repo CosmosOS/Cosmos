@@ -482,7 +482,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         public uint FrameOffset;
 
         /// <summary>
-        /// Create new instance of the <see cref="VMWareSVGAII"/> class.
+        /// Initializes a new instance of the <see cref="VMWareSVGAII"/> class.
         /// </summary>
         public VMWareSVGAII()
         {
