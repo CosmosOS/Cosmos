@@ -1,6 +1,6 @@
 # Introduction
 
-The Cosmos Graphic Subsystem (CGS from now on) is based on the abstraction of Canvas that is an empty space in which the user of CGS can draw its content. CGS is not a widget toolkit as Winforms or Gnome / GTK but is thought to be more lower level and it will be the basic in which widget toolkits will be implemented. CGS hides the graphics driver (so far VGA, VBE and SVGA II) used and it is thought to be the universal way to draw on the screen in Cosmos.
+The Cosmos Graphic Subsystem (CGS from now on) is based on the abstraction of Canvas that is an empty space in which the user of CGS can draw its content. CGS is not a widget toolkit as WinForms or GTK but is thought to be more lower level and it will be the basic in which widget toolkits will be implemented. CGS hides the graphics driver (so far VGA, VBE and SVGA II) used and it is thought to be the universal way to draw on the screen in Cosmos.
 
 # FullScreenCanvas
 The `FullScreenCanvas` provides two methods to get a canvas instance for the screen. It automatically chooses the best available driver to use.
@@ -8,6 +8,8 @@ The `FullScreenCanvas` provides two methods to get a canvas instance for the scr
 `public static Canvas GetFullScreenCanvas(Mode mode)`: gets the instance of Canvas representing the complete screen in the specified mode
 
 `public static Canvas GetFullScreenCanvas()`: gets the instance of Canvas representing the complete screen in the best driver available on your platform
+
+You can also use specific canvas as the `SVGAIICanvas` or the `VBECanvas`
 
 # Canvas
 ## List of Properties of the Canvas class
@@ -20,15 +22,15 @@ The `FullScreenCanvas` provides two methods to get a canvas instance for the scr
 
 `Clear(Color color)` clear the entire Canvas using the specified color as background
 
-`void DrawPoint(Pen pen, int x, int y)` draws a point at the coordinates specified by x and y with the specified pen
+`void DrawPoint(Color color, int x, int y)` draws a point at the coordinates specified by x and y with the specified color
 
-`void DrawLine(Pen pen, int x_start, int y_start, int x_end, int y_end)` draws a line at the coordinates specified by x_start, y_start and x_end, y_end with the specified pen
+`void DrawLine(Color color, int x_start, int y_start, int x_end, int y_end)` draws a line at the coordinates specified by x_start, y_start and x_end, y_end with the specified color
 
-`void DrawRectangle(Pen pen, int x_start, int y_start,int width, int height)` draws a rectangle specified by a coordinate pair, a width, and a height with the specified pen
+`void DrawRectangle(Color color, int x_start, int y_start,int width, int height)` draws a rectangle specified by a coordinate pair, a width, and a height with the specified color
 
 `void DrawImage(Image image, int x, int y)` draws an image at the x and y specified
 
-`void DrawString(String string, Font font, Brush brush, int x, int y)` draws a string with the specified font and brush at the specified x and y coordinates
+`void DrawString(String string, Font font, Color color, int x, int y)` draws a string with the specified font and color at the specified x and y coordinates
 
 `void Display()` is only required when using a double buffered driver, swaps the 2 buffers which causes all changes to be displayed
 
@@ -78,7 +80,7 @@ namespace GraphicTest
         {
             try
             {
-                Pen pen = new Pen();
+                Color col = new Color();
 
                 // A red Point
                 canvas.DrawPoint(Color.Red, 69, 69);
