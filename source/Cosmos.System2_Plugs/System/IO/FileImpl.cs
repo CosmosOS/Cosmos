@@ -35,7 +35,7 @@ namespace Cosmos.System_Plugs.System.IO
                 throw new ArgumentException("Empty", "aFile");
             }
 
-            Global.mFileSystemDebugger.SendInternal("Writing contents");
+            Global.FileSystemDebugger.SendInternal("Writing contents");
 
             using (var xSW = new StreamWriter(aFile))
             {

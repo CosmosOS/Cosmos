@@ -1,58 +1,38 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          ICMP Packet (to ping for exemple)
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using System;
+﻿using System;
 
 namespace Cosmos.System.Network.IPv4
 {
     /// <summary>
-    /// ICMPPacket class. See also: <seealso cref="IPPacket"/>.
+    /// Represents an ICMP packet.
     /// </summary>
+    /// <remarks>
+    /// See also: <seealso cref="IPPacket"/>.
+    /// </remarks>
     public class ICMPPacket : IPPacket
     {
-        /// <summary>
-        /// Packet type.
-        /// </summary>
         protected byte icmpType;
-        /// <summary>
-        /// Packet code.
-        /// </summary>
         protected byte icmpCode;
-        /// <summary>
-        /// Packet CRC.
-        /// </summary>
         protected ushort icmpCRC;
-        /// <summary>
-        /// Received reply.
-        /// </summary>
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPPacket"/> class.
+        /// Handles an ICMP packet.
         /// </summary>
-        /// <param name="packetData">Packet data.</param>
+        /// <param name="packetData">The data of the packet.</param>
         /// <exception cref="ArgumentException">Thrown if packetData is invalid.</exception>
         internal static void ICMPHandler(byte[] packetData)
         {
-            Global.mDebugger.Send("ICMP Handler called");
-            var icmp_packet = new ICMPPacket(packetData);
-            switch (icmp_packet.ICMPType)
+            var icmpPacket = new ICMPPacket(packetData);
+            switch (icmpPacket.ICMPType)
             {
                 case 0:
-                    var receiver = ICMPClient.GetClient(icmp_packet.SourceIP.Hash);
-                    if (receiver != null)
-                    {
-                        receiver.ReceiveData(icmp_packet);
-                    }
-                    Global.mDebugger.Send("Received ICMP Echo reply from " + icmp_packet.SourceIP.ToString());
+                    var receiver = ICMPClient.GetClient(icmpPacket.SourceIP.Hash);
+                    receiver?.ReceiveData(icmpPacket);
+                    NetworkStack.Debugger.Send("Received ICMP Echo reply from " + icmpPacket.SourceIP.ToString());
                     break;
                 case 8:
                     var request = new ICMPEchoRequest(packetData);
                     var reply = new ICMPEchoReply(request);
-                    Global.mDebugger.Send("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
+                    NetworkStack.Debugger.Send("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
                     OutgoingBuffer.AddPacket(reply);
                     NetworkStack.Update();
                     break;
@@ -60,14 +40,14 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPPacket"/> class.
+        /// Initializes a new instance of the <see cref="ICMPPacket"/> class.
         /// </summary>
         internal ICMPPacket()
             : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPPacket"/> class.
+        /// Initializes a new instance of the <see cref="ICMPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ICMPPacket(byte[] rawData)
@@ -75,21 +55,16 @@ namespace Cosmos.System.Network.IPv4
         {
         }
 
-        /// <summary>
-        /// Init ICMPPacket fields.1
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
-            //Sys.Console.WriteLine("ICMPPacket.InitFields() called;");
-            base.InitFields();
+            base.InitializeFields();
             icmpType = RawData[DataOffset];
             icmpCode = RawData[DataOffset + 1];
             icmpCRC = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPPacket"/> class.
+        /// Initializes a new instance of the <see cref="ICMPPacket"/> class.
         /// </summary>
         /// <param name="source">Source address.</param>
         /// <param name="dest">Destination address.</param>
@@ -115,43 +90,41 @@ namespace Cosmos.System.Network.IPv4
 
             RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
-            InitFields();
+            InitializeFields();
         }
 
         /// <summary>
-        /// Calculate ICMP CRC3.
+        /// Calculates the ICMP CRC3.
         /// </summary>
-        /// <param name="length">Lenght.</param>
-        /// <returns></returns>
+        /// <param name="length">The length of the packet.</param>
         protected ushort CalcICMPCRC(ushort length)
         {
             return CalcOcCRC(DataOffset, length);
         }
 
         /// <summary>
-        /// Get ICMP type.
+        /// The ICMP packet type.
         /// </summary>
         internal byte ICMPType => icmpType;
 
         /// <summary>
-        /// Get ICMP code.
+        /// The ICMP packet code.
         /// </summary>
         internal byte ICMPCode => icmpCode;
 
         /// <summary>
-        /// Get ICMP CRC.
+        /// The ICMP packet CRC.
         /// </summary>
         internal ushort ICMPCRC => icmpCRC;
 
         /// <summary>
-        /// Get ICMP data length.
+        /// The ICMP packet data length.
         /// </summary>
         internal ushort ICMPDataLength => (ushort)(DataLength - 8);
 
         /// <summary>
-        /// Get ICMP data.
+        /// Returns the ICMP packet data.
         /// </summary>
-        /// <returns>byte array value.</returns>
         internal byte[] GetICMPData()
         {
             byte[] data = new byte[ICMPDataLength];
@@ -164,10 +137,6 @@ namespace Cosmos.System.Network.IPv4
             return data;
         }
 
-        /// <summary>
-        /// To string.
-        /// </summary>
-        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "ICMP Packet Src=" + SourceIP + ", Dest=" + DestinationIP + ", Type=" + icmpType + ", Code=" + icmpCode;
@@ -175,22 +144,25 @@ namespace Cosmos.System.Network.IPv4
     }
 
     /// <summary>
-    /// ICMPEchoRequest class. See also: <seealso cref="ICMPPacket"/>.
+    /// Represents an ICMP echo request packet.
     /// </summary>
+    /// <remarks>
+    /// See also: <seealso cref="ICMPPacket"/>.
+    /// </remarks>
     internal class ICMPEchoRequest : ICMPPacket
     {
         protected ushort icmpID;
         protected ushort icmpSequence;
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPEchoRequest"/> class.
+        /// Initializes a new instance of the <see cref="ICMPEchoRequest"/> class.
         /// </summary>
         internal ICMPEchoRequest()
             : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPEchoRequest"/> class.
+        /// Initializes a new instance of the <see cref="ICMPEchoRequest"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ICMPEchoRequest(byte[] rawData)
@@ -199,7 +171,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPEchoRequest"/> class.
+        /// Initializes a new instance of the <see cref="ICMPEchoRequest"/> class.
         /// </summary>
         /// <param name="source">Source address.</param>
         /// <param name="dest">Destination address.</param>
@@ -221,31 +193,23 @@ namespace Cosmos.System.Network.IPv4
             RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
         }
 
-        /// <summary>
-        /// Init ICMPPacket fields.1
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
-            base.InitFields();
+            base.InitializeFields();
             icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
             icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
         }
 
         /// <summary>
-        /// Get ICMP ID.
+        /// The ICMP packet ID.
         /// </summary>
         internal ushort ICMPID => icmpID;
 
         /// <summary>
-        /// Get ICMP Sequence.
+        /// The ICMP packet Sequence.
         /// </summary>
         internal ushort ICMPSequence => icmpSequence;
 
-        /// <summary>
-        /// To string.
-        /// </summary>
-        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "ICMP Echo Request Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + icmpID + ", Sequence=" + icmpSequence;
@@ -253,22 +217,25 @@ namespace Cosmos.System.Network.IPv4
     }
 
     /// <summary>
-    /// ICMPEchoReply class. See also: <seealso cref="ICMPPacket"/>.
+    /// Represents an ICMP echo reply packet.
     /// </summary>
+    /// <remarks>
+    /// See also: <seealso cref="ICMPPacket"/>.
+    /// </remarks>
     internal class ICMPEchoReply : ICMPPacket
     {
         protected ushort icmpID;
         protected ushort icmpSequence;
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPEchoReply"/> class.
+        /// Initializes a new instance of the <see cref="ICMPEchoReply"/> class.
         /// </summary>
         internal ICMPEchoReply()
             : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPEchoReply"/> class.
+        /// Initializes a new instance of the <see cref="ICMPEchoReply"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal ICMPEchoReply(byte[] rawData)
@@ -276,20 +243,16 @@ namespace Cosmos.System.Network.IPv4
         {
         }
 
-        /// <summary>
-        /// Init ICMPEchoReply fields.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
             //Sys.Console.WriteLine("ICMPEchoReply.InitFields() called;");
-            base.InitFields();
+            base.InitializeFields();
             icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
             icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="ICMPEchoReply"/> class.
+        /// Initializes a new instance of the <see cref="ICMPEchoReply"/> class.
         /// </summary>
         /// <param name="request">ICMP echo request.</param>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
@@ -309,19 +272,15 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Get ICMP ID.
+        /// The ICMP packet ID.
         /// </summary>
         internal ushort ICMPID => icmpID;
 
         /// <summary>
-        /// Get ICMP sequence.
+        /// The ICMP packet sequence.
         /// </summary>
         internal ushort ICMPSequence => icmpSequence;
 
-        /// <summary>
-        /// To string.
-        /// </summary>
-        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "ICMP Echo Reply Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + icmpID + ", Sequence=" + icmpSequence;
