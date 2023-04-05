@@ -66,7 +66,8 @@ namespace ConsoleTest
             Console.WriteLine("Let's write some accented characters: èòàùì");
             Console.WriteLine("Let's print all the CP437 codepage");
 
-            Sys.Global.mDebugger.SendInternal("");
+            //Sys.Global.mDebugger.SendInternal("");
+            // unsure on importance but this no longer works
 
             Console.Write("Ç ü é â ä à å ç ê ë è ï î ì Ä Å\n" +
                           "É æ Æ ô ö ò û ù ÿ Ö Ü ¢ £ ¥ ₧ ƒ\n" +
@@ -121,7 +122,7 @@ namespace ConsoleTest
             //Console.WriteLine("Test Format (hex) {0:x}", 42);
 
             Console.WriteLine("Layout switched to DE...");
-            Sys.KeyboardManager.SetKeyLayout(new DEStandardLayout());
+            KeyboardManager.SetKeyLayout(new DEStandardLayout());
             Console.WriteLine("Write in german now I'll read it with Console.ReadLine()...");
 
             var str = Console.ReadLine();
