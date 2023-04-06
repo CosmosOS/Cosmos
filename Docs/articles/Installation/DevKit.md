@@ -1,7 +1,7 @@
 
 ###  Prerequisites for Windows
 
-* (Free) source code of Devloppement Kit from [Cosmos on GitHub](https://github.com/CosmosOS/Cosmos)
+* (Free) source code of Development Kit from [Cosmos on GitHub](https://github.com/CosmosOS/Cosmos)
    * You must clone the repository using Git. For a detailed walkthrough, [see here](https://help.github.com/articles/fork-a-repo/).
    * When following the tutorial, replace *OctoCat* with *CosmosOS* and *Spoon-Knife* with *Cosmos*.
 * (Free) [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/)  
@@ -15,7 +15,7 @@
 * .NET 6 SDK: [Download .NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
 * Make
 * Yasm (`apt install yasm`)
-* Mkisofs (`apt install mkisofs`)
+* Xorriso (`apt install xorriso`)
 * QEMU or any other virtual machine
 
 ###  Installation on Windows
@@ -36,3 +36,8 @@ The `install-VS2022.bat` accepts the following parameters :
 
 ###  Installation on Linux
 Run `make all` to build Cosmos. Run `sudo make install`. Make sure to run `make nuget-install` under your user account, and not as sudo.
+
+### dotnet Project Templates
+If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install .\source\templates\csharp\` assuming you are currently in the Cosmos base directory.
+After installing the template use `dotnet new cosmosCSKernel -n {name}` to create a new Cosmos Kernel project. 
+The dotnet template can be removed at a later time using `dotnet new --uninstall .\source\templates\csharp\`.

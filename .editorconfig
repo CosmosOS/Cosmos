@@ -9,7 +9,7 @@ root = true
 # Use tabs as indentation
 # Trim trailing whitespace
 [*]
-insert_final_newline = true
+insert_final_newline = false
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
@@ -66,11 +66,9 @@ dotnet_style_qualification_for_method = false:warning
 
 dotnet_naming_style.pascal_case.capitalization = pascal_case
 
-dotnet_naming_style.parameters.capitalization = pascal_case
-dotnet_naming_style.parameters.required_prefix = a
+dotnet_naming_style.parameters.capitalization = camel_case
 
-dotnet_naming_style.private_fields.capitalization = pascal_case
-dotnet_naming_style.private_fields.required_prefix = _
+dotnet_naming_style.private_fields.capitalization = camel_case
 
 dotnet_naming_style.interfaces.capitalization = pascal_case
 dotnet_naming_style.interfaces.required_prefix = I

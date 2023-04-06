@@ -4,22 +4,18 @@ using Cosmos.Debug.Kernel;
 namespace Cosmos.System.ExtendedASCII
 {
     /// <summary>
-    /// CP858Enconding class, represent CP858 encoding. See also: <seealso cref="SingleByteEncoding"/>.
+    /// Represents the CP858 encoding.
     /// </summary>
+    /// <remarks>
+    /// See also: <seealso cref="SingleByteEncoding"/>.
+    /// </remarks>
     internal class CP858Enconding : SingleByteEncoding
     {
-        /// <summary>
-        /// Debugger instance of the "System" ring with the "CP858 Encoding" tag.
-        /// </summary>
-        private static Debugger myDebugger = new Debugger("System", "CP858 Encoding");
-
         /// <summary>
         /// Create new instance of the <see cref="CP858Enconding"/> class.
         /// </summary>
         internal CP858Enconding()
         {
-            myDebugger.SendInternal($"CP858Enconding Setting CodePageTable only one time...");
-
             CodePageTable = new char[]
             {
                 'Ç', 'ü', 'é', 'â', 'ä', 'à', 'å', 'ç', 'ê', 'ë', 'è', 'ï', 'î', 'ì', 'Ä', 'Å',
@@ -33,14 +29,7 @@ namespace Cosmos.System.ExtendedASCII
             };
         }
 
-        /// <summary>
-        /// Get encoding body name.
-        /// </summary>
         public override string BodyName => "IBM00858";
-
-        /// <summary>
-        /// Get encoding codepage.
-        /// </summary>
         public override int CodePage => 858;
     }
 }

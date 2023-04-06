@@ -1,204 +1,153 @@
 using System;
-using sysIO = System.IO;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
-using Cosmos.System.ScanMaps;
 
-namespace Cosmos.System
+namespace Cosmos.System;
+
+// MtW: if the fullname (namespace + name) of this class changes, please also change IL2CPU msbuild task
+/// <summary>
+/// Provides a base kernel class for a Cosmos-based system
+/// </summary>
+public abstract class Kernel
 {
-    // MtW: if the fullname (namespace + name) of this class changes, please also change IL2CPU msbuild task
     /// <summary>
-    /// Provides a base kernel class for a Cosmos-based system
+    /// User ring debugger instance, with the tag "Kernel".
     /// </summary>
-    public abstract class Kernel
+    public readonly Debugger mDebugger = new("User", "Kernel");
+
+    // Set after initial start. Can be started and stopped at same time
+    protected bool mStarted;
+
+    // Set to signal stopped
+    protected bool mStopped;
+
+    /// <summary>
+    /// Gets the text screen device to initialize the system with. If not
+    /// overriden, the default text screen device will be used.
+    /// </summary>
+    // If this method returns "null", that means that the default device should be used.
+    protected virtual TextScreenBase GetTextScreen() => null;
+
+    /// <summary>
+    /// Gets the keyboard key layout.
+    /// </summary>
+    [Obsolete("Use KeyboardManager.GetKeyLayout instead.")]
+    protected ScanMapBase GetKeyboardScanMap() => KeyboardManager.GetKeyLayout();
+
+    /// <summary>
+    /// Set the keyboard key layout.
+    /// </summary>
+    /// <param name="scanMap">Keyboard key layout.</param>
+    [Obsolete("Use KeyboardManager.SetKeyLayout instead.")]
+    protected void SetKeyboardScanMap(ScanMapBase scanMap) => KeyboardManager.SetKeyLayout(scanMap);
+
+    /// <summary>
+    /// Start the system up using the properties for configuration.
+    /// </summary>
+    public virtual void Start()
     {
-        /// <summary>
-        /// User ring debugger instance, with the tag "Kernel".
-        /// </summary>
-        public readonly Debugger mDebugger = new Debugger("User", "Kernel");
-
-        /// <summary>
-        /// Clear screen.
-        /// </summary>
-        public bool ClearScreen = true;
-
-        // Set after initial start. Can be started and stopped at same time
-        /// <summary>
-        /// Kernel started.
-        /// </summary>
-        protected bool mStarted = false;
-        // Set to signal stopped
-        /// <summary>
-        /// Kernel stopped.
-        /// </summary>
-        protected bool mStopped = false;
-
-        /// <summary>
-        /// Get text screen device.
-        /// </summary>
-        /// <returns>null</returns>
-        protected virtual TextScreenBase GetTextScreen()
-        {
-            // null means use default
-            return null;
-        }
-
-        /// <summary>
-        /// Get keyboard key layout.
-        /// </summary>
-        /// <returns>Keyboard key layout.</returns>
-        protected ScanMapBase GetKeyboardScanMap()
-        {
-            return KeyboardManager.GetKeyLayout();
-        }
-
-        /// <summary>
-        /// Set keyboard key layout.
-        /// </summary>
-        /// <param name="ScanMap">Keyboard key layout.</param>
-        protected void SetKeyboardScanMap(ScanMapBase ScanMap)
-        {
-            KeyboardManager.SetKeyLayout(ScanMap);
-        }
-
-        /// <summary>
-        /// Start the system up using the properties for configuration.
-        /// </summary>
-        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
-        public virtual void Start()
-        {
-            try
+        try {
+            Global.Debugger.Send("Starting the kernel...");
+            if (mStarted)
             {
-                Global.mDebugger.Send("Starting kernel");
-                if (mStarted)
-                {
-                    Global.mDebugger.Send("ERROR: Kernel Already Started");
-                    throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
-                }
-                mStarted = true;
-
-                if (string.Empty == null)
-                {
-                    throw new Exception("Compiler didn't initialize System.String.Empty!");
-                }
-
-                Global.mDebugger.Send("HW Bootstrap Init");
-                HAL.Bootstrap.Init();
-                OnBoot();
-                // Provide the user with a clear screen if they requested it
-                if (ClearScreen)
-                {
-                    Global.mDebugger.Send("Cls");
-                    //Global.Console.Clear();
-                }
-
-
-                //  Global.mDebugger.Send("On Boot");
-                //  OnBoot();
-                Global.mDebugger.Send("Before Run");
-                BeforeRun();
-
-                // now enable interrupts:
-                HAL.Global.EnableInterrupts();
-
-                Global.mDebugger.Send("Run");
-                if (mStopped)
-                {
-                    Global.mDebugger.Send("Already stopped");
-                }
-                else
-                {
-                    Global.mDebugger.Send("Not yet stopped");
-                }
-                while (!mStopped)
-                {
-                    //Network.NetworkStack.Update();
-                    Run();
-                }
-                Global.mDebugger.Send("AfterRun");
-                AfterRun();
-                //bool xTest = 1 != 3;
-                //while (xTest) {
-                //}
+                Global.Debugger.Send("ERROR: The kernel has already been started.");
+                throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
             }
-            catch (Exception E)
+
+            mStarted = true;
+
+            if (String.Empty == null)
             {
-                // todo: better ways to handle?
-                global::System.Console.WriteLine("Exception occurred while running kernel:");
-                global::System.Console.WriteLine(E.ToString());
+                throw new Exception("Compiler didn't initialize System.String.Empty!");
             }
-        }
 
-        /// <summary>
-        /// This Method controls the Driver initialisation process and is intended for
-        /// Advanced users developing their drivers and takes 4 additional booleans.
-        /// 1. Mousewheel, if you experience your mouse cursors being stuck in the lower left corner set this to "false", default: true
-        /// 2. PS2 Driver initialisation, true/false , default: true
-        /// 3. Network Driver initialisation, true/false, default: true
-        /// 4. IDE initialisation, true/false, default: true
-        /// If you need anything else to be initialised really early on, place it here.
-        /// </summary>
-        protected virtual void OnBoot() {
-            Global.Init(GetTextScreen());
-        }
-        /// <summary>
-        /// Pre-run events
-        /// </summary>
-        protected virtual void BeforeRun() { }
+            Global.Debugger.Send("Initializing hardware bootstrap...");
+            Bootstrap.Init();
+            OnBoot();
 
-        /// <summary>
-        /// Main kernel loop
-        /// </summary>
-        protected abstract void Run();
+            BeforeRun();
 
-        /// <summary>
-        /// After the Run() method is exited (?)
-        /// </summary>
-        protected virtual void AfterRun() { }
+            // now enable interrupts:
+            HAL.Global.EnableInterrupts();
 
-        /// <summary>
-        /// Shut down the system and power off
-        /// </summary>
-        public void Stop()
-        {
-            mStopped = true;
-        }
-
-        /// <summary>
-        /// Kernal object constructor.
-        /// </summary>
-        public Kernel()
-        {
-            Global.mDebugger.Send("In Cosmos.System.Kernel..ctor");
-        }
-
-        // Shutdown and restart
-        /// <summary>
-        /// Shutdown and restart. Implemented.
-        /// </summary>
-        public void Restart()
-        {
-            Power.Reboot();
-        }
-
-        /// <summary>
-        /// Print message to the debbuger at system ring with "Global"-tag.
-        /// </summary>
-        /// <param name="message">A message to print.</param>
-        public static void PrintDebug(string message)
-        {
-            Global.mDebugger.Send(message);
-        }
-
-        /// <summary>
-        /// Get interrupts status.
-        /// </summary>
-        public static bool InterruptsEnabled
-        {
-            get
+            while (!mStopped)
             {
-                return HAL.Global.InterruptsEnabled;
+                Run();
             }
+
+            Global.Debugger.Send("The main kernel loop has stopped.");
+            AfterRun();
+        }
+        catch (Exception e)
+        {
+            // todo: better ways to handle?
+            Global.Debugger.Send($"Kernel Exception {e}");
+            global::System.Console.ForegroundColor = ConsoleColor.Red;
+            global::System.Console.WriteLine("A kernel exception has occured:");
+            global::System.Console.ForegroundColor = ConsoleColor.White;
+            global::System.Console.WriteLine(e.ToString());
         }
     }
+
+    /// <summary>
+    /// This method controls the driver initialisation process.
+    /// </summary>
+    // 1. Mousewheel, if you experience your mouse cursors being stuck in the lower left corner set this to "false", default: true
+    // 2. PS2 Driver initialisation, true/false , default: true
+    // 3. Network Driver initialisation, true/false, default: true
+    // 4. IDE initialisation, true/false, default: true
+    // If you need anything else to be initialised early on, place it here.
+    protected virtual void OnBoot() => Global.Init(GetTextScreen());
+
+    /// <summary>
+    /// Called before the main kernel loop begins.
+    /// </summary>
+    protected virtual void BeforeRun()
+    {
+    }
+
+    /// <summary>
+    /// The main kernel loop method; this method is called on a infinite
+    /// loop, until <see cref="Stop"/> is called.
+    /// </summary>
+    protected abstract void Run();
+
+    /// <summary>
+    /// Called after the main kernel loop method finishes. The main kernel
+    /// loop can stop after e.g. a call to the <see cref="Stop"/> method.
+    /// </summary>
+    protected virtual void AfterRun()
+    {
+    }
+
+    /// <summary>
+    /// Stops the main kernel loop.
+    /// </summary>
+    public void Stop() => mStopped = true;
+
+    /// <summary>
+    /// The kernel object construtor. Overriding this constructor is not
+    /// recommended and may result in undesirable behavior.
+    /// </summary>
+    public Kernel()
+    {
+        Global.Debugger.Send("Constructing a new Cosmos.System.Kernel instance.");
+    }
+
+    /// <summary>
+    /// Reboots the system.
+    /// </summary>
+    [Obsolete("Use Power.Reboot() instead.")]
+    public void Restart() => Power.Reboot();
+
+    /// <summary>
+    /// Prints a message to the debugger with the "Global" tag.
+    /// </summary>
+    /// <param name="message">The message to print.</param>
+    public static void PrintDebug(string message) => Global.Debugger.Send(message);
+
+    /// <summary>
+    /// Whether system interrupts are currently enabled.
+    /// </summary>
+    public static bool InterruptsEnabled => HAL.Global.InterruptsEnabled;
 }

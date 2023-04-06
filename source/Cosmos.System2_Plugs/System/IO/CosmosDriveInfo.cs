@@ -43,42 +43,42 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static long get_AvailableFreeSpace(DriveInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"Getting Available Free Space of {aThis.Name}");
+            Global.FileSystemDebugger.SendInternal($"Getting Available Free Space of {aThis.Name}");
 
             return VFSManager.GetAvailableFreeSpace(aThis.Name);
         }
 
         public static long get_TotalFreeSpace(DriveInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"Getting Total Free Space of {aThis.Name}");
+            Global.FileSystemDebugger.SendInternal($"Getting Total Free Space of {aThis.Name}");
 
             return VFSManager.GetTotalFreeSpace(aThis.Name);
         }
 
         public static long get_TotalSize(DriveInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"Getting size of {aThis.Name}");
+            Global.FileSystemDebugger.SendInternal($"Getting size of {aThis.Name}");
 
             return VFSManager.GetTotalSize(aThis.Name);
         }
 
         public static string get_DriveFormat(DriveInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"Getting format of {aThis.Name}");
+            Global.FileSystemDebugger.SendInternal($"Getting format of {aThis.Name}");
 
             return VFSManager.GetFileSystemType(aThis.Name);
         }
 
         public static string get_VolumeLabel(DriveInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"Getting label of {aThis.Name}");
+            Global.FileSystemDebugger.SendInternal($"Getting label of {aThis.Name}");
 
             return VFSManager.GetFileSystemLabel(aThis.Name);
         }
 
         public static void set_VolumeLabel(DriveInfo aThis, string aLabel)
         {
-            Global.mFileSystemDebugger.SendInternal($"Setting label of {aThis.Name} with {aLabel}");
+            Global.FileSystemDebugger.SendInternal($"Setting label of {aThis.Name} with {aLabel}");
 
             VFSManager.SetFileSystemLabel(aThis.Name, aLabel);
         }
@@ -86,20 +86,20 @@ namespace Cosmos.System_Plugs.System.IO
         /* For now I'm forcing IsReady to be always true as only fixed drives are supported in Cosmos for now */
         public static bool get_IsReady(DriveInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"Getting isReady status of {aThis.Name}");
+            Global.FileSystemDebugger.SendInternal($"Getting isReady status of {aThis.Name}");
             return true;
         }
 
         /* For now I'm forcing DriveType to always be 'Fixed' as only fixed drives are supported in Cosmos for now */
         public static DriveType get_DriveType(DriveInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"Getting DriveType of {aThis.Name}");
+            Global.FileSystemDebugger.SendInternal($"Getting DriveType of {aThis.Name}");
             return DriveType.Fixed;
         }
 
         public static DriveInfo[] GetDrives()
         {
-            Global.mFileSystemDebugger.SendInternal("GetDrives called");
+            Global.FileSystemDebugger.SendInternal("GetDrives called");
 
             List<string> drives = VFSManager.GetLogicalDrives();
 

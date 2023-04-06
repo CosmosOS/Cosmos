@@ -8,46 +8,45 @@ namespace Cosmos.System.Graphics
      */
 
     /// <summary>
-    /// Mode struct. Represents a video mode in term of its number of columns, rows and color depth.
+    /// Represents a video mode, definining its width (rows), height (columns) and color depth.
     /// </summary>
-    public struct Mode
+    public readonly struct Mode
     {
-        /* Constuctor of our struct */
         /// <summary>
-        /// Create new instance of the <see cref="Mode"/> struct.
+        /// The width, or rows, of the display mode.
         /// </summary>
-        /// <param name="columns">Number of columns.</param>
-        /// <param name="rows">Number of rows.</param>
-        /// <param name="color_depth">Color depth.</param>
-        public Mode(int columns, int rows, ColorDepth color_depth)
-        {
-            this.Width = columns;
-            this.Height = rows;
-            this.ColorDepth = color_depth;
-        }
+        public int Width { get; }
 
         /// <summary>
-        /// Check if modes equal.
+        /// The height, or columns, of the display mode.
         /// </summary>
-        /// <param name="other">Other mode.</param>
-        /// <returns>bool value.</returns>
+        public int Height { get; }
+
+        /// <summary>
+        /// The color depth of the display mode, i.e. the amount of bits per a single pixel.
+        /// </summary>
+        public ColorDepth ColorDepth { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Mode"/> struct.
+        /// </summary>
+        /// <param name="columns">The number of columns.</param>
+        /// <param name="rows">The number of rows.</param>
+        /// <param name="colorDepth">The color depth, i.e. the amount of bits per a single pixel.</param>
+        public Mode(int columns, int rows, ColorDepth colorDepth)
+        {
+            Width = columns;
+            Height = rows;
+            ColorDepth = colorDepth;
+        }
+
         public bool Equals(Mode other)
         {
             return Width == other.Width && Height == other.Height && ColorDepth == other.ColorDepth;
         }
 
-        /// <summary>
-        /// Check if modes equal.
-        /// </summary>
-        /// <param name="obj">Object to compare to.</param>
-        /// <returns>bool value.</returns>
         public override bool Equals(object obj) => obj is Mode mode && Equals(mode);
 
-        /* If you ovveride Equals you should ovveride GetHashCode too! */
-        /// <summary>
-        /// Get hash code.
-        /// </summary>
-        /// <returns>int value.</returns>
         public override int GetHashCode()
         {
             // overflow is acceptable in this case
@@ -60,11 +59,6 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        /// <summary>
-        /// Compare modes.
-        /// </summary>
-        /// <param name="other">Other mode to compare to.</param>
-        /// <returns>-1 if this smaller, +1 if this bigger, 0 otherwise.</returns>
         public int CompareTo(Mode other)
         {
             // color_depth has no effect on the orderiring
@@ -82,89 +76,13 @@ namespace Cosmos.System.Graphics
             return 0;
         }
 
-        /// <summary>
-        /// Check if modes are equal.
-        /// </summary>
-        /// <param name="mode_a">lhs mode.</param>
-        /// <param name="mode_b">rhs mode.</param>
-        /// <returns>bool value.</returns>
-        public static bool operator ==(Mode mode_a, Mode mode_b) => mode_a.Equals(mode_b);
+        public static bool operator ==(Mode a, Mode b) => a.Equals(b);
+        public static bool operator !=(Mode a, Mode b) => !(a == b);
+        public static bool operator >(Mode a, Mode b) => a.CompareTo(b) > 0;
+        public static bool operator <(Mode a, Mode b) => a.CompareTo(b) < 0;
+        public static bool operator >=(Mode a, Mode b) => a.CompareTo(b) >= 0;
+        public static bool operator <=(Mode a, Mode b) => a.CompareTo(b) <= 0;
 
-        /// <summary>
-        /// Check if modes are not equal.
-        /// </summary>
-        /// <param name="mode_a">lhs mode.</param>
-        /// <param name="mode_b">rhs mode.</param>
-        /// <returns>bool value.</returns>
-        public static bool operator !=(Mode mode_a, Mode mode_b) => !(mode_a == mode_b);
-
-        /// <summary>
-        /// Compare modes.
-        /// </summary>
-        /// <param name="mode_a">lhs mode.</param>
-        /// <param name="mode_b">rhs mode.</param>
-        /// <returns>bool value.</returns>
-        public static bool operator >(Mode mode_a, Mode mode_b)
-        {
-            var result = mode_a.CompareTo(mode_b);
-
-            return result > 0;
-        }
-
-        /// <summary>
-        /// Compare modes.
-        /// </summary>
-        /// <param name="mode_a">lhs mode.</param>
-        /// <param name="mode_b">rhs mode.</param>
-        /// <returns>bool value.</returns>
-        public static bool operator <(Mode mode_a, Mode mode_b)
-        {
-            var result = mode_a.CompareTo(mode_b);
-
-            return result < 0;
-        }
-
-        /// <summary>
-        /// Compare modes.
-        /// </summary>
-        /// <param name="mode_a">lhs mode.</param>
-        /// <param name="mode_b">rhs mode.</param>
-        /// <returns>bool value.</returns>
-        public static bool operator >=(Mode mode_a, Mode mode_b)
-        {
-            return mode_a.CompareTo(mode_b) >= 0;
-        }
-
-        /// <summary>
-        /// Compare modes.
-        /// </summary>
-        /// <param name="mode_a">lhs mode.</param>
-        /// <param name="mode_b">rhs mode.</param>
-        /// <returns>bool value.</returns>
-        public static bool operator <=(Mode mode_a, Mode mode_b)
-        {
-            return mode_a.CompareTo(mode_b) <= 0;
-        }
-
-        /// <summary>
-        /// Get columns.
-        /// </summary>
-        public int Width { get; }
-
-        /// <summary>
-        /// Get rows.
-        /// </summary>
-        public int Height { get; }
-
-        /// <summary>
-        /// Get color depth
-        /// </summary>
-        public ColorDepth ColorDepth { get; }
-
-        /// <summary>
-        /// To string.
-        /// </summary>
-        /// <returns>string value.</returns>
         public override string ToString()
         {
             return $"{Width}x{Height}@{(int)ColorDepth}";

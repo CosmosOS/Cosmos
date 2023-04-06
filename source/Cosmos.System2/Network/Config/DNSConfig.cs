@@ -6,24 +6,24 @@ using System.Text;
 namespace Cosmos.System.Network.Config
 {
     /// <summary>
-    /// Contains DNS configuration
+    /// Represents DNS configuration.
     /// </summary>
     public class DNSConfig
     {
         /// <summary>
-        /// DNS Addresses list.
+        /// The list of known DNS nameserver addresses.
         /// </summary>
-        public static List<Address> DNSNameservers = new List<Address>();
+        public readonly static List<Address> DNSNameservers = new();
 
         /// <summary>
-        /// Add IPv4 configuration.
+        /// Registers a given DNS server.
         /// </summary>
-        /// <param name="config"></param>
+        /// <param name="nameserver">The IP address of the target DNS server.</param>
         public static void Add(Address nameserver)
         {
             for (int i = 0; i < DNSNameservers.Count; i++)
             {
-                if (DNSNameservers[i].address.Equals(nameserver))
+                if (DNSNameservers[i].Parts.Equals(nameserver))
                 {
                     return;
                 }
@@ -32,14 +32,14 @@ namespace Cosmos.System.Network.Config
         }
 
         /// <summary>
-        /// Remove IPv4 configuration.
+        /// Removes the given DNS server from the list of registered nameservers.
         /// </summary>
-        /// <param name="config"></param>
+        /// <param name="nameserver">The IP address of the target DNS server.</param>
         public static void Remove(Address nameserver)
         {
             for (int i = 0; i < DNSNameservers.Count; i++)
             {
-                if (DNSNameservers[i].address.Equals(nameserver))
+                if (DNSNameservers[i].Parts.Equals(nameserver))
                 {
                     DNSNameservers.RemoveAt(i);
                     return;
@@ -48,10 +48,11 @@ namespace Cosmos.System.Network.Config
         }
 
         /// <summary>
-        /// Call this to get your adress to request your DNS server
+        /// Gets the address of a known DNS server under the given
+        /// registered list index.
         /// </summary>
-        /// <param name="index">Which server you want to get</param>
-        /// <returns>DNS Server</returns>
+        /// <param name="index">The index of the server to fetch.</param>
+        [Obsolete("Directly index the 'DNSNameservers' dictionary instead.")]
         public static Address Server(int index)
         {
             return DNSNameservers[index];

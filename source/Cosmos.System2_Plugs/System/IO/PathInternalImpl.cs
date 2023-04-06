@@ -19,7 +19,7 @@ namespace Cosmos.System_Plugs.System.IO
          */
         public static bool GetIsCaseSensitive()
         {
-            Global.mFileSystemDebugger.SendInternal($"GetIsCaseSensitive() called false always returned");
+            Global.FileSystemDebugger.SendInternal($"GetIsCaseSensitive() called false always returned");
             return false;
         }
 

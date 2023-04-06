@@ -4,12 +4,12 @@ using System;
 namespace Cosmos.System
 {
     /// <summary>
-    /// Power class.
+    /// Manages the power state of the system.
     /// </summary>
     public static class Power
     {
         /// <summary>
-        /// Reboot with CPU.
+        /// Reboots the system using the CPU.
         /// </summary>
         public static void Reboot()
         {

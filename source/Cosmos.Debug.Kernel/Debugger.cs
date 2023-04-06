@@ -1,71 +1,138 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Cosmos.Debug.Kernel
 {
-    public class DebuggerFactory
+    /// <summary>
+    /// Provides a simplified interface for creating new instances of the
+    /// <see cref="Debugger"/> class.
+    /// </summary>
+    public static class DebuggerFactory
     {
+        /// <summary>
+        /// Whether the created <see cref="Debugger"/> instances should output
+        /// the given log inputs to the display console.
+        /// </summary>
         public static bool WriteToConsole = false;
 
-        public static Debugger CreateDebugger(string aRing = "", string aSection = "")
+        /// <summary>
+        /// Creates a new <see cref="Debugger"/> instance.
+        /// </summary>
+        /// <param name="ring">The virtual compile-time ring the debugger is operating in.</param>
+        /// <param name="section">The section the debugger refers to.</param>
+        public static Debugger CreateDebugger(string ring = "", string section = "")
         {
             if (WriteToConsole)
             {
-                return new ConsoleDebugger(aRing, aSection);
+                return new ConsoleDebugger(ring, section);
             }
             else
             {
-                return new Debugger(aRing, aSection);
+                return new Debugger(ring, section);
             }
         }
     }
 
+    /// <summary>
+    /// Represents a categorized remote debugger, capable of communicating
+    /// with an external host machine, including virtualizers.
+    /// </summary>
     public class Debugger
     {
-        public Debugger(string aRing, string aSection)
+        /// <summary>
+        /// Creates a new instance of the <see cref="Debugger"/> class.
+        /// </summary>
+        /// <param name="ring">The virtual compile-time ring the debugger is operating in.</param>
+        /// <param name="section">The section the debugger refers to.</param>
+        public Debugger(string ring, string section)
         {
-            Ring = aRing;
-            Section = aSection;
+            Ring = ring;
+            Section = section;
         }
 
+        /// <summary>
+        /// The virtual compile-time ring the debugger is operating in. This value acts like
+        /// a label, and can be virtually any string.
+        /// </summary>
         public string Ring { get; }
 
+        /// <summary>
+        /// The section the debugger refers to.
+        /// </summary>
         public string Section { get; }
 
+        /// <summary>
+        /// Triggers a software breakpoint.
+        /// </summary>
         public void Break() { }
 
+        /// <summary>
+        /// Triggers a Bochs breakpoint.
+        /// </summary>
         public static void DoBochsBreak() { }
 
         internal static void DoRealHalt() { }
 
         private static unsafe void ActualSend(int aLength, char* aText) { }
 
-        public void SendPtr(object aObject) { }
+        /// <summary>
+        /// Sends the pointer of the given object to any connected debugging hosts.
+        /// </summary>
+        public void SendPtr(object obj) { }
 
-        public static void DoSendNumber(uint aNumber) { }
+        /// <summary>
+        /// Sends a 32-bit unsigned integer to connected debugging hosts.
+        /// </summary>
+        public static void DoSendNumber(uint number) { }
 
-        public static void DoSendNumber(int aNumber) { }
+        /// <summary>
+        /// Sends a 32-bit signed integer to connected debugging hosts.
+        /// </summary>
+        public static void DoSendNumber(int number) { }
 
-        public static void DoSendNumber(ulong aNumber) { }
+        /// <summary>
+        /// Sends a 64-bit unsigned integer to connected debugging hosts.
+        /// </summary>
+        public static void DoSendNumber(ulong number) { }
 
-        public static void DoSendNumber(long aNumber) { }
+        /// <summary>
+        /// Sends a 64-bit signed integer to connected debugging hosts.
+        /// </summary>
+        public static void DoSendNumber(long number) { }
 
-        public static void DoSendNumber(float aNumber) { }
+        /// <summary>
+        /// Sends a 32-bit floating-point number to connected debugging hosts.
+        /// </summary>
+        public static void DoSendNumber(float number) { }
 
-        public static void DoSendNumber(double aNumber) { }
+        /// <summary>
+        /// Sends a 64-bit floating-point number to connected debugging hosts.
+        /// </summary>
+        public static void DoSendNumber(double number) { }
 
-        internal static void DoSendCoreDump() { }
+        // NOTE: @ascpixi: There is no plug for this method anywhere. If we're
+        //                 sure there is no end-user code using this method (I
+        //                 doubt there is), then we can safely remove it. For
+        //                 now, this is marked as [Obsolete].
+        [Obsolete] internal static void DoSendCoreDump() { }
 
-        public void SendNumber(uint aNumber) => DoSendNumber(aNumber);
-        
-        public void SendNumber(int aNumber) => DoSendNumber(aNumber);
-        
-        public void SendNumber(ulong aNumber) => DoSendNumber(aNumber);
-        
-        public void SendNumber(long aNumber) => DoSendNumber(aNumber);
+        /// <inheritdoc cref="DoSendNumber(uint)"/>
+        public void SendNumber(uint number) => DoSendNumber(number);
 
-        public void SendNumber(float aNumber) => DoSendNumber(aNumber);
-        
-        public void SendNumber(double aNumber) => DoSendNumber(aNumber);
+        /// <inheritdoc cref="DoSendNumber(int)"/>
+        public void SendNumber(int number) => DoSendNumber(number);
+
+        /// <inheritdoc cref="DoSendNumber(ulong)"/>
+        public void SendNumber(ulong number) => DoSendNumber(number);
+
+        /// <inheritdoc cref="DoSendNumber(long)"/>
+        public void SendNumber(long number) => DoSendNumber(number);
+
+        /// <inheritdoc cref="DoSendNumber(float)"/>
+        public void SendNumber(float number) => DoSendNumber(number);
+
+        /// <inheritdoc cref="DoSendNumber(double)"/>
+        public void SendNumber(double number) => DoSendNumber(number);
         
         public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData) {
             fixed (byte* xPtr = &aData[0]) {
@@ -73,35 +140,95 @@ namespace Cosmos.Debug.Kernel
             }
         }
 
-        public static unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData) { }
+        /// <summary>
+        /// Sends a command and its associated data to the given debug channel.
+        /// </summary>
+        /// <param name="channel">The channel to send the data to.</param>
+        /// <param name="command">The numeric command.</param>
+        /// <param name="byteCount">The amount of bytes in the data associated with the command.</param>
+        /// <param name="data">The data associated with the command</param>
+        public static unsafe void SendChannelCommand(byte channel, byte command, int byteCount, byte* data) { }
 
-        public static void SendChannelCommand(byte aChannel, byte aCommand) { }
+        /// <summary>
+        /// Sends a command to the given debug channel.
+        /// </summary>
+        /// <param name="channel">The channel to send the data to.</param>
+        /// <param name="command">The numeric command.</param>
+        public static void SendChannelCommand(byte channel, byte command) { }
 
         internal static void DoSend(string aText) { }
 
+        internal static void DoSend(string[] aStringArray) {
+            for (int i = 0; i < aStringArray.Length; ++i)
+            {
+                DoSend(aStringArray[i]);
+            }
+        }
+
+        /// <summary>
+        /// Sends a kernel panic error code to connected debugging hosts.
+        /// </summary>
         public static void SendKernelPanic(uint id) { }
-        public void Send(string aText) => DoSend(aText);
 
-        [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(string aText) => DoSend(aText);
-        
-        [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(uint aNumber) => DoSendNumber(aNumber);
-        
-        [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(int aNumber) => DoSendNumber(aNumber);
+        /// <summary>
+        /// Sends the given string to connected debugging hosts.
+        /// </summary>
+        /// <param name="text">The text/message to send.</param>
+        public void Send(string text) => DoSend(text);
 
-        [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(ulong aNumber) => DoSendNumber(aNumber);
-        
-        [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(long aNumber) => DoSendNumber(aNumber);
+        /// <summary>
+        /// Sends multiple strings to connected debugging hosts.
+        /// </summary>
+        /// <param name="stringArray">The strings to send.</param>
+        public void Send(string[] stringArray) => DoSend(stringArray);
 
+        /// <summary>
+        /// Sends the given message to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(float aNumber)  => DoSendNumber(aNumber);
+        public virtual void SendInternal(string text) => DoSend(text);
 
+        /// <summary>
+        /// Sends the given strings to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(double aNumber) => DoSendNumber(aNumber);
+        public virtual void SendInternal(string[] stringArray) => DoSend(stringArray);
+
+        /// <summary>
+        /// Sends the given 32-bit unsigned integer to all connected debugging hosts.
+        /// </summary>
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(uint number) => DoSendNumber(number);
+
+        /// <summary>
+        /// Sends the given 32-bit signed integer to all connected debugging hosts.
+        /// </summary>
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(int number) => DoSendNumber(number);
+
+        /// <summary>
+        /// Sends the given 64-bit unsigned integer to all connected debugging hosts.
+        /// </summary>
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(ulong number) => DoSendNumber(number);
+
+        /// <summary>
+        /// Sends the given 64-bit signed integer to all connected debugging hosts.
+        /// </summary>
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(long number) => DoSendNumber(number);
+
+        /// <summary>
+        /// Sends the given 32-bit floating-point number to all connected debugging hosts.
+        /// </summary>
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(float number)  => DoSendNumber(number);
+
+        /// <summary>
+        /// Sends the given 64-bit floating-point number to all connected debugging hosts.
+        /// </summary>
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(double number) => DoSendNumber(number);
 
         //public void OldSend(string aText) {
         //    // TODO: Need to fix this so it can send empty strings.
@@ -118,34 +245,45 @@ namespace Cosmos.Debug.Kernel
         //    }
         //}
 
-        public unsafe void SendMessageBox(int aLength, char* aText) { } // Plugged
+        /// <summary>
+        /// Displays a message box on connected debugging hosts.
+        /// </summary>
+        /// <param name="length">The length of the <paramref name="text"/> C-string.</param>
+        /// <param name="text">The text to display in the message box, as a C-string.</param>
+        public unsafe void SendMessageBox(int length, char* text) { } // Plugged
 
-        public unsafe void SendMessageBox(string aText) {
+        /// <summary>
+        /// Displays a message box on connected debugging hosts.
+        /// </summary>
+        /// <param name="text">The text to display.</param>
+        public unsafe void SendMessageBox(string text) {
             // TODO: Need to fix this so it can send empty strings.
             // Sending empty strings locks it up right now
-            if (aText.Length == 0) {
+            if (text.Length == 0) {
                 return;
             }
 
-            var xChars = aText.ToCharArray();
+            var xChars = text.ToCharArray();
             fixed (char* xPtr = &xChars[0]) {
                 SendMessageBox(xChars.Length, xPtr);
             }
         }
 
         // TODO: Kudzu replacement methods for Cosmos.HAL.DebugUtil
-        public unsafe void SendMessage(string aModule, string aData) {
+        [Obsolete("This method is no longer used.")]
+        public unsafe void SendMessage(string module, string data) {
             //string xSingleString;
             //xSingleString = "Message Module: \"" + aModule + "\"";
             //xSingleString += " Data: \"" + aData + "\"";
             //Send(xSingleString);
 
             DoSend("Message Module:");
-            DoSend(aModule);
+            DoSend(module);
             DoSend("Data:");
-            DoSend(aData);
+            DoSend(data);
         }
 
+        [Obsolete("This method is equivalent to a no-op in this version of Cosmos.")]
         public unsafe void SendError(string aModule, string aData) {
             //string xSingleString;
             //xSingleString = "Error Module: \"" + aModule + "\"";
@@ -153,6 +291,7 @@ namespace Cosmos.Debug.Kernel
             //Send(xSingleString);
         }
 
+        [Obsolete("This method is equivalent to a no-op in this version of Cosmos.")]
         public unsafe void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
             //string xSingleString;
             //xSingleString = "Number Module: \"" + aModule + "\"";
@@ -160,18 +299,22 @@ namespace Cosmos.Debug.Kernel
             //xSingleString += " Number: \"" + CreateNumber(aNumber, aBits) + "\"";
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe void WriteNumber(uint aNumber, byte aBits) {
             WriteNumber(aNumber, aBits, true);
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix) {
             Send(CreateNumber(aNumber, aBits, aWritePrefix));
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe string CreateNumber(uint aNumber, byte aBits) {
             return CreateNumber(aNumber, aBits, true);
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe string CreateNumber(uint aNumber, byte aBits, bool aWritePrefix) {
             return "Cosmos.Debug.Debugger.CreateNumber(aNumber, aBits, aWritePrefix) not implemented";
             //string xNumberString = null;
@@ -244,10 +387,12 @@ namespace Cosmos.Debug.Kernel
             //return xNumberString;
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue) {
             WriteBinary(aModule, aMessage, aValue, 0, aValue.Length);
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength) {
             //string xSingleString;
             //xSingleString = "Binary Module = \"" + aModule + "\"";
@@ -261,6 +406,7 @@ namespace Cosmos.Debug.Kernel
             //Send(xSingleString);
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength) {
             //string xSingleString;
             //xSingleString = "Binary Module = \"" + aModule + "\"";
@@ -274,10 +420,12 @@ namespace Cosmos.Debug.Kernel
             //Send(xSingleString);
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe void ViewMemory() {
             ViewMemory(0);
         }
 
+        [Obsolete("This method is currently not implemented.")]
         public unsafe void ViewMemory(int addr) {
             //while (true) {
             //    Console.Clear();
@@ -317,6 +465,8 @@ namespace Cosmos.Debug.Kernel
             //}
         }
 
+
+        [Obsolete("This method is currently not implemented.")]
         public void SendCoreDump() => DoSendCoreDump();
 
         private int FromHex(string p) {

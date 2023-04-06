@@ -57,8 +57,8 @@ namespace ConsoleTest
             Console.WriteLine($"ConsoleOutputEncoding {Console.OutputEncoding.BodyName}");
 
             /* Let's change it in the legacy IBM437 encoding */
-            Console.InputEncoding = Encoding.GetEncoding(437);
-            Console.OutputEncoding = Encoding.GetEncoding(437);
+            Console.InputEncoding = Cosmos.System.ExtendedASCII.CosmosEncodingProvider.Instance.GetEncoding(437);
+            Console.OutputEncoding = Cosmos.System.ExtendedASCII.CosmosEncodingProvider.Instance.GetEncoding(437);
 
             Console.WriteLine($"ConsoleInputEncoding in now {Console.InputEncoding.BodyName}");
             Console.WriteLine($"ConsoleOutputEncoding in now {Console.OutputEncoding.BodyName}");
@@ -121,7 +121,7 @@ namespace ConsoleTest
             //Console.WriteLine("Test Format (hex) {0:x}", 42);
 
             Console.WriteLine("Layout switched to DE...");
-            SetKeyboardScanMap(new DE_Standard());
+            Sys.KeyboardManager.SetKeyLayout(new DEStandardLayout());
             Console.WriteLine("Write in german now I'll read it with Console.ReadLine()...");
 
             var str = Console.ReadLine();

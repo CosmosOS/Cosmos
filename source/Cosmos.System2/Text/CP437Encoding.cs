@@ -4,22 +4,18 @@ using Cosmos.Debug.Kernel;
 namespace Cosmos.System.ExtendedASCII
 {
     /// <summary>
-    /// CP437Enconding class, represent CP437 encoding. See also: <seealso cref="SingleByteEncoding"/>.
+    /// Represents the CP437 encoding.
     /// </summary>
-    internal class CP437Enconding : SingleByteEncoding
+    /// <remarks>
+    /// See also: <seealso cref="SingleByteEncoding"/>.
+    /// </remarks>
+    internal class CP437Encoding : SingleByteEncoding
     {
         /// <summary>
-        /// Debugger instance of the "System" ring with the "CP437 Encoding" tag.
+        /// Create new instance of the <see cref="CP437Encoding"/> class.
         /// </summary>
-        private static Debugger myDebugger = new Debugger("System", "CP437 Encoding");
-
-        /// <summary>
-        /// Create new instance of the <see cref="CP437Enconding"/> class.
-        /// </summary>
-        internal CP437Enconding()
+        internal CP437Encoding()
         {
-            myDebugger.SendInternal("CP437Enconding Setting CodePageTable only one time...");
-
             CodePageTable = new char[] {
                 'Ç' , 'ü' , 'é' , 'â' , 'ä' , 'à' , 'å' , 'ç' , 'ê' , 'ë' , 'è' , 'ï' , 'î' , 'ì' , 'Ä' , 'Å' ,
                 'É' , 'æ' , 'Æ' , 'ô' , 'ö' , 'ò' , 'û' , 'ù' , 'ÿ' , 'Ö' , 'Ü' , '¢' , '£' , '¥' , '₧' , 'ƒ' ,
@@ -32,14 +28,8 @@ namespace Cosmos.System.ExtendedASCII
             };
         }
 
-        /// <summary>
-        /// Get encoding body name.
-        /// </summary>
         public override string BodyName => "IBM437";
 
-        /// <summary>
-        /// Get encoding codepage.
-        /// </summary>
         public override int CodePage => 437;
     }
 }

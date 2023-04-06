@@ -64,6 +64,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
                 dictionary.Add("b", "basds");
                 Assert.IsTrue(dictionary.Count == 1, "Dictionary<string, string>().Clear prevents correctly adding values again");
                 Assert.IsTrue(dictionary["b"] == "basds", "Dictionary<string, string>().Clear prevents correctly adding values again");
+
+                dictionary.Add("", "1234");
+
+                Assert.AreEqual("1234", (string)dictionary[""], "key of \"\" failed");
+
+
             }
 
             {
@@ -117,6 +123,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
                 dictionary2.Add("b", 9);
                 Assert.IsTrue(dictionary2.Count == 1, "Dictionary<string, int>().Clear prevents correctly adding values again");
                 Assert.IsTrue(dictionary2["b"] == 9, "Dictionary<string, int>().Clear prevents correctly adding values again");
+
             }
 
             //#region "Dictionary<char, char> Tests"

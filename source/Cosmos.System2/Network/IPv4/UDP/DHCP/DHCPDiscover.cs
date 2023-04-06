@@ -1,33 +1,32 @@
 ﻿using System;
 using Cosmos.HAL.Network;
-using Cosmos.System.Network.IPv4.UDP.DHCP;
 
 namespace Cosmos.System.Network.IPv4.UDP.DHCP
 {
     /// <summary>
-    /// DHCPDiscover class.
+    /// Represents a DHCP discovery packet.
     /// </summary>
     internal class DHCPDiscover : DHCPPacket
     {
         /// <summary>
-        /// Create new instance of the <see cref="DHCPDiscover"/> class.
+        /// Initializes a new instance of the <see cref="DHCPDiscover"/> class.
         /// </summary>
         internal DHCPDiscover() : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPDiscover"/> class.
+        /// Initializes a new instance of the <see cref="DHCPDiscover"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal DHCPDiscover(byte[] rawData) : base(rawData)
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPDiscover"/> class.
+        /// Initializes a new instance of the <see cref="DHCPDiscover"/> class.
         /// </summary>
-        /// <param name="mac_src">Source MAC Address.</param>
+        /// <param name="sourceMAC">Source MAC Address.</param>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        internal DHCPDiscover(MACAddress mac_src) : base(mac_src, 10) //discover packet size
+        internal DHCPDiscover(MACAddress sourceMAC) : base(sourceMAC, 10) //discover packet size
         {
             //Discover
             RawData[282] = 0x35;
