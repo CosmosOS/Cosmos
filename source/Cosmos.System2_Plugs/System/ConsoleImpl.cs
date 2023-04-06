@@ -134,7 +134,7 @@ namespace Cosmos.System_Plugs.System
 
                 if (value < 0)
                 {
-                    throw new ArgumentException("The value x must be at least 0!");
+                    throw new ArgumentException("The value must be at least 0!", "value");
                 }
 
                 if (value < WindowWidth)
@@ -143,7 +143,7 @@ namespace Cosmos.System_Plugs.System
                 }
                 else
                 {
-                    throw new ArgumentException("The value x must be lower than the console width!");
+                    throw new ArgumentException("The value must be lower than the console width!", "value");
                 }
             }
         }
@@ -171,7 +171,7 @@ namespace Cosmos.System_Plugs.System
 
                 if (value < 0)
                 {
-                    throw new ArgumentException("The 'Y' value must be at least 0!");
+                    throw new ArgumentException("The value must be at least 0!", "value");
                 }
 
                 if (value < WindowHeight)
@@ -180,7 +180,7 @@ namespace Cosmos.System_Plugs.System
                 }
                 else
                 {
-                    throw new ArgumentException("The 'Y' value must be lower than the console height!");
+                    throw new ArgumentException("The value must be lower than the console height!", "value");
                 }
             }
         }
