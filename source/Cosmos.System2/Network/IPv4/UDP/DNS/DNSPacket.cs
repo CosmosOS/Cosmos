@@ -1,10 +1,4 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          DNS Packet
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*/
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -25,7 +19,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     }
 
     /// <summary>
-    /// DNS Query
+    /// Represents a DNS query.
     /// </summary>
     public class DNSQuery
     {
@@ -35,7 +29,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     }
 
     /// <summary>
-    /// DNS Answer
+    /// Represents a DNS answer (response).
     /// </summary>
     public class DNSAnswer
     {
@@ -43,40 +37,36 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         public ushort Type { get; set; }
         public ushort Class { get; set; }
         public int TimeToLive { get; set; }
-        public ushort DataLenght { get; set; }
+        public ushort DataLength { get; set; }
         public byte[] Address { get; set; }
     }
 
     /// <summary>
-    /// DNSPacket class.
+    /// Represents a DNS packet.
     /// </summary>
     public class DNSPacket : UDPPacket
     {
         /// <summary>
-        /// DNS handler.
+        /// Handles DNS packets.
         /// </summary>
-        /// <param name="packetData">Packet data.</param>
-        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
+        /// <param name="packetData">The raw packet data.</param>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         internal static void DNSHandler(byte[] packetData)
         {
-            DNSPacket dns_packet = new DNSPacket(packetData);
-
-            DnsClient receiver = (DnsClient)UdpClient.GetClient(dns_packet.DestinationPort);
-            if (receiver != null)
-            {
-                receiver.ReceiveData(dns_packet);
-            }
+            var dnsPacket = new DNSPacket(packetData);
+            var receiver = (DnsClient)UdpClient.GetClient(dnsPacket.DestinationPort);
+            receiver?.ReceiveData(dnsPacket);
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="DNSPacket"/> class.
+        /// Initializes a new instance of the <see cref="DNSPacket"/> class.
         /// </summary>
         internal DNSPacket()
             : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DNSPacket"/> class.
+        /// Initializes a new instance of the <see cref="DNSPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public DNSPacket(byte[] rawData)
@@ -84,7 +74,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="UDPPacket"/> class.
+        /// Initializes a new instance of the <see cref="UDPPacket"/> class.
         /// </summary>
         /// <param name="source">Source address.</param>
         /// <param name="dest">Destination address.</param>
@@ -115,16 +105,12 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
             RawData[this.DataOffset + 18] = (byte)((0 >> 8) & 0xFF);
             RawData[this.DataOffset + 19] = (byte)((0 >> 0) & 0xFF);
 
-            InitFields();
+            InitializeFields();
         }
 
-        /// <summary>
-        /// Init DNSPacket fields.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
-            base.InitFields();
+            base.InitializeFields();
             TransactionID = (ushort)((RawData[this.DataOffset + 8] << 8) | RawData[this.DataOffset + 9]);
             DNSFlags = (ushort)((RawData[this.DataOffset + 10] << 8) | RawData[this.DataOffset + 11]);
             Questions = (ushort)((RawData[this.DataOffset + 12] << 8) | RawData[this.DataOffset + 13]);
@@ -134,73 +120,70 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         }
 
         /// <summary>
-        /// Get name from data and offset
+        /// Gets the domain name from the given data and offset.
         /// </summary>
-        /// <param name="RawData">Data</param>
-        /// <param name="index">Data offset</param>
-        public string ParseName(byte[] RawData, ref int index)
+        /// <param name="rawData">The raw data of the packet.</param>
+        /// <param name="index">The offset in the <paramref name="rawData"/> array.</param>
+        public string ParseName(byte[] rawData, ref int index)
         {
-            StringBuilder url = new StringBuilder();
+            var url = new StringBuilder();
 
-            while (RawData[index] != 0x00 && index < RawData.Length)
+            while (rawData[index] != 0x00 && index < rawData.Length)
             {
-                byte wordlength = RawData[index];
+                byte wordlength = rawData[index];
                 index++;
                 for (int j = 0; j < wordlength; j++)
                 {
-                    url.Append((char)RawData[index]);
+                    url.Append((char)rawData[index]);
                     index++;
                 }
                 url.Append('.');
             }
+
             index++; //End 0x00
             return url.ToString().Remove(url.Length - 1, 1);
         }
 
         /// <summary>
-        /// Get AnswerRRs
+        /// The amount of answer Resource Records.
         /// </summary>
         internal ushort AnswerRRs { get; private set; }
 
         /// <summary>
-        /// Get AuthorityRRs
+        /// The amount of authority Resource Records.
         /// </summary>
         internal ushort AuthorityRRs { get; private set; }
 
         /// <summary>
-        /// Get AdditionalRRs
+        /// The amount of additional Resource Records.
         /// </summary>
         internal ushort AdditionalRRs { get; private set; }
 
         /// <summary>
-        /// Get Transaction ID
+        /// The DNS transaction ID.
         /// </summary>
         internal ushort TransactionID { get; private set; }
 
         /// <summary>
-        /// Get DNS Flags
+        /// The flags of the packet.
         /// </summary>
         internal ushort DNSFlags { get; private set; }
 
         /// <summary>
-        /// Get DNS Queries Number
+        /// The number of DNS queries.
         /// </summary>
         internal ushort Questions { get; private set; }
 
         /// <summary>
-        /// Get DNS Queries
+        /// The DNS queries.
         /// </summary>
         internal List<DNSQuery> Queries { get; set; }
 
         /// <summary>
-        /// Get DNS Answers
+        /// The DNS answers (responses).
         /// </summary>
         internal List<DNSAnswer> Answers { get; set; }
 
-        /// <summary>
-        /// To string.
-        /// </summary>
-        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "DNS Packet Src=" + SourceIP + ":" + SourcePort + ", Dest=" + DestinationIP + ":" + DestinationPort;
@@ -209,19 +192,19 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     }
 
     /// <summary>
-    /// DNSPacketAsk class.
+    /// Represents a DNS translation request packet.
     /// </summary>
     public class DNSPacketAsk : DNSPacket
     {
         /// <summary>
-        /// Create new instance of the <see cref="DNSPacketAsk"/> class.
+        /// Initializes a new instance of the <see cref="DNSPacketAsk"/> class.
         /// </summary>
         internal DNSPacketAsk()
             : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DNSPacketAsk"/> class.
+        /// Initializes a new instance of the <see cref="DNSPacketAsk"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public DNSPacketAsk(byte[] rawData)
@@ -229,7 +212,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="UDPPacket"/> class.
+        /// Initializes a new instance of the <see cref="UDPPacket"/> class.
         /// </summary>
         /// <param name="source">Source address.</param>
         /// <param name="dest">DNS Server address.</param>
@@ -267,36 +250,32 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
     }
 
     /// <summary>
-    /// DNSPacketAnswer class.
+    /// Represents a DNS translation result packet.
     /// </summary>
     public class DNSPacketAnswer : DNSPacket
     {
         /// <summary>
-        /// Create new instance of the <see cref="DNSPacketAnswer"/> class.
+        /// Initializes a new instance of the <see cref="DNSPacketAnswer"/> class.
         /// </summary>
         internal DNSPacketAnswer()
             : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DNSPacketAnswer"/> class.
+        /// Initializes a new instance of the <see cref="DNSPacketAnswer"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public DNSPacketAnswer(byte[] rawData)
             : base(rawData)
         { }
 
-        /// <summary>
-        /// Init DNSPacketAnswer fields.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
-            base.InitFields();
+            base.InitializeFields();
 
             if ((ushort)(DNSFlags & 0x0F) != (ushort)ReplyCode.OK)
             {
-                Global.mDebugger.Send("DNS Packet response not OK. Passing packet.");
+                NetworkStack.Debugger.Send("DNS Packet response not OK. Passing packet.");
                 return;
             }
 
@@ -307,7 +286,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
 
                 for (int i = 0; i < Questions; i++)
                 {
-                    DNSQuery query = new DNSQuery();
+                    var query = new DNSQuery();
                     query.Name = ParseName(RawData, ref index);
                     query.Type = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]);
                     query.Class = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]);
@@ -321,18 +300,19 @@ namespace Cosmos.System.Network.IPv4.UDP.DNS
 
                 for (int i = 0; i < AnswerRRs; i++)
                 {
-                    DNSAnswer answer = new DNSAnswer();
+                    var answer = new DNSAnswer();
                     answer.Name = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]);
                     answer.Type = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]);
                     answer.Class = (ushort)((RawData[index + 4] << 8) | RawData[index + 5]);
                     answer.TimeToLive = (RawData[index + 6] << 24) | (RawData[index + 7] << 16) | (RawData[index + 8] << 8) | RawData[index + 9];
-                    answer.DataLenght = (ushort)((RawData[index + 10] << 8) | RawData[index + 11]);
+                    answer.DataLength = (ushort)((RawData[index + 10] << 8) | RawData[index + 11]);
                     index += 12;
-                    answer.Address = new byte[answer.DataLenght];
-                    for (int j = 0; j < answer.DataLenght; j++, index++)
+                    answer.Address = new byte[answer.DataLength];
+                    for (int j = 0; j < answer.DataLength; j++, index++)
                     {
                         answer.Address[j] = RawData[index];
                     }
+
                     Answers.Add(answer);
                 }
             }

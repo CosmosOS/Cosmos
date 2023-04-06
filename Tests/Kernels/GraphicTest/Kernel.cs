@@ -228,13 +228,13 @@ namespace GraphicTest
         private void TestBitmaps()
         {
             Assert.IsTrue(bitmap.Width == 10 && bitmap.Height == 10, "Bitmap width and height set correctly");
-            Assert.IsTrue(bitmap.rawData.Length == 100, "Bitmap data size makes sense");
+            Assert.IsTrue(bitmap.RawData.Length == 100, "Bitmap data size makes sense");
             MemoryStream savedBitmap = new MemoryStream();
-            letter.Save(savedBitmap, ImageFormat.bmp);
+            letter.Save(savedBitmap, ImageFormat.BMP);
             var bitmapData = savedBitmap.ToArray();
             Assert.IsTrue(EqualityHelper.ByteArrayAreEquals(bitmapData, letterData), "Saving a bitmap creates the same data as used to create it");
             Bitmap letter2 = new Bitmap(bitmapData);
-            Assert.IsTrue(EqualityHelper.IntArrayAreEquals(letter2.rawData, letter.rawData), "Creating a new bitmap from saved bitmap creates same bitmap");
+            Assert.IsTrue(EqualityHelper.IntArrayAreEquals(letter2.RawData, letter.RawData), "Creating a new bitmap from saved bitmap creates same bitmap");
         }
     }
 }

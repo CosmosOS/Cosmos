@@ -23,7 +23,7 @@ namespace Cosmos.System_Plugs.System.IO
     {
         private static void CreateDirectory(string fullPath)
         {
-            Global.mFileSystemDebugger.SendInternal("-- CosmosFileSystem.CreateDirectory -- fullPath = " + fullPath);
+            Global.FileSystemDebugger.SendInternal("-- CosmosFileSystem.CreateDirectory -- fullPath = " + fullPath);
             // If 'fullPath' exists already we return already without dealing with VFSManager
             if (DirectoryExists(fullPath))
                 return;
@@ -38,8 +38,8 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void CreateDirectory(string aPath, byte[] securityDescriptor = null)
         {
-            Global.mFileSystemDebugger.SendInternal("-- CosmosFileSystem.CreateDirectory(string, byte[]) -- ");
-            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
+            Global.FileSystemDebugger.SendInternal("-- CosmosFileSystem.CreateDirectory(string, byte[]) -- ");
+            Global.FileSystemDebugger.SendInternal("aPath = " + aPath);
             CreateDirectory(aPath);
         }
 
@@ -51,7 +51,7 @@ namespace Cosmos.System_Plugs.System.IO
                 return false;
             }
 
-            Global.mFileSystemDebugger.SendInternal($"DirectoryExists : fullPath = {fullPath}");
+            Global.FileSystemDebugger.SendInternal($"DirectoryExists : fullPath = {fullPath}");
             return VFSManager.DirectoryExists(fullPath);
         }
 
@@ -62,13 +62,13 @@ namespace Cosmos.System_Plugs.System.IO
                 return false;
             }
 
-            Global.mFileSystemDebugger.SendInternal($"-- CosmosFileSystem.FileExists -- : fullPath = {fullPath}");
+            Global.FileSystemDebugger.SendInternal($"-- CosmosFileSystem.FileExists -- : fullPath = {fullPath}");
             return VFSManager.FileExists(fullPath);
         }
 
         public static void RemoveDirectory(string fullPath, bool recursive)
         {
-            Global.mFileSystemDebugger.SendInternal($"RemoveDirectory : fullPath = {fullPath}");
+            Global.FileSystemDebugger.SendInternal($"RemoveDirectory : fullPath = {fullPath}");
             VFSManager.DeleteDirectory(fullPath, recursive);
         }
 
@@ -88,7 +88,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void CopyFile(string sourceFullPath, string destFullPath, bool overwrite)
         {
-            Global.mFileSystemDebugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath} with overwrite {overwrite}");
+            Global.FileSystemDebugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath} with overwrite {overwrite}");
 
             // The destination path may just be a directory into which the file should be copied.
             // If it is, append the filename from the source onto the destination directory

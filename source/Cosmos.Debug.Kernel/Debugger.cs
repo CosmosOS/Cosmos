@@ -2,6 +2,8 @@
 
 namespace Cosmos.Debug.Kernel
 {
+
+
     public class DebuggerFactory
     {
         public static bool WriteToConsole = false;

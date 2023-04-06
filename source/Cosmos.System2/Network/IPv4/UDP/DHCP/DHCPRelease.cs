@@ -1,30 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network.IPv4.UDP.DHCP
 {
     /// <summary>
-    /// DHCPRelease class.
+    /// Represents a DHCP release packet.
     /// </summary>
     internal class DHCPRelease : DHCPPacket
     {
         /// <summary>
-        /// Create new instance of the <see cref="DHCPRelease"/> class.
+        /// Initializes a new instance of the <see cref="DHCPRelease"/> class.
         /// </summary>
         internal DHCPRelease() : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPRelease"/> class.
+        /// Initializes a new instance of the <see cref="DHCPRelease"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal DHCPRelease(byte[] rawData) : base(rawData)
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPRelease"/> class.
+        /// Initializes a new instance of the <see cref="DHCPRelease"/> class.
         /// </summary>
         /// <param name="client">Client IPv4 Address.</param>
         /// <param name="server">DHCP Server IPv4 Address.</param>
@@ -42,10 +40,10 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             RawData[285] = 0x36;
             RawData[286] = 0x04;
 
-            RawData[287] = server.address[0];
-            RawData[288] = server.address[1];
-            RawData[289] = server.address[2];
-            RawData[290] = server.address[3];
+            RawData[287] = server.Parts[0];
+            RawData[288] = server.Parts[1];
+            RawData[289] = server.Parts[2];
+            RawData[290] = server.Parts[3];
 
             //Client ID
             RawData[291] = 0x3d;

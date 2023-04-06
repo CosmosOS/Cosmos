@@ -7,40 +7,36 @@ using Con = System.Console;
 
 namespace Cosmos.System.Network
 {
+    /// <summary>
+    /// Facilitates kernel debugging over IP.
+    /// </summary>
     public class NetworkDebugger
     {
-        /// <summary>
-        /// TCP Server.
-        /// </summary>
-        private TcpListener xListener = null;
+        private readonly TcpListener listener;
+        private TcpClient client;
 
         /// <summary>
-        /// TCP Client.
-        /// </summary>
-        private TcpClient xClient = null;
-
-        /// <summary>
-        /// Remote IP Address
+        /// The remote host IP address.
         /// </summary>
         public Address Ip { get; set; }
 
         /// <summary>
-        /// Port used
+        /// The port to use.
         /// </summary>
         public int Port { get; set; }
 
         /// <summary>
-        /// Create NetworkDebugger class (used to listen for a debugger connection)
+        /// Initializes a new instance of the <see cref="NetworkDebugger"/> class.
         /// </summary>
         /// <param name="port">Port used for TCP connection.</param>
         public NetworkDebugger(int port)
         {
             Port = port;
-            xListener = new TcpListener((ushort)port);
+            listener = new TcpListener((ushort)port);
         }
 
         /// <summary>
-        /// Create NetworkDebugger class (used to connect to a remote debugger)
+        /// Initializes a new instance of the <see cref="NetworkDebugger"/> class.
         /// </summary>
         /// <param name="ip">IP Address of the remote debugger.</param>
         /// <param name="port">Port used for TCP connection.</param>
@@ -48,47 +44,47 @@ namespace Cosmos.System.Network
         {
             Ip = ip;
             Port = port;
-            xClient = new TcpClient(port);
+            client = new TcpClient(port);
         }
 
         /// <summary>
-        /// Start debugger
+        /// Starts the debugger.
         /// </summary>
         public void Start()
         {
-            if (xClient == null)
+            if (client == null)
             {
-                xListener.Start();
+                listener.Start();
                 
                 Con.WriteLine("Waiting for remote debugger connection at " + NetworkConfiguration.CurrentAddress.ToString() + ":" + Port);
-                xClient = xListener.AcceptTcpClient(); //blocking
+                client = listener.AcceptTcpClient(); //blocking
             }
-            else if (xListener == null)
+            else if (listener == null)
             {
-                xClient.Connect(Ip, Port);
+                client.Connect(Ip, Port);
             }
 
             Send("--- Cosmos Network Debugger ---");
-            Send("Debugger Connected!");
+            Send("Debugger connected!");
         }
 
         /// <summary>
-        /// Send text to the debugger
+        /// Send text to the debugger.
         /// </summary>
         /// <param name="message">Text to send to the debugger.</param>
         public void Send(string message)
         {
-            xClient.Send(Encoding.ASCII.GetBytes("[" + DateTime.Now.ToString("HH:mm:ss") + "] - " + message + "\r\n"));
+            client.Send(Encoding.ASCII.GetBytes("[" + DateTime.Now.ToString("HH:mm:ss") + "] - " + message + "\r\n"));
         }
 
         /// <summary>
-        /// Stop the debugger by closing TCP Connection
+        /// Stops the debugger by closing the TCP connection.
         /// </summary>
         public void Stop()
         {
             Con.WriteLine("Closing Debugger connection");
             Send("Closing...");
-            xClient.Close();
+            client.Close();
         }
     }
 }

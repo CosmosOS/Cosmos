@@ -1,60 +1,42 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          End point
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using System;
+﻿using System;
 
 namespace Cosmos.System.Network.IPv4
 {
     /// <summary>
-    /// EndPoint class.
+    /// Represents an IPv4 end-point.
     /// </summary>
     public class EndPoint : IComparable
     {
         /// <summary>
-        /// Address.
+        /// The address of the end-point.
         /// </summary>
         public Address Address;
+
         /// <summary>
-        /// Port.
+        /// The port of the end-point.
         /// </summary>
         public ushort Port;
 
         /// <summary>
-        /// Create new instance of the <see cref="EndPoint"/> class.
+        /// Initializes a new instance of the <see cref="EndPoint"/> class.
         /// </summary>
-        /// <param name="addr">Adress.</param>
-        /// <param name="port">Port.</param>
+        /// <param name="addr">The IPv4 address.</param>
+        /// <param name="port">The port.</param>
         public EndPoint(Address addr, ushort port)
         {
             Address = addr;
             Port = port;
         }
 
-        /// <summary>
-        /// To string.
-        /// </summary>
-        /// <returns>string value.</returns>
         public override string ToString()
         {
             return Address.ToString() + ":" + Port.ToString();
         }
 
-        /// <summary>
-        /// Compare end points.
-        /// </summary>
-        /// <param name="obj">Other end point to compare to.</param>
-        /// <returns>-1 if end points are diffrent, 0 if equal.</returns>
-        /// <exception cref="ArgumentException">Thrown if obj is not a EndPoint.</exception>
         public int CompareTo(object obj)
         {
-            if (obj is EndPoint)
+            if (obj is EndPoint other)
             {
-                var other = (EndPoint)obj;
-
                 if (other.Address.CompareTo(Address) != 0 || other.Port != Port)
                 {
                     return -1;
@@ -64,7 +46,7 @@ namespace Cosmos.System.Network.IPv4
             }
             else
             {
-                throw new ArgumentException("obj is not a IPv4EndPoint", "obj");
+                throw new ArgumentException("'obj' is not an EndPoint instance", nameof(obj));
             }
         }
     }

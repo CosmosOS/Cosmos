@@ -1,51 +1,37 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          Ethernet frame
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using System;
-using Cosmos.HAL.Network;
+﻿using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network
 {
-    // for more info, http://standards.ieee.org/about/get/802/802.3.html
     /// <summary>
-    /// EthernetPacket class.
+    /// Represents an Ethernet packet.
     /// </summary>
+    // For more info, refer to http://standards.ieee.org/about/get/802/802.3.html
     public class EthernetPacket
     {
-        /// <summary>
-        /// Source MAC address.
-        /// </summary>
         protected MACAddress srcMAC;
-        /// <summary>
-        /// Destination MAC address.
-        /// </summary>
         protected MACAddress destMAC;
 
         /// <summary>
-        /// Create new instance of the <see cref="EthernetPacket"/> class.
+        /// Initializes a new instance of the <see cref="EthernetPacket"/> class.
         /// </summary>
         protected EthernetPacket()
         {
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified raw data.
+        /// Initializes a new instance of the <see cref="EthernetPacket"/> class, with specified raw data.
         /// </summary>
-        /// <param name="rawData">Raw data.</param>
+        /// <param name="rawData">The raw data of the packet.</param>
         public EthernetPacket(byte[] rawData)
         {
             RawData = rawData;
-            InitFields();
+            InitializeFields();
         }
 
         /// <summary>
-        /// Init EthernetPacket fields.
+        /// Initializes all internal fields.
         /// </summary>
-        protected virtual void InitFields()
+        protected virtual void InitializeFields()
         {
             destMAC = new MACAddress(RawData, 0);
             srcMAC = new MACAddress(RawData, 6);
@@ -53,25 +39,19 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified type and size.
+        /// Initializes a new instance of the <see cref="EthernetPacket"/> class, with specified type and size.
         /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="packet_size">Size.</param>
-        protected EthernetPacket(ushort type, int packet_size)
-            : this(MACAddress.None, MACAddress.None, type, packet_size)
+        protected EthernetPacket(ushort type, int packetSize)
+            : this(MACAddress.None, MACAddress.None, type, packetSize)
         {
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="EthernetPacket"/> class, with specified dsetination, source, type and size.
+        /// Initializes a new instance of the <see cref="EthernetPacket"/> class, with specified dsetination, source, type and size.
         /// </summary>
-        /// <param name="dest">Destination.</param>
-        /// <param name="src">Source.</param>
-        /// <param name="type">Type.</param>
-        /// <param name="packet_size">Size.</param>
-        protected EthernetPacket(MACAddress dest, MACAddress src, ushort type, int packet_size)
+        protected EthernetPacket(MACAddress dest, MACAddress src, ushort type, int packetSize)
         {
-            RawData = new byte[packet_size];
+            RawData = new byte[packetSize];
             for (int i = 0; i < 6; i++)
             {
                 RawData[i] = dest.bytes[i];
@@ -80,16 +60,16 @@ namespace Cosmos.System.Network
 
             RawData[12] = (byte)(type >> 8);
             RawData[13] = (byte)(type >> 0);
-            InitFields();
+            InitializeFields();
         }
 
         /// <summary>
-        /// Get raw data byte array.
+        /// Gets the raw data of the packet in the form of a byte array.
         /// </summary>
         public byte[] RawData { get; }
 
         /// <summary>
-        /// Get and set source MAC address.
+        /// The source MAC address.
         /// </summary>
         internal MACAddress SourceMAC
         {
@@ -100,12 +80,12 @@ namespace Cosmos.System.Network
                 {
                     RawData[6 + i] = value.bytes[i];
                 }
-                InitFields();
+                InitializeFields();
             }
         }
 
         /// <summary>
-        /// Get and set destination MAC address.
+        /// The destination MAC address.
         /// </summary>
         internal MACAddress DestinationMAC
         {
@@ -116,25 +96,21 @@ namespace Cosmos.System.Network
                 {
                     RawData[i] = value.bytes[i];
                 }
-                InitFields();
+
+                InitializeFields();
             }
         }
 
         /// <summary>
-        /// Get packet type.
+        /// The type of the packet.
         /// </summary>
         internal ushort EthernetType { get; private set; }
 
         /// <summary>
-        /// Prepare packet for sending.
-        /// Not implemented.
+        /// Prepares the packet for sending. Not implemented.
         /// </summary>
         internal virtual void PrepareForSending() { }
 
-        /// <summary>
-        /// To string.
-        /// </summary>
-        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "Ethernet Packet : Src=" + srcMAC + ", Dest=" + destMAC + ", Type=" + EthernetType;

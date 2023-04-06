@@ -1,14 +1,5 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          TCP Packet
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using Cosmos.HAL;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Cosmos.System.Network.IPv4.TCP
 {
@@ -67,9 +58,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// TCP handler.
         /// </summary>
         /// <param name="packetData">Packet data.</param>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="sys.IO.IOException">Thrown on IO error.</exception>
-        /// <exception cref="sys.ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="sys.ArgumentException">Thrown on fatal error.</exception>
         /// <exception cref="sys.OverflowException">Thrown if packetData array length is greater than Int32.MaxValue.</exception>
         internal static void TCPHandler(byte[] packetData)
         {
@@ -86,7 +77,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else
             {
-                Global.mDebugger.Send("Checksum incorrect! Packet passed.");
+                Global.Debugger.Send("Checksum incorrect! Packet passed.");
             }
         }
 
@@ -211,7 +202,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             RawData[DataOffset + 18] = (byte)((UrgentPointer >> 8) & 0xFF);
             RawData[DataOffset + 19] = (byte)((UrgentPointer >> 0) & 0xFF);
 
-            InitFields();
+            InitializeFields();
 
             //Checksum computation
             byte[] header = MakeHeader();
@@ -226,9 +217,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// Init TCPPacket fields.
         /// </summary>
         /// <exception cref="sys.ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
-            base.InitFields();
+            base.InitializeFields();
             SourcePort = (ushort)((RawData[DataOffset] << 8) | RawData[DataOffset + 1]);
             DestinationPort = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
             SequenceNumber = (uint)((RawData[DataOffset + 4] << 24) | (RawData[DataOffset + 5] << 16) | (RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
@@ -311,8 +302,8 @@ namespace Cosmos.System.Network.IPv4.TCP
             //Addresses
             for (int b = 0; b < 4; b++)
             {
-                header[0 + b] = SourceIP.address[b];
-                header[4 + b] = DestinationIP.address[b];
+                header[0 + b] = SourceIP.Parts[b];
+                header[4 + b] = DestinationIP.Parts[b];
             }
             //Reserved
             header[8] = 0x00;
@@ -420,7 +411,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Get TCP data.
         /// </summary>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
         internal byte[] TCP_Data
         {
             get

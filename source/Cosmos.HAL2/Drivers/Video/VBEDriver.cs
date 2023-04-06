@@ -85,7 +85,7 @@ namespace Cosmos.HAL.Drivers
         };
 
         /// <summary>
-        /// Create new instance of the <see cref="VBEDriver"/> class.
+        /// Initializes a new instance of the <see cref="VBEDriver"/> class.
         /// </summary>
         /// <param name="xres">X resolution.</param>
         /// <param name="yres">Y resolution.</param>

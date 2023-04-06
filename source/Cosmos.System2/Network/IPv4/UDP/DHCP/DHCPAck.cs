@@ -1,46 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Cosmos.System.Network.IPv4.UDP.DHCP
+﻿namespace Cosmos.System.Network.IPv4.UDP.DHCP
 {
     /// <summary>
-    /// DHCPAck class.
+    /// Represents a DHCP acknowledge (ACK) packet.
     /// </summary>
     internal class DHCPAck : DHCPPacket
     {
         /// <summary>
-        /// Create new instance of the <see cref="DHCPAck"/> class.
+        /// Initializes a new instance of the <see cref="DHCPAck"/> class.
         /// </summary>
         internal DHCPAck() : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPAck"/> class.
+        /// Initializes a new instance of the <see cref="DHCPAck"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         internal DHCPAck(byte[] rawData) : base(rawData)
         { }
 
-        /// <summary>
-        /// Init DHCPAck fields.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
-            base.InitFields();
+            base.InitializeFields();
 
             foreach (var option in Options)
             {
-                if (option.Type == 1) //Mask
+                if (option.Type == 1) // Mask
                 {
                     Subnet = new Address(option.Data, 0);
                 }
-                else if (option.Type == 3) //Router
+                else if (option.Type == 3) // Router
                 {
                     Server = new Address(option.Data, 0);
                 }
-                else if (option.Type == 6) //DNS
+                else if (option.Type == 6) // DNS
                 {
                     DNS = new Address(option.Data, 0);
                 }
@@ -48,17 +40,17 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         }
 
         /// <summary>
-        /// Get Subnet IPv4 Address
+        /// Gets the subnet IPv4 address.
         /// </summary>
         internal Address Subnet { get; private set; }
 
         /// <summary>
-        /// Get DNS IPv4 Address
+        /// Gets the DNS IPv4 address.
         /// </summary>
         internal Address DNS { get; private set; }
 
         /// <summary>
-        /// Get DHCP Server IPv4 Address
+        /// Gets the DHCP server IPv4 address.
         /// </summary>
         internal Address Server { get; private set; }
     }

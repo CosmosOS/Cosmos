@@ -121,17 +121,17 @@ namespace Cosmos.System.FileSystem
             {
                 for (int i = 0; i < Partitions.Count; i++)
                 {
-                    Global.mFileSystemDebugger.SendInternal("Partition #: ");
-                    Global.mFileSystemDebugger.SendInternal(i + 1);
+                    Global.FileSystemDebugger.SendInternal("Partition #: ");
+                    Global.FileSystemDebugger.SendInternal(i + 1);
                     global::System.Console.WriteLine("Partition #: " + (i + 1));
-                    Global.mFileSystemDebugger.SendInternal("Block Size:");
-                    Global.mFileSystemDebugger.SendInternal(Partitions[i].Host.BlockSize);
+                    Global.FileSystemDebugger.SendInternal("Block Size:");
+                    Global.FileSystemDebugger.SendInternal(Partitions[i].Host.BlockSize);
                     global::System.Console.WriteLine("Block Size: " + Partitions[i].Host.BlockSize + " bytes");
-                    Global.mFileSystemDebugger.SendInternal("Block Count:");
-                    Global.mFileSystemDebugger.SendInternal(Partitions[i].Host.BlockCount);
+                    Global.FileSystemDebugger.SendInternal("Block Count:");
+                    Global.FileSystemDebugger.SendInternal(Partitions[i].Host.BlockCount);
                     global::System.Console.WriteLine("Block Partitions: " + Partitions[i].Host.BlockCount);
-                    Global.mFileSystemDebugger.SendInternal("Size:");
-                    Global.mFileSystemDebugger.SendInternal(Partitions[i].Host.BlockCount * Partitions[i].Host.BlockSize / 1024 / 1024);
+                    Global.FileSystemDebugger.SendInternal("Size:");
+                    Global.FileSystemDebugger.SendInternal(Partitions[i].Host.BlockCount * Partitions[i].Host.BlockSize / 1024 / 1024);
                     global::System.Console.WriteLine("Size: " + Partitions[i].Host.BlockCount * Partitions[i].Host.BlockSize / 1024 / 1024 + " MB");
                 }
             }

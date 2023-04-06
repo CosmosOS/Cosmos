@@ -7,7 +7,8 @@ using Cosmos.HAL;
 namespace Cosmos.System
 {
     /// <summary>
-    /// PC speaker helper class.
+    /// Serves as an extension class, with methods relating to the
+    /// PC speaker (beeper).
     /// </summary>
     public static class PCSExtensions
     {
@@ -15,17 +16,17 @@ namespace Cosmos.System
         /// Convert milliseconds (ms) to hertz (Hz).
         /// </summary>
         /// <param name="ms">A milliseconds value, must be > 0.</param>
-        /// <returns>integer value.</returns>
+        /// <returns>The given value, in hertz (Hz).</returns>
         public static uint MsToHz(this int ms)
         {
-            return (uint)(1000 / ms); //TODO: maybe throw exception on <= 0 ms value
+            return (uint)(1000 / ms); // TODO: maybe throw exception on <= 0 ms value
         }
 
         /// <summary>
         /// Convert milliseconds (ms) to hertz (Hz).
         /// </summary>
         /// <param name="ms">A milliseconds value, must be > 0.</param>
-        /// <returns>integer value.</returns>
+        /// <returns>The given value, in hertz (Hz).</returns>
         public static uint MsToHz(this uint ms)
         {
             return (uint)(1000 / ms);
@@ -34,8 +35,10 @@ namespace Cosmos.System
 
     /// <summary>
     /// Possible duration types.
-    /// <seealso href="https://en.wikipedia.org/wiki/Duration_(music)"/>
     /// </summary>
+    /// <remarks>
+    /// <seealso href="https://en.wikipedia.org/wiki/Duration_(music)"/>
+    /// </remarks>
     public enum Durations
     {
          Whole = 1600,
@@ -49,9 +52,11 @@ namespace Cosmos.System
 
     /// <summary>
     /// Possible note types.
+    /// </summary>
+    /// <remarks>
     /// <seealso href="https://en.wikipedia.org/wiki/Musical_note"/>
     /// <seealso href="https://en.wikipedia.org/wiki/Audio_frequency"/>
-    /// </summary>
+    /// </remarks>
     public enum Notes
     {
         A0 = 28, // Exactly 27.500
@@ -141,13 +146,13 @@ namespace Cosmos.System
 
     // TODO: continue exception list, once HAL is documented.
     /// <summary>
-    /// PC speaker class.
+    /// Represents the internal PC speaker/beeper.
     /// </summary>
     public class PCSpeaker
     {
         // TODO: continue exception list, once HAL is documented.
         /// <summary>
-        /// Play beep sound, at 800hz for one eighth.
+        /// Plays a beep sound, at 800hz for one eighth.
         /// </summary>
         public static void Beep()
         {
@@ -156,7 +161,7 @@ namespace Cosmos.System
 
         // TODO: continue exception list, once HAL is documented.
         /// <summary>
-        /// Play beep sound, at a specified frequency for one eighth.
+        /// Plays a beep sound, at a specified frequency for one eighth.
         /// </summary>
         /// <param name="frequency">Audio frequency in Hz, must be between 37 and 32767Hz.</param>
         public static void Beep(uint frequency)
@@ -166,7 +171,7 @@ namespace Cosmos.System
 
         // TODO: continue exception list, once HAL is documented.
         /// <summary>
-        /// Play beep sound, at a specified frequency for a specified duration.
+        /// Plays a beep sound, at a specified frequency for a specified duration.
         /// </summary>
         /// <param name="frequency">Audio frequency in Hz, must be between 37 and 32767Hz.</param>
         /// <param name="duration">Beep duration, must be > 0.</param>
@@ -177,7 +182,7 @@ namespace Cosmos.System
 
         // TODO: continue exception list, once HAL is documented.
         /// <summary>
-        /// Play beep sound, at a specified note for a specified duration.
+        /// Plays a beep sound, at a specified note for a specified duration.
         /// </summary>
         /// <param name="note">A note to play.</param>
         /// <param name="duration">Beep duration, must be > 0.</param>
@@ -188,7 +193,7 @@ namespace Cosmos.System
 
         // TODO: continue exception list, once HAL is documented.
         /// <summary>
-        /// Play beep sound, at a specified frequency for one eighth.
+        /// Plays a beep sound, at a specified frequency for one eighth.
         /// </summary>
         /// <param name="note">A note to play.</param>
         public static void Beep(Notes note)

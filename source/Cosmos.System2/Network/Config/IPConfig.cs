@@ -1,12 +1,4 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          List of all IPs / Utils
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Alexy DA CRUZ <dacruzalexy@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using Cosmos.System.Network.IPv4;
 using Cosmos.HAL;
@@ -14,28 +6,23 @@ using Cosmos.HAL;
 namespace Cosmos.System.Network.Config
 {
     /// <summary>
-    /// Contains a IPv4 configuration
+    /// Represents IPv4 configuration.
     /// </summary>
     public class IPConfig
     {
-        /// <summary>
-        /// IPv4 configurations list.
-        /// </summary>
-        private static readonly List<IPConfig> ipConfigs = new List<IPConfig>();
+        private static readonly List<IPConfig> ipConfigs = new();
 
         /// <summary>
-        /// Add IPv4 configuration.
+        /// Add the given IPv4 configuration.
         /// </summary>
-        /// <param name="config"></param>
         internal static void Add(IPConfig config)
         {
             ipConfigs.Add(config);
         }
 
         /// <summary>
-        /// Remove IPv4 configuration.
+        /// Removes the given IPv4 configuration.
         /// </summary>
-        /// <param name="config"></param>
         internal static void Remove(IPConfig config)
         {
             int counter = 0;
@@ -52,7 +39,7 @@ namespace Cosmos.System.Network.Config
         }
 
         /// <summary>
-        /// Remove All IPv4 configuration.
+        /// Remove all IPv4 configurations.
         /// </summary>
         internal static void RemoveAll()
         {
@@ -60,14 +47,13 @@ namespace Cosmos.System.Network.Config
         }
 
         /// <summary>
-        /// Find network.
+        /// Finds the network address for the specified destination IP address.
         /// </summary>
-        /// <param name="destIP">Destination IP address.</param>
-        /// <returns>Address value.</returns>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <param name="destIP">The destination IP address.</param>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
         public static Address FindNetwork(Address destIP)
         {
-            Address default_gw = null;
+            Address defaultGw = null;
 
             foreach (IPConfig ipConfig in ipConfigs)
             {
@@ -76,9 +62,9 @@ namespace Cosmos.System.Network.Config
                 {
                     return ipConfig.IPAddress;
                 }
-                if (default_gw == null && ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0)
+                if (defaultGw == null && ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0)
                 {
-                    default_gw = ipConfig.IPAddress;
+                    defaultGw = ipConfig.IPAddress;
                 }
 
                 if (!IsLocalAddress(destIP))
@@ -87,26 +73,33 @@ namespace Cosmos.System.Network.Config
                 }
             }
 
-            return default_gw;
+            return defaultGw;
         }
 
+        /// <summary>
+        /// Enables a network device with the specified IP configuration.
+        /// </summary>
+        /// <param name="device">The network device to enable.</param>
+        /// <param name="ip">The IP address to assign to the device.</param>
+        /// <param name="subnet">The subnet mask to use for the device.</param>
+        /// <param name="gw">The default gateway address to use for the device.</param>
+        /// <returns><see langword="true"/> if the device was successfully enabled, <see langword="false"/> otherwise.</returns>
         public static bool Enable(NetworkDevice device, Address ip, Address subnet, Address gw)
         {
             if (device != null)
             {
                 var config = new IPConfig(ip, subnet, gw);
                 NetworkStack.ConfigIP(device, config);
-                Global.mDebugger.Send("Config OK.");
+                NetworkStack.Debugger.Send("Config OK.");
                 return true;
             }
             return false;
         }
 
         /// <summary>
-        /// Check if address is local address.
+        /// Check if the given address is a local address.
         /// </summary>
-        /// <param name="destIP">Address to check.</param>
-        /// <returns>bool value.</returns>
+        /// <param name="destIP">The address to check.</param>
         internal static bool IsLocalAddress(Address destIP)
         {
             for (int c = 0; c < ipConfigs.Count; c++)
@@ -122,10 +115,9 @@ namespace Cosmos.System.Network.Config
         }
 
         /// <summary>
-        /// Find interface.
+        /// Find the interface by the given IP address.
         /// </summary>
         /// <param name="sourceIP">Source IP.</param>
-        /// <returns>NetworkDevice value.</returns>
         internal static NetworkDevice FindInterface(Address sourceIP)
         {
             return NetworkStack.AddressMap[sourceIP.Hash];
@@ -136,7 +128,7 @@ namespace Cosmos.System.Network.Config
         /// </summary>
         /// <param name="destIP">Destination IP.</param>
         /// <returns>Address value.</returns>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
         internal static Address FindRoute(Address destIP)
         {
             for (int c = 0; c < ipConfigs.Count; c++)
@@ -151,7 +143,7 @@ namespace Cosmos.System.Network.Config
         }
 
         /// <summary>
-        /// Create a IPv4 Configuration with no default gateway
+        /// Creates a IPv4 Configuration with no default gateway.
         /// </summary>
         /// <param name="ip">IP Address</param>
         /// <param name="subnet">Subnet Mask</param>
@@ -161,7 +153,7 @@ namespace Cosmos.System.Network.Config
         }
 
         /// <summary>
-        /// Create a IPv4 Configuration
+        /// Creates a IPv4 Configuration.
         /// </summary>
         /// <param name="ip">IP Address</param>
         /// <param name="subnet">Subnet Mask</param>
@@ -174,15 +166,17 @@ namespace Cosmos.System.Network.Config
         }
 
         /// <summary>
-        /// Get IP address.
+        /// The IP address.
         /// </summary>
         public Address IPAddress { get; }
+
         /// <summary>
-        /// Get subnet mask.
+        /// The subnet mask.
         /// </summary>
         public Address SubnetMask { get; }
+
         /// <summary>
-        /// Get default gateway.
+        /// The default gateway address.
         /// </summary>
         public Address DefaultGateway { get; }
     }
