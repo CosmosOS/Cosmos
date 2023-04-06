@@ -977,10 +977,20 @@ namespace Cosmos.Core_Plugs.System
 
         public static unsafe int GetNonRandomizedHashCode(string aString)
         {
+
             // the code is the same as the one used in .net except for the explicit == 2 and == 1 cases
             // we need this since a new object can start directly behind the string in memory, so the standard
             // implementation would read the allocated size of the next object and use it for the hash
-            fixed (char* ptr = &aString.AsSpan()[0])
+            var asSpan = aString.AsSpan();
+            if (asSpan.Length == 0)
+            {
+                unchecked
+                {
+                    return (int)(352654597u + 352654597u * 1566083941);
+                }
+            }
+
+            fixed (char* ptr = &asSpan[0])
             {
                 uint num = 352654597u;
                 uint num2 = num;
@@ -1006,7 +1016,11 @@ namespace Cosmos.Core_Plugs.System
                 {
                     num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ *(char*)ptr2;
                 }
-                return (int)(num + num2 * 1566083941);
+
+                unchecked
+                {
+                    return (int)(num + num2 * 1566083941);
+                }
             }
         }
     }

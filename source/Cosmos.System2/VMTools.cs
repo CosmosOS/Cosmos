@@ -3,23 +3,29 @@ using Cosmos.HAL;
 namespace Cosmos.System
 {
     /// <summary>
-	/// A class used to detect if cosmos is being ran in a virtual machine.
-	/// Usefull for VM specific tasks.
+    /// Used to get the virtualization state of the CPU.
 	/// </summary>
     public static class VMTools
     {
         /// <summary>
-		/// A boolean describing whether or not virtualbox has been detected.
+		/// Whether or not the VirtualBox virtualizer has been detected.
 		/// </summary>
         public static bool IsVirtualBox => GetIsVirtualBox();
+
         /// <summary>
-		/// A boolean describing whether or not VMware has been detected.
+		/// Whether or not the VMware virtualizer has been detected.
 		/// </summary>
         public static bool IsVMWare => GetIsVMWare();
+
         /// <summary>
-		/// A boolean describing whether or not QEMU has been detected.
+		/// Whether or not the QEMU virtualizer has been detected.
 		/// </summary>
         public static bool IsQEMU => GetIsQEMU();
+
+        // NOTE: @ascpixi: A better way to scan for virtualizers would be
+        //       to read the CPUID leaf 0x40000000. This leaf is dedicated
+        //       for hypervisors to provide information about the virtualization
+        //       state of the CPU.
 
         private static bool GetIsVirtualBox()
         {

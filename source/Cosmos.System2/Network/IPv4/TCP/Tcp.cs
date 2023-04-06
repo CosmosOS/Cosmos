@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Cosmos.HAL;
 using Cosmos.System.Helpers;
 using Cosmos.System.Network.Config;
@@ -8,7 +7,7 @@ using Cosmos.System.Network.Config;
 namespace Cosmos.System.Network.IPv4.TCP
 {
     /// <summary>
-    /// TCP Connection status
+    /// Represents a TCP connection status.
     /// </summary>
     public enum Status
     {
@@ -63,13 +62,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         TIME_WAIT,
 
         /// <summary>
-        /// represents no connection state at all.
+        /// Represents no connection state.
         /// </summary>
         CLOSED
     }
 
     /// <summary>
-    /// Transmission Control Block (TCB).
+    /// Represents a Transmission Control Block (TCB).
     /// </summary>
     public class TransmissionControlBlock
     {
@@ -134,59 +133,61 @@ namespace Cosmos.System.Network.IPv4.TCP
     }
 
     /// <summary>
-    /// Tcp class. Used to manage the TCP state machine.
+    /// Used to manage the TCP state machine.
     /// Handle received packets according to current TCP connection Status. Also contains TCB (Transmission Control Block) information.
-    /// See <a href="https://datatracker.ietf.org/doc/html/rfc793">RFC 793</a> for more information.
     /// </summary>
+    /// <remarks>
+    /// See <a href="https://datatracker.ietf.org/doc/html/rfc793">RFC 793</a> for more information.
+    /// </remarks>
     public class Tcp
     {
         /// <summary>
-        /// TCP Window Size.
+        /// The TCP window size.
         /// </summary>
         public const ushort TcpWindowSize = 8192;
 
         #region Static
-
         /// <summary>
-        /// Connection list.
+        /// A list of currently active connections.
         /// </summary>
         internal static List<Tcp> Connections;
 
         /// <summary>
         /// String / enum correspondance (used for debugging)
         /// </summary>
-        internal static string[] table;
+        internal static string[] Table;
 
-        /// <summary>
-        /// Assign connection list.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
         static Tcp()
         {
             Connections = new List<Tcp>();
 
-            table = new string[11];
-            table[0] = "LISTEN";
-            table[1] = "SYN_SENT";
-            table[2] = "SYN_RECEIVED";
-            table[3] = "ESTABLISHED";
-            table[4] = "FIN_WAIT1";
-            table[5] = "FIN_WAIT2";
-            table[6] = "CLOSE_WAIT";
-            table[7] = "CLOSING";
-            table[8] = "LAST_ACK";
-            table[9] = "TIME_WAIT";
-            table[10] = "CLOSED";
+            Table = new string[11];
+            Table[0] = "LISTEN";
+            Table[1] = "SYN_SENT";
+            Table[2] = "SYN_RECEIVED";
+            Table[3] = "ESTABLISHED";
+            Table[4] = "FIN_WAIT1";
+            Table[5] = "FIN_WAIT2";
+            Table[6] = "CLOSE_WAIT";
+            Table[7] = "CLOSING";
+            Table[8] = "LAST_ACK";
+            Table[9] = "TIME_WAIT";
+            Table[10] = "CLOSED";
         }
 
         /// <summary>
-        /// Get TCP Connection.
+        /// Gets a TCP connection object that matches the specified local and remote ports and addresses.
         /// </summary>
-        /// <param name="localPort">Local port.</param>
-        /// <param name="remotePort">Destination port.</param>
-        /// <param name="localIp">Local IPv4 Address.</param>
-        /// <param name="remoteIp">Remote IPv4 Address.</param>
-        /// <returns>Tcp</returns>
+        /// <param name="localPort">The local port number of the connection.</param>
+        /// <param name="remotePort">The remote port number of the connection.</param>
+        /// <param name="localIp">The local IP address of the connection.</param>
+        /// <param name="remoteIp">The remote IP address of the connection.</param>
+        /// <returns>A TCP connection object if a match is found, <see langword="null"/> otherwise.</returns>
+        /// <remarks>
+        /// If a connection is found that matches the local and remote ports and addresses, it will be returned.
+        /// If no exact match is found, a connection that is listening on the specified local port will be returned.
+        /// If no matching connection is found, <see langword="null"/> is returned.
+        /// </remarks>
         internal static Tcp GetConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
             foreach (var con in Connections)
@@ -204,12 +205,15 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Remove TCP Connection.
+        /// Removes a TCP connection object that matches the specified local and remote ports and addresses.
         /// </summary>
-        /// <param name="localPort">Local port.</param>
-        /// <param name="remotePort">Destination port.</param>
-        /// <param name="localIp">Local IPv4 Address.</param>
-        /// <param name="remoteIp">Remote IPv4 Address.</param>
+        /// <param name="localPort">The local port number of the connection.</param>
+        /// <param name="remotePort">The remote port number of the connection.</param>
+        /// <param name="localIp">The local IP address of the connection.</param>
+        /// <param name="remoteIp">The remote IP address of the connection.</param>
+        /// <remarks>
+        /// If a connection is found that matches the local and remote ports and addresses, it will be removed from the list of connections.
+        /// </remarks>
         internal static void RemoveConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
             for (int i = 0; i < Connections.Count; i++)
@@ -218,7 +222,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     Connections.RemoveAt(i);
 
-                    Global.mDebugger.Send("Connection removed!");
+                    NetworkStack.Debugger.Send("Connection removed!");
 
                     return;
                 }
@@ -230,34 +234,34 @@ namespace Cosmos.System.Network.IPv4.TCP
         #region TCB
 
         /// <summary>
-        /// Local EndPoint.
+        /// The local end-point.
         /// </summary>
         public EndPoint LocalEndPoint;
 
         /// <summary>
-        /// Remote EndPoint.
+        /// The remote end-point.
         /// </summary>
         public EndPoint RemoteEndPoint;
 
         /// <summary>
-        /// Connection Transmission Control Block.
+        /// The connection Transmission Control Block.
         /// </summary>
         internal TransmissionControlBlock TCB { get; set; }
 
         #endregion
 
         /// <summary>
-        /// RX buffer queue.
+        /// The RX buffer queue.
         /// </summary>
-        internal Queue<TCPPacket> rxBuffer;
+        internal Queue<TCPPacket> RxBuffer;
 
         /// <summary>
-        /// Connection status.
+        /// The connection status.
         /// </summary>
         public Status Status;
 
         /// <summary>
-        /// TCP Received Data.
+        /// The received data buffer.
         /// </summary>
         internal byte[] Data { get; set; }
 
@@ -269,20 +273,20 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Handle incoming TCP packets according to current connection status.
+        /// Handles incoming TCP packets according to the current connection status.
         /// </summary>
-        /// <param name="packet">Packet to receive.</param>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
+        /// <param name="packet">The packet to receive.</param>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            Global.mDebugger.Send("[" + table[(int)Status] + "] " + packet.ToString());
+            NetworkStack.Debugger.Send("[" + Table[(int)Status] + "] " + packet.ToString());
 
-            if (Status == Status.CLOSED)
+            /*if (Status == Status.CLOSED)
             {
                 //DO NOTHING
             }
-            else if (Status == Status.LISTEN)
+            else*/ if (Status == Status.LISTEN)
             {
                 ProcessListen(packet);
             }
@@ -321,7 +325,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                         case Status.TIME_WAIT:
                             break;
                         default:
-                            Global.mDebugger.Send("Unknown TCP connection state.");
+                            NetworkStack.Debugger.Send("Unknown TCP connection state.");
                             break;
                     }
                 }
@@ -332,7 +336,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                         SendEmptyPacket(Flags.ACK);
                     }
 
-                    Global.mDebugger.Send("Sequence number or segment data invalid, packet passed.");
+                    NetworkStack.Debugger.Send("Sequence number or segment data invalid, packet passed.");
                 }
             }
         }
@@ -340,14 +344,21 @@ namespace Cosmos.System.Network.IPv4.TCP
         #region Process Status
 
         /// <summary>
-        /// Process LISTEN Status.
+        /// Processes a TCP LISTEN state packet and updates the connection status accordingly.
         /// </summary>
-        /// <param name="packet">Packet to receive.</param>
+        /// <param name="packet">The incoming TCP packet.</param>
+        /// <remarks>
+        /// This method handles various types of incoming TCP packets during the LISTEN state and updates the status of the connection accordingly.
+        /// If an RST packet is received, the packet is passed and no action is taken.
+        /// If a FIN packet is received, the TCP connection is closed.
+        /// If an ACK packet is received, the TCP connection is established.
+        /// If a SYN packet is received, the TCP connection is moved to the SYN_RECEIVED state and an empty packet with the SYN and ACK flags set is sent back.
+        /// </remarks>
         public void ProcessListen(TCPPacket packet)
         {
             if (packet.RST)
             {
-                Global.mDebugger.Send("RST received at LISTEN state, packet passed.");
+                NetworkStack.Debugger.Send("RST received at LISTEN state, packet passed.");
 
                 return;
             }
@@ -355,7 +366,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
 
-                Global.mDebugger.Send("TCP connection closed! (FIN received on LISTEN state)");
+                NetworkStack.Debugger.Send("TCP connection closed! (FIN received on LISTEN state)");
             }
             else if (packet.ACK)
             {
@@ -394,9 +405,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Process SYN_RECEIVED Status.
+        /// Processes a TCP SYN_RECEIVED state packet and updates the connection status accordingly.
         /// </summary>
-        /// <param name="packet">Packet to receive.</param>
+        /// <param name="packet">The incoming TCP packet.</param>
+        /// <remarks>
+        /// This method handles an incoming TCP packet during the SYN_RECEIVED state and updates the status of the connection accordingly.
+        /// If an ACK packet is received with a valid AckNumber, the TCP connection is established.
+        /// If the AckNumber is invalid, a reset packet is sent back with the AckNumber set to the invalid value.
+        /// </remarks>
         public void ProcessSynReceived(TCPPacket packet)
         {
             if (packet.ACK)
@@ -417,9 +433,16 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Process SYN_SENT Status.
+        /// Processes a SYN_SENT state TCP packet and updates the connection state accordingly.
         /// </summary>
-        /// <param name="packet">Packet to receive.</param>
+        /// <param name="packet">The TCP packet to process.</param>
+        /// <remarks>
+        /// If the packet has the SYN flag set, the method sets the initial receive sequence number and responds with an ACK packet
+        /// if the ACK flag is also set. If the SYN flag is set but not the ACK flag, the method closes the connection and sends an
+        /// error message. If the packet has only the ACK flag set, the method checks whether the acknowledgment number is within the
+        /// valid range and updates the send and receive sequence numbers. If the packet has the FIN flag set, the method closes the
+        /// connection. If the packet has the RST flag set, the method also closes the connection and sends an error message.
+        /// </remarks>
         public void ProcessSynSent(TCPPacket packet)
         {
             if (packet.SYN)
@@ -442,13 +465,13 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     Status = Status.CLOSED;
 
-                    Global.mDebugger.Send("Simultaneous open not supported.");
+                    NetworkStack.Debugger.Send("Simultaneous open not supported.");
                 }
                 else
                 {
                     Status = Status.CLOSED;
 
-                    Global.mDebugger.Send("TCP connection closed! (" + packet.getFlags() + " received on SYN_SENT state)");
+                    NetworkStack.Debugger.Send("TCP connection closed! (" + packet.getFlags() + " received on SYN_SENT state)");
                 }
             }
             else if (packet.ACK)
@@ -458,7 +481,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     SendEmptyPacket(Flags.RST, packet.AckNumber);
 
-                    Global.mDebugger.Send("Bad ACK received at SYN_SENT.");
+                    NetworkStack.Debugger.Send("Bad ACK received at SYN_SENT.");
                 }
                 else
                 {
@@ -472,20 +495,20 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
 
-                Global.mDebugger.Send("TCP connection closed! (FIN received on SYN_SENT state).");
+                NetworkStack.Debugger.Send("TCP connection closed! (FIN received on SYN_SENT state).");
             }
             else if (packet.RST)
             {
                 Status = Status.CLOSED;
 
-                Global.mDebugger.Send("Connection refused by remote computer.");
+                NetworkStack.Debugger.Send("Connection refused by remote computer.");
             }
         }
 
         /// <summary>
-        /// Process ESTABLISHED Status.
+        /// Processes a ESTABLISHED state TCP packet.
         /// </summary>
-        /// <param name="packet">Packet to receive.</param>
+        /// <param name="packet">The received packet.</param>
         public void ProcessEstablished(TCPPacket packet)
         {
             if (packet.ACK)
@@ -522,7 +545,7 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                     Data = ArrayHelper.Concat(Data, packet.TCP_Data);
 
-                    rxBuffer.Enqueue(packet);
+                    RxBuffer.Enqueue(packet);
 
                     SendEmptyPacket(Flags.ACK);
                     return;
@@ -549,7 +572,7 @@ namespace Cosmos.System.Network.IPv4.TCP
             {
                 Status = Status.CLOSED;
 
-                Global.mDebugger.Send("TCP Connection resetted!");
+                NetworkStack.Debugger.Send("TCP Connection resetted!");
             }
             else if (packet.FIN)
             {
@@ -643,7 +666,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         #region Utils
 
         /// <summary>
-        /// Wait until remote receive ACK of its connection termination request.
+        /// Waits until remote receives an ACKnowledge of its connection termination request.
         /// </summary>
         private void WaitAndClose()
         {
@@ -655,7 +678,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Wait for new TCP connection status.
+        /// Waits for a new TCP connection status.
         /// </summary>
         internal bool WaitStatus(Status status, int timeout)
         {
@@ -678,7 +701,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Wait for new TCP connection status (blocking).
+        /// Waits for a new TCP connection status (blocking).
         /// </summary>
         internal bool WaitStatus(Status status)
         {
@@ -688,7 +711,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Send empty packet.
+        /// Sends an empty packet.
         /// </summary>
         internal void SendEmptyPacket(Flags flag)
         {
@@ -696,7 +719,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Send empty packet.
+        /// Sends an empty packet.
         /// </summary>
         internal void SendEmptyPacket(Flags flag, uint sequenceNumber)
         {
@@ -704,7 +727,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         }
 
         /// <summary>
-        /// Send TCP packet.
+        /// Sends a TCP packet.
         /// </summary>
         private void SendPacket(TCPPacket packet)
         {
@@ -717,9 +740,6 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
         }
 
-        /// <summary>
-        /// Equals connection.
-        /// </summary>
         internal bool Equals(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
             return LocalEndPoint.Port.Equals(localPort) && RemoteEndPoint.Port.Equals(remotePort) && LocalEndPoint.Address.Hash.Equals(localIp.Hash) && RemoteEndPoint.Address.Hash.Equals(remoteIp.Hash);

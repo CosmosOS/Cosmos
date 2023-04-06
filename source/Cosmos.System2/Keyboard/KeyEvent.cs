@@ -3,12 +3,12 @@
 namespace Cosmos.System
 {
     /// <summary>
-    /// KeyEvent class. Represent key event.
+    /// Represents a key-press event.
     /// </summary>
     public class KeyEvent
     {
         /// <summary>
-        /// Key event type.
+        /// Represents the type of the a <see cref="KeyEvent"/>.
         /// </summary>
         public enum KeyEventType
         {
@@ -16,79 +16,70 @@ namespace Cosmos.System
             Break
         }
 
-        // todo: once Github issue #137 is fixed, replace this class with ConsoleKeyInfo struct.
-        // Well, this one has more features
+        // TODO: As GitHub issue #137 is fixed, this can be replaced with the ConsoleKeyInfo struct.
 
         /// <summary>
-        /// Get and set key char.
+        /// The text character of the key-press event.
         /// </summary>
-        public char KeyChar
-        {
-            get;
-            set;
-        }
+        public char KeyChar { get; set; }
 
         /// <summary>
-        /// Get and set key.
+        /// The virtual key of the key-press event.
         /// </summary>
-        public ConsoleKeyEx Key
-        {
-            get;
-            set;
-        }
+        public ConsoleKeyEx Key { get; set; }
 
         /// <summary>
-        /// Get and set console modifiers.
+        /// The modifiers of the key-press event.
         /// </summary>
-        public ConsoleModifiers Modifiers
-        {
-            get;
-            set;
-        }
+        public ConsoleModifiers Modifiers { get; set;}
 
         /// <summary>
-        /// Get and set key event type.
+        /// The type of the key-press event.
         /// </summary>
         public KeyEventType Type { get; set; }
 
         /// <summary>
-        /// Create new instance of the <see cref="KeyEvent"/> class.
+        /// Initializes a new instance of the <see cref="KeyEvent"/> class.
         /// </summary>
         public KeyEvent()
         {
             KeyChar = '\0';
             Key = ConsoleKeyEx.NoName;
-            this.Modifiers = (ConsoleModifiers)0;
+            Modifiers = 0;
             Type = KeyEventType.Make;
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="KeyEvent"/> class.
+        /// Initializes a new instance of the <see cref="KeyEvent"/> class.
         /// </summary>
-        /// <param name="keyChar">Key char.</param>
-        /// <param name="key">Key.</param>
-        /// <param name="shift">Shift.</param>
-        /// <param name="alt">Alt.</param>
-        /// <param name="control">Ctrl.</param>
-        /// <param name="type">Type.</param>
+        /// <param name="keyChar">The text character.</param>
+        /// <param name="key">The virtual key.</param>
+        /// <param name="shift">Whether the Shift key was pressed.</param>
+        /// <param name="alt">Whether the Alt key was pressed.</param>
+        /// <param name="control">Whether the Control (Ctrl) key was pressed.</param>
+        /// <param name="type">The type of the <see cref="KeyEvent"/>.</param>
         public KeyEvent(char keyChar, ConsoleKeyEx key, bool shift, bool alt, bool control, KeyEventType type)
         {
-            this.KeyChar = keyChar;
-            this.Key = key;
-            this.Modifiers = (ConsoleModifiers)0;
+            KeyChar = keyChar;
+            Key = key;
+            Modifiers = (ConsoleModifiers)0;
+
             if (shift)
             {
-                this.Modifiers |= ConsoleModifiers.Shift;
+                Modifiers |= ConsoleModifiers.Shift;
             }
+
             if (alt)
             {
-                this.Modifiers |= ConsoleModifiers.Alt;
+                Modifiers |= ConsoleModifiers.Alt;
             }
+
             if (control)
             {
-                this.Modifiers |= ConsoleModifiers.Control;
+                Modifiers |= ConsoleModifiers.Control;
             }
-            this.Type = type;
+
+            Type = type;
         }
     }
 }
