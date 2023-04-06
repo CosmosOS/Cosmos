@@ -85,9 +85,13 @@ namespace Cosmos.HAL
         /// <exception cref="ArgumentOutOfRangeException">Thrown if duration or frequency invalid.</exception>
         public static void Beep(uint frequency, uint duration)
         {
+            if (frequency < 37 || frequency > 32767)
+            {
+                throw new ArgumentOutOfRangeException("'frequency' must be between 37 and 32767Hz.");
+            }
             if (duration <= 0)
             {
-                throw new ArgumentOutOfRangeException("Duration must be more than 0");
+                throw new ArgumentOutOfRangeException("'duration' must be more than 0.");
             }
 
             Beep(frequency);

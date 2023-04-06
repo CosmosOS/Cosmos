@@ -1,422 +1,308 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.System;
 using IL2CPU.API.Attribs;
+using Cosmos.System.Graphics;
+using Cosmos.System;
+using System.Text;
 
 namespace Cosmos.System_Plugs.System
 {
     [Plug(Target = typeof (global::System.Console))]
     public static class ConsoleImpl
     {
-        private static ConsoleColor mForeground = ConsoleColor.White;
-        private static ConsoleColor mBackground = ConsoleColor.Black;
-        private static Encoding ConsoleInputEncoding = Encoding.ASCII;
-        private static Encoding ConsoleOutputEncoding = Encoding.ASCII;
+        #region Properties
 
-        private static Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
+        public static bool TreatControlCAsInput => throw new NotImplementedException("Not implemented: TreatControlCAsInput");
 
-        private static Cosmos.System.Console GetConsole()
+        public static int LargestWindowHeight => throw new NotImplementedException("Not implemented: LargestWindowHeight");
+
+        public static int LargestWindowWidth => throw new NotImplementedException("Not implemented: LargestWindowWidth");
+
+        public static void Title(string value) => throw new NotImplementedException("Not implemented: Title");
+
+        public static int BufferHeight => throw new NotImplementedException("Not implemented: BufferHeight");
+
+        public static int BufferWidth => throw new NotImplementedException("Not implemented: BufferWidth");
+
+        public static int WindowLeft => throw new NotImplementedException("Not implemented: WindowLeft");
+
+        public static int WindowTop => throw new NotImplementedException("Not implemented: WindowTop");
+
+        public static Encoding OutputEncoding => consoleOutputEncoding;
+
+        public static Encoding InputEncoding => consoleInputEncoding;
+
+        public static bool KeyAvailable => KeyboardManager.KeyAvailable;
+
+        public static bool NumberLock => Global.NumLock;
+
+        public static bool CapsLock => Global.CapsLock;
+
+        public static ConsoleColor ForegroundColor
         {
-            return mFallbackConsole;
-        }
-
-        public static ConsoleColor get_BackgroundColor()
-        {
-            return mBackground;
-        }
-
-        public static void set_BackgroundColor(ConsoleColor value)
-        {
-            mBackground = value;
-            //Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
-            if (GetConsole() != null)
+            get => foreGround;
+            set
             {
-                GetConsole().Background = value;
+                foreGround = value;
+
+                if (GetConsole() != null)
+                {
+                    GetConsole().Foreground = value;
+                }
             }
         }
 
-        public static int get_BufferHeight()
+        public static ConsoleColor BackgroundColor
         {
-            throw new NotImplementedException("Not implemented: get_BufferHeight");
-        }
-
-        public static void set_BufferHeight(int aHeight)
-        {
-            throw new NotImplementedException("Not implemented: set_BufferHeight");
-        }
-
-        public static int get_BufferWidth()
-        {
-            throw new NotImplementedException("Not implemented: get_BufferWidth");
-        }
-
-        public static void set_BufferWidth(int aWidth)
-        {
-            throw new NotImplementedException("Not implemented: set_BufferWidth");
-        }
-
-        public static bool get_CapsLock()
-        {
-            return Global.CapsLock;
-        }
-
-        public static int get_CursorLeft()
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
+            get => backGround;
+            set
             {
-                // for now:
-                return 0;
+                backGround = value;
+
+                if (GetConsole() != null)
+                {
+                    GetConsole().Background = value;
+                }
             }
-            return GetConsole().X;
         }
 
-        public static void set_CursorLeft(int x)
+        public static bool CursorVisible
         {
-            var xConsole = GetConsole();
-            if (xConsole == null)
+            get
             {
-                // for now:
-                return;
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    return false;
+                }
+                return GetConsole().CursorVisible;
             }
-
-            if (x < 0)
+            set
             {
-                throw new ArgumentException("The value x must be at least 0!");
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return;
+                }
+                xConsole.CursorVisible = value;
             }
+        }
 
-            if (x < get_WindowWidth())
+        public static int CursorSize
+        {
+            get
             {
-                xConsole.X = x;
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return 0;
+                }
+                return xConsole.CursorSize;
+            }
+            set
+            {
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return;
+                }
+                xConsole.CursorSize = value;
+            }
+        }
+
+        public static int CursorLeft
+        {
+            get
+            {
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return 0;
+                }
+                return GetConsole().X;
+            }
+            set
+            {
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return;
+                }
+
+                if (value < 0)
+                {
+                    throw new ArgumentException("The value x must be at least 0!");
+                }
+
+                if (value < WindowWidth)
+                {
+                    xConsole.X = value;
+                }
+                else
+                {
+                    throw new ArgumentException("The value x must be lower than the console width!");
+                }
+            }
+        }
+
+        public static int CursorTop
+        {
+            get
+            {
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return 0;
+                }
+                return GetConsole().Y;
+            }
+            set
+            {
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return;
+                }
+
+                if (value < 0)
+                {
+                    throw new ArgumentException("The 'Y' value must be at least 0!");
+                }
+
+                if (value < WindowHeight)
+                {
+                    xConsole.Y = value;
+                }
+                else
+                {
+                    throw new ArgumentException("The 'Y' value must be lower than the console height!");
+                }
+            }
+        }
+
+        public static int WindowHeight
+        {
+            get
+            {
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return 25;
+                }
+                return GetConsole().Rows;
+            }
+            set => throw new NotImplementedException("Not implemented: set_WindowHeight");
+        }
+
+        public static int WindowWidth
+        {
+            get
+            {
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return 85;
+                }
+                return GetConsole().Cols;
+            }
+            set => throw new NotImplementedException("Not implemented: set_WindowWidth");
+        }
+
+        #endregion
+
+        #region Methods
+
+        public static void SetBufferSize(int width, int height)
+        {
+            throw new NotImplementedException("Not implemented: SetBufferSize");
+        }
+
+        public static void SetCursorPosition(int left, int top)
+        {
+            CursorLeft = left;
+            CursorTop = top;
+        }
+
+        public static void SetWindowPosition(int left, int top)
+        {
+            throw new NotImplementedException("Not implemented: SetWindowPosition");
+        }
+
+        public static void SetWindowSize(int width, int height)
+        {
+            if (width == 40 && height == 25)
+            {
+                fallBackConsole.mText.Cols = 40;
+                fallBackConsole.mText.Rows = 25;
+                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size40x25);
+            }
+            else if (width == 40 && height == 50)
+            {
+                fallBackConsole.mText.Cols = 40;
+                fallBackConsole.mText.Rows = 50;
+                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size40x50);
+            }
+            else if (width == 80 && height == 25)
+            {
+                fallBackConsole.mText.Cols = 80;
+                fallBackConsole.mText.Rows = 25;
+                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size80x25);
+            }
+            else if (width == 80 && height == 50)
+            {
+                fallBackConsole.mText.Cols = 80;
+                fallBackConsole.mText.Rows = 50;
+                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size80x50);
+            }
+            else if (width == 90 && height == 30)
+            {
+                fallBackConsole.mText.Cols = 90;
+                fallBackConsole.mText.Rows = 30;
+                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size90x30);
+            }
+            else if (width == 90 && height == 60)
+            {
+                fallBackConsole.mText.Cols = 90;
+                fallBackConsole.mText.Rows = 60;
+                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size90x60);
             }
             else
             {
-                throw new ArgumentException("The value x must be lower than the console width!");
-            }
-        }
-
-        public static int get_CursorSize()
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return 0;
-            }
-            return xConsole.CursorSize;
-        }
-
-        public static void set_CursorSize(int aSize)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            xConsole.CursorSize = aSize;
-        }
-
-        public static int get_CursorTop()
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return 0;
-            }
-            return GetConsole().Y;
-        }
-
-        public static void set_CursorTop(int y)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
+                throw new Exception("Invalid text size.");
             }
 
-            if (y < 0)
-            {
-                throw new ArgumentException("The value y must be at least 0!");
-            }
+            fallBackConsole.Cols = fallBackConsole.mText.Cols;
+            fallBackConsole.Rows = fallBackConsole.mText.Rows;
 
-            if (y < get_WindowHeight())
-            {
-                xConsole.Y = y;
-            }
-            else
-            {
-                throw new ArgumentException("The value y must be lower than the console height!");
-            }
+            ((HAL.TextScreen)fallBackConsole.mText).UpdateWindowSize();
+
+            Clear();
         }
 
-        public static bool get_CursorVisible()
+        public static (int Left, int Top) GetCursorPosition()
         {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                return false;
-            }
-            return GetConsole().CursorVisible;
-        }
-
-        public static void set_CursorVisible(bool value)
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            xConsole.CursorVisible = value;
-        }
-
-
-        //public static TextWriter get_Error() {
-        //    WriteLine("Not implemented: get_Error");
-        //    return null;
-        //}
-
-        public static ConsoleColor get_ForegroundColor()
-        {
-            return mForeground;
-        }
-
-        public static void set_ForegroundColor(ConsoleColor value)
-        {
-            mForeground = value;
-            //Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
-            if (GetConsole() != null)
-            {
-                GetConsole().Foreground = value;
-            }
-        }
-
-        //public static TextReader get_In()
-        //{
-        //    WriteLine("Not implemented: get_In");
-        //    return null;
-        //}
-
-        public static Encoding get_InputEncoding()
-        {
-            return ConsoleInputEncoding;
-        }
-
-        public static void set_InputEncoding(Encoding value)
-        {
-            ConsoleInputEncoding = value;
-        }
-
-        public static Encoding get_OutputEncoding()
-        {
-            return ConsoleOutputEncoding;
-        }
-
-
-        public static void set_OutputEncoding(Encoding value)
-        {
-            ConsoleOutputEncoding = value;
-        }
-
-        public static bool get_KeyAvailable()
-        {
-            return KeyboardManager.KeyAvailable;
-        }
-
-        public static int get_LargestWindowHeight()
-        {
-            throw new NotImplementedException("Not implemented: get_LargestWindowHeight");
-        }
-
-        public static int get_LargestWindowWidth()
-        {
-            throw new NotImplementedException("Not implemented: get_LargestWindowWidth");
-        }
-
-        public static bool get_NumberLock()
-        {
-            return Global.NumLock;
-        }
-
-        //public static TextWriter get_Out() {
-        //    WriteLine("Not implemented: get_Out");
-        //    return null;
-        //}
-
-        public static string get_Title()
-        {
-            throw new NotImplementedException("Not implemented: get_Title");
-        }
-
-        public static void set_Title(string value)
-        {
-            throw new NotImplementedException("Not implemented: set_Title");
-        }
-
-        public static bool get_TreatControlCAsInput()
-        {
-            throw new NotImplementedException("Not implemented: get_TreatControlCAsInput");
-        }
-
-        public static void set_TreatControlCAsInput(bool value)
-        {
-            throw new NotImplementedException("Not implemented: set_TreatControlCAsInput");
-        }
-
-        public static int get_WindowHeight()
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return 25;
-            }
-            return GetConsole().Rows;
-        }
-
-        public static void set_WindowHeight(int value)
-        {
-            throw new NotImplementedException("Not implemented: set_WindowHeight");
-        }
-
-        public static int get_WindowLeft()
-        {
-            throw new NotImplementedException("Not implemented: get_WindowLeft");
-        }
-
-        public static void set_WindowLeft(int value)
-        {
-            throw new NotImplementedException("Not implemented: set_WindowLeft");
-        }
-
-        public static int get_WindowTop()
-        {
-            throw new NotImplementedException("Not implemented: get_WindowTop");
-        }
-
-        public static void set_WindowTop(int value)
-        {
-            throw new NotImplementedException("Not implemented: set_WindowTop");
-        }
-
-        public static int get_WindowWidth()
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return 85;
-            }
-            return GetConsole().Cols;
-        }
-
-        public static void set_WindowWidth(int value)
-        {
-            throw new NotImplementedException("Not implemented: set_WindowWidth");
-        }
-
-        /// <summary>
-        /// The ArgumentOutOfRangeException check is now done at driver level in PCSpeaker - is it still needed here?
-        /// </summary>
-        /// <param name="aFrequency"></param>
-        /// <param name="aDuration"></param>
-        public static void Beep(int aFrequency, int aDuration)
-        {
-            if (aFrequency < 37 || aFrequency > 32767)
-            {
-                throw new ArgumentOutOfRangeException("Frequency must be between 37 and 32767Hz");
-            }
-
-            if (aDuration <= 0)
-            {
-                throw new ArgumentOutOfRangeException("Duration must be more than 0");
-            }
-
-            PCSpeaker.Beep((uint) aFrequency, (uint) aDuration);
-        }
-
-        /// <summary>
-        /// Beep() is pure CIL
-        /// Default implementation beeps for 200 milliseconds at 800 hertz
-        /// In Cosmos, these are Cosmos.System.Duration.Default and Cosmos.System.Notes.Default respectively,
-        /// and are used when there are no params
-        /// https://docs.microsoft.com/en-us/dotnet/api/system.console.beep?view=netcore-2.0
-        /// </summary>
-        public static void Beep()
-        {
-            PCSpeaker.Beep();
-        }
-
-        //TODO: Console uses TextWriter - intercept and plug it instead
-        public static void Clear()
-        {
-            var xConsole = GetConsole();
-            if (xConsole == null)
-            {
-                // for now:
-                return;
-            }
-            GetConsole().Clear();
+            return (CursorLeft, CursorTop);
         }
 
         //  MoveBufferArea(int, int, int, int, int, int) is pure CIL
-
-        public static void MoveBufferArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight,
-            int targetLeft, int targetTop, char sourceChar, ConsoleColor sourceForeColor, ConsoleColor sourceBackColor)
+        public static void MoveBufferArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight, int targetLeft, int targetTop, char sourceChar, ConsoleColor sourceForeColor, ConsoleColor sourceBackColor)
         {
             throw new NotImplementedException("Not implemented: MoveBufferArea");
         }
 
-        //public static Stream OpenStandardError() {
-        //    WriteLine("Not implemented: OpenStandardError");
-        //}
-
-        //public static Stream OpenStandardError(int bufferSize) {
-        //    WriteLine("Not implemented: OpenStandardError");
-        //}
-
-        //public static Stream OpenStandardInput(int bufferSize) {
-        //    WriteLine("Not implemented: OpenStandardInput");
-        //}
-
-        //public static Stream OpenStandardInput() {
-        //    WriteLine("Not implemented: OpenStandardInput");
-        //}
-
-        //public static Stream OpenStandardOutput(int bufferSize) {
-        //    WriteLine("Not implemented: OpenStandardOutput");
-        //}
-
-        //public static Stream OpenStandardOutput() {
-        //    WriteLine("Not implemented: OpenStandardOutput");
-        //}
-
-        public static int Read()
+        private static Cosmos.System.Console GetConsole()
         {
-            // TODO special cases, if needed, that returns -1
-            KeyEvent xResult;
-
-            if (KeyboardManager.TryReadKey(out xResult))
-            {
-                return xResult.KeyChar;
-            }
-            else
-            {
-                return -1;
-            }
-        }
-
-        public static ConsoleKeyInfo ReadKey()
-        {
-            return ReadKey(false);
+            return fallBackConsole;
         }
 
         // ReadKey() pure CIL
-
         public static ConsoleKeyInfo ReadKey(bool intercept)
         {
             var key = KeyboardManager.ReadKey();
@@ -436,6 +322,11 @@ namespace Cosmos.System_Plugs.System
             bool xControl = (key.Modifiers & ConsoleModifiers.Control) == ConsoleModifiers.Control;
 
             return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), xShift, xAlt, xControl);
+        }
+
+        public static ConsoleKeyInfo ReadKey()
+        {
+            return ReadKey(false);
         }
 
         public static string ReadLine()
@@ -547,127 +438,41 @@ namespace Cosmos.System_Plugs.System
 
         public static void ResetColor()
         {
-            set_BackgroundColor(ConsoleColor.Black);
-            set_ForegroundColor(ConsoleColor.White);
+            BackgroundColor = ConsoleColor.Black;
+            ForegroundColor = ConsoleColor.White;
         }
 
-        public static void SetBufferSize(int width, int height)
+        public static int Read()
         {
-            throw new NotImplementedException("Not implemented: SetBufferSize");
-        }
-
-        public static void SetCursorPosition(int left, int top)
-        {
-            set_CursorLeft(left);
-            set_CursorTop(top);
-        }
-
-        public static (int Left, int Top) GetCursorPosition()
-        {
-            int Left = get_CursorLeft();
-            int Top = get_CursorTop();
-
-            return (Left, Top);
-        }
-
-        //public static void SetError(TextWriter newError) {
-        //    WriteLine("Not implemented: SetError");
-        //}
-
-        //public static void SetIn(TextReader newIn) {
-        //    WriteLine("Not implemented: SetIn");
-        //}
-
-        //public static void SetOut(TextWriter newOut) {
-        //    WriteLine("Not implemented: SetOut");
-        //}
-
-        public static void SetWindowPosition(int left, int top)
-        {
-            throw new NotImplementedException("Not implemented: SetWindowPosition");
-        }
-
-        public static void SetWindowSize(int width, int height)
-        {
-            if (width == 40 && height == 25)
+            if (KeyboardManager.TryReadKey(out KeyEvent result))
             {
-                mFallbackConsole.mText.Cols = 40;
-                mFallbackConsole.mText.Rows = 25;
-                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size40x25);
-            }
-            else if (width == 40 && height == 50)
-            {
-                mFallbackConsole.mText.Cols = 40;
-                mFallbackConsole.mText.Rows = 50;
-                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size40x50);
-            }
-            else if (width == 80 && height == 25)
-            {
-                mFallbackConsole.mText.Cols = 80;
-                mFallbackConsole.mText.Rows = 25;
-                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size80x25);
-            }
-            else if (width == 80 && height == 50)
-            {
-                mFallbackConsole.mText.Cols = 80;
-                mFallbackConsole.mText.Rows = 50;
-                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size80x50);
-            }
-            else if (width == 90 && height == 30)
-            {
-                mFallbackConsole.mText.Cols = 90;
-                mFallbackConsole.mText.Rows = 30;
-                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size90x30);
-            }
-            else if (width == 90 && height == 60)
-            {
-                mFallbackConsole.mText.Cols = 90;
-                mFallbackConsole.mText.Rows = 60;
-                Cosmos.System.Graphics.VGAScreen.SetTextMode(Cosmos.HAL.VGADriver.TextSize.Size90x60);
+                return result.KeyChar;
             }
             else
             {
-                throw new Exception("Invalid text size.");
+                return -1;
             }
-            mFallbackConsole.Cols = mFallbackConsole.mText.Cols;
-            mFallbackConsole.Rows = mFallbackConsole.mText.Rows;
-
-            ((Cosmos.HAL.TextScreen)mFallbackConsole.mText).UpdateWindowSize();
-
-            Clear();
         }
 
-        #region Write
-
-        public static void Write(bool aBool)
+        public static void Beep(int frequency, int duration)
         {
-            Write(aBool.ToString());
+            PCSpeaker.Beep((uint)frequency, (uint)duration);
         }
 
-        /*
-         * A .Net character can be effectevily more can one byte so calling the low level Console.Write() will be wrong as
-         * it accepts only bytes, we need to convert it using the specified OutputEncoding but to do this we have to convert
-         * it ToString first
-         */
-        public static void Write(char aChar) => Write(aChar.ToString());
+        /// <summary>
+        /// Beep() is pure CIL
+        /// Default implementation beeps for 200 milliseconds at 800 hertz
+        /// In Cosmos, these are Cosmos.System.Duration.Default and Cosmos.System.Notes.Default respectively,
+        /// and are used when there are no params
+        /// https://docs.microsoft.com/en-us/dotnet/api/system.console.beep?view=netcore-2.0
+        /// </summary>
+        public static void Beep()
+        {
+            PCSpeaker.Beep();
+        }
 
-        public static void Write(char[] aBuffer) => Write(aBuffer, 0, aBuffer.Length);
-
-        /* Decimal type is not working yet... */
-        //public static void Write(decimal aDecimal) => Write(aDecimal.ToString());
-
-        public static void Write(double aDouble) => Write(aDouble.ToString());
-
-        public static void Write(float aFloat) => Write(aFloat.ToString());
-
-        public static void Write(int aInt) => Write(aInt.ToString());
-
-        public static void Write(long aLong) => Write(aLong.ToString());
-
-        /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
-        public static void Write(object value) => Write(value ?? String.Empty);
-
-        public static void Write(string aText)
+        //TODO: Console uses TextWriter - intercept and plug it instead
+        public static void Clear()
         {
             var xConsole = GetConsole();
             if (xConsole == null)
@@ -675,53 +480,8 @@ namespace Cosmos.System_Plugs.System
                 // for now:
                 return;
             }
-
-            byte[] aTextEncoded = ConsoleOutputEncoding.GetBytes(aText);
-            GetConsole().Write(aTextEncoded);
+            GetConsole().Clear();
         }
-
-        public static void Write(uint aInt) => Write(aInt.ToString());
-
-        public static void Write(ulong aLong) => Write(aLong.ToString());
-
-        public static void Write(string format, object arg0) => Write(String.Format(format, arg0));
-
-        public static void Write(string format, object arg0, object arg1) => Write(String.Format(format, arg0, arg1));
-
-        public static void Write(string format, object arg0, object arg1, object arg2) => Write(String.Format(format, arg0, arg1, arg2));
-
-        public static void Write(string format, params object[] arg) => Write(String.Format(format, arg));
-
-        public static void Write(char[] aBuffer, int aIndex, int aCount)
-        {
-            if (aBuffer == null)
-            {
-                throw new ArgumentNullException("aBuffer");
-            }
-            if (aIndex < 0)
-            {
-                throw new ArgumentOutOfRangeException("aIndex");
-            }
-            if (aCount < 0)
-            {
-                throw new ArgumentOutOfRangeException("aCount");
-            }
-            if (aBuffer.Length - aIndex < aCount)
-            {
-                throw new ArgumentException();
-            }
-            for (int i = 0; i < aCount; i++)
-            {
-                Write(aBuffer[aIndex + i]);
-            }
-        }
-
-        //You'd expect this to be on System.Console wouldn't you? Well, it ain't so we just rely on Write(object value)
-        //public static void Write(byte aByte) {
-        //    Write(aByte.ToString());
-        //}
-
-#endregion
 
         #region WriteLine
 
@@ -767,7 +527,104 @@ namespace Cosmos.System_Plugs.System
             WriteLine();
         }
 
-#endregion
+        #endregion
 
+        #region Write
+
+        public static void Write(bool aBool)
+        {
+            Write(aBool.ToString());
+        }
+
+        /*
+         * A .Net character can be effectevily more can one byte so calling the low level Console.Write() will be wrong as
+         * it accepts only bytes, we need to convert it using the specified OutputEncoding but to do this we have to convert
+         * it ToString first
+         */
+        public static void Write(char aChar) => Write(aChar.ToString());
+
+        public static void Write(char[] aBuffer) => Write(aBuffer, 0, aBuffer.Length);
+
+        /* Decimal type is not working yet... */
+        //public static void Write(decimal aDecimal) => Write(aDecimal.ToString());
+
+        public static void Write(double aDouble) => Write(aDouble.ToString());
+
+        public static void Write(float aFloat) => Write(aFloat.ToString());
+
+        public static void Write(int aInt) => Write(aInt.ToString());
+
+        public static void Write(long aLong) => Write(aLong.ToString());
+
+        /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
+        public static void Write(object value) => Write(value ?? String.Empty);
+
+        public static void Write(string aText)
+        {
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
+
+            byte[] aTextEncoded = consoleOutputEncoding.GetBytes(aText);
+            GetConsole().Write(aTextEncoded);
+        }
+
+        public static void Write(uint aInt) => Write(aInt.ToString());
+
+        public static void Write(ulong aLong) => Write(aLong.ToString());
+
+        public static void Write(string format, object arg0) => Write(String.Format(format, arg0));
+
+        public static void Write(string format, object arg0, object arg1) => Write(String.Format(format, arg0, arg1));
+
+        public static void Write(string format, object arg0, object arg1, object arg2) => Write(String.Format(format, arg0, arg1, arg2));
+
+        public static void Write(string format, params object[] arg) => Write(String.Format(format, arg));
+
+        public static void Write(char[] buffer, int index, int count)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("buffer");
+            }
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException("count");
+            }
+            if (buffer.Length - index < count)
+            {
+                throw new ArgumentException();
+            }
+            for (int i = 0; i < count; i++)
+            {
+                Write(buffer[index + i]);
+            }
+        }
+
+        //You'd expect this to be on System.Console wouldn't you? Well, it ain't so we just rely on Write(object value)
+        //public static void Write(byte aByte) {
+        //    Write(aByte.ToString());
+        //}
+
+        #endregion
+
+        #endregion
+
+        #region Fields
+
+        private static readonly Cosmos.System.Console fallBackConsole = new(null);
+        private static Encoding consoleOutputEncoding = Encoding.ASCII;
+        private static Encoding consoleInputEncoding = Encoding.ASCII;
+        private static ConsoleColor foreGround = ConsoleColor.White;
+        private static ConsoleColor backGround = ConsoleColor.Black;
+
+        #endregion
     }
 }
