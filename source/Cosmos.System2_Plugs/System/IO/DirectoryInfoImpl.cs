@@ -15,7 +15,7 @@ namespace Cosmos.System_Plugs.System.IO
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
         public static DirectoryInfo[] GetDirectories(DirectoryInfo directory)
         {
-            Global.FileSystemDebugger.SendInternal($"directory.GetDirectories() on path '{directory.FullName}'.");
+            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetDirectories() on path '{directory.FullName}'.");
             var xEntries = VFSManager.GetDirectoryListing(directory.FullName);
 
             //var result = new DirectoryInfo[xEntries.Count];

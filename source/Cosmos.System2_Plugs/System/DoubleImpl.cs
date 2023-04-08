@@ -1,6 +1,4 @@
-using System;
 using Cosmos.Common;
-using System.Collections.Generic;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
@@ -20,33 +18,45 @@ namespace Cosmos.System_Plugs.System
             //Format of Double string: [whitespace][sign][integral-digits[,]]integral-digits[.[fractional-digits]][E[sign]exponential-digits][whitespace]
 
             //Validate input
-            if (s is null) throw new ArgumentNullException("s can not be null");
+            if (s is null)
+            {
+                throw new ArgumentNullException(nameof(s), "Value can not be null");
+            }
 
             //Remove leading whitespaces
             while (s.Length != 0 && (s[0] == ' ' || s[0] == '\n' || s[0] == '\t'))
             {
-                s = s.Substring(1);
+                s = s[1..];
             }
 
             //Check that string is not finished too early
-            if (s.Length == 0) throw new FormatException();
+            if (s.Length == 0)
+            {
+                throw new FormatException();
+            }
 
             //Check for sign
             short sign = 1;
             if (s[0] == '-')
             {
-                s = s.Substring(1);
+                s = s[1..];
                 sign = -1;
             }
-            else if (s[0] == '+') s = s.Substring(1);
+            else if (s[0] == '+')
+            {
+                s = s[1..];
+            }
 
             //Check that string is not finished too early
-            if (s.Length == 0) throw new FormatException();
+            if (s.Length == 0)
+            {
+                throw new FormatException();
+            }
 
             //Read in number
 
-            List<int> internalDigits = new List<int>();
-            List<int> fractionalDigits = new List<int>();
+            List<int> internalDigits = new();
+            List<int> fractionalDigits = new();
 
             bool foundDecimal = false;
 
@@ -55,15 +65,30 @@ namespace Cosmos.System_Plugs.System
             while (s.Length != 0)
             {
                 char active = s[0];
-                if (active == 'E' || active == 'e' || active == ' ' || active == '\n' || active == '\t') break;
+                if (active == 'E' || active == 'e' || active == ' ' || active == '\n' || active == '\t')
+                {
+                    break;
+                }
 
-                s = s.Substring(1);
-                if (active == '.') foundDecimal = true;
-                else if (active == ',') continue;
+                s = s[1..];
+                if (active == '.')
+                {
+                    foundDecimal = true;
+                }
+                else if (active == ',')
+                {
+                    continue;
+                }
                 else if (active >= '0' && active <= '9')
                 {
-                    if (foundDecimal) fractionalDigits.Add(int.Parse(active.ToString()));
-                    else internalDigits.Add(int.Parse(active.ToString()));
+                    if (foundDecimal)
+                    {
+                        fractionalDigits.Add(int.Parse(active.ToString()));
+                    }
+                    else
+                    {
+                        internalDigits.Add(int.Parse(active.ToString()));
+                    }
                 }
                 else
                 {
@@ -79,11 +104,17 @@ namespace Cosmos.System_Plugs.System
                 //E can only be followed by integers
                 if (s[0] == 'E' || s[0] == 'e')
                 {
-                    multiplier = double.Parse(s.Substring(1));
+                    multiplier = double.Parse(s[1..]);
                     break;
                 }
-                else if (s[0] == ' ' || s[0] == '\n' || s[0] == '\t') s = s.Substring(1);
-                else throw new FormatException();
+                else if (s[0] == ' ' || s[0] == '\n' || s[0] == '\t')
+                {
+                    s = s[1..];
+                }
+                else
+                {
+                    throw new FormatException();
+                }
             }
 
             //Create double

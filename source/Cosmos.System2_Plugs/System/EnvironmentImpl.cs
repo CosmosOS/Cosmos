@@ -8,6 +8,7 @@ namespace Cosmos.System_Plugs.System
     {
         #region Properties
 
+        // We still need to add support for ".." and "." here, best method when ".." is detected is just remove last directory from current instead of adding the literal "..".
         public static string CurrentDirectory
         {
             get => Directory.GetCurrentDirectory();
