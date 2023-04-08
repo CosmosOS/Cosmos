@@ -15,8 +15,8 @@ namespace Cosmos.System_Plugs.System.IO
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
         public static DirectoryInfo[] GetDirectories(DirectoryInfo directory)
         {
-            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetDirectories() on path '{thisContext.FullName}'.");
-            var xEntries = VFSManager.GetDirectoryListing(thisContext.FullName);
+            Global.FileSystemDebugger.SendInternal($"directory.GetDirectories() on path '{thisContext.FullName}'.");
+            var xEntries = VFSManager.GetDirectoryListing(directory.FullName);
 
             //var result = new DirectoryInfo[xEntries.Count];
             List<DirectoryInfo> result = new();
@@ -35,8 +35,8 @@ namespace Cosmos.System_Plugs.System.IO
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
         public static FileInfo[] GetFiles(DirectoryInfo directory)
         {
-            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path '{thisContext.FullName}'.");
-            var xEntries = VFSManager.GetDirectoryListing(thisContext.FullName);
+            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path '{directory.FullName}'.");
+            var xEntries = VFSManager.GetDirectoryListing(directory.FullName);
 
             List<FileInfo> result = new();
 
@@ -55,8 +55,8 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static FileSystemInfo[] GetFileSystemInfos(DirectoryInfo directory)
         {
-            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path '{thisContext.FullName}'.");
-            var xEntries = VFSManager.GetDirectoryListing(thisContext.FullName);
+            Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path '{directory.FullName}'.");
+            var xEntries = VFSManager.GetDirectoryListing(directory.FullName);
 
             List<FileSystemInfo> result = new();
 
