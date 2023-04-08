@@ -13,7 +13,7 @@ namespace Cosmos.System_Plugs.System.IO
     public static class DirectoryInfoImpl
     {
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
-        public static DirectoryInfo[] GetDirectories(DirectoryInfo thisContext)
+        public static DirectoryInfo[] GetDirectories(DirectoryInfo directory)
         {
             Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetDirectories() on path '{thisContext.FullName}'.");
             var xEntries = VFSManager.GetDirectoryListing(thisContext.FullName);
@@ -33,7 +33,7 @@ namespace Cosmos.System_Plugs.System.IO
         }
 
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
-        public static FileInfo[] GetFiles(DirectoryInfo thisContext)
+        public static FileInfo[] GetFiles(DirectoryInfo directory)
         {
             Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path '{thisContext.FullName}'.");
             var xEntries = VFSManager.GetDirectoryListing(thisContext.FullName);
@@ -53,7 +53,7 @@ namespace Cosmos.System_Plugs.System.IO
             return result.ToArray();
         }
 
-        public static FileSystemInfo[] GetFileSystemInfos(DirectoryInfo thisContext)
+        public static FileSystemInfo[] GetFileSystemInfos(DirectoryInfo directory)
         {
             Global.FileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path '{thisContext.FullName}'.");
             var xEntries = VFSManager.GetDirectoryListing(thisContext.FullName);
