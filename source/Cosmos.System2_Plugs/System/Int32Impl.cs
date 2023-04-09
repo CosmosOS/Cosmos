@@ -1,7 +1,4 @@
-using System;
-
 using Cosmos.Common;
-
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
@@ -108,7 +105,7 @@ namespace Cosmos.System_Plugs.System
         {
             try
             {
-                result = Int32.Parse(s);
+                result = int.Parse(s);
                 return true;
             }
             catch

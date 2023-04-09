@@ -1,12 +1,6 @@
-﻿// #define COSMOSDEBUG
-using Cosmos.System;
-using Cosmos.System.FileSystem;
-using Cosmos.System.FileSystem.VFS;
+﻿using Cosmos.System.FileSystem.VFS;
 using IL2CPU.API.Attribs;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using Cosmos.System;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -15,30 +9,35 @@ namespace Cosmos.System_Plugs.System.IO
     {
         public static string NormalizeDriveName(string driveName)
         {
-            string name;
+            string Name;
 
             if (driveName.Length == 1)
-                name = driveName + ":\\";
+            {
+                Name = driveName + ":\\";
+            }
             else
             {
-                name = Path.GetPathRoot(driveName);
+                Name = Path.GetPathRoot(driveName);
+
                 // Disallow null or empty drive letters and UNC paths
-                if (name == null || name.Length == 0 || name.StartsWith("\\\\", StringComparison.Ordinal))
+                if (Name == null || Name.Length == 0 || Name.StartsWith("\\\\", StringComparison.Ordinal))
+                {
                     throw new ArgumentException("Argument must be drive identifier or root dir");
+                }
             }
             // We want to normalize to have a trailing backslash so we don't have two equivalent forms and
             // because some Win32 API don't work without it.
-            if (name.Length == 2 && name[1] == ':')
+            if (Name.Length == 2 && Name[1] == ':')
             {
-                name = name + "\\";
+                Name += '\\';
             }
 
-            if (!VFSManager.IsValidDriveId(name))
+            if (!VFSManager.IsValidDriveId(Name))
             {
                 throw new ArgumentException("Argument must be drive identifier or root dir");
             }
 
-            return name;
+            return Name;
         }
 
         public static long get_AvailableFreeSpace(DriveInfo aThis)
