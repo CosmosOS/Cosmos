@@ -8,14 +8,14 @@ namespace Cosmos.Debug.Kernel
     /// </summary>
     class ConsoleDebugger : Debugger
     {
-        public ConsoleDebugger(string aRing, string aSection) : base(aRing, aSection)
+        public ConsoleDebugger(string section) : base(section)
         {
 
         }
 
         void WriteText(string message)
         {
-            Console.WriteLine($"[{Ring}][{Section}]: {message}");
+            Console.WriteLine($"[{Section}]: {message}");
         }
 
         public override void SendInternal(double aNumber)

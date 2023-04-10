@@ -7,9 +7,11 @@ namespace Cosmos.System
 	/// </summary>
     public static class VMTools
     {
+        #region Properties
+
         /// <summary>
-		/// Whether or not the VirtualBox virtualizer has been detected.
-		/// </summary>
+        /// Whether or not the VirtualBox virtualizer has been detected.
+        /// </summary>
         public static bool IsVirtualBox => GetIsVirtualBox();
 
         /// <summary>
@@ -21,6 +23,10 @@ namespace Cosmos.System
 		/// Whether or not the QEMU virtualizer has been detected.
 		/// </summary>
         public static bool IsQEMU => GetIsQEMU();
+
+        #endregion
+
+        #region Methods
 
         // NOTE: @ascpixi: A better way to scan for virtualizers would be
         //       to read the CPUID leaf 0x40000000. This leaf is dedicated
@@ -60,5 +66,7 @@ namespace Cosmos.System
             }
             return false;
         }
+
+        #endregion
     }
 }

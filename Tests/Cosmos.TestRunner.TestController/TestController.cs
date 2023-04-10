@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using Cosmos.Debug.Kernel;
+using System;
 
 namespace Cosmos.TestRunner
 {
     public static class TestController
     {
-        static Debugger debugger = new("Tests", "TestController");
+        static readonly Debugger debugger = new("TestController");
+
         internal static Debugger Debugger
         {
             get
@@ -25,8 +23,7 @@ namespace Cosmos.TestRunner
             Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestCompleted);
             Debugger.Send("Test completed");
             Console.WriteLine("Test completed");
-            while (true)
-                ;
+            while (true) ;
         }
 
         public static void Failed()
@@ -34,8 +31,7 @@ namespace Cosmos.TestRunner
             Debugger.Send("Failed");
             Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestFailed);
             Debugger.DoBochsBreak();
-            while (true)
-                ;
+            while (true) ;
         }
 
         internal static void AssertionSucceeded()

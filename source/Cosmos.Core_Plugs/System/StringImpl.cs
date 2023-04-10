@@ -11,7 +11,7 @@ namespace Cosmos.Core_Plugs.System
     [Plug(Target = typeof(string))]
     public static class StringImpl
     {
-        internal static Debugger mDebugger = new Debugger("Core", "String Plugs");
+        internal static Debugger mDebugger = new("String Plug");
 
         public static unsafe void Ctor(string aThis, char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,

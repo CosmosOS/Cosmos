@@ -1,4 +1,3 @@
-//#define COSMOSDEBUG
 using System;
 
 using Cosmos.Core;
@@ -6,9 +5,9 @@ using Cosmos.Core_Asm.MemoryOperations;
 
 using IL2CPU.API.Attribs;
 
-namespace Cosmos.Core_Plugs.MemoryOperations
+namespace Cosmos.Core_Plugs
 {
-    [Plug(Target = typeof(Cosmos.Core.MemoryOperations))]
+    [Plug(Target = typeof(MemoryOperations))]
     public static unsafe class MemoryOperationsImpl
     {
         [PlugMethod(Assembler = typeof(MemoryOperationsFill16BlocksAsm))]
@@ -741,13 +740,13 @@ namespace Cosmos.Core_Plugs.MemoryOperations
 
         unsafe public static void Copy(byte* dest, byte* src, int size)
         {
-            Global.mDebugger.SendInternal("Copying array of size " + size + " ...");
+            Global.debugger.SendInternal("Copying array of size " + size + " ...");
 
             if (size < 129)
             {
-                Global.mDebugger.SendInternal("Size less than 129 bytes Calling CopyTiny...");
+                Global.debugger.SendInternal("Size less than 129 bytes Calling CopyTiny...");
                 CopyTiny(dest, src, size);
-                Global.mDebugger.SendInternal("CopyTiny returned");
+                Global.debugger.SendInternal("CopyTiny returned");
                 return;
             }
 
@@ -760,7 +759,7 @@ namespace Cosmos.Core_Plugs.MemoryOperations
 #else
             var xBlocksNum = Math.DivRem(size, xBlockSize, out xByteRemaining);
 #endif
-            Global.mDebugger.SendInternal($"size {size} is composed of {xBlocksNum} blocks of {xBlockSize} bytes with {xByteRemaining} remainder");
+            Global.debugger.SendInternal($"size {size} is composed of {xBlocksNum} blocks of {xBlockSize} bytes with {xByteRemaining} remainder");
 
             // TODO call Copy128Blocks()
             for (int i = 0; i < xByteRemaining; i++)
@@ -768,10 +767,10 @@ namespace Cosmos.Core_Plugs.MemoryOperations
                 *(dest + i) = *(src + i);
             }
 
-            Global.mDebugger.SendInternal("Calling Copy128Blocks...");
+            Global.debugger.SendInternal("Calling Copy128Blocks...");
             /* Let's call the assembler version now to do the 128 byte block copies */
             Copy128Blocks(dest + xByteRemaining, src + xByteRemaining, xBlocksNum);
-            Global.mDebugger.SendInternal("Copy128Blocks returned");
+            Global.debugger.SendInternal("Copy128Blocks returned");
         }
     }
 }

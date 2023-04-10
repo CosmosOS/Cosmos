@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
@@ -13,10 +12,10 @@ namespace Cosmos.Core
     /// </summary>
     public static class CPU
     {
-        // Amount of RAM in MB's.
+        // Amount of RAM in MBs.
         // needs to be static, as Heap needs it before we can instantiate objects
         /// <summary>
-        /// Get amount of RAM in MB's.
+        /// Get amount of RAM in MBs.
         /// </summary>
         public static uint GetAmountOfRAM()
         {
@@ -256,7 +255,7 @@ namespace Cosmos.Core
                 }
                 if (value == 0)
                 {
-                    if (Double.TryParse(word, out value) || Double.TryParse(word.Substring(0, word.Length - 3), out value))
+                    if (double.TryParse(word, out value) || double.TryParse(word[0..^3], out value))
                     {
                         break;
                     }
@@ -265,7 +264,7 @@ namespace Cosmos.Core
             value *= multiplier;
             if ((long)value == 0)
             {
-                Global.mDebugger.Send("Unable to calculate cycle speed from " + s);
+                Global.debugger.Send("Unable to calculate cycle speed from " + s);
                 throw new NotSupportedException("Unable to calculate cycle speed from " + s);
             }
             return (long)value;

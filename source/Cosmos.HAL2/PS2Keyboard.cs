@@ -24,7 +24,7 @@ namespace Cosmos.HAL
         public byte PS2Port { get; }
 
         private PS2Controller mPS2Controller = Global.PS2Controller;
-        private Debugger mDebugger = new Debugger("HAL", "PS2Keyboard");
+        private Debugger mDebugger = new("PS2Keyboard");
 
         internal PS2Keyboard(byte aPort)
         {
@@ -45,10 +45,10 @@ namespace Cosmos.HAL
 
             SendCommand(Command.EnableScanning);
 
-            Global.mDebugger.SendInternal("(PS/2 Keyboard) Initialized");
+            Global.debugger.SendInternal("(PS/2 Keyboard) Initialized");
 
             UpdateLeds();
-            Global.mDebugger.SendInternal("(PS/2 Keyboard) Leds updated");
+            Global.debugger.SendInternal("(PS/2 Keyboard) Leds updated");
         }
 
         private void HandleIRQ(ref INTs.IRQContext aContext)

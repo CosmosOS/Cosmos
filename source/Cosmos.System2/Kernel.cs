@@ -13,7 +13,7 @@ public abstract class Kernel
     /// <summary>
     /// User ring debugger instance, with the tag "Kernel".
     /// </summary>
-    public readonly Debugger mDebugger = new("User", "Kernel");
+    public readonly Debugger mDebugger = new("Kernel");
 
     // Set after initial start. Can be started and stopped at same time
     protected bool mStarted;
@@ -56,7 +56,7 @@ public abstract class Kernel
 
             mStarted = true;
 
-            if (String.Empty == null)
+            if (string.Empty == null)
             {
                 throw new Exception("Compiler didn't initialize System.String.Empty!");
             }
