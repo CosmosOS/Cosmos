@@ -1,5 +1,4 @@
-﻿//#define COSMOSDEBUG
-using System.Text;
+﻿using System.Text;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.ExtendedASCII
@@ -13,7 +12,7 @@ namespace Cosmos.System.ExtendedASCII
     public class CosmosEncodingProvider : EncodingProvider
     {
         static readonly EncodingProvider singleton = new CosmosEncodingProvider();
-        static readonly Debugger debugger = new("System", "CosmosEncodingProvider");
+        static readonly Debugger debugger = new("CosmosEncodingProvider");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CosmosEncodingProvider"/> class.

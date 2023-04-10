@@ -20,15 +20,15 @@ namespace Cosmos.Debug.Kernel
         /// </summary>
         /// <param name="ring">The virtual compile-time ring the debugger is operating in.</param>
         /// <param name="section">The section the debugger refers to.</param>
-        public static Debugger CreateDebugger(string ring = "", string section = "")
+        public static Debugger CreateDebugger(string section = "")
         {
             if (WriteToConsole)
             {
-                return new ConsoleDebugger(ring, section);
+                return new ConsoleDebugger(section);
             }
             else
             {
-                return new Debugger(ring, section);
+                return new Debugger(section);
             }
         }
     }
@@ -44,17 +44,10 @@ namespace Cosmos.Debug.Kernel
         /// </summary>
         /// <param name="ring">The virtual compile-time ring the debugger is operating in.</param>
         /// <param name="section">The section the debugger refers to.</param>
-        public Debugger(string ring, string section)
+        public Debugger(string section)
         {
-            Ring = ring;
             Section = section;
         }
-
-        /// <summary>
-        /// The virtual compile-time ring the debugger is operating in. This value acts like
-        /// a label, and can be virtually any string.
-        /// </summary>
-        public string Ring { get; }
 
         /// <summary>
         /// The section the debugger refers to.

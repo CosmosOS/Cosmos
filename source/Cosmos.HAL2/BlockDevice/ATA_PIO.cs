@@ -142,7 +142,7 @@ namespace Cosmos.HAL.BlockDevice
 		}
 		#endregion
 
-	    internal static Debugger mDebugger = new Debugger("HAL", "AtaPio");
+	    internal static Debugger mDebugger = new("AtaPIO");
 
         /// <summary>
         /// Internal Debugger method

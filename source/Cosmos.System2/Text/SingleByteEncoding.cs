@@ -10,7 +10,7 @@ namespace Cosmos.System.ExtendedASCII
     /// </summary>
     internal class SingleByteEncoding : Encoding
     {
-        static readonly Debugger mDebugger = new("System", "SingleByteEncoding");
+        static readonly Debugger mDebugger = new("SingleByteEncoding");
 
         /// <summary>
         /// The code page table.

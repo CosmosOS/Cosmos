@@ -20,7 +20,7 @@ namespace Cosmos.System_Plugs.System
 
         //Following functions which have been implemented in this file are functions taken from http://www.netlib.org/fdlibm/ and have then be changed to work in C#
         //Acos, Asin, Cos, _cos,  __ieee754_rem_pio2, __kernel_rem_pio2, Scalbn, Log base e, Sin, _sin, exp, atan
-        internal static Debugger mDebugger = new Debugger("System", "Math Plugs");
+        internal static Debugger mDebugger = new("Math");
 
         #region Internal Constants
 
