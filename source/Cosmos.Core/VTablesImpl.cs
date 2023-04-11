@@ -98,8 +98,10 @@ namespace Cosmos.Core
 
         public static void SetTypeInfo(int aType, uint aBaseType, uint aSize, uint aInterfaceCount, uint[] aInterfaceIndexes,
           uint aMethodCount, uint[] aMethodIndexes, uint[] aMethodAddresses,
-          uint aInterfaceMethodCount, uint[] aInterfaceMethodIndexes, uint[] aTargetMethodIndexes, uint aGCFieldCount,
-          uint[] aGCFieldOffsets, uint[] aGCFieldTypes, bool aIsValueType, bool aIsStruct, string aName, string aAssemblyQualifiedName)
+          uint aInterfaceMethodCount, uint[] aInterfaceMethodIndexes, uint[] aTargetMethodIndexes,
+          uint aEnumEntriesCount, uint[] aEnumValues, uint[] aEnumValueNames,
+          uint aGCFieldCount,
+          uint[] aGCFieldOffsets, uint[] aGCFieldTypes, bool aIsEnum, bool aIsValueType, bool aIsStruct, string aName, string aAssemblyQualifiedName)
         {
             var vTable = new VTable();
             vTable.BaseTypeIdentifier = aBaseType;
@@ -112,11 +114,18 @@ namespace Cosmos.Core
             vTable.InterfaceMethodCount = aInterfaceMethodCount;
             vTable.InterfaceMethodIndexes = aInterfaceMethodIndexes;
             vTable.TargetMethodIndexes = aTargetMethodIndexes;
+
+            vTable.EnumEntryCount = aEnumEntriesCount;
+            vTable.EnumValues = aEnumValues;
+            vTable.EnumValueNames = aEnumValueNames;
+
+            vTable.IsEnum = aIsEnum;
             vTable.IsValueType = aIsValueType;
             vTable.IsStruct = aIsStruct;
             vTable.Name = aName;
             vTable.AssemblyQualifiedName = aAssemblyQualifiedName;
             mTypes[aType] = vTable;
+
             var gcTable = new GCTable();
             gcTable.GCFieldCount = aGCFieldCount;
             gcTable.GCFieldOffsets = aGCFieldOffsets;
@@ -142,6 +151,24 @@ namespace Cosmos.Core
             if (mTypes[aType].MethodIndexes[aMethodIndex] != aMethodIdentifier)
             {
                 DebugAndHalt("Setting method info failed! (1)");
+            }
+        }
+
+        public static void SetEnumInfo(int aType, int aEnumEntryIndex, uint aEnumValue0, uint aEnumValue1) {
+            mTypes[aType].EnumValues[aEnumEntryIndex] = aEnumValue0;
+            mTypes[aType].EnumValues[aEnumEntryIndex+1] = aEnumValue1;
+
+
+            if (mTypes[aType].EnumValues[aEnumEntryIndex] != aEnumValue0) {
+                DebugAndHalt("Setting enum info failed!");
+            }
+        }
+
+        public static void SetEnumNamePartial(int aType, int aEnumNameIndex, uint value) {
+            mTypes[aType].EnumValues[aEnumNameIndex] = value;
+
+            if (mTypes[aType].EnumValues[aEnumNameIndex] != value) {
+                DebugAndHalt("Setting enum value name failed!");
             }
         }
 
@@ -411,6 +438,44 @@ namespace Cosmos.Core
             }
             return -1;
         }
+
+        /// <summary>
+        /// Gets the name of a specified enum value
+        /// </summary>
+        /// <param name="aType">The type id</param>
+        /// <param name="aCastedValue">The value casted from its original type</param>
+        /// <returns>The enum string value if found, otherwise string.Empty</returns>
+        public static string GetEnumValueString(uint aType, ulong aCastedValue) {
+            if (aType >= mTypes.Length) {
+                EnableDebug = true;
+                DebugAndHalt("Requested GetEnumValueString for invalid aObjectType: " + aType);
+                throw new IndexOutOfRangeException();
+            }
+
+            var type = mTypes[aType];
+
+            for(var i = 0; i < type.EnumValues.Length; i++) {
+                byte[] rawBytes = BitConverter.GetBytes(aCastedValue);
+                uint uint0 = BitConverter.ToUInt32(rawBytes, 0);
+                uint uint1 = BitConverter.ToUInt32(rawBytes, 4);
+
+                if (type.EnumValues[(i * 2)] == uint0 && type.EnumValues[(i*2)+1] == uint1) {
+                    return GetStringFromUintArray(type.EnumValueNames, i * 16, 16);
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static string GetStringFromUintArray(uint[] array, int offset, int count) {
+            StringBuilder sb = new(count * 4);
+
+            for(int i = offset; i < offset+count; i++) {
+                sb.Append(Encoding.ASCII.GetString(BitConverter.GetBytes(array[i])));
+            }
+
+            return sb.ToString();
+        }
     }
 
     public struct VTable
@@ -431,6 +496,11 @@ namespace Cosmos.Core
         public uint[] InterfaceMethodIndexes;
         public uint[] TargetMethodIndexes;
 
+        public uint EnumEntryCount; // Can be 0 if IsEnum == false
+        public uint[] EnumValues; // EnumValues contains the numeric keys (2x uints as we store all as ulongs for compatibility)
+        public uint[] EnumValueNames; // EnumValueNames contains the string keys as 16x uints stored at the (index in EnumValues*16)
+
+        public bool IsEnum;
         public bool IsValueType;
         public bool IsStruct;
     }

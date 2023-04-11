@@ -29,6 +29,7 @@
         <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.DiskManager\Cosmos.Kernel.Tests.DiskManager.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
         <ProjectReference Include="..\Kernels\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
+        <ProjectReference Include="..\Kernels\EnumTest\EnumTest.csproj" />
         <ProjectReference Include="..\Kernels\GraphicTest\GraphicTest.csproj" />
         <ProjectReference Include="..\Kernels\NetworkTest\NetworkTest.csproj" />
         <ProjectReference Include="..\Kernels\ProcessorTests\ProcessorTests.csproj" />
