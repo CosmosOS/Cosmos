@@ -697,6 +697,7 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// Validates that the given coordinates are in-range of the canvas, and
         /// throws an exception if the coordinates are out-of-bounds.
+        /// </summary>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the coordinates are invalid.</exception>
