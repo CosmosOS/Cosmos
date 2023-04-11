@@ -99,7 +99,7 @@ namespace Cosmos.Core
         public static void SetTypeInfo(int aType, uint aBaseType, uint aSize, uint aInterfaceCount, uint[] aInterfaceIndexes,
           uint aMethodCount, uint[] aMethodIndexes, uint[] aMethodAddresses,
           uint aInterfaceMethodCount, uint[] aInterfaceMethodIndexes, uint[] aTargetMethodIndexes,
-          uint aEnumEntriesCount, uint[] aEnumValues, uint[] aEnumValueNames,
+          uint aEnumEntriesCount, uint[] aEnumValues, uint[] aEnumValueNames, uint aEnumUnderlyingTypeIdentifier,
           uint aGCFieldCount,
           uint[] aGCFieldOffsets, uint[] aGCFieldTypes, bool aIsEnum, bool aIsValueType, bool aIsStruct, string aName, string aAssemblyQualifiedName)
         {
@@ -118,6 +118,7 @@ namespace Cosmos.Core
             vTable.EnumEntryCount = aEnumEntriesCount;
             vTable.EnumValues = aEnumValues;
             vTable.EnumValueNames = aEnumValueNames;
+            vTable.EnumUnderlyingTypeIdentifier = aEnumUnderlyingTypeIdentifier;
 
             vTable.IsEnum = aIsEnum;
             vTable.IsValueType = aIsValueType;
@@ -364,6 +365,24 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Gets the underlying type id of an enum
+        /// </summary>
+        /// <param name="aType"></param>
+        /// <returns></returns>
+        public static uint GetEnumUnderlyingType(uint aType) {
+            return mTypes[aType].EnumUnderlyingTypeIdentifier;
+        }
+
+        /// <summary>
+        /// Determine if Type is an Enum
+        /// </summary>
+        /// <param name="aType"></param>
+        /// <returns></returns>
+        public static bool IsEnum(uint aType) {
+            return mTypes[aType].IsEnum;
+        }
+
+        /// <summary>
         /// Determine if Type is a ValueType
         /// </summary>
         /// <param name="aType"></param>
@@ -506,6 +525,7 @@ namespace Cosmos.Core
         public uint EnumEntryCount; // Can be 0 if IsEnum == false
         public uint[] EnumValues; // EnumValues contains the numeric keys (2x uints as we store all as ulongs for compatibility)
         public uint[] EnumValueNames; // EnumValueNames contains the string keys as 16x uints stored at the (index in EnumValues*16)
+        public uint EnumUnderlyingTypeIdentifier;
 
         public bool IsEnum;
         public bool IsValueType;

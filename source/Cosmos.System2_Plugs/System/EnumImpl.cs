@@ -1,4 +1,6 @@
+using System.Runtime.CompilerServices;
 using Cosmos.Core;
+using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
@@ -18,8 +20,24 @@ namespace Cosmos.System_Plugs.System
         }
 
         public static string ToString(Enum aThis) {
-            var vtableTypeId = VTablesImpl.GetType(aThis.GetType().Name); // is there a way to directly get the type id?
-            return VTablesImpl.GetEnumValueString(vtableTypeId, aThis.);
+            var vtableTypeId = (uint)VTablesImpl.GetType(aThis.GetType().Name);
+            var value = (ulong)((object)aThis);                                
+                                                                               
+            Debugger debugger = new("enum.tostring");
+            debugger.Send("=== Enum.ToString ===");
+            debugger.Send("GetType().Name: " + aThis.GetType().Name);
+
+            debugger.Send("GetType().AssemblyQualifiedName: " + aThis.GetType().AssemblyQualifiedName);
+
+            debugger.Send("VTableId: " + vtableTypeId.ToString());
+
+            debugger.Send("VTable.GetName: " + VTablesImpl.GetName(vtableTypeId));
+            debugger.Send("VTable.GetName+1: " + VTablesImpl.GetName(vtableTypeId+1));
+            debugger.Send("VTable.GetName-1: " + VTablesImpl.GetName(vtableTypeId-1));
+
+            debugger.Send("Value: " + value.ToString());
+
+            return VTablesImpl.GetEnumValueString(vtableTypeId, value);
         }
 
         public static string ToString(Enum aThis, string format) => aThis.ToString();

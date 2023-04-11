@@ -38,6 +38,12 @@ namespace EnumTests {
             Assert.AreNotEqual(typeId, unchecked((uint)-1), "TestEnum was resolved to not -1");
             Console.WriteLine((byte)VTablesImpl.GetEnumValueString(typeId, (uint)(byte)60)[12]);
             Assert.AreEqual("CANCEL", VTablesImpl.GetEnumValueString(typeId, (uint)(byte)60), "VTablesImpl.GetEnumValueString returned proper string");
+
+            Enum enumInstance = (Enum)(object)TestEnum.RESUME;
+            Assert.AreEqual("TestEnum", (enumInstance as Enum).GetType().Name, "GetType() returns proper name; returned " + (enumInstance as Enum).GetType().Name);
+            Assert.AreEqual(61, (ulong)((object)(enumInstance)), "Can get value of System.Enum");
+
+            Assert.AreEqual("RESUME", TestEnum.RESUME.ToString(), "Enum.ToString works correctly");
         }
     }
 
