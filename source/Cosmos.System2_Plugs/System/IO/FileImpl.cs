@@ -1,5 +1,5 @@
-using GCImplementation = Cosmos.Core.GCImplementation;
 using IL2CPU.API.Attribs;
+using IL2CPU.API;
 using Cosmos.System;
 
 namespace Cosmos.System_Plugs.System.IO
@@ -14,41 +14,37 @@ namespace Cosmos.System_Plugs.System.IO
          */
         public static void WriteAllLines(string path, string[] contents)
         {
-            string fullPath = Path.GetFullPath(path);
-
-            if (string.IsNullOrEmpty(fullPath))
+            if (path == null)
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (contents.Length == 0)
+            if (contents == null)
             {
-                File.Create(fullPath);
-                return;
+                throw new ArgumentNullException(nameof(contents));
+            }
+            if (path.Length == 0)
+            {
+                throw new ArgumentException("Empty", nameof(path));
             }
 
             Global.FileSystemDebugger.SendInternal("Writing contents");
 
-            StreamWriter Writer = new(fullPath);
+            StreamWriter Writer = new(path);
 
             foreach (var current in contents)
             {
                 Writer.WriteLine(current);
             }
 
-            GCImplementation.Free(fullPath);
-
             Writer.Dispose();
         }
 
         public static void WriteAllBytes(string path, byte[] aData)
         {
-            string fullPath = Path.GetFullPath(path);
-
-            BinaryWriter Writer = new(new FileStream(fullPath, FileMode.OpenOrCreate));
+            BinaryWriter Writer = new(new FileStream(path, FileMode.OpenOrCreate));
 
             Writer.Write(aData);
 
-            GCImplementation.Free(fullPath);
             Writer.Dispose();
         }
     }

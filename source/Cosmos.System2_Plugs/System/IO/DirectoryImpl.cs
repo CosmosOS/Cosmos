@@ -1,8 +1,8 @@
-using GCImplementation = Cosmos.Core.GCImplementation;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 using Cosmos.System;
 using IL2CPU.API.Attribs;
+using IL2CPU.API;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -19,46 +19,19 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void SetCurrentDirectory(string path)
         {
-            if (Path.IsPathRooted(path))
-            {
-                currentDirectory = string.Empty;
-            }
-
-            // Create as referencable variable to prevent memory leaks.
-            string[] Sections = path.Split(Path.DirectorySeparatorChar);
-
-            foreach (string Section in Sections)
-            {
-                currentDirectory = Section switch
-                {
-                    ".." => currentDirectory[..currentDirectory[..^1].LastIndexOf(Path.DirectorySeparatorChar)] + Path.DirectorySeparatorChar,
-                    "." => string.Empty,
-                    _ => currentDirectory + Section + (Section.EndsWith(Path.DirectorySeparatorChar) ? string.Empty : Path.DirectorySeparatorChar),
-                };
-            }
-
-            currentDirectory = Path.GetFullPath(currentDirectory);
-
-            // Free the temporary array.
-            GCImplementation.Free(Sections);
-
             Global.FileSystemDebugger.SendInternal($"Directory.SetCurrentDirectory : path = {path}");
+            currentDirectory = path;
         }
 
         public static bool Exists(string path)
         {
-            if (string.IsNullOrEmpty(path))
+            if (path == null)
             {
                 return false;
             }
 
-            string fullPath = Path.GetFullPath(path);
-
-            Global.FileSystemDebugger.SendInternal($"Directory.Exists : path = {fullPath}");
-
-            bool returnValue = VFSManager.DirectoryExists(fullPath);
-            GCImplementation.Free(fullPath);
-            return returnValue;
+            Global.FileSystemDebugger.SendInternal($"Directory.Exists : aPath = {path}");
+            return VFSManager.DirectoryExists(path);
         }
 
         public static DirectoryInfo CreateDirectory(string path)
@@ -66,42 +39,47 @@ namespace Cosmos.System_Plugs.System.IO
             Global.FileSystemDebugger.SendInternal($"-- Directory.CreateDirectory --");
             Global.FileSystemDebugger.SendInternal($"path = {path}");
 
-            if (string.IsNullOrEmpty(path))
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            if (path.Length == 0)
             {
                 throw new ArgumentException("Path must not be empty.", nameof(path));
             }
 
-            string fullPath = Path.GetFullPath(path);
-
-            DirectoryEntry entry = VFSManager.CreateDirectory(fullPath);
+            DirectoryEntry entry = VFSManager.CreateDirectory(path);
 
             if (entry == null)
             {
                 return null;
             }
 
-            GCImplementation.Free(entry);
-
-            return new DirectoryInfo(fullPath);
+            return new DirectoryInfo(path);
         }
 
-        public static void Delete(string path)
+        public static void Delete(string aPath)
         {
-            string fullPath = Path.GetFullPath(path);
-            Delete(fullPath, false);
-            GCImplementation.Free(fullPath);
+            Delete(aPath, false);
         }
 
         public static void Delete(string path, bool recursive)
         {
             string fullPath = Path.GetFullPath(path);
+
             VFSManager.DeleteDirectory(fullPath, recursive);
-            GCImplementation.Free(fullPath);
         }
 
         public static DirectoryInfo GetParent(string path)
         {
             Global.FileSystemDebugger.SendInternal("Directory.GetParent:");
+
+            if (path == null)
+            {
+                Global.FileSystemDebugger.SendInternal("Directory.GetParent : path is null");
+                throw new ArgumentNullException(nameof(path));
+            }
 
             if (string.IsNullOrEmpty(path))
             {
@@ -113,8 +91,6 @@ namespace Cosmos.System_Plugs.System.IO
 
             string fullPath = Path.GetFullPath(path);
             string parentDirectory = Path.GetDirectoryName(fullPath);
-            GCImplementation.Free(fullPath);
-
             if (parentDirectory == null)
             {
                 Global.FileSystemDebugger.SendInternal("Directory.GetParent : Parent Directory is null");
@@ -127,17 +103,13 @@ namespace Cosmos.System_Plugs.System.IO
         public static string[] GetDirectories(string path)
         {
             Global.FileSystemDebugger.SendInternal("Directory.GetDirectories");
-
             if (path == null)
             {
                 throw new ArgumentNullException(path);
             }
 
-            string fullPath = Path.GetFullPath(path);
-
             List<string> directories = new();
-            List<DirectoryEntry> entries = VFSManager.GetDirectoryListing(fullPath);
-            GCImplementation.Free(fullPath);
+            List<DirectoryEntry> entries = VFSManager.GetDirectoryListing(path);
 
             for (int i = 0; i < entries.Count; i++)
             {
@@ -153,17 +125,13 @@ namespace Cosmos.System_Plugs.System.IO
         public static string[] GetFiles(string path)
         {
             Global.FileSystemDebugger.SendInternal("Directory.GetFiles");
-
             if (path == null)
             {
                 throw new ArgumentNullException(path);
             }
 
-            string fullPath = Path.GetFullPath(path);
-
             List<string> files = new();
-            List<DirectoryEntry> entries = VFSManager.GetDirectoryListing(fullPath);
-            GCImplementation.Free(fullPath);
+            List<DirectoryEntry> entries = VFSManager.GetDirectoryListing(path);
 
             for (int i = 0; i < entries.Count; i++)
             {
@@ -180,7 +148,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         #region Fields
 
-        private static string currentDirectory = "0:\\";
+        private static string currentDirectory = string.Empty;
 
         #endregion
     }
