@@ -155,19 +155,19 @@ namespace Cosmos.Core
         }
 
         public static void SetEnumInfo(int aType, int aEnumEntryIndex, uint aEnumValue0, uint aEnumValue1) {
-            mTypes[aType].EnumValues[aEnumEntryIndex] = aEnumValue0;
-            mTypes[aType].EnumValues[aEnumEntryIndex+1] = aEnumValue1;
+            mTypes[aType].EnumValues[(aEnumEntryIndex * 2)] = aEnumValue0;
+            mTypes[aType].EnumValues[(aEnumEntryIndex * 2) + 1] = aEnumValue1;
 
 
-            if (mTypes[aType].EnumValues[aEnumEntryIndex] != aEnumValue0) {
+            if (mTypes[aType].EnumValues[(aEnumEntryIndex * 2)] != aEnumValue0) {
                 DebugAndHalt("Setting enum info failed!");
             }
         }
 
         public static void SetEnumNamePartial(int aType, int aEnumNameIndex, uint value) {
-            mTypes[aType].EnumValues[aEnumNameIndex] = value;
+            mTypes[aType].EnumValueNames[aEnumNameIndex] = value;
 
-            if (mTypes[aType].EnumValues[aEnumNameIndex] != value) {
+            if (mTypes[aType].EnumValueNames[aEnumNameIndex] != value) {
                 DebugAndHalt("Setting enum value name failed!");
             }
         }
@@ -449,18 +449,19 @@ namespace Cosmos.Core
             if (aType >= mTypes.Length) {
                 EnableDebug = true;
                 DebugAndHalt("Requested GetEnumValueString for invalid aObjectType: " + aType);
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Requested GetEnumValueString for invalid aObjectType: " + aType);
             }
 
             var type = mTypes[aType];
 
-            for(var i = 0; i < type.EnumValues.Length; i++) {
+            // We are iterating over 2 steps each time as the value is split in two uints to store a ulong
+            for(var i = 0; i < type.EnumValues.Length; i+=2) {
                 byte[] rawBytes = BitConverter.GetBytes(aCastedValue);
                 uint uint0 = BitConverter.ToUInt32(rawBytes, 0);
                 uint uint1 = BitConverter.ToUInt32(rawBytes, 4);
 
-                if (type.EnumValues[(i * 2)] == uint0 && type.EnumValues[(i*2)+1] == uint1) {
-                    return GetStringFromUintArray(type.EnumValueNames, i * 16, 16);
+                if (type.EnumValues[i] == uint0 && type.EnumValues[i+1] == uint1) {
+                    return GetStringFromUintArray(type.EnumValueNames, (i/2) * 16, 16);
                 }
             }
 
@@ -472,6 +473,12 @@ namespace Cosmos.Core
 
             for(int i = offset; i < offset+count; i++) {
                 sb.Append(Encoding.ASCII.GetString(BitConverter.GetBytes(array[i])));
+            }
+
+            for(var i = 0; i < sb.Length; i++) {
+                if (sb[i] == '\0') {
+                    sb.Remove(i, sb.Length - i);
+                }
             }
 
             return sb.ToString();

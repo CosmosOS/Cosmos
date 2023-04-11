@@ -9,93 +9,41 @@ using Cosmos.Core;
 using System.Runtime.InteropServices;
 using Cosmos.HAL;
 
-namespace ProcessorTests
-{
-    public class Kernel : Sys.Kernel
-    {
-        protected override void BeforeRun()
-        {
+namespace EnumTests {
+    public class Kernel : Sys.Kernel {
+        protected override void BeforeRun() {
             Console.WriteLine("Cosmos booted successfully. Starting Tests");
         }
 
-        protected override void Run()
-        {
-            try
-            {
-                TestMultibootMemoryMap();
-                TestGetRam();
-                TestVendorNameIsNotBlank();
-                TestBrandStringBlank();
-                TestCycleCount();
-                TestCycleRateIsNotZero();
-                TestMultiboot();
+        protected override void Run() {
+            try {
+                TestVTableEnumStrings();
 
                 TestController.Completed();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 mDebugger.Send("Exception occurred: " + e.Message);
                 mDebugger.Send(e.Message);
                 TestController.Failed();
             }
         }
 
-        public void TestGetRam()
-        {
-            Assert.IsTrue(CPU.GetAmountOfRAM() > 0, "CPU.GetAmountOfRAM() returns a positive value: " + CPU.GetAmountOfRAM());
-        }
+        public void TestVTableEnumStrings() {
+            var testEnumVal = TestEnum.OK;
+            uint x = (uint)testEnumVal; // random stuff to make TestEnum actually appear in the output
 
-        public void TestMultibootMemoryMap()
-        {
-            var memoryMap = CPU.GetMemoryMap();
-            for (int i = 0; i < memoryMap.Length; i++)
-            {
-                mDebugger.Send($"Memory Map: {memoryMap[i].Address} " +
-                    $"Length: {memoryMap[i].Length} Type: {memoryMap[i].Type}");
-            }
-            Assert.IsTrue(memoryMap.Length != 0, "Memory Map is not empty! Length " + memoryMap.Length);
-        }
+            Console.WriteLine(testEnumVal.ToString());
 
-        public void TestMultiboot()
-        {
-            Assert.IsTrue(Multiboot2.GetMBIAddress() != 0, $"Multiboot.GetMBIAddress works {Multiboot2.GetMBIAddress()}");
-        }
-         
-        public void TestBrandStringBlank()
-        {
-            string brandString = CPU.GetCPUBrandString();
-            mDebugger.Send("Brand String: " + brandString);
-            bool isBrandStringBlank = string.IsNullOrWhiteSpace(brandString);
-            Assert.IsFalse(isBrandStringBlank, "Processor brand string is blank.");
-        }
+            uint typeId = (uint)VTablesImpl.GetType("TestEnum");
 
-        public void TestVendorNameIsNotBlank()
-        {
-            string vendorName = CPU.GetCPUVendorName();
-            mDebugger.Send("Vendor name: " + vendorName);
-            bool isVendorNameBlank = string.IsNullOrWhiteSpace(vendorName);
-            mDebugger.Send("Vendor name: ");
-            mDebugger.Send(vendorName);
-            Assert.IsFalse(isVendorNameBlank, "Processor vendor name is blank.");
+            Assert.AreNotEqual(typeId, unchecked((uint)-1), "TestEnum was resolved to not -1");
+            Console.WriteLine((byte)VTablesImpl.GetEnumValueString(typeId, (uint)(byte)60)[12]);
+            Assert.AreEqual("CANCEL", VTablesImpl.GetEnumValueString(typeId, (uint)(byte)60), "VTablesImpl.GetEnumValueString returned proper string");
         }
+    }
 
-        public void TestCycleCount()
-        {
-            ulong cycleCount = CPU.GetCPUUptime();
-            mDebugger.Send($"CycleCount: {cycleCount}");
-            bool isCycleCountZero = cycleCount == 0;
-            Assert.IsFalse(isCycleCountZero, "Processor cycle count is not zero.");
-            ulong secondCount = CPU.GetCPUUptime();
-            Assert.IsTrue(secondCount > cycleCount, "Processor cycle count is increasing");
-        }
-
-        public void TestCycleRateIsNotZero()
-        {
-            long cycleRate = CPU.GetCPUCycleSpeed();
-            mDebugger.Send($"CycleRate: {cycleRate}");
-            bool isCycleRateZero = cycleRate == 0;
-            Assert.IsFalse(isCycleRateZero, "Processor cycle rate is not zero.");
-            Assert.IsTrue(CPU.GetCPUCycleSpeed() == cycleRate, "Processor cycle speed is not constant");
-        }
+    public enum TestEnum : byte {
+        OK = 3,
+        CANCEL = 60,
+        RESUME
     }
 }

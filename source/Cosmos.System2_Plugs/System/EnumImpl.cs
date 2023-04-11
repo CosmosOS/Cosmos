@@ -1,3 +1,4 @@
+using Cosmos.Core;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System
@@ -16,7 +17,10 @@ namespace Cosmos.System_Plugs.System
             throw new NotSupportedException("Enum.Equals not supported yet!");
         }
 
-        public static string ToString(Enum aThis) => "<Enum.ToString> not implemented";
+        public static string ToString(Enum aThis) {
+            var vtableTypeId = VTablesImpl.GetType(aThis.GetType().Name); // is there a way to directly get the type id?
+            return VTablesImpl.GetEnumValueString(vtableTypeId, aThis.);
+        }
 
         public static string ToString(Enum aThis, string format) => aThis.ToString();
 
