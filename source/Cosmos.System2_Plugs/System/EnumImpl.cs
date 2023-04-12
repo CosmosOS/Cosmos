@@ -20,24 +20,33 @@ namespace Cosmos.System_Plugs.System
         }
 
         public static string ToString(Enum aThis) {
-            var vtableTypeId = (uint)VTablesImpl.GetType(aThis.GetType().Name);
-            var value = (ulong)((object)aThis);                                
-                                                                               
-            Debugger debugger = new("enum.tostring");
-            debugger.Send("=== Enum.ToString ===");
-            debugger.Send("GetType().Name: " + aThis.GetType().Name);
+            unsafe {
+                Debugger debugger = new("enum.tostring");
 
-            debugger.Send("GetType().AssemblyQualifiedName: " + aThis.GetType().AssemblyQualifiedName);
+                byte* addr = (byte*)&aThis;
+                IntPtr ptr = new IntPtr(addr);
 
-            debugger.Send("VTableId: " + vtableTypeId.ToString());
+                for(long i = ptr.ToInt64() - 32; i < ptr.ToInt64() + 32; i++) {
+                    debugger.Send((*((byte*)(new IntPtr(i)))).ToString() + " << Content of offset " + (i - ptr.ToInt64()).ToString() + "to aThis");
+                }
 
-            debugger.Send("VTable.GetName: " + VTablesImpl.GetName(vtableTypeId));
-            debugger.Send("VTable.GetName+1: " + VTablesImpl.GetName(vtableTypeId+1));
-            debugger.Send("VTable.GetName-1: " + VTablesImpl.GetName(vtableTypeId-1));
+                //var vtableTypeId = (uint)VTablesImpl.GetType(aThis.GetType().Name);
+                //var value = (uint)(object)aThis;
+                var value = (uint)VTablesImpl.GetType(aThis.GetType().Name);
+                var vtableTypeId = (uint)(object)aThis;
 
-            debugger.Send("Value: " + value.ToString());
+                debugger.Send("=== Enum.ToString ===");
+                debugger.Send("VTableId: " + vtableTypeId.ToString());
+                debugger.Send("VTableId Expected: " + VTablesImpl.GetType("TestEnum"));
 
-            return VTablesImpl.GetEnumValueString(vtableTypeId, value);
+                debugger.Send("GetType().Name: " + aThis.GetType().Name);
+                debugger.Send("GetType().AssemblyQualifiedName: " + aThis.GetType().AssemblyQualifiedName);
+                debugger.Send("VTable.GetName: " + VTablesImpl.GetName(vtableTypeId));
+
+                debugger.Send("Value: " + value.ToString());
+
+                return VTablesImpl.GetEnumValueString(vtableTypeId, value);
+            }
         }
 
         public static string ToString(Enum aThis, string format) => aThis.ToString();

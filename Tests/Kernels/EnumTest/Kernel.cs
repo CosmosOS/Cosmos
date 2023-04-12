@@ -47,7 +47,7 @@ namespace EnumTests {
         }
     }
 
-    public enum TestEnum : byte {
+    public enum TestEnum : uint {
         OK = 3,
         CANCEL = 60,
         RESUME
