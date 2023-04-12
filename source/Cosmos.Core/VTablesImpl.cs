@@ -16,6 +16,7 @@ namespace Cosmos.Core
     {
         // this field seems to be always empty, but the VTablesImpl class is embedded in the final bin.
         public static VTable[] mTypes;
+        public static EnumTable[] mEnums;
         public static GCTable[] gcTypes;
 
         static VTablesImpl()
@@ -115,11 +116,6 @@ namespace Cosmos.Core
             vTable.InterfaceMethodIndexes = aInterfaceMethodIndexes;
             vTable.TargetMethodIndexes = aTargetMethodIndexes;
 
-            vTable.EnumEntryCount = aEnumEntriesCount;
-            vTable.EnumValues = aEnumValues;
-            vTable.EnumValueNames = aEnumValueNames;
-            vTable.EnumUnderlyingTypeIdentifier = aEnumUnderlyingTypeIdentifier;
-
             vTable.IsEnum = aIsEnum;
             vTable.IsValueType = aIsValueType;
             vTable.IsStruct = aIsStruct;
@@ -132,6 +128,13 @@ namespace Cosmos.Core
             gcTable.GCFieldOffsets = aGCFieldOffsets;
             gcTable.GCFieldTypes = aGCFieldTypes;
             gcTypes[aType] = gcTable;
+
+            var enumTable = new EnumTable();
+            enumTable.EnumEntryCount = aEnumEntriesCount;
+            enumTable.EnumValues = aEnumValues;
+            enumTable.EnumValueNames = aEnumValueNames;
+            enumTable.EnumUnderlyingTypeIdentifier = aEnumUnderlyingTypeIdentifier;
+            mEnums[aType] = enumTable;
         }
 
         public static void SetInterfaceInfo(int aType, int aInterfaceIndex, uint aInterfaceIdentifier)
@@ -152,24 +155,6 @@ namespace Cosmos.Core
             if (mTypes[aType].MethodIndexes[aMethodIndex] != aMethodIdentifier)
             {
                 DebugAndHalt("Setting method info failed! (1)");
-            }
-        }
-
-        public static void SetEnumInfo(int aType, int aEnumEntryIndex, uint aEnumValue0, uint aEnumValue1) {
-            mTypes[aType].EnumValues[(aEnumEntryIndex * 2)] = aEnumValue0;
-            mTypes[aType].EnumValues[(aEnumEntryIndex * 2) + 1] = aEnumValue1;
-
-
-            if (mTypes[aType].EnumValues[(aEnumEntryIndex * 2)] != aEnumValue0) {
-                DebugAndHalt("Setting enum info failed!");
-            }
-        }
-
-        public static void SetEnumNamePartial(int aType, int aEnumNameIndex, uint value) {
-            mTypes[aType].EnumValueNames[aEnumNameIndex] = value;
-
-            if (mTypes[aType].EnumValueNames[aEnumNameIndex] != value) {
-                DebugAndHalt("Setting enum value name failed!");
             }
         }
 
@@ -370,7 +355,7 @@ namespace Cosmos.Core
         /// <param name="aType"></param>
         /// <returns></returns>
         public static uint GetEnumUnderlyingType(uint aType) {
-            return mTypes[aType].EnumUnderlyingTypeIdentifier;
+            return mEnums[aType].EnumUnderlyingTypeIdentifier;
         }
 
         /// <summary>
@@ -471,7 +456,7 @@ namespace Cosmos.Core
                 throw new IndexOutOfRangeException("Requested GetEnumValueString for invalid aObjectType: " + aType);
             }
 
-            var type = mTypes[aType];
+            var type = mEnums[aType];
 
             // We are iterating over 2 steps each time as the value is split in two uints to store a ulong
             for(var i = 0; i < type.EnumValues.Length; i+=2) {
@@ -522,14 +507,16 @@ namespace Cosmos.Core
         public uint[] InterfaceMethodIndexes;
         public uint[] TargetMethodIndexes;
 
+        public bool IsEnum;
+        public bool IsValueType;
+        public bool IsStruct;
+    }
+
+    public struct EnumTable {
         public uint EnumEntryCount; // Can be 0 if IsEnum == false
         public uint[] EnumValues; // EnumValues contains the numeric keys (2x uints as we store all as ulongs for compatibility)
         public uint[] EnumValueNames; // EnumValueNames contains the string keys as 16x uints stored at the (index in EnumValues*16)
         public uint EnumUnderlyingTypeIdentifier;
-
-        public bool IsEnum;
-        public bool IsValueType;
-        public bool IsStruct;
     }
 
     public struct GCTable
