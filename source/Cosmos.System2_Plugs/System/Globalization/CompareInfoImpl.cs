@@ -1,6 +1,4 @@
-using System;
 using System.Globalization;
-
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.Globalization
@@ -8,7 +6,7 @@ namespace Cosmos.System_Plugs.System.Globalization
     [Plug(Target = typeof(CompareInfo))]
     public static class CompareInfoImpl
     {
-        public static void Ctor(CompareInfo aThis, CultureInfo aCulture)
+        public static void Ctor(CompareInfo context, CultureInfo culture)
         {
         }
 

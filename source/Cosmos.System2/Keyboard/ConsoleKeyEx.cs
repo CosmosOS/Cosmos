@@ -1,10 +1,14 @@
 namespace Cosmos.System
 {
     /// <summary>
-    /// ConsoleKeyEx enum.
+    /// Specifies the recognized virtual console keys, that are independent
+    /// from physical keyboard scan-codes.
     /// </summary>
     public enum ConsoleKeyEx
     {
+        /// <summary>
+        /// An unknown, undefined, or otherwise unrecognized key.
+        /// </summary>
         NoName,
 
         Escape,
@@ -79,6 +83,7 @@ namespace Cosmos.System
         LShift,
         RShift,
         OEM102, // <<=== This key does not exist on a US keyboard, but on the german one. It contains the characters `|`, `<` and `>`
+        OEM5, // This one is registered as \ and | on a British keyboard. however US use the one registered as # and ~ to us.
         Z,
         X,
         C,

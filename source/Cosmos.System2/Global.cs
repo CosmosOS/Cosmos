@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 
@@ -12,84 +8,86 @@ using Debugger = Cosmos.Debug.Kernel.Debugger;
 namespace Cosmos.System
 {
     /// <summary>
-    /// Cosmos global class.
-    /// Used to init the console, screen and debugger and get/set keyboard keys.
+    /// Contains commonly used globals. Used to initialize the console, screen
+    /// and debugger and get/set keyboard scan-maps.
     /// </summary>
     public static class Global
     {
         /// <summary>
-        /// Create new instance of the <see cref="Global"/> class.
+        /// The global system ring debugger instance, with the tag "Global".
         /// </summary>
-        static Global()
-        {
+        public static readonly Debugger Debugger = DebuggerFactory.CreateDebugger("Global");
 
-        }
+        [Obsolete("Use the 'Debugger' field of Global instead.")]
+        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "This property is provided for compatibility with older projects.")]
+        public static Debugger mDebugger => Debugger;
 
         /// <summary>
-        /// System ring debugger instance, with the tag "Global".
+        /// The file system ring debugger instance, with the tag "FileSystem".
         /// </summary>
-        public static readonly Debugger mDebugger = DebuggerFactory.CreateDebugger("System", "Global");
+        public static readonly Debugger FileSystemDebugger = DebuggerFactory.CreateDebugger("FileSystem");
+
+        [Obsolete("Use the 'FileSystemDebugger' field of Global instead.")]
+        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "This property is provided for compatibility with older projects.")]
+        public static Debugger mFileSystemDebugger => FileSystemDebugger;
 
         /// <summary>
-        /// System ring debugger instance, with the tag "FileSystem".
-        /// </summary>
-        public static readonly Debugger mFileSystemDebugger = DebuggerFactory.CreateDebugger("System", "FileSystem");
-
-        /// <summary>
-        /// Console instance.
+        /// The main global console instance.
         /// </summary>
         public static Console Console;
 
         /// <summary>
-        /// Get and set keyboard NumLock value.
+        /// Gets and sets the keyboards num-lock state.
         /// </summary>
         public static bool NumLock
         {
-            get { return KeyboardManager.NumLock; }
-            set { KeyboardManager.NumLock = value; }
+            get => KeyboardManager.NumLock;
+            set => KeyboardManager.NumLock = value;
         }
 
         /// <summary>
-        /// Get and set keyboard CapsLock value.
+        /// Gets and sets the keyboards caps-lock state.
         /// </summary>
         public static bool CapsLock
         {
-            get { return KeyboardManager.CapsLock; }
-            set { KeyboardManager.CapsLock = value; }
+            get => KeyboardManager.CapsLock;
+            set => KeyboardManager.CapsLock = value;
         }
 
         /// <summary>
-        /// Get and set keyboard ScrollLock value.
+        /// Gets and sets the keyboards scroll-lock state.
         /// </summary>
         public static bool ScrollLock
         {
-            get { return KeyboardManager.ScrollLock; }
-            set { KeyboardManager.ScrollLock = value; }
+            get => KeyboardManager.ScrollLock;
+            set => KeyboardManager.ScrollLock = value;
         }
 
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
-        /// Init console, screen and keyboard.
+        /// Initializes the console, screen and keyboard.
         /// </summary>
         /// <param name="textScreen">A screen device.</param>
-        public static void Init(TextScreenBase textScreen, bool InitScroolWheel = true, bool InitPS2 = true, bool InitNetwork = true, bool IDEInit = true)
+        public static void Init(TextScreenBase textScreen, bool initScrollWheel = true, bool initPS2 = true, bool initNetwork = true, bool ideInit = true)
         {
 
             // We must init Console before calling Inits.
             // This is part of the "minimal" boot to allow output.
-            mDebugger.Send("Creating Console");
+            Debugger.Send("Creating the global console...");
             if (textScreen != null)
             {
                 Console = new Console(textScreen);
             }
 
-            mDebugger.Send("Creating Keyboard");
+            Debugger.Send("Initializing the Hardware Abstraction Layer (HAL)...");
+            HAL.Global.Init(textScreen, initScrollWheel, initPS2, initNetwork, ideInit);
 
-            mDebugger.Send("HW Init");
-            HAL.Global.Init(textScreen, InitScroolWheel, InitPS2, InitNetwork, IDEInit);
-
-            Network.NetworkStack.Init();
-            mDebugger.Send("Network Stack Init");
+            // TODO: @ascpixi: The end-user should have an option to exclude parts of
+            //       Cosmos, such as the network stack, when they are not needed. As of
+            //       now, these modules will *always* be included, as they're referenced
+            //       by the initialization code.
+            Debugger.Send("Initializing the network stack...");
+            Network.NetworkStack.Initialize();
 
             NumLock = false;
             CapsLock = false;
@@ -97,18 +95,10 @@ namespace Cosmos.System
         }
 
         /// <summary>
-        /// Change keyboard layout. Initially set to US_Standard.
-        /// <para>
-        /// Currently available:
-        /// <list type="bullet">
-        /// <item>US_Standard.</item>
-        /// <item>FR_Standard.</item>
-        /// <item>DE_Standard.</item>
-        /// <item>TR_StandardQ.</item>
-        /// </list>
-        /// </para>
+        /// Changes the layout of the keyboard.
         /// </summary>
-        /// <param name="scanMap">A key mapping.</param>
+        /// <param name="scanMap">The key mapping to use.</param>
+        [Obsolete("Use KeyboardManager.SetKeyLayout instead.")]
         public static void ChangeKeyLayout(ScanMapBase scanMap)
         {
             KeyboardManager.SetKeyLayout(scanMap);

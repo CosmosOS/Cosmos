@@ -1,34 +1,34 @@
+using System;
 using Cosmos.Core;
 
 namespace Cosmos.HAL
 {
     /// <summary>
-    /// Power class. Used to reboot and shutdown the PC.
+    /// Manages the power state of the system by directly manipulating
+    /// hardware devices.
     /// </summary>
     public class Power
     {
-        //Reboot with CPU
         /// <summary>
-        /// Reboot the CPU.
+        /// Triggers a direct, raw CPU reboot.
         /// </summary>
         public static void CPUReboot()
         {
-            Core.CPU.Reboot();
+            CPU.Reboot();
         }
 
-        //Reboot with ACPI
         /// <summary>
-        /// Reboot using ACPI.
+        /// Reboot the system using ACPI. Currently not implemented.
         /// </summary>
         /// <exception cref="NotImplementedException">Thrown always.</exception>
+        [Obsolete("This method is not yet implemented.", error: true)]
         public static void ACPIReboot()
         {
-            ACPI.Reboot(); //TODO
+            ACPI.Reboot();
         }
 
-        //Shutdown with ACPI
         /// <summary>
-        /// Shutdown the ACPI.
+        /// Shutdown the system using ACPI.
         /// </summary>
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
         public static void ACPIShutdown()

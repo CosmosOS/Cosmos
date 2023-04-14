@@ -9,7 +9,7 @@ namespace Cosmos.Core_Plugs.System
     [Plug(Target = typeof(object))]
     public static class ObjectImpl
     {
-        private static Debugger mDebugger = new Debugger("IL2CPU", "ObjectImpl");
+        private static Debugger mDebugger = new("ObjectImpl");
 
         public static string ToString(object aThis)
         {

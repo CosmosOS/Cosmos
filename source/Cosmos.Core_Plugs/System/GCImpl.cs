@@ -19,7 +19,7 @@ namespace Cosmos.Core_Plugs.System
         {
             if (aGCFlags != 0 && aGCFlags != 16) // 16 means that zeroing is optional
             {
-                var debugger = new Debugger("Plug", "GC");
+                Debugger debugger = new("GC");
                 debugger.Send($"-- AllocateNewArray -- Invalid aGCFlags: {aGCFlags}");
                 Debugger.DoBochsBreak();
                 throw new NotImplementedException();

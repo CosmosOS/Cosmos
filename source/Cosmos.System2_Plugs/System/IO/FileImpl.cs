@@ -1,14 +1,6 @@
-//#define COSMOSDEBUG
-using System;
-using System.Collections.Generic;
-using System.IO;
-using Cosmos.System;
-using Cosmos.Common.Extensions;
-using Cosmos.Debug.Kernel;
-using IL2CPU.API;
 using IL2CPU.API.Attribs;
-using Cosmos.System.FileSystem;
-using Cosmos.System.FileSystem.VFS;
+using IL2CPU.API;
+using Cosmos.System;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -20,38 +12,40 @@ namespace Cosmos.System_Plugs.System.IO
          * Plug needed for the usual issue that Array can not be converted in IEnumerable... it is starting
          * to become annoying :-(
          */
-        public static void WriteAllLines(string aFile, string[] contents)
+        public static void WriteAllLines(string path, string[] contents)
         {
-            if (aFile == null)
+            if (path == null)
             {
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException(nameof(path));
             }
             if (contents == null)
             {
-                throw new ArgumentNullException("contents");
+                throw new ArgumentNullException(nameof(contents));
             }
-            if (aFile.Length == 0)
+            if (path.Length == 0)
             {
-                throw new ArgumentException("Empty", "aFile");
+                throw new ArgumentException("Empty", nameof(path));
             }
 
-            Global.mFileSystemDebugger.SendInternal("Writing contents");
+            Global.FileSystemDebugger.SendInternal("Writing contents");
 
-            using (var xSW = new StreamWriter(aFile))
+            StreamWriter Writer = new(path);
+
+            foreach (var current in contents)
             {
-                foreach (var current in contents)
-                {
-                    xSW.WriteLine(current);
-                }
+                Writer.WriteLine(current);
             }
+
+            Writer.Dispose();
         }
 
-        public static void WriteAllBytes(string aFile, byte[] aData)
+        public static void WriteAllBytes(string path, byte[] aData)
         {
-            using (var xSW = new BinaryWriter(new FileStream(aFile, FileMode.OpenOrCreate)))
-            {
-                xSW.Write(aData);
-            }
+            BinaryWriter Writer = new(new FileStream(path, FileMode.OpenOrCreate));
+
+            Writer.Write(aData);
+
+            Writer.Dispose();
         }
     }
 }

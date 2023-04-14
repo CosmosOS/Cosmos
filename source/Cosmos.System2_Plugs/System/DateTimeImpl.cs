@@ -92,7 +92,7 @@ namespace Cosmos.System_Plugs.System
 
         public static IntPtr GetGetSystemTimeAsFileTimeFnPtr()
         {
-            return new IntPtr();
+            return new();
         }
 
         public static void ValidateLeapSecond(DateTime aThis)

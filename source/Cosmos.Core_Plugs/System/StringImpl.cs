@@ -11,7 +11,7 @@ namespace Cosmos.Core_Plugs.System
     [Plug(Target = typeof(string))]
     public static class StringImpl
     {
-        internal static Debugger mDebugger = new Debugger("Core", "String Plugs");
+        internal static Debugger mDebugger = new("String Plug");
 
         public static unsafe void Ctor(string aThis, char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
@@ -122,8 +122,6 @@ namespace Cosmos.Core_Plugs.System
         {
             return *(aFirstChar + aIndex);
         }
-
-
 
         public static bool IsAscii(string aThis)
         {
@@ -409,13 +407,13 @@ namespace Cosmos.Core_Plugs.System
 
         // HACK: TODO - improve efficiency of this.
         //How do we access the raw memory to copy it into a char array?
-        public static char[] ToCharArray(string aThis)
+        public static unsafe char[] ToCharArray(string aThis)
         {
-            var result = new char[aThis.Length];
+            char[] result = new char[aThis.Length];
 
-            for (int i = 0; i < aThis.Length; i++)
+            fixed (char* P1 = aThis, P2 = result)
             {
-                result[i] = aThis[i];
+                MemoryOperationsImpl.Copy((byte*)P2, (byte*)P1, aThis.Length * sizeof(char));
             }
 
             return result;
@@ -638,7 +636,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static int LastIndexOf(string aThis, string aString, int aIndex, int aCount)
         {
-            if (aString == String.Empty)
+            if (aString == string.Empty)
             {
                 if (aIndex > aThis.Length)
                 {
@@ -977,10 +975,20 @@ namespace Cosmos.Core_Plugs.System
 
         public static unsafe int GetNonRandomizedHashCode(string aString)
         {
+
             // the code is the same as the one used in .net except for the explicit == 2 and == 1 cases
             // we need this since a new object can start directly behind the string in memory, so the standard
             // implementation would read the allocated size of the next object and use it for the hash
-            fixed (char* ptr = &aString.AsSpan()[0])
+            var asSpan = aString.AsSpan();
+            if (asSpan.Length == 0)
+            {
+                unchecked
+                {
+                    return (int)(352654597u + 352654597u * 1566083941);
+                }
+            }
+
+            fixed (char* ptr = &asSpan[0])
             {
                 uint num = 352654597u;
                 uint num2 = num;
@@ -1006,7 +1014,11 @@ namespace Cosmos.Core_Plugs.System
                 {
                     num2 = (global::System.Numerics.BitOperations.RotateLeft(num2, 5) + num2) ^ *(char*)ptr2;
                 }
-                return (int)(num + num2 * 1566083941);
+
+                unchecked
+                {
+                    return (int)(num + num2 * 1566083941);
+                }
             }
         }
     }

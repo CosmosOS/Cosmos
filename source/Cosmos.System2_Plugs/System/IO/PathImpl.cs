@@ -1,14 +1,7 @@
-//#define COSMOSDEBUG
-using System;
-using System.IO;
-using Cosmos.System;
-using Cosmos.Common;
-using Cosmos.Debug.Kernel;
-using IL2CPU.API;
-using IL2CPU.API.Attribs;
-using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
-using System.Text;
+using Cosmos.System;
+using IL2CPU.API.Attribs;
+using IL2CPU.API;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -37,7 +30,7 @@ namespace Cosmos.System_Plugs.System.IO
                     char xC = aPath[xNum];
                     if (xC == '.')
                     {
-                        xText = aPath.Substring(0, xNum);
+                        xText = aPath[..xNum];
                         break;
                     }
                     if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar
@@ -54,7 +47,7 @@ namespace Cosmos.System_Plugs.System.IO
                     }
                     xText += aExtension;
                 }
-                Global.mFileSystemDebugger.SendInternal($"Path.ChangeExtension : aPath = {aPath}, aExtension = {aExtension}, returning {xText}");
+                Global.FileSystemDebugger.SendInternal($"Path.ChangeExtension : aPath = {aPath}, aExtension = {aExtension}, returning {xText}");
                 return xText;
             }
             return null;
@@ -62,7 +55,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static string Combine(string aPath1, string aPath2)
         {
-            if (aPath1 == null || aPath2 == null)
+            if (string.IsNullOrEmpty(aPath1) || string.IsNullOrEmpty(aPath2))
             {
                 throw new ArgumentNullException(aPath1 == null ? "path1" : "path2");
             }
@@ -70,7 +63,7 @@ namespace Cosmos.System_Plugs.System.IO
             CheckInvalidPathChars(aPath1);
             CheckInvalidPathChars(aPath2);
             string result = CombineNoChecks(aPath1, aPath2);
-            Global.mFileSystemDebugger.SendInternal($"Path.Combine : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {result}");
+            Global.FileSystemDebugger.SendInternal($"Path.Combine : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {result}");
             return result;
         }
 
@@ -78,39 +71,38 @@ namespace Cosmos.System_Plugs.System.IO
         {
             if (aPath2.Length == 0)
             {
-                Global.mFileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath2 has 0 length, returning {aPath1}");
+                Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath2 has 0 length, returning {aPath1}");
                 return aPath1;
             }
-
             if (aPath1.Length == 0)
             {
-                Global.mFileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 has 0 length, returning {aPath2}");
+                Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 has 0 length, returning {aPath2}");
                 return aPath2;
             }
-
             if (IsPathRooted(aPath2))
             {
-                Global.mFileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath2 is root, returning {aPath2}");
+                Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath2 is root, returning {aPath2}");
                 return aPath2;
             }
 
-            string xResult = string.Empty;
-            char xC = aPath1[aPath1.Length - 1];
+            char xC = aPath1[^1];
+            string result;
+
             if (xC != Path.DirectorySeparatorChar && xC != Path.AltDirectorySeparatorChar && xC != Path.VolumeSeparatorChar)
             {
-                xResult = string.Concat(aPath1, "\\", aPath2);
-                Global.mFileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {xResult}");
-                return xResult;
+                result = string.Concat(aPath1, "\\", aPath2);
+                Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {result}");
+                return result;
             }
 
-            xResult = string.Concat(aPath1, aPath2);
-            Global.mFileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {xResult}");
-            return xResult;
+            result = string.Concat(aPath1, aPath2);
+            Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {result}");
+            return result;
         }
 
         public static string GetExtension(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("Path.GetExtension");
+            Global.FileSystemDebugger.SendInternal("Path.GetExtension");
 
             if (aPath == null)
             {
@@ -144,7 +136,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static string GetFileName(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal($"Path.GetFileName : aPath = {aPath}");
+            Global.FileSystemDebugger.SendInternal($"Path.GetFileName : aPath = {aPath}");
             if (aPath != null)
             {
                 CheckInvalidPathChars(aPath);
@@ -161,29 +153,29 @@ namespace Cosmos.System_Plugs.System.IO
                 }
             }
 
-            Global.mFileSystemDebugger.SendInternal($"Path.GetFileName : returning {aPath}");
+            Global.FileSystemDebugger.SendInternal($"Path.GetFileName : returning {aPath}");
             return aPath;
         }
 
         public static string GetFileNameWithoutExtension(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal($"Path.GetFileNameWithoutExtension : aPath = {aPath}");
+            Global.FileSystemDebugger.SendInternal($"Path.GetFileNameWithoutExtension : aPath = {aPath}");
 
             aPath = GetFileName(aPath);
             if (aPath == null)
             {
-                Global.mFileSystemDebugger.SendInternal($"Path.GetFileNameWithoutExtension : returning null");
+                Global.FileSystemDebugger.SendInternal($"Path.GetFileNameWithoutExtension : returning null");
                 return null;
             }
             int xLength;
             if ((xLength = aPath.LastIndexOf('.')) == -1)
             {
-                Global.mFileSystemDebugger.SendInternal($"Path.GetFileNameWithoutExtension : returning {aPath}");
+                Global.FileSystemDebugger.SendInternal($"Path.GetFileNameWithoutExtension : returning {aPath}");
                 return aPath;
             }
 
             string xResult = aPath.Substring(0, xLength);
-            Global.mFileSystemDebugger.SendInternal($"Path.GetFileNameWithoutExtension : returning {xResult}");
+            Global.FileSystemDebugger.SendInternal($"Path.GetFileNameWithoutExtension : returning {xResult}");
 
             return xResult;
         }
@@ -192,12 +184,12 @@ namespace Cosmos.System_Plugs.System.IO
         {
             if (aPath == null)
             {
-                Global.mFileSystemDebugger.SendInternal($"Path.GetFullPath : aPath is null");
+                Global.FileSystemDebugger.SendInternal($"Path.GetFullPath : aPath is null");
                 throw new ArgumentNullException("aPath");
             }
 
             string result = NormalizePath(aPath, true);
-            Global.mFileSystemDebugger.SendInternal($"Path.GetFullPath : aPath = {aPath}, returning {result}");
+            Global.FileSystemDebugger.SendInternal($"Path.GetFullPath : aPath = {aPath}, returning {result}");
             return result;
         }
 
@@ -215,7 +207,7 @@ namespace Cosmos.System_Plugs.System.IO
         {
             if (aPath == null)
             {
-                Global.mFileSystemDebugger.SendInternal($"Path.GetPathRoot : aPath is null");
+                Global.FileSystemDebugger.SendInternal($"Path.GetPathRoot : aPath is null");
                 throw new ArgumentNullException(nameof(aPath));
             }
 
@@ -227,7 +219,7 @@ namespace Cosmos.System_Plugs.System.IO
                 xResult = string.Concat(xResult, Path.DirectorySeparatorChar);
             }
 
-            Global.mFileSystemDebugger.SendInternal($"Path.GetPathRoot : aPath = {aPath}, xResult = {xResult}");
+            Global.FileSystemDebugger.SendInternal($"Path.GetPathRoot : aPath = {aPath}, xResult = {xResult}");
             return xResult;
         }
 
@@ -321,7 +313,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static bool IsPathRooted(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("Path.IsPathRooted");
+            Global.FileSystemDebugger.SendInternal("Path.IsPathRooted");
 
             if (aPath != null)
             {
@@ -338,7 +330,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static bool IsRelative(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("-- Path.IsRelative -- aPath = " + aPath);
+            Global.FileSystemDebugger.SendInternal("-- Path.IsRelative -- aPath = " + aPath);
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -369,15 +361,15 @@ namespace Cosmos.System_Plugs.System.IO
 
         internal static void CheckInvalidPathChars(string aPath, bool aCheckAdditional = false)
         {
-            Global.mFileSystemDebugger.SendInternal("Path.CheckInvalidPathChars");
+            Global.FileSystemDebugger.SendInternal("Path.CheckInvalidPathChars");
 
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.FileSystemDebugger.SendInternal("aPath =");
+            Global.FileSystemDebugger.SendInternal(aPath);
 
             var xChars = VFSManager.GetRealInvalidPathChars();
 
@@ -392,12 +384,12 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static string GetDirectoryName(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("Path.GetDirectoryName");
+            Global.FileSystemDebugger.SendInternal("Path.GetDirectoryName");
 
             if (aPath != null)
             {
-                Global.mFileSystemDebugger.SendInternal("aPath =");
-                Global.mFileSystemDebugger.SendInternal(aPath);
+                Global.FileSystemDebugger.SendInternal("aPath =");
+                Global.FileSystemDebugger.SendInternal(aPath);
 
                 CheckInvalidPathChars(aPath);
                 string xText = NormalizePath(aPath, false);
@@ -447,8 +439,8 @@ namespace Cosmos.System_Plugs.System.IO
 
         internal static int GetRootLength(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal("Path.GetRootLength");
-            Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
+            Global.FileSystemDebugger.SendInternal("Path.GetRootLength");
+            Global.FileSystemDebugger.SendInternal("aPath =" + aPath);
 
             int i = 0;
             int xLength = aPath.Length;
@@ -482,11 +474,11 @@ namespace Cosmos.System_Plugs.System.IO
 
         static string NormalizePath(string aPath, bool aFullCheck)
         {
-            Global.mFileSystemDebugger.SendInternal("-- Path.NormalizePath -- aPath = " + aPath);
+            Global.FileSystemDebugger.SendInternal("-- Path.NormalizePath -- aPath = " + aPath);
 
             if (aPath == null)
             {
-                Global.mFileSystemDebugger.SendInternal("aPath is null");
+                Global.FileSystemDebugger.SendInternal("aPath is null");
                 throw new ArgumentNullException("aPath");
             }
 
@@ -494,22 +486,22 @@ namespace Cosmos.System_Plugs.System.IO
             if (IsRelative(result))
             {
                 result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + result;
-                Global.mFileSystemDebugger.SendInternal("aPath is relative");
-                Global.mFileSystemDebugger.SendInternal("aPath =" + aPath);
-                Global.mFileSystemDebugger.SendInternal("result = " + result);
+                Global.FileSystemDebugger.SendInternal("aPath is relative");
+                Global.FileSystemDebugger.SendInternal("aPath =" + aPath);
+                Global.FileSystemDebugger.SendInternal("result = " + result);
             }
 
             if (IsDirectorySeparator(result[result.Length - 1]))
             {
-                Global.mFileSystemDebugger.SendInternal("Found directory seprator");
+                Global.FileSystemDebugger.SendInternal("Found directory seprator");
                 if (result.Length > 3)
                 {
                     result = result.Remove(result.Length - 1);
                 }
             }
 
-            Global.mFileSystemDebugger.SendInternal("aPath = " + aPath);
-            Global.mFileSystemDebugger.SendInternal("result = " + result);
+            Global.FileSystemDebugger.SendInternal("aPath = " + aPath);
+            Global.FileSystemDebugger.SendInternal("result = " + result);
             return result;
         }
     }
