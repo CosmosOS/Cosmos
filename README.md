@@ -35,8 +35,8 @@
 
 <hr/>
 
-Cosmos (C# Open Source Managed Operating System) is an operating system development kit which uses dotnet, along with the custom il2cpu compiler to turn any C# code into a working bare-metal OS.
-Despite C# in the name, any .NET based language can be used including VB.NET, Fortran, Delphi Prism, IronPython, F# and more. Cosmos itself and the kernel routines are primarily written in C#, and thus the Cosmos name.
+Cosmos (C# Open Source Managed Operating System) is an operating system development kit which uses dotnet, along with the custom IL2CPU compiler to convert (most) C# code into a working bare-metal OS.
+Despite C# in the name, any .NET based language can be used, which includes: VB.NET, IronPython, F# and more. Cosmos itself and the kernel routines are primarily written in C#, and thus the Cosmos name.
 
 In a project, cosmos can be thought of as a compiler and a sort-of standard library for a project. It gives the user access to often hard to find or otherwise difficult to understand tools.
 
@@ -44,17 +44,15 @@ In a project, cosmos can be thought of as a compiler and a sort-of standard libr
 
 ## Some of the included features
 
-These are some of the (optinal) features that can be used in cosmos:
+These are some of the (optional) features that can be used in cosmos:
 
-|                                                      |
-|------------------------------------------------------|
-| Low level assembly access and pointer memory control |
-| A basic (and unstable at the moment) filesystem      |
-| Most fretures found in the .NET corlib               |
-| A CPU/FPU accelerated math library                   |
-| A basic graphics interface                           |
-| A basic network interface                            |
-| A basic audio interface                              |
+- Low level assembly access and pointer memory control
+- A basic (and unstable at the moment) filesystem
+- Most fretures found in the .NET corlib
+- A CPU/FPU accelerated math library
+- A basic graphics interface
+- A basic network interface
+- A basic audio interface
 > Note: Use [embeded resources](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html) instead of the FS for now.
 
 <hr/>
