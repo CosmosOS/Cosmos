@@ -186,7 +186,7 @@ namespace Cosmos.Core_Plugs
         {
             /* We do copy in reverse */
             byte* dd = dest + size;
-            byte* ss = src  + size;
+            byte* ss = src + size;
 
             switch (size)
             {
@@ -750,15 +750,10 @@ namespace Cosmos.Core_Plugs
                 return;
             }
 
-            int xByteRemaining;
             const int xBlockSize = 128;
 
-#if NETSTANDARD1_5
-            xBlocksNum = size / xBlockSize;
-            xByteRemaining = size % xBlockSize;
-#else
-            var xBlocksNum = Math.DivRem(size, xBlockSize, out xByteRemaining);
-#endif
+            var xBlocksNum = Math.DivRem(size, xBlockSize, out int xByteRemaining);
+
             Global.debugger.SendInternal($"size {size} is composed of {xBlocksNum} blocks of {xBlockSize} bytes with {xByteRemaining} remainder");
 
             // TODO call Copy128Blocks()
