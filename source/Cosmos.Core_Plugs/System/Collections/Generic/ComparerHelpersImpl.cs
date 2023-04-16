@@ -8,7 +8,7 @@ namespace Cosmos.Core_Plugs.System.Collections.Generic
     [Plug("System.Collections.Generic.ComparerHelpers, System.Private.CoreLib")]
     public static class ComparerHelpersImpl
     {
-        private static readonly Debugger mDebugger = new Debugger("Core", "ComparerHelpersImpl");
+        private static readonly Debugger mDebugger = new("ComparerHelpersImpl");
 
         public static object CreateDefaultComparer(Type aType)
         {

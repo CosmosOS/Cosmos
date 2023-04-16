@@ -5,7 +5,7 @@ namespace Cosmos.HAL.BlockDevice
     public abstract class Ata : BlockDevice
     {
 
-        internal static Debugger AtaDebugger = new Debugger("HAL", "Ata");
+        internal static Debugger ataDebugger = new("Ata");
 
         protected Ata()
         {

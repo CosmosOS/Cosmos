@@ -1,4 +1,3 @@
-using System;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
@@ -12,7 +11,6 @@ namespace Cosmos.System_Plugs.System
         {
             return "<UIntPtr>";
         }
-        //}
 
         public static int GetHashCode(ref UIntPtr aThis)
         {

@@ -1,8 +1,5 @@
-//#define COSMOSDEBUG
-
 using System;
 using Cosmos.Core;
-using Cosmos.Core.IOGroup;
 
 namespace Cosmos.HAL.Drivers
 {
@@ -96,13 +93,13 @@ namespace Cosmos.HAL.Drivers
 
             if (VBE.IsAvailable()) //VBE VESA Enabled Mulitboot Parsing
             {
-                Global.mDebugger.SendInternal($"Creating VBE VESA driver with Mode {xres}*{yres}@{bpp}");
+                Global.debugger.SendInternal($"Creating VBE VESA driver with Mode {xres}*{yres}@{bpp}");
                 LinearFrameBuffer = new MemoryBlock(VBE.getLfbOffset(), (uint)xres * yres * (uint)(bpp / 8));
                 lastbuffer = new ManagedMemoryBlock((uint)xres * yres * (uint)(bpp / 8));
             }
             else if (ISAModeAvailable()) //Bochs Graphics Adaptor ISA Mode
             {
-                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}.");
+                Global.debugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}.");
 
                 LinearFrameBuffer = new MemoryBlock(0xE0000000, 1920 * 1200 * 4);
                 lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
@@ -111,7 +108,7 @@ namespace Cosmos.HAL.Drivers
             else if ((videocard = HAL.PCI.GetDevice(VendorID.VirtualBox, DeviceID.VBVGA)) != null || //VirtualBox Video Adapter PCI Mode
             (videocard = HAL.PCI.GetDevice(VendorID.Bochs, DeviceID.BGA)) != null) // Bochs Graphics Adaptor PCI Mode
             {
-                Global.mDebugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}. Framebuffer address=" + videocard.BAR0);
+                Global.debugger.SendInternal($"Creating VBE BGA driver with Mode {xres}*{yres}@{bpp}. Framebuffer address=" + videocard.BAR0);
 
                 LinearFrameBuffer = new MemoryBlock(videocard.BAR0, 1920 * 1200 * 4);
                 lastbuffer = new ManagedMemoryBlock(1920 * 1200 * 4);
@@ -153,7 +150,7 @@ namespace Cosmos.HAL.Drivers
         /// </summary>
         public void DisableDisplay()
         {
-            Global.mDebugger.SendInternal($"Disabling VBE display");
+            Global.debugger.SendInternal($"Disabling VBE display");
             VBEWrite(RegisterIndex.DisplayEnable, (ushort)EnableValues.Disabled);
         }
 
@@ -163,7 +160,7 @@ namespace Cosmos.HAL.Drivers
         /// <param name="xres">X resolution.</param>
         private void SetXResolution(ushort xres)
         {
-            Global.mDebugger.SendInternal($"VBE Setting X resolution to {xres}");
+            Global.debugger.SendInternal($"VBE Setting X resolution to {xres}");
             VBEWrite(RegisterIndex.DisplayXResolution, xres);
         }
 
@@ -173,7 +170,7 @@ namespace Cosmos.HAL.Drivers
         /// <param name="yres">Y resolution.</param>
         private void SetYResolution(ushort yres)
         {
-            Global.mDebugger.SendInternal($"VBE Setting Y resolution to {yres}");
+            Global.debugger.SendInternal($"VBE Setting Y resolution to {yres}");
             VBEWrite(RegisterIndex.DisplayYResolution, yres);
         }
 
@@ -183,7 +180,7 @@ namespace Cosmos.HAL.Drivers
         /// <param name="bpp">BPP (color depth).</param>
         private void SetDisplayBPP(ushort bpp)
         {
-            Global.mDebugger.SendInternal($"VBE Setting BPP to {bpp}");
+            Global.debugger.SendInternal($"VBE Setting BPP to {bpp}");
             VBEWrite(RegisterIndex.DisplayBPP, bpp);
         }
 

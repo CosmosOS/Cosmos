@@ -206,7 +206,7 @@ namespace Cosmos.Compiler.Tests.MethodTests
 
         private static void TestMulticastDelegateWithoutArguments()
         {
-            var xDebugger = new Debugger("Test", "Delegates");
+            Debugger xDebugger = new("Delegates");
             xDebugger.Send("Start MulticastDelegate test");
             mCount = 0;
             Action xDelegate = IncreaseCounterOnce;

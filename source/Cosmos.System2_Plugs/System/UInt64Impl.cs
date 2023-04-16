@@ -1,9 +1,7 @@
-using System;
-
-using Cosmos.Common;
 using Cosmos.Common.Extensions;
-using IL2CPU.API;
+using Cosmos.Common;
 using IL2CPU.API.Attribs;
+using IL2CPU.API;
 
 namespace Cosmos.System_Plugs.System
 {
@@ -17,18 +15,12 @@ namespace Cosmos.System_Plugs.System
 
         public static string ToString(ref ulong aThis, string formating)
         {
-            if(formating == "X")
+            return formating switch
             {
-                return ToHexString.ToHex(aThis, false);
-            }
-            else if(formating == "G")
-            {
-                return ToString(ref aThis);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+                "X" => ToHexString.ToHex(aThis, false),
+                "G" => ToString(ref aThis),
+                _ => throw new NotImplementedException(),
+            };
         }
     }
 }
