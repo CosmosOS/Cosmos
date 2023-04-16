@@ -4,8 +4,6 @@
 
 </p>
 
-<h1 align="center">Cosmos</h1>
-
 <p align="center">
 
   <a href="https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master">
