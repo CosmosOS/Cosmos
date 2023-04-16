@@ -53,7 +53,8 @@ The following is a non-exhaustive list of features that Cosmos offers:
 - A basic audio interface
 
 > **Note**
-> Note: Use [embeded resources](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html) instead of the FS for now.
+
+> Use [embeded resources](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html) instead of the FS for now.
 
 <hr/>
 
