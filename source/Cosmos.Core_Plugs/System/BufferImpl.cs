@@ -1,4 +1,3 @@
-//#define COSMOSDEBUG
 using System;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
@@ -9,7 +8,7 @@ namespace Cosmos.Core_Plugs.System
     [Plug(Target = typeof(Buffer))]
     public class BufferImpl
     {
-        static Debugger mDebugger = new Debugger("Plug", "Buffer");
+        static Debugger mDebugger = new (nameof(Buffer));
         /// <summary>
         /// The memmove() function copies n bytes from memory area src to memory area dest.
         /// The memory areas may overlap: copying takes place as though the bytes in src
@@ -22,7 +21,7 @@ namespace Cosmos.Core_Plugs.System
         [PlugMethod(IsOptional = true, Signature = "System_Void__System_Buffer___Memmove_System_Byte___System_Byte___System_UIntPtr_")]
         public static unsafe void __Memmove(byte* aDest, byte* aSrc, uint aCount)
         {
-            MemoryOperations.MemoryOperationsImpl.Copy(aDest, aSrc, (int)aCount);
+            MemoryOperationsImpl.Copy(aDest, aSrc, (int)aCount);
         }
 
         /// <summary>

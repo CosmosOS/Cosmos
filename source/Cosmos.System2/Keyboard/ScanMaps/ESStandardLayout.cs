@@ -81,7 +81,7 @@ namespace Cosmos.System.ScanMaps
             Keys.Add(new KeyMapping(0x32, 'm', 'M', 'm', 'M', 'm', 'M', ConsoleKeyEx.M));
             Keys.Add(new KeyMapping(0x33, ',', ';', ',', ',', ';', ';', ConsoleKeyEx.Comma));
             Keys.Add(new KeyMapping(0x34, '.', ':', '.', '.', ':', ':', ConsoleKeyEx.Period));
-            Keys.Add(new KeyMapping(0x36, '-', '_', '-', '-', '_', '_', ConsoleKeyEx.Slash)); //
+            Keys.Add(new KeyMapping(0x35, '-', '_', '-', '-', '_', '_', ConsoleKeyEx.Slash)); //
             /* Right Shift */
             Keys.Add(new KeyMapping(0x36, ConsoleKeyEx.RShift));
             /* Print Screen */

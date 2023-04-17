@@ -10,7 +10,7 @@ namespace Cosmos.Common
     /// </summary>
     public static class StringHelper
     {
-        private static Debugger mDebugger = new Debugger("Common", "StringHelper");
+        private static Debugger debugger = new("StringHelper");
 
         internal enum StringComparisonResultEnum
         {
@@ -28,7 +28,7 @@ namespace Cosmos.Common
         /// <returns>String value.</returns>
         public static string GetNumberString(uint aValue)
         {
-            mDebugger.SendInternal("StringHelper.GetNumberString(uint)");
+            debugger.SendInternal("StringHelper.GetNumberString(uint)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
@@ -58,7 +58,7 @@ namespace Cosmos.Common
         /// <returns>String value.</returns>
         public static string GetNumberString(int aValue)
         {
-            mDebugger.SendInternal("StringHelper.GetNumberString(int)");
+            debugger.SendInternal("StringHelper.GetNumberString(int)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
@@ -99,7 +99,7 @@ namespace Cosmos.Common
         /// <returns>String value.</returns>
         public static string GetNumberString(ulong aValue)
         {
-            mDebugger.SendInternal("StringHelper.GetNumberString(ulong)");
+            debugger.SendInternal("StringHelper.GetNumberString(ulong)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
@@ -107,30 +107,30 @@ namespace Cosmos.Common
             if (aValue == 0)
             {
                 xResult = "0";
-                mDebugger.SendInternal("xResult =");
-                mDebugger.SendInternal(xResult);
+                debugger.SendInternal("xResult =");
+                debugger.SendInternal(xResult);
             }
             else
             {
                 ulong xValue = aValue;
-                mDebugger.SendInternal("xValue =");
-                mDebugger.SendInternal(xValue);
+                debugger.SendInternal("xValue =");
+                debugger.SendInternal(xValue);
                 while (xValue > 0)
                 {
                     ulong xValue2 = xValue % 10;
-                    mDebugger.SendInternal("xValue2 =");
-                    mDebugger.SendInternal(xValue2);
+                    debugger.SendInternal("xValue2 =");
+                    debugger.SendInternal(xValue2);
                     xResult = string.Concat(xChars[xValue2], xResult);
-                    mDebugger.SendInternal("xResult =");
-                    mDebugger.SendInternal(xResult);
+                    debugger.SendInternal("xResult =");
+                    debugger.SendInternal(xResult);
                     xValue /= 10;
-                    mDebugger.SendInternal("xValue =");
-                    mDebugger.SendInternal(xValue);
+                    debugger.SendInternal("xValue =");
+                    debugger.SendInternal(xValue);
                 }
             }
 
-            mDebugger.SendInternal("xResult =");
-            mDebugger.SendInternal(xResult);
+            debugger.SendInternal("xResult =");
+            debugger.SendInternal(xResult);
             return xResult;
         }
 
@@ -141,7 +141,7 @@ namespace Cosmos.Common
         /// <returns>String value.</returns>
         public static string GetNumberString(long aValue)
         {
-            mDebugger.SendInternal("StringHelper.GetNumberString(long)");
+            debugger.SendInternal("StringHelper.GetNumberString(long)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
@@ -150,8 +150,8 @@ namespace Cosmos.Common
             if (aValue == 0)
             {
                 xResult = "0";
-                mDebugger.SendInternal("xResult =");
-                mDebugger.SendInternal(xResult);
+                debugger.SendInternal("xResult =");
+                debugger.SendInternal(xResult);
             }
             else
             {
@@ -160,19 +160,19 @@ namespace Cosmos.Common
                     xValue *= -1;
                 }
 
-                mDebugger.SendInternal("xValue =");
-                mDebugger.SendInternal(xValue);
+                debugger.SendInternal("xValue =");
+                debugger.SendInternal(xValue);
                 while (xValue > 0)
                 {
                     long xValue2 = xValue % 10;
-                    mDebugger.SendInternal("xValue2 =");
-                    mDebugger.SendInternal(xValue2);
+                    debugger.SendInternal("xValue2 =");
+                    debugger.SendInternal(xValue2);
                     xResult = string.Concat(xChars[xValue2], xResult);
-                    mDebugger.SendInternal("xResult =");
-                    mDebugger.SendInternal(xResult);
+                    debugger.SendInternal("xResult =");
+                    debugger.SendInternal(xResult);
                     xValue /= 10;
-                    mDebugger.SendInternal("xValue =");
-                    mDebugger.SendInternal(xValue);
+                    debugger.SendInternal("xValue =");
+                    debugger.SendInternal(xValue);
                 }
             }
 
@@ -181,8 +181,8 @@ namespace Cosmos.Common
                 xResult = string.Concat("-", xResult);
             }
 
-            mDebugger.SendInternal("xResult =");
-            mDebugger.SendInternal(xResult);
+            debugger.SendInternal("xResult =");
+            debugger.SendInternal(xResult);
             return xResult;
         }
 
@@ -199,7 +199,7 @@ namespace Cosmos.Common
         /// <returns>String value.</returns>
         public static string GetNumberString(float aValue)
         {
-            mDebugger.SendInternal("StringHelper.GetNumberString(float)");
+            debugger.SendInternal("StringHelper.GetNumberString(float)");
 
             var singleBytes = BitConverter.GetBytes(aValue);
             int hexVal = BitConverter.ToInt32(singleBytes, 0);
@@ -220,22 +220,26 @@ namespace Cosmos.Common
                 case 0xFF:
                     if (mantissa == 0)
                     {
-                        if (isNeg)
-                            return "-∞";
-                        else
-                            return "∞";
+                        return isNeg ? "-∞" : "∞";
                     }
                     else
+                    {
                         /* It could exist -NaN but this is always printed as NaN */
                         return "NaN";
+                    }
 
                 /* 0 or denormalized float? */
                 case 0x00:
                     if (mantissa == 0)
+                    {
                         return "0";
+                    }
                     /* Denormalized float have always exp -126 */
                     else
+                    {
                         exp = -126;
+                    }
+
                     break;
 
                 /* Normalized float the exponent is unbiased and the implicit leading one is placed in the mantissa */
@@ -289,7 +293,7 @@ namespace Cosmos.Common
             }
             fracPart = (fracPart << 3) + (fracPart << 1);
             char remain = (char)((fracPart >> 24) + '0');
-            if (remain > '5' && result[result.Length - 1] > '0')
+            if (remain > '5' && result[^1] > '0')
             {
                 char[] answer = result.ToCharArray();
                 int digitPos = answer.Length - 1;
@@ -311,9 +315,9 @@ namespace Cosmos.Common
                 result = new string(answer);
             }
 
-            while (result[result.Length - 1] == '0')
+            while (result[^1] == '0')
             {
-                result = result.Substring(0, result.Length - 1);
+                result = result[0..^1];
             }
 
             return result;
@@ -332,24 +336,24 @@ namespace Cosmos.Common
         /// <returns>String value.</returns>
         public static string GetNumberString(double aValue)
         {
-            mDebugger.SendInternal("StringHelper.GetNumberString(double)");
-            mDebugger.SendInternal("aValue = ");
-            mDebugger.SendInternal(aValue);
+            debugger.SendInternal("StringHelper.GetNumberString(double)");
+            debugger.SendInternal("aValue = ");
+            debugger.SendInternal(aValue);
 
             long hexVal = BitConverter.DoubleToInt64Bits(aValue);
-            mDebugger.SendInternal("hexVal = ");
-            mDebugger.SendInternal(hexVal);
+            debugger.SendInternal("hexVal = ");
+            debugger.SendInternal(hexVal);
 
             /* Let's extract the parts that compose our double: sign, exponent and mantissa */
             bool isNeg = hexVal >> 63 != 0;
             int exp = (int)((hexVal >> 52) & 0x07FF);
             ulong mantissa = (ulong)(hexVal & 0x0FFFFFFFFFFFFF);
-            mDebugger.SendInternal("isNeg = ");
-            mDebugger.SendInternal(isNeg.ToString());
-            mDebugger.SendInternal("exp = ");
-            mDebugger.SendInternal(exp);
-            mDebugger.SendInternal("mantissa = ");
-            mDebugger.SendInternal(mantissa);
+            debugger.SendInternal("isNeg = ");
+            debugger.SendInternal(isNeg.ToString());
+            debugger.SendInternal("exp = ");
+            debugger.SendInternal(exp);
+            debugger.SendInternal("mantissa = ");
+            debugger.SendInternal(mantissa);
 
             ulong intPart = 0, fracPart = 0;
 
@@ -359,22 +363,26 @@ namespace Cosmos.Common
                 case 0x07ff:
                     if (mantissa == 0)
                     {
-                        if (isNeg)
-                            return "-∞";
-                        else
-                            return "∞";
+                        return isNeg ? "-∞" : "∞";
                     }
                     else
+                    {
                         /* It could exist -NaN but this is always printed as NaN */
                         return "NaN";
+                    }
 
                 /* 0 or denormalized double? */
                 case 0x0000:
                     if (mantissa == 0)
+                    {
                         return "0";
+                    }
                     /* Denormalized float have always exp -1022 */
                     else
+                    {
                         exp = -1022;
+                    }
+
                     break;
 
                 /* Normalized double the exponent is unbiased and the implicit leading one is placed in the mantissa */
@@ -427,7 +435,7 @@ namespace Cosmos.Common
             }
             fracPart = (fracPart << 3) + (fracPart << 1);
             char remain = (char)((fracPart >> 53) + '0');
-            if (remain > '5' && result[result.Length - 1] > '0')
+            if (remain > '5' && result[^1] > '0')
             {
                 char[] answer = result.ToCharArray();
                 int digitPos = answer.Length - 1;
@@ -449,9 +457,9 @@ namespace Cosmos.Common
                 result = new string(answer);
             }
 
-            while (result[result.Length - 1] == '0')
+            while (result[^1] == '0')
             {
-                result = result.Substring(0, result.Length - 1);
+                result = result[0..^1];
             }
 
             return result;

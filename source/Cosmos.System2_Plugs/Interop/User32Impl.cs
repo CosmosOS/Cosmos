@@ -1,5 +1,4 @@
 ﻿using IL2CPU.API.Attribs;
-using System;
 using System.Drawing;
 
 namespace Cosmos.System_Plugs.Interop

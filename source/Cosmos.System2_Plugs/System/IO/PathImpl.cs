@@ -1,14 +1,7 @@
-//#define COSMOSDEBUG
-using System;
-using System.IO;
-using Cosmos.System;
-using Cosmos.Common;
-using Cosmos.Debug.Kernel;
-using IL2CPU.API;
-using IL2CPU.API.Attribs;
-using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
-using System.Text;
+using Cosmos.System;
+using IL2CPU.API.Attribs;
+using IL2CPU.API;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -37,7 +30,7 @@ namespace Cosmos.System_Plugs.System.IO
                     char xC = aPath[xNum];
                     if (xC == '.')
                     {
-                        xText = aPath.Substring(0, xNum);
+                        xText = aPath[..xNum];
                         break;
                     }
                     if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar
@@ -62,7 +55,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static string Combine(string aPath1, string aPath2)
         {
-            if (aPath1 == null || aPath2 == null)
+            if (string.IsNullOrEmpty(aPath1) || string.IsNullOrEmpty(aPath2))
             {
                 throw new ArgumentNullException(aPath1 == null ? "path1" : "path2");
             }
@@ -81,31 +74,30 @@ namespace Cosmos.System_Plugs.System.IO
                 Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath2 has 0 length, returning {aPath1}");
                 return aPath1;
             }
-
             if (aPath1.Length == 0)
             {
                 Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 has 0 length, returning {aPath2}");
                 return aPath2;
             }
-
             if (IsPathRooted(aPath2))
             {
                 Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath2 is root, returning {aPath2}");
                 return aPath2;
             }
 
-            string xResult = string.Empty;
-            char xC = aPath1[aPath1.Length - 1];
+            char xC = aPath1[^1];
+            string result;
+
             if (xC != Path.DirectorySeparatorChar && xC != Path.AltDirectorySeparatorChar && xC != Path.VolumeSeparatorChar)
             {
-                xResult = string.Concat(aPath1, "\\", aPath2);
-                Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {xResult}");
-                return xResult;
+                result = string.Concat(aPath1, "\\", aPath2);
+                Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {result}");
+                return result;
             }
 
-            xResult = string.Concat(aPath1, aPath2);
-            Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {xResult}");
-            return xResult;
+            result = string.Concat(aPath1, aPath2);
+            Global.FileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {result}");
+            return result;
         }
 
         public static string GetExtension(string aPath)

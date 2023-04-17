@@ -10,12 +10,12 @@ namespace Cosmos.System2_Plugs.System.Threading
 	[Plug(Target = typeof(Timer))]
 	public static class TimerImpl
 	{
-		public static void Ctor(Timer This, TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
-		{
-			Ctor(This, callback, state, (long)dueTime.TotalMilliseconds, (long)period.TotalMilliseconds);
+        public static void Ctor(Timer context, TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+        {
+			Ctor(context, callback, state, (long)dueTime.TotalMilliseconds, (long)period.TotalMilliseconds);
 		}
 
-		public static void Ctor(Timer This, TimerCallback callback, object? state, long dueTime, long period)
+		public static void Ctor(Timer context, TimerCallback callback, object? state, long dueTime, long period)
 		{
 			_CoreTimer = new(() => { callback.Invoke(state); }, (ulong)(dueTime * 1000000), true);
 
@@ -23,19 +23,19 @@ namespace Cosmos.System2_Plugs.System.Threading
 			Change(dueTime, period);
 		}
 
-		public static void Ctor(Timer This, TimerCallback callback, object? state, uint dueTime, uint period)
+		public static void Ctor(Timer context, TimerCallback callback, object? state, uint dueTime, uint period)
 		{
-			Ctor(This, callback, state, (long)dueTime, period);
+			Ctor(context, callback, state, (long)dueTime, period);
 		}
 
-		public static void Ctor(Timer This, TimerCallback callback, object? state, int dueTime, int period)
+		public static void Ctor(Timer context, TimerCallback callback, object? state, int dueTime, int period)
 		{
-			Ctor(This, callback, state, (long)dueTime, period);
+			Ctor(context, callback, state, (long)dueTime, period);
 		}
 
-		public static void Ctor(Timer This, TimerCallback callback)
+		public static void Ctor(Timer context, TimerCallback callback)
 		{
-			Ctor(This, callback, null, (long)Timeout.Infinite, Timeout.Infinite);
+			Ctor(context, callback, null, (long)Timeout.Infinite, Timeout.Infinite);
 		}
 
 		#region Methods

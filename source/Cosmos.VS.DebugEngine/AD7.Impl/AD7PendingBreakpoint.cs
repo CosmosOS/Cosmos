@@ -56,8 +56,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         public AD7DocumentContext GetDocumentContext(uint address)
         {
             IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(mBpRequestInfo.bpLocation.unionmember2));
-            string documentName;
-            EngineUtils.CheckOk(docPosition.GetFileName(out documentName));
+            EngineUtils.CheckOk(docPosition.GetFileName(out string documentName));
 
             // Get the location in the document that the breakpoint is in.
             TEXT_POSITION[] startPosition = new TEXT_POSITION[1];
@@ -97,16 +96,15 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             {
                 if (CanBind())
                 {
-                    var xDocPos = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(mBpRequestInfo.bpLocation.unionmember2));
+                    IDebugDocumentPosition2 xDocPos = (IDebugDocumentPosition2)Marshal.GetObjectForIUnknown(mBpRequestInfo.bpLocation.unionmember2);
 
                     // Get the name of the document that the breakpoint was put in
-                    string xDocName;
-                    EngineUtils.CheckOk(xDocPos.GetFileName(out xDocName));
+                    EngineUtils.CheckOk(xDocPos.GetFileName(out string xDocName));
                     xDocName = xDocName.ToLower(); //Bug: Some filenames were returned with the drive letter as lower case but in DocumentGUIDs it was captialised so file-not-found!
 
                     // Get the location in the document that the breakpoint is in.
-                    var xStartPos = new TEXT_POSITION[1];
-                    var xEndPos = new TEXT_POSITION[1];
+                    TEXT_POSITION[] xStartPos = new TEXT_POSITION[1];
+                    TEXT_POSITION[] xEndPos = new TEXT_POSITION[1];
                     EngineUtils.CheckOk(xDocPos.GetRange(xStartPos, xEndPos));
 
                     uint xAddress = 0;
@@ -116,8 +114,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     // VS will send us BPs from other Cosmos projects (and possibly non Cosmos ones, didnt look that deep)
                     // but we wont have them in our doc list because it contains only ones from the currently project
                     // to run.
-                    long xDocID;
-                    if (xDebugInfo.DocumentGUIDs.TryGetValue(xDocName, out xDocID))
+                    if (xDebugInfo.DocumentGUIDs.TryGetValue(xDocName, out long xDocID))
                     {
                         // Find which Method the Doc, Line, Col are in.
                         // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.
@@ -146,8 +143,8 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                             if (xAddress > 0)
                             {
-                                var xBPR = new AD7BreakpointResolution(mEngine, xAddress, GetDocumentContext(xAddress));
-                                var xBBP = new AD7BoundBreakpoint(mEngine, xAddress, this, xBPR);
+                                AD7BreakpointResolution xBPR = new(mEngine, xAddress, GetDocumentContext(xAddress));
+                                AD7BoundBreakpoint xBBP = new(mEngine, xAddress, this, xBPR);
                                 mBoundBPs.Add(xBBP);
                             }
 

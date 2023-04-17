@@ -53,7 +53,7 @@ namespace Cosmos.HAL
         public Device FirstDevice;
         public Device SecondDevice;
 
-        private Debugger mDebugger = new Debugger("HAL", "PS2Controller");
+        private Debugger mDebugger = new("PS2Controller");
 
         /// <summary>
         /// Initializes the PS/2 controller.
