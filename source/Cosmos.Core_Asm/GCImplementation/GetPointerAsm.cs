@@ -1,5 +1,4 @@
 ﻿using XSharp.Assembler;
-using IL2CPU.API;
 using XSharp;
 using CPUx86 = XSharp.Assembler.x86;
 using static XSharp.XSRegisters;

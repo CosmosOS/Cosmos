@@ -1,7 +1,5 @@
-﻿using Cosmos.Debug.Kernel;
-using XSharp;
+﻿using XSharp;
 using XSharp.Assembler;
-using static XSharp.XSRegisters;
 
 namespace Cosmos.Core_Asm
 {

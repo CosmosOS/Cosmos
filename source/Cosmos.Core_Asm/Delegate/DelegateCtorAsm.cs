@@ -1,7 +1,7 @@
-using System.Reflection;
 using XSharp.Assembler;
-using Cosmos.IL2CPU;
-using Cosmos.IL2CPU.X86.IL;
+using Cosmos.IL2CPU.CIL;
+using Cosmos.IL2CPU.CIL.Instructions;
+using Cosmos.IL2CPU.CIL.Utils;
 using XSharp;
 
 namespace Cosmos.Core_Asm

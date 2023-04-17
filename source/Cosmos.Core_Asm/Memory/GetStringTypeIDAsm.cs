@@ -1,4 +1,4 @@
-﻿using Cosmos.IL2CPU;
+﻿using Cosmos.IL2CPU.CIL;
 using XSharp;
 using XSharp.Assembler;
 

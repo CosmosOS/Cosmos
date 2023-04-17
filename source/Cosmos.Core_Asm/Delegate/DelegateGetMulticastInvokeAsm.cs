@@ -1,6 +1,6 @@
 using System.Reflection;
 using XSharp.Assembler;
-using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.CIL;
 using XSharp;
 
 namespace Cosmos.Core_Asm
