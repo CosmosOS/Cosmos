@@ -18,7 +18,7 @@ namespace Cosmos.Core.Multiboot
         #region Properties
 
         public static BasicMemoryInformation* BasicMemoryInformation { get; set; }
-        public static bool IsVBEAvailable { get; internal set; }
+        public static bool IsVBEAvailable => Framebuffer->Address != 753664; // Some kinda default number.
         public static Framebuffer* Framebuffer { get; set; }
         public static MemoryMap* MemoryMap { get; set; }
         public static EFI64* EFI64 { get; set; }
@@ -34,7 +34,6 @@ namespace Cosmos.Core.Multiboot
         {
             if (!isInitialized)
             {
-                IsVBEAvailable = false;
                 isInitialized = true;
 
                 uint MbAddress = GetMBIAddress();
@@ -57,7 +56,6 @@ namespace Cosmos.Core.Multiboot
                             break;
                         case 8:
                             Framebuffer = (Framebuffer*)Tag;
-                            IsVBEAvailable = true;
                             break;
                         case 12:
                             EFI64 = (EFI64*)Tag;
