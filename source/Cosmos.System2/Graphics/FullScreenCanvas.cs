@@ -1,8 +1,6 @@
-//#define COSMOSDEBUG
-using System;
-using Cosmos.Core;
+using Cosmos.HAL.Drivers.Video;
+using Cosmos.Core.Multiboot;
 using Cosmos.HAL;
-using Cosmos.HAL.Drivers;
 
 namespace Cosmos.System.Graphics
 {
@@ -58,7 +56,7 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas();
             }
-            else if (VBEAvailable())
+            else if (IsVBEAvailable())
             {
                 return new VBECanvas();
             }
@@ -79,7 +77,7 @@ namespace Cosmos.System.Graphics
             {
                 return new SVGAIICanvas(mode);
             }
-            else if (VBEAvailable())
+            else if (IsVBEAvailable())
             {
                 return new VBECanvas(mode);
             }
@@ -153,7 +151,7 @@ namespace Cosmos.System.Graphics
             return videoDriver;
         }
 
-        private static bool VBEAvailable()
+        private static bool IsVBEAvailable()
         {
             if (BGAExists())
             {
@@ -167,7 +165,7 @@ namespace Cosmos.System.Graphics
             {
                 return true;
             }
-            else if (VBE.IsAvailable())
+            else if (Multiboot2.IsVBEAvailable)
             {
                 return true;
             }

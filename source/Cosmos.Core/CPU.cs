@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Cosmos.Core.Multiboot;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
