@@ -232,12 +232,6 @@ namespace Cosmos.System.Graphics
             DrawDiagonalLine(color, dx, dy, x1, y1);
         }
 
-        [Obsolete("Floating-point drawing methods have been deprecated.", true)]
-        public void DrawLine(Color color, float x1, float y1, float x2, float y2)
-        {
-            throw new NotImplementedException("The DrawLine(Color, float, float, float, float) method has been deprecated.");
-        }
-
         //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
         /// <summary>
         /// Draws a circle at the given coordinates with the given radius.
@@ -527,12 +521,6 @@ namespace Cosmos.System.Graphics
             DrawLine(color, v1x, v1y, v2x, v2y);
             DrawLine(color, v1x, v1y, v3x, v3y);
             DrawLine(color, v2x, v2y, v3x, v3y);
-        }
-
-        [Obsolete("Floating-point drawing methods have been deprecated.", true)]
-        public void DrawRectangle(Color color, float xStart, float yStart, float width, float height)
-        {
-            throw new NotImplementedException("The DrawRectangle(Color, float, float, float, float) method has been deprecated.");
         }
 
         /// <summary>
