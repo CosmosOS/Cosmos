@@ -22,7 +22,7 @@ namespace Cosmos.Core.Multiboot
         public static MemoryMap* MemoryMap { get; set; }
         public static EFI64* EFI64 { get; set; }
 
-        public static bool IsVBEAvailable => Framebuffer != null;
+        public static bool IsVBEAvailable => Framebuffer->Address != 0;
 
         #endregion
 
