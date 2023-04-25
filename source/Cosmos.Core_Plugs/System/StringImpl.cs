@@ -11,7 +11,7 @@ namespace Cosmos.Core_Plugs.System
     [Plug(Target = typeof(string))]
     public static class StringImpl
     {
-        internal static Debugger mDebugger = new Debugger("Core", "String Plugs");
+        internal static Debugger mDebugger = new("String Plug");
 
         public static unsafe void Ctor(string aThis, char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
@@ -122,8 +122,6 @@ namespace Cosmos.Core_Plugs.System
         {
             return *(aFirstChar + aIndex);
         }
-
-
 
         public static bool IsAscii(string aThis)
         {
@@ -409,13 +407,13 @@ namespace Cosmos.Core_Plugs.System
 
         // HACK: TODO - improve efficiency of this.
         //How do we access the raw memory to copy it into a char array?
-        public static char[] ToCharArray(string aThis)
+        public static unsafe char[] ToCharArray(string aThis)
         {
-            var result = new char[aThis.Length];
+            char[] result = new char[aThis.Length];
 
-            for (int i = 0; i < aThis.Length; i++)
+            fixed (char* P1 = aThis, P2 = result)
             {
-                result[i] = aThis[i];
+                MemoryOperationsImpl.Copy((byte*)P2, (byte*)P1, aThis.Length * sizeof(char));
             }
 
             return result;
@@ -638,7 +636,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static int LastIndexOf(string aThis, string aString, int aIndex, int aCount)
         {
-            if (aString == String.Empty)
+            if (aString == string.Empty)
             {
                 if (aIndex > aThis.Length)
                 {

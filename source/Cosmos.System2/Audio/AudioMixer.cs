@@ -1,9 +1,9 @@
 ﻿using Cosmos.HAL.Audio;
 using Cosmos.System.Audio.IO;
-using System;
 using System.Collections.Generic;
 
-namespace Cosmos.System.Audio {
+namespace Cosmos.System.Audio
+{
     /// <summary>
     /// An audio mixer is responsible for mixing several streams of audio together.
     /// </summary>
@@ -11,7 +11,8 @@ namespace Cosmos.System.Audio {
     /// The <see cref="AudioMixer"/> class does not implement any kind of compressor or
     /// limiter, and as such, the resulting audio may introduce hard-clipping.
     /// </remarks>
-    public class AudioMixer : AudioStream {
+    public class AudioMixer : AudioStream
+    {
         AudioBuffer mixBuffer;
 
         /// <summary>
@@ -56,12 +57,13 @@ namespace Cosmos.System.Audio {
         public unsafe override void Read(AudioBuffer buffer)
         {
             // Ensure our mixing buffer is the same format and size as the output buffer
-            if(mixBuffer == null || mixBuffer.Size != buffer.Size || mixBuffer.Format != buffer.Format) {
+            if (mixBuffer == null || mixBuffer.Size != buffer.Size || mixBuffer.Format != buffer.Format)
+            {
                 mixBuffer = new AudioBuffer(buffer.Size, buffer.Format);
                 streamReader = new AudioBufferReader(mixBuffer);
             }
 
-            if(cachedBuffer != buffer)
+            if (cachedBuffer != buffer)
             {
                 cachedBuffer = buffer;
                 cachedOutputWriter = new(buffer, new SampleFormat(AudioBitDepth.Bits16, 1, true));
@@ -129,7 +131,8 @@ namespace Cosmos.System.Audio {
 
         private static short SaturationAdd(short a, short b)
         {
-            if(a > 0) {
+            if (a > 0)
+            {
                 if (b > short.MaxValue - a)
                 {
                     return short.MaxValue;

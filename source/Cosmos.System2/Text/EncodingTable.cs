@@ -1,5 +1,4 @@
-﻿//#define COSMOSDEBUG
-using System.Text;
+﻿using System.Text;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.ExtendedASCII
@@ -14,7 +13,7 @@ namespace Cosmos.System.ExtendedASCII
     /// </summary>
     internal static class EncodingTable
     {
-        static readonly Debugger mDebugger = new("System", "EncodingTable");
+        static readonly Debugger mDebugger = new("EncodingTable");
 
         /// <summary>
         /// Create new instance of the <see cref="EncodingTable"/> class.

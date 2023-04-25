@@ -1,4 +1,3 @@
-//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,7 +14,7 @@ namespace Cosmos.System.Graphics
     /// </summary>
     public class SVGAIICanvas : Canvas
     {
-        internal Debugger debugger = new("System", "SVGAIIScreen");
+        internal Debugger debugger = new("SVGAIIScreen");
         static readonly Mode defaultMode = new(1024, 768, ColorDepth.ColorDepth32);
 
         private Mode mode;

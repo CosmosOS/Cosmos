@@ -83,11 +83,11 @@ namespace Cosmos.Core.IOGroup
         {
             if (aSecondary)
             {
-                Global.mDebugger.Send("Creating Secondary ATA IOGroup");
+                Global.debugger.Send("Creating Secondary ATA IOGroup");
             }
             else
             {
-                Global.mDebugger.Send("Creating Primary ATA IOGroup");
+                Global.debugger.Send("Creating Primary ATA IOGroup");
             }
 
             var xBAR0 = GetBAR0(aSecondary);
