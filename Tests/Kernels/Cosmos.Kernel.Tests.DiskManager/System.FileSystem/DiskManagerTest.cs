@@ -20,6 +20,7 @@ namespace Cosmos.Kernel.Tests.DiskManager
             string driveName = @"0:\";
             Disk ourDisk = null;
             ManagedPartition ourPart = null;
+            MBR ourMBR = null;
             foreach (var disk in Kernel.mVFS.GetDisks())
             {
                 foreach (var part in disk.Partitions)
@@ -36,7 +37,7 @@ namespace Cosmos.Kernel.Tests.DiskManager
             {
                 throw new Exception("Failed to find our drive.");
             }
-
+            
             mDebugger.Send("START TEST: Get Name");
 
             Assert.IsTrue(ourPart.RootPath == driveName, "ManagedPartition.RootPath failed drive has wrong name");
@@ -46,6 +47,12 @@ namespace Cosmos.Kernel.Tests.DiskManager
             //How to really test this? I fear the other tests relies on the fact that there are files on 0:
 
             mDebugger.Send("START TEST: Format");
+
+            ourMBR = new MBR(ourDisk.Host);
+
+            ourMBR.CreateMBR(ourDisk.Host);
+
+            ourMBR.WritePartitionInformation(ourDisk.Partitions[0].Host, 0);
 
             ourDisk.FormatPartition(0, "FAT32", true);
 
