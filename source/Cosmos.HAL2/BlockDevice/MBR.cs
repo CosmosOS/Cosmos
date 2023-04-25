@@ -4,9 +4,9 @@ using Cosmos.Core;
 
 namespace Cosmos.HAL.BlockDevice
 {
-    // Its not a BlockDevice, but its related to "fixed" devices
+    // It's not a BlockDevice, but its related to "fixed" devices
     // and necessary to create partition block devices
-    // Im not comfortable with MBR and Partition being in Hardware ring and would prefer
+    // I'm not comfortable with MBR and Partition being in Hardware ring and would prefer
     // them in the system ring, but there are issues relating to moving it there.
     public class MBR
     {
@@ -64,8 +64,21 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
 
-        public void CreateMBR(BlockDevice device)
+        /// <summary>
+        /// Creates a MBR partition table on a disk
+        /// </summary>
+        /// <param name="aDevice">The device to be written a partition table.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item>Thrown when aDevice is null.</item>
+        /// </list>
+        public void CreateMBR(BlockDevice aDevice)
         {
+            if (aDevice == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             ManagedMemoryBlock mb = new ManagedMemoryBlock(512);
             mb.Fill(0);
             //Boot code
@@ -89,18 +102,26 @@ namespace Cosmos.HAL.BlockDevice
             mb.Write32(68, 0x007C00EA);
             mb.Write32(72, 0x00FEEB00);
             //Unique disk ID, is used to seperate different drives
-            mb.Write32(440, (uint)device.GetHashCode() * 0x5A5A);
+            mb.Write32(440, (uint)aDevice.GetHashCode() * 0x5A5A);
             //Signature
             mb.Write16(510, 0xAA55);
-            device.WriteBlock(0, 1, ref mb.memory);
+            aDevice.WriteBlock(0, 1, ref mb.memory);
         }
 
-
+        /// <summary>
+        /// Writes the selected partitions information on the MBR
+        /// </summary>
+        /// <param name="partition">The partition whose information will be written.</param>
+        /// <param name="PartitionNo">The partition number.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <list type="bullet">
+        /// <item>Thrown when the partition number is larger or smaller than allowed partition number count.</item>
+        /// </list>
         public void WritePartitionInformation(Partition partition, byte PartitionNo)
         {
-            if (PartitionNo > 3)
+            if (PartitionNo < 0 || PartitionNo > 3)
             {
-                return;
+                throw new ArgumentOutOfRangeException();
             }
 
             ManagedMemoryBlock mb = new ManagedMemoryBlock(512);
