@@ -1,9 +1,8 @@
-//#define COSMOSDEBUG
-using System;
 using System.Collections.Generic;
+using Cosmos.HAL.Drivers.Video;
+using Cosmos.Core.Multiboot;
 using System.Drawing;
-
-using Cosmos.HAL.Drivers;
+using System;
 
 namespace Cosmos.System.Graphics
 {
@@ -29,12 +28,11 @@ namespace Cosmos.System.Graphics
         /// Initializes a new instance of the <see cref="VBECanvas"/> class.
         /// </summary>
         /// <param name="mode">The display mode to use.</param>
-        public VBECanvas(Mode mode)
+        public unsafe VBECanvas(Mode mode)
         {
-            if (Core.VBE.IsAvailable())
+            if (Multiboot2.IsVBEAvailable)
             {
-                Core.VBE.ModeInfo ModeInfo = Core.VBE.getModeInfo();
-                mode = new Mode(ModeInfo.width, ModeInfo.height, (ColorDepth)ModeInfo.bpp);
+                mode = new(Multiboot2.Framebuffer->Width, Multiboot2.Framebuffer->Height, (ColorDepth)Multiboot2.Framebuffer->Bpp);
             }
 
             ThrowIfModeIsNotValid(mode);
@@ -94,7 +92,7 @@ namespace Cosmos.System.Graphics
         /// </list>
         /// </para>
         /// </summary>
-        public override List<Mode> AvailableModes { get; } = new List<Mode>
+        public override List<Mode> AvailableModes { get; } = new()
         {
             new Mode(320, 240, ColorDepth.ColorDepth32),
             new Mode(640, 480, ColorDepth.ColorDepth32),
@@ -253,7 +251,7 @@ namespace Cosmos.System.Graphics
         public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight)
         {
             // ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
-            aWidth = Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32;
+            aWidth = (int)(Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32);
             var color = aColor.ToArgb();
 
             for (int i = aY; i < aY + aHeight; i++)
@@ -269,11 +267,10 @@ namespace Cosmos.System.Graphics
             var xHeight = (int)aImage.Height;
 
             int xOffset = GetPointOffset(aX, aY);
-            int xScreenWidthInPixel = Mode.Width;
 
             for (int i = 0; i < xHeight; i++)
             {
-                driver.CopyVRAM((i * xScreenWidthInPixel) + xOffset, xBitmap, i * xWidth, xWidth);
+                driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
             }
         }
 

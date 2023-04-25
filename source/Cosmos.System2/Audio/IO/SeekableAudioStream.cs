@@ -1,6 +1,5 @@
 ﻿namespace Cosmos.System.Audio.IO
 {
-
     /// <summary>
     /// Represents a finite audio stream that supports seeking operations.
     /// </summary>

@@ -15,12 +15,12 @@ namespace Cosmos.System.Graphics
         /// <summary>
         /// The width, or rows, of the display mode.
         /// </summary>
-        public int Width { get; }
+        public uint Width { get; }
 
         /// <summary>
         /// The height, or columns, of the display mode.
         /// </summary>
-        public int Height { get; }
+        public uint Height { get; }
 
         /// <summary>
         /// The color depth of the display mode, i.e. the amount of bits per a single pixel.
@@ -33,7 +33,7 @@ namespace Cosmos.System.Graphics
         /// <param name="columns">The number of columns.</param>
         /// <param name="rows">The number of rows.</param>
         /// <param name="colorDepth">The color depth, i.e. the amount of bits per a single pixel.</param>
-        public Mode(int columns, int rows, ColorDepth colorDepth)
+        public Mode(uint columns, uint rows, ColorDepth colorDepth)
         {
             Width = columns;
             Height = rows;
