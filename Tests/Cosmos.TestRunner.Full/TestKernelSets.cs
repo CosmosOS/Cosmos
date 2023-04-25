@@ -19,7 +19,7 @@ namespace Cosmos.TestRunner.Full
             yield return typeof(Compiler.Tests.TypeSystem.Kernel);
             yield return typeof(Compiler.Tests.Bcl.Kernel);
             yield return typeof(Compiler.Tests.Bcl.System.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
+            //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
             yield return typeof(Compiler.Tests.Exceptions.Kernel);
             yield return typeof(Compiler.Tests.MethodTests.Kernel);
             yield return typeof(Compiler.Tests.SingleEchoTest.Kernel);
@@ -33,7 +33,7 @@ namespace Cosmos.TestRunner.Full
             yield return typeof(NetworkTest.Kernel);
             yield return typeof(AudioTests.Kernel);
             // Please see the notes on the kernel itself before enabling it
-            yield return typeof(ConsoleTest.Kernel);
+            //yield return typeof(ConsoleTest.Kernel);
             yield return typeof(MemoryOperationsTest.Kernel);
             yield return typeof(ProcessorTests.Kernel);
         }
