@@ -201,16 +201,16 @@ namespace Cosmos.Compiler.Tests.TypeSystem
         public void RealMethodsTest()
         {
             Heap.Collect();
-            //int allocated = HeapSmall.GetAllocatedObjectCount();
-            //TestMethod6();
-            //Heap.Collect();
-            //int nowAllocated = HeapSmall.GetAllocatedObjectCount();
-            //Assert.AreEqual(allocated, nowAllocated, "Concentating and writing strings does not leak objects");
-
             int allocated = HeapSmall.GetAllocatedObjectCount();
-            TestMethod7();
+            TestMethod6();
             Heap.Collect();
             int nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "Concentating and writing strings does not leak objects");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            TestMethod7();
+            Heap.Collect();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated, nowAllocated, "TestMethod7 does not leak string objects");
         }
 
@@ -236,55 +236,55 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             {
                 mDebugger.Send("Run");
 
-                //object xString = "a";
-                //string xString2 = "b";
+                object xString = "a";
+                string xString2 = "b";
 
-                //Assert.IsTrue(xString.GetType() == typeof(string), "GetType or typeof() works for reference types!");
-                //Assert.IsTrue(xString.GetType() == xString2.GetType(), "GetType or typeof() works for reference types!");
-                //Assert.IsTrue(xString is ICloneable, "isinst works for interfaces on reference types!");
-                //Assert.IsTrue(xString is IEnumerable<char>, "isinst works for generic interfaces on reference types!");
-                //Assert.IsFalse(xString.GetType().IsValueType, "IsValueType works for reference types!");
+                Assert.IsTrue(xString.GetType() == typeof(string), "GetType or typeof() works for reference types!");
+                Assert.IsTrue(xString.GetType() == xString2.GetType(), "GetType or typeof() works for reference types!");
+                Assert.IsTrue(xString is ICloneable, "isinst works for interfaces on reference types!");
+                Assert.IsTrue(xString is IEnumerable<char>, "isinst works for generic interfaces on reference types!");
+                Assert.IsFalse(xString.GetType().IsValueType, "IsValueType works for reference types!");
 
-                //IComparable<int> xNumber = 3;
+                IComparable<int> xNumber = 3;
 
-                //Assert.IsTrue(xNumber.GetType() == typeof(int), "GetType or typeof() works for value types!");
-                //Assert.IsTrue(xNumber is IConvertible, "isinst works for interfaces on value types!");
-                //Assert.IsTrue(xNumber is IEquatable<int>, "isinst works for generic interfaces on value types!");
+                Assert.IsTrue(xNumber.GetType() == typeof(int), "GetType or typeof() works for value types!");
+                Assert.IsTrue(xNumber is IConvertible, "isinst works for interfaces on value types!");
+                Assert.IsTrue(xNumber is IEquatable<int>, "isinst works for generic interfaces on value types!");
 
-                //IEnumerable<string> xEnumerable = new List<string>();
+                IEnumerable<string> xEnumerable = new List<string>();
 
-                //Assert.IsTrue(xEnumerable.GetType() == typeof(List<string>), "GetType or typeof() works for reference types!");
-                //Assert.IsTrue(xEnumerable is global::System.Collections.IEnumerable, "isinst works for interfaces on generic reference types!");
-                //Assert.IsTrue(xEnumerable is IList<string>, "isinst works for generic interfaces on generic reference types!");
+                Assert.IsTrue(xEnumerable.GetType() == typeof(List<string>), "GetType or typeof() works for reference types!");
+                Assert.IsTrue(xEnumerable is global::System.Collections.IEnumerable, "isinst works for interfaces on generic reference types!");
+                Assert.IsTrue(xEnumerable is IList<string>, "isinst works for generic interfaces on generic reference types!");
 
-                //B b = new B();
-                //Assert.IsTrue(b.GetType() == typeof(B), "GetType or typeof() works for custom types!");
+                B b = new B();
+                Assert.IsTrue(b.GetType() == typeof(B), "GetType or typeof() works for custom types!");
 
-                //Type baseType = b.GetType().BaseType;
-                //Type objectType = typeof(A);
-                //Assert.IsTrue(baseType == objectType, "BaseType works for custom reference types!");
-                //Assert.IsTrue(b.GetType().BaseType == new B().GetType().BaseType, "BaseType works for custom reference types!");
-                //Assert.IsTrue(b.GetType().IsSubclassOf(typeof(A)), "IsSubClassOf works for custom reference types!");
+                Type baseType = b.GetType().BaseType;
+                Type objectType = typeof(A);
+                Assert.IsTrue(baseType == objectType, "BaseType works for custom reference types!");
+                Assert.IsTrue(b.GetType().BaseType == new B().GetType().BaseType, "BaseType works for custom reference types!");
+                Assert.IsTrue(b.GetType().IsSubclassOf(typeof(A)), "IsSubClassOf works for custom reference types!");
 
-                //byte xByte = 1;
-                //Assert.IsTrue(xByte.GetType() == typeof(byte), "GetType or typeof() works for value types!");
-                //Assert.IsTrue(xByte.GetType().IsSubclassOf(typeof(ValueType)), "IsSubClassOf works for value types!");
-                //Assert.IsTrue(xByte.GetType().IsValueType, "IsValueType works for value types!");
+                byte xByte = 1;
+                Assert.IsTrue(xByte.GetType() == typeof(byte), "GetType or typeof() works for value types!");
+                Assert.IsTrue(xByte.GetType().IsSubclassOf(typeof(ValueType)), "IsSubClassOf works for value types!");
+                Assert.IsTrue(xByte.GetType().IsValueType, "IsValueType works for value types!");
 
-                //Action a = () => { };
-                //Action<int> a1 = (i) => test++;
-                //Assert.IsTrue(a != null, "Anonymous type for action is created correctly");
-                //Assert.IsTrue(a1 != null, "Anonymous type for action<int> is created correctly");
+                Action a = () => { };
+                Action<int> a1 = (i) => test++;
+                Assert.IsTrue(a != null, "Anonymous type for action is created correctly");
+                Assert.IsTrue(a1 != null, "Anonymous type for action<int> is created correctly");
 
-                //var c = new { i = 1, n = "Test" };
-                //Assert.IsTrue(c != null, "Anonymous types are created correctly");
-                //Assert.IsTrue(c.i == 1 && c.n == "Test", "Anonymous types have correct values");
+                var c = new { i = 1, n = "Test" };
+                Assert.IsTrue(c != null, "Anonymous types are created correctly");
+                Assert.IsTrue(c.i == 1 && c.n == "Test", "Anonymous types have correct values");
 
-                //TestVTablesImpl();
-                //TestGarbageCollectorMethods();
-                //TestGarbageCollector();
+                TestVTablesImpl();
+                TestGarbageCollectorMethods();
+                TestGarbageCollector();
                 RealMethodsTest();
-                //TestReflection();
+                TestReflection();
 
                 TestController.Completed();
             }

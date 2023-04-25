@@ -250,7 +250,7 @@ namespace Cosmos.TestRunner.Core
                         throw new Exception("Cannot run multiple kernels with in-process compilation!");
                     }
 
-                    xArgs.Add("AllowComments:true");
+                    //xArgs.Add("AllowComments:true"); // enable this line when debugging cosmos
 
                     RunIL2CPUInProc(xArgs.ToArray(), OutputHandler.LogMessage, OutputHandler.LogError);
                 }

@@ -66,7 +66,7 @@ namespace Cosmos.Core.Memory
         /// Debug flag.
         /// </summary>
         /// <remarks>Used to bypass certain checks that will fail during tests and debugging.</remarks>
-        static internal bool Debug = true;
+        static internal bool Debug = false;
 
         /// <summary>
         /// Native Intel page size.
@@ -114,11 +114,6 @@ namespace Cosmos.Core.Memory
         /// </exception>
         public static void Init(byte* aStartPtr, uint aSize)
         {
-            Debugger.DoSendNumber(0x1010101);
-            Debugger.DoSendNumber((int)aStartPtr);
-            Debugger.DoSendNumber((int)aSize);
-            Debugger.DoBochsBreak();
-
             if ((uint)aStartPtr % PageSize != 0 && !Debug)
             {
                 Debugger.DoSendNumber((uint)aStartPtr % PageSize);

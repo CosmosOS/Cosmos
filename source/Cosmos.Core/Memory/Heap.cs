@@ -183,18 +183,19 @@ namespace Cosmos.Core.Memory
             while (rootSMTPtr != null)
             {
                 uint size = rootSMTPtr->Size;
-                var objectSize = size + HeapSmall.PrefixItemBytes;
+                uint objectSize = size + HeapSmall.PrefixItemBytes;
                 uint objectsPerPage = RAT.PageSize / objectSize;
 
-                var smtBlock = rootSMTPtr->First;
+                SMTBlock* smtBlock = rootSMTPtr->First;
 
                 while (smtBlock != null)
                 {
-                    var pagePtr = smtBlock->PagePtr;
+                    byte* pagePtr = smtBlock->PagePtr;
                     for (int i = 0; i < objectsPerPage; i++)
                     {
 
-                        if (*(ushort*)(pagePtr + i * objectSize + 1) > 1) // 0 means not found and 1 means marked
+                        if (*(ushort*)(pagePtr + i * objectSize + sizeof(ushort)) > 1) // 0 means not found and 1 means marked
+                            // after the start of the object we first have one ushort of object size and then the ushort of gc info so + 2 == sizeof(ushort)
                         {
                             MarkAndSweepObject(pagePtr + i * objectSize + HeapSmall.PrefixItemBytes);
                         }
@@ -220,8 +221,6 @@ namespace Cosmos.Core.Memory
                 currentStackPointer += 1;
             }
 
-            Debugger.DoBochsBreak();
-
             // Free all unreferenced and reset hit flag
             // This means we do the same transversal as we did before of the heap
             // but we done have to touch the stack again
@@ -233,8 +232,6 @@ namespace Cosmos.Core.Memory
                 if (pageType == (byte)RAT.PageType.HeapMedium || pageType == (byte)RAT.PageType.HeapLarge)
                 {
                     byte* pagePointer = RAT.RamStart + ratIndex * RAT.PageSize;
-                    Debugger.DoSendNumber((int)(pagePointer + HeapLarge.PrefixBytes - 2));
-                    Debugger.DoSendNumber(*((ushort*)(pagePointer + HeapLarge.PrefixBytes - 2)));
                     if (*((ushort*)(pagePointer + HeapLarge.PrefixBytes - 2)) == 0)
                     {
                         Free(pagePointer + HeapLarge.PrefixBytes);
