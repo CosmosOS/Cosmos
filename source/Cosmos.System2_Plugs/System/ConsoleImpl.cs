@@ -1,4 +1,5 @@
 using IL2CPU.API.Attribs;
+using Cosmos.HAL.Drivers.Video;
 using Cosmos.System.Graphics;
 using Cosmos.System;
 using System.Text;
@@ -241,37 +242,37 @@ namespace Cosmos.System_Plugs.System
             {
                 fallBackConsole.mText.Cols = 40;
                 fallBackConsole.mText.Rows = 25;
-                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size40x25);
+                VGAScreen.SetTextMode(VGADriver.TextSize.Size40x25);
             }
             else if (width == 40 && height == 50)
             {
                 fallBackConsole.mText.Cols = 40;
                 fallBackConsole.mText.Rows = 50;
-                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size40x50);
+                VGAScreen.SetTextMode(VGADriver.TextSize.Size40x50);
             }
             else if (width == 80 && height == 25)
             {
                 fallBackConsole.mText.Cols = 80;
                 fallBackConsole.mText.Rows = 25;
-                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size80x25);
+                VGAScreen.SetTextMode(VGADriver.TextSize.Size80x25);
             }
             else if (width == 80 && height == 50)
             {
                 fallBackConsole.mText.Cols = 80;
                 fallBackConsole.mText.Rows = 50;
-                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size80x50);
+                VGAScreen.SetTextMode(VGADriver.TextSize.Size80x50);
             }
             else if (width == 90 && height == 30)
             {
                 fallBackConsole.mText.Cols = 90;
                 fallBackConsole.mText.Rows = 30;
-                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size90x30);
+                VGAScreen.SetTextMode(VGADriver.TextSize.Size90x30);
             }
             else if (width == 90 && height == 60)
             {
                 fallBackConsole.mText.Cols = 90;
                 fallBackConsole.mText.Rows = 60;
-                VGAScreen.SetTextMode(HAL.VGADriver.TextSize.Size90x60);
+                VGAScreen.SetTextMode(VGADriver.TextSize.Size90x60);
             }
             else
             {
