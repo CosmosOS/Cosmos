@@ -12,7 +12,7 @@ Sets VGA-compatible video modes without using the BIOS
  * by Stephen Remde
 //*/
 
-namespace Cosmos.HAL
+namespace Cosmos.HAL.Drivers.Video
 {
     public class VGADriver
     {

@@ -68,9 +68,6 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         public abstract void DrawPoint(Color color, int x, int y);
 
-        [Obsolete("Floating-point drawing methods have been deprecated.", true)]
-        public void DrawPoint(Color color, float x, float y) => throw new NotImplementedException("The method DrawPoint(Color, float, float) has been deprecated.");
-
         /// <summary>
         /// The name of the Canvas implementation.
         /// </summary>
@@ -98,7 +95,7 @@ namespace Cosmos.System.Graphics
         {
             int xBytePerPixel = (int)Mode.ColorDepth / 8;
             int stride = (int)Mode.ColorDepth / 8;
-            int pitch = Mode.Width * xBytePerPixel;
+            int pitch = (int)Mode.Width * xBytePerPixel;
 
             return (x * stride) + (y * pitch);
         }
@@ -233,12 +230,6 @@ namespace Cosmos.System.Graphics
 
             // The line is neither horizontal neither vertical - it's diagonal.
             DrawDiagonalLine(color, dx, dy, x1, y1);
-        }
-
-        [Obsolete("Floating-point drawing methods have been deprecated.", true)]
-        public void DrawLine(Color color, float x1, float y1, float x2, float y2)
-        {
-            throw new NotImplementedException("The DrawLine(Color, float, float, float, float) method has been deprecated.");
         }
 
         //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
@@ -532,12 +523,6 @@ namespace Cosmos.System.Graphics
             DrawLine(color, v2x, v2y, v3x, v3y);
         }
 
-        [Obsolete("Floating-point drawing methods have been deprecated.", true)]
-        public void DrawRectangle(Color color, float xStart, float yStart, float width, float height)
-        {
-            throw new NotImplementedException("The DrawRectangle(Color, float, float, float, float) method has been deprecated.");
-        }
-
         /// <summary>
         /// Draws the given image at the specified coordinates.
         /// </summary>
@@ -719,10 +704,10 @@ namespace Cosmos.System.Graphics
             // in case of vertical lines, no need to perform complex operations
             if (x1 == x2)
             {
-                x1 = Math.Min(Mode.Width - 1, Math.Max(0, x1));
+                x1 = Math.Min((int)Mode.Width - 1, Math.Max(0, x1));
                 x2 = x1;
-                y1 = Math.Min(Mode.Height - 1, Math.Max(0, y1));
-                y2 = Math.Min(Mode.Height - 1, Math.Max(0, y2));
+                y1 = Math.Min((int)Mode.Height - 1, Math.Max(0, y1));
+                y2 = Math.Min((int)Mode.Height - 1, Math.Max(0, y2));
 
                 return;
             }

@@ -60,8 +60,8 @@ namespace GraphicTest
 
             /* A Black Lines larger than the canvas */
             color = Color.Black;
-            aCanvas.DrawLine(color, -20, 100, aCanvas.Mode.Width + 20, 100);
-            aCanvas.DrawLine(color, -20, -20, aCanvas.Mode.Width + 20, aCanvas.Mode.Height + 20);
+            aCanvas.DrawLine(color, -20, 100, (int)aCanvas.Mode.Width + 20, 100);
+            aCanvas.DrawLine(color, -20, -20, (int)aCanvas.Mode.Width + 20, (int)aCanvas.Mode.Height + 20);
 
             /* An IndianRed vertical line */
             color = Color.IndianRed;

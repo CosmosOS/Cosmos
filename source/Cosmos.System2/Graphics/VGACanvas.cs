@@ -1,9 +1,8 @@
-﻿using System;
+﻿using static Cosmos.HAL.Drivers.Video.VGADriver;
+using Cosmos.HAL.Drivers.Video;
 using System.Collections.Generic;
-using System.Text;
-using Cosmos.HAL;
 using System.Drawing;
-using static Cosmos.HAL.VGADriver;
+using System;
 
 namespace Cosmos.System.Graphics
 {

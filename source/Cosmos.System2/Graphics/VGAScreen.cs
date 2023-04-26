@@ -1,6 +1,6 @@
+using static Cosmos.HAL.Drivers.Video.VGADriver;
+using Cosmos.HAL.Drivers.Video;
 using System;
-using Cosmos.HAL;
-using static Cosmos.HAL.VGADriver;
 
 namespace Cosmos.System.Graphics
 {
