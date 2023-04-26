@@ -80,12 +80,6 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)x, (uint)y, (uint)color.ToArgb());
         }
 
-        [Obsolete("This method is not yet implemented.", true)]
-        public override void DrawArray(Color[] colors, int x, int y, int width, int height)
-        {
-            throw new NotImplementedException();
-        }
-
         public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height)
         {
             var argb = color.ToArgb();

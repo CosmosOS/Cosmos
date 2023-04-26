@@ -109,7 +109,16 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         /// <param name="width">The width of the drawn bitmap.</param>
         /// <param name="height">This parameter is unused.</param>
-        public abstract void DrawArray(Color[] colors, int x, int y, int width, int height);
+        public virtual void DrawArray(Color[] colors, int x, int y, int width, int height)
+        {
+            for (int X = 0; X < width; X++)
+            {
+                for (int Y = 0; Y < height; Y++)
+                {
+                    DrawPoint(colors[Y * width + X], x + X, y + Y);
+                }
+            }
+        }
 
         /// <summary>
         /// Draws a horizontal line.

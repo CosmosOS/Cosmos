@@ -46,16 +46,5 @@ namespace Cosmos.System.Network.Config
                 }
             }
         }
-
-        /// <summary>
-        /// Gets the address of a known DNS server under the given
-        /// registered list index.
-        /// </summary>
-        /// <param name="index">The index of the server to fetch.</param>
-        [Obsolete("Directly index the 'DNSNameservers' dictionary instead.")]
-        public static Address Server(int index)
-        {
-            return DNSNameservers[index];
-        }
     }
 }

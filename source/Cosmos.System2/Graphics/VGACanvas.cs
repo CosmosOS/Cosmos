@@ -71,12 +71,6 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        [Obsolete("This method is not yet implemented.", true)]
-        public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
-        {
-            throw new NotImplementedException();
-        }
-
         public override void DrawFilledRectangle(Color aColor, int aXStart, int aYStart, int aWidth, int aHeight)
         {
             driver.DrawFilledRectangle(aXStart, aYStart, aWidth, aHeight, driver.GetClosestColorInPalette(aColor));
