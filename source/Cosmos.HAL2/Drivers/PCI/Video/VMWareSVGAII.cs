@@ -540,8 +540,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <param name="value">A value.</param>
         protected void WriteRegister(Register register, uint value)
         {
-            IOPort.Write32(IndexPort, (uint)register);
-            IOPort.Write32(ValuePort, value);
+            IOPort.Write32(indexPort, (uint)register);
+            IOPort.Write32(valuePort, value);
         }
 
         /// <summary>
@@ -551,8 +551,8 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         /// <returns>uint value.</returns>
         protected uint ReadRegister(Register register)
         {
-            IOPort.Write32(IndexPort, (uint)register);
-            return IOPort.Read32(ValuePort);
+            IOPort.Write32(indexPort, (uint)register);
+            return IOPort.Read32(valuePort);
         }
 
         /// <summary>
