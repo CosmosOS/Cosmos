@@ -6,6 +6,8 @@ Plugs are used to fill "holes" in .NET libraries and replace them with different
  Cosmos replaces specific methods and property implementations that rely on 
  win32 API calls. Plugs can also be used to provide an alternate implementation 
  for a method, even if it does not rely on the Windows API.
+ 
+ > **Important: All plugs must go in a seperate project, which is included in your original project using the `PlugReference` attribute in your kernels csproj.**
 
 ## Types of plugs
 
@@ -54,5 +56,3 @@ https://github.com/CosmosOS/Cosmos/blob/8a8393353f1957890c5154650e29847fd22bf893
 While plugs are usually used to overwrite existing methods in the .Net runtime, they can also be used to include assembly methods in your kernel. 
 This is for example done to implement the `void CPU.UpdateIDT(bool)` method in Cosmos. 
 To do this for your own classes and methods is not more difficult than plugging any other method. Simply set target of the plug class to your own class and write the assembly plug as usual. As a reference you can look at [Cosmos.Core/CPU.cs](https://github.com/CosmosOS/Cosmos/blob/master/source/Cosmos.Core/CPU.cs), [Cosmos.Core_Asm/CPUImpl.cs](https://github.com/CosmosOS/Cosmos/blob/master/source/Cosmos.Core_Asm/CPUImpl.cs) and [CPUUpdateIDTAsm.cs]( https://github.com/CosmosOS/Cosmos/blob/master/source/Cosmos.Core_Asm/CPU/CPUUpdateIDTAsm.cs).
-
-**Important:** All plugs must go in a seperate project, which is included in your original project using the `PlugReference` attribute in your kernels csproj.
