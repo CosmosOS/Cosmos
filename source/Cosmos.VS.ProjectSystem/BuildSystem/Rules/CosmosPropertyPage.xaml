@@ -85,7 +85,7 @@
     </EnumProperty>
 
     <StringProperty Name="Timeout"
-                    DisplayName="GRUB Menu Timeout"
+                    DisplayName="Limine Menu Timeout"
                     Description="The time to wait (in seconds) before the kernel is automatically started."
                     Category="Compile"
 		    Default="0">
