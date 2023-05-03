@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using Cosmos.Debug.Kernel;
-using Cosmos.HAL.Drivers.PCI.Video;
+using Cosmos.HAL.Drivers.Video.SVGAII;
 using Cosmos.System.Graphics.Fonts;
 
 namespace Cosmos.System.Graphics
@@ -80,12 +80,6 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)x, (uint)y, (uint)color.ToArgb());
         }
 
-        [Obsolete("This method is not yet implemented.", true)]
-        public override void DrawArray(Color[] colors, int x, int y, int width, int height)
-        {
-            throw new NotImplementedException();
-        }
-
         public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height)
         {
             var argb = color.ToArgb();
@@ -93,7 +87,7 @@ namespace Cosmos.System.Graphics
             // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
             for (int i = yStart; i < yStart + height; i++)
             {
-                driver.VideoMemory.Fill(GetPointOffset(xStart, i) + (int)driver.FrameSize, width, argb);
+                driver.videoMemory.Fill(GetPointOffset(xStart, i) + (int)driver.FrameSize, width, argb);
             }
         }
 
@@ -352,7 +346,7 @@ namespace Cosmos.System.Graphics
 
             for (int i = 0; i < height; i++)
             {
-                driver.VideoMemory.Copy(GetPointOffset(x, y + i) + (int)driver.FrameSize, image.RawData, i * width, width);
+                driver.videoMemory.Copy(GetPointOffset(x, y + i) + (int)driver.FrameSize, image.RawData, i * width, width);
             }
         }
     }

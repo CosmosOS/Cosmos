@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Cosmos.HAL.BlockDevice;
-using Cosmos.System.FileSystem.FAT;
 
 namespace Cosmos.System.FileSystem.FAT
 {

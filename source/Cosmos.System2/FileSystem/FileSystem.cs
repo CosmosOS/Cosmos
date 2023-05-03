@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Cosmos.HAL.BlockDevice;
-using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem

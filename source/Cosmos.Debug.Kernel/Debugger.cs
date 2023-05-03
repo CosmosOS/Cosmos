@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Cosmos.Debug.Kernel
 {
@@ -103,12 +102,6 @@ namespace Cosmos.Debug.Kernel
         /// </summary>
         public static void DoSendNumber(double number) { }
 
-        // NOTE: @ascpixi: There is no plug for this method anywhere. If we're
-        //                 sure there is no end-user code using this method (I
-        //                 doubt there is), then we can safely remove it. For
-        //                 now, this is marked as [Obsolete].
-        [Obsolete] internal static void DoSendCoreDump() { }
-
         /// <inheritdoc cref="DoSendNumber(uint)"/>
         public void SendNumber(uint number) => DoSendNumber(number);
 
@@ -126,9 +119,11 @@ namespace Cosmos.Debug.Kernel
 
         /// <inheritdoc cref="DoSendNumber(double)"/>
         public void SendNumber(double number) => DoSendNumber(number);
-        
-        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData) {
-            fixed (byte* xPtr = &aData[0]) {
+
+        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData)
+        {
+            fixed (byte* xPtr = &aData[0])
+            {
                 SendChannelCommand(aChannel, aCommand, aData.Length, xPtr);
             }
         }
@@ -151,7 +146,8 @@ namespace Cosmos.Debug.Kernel
 
         internal static void DoSend(string aText) { }
 
-        internal static void DoSend(string[] aStringArray) {
+        internal static void DoSend(string[] aStringArray)
+        {
             for (int i = 0; i < aStringArray.Length; ++i)
             {
                 DoSend(aStringArray[i]);
@@ -215,7 +211,7 @@ namespace Cosmos.Debug.Kernel
         /// Sends the given 32-bit floating-point number to all connected debugging hosts.
         /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(float number)  => DoSendNumber(number);
+        public virtual void SendInternal(float number) => DoSendNumber(number);
 
         /// <summary>
         /// Sends the given 64-bit floating-point number to all connected debugging hosts.
@@ -249,226 +245,31 @@ namespace Cosmos.Debug.Kernel
         /// Displays a message box on connected debugging hosts.
         /// </summary>
         /// <param name="text">The text to display.</param>
-        public unsafe void SendMessageBox(string text) {
+        public unsafe void SendMessageBox(string text)
+        {
             // TODO: Need to fix this so it can send empty strings.
             // Sending empty strings locks it up right now
-            if (text.Length == 0) {
+            if (text.Length == 0)
+            {
                 return;
             }
 
             var xChars = text.ToCharArray();
-            fixed (char* xPtr = &xChars[0]) {
+            fixed (char* xPtr = &xChars[0])
+            {
                 SendMessageBox(xChars.Length, xPtr);
             }
         }
 
-        // TODO: Kudzu replacement methods for Cosmos.HAL.DebugUtil
-        [Obsolete("This method is no longer used.")]
-        public unsafe void SendMessage(string module, string data) {
-            //string xSingleString;
-            //xSingleString = "Message Module: \"" + aModule + "\"";
-            //xSingleString += " Data: \"" + aData + "\"";
-            //Send(xSingleString);
-
-            DoSend("Message Module:");
-            DoSend(module);
-            DoSend("Data:");
-            DoSend(data);
-        }
-
-        [Obsolete("This method is equivalent to a no-op in this version of Cosmos.")]
-        public unsafe void SendError(string aModule, string aData) {
-            //string xSingleString;
-            //xSingleString = "Error Module: \"" + aModule + "\"";
-            //xSingleString += " Data: \"" + aData + "\"";
-            //Send(xSingleString);
-        }
-
-        [Obsolete("This method is equivalent to a no-op in this version of Cosmos.")]
-        public unsafe void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
-            //string xSingleString;
-            //xSingleString = "Number Module: \"" + aModule + "\"";
-            //xSingleString += " Description: \"" + aDescription + "\"";
-            //xSingleString += " Number: \"" + CreateNumber(aNumber, aBits) + "\"";
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe void WriteNumber(uint aNumber, byte aBits) {
-            WriteNumber(aNumber, aBits, true);
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix) {
-            Send(CreateNumber(aNumber, aBits, aWritePrefix));
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe string CreateNumber(uint aNumber, byte aBits) {
-            return CreateNumber(aNumber, aBits, true);
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe string CreateNumber(uint aNumber, byte aBits, bool aWritePrefix) {
-            return "Cosmos.Debug.Debugger.CreateNumber(aNumber, aBits, aWritePrefix) not implemented";
-            //string xNumberString = null;
-            //uint xValue = aNumber;
-            //byte xCurrentBits = aBits;
-            //if (aWritePrefix)
-            //{
-            //    xNumberString += "0x";
-            //}
-            //while (xCurrentBits >= 4)
-            //{
-            //    xCurrentBits -= 4;
-            //    byte xCurrentDigit = (byte)((xValue >> xCurrentBits) & 0xF);
-            //    string xDigitString = null;
-            //    switch (xCurrentDigit)
-            //    {
-            //        case 0:
-            //            xDigitString = "0";
-            //            goto default;
-            //        case 1:
-            //            xDigitString = "1";
-            //            goto default;
-            //        case 2:
-            //            xDigitString = "2";
-            //            goto default;
-            //        case 3:
-            //            xDigitString = "3";
-            //            goto default;
-            //        case 4:
-            //            xDigitString = "4";
-            //            goto default;
-            //        case 5:
-            //            xDigitString = "5";
-            //            goto default;
-            //        case 6:
-            //            xDigitString = "6";
-            //            goto default;
-            //        case 7:
-            //            xDigitString = "7";
-            //            goto default;
-            //        case 8:
-            //            xDigitString = "8";
-            //            goto default;
-            //        case 9:
-            //            xDigitString = "9";
-            //            goto default;
-            //        case 10:
-            //            xDigitString = "A";
-            //            goto default;
-            //        case 11:
-            //            xDigitString = "B";
-            //            goto default;
-            //        case 12:
-            //            xDigitString = "C";
-            //            goto default;
-            //        case 13:
-            //            xDigitString = "D";
-            //            goto default;
-            //        case 14:
-            //            xDigitString = "E";
-            //            goto default;
-            //        case 15:
-            //            xDigitString = "F";
-            //            goto default;
-            //        default:
-            //            xNumberString += xDigitString;
-            //            break;
-            //    }
-            //}
-            //return xNumberString;
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue) {
-            WriteBinary(aModule, aMessage, aValue, 0, aValue.Length);
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength) {
-            //string xSingleString;
-            //xSingleString = "Binary Module = \"" + aModule + "\"";
-            //xSingleString += " Message = " + aMessage + "\"";
-            //xSingleString += " Value = \"";
-            //for (int i = 0; i < aLength; i++)
-            //{
-            //    xSingleString += CreateNumber(aValue[aIndex + i], 8, false);
-            //}
-            //xSingleString += "\"";
-            //Send(xSingleString);
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength) {
-            //string xSingleString;
-            //xSingleString = "Binary Module = \"" + aModule + "\"";
-            //xSingleString += " Message = " + aMessage + "\"";
-            //xSingleString += " Value = \"";
-            //for (int i = 0; i < aLength; i++)
-            //{
-            //    xSingleString += CreateNumber(aValue[aIndex + i], 8, false);
-            //}
-            //xSingleString += "\"";
-            //Send(xSingleString);
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe void ViewMemory() {
-            ViewMemory(0);
-        }
-
-        [Obsolete("This method is currently not implemented.")]
-        public unsafe void ViewMemory(int addr) {
-            //while (true) {
-            //    Console.Clear();
-            //    Console.WriteLine();
-
-            //    for (int j = 0; j < 20; j++) {
-            //        int line = addr + j * 16;
-            //        Console.Write(line.ToHex(8));
-            //        Console.Write(": ");
-
-            //        for (int i = 0; i < 16; i++) {
-            //            if (i == 8) Console.Write("  ");
-            //            Console.Write((*(byte*)(line + i)).ToHex(2) + " ");
-            //        }
-            //        Console.Write(" ");
-
-            //        for (int i = 0; i < 16; i++) {
-            //            byte b = (*(byte*)(line + i));
-            //            if (i == 8) Console.Write(" ");
-            //            if (b < 32 || b > 127)
-            //                Console.Write(".");
-            //            else
-            //                Console.Write((char)b);
-            //        }
-
-            //        Console.WriteLine();
-            //    }
-
-            //    Console.WriteLine();
-
-            //    Console.Write("Enter Hex Address (q to quit): ");
-            //    string s = Console.ReadLine();
-            //    if (s == "q")
-            //        break;
-
-            //    addr = FromHex(s);
-            //}
-        }
-
-
-        [Obsolete("This method is currently not implemented.")]
-        public void SendCoreDump() => DoSendCoreDump();
-
-        private int FromHex(string p) {
+        private int FromHex(string p)
+        {
             p = p.ToLower();
             string hex = "0123456789abcdef";
 
             int ret = 0;
 
-            for (int i = 0; i < p.Length; i++) {
+            for (int i = 0; i < p.Length; i++)
+            {
                 ret = ret * 16 + hex.IndexOf(p[i]);
             }
             return ret;
