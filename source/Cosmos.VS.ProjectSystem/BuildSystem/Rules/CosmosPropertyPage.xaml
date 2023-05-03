@@ -85,8 +85,8 @@
     </EnumProperty>
 
     <StringProperty Name="Timeout"
-                    DisplayName="Limine Menu Timeout"
-                    Description="The time to wait (in seconds) before the kernel is automatically started."
+                    DisplayName="Bootloader Timeout"
+                    Description="The time to wait (in seconds) before the bootloader automatically starts the kernel."
                     Category="Compile"
 		    Default="0">
     </StringProperty>
