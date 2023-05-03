@@ -80,9 +80,9 @@ namespace Cosmos.System.FileSystem.FAT
         {
             get
             {
-                Global.FileSystemDebugger.SendInternal("-- FatStream.get_Length --");
-                Global.FileSystemDebugger.SendInternal("Length =");
-                Global.FileSystemDebugger.SendInternal(mSize);
+                Global.Debugger.SendInternal("-- FatStream.get_Length --");
+                Global.Debugger.SendInternal("Length =");
+                Global.Debugger.SendInternal(mSize);
                 return mSize;
             }
         }
@@ -95,9 +95,9 @@ namespace Cosmos.System.FileSystem.FAT
         {
             get
             {
-                Global.FileSystemDebugger.SendInternal("-- FatStream.get_Position --");
-                Global.FileSystemDebugger.SendInternal("Position =");
-                Global.FileSystemDebugger.SendInternal(mPosition);
+                Global.Debugger.SendInternal("-- FatStream.get_Position --");
+                Global.Debugger.SendInternal("Position =");
+                Global.Debugger.SendInternal(mPosition);
                 return mPosition;
             }
             set
@@ -107,9 +107,9 @@ namespace Cosmos.System.FileSystem.FAT
                     throw new ArgumentOutOfRangeException(nameof(value));
                 }
 
-                Global.FileSystemDebugger.SendInternal("-- FatStream.set_Position --");
-                Global.FileSystemDebugger.SendInternal("Position =");
-                Global.FileSystemDebugger.SendInternal(mPosition);
+                Global.Debugger.SendInternal("-- FatStream.set_Position --");
+                Global.Debugger.SendInternal("Position =");
+                Global.Debugger.SendInternal(mPosition);
                 mPosition = value;
             }
         }
@@ -203,11 +203,11 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void SetLength(long value)
         {
-            Global.FileSystemDebugger.SendInternal("-- FatStream.SetLength --");
-            Global.FileSystemDebugger.SendInternal("value =");
-            Global.FileSystemDebugger.SendInternal(value);
-            Global.FileSystemDebugger.SendInternal("mFatTable.Length =");
-            Global.FileSystemDebugger.SendInternal(mFatTable.Length);
+            Global.Debugger.SendInternal("-- FatStream.SetLength --");
+            Global.Debugger.SendInternal("value =");
+            Global.Debugger.SendInternal(value);
+            Global.Debugger.SendInternal("mFatTable.Length =");
+            Global.Debugger.SendInternal(mFatTable.Length);
 
             mDirectoryEntry.SetSize(value);
             mSize = value;
@@ -231,18 +231,18 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         public override int Read(byte[] aBuffer, int aOffset, int aCount)
         {
-            Global.FileSystemDebugger.SendInternal("-- FatStream.Read --");
-            Global.FileSystemDebugger.SendInternal("aBuffer.Length = " + aBuffer.Length);
-            Global.FileSystemDebugger.SendInternal("aOffset = " + aOffset);
-            Global.FileSystemDebugger.SendInternal("aCount = " + aCount);
-            Global.FileSystemDebugger.SendInternal("Current State");
-            Global.FileSystemDebugger.SendInternal("mPosition = " + mPosition);
-            Global.FileSystemDebugger.SendInternal("mDirectoryEntry.mSize = " + mDirectoryEntry.mSize);
-            Global.FileSystemDebugger.SendInternal("xClusterSize = " + mFS.BytesPerCluster);
-            Global.FileSystemDebugger.SendInternal("mFatTable = ");
+            Global.Debugger.SendInternal("-- FatStream.Read --");
+            Global.Debugger.SendInternal("aBuffer.Length = " + aBuffer.Length);
+            Global.Debugger.SendInternal("aOffset = " + aOffset);
+            Global.Debugger.SendInternal("aCount = " + aCount);
+            Global.Debugger.SendInternal("Current State");
+            Global.Debugger.SendInternal("mPosition = " + mPosition);
+            Global.Debugger.SendInternal("mDirectoryEntry.mSize = " + mDirectoryEntry.mSize);
+            Global.Debugger.SendInternal("xClusterSize = " + mFS.BytesPerCluster);
+            Global.Debugger.SendInternal("mFatTable = ");
             for (int i = 0; i < mFatTable.Length; i++)
             {
-                Global.FileSystemDebugger.SendInternal(mFatTable[i]);
+                Global.Debugger.SendInternal(mFatTable[i]);
             }
 
             if (aCount < 0)
@@ -296,9 +296,9 @@ namespace Cosmos.System.FileSystem.FAT
                     xReadSize = xCount;
                 }
 
-                Global.FileSystemDebugger.SendInternal("xClusterIdx = " + xClusterIdx);
-                Global.FileSystemDebugger.SendInternal("xPosInCluster = " + xPosInCluster);
-                Global.FileSystemDebugger.SendInternal("xReadSize = " + xReadSize);
+                Global.Debugger.SendInternal("xClusterIdx = " + xClusterIdx);
+                Global.Debugger.SendInternal("xPosInCluster = " + xPosInCluster);
+                Global.Debugger.SendInternal("xReadSize = " + xReadSize);
 
                 Array.Copy(xCluster, xPosInCluster, aBuffer, xOffset, xReadSize);
 
@@ -307,8 +307,8 @@ namespace Cosmos.System.FileSystem.FAT
                 mPosition += xReadSize;
             }
 
-            Global.FileSystemDebugger.SendInternal("aBuffer =" + BitConverter.ToString(aBuffer));
-            Global.FileSystemDebugger.SendInternal("xOffset =" + xOffset);
+            Global.Debugger.SendInternal("aBuffer =" + BitConverter.ToString(aBuffer));
+            Global.Debugger.SendInternal("xOffset =" + xOffset);
 
             return (int)xOffset;
         }
@@ -360,13 +360,13 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public override void Write(byte[] aBuffer, int aOffset, int aCount)
         {
-            Global.FileSystemDebugger.SendInternal("-- FatStream.Write --");
-            Global.FileSystemDebugger.SendInternal("aBuffer.Length =");
-            Global.FileSystemDebugger.SendInternal(aBuffer.Length);
-            Global.FileSystemDebugger.SendInternal("aOffset =");
-            Global.FileSystemDebugger.SendInternal(aOffset);
-            Global.FileSystemDebugger.SendInternal("aCount =");
-            Global.FileSystemDebugger.SendInternal(aCount);
+            Global.Debugger.SendInternal("-- FatStream.Write --");
+            Global.Debugger.SendInternal("aBuffer.Length =");
+            Global.Debugger.SendInternal(aBuffer.Length);
+            Global.Debugger.SendInternal("aOffset =");
+            Global.Debugger.SendInternal(aOffset);
+            Global.Debugger.SendInternal("aCount =");
+            Global.Debugger.SendInternal(aCount);
 
             if (aCount < 0)
             {
@@ -412,12 +412,12 @@ namespace Cosmos.System.FileSystem.FAT
                 Array.Copy(aBuffer, aOffset, xCluster, (int)xPosInCluster, (int)xWriteSize);
                 mFS.Write(mFatTable[xClusterIdx], xCluster);
 
-                Global.FileSystemDebugger.SendInternal("xClusterIdx =");
-                Global.FileSystemDebugger.SendInternal(xClusterIdx);
-                Global.FileSystemDebugger.SendInternal("xPosInCluster =");
-                Global.FileSystemDebugger.SendInternal(xPosInCluster);
-                Global.FileSystemDebugger.SendInternal("xWriteSize =");
-                Global.FileSystemDebugger.SendInternal(xWriteSize);
+                Global.Debugger.SendInternal("xClusterIdx =");
+                Global.Debugger.SendInternal(xClusterIdx);
+                Global.Debugger.SendInternal("xPosInCluster =");
+                Global.Debugger.SendInternal(xPosInCluster);
+                Global.Debugger.SendInternal("xWriteSize =");
+                Global.Debugger.SendInternal(xWriteSize);
 
                 xOffset += xWriteSize;
                 xCount -= xWriteSize;

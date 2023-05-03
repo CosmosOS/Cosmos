@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using static Cosmos.Core.INTs;
 
-namespace Cosmos.HAL.Drivers.PCI.Network
+namespace Cosmos.HAL.Drivers.Network
 {
     public class RTL8139 : NetworkDevice
     {
@@ -31,7 +31,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             // We are handling this device
             pciCard.Claimed = true;
             // Setup interrupt handling
-            INTs.SetIrqHandler(device.InterruptLine, HandleNetworkInterrupt);
+            SetIrqHandler(device.InterruptLine, HandleNetworkInterrupt);
             // Get IO Address from PCI Bus
             // Enable the card
             pciCard.EnableDevice();
@@ -45,7 +45,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             {
                 eeprom_mac[b] = IOPort.Read8((ushort)(Base + b));
             }
-            this.mac = new MACAddress(eeprom_mac);
+            mac = new MACAddress(eeprom_mac);
             // Get a receive buffer and assign it to the card
             rxBuffer = new ManagedMemoryBlock(RxBufferSize + 2048 + 16, 4);
             RBStartRegister = (uint)rxBuffer.Offset;
@@ -65,7 +65,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             //Console.WriteLine("Scanning for Realtek 8139 cards...");
 
             List<RTL8139> cards = new List<RTL8139>();
-            foreach (var xDevice in HAL.PCI.Devices)
+            foreach (var xDevice in PCI.Devices)
             {
                 if (xDevice.VendorID == 0x10EC && xDevice.DeviceID == 0x8139 && xDevice.Claimed == false)
                 {
@@ -205,13 +205,13 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         #region Network Device Implementation
         public override MACAddress MACAddress
         {
-            get { return this.mac; }
+            get { return mac; }
         }
         public override bool Enable()
         {
             // Enable Receiving and Transmitting of data
             CommandRegister = 0x0C;
-            while (this.Ready == false)
+            while (Ready == false)
             { }
             return true;
         }
@@ -291,7 +291,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 }
                 mRecvBuffer.Enqueue(recv_data);
             }
-            capr += (ushort)((packetLen + 4 + 3) & 0xFFFFFFFC);
+            capr += (ushort)(packetLen + 4 + 3 & 0xFFFFFFFC);
             if (capr > RxBufferSize)
             {
                 capr -= RxBufferSize;

@@ -1,6 +1,7 @@
 //#define COSMOSDEBUG
 using System;
 using System.Globalization;
+using System.Text;
 using Cosmos.Common;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
@@ -473,7 +474,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static int IndexOf(string aThis, string aSubstring, int aIdx, int aLength, StringComparison aComparison)
         {
-            if (aSubstring == String.Empty)
+            if (aSubstring == string.Empty)
             {
                 return aIdx;
             }
@@ -760,7 +761,7 @@ namespace Cosmos.Core_Plugs.System
             throw new ArgumentNullException();
         }
 
-        internal static unsafe char *GetFirstChar(string aThis, [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+        internal static unsafe char* GetFirstChar(string aThis, [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
             return aFirstChar;
         }
@@ -880,16 +881,23 @@ namespace Cosmos.Core_Plugs.System
                         char* ptr1 = (char*)((byte*)strBChars + diff);
                         char* ptr2 = (char*)strBChars;
                         if (*ptr1 != *ptr2)
-                            return (int)*ptr1 - (int)*ptr2;
-                        return (int)*(ptr1 + 1) - (int)*(ptr2 + 1);
+                        {
+                            return *ptr1 - *ptr2;
+                        }
+
+                        return *(ptr1 + 1) - *(ptr2 + 1);
                     }
                     ++strBChars;
                 }
 
                 int c;
                 if (count == -1)
+                {
                     if ((c = *(char*)((byte*)strBChars + diff) - *(char*)strBChars) != 0)
+                    {
                         return c;
+                    }
+                }
             }
 
             return countA - countB;
@@ -960,17 +968,12 @@ namespace Cosmos.Core_Plugs.System
             int lengthA = Math.Min(length, strA.Length - indexA);
             int lengthB = Math.Min(length, strB.Length - indexB);
 
-            switch (comparisonType)
+            return comparisonType switch
             {
-                case StringComparison.Ordinal:
-                    return CompareOrdinalHelper(strA, indexA, lengthA, strB, indexB, lengthB);
-
-                case StringComparison.OrdinalIgnoreCase:
-                    return CompareOrdinalHelperIgnoreCase(strA, indexA, lengthA, strB, indexB, lengthB);
-
-                default:
-                    throw new ArgumentException("Not Supported StringComparison");
-            }
+                StringComparison.Ordinal => CompareOrdinalHelper(strA, indexA, lengthA, strB, indexB, lengthB),
+                StringComparison.OrdinalIgnoreCase => CompareOrdinalHelperIgnoreCase(strA, indexA, lengthA, strB, indexB, lengthB),
+                _ => throw new ArgumentException("String comparison not supported!"),
+            };
         }
 
         public static unsafe int GetNonRandomizedHashCode(string aString)

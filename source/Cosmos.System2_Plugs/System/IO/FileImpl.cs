@@ -27,7 +27,7 @@ namespace Cosmos.System_Plugs.System.IO
                 throw new ArgumentException("Empty", nameof(path));
             }
 
-            Global.FileSystemDebugger.SendInternal("Writing contents");
+            Global.Debugger.SendInternal("Writing contents");
 
             StreamWriter Writer = new(path);
 

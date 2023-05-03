@@ -13,13 +13,13 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static string GetCurrentDirectory()
         {
-            Global.FileSystemDebugger.SendInternal($"Directory.GetCurrentDirectory : currentDirectory = {currentDirectory}");
+            Global.Debugger.SendInternal($"Directory.GetCurrentDirectory : currentDirectory = {currentDirectory}");
             return currentDirectory;
         }
 
         public static void SetCurrentDirectory(string path)
         {
-            Global.FileSystemDebugger.SendInternal($"Directory.SetCurrentDirectory : path = {path}");
+            Global.Debugger.SendInternal($"Directory.SetCurrentDirectory : path = {path}");
             currentDirectory = path;
         }
 
@@ -30,14 +30,14 @@ namespace Cosmos.System_Plugs.System.IO
                 return false;
             }
 
-            Global.FileSystemDebugger.SendInternal($"Directory.Exists : aPath = {path}");
+            Global.Debugger.SendInternal($"Directory.Exists : aPath = {path}");
             return VFSManager.DirectoryExists(path);
         }
 
         public static DirectoryInfo CreateDirectory(string path)
         {
-            Global.FileSystemDebugger.SendInternal($"-- Directory.CreateDirectory --");
-            Global.FileSystemDebugger.SendInternal($"path = {path}");
+            Global.Debugger.SendInternal($"-- Directory.CreateDirectory --");
+            Global.Debugger.SendInternal($"path = {path}");
 
             if (path == null)
             {
@@ -73,27 +73,27 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static DirectoryInfo GetParent(string path)
         {
-            Global.FileSystemDebugger.SendInternal("Directory.GetParent:");
+            Global.Debugger.SendInternal("Directory.GetParent:");
 
             if (path == null)
             {
-                Global.FileSystemDebugger.SendInternal("Directory.GetParent : path is null");
+                Global.Debugger.SendInternal("Directory.GetParent : path is null");
                 throw new ArgumentNullException(nameof(path));
             }
 
             if (string.IsNullOrEmpty(path))
             {
-                Global.FileSystemDebugger.SendInternal("Directory.GetParent : path is empty");
+                Global.Debugger.SendInternal("Directory.GetParent : path is empty");
                 throw new ArgumentException("Path must not be empty.", nameof(path));
             }
 
-            Global.FileSystemDebugger.SendInternal($"path = {path}");
+            Global.Debugger.SendInternal($"path = {path}");
 
             string fullPath = Path.GetFullPath(path);
             string parentDirectory = Path.GetDirectoryName(fullPath);
             if (parentDirectory == null)
             {
-                Global.FileSystemDebugger.SendInternal("Directory.GetParent : Parent Directory is null");
+                Global.Debugger.SendInternal("Directory.GetParent : Parent Directory is null");
                 return null;
             }
 
@@ -102,7 +102,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static string[] GetDirectories(string path)
         {
-            Global.FileSystemDebugger.SendInternal("Directory.GetDirectories");
+            Global.Debugger.SendInternal("Directory.GetDirectories");
             if (path == null)
             {
                 throw new ArgumentNullException(path);
@@ -124,7 +124,7 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static string[] GetFiles(string path)
         {
-            Global.FileSystemDebugger.SendInternal("Directory.GetFiles");
+            Global.Debugger.SendInternal("Directory.GetFiles");
             if (path == null)
             {
                 throw new ArgumentNullException(path);

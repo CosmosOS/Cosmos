@@ -4,7 +4,7 @@ using Cosmos.Common;
 using Cosmos.Core;
 using Cosmos.HAL.Network;
 
-namespace Cosmos.HAL.Drivers.PCI.Network
+namespace Cosmos.HAL.Drivers.Network
 {
     public class AMDPCNetII : NetworkDevice
     {
@@ -50,11 +50,11 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 throw new ArgumentException("PCI Device is null. Unable to get AMD PCNet card");
             }
 
-            this.pciCard = device;
-            this.pciCard.Claimed = true;
-            this.pciCard.EnableDevice();
+            pciCard = device;
+            pciCard.Claimed = true;
+            pciCard.EnableDevice();
 
-            int baseAddress = (int)this.pciCard.BaseAddressBar[0].BaseAddress;
+            int baseAddress = (int)pciCard.BaseAddressBar[0].BaseAddress;
             RegisterAddress = baseAddress + 0x14;
             RegisterData = baseAddress + 0x10;
             BusData = baseAddress + 0x1C;
@@ -80,10 +80,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             mRxDescriptor = new ManagedMemoryBlock(256, 16);
             mTxDescriptor = new ManagedMemoryBlock(256, 16);
 
-            mInitBlock.Write32(0x00, (0x4 << 28) | (0x4 << 20));
+            mInitBlock.Write32(0x00, 0x4 << 28 | 0x4 << 20);
             mInitBlock.Write32(0x04,
-                (uint)(eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24)));
-            mInitBlock.Write32(0x08, (uint)(eeprom_mac[4] | (eeprom_mac[5] << 8)));
+                (uint)(eeprom_mac[0] | eeprom_mac[1] << 8 | eeprom_mac[2] << 16 | eeprom_mac[3] << 24));
+            mInitBlock.Write32(0x08, (uint)(eeprom_mac[4] | eeprom_mac[5] << 8));
             mInitBlock.Write32(0x0C, 0x0);
             mInitBlock.Write32(0x10, 0x0);
             mInitBlock.Write32(0x14, (uint)mRxDescriptor.Offset);
@@ -149,7 +149,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             }
 
             StatusRegister = cur_status;
-            Cosmos.Core.Global.PIC.EoiSlave();
+            Core.Global.PIC.EoiSlave();
         }
 
         /// <summary>
@@ -158,10 +158,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static void FindAll()
         {
             Console.WriteLine("Scanning for AMD PCNetII cards...");
-            PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+            PCIDevice device = HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
             if (device != null)
             {
-                AMDPCNetII nic = new AMDPCNetII((PCIDevice)device);
+                AMDPCNetII nic = new AMDPCNetII(device);
 
                 Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
                                   device.function);
