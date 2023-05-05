@@ -58,19 +58,19 @@ namespace Cosmos.System.Audio.IO
         /// <param name="waveFile">The target wave file.</param>
         public unsafe static MemoryAudioStream FromWave(byte[] waveFile)
         {
-            if (!ValidateValues(waveFile, 0, "RIFF"u8.ToArray()))
+            if (!ValidateValues(waveFile, 0, 0x52, 0x49, 0x46, 0x46))
             {
                 throw new ArgumentException("Invalid WAVE file - expected a RIFF header.", nameof(waveFile));
             }
 
             // chunkSize at offset 4 of size 4
-
-            if (!ValidateValues(waveFile, 8, "WAVE"u8.ToArray()))
+            
+            if (!ValidateValues(waveFile, 8, 0x57, 0x41, 0x56, 0x45))
             {
                 throw new ArgumentException("Invalid WAVE file - expected a WAVE format in the RIFF header.", nameof(waveFile));
             }
 
-            if (!ValidateValues(waveFile, 12, "fmt "u8.ToArray()))
+            if (!ValidateValues(waveFile, 12, 0x66, 0x6D, 0x74, 0x20))
             {
                 throw new ArgumentException("The first subchunk is expected to be the sample format.", nameof(waveFile));
             }
@@ -109,7 +109,7 @@ namespace Cosmos.System.Audio.IO
             // ExtraParamSize and ExtraParams would be here for encodings different than PCM
             int dataStart = 20 + metadataSize;
 
-            if (!ValidateValues(waveFile, dataStart, "data"u8.ToArray()))
+            if (!ValidateValues(waveFile, dataStart, 0x64, 0x61, 0x74, 0x61))
             {
                 throw new ArgumentException("Expected a 'data' block");
             }
