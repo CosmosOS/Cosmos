@@ -1,12 +1,13 @@
 ﻿using System;
 using Cosmos.HAL.Audio;
 
-namespace Cosmos.HAL.Audio
+namespace Cosmos.HAL.Drivers.Audio
 {
     /// <summary>
     /// Represents an audio driver.
     /// </summary>
-    public abstract class AudioDriver {
+    public abstract class AudioDriver
+    {
         /// <summary>
         /// The buffer provider to use.
         /// </summary>

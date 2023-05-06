@@ -66,7 +66,7 @@ namespace ConsoleTest
             Console.WriteLine("Let's write some accented characters: èòàùì");
             Console.WriteLine("Let's print all the CP437 codepage");
 
-            Sys.Global.mDebugger.SendInternal("");
+            Sys.Global.Debugger.SendInternal("");
 
             Console.Write("Ç ü é â ä à å ç ê ë è ï î ì Ä Å\n" +
                           "É æ Æ ô ö ò û ù ÿ Ö Ü ¢ £ ¥ ₧ ƒ\n" +

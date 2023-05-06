@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.HAL.Drivers.PCI.Network;
+using Cosmos.HAL.Drivers.Network;
 
 namespace Cosmos.HAL.Network
 {
