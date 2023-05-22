@@ -5,7 +5,7 @@ namespace Cosmos.HAL
     /// <summary>
     /// Represents the baud rates for serial ports.
     /// </summary>
-    public enum BaudRate
+    public enum BaudRate : byte
     {
         /// <summary>
         /// 115200 bits per second.
