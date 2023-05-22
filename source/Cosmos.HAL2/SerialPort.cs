@@ -39,17 +39,17 @@ namespace Cosmos.HAL
         /// <summary>
         /// IO port for COM8 port
         /// </summary>
-        public const ushort COM8 = 0x4E8; 
+        public const ushort COM8 = 0x4E8;
 
         /// <summary>
         /// Enables certain COM port
         /// </summary>
         /// <param name="aPort">COM port</param>
-        public static void Enable(ushort aPort)
+        public static void Enable(ushort aPort, BaudRate aBaudRate)
         {
             IOPort.Write8((ushort)(aPort + 1), 0x00);
             IOPort.Write8((ushort)(aPort + 3), 0x80);
-            IOPort.Write8(aPort, 0x03);
+            IOPort.Write8(aPort, (byte)aBaudRate);
             IOPort.Write8((ushort)(aPort + 1), 0x00);
             IOPort.Write8((ushort)(aPort + 3), 0x03);
             IOPort.Write8((ushort)(aPort + 2), 0xC7);
