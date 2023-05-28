@@ -1,18 +1,11 @@
-﻿using System;
+﻿using Debugger = Cosmos.Debug.Kernel.Debugger;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Debugger = Cosmos.Debug.Kernel.Debugger;
-using Cosmos.Common.Extensions;
 
 namespace Cosmos.HAL
 {
     public static class TextScreenHelpers
     {
-        private static Debugger mDebugger = new Debugger("TextScreen", "Debug");
+        private static Debugger debugger = new("Debug");
 
         [Conditional("COSMOSDEBUG")]
         public static void Debug(string aMessage, params object[] aParams)
@@ -21,7 +14,6 @@ namespace Cosmos.HAL
 
             if (aParams != null)
             {
-                aMessage = aMessage + " : ";
                 for (int i = 0; i < aParams.Length; i++)
                 {
                     if (aParams[i] != null)
@@ -35,31 +27,31 @@ namespace Cosmos.HAL
                 }
             }
 
-            mDebugger.Send("TextScreen Debug: " + xMessage);
+            debugger.Send("TextScreen Debug: " + xMessage);
         }
 
         [Conditional("COSMOSDEBUG")]
         public static void Debug(string aMessage)
         {
-            mDebugger.Send("TextScreen Debug: " + aMessage);
+            debugger.Send("TextScreen Debug: " + aMessage);
         }
 
         [Conditional("COSMOSDEBUG")]
         public static void DebugNumber(uint aValue)
         {
-            mDebugger.SendNumber(aValue);
+            debugger.SendNumber(aValue);
         }
 
         [Conditional("COSMOSDEBUG")]
         public static void DebugNumber(ulong aValue)
         {
-            mDebugger.Send(((uint)aValue).ToString() + ((uint)aValue >> 32).ToString());
+            debugger.Send(((uint)aValue).ToString() + ((uint)aValue >> 32).ToString());
         }
 
         [Conditional("COSMOSDEBUG")]
         public static void DevDebug(string message)
         {
-            mDebugger.Send("TextScreen DevDebug: " + message);
+            debugger.Send("TextScreen DevDebug: " + message);
         }
     }
 }

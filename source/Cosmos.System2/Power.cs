@@ -1,5 +1,6 @@
 using Cosmos.Core;
-using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace Cosmos.System
 {
@@ -11,10 +12,11 @@ namespace Cosmos.System
         /// <summary>
         /// Reboots the system using the CPU.
         /// </summary>
+        [DoesNotReturn]
         public static void Reboot()
         {
             /*
-             * Qemu does not support ACPI at the current moment due to multiboot2 and SeaBios being to old.
+             * Qemu does not support ACPI at the current moment due to multiboot2 and SeaBios being too old.
              * This Provides a Reboot functionality.
             */
             if (VMTools.IsQEMU)
@@ -29,6 +31,7 @@ namespace Cosmos.System
         /// Shutdown the ACPI.
         /// </summary>
         /// <exception cref="IOException">Thrown on IO error.</exception>
+        [DoesNotReturn]
         public static void Shutdown()
         {
             /*
@@ -39,6 +42,7 @@ namespace Cosmos.System
             {
                 IOPort.Write32(0x4004, 0x3400);
             }
+
             /*
              * Qemu does not support ACPI at the current moment due to multiboot2 and SeaBios being to old.
              * This Provides a shutdown functionality.

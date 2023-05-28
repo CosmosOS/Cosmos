@@ -13,7 +13,7 @@ public abstract class Kernel
     /// <summary>
     /// User ring debugger instance, with the tag "Kernel".
     /// </summary>
-    public readonly Debugger mDebugger = new("User", "Kernel");
+    public readonly Debugger mDebugger = new("Kernel");
 
     // Set after initial start. Can be started and stopped at same time
     protected bool mStarted;
@@ -27,19 +27,6 @@ public abstract class Kernel
     /// </summary>
     // If this method returns "null", that means that the default device should be used.
     protected virtual TextScreenBase GetTextScreen() => null;
-
-    /// <summary>
-    /// Gets the keyboard key layout.
-    /// </summary>
-    [Obsolete("Use KeyboardManager.GetKeyLayout instead.")]
-    protected ScanMapBase GetKeyboardScanMap() => KeyboardManager.GetKeyLayout();
-
-    /// <summary>
-    /// Set the keyboard key layout.
-    /// </summary>
-    /// <param name="scanMap">Keyboard key layout.</param>
-    [Obsolete("Use KeyboardManager.SetKeyLayout instead.")]
-    protected void SetKeyboardScanMap(ScanMapBase scanMap) => KeyboardManager.SetKeyLayout(scanMap);
 
     /// <summary>
     /// Start the system up using the properties for configuration.
@@ -56,7 +43,7 @@ public abstract class Kernel
 
             mStarted = true;
 
-            if (String.Empty == null)
+            if (string.Empty == null)
             {
                 throw new Exception("Compiler didn't initialize System.String.Empty!");
             }
@@ -133,12 +120,6 @@ public abstract class Kernel
     {
         Global.Debugger.Send("Constructing a new Cosmos.System.Kernel instance.");
     }
-
-    /// <summary>
-    /// Reboots the system.
-    /// </summary>
-    [Obsolete("Use Power.Reboot() instead.")]
-    public void Restart() => Power.Reboot();
 
     /// <summary>
     /// Prints a message to the debugger with the "Global" tag.

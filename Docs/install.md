@@ -7,6 +7,7 @@
 *   **Visual Studio 2022 Workload: .NET Core Tools** - .NET Core cross-platform development
 *   **.NET Framework 4.8 Developer Pack** - [Download](https://www.microsoft.com/en-us/download/details.aspx?id=53321)
 *   **VMware Player OR Workstation** VMware Player is free, so that is recommended instead - [Download](https://www.vmware.com/uk/products/workstation-player/workstation-player-evaluation.html)
+*   **Microsoft Visual C++ 2010 Redistributable** - [Download](https://www.microsoft.com/en-us/download/details.aspx?id=26999)
   
 ### Installing Cosmos
  

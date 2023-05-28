@@ -8,7 +8,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections
 {
     class HashtableTest
     {
-        private static Debugger myDebugger = new Debugger("System", "HashtableTest");
+        private static Debugger myDebugger = new("HashtableTest");
 
         public static void Execute()
         {

@@ -33,28 +33,16 @@ namespace Cosmos.HAL.BlockDevice
         protected Core.IOGroup.ATA IO;
 
 		protected SpecLevel mDriveType = SpecLevel.Null;
-		public SpecLevel DriveType
-		{
-			get { return mDriveType; }
-		}
+        public SpecLevel DriveType => mDriveType;
 
-		protected string mSerialNo;
-		public string SerialNo
-		{
-			get { return mSerialNo; }
-		}
+        protected string mSerialNo;
+        public string SerialNo => mSerialNo;
 
-		protected string mFirmwareRev;
-		public string FirmwareRev
-		{
-			get { return mFirmwareRev; }
-		}
+        protected string mFirmwareRev;
+        public string FirmwareRev => mFirmwareRev;
 
-		protected string mModelNo;
-		public string ModelNo
-		{
-			get { return mModelNo; }
-		}
+        protected string mModelNo;
+        public string ModelNo => mModelNo;
         #endregion
         #region Enums
         [Flags]
@@ -142,7 +130,7 @@ namespace Cosmos.HAL.BlockDevice
 		}
 		#endregion
 
-	    internal static Debugger mDebugger = new Debugger("HAL", "AtaPio");
+	    internal static Debugger mDebugger = new("AtaPIO");
 
         /// <summary>
         /// Internal Debugger method

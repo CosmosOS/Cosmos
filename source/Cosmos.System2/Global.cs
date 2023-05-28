@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 
@@ -21,20 +16,7 @@ namespace Cosmos.System
         /// <summary>
         /// The global system ring debugger instance, with the tag "Global".
         /// </summary>
-        public static readonly Debugger Debugger = DebuggerFactory.CreateDebugger("System", "Global");
-
-        [Obsolete("Use the 'Debugger' field of Global instead.")]
-        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "This property is provided for compatibility with older projects.")]
-        public static Debugger mDebugger => Debugger;
-
-        /// <summary>
-        /// The file system ring debugger instance, with the tag "FileSystem".
-        /// </summary>
-        public static readonly Debugger FileSystemDebugger = DebuggerFactory.CreateDebugger("System", "FileSystem");
-
-        [Obsolete("Use the 'FileSystemDebugger' field of Global instead.")]
-        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "This property is provided for compatibility with older projects.")]
-        public static Debugger mFileSystemDebugger => FileSystemDebugger;
+        public static readonly Debugger Debugger = DebuggerFactory.CreateDebugger("Global");
 
         /// <summary>
         /// The main global console instance.
@@ -97,16 +79,6 @@ namespace Cosmos.System
             NumLock = false;
             CapsLock = false;
             ScrollLock = false;
-        }
-
-        /// <summary>
-        /// Changes the layout of the keyboard.
-        /// </summary>
-        /// <param name="scanMap">The key mapping to use.</param>
-        [Obsolete("Use KeyboardManager.SetKeyLayout instead.")]
-        public static void ChangeKeyLayout(ScanMapBase scanMap)
-        {
-            KeyboardManager.SetKeyLayout(scanMap);
         }
     }
 }

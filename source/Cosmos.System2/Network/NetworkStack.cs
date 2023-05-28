@@ -1,6 +1,4 @@
-﻿//#define COSMOSDEBUG
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
@@ -18,7 +16,7 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Debugger instance of the "System" ring, with the "NetworkStack" tag.
         /// </summary>
-        public static readonly Debugger Debugger = new("System", "NetworkStack");
+        public static readonly Debugger Debugger = new("Network Stack");
 
         /// <summary>
         /// Maps IP (Internet Protocol) addresses to network devices.

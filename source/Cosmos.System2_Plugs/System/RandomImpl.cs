@@ -1,6 +1,4 @@
-using System;
 using IL2CPU.API.Attribs;
-using Cosmos.HAL;
 
 namespace Cosmos.System_Plugs.System
 {
@@ -14,9 +12,9 @@ namespace Cosmos.System_Plugs.System
         //
         // Private Constants
         //
-        private const int MBIG = Int32.MaxValue;
-        private const int MSEED = 161803398;
-        private const int MZ = 0;
+        private const int mBIG = int.MaxValue;
+        private const int mSEED = 161803398;
+        private const int mZ = 0;
         private static int counter = 0;
 
         //
@@ -24,7 +22,7 @@ namespace Cosmos.System_Plugs.System
         //
         private static int inext;
         private static int inextp;
-        private static int[] SeedArray = new int[56];
+        private static readonly int[] seedArray = new int[56];
 
 
         public static void Ctor(Random aThis)
@@ -39,42 +37,41 @@ namespace Cosmos.System_Plugs.System
 
             //Initialize our Seed array.
             //This algorithm comes from Numerical Recipes in C (2nd Ed.)
-            int subtraction = seed == Int32.MinValue ? Int32.MaxValue : Math.Abs(seed);
-            var mj = MSEED - subtraction;
-            SeedArray[55] = mj;
+            int subtraction = seed == int.MinValue ? int.MaxValue : Math.Abs(seed);
+            var mj = mSEED - subtraction;
+            seedArray[55] = mj;
             var mk = 1;
             for (int i = 1; i < 55; i++)
             {  //Apparently the range [1..55] is special (Knuth) and so we're wasting the 0'th position.
                 ii = 21 * i % 55;
-                SeedArray[ii] = mk;
+                seedArray[ii] = mk;
                 mk = mj - mk;
                 if (mk < 0)
                 {
-                    mk += MBIG;
+                    mk += mBIG;
                 }
-                mj = SeedArray[ii];
+                mj = seedArray[ii];
             }
             for (int k = 1; k < 5; k++)
             {
                 for (int i = 1; i < 56; i++)
                 {
-                    SeedArray[i] -= SeedArray[1 + (i + 30) % 55];
-                    if (SeedArray[i] < 0)
+                    seedArray[i] -= seedArray[1 + (i + 30) % 55];
+                    if (seedArray[i] < 0)
                     {
-                        SeedArray[i] += MBIG;
+                        seedArray[i] += mBIG;
                     }
                 }
             }
             inext = 0;
             inextp = 21;
-            seed = 1;
         }
 
         private static double Sample()
         {
             //Including this division at the end gives us significantly improved
             //random number distribution.
-            return InternalSample() * (1.0 / MBIG);
+            return InternalSample() * (1.0 / mBIG);
         }
 
         private static int InternalSample()
@@ -91,18 +88,18 @@ namespace Cosmos.System_Plugs.System
                 locINextp = 1;
             }
 
-            var retVal = SeedArray[locINext] - SeedArray[locINextp];
+            var retVal = seedArray[locINext] - seedArray[locINextp];
 
-            if (retVal == MBIG)
+            if (retVal == mBIG)
             {
                 retVal--;
             }
             if (retVal < 0)
             {
-                retVal += MBIG;
+                retVal += mBIG;
             }
 
-            SeedArray[locINext] = retVal;
+            seedArray[locINext] = retVal;
 
             inext = locINext;
             inextp = locINextp;
@@ -139,8 +136,8 @@ namespace Cosmos.System_Plugs.System
                 result = -result;
             }
             double d = result;
-            d += Int32.MaxValue - 1; // get a number in range [0 .. 2 * Int32MaxValue - 1)
-            d /= 2 * (uint)Int32.MaxValue - 1;
+            d += int.MaxValue - 1; // get a number in range [0 .. 2 * Int32MaxValue - 1)
+            d /= 2 * (uint)int.MaxValue - 1;
             return d;
         }
 
@@ -152,7 +149,7 @@ namespace Cosmos.System_Plugs.System
             }
 
             long range = (long)maxValue - minValue;
-            if (range <= (long)Int32.MaxValue)
+            if (range <= int.MaxValue)
             {
                 return (int)(Sample() * range) + minValue;
             }
@@ -171,7 +168,7 @@ namespace Cosmos.System_Plugs.System
 
             for (int i = 0; i < buffer.Length; i++)
             {
-                buffer[i] = (byte)(InternalSample() % (Byte.MaxValue + 1));
+                buffer[i] = (byte)(InternalSample() % (byte.MaxValue + 1));
             }
         }
 
@@ -184,12 +181,12 @@ namespace Cosmos.System_Plugs.System
         {
             counter++;
 
-            if (counter == Int32.MaxValue - 1)
+            if (counter == int.MaxValue - 1)
             {
                 counter = 0;
             }
 
-            return counter + (int)(Cosmos.Core.CPU.GetCPUUptime() / 50) * 1000;
+            return counter + (int)(Core.CPU.GetCPUUptime() / 50) * 1000;
         }
     }
 }

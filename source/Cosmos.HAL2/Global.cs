@@ -10,15 +10,15 @@ namespace Cosmos.HAL
 {
     public static class Global
     {
-        public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
+        public static readonly Debugger debugger = new("Global");
 
-        public static PIT PIT = new PIT();
+        public static PIT PIT = new();
         // Must be static init, other static inits rely on it not being null
 
         public static TextScreenBase TextScreen = new TextScreen();
         public static PCI Pci;
 
-        public static readonly PS2Controller PS2Controller = new PS2Controller();
+        public static readonly PS2Controller PS2Controller = new();
 
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
@@ -33,7 +33,7 @@ namespace Cosmos.HAL
                 TextScreen = textScreen;
             }
 
-            mDebugger.Send("Before Core.Global.Init");
+            debugger.Send("Before Core.Global.Init");
             Core.Global.Init();
 
             //TODO Redo this - Global init should be other.
@@ -47,24 +47,24 @@ namespace Cosmos.HAL
             // for the future.
             Console.Clear();
             Console.WriteLine("Finding PCI Devices");
-            mDebugger.Send("PCI Devices");
+            debugger.Send("PCI Devices");
             PCI.Setup();
 
             Console.WriteLine("Starting ACPI");
-            mDebugger.Send("ACPI Init");
+            debugger.Send("ACPI Init");
             ACPI.Start();
 
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
-            mDebugger.Send("PS/2 Controller Init");
+            debugger.Send("PS/2 Controller Init");
             if (InitPS2)
             {
                 PS2Controller.Initialize(InitScrollWheel);
             }
             else
             {
-                mDebugger.Send("PS/2 Controller disabled in User Kernel");
+                debugger.Send("PS/2 Controller disabled in User Kernel");
             }
             if (IDEInit)
             {
@@ -72,22 +72,22 @@ namespace Cosmos.HAL
             }
             else
             {
-                mDebugger.Send("IDE Driver disabled in User Kernel");
+                debugger.Send("IDE Driver disabled in User Kernel");
             }
             AHCI.InitDriver();
             //EHCI.InitDriver();
             if (InitNetwork)
             {
-                mDebugger.Send("Network Devices Init");
+                debugger.Send("Network Devices Init");
                 NetworkInit.Init();
             }
             else
             {
-                mDebugger.Send("Network Driver disabled in User Kernel");
+                debugger.Send("Network Driver disabled in User Kernel");
             }
             Console.WriteLine("Enabling Serial Output on COM1");
-            SerialPort.Enable(SerialPort.COM1);
-            mDebugger.Send("Done initializing Cosmos.HAL.Global");
+            SerialPort.Enable(COMPort.COM1, BaudRate.BaudRate38400);
+            debugger.Send("Done initializing Cosmos.HAL.Global");
 
         }
 

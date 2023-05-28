@@ -41,8 +41,8 @@ public class CreateLimineConfig : Task
         xWriter.WriteLineAsync("INTERFACE_RESOLUTION=800x600x32");
         xWriter.WriteLineAsync();
 
-        xWriter.WriteLineAsync($":Cosmos {xLabelName}");
-        WriteIndentedLine(xWriter, $"COMMENT=Boot {xLabelName} Cosmos kernel using multiboot2");
+        xWriter.WriteLineAsync($":{xLabelName}");
+        WriteIndentedLine(xWriter, $"COMMENT=Boot {xLabelName} using multiboot2.");
         xWriter.WriteLineAsync();
         WriteIndentedLine(xWriter, "PROTOCOL=multiboot2");
         WriteIndentedLine(xWriter,

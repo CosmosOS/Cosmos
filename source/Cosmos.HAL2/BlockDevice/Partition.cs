@@ -1,5 +1,4 @@
-﻿//#define COSMOSDEBUG
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Cosmos.HAL.BlockDevice
@@ -17,8 +16,8 @@ namespace Cosmos.HAL.BlockDevice
         /// Starting sector.
         /// </summary>
         public readonly ulong StartingSector;
-        public static List<Partition> Partitions = new List<Partition>();
-        public override BlockDeviceType Type { get { return Host.Type; } }
+        public static List<Partition> Partitions = new();
+        public override BlockDeviceType Type => Host.Type;
         /// <summary>
         /// Create new instance of the <see cref="Partition"/> class.
         /// </summary>
@@ -43,14 +42,14 @@ namespace Cosmos.HAL.BlockDevice
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
         public override void ReadBlock(ulong aBlockNo, ulong aBlockCount, ref byte[] aData)
         {
-            Global.mDebugger.SendInternal("-- Partition.ReadBlock --");
-            Global.mDebugger.SendInternal($"aBlockNo = {aBlockNo}");
-            Global.mDebugger.SendInternal($"aBlockCount = {aBlockCount}");
+            Global.debugger.SendInternal("-- Partition.ReadBlock --");
+            Global.debugger.SendInternal($"aBlockNo = {aBlockNo}");
+            Global.debugger.SendInternal($"aBlockCount = {aBlockCount}");
             CheckDataSize(aData, aBlockCount);
             ulong xHostBlockNo = StartingSector + aBlockNo;
             CheckBlockNo(xHostBlockNo, aBlockCount);
             Host.ReadBlock(xHostBlockNo, aBlockCount, ref aData);
-            Global.mDebugger.SendInternal("Returning -- Partition.ReadBlock --");
+            Global.debugger.SendInternal("Returning -- Partition.ReadBlock --");
         }
 
         /// <summary>

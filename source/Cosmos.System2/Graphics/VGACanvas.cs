@@ -1,9 +1,8 @@
-﻿using System;
+﻿using static Cosmos.HAL.Drivers.Video.VGADriver;
+using Cosmos.HAL.Drivers.Video;
 using System.Collections.Generic;
-using System.Text;
-using Cosmos.HAL;
 using System.Drawing;
-using static Cosmos.HAL.VGADriver;
+using System;
 
 namespace Cosmos.System.Graphics
 {
@@ -70,12 +69,6 @@ namespace Cosmos.System.Graphics
             {
                 Enabled = false;
             }
-        }
-
-        [Obsolete("This method is not yet implemented.", true)]
-        public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
-        {
-            throw new NotImplementedException();
         }
 
         public override void DrawFilledRectangle(Color aColor, int aXStart, int aYStart, int aWidth, int aHeight)
