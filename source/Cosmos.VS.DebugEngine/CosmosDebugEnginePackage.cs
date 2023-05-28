@@ -8,23 +8,23 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
-[assembly: ProvideBindingRedirection(
-    AssemblyName = "SQLitePCLRaw.batteries_v2",
-    NewVersion = "2.0.6.1341",
-    OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "2.0.6.1341")]
+//[assembly: ProvideBindingRedirection(
+//    AssemblyName = "SQLitePCLRaw.batteries_v2",
+//    NewVersion = "2.0.6.1341",
+//    OldVersionLowerBound = "1.0.0.0",
+//    OldVersionUpperBound = "2.0.6.1341")]
 
-[assembly: ProvideBindingRedirection(
-    AssemblyName = "SQLitePCLRaw.core",
-    NewVersion = "2.0.6.1341",
-    OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "2.0.6.1341")]
+//[assembly: ProvideBindingRedirection(
+//    AssemblyName = "SQLitePCLRaw.core",
+//    NewVersion = "2.0.6.1341",
+//    OldVersionLowerBound = "1.0.0.0",
+//    OldVersionUpperBound = "2.0.6.1341")]
 
-[assembly: ProvideBindingRedirection(
-    AssemblyName = "SQLitePCLRaw.provider.e_sqlite3",
-    NewVersion = "2.0.6.1341",
-    OldVersionLowerBound = "1.0.0.0",
-    OldVersionUpperBound = "2.0.6.1341")]
+//[assembly: ProvideBindingRedirection(
+//    AssemblyName = "SQLitePCLRaw.provider.e_sqlite3",
+//    NewVersion = "2.0.6.1341",
+//    OldVersionLowerBound = "1.0.0.0",
+//    OldVersionUpperBound = "2.0.6.1341")]
 
 namespace Cosmos.VS.DebugEngine
 {
