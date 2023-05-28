@@ -66,9 +66,9 @@ namespace Cosmos.System.FileSystem
                     foreach (var item in FindLostPartitions())
                     {
                         var part = new ManagedPartition(item);
-                        if (MountedPartitions[i] != null)
+                        if (mountedPartitions[i] != null)
                         {
-                            var data = MountedPartitions[i];
+                            var data = mountedPartitions[i];
                             part.RootPath = data.RootPath;
                             part.MountedFS = data;
                         }
