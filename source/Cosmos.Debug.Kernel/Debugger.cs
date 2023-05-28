@@ -264,26 +264,53 @@ namespace Cosmos.Debug.Kernel
 
         public void Send(string[] aStringArray) => DoSend(aStringArray);
 
+        /// <summary>
+        /// Sends the given message to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(string aText) => DoSend(aText);
+        public virtual void SendInternal(string text) => DoSend(text);
 
+        /// <summary>
+        /// Sends the given strings to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(uint aNumber) => DoSendNumber(aNumber);
+        public virtual void SendInternal(string[] stringArray) => DoSend(stringArray);
 
+        /// <summary>
+        /// Sends the given 32-bit unsigned integer to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(int aNumber) => DoSendNumber(aNumber);
+        public virtual void SendInternal(uint number) => DoSendNumber(number);
 
+        /// <summary>
+        /// Sends the given 32-bit signed integer to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(ulong aNumber) => DoSendNumber(aNumber);
+        public virtual void SendInternal(int number) => DoSendNumber(number);
 
+        /// <summary>
+        /// Sends the given 64-bit unsigned integer to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(long aNumber) => DoSendNumber(aNumber);
+        public virtual void SendInternal(ulong number) => DoSendNumber(number);
 
+        /// <summary>
+        /// Sends the given 64-bit signed integer to all connected debugging hosts.
+        /// </summary>
+        [Conditional("COSMOSDEBUG")]
+        public virtual void SendInternal(long number) => DoSendNumber(number);
+
+        /// <summary>
+        /// Sends the given 32-bit floating-point number to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
         public virtual void SendInternal(float number) => DoSendNumber(number);
 
+        /// <summary>
+        /// Sends the given 64-bit floating-point number to all connected debugging hosts.
+        /// </summary>
         [Conditional("COSMOSDEBUG")]
-        public virtual void SendInternal(double aNumber) => DoSendNumber(aNumber);
+        public virtual void SendInternal(double number) => DoSendNumber(number);
 
         //public void OldSend(string aText) {
         //    // TODO: Need to fix this so it can send empty strings.
