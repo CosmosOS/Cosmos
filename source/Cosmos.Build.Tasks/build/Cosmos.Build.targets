@@ -15,10 +15,10 @@
     <PropertyGroup>
         <CosmosToolsPath Condition="'$(CosmosToolsPath)' == ''">$(MSBuildThisFileDirectory)..\tools\</CosmosToolsPath>
 
-        <NasmToolPath Condition = "'$(NasmToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)yasm\win\</NasmToolPath>
-        <NasmToolPath Condition = "'$(NasmToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</NasmToolPath>
-        <NasmToolExe Condition = "'$(NasmToolExe)' == '' AND '$(OS)' == 'Windows_NT'">yasm.exe</NasmToolExe>
-        <NasmToolExe Condition = "'$(NasmToolExe)' == '' AND '$(OS)' != 'Windows_NT'">yasm</NasmToolExe>
+        <YasmToolPath Condition = "'$(YasmToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)yasm\win\</YasmToolPath>
+        <YasmToolPath Condition = "'$(YasmToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</YasmToolPath>
+        <YasmToolExe Condition = "'$(YasmToolExe)' == '' AND '$(OS)' == 'Windows_NT'">yasm.exe</YasmToolExe>
+        <YasmToolExe Condition = "'$(YasmToolExe)' == '' AND '$(OS)' != 'Windows_NT'">yasm</YasmToolExe>
 
         <LdToolPath Condition = "'$(LdToolPath)' == '' AND '$(OS)' == 'Windows_NT' ">$(CosmosToolsPath)cygwin\win\</LdToolPath>
         <LdToolPath Condition = "'$(LdToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</LdToolPath>
@@ -28,18 +28,10 @@
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)cygwin\win\</ObjdumpToolPath>
         <ObjdumpToolPath Condition = "'$(ObjdumpToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/bin/</ObjdumpToolPath>
 
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)mkisofs\win\</MkisofsToolPath>
-        <MkisofsToolPath Condition = "'$(MkisofsToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</MkisofsToolPath>
-        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' == 'Windows_NT'">mkisofs.exe</MkisofsToolExe>
-        <MkisofsToolExe Condition = "'$(MkisofsToolExe)' == '' AND '$(OS)' != 'Windows_NT'">mkisofs</MkisofsToolExe>
-
         <XorrisoToolPath Condition = "'$(XorrisoToolPath)' == '' AND '$(OS)' == 'Windows_NT'">$(CosmosToolsPath)xorriso\win\</XorrisoToolPath>
         <XorrisoToolPath Condition = "'$(XorrisoToolPath)' == '' AND '$(OS)' != 'Windows_NT'">/usr/bin/</XorrisoToolPath>
         <XorrisoToolExe Condition = "'$(XorrisoToolExe)' == '' AND '$(OS)' == 'Windows_NT'">xorriso.exe</XorrisoToolExe>
         <XorrisoToolExe Condition = "'$(XorrisoToolExe)' == '' AND '$(OS)' != 'Windows_NT'">xorriso</XorrisoToolExe>
-
-        <SyslinuxToolPath Condition = "'$(SyslinuxToolPath)' == ''">$(CosmosToolsPath)syslinux\win\</SyslinuxToolPath>
-        <SyslinuxToolExe Condition = "'$(SyslinuxToolExe)' == ''">syslinux.exe</SyslinuxToolExe>
 
         <LimineToolPath Condition = "'$(LimineToolPath)' == ''">$(CosmosToolsPath)limine\boot\</LimineToolPath>
         <LimineToolExe Condition = "'$(LimineToolExe)' == ''">limine-deploy.exe</LimineToolExe>
@@ -63,16 +55,14 @@
 
         <Il2cpuOutput Condition="'$(Il2cpuOutput)' == ''">$(OutputPath)$(AssemblyName).asm</Il2cpuOutput>
 
-        <NasmOutput Condition="'$(NasmOutput)' == '' AND '$(BinFormat)' == 'ELF'">$(OutputPath)$(AssemblyName).obj</NasmOutput>
-        <NasmOutput Condition="'$(NasmOutput)' == ''">$(OutputPath)$(AssemblyName).bin</NasmOutput>
+        <YasmOutput Condition="'$(YasmOutput)' == '' AND '$(BinFormat)' == 'ELF'">$(OutputPath)$(AssemblyName).obj</YasmOutput>
+        <YasmOutput Condition="'$(YasmOutput)' == ''">$(OutputPath)$(AssemblyName).bin</YasmOutput>
 
         <MapFile Condition="'$(MapFile)' == ''">$(OutputPath)$(AssemblyName).map</MapFile>
         <CosmosDebugSymbolsFile Condition="'$(CosmosDebugSymbolsFile)' == ''">$(OutputPath)$(AssemblyName).cdb</CosmosDebugSymbolsFile>
 
         <IntermediateIsoDirectory Condition="'$(IntermediateIsoDirectory)' == ''">$(OutputPath)ISO\</IntermediateIsoDirectory>
-        <SyslinuxPath Condition="'$(SyslinuxPath)' == ''">$(CosmosToolsPath)syslinux\bios\</SyslinuxPath>
 
-        <GrubPath Condition="'$(GrubPath)' == ''">$(CosmosToolsPath)grub2\</GrubPath>
         <LiminePath Condition="'$(LiminePath)' == ''">$(CosmosToolsPath)limine\</LiminePath>
 
         <Deployment Condition="'$(Deployment)' == ''">ISO</Deployment>
@@ -102,7 +92,7 @@
 
     <ItemGroup>
         <UpToDateCheckOutput Include="$(Il2cpuOutput)" />
-        <UpToDateCheckOutput Include="$(NasmOutput)" />
+        <UpToDateCheckOutput Include="$(YasmOutput)" />
         <UpToDateCheckOutput Include="$(IsoFile)" />
     </ItemGroup>
 
@@ -134,7 +124,6 @@
         </PackageReference>
     </ItemGroup>
 
-    <UsingTask TaskName="Cosmos.Build.Tasks.CreateMbr" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.CreateLimineConfig" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.IL2CPU" AssemblyFile="$(CosmosBuildTasksAssembly)" />
@@ -143,8 +132,8 @@
     <UsingTask TaskName="Cosmos.Build.Tasks.Gzip" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.MakeIso" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.LimineDeploy" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.Nasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
-    <UsingTask TaskName="Cosmos.Build.Tasks.ReadNasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.Yasm" AssemblyFile="$(CosmosBuildTasksAssembly)" />
+    <UsingTask TaskName="Cosmos.Build.Tasks.ReadYasmMapToDebugInfo" AssemblyFile="$(CosmosBuildTasksAssembly)" />
     <UsingTask TaskName="Cosmos.Build.Tasks.TheRingMaster" AssemblyFile="$(CosmosBuildTasksAssembly)" />
 
     <PropertyGroup>
@@ -156,10 +145,10 @@
             FailIfRelease;
             TheRingMaster;
             IL2CPU;
-            Nasm;
+            Yasm;
             Ld;
             ExtractMapFromElfFile;
-            ReadNasmMapToDebugInfo;
+            ReadYasmMapToDebugInfo;
             Gzip;
             MakeIso
         </CosmosBuildDependsOn>
@@ -224,25 +213,25 @@
 
     <!--
     ================================================================================
-                                          Nasm
+                                          Yasm
 
         [IN]
         $(Il2cpuOutput) - a .asm file.
 
         [OUT]
-        $(NasmOutput) - a .obj file.
+        $(YasmOutput) - a .obj file.
 
     ================================================================================
     -->
-    <Target Name="Nasm"
+    <Target Name="Yasm"
             Inputs="$(Il2cpuOutput)"
-            Outputs="$(NasmOutput)">
+            Outputs="$(YasmOutput)">
 
-        <NASM InputFile="$(Il2cpuOutput)"
-              OutputFile="$(NasmOutput)"
+        <YASM InputFile="$(Il2cpuOutput)"
+              OutputFile="$(YasmOutput)"
               OutputFormat="$(BinFormat)"
-              ToolPath="$(NasmToolPath)"
-              ToolExe="$(NasmToolExe)"
+              ToolPath="$(YasmToolPath)"
+              ToolExe="$(YasmToolExe)"
 	      OptimizationLevel="$(OptimizationLevel)"/>
 
     </Target>
@@ -252,7 +241,7 @@
                                            Ld
 
         [IN]
-        $(NasmOutput) - NASM output.
+        $(YasmOutput) - YASM output.
 
         [OUT]
         $(BinFile) - a linked file.
@@ -260,11 +249,11 @@
     ================================================================================
     -->
     <Target Name="Ld"
-            Inputs="$(NasmOutput)"
+            Inputs="$(YasmOutput)"
             Outputs="$(BinFile)"
             Condition="'$(BinFormat)' == 'ELF'">
 
-        <Ld InputFiles="$(NasmOutput)"
+        <Ld InputFiles="$(YasmOutput)"
             OutputFile="$(BinFile)"
             TextAddress="0x2000000"
             DataAddress="0x1000000"
@@ -302,22 +291,22 @@
 
     <!--
     ================================================================================
-                                 ReadNasmMapToDebugInfo
+                                 ReadYasmMapToDebugInfo
 
         [IN]
-        $(MapFile) - a NASM map file.
+        $(MapFile) - a YASM map file.
 
         [OUT]
         $(CosmosDebugSymbolsPath) - a debug symbols file.
 
     ================================================================================
     -->
-    <Target Name="ReadNasmMapToDebugInfo"
+    <Target Name="ReadYasmMapToDebugInfo"
             Inputs="$(MapFile)"
             Outputs="$(CosmosDebugSymbolsFile)"
             Condition="'$(BinFormat)' != 'ELF'">
 
-        <ReadNasmMapToDebugInfo MapFile="$(MapFile)"
+        <ReadYasmMapToDebugInfo MapFile="$(MapFile)"
                                 DebugInfoFile="$(CosmosDebugSymbolsFile)" />
 
     </Target>

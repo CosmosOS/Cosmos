@@ -48,7 +48,7 @@ This directory contains the Cosmos assembler, the thing that writes generated as
 
 This directory contains code related to the building process of Cosmos with the exception of
 IL2CPU which is however executed from here, it's contains code for executing ld,
-nasm, makeiso, MSBuild, and others.
+yasm, makeiso, MSBuild, and others.
 
 #### \Source\Cosmos.Common
 
