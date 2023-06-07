@@ -5,7 +5,7 @@ IL2CPU_URL = https://github.com/CosmosOS/IL2CPU
 XSHARP_URL = https://github.com/CosmosOS/XSharp
 COMMON_URL = https://github.com/CosmosOS/Common
 
-IL2CPU_BRANCH = crossplatform
+IL2CPU_BRANCH = master
 XSHARP_BRANCH = master
 COMMON_BRANCH = master
 
