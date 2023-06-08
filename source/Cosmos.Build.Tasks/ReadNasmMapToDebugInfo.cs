@@ -34,10 +34,8 @@ namespace Cosmos.Build.Tasks
 
                 using (var xDebugInfo = new DebugInfo(DebugInfoFile))
                 {
-                    var connection = xDebugInfo.GetNewConnection();
-                    xDebugInfo.AddLabels(connection, xSourceInfos);
-                    xDebugInfo.CreateIndexes(connection);
-                    connection.Close();
+                    xDebugInfo.AddLabels(xSourceInfos);
+                    xDebugInfo.CreateIndexes();
                 }
 
                 return true;
