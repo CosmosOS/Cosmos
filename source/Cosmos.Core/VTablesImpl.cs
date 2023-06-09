@@ -298,7 +298,7 @@ namespace Cosmos.Core
 
             EnableDebug = true;
             DebugHex("Type", aType);
-            Debug("TypeName", xTypeInfo.AssemblyQualifiedName);
+            Debug("TypeName: " + xTypeInfo.AssemblyQualifiedName);
             DebugHex("InterfaceMethodId", aInterfaceMethodId);
             Debug("Not FOUND!");
 
