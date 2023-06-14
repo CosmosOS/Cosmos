@@ -23,6 +23,9 @@ DOTNETFLAGS = -v:q -nologo
 all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
 	$(MAKE) build
 	$(MAKE) publish
+	@sudo $(MAKE) install
+	$(MAKE) nuget-install
+	@echo "Cosmos has been installed successfully!"
 
 $(IL2CPU_DIR):
 	@echo "Cloning Cosmos/IL2CPU"
