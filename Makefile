@@ -26,7 +26,7 @@ all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
 	@sudo $(MAKE) install
 	$(MAKE) nuget-install
 	@echo "============================================"
-	@echo "| Cosmos has been installed successfully!" |
+	@echo "| Cosmos has been installed successfully!" |"
 	@echo "============================================"
 
 $(IL2CPU_DIR):
@@ -111,7 +111,6 @@ install:
 	@cp -r $(THISDIR)/Build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
 	@cp -r $(THISDIR)/Build/syslinux/* $(DESTDIR)/Build/ISO/
 	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
-	@echo "if this is your first time installing cosmos you will want to run 'make nuget-install'"
 
 .PHONY: nuget-install
 nuget-install:
