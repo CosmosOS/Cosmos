@@ -29,19 +29,6 @@ public abstract class Kernel
     protected virtual TextScreenBase GetTextScreen() => null;
 
     /// <summary>
-    /// Gets the keyboard key layout.
-    /// </summary>
-    [Obsolete("Use KeyboardManager.GetKeyLayout instead.")]
-    protected ScanMapBase GetKeyboardScanMap() => KeyboardManager.GetKeyLayout();
-
-    /// <summary>
-    /// Set the keyboard key layout.
-    /// </summary>
-    /// <param name="scanMap">Keyboard key layout.</param>
-    [Obsolete("Use KeyboardManager.SetKeyLayout instead.")]
-    protected void SetKeyboardScanMap(ScanMapBase scanMap) => KeyboardManager.SetKeyLayout(scanMap);
-
-    /// <summary>
     /// Start the system up using the properties for configuration.
     /// </summary>
     public virtual void Start()
@@ -128,12 +115,6 @@ public abstract class Kernel
     {
         Global.Debugger.Send("Constructing a new Cosmos.System.Kernel instance.");
     }
-
-    /// <summary>
-    /// Reboots the system.
-    /// </summary>
-    [Obsolete("Use Power.Reboot() instead.")]
-    public void Restart() => Power.Reboot();
 
     /// <summary>
     /// Prints a message to the debugger with the "Global" tag.

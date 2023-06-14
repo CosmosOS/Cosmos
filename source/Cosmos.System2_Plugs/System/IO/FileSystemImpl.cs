@@ -30,13 +30,13 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void DeleteFile(string fullPath)
         {
-            Global.FileSystemDebugger.SendInternal($"DeleteFile : fullPath = {fullPath}");
+            Global.Debugger.SendInternal($"DeleteFile : fullPath = {fullPath}");
             VFSManager.DeleteFile(fullPath);
         }
 
         public static void CopyFile(string sourceFullPath, string destFullPath, bool overwrite)
         {
-            Global.FileSystemDebugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath} with overwrite {overwrite}");
+            Global.Debugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath} with overwrite {overwrite}");
 
             // The destination path may just be a directory into which the file should be copied.
             // If it is, append the filename from the source onto the destination directory
@@ -50,13 +50,13 @@ namespace Cosmos.System_Plugs.System.IO
             using (var dst = new FileStream(destFullPath, overwrite ? FileMode.Create : FileMode.CreateNew))
             {
                 int xSize = (int)src.Length;
-                Global.FileSystemDebugger.SendInternal($"size of {sourceFullPath} is {xSize} bytes");
+                Global.Debugger.SendInternal($"size of {sourceFullPath} is {xSize} bytes");
                 byte[] content = new byte[xSize];
-                Global.FileSystemDebugger.SendInternal($"content byte buffer allocated");
+                Global.Debugger.SendInternal($"content byte buffer allocated");
                 src.Read(content, 0, xSize);
-                Global.FileSystemDebugger.SendInternal($"content byte buffer read");
+                Global.Debugger.SendInternal($"content byte buffer read");
                 dst.Write(content, 0, xSize);
-                Global.FileSystemDebugger.SendInternal($"content byte buffer written");
+                Global.Debugger.SendInternal($"content byte buffer written");
             }
         }
 
@@ -67,7 +67,7 @@ namespace Cosmos.System_Plugs.System.IO
                 return false;
             }
 
-            Global.FileSystemDebugger.SendInternal($"-- CosmosFileSystem.FileExists -- : fullPath = {fullPath}");
+            Global.Debugger.SendInternal($"-- CosmosFileSystem.FileExists -- : fullPath = {fullPath}");
             return VFSManager.FileExists(fullPath);
         }
     }

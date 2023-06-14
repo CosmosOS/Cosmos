@@ -59,7 +59,7 @@ namespace Cosmos.HAL
                 Recurring = recurring;
             }
 
-            /// <inheritdoc cref="PITTimer(OnTrigger, UInt64, Boolean)"/>
+            /// <inheritdoc cref="PITTimer(OnTrigger, ulong, bool)"/>
             public PITTimer(Action callback, ulong nanosecondsTimeout, bool recurring)
                 : this(_ => callback(), nanosecondsTimeout, recurring)
             { }
@@ -79,7 +79,7 @@ namespace Cosmos.HAL
                 Recurring = true;
             }
 
-            /// <inheritdoc cref="PITTimer(OnTrigger, UInt64, UInt64)"/>
+            /// <inheritdoc cref="PITTimer(OnTrigger, ulong, ulong)"/>
             public PITTimer(Action callback, ulong nanosecondsTimeout, ulong nanosecondsLeft)
                 : this(_ => callback(), nanosecondsTimeout, nanosecondsLeft)
             { }
@@ -96,13 +96,6 @@ namespace Cosmos.HAL
                     Global.PIT.UnregisterTimer(ID);
                 }
             }
-
-            #region (deprecated)
-
-            [Obsolete($"Use the {nameof(Recurring)} property instead.")]
-            public bool Recuring => Recurring;
-
-            #endregion
         }
 
         public const uint PITFrequency = 1193180;
@@ -111,8 +104,8 @@ namespace Cosmos.HAL
         public bool T0RateGen = false;
 
         private readonly List<PITTimer> activeHandlers = new();
-        private ushort _T0Countdown = 65535;
-        private ushort _T2Countdown = 65535;
+        private ushort t0Countdown = 65535;
+        private ushort t2Countdown = 65535;
         private int timerCounter;
         private bool waitSignaled;
 
@@ -141,9 +134,9 @@ namespace Cosmos.HAL
 
         public ushort T0Countdown
         {
-            get => _T0Countdown;
+            get => t0Countdown;
             set {
-                _T0Countdown = value;
+                t0Countdown = value;
 
                 IOPort.Write8(Command, (byte)(T0RateGen ? 0x34 : 0x30));
                 IOPort.Write8(Data0, (byte)(value & 0xFF));
@@ -153,7 +146,7 @@ namespace Cosmos.HAL
 
         public uint T0Frequency
         {
-            get => PITFrequency / (uint)_T0Countdown;
+            get => PITFrequency / t0Countdown;
             set {
                 if (value < 19 || value > 1193180) {
                     throw new ArgumentException("Frequency must be between 19 and 1193180!");
@@ -165,7 +158,7 @@ namespace Cosmos.HAL
 
         public uint T0DelayNS
         {
-            get => PITDelayNS * _T0Countdown;
+            get => PITDelayNS * t0Countdown;
             set {
                 if (value > 54918330) {
                     throw new ArgumentException("Delay must be no greater that 54918330");
@@ -177,10 +170,10 @@ namespace Cosmos.HAL
 
         public ushort T2Countdown
         {
-            get => _T2Countdown;
+            get => t2Countdown;
             set
             {
-                _T2Countdown = value;
+                t2Countdown = value;
 
                 IOPort.Write8(Command, 0xB6);
                 IOPort.Write8(Data0, (byte)(value & 0xFF));
@@ -190,7 +183,7 @@ namespace Cosmos.HAL
 
         public uint T2Frequency
         {
-            get => PITFrequency / (uint)_T2Countdown;
+            get => PITFrequency / t2Countdown;
             set
             {
                 if (value < 19 || value > 1193180)
@@ -204,7 +197,7 @@ namespace Cosmos.HAL
 
         public uint T2DelayNS
         {
-            get => PITDelayNS * _T2Countdown;
+            get => PITDelayNS * t2Countdown;
             set
             {
                 if (value > 54918330) {
@@ -213,30 +206,6 @@ namespace Cosmos.HAL
 
                 T2Countdown = (ushort)(value / PITDelayNS);
             }
-        }
-
-        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
-        public void EnableSound()
-        {
-            //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0x03);
-        }
-
-        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
-        public void DisableSound()
-        {
-            //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
-        }
-
-        public void PlaySound(int aFreq)
-        {
-            EnableSound();
-            T2Frequency = (uint)aFreq;
-        }
-
-        [Obsolete("This method has been deprecated and is equivalent to a no-op.")]
-        public void MuteSound()
-        {
-            DisableSound();
         }
 
         private void SignalWait(INTs.IRQContext irqContext)
@@ -346,15 +315,5 @@ namespace Cosmos.HAL
                 }
             }
         }
-
-        #region (deprecated)
-
-        [Obsolete($"Use the {nameof(T0DelayNS)} property instead.")]
-        public uint T0DelyNS => T0DelayNS;
-
-        [Obsolete($"Use the {nameof(T2DelayNS)} property instead.")]
-        public uint T2DelyNS => T2DelayNS;
-
-        #endregion
     }
 }

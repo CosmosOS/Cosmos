@@ -18,8 +18,8 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static void Init(string aPathname, FileMode aMode, ref Stream innerStream)
         {
-            Global.FileSystemDebugger.SendInternal("-- FileStream.Init --");
-            Global.FileSystemDebugger.SendInternal("aPathname = " + aPathname);
+            Global.Debugger.SendInternal("-- FileStream.Init --");
+            Global.Debugger.SendInternal("aPathname = " + aPathname);
 
             innerStream = InitializeStream(aPathname, aMode);
         }
@@ -49,7 +49,7 @@ namespace Cosmos.System_Plugs.System.IO
         public static int Read(FileStream aThis, Span<byte> aBuffer,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
-            Global.FileSystemDebugger.SendInternal("FileStream.Read:");
+            Global.Debugger.SendInternal("FileStream.Read:");
 
             return innerStream.Read(aBuffer);
         }
@@ -66,7 +66,7 @@ namespace Cosmos.System_Plugs.System.IO
         public static void Write(FileStream aThis, ReadOnlySpan<byte> aBuffer,
             [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
-            Global.FileSystemDebugger.SendInternal($"FileStream.Write:");
+            Global.Debugger.SendInternal($"FileStream.Write:");
 
             innerStream.Write(aBuffer);
         }
@@ -104,7 +104,7 @@ namespace Cosmos.System_Plugs.System.IO
             /*
              * It gives NRE and kills the OS, commented it for now... we will "de-plug" FileStream soon
              */
-            Global.FileSystemDebugger.SendInternal($"In FileStream.InitializeStream Flush()");
+            Global.Debugger.SendInternal($"In FileStream.InitializeStream Flush()");
             //innerStream.Flush();
         }
 
@@ -122,11 +122,11 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream CreateNewFile(string aPath, bool aPathExists)
         {
-            Global.FileSystemDebugger.SendInternal($"-- FileStream.CreateNewFile -- aPath = {aPath} existing = {aPathExists}");
+            Global.Debugger.SendInternal($"-- FileStream.CreateNewFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (aPathExists)
             {
-                Global.FileSystemDebugger.SendInternal("CreateNew Mode with aPath already existing");
+                Global.Debugger.SendInternal("CreateNew Mode with aPath already existing");
                 throw new IOException("File already existing but CreateNew Requested");
             }
 
@@ -141,15 +141,15 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream TruncateFile(string aPath, bool aPathExists)
         {
-            Global.FileSystemDebugger.SendInternal($"-- FileStream.TruncateFile -- aPath = {aPath} existing = {aPathExists}");
+            Global.Debugger.SendInternal($"-- FileStream.TruncateFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (!aPathExists)
             {
-                Global.FileSystemDebugger.SendInternal("Truncate Mode with aPath not existing");
+                Global.Debugger.SendInternal("Truncate Mode with aPath not existing");
                 throw new IOException("File not existing but Truncate Requested");
             }
 
-            Global.FileSystemDebugger.SendInternal("Truncate Mode: change file lenght to 0 bytes");
+            Global.Debugger.SendInternal("Truncate Mode: change file lenght to 0 bytes");
 
             var aStream = VFSManager.GetFileStream(aPath);
             aStream.SetLength(0);
@@ -159,50 +159,50 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream CreateFile(string aPath, bool aPathExists)
         {
-            Global.FileSystemDebugger.SendInternal($"-- FileStream.CreateFile -- aPath = {aPath} existing = {aPathExists}");
+            Global.Debugger.SendInternal($"-- FileStream.CreateFile -- aPath = {aPath} existing = {aPathExists}");
 
             if (aPathExists == false)
             {
-                Global.FileSystemDebugger.SendInternal($"File does not exist let's call CreateNew() to create it");
+                Global.Debugger.SendInternal($"File does not exist let's call CreateNew() to create it");
                 return CreateNewFile(aPath, aPathExists);
             }
             else
             {
-                Global.FileSystemDebugger.SendInternal($"File does exist let's call TruncateFile() to truncate it");
+                Global.Debugger.SendInternal($"File does exist let's call TruncateFile() to truncate it");
                 return TruncateFile(aPath, aPathExists);
             }
         }
 
         private static Stream AppendToFile(string aPath, bool aPathExists)
         {
-            Global.FileSystemDebugger.SendInternal($"In FileStream.AppendToFile aPath {aPath} existing? {aPathExists}");
+            Global.Debugger.SendInternal($"In FileStream.AppendToFile aPath {aPath} existing? {aPathExists}");
 
             if (aPathExists)
             {
-                Global.FileSystemDebugger.SendInternal("Append mode with aPath already existing let's seek to end of the file");
+                Global.Debugger.SendInternal("Append mode with aPath already existing let's seek to end of the file");
                 var aStream = VFSManager.GetFileStream(aPath);
-                Global.FileSystemDebugger.SendInternal("Actual aStream Lenght: " + aStream.Length);
+                Global.Debugger.SendInternal("Actual aStream Lenght: " + aStream.Length);
 
                 aStream.Seek(0, SeekOrigin.End);
                 return aStream;
             }
             else
             {
-                Global.FileSystemDebugger.SendInternal("Append mode with aPath not existing let's create a new the file");
+                Global.Debugger.SendInternal("Append mode with aPath not existing let's create a new the file");
                 return CreateNewFile(aPath, aPathExists);
             }
         }
 
         private static Stream OpenFile(string aPath, bool aPathExists)
         {
-            Global.FileSystemDebugger.SendInternal($"In FileStream.OpenFile aPath {aPath} existing? {aPathExists}");
+            Global.Debugger.SendInternal($"In FileStream.OpenFile aPath {aPath} existing? {aPathExists}");
 
             if (!aPathExists)
             {
                 throw new IOException("File not existing but Open Requested");
             }
 
-            Global.FileSystemDebugger.SendInternal("Open Mode with aPath already existing opening file");
+            Global.Debugger.SendInternal("Open Mode with aPath already existing opening file");
             var aStream = VFSManager.GetFileStream(aPath);
 
             aStream.Position = 0;
@@ -211,32 +211,32 @@ namespace Cosmos.System_Plugs.System.IO
 
         private static Stream OpenOrCreateFile(string aPath, bool aPathExists)
         {
-            Global.FileSystemDebugger.SendInternal($"In FileStream.OpenOrCreateFile aPath {aPath} existing? {aPathExists}");
+            Global.Debugger.SendInternal($"In FileStream.OpenOrCreateFile aPath {aPath} existing? {aPathExists}");
 
             if (aPathExists)
             {
-                Global.FileSystemDebugger.SendInternal("OpenOrCreateFile Mode with aPath already existing, let's Open it!");
+                Global.Debugger.SendInternal("OpenOrCreateFile Mode with aPath already existing, let's Open it!");
                 return OpenFile(aPath, aPathExists);
             }
             else
             {
-                Global.FileSystemDebugger.SendInternal("OpenOrCreateFile Mode with aPath not existing, let's Create it!");
+                Global.Debugger.SendInternal("OpenOrCreateFile Mode with aPath not existing, let's Create it!");
                 return CreateNewFile(aPath, aPathExists);
             }
         }
 
         private static Stream InitializeStream(string aPath, FileMode aMode)
         {
-            Global.FileSystemDebugger.SendInternal($"-- FileStream.InitializeStream --");
-            Global.FileSystemDebugger.SendInternal($"aPath = {aPath}");
+            Global.Debugger.SendInternal($"-- FileStream.InitializeStream --");
+            Global.Debugger.SendInternal($"aPath = {aPath}");
             if (aPath == null)
             {
-                Global.FileSystemDebugger.SendInternal("In FileStream.Ctor: Path == null is true");
+                Global.Debugger.SendInternal("In FileStream.Ctor: Path == null is true");
                 throw new ArgumentNullException("The file path cannot be null.");
             }
             if (aPath.Length == 0)
             {
-                Global.FileSystemDebugger.SendInternal("In FileStream.Ctor: Path.Length == 0 is true");
+                Global.Debugger.SendInternal("In FileStream.Ctor: Path.Length == 0 is true");
                 throw new ArgumentException("The file path cannot be empty.");
             }
 
@@ -264,7 +264,7 @@ namespace Cosmos.System_Plugs.System.IO
                     return TruncateFile(aPath, aPathExists);
 
                 default:
-                    Global.FileSystemDebugger.SendInternal("The mode " + aMode + "is out of range");
+                    Global.Debugger.SendInternal("The mode " + aMode + "is out of range");
                     throw new ArgumentOutOfRangeException("The file mode is invalid");
             }
         }
