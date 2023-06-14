@@ -12,7 +12,7 @@
 
 ###  Prerequisites for Linux
 
-* .NET 6 SDK: [Download .NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
+* .NET SDK (6+): [Download .NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
 * Make
 * Yasm (`apt install yasm`)
 * Xorriso (`apt install xorriso`)
