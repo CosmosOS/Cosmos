@@ -157,7 +157,6 @@ namespace Cosmos.Core.Memory
             //Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
             CPU.DisableInterrupts();
 
-            Debugger.DoBochsBreak();
             // Mark and sweep objects from roots
             // 1. Check if a page is in use if medium/large mark and sweep object
             // 2. Go throught the SMT table for small objects and go through pages by size
@@ -376,7 +375,7 @@ namespace Cosmos.Core.Memory
                     if (*location != 0) // Check if its null
                     {
                         location = *(uint**)location;
-                        if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
+                        if (RAT.GetPageType(location) != RAT.PageType.Empty)
                         {
                             MarkAndSweepObject(location);
                         }
