@@ -149,7 +149,7 @@ namespace Cosmos.Core
             if (RAT.GetPageType(aPtr) != 0)
             {
                 var rootCount = *(aPtr - 1) >> 1; // lowest bit is used to set if hit
-                *(aPtr - 1) = (ushort)((rootCount - 1) << 1); // loest bit can be zero since we shouldnt be doing this while gc is collecting
+                *(aPtr - 1) = (ushort)((rootCount - 1) << 1); // lowest bit can be zero since we shouldnt be doing this while gc is collecting
             }
         }
 
