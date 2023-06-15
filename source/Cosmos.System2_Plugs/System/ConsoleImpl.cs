@@ -506,7 +506,7 @@ namespace Cosmos.System_Plugs.System
         public static void WriteLine(long aLong) => WriteLine(aLong.ToString());
 
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty line */
-        public static void WriteLine(object value) => Write((value ?? string.Empty) + Environment.NewLine);
+        public static void WriteLine(object value) => Write((value ?? string.Empty).ToString() + Environment.NewLine);
 
         public static void WriteLine(string aText) => Write(aText + Environment.NewLine);
 
@@ -558,7 +558,7 @@ namespace Cosmos.System_Plugs.System
         public static void Write(long aLong) => Write(aLong.ToString());
 
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
-        public static void Write(object value) => Write(value ?? string.Empty);
+        public static void Write(object value) => Write((value ?? string.Empty).ToString());
 
         public static void Write(string aText)
         {
