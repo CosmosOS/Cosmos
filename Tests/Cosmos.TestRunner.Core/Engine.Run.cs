@@ -85,6 +85,10 @@ namespace Cosmos.TestRunner.Core
             {
                 aAction();
             }
+            catch(Exception e)
+            {
+                OutputHandler.LogError(e.ToString());
+            }
             finally
             {
                 OutputHandler.TaskEnd(aTaskName);
