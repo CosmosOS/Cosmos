@@ -25,6 +25,21 @@ namespace Cosmos.System.FileSystem
             get
             {
                 List<ManagedPartition> converted = new();
+
+                if(Host.Type == BlockDeviceType.RemovableCD) {
+                    // we dont actually have a partition table in CDs
+                    ManagedPartition part = new(new Partition(Host, 0, Host.BlockCount / 4)); // BlockSize is 512, SectorSize of ISO9660 usually is 2 2048
+
+                    if (mountedPartitions[0] != null) {
+                        var data = mountedPartitions[0];
+                        part.RootPath = data.RootPath;
+                        part.MountedFS = data;
+                    }
+
+                    converted.Add(part);
+                    return converted;
+                }
+
                 if (GPT.IsGPTPartition(Host))
                 {
                     GPT gpt = new(Host);
