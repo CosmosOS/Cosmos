@@ -21,59 +21,66 @@ DOTNETFLAGS = -v:q -nologo
 
 .PHONY: all
 all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
-	$(MAKE) build
-	$(MAKE) publish
+	@$(MAKE) build
+	@$(MAKE) publish
+	@sudo $(MAKE) install
+	@$(MAKE) nuget-install
+	@echo "============================================"
+	@echo "| Cosmos has been installed successfully!  |"
+	@echo "============================================"
 
 $(IL2CPU_DIR):
 	@echo "Cloning Cosmos/IL2CPU"
-	$(GIT) $(GITFLAGS) --branch=$(IL2CPU_BRANCH) $(IL2CPU_URL) $(THISDIR)/../IL2CPU
+	@$(GIT) $(GITFLAGS) --branch=$(IL2CPU_BRANCH) $(IL2CPU_URL) $(THISDIR)/../IL2CPU
 
 $(XSHARP_DIR):
 	@echo "Cloning Cosmos/XSharp"
-	$(GIT) $(GITFLAGS) --branch=$(XSHARP_BRANCH) $(XSHARP_URL) $(THISDIR)/../XSharp
+	@$(GIT) $(GITFLAGS) --branch=$(XSHARP_BRANCH) $(XSHARP_URL) $(THISDIR)/../XSharp
 
 $(COMMON_DIR):
 	@echo "Cloning Cosmos/Common"
-	$(GIT) $(GITFLAGS) --branch=$(COMMON_BRANCH) $(COMMON_URL) $(THISDIR)/../Common
+	@$(GIT) $(GITFLAGS) --branch=$(COMMON_BRANCH) $(COMMON_URL) $(THISDIR)/../Common
 
 .PHONY: build
 build:
 	@echo "Building IL2CPU"
-	$(DOTNET) clean $(IL2CPU_DIR)
-	$(DOTNET) build $(IL2CPU_DIR) $(DOTNETFLAGS)
-	$(DOTNET) pack $(IL2CPU_DIR) $(DOTNETFLAGS)
+	@$(DOTNET) clean $(IL2CPU_DIR)
+	@$(DOTNET) build $(IL2CPU_DIR) $(DOTNETFLAGS)
+	@$(DOTNET) pack $(IL2CPU_DIR) $(DOTNETFLAGS)
 
 	@echo "Building Cosmos"
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.Common
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.Core
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.Core_Asm
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.Core_Plugs
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.HAL2
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.System2
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.System2_Plugs
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.Build.Tasks
-	$(DOTNET) clean $(THISDIR)/source/Cosmos.Plugs
 
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Common $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Asm $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Plugs $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2 $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks $(DOTNETFLAGS)
-	$(DOTNET) pack $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Common
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Core
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Core_Asm
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Core_Plugs
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.HAL2
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.System2
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.System2_Plugs
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Build.Tasks
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Plugs
+
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Common $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Core $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Asm $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Core_Plugs $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.System2 $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
 
 	@echo "Building X#"
-	$(DOTNET) clean $(XSHARP_DIR)/source/XSharp/XSharp
-	$(DOTNET) clean $(XSHARP_DIR)/source/Spruce
+	@$(DOTNET) clean $(XSHARP_DIR)/source/XSharp/XSharp
+	@$(DOTNET) clean $(XSHARP_DIR)/source/Spruce
 
 	$(DOTNET) pack $(XSHARP_DIR)/source/XSharp/XSharp $(DOTNETFLAGS)
 	$(DOTNET) pack $(XSHARP_DIR)/source/Spruce $(DOTNETFLAGS)
+
 
 .PHONY: publish
 publish:
@@ -81,15 +88,15 @@ publish:
 	$(DOTNET) publish $(IL2CPU_DIR)/source/IL2CPU -r linux-x64 --self-contained $(DOTNETFLAGS)
 
 	@echo "Publishing Cosmos"
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.Core_Plugs $(DOTNETFLAGS)
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
-	$(DOTNET) publish $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
+	@$(DOTNET) publish $(THISDIR)/source/Cosmos.Core_Plugs $(DOTNETFLAGS)
+	@$(DOTNET) publish $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
+	@$(DOTNET) publish $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
+	@$(DOTNET) publish $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
+	@$(DOTNET) publish $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
 
 	@echo "Publishing X#"
-	$(DOTNET) publish $(XSHARP_DIR)/source/XSharp/XSharp $(DOTNETFLAGS)
-	$(DOTNET) publish $(XSHARP_DIR)/source/Spruce $(DOTNETFLAGS)
+	@$(DOTNET) publish $(XSHARP_DIR)/source/XSharp/XSharp $(DOTNETFLAGS)
+	@$(DOTNET) publish $(XSHARP_DIR)/source/Spruce $(DOTNETFLAGS)
 
 .PHONY: install
 install:
@@ -120,10 +127,13 @@ install:
 	@cp -r $(THISDIR)/Build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
 	@cp -r $(THISDIR)/Build/syslinux/* $(DESTDIR)/Build/ISO/
 	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
-	@echo "if this is your first time installing cosmos you will want to run 'make nuget-install'"
 
 .PHONY: nuget-install
 nuget-install:
 	@echo "Installing Nuget packages"
-	$(DOTNET) nuget remove source "Cosmos Local Package Feed" || true
-	$(DOTNET) nuget add source $(DESTDIR)/Packages/ -n "Cosmos Local Package Feed"
+
+	@rm -r -f ~/.nuget/packages/cosmos.*/
+	@rm -r -f ~/.nuget/packages/il2cpu.*/
+
+	@$(DOTNET) nuget remove source "Cosmos Local Package Feed" || true
+	@$(DOTNET) nuget add source $(DESTDIR)/Packages/ -n "Cosmos Local Package Feed"
