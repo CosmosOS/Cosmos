@@ -628,10 +628,13 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The origin Y coordinate.</param>
         public virtual void DrawString(string str, Font font, Color color, int x, int y)
         {
-            for (int i = 0; i < str.Length; i++)
+            var len = str.Length;
+            var width = font.Width;
+
+            for (int i = 0; i < len; i++)
             {
                 DrawChar(str[i], font, color, x, y);
-                x += font.Width;
+                x += width;
             }
         }
 
@@ -642,15 +645,17 @@ namespace Cosmos.System.Graphics
         /// <inheritdoc cref="DrawString(string, Font, Color, int, int)"/>
         public virtual void DrawChar(char c, Font font, Color color, int x, int y)
         {
+            var width = font.Width;
+            var height = font.Height;
             int p = font.Height * (byte)c;
 
-            for (int cy = 0; cy < font.Height; cy++)
+            for (int cy = 0; cy < height; cy++)
             {
-                for (byte cx = 0; cx < font.Width; cx++)
+                for (byte cx = 0; cx < width; cx++)
                 {
                     if (font.ConvertByteToBitAddress(font.Data[p + cy], cx + 1))
                     {
-                        DrawPoint(color, (ushort)(x + (font.Width - cx)), (ushort)(y + cy));
+                        DrawPoint(color, (ushort)(x + (width - cx)), (ushort)(y + cy));
                     }
                 }
             }
