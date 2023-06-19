@@ -590,11 +590,5 @@ namespace Cosmos.System_Plugs.System.Drawing
         {
             return aValue;
         }
-
-        public static int ToArgb(ref Color aThis,
-            [FieldAccess(Name = "System.Int64 System.Drawing.Color.value")] ref long aValue)
-        {
-            return (int)aValue;
-        }
     }
 }
