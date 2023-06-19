@@ -206,11 +206,26 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Heap.Collect();
             int nowAllocated = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated, nowAllocated, "Concentating and writing strings does not leak objects");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            TestMethod7();
+            Heap.Collect();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "TestMethod7 does not leak string objects");
         }
 
         void TestMethod6()
         {
             Console.WriteLine("Test: " + 3 + " vs " + 5);
+        }
+
+        void TestMethod7()
+        {
+            string o = "";
+            for (int i = 0; i < 128; i++)
+            {
+                o += i + "|" + i * 2;
+            }
         }
 
         #endregion

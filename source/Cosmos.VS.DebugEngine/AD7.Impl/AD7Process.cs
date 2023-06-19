@@ -383,14 +383,14 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     try
                     {
                         var connection = mDebugInfoDb.GetNewConnection();
-                        var xMethod = mDebugInfoDb.GetMethod(connection, lastEIPAddress);
+                        var xMethod = mDebugInfoDb.GetMethod(lastEIPAddress);
                         var xLabel = mDebugInfoDb.GetLabels(lastEIPAddress)[0];
                         var xMethodIlOp = mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel.Remove(xLabel.LastIndexOf('.'))).IlOffset;
                         var xSequencePoints = mDebugInfoDb.GetSequencePoints(mDebugInfoDb.GetAssemblyFileById(xMethod.AssemblyFileID).Pathname, xMethod.MethodToken);
                         var xLine = xSequencePoints.Where(q => q.Offset <= xMethodIlOp).Last().LineStart;
 
 
-                        AD7Util.ShowError($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(connection, xMethod.DocumentID).Pathname}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
+                        AD7Util.ShowError($"NullReferenceException occurred in '{xMethod.LabelCall}'{Environment.NewLine}Document: {mDebugInfoDb.GetDocumentById(xMethod.DocumentID).Pathname}{Environment.NewLine}Line: {xLine}{Environment.NewLine}Address: 0x{lastEIPAddress.ToString("X8")}");
 
                         connection.Close();
                         return;
@@ -456,9 +456,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                         var connection = mDebugInfoDb.GetNewConnection();
                         try
                         {
-                            var xMethod = mDebugInfoDb.GetMethod(connection, address);
+                            var xMethod = mDebugInfoDb.GetMethod(address);
                             var xLabels = mDebugInfoDb.GetLabels(address);
-                            var xDocument = mDebugInfoDb.GetDocumentById(connection, xMethod.DocumentID);
+                            var xDocument = mDebugInfoDb.GetDocumentById(xMethod.DocumentID);
                             int? xLine = null; 
                             if (xLabels != null && xLabels.Length > 0)
                             {
@@ -466,7 +466,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                             }
                             else
                             {
-                                var xLabel = mDebugInfoDb.GetMethodLabels(connection, address)
+                                var xLabel = mDebugInfoDb.GetMethodLabels(address)
                                     .OrderBy(x => Math.Abs(address - x.Address)).First(); // Get closest address
                                 xLabel.Name = xLabel.Name.Remove(xLabel.Name.LastIndexOf('.')) == xMethod.LabelCall ? xLabel.Name + ".AfterCall" : xLabel.Name; // Verify label name
                                 xLine = GetLabelLine(xMethod, xLabel.Name);
@@ -1126,11 +1126,11 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             if (mCurrentAddress.HasValue)
             {
                 var connection = mDebugInfoDb.GetNewConnection();
-                var currMethod = mDebugInfoDb.GetMethod(connection, mCurrentAddress.Value);
+                var currMethod = mDebugInfoDb.GetMethod(mCurrentAddress.Value);
                 //Clear out the full list so we don't accidentally accumulate INT3s all over the place
                 //Or set INT3s for all places in current method
 
-                var tpAdresses = clear ? new List<KeyValuePair<uint, string>>(INT3sSet.Count) : mDebugInfoDb.GetAllINT3AddressesForMethod(connection, currMethod, true);
+                var tpAdresses = clear ? new List<KeyValuePair<uint, string>>(INT3sSet.Count) : mDebugInfoDb.GetAllINT3AddressesForMethod(currMethod, true);
                 connection.Close();
 
                 //If we just do a stright assigment then we get a collection modified exception in foreach loop below
@@ -1237,7 +1237,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 // - We use the method header label as a start point and find all asm labels till the method footer label
                 // - We then find all the asm for these labels and display it.
                 var connection = mDebugInfoDb.GetNewConnection();
-                Label[] xLabels = mDebugInfoDb.GetMethodLabels(connection, xAddress);
+                Label[] xLabels = mDebugInfoDb.GetMethodLabels(xAddress);
                 connection.Close();
                 AD7Util.Log("SendAssembly - MethodLabels retrieved");
                 // get the label of our current position, or the closest one before
