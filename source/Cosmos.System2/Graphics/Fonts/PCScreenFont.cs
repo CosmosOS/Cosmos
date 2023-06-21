@@ -216,19 +216,22 @@ namespace Cosmos.System.Graphics.Fonts
                 charHeight = (byte)height;
                 charWidth = (byte)width;
 
-                parsedFontData = new byte[length * charHeight]; 
+                uint bytesPerRow = (width + 7) / 8;
+                uint charDataSize = charHeight * bytesPerRow;
+                parsedFontData = new byte[length * charDataSize];
 
                 for (int i = 0; i < length; i++)
                 {
                     for (int k = 0; k < charHeight; k++)
                     {
-                        int dataIndex = 32 + (i * charHeight * (charWidth / 8)) + k * (charWidth / 8);
-                        for (int j = 0; j < charWidth / 8; j++)
+                        int dataIndex = 32 + (i * (byte)charDataSize) + (k * (byte)bytesPerRow);
+                        for (int j = 0; j < bytesPerRow; j++)
                         {
-                            parsedFontData[(i * charHeight + k) * (charWidth / 8) + j] = fontData[dataIndex + j];
+                            parsedFontData[(i * charDataSize) + (k * bytesPerRow) + j] = fontData[dataIndex + j];
                         }
                     }
                 }
+
 
                 return new PCScreenFont(charWidth, charHeight, parsedFontData, mappings);
             }
