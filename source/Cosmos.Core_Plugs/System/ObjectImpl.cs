@@ -13,8 +13,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static string ToString(object aThis)
         {
-            mDebugger.Send("<Object.ToString not yet implemented!>");
-            return "<Object.ToString not yet implemented!>";
+            return $"<object of {aThis.GetType().Name}>";
         }
 
         public static void Ctor(object aThis)
