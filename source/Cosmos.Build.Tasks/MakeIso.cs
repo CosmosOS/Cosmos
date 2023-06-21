@@ -64,6 +64,7 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitch("-relaxed-filenames");
             xBuilder.AppendSwitch("-J");
             xBuilder.AppendSwitch("-R");
+            xBuilder.AppendSwitch("-l");
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
             xBuilder.AppendSwitch(" -b boot/limine-cd.bin");
             xBuilder.AppendSwitch("-no-emul-boot");
