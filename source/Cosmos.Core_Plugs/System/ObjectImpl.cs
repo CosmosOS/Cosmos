@@ -13,7 +13,7 @@ namespace Cosmos.Core_Plugs.System
 
         public static string ToString(object aThis)
         {
-            return $"<object of {aThis.GetType().Name}>";
+            return aThis.GetType().Name;
         }
 
         public static void Ctor(object aThis)
