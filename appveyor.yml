@@ -1,4 +1,4 @@
-version: 0.20150918.{build}
+version: 0.20221121.{build}
 image: Visual Studio 2022
 configuration: Debug-CI
 platform: Any CPU

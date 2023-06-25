@@ -43,11 +43,6 @@ public abstract class Kernel
 
             mStarted = true;
 
-            if (string.Empty == null)
-            {
-                throw new Exception("Compiler didn't initialize System.String.Empty!");
-            }
-
             Global.Debugger.Send("Initializing hardware bootstrap...");
             Bootstrap.Init();
             OnBoot();

@@ -267,7 +267,7 @@ namespace Cosmos.System_Plugs.System
         public static void set_TreatControlCAsInput(bool value)
         {
             throw new NotImplementedException("Not implemented: set_TreatControlCAsInput");
-        }
+        }  
 
         public static int get_WindowHeight()
         {
@@ -667,8 +667,7 @@ namespace Cosmos.System_Plugs.System
 
         public static void Write(long aLong) => Write(aLong.ToString());
 
-        /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
-        public static void Write(object value) => Write(value ?? String.Empty);
+        public static void Write(object value) => Write((value ?? string.Empty).ToString());
 
         public static void Write(string aText)
         {

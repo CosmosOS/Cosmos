@@ -12,7 +12,7 @@
 
 ###  Prerequisites for Linux
 
-* .NET 6 SDK: [Download .NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
+* .NET SDK (6+): [Download .NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
 * Make
 * Yasm (`apt install yasm`)
 * Xorriso (`apt install xorriso`)
@@ -35,7 +35,7 @@ The `install-VS2022.bat` accepts the following parameters :
 - `-VSEXPHIVE` or `/VSEXPHIVE` Use Visual Studio Experimental Hive for installation.
 
 ###  Installation on Linux
-Run `make all` to build Cosmos. Run `sudo make install`. Make sure to run `make nuget-install` under your user account, and not as sudo.
+Run `make` to build Cosmos. Cosmos will clone all the required repos, build itself, and install it and it's nuget packages to the system automatically.
 
 ### dotnet Project Templates
 If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install .\source\templates\csharp\` assuming you are currently in the Cosmos base directory.

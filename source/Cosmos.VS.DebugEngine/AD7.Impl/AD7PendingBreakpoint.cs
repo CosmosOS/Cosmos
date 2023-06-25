@@ -123,9 +123,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
                         try
                         {
-                            var connection = xDebugInfo.GetNewConnection();
-
-                            var xMethod = xDebugInfo.GetMethodByDocumentIDAndLinePosition(connection, xDocID, xPos, xPos);
+                            var xMethod = xDebugInfo.GetMethodByDocumentIDAndLinePosition(xDocID, xPos, xPos);
                             var asm = xDebugInfo.GetAssemblyFileById(xMethod.AssemblyFileID);
 
                             // We have the method. Now find out what Sequence Point it belongs to.
@@ -133,9 +131,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                             var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
 
                             // We have the Sequence Point, find the MethodILOp
-                            var xOp = xDebugInfo.GetFirstMethodIlOpByMethodIdAndILOffset(connection, xMethod.ID, xSP.Offset);
-
-                            connection.Close();
+                            var xOp = xDebugInfo.GetFirstMethodIlOpByMethodIdAndILOffset(xMethod.ID, xSP.Offset);
 
                             // Get the address of the Label
                             xAddress = xDebugInfo.GetAddressOfLabel(xOp.LabelName);

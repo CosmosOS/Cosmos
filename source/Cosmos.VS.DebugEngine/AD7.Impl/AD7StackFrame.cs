@@ -43,9 +43,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
       if (mHasSource = xProcess.mCurrentAddress.HasValue)
       {
         var xAddress = xProcess.mCurrentAddress.Value;
-        var connection = xProcess.mDebugInfoDb.GetNewConnection();
-        var label = xProcess.mDebugInfoDb.GetMethod(connection, xAddress);
-        connection.Close();
+        var label = xProcess.mDebugInfoDb.GetMethod(xAddress);
         var xSourceInfos = xProcess.mDebugInfoDb.GetSourceInfos(xAddress);
         if (!xSourceInfos.ContainsKey(xAddress))
         {
