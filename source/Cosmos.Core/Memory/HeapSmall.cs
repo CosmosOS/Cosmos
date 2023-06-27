@@ -442,7 +442,7 @@ namespace Cosmos.Core.Memory
                     pageBlock->SpacesLeft--;
 
                     // set info in page
-                    var heapObject = &page[i * elementSize / 2];
+                    ushort* heapObject = &page[i * elementSize / 2];
                     heapObject[0] = aSize; // size of actual object being allocated
                     heapObject[1] = 0; // gc status starts as 0
 
@@ -562,8 +562,8 @@ namespace Cosmos.Core.Memory
         /// <returns></returns>
         private static int GetAllocatedObjectCount(SMTPage* aPage, uint aSize)
         {
-            var root = GetFirstBlock(aPage, aSize);
-            var ptr = root->First;
+            RootSMTBlock* root = GetFirstBlock(aPage, aSize);
+            SMTBlock* ptr = root->First;
 
             uint size = root->Size;
             int count = 0;

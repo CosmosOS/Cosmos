@@ -34,7 +34,7 @@ The `FullScreenCanvas` provides two methods to get a canvas instance for the scr
 
 
 Really simple right?
-# A working example
+# A working example (devkit only!)
 ```CSharp
 using System;
 using Sys = Cosmos.System;
@@ -78,8 +78,6 @@ namespace GraphicTest
         {
             try
             {
-                Pen pen = new Pen();
-
                 // A red Point
                 canvas.DrawPoint(Color.Red, 69, 69);
 
