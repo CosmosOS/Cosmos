@@ -55,7 +55,7 @@ namespace Cosmos.System
         /// Initializes the console, screen and keyboard.
         /// </summary>
         /// <param name="textScreen">A screen device.</param>
-        public static void Init(TextScreenBase textScreen, bool initScrollWheel = true, bool initPS2 = true, bool initNetwork = true, bool ideInit = true)
+        public static void Init(TextScreenBase textScreen, bool initScrollWheel = true, bool initPS2 = true, bool initNetwork = true, bool ideInit = true, bool InitSerial = true, bool InitPCI = true, bool InitACPI = true, bool InitAHCI = true)
         {
 
             // We must init Console before calling Inits.
@@ -67,7 +67,7 @@ namespace Cosmos.System
             }
 
             Debugger.Send("Initializing the Hardware Abstraction Layer (HAL)...");
-            HAL.Global.Init(textScreen, initScrollWheel, initPS2, initNetwork, ideInit);
+            HAL.Global.Init(textScreen, initScrollWheel, initPS2, initNetwork, ideInit, InitSerial, InitPCI, InitACPI, InitAHCI);
 
             // TODO: @ascpixi: The end-user should have an option to exclude parts of
             //       Cosmos, such as the network stack, when they are not needed. As of
