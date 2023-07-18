@@ -36,6 +36,11 @@ namespace Cosmos.Core_Plugs.System
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
+            if (length < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(length), "Cannot initialize a string with a negative length");
+            }
+
             aStringEmpty = "";
             aStringLength = length;
             for (int i = 0; i < length; i++)
@@ -62,6 +67,11 @@ namespace Cosmos.Core_Plugs.System
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
+            if (length < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(length), "Cannot initialize a string with a negative length");
+            }
+
             aStringEmpty = "";
             aStringLength = length;
             for (int i = 0; i < length; i++)
@@ -75,6 +85,11 @@ namespace Cosmos.Core_Plugs.System
             [FieldAccess(Name = "System.Int32 System.String._stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String._firstChar")] char* aFirstChar)
         {
+            if (aLength < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(aLength), "Cannot initialize a string with a negative length");
+            }
+
             aStringEmpty = "";
             aStringLength = aLength;
             for (int i = 0; i < aLength; i++)
