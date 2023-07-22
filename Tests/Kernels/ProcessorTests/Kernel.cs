@@ -30,6 +30,7 @@ namespace ProcessorTests
                 TestCycleCount();
                 TestCycleRateIsNotZero();
                 TestMultiboot();
+                TestPit();
 
                 TestController.Completed();
             }
@@ -97,6 +98,22 @@ namespace ProcessorTests
             bool isCycleRateZero = cycleRate == 0;
             Assert.IsFalse(isCycleRateZero, "Processor cycle rate is not zero.");
             Assert.IsTrue(CPU.GetCPUCycleSpeed() == cycleRate, "Processor cycle speed is not constant");
+        }
+
+        public void TestPit() {
+            var i = 0;
+
+            Cosmos.HAL.Global.PIT.T0Frequency = 20000;
+            Cosmos.HAL.Global.PIT.RegisterTimer(new(() => {
+                i++;
+            }, 100_000, true));
+
+            Cosmos.HAL.Global.PIT.RegisterTimer(new(() => {
+                mDebugger.Send($"PIT ran {i} times");
+                Assert.IsTrue(i > 5_500, "PIT did not run adequate amount of times"); // We dont expect it to run perfectly 10k times
+            }, 1_000_000_000, false));                                                // because the handler itself takes too long (I think?)
+
+            for(var x = 0; x < 50_000_000; x++) { }
         }
     }
 }
