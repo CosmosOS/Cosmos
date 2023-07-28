@@ -1,9 +1,9 @@
+# Dev Kit Installation 
 
 ###  Prerequisites for Windows
 
 * (Free) source code of Development Kit from [Cosmos on GitHub](https://github.com/CosmosOS/Cosmos)
    * You must clone the repository using Git. For a detailed walkthrough, [see here](https://help.github.com/articles/fork-a-repo/).
-   * When following the tutorial, replace *OctoCat* with *CosmosOS* and *Spoon-Knife* with *Cosmos*.
 * (Free) [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/)  
 * (Free) [InnoSetup QuickStart Kit](http://www.jrsoftware.org/isdl.php#qsp)
    * This is required to build the setup kit which is used to build and install the Visual Studio integration libaries for Cosmos.
@@ -13,10 +13,10 @@
 ###  Prerequisites for Linux
 
 * .NET SDK (6+): [Download .NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
-* Make
+* Make (`apt install make`)
 * Yasm (`apt install yasm`)
 * Xorriso (`apt install xorriso`)
-* QEMU or any other virtual machine
+* QEMU or any other virtual machine. See [Running](https://cosmosos.github.io/articles/Installation/Running.html) for more information.
 
 ###  Installation on Windows
 
@@ -38,6 +38,6 @@ The `install-VS2022.bat` accepts the following parameters :
 Run `make` to build Cosmos. Cosmos will clone all the required repos, build itself, and install it and it's nuget packages to the system automatically.
 
 ### dotnet Project Templates
-If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install .\source\templates\csharp\` assuming you are currently in the Cosmos base directory.
+If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install ./source/templates/csharp/` assuming you are currently in the Cosmos base directory.
 After installing the template use `dotnet new cosmosCSKernel -n {name}` to create a new Cosmos Kernel project. 
-The dotnet template can be removed at a later time using `dotnet new --uninstall .\source\templates\csharp\`.
+The dotnet template can be removed at a later time using `dotnet new --uninstall ./source/templates/csharp/`.
