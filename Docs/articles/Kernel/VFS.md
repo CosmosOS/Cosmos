@@ -12,7 +12,7 @@ This is essential for using the VFS.
 We start with creating a global CosmosVFS, this line should appear outside of any function, and before the BeforeRun() function.
 
 ```C#
-Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
+Sys.FileSystem.CosmosVFS fs = new Cosmos.FileSystem.CosmosVFS();
 ```
 
 Next, we register our VFS at the VFS manager, this will initiate the VFS and make it usable, add this to your kernel's BeforeRun() function:
