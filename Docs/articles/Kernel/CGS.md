@@ -10,6 +10,7 @@ The `FullScreenCanvas` provides two methods to get a canvas instance for the scr
 `public static Canvas GetFullScreenCanvas()`: gets the instance of Canvas representing the complete screen in the best driver available on your platform
 
 # Canvas
+
 ## List of Properties of the Canvas class
 
 `Mode`: get / set the mode of the video card to mode. It throws if the selected mode is not supported by the video card
@@ -106,7 +107,7 @@ namespace GraphicTest
             }
             catch (Exception e)
             {
-                mDebugger.Send("Exception occurred: " + e.Message);
+                Debugger.Send("Exception occurred: " + e.Message);
                 Sys.Power.Shutdown();
             }
         }
