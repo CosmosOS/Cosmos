@@ -38,9 +38,9 @@ console window, you will see the following:
 
 ![](images/SNAG-0003.png)
 
-This is your operating system running in VMWare Player! Cosmos can of course
-also be booted in VMWare Workstation, Hyper-V, Virtual PC, Bochs, or on real
-hardware. But by default Cosmos uses VMWare Player because it is both free,
+This is your operating system running in VMware Player! Cosmos can of course
+also be booted in VMware Workstation, Hyper-V, Virtual PC, Bochs, or on real
+hardware. But by default Cosmos uses VMware Player because it is both free,
 and reliable. Cosmos can even debug in Visual Studio, even when running on
 another machine.
 
@@ -70,7 +70,7 @@ over (F10) is not supported yet.
 
 The debugger uses the serial port to communicate. Because of this, debugging
 only works wtih virtualization environments that support serial ports such as
-VMWare. QEMU supports serial ports as well, but its serial port implementation
+VMware. QEMU supports serial ports as well, but its serial port implementation
 is seriously broken on Windows and makes debugging impossible using QEMU. To
 debug on real hardware, you must use a physical serial cable. In the future
 Cosmos will also support debugging over Ethernet.
