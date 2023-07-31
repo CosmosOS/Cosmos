@@ -2,7 +2,8 @@
 If you need to disable drivers because you are developing your own, or in some cases just don't need them, you may do so by adding the OnBoot method to your kernel. For now, you can disable 3 drivers and disable a part of a driver, an example would be
 
 ```csharp
-protected override void OnBoot() {
+protected override void OnBoot() 
+{
     Sys.Global.Init(GetTextScreen(),true,true,true,false);
 }
 ```
