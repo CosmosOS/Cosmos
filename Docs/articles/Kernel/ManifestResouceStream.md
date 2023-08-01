@@ -6,10 +6,10 @@ Manifest Resource Streams allow you to include data from the files as byte array
 ![image](https://user-images.githubusercontent.com/8559822/132468001-256b92d1-0b29-4db3-9ef5-3383bfdef023.png)
 2. In the code reference the file using the following format (a static byte array with the attribute):
 ```
-[ManifestResourceStream(ResourceName = “{project_name}.{path}.{to}.{filename_with_extension}”)] 
+[ManifestResourceStream(ResourceName = "{project_name}.{path}.{to}.{filename_with_extension}")] 
 static byte[] file;
 ```
-The field _must_ be static but the name of the field can be changed. You will also need to add `using IL2CPU.API.Attribs;` to the code.
+The field _must_ be static but the name of the field (file) can be changed. You will also need to add `using IL2CPU.API.Attribs;` to the code.
 For example, if the project is called Kernel and the file is `Data\Text.txt`, then `ResourceName = "Kernel.Data.Text.txt"`.
 
 3. To access the data simply read from the byte array defined. 
