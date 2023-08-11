@@ -21,10 +21,6 @@
     <img src="https://img.shields.io/github/license/CosmosOS/Cosmos" />
   </a>
 
-  <a href="https://github.com/CosmosOS/Cosmos/issues">
-    <img src="https://img.shields.io/github/issues/CosmosOS/Cosmos" />
-  </a>
-
   <a href="https://discord.com/invite/kwtBwv6jhD">
     <img src="https://img.shields.io/discord/833970409337913344" />
   </a>
