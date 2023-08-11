@@ -35,7 +35,7 @@ namespace Cosmos.System.FileSystem.VFS
             Global.Debugger.SendInternal("--- VFSManager.RegisterVFS ---");
             if (!aAllowReinitialise && mVFS != null)
             {
-                throw new Exception("Virtual File System Manager already initialized!");
+                throw new Exception("The VFS already initialized!");
             }
 
             mVFS = aVFS;
@@ -1143,7 +1143,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             if (mVFS == null)
             {
-                throw new Exception("VFS not registered. Use VFSManager.RegisterVFS() before doing file system operations!");
+                throw new Exception("The VFS has not been registered. Use VFSManager.RegisterVFS() to register your filesystem!");
             }
         }
     }
