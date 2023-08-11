@@ -143,10 +143,8 @@ namespace Cosmos.System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DoTab()
         {
-            Write(Space);
-            Write(Space);
-            Write(Space);
-            Write(Space);
+            // Why use space 4 times instead of tab??
+            Write(Tab);
         }
 
         /// <summary>
