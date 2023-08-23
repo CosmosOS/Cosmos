@@ -110,7 +110,7 @@ namespace Cosmos.Build.Builder
                 "Cosmos.Build.Tasks",
             };
 
-            foreach (var task in PackProject(cosmosPackageProjects, new List<string>()))
+            foreach (var task in PackProject(cosmosPackageProjects, new List<string>(), new List<string>()))
             {
                 yield return task;
             }
