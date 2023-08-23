@@ -106,22 +106,6 @@
         <UpToDateCheckOutput Include="$(IsoFile)" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(KernelPkg)' == ''">
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Asm.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Core_Plugs.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Debug.Kernel.Plugs.Asm.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.System2_Plugs.dll" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(KernelPkg)' == 'X86'">
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.CPU.x86.dll" />
-
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.CPU_Plugs.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Debug.Kernel.Plugs.Asm.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Platform.PC.dll" />
-        <PlugsReference Include="$(KernelAssembliesDir)Cosmos.Plugs.TapRoot.dll" />
-    </ItemGroup>
-
     <ItemDefinitionGroup Condition="'$(DefineExplicitDefaults)' == 'True'">
         <PackageReference>
             <IsPlugsReference>False</IsPlugsReference>

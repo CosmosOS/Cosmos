@@ -7,6 +7,7 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\source\Cosmos.System2\Cosmos.System2.csproj" />
+        <ProjectReference Include="..\..\..\source\Cosmos.Plugs\Cosmos.Plugs.csproj" />
         <ProjectReference Include="..\..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
     </ItemGroup>
 
