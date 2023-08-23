@@ -29,6 +29,10 @@ if not exist "%MSBuild%" (
 
 echo Building Builder.sln
 "%MSBuild%" Builder.sln /nologo /maxcpucount /nodeReuse:false /verbosity:minimal /t:Restore;Build
+if %ERRORLEVEL% neq 0 (
+  echo Failed to build Cosmos Builder. Exiting...
+  exit /b %ERRORLEVEL%
+)
 
 start "Cosmos Builder" "source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-VSPATH=%InstallDir%" %*
 exit
