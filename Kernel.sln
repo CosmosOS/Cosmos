@@ -46,6 +46,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL2CPU.Debug.Symbols", "..\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spruce", "..\XSharp\source\Spruce\Spruce.csproj", "{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Plugs", "source\Cosmos.Plugs\Cosmos.Plugs.csproj", "{F2948368-61B6-4653-BAEC-C7152CE4980E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +185,14 @@ Global
 		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Release|x86.ActiveCfg = Release|Any CPU
 		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2}.Release|x86.Build.0 = Release|Any CPU
+		{F2948368-61B6-4653-BAEC-C7152CE4980E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2948368-61B6-4653-BAEC-C7152CE4980E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2948368-61B6-4653-BAEC-C7152CE4980E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F2948368-61B6-4653-BAEC-C7152CE4980E}.Debug|x86.Build.0 = Debug|Any CPU
+		{F2948368-61B6-4653-BAEC-C7152CE4980E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2948368-61B6-4653-BAEC-C7152CE4980E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2948368-61B6-4653-BAEC-C7152CE4980E}.Release|x86.ActiveCfg = Release|Any CPU
+		{F2948368-61B6-4653-BAEC-C7152CE4980E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -205,6 +215,7 @@ Global
 		{67FD9912-CE63-4EB2-880C-F4F0D9AED7CA} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
 		{4E9B8F31-AEA0-402D-9B3A-223100F2156D} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
 		{0812DD0A-4CEE-4376-B78A-02EBCBAA14C2} = {3CD3D9A5-9BC5-4FEB-8D63-4D535C0ABB78}
+		{F2948368-61B6-4653-BAEC-C7152CE4980E} = {9A923E6F-FF63-4F02-A4EA-C2D44F9323FD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1A1E8F1D-82B3-471F-9B59-0350DEA9203D}

@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
+        <ItemGroup>
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
+        </ItemGroup>
+    </Target>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    </PropertyGroup>
+    <ItemGroup>
+        <Content Include="build\**" Pack="True" PackagePath="build\" copyToOutput="true" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" PrivateAssets="compile">
+          <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+          <IncludeAssets>Cosmos.Core_Asm.dll</IncludeAssets>
+      </ProjectReference>
+      <ProjectReference Include="..\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj" PrivateAssets="compile">
+          <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+          <IncludeAssets>Cosmos.Core_Plugs.dll</IncludeAssets>
+      </ProjectReference>
+      <ProjectReference Include="..\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj" PrivateAssets="compile">
+          <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+          <IncludeAssets>Cosmos.Debug.Kernel.Plugs.Asm.dll</IncludeAssets>
+      </ProjectReference>
+      <ProjectReference Include="..\Cosmos.System2_Plugs\Cosmos.System2_Plugs.csproj" PrivateAssets="compile">
+          <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+          <IncludeAssets>Cosmos.System2_Plugs.dll</IncludeAssets>
+      </ProjectReference>
+    </ItemGroup>
+
+</Project>
