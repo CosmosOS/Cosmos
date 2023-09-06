@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using Cosmos.Debug.Kernel;
 using IL2CPU.API;
 
 namespace Cosmos.Core.Memory
 {
-
     /// <summary>
     /// Flags to track an object status
     /// All higher values in the ushort are used to track count of static counts
@@ -14,12 +13,15 @@ namespace Cosmos.Core.Memory
         None = 0,
         Hit = 1
     }
+
     /// <summary>
     /// Heap class.
     /// </summary>
     public static unsafe class Heap
     {
         private static uint* StackStart;
+        private static uint _StringType;
+
         /// <summary>
         /// Init heap.
         /// </summary>
@@ -27,7 +29,6 @@ namespace Cosmos.Core.Memory
         public static unsafe void Init()
         {
             _StringType = GetStringTypeID();
-
             StackStart = (uint*)CPU.GetStackStart();
             HeapSmall.Init();
             HeapMedium.Init();
@@ -35,45 +36,43 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-		/// Re-allocates or "re-sizes" data asigned to a pointer.
-		/// The pointer specified must be the start of an allocated block in the heap.
-		/// This shouldn't be used with objects as a new address is given when realocating memory.
-		/// </summary>
-		/// <param name="aPtr">Existing pointer</param>
-		/// <param name="NewSize">Size to extend to</param>
-		/// <returns>New pointer with specified size while maintaining old data.</returns>
+        /// Re-allocates or "re-sizes" data assigned to a pointer.
+        /// The pointer specified must be the start of an allocated block in the heap.
+        /// This shouldn't be used with objects as a new address is given when reallocating memory.
+        /// </summary>
+        /// <param name="aPtr">Existing pointer</param>
+        /// <param name="newSize">Size to extend to</param>
+        /// <returns>New pointer with specified size while maintaining old data.</returns>
         public static byte* Realloc(byte* aPtr, uint newSize)
-		{
-            // TODO: don't move memory position if there is enough space in the current one.
-
+        {
             // Get existing size
-            uint Size = RAT.GetPageType(aPtr) == RAT.PageType.HeapSmall ? ((ushort*)aPtr)[-2] : ((uint*)aPtr)[-4];
+            uint size = RAT.GetPageType(aPtr) == RAT.PageType.HeapSmall ? ((ushort*)aPtr)[-2] : ((uint*)aPtr)[-4];
 
-            if (Size == newSize)
-			{
+            if (size == newSize)
+            {
                 // Return existing pointer as nothing needs to be done.
                 return aPtr;
-			}
-            if (Size > newSize)
-			{
-                Size -= newSize - Size;
-			}
+            }
+            if (size > newSize)
+            {
+                size -= newSize - size;
+            }
 
             // Allocate a new buffer to use
-			byte* ToReturn = Alloc(newSize);
+            byte* toReturn = Alloc(newSize);
 
             // Copy the old buffer to the new one
-            MemoryOperations.Copy(ToReturn, aPtr, (int)Size);
+            MemoryOperations.Copy(toReturn, aPtr, (int)Math.Max(size, newSize));
 
-            // Comented out to help in the future if we use objects with realloc
+            // Commented out to help in the future if we use objects with realloc
             // Copy the GC state
             //((ushort*)ToReturn)[-1] = ((ushort*)aPtr)[-1];
-            ((ushort*)ToReturn)[-1] = 0;
+            ((ushort*)toReturn)[-1] = 0;
 
             // Free the old data and return
             Free(aPtr);
-            return ToReturn;
-		}
+            return toReturn;
+        }
 
         /// <summary>
         /// Alloc memory block, of a given size.
@@ -115,7 +114,6 @@ namespace Cosmos.Core.Memory
         }
 
         // Keep as void* and not byte* or other. Reduces typecasting from callers
-        // who may have typed the pointer to their own needs.
         /// <summary>
         /// Free a heap item.
         /// </summary>
@@ -159,7 +157,7 @@ namespace Cosmos.Core.Memory
 
             // Mark and sweep objects from roots
             // 1. Check if a page is in use if medium/large mark and sweep object
-            // 2. Go throught the SMT table for small objects and go through pages by size
+            // 2. Go through the SMT table for small objects and go through pages by size
             //    mark and sweep all allocated objects as well
 
             // Medium and large objects
@@ -169,7 +167,7 @@ namespace Cosmos.Core.Memory
                 if (pageType == (byte)RAT.PageType.HeapMedium || pageType == (byte)RAT.PageType.HeapLarge)
                 {
                     byte* pagePtr = RAT.RamStart + ratIndex * RAT.PageSize;
-                    if (*(ushort*)(pagePtr + 3 * sizeof(int) + 2) != 0) // the math is kinda messy but we have 4 int space and the last ushort of that space is for the gc info
+                    if (*(ushort*)(pagePtr + 3 * sizeof(int) + 2) != 0)
                     {
                         MarkAndSweepObject(pagePtr + HeapLarge.PrefixBytes);
                     }
@@ -177,7 +175,6 @@ namespace Cosmos.Core.Memory
             }
 
             // Small objects
-            // we go one size at a time
             var rootSMTPtr = HeapSmall.SMT->First;
             while (rootSMTPtr != null)
             {
@@ -192,9 +189,7 @@ namespace Cosmos.Core.Memory
                     byte* pagePtr = smtBlock->PagePtr;
                     for (int i = 0; i < objectsPerPage; i++)
                     {
-
-                        if (*(ushort*)(pagePtr + i * objectSize + sizeof(ushort)) > 1) // 0 means not found and 1 means marked
-                            // after the start of the object we first have one ushort of object size and then the ushort of gc info so + 2 == sizeof(ushort)
+                        if (*(ushort*)(pagePtr + i * objectSize + sizeof(ushort)) > 1)
                         {
                             MarkAndSweepObject(pagePtr + i * objectSize + HeapSmall.PrefixItemBytes);
                         }
@@ -221,8 +216,6 @@ namespace Cosmos.Core.Memory
             }
 
             // Free all unreferenced and reset hit flag
-            // This means we do the same transversal as we did before of the heap
-            // but we done have to touch the stack again
             int freed = 0;
             // Medium and large objects
             for (int ratIndex = 0; ratIndex < RAT.TotalPageCount; ratIndex++)
@@ -244,7 +237,6 @@ namespace Cosmos.Core.Memory
             }
 
             // Small objects
-            // we go one size at a time
             rootSMTPtr = HeapSmall.SMT->First;
             while (rootSMTPtr != null)
             {
@@ -278,16 +270,12 @@ namespace Cosmos.Core.Memory
                 rootSMTPtr = rootSMTPtr->LargerSize;
             }
 
-			//Enable interrupts back
-			CPU.EnableInterrupts();
+            // Enable interrupts back
+            CPU.EnableInterrupts();
 
             return freed;
         }
 
-        /// <summary>
-        /// Marks a GC managed object as referenced and recursivly marks child objects as well
-        /// </summary>
-        /// <param name="aPtr"></param>
         public static void MarkAndSweepObject(void* aPtr)
         {
             var gcPointer = (ObjectGCStatus*)aPtr;
@@ -300,17 +288,14 @@ namespace Cosmos.Core.Memory
             // Mark
             gcPointer[-1] |= ObjectGCStatus.Hit;
 
-            // Sweep
-
             uint* obj = (uint*)aPtr;
-            // Check what we are dealing with
+
             if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
             {
                 var type = *obj;
-                // Deal with strings first
                 if (type == _StringType)
                 {
-                    return; // we are done since they dont hold any reference to fields
+                    return; // we are done since they don't hold any reference to fields
                 }
 
                 SweepTypedObject(obj, type);
@@ -326,7 +311,7 @@ namespace Cosmos.Core.Memory
                     {
                         for (int i = 0; i < length; i++)
                         {
-                            var location = (uint*)((byte*)obj + size* i) + 4;
+                            var location = (uint*)((byte*)obj + size * i) + 4;
                             SweepTypedObject(location, elementType);
                         }
                     }
@@ -339,7 +324,7 @@ namespace Cosmos.Core.Memory
                         if (*location != 0)
                         {
                             location = *(uint**)location;
-                            if (RAT.GetPageType(location) == RAT.PageType.HeapSmall) // so we dont try free string literals
+                            if (RAT.GetPageType(location) == RAT.PageType.HeapSmall) // so we don't try free string literals
                             {
                                 MarkAndSweepObject(location);
                             }
@@ -353,11 +338,6 @@ namespace Cosmos.Core.Memory
             }
         }
 
-        /// <summary>
-        /// Marks all objects referenced
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="type"></param>
         public static void SweepTypedObject(uint* obj, uint type)
         {
             if (obj == null)
@@ -371,8 +351,8 @@ namespace Cosmos.Core.Memory
             {
                 if (!VTablesImpl.IsValueType(types[i]))
                 {
-                    var location = (uint*)((byte*)obj + offsets[i]) + 1; // +1 since we are only using 32bits from the 64bit
-                    if (*location != 0) // Check if its null
+                    var location = (uint*)((byte*)obj + offsets[i]) + 1;
+                    if (*location != 0) // Check if it's null
                     {
                         location = *(uint**)location;
                         if (RAT.GetPageType(location) != RAT.PageType.Empty)
@@ -389,15 +369,6 @@ namespace Cosmos.Core.Memory
             }
         }
 
-        /// <summary>
-        /// Stores the ID used for strings for quick comparison in CleanUp
-        /// </summary>
-        private static uint _StringType = 0;
-
-        /// <summary>
-        /// This is plugged using asm and gets the value for _StringType
-        /// </summary>
-        /// <returns></returns>
         private static uint GetStringTypeID()
         {
             return UInt32.MaxValue; // so that tests still pass return bogus value
