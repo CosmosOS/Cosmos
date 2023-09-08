@@ -385,7 +385,8 @@ namespace Cosmos.System.FileSystem.FAT
                         break;
 
                     case FatTypeEnum.Fat32:
-                        aValue = BitConverter.ToUInt32(xData, (int)xEntryOffset) & 0x0FFFFFFF;
+                        int localOffset = (int)(xEntryOffset % mFileSystem.BytesPerSector);
+                        aValue = BitConverter.ToUInt32(xData, localOffset) & 0x0FFFFFFF;
                         break;
 
                     default:
