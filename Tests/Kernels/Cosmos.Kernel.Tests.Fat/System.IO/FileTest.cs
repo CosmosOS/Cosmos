@@ -293,6 +293,12 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             string read = File.ReadAllText("0:\\long.txt");
             Assert.AreEqual(text, read, "Reading files larger than one cluster works using read all text");
 
+            text = new string('l', 1000000);
+            File.WriteAllText("0:\\long.txt", text);
+
+            string read2 = File.ReadAllText("0:\\long.txt");
+            Assert.AreEqual(text, read2, "Reading files larger than 1MB works using read all text");
+
             using (StreamReader streamReader = new StreamReader("0:\\long.txt"))
             {
                 Assert.AreEqual(0, streamReader.BaseStream.Position, "Position of StreamReader is correct");
