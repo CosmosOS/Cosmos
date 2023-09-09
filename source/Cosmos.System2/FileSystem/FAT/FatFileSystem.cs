@@ -416,7 +416,7 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xEntryOffset = aEntryNumber * xEntrySize;
 
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
-                int localOffset = (int)(xEntryOffset % mFileSystem.BytesPerSector);  // Calculate the local offset within the sector
+                int localOffset = (int)(xEntryOffset % mFileSystem.BytesPerSector);
 
                 byte[] xData;
                 ReadFatSector(xSector, out xData);
