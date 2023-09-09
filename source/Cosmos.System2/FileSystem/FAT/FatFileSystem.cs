@@ -146,6 +146,7 @@ namespace Cosmos.System.FileSystem.FAT
                     }
                 }
 
+                /* 
                 string xChain = "";
                 for (int i = 0; i < xReturn.Length; i++)
                 {
@@ -157,6 +158,7 @@ namespace Cosmos.System.FileSystem.FAT
                 }
                 Global.Debugger.SendInternal("Fat xChain:");
                 Global.Debugger.SendInternal(xChain);
+                */
 
                 SetFatEntry(xCurrentEntry, FatEntryEofValue());
 
