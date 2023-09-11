@@ -22,6 +22,9 @@ namespace Cosmos.System.Network.IPv4
         /// </summary>
         internal byte[] Parts = new byte[4];
 
+        public bool IsIpv4 => Parts.Length == 4;
+        public bool IsIpv6 => !IsIpv4;
+
         /// <summary>
         /// The <c>0.0.0.0</c> IP address.
         /// </summary>
