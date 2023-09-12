@@ -198,5 +198,47 @@ namespace Cosmos.System.Network.IPv4
                 throw new ArgumentException("obj is not a IPv4Address", nameof(obj));
             }
         }
+
+        public override bool Equals(object obj)
+        {
+
+            if (obj == null && this == null)
+            {
+                return true;
+            }
+
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (this == null)
+            {
+                return false;
+            }
+
+            if (obj is Address address)
+            {
+                if (IsIpv4 != address.IsIpv4) // not same ip type so is false
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < Parts.Length; i++)
+                {
+                    if (Parts[i] != address.Parts[i])
+                    {
+                        return false; // ips dont match
+                    }
+                }
+
+                return true; // ip type and value match
+
+            }
+
+            return false; // obj is not an Address
+
+        }
+
     }
 }
