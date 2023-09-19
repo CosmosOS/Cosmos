@@ -27,9 +27,23 @@ namespace Cosmos.System_Plugs.System
 
         public static int WindowTop => throw new NotImplementedException("Not implemented: WindowTop");
 
-        public static Encoding OutputEncoding => consoleOutputEncoding;
-
-        public static Encoding InputEncoding => consoleInputEncoding;
+        public static Encoding OutputEncoding
+        {
+            get => consoleOutputEncoding;
+            set
+            {
+                consoleOutputEncoding = value;
+            }
+        }
+        
+        public static Encoding InputEncoding
+        {
+            get => consoleInputEncoding;
+            set
+            {
+                consoleInputEncoding = value;
+            }
+        }
 
         public static bool KeyAvailable => KeyboardManager.KeyAvailable;
 

@@ -20,11 +20,7 @@
   <a href="https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt">
     <img src="https://img.shields.io/github/license/CosmosOS/Cosmos" />
   </a>
-
-  <a href="https://github.com/CosmosOS/Cosmos/issues">
-    <img src="https://img.shields.io/github/issues/CosmosOS/Cosmos" />
-  </a>
-
+  
   <a href="https://discord.com/invite/kwtBwv6jhD">
     <img src="https://img.shields.io/discord/833970409337913344" />
   </a>
@@ -64,5 +60,7 @@ For instructions on how to install and use Cosmos, please visit the [Cosmos webs
 For documentation and technical information, see the [Cosmos Documentation](https://cosmosos.github.io).
 
 If you have questions about how to use Cosmos, want to show off what you have made or have general questions, go check out [GitHub Discussions](https://github.com/CosmosOS/Cosmos/discussions). Alternatively, you can also join our [Discord server](https://discord.com/invite/kwtBwv6jhD)! If you think you found a bug in Cosmos, please check existing [issues](https://github.com/CosmosOS/Cosmos/issues) first before opening a new one. 
+
+[DevKit Change Log](https://cosmosos.github.io/articles/ChangeLog.html)
 
 </p>
