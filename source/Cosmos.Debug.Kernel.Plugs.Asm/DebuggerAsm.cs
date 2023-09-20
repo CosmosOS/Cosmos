@@ -60,6 +60,15 @@ namespace Cosmos.Debug.Kernel.Plugs.Asm
       new LiteralAssemblerCode("%endif");
     }
 
+
+    [Inline]
+    public static void SendCoreDump()
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      new LiteralAssemblerCode("Call DebugStub_SendCoreDump");
+      new LiteralAssemblerCode("%endif");
+    }
+
     [PlugMethod(Assembler = typeof(DoRealHalt))]
     public static void DoRealHalt() { }
 

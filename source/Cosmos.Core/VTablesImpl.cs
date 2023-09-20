@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core
@@ -158,8 +154,7 @@ namespace Cosmos.Core
                 EnableDebug = true;
                 DebugHex("Type", aType);
                 DebugHex("MethodId", aMethodId);
-                Debugger.SendKernelPanic(KernelPanics.VMT_TypeIdInvalid);
-                while (true) ;
+                Debugger.DoFail(KernelPanics.VMT_TypeIdInvalid);
             }
             var xCurrentType = aType;
             do
@@ -172,15 +167,13 @@ namespace Cosmos.Core
                 {
                     EnableDebug = true;
                     DebugHex("MethodIndexes is null for type", aType);
-                    Debugger.SendKernelPanic(KernelPanics.VMT_MethodIndexesNull);
-                    while (true) ;
+                    Debugger.DoFail(KernelPanics.VMT_MethodIndexesNull);
                 }
                 if (xCurrentTypeInfo.MethodAddresses == null)
                 {
                     EnableDebug = true;
                     DebugHex("MethodAddresses is null for type", aType);
-                    Debugger.SendKernelPanic(KernelPanics.VMT_MethodAddressesNull);
-                    while (true) ;
+                    Debugger.DoFail(KernelPanics.VMT_MethodAddressesNull);
                 }
 
                 for (int i = 0; i < xCurrentTypeInfo.MethodIndexes.Length; i++)
@@ -198,9 +191,8 @@ namespace Cosmos.Core
                             DebugHex("MethodCount", xCurrentTypeInfo.MethodCount);
                             DebugHex("MethodAddresses.Length", (uint)xCurrentTypeInfo.MethodAddresses.Length);
                             Debug("Method found, but address is invalid!");
-                            Debugger.SendKernelPanic(KernelPanics.VMT_MethodFoundButAddressInvalid);
-                            while (true)
-                                ;
+                            Debugger.DoFail(KernelPanics.VMT_MethodFoundButAddressInvalid);
+
                         }
                         Debug("Found.");
                         return xResult;
@@ -220,8 +212,7 @@ namespace Cosmos.Core
             DebugHex("MethodId", aMethodId);
             Debug("Not FOUND!");
 
-            Debugger.SendKernelPanic(KernelPanics.VMT_MethodNotFound);
-            while (true) ;
+            Debugger.DoFail(KernelPanics.VMT_MethodNotFound);
             throw new Exception("Cannot find virtual method!");
         }
 
@@ -254,8 +245,8 @@ namespace Cosmos.Core
             DebugHex("MethodId", aMethodId);
             Debug("Not FOUND Declaring TYPE!");
             Debugger.DoBochsBreak();
-            Debugger.SendKernelPanic(KernelPanics.VMT_MethodNotFound);
-            while (true) ;
+            Debugger.DoFail(KernelPanics.VMT_MethodNotFound);
+            return 0;
         }
 
         public static uint GetMethodAddressForInterfaceType(uint aType, uint aInterfaceMethodId)
@@ -265,8 +256,7 @@ namespace Cosmos.Core
                 EnableDebug = true;
                 DebugHex("Type", aType);
                 DebugHex("InterfaceMethodId", aInterfaceMethodId);
-                Debugger.SendKernelPanic(KernelPanics.VMT_TypeIdInvalid);
-                while (true) ;
+                Debugger.DoFail(KernelPanics.VMT_TypeIdInvalid);
             }
 
             var xTypeInfo = mTypes[aType];
@@ -275,16 +265,14 @@ namespace Cosmos.Core
             {
                 EnableDebug = true;
                 DebugHex("InterfaceMethodIndexes is null for type", aType);
-                Debugger.SendKernelPanic(KernelPanics.VMT_MethodIndexesNull);
-                while (true) ;
+                Debugger.DoFail(KernelPanics.VMT_MethodIndexesNull);
             }
 
             if (xTypeInfo.TargetMethodIndexes == null)
             {
                 EnableDebug = true;
                 DebugHex("TargetMethodIndexes is null for type", aType);
-                Debugger.SendKernelPanic(KernelPanics.VMT_MethodAddressesNull);
-                while (true) ;
+                Debugger.DoFail(KernelPanics.VMT_MethodAddressesNull);
             }
 
             for (int i = 0; i < xTypeInfo.InterfaceMethodIndexes.Length; i++)
@@ -302,8 +290,8 @@ namespace Cosmos.Core
             DebugHex("InterfaceMethodId", aInterfaceMethodId);
             Debug("Not FOUND!");
 
-            Debugger.SendKernelPanic(KernelPanics.VMT_MethodNotFound);
-            while (true) ;
+            Debugger.DoFail(KernelPanics.VMT_MethodNotFound);
+            return 0;
         }
 
         /// <summary>

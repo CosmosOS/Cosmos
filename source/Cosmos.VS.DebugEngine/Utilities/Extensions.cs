@@ -71,12 +71,8 @@ namespace Cosmos.VS.DebugEngine.Utilities
             return String.Intern(xBuilder.ToString());
         }
 
-        public static string GetFullName(this Type aType)
+        public static string GetFullName(this Type aType,bool checkParam=false)
         {
-            if (aType.IsGenericParameter)
-            {
-                return aType.FullName;
-            }
             var xSB = new StringBuilder();
             if (aType.IsArray)
             {
@@ -103,7 +99,24 @@ namespace Cosmos.VS.DebugEngine.Utilities
             {
                 xSB.Append(aType.FullName);
             }
-            if (aType.IsGenericType)
+            if (aType.IsGenericParameter)
+            {
+                if (checkParam)
+                {
+                    xSB.Append(aType.DeclaringType.FullName);
+                    xSB.Append(aType.DeclaringMethod?.Name);
+                    var paramss = aType.DeclaringMethod?.GetParameters();
+                    if (paramss != null)
+                    {
+                        foreach (var item in paramss)
+                        {
+                            xSB.Append(GetFullName(item.ParameterType, false));
+                        }
+                    }
+                }
+                xSB.Append(aType.Name);
+            }
+            if (aType.IsGenericType && !aType.IsGenericTypeDefinition)
             {
                 xSB.Append("<");
                 var xArgs = aType.GetGenericArguments();

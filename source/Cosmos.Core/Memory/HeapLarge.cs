@@ -35,8 +35,8 @@ namespace Cosmos.Core.Memory
             var xPtr = (uint*)RAT.AllocPages(aType, xPages);
             if (xPtr == null)
             {
-                Debugger.SendKernelPanic(0x67); // out of pages
-                while (true) { }
+                Debugger.DoFail(0x67); // out of pages
+
             }
             xPtr[0] = xPages * RAT.PageSize - PrefixBytes; // Allocated data size
             xPtr[1] = aSize; // Actual data size
@@ -52,7 +52,13 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown if page type is not found.</exception>
         public static void Free(void* aPtr)
         {
+            var heapObject = (uint*)aPtr;
             var xPageIdx = RAT.GetFirstRATIndex(aPtr);
+            if (heapObject[-4] == 0 && xPageIdx == 0)
+            {
+                // The object is not allocated
+                return;
+            }
             RAT.Free(xPageIdx);
         }
     }

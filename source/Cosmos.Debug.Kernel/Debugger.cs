@@ -2,6 +2,8 @@
 
 namespace Cosmos.Debug.Kernel
 {
+
+
     /// <summary>
     /// Provides a simplified interface for creating new instances of the
     /// <see cref="Debugger"/> class.
@@ -32,12 +34,9 @@ namespace Cosmos.Debug.Kernel
         }
     }
 
-    /// <summary>
-    /// Represents a categorized remote debugger, capable of communicating
-    /// with an external host machine, including virtualizers.
-    /// </summary>
     public class Debugger
     {
+        public static bool IgnoreAssert = false;
         /// <summary>
         /// Creates a new instance of the <see cref="Debugger"/> class.
         /// </summary>
@@ -53,17 +52,13 @@ namespace Cosmos.Debug.Kernel
         /// </summary>
         public string Section { get; }
 
-        /// <summary>
-        /// Triggers a software breakpoint.
-        /// </summary>
+        #region Break
         public void Break() { }
 
-        /// <summary>
-        /// Triggers a Bochs breakpoint.
-        /// </summary>
         public static void DoBochsBreak() { }
 
         internal static void DoRealHalt() { }
+        #endregion
 
         private static unsafe void ActualSend(int aLength, char* aText) { }
 
@@ -154,22 +149,120 @@ namespace Cosmos.Debug.Kernel
             }
         }
 
-        /// <summary>
-        /// Sends a kernel panic error code to connected debugging hosts.
-        /// </summary>
-        public static void SendKernelPanic(uint id) { }
+        #region Assert
+        private static void SendKernelPanic(uint id) { }
 
-        /// <summary>
-        /// Sends the given string to connected debugging hosts.
-        /// </summary>
-        /// <param name="text">The text/message to send.</param>
-        public void Send(string text) => DoSend(text);
+        public static void SendCoreDump() { }
 
-        /// <summary>
-        /// Sends multiple strings to connected debugging hosts.
-        /// </summary>
-        /// <param name="stringArray">The strings to send.</param>
-        public void Send(string[] stringArray) => DoSend(stringArray);
+        #region Assert Function
+
+        public static void DoAssert(int code)
+        {
+            DoAssert(true, code);
+        }
+
+        public static void DoAssert(bool condition)
+        {
+            DoAssert(condition, -1);
+        }
+
+        public static void DoAssert(bool condition, int code)
+        {
+            DoAssert(condition, code, false);
+        }
+        public static void DoAssert(bool condition, int code, string message)
+        {
+            DoAssert(condition, code, false, message);
+        }
+        public static void DoAssert(bool condition, bool DoBreak)
+        {
+            DoAssert(condition, -1, DoBreak, null);
+        }
+        public static void DoAssert(bool condition, bool DoBreak, string message)
+        {
+            DoAssert(condition, -1, DoBreak, message);
+        }
+
+        public static void DoAssert(bool condition, string message)
+        {
+            DoAssert(condition, -1, false, message);
+        }
+
+        public static void DoAssert(bool condition, int code, bool DoBreak)
+        {
+            DoAssert(condition, code, DoBreak, null);
+        }
+
+        public static void DoAssert(bool condition, int code, bool DoBreak, string message)
+        {
+            if (condition && !IgnoreAssert)
+            {
+                if (message != null) { DoSend(message); }
+                if (DoBreak)
+                {
+                    DoBochsBreak();
+                }
+                if (code > -1)
+                {
+                    SendKernelPanic((uint)code);
+                }
+                else { SendCoreDump(); }
+            }
+        }
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Assert(bool condition) => DoAssert(condition);
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Assert(bool condition, int code) => DoAssert(condition, code);
+
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Assert(bool condition, int code, string message) => DoAssert(condition, code, message);
+        #endregion
+
+        #region Fail Function
+
+        public static void DoFail(uint code)
+        {
+            DoFail((int)code);
+        }
+
+        public static void DoFail(int code)
+        {
+            DoFail(code, null);
+        }
+
+        public static void DoFail(string message)
+        {
+            DoFail(-1, message);
+        }
+
+        public static void DoFail(int code, string message)
+        {
+            if (message != null) { DoSend(message); }
+            if (code > -1)
+            {
+                SendKernelPanic((uint)code);
+            }
+            else { SendCoreDump(); } //  behave like assert function
+            // halt
+            while (true) { }
+        }
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Fail(string message) => DoFail(message);
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Fail(int code) => DoFail(code);
+        [Conditional("COSMOSDEBUG")]
+        public virtual void Fail(int code, string message) => DoFail(code, message);
+        #endregion
+
+        #endregion
+
+        #region Trace
+
+        public void Send(string aText) => DoSend(aText);
+
+        public void Send(string[] aStringArray) => DoSend(aStringArray);
 
         /// <summary>
         /// Sends the given message to all connected debugging hosts.
@@ -234,12 +327,7 @@ namespace Cosmos.Debug.Kernel
         //    }
         //}
 
-        /// <summary>
-        /// Displays a message box on connected debugging hosts.
-        /// </summary>
-        /// <param name="length">The length of the <paramref name="text"/> C-string.</param>
-        /// <param name="text">The text to display in the message box, as a C-string.</param>
-        public unsafe void SendMessageBox(int length, char* text) { } // Plugged
+        public unsafe void SendMessageBox(int aLength, char* aText) { } // Plugged
 
         /// <summary>
         /// Displays a message box on connected debugging hosts.
@@ -260,7 +348,7 @@ namespace Cosmos.Debug.Kernel
                 SendMessageBox(xChars.Length, xPtr);
             }
         }
-
+        #endregion
         private int FromHex(string p)
         {
             p = p.ToLower();

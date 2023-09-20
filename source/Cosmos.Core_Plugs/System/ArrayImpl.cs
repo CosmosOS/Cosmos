@@ -118,7 +118,7 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
-        public static unsafe void SetValue([ObjectPointerAccess] uint* aThis, uint aValue, int aIndex)
+        public static unsafe void SetValue([ObjectPointerAccess] uint* aThis, [ObjectPointerAccess] uint* aValue, int aIndex)
         {
             aThis = (uint*) aThis[0];
             aThis += 3;
@@ -128,16 +128,16 @@ namespace Cosmos.Core_Plugs.System
             switch (xElementSize)
             {
                 case 1:
-                    *(byte*) aThis = (byte) aValue;
+                    *(byte*) aThis = (byte) *aValue;
                     return;
                 case 2:
-                    *(ushort*) aThis = (ushort) aValue;
+                    *(ushort*) aThis = (ushort) *aValue;
                     return;
                 case 3:
-                    *(uint*) aThis = (uint) aValue;
+                    *(uint*) aThis = (uint) *aValue;
                     return;
                 case 4:
-                    *(uint*) aThis = (uint) aValue;
+                    *(uint*) aThis = (uint) *aValue;
                     return;
             }
             throw new NotSupportedException("SetValue not supported in this situation!");
