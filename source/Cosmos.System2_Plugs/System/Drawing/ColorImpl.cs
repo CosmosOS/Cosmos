@@ -590,5 +590,25 @@ namespace Cosmos.System_Plugs.System.Drawing
         {
             return aValue;
         }
+
+        public static string ToString(ref Color aThis,
+            [FieldAccess(Name = "System.Int64 System.Drawing.Color.value")] ref long aValue,
+            [FieldAccess(Name = "System.String System.Drawing.Color.name")] ref string aName,
+            [FieldAccess(Name = "System.Int16 System.Drawing.Color.knownColor")] ref short aKnownColor)
+        {
+            if (!string.IsNullOrEmpty(aName))
+            {
+                return aName;
+            }
+
+            KnownColor knownColor = (KnownColor)aKnownColor;
+            if (Enum.IsDefined(typeof(KnownColor), knownColor))
+            {
+                return knownColor.ToString();
+            }
+
+            return "#" + aValue.ToString("X8");
+        }
+
     }
 }
