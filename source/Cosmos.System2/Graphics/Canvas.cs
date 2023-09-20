@@ -109,7 +109,16 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         /// <param name="width">The width of the drawn bitmap.</param>
         /// <param name="height">This parameter is unused.</param>
-        public abstract void DrawArray(Color[] colors, int x, int y, int width, int height);
+        public virtual void DrawArray(Color[] colors, int x, int y, int width, int height)
+        {
+            for (int X = 0; X < width; X++)
+            {
+                for (int Y = 0; Y < height; Y++)
+                {
+                    DrawPoint(colors[Y * width + X], x + X, y + Y);
+                }
+            }
+        }
 
         /// <summary>
         /// Draws a horizontal line.
@@ -619,10 +628,13 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The origin Y coordinate.</param>
         public virtual void DrawString(string str, Font font, Color color, int x, int y)
         {
-            for (int i = 0; i < str.Length; i++)
+            var len = str.Length;
+            var width = font.Width;
+
+            for (int i = 0; i < len; i++)
             {
                 DrawChar(str[i], font, color, x, y);
-                x += font.Width;
+                x += width;
             }
         }
 
@@ -633,15 +645,18 @@ namespace Cosmos.System.Graphics
         /// <inheritdoc cref="DrawString(string, Font, Color, int, int)"/>
         public virtual void DrawChar(char c, Font font, Color color, int x, int y)
         {
-            int p = font.Height * (byte)c;
+            var height = font.Height;
+            var width = font.Width;
+            var data = font.Data;
+            int p = height * (byte)c;
 
-            for (int cy = 0; cy < font.Height; cy++)
+            for (int cy = 0; cy < height; cy++)
             {
-                for (byte cx = 0; cx < font.Width; cx++)
+                for (byte cx = 0; cx < width; cx++)
                 {
-                    if (font.ConvertByteToBitAddress(font.Data[p + cy], cx + 1))
+                    if (font.ConvertByteToBitAddress(data[p + cy], cx + 1))
                     {
-                        DrawPoint(color, (ushort)(x + (font.Width - cx)), (ushort)(y + cy));
+                        DrawPoint(color, (ushort)(x + cx), (ushort)(y + cy));
                     }
                 }
             }

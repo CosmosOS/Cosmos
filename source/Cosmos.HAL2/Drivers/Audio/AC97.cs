@@ -1,9 +1,8 @@
-﻿using Cosmos.HAL;
-using System;
+﻿using System;
 using Cosmos.Core;
 using Cosmos.HAL.Audio;
 
-namespace Cosmos.HAL.Drivers.PCI.Audio
+namespace Cosmos.HAL.Drivers.Audio
 {
     /// <summary>
     /// Handles AC97-compatible sound cards at a low-level.
@@ -88,7 +87,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
         /// <param name="left">The left chanel volume. Must be between 0 and 63.</param>
         /// <param name="mute">Whether to mute all output of the channel.</param>
         private static ushort CreateMixerVolumeValue(byte right, byte left, bool mute)
-            => (ushort)((right & 0x3f) | ((left & 0x3f) << 8) | ((mute ? 1 : 0) & 1 << 15));
+            => (ushort)(right & 0x3f | (left & 0x3f) << 8 | (mute ? 1 : 0) & 1 << 15);
 
         /// <summary>
         /// Creates a new instance of the <see cref="AC97"/> class, with the
@@ -104,7 +103,7 @@ namespace Cosmos.HAL.Drivers.PCI.Audio
                 // (1.2.4.2 PCM Buffer Restrictions, Intel document 302349-003)
                 throw new ArgumentException("The buffer size must be an even number.", nameof(bufferSize));
 
-            PCIDevice pci = Cosmos.HAL.PCI.GetDeviceClass(
+            PCIDevice pci = HAL.PCI.GetDeviceClass(
                 ClassID.MultimediaDevice, // 0x04
                 (SubclassID)0x01          // 0x01
             );

@@ -19,7 +19,7 @@ namespace Cosmos.System_Plugs.System.IO
         [PlugMethod(Signature = "System_Boolean__System_IO_FileSystemInfo_System_IO_IFileSystemObject_get_Exists__")]
         public static bool get_Exists(FileSystemInfo aThis)
         {
-            Global.FileSystemDebugger.SendInternal($"FileSystemInfo.get_Exists : fullPath = {aThis.FullName}");
+            Global.Debugger.SendInternal($"FileSystemInfo.get_Exists : fullPath = {aThis.FullName}");
             // TODO we have to find if 'aThis' is a DirectoryInfo or a FileInfo to decide what method to call
             if (aThis is DirectoryInfo)
             {
@@ -33,13 +33,13 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static FileAttributes get_Attributes(FileSystemInfo aThis)
         {
-            Global.FileSystemDebugger.SendInternal($"FileSystemInfo.get_Attributes : fullPath = {aThis.FullName}");
+            Global.Debugger.SendInternal($"FileSystemInfo.get_Attributes : fullPath = {aThis.FullName}");
             return VFSManager.GetFileAttributes(aThis.FullName);
         }
 
         public static void set_Attributes(FileSystemInfo aThis, FileAttributes value)
         {
-            Global.FileSystemDebugger.SendInternal($"FileSystemInfo.set_Attributes : fullPath = {aThis.FullName} value {(int) value}");
+            Global.Debugger.SendInternal($"FileSystemInfo.set_Attributes : fullPath = {aThis.FullName} value {(int) value}");
             VFSManager.SetFileAttributes(aThis.FullName, value);
         }
     }

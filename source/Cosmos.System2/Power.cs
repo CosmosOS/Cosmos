@@ -1,4 +1,5 @@
 using Cosmos.Core;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Cosmos.System
@@ -11,6 +12,7 @@ namespace Cosmos.System
         /// <summary>
         /// Reboots the system using the CPU.
         /// </summary>
+        [DoesNotReturn]
         public static void Reboot()
         {
             /*
@@ -29,6 +31,7 @@ namespace Cosmos.System
         /// Shutdown the ACPI.
         /// </summary>
         /// <exception cref="IOException">Thrown on IO error.</exception>
+        [DoesNotReturn]
         public static void Shutdown()
         {
             /*

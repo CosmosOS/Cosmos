@@ -8,7 +8,7 @@ using Cosmos.Core;
 using Cosmos.Core.Memory;
 using Cosmos.HAL.Network;
 
-namespace Cosmos.HAL.Drivers.PCI.Network
+namespace Cosmos.HAL.Drivers.Network
 {
     public unsafe class E1000 : NetworkDevice
     {
@@ -52,7 +52,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             dev = device;
             device.EnableDevice();
-            BAR0 = (uint)(device.BAR0 & (~3));
+            BAR0 = (uint)(device.BAR0 & ~3);
             INTs.SetIrqHandler(device.InterruptLine, HandleIRQ);
 
             var HasEEPROM = DetectEEPROM();
@@ -133,7 +133,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             if ((Status & 0x80) != 0)
             {
                 uint _RXCurr = RXCurr;
-                var desc = (RXDesc*)(RXDescs + (RXCurr * 16));
+                var desc = (RXDesc*)(RXDescs + RXCurr * 16);
                 while ((desc->status & 0x1) != 0)
                 {
                     byte[] data = new byte[desc->length];
@@ -153,11 +153,11 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         private void RXInitialize()
         {
             var tmp = Heap.SafeAlloc(32 * 16 + 16);
-            RXDescs = (tmp % 16 != 0) ? (tmp + 16 - (tmp % 16)) : tmp;
+            RXDescs = tmp % 16 != 0 ? tmp + 16 - tmp % 16 : tmp;
 
             for (uint i = 0; i < 32; i++)
             {
-                var desc = (RXDesc*)(RXDescs + (i * 16));
+                var desc = (RXDesc*)(RXDescs + i * 16);
                 desc->addr = Heap.SafeAlloc(2048 + 16);
                 desc->status = 0;
             }
@@ -172,25 +172,25 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             WriteRegister(REG_RXDESCTAIL, 32 - 1);
 
             WriteRegister(REG_RCTRL,
-                     (1 << 1) | // Receiver Enable
-                     (1 << 2) | // Store Bad Packets
-                     (1 << 3) | // Unicast Promiscuous Enabled
-                     (1 << 4) | // Multicast Promiscuous Enabled
-                     (0 << 6) | // No Loopback
-                     (0 << 8) | // Free Buffer Threshold is 1/2 of RDLEN
-                    (1 << 15) | // Broadcast Accept Mode
-                    (1 << 26) | // Strip Ethernet CRC
-                    (0 << 16) //Buffer size of 2048 bytes
+                     1 << 1 | // Receiver Enable
+                     1 << 2 | // Store Bad Packets
+                     1 << 3 | // Unicast Promiscuous Enabled
+                     1 << 4 | // Multicast Promiscuous Enabled
+                     0 << 6 | // No Loopback
+                     0 << 8 | // Free Buffer Threshold is 1/2 of RDLEN
+                    1 << 15 | // Broadcast Accept Mode
+                    1 << 26 | // Strip Ethernet CRC
+                    0 << 16 //Buffer size of 2048 bytes
                 );
         }
         private void TXInitialize()
         {
             var tmp = Heap.SafeAlloc(8 * 16 + 16);
-            TXDescs = (tmp % 16 != 0) ? (tmp + 16 - (tmp % 16)) : tmp;
+            TXDescs = tmp % 16 != 0 ? tmp + 16 - tmp % 16 : tmp;
 
             for (int i = 0; i < 8; i++)
             {
-                var desc = (TXDesc*)(TXDescs + (i * 16));
+                var desc = (TXDesc*)(TXDescs + i * 16);
                 desc->addr = 0;
                 desc->cmd = 0;
             }
@@ -248,12 +248,12 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public ushort ReadROM(uint Addr)
         {
             uint Temp;
-            WriteRegister(REG_EEPROM, 1 | (Addr << 8));
+            WriteRegister(REG_EEPROM, 1 | Addr << 8);
             while (((Temp = ReadRegister(REG_EEPROM)) & 0x10) == 0)
             {
 
             }
-            return ((ushort)((Temp >> 16) & 0xFFFF));
+            return (ushort)(Temp >> 16 & 0xFFFF);
         }
 
         public override bool QueueBytes(byte[] buffer, int offset, int length)
@@ -269,10 +269,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 a++;
             }
 
-            var desc = (TXDesc*)(TXDescs + (TXCurr * 16));
+            var desc = (TXDesc*)(TXDescs + TXCurr * 16);
             desc->addr = (ulong)ptr;
             desc->length = (ushort)length;
-            desc->cmd = (1 << 0) | (1 << 1) | (1 << 3);
+            desc->cmd = 1 << 0 | 1 << 1 | 1 << 3;
             desc->status = 0;
 
             byte _TXCurr = (byte)TXCurr;

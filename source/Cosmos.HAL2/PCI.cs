@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
 {
@@ -80,10 +76,7 @@ namespace Cosmos.HAL
     {
         public static List<PCIDevice> Devices;
 
-        public static uint Count
-        {
-            get { return (uint)Devices.Count; }
-        }
+        public static uint Count => (uint)Devices.Count;
 
         public static void Setup()
         {
@@ -97,7 +90,9 @@ namespace Cosmos.HAL
                 for (ushort fn = 0; fn < 8; fn++)
                 {
                     if (PCIDevice.GetVendorID(0x0, 0x0, fn) != 0xFFFF)
+                    {
                         break;
+                    }
 
                     CheckBus(fn);
                 }

@@ -16,6 +16,8 @@ var audioManager = new AudioManager()
 audioManager.Enable();
 ```
 
+The sampleAudioBytes are the bytes of a ttf audio file. You can read it from [VFS](https://cosmosos.github.io/articles/Kernel/VFS.html) or using [ManifestResourceStream](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html)
+
 ## Audio Streams
 An `AudioStream` is an object that can provide sample data to audio buffers. By design, the base `AudioStream` class does not have any length or position properties, as audio streams may be infinite - for example, an output stream from a microphone, or an audio mixer. All seekable streams inherit from the class `SeekableAudioStream`, which provides functionality for accessing the position/length properties and allows methods to determine whether they accept infinite and finite streams, or only finite streams.
 

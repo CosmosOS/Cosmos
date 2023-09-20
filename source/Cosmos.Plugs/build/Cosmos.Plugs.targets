@@ -1,0 +1,8 @@
+<Project>
+    <ItemGroup Condition="'$(KernelPkg)' == ''">
+        <PlugsReference Include="$(MSBuildThisFileDirectory)../lib/$(TargetFramework)/Cosmos.Core_Asm.dll" />
+        <PlugsReference Include="$(MSBuildThisFileDirectory)../lib/$(TargetFramework)/Cosmos.Core_Plugs.dll" />
+        <PlugsReference Include="$(MSBuildThisFileDirectory)../lib/$(TargetFramework)/Cosmos.Debug.Kernel.Plugs.Asm.dll" />
+        <PlugsReference Include="$(MSBuildThisFileDirectory)../lib/$(TargetFramework)/Cosmos.System2_Plugs.dll" />
+    </ItemGroup>
+</Project>

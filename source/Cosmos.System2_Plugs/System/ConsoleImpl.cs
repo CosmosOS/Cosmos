@@ -17,7 +17,7 @@ namespace Cosmos.System_Plugs.System
 
         public static int LargestWindowWidth => throw new NotImplementedException("Not implemented: LargestWindowWidth");
 
-        public static void Title(string value) => throw new NotImplementedException("Not implemented: Title");
+        public static string Title => throw new NotImplementedException("Not implemented: Title");
 
         public static int BufferHeight => throw new NotImplementedException("Not implemented: BufferHeight");
 
@@ -27,9 +27,23 @@ namespace Cosmos.System_Plugs.System
 
         public static int WindowTop => throw new NotImplementedException("Not implemented: WindowTop");
 
-        public static Encoding OutputEncoding => consoleOutputEncoding;
-
-        public static Encoding InputEncoding => consoleInputEncoding;
+        public static Encoding OutputEncoding
+        {
+            get => consoleOutputEncoding;
+            set
+            {
+                consoleOutputEncoding = value;
+            }
+        }
+        
+        public static Encoding InputEncoding
+        {
+            get => consoleInputEncoding;
+            set
+            {
+                consoleInputEncoding = value;
+            }
+        }
 
         public static bool KeyAvailable => KeyboardManager.KeyAvailable;
 
@@ -135,7 +149,7 @@ namespace Cosmos.System_Plugs.System
 
                 if (value < 0)
                 {
-                    throw new ArgumentException("The value must be at least 0!", "value");
+                    throw new ArgumentException("The value must be at least 0!", nameof(value));
                 }
 
                 if (value < WindowWidth)
@@ -144,7 +158,7 @@ namespace Cosmos.System_Plugs.System
                 }
                 else
                 {
-                    throw new ArgumentException("The value must be lower than the console width!", "value");
+                    throw new ArgumentException("The value must be lower than the console width!", nameof(value));
                 }
             }
         }
@@ -172,7 +186,7 @@ namespace Cosmos.System_Plugs.System
 
                 if (value < 0)
                 {
-                    throw new ArgumentException("The value must be at least 0!", "value");
+                    throw new ArgumentException("The value must be at least 0!", nameof(value));
                 }
 
                 if (value < WindowHeight)
@@ -181,7 +195,7 @@ namespace Cosmos.System_Plugs.System
                 }
                 else
                 {
-                    throw new ArgumentException("The value must be lower than the console height!", "value");
+                    throw new ArgumentException("The value must be lower than the console height!", nameof(value));
                 }
             }
         }
@@ -338,7 +352,7 @@ namespace Cosmos.System_Plugs.System
                 // for now:
                 return null;
             }
-            var chars = new List<char>(32);
+            List<char> chars = new(32);
             KeyEvent current;
             int currentCount = 0;
 
@@ -407,7 +421,7 @@ namespace Cosmos.System_Plugs.System
                     //Insert the new character in the correct location
                     //For some reason, List.Insert() doesn't work properly
                     //so the character has to be inserted manually
-                    var temp = new List<char>();
+                    List<char> temp = new();
 
                     for (int x = 0; x < chars.Count; x++)
                     {
@@ -506,7 +520,7 @@ namespace Cosmos.System_Plugs.System
         public static void WriteLine(long aLong) => WriteLine(aLong.ToString());
 
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty line */
-        public static void WriteLine(object value) => Write((value ?? String.Empty) + Environment.NewLine);
+        public static void WriteLine(object value) => Write((value ?? string.Empty).ToString() + Environment.NewLine);
 
         public static void WriteLine(string aText) => Write(aText + Environment.NewLine);
 
@@ -514,13 +528,13 @@ namespace Cosmos.System_Plugs.System
 
         public static void WriteLine(ulong aLong) => WriteLine(aLong.ToString());
 
-        public static void WriteLine(string format, object arg0) => WriteLine(String.Format(format, arg0));
+        public static void WriteLine(string format, object arg0) => WriteLine(string.Format(format, arg0));
 
-        public static void WriteLine(string format, object arg0, object arg1) => WriteLine(String.Format(format, arg0, arg1));
+        public static void WriteLine(string format, object arg0, object arg1) => WriteLine(string.Format(format, arg0, arg1));
 
-        public static void WriteLine(string format, object arg0, object arg1, object arg2) => WriteLine(String.Format(format, arg0, arg1, arg2));
+        public static void WriteLine(string format, object arg0, object arg1, object arg2) => WriteLine(string.Format(format, arg0, arg1, arg2));
 
-        public static void WriteLine(string format, params object[] arg) => WriteLine(String.Format(format, arg));
+        public static void WriteLine(string format, params object[] arg) => WriteLine(string.Format(format, arg));
 
         public static void WriteLine(char[] aBuffer, int aIndex, int aCount)
         {
@@ -558,7 +572,7 @@ namespace Cosmos.System_Plugs.System
         public static void Write(long aLong) => Write(aLong.ToString());
 
         /* Correct behaviour printing null should not throw NRE or do nothing but should print an empty string */
-        public static void Write(object value) => Write(value ?? String.Empty);
+        public static void Write(object value) => Write((value ?? string.Empty).ToString());
 
         public static void Write(string aText)
         {
@@ -577,27 +591,27 @@ namespace Cosmos.System_Plugs.System
 
         public static void Write(ulong aLong) => Write(aLong.ToString());
 
-        public static void Write(string format, object arg0) => Write(String.Format(format, arg0));
+        public static void Write(string format, object arg0) => Write(string.Format(format, arg0));
 
-        public static void Write(string format, object arg0, object arg1) => Write(String.Format(format, arg0, arg1));
+        public static void Write(string format, object arg0, object arg1) => Write(string.Format(format, arg0, arg1));
 
-        public static void Write(string format, object arg0, object arg1, object arg2) => Write(String.Format(format, arg0, arg1, arg2));
+        public static void Write(string format, object arg0, object arg1, object arg2) => Write(string.Format(format, arg0, arg1, arg2));
 
-        public static void Write(string format, params object[] arg) => Write(String.Format(format, arg));
+        public static void Write(string format, params object[] arg) => Write(string.Format(format, arg));
 
         public static void Write(char[] buffer, int index, int count)
         {
             if (buffer == null)
             {
-                throw new ArgumentNullException("buffer");
+                throw new ArgumentNullException(nameof(buffer));
             }
             if (index < 0)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             if (count < 0)
             {
-                throw new ArgumentOutOfRangeException("count");
+                throw new ArgumentOutOfRangeException(nameof(count));
             }
             if (buffer.Length - index < count)
             {
