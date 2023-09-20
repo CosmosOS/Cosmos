@@ -178,6 +178,7 @@ namespace GraphicTest
             Console.WriteLine("I(39u0pwoejJIosjfppkspjfsdjfp");
 
             TestBitmaps();
+            TestColorClass();
 
             /* First test with the DefaultMode */
             Canvas canvas = FullScreenCanvas.GetFullScreenCanvas();
@@ -246,6 +247,21 @@ namespace GraphicTest
             Assert.IsTrue(EqualityHelper.ByteArrayAreEquals(bitmapData, letterData), "Saving a bitmap creates the same data as used to create it");
             Bitmap letter2 = new Bitmap(bitmapData);
             Assert.IsTrue(EqualityHelper.IntArrayAreEquals(letter2.RawData, letter.RawData), "Creating a new bitmap from saved bitmap creates same bitmap");
+        }
+
+        private void TestColorClass()
+        {
+            Color testColor = Color.AliceBlue;
+            Assert.AreEqual(testColor.ToString(), "AliceBlue", "ToString() should return the name of the color for named colors.");
+            testColor = Color.FromArgb(123, 45, 67);
+            Assert.AreEqual(testColor.ToString(), "Color [A=255, R=123, G=45, B=67]", "ToString() should return the ARGB values for unnamed colors.");
+            testColor = Color.Aqua;
+            Assert.AreEqual(testColor.Name, "Aqua", "Name should return the name of the color for named colors.");
+            testColor = Color.FromArgb(123, 45, 67);
+            Assert.IsTrue(string.IsNullOrEmpty(testColor.Name), "Name should return an empty string for unnamed colors.");
+            testColor = Color.FromArgb(255, 0, 0);
+            Color redColor = Color.Red;
+            Assert.IsTrue(testColor == redColor, "The == operator should work correctly for comparing colors.");
         }
     }
 }
