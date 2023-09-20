@@ -604,281 +604,285 @@ namespace Cosmos.System_Plugs.System.Drawing
             switch (aKnownColor)
             {
                 case (short)KnownColor.AliceBlue:
-                    return "AliceBlue";
+                    return "Color [AliceBlue]";
                 case (short)KnownColor.AntiqueWhite:
-                    return "AntiqueWhite";
+                    return "Color [AntiqueWhite]";
                 case (short)KnownColor.Aqua:
-                    return "Aqua";
+                    return "Color [Aqua]";
                 case (short)KnownColor.Aquamarine:
-                    return "Aquamarine";
+                    return "Color [Aquamarine]";
                 case (short)KnownColor.Azure:
-                    return "Azure";
+                    return "Color [Azure]";
                 case (short)KnownColor.Beige:
-                    return "Beige";
+                    return "Color [Beige]";
                 case (short)KnownColor.Bisque:
-                    return "Bisque";
+                    return "Color [Bisque]";
                 case (short)KnownColor.Black:
-                    return "Black";
+                    return "Color [Black]";
                 case (short)KnownColor.BlueViolet:
-                    return "BlueViolet";
+                    return "Color [BlueViolet]";
                 case (short)KnownColor.Brown:
-                    return "Brown";
+                    return "Color [Brown]";
                 case (short)KnownColor.BurlyWood:
-                    return "BurlyWood";
+                    return "Color [BurlyWood]";
                 case (short)KnownColor.CadetBlue:
-                    return "CadetBlue";
+                    return "Color [CadetBlue]";
                 case (short)KnownColor.Chartreuse:
-                    return "Chartreuse";
+                    return "Color [Chartreuse]";
                 case (short)KnownColor.Chocolate:
-                    return "Chocolate";
+                    return "Color [Chocolate]";
                 case (short)KnownColor.Coral:
-                    return "Coral";
+                    return "Color [Coral]";
                 case (short)KnownColor.CornflowerBlue:
-                    return "CornflowerBlue";
+                    return "Color [CornflowerBlue]";
                 case (short)KnownColor.Cornsilk:
-                    return "Cornsilk";
+                    return "Color [Cornsilk]";
                 case (short)KnownColor.Crimson:
-                    return "Crimson";
+                    return "Color [Crimson]";
                 case (short)KnownColor.Cyan:
-                    return "Cyan";
+                    return "Color [Cyan]";
                 case (short)KnownColor.DarkBlue:
-                    return "DarkBlue";
+                    return "Color [DarkBlue]";
                 case (short)KnownColor.DarkCyan:
-                    return "DarkCyan";
+                    return "Color [DarkCyan]";
                 case (short)KnownColor.DarkGoldenrod:
-                    return "DarkGoldenrod";
+                    return "Color [DarkGoldenrod]";
                 case (short)KnownColor.DarkGray:
-                    return "DarkGray";
+                    return "Color [DarkGray]";
                 case (short)KnownColor.DarkGreen:
-                    return "DarkGreen";
+                    return "Color [DarkGreen]";
                 case (short)KnownColor.DarkKhaki:
-                    return "DarkKhaki";
+                    return "Color [DarkKhaki]";
                 case (short)KnownColor.DarkMagenta:
-                    return "DarkMagenta";
+                    return "Color [DarkMagenta]";
                 case (short)KnownColor.DarkOliveGreen:
-                    return "DarkOliveGreen";
+                    return "Color [DarkOliveGreen]";
                 case (short)KnownColor.DarkOrange:
-                    return "DarkOrange";
+                    return "Color [DarkOrange]";
                 case (short)KnownColor.DarkOrchid:
-                    return "DarkOrchid";
+                    return "Color [DarkOrchid]";
                 case (short)KnownColor.DarkRed:
-                    return "DarkRed";
+                    return "Color [DarkRed]";
                 case (short)KnownColor.DarkSalmon:
-                    return "DarkSalmon";
+                    return "Color [DarkSalmon]";
                 case (short)KnownColor.DarkSeaGreen:
-                    return "DarkSeaGreen";
+                    return "Color [DarkSeaGreen]";
                 case (short)KnownColor.DarkSlateBlue:
-                    return "DarkSlateBlue";
+                    return "Color [DarkSlateBlue]";
                 case (short)KnownColor.DarkSlateGray:
-                    return "DarkSlateGray";
+                    return "Color [DarkSlateGray]";
                 case (short)KnownColor.DarkTurquoise:
-                    return "DarkTurquoise";
+                    return "Color [DarkTurquoise]";
                 case (short)KnownColor.DarkViolet:
-                    return "DarkViolet";
+                    return "Color [DarkViolet]";
                 case (short)KnownColor.DeepPink:
-                    return "DeepPink";
+                    return "Color [DeepPink]";
                 case (short)KnownColor.DeepSkyBlue:
-                    return "DeepSkyBlue";
+                    return "Color [DeepSkyBlue]";
                 case (short)KnownColor.DimGray:
-                    return "DimGray";
+                    return "Color [DimGray]";
                 case (short)KnownColor.DodgerBlue:
-                    return "DodgerBlue";
+                    return "Color [DodgerBlue]";
                 case (short)KnownColor.Firebrick:
-                    return "Firebrick";
+                    return "Color [Firebrick]";
                 case (short)KnownColor.FloralWhite:
-                    return "FloralWhite";
+                    return "Color [FloralWhite]";
                 case (short)KnownColor.ForestGreen:
-                    return "ForestGreen";
+                    return "Color [ForestGreen]";
                 case (short)KnownColor.Fuchsia:
-                    return "Fuchsia";
+                    return "Color [Fuchsia]";
                 case (short)KnownColor.Gainsboro:
-                    return "Gainsboro";
+                    return "Color [Gainsboro]";
                 case (short)KnownColor.GhostWhite:
-                    return "GhostWhite";
+                    return "Color [GhostWhite]";
                 case (short)KnownColor.Gold:
-                    return "Gold";
+                    return "Color [Gold]";
                 case (short)KnownColor.Goldenrod:
-                    return "Goldenrod";
+                    return "Color [Goldenrod]";
                 case (short)KnownColor.Gray:
-                    return "Gray";
+                    return "Color [Gray]";
                 case (short)KnownColor.Green:
-                    return "Green";
+                    return "Color [Green]";
                 case (short)KnownColor.GreenYellow:
-                    return "GreenYellow";
+                    return "Color [GreenYellow]";
                 case (short)KnownColor.Honeydew:
-                    return "Honeydew";
+                    return "Color [Honeydew]";
                 case (short)KnownColor.HotPink:
-                    return "HotPink";
+                    return "Color [HotPink]";
                 case (short)KnownColor.IndianRed:
-                    return "IndianRed";
+                    return "Color [IndianRed]";
                 case (short)KnownColor.Indigo:
-                    return "Indigo";
+                    return "Color [Indigo]";
                 case (short)KnownColor.Ivory:
-                    return "Ivory";
+                    return "Color [Ivory]";
                 case (short)KnownColor.Khaki:
-                    return "Khaki";
+                    return "Color [Khaki]";
                 case (short)KnownColor.Lavender:
-                    return "Lavender";
+                    return "Color [Lavender]";
                 case (short)KnownColor.LavenderBlush:
-                    return "LavenderBlush";
+                    return "Color [LavenderBlush]";
                 case (short)KnownColor.LawnGreen:
-                    return "LawnGreen";
+                    return "Color [LawnGreen]";
                 case (short)KnownColor.LemonChiffon:
-                    return "LemonChiffon";
+                    return "Color [LemonChiffon]";
                 case (short)KnownColor.LightBlue:
-                    return "LightBlue";
+                    return "Color [LightBlue]";
                 case (short)KnownColor.LightCoral:
-                    return "LightCoral";
+                    return "Color [LightCoral]";
                 case (short)KnownColor.LightCyan:
-                    return "LightCyan";
+                    return "Color [LightCyan]";
                 case (short)KnownColor.LightGoldenrodYellow:
-                    return "LightGoldenrodYellow";
+                    return "Color [LightGoldenrodYellow]";
                 case (short)KnownColor.LightGreen:
-                    return "LightGreen";
+                    return "Color [LightGreen]";
                 case (short)KnownColor.LightGray:
-                    return "LightGray";
+                    return "Color [LightGray]";
                 case (short)KnownColor.LightPink:
-                    return "LightPink";
+                    return "Color [LightPink]";
                 case (short)KnownColor.LightSalmon:
-                    return "LightSalmon";
+                    return "Color [LightSalmon]";
                 case (short)KnownColor.LightSeaGreen:
-                    return "LightSeaGreen";
+                    return "Color [LightSeaGreen]";
                 case (short)KnownColor.LightSkyBlue:
-                    return "LightSkyBlue";
+                    return "Color [LightSkyBlue]";
                 case (short)KnownColor.LightSlateGray:
-                    return "LightSlateGray";
+                    return "Color [LightSlateGray]";
                 case (short)KnownColor.LightSteelBlue:
-                    return "LightSteelBlue";
+                    return "Color [LightSteelBlue]";
                 case (short)KnownColor.LightYellow:
-                    return "LightYellow";
+                    return "Color [LightYellow]";
                 case (short)KnownColor.Lime:
-                    return "Lime";
+                    return "Color [Lime]";
                 case (short)KnownColor.LimeGreen:
-                    return "LimeGreen";
+                    return "Color [LimeGreen]";
                 case (short)KnownColor.Linen:
-                    return "Linen";
+                    return "Color [Linen]";
                 case (short)KnownColor.Magenta:
-                    return "Magenta";
+                    return "Color [Magenta]";
                 case (short)KnownColor.Maroon:
-                    return "Maroon";
+                    return "Color [Maroon]";
                 case (short)KnownColor.MediumAquamarine:
-                    return "MediumAquamarine";
+                    return "Color [MediumAquamarine]";
                 case (short)KnownColor.MediumBlue:
-                    return "MediumBlue";
+                    return "Color [MediumBlue]";
                 case (short)KnownColor.MediumOrchid:
-                    return "MediumOrchid";
+                    return "Color [MediumOrchid]";
                 case (short)KnownColor.MediumPurple:
-                    return "MediumPurple";
+                    return "Color [MediumPurple]";
                 case (short)KnownColor.MediumSeaGreen:
-                    return "MediumSeaGreen";
+                    return "Color [MediumSeaGreen]";
                 case (short)KnownColor.MediumSlateBlue:
-                    return "MediumSlateBlue";
+                    return "Color [MediumSlateBlue]";
                 case (short)KnownColor.MediumSpringGreen:
-                    return "MediumSpringGreen";
+                    return "Color [MediumSpringGreen]";
                 case (short)KnownColor.MediumTurquoise:
-                    return "MediumTurquoise";
+                    return "Color [MediumTurquoise]";
                 case (short)KnownColor.MediumVioletRed:
-                    return "MediumVioletRed";
+                    return "Color [MediumVioletRed]";
                 case (short)KnownColor.MidnightBlue:
-                    return "MidnightBlue";
+                    return "Color [MidnightBlue]";
                 case (short)KnownColor.MintCream:
-                    return "MintCream";
+                    return "Color [MintCream]";
                 case (short)KnownColor.MistyRose:
-                    return "MistyRose";
+                    return "Color [MistyRose]";
                 case (short)KnownColor.Moccasin:
-                    return "Moccasin";
+                    return "Color [Moccasin]";
                 case (short)KnownColor.NavajoWhite:
-                    return "NavajoWhite";
+                    return "Color [NavajoWhite]";
                 case (short)KnownColor.Navy:
-                    return "Navy";
+                    return "Color [Navy]";
                 case (short)KnownColor.OldLace:
-                    return "OldLace";
+                    return "Color [OldLace]";
                 case (short)KnownColor.Olive:
-                    return "Olive";
+                    return "Color [Olive]";
                 case (short)KnownColor.OliveDrab:
-                    return "OliveDrab";
+                    return "Color [OliveDrab]";
                 case (short)KnownColor.Orange:
-                    return "Orange";
+                    return "Color [Orange]";
                 case (short)KnownColor.OrangeRed:
-                    return "OrangeRed";
+                    return "Color [OrangeRed]";
                 case (short)KnownColor.Orchid:
-                    return "Orchid";
+                    return "Color [Orchid]";
                 case (short)KnownColor.PaleGoldenrod:
-                    return "PaleGoldenrod";
+                    return "Color [PaleGoldenrod]";
                 case (short)KnownColor.PaleGreen:
-                    return "PaleGreen";
+                    return "Color [PaleGreen]";
                 case (short)KnownColor.PaleTurquoise:
-                    return "PaleTurquoise";
+                    return "Color [PaleTurquoise]";
                 case (short)KnownColor.PaleVioletRed:
-                    return "PaleVioletRed";
+                    return "Color [PaleVioletRed]";
                 case (short)KnownColor.PapayaWhip:
-                    return "PapayaWhip";
+                    return "Color [PapayaWhip]";
                 case (short)KnownColor.PeachPuff:
-                    return "PeachPuff";
+                    return "Color [PeachPuff]";
                 case (short)KnownColor.Peru:
-                    return "Peru";
+                    return "Color [Peru]";
                 case (short)KnownColor.Pink:
-                    return "Pink";
+                    return "Color [Pink]";
                 case (short)KnownColor.Plum:
-                    return "Plum";
+                    return "Color [Plum]";
                 case (short)KnownColor.PowderBlue:
-                    return "PowderBlue";
+                    return "Color [PowderBlue]";
                 case (short)KnownColor.Purple:
-                    return "Purple";
+                    return "Color [Purple]";
                 case (short)KnownColor.Red:
-                    return "Red";
+                    return "Color [Red]";
                 case (short)KnownColor.RosyBrown:
-                    return "RosyBrown";
+                    return "Color [RosyBrown]";
                 case (short)KnownColor.RoyalBlue:
-                    return "RoyalBlue";
+                    return "Color [RoyalBlue]";
                 case (short)KnownColor.SaddleBrown:
-                    return "SaddleBrown";
+                    return "Color [SaddleBrown]";
                 case (short)KnownColor.Salmon:
-                    return "Salmon";
+                    return "Color [Salmon]";
                 case (short)KnownColor.SandyBrown:
-                    return "SandyBrown";
+                    return "Color [SandyBrown]";
                 case (short)KnownColor.SeaGreen:
-                    return "SeaGreen";
+                    return "Color [SeaGreen]";
                 case (short)KnownColor.Sienna:
-                    return "Sienna";
+                    return "Color [Sienna]";
                 case (short)KnownColor.Silver:
-                    return "Silver";
+                    return "Color [Silver]";
                 case (short)KnownColor.SkyBlue:
-                    return "SkyBlue";
+                    return "Color [SkyBlue]";
                 case (short)KnownColor.SlateBlue:
-                    return "SlateBlue";
+                    return "Color [SlateBlue]";
                 case (short)KnownColor.SlateGray:
-                    return "SlateGray";
+                    return "Color [SlateGray]";
                 case (short)KnownColor.Snow:
-                    return "Snow";
+                    return "Color [Snow]";
                 case (short)KnownColor.SpringGreen:
-                    return "SpringGreen";
+                    return "Color [SpringGreen]";
                 case (short)KnownColor.SteelBlue:
-                    return "SteelBlue";
+                    return "Color [SteelBlue]";
                 case (short)KnownColor.Tan:
-                    return "Tan";
+                    return "Color [Tan]";
                 case (short)KnownColor.Thistle:
-                    return "Thistle";
+                    return "Color [Thistle]";
                 case (short)KnownColor.Tomato:
-                    return "Tomato";
+                    return "Color [Tomato]";
                 case (short)KnownColor.Transparent:
-                    return "Transparent";
+                    return "Color [Transparent]";
                 case (short)KnownColor.Turquoise:
-                    return "Turquoise";
+                    return "Color [Turquoise]";
                 case (short)KnownColor.Violet:
-                    return "Violet";
+                    return "Color [Violet]";
                 case (short)KnownColor.Wheat:
-                    return "Wheat";
+                    return "Color [Wheat]";
                 case (short)KnownColor.White:
-                    return "White";
+                    return "Color [White]";
                 case (short)KnownColor.WhiteSmoke:
-                    return "WhiteSmoke";
+                    return "Color [WhiteSmoke]";
                 case (short)KnownColor.Yellow:
-                    return "Yellow";
+                    return "Color [Yellow]";
                 case (short)KnownColor.YellowGreen:
-                    return "YellowGreen";
+                    return "Color [YellowGreen]";
                 default:
-                    return "#" + aValue.ToString("X8");
+                    int alpha = (int)(aValue >> 24) & 0xFF;
+                    int red = (int)(aValue >> 16) & 0xFF;
+                    int green = (int)(aValue >> 8) & 0xFF;
+                    int blue = (int)aValue & 0xFF;
+                    return $"Color [A={alpha}, R={red}, G={green}, B={blue}]";
             }
         }
     }
