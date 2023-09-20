@@ -49,6 +49,7 @@ build:
 	@$(DOTNET) pack $(IL2CPU_DIR) $(DOTNETFLAGS)
 
 	@echo "Building Cosmos"
+
 	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Common
 	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel
 	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm
@@ -59,7 +60,7 @@ build:
 	@$(DOTNET) clean $(THISDIR)/source/Cosmos.System2
 	@$(DOTNET) clean $(THISDIR)/source/Cosmos.System2_Plugs
 	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Build.Tasks
-
+	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Plugs
 
 	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Common $(DOTNETFLAGS)
 	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Debug.Kernel $(DOTNETFLAGS)
@@ -71,6 +72,15 @@ build:
 	@$(DOTNET) pack $(THISDIR)/source/Cosmos.System2 $(DOTNETFLAGS)
 	@$(DOTNET) pack $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
 	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks $(DOTNETFLAGS)
+	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
+
+	@echo "Building X#"
+	@$(DOTNET) clean $(XSHARP_DIR)/source/XSharp/XSharp
+	@$(DOTNET) clean $(XSHARP_DIR)/source/Spruce
+
+	$(DOTNET) pack $(XSHARP_DIR)/source/XSharp/XSharp $(DOTNETFLAGS)
+	$(DOTNET) pack $(XSHARP_DIR)/source/Spruce $(DOTNETFLAGS)
+
 
 .PHONY: publish
 publish:
@@ -82,6 +92,11 @@ publish:
 	@$(DOTNET) publish $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
 	@$(DOTNET) publish $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
 	@$(DOTNET) publish $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
+	@$(DOTNET) publish $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
+
+	@echo "Publishing X#"
+	@$(DOTNET) publish $(XSHARP_DIR)/source/XSharp/XSharp $(DOTNETFLAGS)
+	@$(DOTNET) publish $(XSHARP_DIR)/source/Spruce $(DOTNETFLAGS)
 
 .PHONY: install
 install:
@@ -96,6 +111,7 @@ install:
 	@mkdir -p $(DESTDIR)/Kernel
 	@cp -r $(IL2CPU_DIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
 	@cp -r $(THISDIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
+	@cp -r $(XSHARP_DIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
 	@cp -r $(IL2CPU_DIR)/source/Cosmos.Core.DebugStub/*.xs $(DESTDIR)/XSharp/DebugStub/
 
 	@cp -r $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/

@@ -72,8 +72,11 @@ namespace Cosmos.Build.Builder
 
             var il2cpuDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "IL2CPU"));
 
+            var xSharpDir = Path.GetFullPath(Path.Combine(_cosmosDir, "..", "XSharp"));
+
             var cosmosSourceDir = Path.Combine(_cosmosDir, "source");
             var il2cpuSourceDir = Path.Combine(il2cpuDir, "source");
+            var xSharpSourceDir = Path.Combine(xSharpDir, "source");
 
             var buildSlnPath = Path.Combine(_cosmosDir, "Build.sln");
 
@@ -107,7 +110,7 @@ namespace Cosmos.Build.Builder
                 "Cosmos.Build.Tasks",
             };
 
-            foreach (var task in PackProject(cosmosPackageProjects, new List<string>()))
+            foreach (var task in PackProject(cosmosPackageProjects, new List<string>(), new List<string>()))
             {
                 yield return task;
             }
@@ -127,7 +130,9 @@ namespace Cosmos.Build.Builder
                 "Cosmos.System2_Plugs",
 
                 "Cosmos.Debug.Kernel",
-                "Cosmos.Debug.Kernel.Plugs.Asm"
+                "Cosmos.Debug.Kernel.Plugs.Asm",
+
+                "Cosmos.Plugs"
             };
 
             var il2cpuPackageProjects = new List<string>()
@@ -135,7 +140,14 @@ namespace Cosmos.Build.Builder
                 "IL2CPU.API"
             };
 
-            foreach (var task in PackProject(cosmosPackageProjects, il2cpuPackageProjects))
+            var xSharpProjects = new List<string>()
+            {
+                "Spruce",
+                "XSharp/XSharp"
+            };
+
+
+            foreach (var task in PackProject(cosmosPackageProjects, il2cpuPackageProjects, xSharpProjects))
             {
                 yield return task;
             }
@@ -169,11 +181,12 @@ namespace Cosmos.Build.Builder
                 }
             }
 
-            IEnumerable<IBuildTask> PackProject(List<string> cosmosProjects, List<string> il2cpuProjects)
+            IEnumerable<IBuildTask> PackProject(List<string> cosmosProjects, List<string> il2cpuProjects, List<string> xSharpProjects)
             {
-                var packageProjectPaths = cosmosProjects.Select(p => Path.Combine(cosmosSourceDir, p));
-                packageProjectPaths = packageProjectPaths.Concat(il2cpuProjects.Select(p => Path.Combine(il2cpuSourceDir, p)));
-
+                var packageProjectPaths = cosmosProjects.Select(p => Path.Combine(cosmosSourceDir, p))
+                .Concat(il2cpuProjects.Select(p => Path.Combine(il2cpuSourceDir, p)))
+                .Concat(xSharpProjects.Select(p => Path.Combine(xSharpSourceDir, p)));
+                
                 var packagesDir = Path.Combine(vsipDir, "packages");
                 var packageVersionLocalBuildSuffix = DateTime.Now.ToString("yyyyMMddhhmmss");
 
