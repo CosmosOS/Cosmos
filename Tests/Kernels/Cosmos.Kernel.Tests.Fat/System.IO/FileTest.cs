@@ -317,16 +317,16 @@ namespace Cosmos.Kernel.Tests.Fat.System.IO
             Assert.IsTrue(ByteArrayAreEquals(readBytes, textBytes), "Reading large files works using read all bytes does not work.");
 
             byte[] smolBinBytes = Convert.FromBase64String(smolBin);
-            readBytes = File.ReadAllBytes("0:\\smol.bin");
-            Assert.IsTrue(ByteArrayAreEquals(smolBinBytes, readBytes), "Reading files larger than 100KB works using read all bytes.");
+            byte[] smolReadBytes = File.ReadAllBytes("0:\\smol.bin");
+            Assert.IsTrue(ByteArrayAreEquals(smolBinBytes, smolReadBytes), "Reading files larger than 100KB works using read all bytes.");
 
             byte[] longBinBytes = Convert.FromBase64String(longBin);
-            readBytes = File.ReadAllBytes("0:\\long.bin");
-            Assert.IsTrue(ByteArrayAreEquals(longBinBytes, readBytes), "Reading files larger than 500KB works using read all bytes.");
+            byte[] longReadBytes = File.ReadAllBytes("0:\\long.bin");
+            Assert.IsTrue(ByteArrayAreEquals(longBinBytes, longReadBytes), "Reading files larger than 500KB works using read all bytes.");
 
             byte[] longerBinBytes = Convert.FromBase64String(longerBin);
-            readBytes = File.ReadAllBytes("0:\\longer.bin");
-            Assert.IsTrue(ByteArrayAreEquals(longerBinBytes, readBytes), "Reading files larger than 1MB works using read all bytes.");
+            byte[] longerReadBytes = File.ReadAllBytes("0:\\longer.bin");
+            Assert.IsTrue(ByteArrayAreEquals(longerBinBytes, longerReadBytes), "Reading files larger than 1MB works using read all bytes.");
 
             using (FileStream fs = File.OpenWrite("0:\\long2.txt"))
             {
