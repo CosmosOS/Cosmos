@@ -258,7 +258,7 @@ namespace GraphicTest
             testColor = Color.Aqua;
             Assert.AreEqual(testColor.Name, "Aqua", "Name should return the name of the color for named colors.");
             testColor = Color.FromArgb(255, 123, 45, 67);
-            Assert.AreEqual(testColor.ToArgb(), 0xFF7B2D43, "ToArgb() should return the correct integer representation of the color.");
+            Assert.AreEqual(testColor.ToArgb(), unchecked((int)0xFF7B2D43), "ToArgb() should return the correct integer representation of the color.");
             testColor = Color.FromArgb(255, 0, 0);
             Color redColor = Color.Red;
             Assert.IsTrue(testColor == redColor, "The == operator should work correctly for comparing colors.");
