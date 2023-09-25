@@ -599,7 +599,7 @@ namespace Cosmos.System_Plugs.System.Drawing
         public static int ToArgb(ref Color aThis,
             [FieldAccess(Name = "System.Int64 System.Drawing.Color.value")] ref long aValue)
         {
-            return (int)aValue;
+            return unchecked((int)aValue);
         }
 
         public static string ToString(ref Color aThis,
