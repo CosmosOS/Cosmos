@@ -338,7 +338,7 @@ namespace Cosmos.System.Graphics
                 {
                     if (font.ConvertByteToBitAddress(font.Data[p + cy], cx + 1))
                     {
-                        DrawPoint(color, (ushort)(x + (width - cx)), (ushort)(y + cy));
+                        DrawPoint(color, (ushort)(x + cx), (ushort)(y + cy));
                     }
                 }
             }

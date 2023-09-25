@@ -645,17 +645,18 @@ namespace Cosmos.System.Graphics
         /// <inheritdoc cref="DrawString(string, Font, Color, int, int)"/>
         public virtual void DrawChar(char c, Font font, Color color, int x, int y)
         {
-            var width = font.Width;
             var height = font.Height;
-            int p = font.Height * (byte)c;
+            var width = font.Width;
+            var data = font.Data;
+            int p = height * (byte)c;
 
             for (int cy = 0; cy < height; cy++)
             {
                 for (byte cx = 0; cx < width; cx++)
                 {
-                    if (font.ConvertByteToBitAddress(font.Data[p + cy], cx + 1))
+                    if (font.ConvertByteToBitAddress(data[p + cy], cx + 1))
                     {
-                        DrawPoint(color, (ushort)(x + (width - cx)), (ushort)(y + cy));
+                        DrawPoint(color, (ushort)(x + cx), (ushort)(y + cy));
                     }
                 }
             }
