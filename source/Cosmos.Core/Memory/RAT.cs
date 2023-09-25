@@ -21,7 +21,7 @@ namespace Cosmos.Core.Memory
         /// <summary>
         /// PageType enum. Used to define the type of the page.
         /// </summary>
-        public enum PageType
+        public enum PageType : byte
         {
             /// <summary>
             /// Empty page.
@@ -171,7 +171,7 @@ namespace Cosmos.Core.Memory
                 }
                 else if (xCounting)
                 {
-                    if (*p == (byte)PageType.Extension)
+                    if (*p == (byte)PageType.Extension || *p == aType)
                     {
                         xResult++;
                     }
