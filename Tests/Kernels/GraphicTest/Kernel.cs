@@ -252,13 +252,13 @@ namespace GraphicTest
         private void TestColorClass()
         {
             Color testColor = Color.AliceBlue;
-            Assert.AreEqual(testColor.ToString(), "AliceBlue", "ToString() should return the name of the color for named colors.");
+            Assert.AreEqual(testColor.ToString(), "Color [AliceBlue]", "ToString() should return the name of the color for named colors.");
             testColor = Color.FromArgb(123, 45, 67);
             Assert.AreEqual(testColor.ToString(), "Color [A=255, R=123, G=45, B=67]", "ToString() should return the ARGB values for unnamed colors.");
             testColor = Color.Aqua;
             Assert.AreEqual(testColor.Name, "Aqua", "Name should return the name of the color for named colors.");
-            testColor = Color.FromArgb(123, 45, 67);
-            Assert.IsTrue(string.IsNullOrEmpty(testColor.Name), "Name should return an empty string for unnamed colors.");
+            testColor = Color.FromArgb(255, 123, 45, 67);
+            Assert.AreEqual(testColor.ToArgb(), 0xFF7B2D43, "ToArgb() should return the correct integer representation of the color.");
             testColor = Color.FromArgb(255, 0, 0);
             Color redColor = Color.Red;
             Assert.IsTrue(testColor == redColor, "The == operator should work correctly for comparing colors.");

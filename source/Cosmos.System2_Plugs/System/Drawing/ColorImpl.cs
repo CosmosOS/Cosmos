@@ -1,6 +1,7 @@
 using System;
 using IL2CPU.API.Attribs;
 using System.Drawing;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cosmos.System_Plugs.System.Drawing
 {
@@ -38,6 +39,9 @@ namespace Cosmos.System_Plugs.System.Drawing
                     break;
                 case KnownColor.Black:
                     aValue = 0xFF000000;
+                    break;
+                case KnownColor.Blue:
+                    aValue = 0xFF0000FF;
                     break;
                 case KnownColor.BlueViolet:
                     aValue = 0xFF8A2BE2;
@@ -451,6 +455,7 @@ namespace Cosmos.System_Plugs.System.Drawing
                 "Beige" => Color.Beige,
                 "Bisque" => Color.Bisque,
                 "Black" => Color.Black,
+                "Blue" => Color.Blue,
                 "BlueViolet" => Color.BlueViolet,
                 "Brown" => Color.Brown,
                 "BurlyWood" => Color.BurlyWood,
@@ -591,6 +596,12 @@ namespace Cosmos.System_Plugs.System.Drawing
             return aValue;
         }
 
+        public static int ToArgb(ref Color aThis,
+            [FieldAccess(Name = "System.Int64 System.Drawing.Color.value")] ref long aValue)
+        {
+            return (int)aValue;
+        }
+
         public static string ToString(ref Color aThis,
             [FieldAccess(Name = "System.Int64 System.Drawing.Color.value")] ref long aValue,
             [FieldAccess(Name = "System.String System.Drawing.Color.name")] ref string aName,
@@ -619,6 +630,8 @@ namespace Cosmos.System_Plugs.System.Drawing
                     return "Color [Bisque]";
                 case (short)KnownColor.Black:
                     return "Color [Black]";
+                case (short)KnownColor.Blue:
+                    return "Color [Blue]";
                 case (short)KnownColor.BlueViolet:
                     return "Color [BlueViolet]";
                 case (short)KnownColor.Brown:
@@ -885,5 +898,9 @@ namespace Cosmos.System_Plugs.System.Drawing
                     return $"Color [A={alpha}, R={red}, G={green}, B={blue}]";
             }
         }
+
+        public static bool op_Equality(Color left, Color right) => left.ToArgb() == right.ToArgb();
+
+        public static bool Equals(ref Color aThis, Color other) => aThis == other;
     }
 }
