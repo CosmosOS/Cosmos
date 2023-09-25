@@ -40,6 +40,9 @@ namespace Cosmos.System_Plugs.System.Drawing
                 case KnownColor.Black:
                     aValue = 0xFF000000;
                     break;
+                case KnownColor.BlanchedAlmond:
+                    aValue = 0xFFFFEBCD;
+                    break;
                 case KnownColor.Blue:
                     aValue = 0xFF0000FF;
                     break;
@@ -400,6 +403,9 @@ namespace Cosmos.System_Plugs.System.Drawing
                 case KnownColor.Tan:
                     aValue = 0xFFD2B48C;
                     break;
+                case KnownColor.Teal:
+                    aValue = 0xFF008080;
+                    break;
                 case KnownColor.Thistle:
                     aValue = 0xFFD8BFD8;
                     break;
@@ -455,6 +461,7 @@ namespace Cosmos.System_Plugs.System.Drawing
                 "Beige" => Color.Beige,
                 "Bisque" => Color.Bisque,
                 "Black" => Color.Black,
+                "BlanchedAlmond" => Color.BlanchedAlmond,
                 "Blue" => Color.Blue,
                 "BlueViolet" => Color.BlueViolet,
                 "Brown" => Color.Brown,
@@ -575,6 +582,7 @@ namespace Cosmos.System_Plugs.System.Drawing
                 "SpringGreen" => Color.SpringGreen,
                 "SteelBlue" => Color.SteelBlue,
                 "Tan" => Color.Tan,
+                "Teal" => Color.Teal,
                 "Thistle" => Color.Thistle,
                 "Tomato" => Color.Tomato,
                 "Transparent" => Color.Transparent,
@@ -630,6 +638,8 @@ namespace Cosmos.System_Plugs.System.Drawing
                     return "Color [Bisque]";
                 case (short)KnownColor.Black:
                     return "Color [Black]";
+                case (short)KnownColor.BlanchedAlmond:
+                    return "Color [BlanchedAlmond]";
                 case (short)KnownColor.Blue:
                     return "Color [Blue]";
                 case (short)KnownColor.BlueViolet:
@@ -870,6 +880,8 @@ namespace Cosmos.System_Plugs.System.Drawing
                     return "Color [SteelBlue]";
                 case (short)KnownColor.Tan:
                     return "Color [Tan]";
+                case (short)KnownColor.Teal:
+                    return "Color [Teal]";
                 case (short)KnownColor.Thistle:
                     return "Color [Thistle]";
                 case (short)KnownColor.Tomato:
