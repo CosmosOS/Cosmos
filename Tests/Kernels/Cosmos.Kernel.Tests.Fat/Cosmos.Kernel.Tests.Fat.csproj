@@ -13,4 +13,11 @@
         <ProjectReference Include="..\..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\smol.bin" />
+        <EmbeddedResource Include="Resources\long.bin" />
+        <EmbeddedResource Include="Resources\longer.bin" />
+        <EmbeddedResource Include="Resources\big.bin" />
+    </ItemGroup>
+
 </Project>
