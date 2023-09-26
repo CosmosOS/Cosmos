@@ -1,4 +1,5 @@
-﻿using Cosmos.Debug.Kernel;
+﻿using Cosmos.Core.Multiboot;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core
 {

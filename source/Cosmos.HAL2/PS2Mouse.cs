@@ -1,7 +1,5 @@
-﻿//#define COSMOSDEBUG
-
+﻿using Cosmos.Debug.Kernel;
 using Cosmos.Core;
-using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
 {
@@ -10,6 +8,12 @@ namespace Cosmos.HAL
     /// </summary>
     public class PS2Mouse : MouseBase
     {
+        internal PS2Mouse(byte aPort, byte aMouseID)
+        {
+            PS2Port = aPort;
+            mouseID = aMouseID;
+        }
+
         enum Command : byte
         {
             SetScaling1_1 = 0xE6,
@@ -30,26 +34,15 @@ namespace Cosmos.HAL
             Reset = 0xFF
         }
 
+        #region Properties
+
+        private bool HasScrollWheel => mouseID == 3 || mouseID == 4;
+
         public byte PS2Port { get; }
 
-        private bool HasScrollWheel
-        {
-            get
-            {
-                return mMouseID == 3 || mMouseID == 4;
-            }
-        }
+        #endregion
 
-        private PS2Controller mPS2Controller = Global.PS2Controller;
-        private Debugger mDebugger = new Debugger("HAL", "PS2Mouse");
-
-        private byte mMouseID = 0;
-
-        internal PS2Mouse(byte aPort, byte aMouseID)
-        {
-            PS2Port = aPort;
-            mMouseID = aMouseID;
-        }
+        #region Methods
 
         /// <summary>
         /// This is the required call to start
@@ -58,20 +51,20 @@ namespace Cosmos.HAL
         public override void Initialize()
         {
             SendCommand(Command.Reset);
-            mPS2Controller.WaitForDeviceReset();
+            ps2Controller.WaitForDeviceReset();
 
-            if (mMouseID == 0)
+            if (mouseID == 0)
             {
-                mMouseID = TryToEnableScrollWheel();
+                mouseID = TryToEnableScrollWheel();
 
-                mDebugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mMouseID);
+                debugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mouseID);
 
-                if (mMouseID == 3)
+                if (mouseID == 3)
                 {
-                    mMouseID = TryToEnableAdditionalButtons();
+                    mouseID = TryToEnableAdditionalButtons();
                 }
 
-                mDebugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mMouseID);
+                debugger.SendInternal("(PS/2 Mouse) Mouse ID: " + mouseID);
             }
 
             //SendCommand(Command.SetDefaults);
@@ -80,7 +73,7 @@ namespace Cosmos.HAL
             INTs.SetIrqHandler(12, HandleMouse);
 
             SendCommand(Command.EnablePacketStreaming);
-            mPS2Controller.WaitForAck();
+            ps2Controller.WaitForAck();
         }
 
         /// <summary>
@@ -95,7 +88,7 @@ namespace Cosmos.HAL
 
             SendCommand(Command.GetMouseID);
 
-            return mPS2Controller.ReadByteAfterAck();
+            return ps2Controller.ReadByteAfterAck();
         }
 
         /// <summary>
@@ -110,43 +103,40 @@ namespace Cosmos.HAL
 
             SendCommand(Command.GetMouseID);
 
-            return mPS2Controller.ReadByteAfterAck();
+            return ps2Controller.ReadByteAfterAck();
         }
-
-        private byte[] mMouseByte = new byte[4];
-        private static byte mMouseCycle = 0;
 
         public void HandleMouse(ref INTs.IRQContext context)
         {
-            if (mMouseCycle == 0)
+            if (mouseCycle == 0)
             {
-                mMouseByte[0] = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
+                mouseByte[0] = IOPort.Read8(Core.IOGroup.PS2Controller.Data);
 
                 //Bit 3 of byte 0 is 1, then we have a good package
-                if ((mMouseByte[0] & (1 << 3)) == 1 << 3)
+                if ((mouseByte[0] & (1 << 3)) == 1 << 3)
                 {
-                    mMouseCycle++;
+                    mouseCycle++;
                 }
             }
-            else if (mMouseCycle == 1)
+            else if (mouseCycle == 1)
             {
-                mMouseByte[1] = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
-                mMouseCycle++;
+                mouseByte[1] = IOPort.Read8(Core.IOGroup.PS2Controller.Data);
+                mouseCycle++;
             }
-            else if (mMouseCycle == 2)
+            else if (mouseCycle == 2)
             {
-                mMouseByte[2] = IOPort.Read8(Cosmos.Core.IOGroup.PS2Controller.Data);
+                mouseByte[2] = IOPort.Read8(Core.IOGroup.PS2Controller.Data);
 
                 if (HasScrollWheel)
                 {
-                    mMouseCycle++;
+                    mouseCycle++;
                 }
             }
 
             // TODO: move conditions to the if statement when stack corruption detection
             //       works better for complex conditions
-            var xTest1 = mMouseCycle == 2 && !HasScrollWheel;
-            var xTest2 = mMouseCycle == 3 && HasScrollWheel;
+            var xTest1 = mouseCycle == 2 && !HasScrollWheel;
+            var xTest2 = mouseCycle == 3 && HasScrollWheel;
 
             if (xTest1 || xTest2)
             {
@@ -154,81 +144,91 @@ namespace Cosmos.HAL
                 int xDeltaY = 0;
                 int xScrollWheel = 0;
 
-                if ((mMouseByte[0] & (1 << 4)) == 1 << 4)
+                if ((mouseByte[0] & (1 << 4)) == 1 << 4)
                 {
-                    xDeltaX = mMouseByte[1] | ~0xFF;
+                    xDeltaX = mouseByte[1] | ~0xFF;
                 }
                 else
                 {
-                    xDeltaX = mMouseByte[1];
+                    xDeltaX = mouseByte[1];
                 }
 
-                if ((mMouseByte[0] & (1 << 5)) == 1 << 5)
+                if ((mouseByte[0] & (1 << 5)) == 1 << 5)
                 {
-                    xDeltaY = -(mMouseByte[2] | ~0xFF);
+                    xDeltaY = -(mouseByte[2] | ~0xFF);
                 }
                 else
                 {
-                    xDeltaY = -mMouseByte[2];
+                    xDeltaY = -mouseByte[2];
                 }
 
-                var xMouseState = mMouseByte[0] & 0b0000_0111;
+                var xMouseState = mouseByte[0] & 0b0000_0111;
 
                 if (HasScrollWheel)
                 {
-                    var xScrollWheelByte = mMouseByte[3] & 0x0F;
+                    var xScrollWheelByte = mouseByte[3] & 0x0F;
                     xScrollWheel = (xScrollWheelByte & 0b1000) == 0 ? xScrollWheelByte : xScrollWheelByte | ~0x0F;
 
-                    if (mMouseID == 4)
+                    if (mouseID == 4)
                     {
-                        var xAdditionalButtonsByte = mMouseByte[3] & 0b0011_0000;
+                        var xAdditionalButtonsByte = mouseByte[3] & 0b0011_0000;
                         xMouseState |= xAdditionalButtonsByte >> 1;
                     }
                 }
 
-
-                mDebugger.SendInternal($"(PS/2 Mouse) IRQ 12: Mouse State: ({xDeltaX}, {xDeltaY}, {xMouseState})");
-
                 OnMouseChanged?.Invoke(xDeltaX, xDeltaY, xMouseState, xScrollWheel);
 
-                mMouseCycle = 0;
+                mouseCycle = 0;
             }
         }
 
         private void SendCommand(Command aCommand, byte? aByte = null)
         {
-            mDebugger.SendInternal("(PS/2 Mouse) Sending command:");
-            mDebugger.SendInternal("Command:");
-            mDebugger.SendInternal((byte)aCommand);
+            debugger.SendInternal("(PS/2 Mouse) Sending command:");
+            debugger.SendInternal("Command:");
+            debugger.SendInternal((byte)aCommand);
 
             if (PS2Port == 2)
             {
-                mPS2Controller.PrepareSecondPortWrite();
+                ps2Controller.PrepareSecondPortWrite();
             }
 
-            mPS2Controller.WaitToWrite();
-            IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, (byte)aCommand);
+            ps2Controller.WaitToWrite();
+            IOPort.Write8(Core.IOGroup.PS2Controller.Data, (byte)aCommand);
 
-            mPS2Controller.WaitForAck();
+            ps2Controller.WaitForAck();
 
-            mDebugger.SendInternal("Command sent.");
+            debugger.SendInternal("Command sent.");
 
             if (aByte.HasValue)
             {
-                mDebugger.SendInternal("(PS/2 Mouse) Sending byte after command:");
-                mDebugger.SendInternal("Byte value:");
-                mDebugger.SendInternal(aByte.Value);
+                debugger.SendInternal("(PS/2 Mouse) Sending byte after command:");
+                debugger.SendInternal("Byte value:");
+                debugger.SendInternal(aByte.Value);
 
                 if (PS2Port == 2)
                 {
-                    mPS2Controller.PrepareSecondPortWrite();
+                    ps2Controller.PrepareSecondPortWrite();
                 }
 
-                mPS2Controller.WaitToWrite();
-                IOPort.Write8(Cosmos.Core.IOGroup.PS2Controller.Data, aByte.Value);
+                ps2Controller.WaitToWrite();
+                IOPort.Write8(Core.IOGroup.PS2Controller.Data, aByte.Value);
 
-                mPS2Controller.WaitForAck();
+                ps2Controller.WaitForAck();
             }
         }
+
+        #endregion
+
+        #region Fields
+
+        private readonly PS2Controller ps2Controller = Global.PS2Controller;
+        private readonly Debugger debugger = new("PS2Mouse");
+
+        private readonly byte[] mouseByte = new byte[4];
+        private static byte mouseCycle = 0;
+        private byte mouseID = 0;
+
+        #endregion
     }
 }

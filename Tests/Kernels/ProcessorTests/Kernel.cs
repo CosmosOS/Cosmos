@@ -5,6 +5,7 @@ using Cosmos.System.Graphics;
 using System.Text;
 using Cosmos.System.ExtendedASCII;
 using Cosmos.System.ScanMaps;
+using Cosmos.Core.Multiboot;
 using Cosmos.Core;
 using System.Runtime.InteropServices;
 using Cosmos.HAL;

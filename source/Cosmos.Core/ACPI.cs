@@ -1,6 +1,4 @@
-﻿using Cosmos.Core;
-using Cosmos.Debug.Kernel;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.Core
@@ -10,12 +8,6 @@ namespace Cosmos.Core
     /// </summary>
     public unsafe class ACPI
     {
-
-        /// <summary>
-        /// Debugger instance at the System ring, of the Global section.
-        /// </summary>
-        public static readonly Debugger mDebugger = new Debugger("System", "Global");
-
         /// <summary>
         /// RSD table struct.
         /// </summary>

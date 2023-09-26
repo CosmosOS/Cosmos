@@ -86,7 +86,7 @@ Type: filesandordirs; Name: "{app}"
 Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Yasm\*.exe"; DestDir: "{app}\Build\Tools\Yasm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
+Source: ".\source\Cosmos.Build.Tasks\tools\xorriso\win\*"; DestDir: "{app}\Build\Tools\xorriso"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly recursesubdirs
 ;Source: ".\Build\VSIP\XSharp\*"; DestDir: "{app}\Build\XSharp"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
@@ -113,6 +113,7 @@ Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion 
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
 Source: ".\Build\limine\boot\limine.cfg"; DestDir: "{app}\Build\ISO\boot\limine\"
+Source: ".\source\Cosmos.Build.Tasks\tools\limine\boot\*"; DestDir: "{app}\Build\ISO\boot\limine\"
 ; USB
 Source: ".\Build\limine\boot\limine.cfg"; DestDir: "{app}\Build\USB\boot\limine\"
 ; PXE

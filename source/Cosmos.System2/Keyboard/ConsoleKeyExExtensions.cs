@@ -3,219 +3,118 @@ using System;
 namespace Cosmos.System
 {
     /// <summary>
-    /// ConsoleKeyEx extensions class.
+    /// Provides extension methods to the <see cref="ConsoleKeyEx"/> enumeration type.
     /// </summary>
     public static class ConsoleKeyExExtensions
     {
         /// <summary>
-        /// Convert ConsoleKeyEx to ConsoleKey.
+        /// Converts the <see cref="ConsoleKeyEx"/> enumeration value to a
+        /// standard .NET <see cref="ConsoleKey"/> value.
         /// </summary>
-        /// <param name="keyEx">KeyEx to convert.</param>
-        /// <returns>ConsoleKey value.</returns>
-        /// <exception cref="Exception">Thorwn if KeyEx not implemented.</exception>
+        /// <param name="keyEx">The key value to convert.</param>
+        /// <returns>The translated enumeration value..</returns>
+        /// <exception cref="NotImplementedException">Thrown if the given enumeration value is unrecognized.</exception>
         public static ConsoleKey ToConsoleKey(this ConsoleKeyEx keyEx)
         {
-            switch (keyEx)
-            {
-                case ConsoleKeyEx.NoName:
-                    return ConsoleKey.NoName;
-                case ConsoleKeyEx.Escape:
-                    return ConsoleKey.Escape;
-                case ConsoleKeyEx.F1:
-                    return ConsoleKey.F1;
-                case ConsoleKeyEx.F2:
-                    return ConsoleKey.F2;
-                case ConsoleKeyEx.F3:
-                    return ConsoleKey.F3;
-                case ConsoleKeyEx.F4:
-                    return ConsoleKey.F4;
-                case ConsoleKeyEx.F5:
-                    return ConsoleKey.F5;
-                case ConsoleKeyEx.F6:
-                    return ConsoleKey.F6;
-                case ConsoleKeyEx.F7:
-                    return ConsoleKey.F7;
-                case ConsoleKeyEx.F8:
-                    return ConsoleKey.F8;
-                case ConsoleKeyEx.F9:
-                    return ConsoleKey.F9;
-                case ConsoleKeyEx.F10:
-                    return ConsoleKey.F10;
-                case ConsoleKeyEx.F11:
-                    return ConsoleKey.F11;
-                case ConsoleKeyEx.F12:
-                    return ConsoleKey.F12;
-                case ConsoleKeyEx.PrintScreen:
-                    return ConsoleKey.PrintScreen;
-                case ConsoleKeyEx.D1:
-                    return ConsoleKey.D1;
-                case ConsoleKeyEx.D2:
-                    return ConsoleKey.D2;
-                case ConsoleKeyEx.D3:
-                    return ConsoleKey.D3;
-                case ConsoleKeyEx.D4:
-                    return ConsoleKey.D4;
-                case ConsoleKeyEx.D5:
-                    return ConsoleKey.D5;
-                case ConsoleKeyEx.D6:
-                    return ConsoleKey.D6;
-                case ConsoleKeyEx.D7:
-                    return ConsoleKey.D7;
-                case ConsoleKeyEx.D8:
-                    return ConsoleKey.D8;
-                case ConsoleKeyEx.D9:
-                    return ConsoleKey.D9;
-                case ConsoleKeyEx.D0:
-                    return ConsoleKey.D0;
-                case ConsoleKeyEx.Backspace:
-                    return ConsoleKey.Backspace;
-                case ConsoleKeyEx.Tab:
-                    return ConsoleKey.Tab;
-                case ConsoleKeyEx.Q:
-                    return ConsoleKey.Q;
-                case ConsoleKeyEx.W:
-                    return ConsoleKey.W;
-                case ConsoleKeyEx.E:
-                    return ConsoleKey.E;
-                case ConsoleKeyEx.R:
-                    return ConsoleKey.R;
-                case ConsoleKeyEx.T:
-                    return ConsoleKey.T;
-                case ConsoleKeyEx.Y:
-                    return ConsoleKey.Y;
-                case ConsoleKeyEx.U:
-                    return ConsoleKey.U;
-                case ConsoleKeyEx.I:
-                    return ConsoleKey.I;
-                case ConsoleKeyEx.O:
-                    return ConsoleKey.O;
-                case ConsoleKeyEx.P:
-                    return ConsoleKey.P;
-                case ConsoleKeyEx.Enter:
-                    return ConsoleKey.Enter;
-                case ConsoleKeyEx.A:
-                    return ConsoleKey.A;
-                case ConsoleKeyEx.S:
-                    return ConsoleKey.S;
-                case ConsoleKeyEx.D:
-                    return ConsoleKey.D;
-                case ConsoleKeyEx.F:
-                    return ConsoleKey.F;
-                case ConsoleKeyEx.G:
-                    return ConsoleKey.G;
-                case ConsoleKeyEx.H:
-                    return ConsoleKey.H;
-                case ConsoleKeyEx.J:
-                    return ConsoleKey.J;
-                case ConsoleKeyEx.K:
-                    return ConsoleKey.K;
-                case ConsoleKeyEx.L:
-                    return ConsoleKey.L;
-                case ConsoleKeyEx.Z:
-                    return ConsoleKey.Z;
-                case ConsoleKeyEx.X:
-                    return ConsoleKey.X;
-                case ConsoleKeyEx.C:
-                    return ConsoleKey.C;
-                case ConsoleKeyEx.V:
-                    return ConsoleKey.V;
-                case ConsoleKeyEx.B:
-                    return ConsoleKey.B;
-                case ConsoleKeyEx.N:
-                    return ConsoleKey.N;
-                case ConsoleKeyEx.M:
-                    return ConsoleKey.M;
-                case ConsoleKeyEx.Spacebar:
-                    return ConsoleKey.Spacebar;
-                case ConsoleKeyEx.Insert:
-                    return ConsoleKey.Insert;
-                case ConsoleKeyEx.Home:
-                    return ConsoleKey.Home;
-                case ConsoleKeyEx.PageUp:
-                    return ConsoleKey.PageUp;
-                case ConsoleKeyEx.Delete:
-                    return ConsoleKey.Delete;
-                case ConsoleKeyEx.End:
-                    return ConsoleKey.End;
-                case ConsoleKeyEx.PageDown:
-                    return ConsoleKey.PageDown;
-                case ConsoleKeyEx.UpArrow:
-                    return ConsoleKey.UpArrow;
-                case ConsoleKeyEx.DownArrow:
-                    return ConsoleKey.DownArrow;
-                case ConsoleKeyEx.LeftArrow:
-                    return ConsoleKey.LeftArrow;
-                case ConsoleKeyEx.RightArrow:
-                    return ConsoleKey.RightArrow;
-                case ConsoleKeyEx.Sleep:
-                    return ConsoleKey.Sleep;
-                case ConsoleKeyEx.BiggerThan:
-                case ConsoleKeyEx.ExclamationPoint:
-                case ConsoleKeyEx.Period:
-                    return ConsoleKey.OemPeriod;
-                case ConsoleKeyEx.LowerThan:
-                case ConsoleKeyEx.Comma:
-                    return ConsoleKey.OemComma;
-                case ConsoleKeyEx.NumPeriod:
-                    return ConsoleKey.Decimal;
-                case ConsoleKeyEx.NumEnter:
-                    return ConsoleKey.Enter;
-                case ConsoleKeyEx.Num0:
-                    return ConsoleKey.D0;
-                case ConsoleKeyEx.Num1:
-                    return ConsoleKey.D1;
-                case ConsoleKeyEx.Num2:
-                    return ConsoleKey.D2;
-                case ConsoleKeyEx.Num3:
-                    return ConsoleKey.D3;
-                case ConsoleKeyEx.Num4:
-                    return ConsoleKey.D4;
-                case ConsoleKeyEx.Num5:
-                    return ConsoleKey.D5;
-                case ConsoleKeyEx.Num6:
-                    return ConsoleKey.D6;
-                case ConsoleKeyEx.Num7:
-                    return ConsoleKey.D7;
-                case ConsoleKeyEx.Num8:
-                    return ConsoleKey.D8;
-                case ConsoleKeyEx.Num9:
-                    return ConsoleKey.D9;
-                case ConsoleKeyEx.NumDivide:
-                    return ConsoleKey.Divide;
-                case ConsoleKeyEx.NumMultiply:
-                    return ConsoleKey.Multiply;
-                case ConsoleKeyEx.NumMinus:
-                    return ConsoleKey.OemMinus;
-                case ConsoleKeyEx.NumPlus:
-                    return ConsoleKey.OemPlus;
-                case ConsoleKeyEx.Backslash:
-                    return ConsoleKey.Oem5;
-                case ConsoleKeyEx.LBracket:
-                    return ConsoleKey.Oem4;
-                case ConsoleKeyEx.RBracket:
-                    return ConsoleKey.Oem6;
-                case ConsoleKeyEx.Minus:
-                    return ConsoleKey.OemMinus;
-                case ConsoleKeyEx.Apostrophe:
-                    return ConsoleKey.Oem7;
-                case ConsoleKeyEx.Slash:
-                    return ConsoleKey.Oem2;
-                case ConsoleKeyEx.Equal:
-                    return ConsoleKey.OemPlus;
-                case ConsoleKeyEx.Backquote:
-                    return ConsoleKey.Oem3;
-                case ConsoleKeyEx.Semicolon:
-                case ConsoleKeyEx.Colon:
-                    return ConsoleKey.Oem1;
-                case ConsoleKeyEx.OEM102:
-                    return ConsoleKey.Oem102;
-                case ConsoleKeyEx.LWin:
-                    return ConsoleKey.LeftWindows;
-                case ConsoleKeyEx.RWin:
-                    return ConsoleKey.RightWindows;
-                default:
-                    throw new Exception("KeyEx not implemented!");
-            }
+            return keyEx switch {
+                ConsoleKeyEx.NoName => ConsoleKey.NoName,
+                ConsoleKeyEx.Escape => ConsoleKey.Escape,
+                ConsoleKeyEx.F1 => ConsoleKey.F1,
+                ConsoleKeyEx.F2 => ConsoleKey.F2,
+                ConsoleKeyEx.F3 => ConsoleKey.F3,
+                ConsoleKeyEx.F4 => ConsoleKey.F4,
+                ConsoleKeyEx.F5 => ConsoleKey.F5,
+                ConsoleKeyEx.F6 => ConsoleKey.F6,
+                ConsoleKeyEx.F7 => ConsoleKey.F7,
+                ConsoleKeyEx.F8 => ConsoleKey.F8,
+                ConsoleKeyEx.F9 => ConsoleKey.F9,
+                ConsoleKeyEx.F10 => ConsoleKey.F10,
+                ConsoleKeyEx.F11 => ConsoleKey.F11,
+                ConsoleKeyEx.F12 => ConsoleKey.F12,
+                ConsoleKeyEx.PrintScreen => ConsoleKey.PrintScreen,
+                ConsoleKeyEx.D1 => ConsoleKey.D1,
+                ConsoleKeyEx.D2 => ConsoleKey.D2,
+                ConsoleKeyEx.D3 => ConsoleKey.D3,
+                ConsoleKeyEx.D4 => ConsoleKey.D4,
+                ConsoleKeyEx.D5 => ConsoleKey.D5,
+                ConsoleKeyEx.D6 => ConsoleKey.D6,
+                ConsoleKeyEx.D7 => ConsoleKey.D7,
+                ConsoleKeyEx.D8 => ConsoleKey.D8,
+                ConsoleKeyEx.D9 => ConsoleKey.D9,
+                ConsoleKeyEx.D0 => ConsoleKey.D0,
+                ConsoleKeyEx.Backspace => ConsoleKey.Backspace,
+                ConsoleKeyEx.Tab => ConsoleKey.Tab,
+                ConsoleKeyEx.Q => ConsoleKey.Q,
+                ConsoleKeyEx.W => ConsoleKey.W,
+                ConsoleKeyEx.E => ConsoleKey.E,
+                ConsoleKeyEx.R => ConsoleKey.R,
+                ConsoleKeyEx.T => ConsoleKey.T,
+                ConsoleKeyEx.Y => ConsoleKey.Y,
+                ConsoleKeyEx.U => ConsoleKey.U,
+                ConsoleKeyEx.I => ConsoleKey.I,
+                ConsoleKeyEx.O => ConsoleKey.O,
+                ConsoleKeyEx.P => ConsoleKey.P,
+                ConsoleKeyEx.Enter => ConsoleKey.Enter,
+                ConsoleKeyEx.A => ConsoleKey.A,
+                ConsoleKeyEx.S => ConsoleKey.S,
+                ConsoleKeyEx.D => ConsoleKey.D,
+                ConsoleKeyEx.F => ConsoleKey.F,
+                ConsoleKeyEx.G => ConsoleKey.G,
+                ConsoleKeyEx.H => ConsoleKey.H,
+                ConsoleKeyEx.J => ConsoleKey.J,
+                ConsoleKeyEx.K => ConsoleKey.K,
+                ConsoleKeyEx.L => ConsoleKey.L,
+                ConsoleKeyEx.Z => ConsoleKey.Z,
+                ConsoleKeyEx.X => ConsoleKey.X,
+                ConsoleKeyEx.C => ConsoleKey.C,
+                ConsoleKeyEx.V => ConsoleKey.V,
+                ConsoleKeyEx.B => ConsoleKey.B,
+                ConsoleKeyEx.N => ConsoleKey.N,
+                ConsoleKeyEx.M => ConsoleKey.M,
+                ConsoleKeyEx.Spacebar => ConsoleKey.Spacebar,
+                ConsoleKeyEx.Insert => ConsoleKey.Insert,
+                ConsoleKeyEx.Home => ConsoleKey.Home,
+                ConsoleKeyEx.PageUp => ConsoleKey.PageUp,
+                ConsoleKeyEx.Delete => ConsoleKey.Delete,
+                ConsoleKeyEx.End => ConsoleKey.End,
+                ConsoleKeyEx.PageDown => ConsoleKey.PageDown,
+                ConsoleKeyEx.UpArrow => ConsoleKey.UpArrow,
+                ConsoleKeyEx.DownArrow => ConsoleKey.DownArrow,
+                ConsoleKeyEx.LeftArrow => ConsoleKey.LeftArrow,
+                ConsoleKeyEx.RightArrow => ConsoleKey.RightArrow,
+                ConsoleKeyEx.Sleep => ConsoleKey.Sleep,
+                ConsoleKeyEx.BiggerThan or ConsoleKeyEx.ExclamationPoint or ConsoleKeyEx.Period => ConsoleKey.OemPeriod,
+                ConsoleKeyEx.LowerThan or ConsoleKeyEx.Comma => ConsoleKey.OemComma,
+                ConsoleKeyEx.NumPeriod => ConsoleKey.Decimal,
+                ConsoleKeyEx.NumEnter => ConsoleKey.Enter,
+                ConsoleKeyEx.Num0 => ConsoleKey.D0,
+                ConsoleKeyEx.Num1 => ConsoleKey.D1,
+                ConsoleKeyEx.Num2 => ConsoleKey.D2,
+                ConsoleKeyEx.Num3 => ConsoleKey.D3,
+                ConsoleKeyEx.Num4 => ConsoleKey.D4,
+                ConsoleKeyEx.Num5 => ConsoleKey.D5,
+                ConsoleKeyEx.Num6 => ConsoleKey.D6,
+                ConsoleKeyEx.Num7 => ConsoleKey.D7,
+                ConsoleKeyEx.Num8 => ConsoleKey.D8,
+                ConsoleKeyEx.Num9 => ConsoleKey.D9,
+                ConsoleKeyEx.NumDivide => ConsoleKey.Divide,
+                ConsoleKeyEx.NumMultiply => ConsoleKey.Multiply,
+                ConsoleKeyEx.NumMinus => ConsoleKey.OemMinus,
+                ConsoleKeyEx.NumPlus => ConsoleKey.OemPlus,
+                ConsoleKeyEx.Backslash => ConsoleKey.Oem5,
+                ConsoleKeyEx.LBracket => ConsoleKey.Oem4,
+                ConsoleKeyEx.RBracket => ConsoleKey.Oem6,
+                ConsoleKeyEx.Minus => ConsoleKey.OemMinus,
+                ConsoleKeyEx.Apostrophe => ConsoleKey.Oem7,
+                ConsoleKeyEx.Slash => ConsoleKey.Oem2,
+                ConsoleKeyEx.Equal => ConsoleKey.OemPlus,
+                ConsoleKeyEx.Backquote => ConsoleKey.Oem3,
+                ConsoleKeyEx.Semicolon or ConsoleKeyEx.Colon => ConsoleKey.Oem1,
+                ConsoleKeyEx.OEM102 => ConsoleKey.Oem102,
+                ConsoleKeyEx.LWin => ConsoleKey.LeftWindows,
+                ConsoleKeyEx.RWin => ConsoleKey.RightWindows,
+                _ => throw new Exception($"The given key enumeration value '{keyEx}' is unrecognized or cannot be converted to a ConsoleKey."),
+            };
         }
     }
 }

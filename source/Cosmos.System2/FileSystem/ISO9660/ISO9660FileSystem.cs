@@ -204,16 +204,18 @@ namespace Cosmos.System.FileSystem.ISO9660
             foreach (var item in dirEntries)
             {
                 DirectoryEntryTypeEnum type;
+                var fName = item.FileID;
+
                 if ((item.FileFlags & (1 << 1)) != 0)
                 {
                     type = DirectoryEntryTypeEnum.Directory;
                 }
                 else
                 {
-                    type = DirectoryEntryTypeEnum.File;
+                    type = DirectoryEntryTypeEnum.File; //remove the ;1 part from the file name
+                    fName = fName.Remove(fName.Length - 2);
                 }
-                var properID = item.FileID.Remove(item.FileID.Length - 2); //remove the ;1 part from the file name
-                entries.Add(new ISO9660DirectoryEntry(item, this, parent, Path.Combine(parent.mFullPath, properID), properID, 0, type));
+                entries.Add(new ISO9660DirectoryEntry(item, this, parent, Path.Combine(parent.mFullPath, fName), fName, 0, type));
             }
             return entries;
         }

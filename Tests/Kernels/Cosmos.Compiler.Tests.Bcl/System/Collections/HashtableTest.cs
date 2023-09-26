@@ -8,7 +8,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections
 {
     class HashtableTest
     {
-        private static Debugger myDebugger = new Debugger("System", "HashtableTest");
+        private static Debugger myDebugger = new("HashtableTest");
 
         public static void Execute()
         {
@@ -57,7 +57,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections
 
             Assert.IsTrue((string)h2[43] == "FortyThree", "h2 indexer failed: existing value (II) not found");
 
-            Assert.IsTrue(h2.Count == 2, "h2 Count failed: value != 2"); 
+            Assert.IsTrue(h2.Count == 2, "h2 Count failed: value != 2");
 
             foreach (var k in h2.Keys)
             {
@@ -97,7 +97,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections
                 Assert.IsTrue((int)k.Value == 41 || (int)k.Value == 42, "h3 enumeration returns invalid values");
             }
 
-            
+
+
         }
     }
 }

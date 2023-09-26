@@ -1,10 +1,7 @@
-﻿//#define COSMOSDEBUG
-using System.IO;
-using IL2CPU.API.Attribs;
-using Cosmos.System;
-using Cosmos.System.FileSystem.Listing;
+﻿using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
-using System.Collections.Generic;
+using Cosmos.System;
+using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.IO
 {
@@ -16,13 +13,13 @@ namespace Cosmos.System_Plugs.System.IO
     public static class DirectoryInfoImpl
     {
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
-        public static DirectoryInfo[] GetDirectories(DirectoryInfo aThis)
+        public static DirectoryInfo[] GetDirectories(DirectoryInfo directory)
         {
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.GetDirectories() on path {aThis.FullName}");
-            var xEntries = VFSManager.GetDirectoryListing(aThis.FullName);
+            Global.Debugger.SendInternal($"DirectoryInfo.GetDirectories() on path '{directory.FullName}'.");
+            var xEntries = VFSManager.GetDirectoryListing(directory.FullName);
 
             //var result = new DirectoryInfo[xEntries.Count];
-            var result = new List<DirectoryInfo>();
+            List<DirectoryInfo> result = new();
 
             for (int i = 0; i < xEntries.Count; i++)
             {
@@ -36,16 +33,16 @@ namespace Cosmos.System_Plugs.System.IO
         }
 
         /* The real implementation uses IEnumerable and do a conversion ToArray that crashes IL2CPU */
-        public static FileInfo[] GetFiles(DirectoryInfo aThis)
+        public static FileInfo[] GetFiles(DirectoryInfo directory)
         {
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path {aThis.FullName}");
-            var xEntries = VFSManager.GetDirectoryListing(aThis.FullName);
+            Global.Debugger.SendInternal($"DirectoryInfo.GetFiles() on path '{directory.FullName}'.");
+            var xEntries = VFSManager.GetDirectoryListing(directory.FullName);
 
-            var result = new List<FileInfo>();
+            List<FileInfo> result = new();
 
             for (int i = 0; i < xEntries.Count; i++)
             {
-                Global.mFileSystemDebugger.SendInternal($"Found entry of type {(int)xEntries[i].mEntryType} and name {xEntries[i].mFullPath}");
+                Global.Debugger.SendInternal($"Found entry of type {(int)xEntries[i].mEntryType} and name {xEntries[i].mFullPath}");
                 if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.File)
                 {
                     //result[i] = new FileInfo(xEntries[i].mFullPath);
@@ -56,16 +53,16 @@ namespace Cosmos.System_Plugs.System.IO
             return result.ToArray();
         }
 
-        public static FileSystemInfo[] GetFileSystemInfos(DirectoryInfo aThis)
+        public static FileSystemInfo[] GetFileSystemInfos(DirectoryInfo directory)
         {
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.GetFiles() on path {aThis.FullName}");
-            var xEntries = VFSManager.GetDirectoryListing(aThis.FullName);
+            Global.Debugger.SendInternal($"DirectoryInfo.GetFiles() on path '{directory.FullName}'.");
+            var xEntries = VFSManager.GetDirectoryListing(directory.FullName);
 
-            var result = new List<FileSystemInfo>();
+            List<FileSystemInfo> result = new();
 
             for (int i = 0; i < xEntries.Count; i++)
             {
-                Global.mFileSystemDebugger.SendInternal($"Found entry of type {(int)xEntries[i].mEntryType} and name {xEntries[i].mFullPath}");
+                Global.Debugger.SendInternal($"Found entry of type {(int)xEntries[i].mEntryType} and name {xEntries[i].mFullPath}");
                 if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.Directory)
                 {
                     result.Add(new DirectoryInfo(xEntries[i].mFullPath));

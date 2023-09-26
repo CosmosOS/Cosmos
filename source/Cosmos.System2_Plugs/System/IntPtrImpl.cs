@@ -1,6 +1,5 @@
-using System;
-using IL2CPU.API;
 using IL2CPU.API.Attribs;
+using IL2CPU.API;
 
 namespace Cosmos.System_Plugs.System
 {
@@ -10,9 +9,8 @@ namespace Cosmos.System_Plugs.System
         //  //[PlugMethod(Signature="System_String___System_IntPtr_ToString____")]
         public static string ToString(IntPtr aThis)
         {
-            return "<IntPtr>";
+            return aThis.ToInt64().ToString();
         }
-        //}
 
         public static int GetHashCode(ref IntPtr aThis)
         {

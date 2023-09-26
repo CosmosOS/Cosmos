@@ -54,3 +54,6 @@ Docs/~$RingsGen3.xlsx
 *.map
 /Resources/Dependencies/Dapper/DapperExtensions.StrongName.deps.json
 /Resources/Dependencies/Dapper/ref/DapperExtensions.StrongName.dll
+
+
+.idea/
