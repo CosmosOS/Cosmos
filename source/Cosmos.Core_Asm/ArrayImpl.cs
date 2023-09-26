@@ -24,7 +24,7 @@ namespace Cosmos.Core_Asm
         {
             fixed (byte* sourceArrayPtr = sourceArray, destinationArrayPtr = destinationArray)
             {
-                MemoryOperations.Copy(sourceArrayPtr + sourceIndex, destinationArray + destinationIndex, length);
+                Cosmos.Core.MemoryOperations.Copy(sourceArrayPtr + sourceIndex, destinationArray + destinationIndex, length);
             }
         }
 
