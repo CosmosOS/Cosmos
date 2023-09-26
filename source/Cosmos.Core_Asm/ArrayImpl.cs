@@ -2,11 +2,12 @@
 using System;
 using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
+using Cosmos.Core;
 
 namespace Cosmos.Core_Asm
 {
     [Plug(Target = typeof(Array))]
-    public class ArrayImpl
+    public unsafe class ArrayImpl
     {
         [PlugMethod(Assembler = typeof(ArrayGetLengthAsm))]
         public static int get_Length(Array aThis)
@@ -19,10 +20,12 @@ namespace Cosmos.Core_Asm
             Copy(sourceArray, sourceIndex, destinationArray, destinationIndex, length, false);
         }
 
-        [PlugMethod(Assembler = typeof(ArrayInternalCopyAsm))]
         public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable)
         {
-            throw new NotImplementedException();
+            fixed (byte* sourceArrayPtr = sourceArray, destinationArrayPtr = destinationArray)
+            {
+                MemoryOperations.Copy(sourceArrayPtr + sourceIndex, destinationArray + destinationIndex, length);
+            }
         }
 
         [PlugMethod(Assembler = typeof(ArrayClearAsm))]
