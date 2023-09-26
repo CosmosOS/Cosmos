@@ -22,7 +22,7 @@ namespace Cosmos.Debug.Hosts
                                      + "plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1\n"
                                      + "config_interface: win32config\n" + "display_library: win32" + debugGui + "\n"
                                      + "debug_symbols: file=\"%DEBUGSYMBOLSPATH%\"\n"
-                                     + "memory: host=1024, guest=1024\n" + "romimage: file=\"" + BochsDirectory
+                                     + "memory: host=2048, guest=2048\n" + "romimage: file=\"" + BochsDirectory
                                      + "/BIOS-bochs-latest\"\n" + "vgaromimage: file=\"" + BochsDirectory
                                      + "/VGABIOS-lgpl-latest\"\n" + "boot: cdrom\n"
                                      + "floppy_bootsig_check: disabled=0\n" + "# no floppya\n" + "# no floppyb\n"
