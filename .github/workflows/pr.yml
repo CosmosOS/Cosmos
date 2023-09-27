@@ -166,10 +166,6 @@ jobs:
           reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d %USER_KIT_PATH%
           reg query HKLM\SOFTWARE\WOW6432Node\Cosmos
 
-      - name: Copy Bochs
-        run: |
-          xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "${env:ProgramFiles}\Bochs-2.7\"
-
       - name: Test - Cosmos
         run: |
           dotnet test "Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResults\${{ matrix.kernel }}-TestResult.trx" --filter "FullyQualifiedName~${{ matrix.kernel }}"
