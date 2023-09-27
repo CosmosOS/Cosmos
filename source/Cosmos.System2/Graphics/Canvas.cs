@@ -27,6 +27,38 @@ namespace Cosmos.System.Graphics
         public abstract Mode Mode { get; set; }
 
         /// <summary>
+        /// Bytes per pixel (4 in 32bit, 3 in 24bit).
+        /// </summary>
+        internal int BytesPerPixel;
+
+        /// <summary>
+        /// Stride.
+        /// </summary>
+        internal int Stride;
+
+        /// <summary>
+        /// Pitch.
+        /// </summary>
+        internal int Pitch;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Canvas"/> class.
+        /// </summary>
+        public Canvas()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Canvas"/> class.
+        /// </summary>
+        public Canvas(Mode mode)
+        {
+            BytesPerPixel = (int)mode.ColorDepth / 8;
+            Stride = (int)mode.ColorDepth / 8;
+            Pitch = (int)mode.Width * BytesPerPixel;
+        }
+
+        /// <summary>
         /// Clears the canvas with the default color.
         /// </summary>
         public void Clear()
@@ -93,11 +125,7 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         internal int GetPointOffset(int x, int y)
         {
-            int xBytePerPixel = (int)Mode.ColorDepth / 8;
-            int stride = (int)Mode.ColorDepth / 8;
-            int pitch = (int)Mode.Width * xBytePerPixel;
-
-            return (x * stride) + (y * pitch);
+            return (x * Stride) + (y * Pitch);
         }
 
         /// <summary>
@@ -645,17 +673,18 @@ namespace Cosmos.System.Graphics
         /// <inheritdoc cref="DrawString(string, Font, Color, int, int)"/>
         public virtual void DrawChar(char c, Font font, Color color, int x, int y)
         {
-            var width = font.Width;
             var height = font.Height;
-            int p = font.Height * (byte)c;
+            var width = font.Width;
+            var data = font.Data;
+            int p = height * (byte)c;
 
             for (int cy = 0; cy < height; cy++)
             {
                 for (byte cx = 0; cx < width; cx++)
                 {
-                    if (font.ConvertByteToBitAddress(font.Data[p + cy], cx + 1))
+                    if (font.ConvertByteToBitAddress(data[p + cy], cx + 1))
                     {
-                        DrawPoint(color, (ushort)(x + (width - cx)), (ushort)(y + cy));
+                        DrawPoint(color, (ushort)(x + cx), (ushort)(y + cy));
                     }
                 }
             }

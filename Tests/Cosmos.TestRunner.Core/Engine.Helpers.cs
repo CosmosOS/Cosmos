@@ -107,7 +107,7 @@ namespace Cosmos.TestRunner.Core
                     }
                     else
                     {
-                        xErrorReceived($"Error invoking '{aProcess}'.");
+                            xErrorReceived($"Error invoking '{aProcess}'.");
                     }
                 }
             }
@@ -223,7 +223,8 @@ namespace Cosmos.TestRunner.Core
                 "OutputFilename:" + outputFile,
                 "EnableLogging:True",
                 "EmitDebugSymbols:True",
-                "IgnoreDebugStubAttribute:False"
+                "IgnoreDebugStubAttribute:False",
+                "AllowComments:True"
             };
 
             xArgs.AddRange(xReferences.Select(r => "References:" + r));
