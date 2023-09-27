@@ -43,7 +43,7 @@ namespace Cosmos.TestRunner.Core
             else
             {
                 xHarddiskPath = Path.Combine(workingDirectory, "Harddisk.vmdk");
-                var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
+                var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "FilesystemTest.vmdk");
                 File.Copy(xOriginalHarddiskPath, xHarddiskPath);
             }
 
