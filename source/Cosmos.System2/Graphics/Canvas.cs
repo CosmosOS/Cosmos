@@ -27,6 +27,38 @@ namespace Cosmos.System.Graphics
         public abstract Mode Mode { get; set; }
 
         /// <summary>
+        /// Bytes per pixel (4 in 32bit, 3 in 24bit).
+        /// </summary>
+        internal int BytesPerPixel;
+
+        /// <summary>
+        /// Stride.
+        /// </summary>
+        internal int Stride;
+
+        /// <summary>
+        /// Pitch.
+        /// </summary>
+        internal int Pitch;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Canvas"/> class.
+        /// </summary>
+        public Canvas()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Canvas"/> class.
+        /// </summary>
+        public Canvas(Mode mode)
+        {
+            BytesPerPixel = (int)mode.ColorDepth / 8;
+            Stride = (int)mode.ColorDepth / 8;
+            Pitch = (int)mode.Width * BytesPerPixel;
+        }
+
+        /// <summary>
         /// Clears the canvas with the default color.
         /// </summary>
         public void Clear()
@@ -93,11 +125,7 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         internal int GetPointOffset(int x, int y)
         {
-            int xBytePerPixel = (int)Mode.ColorDepth / 8;
-            int stride = (int)Mode.ColorDepth / 8;
-            int pitch = (int)Mode.Width * xBytePerPixel;
-
-            return (x * stride) + (y * pitch);
+            return (x * Stride) + (y * Pitch);
         }
 
         /// <summary>
