@@ -2,6 +2,6 @@
   "version": 1,
   "dependencies": {
     "net6.0-windows7.0": {},
-    "net6.0-windows7.0/win-x64": {}
+    "net6.0-windows7.0/win-x86": {}
   }
 }

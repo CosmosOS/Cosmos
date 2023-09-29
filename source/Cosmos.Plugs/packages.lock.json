@@ -128,21 +128,6 @@
         "resolved": "4.3.0",
         "contentHash": "c3YNH1GQJbfIPJeCnr4avseugSqPrxwIqzthYyZDN6EuOyNOzq+y2KSUfRcXauya1sF4foESTgwM5e1A8arAKw=="
       },
-      "runtime.linux-arm.runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0-rtm.20519.4",
-        "contentHash": "Np6w3r1dSFB930GGZHIKCc5ZClRXZIqOrCAT0pzcd/zXnsZPvGqLZB1MnxAbVhvriJl71B0N0tJaaT1ICWXsyg=="
-      },
-      "runtime.linux-arm64.runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0-rtm.20519.4",
-        "contentHash": "VnGZmQ7pzMNkcTVdmGtXUQIbytK4Xk8F4/mxm0I+n7zbrsW/WNgLrWMTv9pb2Uyq09azXazNDQhZao4R4ebWcw=="
-      },
-      "runtime.linux-x64.runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0-rtm.20519.4",
-        "contentHash": "kvMZgZjtcC6cA8Y8imKpjCpiOJKDtwlNekS86GzUol4Jmzh0FWiRwAj4E9ZKO8R7rTBGIA4rkmra9Ko8j7l6AA=="
-      },
       "runtime.native.System": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -169,17 +154,6 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
           "Microsoft.NETCore.Targets": "1.1.0"
-        }
-      },
-      "runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0",
-        "contentHash": "ME+/evR+UxVlWyGHUlLBoNTnsTdaylMbnvVwOp0Nl6XIZGGyXdqJqjlEew7e6TcKkJAA0lljhjKi3Kie+vzQ7g==",
-        "dependencies": {
-          "runtime.linux-arm.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4",
-          "runtime.linux-arm64.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4",
-          "runtime.linux-x64.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4",
-          "runtime.osx-x64.runtime.native.System.IO.Ports": "5.0.0-rtm.20519.4"
         }
       },
       "runtime.native.System.Net.Http": {
@@ -225,11 +199,6 @@
         "type": "Transitive",
         "resolved": "4.3.0",
         "contentHash": "KeLz4HClKf+nFS7p/6Fi/CqyLXh81FpiGzcmuS8DGi9lUqSnZ6Es23/gv2O+1XVGfrbNmviF7CckBpavkBoIFQ=="
-      },
-      "runtime.osx-x64.runtime.native.System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0-rtm.20519.4",
-        "contentHash": "N+dbbqhT7JBnPVHa7n2+Z5fHYO4a4UUhm7cQkbuQQoNkjbxLpxYnQ4lpRjr1RuQptqYkPmunKvN5etdFOObaiw=="
       },
       "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.Apple": {
         "type": "Transitive",
@@ -408,34 +377,6 @@
           "System.Threading": "4.3.0"
         }
       },
-      "System.Diagnostics.Process": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "J0wOX07+QASQblsfxmIMFc9Iq7KTXYL3zs2G/Xc704Ylv3NpuVdo6gij6V3PGiptTxqsK0K7CdXenRvKUnkA2g==",
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.Win32.Primitives": "4.3.0",
-          "Microsoft.Win32.Registry": "4.3.0",
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.IO.FileSystem": "4.3.0",
-          "System.IO.FileSystem.Primitives": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Runtime.Handles": "4.3.0",
-          "System.Runtime.InteropServices": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Text.Encoding.Extensions": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Threading.Tasks": "4.3.0",
-          "System.Threading.Thread": "4.3.0",
-          "System.Threading.ThreadPool": "4.3.0",
-          "runtime.native.System": "4.3.0"
-        }
-      },
       "System.Diagnostics.Tools": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -581,41 +522,6 @@
           "System.Threading": "4.3.0",
           "System.Threading.Tasks": "4.3.0",
           "runtime.native.System": "4.3.0"
-        }
-      },
-      "System.IO.Pipes": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "wpGJuACA6r8+KRckXoI6ghGTwgPRiICI6T7kgHI/m7S5eMqV/8jH37fzAUhTwIe9RwlH/j1sWwm2Q2zyXwZGHw==",
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "System.Buffers": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.IO.FileSystem.Primitives": "4.3.0",
-          "System.Net.Primitives": "4.3.0",
-          "System.Net.Sockets": "4.3.0",
-          "System.Reflection": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Runtime.Handles": "4.3.0",
-          "System.Runtime.InteropServices": "4.3.0",
-          "System.Security.Principal": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Threading.Overlapped": "4.3.0",
-          "System.Threading.Tasks": "4.3.0",
-          "runtime.native.System": "4.3.0"
-        }
-      },
-      "System.IO.Ports": {
-        "type": "Transitive",
-        "resolved": "5.0.0",
-        "contentHash": "MZY/0cgRg5bcuvHR4LKHqWnlxWV7GkoTgBaOdwIoWGZKsfSBC1twDz+BzG0o1Rk46WdRhhV30E2qzsBABHwGUA==",
-        "dependencies": {
-          "Microsoft.Win32.Registry": "5.0.0",
-          "runtime.native.System.IO.Ports": "5.0.0"
         }
       },
       "System.IO.UnmanagedMemoryStream": {
@@ -1067,14 +973,6 @@
           "runtime.native.System.Security.Cryptography.OpenSsl": "4.3.0"
         }
       },
-      "System.Security.Principal": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "I1tkfQlAoMM2URscUtpcRo/hX0jinXx6a/KUtEQoz3owaYwl3qwsO8cbzYVVnjxrzxjHo3nJC+62uolgeGIS9A==",
-        "dependencies": {
-          "System.Runtime": "4.3.0"
-        }
-      },
       "System.Security.Principal.Windows": {
         "type": "Transitive",
         "resolved": "5.0.0",
@@ -1118,17 +1016,6 @@
           "System.Threading.Tasks": "4.3.0"
         }
       },
-      "System.Threading.Overlapped": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "m3HQ2dPiX/DSTpf+yJt8B0c+SRvzfqAJKx+QDWi+VLhz8svLT23MVjEOHPF/KiSLeArKU/iHescrbLd3yVgyNg==",
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Handles": "4.3.0"
-        }
-      },
       "System.Threading.Tasks": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -1147,23 +1034,6 @@
           "System.Collections": "4.3.0",
           "System.Runtime": "4.3.0",
           "System.Threading.Tasks": "4.3.0"
-        }
-      },
-      "System.Threading.Thread": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "OHmbT+Zz065NKII/ZHcH9XO1dEuLGI1L2k7uYss+9C1jLxTC9kTZZuzUOyXHayRk+dft9CiDf3I/QZ0t8JKyBQ==",
-        "dependencies": {
-          "System.Runtime": "4.3.0"
-        }
-      },
-      "System.Threading.ThreadPool": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "k/+g4b7vjdd4aix83sTgC9VG6oXYKAktSfNIJUNGxPEj7ryEOfzHHhfnmsZvjxawwcD9HyWXKCXmPjX8U4zeSw==",
-        "dependencies": {
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Handles": "4.3.0"
         }
       },
       "System.Threading.Timer": {
@@ -1217,46 +1087,6 @@
           "System.Xml.ReaderWriter": "4.3.0"
         }
       },
-      "audiotests": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Compiler.Tests.Bcl": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "boxingtests": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "consoletest": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
       "cosmos.build.common": {
         "type": "Project",
         "dependencies": {
@@ -1267,110 +1097,6 @@
         "type": "Project",
         "dependencies": {
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.compiler.tests.bcl": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.compiler.tests.bclsystem": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Compiler.Tests.Bcl": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.compiler.tests.encryption": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.compiler.tests.exceptions": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.compiler.tests.interfaces": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.compiler.tests.methodtests": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.compiler.tests.singleechotest": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.compiler.tests.typesystem": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
         }
       },
       "cosmos.core": {
@@ -1402,33 +1128,6 @@
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "IgnoresAccessChecksToGenerator": "[0.5.0, )",
           "XSharp": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.debug.common": {
-        "type": "Project",
-        "dependencies": {
-          "Microsoft.Win32.Registry": "[5.0.0, )",
-          "System.Diagnostics.Process": "[4.3.0, )",
-          "System.IO.Pipes": "[4.3.0, )",
-          "System.Threading.Thread": "[4.3.0, )"
-        }
-      },
-      "cosmos.debug.debugconnectors": {
-        "type": "Project",
-        "dependencies": {
-          "System.Diagnostics.Process": "[4.3.0, )",
-          "System.IO.Pipes": "[4.3.0, )",
-          "System.IO.Ports": "[5.0.0, )",
-          "System.Threading.Thread": "[4.3.0, )"
-        }
-      },
-      "cosmos.debug.hosts": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Build.Common": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Common": "[0.1.0-localbuild, )",
-          "System.Diagnostics.Process": "[4.3.0, )",
-          "System.IO.Ports": "[5.0.0, )"
         }
       },
       "cosmos.debug.kernel": {
@@ -1467,58 +1166,6 @@
           "XSharp": "[0.1.0-localbuild, )"
         }
       },
-      "cosmos.kernel.tests.diskmanager": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Common": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.HAL2": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.kernel.tests.fat": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Common": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.kernel.tests.io": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Common": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.plugs": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )"
-        }
-      },
       "cosmos.system2": {
         "type": "Project",
         "dependencies": {
@@ -1538,40 +1185,11 @@
           "IL2CPU.API": "[0.1.0-localbuild, )"
         }
       },
-      "cosmos.testrunner.core": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Build.Common": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.DebugConnectors": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Hosts": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "cosmos.testrunner.testcontroller": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )"
-        }
-      },
       "dapperextensions.strongname": {
         "type": "Project",
         "dependencies": {
           "Dapper.StrongName": "[2.0.90, )",
           "Microsoft.CSharp": "[4.7.0, )"
-        }
-      },
-      "graphictest": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Compiler.Tests.Bcl": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
         }
       },
       "il2cpu.api": {
@@ -1591,58 +1209,6 @@
           "System.Data.SqlClient": "[4.8.5, )",
           "System.IO.MemoryMappedFiles": "[4.3.0, )",
           "System.Reflection.Metadata": "[5.0.0, )"
-        }
-      },
-      "memoryoperationstest": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "networktest": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "processortests": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
-        }
-      },
-      "simplestructsandarraystest": {
-        "type": "Project",
-        "dependencies": {
-          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
-          "Cosmos.Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.System2": "[0.1.0-localbuild, )",
-          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
-          "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
         }
       },
       "spruce": {

@@ -112,8 +112,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.2",
-        "contentHash": "80vGtW6uLB4AkyrdVuKTXYUyuXDPAsSKbTVfvjndZaRAYxzFzWhJbvUfeAKrN+128ycWZjLIAl61dFUwWHOOTw=="
+        "resolved": "4.8.5",
+        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg=="
       },
       "System.Diagnostics.Process": {
         "type": "Transitive",
@@ -249,13 +249,13 @@
           "SQLitePCLRaw.core": "[2.0.6, )",
           "SQLitePCLRaw.lib.e_sqlite3.linux": "[1.1.14, )",
           "System.ComponentModel.Annotations": "[5.0.0, )",
-          "System.Data.SqlClient": "[4.8.2, )",
+          "System.Data.SqlClient": "[4.8.5, )",
           "System.IO.MemoryMappedFiles": "[4.3.0, )",
           "System.Reflection.Metadata": "[5.0.0, )"
         }
       }
     },
-    ".NETFramework,Version=v4.8/win-x64": {
+    ".NETFramework,Version=v4.8/win-x86": {
       "Microsoft.Win32.Registry": {
         "type": "Transitive",
         "resolved": "5.0.0",
@@ -277,8 +277,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.2",
-        "contentHash": "80vGtW6uLB4AkyrdVuKTXYUyuXDPAsSKbTVfvjndZaRAYxzFzWhJbvUfeAKrN+128ycWZjLIAl61dFUwWHOOTw=="
+        "resolved": "4.8.5",
+        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg=="
       },
       "System.Diagnostics.Process": {
         "type": "Transitive",

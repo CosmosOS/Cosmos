@@ -16,7 +16,7 @@ jobs:
 
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
-      BochsPath: 'C:\Program Files\Bochs-2.7\Bochs.exe'
+      BochsPath: 'C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe'
 
     steps:
       - name: Checkout Cosmos
@@ -127,7 +127,7 @@ jobs:
     
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
-      BochsPath: 'C:\Program Files\Bochs-2.7\Bochs.exe'
+      BochsPath: 'C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe'
 
     steps:
       - name: Checkout Cosmos
@@ -160,16 +160,15 @@ jobs:
           name: cosmos-userkit
           path: ${{ env.USER_KIT_PATH }}
 
-      - name: Setup Registry
-        shell: cmd
+      - name: Copy Bochs
         run: |
-          reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d %USER_KIT_PATH%
-          reg query HKLM\SOFTWARE\WOW6432Node\Cosmos
+          xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "${env:ProgramFiles(x86)}\Bochs-2.6.8\"
 
       - name: Test - Cosmos
+        env:
+          CI: "True"
         run: |
           dotnet test "Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResults\${{ matrix.kernel }}-TestResult.trx" --filter "FullyQualifiedName~${{ matrix.kernel }}"
-        continue-on-error: true
       
       - name: Upload Test Logs
         uses: actions/upload-artifact@v3

@@ -1347,7 +1347,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.8/win-x64": {
+    ".NETFramework,Version=v4.8/win-x86": {
       "Microsoft.Win32.Registry": {
         "type": "Direct",
         "requested": "[5.0.0, )",

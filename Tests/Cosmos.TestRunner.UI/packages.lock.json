@@ -871,8 +871,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.2",
-        "contentHash": "80vGtW6uLB4AkyrdVuKTXYUyuXDPAsSKbTVfvjndZaRAYxzFzWhJbvUfeAKrN+128ycWZjLIAl61dFUwWHOOTw==",
+        "resolved": "4.8.5",
+        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg==",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.7.0",
           "System.Security.Principal.Windows": "4.7.0",
@@ -2190,6 +2190,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2202,6 +2203,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2214,6 +2216,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2238,6 +2241,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2251,6 +2255,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2263,6 +2268,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2275,6 +2281,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2287,6 +2294,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2299,6 +2307,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2311,6 +2320,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2322,6 +2332,7 @@
           "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2429,6 +2440,8 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.HAL2": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2442,6 +2455,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2455,9 +2469,19 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
+        }
+      },
+      "cosmos.plugs": {
+        "type": "Project",
+        "dependencies": {
+          "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
+          "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.System2_Plugs": "[0.1.0-localbuild, )"
         }
       },
       "cosmos.system2": {
@@ -2535,6 +2559,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2554,7 +2579,7 @@
           "SQLitePCLRaw.core": "[2.0.6, )",
           "SQLitePCLRaw.lib.e_sqlite3.linux": "[1.1.14, )",
           "System.ComponentModel.Annotations": "[5.0.0, )",
-          "System.Data.SqlClient": "[4.8.2, )",
+          "System.Data.SqlClient": "[4.8.5, )",
           "System.IO.MemoryMappedFiles": "[4.3.0, )",
           "System.Reflection.Metadata": "[5.0.0, )"
         }
@@ -2566,6 +2591,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2578,6 +2604,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2590,6 +2617,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -2602,6 +2630,7 @@
           "Cosmos.Core_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel.Plugs.Asm": "[0.1.0-localbuild, )",
+          "Cosmos.Plugs": "[0.1.0-localbuild, )",
           "Cosmos.System2": "[0.1.0-localbuild, )",
           "Cosmos.System2_Plugs": "[0.1.0-localbuild, )",
           "Cosmos.TestRunner.TestController": "[0.1.0-localbuild, )"
@@ -3091,8 +3120,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.2",
-        "contentHash": "80vGtW6uLB4AkyrdVuKTXYUyuXDPAsSKbTVfvjndZaRAYxzFzWhJbvUfeAKrN+128ycWZjLIAl61dFUwWHOOTw==",
+        "resolved": "4.8.5",
+        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg==",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.7.0",
           "System.Security.Principal.Windows": "4.7.0",
