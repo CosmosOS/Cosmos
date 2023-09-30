@@ -77,12 +77,6 @@ jobs:
         run: |
           xcopy /Y "IL2CPU\source\Cosmos.Core.DebugStub\*.xs" "$($env:USER_KIT_PATH)XSharp\DebugStub\"
 
-      - name: Upload User Kit Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cosmos-userkit
-          path: ${{ env.USER_KIT_PATH }}
-
       # - name: Send test kernels to GITHUB_OUTPUT
       #   id: testkernels_output
       #   run: |
@@ -153,12 +147,6 @@ jobs:
         with:
           repository: CosmosOS/XSharp
           path: XSharp
-
-      - name: Download User Kit Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: cosmos-userkit
-          path: ${{ env.USER_KIT_PATH }}
 
       - name: Copy Bochs
         run: |
