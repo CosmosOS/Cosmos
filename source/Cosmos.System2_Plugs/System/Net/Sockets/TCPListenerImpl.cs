@@ -36,11 +36,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             throw new NotImplementedException();
         }
 
-        public static Socket AcceptSocket(TcpListener aThis)
-        {
-            throw new NotImplementedException();
-        }
-
         public static TcpClient AcceptTcpClient(TcpListener aThis)
         {
             throw new NotImplementedException();

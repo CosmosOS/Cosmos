@@ -40,5 +40,10 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         {
             throw new NotImplementedException();
         }
+
+        public static void Dispose(TcpClient aThis)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
