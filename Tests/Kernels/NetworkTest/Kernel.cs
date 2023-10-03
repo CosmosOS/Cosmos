@@ -149,12 +149,12 @@ namespace NetworkTest
                 // Enter the listening loop.
                 while (true)
                 {
-                    Console.Write("Waiting for a connection... ");
+                    mDebugger.Send("Waiting for a connection... ");
 
                     // Perform a blocking call to accept requests.
                     // You could also use server.AcceptSocket() here.
-                    using TcpClient client = server.AcceptTcpClient();
-                    Console.WriteLine("Connected!");
+                    TcpClient client = server.AcceptTcpClient();
+                    mDebugger.Send("Connected!");
 
                     data = null;
 
@@ -168,7 +168,7 @@ namespace NetworkTest
                     {
                         // Translate data bytes to a ASCII string.
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                        Console.WriteLine("Received: {0}", data);
+                        mDebugger.Send("Received: " + data);
 
                         // Process the data sent by the client.
                         data = data.ToUpper();
@@ -177,8 +177,10 @@ namespace NetworkTest
 
                         // Send back a response.
                         stream.Write(msg, 0, msg.Length);
-                        Console.WriteLine("Sent: {0}", data);
+                        mDebugger.Send("Sent: " + data);
                     }
+
+                    client.Close();
                 }
             }
             catch (SocketException e)

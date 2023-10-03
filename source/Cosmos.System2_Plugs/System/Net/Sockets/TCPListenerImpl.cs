@@ -8,35 +8,40 @@ using System.Net;
 
 namespace Cosmos.System_Plugs.System.Net.Sockets
 {
-    [Plug(Target = typeof(TcpClient))]
-    public static class TcpClientImpl
+    [Plug(Target = typeof(TcpListener))]
+    public static class TcpListenerImpl
     {
-        public static void Ctor(TcpClient aThis, IPEndPoint localEP)
+        public static void Ctor(TcpListener aThis, IPEndPoint localEP)
         {
             throw new NotImplementedException();
         }
 
-        public static void Ctor(TcpListener aThis)
+        public static void Ctor(TcpListener aThis, IPAddress localaddr, int port)
         {
             throw new NotImplementedException();
         }
 
-        public static void Ctor(TcpListener aThis, AddressFamily family)
+        public static void Ctor(TcpListener aThis, int port)
         {
             throw new NotImplementedException();
         }
 
-        public static void Ctor(TcpListener aThis, string hostname, int port)
+        public static void Start(TcpListener aThis)
         {
             throw new NotImplementedException();
         }
 
-        public static void Ctor(TcpListener aThis, Socket acceptedSocket)
+        public static void Stop(TcpListener aThis)
         {
             throw new NotImplementedException();
         }
 
-        public static NetworkStream GetStream()
+        public static Socket AcceptSocket(TcpListener aThis)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static TcpClient AcceptTcpClient(TcpListener aThis)
         {
             throw new NotImplementedException();
         }
