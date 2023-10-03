@@ -1,17 +1,12 @@
 ﻿using Cosmos.HAL;
-using Cosmos.System.Network;
-using Cosmos.System.Network.ARP;
-using Cosmos.System.Network.Config;
-using Cosmos.System.Network.IPv4;
-using Cosmos.System.Network.IPv4.TCP;
-using Cosmos.System.Network.IPv4.UDP;
-using Cosmos.System.Network.IPv4.UDP.DHCP;
-using Cosmos.System.Network.IPv4.UDP.DNS;
 using Cosmos.TestRunner;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Net;
 using System.Text;
 using Sys = Cosmos.System;
+using Cosmos.System.Graphics;
 
 namespace NetworkTest
 {
@@ -32,7 +27,7 @@ namespace NetworkTest
             {
                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x0C, 0x29, 0xD5, 0xDB, 0x9D, 0x08, 0x00
             };
-            EthernetPacket ethernetPacket = new EthernetPacket(ethernetPacketData);
+            Cosmos.System.Network.EthernetPacket ethernetPacket = new Cosmos.System.Network.EthernetPacket(ethernetPacketData);
             Equals(ethernetPacketData, ethernetPacket.RawData);
 
             /** IP Packet Parsing Test **/
@@ -41,7 +36,7 @@ namespace NetworkTest
                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x0C, 0x29, 0xD5, 0xDB, 0x9D, 0x08, 0x00, 0x45, 0x00, 0x01, 0x16, 0x00, 0x00, 0x00, 0x00, 0x80, 0x11, 0x39,
                 0xD8, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF
             };
-            IPPacket ipPacket = new IPPacket(ipPacketData);
+            Cosmos.System.Network.IPv4.IPPacket ipPacket = new Cosmos.System.Network.IPv4.IPPacket(ipPacketData);
             Equals(ipPacketData, ipPacket.RawData);
 
             /** UDP Packet Parsing Test **/
@@ -50,7 +45,7 @@ namespace NetworkTest
                 0x98, 0xFA, 0x9B, 0xD4, 0xEB, 0x29, 0xD8, 0xCE, 0x3A, 0x89, 0x3E, 0xD9, 0x08, 0x00, 0x45, 0x00, 0x00, 0x22, 0x0C, 0x74, 0x40, 0x00, 0x40, 0x11, 0xAA,
                 0xBE, 0xC0, 0xA8, 0x01, 0x02, 0xC0, 0xA8, 0x01, 0x46, 0x10, 0x92, 0x10, 0x92, 0x00, 0x0E, 0x37, 0x22, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x21
             };
-            UDPPacket udpPacket = new UDPPacket(udpPacketData);
+            Cosmos.System.Network.IPv4.UDP.UDPPacket udpPacket = new Cosmos.System.Network.IPv4.UDP.UDPPacket(udpPacketData);
             Equals(udpPacketData, udpPacket.RawData);
 
             /** DNS Packet Parsing Test **/
@@ -60,7 +55,7 @@ namespace NetworkTest
                 0x00, 0xC0, 0xA8, 0x01, 0x46, 0xC0, 0xA8, 0x01, 0xFE, 0xF0, 0x66, 0x00, 0x35, 0x00, 0x24, 0x84, 0xCA, 0xD6, 0x80, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x00, 0x06, 0x67, 0x69, 0x74, 0x74, 0x65, 0x72, 0x03, 0x63, 0x6F, 0x6D, 0x00, 0x00, 0x01, 0x00, 0x01
             };
-            DNSPacket dnsPacket = new DNSPacket(dnsPacketData);
+            Cosmos.System.Network.IPv4.UDP.DNS.DNSPacket dnsPacket = new Cosmos.System.Network.IPv4.UDP.DNS.DNSPacket(dnsPacketData);
             Equals(dnsPacketData, dnsPacket.RawData);
 
             /** DHCP Packet Parsing Test **/
@@ -82,7 +77,7 @@ namespace NetworkTest
                 0x4F, 0x50, 0x2D, 0x49, 0x51, 0x48, 0x4A, 0x33, 0x31, 0x43, 0x06, 0x04, 0xC0, 0xA8, 0x01, 0xFE, 0x0F, 0x03, 0x6C, 0x61, 0x6E, 0x03, 0x04, 0xC0, 0xA8,
                 0x01, 0xFE, 0x01, 0x04, 0xFF, 0xFF, 0xFF, 0x00, 0xFF
             };
-            DHCPPacket dhcpPacket = new DHCPPacket(dhcpPacketData);
+            Cosmos.System.Network.IPv4.UDP.DHCP.DHCPPacket dhcpPacket = new Cosmos.System.Network.IPv4.UDP.DHCP.DHCPPacket(dhcpPacketData);
             Equals(dhcpPacketData, dhcpPacket.RawData);
 
             /** TCP Packet Parsing Test **/
@@ -92,12 +87,12 @@ namespace NetworkTest
                 0xA2, 0xC0, 0xA8, 0x01, 0xD3, 0xC0, 0xA8, 0x01, 0x64, 0xA8, 0xAB, 0x10, 0x92, 0x67, 0x7C, 0xCE, 0x18, 0x00, 0x00, 0x00, 0x00, 0xA0, 0x02, 0x72, 0x10,
                 0x5F, 0xF0, 0x00, 0x00, 0x02, 0x04, 0x05, 0xB4, 0x04, 0x02, 0x08, 0x0A, 0x58, 0x1A, 0xAA, 0x8A, 0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x03, 0x07
             };
-            TCPPacket tcpPacket = new TCPPacket(tcpPacketData);
+            Cosmos.System.Network.IPv4.TCP.TCPPacket tcpPacket = new Cosmos.System.Network.IPv4.TCP.TCPPacket(tcpPacketData);
             Equals(tcpPacket.SourcePort, 43179);
             Equals(tcpPacket.DestinationPort, 4242);
             Equals(tcpPacket.SequenceNumber, 0x677CCE18);
             Equals(tcpPacket.AckNumber, 0);
-            Equals(tcpPacket.TCPFlags, Flags.SYN);
+            Equals(tcpPacket.TCPFlags, Cosmos.System.Network.IPv4.TCP.Flags.SYN);
             Equals(tcpPacket.WindowSize, 29200);
             Equals(tcpPacket.Checksum, 0x5FF0);
             Equals(tcpPacket.UrgentPointer, 0);
@@ -109,7 +104,7 @@ namespace NetworkTest
                 0xC1, 0xA5, 0xFC, 0xC0, 0xA8, 0x01, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0xA8, 0x01, 0x46, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             };
-            ARPPacket arpPacket = new ARPPacket(arpPacketData);
+            Cosmos.System.Network.ARP.ARPPacket arpPacket = new Cosmos.System.Network.ARP.ARPPacket(arpPacketData);
             Equals(arpPacketData, arpPacket.RawData);
 
             TestController.Completed();
@@ -117,20 +112,85 @@ namespace NetworkTest
             /** 
              * Clients tests
             **/
-            var dhcpCLient = new DHCPClient();
+            var dhcpCLient = new Cosmos.System.Network.IPv4.UDP.DHCP.DHCPClient();
             dhcpCLient.Close();
 
-            var dnsClient = new DnsClient();
+            var dnsClient = new Cosmos.System.Network.IPv4.UDP.DNS.DnsClient();
             dnsClient.Close();
 
-            var udpClient = new UdpClient();
+            var udpClient = new Cosmos.System.Network.IPv4.UDP.UdpClient();
             udpClient.Close();
 			
-			var tcpClient = new TcpClient(4242);
+			var tcpClient = new Cosmos.System.Network.IPv4.TCP.TcpClient(4242);
             tcpClient.Close();
 
-            var icmpClient = new ICMPClient();
+            var icmpClient = new Cosmos.System.Network.IPv4.ICMPClient();
             icmpClient.Close();
+
+            mDebugger.Send($"Test of System.Net plugs");
+
+            TcpListener server = null;
+            try
+            {
+                // Set the TcpListener on port 13000.
+                Int32 port = 13000;
+                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+
+                // TcpListener server = new TcpListener(port);
+                server = new TcpListener(localAddr, port);
+
+                // Start listening for client requests.
+                server.Start();
+
+                // Buffer for reading data
+                Byte[] bytes = new Byte[256];
+                String data = null;
+
+                // Enter the listening loop.
+                while (true)
+                {
+                    Console.Write("Waiting for a connection... ");
+
+                    // Perform a blocking call to accept requests.
+                    // You could also use server.AcceptSocket() here.
+                    using TcpClient client = server.AcceptTcpClient();
+                    Console.WriteLine("Connected!");
+
+                    data = null;
+
+                    // Get a stream object for reading and writing
+                    NetworkStream stream = client.GetStream();
+
+                    int i;
+
+                    // Loop to receive all the data sent by the client.
+                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    {
+                        // Translate data bytes to a ASCII string.
+                        data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                        Console.WriteLine("Received: {0}", data);
+
+                        // Process the data sent by the client.
+                        data = data.ToUpper();
+
+                        byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+
+                        // Send back a response.
+                        stream.Write(msg, 0, msg.Length);
+                        Console.WriteLine("Sent: {0}", data);
+                    }
+                }
+            }
+            catch (SocketException e)
+            {
+                mDebugger.Send(e.ToString());
+            }
+            finally
+            {
+                server.Stop();
+            }
+
+            mDebugger.Send("Test of System.Net plugs executed successfully");
         }
     }
 }
