@@ -32,7 +32,7 @@ namespace Cosmos.System.Graphics
         /// Initializes a new instance of the <see cref="SVGAIICanvas"/> class.
         /// </summary>
         /// <param name="aMode">The graphics mode.</param>
-        public SVGAIICanvas(Mode aMode)
+        public SVGAIICanvas(Mode aMode) : base(aMode)
         {
             debugger.SendInternal($"Called ctor with mode {aMode}");
             ThrowIfModeIsNotValid(aMode);
@@ -83,11 +83,12 @@ namespace Cosmos.System.Graphics
         public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height)
         {
             var argb = color.ToArgb();
+            var frameSize = (int)driver.FrameSize;
 
             // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
             for (int i = yStart; i < yStart + height; i++)
             {
-                driver.videoMemory.Fill(GetPointOffset(xStart, i) + (int)driver.FrameSize, width, argb);
+                driver.videoMemory.Fill(GetPointOffset(xStart, i) + (int)frameSize, width, argb);
             }
         }
 
@@ -316,24 +317,30 @@ namespace Cosmos.System.Graphics
 
         public override void DrawString(string str, Font font, Color color, int x, int y)
         {
-            for (int i = 0; i < str.Length; i++)
+            var len = str.Length;
+            var width = font.Width;
+
+            for (int i = 0; i < len; i++)
             {
                 DrawChar(str[i], font, color, x, y);
-                x += font.Width;
+                x += width;
             }
         }
 
         public override void DrawChar(char c, Font font, Color color, int x, int y)
         {
-            int p = font.Height * (byte)c;
+            var height = font.Height;
+            var width = font.Width;
+            var data = font.Data;
+            int p = height * (byte)c;
 
-            for (int cy = 0; cy < font.Height; cy++)
+            for (int cy = 0; cy < height; cy++)
             {
-                for (byte cx = 0; cx < font.Width; cx++)
+                for (byte cx = 0; cx < width; cx++)
                 {
-                    if (font.ConvertByteToBitAddress(font.Data[p + cy], cx + 1))
+                    if (font.ConvertByteToBitAddress(data[p + cy], cx + 1))
                     {
-                        DrawPoint(color, (ushort)(x + (font.Width - cx)), (ushort)(y + cy));
+                        DrawPoint(color, (ushort)(x + cx), (ushort)(y + cy));
                     }
                 }
             }
@@ -343,10 +350,12 @@ namespace Cosmos.System.Graphics
         {
             var width = (int)image.Width;
             var height = (int)image.Height;
+            var frameSize = (int)driver.FrameSize;
+            var data = image.RawData;
 
             for (int i = 0; i < height; i++)
             {
-                driver.videoMemory.Copy(GetPointOffset(x, y + i) + (int)driver.FrameSize, image.RawData, i * width, width);
+                driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
             }
         }
     }

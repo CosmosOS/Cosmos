@@ -31,7 +31,7 @@ namespace Cosmos.System.Graphics.Fonts
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool ConvertByteToBitAddress(byte byteToConvert, int bitToReturn)
         {
-            int mask = 1 << (bitToReturn - 1);
+            int mask = 1 << (8 - bitToReturn);
             return (byteToConvert & mask) != 0;
         }
 

@@ -28,7 +28,7 @@ namespace Cosmos.System.Graphics
         /// Initializes a new instance of the <see cref="VBECanvas"/> class.
         /// </summary>
         /// <param name="mode">The display mode to use.</param>
-        public unsafe VBECanvas(Mode mode)
+        public unsafe VBECanvas(Mode mode) : base(mode)
         {
             if (Multiboot2.IsVBEAvailable)
             {

@@ -1,4 +1,5 @@
-﻿// #define COSMOSDEBUG
+﻿
+// #define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -145,6 +146,7 @@ namespace Cosmos.System.FileSystem.FAT
                     }
                 }
 
+                /* 
                 string xChain = "";
                 for (int i = 0; i < xReturn.Length; i++)
                 {
@@ -156,6 +158,7 @@ namespace Cosmos.System.FileSystem.FAT
                 }
                 Global.Debugger.SendInternal("Fat xChain:");
                 Global.Debugger.SendInternal(xChain);
+                */
 
                 SetFatEntry(xCurrentEntry, FatEntryEofValue());
 
@@ -385,7 +388,8 @@ namespace Cosmos.System.FileSystem.FAT
                         break;
 
                     case FatTypeEnum.Fat32:
-                        aValue = BitConverter.ToUInt32(xData, (int)xEntryOffset) & 0x0FFFFFFF;
+                        int localOffset = (int)(xEntryOffset % mFileSystem.BytesPerSector);
+                        aValue = BitConverter.ToUInt32(xData, localOffset) & 0x0FFFFFFF;
                         break;
 
                     default:
@@ -414,7 +418,7 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xEntryOffset = aEntryNumber * xEntrySize;
 
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
-                //ulong xSectorOffset = (xSector * mFileSystem.BytesPerSector) - xEntryOffset;
+                int localOffset = (int)(xEntryOffset % mFileSystem.BytesPerSector);
 
                 byte[] xData;
                 ReadFatSector(xSector, out xData);
@@ -422,15 +426,15 @@ namespace Cosmos.System.FileSystem.FAT
                 switch (mFileSystem.mFatType)
                 {
                     case FatTypeEnum.Fat12:
-                        xData.SetUInt16(xEntryOffset, (ushort)aValue);
+                        xData.SetUInt16((ulong)localOffset, (ushort)aValue);
                         break;
 
                     case FatTypeEnum.Fat16:
-                        xData.SetUInt16(xEntryOffset, (ushort)aValue);
+                        xData.SetUInt16((ulong)localOffset, (ushort)aValue);
                         break;
 
                     case FatTypeEnum.Fat32:
-                        xData.SetUInt32(xEntryOffset, (uint)aValue);
+                        xData.SetUInt32((ulong)localOffset, (uint)aValue);
                         break;
 
                     default:

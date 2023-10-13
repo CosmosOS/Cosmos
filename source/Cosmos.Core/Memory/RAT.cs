@@ -191,7 +191,7 @@ namespace Cosmos.Core.Memory
                 }
                 else if (xCounting)
                 {
-                    if (*p == (byte)PageType.Extension)
+                    if (*p == (byte)PageType.Extension || *p == aType)
                     {
                         xResult++;
                     }
