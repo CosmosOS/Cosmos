@@ -157,6 +157,7 @@ namespace MemoryOperationsTest
             memoryBlock.Read32(read);
             Assert.AreEqual(values, read, "Using Fill(int, int, int) works");
         }
+
         static unsafe void TestRealloc()
 		{
             // Allocate initial pointer and fill with value 32
@@ -174,15 +175,40 @@ namespace MemoryOperationsTest
             Assert.AreEqual(aPtr[16], 0, "Expected value 0 not found at the end of aPtr.");
 		}
 
+        static unsafe void TestMemoryManager()
+        {
+            uint freePageCount = RAT.FreePageCount;
+            Assert.IsTrue(freePageCount < RAT.TotalPageCount, "Number of free pages is less than total number of pages");
+            Assert.AreEqual(freePageCount, RAT.GetPageCount((byte)RAT.PageType.Empty), "GetPageCount and FreePageCount get different number of free pages");
+            void* pointer = RAT.AllocPages(RAT.PageType.HeapLarge, 3);
+            Assert.AreEqual(RAT.FreePageCount, freePageCount - 3, "Allocating three pages reduces number of free pages by three");
+            RAT.Free(RAT.GetFirstRATIndex(pointer));
+            Assert.AreEqual(RAT.FreePageCount, freePageCount, "Freeing the allocated pages correctly updates the number of free pages");
+        }
+
+        void TestAutomaticGCCollect()
+        {
+            Assert.AreEqual(RAT.GCTriggered, 0, "Before Enabling GC hasnt been triggered automatically");
+            RAT.MinFreePages = (int)RAT.FreePageCount - 10;
+            while (RAT.GCTriggered == 0)
+            {
+                Console.WriteLine($"Free: {RAT.FreePageCount} Min: {RAT.MinFreePages} GC Triggered: {RAT.GCTriggered} Objects: {HeapSmall.GetAllocatedObjectCount()}");
+            }
+            Assert.Succeed("GC can be triggered automatically");
+            RAT.MinFreePages = -1;
+        }
+
         protected override void Run()
         {
             try
             {
+                TestMemoryManager();
                 TestCopy();
                 TestMemoryBlock(new MemoryBlock(0x60000, 128)); //we are testing in SVGA video memory which should not be in use
                 TestManagedMemoryBlock(new ManagedMemoryBlock(128));
                 TestRealloc();
                 SpanTest.Execute();
+                TestAutomaticGCCollect();
                 TestController.Completed();
             }
             catch (Exception e)
