@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0": {
+      "cosmos.hal": {
+        "type": "Project",
+        "dependencies": {
+          "IL2CPU.API": "[0.1.0-localbuild, )"
+        }
+      },
+      "il2cpu.api": {
+        "type": "Project"
+      }
+    }
+  }
+}

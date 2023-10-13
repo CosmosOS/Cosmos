@@ -1,16 +1,18 @@
 <Project>
 
     <PropertyGroup>
-        <LangVersion>Latest</LangVersion>
-        <NoWarn>CA1051;CA1501;CA1707;CA1711;CA1801;CS1572;CS1573;CS1574;CS1591;$(NoWarn)</NoWarn>
-        <SignAssembly>True</SignAssembly>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
         <CommonRepoRoot>$(RepoRoot)..\Common\</CommonRepoRoot>
         <IL2CPURepoRoot>$(RepoRoot)..\IL2CPU\</IL2CPURepoRoot>
         <XSharpRepoRoot>$(RepoRoot)..\XSharp\</XSharpRepoRoot>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <LangVersion>Latest</LangVersion>
+        <NoWarn>CA1051;CA1501;CA1707;CA1711;CA1801;CS1572;CS1573;CS1574;CS1591;NU1603;$(NoWarn)</NoWarn>
+        <SignAssembly>True</SignAssembly>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     </PropertyGroup>
 
     <PropertyGroup>

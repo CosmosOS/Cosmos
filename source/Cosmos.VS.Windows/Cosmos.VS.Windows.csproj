@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
-        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
         <RootNamespace>Cosmos.VS.Windows</RootNamespace>
         <CreateVsixContainer>False</CreateVsixContainer>
         <DeployExtension>False</DeployExtension>

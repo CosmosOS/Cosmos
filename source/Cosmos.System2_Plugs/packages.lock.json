@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0": {
+      "cosmos.common": {
+        "type": "Project",
+        "dependencies": {
+          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )"
+        }
+      },
+      "cosmos.core": {
+        "type": "Project",
+        "dependencies": {
+          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
+          "IL2CPU.API": "[0.1.0-localbuild, )"
+        }
+      },
+      "cosmos.debug.kernel": {
+        "type": "Project"
+      },
+      "cosmos.hal2": {
+        "type": "Project",
+        "dependencies": {
+          "Cosmos.Common": "[0.1.0-localbuild, )",
+          "Cosmos.Core": "[0.1.0-localbuild, )",
+          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
+          "IL2CPU.API": "[0.1.0-localbuild, )"
+        }
+      },
+      "cosmos.system2": {
+        "type": "Project",
+        "dependencies": {
+          "Cosmos.Common": "[0.1.0-localbuild, )",
+          "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
+          "Cosmos.HAL2": "[0.1.0-localbuild, )",
+          "IL2CPU.API": "[0.1.0-localbuild, )"
+        }
+      },
+      "il2cpu.api": {
+        "type": "Project"
+      }
+    }
+  }
+}
