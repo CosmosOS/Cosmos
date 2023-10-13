@@ -212,7 +212,7 @@ namespace Cosmos.Core.Memory
         /// <returns>A pointer to the first page on success, null on failure.</returns>
         public static void* AllocPages(PageType aType, uint aPageCount = 1)
         {
-            if (MinFreePages > 0 && MinFreePages > FreePageCount)
+            if (MinFreePages > FreePageCount)
             {
                 Heap.Collect();
                 GCTriggered++;
