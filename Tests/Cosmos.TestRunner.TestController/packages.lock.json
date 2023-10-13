@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0": {
+      "cosmos.debug.kernel": {
+        "type": "Project"
+      }
+    }
+  }
+}

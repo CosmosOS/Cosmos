@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0": {
+      "il2cpu.api": {
+        "type": "Project"
+      }
+    }
+  }
+}
