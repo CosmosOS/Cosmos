@@ -44,10 +44,16 @@ namespace Cosmos.Core.Memory.Test
 
                 RAT.Init(xPtr, (uint)xRAM.Length);
 
+                uint freePageCount = RAT.FreePageCount;
+                Assert.IsTrue(freePageCount < RAT.TotalPageCount);
+                Assert.AreEqual(freePageCount, RAT.GetPageCount((byte)RAT.PageType.Empty));
+
                 var largePage = RAT.AllocPages(RAT.PageType.HeapLarge, 3);
                 Assert.AreEqual(RAT.PageType.HeapLarge, RAT.GetPageType(largePage));
                 Assert.AreEqual(RAT.GetFirstRATIndex(largePage), RAT.GetFirstRATIndex((byte*)largePage + 20));
                 Assert.AreEqual(RAT.PageType.HeapLarge, RAT.GetPageType((byte*)largePage + RAT.PageSize));
+
+                Assert.AreEqual(RAT.FreePageCount, freePageCount - 3);
             }
         }
 
