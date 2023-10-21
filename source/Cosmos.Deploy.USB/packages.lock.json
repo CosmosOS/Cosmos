@@ -37,7 +37,7 @@
         }
       }
     },
-    "net6.0-windows7.0/win-x86": {
+    "net6.0-windows7.0/win-x64": {
       "Microsoft.Win32.Registry": {
         "type": "Transitive",
         "resolved": "5.0.0",
