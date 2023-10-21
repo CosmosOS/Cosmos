@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
         <OutputType>Exe</OutputType>
-        <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
         <DebugType>Full</DebugType>
     </PropertyGroup>
 

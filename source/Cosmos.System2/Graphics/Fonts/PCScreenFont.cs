@@ -210,7 +210,30 @@ namespace Cosmos.System.Graphics.Fonts
             }
             if (version2)
             {
-                throw new NotImplementedException();
+                uint length = BitConverter.ToUInt32(fontData, 16);
+                uint height = BitConverter.ToUInt32(fontData, 24);
+                uint width = BitConverter.ToUInt32(fontData, 28);
+                charHeight = (byte)height;
+                charWidth = (byte)width;
+
+                uint bytesPerRow = (width + 7) / 8;
+                uint charDataSize = charHeight * bytesPerRow;
+                parsedFontData = new byte[length * charDataSize];
+
+                for (int i = 0; i < length; i++)
+                {
+                    for (int k = 0; k < charHeight; k++)
+                    {
+                        int dataIndex = 32 + (i * (byte)charDataSize) + (k * (byte)bytesPerRow);
+                        for (int j = 0; j < bytesPerRow; j++)
+                        {
+                            parsedFontData[(i * charDataSize) + (k * bytesPerRow) + j] = fontData[dataIndex + j];
+                        }
+                    }
+                }
+
+
+                return new PCScreenFont(charWidth, charHeight, parsedFontData, mappings);
             }
 
             throw new ArgumentException("The font data is incorrect.", nameof(fontData));

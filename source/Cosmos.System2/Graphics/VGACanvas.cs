@@ -1,4 +1,4 @@
-﻿using static Cosmos.HAL.Drivers.Video.VGADriver;
+using static Cosmos.HAL.Drivers.Video.VGADriver;
 using Cosmos.HAL.Drivers.Video;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,7 +28,7 @@ namespace Cosmos.System.Graphics
         /// Initializes a new instance of the <see cref="VGACanvas"/> class
         /// with the given display mode.
         /// </summary>
-        public VGACanvas(Mode mode) : base()
+        public VGACanvas(Mode mode) : base(mode)
         {
             driver = new VGADriver();
             driver.SetGraphicsMode(ModeToScreenSize(mode), (VGADriver.ColorDepth)(int)mode.ColorDepth);

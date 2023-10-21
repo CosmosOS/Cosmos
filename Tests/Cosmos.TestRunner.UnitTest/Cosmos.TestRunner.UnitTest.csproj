@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <PlatformTarget>x86</PlatformTarget>
+
         <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
