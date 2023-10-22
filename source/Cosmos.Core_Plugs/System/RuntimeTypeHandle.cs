@@ -18,7 +18,7 @@ namespace Cosmos.Core_Plugs.System
         public static bool ContainsGenericVariables(object aRuntimeType)
         {
             throw new NotImplementedException();
-        }   
+        }
         [PlugMethod(Signature = "System_Boolean__System_RuntimeTypeHandle_IsGenericVariable_System_RuntimeType_")]
         public static bool IsGenericVariable(object aRuntimeType)
         {
@@ -55,6 +55,7 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException();
         }
+
         [PlugMethod(Signature = "System_IntPtr__System_RuntimeTypeHandle__GetMetadataImport_System_RuntimeType_")]
         public static IntPtr _GetMetadataImport(object aRuntimeType)
         {
@@ -152,5 +153,6 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException();
         }
+
     }
 }

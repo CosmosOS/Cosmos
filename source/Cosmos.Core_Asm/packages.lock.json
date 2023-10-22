@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net8.0": {
       "System.Reflection.TypeExtensions": {
         "type": "Direct",
         "requested": "[4.7.0, )",

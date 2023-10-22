@@ -66,5 +66,15 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         {
             throw new NotImplementedException();
         }
+
+        // {!}
+        public static unsafe void* GetSpanDataFrom(
+            RuntimeFieldHandle fldHandle,
+            RuntimeTypeHandle targetTypeHandle,
+            out int count)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

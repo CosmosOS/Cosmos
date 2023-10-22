@@ -111,6 +111,7 @@ install:
 	@mkdir -p $(DESTDIR)/Kernel
 	@cp -r $(IL2CPU_DIR)/artifacts/Release/nupkg/*.nupkg $(DESTDIR)/Packages/
 	@cp -r $(THISDIR)/artifacts/Debug/nupkg/*.nupkg $(DESTDIR)/Packages/
+	@cp -r $(THISDIR)/artifacts/Release/nupkg/*.nupkg $(DESTDIR)/Packages/
 	@cp -r $(XSHARP_DIR)/artifacts/Release/nupkg/*.nupkg $(DESTDIR)/Packages/
 	@cp -r $(IL2CPU_DIR)/source/Cosmos.Core.DebugStub/*.xs $(DESTDIR)/XSharp/DebugStub/
 
