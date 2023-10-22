@@ -297,6 +297,11 @@ namespace Cosmos.Core.Memory
             throw new Exception("Page type not found. Likely RAT is rotten.");
         }
 
+        /// <summary>
+        /// Get the pointer pointing to the start of the position to which the current pointer is pointing
+        /// </summary>
+        /// <param name="aPtr"></param>
+        /// <returns></returns>
         public static byte* GetPagePtr(void* aPtr)
         {
             return (byte*)aPtr - ((byte*)aPtr - RamStart) % PageSize;
@@ -326,7 +331,7 @@ namespace Cosmos.Core.Memory
             byte* p = mRAT + aPageIdx;
             *p = (byte)PageType.Empty;
             FreePageCount++;
-            for (; p < mRAT + TotalPageCount; )
+            for (; p < mRAT + TotalPageCount;)
             {
                 if (*++p != (byte)PageType.Extension)
                 {
@@ -335,6 +340,15 @@ namespace Cosmos.Core.Memory
                 *p = (byte)PageType.Empty;
                 FreePageCount++;
             }
+        }
+
+        /// <summary>
+        /// Free the page this pointer points to
+        /// </summary>
+        /// <param name="aPtr"></param>
+        public static void Free(void* aPtr)
+        {
+            Free(GetFirstRATIndex(aPtr));
         }
     }
 }
