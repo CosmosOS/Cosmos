@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
-        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     </PropertyGroup>
 
     <PropertyGroup>

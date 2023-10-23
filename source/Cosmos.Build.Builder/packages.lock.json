@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETFramework,Version=v4.7.2": {
+      "Microsoft.VisualStudio.Setup.Configuration.Interop": {
+        "type": "Direct",
+        "requested": "[1.16.30, )",
+        "resolved": "1.16.30",
+        "contentHash": "lC6SqNkraWUSY7cyF5GUmXSECoTMwslBc/r1dguChjsi0D0BlF7G6PLsvXD0NFCwnpKlgVzUYrIq7DQakdGerw=="
+      },
+      "Newtonsoft.Json": {
+        "type": "Direct",
+        "requested": "[13.0.1, )",
+        "resolved": "13.0.1",
+        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
+      },
+      "NuGet.Common": {
+        "type": "Direct",
+        "requested": "[5.9.1, )",
+        "resolved": "5.9.1",
+        "contentHash": "BRX0V8k8QXcEWL33V2HcBU1+eu/Qp5LDJlheYFSZ03hKjlHVHFfLquvUUYLgSNO7tiBxCFe7pTSgO4XanyzteQ==",
+        "dependencies": {
+          "NuGet.Frameworks": "5.9.1"
+        }
+      },
+      "NuGet.Configuration": {
+        "type": "Direct",
+        "requested": "[5.9.1, )",
+        "resolved": "5.9.1",
+        "contentHash": "dpjLDYEuhR1J8L3s9c1qVHEBaWqFI2/x3qRmhqVYDLB5B9ETVe1jVkxLkFQreQVgh+N5cVgtZWx1jGuArj7QaQ==",
+        "dependencies": {
+          "NuGet.Common": "5.9.1"
+        }
+      },
+      "System.Runtime.WindowsRuntime": {
+        "type": "Direct",
+        "requested": "[4.6.0, )",
+        "resolved": "4.6.0",
+        "contentHash": "IWrs1TmbxP65ZZjIglNyvDkFNoV5q2Pofg5WO7I8RKQOpLdFprQSh3xesOoClBqR4JHr4nEB1Xk1MqLPW1jPuQ=="
+      },
+      "WPF-UI": {
+        "type": "Direct",
+        "requested": "[2.0.3, )",
+        "resolved": "2.0.3",
+        "contentHash": "1e9Q8pQGfi9YFp3WavKZjXyLYohIjXxk5q0NqEaamofVgIdxRxwqrkWha584FBUISRBBT/qFOrl97YBl5bs30Q==",
+        "dependencies": {
+          "System.Drawing.Common": "6.0.0"
+        }
+      },
+      "NuGet.Frameworks": {
+        "type": "Transitive",
+        "resolved": "5.9.1",
+        "contentHash": "LuJA875MQpPMdik6KUsDUnEDSXWX+T/sExFikA0A5zGFkEW37weP5b6NxljWlrw4UNOWTgmTeumm802Jwz20sw=="
+      },
+      "System.Drawing.Common": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "NfuoKUiP2nUWwKZN6twGqXioIe1zVD0RIj2t976A+czLHr2nY454RwwXs6JU9Htc6mwqL6Dn/nEL3dpVf2jOhg=="
+      }
+    },
+    ".NETFramework,Version=v4.7.2/win7-x86": {}
+  }
+}
