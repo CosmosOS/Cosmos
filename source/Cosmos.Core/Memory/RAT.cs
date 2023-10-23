@@ -298,7 +298,7 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Get the pointer pointing to the start of the position to which the current pointer is pointing
+        /// Get the pointer to the start of the page containing the pointer's address
         /// </summary>
         /// <param name="aPtr"></param>
         /// <returns></returns>
