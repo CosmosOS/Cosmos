@@ -546,5 +546,81 @@ namespace Cosmos.Core.Memory
         }
 
         #endregion
+
+        #region Cleanup
+
+        /// <summary>
+        /// This function will free all pages allocated for small objects which are emnpty
+        /// </summary>
+        /// <returns>Number of pages freed</returns>
+        public static int PruneSMT()
+        {
+            int freed = 0;
+            SMTPage* page = SMT;
+            while (page != null)
+            {
+                freed += PruneSMT(page);
+                page = page->Next;
+            }
+            return freed;
+        }
+
+        /// <summary>
+        /// Prune all empty pages allocated on a certain page
+        /// </summary>
+        /// <param name="aPage"></param>
+        /// <returns></returns>
+        private static int PruneSMT(SMTPage* aPage)
+        {
+            int freed = 0;
+            RootSMTBlock* ptr = (RootSMTBlock*)aPage->First; // since both RootSMTBlock and SMTBlock have the same size (20) it doesnt matter if cast is wrong
+            while(ptr != null)
+            {
+                freed += PruneSMT(ptr, ptr->Size);
+                ptr = ptr->LargerSize;
+            }
+            return freed;
+        }
+
+        /// <summary>
+        /// Prune all empty pages which are linked to root block for a certain size
+        /// The root block or first one following it will not be removed!
+        /// </summary>
+        /// <param name="aBlock"></param>
+        /// <param name="aSize"></param>
+        /// <returns></returns>
+        private static int PruneSMT(RootSMTBlock* aBlock, uint aSize)
+        {
+            int freed = 0;
+            int maxElements = (int)(RAT.PageSize / (aSize + PrefixItemBytes));
+            SMTBlock* prev = aBlock->First;
+            SMTBlock* block = prev->NextBlock;
+            while(block != null)
+            {
+                if (block->SpacesLeft == maxElements)
+                {
+                    // This block is currently empty so free it
+                    prev->NextBlock = block->NextBlock;
+                    RAT.Free(block->PagePtr);
+
+                    uint* toCleanUp = (uint*) block;
+                    block = prev->NextBlock;
+
+                    toCleanUp[0] = 0;
+                    toCleanUp[1] = 0;
+                    toCleanUp[2] = 0;
+
+                    freed++;
+                }
+                else
+                {
+                    prev = block;
+                    block = block->NextBlock;
+                }
+            }
+            return freed;
+        }
+
+        #endregion
     }
 }
