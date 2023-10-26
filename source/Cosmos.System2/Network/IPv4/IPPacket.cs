@@ -38,7 +38,8 @@ namespace Cosmos.System.Network.IPv4
             ARPCache.Update(ipPacket.SourceIP, ipPacket.SourceMAC);
 
             if (NetworkStack.AddressMap.ContainsKey(ipPacket.DestinationIP.Hash) == true ||
-                ipPacket.DestinationIP.Parts[3] == 255)
+                ipPacket.DestinationIP.Parts[3] == 255 // this is wrong x.x.x.255 is not always broadcast
+                )
             {
                 switch (ipPacket.Protocol)
                 {
