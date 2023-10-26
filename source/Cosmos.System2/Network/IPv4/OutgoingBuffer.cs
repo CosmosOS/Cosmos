@@ -8,9 +8,9 @@ using Cosmos.HAL.Network;
 namespace Cosmos.System.Network.IPv4
 {
     /// <summary>
-    /// Represents an outgoing IPv4 buffer.
+    /// Represents an outgoing IPv4 buffer. for use by drivers
     /// </summary>
-    internal static class OutgoingBuffer
+    public static class OutgoingBuffer
     {
         private class BufferEntry
         {
@@ -67,23 +67,18 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Adds a packet to the buffer.
+        /// Adds a packet to the buffer. for use by drivers
         /// </summary>
         /// <param name="packet">The IP packet.</param>
-        internal static void AddPacket(IPPacket packet)
-        {
-            EnsureQueueExists();
-            NetworkDevice nic = IPConfig.FindInterface(packet.SourceIP);
-            packet.SourceMAC = nic.MACAddress;
-            queue.Add(new BufferEntry(nic, packet));
-        }
+        public static void AddPacket(IPPacket packet) =>
+            AddPacket(packet, IPConfig.FindInterface(packet.SourceIP));
 
         /// <summary>
-        /// Adds a packet to the buffer.
+        /// Adds a packet to the buffer. for use by drivers
         /// </summary>
         /// <param name="packet">The IP packet.</param>
         /// <param name="device">The Network Interface Controller.</param>
-        internal static void AddPacket(IPPacket packet, NetworkDevice device)
+        public static void AddPacket(IPPacket packet, NetworkDevice device)
         {
             EnsureQueueExists();
             packet.SourceMAC = device.MACAddress;

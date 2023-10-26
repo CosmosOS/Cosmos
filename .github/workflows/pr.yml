@@ -2,18 +2,21 @@ name: Build and Test
 
 on:
   workflow_dispatch:
-#  pull_request:
-#    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
 
   build:
 
-    runs-on: windows-2022
+    runs-on: self-hosted
+
+    outputs:
+      testkernels: ${{ steps.testkernels_output.outputs.testkernels }}
 
     env:
       USER_KIT_PATH: 'C:\CosmosRun\'
-      BOCHS_RUN_CMD: '\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\"'
+      BochsPath: 'C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe'
 
     steps:
       - name: Checkout Cosmos
@@ -22,11 +25,11 @@ jobs:
           repository: CosmosOS/Cosmos
           path: Cosmos
 
-#      - name: Checkout Common
-#        uses: actions/checkout@v3
-#        with:
-#          repository: CosmosOS/Common
-#          path: Common
+      - name: Checkout Common
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/Common
+          path: Common
 
       - name: Checkout IL2CPU
         uses: actions/checkout@v3
@@ -34,24 +37,14 @@ jobs:
           repository: CosmosOS/IL2CPU
           path: IL2CPU
 
-#      - name: Checkout XSharp
-#        uses: actions/checkout@v3
-#        with:
-#          repository: CosmosOS/XSharp
-#          path: XSharp
+      - name: Checkout XSharp
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/XSharp
+          path: XSharp
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1.3
-
-      - name: Setup Registry
-        run: |
-          Write-Host "Setting Cosmos User Kit Path to $($env:USER_KIT_PATH)"
-          reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d "$($env:USER_KIT_PATH)"
-          reg query HKLM\SOFTWARE\WOW6432Node\Cosmos
-
-          Write-Host "Setting Bochs Run Command to $($env:BOCHS_RUN_CMD)"
-          reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "$($env:BOCHS_RUN_CMD)"
-          reg query HKCR\BochsConfigFile\shell\Run\command
 
       - name: Nuget - Cache
         uses: actions/cache@v3
@@ -71,7 +64,7 @@ jobs:
 
       - name: Build - IL2CPU
         run: |
-          dotnet publish IL2CPU\source\IL2CPU -r win7-x86 -o "$($env:USER_KIT_PATH)Build\IL2CPU\"
+          dotnet publish IL2CPU\source\IL2CPU -o "$($env:USER_KIT_PATH)Build\IL2CPU\"
 
       - name: Copy Output - Cosmos
         run: |
@@ -79,18 +72,94 @@ jobs:
           xcopy /Y "Cosmos\Build\grub2\boot\grub\grub.cfg" "$($env:USER_KIT_PATH)Build\ISO\boot\grub"
           xcopy /Y /S "Cosmos\Build\VMware\*" "$($env:USER_KIT_PATH)Build\VMware\"
           xcopy /Y /S "Cosmos\Build\Tools" "$($env:USER_KIT_PATH)Build\Tools\"
-          xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
       - name: Copy Output - IL2CPU
         run: |
           xcopy /Y "IL2CPU\source\Cosmos.Core.DebugStub\*.xs" "$($env:USER_KIT_PATH)XSharp\DebugStub\"
-          
-      - name: Test - Cosmos
-        run: |
-          dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResult.xml"
 
+      # - name: Send test kernels to GITHUB_OUTPUT
+      #   id: testkernels_output
+      #   run: |
+      #     $testList = dotnet test Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --list-tests
+      #     Write-Host $testList
+      #     $testList >> tests.txt
+      #     $match = Select-String -Pattern "^.*TestKernel\((.*)\)$" -Path tests.txt
+      #     Write-Host $match
+      #     $testKernels = $match.matches.groups | where { $_.index % 2 -ne 0 } | Select-Object value | foreach { $_.value }
+      #     Write-Host $testKernels
+      #     $testKernelsEnv = ""
+      #     $testKernels | foreach { $testKernelsEnv += "$($_)," }
+      #     $testKernelsEnv = $testKernelsEnv.Trim(",")
+      #     Write-Host $testKernelsEnv
+      #     "testkernels=[$($testKernelsEnv)]" >> $env:GITHUB_OUTPUT
+
+  test:
+    if: ${{ success() }}
+    needs: [build]
+    runs-on: self-hosted
+    
+    strategy:
+      matrix:
+        kernel: [
+          "BoxingTests.Kernel",
+          "Cosmos.Compiler.Tests.TypeSystem.Kernel",
+          "Cosmos.Compiler.Tests.Bcl.Kernel",
+          "Cosmos.Compiler.Tests.Bcl.System.Kernel",
+          "Cosmos.Compiler.Tests.Exceptions.Kernel",
+          "Cosmos.Compiler.Tests.MethodTests.Kernel",
+          "Cosmos.Compiler.Tests.SingleEchoTest.Kernel",
+          "Cosmos.Kernel.Tests.Fat.Kernel",
+          "Cosmos.Kernel.Tests.IO.Kernel",
+          "SimpleStructsAndArraysTest.Kernel",
+          "Cosmos.Kernel.Tests.DiskManager.Kernel",
+          "GraphicTest.Kernel",
+          "NetworkTest.Kernel",
+          "AudioTests.Kernel",
+          "MemoryOperationsTest.Kernel",
+          "ProcessorTests.Kernel"
+        ]
+    
+    env:
+      USER_KIT_PATH: 'C:\CosmosRun\'
+      BochsPath: 'C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe'
+
+    steps:
+      - name: Checkout Cosmos
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/Cosmos
+          path: Cosmos
+
+      - name: Checkout Common
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/Common
+          path: Common
+
+      - name: Checkout IL2CPU
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/IL2CPU
+          path: IL2CPU
+
+      - name: Checkout XSharp
+        uses: actions/checkout@v3
+        with:
+          repository: CosmosOS/XSharp
+          path: XSharp
+
+      - name: Copy Bochs
+        run: |
+          xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "${env:ProgramFiles(x86)}\Bochs-2.6.8\"
+
+      - name: Test - Cosmos
+        env:
+          CI: "True"
+        run: |
+          dotnet test "Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResults\${{ matrix.kernel }}-TestResult.trx" --filter "FullyQualifiedName~${{ matrix.kernel }}"
+      
       - name: Upload Test Logs
         uses: actions/upload-artifact@v3
         with:
           name: test-logs
-          path: $($env:USER_KIT_PATH)TestResult.xml
+          path: ${{ env.USER_KIT_PATH }}TestResults

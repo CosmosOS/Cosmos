@@ -93,7 +93,23 @@ namespace Cosmos.Core.Memory
         /// Number of pages in the heap.
         /// </summary>
         /// <remarks>Calculated from mSize.</remarks>
-        static public uint TotalPageCount;
+        public static uint TotalPageCount;
+
+        /// <summary>
+        /// Number of pages which are currently not in use
+        /// </summary>
+        public static uint FreePageCount;
+
+        /// <summary>
+        /// If number of free pages drops below this number, we trigger the GC.Collect automatically
+        /// If set to -1 it is disabled
+        /// </summary>
+        public static int MinFreePages = -1;
+
+        /// <summary>
+        /// Number of the times the GC has been triggered automatically
+        /// </summary>
+        public static uint GCTriggered = 0;
 
         /// <summary>
         /// Pointer to the RAT.
@@ -132,6 +148,7 @@ namespace Cosmos.Core.Memory
             RamSize = aSize;
             HeapEnd = aStartPtr + aSize;
             TotalPageCount = aSize / PageSize;
+            FreePageCount = TotalPageCount;
 
             // We need one status byte for each block.
             // Intel blocks are 4k (10 bits). So for 4GB, this means
@@ -150,6 +167,9 @@ namespace Cosmos.Core.Memory
             {
                 *p = (byte)PageType.RAT;
             }
+            // Remove pages needed for RAT table from count
+            FreePageCount -= xRatPageCount;
+
             Heap.Init();
         }
 
@@ -192,6 +212,12 @@ namespace Cosmos.Core.Memory
         /// <returns>A pointer to the first page on success, null on failure.</returns>
         public static void* AllocPages(PageType aType, uint aPageCount = 1)
         {
+            if (MinFreePages > FreePageCount)
+            {
+                Heap.Collect();
+                GCTriggered++;
+            }
+
             byte* xPos = null;
 
             // Could combine with an external method or delegate, but will slow things down
@@ -241,6 +267,10 @@ namespace Cosmos.Core.Memory
                     *p = (byte)PageType.Extension;
                 }
                 CPU.ZeroFill((uint)xResult, PageSize * aPageCount);
+
+                // Decrement free page count
+                FreePageCount -= aPageCount;
+
                 return xResult;
             }
             return null;
@@ -267,6 +297,11 @@ namespace Cosmos.Core.Memory
             throw new Exception("Page type not found. Likely RAT is rotten.");
         }
 
+        /// <summary>
+        /// Get the pointer to the start of the page containing the pointer's address
+        /// </summary>
+        /// <param name="aPtr"></param>
+        /// <returns></returns>
         public static byte* GetPagePtr(void* aPtr)
         {
             return (byte*)aPtr - ((byte*)aPtr - RamStart) % PageSize;
@@ -295,14 +330,25 @@ namespace Cosmos.Core.Memory
         {
             byte* p = mRAT + aPageIdx;
             *p = (byte)PageType.Empty;
-            for (; p < mRAT + TotalPageCount; )
+            FreePageCount++;
+            for (; p < mRAT + TotalPageCount;)
             {
                 if (*++p != (byte)PageType.Extension)
                 {
                     break;
                 }
                 *p = (byte)PageType.Empty;
+                FreePageCount++;
             }
+        }
+
+        /// <summary>
+        /// Free the page this pointer points to
+        /// </summary>
+        /// <param name="aPtr"></param>
+        public static void Free(void* aPtr)
+        {
+            Free(GetFirstRATIndex(aPtr));
         }
     }
 }

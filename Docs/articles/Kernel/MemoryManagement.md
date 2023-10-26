@@ -35,7 +35,16 @@ The RAT is managed through the `RAT` class. Pages are allocated via `void* RAT.A
 
 The Heap itself is managed by the `Heap` class. It contains the mechanism to allocate (`byte* Heap.Alloc(uint aSize)`), re-allocate ('byte* Heap.Realloc(byte* aPtr, uint newSize)') and free (`void Heap.Free(void* aPtr)`) objects of various sizes. Objects are seperated by size in bytes into Small (Smaller than 1/4 Page), Medium (Smaller than 1 Page) and Large (Larger than 1 Page). Currently Medium and Large objects are managed the same way using the methods in `HeapLarge` which do little more than allocating/freeing the necessary number of pages. Small objects are managed differently in `HeapSmall`. 
 
-Small Objects are managed using the SMT (Size Map Table), which is initalised using `void HeapSmall.InitSMT(uint aMaxItemSize)`. The basic idea of the SMT is to allocate objects of similar sizes on the same page. The SMT grows dynamically as required. The SMT is made up of a series of pages, each of which contains a series of `RootSMTBlock` each of which link to a chain of `SMTBlock`. The `RootSMTBlock` can be thought of as column headers and the `SMTBlock` as the elements stored in the column. The `RootSMTBlock` are a linked list, each containing the maximum object size stored in its pages, the location of the first `SMTBlock` for this size, and the location of the next `RootSMTBlock`. The list is in ascending order of size, so that the smallest large enough `RootSMTBlock` is found first. A `SMTBlock` contains a pointer to the actual page where objects are stored, how much space is left on that page, and a pointer to the next `SMTBlock`. If every `SMTBlock` for a certain size is full, a new `SMTBlock` is allocated. The page linked to by the `SMTBlock` is split into an array of spaces, each large enough to allocate an object of maximum size with header, which can be iterated through via index and fixed size when allocating. Each object allocated on the `HeapSmall` has a header of 2 `ushort`, the first one storing the actual size of the object and the second, the GC status of the object.
+Small Objects are managed using the SMT (Size Map Table), which is initalised using `void HeapSmall.InitSMT(uint aMaxItemSize)`.
+The basic idea of the SMT is to allocate objects of similar sizes on the same page. The SMT grows dynamically as required.
+The SMT is made up of a series of pages, each of which contains a series of `RootSMTBlock` each of which link to a chain of `SMTBlock`.
+The `RootSMTBlock` can be thought of as column headers and the `SMTBlock` as the elements stored in the column.
+The `RootSMTBlock` are a linked list, each containing the maximum object size stored in its pages, the location of the first `SMTBlock` for this size, and the location of the next `RootSMTBlock`.
+The list is in ascending order of size, so that the smallest large enough `RootSMTBlock` is found first.
+A `SMTBlock` contains a pointer to the actual page where objects are stored, how much space is left on that page, and a pointer to the next `SMTBlock`.
+If every `SMTBlock` for a certain size is full, a new `SMTBlock` is allocated.
+The page linked to by the `SMTBlock` is split into an array of spaces, each large enough to allocate an object of maximum size with header, which can be iterated through via index and fixed size when allocating.
+Each object allocated on the `HeapSmall` has a header of 2 `ushort`, the first one storing the actual size of the object and the second, the GC status of the object.
 
 ## Garbage Collection
 
@@ -44,6 +53,14 @@ Small Objects are managed using the SMT (Size Map Table), which is initalised us
 The garbage collector has to be manually triggerd using the call `int Heap.Collect()` which returns the number of objects freed. 
 
 Note that the GC does not track objects only pointed to by pointers. To ensure that the GC nevertheless does not incorrectly free objects, you can use `void GCImplementation.IncRootCount(ushort* aPtr)` to manually increase the references of your object by 1. Once you no longer need the object you can use `void GCImplementation.DecRootCount(ushort* aPtr)` to remove the manual reference, which allows the next `Heap.Collect` call to free the object. 
+
+`Heap.Collect` only cleans up the objects which are no longer used but will leave behind empty pages in the SMT.
+These pages can be cleaned up using `HeapSmall.PruneSMT` which will return the number of pages it freed.
+Note that if in future elements are reallocated, this will cause new pages in the SMT to be allocated again, so using this too often may not be useful.
+
+## Automatically Trigger Garbage Collection
+
+When `RAT.MinFreePages` is set to a positive value and the number of free pages (as tracked by `RAT.FreePageCount`) drops below this value, on page allocation `Heap.Collect` will automatically be called. Each time this happens the value in `RAT.GCTriggered` is incremented by one.
 
 ### Internals
 
