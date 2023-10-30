@@ -139,6 +139,19 @@ namespace Cosmos.TestRunner.Core
                 byte[] replyBytes = Encoding.ASCII.GetBytes(replyMessage);
                 stream.Write(replyBytes, 0, replyBytes.Length);
                 Console.WriteLine($"Sent: {replyMessage}");
+
+                // Test 4: Receive a big packet from kernel to test TCP sequencing
+                byte[] buffer2 = new byte[6000];
+                int totalBytesRead = 0;
+
+                while (totalBytesRead < 6000)
+                {
+                    totalBytesRead += stream.Read(buffer2, totalBytesRead, 6000 - totalBytesRead);
+                }
+
+                // Test 5: Send back the received message
+                stream.Write(buffer2, 0, buffer2.Length);
+                Console.WriteLine($"Sent: {replyMessage}");
             }
 
             client.Close();

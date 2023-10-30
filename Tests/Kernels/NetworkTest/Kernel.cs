@@ -165,6 +165,13 @@ namespace NetworkTest
                 xClient.Send(Encoding.ASCII.GetBytes("cosmos is the best operating system uwu"));
                 var data2 = xClient.Receive(ref endpoint);
                 Assert.AreEqual(Encoding.ASCII.GetString(data2), "COSMOS IS THE BEST OPERATING SYSTEM UWU", "TCP send works");
+
+                string baseMessage = "This is a long TCP message for sequencing test...";
+                string paddedMessage = baseMessage.PadRight(6000, '.');
+                xClient.Send(Encoding.ASCII.GetBytes(paddedMessage));
+
+                var data3 = xClient.Receive(ref endpoint);
+                Assert.AreEqual(data3.Length, 6000, "TCP paquet sequencing works.");
             }
         }
     }
