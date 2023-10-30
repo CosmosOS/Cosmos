@@ -121,6 +121,7 @@ namespace NetworkTest
                 **/
                 TestDhcpConnection();
                 TestTcpConnection();
+                TestDnsConnection();
 
                 TestController.Completed();
             }
@@ -191,6 +192,27 @@ namespace NetworkTest
                 var endpoint = new EndPoint(Address.Zero, 0);
                 var data = client.Receive(ref endpoint);
                 Assert.AreEqual(Encoding.ASCII.GetString(data), "Hello from the testrunner again!", "TCP receive works");
+            }
+        }
+
+        private void TestDnsConnection()
+        {
+            Global.debugger.Send("Creating DNS client...");
+
+            using (var xClient = new DnsClient())
+            {
+                xClient.Connect(new Address(1, 1, 1, 1)); //Cloudflare DNS
+
+                xClient.SendAsk("github.com");
+
+                /** Receive DNS Response **/
+                Address destination = xClient.Receive(); //can set a timeout value
+
+                var ip = destination.ToString();
+                Assert.IsTrue(ip != null, "Received IP is valid.");
+                Assert.IsFalse(NetworkConfiguration.CurrentAddress.Equals(Address.Zero), "Received IP is not ZERO, DNS works");
+
+                Global.debugger.Send("IP: " + ip);
             }
         }
     }
