@@ -8,6 +8,7 @@ using Cosmos.System.Network.IPv4.UDP;
 using Cosmos.System.Network.IPv4.UDP.DHCP;
 using Cosmos.System.Network.IPv4.UDP.DNS;
 using Cosmos.TestRunner;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -162,6 +163,8 @@ namespace NetworkTest
                 var data = xClient.Receive(ref endpoint);
                 Assert.AreEqual(Encoding.ASCII.GetString(data), "Hello from the testrunner!", "TCP receive works");
 
+                xClient.Send(Encoding.ASCII.GetBytes(NetworkConfiguration.CurrentAddress.ToString()));
+
                 xClient.Send(Encoding.ASCII.GetBytes("cosmos is the best operating system uwu"));
                 var data2 = xClient.Receive(ref endpoint);
                 Assert.AreEqual(Encoding.ASCII.GetString(data2), "COSMOS IS THE BEST OPERATING SYSTEM UWU", "TCP send works");
@@ -172,6 +175,22 @@ namespace NetworkTest
 
                 var data3 = xClient.Receive(ref endpoint);
                 Assert.AreEqual(data3.Length, 6000, "TCP paquet sequencing works.");
+            }
+
+            Global.debugger.Send("Creating TCP server...");
+
+            using (var xServer = new TcpListener(4343))
+            {
+                xServer.Start();
+                Assert.IsTrue(xServer.IsListening(), "TCP server is listening.");
+
+                var client = xServer.AcceptTcpClient(); //blocking
+                client.Send(Encoding.ASCII.GetBytes("cosmos is the best operating system :3"));
+                Assert.IsTrue(xServer.IsConnected(), "Received new client! TCP connexion established.");
+
+                var endpoint = new EndPoint(Address.Zero, 0);
+                var data = client.Receive(ref endpoint);
+                Assert.AreEqual(Encoding.ASCII.GetString(data), "Hello from the testrunner again!", "TCP receive works");
             }
         }
     }

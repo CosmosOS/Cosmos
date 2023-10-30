@@ -118,7 +118,11 @@ namespace Cosmos.TestRunner.Core
             Console.WriteLine($"IP: {localEndPoint.Address}, Port: {localEndPoint.Port}");
 
             var client = listener.AcceptTcpClient();
+            var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
+            var clientIPAddress = remoteEndPoint.Address;
             Console.WriteLine("Test kernel connected! Beginning tests...");
+
+            IPAddress remoteIPAddress = null;
 
             using (NetworkStream stream = client.GetStream())
             {
@@ -129,6 +133,13 @@ namespace Cosmos.TestRunner.Core
                 Console.WriteLine($"Sent: {testMessage}");
 
                 // Test 2: Receive a message from kernel
+                byte[] bufferIp = new byte[1024];
+                int bytesIpRead = stream.Read(bufferIp, 0, bufferIp.Length);
+                string ip = Encoding.ASCII.GetString(bufferIp, 0, bytesIpRead);
+                remoteIPAddress = IPAddress.Parse(ip);
+                Console.WriteLine($"Received: {ip}");
+
+                // Test 2.2: Receive a message from kernel
                 byte[] buffer = new byte[1024];
                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 string receivedMessage = Encoding.ASCII.GetString(buffer, 0, bytesRead);
@@ -156,6 +167,41 @@ namespace Cosmos.TestRunner.Core
 
             client.Close();
             listener.Stop();
+
+            ConnectToTcpServer(remoteIPAddress);
+        }
+
+        private void ConnectToTcpServer(IPAddress ip)
+        {
+            var xClient = new TcpClient();
+
+            Console.WriteLine("Attempting to connect to the kernel...");
+
+            try
+            {
+                // Test 6: Test TCPListener implementation
+                xClient.Connect(ip, 4343);
+                Console.WriteLine("Connected to the kernel!");
+
+                using (NetworkStream stream = xClient.GetStream())
+                {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    string receivedMessage = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine($"Received: {receivedMessage}");
+
+                    string testMessage = "Hello from the testrunner again!";
+                    byte[] messageBytes = Encoding.ASCII.GetBytes(testMessage);
+                    stream.Write(messageBytes, 0, messageBytes.Length);
+                    Console.WriteLine($"Sent: {testMessage}");
+                }
+
+                xClient.Close();
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine($"Failed to connect to the kernel. Error: {ex.Message}");
+            }
         }
     }
 }

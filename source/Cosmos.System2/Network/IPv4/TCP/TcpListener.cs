@@ -92,6 +92,30 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
         }
 
+        /// <summary>
+        /// Returns a value whether the TCP server is waiting for a connection
+        /// </summary>
+        public bool IsListening()
+        {
+            return StateMachine.Status == Status.LISTEN;
+        }
+
+        /// <summary>
+        /// Returns a value whether the TCP server is connected to a remote host.
+        /// </summary>
+        public bool IsConnected()
+        {
+            return StateMachine.Status == Status.ESTABLISHED;
+        }
+
+        /// <summary>
+        /// Returns a value whether the TCP server is closed
+        /// </summary>
+        public bool IsClosed()
+        {
+            return StateMachine == null || StateMachine.Status == Status.CLOSED;
+        }
+
         public void Dispose()
         {
             Stop();
