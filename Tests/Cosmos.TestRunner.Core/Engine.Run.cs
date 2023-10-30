@@ -122,23 +122,23 @@ namespace Cosmos.TestRunner.Core
 
             using (NetworkStream stream = client.GetStream())
             {
-                // Test 1: Envoyer un simple message
+                // Test 1: Send simple message
                 string testMessage = "Hello from the testrunner!";
                 byte[] messageBytes = Encoding.ASCII.GetBytes(testMessage);
                 stream.Write(messageBytes, 0, messageBytes.Length);
-                Console.WriteLine($"Envoyé: {testMessage}");
+                Console.WriteLine($"Sent: {testMessage}");
 
-                // Test 2: Recevoir un message du client
+                // Test 2: Receive a message from kernel
                 byte[] buffer = new byte[1024];
                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 string receivedMessage = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Reçu: {receivedMessage}");
+                Console.WriteLine($"Received: {receivedMessage}");
 
-                // Test 3: Envoyer une réponse basée sur le message reçu
-                string replyMessage = $"Reçu votre message : {receivedMessage}";
+                // Test 3: Send back the received message, capitalized
+                string replyMessage = receivedMessage.ToUpper();
                 byte[] replyBytes = Encoding.ASCII.GetBytes(replyMessage);
                 stream.Write(replyBytes, 0, replyBytes.Length);
-                Console.WriteLine($"Envoyé: {replyMessage}");
+                Console.WriteLine($"Sent: {replyMessage}");
             }
 
             client.Close();

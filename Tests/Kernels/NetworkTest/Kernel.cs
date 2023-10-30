@@ -156,17 +156,16 @@ namespace NetworkTest
                 Assert.IsTrue(xClient.IsClosed(), "TCP connexion created.");
 
                 xClient.Connect(new Address(127, 0, 0, 1), 12345);
-
                 Assert.IsTrue(xClient.IsConnected(), "TCP connexion established.");
 
-                /** Receive data **/
                 var endpoint = new EndPoint(Address.Zero, 0);
                 var data = xClient.Receive(ref endpoint);
-
                 Assert.AreEqual(Encoding.ASCII.GetString(data), "Hello from the testrunner!", "TCP receive works");
-            }
 
-            Cosmos.HAL.Global.debugger.Send("1 - 2 RemoveConnection");
+                xClient.Send(Encoding.ASCII.GetBytes("cosmos is the best operating system uwu"));
+                var data2 = xClient.Receive(ref endpoint);
+                Assert.AreEqual(Encoding.ASCII.GetString(data2), "COSMOS IS THE BEST OPERATING SYSTEM UWU", "TCP send works");
+            }
         }
     }
 }
