@@ -122,6 +122,7 @@ namespace NetworkTest
                 TestDhcpConnection();
                 TestTcpConnection();
                 TestDnsConnection();
+                TestIcmpConnection();
 
                 TestController.Completed();
             }
@@ -213,6 +214,23 @@ namespace NetworkTest
                 Assert.IsFalse(NetworkConfiguration.CurrentAddress.Equals(Address.Zero), "Received IP is not ZERO, DNS works");
 
                 Global.debugger.Send("IP: " + ip);
+            }
+        }
+
+        private void TestIcmpConnection()
+        {
+            Global.debugger.Send("Creating ICMP client...");
+
+            using (var xClient = new ICMPClient())
+            {
+                xClient.Connect(new Address(127, 0, 0, 1)); //Cloudflare DNS
+
+                xClient.SendEcho();
+
+                var endpoint = new EndPoint(Address.Zero, 0);
+                int time = xClient.Receive(ref endpoint);
+
+                Assert.IsFalse(time == -1, "ICMP echo works");
             }
         }
     }
