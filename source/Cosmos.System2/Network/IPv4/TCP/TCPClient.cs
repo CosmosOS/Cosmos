@@ -236,6 +236,14 @@ namespace Cosmos.System.Network.IPv4.TCP
             return StateMachine.Status == Status.ESTABLISHED;
         }
 
+        /// <summary>
+        /// Returns a value whether the TCP client is closed
+        /// </summary>
+        public bool IsClosed()
+        {
+            return StateMachine.Status == Status.CLOSED;
+        }
+
         public void Dispose()
         {
             Close();

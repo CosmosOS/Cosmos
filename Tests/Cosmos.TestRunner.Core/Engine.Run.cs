@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -49,6 +53,14 @@ namespace Cosmos.TestRunner.Core
 
             RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
 
+            Console.WriteLine("assemblyFileName=" + assemblyFileName);
+
+            if (assemblyFileName.EndsWith("NetworkTest.dll"))
+            {
+                var serverThread = new Thread(StartTcpServer);
+                serverThread.Start();
+            }
+
             switch (configuration.RunTarget)
             {
                 case RunTargetEnum.Bochs:
@@ -93,6 +105,44 @@ namespace Cosmos.TestRunner.Core
             {
                 OutputHandler.TaskEnd(aTaskName);
             }
+        }
+
+        private void StartTcpServer()
+        {
+            var listener = new TcpListener(IPAddress.Loopback, 12345);
+            listener.Start();
+
+            Console.WriteLine("TCP server started in a new thread, waiting connection from test kernel...");
+
+            IPEndPoint localEndPoint = listener.LocalEndpoint as IPEndPoint;
+            Console.WriteLine($"IP: {localEndPoint.Address}, Port: {localEndPoint.Port}");
+
+            var client = listener.AcceptTcpClient();
+            Console.WriteLine("Test kernel connected! Beginning tests...");
+
+            using (NetworkStream stream = client.GetStream())
+            {
+                // Test 1: Envoyer un simple message
+                string testMessage = "Hello from the testrunner!";
+                byte[] messageBytes = Encoding.ASCII.GetBytes(testMessage);
+                stream.Write(messageBytes, 0, messageBytes.Length);
+                Console.WriteLine($"Envoyé: {testMessage}");
+
+                // Test 2: Recevoir un message du client
+                byte[] buffer = new byte[1024];
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                string receivedMessage = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                Console.WriteLine($"Reçu: {receivedMessage}");
+
+                // Test 3: Envoyer une réponse basée sur le message reçu
+                string replyMessage = $"Reçu votre message : {receivedMessage}";
+                byte[] replyBytes = Encoding.ASCII.GetBytes(replyMessage);
+                stream.Write(replyBytes, 0, replyBytes.Length);
+                Console.WriteLine($"Envoyé: {replyMessage}");
+            }
+
+            client.Close();
+            listener.Stop();
         }
     }
 }
