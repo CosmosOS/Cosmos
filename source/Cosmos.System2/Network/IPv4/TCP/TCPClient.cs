@@ -18,6 +18,15 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpClient"/> class.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        /// <exception cref="ArgumentException">Thrown if TcpClient with localPort 0 exists.</exception>
+        public TcpClient() : this(Tcp.GetDynamicPort())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TcpClient"/> class.
+        /// </summary>
         /// <param name="stateMachine">The TCP state machine.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
@@ -32,7 +41,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <param name="localPort">The local port.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if localPort already exists.</exception>
-        public TcpClient(int localPort)
+        internal TcpClient(int localPort)
         {
             StateMachine = new((ushort)localPort, 0, Address.Zero, Address.Zero);
             StateMachine.RxBuffer = new Queue<TCPPacket>(8);
@@ -47,7 +56,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentException">Thrown if TcpClient with localPort 0 exists.</exception>
         public TcpClient(Address dest, int destPort)
-            : this(0)
+            : this(Tcp.GetDynamicPort())
         {
             StateMachine.RemoteEndPoint.Address = dest;
             StateMachine.RemoteEndPoint.Port = (ushort)destPort;

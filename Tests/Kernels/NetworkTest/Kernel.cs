@@ -154,7 +154,7 @@ namespace NetworkTest
         {
             Global.debugger.Send("Creating TCP client...");
 
-            using (var xClient = new TcpClient(4242))
+            using (var xClient = new TcpClient())
             {
                 Assert.IsTrue(xClient.IsClosed(), "TCP connexion created.");
 
