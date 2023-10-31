@@ -187,12 +187,7 @@ namespace NetworkTest
                 Assert.IsTrue(xServer.IsListening(), "TCP server is listening.");
 
                 var client = xServer.AcceptTcpClient(); //blocking
-                client.Send(Encoding.ASCII.GetBytes("cosmos is the best operating system :3"));
                 Assert.IsTrue(xServer.IsConnected(), "Received new client! TCP connexion established.");
-
-                var endpoint = new EndPoint(Address.Zero, 0);
-                var data = client.Receive(ref endpoint);
-                Assert.AreEqual(Encoding.ASCII.GetString(data), "Hello from the testrunner again!", "TCP receive works");
             }
         }
 

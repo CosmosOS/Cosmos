@@ -90,6 +90,21 @@ namespace Cosmos.System.Network.IPv4.TCP
                 Tcp.RemoveConnection(StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address);
                 StateMachine = null;
             }
+            else if (StateMachine.Status == Status.ESTABLISHED)
+            {
+                StateMachine.SendEmptyPacket(Flags.FIN | Flags.ACK);
+
+                StateMachine.TCB.SndNxt++;
+
+                StateMachine.Status = Status.FIN_WAIT1;
+
+                if (StateMachine.WaitStatus(Status.CLOSED, 5000) == false)
+                {
+                    throw new Exception("Failed to close TCP connection!");
+                }
+
+                Tcp.RemoveConnection(StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address);
+            }
         }
 
         /// <summary>
