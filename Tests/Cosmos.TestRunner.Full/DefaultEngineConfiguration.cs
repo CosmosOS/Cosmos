@@ -14,7 +14,7 @@ namespace Cosmos.TestRunner.Full
         {
             get
             {
-                yield return RunTargetEnum.VMware;
+                yield return RunTargetEnum.Bochs;
                 //yield return RunTargetEnum.VMware;
                 //yield return RunTargetEnum.HyperV;
                 //yield return RunTargetEnum.Qemu;
