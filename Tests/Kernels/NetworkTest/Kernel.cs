@@ -143,10 +143,10 @@ namespace NetworkTest
                 xClient.SendDiscoverPacket();
 
                 var ip = NetworkConfiguration.CurrentAddress.ToString();
+                Global.debugger.Send("IP: " + ip);
+
                 Assert.IsTrue(ip != null, "Received IP is valid.");
                 Assert.IsFalse(NetworkConfiguration.CurrentAddress.Equals(Address.Zero), "Received IP is not ZERO, DHCP works");
-
-                Global.debugger.Send("IP: " + NetworkConfiguration.CurrentAddress.ToString());
             }
         }
 
