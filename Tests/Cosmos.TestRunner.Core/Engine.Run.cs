@@ -59,24 +59,28 @@ namespace Cosmos.TestRunner.Core
             {
                 var serverThread = new Thread(StartTcpServer);
                 serverThread.Start();
-            }
 
-            switch (configuration.RunTarget)
+                RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
+            }
+            else
             {
-                case RunTargetEnum.Bochs:
-                    RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath, workingDirectory));
-                    break;
-                case RunTargetEnum.Qemu:
-                    RunTask("RunISO", () => RunIsoInQemu(xIsoFile, xHarddiskPath, workingDirectory));
-                    break;
-                case RunTargetEnum.VMware:
-                    RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
-                    break;
-                case RunTargetEnum.HyperV:
-                    RunTask("RunISO", () => RunIsoInHyperV(xIsoFile, xHarddiskPath));
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");
+                switch (configuration.RunTarget)
+                {
+                    case RunTargetEnum.Bochs:
+                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath, workingDirectory));
+                        break;
+                    case RunTargetEnum.Qemu:
+                        RunTask("RunISO", () => RunIsoInQemu(xIsoFile, xHarddiskPath, workingDirectory));
+                        break;
+                    case RunTargetEnum.VMware:
+                        RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
+                        break;
+                    case RunTargetEnum.HyperV:
+                        RunTask("RunISO", () => RunIsoInHyperV(xIsoFile, xHarddiskPath));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");
+                }
             }
 
             OutputHandler.ExecuteKernelEnd(assemblyFileName);
