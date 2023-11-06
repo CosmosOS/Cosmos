@@ -189,7 +189,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// String / enum correspondance (used for debugging)
         /// </summary>
-        internal static string[] Table;
+        internal static readonly string[] Table;
 
         static Tcp()
         {
@@ -314,7 +314,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            NetworkStack.Debugger.Send("[" + Table[(int)Status] + "] " + packet.ToString());
+            Cosmos.HAL.Global.debugger.Send("[" + Table[(int)Status] + "] " + packet.ToString());
 
             /*if (Status == Status.CLOSED)
             {

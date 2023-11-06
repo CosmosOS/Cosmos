@@ -469,7 +469,9 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <returns>string value.</returns>
         public override string ToString()
         {
-            return $"TCP Packet {SourceIP}:{SourcePort} -> {DestinationIP}:{DestinationPort} (flags={getFlags()}, seq={SequenceNumber}, ack={AckNumber})";
+            return "TCP Packet " + SourceIP + ":" + SourcePort +
+                " -> " + DestinationIP + ":" + DestinationPort + " (flags=" + getFlags() +
+                ", seq=" + SequenceNumber + ", ack=" + AckNumber + ")";
         }
     }
 }
