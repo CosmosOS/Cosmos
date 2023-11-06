@@ -30,7 +30,9 @@ namespace Cosmos.TestRunner.Full
 
             //yield return typeof(KernelGen3.Boot);
             yield return typeof(GraphicTest.Kernel);
-            yield return typeof(NetworkTest.Kernel);
+
+            // Disable network tests due to our self hosted CI/CD limitations (VPS currently doesn't support VMWare with its CPU)
+            //yield return typeof(NetworkTest.Kernel);
             yield return typeof(AudioTests.Kernel);
             // Please see the notes on the kernel itself before enabling it
             //yield return typeof(ConsoleTest.Kernel);
