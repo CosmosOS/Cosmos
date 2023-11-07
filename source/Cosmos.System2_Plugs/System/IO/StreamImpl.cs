@@ -11,6 +11,11 @@ namespace Cosmos.System_Plugs.System.IO
     [Plug(Target = typeof(Stream))]
     public static class StreamImpl
     {
+        public static int Read(Stream aThis, Span<byte> buffer)
+        {
+            throw new NotImplementedException();
+        }
+
         public static void Dispose(Stream aThis)
         {
             throw new NotImplementedException();
