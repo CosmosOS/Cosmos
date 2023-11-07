@@ -25,10 +25,5 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         {
             throw new NotImplementedException();
         }
-
-        public static void Dispose(NetworkStream aThis)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
