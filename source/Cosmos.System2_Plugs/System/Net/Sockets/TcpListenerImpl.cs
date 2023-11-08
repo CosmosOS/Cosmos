@@ -12,9 +12,37 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
     [Plug(Target = typeof(TcpListener))]
     public static class TcpListenerImpl
     {
+        private static Socket? _serverSocket;
+        private static IPEndPoint _serverSocketEP;
+
+        public static void Ctor(TcpListener aThis, IPEndPoint localEP)
+        {
+            if (localEP == null)
+            {
+                throw new ArgumentNullException(nameof(localEP));
+            }
+            _serverSocketEP = localEP;
+            _serverSocket = new Socket(_serverSocketEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        }
+
         public static void Ctor(TcpListener aThis, IPAddress localaddr, int port)
         {
-            throw new NotImplementedException();
+            Cosmos.HAL.Global.debugger.Send("TcpListener - ctor.");
+
+            if (localaddr == null)
+            {
+                throw new ArgumentNullException(nameof(localaddr));
+            }
+
+            Cosmos.HAL.Global.debugger.Send("TcpListener - localaddr ok.");
+
+            _serverSocketEP = new IPEndPoint(localaddr, port);
+
+            Cosmos.HAL.Global.debugger.Send("TcpListener - _serverSocketEP ok.");
+
+            _serverSocket = new Socket(_serverSocketEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+            Cosmos.HAL.Global.debugger.Send("TcpListener - _serverSocket ok.");
         }
 
         public static void Start(TcpListener aThis)
