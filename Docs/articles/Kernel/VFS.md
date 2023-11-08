@@ -45,7 +45,7 @@ Console.WriteLine("Available Free Space: " + available_space);
 You have probably noticed the "0:\" argument passed to this function, this is the id of the drive that we want to get available free space of.
 Cosmos using DOS drive naming system and this is why we use "0".
 
-**Attention**: Typing "0:/" instead of "0:\" might lead to errors, you've been warned.
+**Attention**: Typing "0:/" instead of "0:\\" might lead to errors, you've been warned.
 
 ## Get file system type
 

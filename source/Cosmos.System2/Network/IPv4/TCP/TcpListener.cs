@@ -90,6 +90,45 @@ namespace Cosmos.System.Network.IPv4.TCP
                 Tcp.RemoveConnection(StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address);
                 StateMachine = null;
             }
+            else if (StateMachine.Status == Status.ESTABLISHED)
+            {
+                StateMachine.SendEmptyPacket(Flags.FIN | Flags.ACK);
+
+                StateMachine.TCB.SndNxt++;
+
+                StateMachine.Status = Status.FIN_WAIT1;
+
+                if (StateMachine.WaitStatus(Status.CLOSED, 5000) == false)
+                {
+                    throw new Exception("Failed to close TCP connection!");
+                }
+
+                Tcp.RemoveConnection(StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address);
+            }
+        }
+
+        /// <summary>
+        /// Returns a value whether the TCP server is waiting for a connection
+        /// </summary>
+        public bool IsListening()
+        {
+            return StateMachine.Status == Status.LISTEN;
+        }
+
+        /// <summary>
+        /// Returns a value whether the TCP server is connected to a remote host.
+        /// </summary>
+        public bool IsConnected()
+        {
+            return StateMachine.Status == Status.ESTABLISHED;
+        }
+
+        /// <summary>
+        /// Returns a value whether the TCP server is closed
+        /// </summary>
+        public bool IsClosed()
+        {
+            return StateMachine == null || StateMachine.Status == Status.CLOSED;
         }
 
         public void Dispose()
