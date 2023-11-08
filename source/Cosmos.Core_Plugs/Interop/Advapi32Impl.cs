@@ -94,5 +94,11 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Advapi32_EventSetInformation_System_Int64__Interop_Advapi32_EVENT_INFO_CLASS__System_Void___System_UInt32_")]
+        public static unsafe int EventSetInformation(long registrationHandle, object informationClass, void* eventInformation, uint informationLength)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
