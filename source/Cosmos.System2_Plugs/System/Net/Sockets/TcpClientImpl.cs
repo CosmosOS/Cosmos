@@ -17,9 +17,13 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             Cosmos.HAL.Global.debugger.Send("TcpClient - ctor.");
         }
 
-        public static void Ctor(TcpClient aThis, Socket acceptedSocket)
+        public static void Ctor(TcpClient aThis, Socket acceptedSocket, [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpClient._clientSocket")] ref Socket _clientSocket)
         {
-            Cosmos.HAL.Global.debugger.Send("TcpClient - ctor.");
+            Cosmos.HAL.Global.debugger.Send("TcpClient - ctor socket.");
+
+            _clientSocket = acceptedSocket;
+
+            Cosmos.HAL.Global.debugger.Send("TcpClient - ctor socket " + (acceptedSocket.RemoteEndPoint as IPEndPoint).Port + ":" + (acceptedSocket.RemoteEndPoint as IPEndPoint).Port);
         }
 
         public static int get_ReceiveBufferSize(TcpClient aThis)
@@ -32,9 +36,13 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             throw new NotImplementedException();
         }
 
-        public static void Dispose(TcpClient aThis)
+        public static void Dispose(TcpClient aThis, [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpClient._clientSocket")] ref Socket _clientSocket)
         {
-            throw new NotImplementedException();
+            Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose");
+
+            _clientSocket.Close();
+
+            Cosmos.HAL.Global.debugger.Send("TcpClient - Closed");
         }
     }
 }

@@ -184,7 +184,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// A list of currently active connections.
         /// </summary>
-        internal static List<Tcp> Connections;
+        public static List<Tcp> Connections;
 
         /// <summary>
         /// String / enum correspondance (used for debugging)
@@ -248,7 +248,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <remarks>
         /// If a connection is found that matches the local and remote ports and addresses, it will be removed from the list of connections.
         /// </remarks>
-        internal static void RemoveConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
+        public static void RemoveConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
             for (int i = 0; i < Connections.Count; i++)
             {
@@ -280,14 +280,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// The connection Transmission Control Block.
         /// </summary>
-        internal TransmissionControlBlock TCB { get; set; }
+        public TransmissionControlBlock TCB { get; set; }
 
         #endregion
 
         /// <summary>
         /// The RX buffer queue.
         /// </summary>
-        internal Queue<TCPPacket> RxBuffer;
+        public Queue<TCPPacket> RxBuffer;
 
         /// <summary>
         /// The connection status.
@@ -714,7 +714,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Waits for a new TCP connection status.
         /// </summary>
-        internal bool WaitStatus(Status status, int timeout)
+        public bool WaitStatus(Status status, int timeout)
         {
             int second = 0;
             int _deltaT = 0;
@@ -737,7 +737,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Waits for a new TCP connection status (blocking).
         /// </summary>
-        internal bool WaitStatus(Status status)
+        public bool WaitStatus(Status status)
         {
             while (Status != status);
 
@@ -747,7 +747,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Sends an empty packet.
         /// </summary>
-        internal void SendEmptyPacket(Flags flag)
+        public void SendEmptyPacket(Flags flag)
         {
             SendPacket(new TCPPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
         }
