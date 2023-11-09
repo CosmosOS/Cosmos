@@ -21,5 +21,10 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        public static int bind(SafeSocketHandle socketHandle, byte[] socketAddress, int socketAddressSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

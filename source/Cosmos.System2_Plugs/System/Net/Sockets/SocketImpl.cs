@@ -11,6 +11,11 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
     [Plug(Target = typeof(Socket))]
     public static class SocketImpl
     {
+        public static void Ctor(Socket aThis, SocketType socketType, ProtocolType protocolType)
+        {
+            Cosmos.HAL.Global.debugger.Send("Socket - ctor.");
+        }
+
         public static void Ctor(Socket aThis, AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
         {
             Cosmos.HAL.Global.debugger.Send("Socket - ctor.");
@@ -18,7 +23,8 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static Socket Accept(Socket aThis)
         {
-            throw new NotImplementedException();
+            Cosmos.HAL.Global.debugger.Send("Socket - Accept.");
+            return null;
         }
 
         public static int Send(Socket aThis, ReadOnlySpan<byte> buffer, SocketFlags socketFlags)

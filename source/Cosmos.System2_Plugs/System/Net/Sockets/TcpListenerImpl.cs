@@ -15,6 +15,8 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         private static Socket? _serverSocket;
         private static IPEndPoint _serverSocketEP;
 
+        private static Cosmos.System.Network.IPv4.TCP.TcpListener tcpListener;
+
         public static void Ctor(TcpListener aThis, IPEndPoint localEP)
         {
             if (localEP == null)
@@ -23,6 +25,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             }
             _serverSocketEP = localEP;
             _serverSocket = new Socket(_serverSocketEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            tcpListener = new Cosmos.System.Network.IPv4.TCP.TcpListener((ushort)localEP.Port);
         }
 
         public static void Ctor(TcpListener aThis, IPAddress localaddr, int port)
@@ -42,17 +45,32 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
             _serverSocket = new Socket(_serverSocketEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
+            tcpListener = new Cosmos.System.Network.IPv4.TCP.TcpListener((ushort)port);
+
             Cosmos.HAL.Global.debugger.Send("TcpListener - _serverSocket ok.");
         }
 
         public static void Start(TcpListener aThis)
         {
-            throw new NotImplementedException();
+            tcpListener.Start();
         }
 
         public static TcpClient AcceptTcpClient(TcpListener aThis)
         {
-            throw new NotImplementedException();
+            if (!tcpListener.IsListening())
+            {
+                throw new InvalidOperationException("TcpListener not active.");
+            }
+
+            Cosmos.HAL.Global.debugger.Send("TcpListener - accepting client.");
+
+            var client = tcpListener.AcceptTcpClient();
+
+            Cosmos.HAL.Global.debugger.Send("TcpListener - AcceptTcpClient ok.");
+
+            var realClient = new TcpClient();
+            realClient.Client = _serverSocket;
+            return realClient;
         }
     }
 }

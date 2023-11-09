@@ -161,7 +161,7 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Convert this address to a 32-bit number.
         /// </summary>
-        private uint ToUInt32()
+        public uint ToUInt32()
         {
             return (uint)((Parts[0] << 24) | (Parts[1] << 16) | (Parts[2] << 8) | (Parts[3] << 0));
         }
