@@ -17,12 +17,32 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static void Ctor(Socket aThis, SocketType socketType, ProtocolType protocolType)
         {
+            CheckSocket(aThis, socketType, protocolType);
+
             Cosmos.HAL.Global.debugger.Send("Socket - ctor.");
         }
 
         public static void Ctor(Socket aThis, AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
         {
+            CheckSocket(aThis, socketType, protocolType);
+
             Cosmos.HAL.Global.debugger.Send("Socket - ctor.");
+        }
+
+        public static void CheckSocket(Socket aThis, SocketType socketType, ProtocolType protocolType)
+        {
+            if (socketType != SocketType.Stream)
+            {
+                throw new NotImplementedException("Only stream sockets implemented.");
+            }
+            if (protocolType == ProtocolType.Udp)
+            {
+                throw new NotImplementedException("Only TCP sockets supported. UDP Coming soon ;)");
+            }
+            else if (protocolType != ProtocolType.Tcp)
+            {
+                throw new NotImplementedException("Only TCP sockets supported.");
+            }
         }
 
         public static void Bind(Socket aThis, EndPoint localEP)
