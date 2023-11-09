@@ -12,13 +12,42 @@ namespace Cosmos.System_Plugs.System.Net
     [Plug(Target = typeof(IPAddress))]
     public static class IPAddressImpl
     {
-        public static void Ctor(IPAddress aThis, ReadOnlySpan<byte> address, [FieldAccess(Name = "System.Net.IPAddress System.Net.IPAddress.Any")] ref IPAddress aAny)
+        private const int IPv4AddressBytes = 4;
+        private const int IPv6AddressBytes = 16;
+        private static uint PrivateAddress;
+
+        public static uint get_PrivateAddress()
+        {
+            return PrivateAddress;
+        }
+
+        public static void set_PrivateAddress(uint address)
+        {
+            PrivateAddress = address;
+        }
+
+        public static void Ctor(IPAddress aThis, ReadOnlySpan<byte> address)
         {
             Cosmos.HAL.Global.debugger.Send("IPAddress - ctor.");
-
             
+            if (address.Length == IPv4AddressBytes)
+            {
+                PrivateAddress = (uint)(address[0] << 24 | address[1] << 16 | address[2] << 8 | address[3]);
+            }
+            else if (address.Length == IPv6AddressBytes)
+            {
+                throw new NotImplementedException("IPv6 not supported yet!");
+            }
+            else
+            {
+                throw new ArgumentException("Bad IP address format", nameof(address));
+            }
 
-            Cosmos.HAL.Global.debugger.Send("IPAddress - aAny set.");
+            Cosmos.HAL.Global.debugger.Send("IPAddress - " + address[0] + "." + address[1] + "." + address[2] + "." + address[3] + " set.");
+        }
+
+        public static void Ctor(IPAddress aThis, ReadOnlySpan<byte> address, long scopeId)
+        {
         }
     }
 }
