@@ -55,9 +55,11 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return _streamSocket.Receive(buffer, offset, count, 0);
         }
 
-        public static int Write(NetworkStream aThis, byte[] buffer, int offset, int count)
+        public static int Write(NetworkStream aThis, byte[] buffer, int offset, int count, [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.NetworkStream._streamSocket")] ref Socket _streamSocket)
         {
-            throw new NotImplementedException();
+            Cosmos.HAL.Global.debugger.Send("NetworkStream - Write.");
+
+            return _streamSocket.Send(buffer, offset, count, 0);
         }
 
         public static void Flush(NetworkStream aThis)

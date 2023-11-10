@@ -4,6 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Cosmos.System.Helpers;
+using Cosmos.System.Network.IPv4;
+using Cosmos.System.Network;
 using Cosmos.System.Network.IPv4.TCP;
 using IL2CPU.API.Attribs;
 
@@ -119,11 +122,48 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         public static void Connect(Socket aThis, IPAddress address, int port)
         {
             Cosmos.HAL.Global.debugger.Send("Socket - Connect.");
+
+            throw new NotImplementedException();
         }
 
         public static int Send(Socket aThis, ReadOnlySpan<byte> buffer, SocketFlags socketFlags)
         {
             throw new NotImplementedException();
+        }
+
+        public static int Send(Socket aThis, byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        {
+            if (StateMachine.RemoteEndPoint.Address == null || StateMachine.RemoteEndPoint.Port == 0)
+            {
+                throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
+            }
+            if (StateMachine.Status != Status.ESTABLISHED)
+            {
+                throw new Exception("Client must be connected before sending data.");
+            }
+            if (buffer.Length > 536)
+            {
+                var chunks = ArrayHelper.ArraySplit(buffer, 536);
+
+                for (int i = 0; i < chunks.Length; i++)
+                {
+                    var packet = new TCPPacket(StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address, StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, i == chunks.Length - 2 ? (byte)(Flags.PSH | Flags.ACK) : (byte)Flags.ACK, StateMachine.TCB.SndWnd, 0, chunks[i]);
+                    OutgoingBuffer.AddPacket(packet);
+                    NetworkStack.Update();
+
+                    StateMachine.TCB.SndNxt += (uint)chunks[i].Length;
+                }
+            }
+            else
+            {
+                var packet = new TCPPacket(StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address, StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.TCB.SndNxt, StateMachine.TCB.RcvNxt, 20, (byte)(Flags.PSH | Flags.ACK), StateMachine.TCB.SndWnd, 0, data);
+                OutgoingBuffer.AddPacket(packet);
+                NetworkStack.Update();
+
+                StateMachine.TCB.SndNxt += (uint)buffer.Length;
+            }
+
+            return 0;
         }
 
         public static int Receive(Socket aThis, Span<byte> buffer, SocketFlags socketFlags)
