@@ -28,12 +28,28 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static int get_ReceiveBufferSize(TcpClient aThis)
         {
-            throw new NotImplementedException();
+            //TODO implement Socket.SetSocketOption Socket.GetSocketOption
+            return 8192;
         }
 
-        public static NetworkStream GetStream(TcpClient aThis)
+        public static NetworkStream GetStream(TcpClient aThis, [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpClient._clientSocket")] ref Socket _clientSocket,
+            [FieldAccess(Name = "System.Net.Sockets.NetworkStream System.Net.Sockets.TcpClient._dataStream")] ref NetworkStream _dataStream)
         {
-            throw new NotImplementedException();
+            Cosmos.HAL.Global.debugger.Send("TcpClient - GetStream");
+
+            if (_clientSocket == null)
+            {
+                Cosmos.HAL.Global.debugger.Send("TcpClient - GetStream _clientSocket null");
+                throw new NullReferenceException();
+            }
+            if (_dataStream == null)
+            {
+                _dataStream = new NetworkStream(_clientSocket, true);
+            }
+
+            Cosmos.HAL.Global.debugger.Send("TcpClient - Created network stream");
+
+            return _dataStream;
         }
 
         public static void Dispose(TcpClient aThis, [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpClient._clientSocket")] ref Socket _clientSocket)

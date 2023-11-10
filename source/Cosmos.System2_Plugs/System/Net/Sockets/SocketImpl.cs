@@ -45,6 +45,22 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             }
         }
 
+        public static bool get_Connected(Socket aThis)
+        {
+            Cosmos.HAL.Global.debugger.Send("Socket - get_Connected.");
+
+            Cosmos.HAL.Global.debugger.Send("Socket - StateMachine.Status=" + Tcp.Table[(int)StateMachine.Status] );
+
+            return StateMachine.Status == Status.ESTABLISHED;
+        }
+
+        public static bool Poll(Socket aThis, int microSeconds, SelectMode mode)
+        {
+            Cosmos.HAL.Global.debugger.Send("Socket - Poll.");
+
+            return StateMachine.Status == Status.ESTABLISHED;
+        }
+
         public static void Bind(Socket aThis, EndPoint localEP)
         {
             Cosmos.HAL.Global.debugger.Send("Socket - Bind.");
@@ -112,7 +128,41 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static int Receive(Socket aThis, Span<byte> buffer, SocketFlags socketFlags)
         {
-            throw new NotImplementedException();
+            Cosmos.HAL.Global.debugger.Send("Socket - Receive Span<byte>.");
+
+            return 0;
+        }
+
+        public static int Receive(Socket aThis, byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        {
+            Cosmos.HAL.Global.debugger.Send("Socket - Receive byte[].");
+
+            while (StateMachine.Data == null || StateMachine.Data.Length == 0)
+            {
+                if (StateMachine.Status != Status.ESTABLISHED)
+                {
+                    throw new Exception("Client must be connected before receiving data.");
+                }
+            }
+
+            StateMachine.RxBuffer.Dequeue();
+
+            // Copy received buffer data in buffer arg
+            Cosmos.HAL.Global.debugger.Send("Socket - Receive StateMachine.Data.Length=" + StateMachine.Data.Length);
+            Cosmos.HAL.Global.debugger.Send("Socket - Receive size=" + size);
+            int bytesToCopy = Math.Min(StateMachine.Data.Length, size);
+            Cosmos.HAL.Global.debugger.Send("Socket - Receive bytesToCopy=" + bytesToCopy);
+            Buffer.BlockCopy(StateMachine.Data, 0, buffer, offset, bytesToCopy);
+            Cosmos.HAL.Global.debugger.Send("Socket - Receive copied to buffer");
+
+            // Update buffer data by deleting read data
+            byte[] remainingData = new byte[StateMachine.Data.Length - bytesToCopy];
+            Buffer.BlockCopy(StateMachine.Data, bytesToCopy, remainingData, 0, remainingData.Length);
+            StateMachine.Data = remainingData;
+
+            Cosmos.HAL.Global.debugger.Send("Socket - Receive moved data.");
+
+            return bytesToCopy;
         }
 
         public static void Close(Socket aThis)

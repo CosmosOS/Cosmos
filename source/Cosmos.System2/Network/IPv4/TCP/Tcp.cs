@@ -189,7 +189,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// String / enum correspondance (used for debugging)
         /// </summary>
-        internal static readonly string[] Table;
+        public static readonly string[] Table;
 
         static Tcp()
         {
@@ -297,7 +297,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// The received data buffer.
         /// </summary>
-        internal byte[] Data { get; set; }
+        public byte[] Data { get; set; }
 
         public Tcp(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
