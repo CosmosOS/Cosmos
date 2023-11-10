@@ -64,5 +64,15 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         {
             throw new NotImplementedException();
         }
+
+        public static void Dispose(NetworkStream aThis)
+        {
+            Cosmos.HAL.Global.debugger.Send("NetworkStream - Dispose.");
+        }
+
+        public static void Dispose(NetworkStream aThis, bool disposing)
+        {
+            Cosmos.HAL.Global.debugger.Send("NetworkStream - Dispose.");
+        }
     }
 }

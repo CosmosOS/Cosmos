@@ -141,7 +141,8 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             {
                 if (StateMachine.Status != Status.ESTABLISHED)
                 {
-                    throw new Exception("Client must be connected before receiving data.");
+                    Cosmos.HAL.Global.debugger.Send("Socket - Client must be connected before receiving data..");
+                    return 0;
                 }
             }
 
