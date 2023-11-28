@@ -16,6 +16,7 @@
     <PackageReference Include="NuGet.Configuration" Version="6.8.0" />
     <PackageReference Include="NuGet.Frameworks" Version="6.8.0" />
     <PackageReference Include="System.Runtime.WindowsRuntime" Version="5.0.0-preview.5.20278.1" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageReference Include="WPF-UI" Version="3.0.0-preview.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
