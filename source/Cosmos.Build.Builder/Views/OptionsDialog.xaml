@@ -29,26 +29,14 @@
         <StackPanel Grid.Row="0"
                     Margin="8">
 
-            <ListView MinHeight="196"
-                      MinWidth="256"
-                      ItemsSource="{Binding VisualStudioInstances}"
-                      SelectedItem="{Binding SelectedVisualStudioInstance, Mode=TwoWay}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="ID" DisplayMemberBinding="{Binding ID}" />
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
-                        <GridViewColumn Header="Installation Path" DisplayMemberBinding="{Binding InstallationPath}" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <CheckBox x:Name="chkBuildExtensions" IsChecked="True">Install Visual Studio Extensions</CheckBox>
+            <CheckBox x:Name="chkBuildUserkit">Build a userkit</CheckBox>
 
             <StackPanel Grid.Row="2"
                         HorizontalAlignment="Right"
                         Margin="0,8,0,0"
                         Orientation="Horizontal">
-                <Button Command="{Binding OkCommand}"
-                        CommandParameter="{Binding ElementName=buildOptionsDialog}"
-                        Content="OK" Margin="0,0,5,0"/>
+                <Button Content="OK" Margin="0,0,5,0" Click="OkButton_Click"/>
             </StackPanel>
 
         </StackPanel>

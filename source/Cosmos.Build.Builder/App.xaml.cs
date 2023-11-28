@@ -26,12 +26,14 @@ namespace Cosmos.Build.Builder
             }
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            CommandLineBuilderConfiguration configuration = new(e.Args);
-
-            BuilderConfiguration = configuration;
-
             MainWindow = new MainWindow();
+
+            // ask for build configuration
+            OptionsDialog options = new();
+            options.ShowDialog();
+
+            BuilderConfiguration = options.BuildOptions;
+
 
             VisualStudioService visualStudioService = new();
 
@@ -44,15 +46,6 @@ namespace Cosmos.Build.Builder
             }
 
             ISetupInstance2 visualStudioInstance = null;
-
-            if (configuration.VsPath != null)
-            {
-                visualStudioInstance = visualStudioInstances.FirstOrDefault(
-                    i => string.Equals(
-                        Path.GetFullPath(configuration.VsPath),
-                        Path.GetFullPath(i.GetInstallationPath()),
-                        StringComparison.Ordinal));
-            }
 
             if (visualStudioInstance == null)
             {

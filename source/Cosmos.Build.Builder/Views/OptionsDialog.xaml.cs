@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Cosmos.Build.Builder.BuildTasks;
+using Wpf.Ui.Appearance;
 
 namespace Cosmos.Build.Builder.Views
 {
@@ -19,9 +21,21 @@ namespace Cosmos.Build.Builder.Views
     /// </summary>
     public partial class OptionsDialog : Window
     {
+        internal BuilderConfiguration BuildOptions { get; private set; }
         public OptionsDialog()
         {
             InitializeComponent();
+            SystemThemeWatcher.Watch(this);
+        }
+
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            BuildOptions = new()
+            {
+                BuildExtensions = chkBuildExtensions.IsChecked.Value,
+                UserKit = chkBuildUserkit.IsChecked.Value
+            };
+            DialogResult = true;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using Wpf.Ui.Appearance;
 using Clipboard = System.Windows.Clipboard;
 
 namespace Cosmos.Build.Builder.Views
@@ -17,6 +18,7 @@ namespace Cosmos.Build.Builder.Views
         public MainWindow()
         {
             InitializeComponent();
+            SystemThemeWatcher.Watch(this);
         }
 
         private void SectionTextCopyHandler(object sender, System.Windows.Input.MouseButtonEventArgs e)
