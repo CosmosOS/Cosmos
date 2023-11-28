@@ -10,7 +10,7 @@
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         Title="Choose Build Options"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}">
     <Window.Resources>
