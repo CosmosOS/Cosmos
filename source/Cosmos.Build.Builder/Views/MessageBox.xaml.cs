@@ -10,10 +10,6 @@ namespace Cosmos.Build.Builder.Views
         public MessageBox(string Content)
         {
             InitializeComponent();
-            Loaded += (sender, args) =>
-            {
-                Wpf.Ui.Appearance.Watcher.Watch(this, Wpf.Ui.Appearance.BackgroundType.Mica, true);
-            };
 
             if (Content.StartsWith("link:"))
             {

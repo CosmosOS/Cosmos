@@ -83,6 +83,7 @@ namespace Cosmos.Build.Builder.ViewModels
             win.Show();
             _dependencyInstallationDialogService.SetAnotherOwner(win);
             Window.AppShutdown = false;
+            Window.ShowCloseBuilderDialog = false;
             Window.Close();
             win.DataContext = new MainWindowViewModel(_dependencyInstallationDialogService, _buildDefinition, win);
         }
