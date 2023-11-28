@@ -1,23 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0-windows7.0</TargetFramework>
-    <OutputType>WinExe</OutputType>
-    <ApplicationIcon>Resources\Cosmos.ico</ApplicationIcon>
-     <UseWPF>True</UseWPF>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <ItemGroup>
-    <Resource Include="Resources\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="3.8.2112" />
-    <PackageReference Include="NuGet.Common" Version="6.8.0" />
-    <PackageReference Include="NuGet.Configuration" Version="6.8.0" />
-    <PackageReference Include="NuGet.Frameworks" Version="6.8.0" />
-    <PackageReference Include="System.Runtime.WindowsRuntime" Version="5.0.0-preview.5.20278.1" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-    <PackageReference Include="WPF-UI" Version="3.0.0-preview.11" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0-windows7.0</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <ApplicationIcon>Resources\Cosmos.ico</ApplicationIcon>
+        <UseWPF>True</UseWPF>
+        <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <SignAssembly>False</SignAssembly>
+    </PropertyGroup>
+    <ItemGroup>
+        <Resource Include="Resources\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="3.8.2112" />
+        <PackageReference Include="NuGet.Common" Version="6.8.0" />
+        <PackageReference Include="NuGet.Configuration" Version="6.8.0" />
+        <PackageReference Include="NuGet.Frameworks" Version="6.8.0" />
+        <PackageReference Include="System.Runtime.WindowsRuntime" Version="5.0.0-preview.5.20278.1" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+        <PackageReference Include="WPF-UI" Version="3.0.0-preview.11" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
 </Project>
