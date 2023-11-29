@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ApprovalTestsVersion>3.0.18</ApprovalTestsVersion>
         <AvaloniaVersion>0.7.0</AvaloniaVersion>
-        <NuGetVersion>5.9.1</NuGetVersion>
+        <NuGetVersion>6.8.0</NuGetVersion>
         <NUnitVersion>3.11.0</NUnitVersion>
         <NUnit3TestAdapterVersion>3.12.0</NUnit3TestAdapterVersion>
         <RoslynAnalyzersVersion>2.6.2</RoslynAnalyzersVersion>

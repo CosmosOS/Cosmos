@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace Cosmos.Build.Builder.Views
@@ -8,10 +9,7 @@ namespace Cosmos.Build.Builder.Views
         public VisualStudioInstanceDialog()
         {
             InitializeComponent();
-            Loaded += (sender, args) =>
-            {
-                Wpf.Ui.Appearance.Watcher.Watch(this, Wpf.Ui.Appearance.BackgroundType.Mica, true);
-            };
+            SystemThemeWatcher.Watch(this);
         }
     }
 }
