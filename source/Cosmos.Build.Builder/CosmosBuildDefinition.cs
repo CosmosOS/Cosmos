@@ -163,7 +163,8 @@ namespace Cosmos.Build.Builder
                 _innoSetupService,
                 innoSetupScriptPath,
                 App.BuilderConfiguration.UserKit ? "UserKit" : "DevKit",
-                cosmosSetupVersion);
+                cosmosSetupVersion,
+                App.BuilderConfiguration.BuildExtensions);
 
             if (!App.BuilderConfiguration.UserKit)
             {

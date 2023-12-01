@@ -2,23 +2,23 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using Wpf.Ui.Common;
-using Wpf.Ui.Controls;
+using Wpf.Ui.Appearance;
 using Clipboard = System.Windows.Clipboard;
 
 namespace Cosmos.Build.Builder.Views
 {
-    public partial class MainWindow : UiWindow
+    public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     {
         public bool AppShutdown = true;
 
         public bool AllTasksCompleted;
 
+        public bool ShowCloseBuilderDialog = true;
+
         public MainWindow()
         {
             InitializeComponent();
-
-            Loaded += (_, _) => Wpf.Ui.Appearance.Watcher.Watch(this);
+            SystemThemeWatcher.Watch(this);
         }
 
         private void SectionTextCopyHandler(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -26,30 +26,25 @@ namespace Cosmos.Build.Builder.Views
             Clipboard.SetText(((TextBlock)sender).Text);
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        protected override async void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
 
-            if (!AllTasksCompleted)
+            if (!AllTasksCompleted && ShowCloseBuilderDialog)
             {
                 e.Cancel = true;
 
                 Wpf.Ui.Controls.MessageBox messageBox = new()
                 {
-                    Content = "You're about to close the builder, however tasks are still running. Do you wish to continue?",
-                    SizeToContent = SizeToContent.Width,
-                    ButtonLeftAppearance = ControlAppearance.Secondary,
-                    ButtonLeftName = "Yes",
-                    ButtonRightAppearance = ControlAppearance.Primary,
-                    ButtonRightName = "No"
+                    Title = "Warning",
+                    Content = $"You're about to close the builder, however tasks are still running.{Environment.NewLine}Do you wish to continue?",
+                    PrimaryButtonText = "Yes",
+                    CloseButtonText = "No"
                 };
-                messageBox.ButtonLeftClick += (_, _) =>
+                if (await messageBox.ShowDialogAsync() == Wpf.Ui.Controls.MessageBoxResult.Primary)
                 {
-                    messageBox.Close();
-                    Application.Current.Dispatcher.Invoke(() => Application.Current?.MainWindow?.Close());
-                };
-                messageBox.ButtonRightClick += (_, _) => messageBox.Close();
-                messageBox.ShowDialog();
+                    e.Cancel = false;
+                }
             }
         }
 
