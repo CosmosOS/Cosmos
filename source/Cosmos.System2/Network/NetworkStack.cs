@@ -131,7 +131,7 @@ namespace Cosmos.System.Network
         /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
         /// <exception cref="OverflowException">Thrown on fatal error.</exception>
-        internal static void HandlePacket(byte[] packetData)
+        public static void HandlePacket(byte[] packetData)
         {
             if (packetData == null)
             {

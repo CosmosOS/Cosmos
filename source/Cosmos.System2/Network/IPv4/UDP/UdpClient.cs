@@ -1,6 +1,7 @@
 ﻿using Cosmos.System.Network.Config;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Cosmos.System.Network.IPv4.UDP
 {
@@ -9,6 +10,27 @@ namespace Cosmos.System.Network.IPv4.UDP
     /// </summary>
     public class UdpClient : IDisposable
     {
+        public static ushort DynamicPortStart = 49152;
+
+        private static Random dynamicPortStartRandom = new Random();
+
+        /// <summary>
+        /// gets a random port
+        /// </summary>
+        /// <param name="tries"></param>
+        /// <returns></returns>
+        public static ushort GetDynamicPort(int tries = 10)
+        {
+            for (int i = 0; i < tries; i++)
+            {
+
+                var port = (ushort)dynamicPortStartRandom.Next(DynamicPortStart, ushort.MaxValue);
+                if (!clients.ContainsKey(port)) return port;
+
+            }
+
+            return 0;
+        }
         private readonly static Dictionary<uint, UdpClient> clients;
         private readonly int localPort;
         private int destinationPort;

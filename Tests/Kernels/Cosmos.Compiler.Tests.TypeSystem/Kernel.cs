@@ -140,6 +140,18 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             StaticTestClass.B.FieldA = 10;
             collected = Heap.Collect();
             Assert.AreEqual(0, collected, "Storing elements in static class keeps them referenced");
+
+            for (int i = 0; i < 10_000; i++)
+            {
+                _ = new object();
+            }
+            Heap.Collect();
+            uint heapSmallPages = RAT.GetPageCount((byte)RAT.PageType.HeapSmall);
+            int freed = HeapSmall.PruneSMT();
+            uint afterPrune = RAT.GetPageCount((byte)RAT.PageType.HeapSmall);
+            Assert.IsTrue(heapSmallPages >= afterPrune, "Running PruneSMT does not increase the number of pages in use");
+            Assert.AreEqual(freed, heapSmallPages - afterPrune, "PruneSMT returns the correct number of pages freed");
+
         }
 
         #region Test Methods

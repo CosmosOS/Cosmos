@@ -141,6 +141,40 @@ namespace Cosmos.System.Network.IPv4.TCP
     /// </remarks>
     public class Tcp
     {
+
+        public static ushort DynamicPortStart = 49152;
+
+        private static Random dynamicPortStartRandom = new Random();
+
+        /// <summary>
+        /// gets a random port
+        /// </summary>
+        /// <param name="tries"></param>
+        /// <returns></returns>
+        public static ushort GetDynamicPort(int tries = 10)
+        {
+            for (int i = 0; i < tries; i++)
+            {
+
+                var port = (ushort)dynamicPortStartRandom.Next(DynamicPortStart, ushort.MaxValue);
+                var portInUse = false;
+                foreach (var connection in Connections)
+                {
+                    if (connection.LocalEndPoint.Port == port)
+                    {
+                        portInUse = true;
+                    }
+                }
+
+                if (!portInUse)
+                {
+                    return port;
+                }
+            }
+
+            return 0;
+        }
+
         /// <summary>
         /// The TCP window size.
         /// </summary>
@@ -155,7 +189,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// String / enum correspondance (used for debugging)
         /// </summary>
-        internal static string[] Table;
+        internal static readonly string[] Table;
 
         static Tcp()
         {
@@ -280,7 +314,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         internal void ReceiveData(TCPPacket packet)
         {
-            NetworkStack.Debugger.Send("[" + Table[(int)Status] + "] " + packet.ToString());
+            Cosmos.HAL.Global.debugger.Send("[" + Table[(int)Status] + "] " + packet.ToString());
 
             /*if (Status == Status.CLOSED)
             {
