@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net8.0": {
       "System.Diagnostics.Process": {
         "type": "Direct",
         "requested": "[4.3.0, )",
@@ -361,7 +361,7 @@
         }
       }
     },
-    "net6.0/win-x86": {
+    "net8.0/win-x86": {
       "System.Diagnostics.Process": {
         "type": "Direct",
         "requested": "[4.3.0, )",

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net8.0": {
       "Dapper.StrongName": {
         "type": "Transitive",
         "resolved": "2.0.90",

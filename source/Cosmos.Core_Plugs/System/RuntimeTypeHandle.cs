@@ -154,5 +154,32 @@ namespace Cosmos.Core_Plugs.System
             throw new NotImplementedException();
         }
 
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_CreateInstanceForAnotherGenericParameter_System_Runtime_CompilerServices_QCallTypeHandle__System_IntPtr#__System_Int32__System_Runtime_CompilerServices_ObjectHandleOnStack_")]
+        public static unsafe void CreateInstanceForAnotherGenericParameter(
+            object baseType,
+            IntPtr* pTypeHandles,
+            int cTypeHandles,
+            object instantiatedObject)
+        {
+
+        }
+
+        [PlugMethod(Signature = "System_Int32__System_RuntimeTypeHandle_GetNumVirtuals_System_RuntimeType_")]
+        public static int GetNumVirtuals(object type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static object GetMethodAt(object type, int slot)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Int32__System_RuntimeMethodHandle_GetSlot_System_RuntimeMethodHandleInternal_")]
+        public static int GetSlot(object method)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
