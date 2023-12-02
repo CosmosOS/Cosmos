@@ -44,7 +44,7 @@ public class CreateLimineConfig : Task
         xWriter.WriteLineAsync($":{xLabelName}");
         WriteIndentedLine(xWriter, $"COMMENT=Boot {xLabelName} using multiboot2.");
         xWriter.WriteLineAsync();
-        WriteIndentedLine(xWriter, "PROTOCOL=multiboot2");
+        WriteIndentedLine(xWriter, "PROTOCOL=limine");
         WriteIndentedLine(xWriter,
             xBinName.EndsWith(".gz")
                 ? $"KERNEL_PATH=$boot:///boot/{xBinName}"
