@@ -202,7 +202,8 @@
                 ToolExe="$(Il2cpuToolExe)"
                 CompileVBEMultiboot="$(CompileVBEMultiboot)"
 				AllowComments="$(AllowComments)"
-                VBEResolution="$(VBEResolution)"/>
+                VBEResolution="$(VBEResolution)"
+                TargetArchitecture="$(TargetArchitecture)"/>
 
     </Target>
 
@@ -350,8 +351,8 @@
         </ItemGroup>
 
         <ItemGroup>
-            <_IsoFile Include="$(LiminePath)boot\limine-cd.bin" />
-            <_IsoFile Include="$(LiminePath)boot\limine.sys" />
+            <_IsoFile Include="$(LiminePath)boot\limine-bios-cd.bin" />
+            <_IsoFile Include="$(LiminePath)boot\limine-bios.sys" />
             <_IsoFile Include="$(LiminePath)boot\liminewp.bmp" />
         </ItemGroup>
 

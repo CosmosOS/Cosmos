@@ -99,6 +99,7 @@ namespace Cosmos.Build.Tasks
             {
                 xBuilder.AppendSwitch("-dBIN_COMPILATION");
             }
+            xBuilder.AppendSwitch("-m amd64");
 
             /* Apply the optimization level that the user chose */
 	    if(!String.IsNullOrWhiteSpace(OptimizationLevel) && !String.IsNullOrWhiteSpace(OptimizationLevel))

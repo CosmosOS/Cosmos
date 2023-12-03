@@ -66,7 +66,7 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitch("-R");
             xBuilder.AppendSwitch("-l");
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
-            xBuilder.AppendSwitch(" -b boot/limine-cd.bin");
+            xBuilder.AppendSwitch(" -b boot/limine-bios-cd.bin");
             xBuilder.AppendSwitch("-no-emul-boot");
             xBuilder.AppendSwitch("-boot-load-size 4");
             xBuilder.AppendSwitch("-boot-info-table");

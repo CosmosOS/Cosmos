@@ -36,13 +36,13 @@ namespace Cosmos.Build.Tasks
 
         private static bool IsValidAddress(string aAddress)
         {
-            if (UInt64.TryParse(aAddress, out var xAddress))
+            if (ulong.TryParse(aAddress, out var xAddress))
             {
                 return true;
             }
 
             if (aAddress.StartsWith("0x")
-                && UInt64.TryParse(aAddress.Remove(0, 2), NumberStyles.AllowHexSpecifier, null, out xAddress))
+                && ulong.TryParse(aAddress.Remove(0, 2), NumberStyles.AllowHexSpecifier, null, out xAddress))
             {
                 return true;
             }
@@ -62,9 +62,9 @@ namespace Cosmos.Build.Tasks
             {
                 var xFullPath = xFile.GetMetadata("FullPath");
 
-                if (String.IsNullOrWhiteSpace(xFullPath))
+                if (string.IsNullOrWhiteSpace(xFullPath))
                 {
-                    Log.LogError($"Input file is an empty string! Input files: '{String.Join(";", InputFiles.Select(f => f.GetMetadata("Identity")))}'");
+                    Log.LogError($"Input file is an empty string! Input files: '{string.Join(";", InputFiles.Select(f => f.GetMetadata("Identity")))}'");
                 }
                 else if (!File.Exists(xFullPath))
                 {
@@ -72,17 +72,17 @@ namespace Cosmos.Build.Tasks
                 }
             }
 
-            if (String.IsNullOrEmpty(OutputFile))
+            if (string.IsNullOrEmpty(OutputFile))
             {
                 Log.LogError("No output file specified!");
             }
 
-            if (String.IsNullOrWhiteSpace(Entry))
+            if (string.IsNullOrWhiteSpace(Entry))
             {
                 Entry = null;
             }
 
-            if (String.IsNullOrWhiteSpace(TextAddress))
+            if (string.IsNullOrWhiteSpace(TextAddress))
             {
                 TextAddress = null;
             }
@@ -91,7 +91,7 @@ namespace Cosmos.Build.Tasks
                 Log.LogError(nameof(TextAddress) + " isn't a valid 64-bit number!");
             }
 
-            if (String.IsNullOrWhiteSpace(DataAddress))
+            if (string.IsNullOrWhiteSpace(DataAddress))
             {
                 DataAddress = null;
             }
@@ -100,7 +100,7 @@ namespace Cosmos.Build.Tasks
                 Log.LogError(nameof(DataAddress) + " isn't a valid 64-bit number!");
             }
 
-            if (String.IsNullOrWhiteSpace(BssAddress))
+            if (string.IsNullOrWhiteSpace(BssAddress))
             {
                 BssAddress = null;
             }
@@ -114,12 +114,12 @@ namespace Cosmos.Build.Tasks
 
         protected override string GenerateFullPathToTool()
         {
-            if (String.IsNullOrWhiteSpace(ToolExe))
+            if (string.IsNullOrWhiteSpace(ToolExe))
             {
                 return null;
             }
 
-            if (String.IsNullOrWhiteSpace(ToolPath))
+            if (string.IsNullOrWhiteSpace(ToolPath))
             {
                 return Path.Combine(Directory.GetCurrentDirectory(), ToolExe);
             }
@@ -129,7 +129,7 @@ namespace Cosmos.Build.Tasks
 
         protected override string GenerateCommandLineCommands()
         {
-            var xBuilder = new CommandLineBuilder();
+            CommandLineBuilder xBuilder = new();
 
             xBuilder.AppendSwitchIfNotNull("-Ttext ", TextAddress);
             xBuilder.AppendSwitchIfNotNull("-Tdata ", DataAddress);
@@ -138,7 +138,7 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
 
             xBuilder.AppendFileNamesIfNotNull(InputFiles, " ");
-            xBuilder.AppendSwitch("-m elf_i386");
+            xBuilder.AppendSwitch("-m elf_x86_64");
 
             Log.LogMessage(MessageImportance.High, xBuilder.ToString());
             
@@ -147,7 +147,7 @@ namespace Cosmos.Build.Tasks
 
         public override bool Execute()
         {
-            var xSW = Stopwatch.StartNew();
+            Stopwatch xSW = Stopwatch.StartNew();
             try
             {
                 return base.Execute();
