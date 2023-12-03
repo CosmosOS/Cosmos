@@ -14,17 +14,18 @@ public class LimineDeploy : ToolTask
     [Required]
     public string LimineIsoFile { get; set; }
 
-    protected override string ToolName => IsWindows() ? "limine-deploy.exe" : "limine-deploy";
+    protected override string ToolName => IsWindows() ? "limine.exe" : "limine";
 
     protected override string GenerateFullPathToTool()
     {
-        return String.IsNullOrWhiteSpace(ToolExe) ? null : Path.Combine(String.IsNullOrWhiteSpace(ToolPath) ? Directory.GetCurrentDirectory() : Path.GetFullPath(ToolPath), ToolExe);
+        return string.IsNullOrWhiteSpace(ToolExe) ? null : Path.Combine(string.IsNullOrWhiteSpace(ToolPath) ? Directory.GetCurrentDirectory() : Path.GetFullPath(ToolPath), ToolExe);
     }
 
     protected override string GenerateCommandLineCommands()
     {
-        var xBuilder = new CommandLineBuilder();
-        xBuilder.AppendSwitch($"{IsoFile}");
+        CommandLineBuilder xBuilder = new();
+        xBuilder.AppendSwitch($"bios-install");
+        xBuilder.AppendFileNameIfNotNull($"{IsoFile}");
 
         return xBuilder.ToString();
     }
