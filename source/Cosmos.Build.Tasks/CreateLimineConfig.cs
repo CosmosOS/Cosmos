@@ -14,6 +14,8 @@ public class CreateLimineConfig : Task
     [Required]
     public string BinName { get; set; }
 
+    [Required]
+    public string TargetArchitecture { get; set; }
     public string[] Modules { get; set; }
 
     private string Indentation = "    ";
@@ -44,7 +46,14 @@ public class CreateLimineConfig : Task
         xWriter.WriteLineAsync($":{xLabelName}");
         WriteIndentedLine(xWriter, $"COMMENT=Boot {xLabelName} using multiboot2.");
         xWriter.WriteLineAsync();
-        WriteIndentedLine(xWriter, "PROTOCOL=limine");
+        if(TargetArchitecture == "amd64")
+        {
+            WriteIndentedLine(xWriter, "PROTOCOL=limine");
+        }
+        else
+        {
+            WriteIndentedLine(xWriter, "PROTOCOL=multiboot2");
+        }
         WriteIndentedLine(xWriter,
             xBinName.EndsWith(".gz")
                 ? $"KERNEL_PATH=$boot:///boot/{xBinName}"
