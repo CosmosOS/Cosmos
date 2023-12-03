@@ -295,6 +295,11 @@ namespace Cosmos.System.Network.IPv4.TCP
         public Status Status;
 
         /// <summary>
+        /// Check send data confirmation.
+        /// </summary>
+        public bool WaitingSendAck = false;
+
+        /// <summary>
         /// The received data buffer.
         /// </summary>
         public byte[] Data { get; set; }
@@ -330,9 +335,13 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else
             {
+                Cosmos.HAL.Global.debugger.Send("Tcp - Received TCP");
+
                 // Check sequence number and segment data.
                 if (TCB.RcvNxt <= packet.SequenceNumber && packet.SequenceNumber + packet.TCP_DataLength < TCB.RcvNxt + TCB.RcvWnd)
                 {
+                    Cosmos.HAL.Global.debugger.Send("Tcp - Received TCP ok.");
+
                     switch (Status)
                     {
                         case Status.SYN_RECEIVED:
@@ -359,7 +368,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                         case Status.TIME_WAIT:
                             break;
                         default:
-                            NetworkStack.Debugger.Send("Unknown TCP connection state.");
+                            NetworkStack.Debugger.Send("Unknown TCP connection state = " + (int)Status);
                             break;
                     }
                 }
@@ -547,6 +556,8 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (packet.ACK)
             {
+                Cosmos.HAL.Global.debugger.Send("Tcp - Received ACK");
+
                 if (TCB.SndUna < packet.AckNumber && packet.AckNumber <= TCB.SndNxt)
                 {
                     TCB.SndUna = packet.AckNumber;
@@ -595,12 +606,19 @@ namespace Cosmos.System.Network.IPv4.TCP
                     return;
                 }
 
+                if (WaitingSendAck)
+                {
+                    Cosmos.HAL.Global.debugger.Send("Tcp - WaitingSendAck = false");
+
+                    WaitingSendAck = false;
+                }
+
                 if (packet.TCP_DataLength > 0 && packet.SequenceNumber >= TCB.RcvNxt) //packet sequencing
                 {
                     TCB.RcvNxt += packet.TCP_DataLength;
 
                     Data = ArrayHelper.Concat(Data, packet.TCP_Data);
-                }
+                }                
             }
             if (packet.RST)
             {

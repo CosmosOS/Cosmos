@@ -12,12 +12,20 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
     [Plug(Target = typeof(TcpClient))]
     public static class TcpClientImpl
     {
+        private static Socket _clientSocket;
+        private static NetworkStream _dataStream;
+
+        public static void CCtor(TcpClient aThis)
+        {
+            Cosmos.HAL.Global.debugger.Send("TcpClient - ctor.");
+        }
+
         public static void Ctor(TcpClient aThis)
         {
             Cosmos.HAL.Global.debugger.Send("TcpClient - ctor.");
         }
 
-        public static void Ctor(TcpClient aThis, Socket acceptedSocket, [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpClient._clientSocket")] ref Socket _clientSocket)
+        public static void Ctor(TcpClient aThis, Socket acceptedSocket)
         {
             Cosmos.HAL.Global.debugger.Send("TcpClient - ctor socket.");
 
@@ -26,14 +34,23 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             Cosmos.HAL.Global.debugger.Send("TcpClient - ctor socket " + (acceptedSocket.RemoteEndPoint as IPEndPoint).Port + ":" + (acceptedSocket.RemoteEndPoint as IPEndPoint).Port);
         }
 
+        public static void set_Client(TcpClient aThis, Socket value)
+        {
+            _clientSocket = value;
+        }
+
+        public static Socket get_Client(TcpClient aThis)
+        {
+            return _clientSocket;
+        }
+
         public static int get_ReceiveBufferSize(TcpClient aThis)
         {
             //TODO implement Socket.SetSocketOption Socket.GetSocketOption
             return 8192;
         }
 
-        public static NetworkStream GetStream(TcpClient aThis, [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpClient._clientSocket")] ref Socket _clientSocket,
-            [FieldAccess(Name = "System.Net.Sockets.NetworkStream System.Net.Sockets.TcpClient._dataStream")] ref NetworkStream _dataStream)
+        public static NetworkStream GetStream(TcpClient aThis)
         {
             Cosmos.HAL.Global.debugger.Send("TcpClient - GetStream");
 
@@ -52,11 +69,40 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return _dataStream;
         }
 
-        public static void Dispose(TcpClient aThis, [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpClient._clientSocket")] ref Socket _clientSocket)
+        public static void Close(TcpClient aThis)
         {
-            Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose");
+            Cosmos.HAL.Global.debugger.Send("TcpClient - Close");
 
             _clientSocket.Close();
+
+            Cosmos.HAL.Global.debugger.Send("TcpClient - Closed");
+        }
+
+        public static void Dispose(TcpClient aThis, bool disposing)
+        {
+            Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose 2");
+
+            IDisposable dataStream = _dataStream;
+            if (dataStream != null)
+            {
+                Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.1");
+
+                dataStream.Dispose();
+
+                Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.2");
+            }
+            else
+            {
+                Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.3");
+                Socket socket = _clientSocket;
+                Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.4");
+                if (socket != null)
+                {
+                    Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.5");
+                    socket.Close();
+                    Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.6");
+                }
+            }
 
             Cosmos.HAL.Global.debugger.Send("TcpClient - Closed");
         }

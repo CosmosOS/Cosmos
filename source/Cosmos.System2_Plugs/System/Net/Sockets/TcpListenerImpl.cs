@@ -15,6 +15,11 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         private static Socket? _serverSocket;
         private static IPEndPoint _serverSocketEP;
 
+        public static void CCtor(TcpListener aThis)
+        {
+            Cosmos.HAL.Global.debugger.Send("TcpListener - cctor.");
+        }
+
         public static void Ctor(TcpListener aThis, IPEndPoint localEP)
         {
             if (localEP == null)

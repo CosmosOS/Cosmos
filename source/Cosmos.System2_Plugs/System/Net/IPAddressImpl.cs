@@ -26,6 +26,11 @@ namespace Cosmos.System_Plugs.System.Net
             PrivateAddress = address;
         }
 
+        public static void CCtor(IPAddress aThis)
+        {
+            Cosmos.HAL.Global.debugger.Send("IPAddress - cctor.");
+        }
+
         public static void Ctor(IPAddress aThis, long address)
         {
             Cosmos.HAL.Global.debugger.Send("IPAddress - ctor long.");
