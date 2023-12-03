@@ -16,7 +16,7 @@ namespace Cosmos.Build.Tasks
         }
 
         #region Task Parameters
-        
+
         [Required]
         public string InputFile { get; set; }
 
@@ -31,6 +31,9 @@ namespace Cosmos.Build.Tasks
         }
 
         public string OptimizationLevel { get; set; }
+
+        [Required]
+        public string TargetArchitecture { get; set; }
 
         #endregion
 
@@ -99,11 +102,15 @@ namespace Cosmos.Build.Tasks
             {
                 xBuilder.AppendSwitch("-dBIN_COMPILATION");
             }
-            xBuilder.AppendSwitch("-m amd64");
+
+            if (TargetArchitecture == "amd64")
+            {
+                xBuilder.AppendSwitch("-m amd64");
+            }
 
             /* Apply the optimization level that the user chose */
-	    if(!String.IsNullOrWhiteSpace(OptimizationLevel) && !String.IsNullOrWhiteSpace(OptimizationLevel))
-            	xBuilder.AppendSwitch($"-O{OptimizationLevel}");
+            if (!String.IsNullOrWhiteSpace(OptimizationLevel) && !String.IsNullOrWhiteSpace(OptimizationLevel))
+                xBuilder.AppendSwitch($"-O{OptimizationLevel}");
 
             xBuilder.AppendFileNameIfNotNull(InputFile);
 

@@ -228,7 +228,8 @@
               OutputFormat="$(BinFormat)"
               ToolPath="$(NasmToolPath)"
               ToolExe="$(NasmToolExe)"
-	      OptimizationLevel="$(OptimizationLevel)"/>
+              OptimizationLevel="$(OptimizationLevel)"
+              TargetArchitecture="$(TargetArchitecture)"/>
 
     </Target>
 
@@ -255,7 +256,8 @@
             DataAddress="0x1000000"
             Entry="Kernel_Start"
             ToolPath="$(LdToolPath)"
-            ToolExe="$(LdToolExe)" />
+            ToolExe="$(LdToolExe)"
+            TargetArchitecture="$(TargetArchitecture)"/>
 
     </Target>
 
