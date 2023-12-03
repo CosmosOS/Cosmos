@@ -8,10 +8,6 @@ namespace Cosmos.Build.Builder.Views
         public DependencyInstallationDialog()
         {
             InitializeComponent();
-            Loaded += (sender, args) =>
-            {
-                Wpf.Ui.Appearance.Watcher.Watch(this, Wpf.Ui.Appearance.BackgroundType.Mica, true);
-            };
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-
+using Cosmos.Build.Builder.BuildTasks;
 using Cosmos.Build.Builder.Collections;
 using Cosmos.Build.Builder.Models;
 using Cosmos.Build.Builder.Services;
@@ -83,6 +83,7 @@ namespace Cosmos.Build.Builder.ViewModels
             win.Show();
             _dependencyInstallationDialogService.SetAnotherOwner(win);
             Window.AppShutdown = false;
+            Window.ShowCloseBuilderDialog = false;
             Window.Close();
             win.DataContext = new MainWindowViewModel(_dependencyInstallationDialogService, _buildDefinition, win);
         }
@@ -154,7 +155,7 @@ namespace Cosmos.Build.Builder.ViewModels
 
                         if (dependency.ShouldInstallByDefault)
                         {
-                            using (var viewModel = new DependencyInstallationDialogViewModel(dependency))
+                            using (DependencyInstallationDialogViewModel viewModel = new(dependency))
                             {
                                 _dependencyInstallationDialogService.ShowDialog(viewModel);
 
@@ -189,7 +190,6 @@ namespace Cosmos.Build.Builder.ViewModels
                     if (_buildCancel) { throw new TaskCanceledException(); }
 
                     _logger.NewSection(buildTask.Name);
-
                     await buildTask.RunAsync(_logger).ConfigureAwait(false);
                 }
 
