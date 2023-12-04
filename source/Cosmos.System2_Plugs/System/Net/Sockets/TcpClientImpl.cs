@@ -44,11 +44,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return _clientSocket;
         }
 
-        public static void set_Client(TcpClient aThis, Socket socket)
-        {
-            _clientSocket = socket;
-        }
-
         public static int get_ReceiveBufferSize(TcpClient aThis)
         {
             //TODO implement Socket.SetSocketOption Socket.GetSocketOption
