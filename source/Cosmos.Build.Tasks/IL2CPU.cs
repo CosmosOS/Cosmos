@@ -76,7 +76,7 @@ namespace Cosmos.Build.Tasks
 
         protected override string GenerateFullPathToTool()
         {
-            if (String.IsNullOrWhiteSpace(ToolPath))
+            if (string.IsNullOrWhiteSpace(ToolPath))
             {
                 return Path.Combine(CosmosBuildDir, IsWindows() ? @"IL2CPU\IL2CPU.exe" : "IL2CPU/IL2CPU");
             }
