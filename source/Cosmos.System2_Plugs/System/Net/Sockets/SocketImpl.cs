@@ -261,6 +261,13 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         {
             Cosmos.HAL.Global.debugger.Send("Socket - Receive byte[].");
 
+            if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
+            {
+                Cosmos.HAL.Global.debugger.Send("Socket - Invalid offset or size");
+
+                throw new ArgumentOutOfRangeException("Invalid offset or size");
+            }
+
             while (StateMachine.Data == null || StateMachine.Data.Length == 0)
             {
                 if (StateMachine.Status != Status.ESTABLISHED)
