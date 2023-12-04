@@ -256,8 +256,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                 {
                     Connections.RemoveAt(i);
 
-                    NetworkStack.Debugger.Send("Connection removed!");
-
                     return;
                 }
             }
@@ -335,13 +333,9 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else
             {
-                Cosmos.HAL.Global.debugger.Send("Tcp - Received TCP");
-
                 // Check sequence number and segment data.
                 if (TCB.RcvNxt <= packet.SequenceNumber && packet.SequenceNumber + packet.TCP_DataLength < TCB.RcvNxt + TCB.RcvWnd)
                 {
-                    Cosmos.HAL.Global.debugger.Send("Tcp - Received TCP ok.");
-
                     switch (Status)
                     {
                         case Status.SYN_RECEIVED:
@@ -556,8 +550,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         {
             if (packet.ACK)
             {
-                Cosmos.HAL.Global.debugger.Send("Tcp - Received ACK");
-
                 if (TCB.SndUna < packet.AckNumber && packet.AckNumber <= TCB.SndNxt)
                 {
                     TCB.SndUna = packet.AckNumber;

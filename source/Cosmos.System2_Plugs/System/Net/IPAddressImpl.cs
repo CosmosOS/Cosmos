@@ -26,36 +26,27 @@ namespace Cosmos.System_Plugs.System.Net
             PrivateAddress = address;
         }
 
-        public static void CCtor(IPAddress aThis)
-        {
-            Cosmos.HAL.Global.debugger.Send("IPAddress - cctor.");
-        }
-
         public static void Ctor(IPAddress aThis, long address)
         {
-            Cosmos.HAL.Global.debugger.Send("IPAddress - ctor long.");
-
             PrivateAddress = (uint)address;
         }
 
         public static void Ctor(IPAddress aThis, ReadOnlySpan<byte> address)
         {
-            Cosmos.HAL.Global.debugger.Send("IPAddress - ctor.");
-            
             if (address.Length == IPv4AddressBytes)
             {
                 PrivateAddress = (uint)(address[0] << 24 | address[1] << 16 | address[2] << 8 | address[3]);
             }
             else if (address.Length == IPv6AddressBytes)
             {
+                Cosmos.HAL.Global.debugger.Send("IPv6 not supported yet!");
                 throw new NotImplementedException("IPv6 not supported yet!");
             }
             else
             {
-                throw new ArgumentException("Bad IP address format", nameof(address));
+                Cosmos.HAL.Global.debugger.Send("Bad IP address format");
+                throw new ArgumentException("Bad IP address format");
             }
-
-            Cosmos.HAL.Global.debugger.Send("IPAddress - " + address[0] + "." + address[1] + "." + address[2] + "." + address[3] + " set.");
         }
 
         public static void Ctor(IPAddress aThis, ReadOnlySpan<byte> address, long scopeId)

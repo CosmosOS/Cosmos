@@ -13,25 +13,22 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
     {
         private static Socket _streamSocket;
 
-        public static void CCtor(NetworkStream aThis)
-        {
-            Cosmos.HAL.Global.debugger.Send("NetworkStream - cctor.");
-        }
-
         public static void Ctor(NetworkStream aThis, Socket socket, FileAccess access, bool ownsSocket,
             [FieldAccess(Name = "System.Boolean System.Net.Sockets.NetworkStream._ownsSocket")] ref bool _ownsSocket,
             [FieldAccess(Name = "System.Boolean System.Net.Sockets.NetworkStream._readable")] ref bool _readable,
             [FieldAccess(Name = "System.Boolean System.Net.Sockets.NetworkStream._writeable")] ref bool _writeable
             )
         {
-            Cosmos.HAL.Global.debugger.Send("NetworkStream - ctor.");
-
             if (socket == null)
             {
+                Cosmos.HAL.Global.debugger.Send("NetworkStream - socket is null.");
+
                 throw new ArgumentNullException(nameof(socket));
             }
             if (!socket.Connected)
             {
+                Cosmos.HAL.Global.debugger.Send("NetworkStream - socket is not connected.");
+
                 throw new IOException("Socket not connected.");
             }
 
@@ -56,15 +53,11 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static int Read(NetworkStream aThis, byte[] buffer, int offset, int count)
         {
-            Cosmos.HAL.Global.debugger.Send("NetworkStream - Read.");
-
             return _streamSocket.Receive(buffer, offset, count, 0);
         }
 
         public static void Write(NetworkStream aThis, byte[] buffer, int offset, int count)
         {
-            Cosmos.HAL.Global.debugger.Send("NetworkStream - Write.");
-
             _streamSocket.Send(buffer, offset, count, 0);
         }
 
@@ -75,22 +68,16 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static void Close(NetworkStream aThis)
         {
-            Cosmos.HAL.Global.debugger.Send("NetworkStream - Close");
-
             _streamSocket.Close();
         }
 
         public static void Dispose(NetworkStream aThis)
         {
-            Cosmos.HAL.Global.debugger.Send("NetworkStream - Dispose 1.");
-
             _streamSocket.Close();
         }
 
         public static void Dispose(NetworkStream aThis, bool disposing)
         {
-            Cosmos.HAL.Global.debugger.Send("NetworkStream - Dispose 2.");
-
             _streamSocket.Close();
         }
     }

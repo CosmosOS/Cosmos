@@ -15,11 +15,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         private static Socket? _serverSocket;
         private static IPEndPoint _serverSocketEP;
 
-        public static void CCtor(TcpListener aThis)
-        {
-            Cosmos.HAL.Global.debugger.Send("TcpListener - cctor.");
-        }
-
         public static void Ctor(TcpListener aThis, IPEndPoint localEP)
         {
             if (localEP == null)
@@ -32,22 +27,14 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static void Ctor(TcpListener aThis, IPAddress localaddr, int port)
         {
-            Cosmos.HAL.Global.debugger.Send("TcpListener - ctor.");
-
             if (localaddr == null)
             {
+                Cosmos.HAL.Global.debugger.Send("TcpListener - Ctor localaddr == null");
                 throw new ArgumentNullException(nameof(localaddr));
             }
 
-            Cosmos.HAL.Global.debugger.Send("TcpListener - localaddr ok.");
-
             _serverSocketEP = new IPEndPoint(localaddr, port);
-
-            Cosmos.HAL.Global.debugger.Send("TcpListener - _serverSocketEP ok.");
-
             _serverSocket = new Socket(_serverSocketEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
-            Cosmos.HAL.Global.debugger.Send("TcpListener - _serverSocket ok.");
         }
 
         public static void Start(TcpListener aThis)
@@ -67,12 +54,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static TcpClient AcceptTcpClient(TcpListener aThis)
         {
-            Cosmos.HAL.Global.debugger.Send("TcpListener - accepting client.");
-
             Socket acceptedSocket = _serverSocket!.Accept();
-
-            Cosmos.HAL.Global.debugger.Send("TcpListener - socket accepted.");
-
             var realClient = new TcpClient();
             realClient.Client = acceptedSocket;
             return realClient;
