@@ -105,16 +105,59 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             Tcp.Connections.Add(StateMachine);
         }
 
+        private static uint ConvertIPAddressToUInt32(IPAddress ip)
+        {
+            byte[] bytes = ip.GetAddressBytes();
+            return (uint)(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]);
+        }
+
         public static void Connect(Socket aThis, IPAddress address, int port)
         {
-            Cosmos.HAL.Global.debugger.Send("Socket - Connect.");
+            if (StateMachine.Status == Status.ESTABLISHED)
+            {
+                throw new Exception("Client must be closed before setting a new connection.");
+            }
 
-            throw new NotImplementedException();
+            StateMachine.RemoteEndPoint.Address = new Cosmos.System.Network.IPv4.Address(ConvertIPAddressToUInt32(address));
+            StateMachine.LocalEndPoint.Address = Cosmos.System.Network.Config.IPConfig.FindNetwork(StateMachine.RemoteEndPoint.Address);
+            StateMachine.RemoteEndPoint.Port = (ushort)port;
+
+            _remoteEndPoint = new IPEndPoint(StateMachine.RemoteEndPoint.Address.ToUInt32(), StateMachine.RemoteEndPoint.Port);
+            _localEndPoint = new IPEndPoint(StateMachine.LocalEndPoint.Address.ToUInt32(), StateMachine.LocalEndPoint.Port);
+
+            //Generate Random Sequence Number
+            var rnd = new Random();
+            var SequenceNumber = (uint)(rnd.Next(0, Int32.MaxValue) << 32) | (uint)rnd.Next(0, Int32.MaxValue);
+
+            //Fill TCB
+            StateMachine.TCB.SndUna = SequenceNumber;
+            StateMachine.TCB.SndNxt = SequenceNumber;
+            StateMachine.TCB.SndWnd = Tcp.TcpWindowSize;
+            StateMachine.TCB.SndUp = 0;
+            StateMachine.TCB.SndWl1 = 0;
+            StateMachine.TCB.SndWl2 = 0;
+            StateMachine.TCB.ISS = SequenceNumber;
+
+            StateMachine.TCB.RcvNxt = 0;
+            StateMachine.TCB.RcvWnd = Tcp.TcpWindowSize;
+            StateMachine.TCB.RcvUp = 0;
+            StateMachine.TCB.IRS = 0;
+
+            Tcp.Connections.Add(StateMachine);
+
+            StateMachine.SendEmptyPacket(Flags.SYN);
+
+            StateMachine.Status = Status.SYN_SENT;
+
+            if (StateMachine.WaitStatus(Status.ESTABLISHED, 5) == false)
+            {
+                throw new Exception("Failed to open TCP connection!");
+            }
         }
 
         public static int Send(Socket aThis, ReadOnlySpan<byte> buffer, SocketFlags socketFlags)
         {
-            throw new NotImplementedException();
+            return Send(aThis, buffer.ToArray(), 0, buffer.Length, socketFlags); ;
         }
 
         public static int Send(Socket aThis, byte[] buffer, int offset, int size, SocketFlags socketFlags)

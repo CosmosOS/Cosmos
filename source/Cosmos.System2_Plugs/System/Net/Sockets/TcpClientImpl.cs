@@ -40,6 +40,28 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return 8192;
         }
 
+        public static void Connect(TcpClient aThis, string hostname, int port, [FieldAccess(Name = "System.Boolean System.Net.Sockets.TcpClient._active")] ref bool _active)
+        {
+            _clientSocket.Connect(IPAddress.Parse(hostname), port);
+            _active = true;
+        }
+
+        public static void Connect(TcpClient aThis, IPAddress address, int port, [FieldAccess(Name = "System.Boolean System.Net.Sockets.TcpClient._active")] ref bool _active)
+        {
+            _clientSocket.Connect(address, port);
+            _active = true;
+        }
+
+        public static void Connect(TcpClient aThis, IPEndPoint remoteEP, [FieldAccess(Name = "System.Boolean System.Net.Sockets.TcpClient._active")] ref bool _active)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void Connect(TcpClient aThis, IPAddress[] ipAddresses, int port)
+        {
+            throw new NotImplementedException(); 
+        }
+
         public static NetworkStream GetStream(TcpClient aThis)
         {
             if (_clientSocket == null)
