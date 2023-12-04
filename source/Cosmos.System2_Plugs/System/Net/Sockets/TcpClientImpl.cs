@@ -17,7 +17,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static void CCtor(TcpClient aThis)
         {
-            Cosmos.HAL.Global.debugger.Send("TcpClient - ctor.");
+            Cosmos.HAL.Global.debugger.Send("TcpClient - cctor.");
         }
 
         public static void Ctor(TcpClient aThis)
@@ -42,6 +42,11 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         public static Socket get_Client(TcpClient aThis)
         {
             return _clientSocket;
+        }
+
+        public static void set_Client(TcpClient aThis, Socket socket)
+        {
+            _clientSocket = socket;
         }
 
         public static int get_ReceiveBufferSize(TcpClient aThis)
@@ -69,42 +74,29 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return _dataStream;
         }
 
-        public static void Close(TcpClient aThis)
-        {
-            Cosmos.HAL.Global.debugger.Send("TcpClient - Close");
-
-            _clientSocket.Close();
-
-            Cosmos.HAL.Global.debugger.Send("TcpClient - Closed");
-        }
-
         public static void Dispose(TcpClient aThis, bool disposing)
         {
             Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose 2");
 
-            IDisposable dataStream = _dataStream;
-            if (dataStream != null)
+            if (_dataStream != null)
             {
-                Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.1");
+                Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose 2.1");
 
-                dataStream.Dispose();
+                _dataStream.Dispose();
 
-                Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.2");
+                Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose 2.2");
             }
             else
             {
-                Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.3");
-                Socket socket = _clientSocket;
-                Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.4");
-                if (socket != null)
+                Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose 2.4");
+                if (_clientSocket != null)
                 {
-                    Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.5");
-                    socket.Close();
-                    Cosmos.HAL.Global.debugger.Send("TcpClient - Closed 2.6");
+                    Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose 2.5");
+                    _clientSocket.Close();
                 }
             }
 
-            Cosmos.HAL.Global.debugger.Send("TcpClient - Closed");
+            Cosmos.HAL.Global.debugger.Send("TcpClient - Dispose 3");
         }
     }
 }

@@ -606,13 +606,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                     return;
                 }
 
-                if (WaitingSendAck)
-                {
-                    Cosmos.HAL.Global.debugger.Send("Tcp - WaitingSendAck = false");
-
-                    WaitingSendAck = false;
-                }
-
                 if (packet.TCP_DataLength > 0 && packet.SequenceNumber >= TCB.RcvNxt) //packet sequencing
                 {
                     TCB.RcvNxt += packet.TCP_DataLength;

@@ -149,16 +149,15 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         {
             Cosmos.HAL.Global.debugger.Send("Socket - Send.");
 
+
             if (StateMachine.RemoteEndPoint.Address == null || StateMachine.RemoteEndPoint.Port == 0)
             {
                 Cosmos.HAL.Global.debugger.Send("Socket - Must establish a default remote host by calling Connect() before using this Send() overload.");
-
                 throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
             }
             if (StateMachine.Status != Status.ESTABLISHED)
             {
                 Cosmos.HAL.Global.debugger.Send("Socket - Client must be connected before sending data..");
-
                 throw new Exception("Client must be connected before sending data.");
             }
 
@@ -171,7 +170,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
             int bytesSent = 0;
 
-            if (size > 536) // why 536bytes chunk size??
+            if (size > 536) // why 536 bytes for chunks size??
             {
                 Cosmos.HAL.Global.debugger.Send("Socket - chunked");
 
@@ -187,11 +186,12 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
                     Cosmos.System.Network.NetworkStack.Update();
 
                     StateMachine.TCB.SndNxt += (uint)chunks[i].Length;
+                    bytesSent += chunks[i].Length;
+
+                    WaitAck();
                 }
                 
                 Cosmos.HAL.Global.debugger.Send("Socket - packed sent");
-
-                StateMachine.WaitingSendAck = true;
 
                 bytesSent = size;
             }
@@ -221,13 +221,32 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
                 StateMachine.WaitingSendAck = true;
 
                 bytesSent = size;
-            }
 
-            while (StateMachine.WaitingSendAck == true) { }
+                WaitAck();
+            }
 
             Cosmos.HAL.Global.debugger.Send("Socket - Send ok bytesSent=" + bytesSent);
 
+
             return bytesSent;
+        }
+
+        private static void WaitAck()
+        {
+            bool ackReceived = false;
+            uint expectedAckNumber = StateMachine.TCB.SndNxt;
+
+            while (!ackReceived)
+            {
+                if (StateMachine.TCB.SndUna >= expectedAckNumber)
+                {
+                    Cosmos.HAL.Global.debugger.Send("ACK okay");
+
+                    ackReceived = true;
+                }
+            }
+
+            Cosmos.HAL.Global.debugger.Send("Socket - Send ackReceived");
         }
 
 
