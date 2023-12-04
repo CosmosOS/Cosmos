@@ -350,8 +350,9 @@
         </ItemGroup>
 
         <ItemGroup>
-            <_IsoFile Include="$(LiminePath)boot\limine-cd.bin" />
-            <_IsoFile Include="$(LiminePath)boot\limine.sys" />
+            <_IsoFile Include="$(LiminePath)boot\limine-uefi-cd.bin" />
+            <_IsoFile Include="$(LiminePath)boot\limine-bios-cd.bin" />
+            <_IsoFile Include="$(LiminePath)boot\limine-bios.sys" />
             <_IsoFile Include="$(LiminePath)boot\liminewp.bmp" />
         </ItemGroup>
 
@@ -366,7 +367,12 @@
 
         <Copy SourceFiles="@(_IsoFile)"
               DestinationFolder="$(IntermediateIsoDirectory)\boot\" />
-
+        
+        <Copy SourceFiles="$(LiminePath)EFI\boot\BOOTAA64.EFI" DestinationFolder="$(IntermediateIsoDirectory)\EFI\boot\" />
+        <Copy SourceFiles="$(LiminePath)EFI\boot\BOOTIA32.EFI" DestinationFolder="$(IntermediateIsoDirectory)\EFI\boot\" />
+        <Copy SourceFiles="$(LiminePath)EFI\boot\BOOTRISCV64.EFI" DestinationFolder="$(IntermediateIsoDirectory)\EFI\boot\" />
+        <Copy SourceFiles="$(LiminePath)EFI\boot\BOOTX64.EFI" DestinationFolder="$(IntermediateIsoDirectory)\EFI\boot\" />
+        
         <Copy SourceFiles="@(_IsoCustomFiles)"
               DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)"
 			        SkipUnchangedFiles="true"
