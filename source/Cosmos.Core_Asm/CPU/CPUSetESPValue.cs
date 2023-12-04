@@ -13,8 +13,8 @@ namespace Cosmos.Core_Asm
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.Set(EAX, EBP,sourceDisplacement:8);
-            XS.Set(ESP,EAX,destinationDisplacement:4);
+            XS.Set(RAX, RBP,sourceDisplacement:8);
+            XS.Set(RSP,RAX,destinationDisplacement:4);
         }
     }
 }

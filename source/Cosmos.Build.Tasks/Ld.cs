@@ -143,6 +143,7 @@ namespace Cosmos.Build.Tasks
                 var dir = Path.GetDirectoryName(OutputFile);
                 var path = dir + "/linker.ld";
                 xBuilder.AppendSwitch("-m elf_x86_64");
+                xBuilder.AppendSwitch("-z text");
                 xBuilder.AppendSwitchIfNotNull("-T ", path);
 
 

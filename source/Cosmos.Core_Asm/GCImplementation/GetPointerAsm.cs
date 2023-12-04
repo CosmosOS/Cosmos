@@ -12,8 +12,8 @@ namespace Cosmos.Core_Asm.GCImplementation
         {
             // we get the object as an object size 4 and we just leave it as a uint*
             // so this is just an illegal cast
-            XS.Set(EAX, EBP, sourceDisplacement: 12);
-            XS.Push(EAX);
+            XS.Set(RAX, RBP, sourceDisplacement: 12);
+            XS.Push(RAX);
         }
     }
 }

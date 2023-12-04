@@ -17,39 +17,39 @@ namespace Cosmos.Core_Asm.MemoryOperations
             XS.Comment("CALLED!");
 
             // Copy Src to ESI
-            XS.Set(ESI, EBP, sourceIsIndirect: true, sourceDisplacement: SrcDisplacement);
+            XS.Set(RSI, RBP, sourceIsIndirect: true, sourceDisplacement: SrcDisplacement);
             // Copy Dst to EDI
-            XS.Set(EDI, EBP, sourceIsIndirect: true, sourceDisplacement: DestDisplacement);
+            XS.Set(RDI, RBP, sourceIsIndirect: true, sourceDisplacement: DestDisplacement);
             // Copy BlocksNum to ECX
-            XS.Set(ECX, EBP, sourceDisplacement: BlocksNumDisplacement);
+            XS.Set(RCX, RBP, sourceDisplacement: BlocksNumDisplacement);
 
             /* Do the 'loop' */
             XS.Label(".loop");
 
             // move 128 bytes of src to 8 XMM register
 
-            XS.SSE.MoveDQU(XMM0, ESI, sourceIsIndirect: true);
-            XS.SSE.MoveDQU(XMM1, ESI, sourceIsIndirect: true, sourceDisplacement: 16);
-            XS.SSE.MoveDQU(XMM2, ESI, sourceIsIndirect: true, sourceDisplacement: 32);
-            XS.SSE.MoveDQU(XMM3, ESI, sourceIsIndirect: true, sourceDisplacement: 48);
-            XS.SSE.MoveDQU(XMM4, ESI, sourceIsIndirect: true, sourceDisplacement: 64); 
-            XS.SSE.MoveDQU(XMM5, ESI, sourceIsIndirect: true, sourceDisplacement: 80);
-            XS.SSE.MoveDQU(XMM6, ESI, sourceIsIndirect: true, sourceDisplacement: 96);
-            XS.SSE.MoveDQU(XMM7, ESI, sourceIsIndirect: true, sourceDisplacement: 112);
+            XS.SSE.MoveDQU(XMM0, RSI, sourceIsIndirect: true);
+            XS.SSE.MoveDQU(XMM1, RSI, sourceIsIndirect: true, sourceDisplacement: 16);
+            XS.SSE.MoveDQU(XMM2, RSI, sourceIsIndirect: true, sourceDisplacement: 32);
+            XS.SSE.MoveDQU(XMM3, RSI, sourceIsIndirect: true, sourceDisplacement: 48);
+            XS.SSE.MoveDQU(XMM4, RSI, sourceIsIndirect: true, sourceDisplacement: 64); 
+            XS.SSE.MoveDQU(XMM5, RSI, sourceIsIndirect: true, sourceDisplacement: 80);
+            XS.SSE.MoveDQU(XMM6, RSI, sourceIsIndirect: true, sourceDisplacement: 96);
+            XS.SSE.MoveDQU(XMM7, RSI, sourceIsIndirect: true, sourceDisplacement: 112);
 
             // move 128 bytes from the 8 XMM registers to dest
-            XS.SSE.MoveDQU(EDI, XMM0, destinationIsIndirect: true);
-            XS.SSE.MoveDQU(EDI, XMM1, destinationIsIndirect: true, destinationDisplacement: 16);
-            XS.SSE.MoveDQU(EDI, XMM2, destinationIsIndirect: true, destinationDisplacement: 32);
-            XS.SSE.MoveDQU(EDI, XMM3, destinationIsIndirect: true, destinationDisplacement: 48);
-            XS.SSE.MoveDQU(EDI, XMM4, destinationIsIndirect: true, destinationDisplacement: 64);
-            XS.SSE.MoveDQU(EDI, XMM5, destinationIsIndirect: true, destinationDisplacement: 80);
-            XS.SSE.MoveDQU(EDI, XMM6, destinationIsIndirect: true, destinationDisplacement: 96);
-            XS.SSE.MoveDQU(EDI, XMM7, destinationIsIndirect: true, destinationDisplacement: 112);
+            XS.SSE.MoveDQU(RDI, XMM0, destinationIsIndirect: true);
+            XS.SSE.MoveDQU(RDI, XMM1, destinationIsIndirect: true, destinationDisplacement: 16);
+            XS.SSE.MoveDQU(RDI, XMM2, destinationIsIndirect: true, destinationDisplacement: 32);
+            XS.SSE.MoveDQU(RDI, XMM3, destinationIsIndirect: true, destinationDisplacement: 48);
+            XS.SSE.MoveDQU(RDI, XMM4, destinationIsIndirect: true, destinationDisplacement: 64);
+            XS.SSE.MoveDQU(RDI, XMM5, destinationIsIndirect: true, destinationDisplacement: 80);
+            XS.SSE.MoveDQU(RDI, XMM6, destinationIsIndirect: true, destinationDisplacement: 96);
+            XS.SSE.MoveDQU(RDI, XMM7, destinationIsIndirect: true, destinationDisplacement: 112);
 
-            XS.Add(ESI, 128);
-            XS.Add(EDI, 128);
-            XS.Sub(ECX, 1);
+            XS.Add(RSI, 128);
+            XS.Add(RDI, 128);
+            XS.Sub(RCX, 1);
   
             XS.Jump(ConditionalTestEnum.NotZero, ".loop");
         }

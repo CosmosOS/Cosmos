@@ -14,7 +14,7 @@ namespace Cosmos.Core_Plugs.System.Runtime.CompilerServices
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             // we need
-            XS.Set(EAX, EBP, sourceDisplacement: 8);
+            XS.Set(RAX, RBP, sourceDisplacement: 8);
         }
     }
 }

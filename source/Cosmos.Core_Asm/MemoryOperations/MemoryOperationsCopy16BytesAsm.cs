@@ -14,15 +14,15 @@ namespace Cosmos.Core_Asm.MemoryOperations
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             // Copy Src to ESI
-            XS.Set(ESI, EBP, sourceIsIndirect: true, sourceDisplacement: SrcDisplacement);
+            XS.Set(RSI, RBP, sourceIsIndirect: true, sourceDisplacement: SrcDisplacement);
             // Copy Dst to EDI
-            XS.Set(EDI, EBP, sourceIsIndirect: true, sourceDisplacement: DestDisplacement);
+            XS.Set(RDI, RBP, sourceIsIndirect: true, sourceDisplacement: DestDisplacement);
 
             // move data from src to registers
-            XS.SSE.MoveDQU(XMM0, ESI, sourceIsIndirect: true);
+            XS.SSE.MoveDQU(XMM0, RSI, sourceIsIndirect: true);
 
             // move data from registers to dest
-            XS.SSE.MoveDQU(EDI, XMM0, destinationIsIndirect: true);
+            XS.SSE.MoveDQU(RDI, XMM0, destinationIsIndirect: true);
         }
     }
 }

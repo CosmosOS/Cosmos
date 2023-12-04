@@ -23,21 +23,21 @@ namespace Cosmos.Core_Asm
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             XS.Comment("Source array");
-            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);
-            XS.Add(XSRegisters.ESI, ObjectUtils.FieldDataOffset + 4);
+            XS.Set(XSRegisters.RSI, XSRegisters.RBP, sourceDisplacement: SourceArrayDisplacement);
+            XS.Add(XSRegisters.RSI, ObjectUtils.FieldDataOffset + 4);
             XS.Comment("Source index");
-            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: SourceIndexDisplacement);
-            XS.Add(XSRegisters.ESI, XSRegisters.EAX);
+            XS.Set(XSRegisters.RAX, XSRegisters.RBP, sourceDisplacement: SourceIndexDisplacement);
+            XS.Add(XSRegisters.RSI, XSRegisters.RAX);
 
             XS.Comment("Destination array");
-            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
-            XS.Add(XSRegisters.EDI, ObjectUtils.FieldDataOffset + 4);
+            XS.Set(XSRegisters.RDI, XSRegisters.RBP, sourceDisplacement: DestinationArrayDisplacement);
+            XS.Add(XSRegisters.RDI, ObjectUtils.FieldDataOffset + 4);
             XS.Comment("Destination index");
-            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: DestinationIndexDisplacement);
-            XS.Add(XSRegisters.EDI, XSRegisters.EAX);
+            XS.Set(XSRegisters.RAX, XSRegisters.RBP, sourceDisplacement: DestinationIndexDisplacement);
+            XS.Add(XSRegisters.RDI, XSRegisters.RAX);
 
             XS.Comment("Count");
-            XS.Set(XSRegisters.ECX, XSRegisters.EBP, sourceDisplacement: CountDisplacement);
+            XS.Set(XSRegisters.RCX, XSRegisters.RBP, sourceDisplacement: CountDisplacement);
             new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
         }
     }

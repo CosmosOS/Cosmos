@@ -19,25 +19,25 @@ namespace Cosmos.Core_Asm
             // clear ecx bytes starting at edi
 
             // load element size into eax
-            XS.Set(EAX, EBP, sourceDisplacement: SourceArrayDisplacement);
-            XS.Add(EAX, 8);
-            XS.Set(EAX, EAX, sourceIsIndirect: true);
+            XS.Set(RAX, RBP, sourceDisplacement: SourceArrayDisplacement);
+            XS.Add(RAX, 8);
+            XS.Set(RAX, RAX, sourceIsIndirect: true);
 
             // load length into ebx
-            XS.Set(EBX, EBP, sourceDisplacement: SourceArrayDisplacement);
-            XS.Add(EBX, 12);
-            XS.Set(EBX, EBX, sourceIsIndirect: true);
+            XS.Set(RBX, RBP, sourceDisplacement: SourceArrayDisplacement);
+            XS.Add(RBX, 12);
+            XS.Set(RBX, RBX, sourceIsIndirect: true);
 
             // calculate size in bytes and move to ecx
-            XS.Multiply(EBX);
-            XS.Set(ECX, EAX);
+            XS.Multiply(RBX);
+            XS.Set(RCX, RAX);
 
             // load start into esi
-            XS.Set(EDI, EBP, sourceDisplacement: SourceArrayDisplacement);
-            XS.Add(EDI, 16);
+            XS.Set(RDI, RBP, sourceDisplacement: SourceArrayDisplacement);
+            XS.Add(RDI, 16);
 
             // clear eax bytes starting at esi
-            XS.Set(EAX, 0);
+            XS.Set(RAX, 0);
             XS.LiteralCode("rep stosb");
         }
     }
