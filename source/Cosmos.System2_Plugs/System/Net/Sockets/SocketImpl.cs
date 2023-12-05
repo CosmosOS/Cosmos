@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Cosmos.System.Helpers;
+using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4.TCP;
 using IL2CPU.API.Attribs;
 
@@ -18,6 +19,9 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         private static EndPoint _localEndPoint;
         private static EndPoint _remoteEndPoint;
+
+        private const int MinPort = 49152;
+        private const int MaxPort = 65535;
 
         public static void Ctor(Socket aThis, SocketType socketType, ProtocolType protocolType)
         {
@@ -111,19 +115,40 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return (uint)(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]);
         }
 
+        public static int GetRandomPort()
+        {
+            Random random = new Random();
+            return random.Next(MinPort, MaxPort + 1);
+        }
+
         public static void Connect(Socket aThis, IPAddress address, int port)
         {
+            Start();
+
+            Cosmos.HAL.Global.debugger.Send("Connect - start okay");
+            Cosmos.HAL.Global.debugger.Send("address - " + address.ToString());
+            Cosmos.HAL.Global.debugger.Send("port - " + port);
+
             if (StateMachine.Status == Status.ESTABLISHED)
             {
                 throw new Exception("Client must be closed before setting a new connection.");
             }
 
-            StateMachine.RemoteEndPoint.Address = new Cosmos.System.Network.IPv4.Address(ConvertIPAddressToUInt32(address));
-            StateMachine.LocalEndPoint.Address = Cosmos.System.Network.Config.IPConfig.FindNetwork(StateMachine.RemoteEndPoint.Address);
+            StateMachine.RemoteEndPoint.Address = Cosmos.System.Network.IPv4.Address.Parse(EndPoint.Address.ToString());
             StateMachine.RemoteEndPoint.Port = (ushort)port;
+            StateMachine.LocalEndPoint.Address = NetworkConfiguration.CurrentAddress;
+            StateMachine.LocalEndPoint.Port = (ushort)GetRandomPort();
 
-            _remoteEndPoint = new IPEndPoint(StateMachine.RemoteEndPoint.Address.ToUInt32(), StateMachine.RemoteEndPoint.Port);
+            Cosmos.HAL.Global.debugger.Send("StateMachine.RemoteEndPoint.Address=" + StateMachine.RemoteEndPoint.Address.ToString());
+            Cosmos.HAL.Global.debugger.Send("StateMachine.LocalEndPoint.Address=" + StateMachine.LocalEndPoint.Address.ToString());
+
+            _remoteEndPoint = new IPEndPoint(address, StateMachine.RemoteEndPoint.Port);
             _localEndPoint = new IPEndPoint(StateMachine.LocalEndPoint.Address.ToUInt32(), StateMachine.LocalEndPoint.Port);
+
+            Cosmos.HAL.Global.debugger.Send("_remoteEndPoint=" + _remoteEndPoint.ToString());
+            Cosmos.HAL.Global.debugger.Send("_localEndPoint=" + _localEndPoint.ToString());
+
+            Cosmos.HAL.Global.debugger.Send("Connect - endpoints okay.");
 
             //Generate Random Sequence Number
             var rnd = new Random();
