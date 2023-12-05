@@ -22,6 +22,8 @@ namespace Cosmos.Core.Multiboot
         public static Framebuffer* Framebuffer { get; set; }
         public static MemoryMap* MemoryMap { get; set; }
         public static EFI64* EFI64 { get; set; }
+        public static AcpiOld* AcpiOld { get; set; }
+        public static AcpiNew* AcpiNew { get; set; }
 
         #endregion
 
@@ -59,6 +61,12 @@ namespace Cosmos.Core.Multiboot
                             break;
                         case 12:
                             EFI64 = (EFI64*)Tag;
+                            break;
+                        case 14:
+                            AcpiOld = (AcpiOld*)Tag;
+                            break;
+                        case 15:
+                            AcpiNew = (AcpiNew*)Tag;
                             break;
                         default:
                             break;
