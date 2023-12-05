@@ -26,6 +26,6 @@
 Run `make` to build Cosmos. Cosmos will clone all the required repos, build itself, and install it and it's nuget packages to the system automatically.
 
 ### dotnet Project Templates
-If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install ./source/templates/csharp/` assuming you are currently in the Cosmos base directory.
+If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install ./source/templates/csharp-linux/` assuming you are currently in the Cosmos base directory.
 After installing the template use `dotnet new cosmosCSKernel -n {name}` to create a new Cosmos Kernel project. 
-The dotnet template can be removed at a later time using `dotnet new --uninstall ./source/templates/csharp/`.
+The dotnet template can be removed later on using `dotnet new --uninstall ./source/templates/csharp-linux/`.
