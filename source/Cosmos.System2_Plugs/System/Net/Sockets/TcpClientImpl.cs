@@ -36,8 +36,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static int get_ReceiveBufferSize(TcpClient aThis)
         {
-            //TODO implement Socket.SetSocketOption Socket.GetSocketOption
-            return 8192;
+            return Cosmos.System.Network.IPv4.TCP.Tcp.TcpWindowSize;
         }
 
         public static void Connect(TcpClient aThis, string hostname, int port, [FieldAccess(Name = "System.Boolean System.Net.Sockets.TcpClient._active")] ref bool _active)

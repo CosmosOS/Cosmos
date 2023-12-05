@@ -17,8 +17,8 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         private static Tcp StateMachine;
         private static IPEndPoint EndPoint = null;
 
-        private static EndPoint _localEndPoint;
-        private static EndPoint _remoteEndPoint;
+        private static IPEndPoint _localEndPoint;
+        private static IPEndPoint _remoteEndPoint;
 
         private const int MinPort = 49152;
         private const int MaxPort = 65535;
@@ -125,12 +125,9 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         {
             Start();
 
-            Cosmos.HAL.Global.debugger.Send("Connect - start okay");
-            Cosmos.HAL.Global.debugger.Send("address - " + address.ToString());
-            Cosmos.HAL.Global.debugger.Send("port - " + port);
-
             if (StateMachine.Status == Status.ESTABLISHED)
             {
+                Cosmos.HAL.Global.debugger.Send("Socket - Client must be closed before setting a new connection..");
                 throw new Exception("Client must be closed before setting a new connection.");
             }
 
@@ -139,20 +136,12 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             StateMachine.LocalEndPoint.Address = NetworkConfiguration.CurrentAddress;
             StateMachine.LocalEndPoint.Port = (ushort)GetRandomPort();
 
-            Cosmos.HAL.Global.debugger.Send("StateMachine.RemoteEndPoint.Address=" + StateMachine.RemoteEndPoint.Address.ToString());
-            Cosmos.HAL.Global.debugger.Send("StateMachine.LocalEndPoint.Address=" + StateMachine.LocalEndPoint.Address.ToString());
-
             _remoteEndPoint = new IPEndPoint(address, StateMachine.RemoteEndPoint.Port);
             _localEndPoint = new IPEndPoint(StateMachine.LocalEndPoint.Address.ToUInt32(), StateMachine.LocalEndPoint.Port);
 
-            Cosmos.HAL.Global.debugger.Send("_remoteEndPoint=" + _remoteEndPoint.ToString());
-            Cosmos.HAL.Global.debugger.Send("_localEndPoint=" + _localEndPoint.ToString());
-
-            Cosmos.HAL.Global.debugger.Send("Connect - endpoints okay.");
-
             //Generate Random Sequence Number
-            var rnd = new Random();
-            var SequenceNumber = (uint)(rnd.Next(0, Int32.MaxValue) << 32) | (uint)rnd.Next(0, Int32.MaxValue);
+            Random rnd = new();
+            var SequenceNumber = (uint)(rnd.Next(0, int.MaxValue) << 32) | (uint)rnd.Next(0, int.MaxValue);
 
             //Fill TCB
             StateMachine.TCB.SndUna = SequenceNumber;
@@ -169,12 +158,10 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             StateMachine.TCB.IRS = 0;
 
             Tcp.Connections.Add(StateMachine);
-
             StateMachine.SendEmptyPacket(Flags.SYN);
-
             StateMachine.Status = Status.SYN_SENT;
 
-            if (StateMachine.WaitStatus(Status.ESTABLISHED, 5) == false)
+            if (StateMachine.WaitStatus(Status.ESTABLISHED, 5000) == false)
             {
                 throw new Exception("Failed to open TCP connection!");
             }

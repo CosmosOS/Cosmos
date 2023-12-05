@@ -16,14 +16,19 @@ namespace Cosmos.System_Plugs.System.Net
         private const int IPv6AddressBytes = 16;
         private static uint PrivateAddress;
 
-        public static uint get_PrivateAddress()
+        public static uint get_PrivateAddress(IPAddress aThis)
         {
             return PrivateAddress;
         }
 
-        public static void set_PrivateAddress(uint address)
+        public static void set_PrivateAddress(IPAddress aThis, uint address)
         {
             PrivateAddress = address;
+        }
+
+        public static AddressFamily get_AddressFamily(IPAddress aThis)
+        {
+            return AddressFamily.InterNetwork;
         }
 
         public static void CCtor(IPAddress aThis)
@@ -47,11 +52,11 @@ namespace Cosmos.System_Plugs.System.Net
 
         public static void Ctor(IPAddress aThis, byte[] address)
         {
-            Cosmos.HAL.Global.debugger.Send(address[0] + "." + address[1] + "." + address[2] + "." + address[3]);
-
             if (address.Length == IPv4AddressBytes)
             {
-                PrivateAddress = (uint)((address[0] << 24) | (address[1] << 16) | (address[2] << 8) | (address[3] << 0));
+                PrivateAddress = (uint)((address[0] << 0) | (address[1] << 8) | (address[2] << 16) | (address[3] << 24));
+
+                Cosmos.HAL.Global.debugger.Send("Ctor address=" + aThis.ToString());
             }
             else if (address.Length == IPv6AddressBytes)
             {
@@ -77,9 +82,6 @@ namespace Cosmos.System_Plugs.System.Net
                     addressArray[2] = byte.Parse(fragments[2]);
                     addressArray[3] = byte.Parse(fragments[3]);
 
-                    Cosmos.HAL.Global.debugger.Send(fragments[0] + "." + fragments[1] + "." + fragments[2] + "." + fragments[3]);
-                    Cosmos.HAL.Global.debugger.Send(addressArray[0] + "." + addressArray[1] + "." + addressArray[2] + "." +  addressArray[3]);
-
                     return new IPAddress(addressArray);
                 }
                 catch
@@ -91,11 +93,6 @@ namespace Cosmos.System_Plugs.System.Net
             {
                 return null;
             }
-        }
-
-        public static string ToString(IPAddress aThis)
-        {
-            return (byte)(PrivateAddress >> 24) + "." + (byte)(PrivateAddress >> 16 & 0xff) + "." + (byte)(PrivateAddress >> 8 & 0xff) + "." + (byte)(PrivateAddress & 0xff);
         }
     }
 }
