@@ -44,7 +44,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             var address = IPAddress.Parse(hostname);
             var endpoint = new IPEndPoint(address, port);
 
-            Cosmos.HAL.Global.debugger.Send("address - " + address.ToString());
             _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _clientSocket.Bind(endpoint);
             _clientSocket.Connect(address, port);
@@ -53,6 +52,10 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
         public static void Connect(TcpClient aThis, IPAddress address, int port, [FieldAccess(Name = "System.Boolean System.Net.Sockets.TcpClient._active")] ref bool _active)
         {
+            var endpoint = new IPEndPoint(address, port);
+
+            _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _clientSocket.Bind(endpoint);
             _clientSocket.Connect(address, port);
             _active = true;
         }

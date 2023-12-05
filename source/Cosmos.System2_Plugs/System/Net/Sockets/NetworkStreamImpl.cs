@@ -56,6 +56,11 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return _streamSocket.Receive(buffer, offset, count, 0);
         }
 
+        public static void Write(NetworkStream aThis, ReadOnlySpan<byte> buffer)
+        {
+            Write(aThis, buffer.ToArray(), 0, buffer.Length);
+        }
+
         public static void Write(NetworkStream aThis, byte[] buffer, int offset, int count)
         {
             _streamSocket.Send(buffer, offset, count, 0);
