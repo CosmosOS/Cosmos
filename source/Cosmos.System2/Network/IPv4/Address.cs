@@ -38,6 +38,18 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Create new instance of the <see cref="Address"/> class, with specified IP address.
         /// </summary>
+        /// <param name="address">Adress</param>
+        public Address(uint address)
+        {
+            Parts[0] = (byte)((address >> 24) & 0xFF);
+            Parts[1] = (byte)((address >> 16) & 0xFF);
+            Parts[2] = (byte)((address >> 8) & 0xFF);
+            Parts[3] = (byte)(address & 0xFF);
+        }
+
+        /// <summary>
+        /// Create new instance of the <see cref="Address"/> class, with specified IP address.
+        /// </summary>
         /// <param name="aFirst">First block of the address.</param>
         /// <param name="aSecond">Second block of the address.</param>
         /// <param name="aThird">Third block of the address.</param>
@@ -161,7 +173,7 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Convert this address to a 32-bit number.
         /// </summary>
-        private uint ToUInt32()
+        public uint ToUInt32()
         {
             return (uint)((Parts[0] << 24) | (Parts[1] << 16) | (Parts[2] << 8) | (Parts[3] << 0));
         }

@@ -28,6 +28,17 @@ namespace Cosmos.System.Network.IPv4
             Port = port;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EndPoint"/> class.
+        /// </summary>
+        /// <param name="addr">The IPv4 address.</param>
+        /// <param name="port">The port.</param>
+        public EndPoint(uint addr, ushort port)
+        {
+            Address = new Address(addr);
+            Port = port;
+        }
+
         public override string ToString()
         {
             return Address.ToString() + ":" + Port.ToString();

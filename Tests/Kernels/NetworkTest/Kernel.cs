@@ -11,6 +11,8 @@ using Cosmos.TestRunner;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using Sys = Cosmos.System;
 
@@ -156,39 +158,53 @@ namespace NetworkTest
 
             using (var xClient = new TcpClient())
             {
-                Assert.IsTrue(xClient.IsClosed(), "TCP connexion created.");
+                Global.debugger.Send("Creating IPAddress...");
+                var address = new IPAddress(new byte[] { 127, 0, 0, 1 });
+                Global.debugger.Send("Connecting to TCP server...");
+                xClient.Connect(address, 12345);
+                Global.debugger.Send("TcpClient connected.");
+                NetworkStream stream = xClient.GetStream();
+                Assert.IsTrue(xClient.Connected, "TCP connexion established.");
 
-                xClient.Connect(new Address(127, 0, 0, 1), 12345);
-                Assert.IsTrue(xClient.IsConnected(), "TCP connexion established.");
+                byte[] receivedData = new byte[xClient.ReceiveBufferSize];
+                int bytesRead = stream.Read(receivedData, 0, receivedData.Length);
+                string receivedMessage = Encoding.ASCII.GetString(receivedData, 0, bytesRead);
+                Assert.AreEqual(receivedMessage, "Hello from the testrunner!", "TCP receive works");
 
-                var endpoint = new EndPoint(Address.Zero, 0);
-                var data = xClient.Receive(ref endpoint);
-                Assert.AreEqual(Encoding.ASCII.GetString(data), "Hello from the testrunner!", "TCP receive works");
+                Global.debugger.Send("TcpClient sending IP " + NetworkConfiguration.CurrentAddress.ToString());
+                stream.Write(Encoding.ASCII.GetBytes(NetworkConfiguration.CurrentAddress.ToString()));
+                Global.debugger.Send("TcpClient IP sent");
 
-                xClient.Send(Encoding.ASCII.GetBytes(NetworkConfiguration.CurrentAddress.ToString()));
+                // Envoyer un message au serveur
+                string messageToSend = "cosmos is the best operating system uwu";
+                byte[] dataToSend = Encoding.ASCII.GetBytes(messageToSend);
+                Global.debugger.Send("Sending: " + messageToSend);
+                stream.Write(dataToSend, 0, dataToSend.Length);
 
-                xClient.Send(Encoding.ASCII.GetBytes("cosmos is the best operating system uwu"));
-                var data2 = xClient.Receive(ref endpoint);
-                Assert.AreEqual(Encoding.ASCII.GetString(data2), "COSMOS IS THE BEST OPERATING SYSTEM UWU", "TCP send works");
+                byte[] receivedData2 = new byte[xClient.ReceiveBufferSize];
+                int bytesRead2 = stream.Read(receivedData2, 0, receivedData2.Length);
+                string receivedMessage2 = Encoding.ASCII.GetString(receivedData2, 0, bytesRead2);
+                Assert.AreEqual(receivedMessage2, "COSMOS IS THE BEST OPERATING SYSTEM UWU", "TCP send works");
 
                 string baseMessage = "This is a long TCP message for sequencing test...";
                 string paddedMessage = baseMessage.PadRight(6000, '.');
-                xClient.Send(Encoding.ASCII.GetBytes(paddedMessage));
+                stream.Write(Encoding.ASCII.GetBytes(paddedMessage));
+                Global.debugger.Send("Sent long data packet.");
 
-                var data3 = xClient.Receive(ref endpoint);
-                Assert.AreEqual(data3.Length, 6000, "TCP paquet sequencing works.");
+                byte[] receivedData3 = new byte[xClient.ReceiveBufferSize];
+                int bytesRead3 = stream.Read(receivedData3, 0, receivedData3.Length);
+                Assert.AreEqual(bytesRead3, 6000, "TCP paquet sequencing works.");
+
+                stream.Close();
             }
 
             Global.debugger.Send("Creating TCP server...");
 
-            using (var xServer = new TcpListener(4343))
-            {
-                xServer.Start();
-                Assert.IsTrue(xServer.IsListening(), "TCP server is listening.");
+            var xServer = new TcpListener(IPAddress.Any, 4343);
+            xServer.Start();
 
-                var client = xServer.AcceptTcpClient(); //blocking
-                Assert.IsTrue(xServer.IsConnected(), "Received new client! TCP connexion established.");
-            }
+            var client = xServer.AcceptTcpClient(); //blocking
+            Assert.IsTrue(client.Connected, "Received new client! TCP connexion established.");
         }
 
         private void TestDnsConnection()
@@ -222,7 +238,7 @@ namespace NetworkTest
 
                 xClient.SendEcho();
 
-                var endpoint = new EndPoint(Address.Zero, 0);
+                var endpoint = new Sys.Network.IPv4.EndPoint(Address.Zero, 0);
                 int time = xClient.Receive(ref endpoint);
 
                 Assert.IsFalse(time == -1, "ICMP echo works");
