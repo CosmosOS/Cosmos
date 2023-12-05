@@ -6,7 +6,7 @@ All protocols here don't necessary support every feature described by their RFC 
 
 Each protocol has a Client class which can be used to receive and send data. If a Receive() method is blocking, the method will timeout after 5 seconds or use the value optionally set by parameter. Please note that all finished connections should be closed using Close().
 
-Cosmos Network Stack won't use Classes and Functions that are under .NET Core. Everything described here will be under:
+The Cosmos Network Stack mainly not uses classes and functions that are under .NET Core (except TCP). Everything described here will be under:
 ```csharp
 using Cosmos.System.Network;
 ```
@@ -28,6 +28,11 @@ using(var xClient = new DHCPClient())
 }
 ```
 
+### Get local IP address
+```csharp
+Console.WriteLine(NetworkConfiguration.CurrentAddress.ToString());
+```
+
 ## UDP
 Before playing with packets, we have to create a client and call Connect() to specify the remote machine address. After that the client will be able to send or listen for data.
 ```csharp
@@ -46,7 +51,7 @@ using(var xClient = new UdpClient(4242))
 ```
 
 ## TCP
-Unlike UDP, TCP is plugged with the dotnet framework. You won't have to use Cosmos.System.Network.IPv4.TCP but System.Net.Sockets and System.Net. You can setup TCP network streams using TcpListener, TcpClient and NetworkStream, don't use the Stream class unless you know what you do.
+Unlike UDP, TCP is plugged with the dotnet framework. You won't have to use Cosmos.System.Network but System.Net.Sockets and System.Net. You can setup TCP network streams using TcpListener, TcpClient and NetworkStream, don't use the Stream class unless you know what you do.
 
 Server:
 ```csharp
@@ -196,9 +201,4 @@ using(var xClient = new DnsClient())
     /** Receive DNS Response **/
     Address destination = xClient.Receive(); //can set a timeout value
 }
-
-```
-## Get local IP address
-```csharp
-Console.WriteLine(NetworkConfiguration.CurrentAddress.ToString());
 ```
