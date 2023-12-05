@@ -33,7 +33,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             CheckSocket(aThis, socketType, protocolType);
         }
 
-        public static void CheckSocket(Socket aThis, SocketType socketType, ProtocolType protocolType)
+        private static void CheckSocket(Socket aThis, SocketType socketType, ProtocolType protocolType)
         {
             if (socketType != SocketType.Stream)
             {
@@ -93,7 +93,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             while (StateMachine.WaitStatus(Status.ESTABLISHED) != true);
 
             _remoteEndPoint = new IPEndPoint(StateMachine.RemoteEndPoint.Address.ToUInt32(), StateMachine.RemoteEndPoint.Port);
-
             _localEndPoint = new IPEndPoint(StateMachine.LocalEndPoint.Address.ToUInt32(), StateMachine.LocalEndPoint.Port);
 
             return aThis;
@@ -109,18 +108,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             Tcp.Connections.Add(StateMachine);
         }
 
-        private static uint ConvertIPAddressToUInt32(IPAddress ip)
-        {
-            byte[] bytes = ip.GetAddressBytes();
-            return (uint)(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]);
-        }
-
-        public static int GetRandomPort()
-        {
-            Random random = new Random();
-            return random.Next(MinPort, MaxPort + 1);
-        }
-
         public static void Connect(Socket aThis, IPAddress address, int port)
         {
             Start();
@@ -134,7 +121,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             StateMachine.RemoteEndPoint.Address = Cosmos.System.Network.IPv4.Address.Parse(EndPoint.Address.ToString());
             StateMachine.RemoteEndPoint.Port = (ushort)port;
             StateMachine.LocalEndPoint.Address = NetworkConfiguration.CurrentAddress;
-            StateMachine.LocalEndPoint.Port = (ushort)GetRandomPort();
+            StateMachine.LocalEndPoint.Port = Tcp.GetDynamicPort();
 
             _remoteEndPoint = new IPEndPoint(address, StateMachine.RemoteEndPoint.Port);
             _localEndPoint = new IPEndPoint(StateMachine.LocalEndPoint.Address.ToUInt32(), StateMachine.LocalEndPoint.Port);
@@ -224,8 +211,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
                 Cosmos.System.Network.NetworkStack.Update();
 
                 StateMachine.TCB.SndNxt += (uint)size;
-
-                StateMachine.WaitingSendAck = true;
 
                 bytesSent = size;
 

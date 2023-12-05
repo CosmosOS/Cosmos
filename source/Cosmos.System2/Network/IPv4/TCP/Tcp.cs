@@ -293,11 +293,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         public Status Status;
 
         /// <summary>
-        /// Check send data confirmation.
-        /// </summary>
-        public bool WaitingSendAck = false;
-
-        /// <summary>
         /// The received data buffer.
         /// </summary>
         public byte[] Data { get; set; }
@@ -401,8 +396,6 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.FIN)
             {
-                Status = Status.CLOSED;
-
                 NetworkStack.Debugger.Send("TCP connection closed! (FIN received on LISTEN state)");
             }
             else if (packet.ACK)

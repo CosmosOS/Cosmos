@@ -55,12 +55,10 @@ namespace Cosmos.System_Plugs.System.Net
             if (address.Length == IPv4AddressBytes)
             {
                 PrivateAddress = (uint)((address[0] << 0) | (address[1] << 8) | (address[2] << 16) | (address[3] << 24));
-
-                Cosmos.HAL.Global.debugger.Send("Ctor address=" + aThis.ToString());
             }
             else if (address.Length == IPv6AddressBytes)
             {
-                Cosmos.HAL.Global.debugger.Send("IPv6 not supported yet!");
+                //do nothing
             }
             else
             {
