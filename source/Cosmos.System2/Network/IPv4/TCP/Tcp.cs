@@ -184,12 +184,12 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// A list of currently active connections.
         /// </summary>
-        internal static List<Tcp> Connections;
+        public static List<Tcp> Connections;
 
         /// <summary>
         /// String / enum correspondance (used for debugging)
         /// </summary>
-        internal static readonly string[] Table;
+        public static readonly string[] Table;
 
         static Tcp()
         {
@@ -248,15 +248,13 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <remarks>
         /// If a connection is found that matches the local and remote ports and addresses, it will be removed from the list of connections.
         /// </remarks>
-        internal static void RemoveConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
+        public static void RemoveConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
             for (int i = 0; i < Connections.Count; i++)
             {
                 if (Connections[i].Equals(localPort, remotePort, localIp, remoteIp))
                 {
                     Connections.RemoveAt(i);
-
-                    NetworkStack.Debugger.Send("Connection removed!");
 
                     return;
                 }
@@ -280,14 +278,14 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// The connection Transmission Control Block.
         /// </summary>
-        internal TransmissionControlBlock TCB { get; set; }
+        public TransmissionControlBlock TCB { get; set; }
 
         #endregion
 
         /// <summary>
         /// The RX buffer queue.
         /// </summary>
-        internal Queue<TCPPacket> RxBuffer;
+        public Queue<TCPPacket> RxBuffer;
 
         /// <summary>
         /// The connection status.
@@ -297,7 +295,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// The received data buffer.
         /// </summary>
-        internal byte[] Data { get; set; }
+        public byte[] Data { get; set; }
 
         public Tcp(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
         {
@@ -359,7 +357,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                         case Status.TIME_WAIT:
                             break;
                         default:
-                            NetworkStack.Debugger.Send("Unknown TCP connection state.");
+                            NetworkStack.Debugger.Send("Unknown TCP connection state = " + (int)Status);
                             break;
                     }
                 }
@@ -398,8 +396,6 @@ namespace Cosmos.System.Network.IPv4.TCP
             }
             else if (packet.FIN)
             {
-                Status = Status.CLOSED;
-
                 NetworkStack.Debugger.Send("TCP connection closed! (FIN received on LISTEN state)");
             }
             else if (packet.ACK)
@@ -600,7 +596,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                     TCB.RcvNxt += packet.TCP_DataLength;
 
                     Data = ArrayHelper.Concat(Data, packet.TCP_Data);
-                }
+                }                
             }
             if (packet.RST)
             {
@@ -714,7 +710,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Waits for a new TCP connection status.
         /// </summary>
-        internal bool WaitStatus(Status status, int timeout)
+        public bool WaitStatus(Status status, int timeout)
         {
             int second = 0;
             int _deltaT = 0;
@@ -737,7 +733,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Waits for a new TCP connection status (blocking).
         /// </summary>
-        internal bool WaitStatus(Status status)
+        public bool WaitStatus(Status status)
         {
             while (Status != status);
 
@@ -747,7 +743,7 @@ namespace Cosmos.System.Network.IPv4.TCP
         /// <summary>
         /// Sends an empty packet.
         /// </summary>
-        internal void SendEmptyPacket(Flags flag)
+        public void SendEmptyPacket(Flags flag)
         {
             SendPacket(new TCPPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port, TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
         }

@@ -133,5 +133,17 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Kernel32_ReadFile_System_Runtime_InteropServices_SafeHandle__System_Byte___System_Int32___System_Int32__System_Threading_NativeOverlapped__")]
+        public static unsafe int ReadFile(global::System.Runtime.InteropServices.SafeHandle aSafeHandle, byte* aBytePtr, int aInt, ref int aRefInt, global::System.Threading.NativeOverlapped* aNativeOverlappedPtr)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__Interop_Kernel32_GetSystemInfo__Interop_Kernel32_SYSTEM_INFO_")]
+        public static unsafe void GetSystemInfo(object lpSystemInfo)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
