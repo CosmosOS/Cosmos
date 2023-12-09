@@ -2,7 +2,7 @@
 
 using System;
 using System.IO;
-
+using Cosmos.Core;
 using Cosmos.System.FileSystem.FAT.Listing;
 
 namespace Cosmos.System.FileSystem.FAT
@@ -426,6 +426,8 @@ namespace Cosmos.System.FileSystem.FAT
                 aOffset += (int)xWriteSize;
                 mPosition += xWriteSize;
             }
+
+            GCImplementation.Free(xCluster);
         }
     }
 }
