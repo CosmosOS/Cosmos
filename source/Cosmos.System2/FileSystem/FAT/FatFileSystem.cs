@@ -893,14 +893,13 @@ namespace Cosmos.System.FileSystem.FAT
         /// <param name="aData">A data array to write the output to.</param>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="Exception">Thrown when data size invalid.</exception>
-        internal void Read(long aCluster, out byte[] aData)
+        internal void Read(long aCluster, ref byte[] aData)
         {
             Global.Debugger.SendInternal("-- FatFileSystem.Read --");
             Global.Debugger.SendInternal($"aCluster = {aCluster}");
 
             if (mFatType == FatTypeEnum.Fat32)
             {
-                aData = NewBlockArray();
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
                 Global.Debugger.SendInternal($"xSector = {xSector}");
                 Device.ReadBlock((ulong)xSector, SectorsPerCluster, ref aData);
@@ -908,7 +907,6 @@ namespace Cosmos.System.FileSystem.FAT
             else
             {
                 Global.Debugger.SendInternal("aCluster: " + aCluster);
-                aData = Device.NewBlockArray(1);
                 Device.ReadBlock((ulong)aCluster, RootSectorCount, ref aData);
             }
             Global.Debugger.SendInternal($"aData.Length = {aData.Length}");
@@ -958,8 +956,8 @@ namespace Cosmos.System.FileSystem.FAT
                 aSize = BytesPerCluster;
             }
 
-            byte[] xData;
-            Read(aCluster, out xData);
+            byte[] xData = NewBlockArray();
+            Read(aCluster, ref xData);
 
 
             Array.Copy(aData, 0, xData, aOffset, aSize);
@@ -973,6 +971,8 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 Device.WriteBlock((ulong)aCluster, RootSectorCount, ref xData);
             }
+
+            GCImplementation.Free(xData);
         }
 
         /// <summary>
