@@ -955,24 +955,17 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 aSize = BytesPerCluster;
             }
-
-            byte[] xData = NewBlockArray();
-            Read(aCluster, ref xData);
-
-
-            Array.Copy(aData, 0, xData, aOffset, aSize);
+            
 
             if (mFatType == FatTypeEnum.Fat32)
             {
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                Device.WriteBlock((ulong)xSector, SectorsPerCluster, ref xData);
+                Device.WriteBlock((ulong)xSector, SectorsPerCluster, ref aData);
             }
             else
             {
-                Device.WriteBlock((ulong)aCluster, RootSectorCount, ref xData);
+                Device.WriteBlock((ulong)aCluster, RootSectorCount, ref aData);
             }
-
-            GCImplementation.Free(xData);
         }
 
         /// <summary>
