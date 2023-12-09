@@ -1,5 +1,6 @@
+using System.Security.Cryptography;
 using Cosmos.Core;
-
+using IL2CPU.API;
 using IL2CPU.API.Attribs;
 
 using XSharp;
@@ -82,6 +83,35 @@ namespace Cosmos.Core_Asm
 
         [PlugMethod(Assembler = typeof(Read8Assembler))]
         public static byte Read8(ushort aPort) => throw null;
+
+        #endregion
+
+        #region Read8 (many)
+
+        private class Read8AssemblerMany : AssemblerMethod
+        {
+            public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
+            {
+                // the port index is in EBP+8
+                // the reference to the byte array is in EBP+12
+                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 16); // EDX = Port (ebp+16)
+                XS.Set(XSRegisters.ECX, XSRegisters.EBP, sourceDisplacement: 12); // ECX = Pointer to array (ebp+12)
+
+                XS.Lea(XSRegisters.ESI, XSRegisters.ECX, sourceDisplacement: 16); // ESI = Data* (ecx+16)
+                XS.Set(XSRegisters.EBX, XSRegisters.ECX, sourceDisplacement: 8); // EBX = Length (ecx+8)
+                
+                XS.Label(".loop");
+                XS.ReadFromPortDX(XSRegisters.AX);
+                XS.Set(XSRegisters.ESI, XSRegisters.AX, destinationIsIndirect: true); // *esi = ax
+                XS.Add(XSRegisters.ESI, 2); // esi++
+
+                XS.Sub(XSRegisters.EBX, 2); // ebx--
+                XS.Jump(XSharp.Assembler.x86.ConditionalTestEnum.NotZero, ".loop"); // if (ebx != 0) goto .loop
+            }
+        }
+
+        [PlugMethod(Assembler = typeof(Read8AssemblerMany))]
+        public static void Read8(ushort aPort, byte[] aData) => throw null;
 
         #endregion
 

@@ -405,7 +405,7 @@ namespace Cosmos.HAL.BlockDevice
 			SelectSector(aBlockNo, aBlockCount);
 			SendCmd(LBA48Bit ? Cmd.ReadPioExt : Cmd.ReadPio);
             IOPort.Read8(IO.Data, aData);
-		}
+        }
 
         /// <summary>
         /// Writes the specific block of data using the starting block,
