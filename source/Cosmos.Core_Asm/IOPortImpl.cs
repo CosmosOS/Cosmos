@@ -92,7 +92,7 @@ namespace Cosmos.Core_Asm
         {
             public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
-                // the port index is in EBP+8
+                // the port index is in EBP+16
                 // the reference to the byte array is in EBP+12
                 XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 16); // EDX = Port (ebp+16)
                 XS.Set(XSRegisters.ECX, XSRegisters.EBP, sourceDisplacement: 12); // ECX = Pointer to array (ebp+12)
