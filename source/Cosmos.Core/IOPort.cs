@@ -18,6 +18,15 @@ namespace Cosmos.Core
         public static void Write8(int aPort, byte aData) => throw null;
 
         /// <summary>
+        /// Write many bytes to port with 400ns waits between each word
+        /// Plugged.
+        /// </summary>
+        /// <param name="aPort">A port to write to.</param>
+        /// <param name="aData">The data.</param>
+        [PlugMethod(PlugRequired = true)]
+        public static void WriteMany8WithWait(int aPort, byte[] aData) => throw null;
+
+        /// <summary>
         /// Write Word to port.
         /// Plugged.
         /// </summary>
