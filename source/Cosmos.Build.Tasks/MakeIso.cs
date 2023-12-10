@@ -65,6 +65,7 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitch("-J");
             xBuilder.AppendSwitch("-R");
             xBuilder.AppendSwitch("-l");
+            xBuilder.AppendSwitch("-allow-lowercase");
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
             xBuilder.AppendSwitch(" -b boot/limine-bios-cd.bin");
             xBuilder.AppendSwitch("-no-emul-boot");
