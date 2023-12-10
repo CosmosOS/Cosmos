@@ -29,6 +29,11 @@ namespace Cosmos.System.FileSystem.FAT
             private readonly ulong mFatSector;
 
             /// <summary>
+            /// A reused buffer for <see cref="GetFatEntry(uint, out uint)"/>s read operations to save on allocations.
+            /// </summary>
+            private byte[] _getFatEntryReadBuffer;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="Fat"/> class.
             /// </summary>
             /// <param name="aFileSystem">The file system.</param>
@@ -43,6 +48,7 @@ namespace Cosmos.System.FileSystem.FAT
 
                 mFileSystem = aFileSystem;
                 mFatSector = aFatSector;
+                _getFatEntryReadBuffer = mFileSystem.NewBlockArray();
             }
 
             /// <summary>
@@ -271,8 +277,8 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.Debugger.SendInternal($"RootCluster is {mFileSystem.RootCluster}");
                 Global.Debugger.SendInternal("Clearing all Fat Table");
 
-                byte[] xFatTableFirstSector;
-                ReadFatSector(0, out xFatTableFirstSector);
+                byte[] xFatTableFirstSector = mFileSystem.NewBlockArray();
+                ReadFatSector(0, ref xFatTableFirstSector);
 
                 /* Change 3rd entry (RootDirectory) to be EOC */
                 SetValueInFat(2, FatEntryEofValue(), xFatTableFirstSector);
@@ -311,10 +317,8 @@ namespace Cosmos.System.FileSystem.FAT
             /// <param name="aData">Output data byte.</param>
             /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
             /// <exception cref="Exception">Thrown when data size invalid.</exception>
-            private void ReadFatSector(ulong aSector, out byte[] aData)
-            {
+            private void ReadFatSector(ulong aSector, ref byte[] aData) {
                 Global.Debugger.SendInternal("-- FatFileSystem.ReadFatSector --");
-                aData = mFileSystem.NewBlockArray();
                 ulong xSector = mFatSector + aSector;
                 Global.Debugger.SendInternal("xSector  =" + xSector);
                 mFileSystem.Device.ReadBlock(xSector, mFileSystem.SectorsPerCluster, ref aData);
@@ -364,7 +368,7 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
                 Global.Debugger.SendInternal("xSector = " + xSector);
 
-                ReadFatSector(xSector, out byte[] xData);
+                ReadFatSector(xSector, ref _getFatEntryReadBuffer);
 
                 switch (mFileSystem.mFatType)
                 {
@@ -372,7 +376,7 @@ namespace Cosmos.System.FileSystem.FAT
                         // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
                         // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
                         // we want the high 12-bits of the 16-bits we fetch.
-                        uint xResult = BitConverter.ToUInt16(xData, (int)xEntryOffset);
+                        uint xResult = BitConverter.ToUInt16(_getFatEntryReadBuffer, (int)xEntryOffset);
                         if ((aEntryNumber & 0x01) == 0)
                         {
                             aValue = xResult & 0x0FFF; // Even
@@ -384,12 +388,12 @@ namespace Cosmos.System.FileSystem.FAT
                         break;
 
                     case FatTypeEnum.Fat16:
-                        aValue = BitConverter.ToUInt16(xData, (int)xEntryOffset);
+                        aValue = BitConverter.ToUInt16(_getFatEntryReadBuffer, (int)xEntryOffset);
                         break;
 
                     case FatTypeEnum.Fat32:
                         int localOffset = (int)(xEntryOffset % mFileSystem.BytesPerSector);
-                        aValue = BitConverter.ToUInt32(xData, localOffset) & 0x0FFFFFFF;
+                        aValue = BitConverter.ToUInt32(_getFatEntryReadBuffer, localOffset) & 0x0FFFFFFF;
                         break;
 
                     default:
@@ -420,8 +424,8 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
                 int localOffset = (int)(xEntryOffset % mFileSystem.BytesPerSector);
 
-                byte[] xData;
-                ReadFatSector(xSector, out xData);
+                byte[] xData = mFileSystem.NewBlockArray();
+                ReadFatSector(xSector, ref xData);
 
                 switch (mFileSystem.mFatType)
                 {
@@ -442,6 +446,7 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 WriteFatSector(xSector, xData);
+                GCImplementation.Free(xData);
                 Global.Debugger.SendInternal("Returning from --- Fat.SetFatEntry ---");
             }
 
@@ -468,8 +473,8 @@ namespace Cosmos.System.FileSystem.FAT
                 ulong xSector = xEntryOffset / mFileSystem.BytesPerSector;
                 ulong xSectorOffset = xSector * mFileSystem.BytesPerSector - xEntryOffset;
 
-                byte[] xData;
-                ReadFatSector(xSectorOffset, out xData);
+                byte[] xData = mFileSystem.NewBlockArray();
+                ReadFatSector(xSectorOffset, ref xData);
 
                 switch (mFileSystem.mFatType)
                 {
