@@ -139,9 +139,11 @@ namespace Cosmos.System.FileSystem.FAT
                     if (xEntriesRequired > xReturn.Length)
                     {
                         long xNewClusters = xEntriesRequired - xReturn.Length;
+                        uint prevFoundEntry = 0;
                         for (int i = 0; i < xNewClusters; i++)
                         {
-                            xCurrentEntry = GetNextUnallocatedFatEntry();
+                            xCurrentEntry = GetNextUnallocatedFatEntry(prevFoundEntry);
+                            prevFoundEntry = xCurrentEntry;
                             mFileSystem.Write(xCurrentEntry, new byte[mFileSystem.BytesPerCluster]);
                             uint xLastFatEntry = xReturn[xReturn.Length - 1];
                             SetFatEntry(xLastFatEntry, xCurrentEntry);
@@ -181,12 +183,12 @@ namespace Cosmos.System.FileSystem.FAT
             /// <exception cref="ArgumentNullException">Thrown on fatal error.</exception>
             /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
             /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
-            public uint GetNextUnallocatedFatEntry()
+            public uint GetNextUnallocatedFatEntry(uint startOffset = 0)
             {
                 Global.Debugger.SendInternal("-- Fat.GetNextUnallocatedFatEntry --");
 
                 uint xTotalEntries = mFileSystem.FatSectorCount * mFileSystem.BytesPerSector / GetFatEntrySizeInBytes();
-                for (uint i = mFileSystem.RootCluster + 1; i < xTotalEntries; i++)
+                for (uint i = mFileSystem.RootCluster + 1 + startOffset; i < xTotalEntries; i++)
                 {
                     GetFatEntry(i, out uint xEntryValue);
                     if (xEntryValue == 0) // check if fat entry is free

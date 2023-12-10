@@ -420,18 +420,9 @@ namespace Cosmos.HAL.BlockDevice
             SelectSector(aBlockNo, aBlockCount);
 			SendCmd(LBA48Bit ? Cmd.WritePioExt : Cmd.WritePio);
 
-            ushort xValue;
+            IOPort.WriteMany8WithWait(IO.Data, aData);
 
-			for (long i = 0; i < aData.Length / 2; i++)
-			{
-				xValue = (ushort)((aData[i * 2 + 1] << 8) | aData[i * 2]);
-                IOPort.Write16(IO.Data, xValue);
-				Wait();
-				// There must be a tiny delay between each OUTSW output word. A jmp $+2 size of delay.
-				// But that delay is cpu specific? so how long of a delay?
-			}
-
-			SendCmd(Cmd.CacheFlush);
+            SendCmd(Cmd.CacheFlush);
 		}
 
         /// <summary>
