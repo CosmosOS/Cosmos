@@ -248,14 +248,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
                 throw new ArgumentOutOfRangeException("Invalid offset or size");
             }
 
-            while (StateMachine.Data == null || StateMachine.Data.Length == 0)
-            {
-                if (StateMachine.Status != Status.ESTABLISHED)
-                {
-                    Cosmos.HAL.Global.debugger.Send("Socket - Client must be connected before receiving data..");
-                    return 0;
-                }
-            }
+            while (StateMachine.Data == null || StateMachine.Data.Length == 0) { }
 
             StateMachine.RxBuffer.Dequeue();
 

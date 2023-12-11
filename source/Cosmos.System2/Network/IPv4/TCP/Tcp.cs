@@ -577,7 +577,25 @@ namespace Cosmos.System.Network.IPv4.TCP
 
                     RxBuffer.Enqueue(packet);
 
-                    SendEmptyPacket(Flags.ACK);
+                    // Handle FIN flag within PSH handling if both are set
+                    if (packet.FIN)
+                    {
+                        TCB.RcvNxt++;
+
+                        SendEmptyPacket(Flags.ACK);
+
+                        Status = Status.CLOSE_WAIT;
+
+                        HAL.Global.PIT.Wait(300);
+
+                        SendEmptyPacket(Flags.FIN);
+
+                        Status = Status.LAST_ACK;
+                    }
+                    else
+                    {
+                        SendEmptyPacket(Flags.ACK);
+                    }
                     return;
                 }
                 else if (packet.FIN)
@@ -596,7 +614,7 @@ namespace Cosmos.System.Network.IPv4.TCP
                     TCB.RcvNxt += packet.TCP_DataLength;
 
                     Data = ArrayHelper.Concat(Data, packet.TCP_Data);
-                }                
+                }             
             }
             if (packet.RST)
             {
