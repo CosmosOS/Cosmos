@@ -903,8 +903,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             if (mEntryType != DirectoryEntryTypeEnum.Unknown)
             {
-                byte[] xData;
-                ((FatFileSystem)mFileSystem).Read(mFirstClusterNum, out xData);
+                FatFileSystem fatFS = mFileSystem as FatFileSystem;
+
+                byte[] xData = fatFS.NewBlockArray();
+                fatFS.Read(mFirstClusterNum, ref xData);
                 Global.Debugger.SendInternal("-- --------------------------------------- --");
                 return xData;
             }
@@ -1472,6 +1474,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         private long GetDirectoryEntrySize(byte[] DirectoryEntryData)
         {
             long xResult = 0;
+            FatFileSystem fatFS = ((FatFileSystem)mFileSystem);
+            byte[] xDirData = fatFS.NewBlockArray();
 
             for (uint i = 0; i < DirectoryEntryData.Length; i = i + 32)
             {
@@ -1520,8 +1524,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                         //Global.mFileSystemDebugger.SendInternal($"-- FatDirectoryEntry.GetDirectoryEntrySize() found directory: recursing!");
 
                         uint xFirstCluster = (uint)(BitConverter.ToUInt16(DirectoryEntryData, (int)i + 20) << 16 | BitConverter.ToUInt16(DirectoryEntryData, (int)i + 26));
-                        byte[] xDirData;
-                        ((FatFileSystem)mFileSystem).Read(xFirstCluster, out xDirData);
+                        fatFS.Read(xFirstCluster, ref xDirData);
 
                         xResult += GetDirectoryEntrySize(xDirData);
                         break;
