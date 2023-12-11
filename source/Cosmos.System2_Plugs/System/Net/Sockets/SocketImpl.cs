@@ -247,7 +247,14 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
                 throw new ArgumentOutOfRangeException("Invalid offset or size");
             }
 
-            while (StateMachine.Data == null || StateMachine.Data.Length == 0) { }
+            while (StateMachine.Data == null || StateMachine.Data.Length == 0)
+            {
+                if (StateMachine.Status != Status.ESTABLISHED)
+                {
+                    Cosmos.HAL.Global.debugger.Send("Socket - Client must be connected before receiving data..");
+                    break;
+                }
+            }
 
             int bytesToCopy = Math.Min(StateMachine.Data.Length, size);
             Buffer.BlockCopy(StateMachine.Data, 0, buffer, offset, bytesToCopy);
