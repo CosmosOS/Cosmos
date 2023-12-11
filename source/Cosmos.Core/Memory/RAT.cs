@@ -157,6 +157,11 @@ namespace Cosmos.Core.Memory
             uint xRatTotalSize = xRatPageCount * PageSize;
             mRAT = RamStart + RamSize - xRatTotalSize;
 
+            if (mRAT > HeapEnd)
+            {
+                throw new Exception("mRAT is greater than heap. rattotalsize is "+xRatTotalSize);
+            }
+
             // Mark empty pages as such in the RAT Table
             for (byte* p = mRAT; p < mRAT + TotalPageCount - xRatPageCount; p++)
             {

@@ -2,8 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
+using System.Net.Mime;
+using System.Text;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
+using Cosmos.System.FileSystem.ISO9660;
 using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
@@ -26,9 +30,8 @@ namespace Cosmos.System.FileSystem
             {
                 List<ManagedPartition> converted = new();
 
-                if(Host.Type == BlockDeviceType.RemovableCD) {
-                    // we dont actually have a partition table in CDs
-                    ManagedPartition part = new(new Partition(Host, 0, Host.BlockCount / 4)); // BlockSize is 512, SectorSize of ISO9660 usually is 2 2048
+                if (Host.Type == BlockDeviceType.RemovableCD) {
+                    ManagedPartition part = new(new Partition(Host, 0, 1000000000), nameof(ISO9660FileSystemFactory)); // For some reason, BlockCount is always 0, so just put a large value here.
 
                     if (mountedPartitions[0] != null) {
                         var data = mountedPartitions[0];
@@ -296,6 +299,11 @@ namespace Cosmos.System.FileSystem
 
             foreach (var item in FileSystemManager.RegisteredFileSystems)
             {
+                if(part.LimitFS != null && item.GetType().Name != part.LimitFS) {
+                    Kernel.PrintDebug("Did not mount partition " + index + " as " + item.GetType().Name + " because the partition has been limited to being a " + part.LimitFS);
+                    continue;
+                }
+                
                 if (item.IsType(part.Host))
                 {
                     Kernel.PrintDebug("Mounted partition.");

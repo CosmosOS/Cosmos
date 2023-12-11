@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using Cosmos.System.Network.Config;
-using Cosmos.System.Network.IPv4;
-using Cosmos.System.Network.IPv4.TCP;
 using Con = System.Console;
 
 namespace Cosmos.System.Network
@@ -13,12 +13,13 @@ namespace Cosmos.System.Network
     public class NetworkDebugger
     {
         private readonly TcpListener listener;
+        private NetworkStream stream;
         private TcpClient client;
 
         /// <summary>
         /// The remote host IP address.
         /// </summary>
-        public Address Ip { get; set; }
+        public IPAddress Ip { get; set; }
 
         /// <summary>
         /// The port to use.
@@ -32,7 +33,7 @@ namespace Cosmos.System.Network
         public NetworkDebugger(int port)
         {
             Port = port;
-            listener = new TcpListener((ushort)port);
+            listener = new TcpListener(IPAddress.Any, (ushort)port);
         }
 
         /// <summary>
@@ -40,11 +41,11 @@ namespace Cosmos.System.Network
         /// </summary>
         /// <param name="ip">IP Address of the remote debugger.</param>
         /// <param name="port">Port used for TCP connection.</param>
-        public NetworkDebugger(Address ip, int port)
+        public NetworkDebugger(IPAddress ip, int port)
         {
             Ip = ip;
             Port = port;
-            client = new TcpClient(port);
+            client = new TcpClient(new IPEndPoint(Ip, port));
         }
 
         /// <summary>
@@ -57,12 +58,14 @@ namespace Cosmos.System.Network
                 listener.Start();
                 
                 Con.WriteLine("Waiting for remote debugger connection at " + NetworkConfiguration.CurrentAddress.ToString() + ":" + Port);
-                client = listener.AcceptTcpClient(); //blocking
+                client = listener.AcceptTcpClient();
             }
             else if (listener == null)
             {
                 client.Connect(Ip, Port);
             }
+
+            stream = client.GetStream();
 
             Send("--- Cosmos Network Debugger ---");
             Send("Debugger connected!");
@@ -74,7 +77,8 @@ namespace Cosmos.System.Network
         /// <param name="message">Text to send to the debugger.</param>
         public void Send(string message)
         {
-            client.Send(Encoding.ASCII.GetBytes("[" + DateTime.Now.ToString("HH:mm:ss") + "] - " + message + "\r\n"));
+            byte[] dataToSend = Encoding.ASCII.GetBytes("[" + DateTime.Now.ToString("HH:mm:ss") + "] - " + message + "\r\n");
+            stream.Write(dataToSend, 0, dataToSend.Length);
         }
 
         /// <summary>
@@ -84,6 +88,7 @@ namespace Cosmos.System.Network
         {
             Con.WriteLine("Closing Debugger connection");
             Send("Closing...");
+            stream.Close();
             client.Close();
         }
     }

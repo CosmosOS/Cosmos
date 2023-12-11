@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <DebugEnabled>false</DebugEnabled>
         <EnableGDB>False</EnableGDB>
         <StartCosmosGDB>False</StartCosmosGDB>
         <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
