@@ -21,9 +21,11 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         public bool HasFileSystem => MountedFS != null;
 
-        public ManagedPartition(Partition host)
-        {
+        public string LimitFS = null;
+
+        public ManagedPartition(Partition host, string limitFS = null) {
             Host = host;
+            LimitFS = limitFS;
         }
 
         /// <summary>

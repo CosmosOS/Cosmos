@@ -41,11 +41,9 @@ namespace Cosmos.System_Plugs.System.IO
 
         public static void WriteAllBytes(string path, byte[] aData)
         {
-            BinaryWriter Writer = new(new FileStream(path, FileMode.OpenOrCreate));
-
-            Writer.Write(aData);
-
-            Writer.Dispose();
+            var writer = new FileStream(path, FileMode.OpenOrCreate);
+            writer.Write(aData);
+            writer.Dispose();
         }
     }
 }
