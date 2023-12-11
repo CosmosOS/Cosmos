@@ -283,11 +283,6 @@ namespace Cosmos.System.Network.IPv4.TCP
         #endregion
 
         /// <summary>
-        /// The RX buffer queue.
-        /// </summary>
-        public Queue<TCPPacket> RxBuffer;
-
-        /// <summary>
         /// The connection status.
         /// </summary>
         public Status Status;
@@ -574,8 +569,6 @@ namespace Cosmos.System.Network.IPv4.TCP
                     TCB.RcvNxt += packet.TCP_DataLength;
 
                     Data = ArrayHelper.Concat(Data, packet.TCP_Data);
-
-                    RxBuffer.Enqueue(packet);
 
                     // Handle FIN flag within PSH handling if both are set
                     if (packet.FIN)

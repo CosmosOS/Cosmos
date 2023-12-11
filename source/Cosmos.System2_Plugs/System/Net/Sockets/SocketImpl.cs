@@ -101,7 +101,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         private static void Start()
         {
             StateMachine = new((ushort)EndPoint.Port, 0, Cosmos.System.Network.IPv4.Address.Zero, Cosmos.System.Network.IPv4.Address.Zero);
-            StateMachine.RxBuffer = new Queue<TCPPacket>(8);
             StateMachine.LocalEndPoint.Port = (ushort)EndPoint.Port;
             StateMachine.Status = Status.LISTEN;
 
@@ -250,8 +249,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
             while (StateMachine.Data == null || StateMachine.Data.Length == 0) { }
 
-            StateMachine.RxBuffer.Dequeue();
-
             int bytesToCopy = Math.Min(StateMachine.Data.Length, size);
             Buffer.BlockCopy(StateMachine.Data, 0, buffer, offset, bytesToCopy);
 
@@ -301,8 +298,6 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             else if (StateMachine.Status == Status.ESTABLISHED)
             {
                 StateMachine.SendEmptyPacket(Flags.FIN | Flags.ACK);
-
-                StateMachine.TCB.SndNxt++;
 
                 StateMachine.Status = Status.FIN_WAIT1;
 
