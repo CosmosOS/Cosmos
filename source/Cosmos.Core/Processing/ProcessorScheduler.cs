@@ -23,18 +23,13 @@ namespace Cosmos.Core.Processing
             ProcessContext.m_ContextList = context;
             ProcessContext.m_CurrentContext = context;
 
-            IOPort counter0 = new IOPort(0x40);
-            IOPort cmd = new IOPort(0x43);
-
             int divisor = 1193182 / 25;
-            cmd.Byte = (0x06 | 0x30);
-            counter0.Byte = (byte)divisor;
-            counter0.Byte = (byte)(divisor >> 8);
+            IOPort.Write8(0x43, 0x06 | 0x30); // cmd
+            IOPort.Write8(0x40, (byte)divisor); // counter0
+            IOPort.Write8(0x40, (byte)(divisor >> 8));
 
-            IOPort pA1 = new IOPort(0xA1);
-            IOPort p21 = new IOPort(0xA1);
-            pA1.Byte = 0x00;
-            p21.Byte = 0x00;
+            IOPort.Write8(0xA1, 0x00); // pA1
+            IOPort.Write8(0xA1, 0x00); // p21
         }
 
         public static void EntryPoint()
