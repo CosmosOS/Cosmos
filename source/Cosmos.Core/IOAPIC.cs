@@ -82,22 +82,20 @@ namespace Cosmos.Core
         /// <summary>
         /// Set IO APIC Entry.
         /// </summary>
-        /// <param name="index">Entry index.</param>
-        /// <param name="data">Data.</param>
-        /// <param name="lapicId">Local APIC Id.</param>
-        public static void SetEntry(byte index, ulong data, uint lapicId = 0)
+        /// <param name="data">Irq ID.</param>
+        public static void SetEntry(uint irq)
         {
-            Out((byte)(IOREDTBL + index * 2), (uint)data);
-            Out((byte)(IOREDTBL + index * 2 + 1), (lapicId << 24));
+            SetEntry((byte)ACPI.RemapIRQ(irq - 0x20), irq);
         }
 
         /// <summary>
         /// Set IO APIC Entry.
         /// </summary>
         /// <param name="data">Irq ID.</param>
-        public static void SetEntry(uint irq)
+        public static void SetEntry(byte index, ulong data)
         {
-            SetEntry((byte)ACPI.RemapIRQ(irq), 0x20 + irq);
+            Out((byte)(IOREDTBL + index * 2), (uint)data);
+            Out((byte)(IOREDTBL + index * 2 + 1), (uint)(data >> 32));
         }
 
         /// <summary>

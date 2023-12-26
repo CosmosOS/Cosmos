@@ -283,7 +283,7 @@ namespace Cosmos.Core {
         /// <param name="aIrqNo">IRQ index.</param>
         /// <param name="aHandler">IRQ handler.</param>
         public static void SetIrqHandler(byte aIrqNo, IRQDelegate aHandler) {
-            IOAPIC.SetEntry(aIrqNo);
+            IOAPIC.SetEntry((uint)aIrqNo + 0x20);
             SetIntHandler((byte)(0x20 + aIrqNo), aHandler);
         }
 
