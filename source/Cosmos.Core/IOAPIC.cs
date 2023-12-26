@@ -42,12 +42,12 @@ namespace Cosmos.Core
                 Address = ACPI.IOAPIC->IOApicAddress;
             }
 
-            Global.mDebugger.Send("IO APIC address:0x" + Address.ToString("X"));
+            Global.debugger.Send("IO APIC address:0x" + Address.ToString("X"));
 
             uint x = In(IOAPICVER);
             uint count = ((x >> 16) & 0xFF) + 1;
 
-            Global.mDebugger.Send("IO APIC pins:" + count);
+            Global.debugger.Send("IO APIC pins:" + count);
 
             //Disable All Entries, Make all interrupts edge triggered and not routed to any CPUs
             for (uint i = 0; i < count; ++i)
@@ -55,7 +55,7 @@ namespace Cosmos.Core
                 SetEntry((byte)i, (1 << 16) | 0x20 + i);
             }
 
-            Global.mDebugger.Send("IO APIC " + GetId() + " Initialized");
+            Global.debugger.Send("IO APIC " + GetId() + " Initialized");
         }
 
         /// <summary>

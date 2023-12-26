@@ -28,7 +28,7 @@ namespace Cosmos.HAL
         /// </summary>
         public static void Initialize()
         {
-            INTs.SetIntHandler(0x20, HandleApicTimer);
+            INTs.SetIntHandler(0x21, HandleApicTimer);
 
             // setup timer, Intel IA manual 10-16 Vol. 3A
             LocalAPIC.Out(LocalAPIC.LAPIC_TDCR, 0xB); // divide timer counts by 1
@@ -40,15 +40,15 @@ namespace Cosmos.HAL
                 throw new Exception("APIC timer is not calibrated");
             }
 
-            LocalAPIC.Out(LocalAPIC.LAPIC_TIMER, 0x20000 | 0x20); // periodic, bind to corresponding IRQ
+            LocalAPIC.Out(LocalAPIC.LAPIC_TIMER, 0x20000 | 0x21); // periodic, bind to corresponding IRQ
             LocalAPIC.Out(LocalAPIC.LAPIC_TDCR, 0xB);
 
-            Global.mDebugger.Send("Local APIC Timer Initialized");
+            Global.debugger.Send("Local APIC Timer Initialized");
         }
 
         public static void HandleApicTimer(ref INTs.IRQContext aContext)
         {
-            Global.mDebugger.Send("APIC Timer IRQ");
+            Global.debugger.Send("APIC Timer IRQ");
             //Tick++;
         }
 
@@ -72,7 +72,7 @@ namespace Cosmos.HAL
 
         public static void Calibrate()
         {
-            Global.mDebugger.Send("Calibrating APIC timer...");
+            Global.debugger.Send("Calibrating APIC timer...");
 
             SetTimerCount(0xFFFFFFFF); // Set APIC init counter to -1
 
@@ -82,11 +82,11 @@ namespace Cosmos.HAL
 
             ulong ticks = 0xFFFFFFFF - LocalAPIC.In(LocalAPIC.LAPIC_TCCR); // Now we know how often the APIC timer has ticked in 10ms
 
-            Global.mDebugger.Send("APIC timer ticks per 10ms: " + ticks);
+            Global.debugger.Send("APIC timer ticks per 10ms: " + ticks);
 
             TickFrequency = (uint)(ticks * 1000 / 1000);
 
-            Global.mDebugger.Send("APIC timer tick frequency: " + TickFrequency);
+            Global.debugger.Send("APIC timer tick frequency: " + TickFrequency);
         }
     }
 }

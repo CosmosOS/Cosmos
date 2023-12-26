@@ -87,7 +87,7 @@ namespace Cosmos.Core
                 Address = ACPI.MADT->LocalAPICAddress;
             }
 
-            Global.mDebugger.Send("Local APIC address:0x" + Address.ToString("X"));
+            Global.debugger.Send("Local APIC address:0x" + Address.ToString("X"));
 
             //Enable All Interrupts
             Out(LAPIC_TPR, 0);
@@ -106,7 +106,7 @@ namespace Cosmos.Core
             // accept all level of interrupts
             Out(LAPIC_TPR, 0);
 
-            Global.mDebugger.Send("Local APIC " + GetId() + " initialized");
+            Global.debugger.Send("Local APIC " + GetId() + " initialized");
         }
 
         /// <summary>
