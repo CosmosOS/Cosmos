@@ -71,6 +71,7 @@ AlwaysShowComponentsList=False
 ShowComponentSizes=False
 LicenseFile=LICENSE.txt
 DisableDirPage=no
+WizardStyle=modern
 
 [Messages]
 SelectDirDesc=If the user installing the Cosmos User Kit is not the admin, please choose the users AppData/Roaming directory
@@ -86,7 +87,7 @@ Type: filesandordirs; Name: "{app}"
 Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Yasm\*.exe"; DestDir: "{app}\Build\Tools\Yasm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
+Source: ".\source\Cosmos.Build.Tasks\tools\xorriso\win\*"; DestDir: "{app}\Build\Tools\xorriso"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly recursesubdirs
 ;Source: ".\Build\VSIP\XSharp\*"; DestDir: "{app}\Build\XSharp"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
@@ -113,6 +114,7 @@ Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion 
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
 Source: ".\Build\limine\boot\limine.cfg"; DestDir: "{app}\Build\ISO\boot\limine\"
+Source: ".\source\Cosmos.Build.Tasks\tools\limine\boot\*"; DestDir: "{app}\Build\ISO\boot\limine\"
 ; USB
 Source: ".\Build\limine\boot\limine.cfg"; DestDir: "{app}\Build\USB\boot\limine\"
 ; PXE
@@ -142,12 +144,13 @@ UseRelativePaths=True
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; Description: "Uninstall Kernel Packages"; StatusMsg: "Uninstalling Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\packages\\"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "nuget locals all  -Clear"; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Clearing nuget cache"
-
+#ifndef DoNotInstallExtensions
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; Description: "Remove Cosmos Debug Engine"; StatusMsg: "Removing Visual Studio Extension: Cosmos Debug Engine"
 
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.DebugEngine.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+#endif
 
 [UninstallRun]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; StatusMsg: "Uninstalling Kernel Packages"

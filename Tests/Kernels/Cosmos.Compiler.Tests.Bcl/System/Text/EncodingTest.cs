@@ -11,7 +11,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Text
 {
     internal class EncodingTest
     {
-        private static Debugger mDebugger = new Debugger("System", "Enconding Test");
+        private static Debugger mDebugger = new("Enconding Test");
 
         private static byte[] UTF8EnglishText = new byte[] { 0x43, 0x6F, 0x73, 0x6D, 0x6F, 0x73, 0x20, 0x69, 0x73, 0x20,
                                                        0x77, 0x6F, 0x6E, 0x64, 0x65, 0x72, 0x66, 0x75, 0x6C, 0x21 };

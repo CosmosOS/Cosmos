@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.HAL.Drivers.PCI.Network;
+using Cosmos.HAL.Drivers.Network;
 
 namespace Cosmos.HAL.Network
 {
@@ -25,7 +23,6 @@ namespace Cosmos.HAL.Network
 
                     if (device.VendorID == (ushort)VendorID.AMD && device.DeviceID == (ushort)DeviceID.PCNETII)
                     {
-
                         Console.WriteLine("NIC IRQ: " + device.InterruptLine);
 
                         var AMDPCNetIIDevice = new AMDPCNetII(device);
@@ -44,9 +41,13 @@ namespace Cosmos.HAL.Network
 
                     if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
                     {
+                        Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+
                         var RTL8139Device = new RTL8139(device);
 
                         RTL8139Device.NameID = "eth" + NetworkDeviceID;
+
+                        Console.WriteLine("Registered at " + RTL8139Device.NameID + " (" + RTL8139Device.MACAddress.ToString() + ")");
 
                         RTL8139Device.Enable();
 
@@ -155,9 +156,13 @@ namespace Cosmos.HAL.Network
                            device.DeviceID == (ushort)E1000DeviceID.IntelI219LM_2
                            )
                         {
+                            Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+
                             var E1000Device = new E1000(device);
 
                             E1000Device.NameID = ("eth" + NetworkDeviceID);
+
+                            Console.WriteLine("Registered at " + E1000Device.NameID + " (" + E1000Device.MACAddress.ToString() + ")");
 
                             E1000Device.Enable();
 

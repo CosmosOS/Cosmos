@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Cosmos.HAL.BlockDevice;
-using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem
@@ -71,8 +70,8 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type / memory error.</exception>
         /// <exception cref="ArgumentException">Thrown on memory error.</exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         public abstract DirectoryEntry CreateDirectory(DirectoryEntry aParentDirectory, string aNewDirectory);
 
@@ -94,8 +93,8 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="Exception">Thrown when data size invalid / invalid directory entry type / memory error.</exception>
         /// <exception cref="ArgumentException">Thrown on memory error.</exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown on memory error.</exception>
         public abstract DirectoryEntry CreateFile(DirectoryEntry aParentDirectory, string aNewFile);
 
@@ -121,8 +120,8 @@ namespace Cosmos.System.FileSystem
         /// <item>Out of memory.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
@@ -165,8 +164,8 @@ namespace Cosmos.System.FileSystem
         /// <item>Out of memory.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
@@ -228,7 +227,7 @@ namespace Cosmos.System.FileSystem
         /// <list type = "bullet" >
         /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
         /// <item>Entrys matadata offset value is invalid.</item>
-        /// <item>Fatal error (contact support).</item>
+        /// <item>Fatal error.</item>
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when filesystem is null / memory error.</exception>
@@ -243,14 +242,14 @@ namespace Cosmos.System.FileSystem
         /// <list type="bullet">
         /// <item>Thrown when data size invalid.</item>
         /// <item>Thrown on unknown file system type.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// </list>
         /// </exception>
         /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
         /// <exception cref="DecoderFallbackException">Thrown on memory error.</exception>
         /// <exception cref="NotImplementedException">Thrown when FAT type is unknown.</exception>
-        /// <exception cref="RankException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="RankException">Thrown on fatal error.</exception>
+        /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
         public abstract void Format(string aDriveFormat, bool aQuick);

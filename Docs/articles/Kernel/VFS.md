@@ -12,7 +12,7 @@ This is essential for using the VFS.
 We start with creating a global CosmosVFS, this line should appear outside of any function, and before the BeforeRun() function.
 
 ```C#
-Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
+Sys.FileSystem.CosmosVFS fs = new Cosmos.FileSystem.CosmosVFS();
 ```
 
 Next, we register our VFS at the VFS manager, this will initiate the VFS and make it usable, add this to your kernel's BeforeRun() function:
@@ -30,7 +30,6 @@ Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
 You can get all available disks using `VFSManager.GetDisks()`. The methods to get information about the disk or format it can be found under the [Disk](https://cosmosos.github.io/api/Cosmos.System.FileSystem.Disk.html) class. To format a disk use the [`FormatDisk(int index, string format, bool quick = true)`](https://cosmosos.github.io/api/Cosmos.System.FileSystem.Disk.html#Cosmos_System_FileSystem_Disk_FormatPartition_System_Int32_System_String_System_Boolean_)
 method.
 
-**TODO**: Extend documentation and add examples
 
 ## Get available free space
 
@@ -46,7 +45,7 @@ Console.WriteLine("Available Free Space: " + available_space);
 You have probably noticed the "0:\" argument passed to this function, this is the id of the drive that we want to get available free space of.
 Cosmos using DOS drive naming system and this is why we use "0".
 
-**Attention**: Typing "0:/" instead of "0:\" might lead to errors, you've been warned.
+**Attention**: Typing "0:/" instead of "0:\\" might lead to errors, you've been warned.
 
 ## Get file system type
 
@@ -65,19 +64,38 @@ Console.WriteLine("File System Type: " + fs_type);
 We start by getting a list of files, using:
 
 ```C#
-var directory_list = Directory.GetFiles(@"0:\");
+var files_list = Directory.GetFiles(@"0:\");
 ```
 
 Once we have it, we can get the names of our files:
 
 ```C#
-foreach (var file in directory_list)
+foreach (var file in files_list)
 {
     Console.WriteLine(file);
 }
 ```
 
 ![Files List](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Files%20List.PNG)
+
+## Get directory listing (Files and directories)
+
+You can get files and directory listing by using this code: 
+
+```C#
+var files_list = Directory.GetFiles(@"0:\");
+var directory_list = Directory.GetDirectories(@"0:\");
+
+foreach (var file in files_list);
+{
+    Console.WriteLine(file)
+}
+foreach (var directory in directory_list)
+{
+    Console.WriteLine(directory);
+}
+```
+
 
 ## Read all the files in a directory
 
@@ -125,7 +143,35 @@ catch (Exception e)
 }
 ```
 
-We can also [check our files list](https://github.com/CosmosOS/Cosmos/wiki/FAT-FileSystem#get-files-list) and see our new file in it.
+## Create a new Directory
+Here is a example of code of creating a new directory:
+
+```C#
+try
+{
+    Directory.Create(@"0:\testing\");
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.ToString());
+}
+```
+
+## Deleting a file or a directory
+
+You can also delete files or directories using this code:
+
+```C#
+try
+{
+    File.Delete(@"0:\testing.txt");
+    Directory.Delete(@"0:\testing\");
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.ToString());
+}
+```
 
 ## Write to file
 
@@ -144,7 +190,27 @@ catch (Exception e)
 }
 ```
 
-## Read specific file
+## Move a file
+
+Actually, File.Move() is not plugged in Cosmos, so you need to Copy the file and then delete the old file.
+Here is an example Method:
+```C#
+public static void MoveFile(string file, string newpath)
+{
+    try
+    {
+        File.Copy(file, newpath);
+        File.Delete(file);
+    }
+    catch(Exception e)
+    {
+        Console.WriteLine(ex);
+    }
+}
+```
+
+
+## Read all text from a specific file
 
 Now we will read a specific file from a given path.  
 As usual, we'll do it in a try catch block.
@@ -161,3 +227,18 @@ catch (Exception e)
 ```
 
 ![Read Specific File](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Read%20Specified%20File.PNG)
+
+# Read All bytes from a specific file
+
+As like the ReadAllText Method, ReadAllBytes should return all bytes the bytes from a file.
+
+```C#
+try
+{
+    Console.WriteLine(File.ReadAllBytes(@"0:\testing.txt"));
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.ToString());
+}
+```

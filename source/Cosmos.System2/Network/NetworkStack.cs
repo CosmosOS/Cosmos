@@ -1,58 +1,47 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          Network Intialization + Packet Handler
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-//#define COSMOSDEBUG
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.System.Network.ARP;
 using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4;
-using Cosmos.System.Network.IPv4.UDP;
 
 namespace Cosmos.System.Network
 {
     /// <summary>
-    /// Implement a Network Stack for all network devices and protocols
+    /// Manages the Cosmos networking stack.
     /// </summary>
     public static class NetworkStack
     {
         /// <summary>
         /// Debugger instance of the "System" ring, with the "NetworkStack" tag.
         /// </summary>
-        public static Debugger debugger = new Debugger("System", "NetworkStack");
+        public static readonly Debugger Debugger = new("Network Stack");
 
         /// <summary>
-        /// Get address dictionary.
+        /// Maps IP (Internet Protocol) addresses to network devices.
         /// </summary>
         internal static Dictionary<uint, NetworkDevice> AddressMap { get; private set; }
 
         /// <summary>
-        /// Get address dictionary.
+        /// Maps MAC addresses to network devices.
         /// </summary>
         internal static Dictionary<uint, NetworkDevice> MACMap { get; private set; }
 
         /// <summary>
-        /// Initialize the Network Stack to prepare it for operation.
+        /// Initializes the network stack.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        public static void Init()
+        public static void Initialize()
         {
             AddressMap = new Dictionary<uint, NetworkDevice>();
             MACMap = new Dictionary<uint, NetworkDevice>();
         }
 
         /// <summary>
-        /// Set ConfigIP for NetworkDevice
+        /// Sets the IP configuration for the given network device.
         /// </summary>
-        /// <param name="nic">Network device.</param>
-        /// <param name="config">IP Config</param>
+        /// <param name="nic">The target network device.</param>
+        /// <param name="config">The IP configuration to assign to the device.</param>
         private static void SetConfigIP(NetworkDevice nic, IPConfig config)
         {
             NetworkConfiguration.AddConfig(nic, config);
@@ -63,21 +52,23 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Configure a IP configuration on the given network device.
-        /// <remarks>Multiple IP Configurations can be made, like *nix environments</remarks>
+        /// Configures an IP configuration on the given network device.
         /// </summary>
-        /// <param name="nic"><see cref="NetworkDevice"/> that will have the assigned configuration</param>
-        /// <param name="config"><see cref="Config"/> instance that defines the IP Address, Subnet
-        /// Mask and Default Gateway for the device</param>
+        /// <remarks>
+        /// Multiple IP configurations can be made, similar to *nix environments.
+        /// </remarks>
+        ///
+        /// <param name="nic">The <see cref="NetworkDevice"/> that will have the assigned configuration.</param>
+        /// <param name="config">The <see cref="Config"/> instance that defines the IP Address, Subnet Mask and Default Gateway for the device</param>
+        ///
         /// <exception cref="ArgumentException">
-        /// <list type="bullet">
-        /// <item>Thrown if configuration with the given config.IPAddress.Hash already exists.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
-        /// </list>
+        ///     <list type="bullet">
+        ///         <item>Thrown if configuration with the given config.IPAddress.Hash already exists.</item>
+        ///     </list>
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
         public static void ConfigIP(NetworkDevice nic, IPConfig config)
         {
             if (NetworkConfiguration.ConfigsContainsDevice(nic))
@@ -94,8 +85,7 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Check if Config is empty
-        /// <returns>bool value.</returns>
+        /// Check if the current network configuration is empty.
         /// </summary>
         public static bool ConfigEmpty()
         {
@@ -110,7 +100,7 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Remove All IPConfig
+        /// Remove all IP configurations.
         /// </summary>
         public static void RemoveAllConfigIP()
         {
@@ -121,9 +111,9 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Remove IPConfig
+        /// Removes the IP configuration of a specific network device.
         /// </summary>
-        /// <param name="nic">Network device.</param>
+        /// <param name="nic">The target device.</param>
         public static void RemoveIPConfig(NetworkDevice nic)
         {
             IPConfig config = NetworkConfiguration.Get(nic);
@@ -134,18 +124,18 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Handle packet.
+        /// Handle a network packet.
         /// </summary>
         /// <param name="packetData">Packet data array.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="Sys.IO.IOException">Thrown on IO error.</exception>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
-        internal static void HandlePacket(byte[] packetData)
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
+        public static void HandlePacket(byte[] packetData)
         {
             if (packetData == null)
             {
-                Global.mDebugger.Send("Error packet data null");
+                Debugger.Send("Error packet data null");
                 return;
             }
 
@@ -162,11 +152,12 @@ namespace Cosmos.System.Network
         }
 
         /// <summary>
-        /// Called continously to keep the Network Stack going.
+        /// Updates the network stack. This method should be called continously by
+        /// other parts of the network stack.
         /// </summary>
-        /// <exception cref="ArgumentException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on memory error.</exception>
-        /// <exception cref="OverflowException">Thrown if data length of any packet in the queue is bigger than Int32.MaxValue.</exception>
+        /// <exception cref="OverflowException">Thrown if data length of any packet in the queue is bigger than <see cref="Int32.MaxValue"/>.</exception>
         public static void Update()
         {
             OutgoingBuffer.Send();

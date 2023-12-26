@@ -1,34 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net6.0-windows7.0</TargetFramework>
         <OutputType>WinExe</OutputType>
         <ApplicationIcon>Resources\Cosmos.ico</ApplicationIcon>
-        <IncludeWpfReferences>True</IncludeWpfReferences>
+        <UseWPF>True</UseWPF>
         <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
         <SignAssembly>False</SignAssembly>
     </PropertyGroup>
-
     <ItemGroup>
-        <ApplicationDefinition Include="App.xaml" SubType="Designer" Generator="MSBuild:Compile" />
-        <Page Include="**\*.xaml" Exclude="App.xaml" SubType="Designer" Generator="MSBuild:Compile" />
-        <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
         <Resource Include="Resources\**" />
-        <UpToDateCheckInput Include="@(ApplicationDefinition)" />
-        <UpToDateCheckInput Include="@(Page)" />
     </ItemGroup>
-
     <ItemGroup>
-        <Reference Include="System.Net.Http" />
+        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="3.8.2112" />
+        <PackageReference Include="NuGet.Common" Version="6.8.0" />
+        <PackageReference Include="NuGet.Configuration" Version="6.8.0" />
+        <PackageReference Include="NuGet.Frameworks" Version="6.8.0" />
+        <PackageReference Include="System.Runtime.WindowsRuntime" Version="5.0.0-preview.5.20278.1" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+        <PackageReference Include="WPF-UI" Version="3.0.0-preview.11" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-        <PackageReference Include="NuGet.Common" />
-        <PackageReference Include="NuGet.Configuration" />
-        <PackageReference Include="System.Runtime.WindowsRuntime" Version="4.6.0" />
-        <PackageReference Include="WPF-UI" Version="2.0.3" />
-    </ItemGroup>
-
 </Project>

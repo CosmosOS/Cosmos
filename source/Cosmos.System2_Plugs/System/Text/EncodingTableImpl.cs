@@ -1,9 +1,4 @@
-﻿//#define COSMOSDEBUG
-
-using System;
-
-using Cosmos.Debug.Kernel;
-
+﻿using Cosmos.Debug.Kernel;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.Globalization
@@ -12,7 +7,7 @@ namespace Cosmos.System_Plugs.System.Globalization
     [Plug("System.Text.EncodingTable, System.Private.CoreLib")]
     public static class EncodingTableImpl
     {
-        private static Debugger mDebugger = new Debugger("System", "SingleByteEncoding");
+        #region Methods
 
         /*
          * This is Table is pratically empty in Net Core, but instatiate a Dictionary that Cosmos yet does not
@@ -24,14 +19,22 @@ namespace Cosmos.System_Plugs.System.Globalization
 
         public static object GetCodePageDataItem(int codepage)
         {
-            mDebugger.SendInternal($"GetCodePageDataItem for codepage {codepage}");
+            debugger.SendInternal($"GetCodePageDataItem for codepage {codepage}");
             return null;
         }
 
         public static int GetCodePageFromName(string name)
         {
-            mDebugger.SendInternal($"GetCodePageFromName for name {name}");
+            debugger.SendInternal($"GetCodePageFromName for name {name}");
             return -1;
         }
+
+        #endregion
+
+        #region Fields
+
+        private static readonly Debugger debugger = new("SingleByteEncoding");
+
+        #endregion
     }
 }

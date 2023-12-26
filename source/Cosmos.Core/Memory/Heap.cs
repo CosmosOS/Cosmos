@@ -29,6 +29,8 @@ namespace Cosmos.Core.Memory
         /// <exception cref="Exception">Thrown on fatal error, contact support.</exception>
         public static unsafe void Init()
         {
+            _StringType = GetStringTypeID();
+
             StackStart = (uint*)CPU.GetStackStart();
             HeapSmall.Init();
             HeapMedium.Init();
@@ -183,8 +185,8 @@ namespace Cosmos.Core.Memory
         /// <returns>Number of objects freed</returns>
         public static int Collect()
         {
-			//Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
-			CPU.DisableInterrupts();
+            //Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
+            CPU.DisableInterrupts();
 
             // Mark and sweep objects from roots
             // 1. Check if a page is in use if medium/large mark and sweep object
@@ -194,11 +196,11 @@ namespace Cosmos.Core.Memory
             // Medium and large objects
             for (int ratIndex = 0; ratIndex < RAT.TotalPageCount; ratIndex++)
             {
-                var pageType = *(RAT.mRAT + ratIndex);
+                byte pageType = *(RAT.mRAT + ratIndex);
                 if (pageType == (byte)RAT.PageType.HeapMedium || pageType == (byte)RAT.PageType.HeapLarge)
                 {
-                    var pagePtr = RAT.RamStart + ratIndex * RAT.PageSize;
-                    if (*(ushort*)(pagePtr + 3) != 0)
+                    byte* pagePtr = RAT.RamStart + ratIndex * RAT.PageSize;
+                    if (*(ushort*)(pagePtr + 3 * sizeof(int) + 2) != 0) // the math is kinda messy but we have 4 int space and the last ushort of that space is for the gc info
                     {
                         MarkAndSweepObject(pagePtr + HeapLarge.PrefixBytes);
                     }
@@ -207,31 +209,37 @@ namespace Cosmos.Core.Memory
 
             // Small objects
             // we go one size at a time
-            var rootSMTPtr = HeapSmall.SMT->First;
-            while (rootSMTPtr != null)
+            SMTPage* SMTPage = HeapSmall.SMT;
+            while (SMTPage != null)
             {
-                uint size = rootSMTPtr->Size;
-                var objectSize = size + HeapSmall.PrefixItemBytes;
-                uint objectsPerPage = RAT.PageSize / objectSize;
-
-                var smtBlock = rootSMTPtr->First;
-
-                while (smtBlock != null)
+                RootSMTBlock* rootSMTPtr = SMTPage->First;
+                while (rootSMTPtr != null)
                 {
-                    var pagePtr = smtBlock->PagePtr;
-                    for (int i = 0; i < objectsPerPage; i++)
-                    {
+                    uint size = rootSMTPtr->Size;
+                    uint objectSize = size + HeapSmall.PrefixItemBytes;
+                    uint objectsPerPage = RAT.PageSize / objectSize;
 
-                        if (*(ushort*)(pagePtr + i * objectSize + 1) > 1) // 0 means not found and 1 means marked
+                    SMTBlock* smtBlock = rootSMTPtr->First;
+
+                    while (smtBlock != null)
+                    {
+                        byte* pagePtr = smtBlock->PagePtr;
+                        for (int i = 0; i < objectsPerPage; i++)
                         {
-                            MarkAndSweepObject(pagePtr + i * objectSize + HeapSmall.PrefixItemBytes);
+
+                            if (*(ushort*)(pagePtr + i * objectSize + sizeof(ushort)) > 1) // 0 means not found and 1 means marked
+                                // after the start of the object we first have one ushort of object size and then the ushort of gc info so + 2 == sizeof(ushort)
+                            {
+                                MarkAndSweepObject(pagePtr + i * objectSize + HeapSmall.PrefixItemBytes);
+                            }
                         }
+
+                        smtBlock = smtBlock->NextBlock;
                     }
 
-                    smtBlock = smtBlock->NextBlock;
+                    rootSMTPtr = rootSMTPtr->LargerSize;
                 }
-
-                rootSMTPtr = rootSMTPtr->LargerSize;
+                SMTPage = SMTPage->Next;
             }
 
             // Mark and sweep objects from stack
@@ -258,52 +266,57 @@ namespace Cosmos.Core.Memory
                 var pageType = *(RAT.mRAT + ratIndex);
                 if (pageType == (byte)RAT.PageType.HeapMedium || pageType == (byte)RAT.PageType.HeapLarge)
                 {
-                    var pagePointer = RAT.RamStart + ratIndex * RAT.PageSize;
-                    if (*((ushort*)(pagePointer + HeapLarge.PrefixBytes) - 1) == 0)
+                    byte* pagePointer = RAT.RamStart + ratIndex * RAT.PageSize;
+                    if (*((ushort*)(pagePointer + HeapLarge.PrefixBytes - 2)) == 0)
                     {
                         Free(pagePointer + HeapLarge.PrefixBytes);
                         freed += 1;
                     }
                     else
                     {
-                        *((ushort*)(pagePointer + HeapLarge.PrefixBytes) - 1) &= (ushort)~ObjectGCStatus.Hit;
+                        *((ushort*)(pagePointer + HeapLarge.PrefixBytes - 2)) &= (ushort)~ObjectGCStatus.Hit;
                     }
                 }
             }
 
             // Small objects
             // we go one size at a time
-            rootSMTPtr = HeapSmall.SMT->First;
-            while (rootSMTPtr != null)
+            SMTPage = HeapSmall.SMT;
+            while (SMTPage != null)
             {
-                uint size = rootSMTPtr->Size;
-                uint objectSize = size + HeapSmall.PrefixItemBytes;
-                uint objectsPerPage = RAT.PageSize / objectSize;
-
-                SMTBlock* smtBlock = rootSMTPtr->First;
-
-                while (smtBlock != null)
+                RootSMTBlock* rootSMTPtr = SMTPage->First;
+                while (rootSMTPtr != null)
                 {
-                    byte* pagePtr = smtBlock->PagePtr;
-                    for (int i = 0; i < objectsPerPage; i++)
+                    uint size = rootSMTPtr->Size;
+                    uint objectSize = size + HeapSmall.PrefixItemBytes;
+                    uint objectsPerPage = RAT.PageSize / objectSize;
+
+                    SMTBlock* smtBlock = rootSMTPtr->First;
+
+                    while (smtBlock != null)
                     {
-                        if (*(ushort*)(pagePtr + i * objectSize) != 0)
+                        byte* pagePtr = smtBlock->PagePtr;
+                        for (int i = 0; i < objectsPerPage; i++)
                         {
-                            if (*((ushort*)(pagePtr + i * objectSize) + 1) == 0)
+                            if (*(ushort*)(pagePtr + i * objectSize) != 0)
                             {
-                                Free(pagePtr + i * objectSize + HeapSmall.PrefixItemBytes);
-                                freed += 1;
-                            }
-                            else
-                            {
-                                *((ushort*)(pagePtr + i * objectSize) + 1) &= (ushort)~ObjectGCStatus.Hit;
+                                if (*((ushort*)(pagePtr + i * objectSize) + 1) == 0)
+                                {
+                                    Free(pagePtr + i * objectSize + HeapSmall.PrefixItemBytes);
+                                    freed += 1;
+                                }
+                                else
+                                {
+                                    *((ushort*)(pagePtr + i * objectSize) + 1) &= (ushort)~ObjectGCStatus.Hit;
+                                }
                             }
                         }
+                        smtBlock = smtBlock->NextBlock;
                     }
-                    smtBlock = smtBlock->NextBlock;
-                }
 
-                rootSMTPtr = rootSMTPtr->LargerSize;
+                    rootSMTPtr = rootSMTPtr->LargerSize;
+                }
+                SMTPage = SMTPage->Next;
             }
 
 			//Enable interrupts back
@@ -334,10 +347,6 @@ namespace Cosmos.Core.Memory
             // Check what we are dealing with
             if (*(obj + 1) == (uint)ObjectUtils.InstanceTypeEnum.NormalObject)
             {
-                if (_StringType == 0)
-                {
-                    _StringType = GetStringTypeID();
-                }
                 var type = *obj;
                 // Deal with strings first
                 if (type == _StringType)
@@ -407,7 +416,7 @@ namespace Cosmos.Core.Memory
                     if (*location != 0) // Check if its null
                     {
                         location = *(uint**)location;
-                        if (RAT.GetPageType(location) == RAT.PageType.HeapSmall)
+                        if (RAT.GetPageType(location) != RAT.PageType.Empty)
                         {
                             MarkAndSweepObject(location);
                         }

@@ -1,4 +1,4 @@
-﻿using Cosmos.Core;
+﻿using Cosmos.Core.Multiboot;
 using IL2CPU.API.Attribs;
 using XSharp;
 using XSharp.Assembler;

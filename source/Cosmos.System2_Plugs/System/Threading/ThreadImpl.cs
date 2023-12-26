@@ -1,11 +1,9 @@
-using System;
-using System.Threading;
-using Cosmos.HAL;
 using IL2CPU.API.Attribs;
+using Cosmos.HAL;
 
 namespace Cosmos.System_Plugs.System.Threading
 {
-    [Plug(Target = typeof(global::System.Threading.Thread))]
+    [Plug(Target = typeof(Thread))]
     public static class ThreadImpl
     {
         public static void Sleep(TimeSpan timeout)

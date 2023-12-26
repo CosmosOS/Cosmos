@@ -4,6 +4,6 @@
     {
         bool NoVsLaunch { get; }
         bool UserKit { get; }
-        string VsPath { get; }
+        bool BuildExtensions { get; }
     }
 }

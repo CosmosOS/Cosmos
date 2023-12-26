@@ -1,10 +1,7 @@
-﻿using System;
-using System.Threading;
-using IL2CPU.API.Attribs;
+﻿using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.Threading
 {
-    //[Plug(Target = typeof(global::System.Threading.SpinWait))]
     [Plug(Target = typeof(SpinWait))]
     public static class SpinWaitImpl
     {

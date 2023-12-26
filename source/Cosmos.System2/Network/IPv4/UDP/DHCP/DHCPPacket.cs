@@ -1,4 +1,11 @@
-﻿using Cosmos.HAL;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          DHCP Packet
+* PROGRAMMERS:      Alexy DA CRUZ <dacruzalexy@gmail.com>
+*                   Valentin CHARBONNIER <valentinbreiz@gmail.com>
+*/
+
+using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.IPv4;
 using Cosmos.System.Network.IPv4.UDP;
@@ -6,68 +13,58 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          DHCP Packet
-* PROGRAMMERS:      Alexy DA CRUZ <dacruzalexy@gmail.com>
-*/
-
 namespace Cosmos.System.Network.IPv4.UDP.DHCP
 {
-
     /// <summary>
-    /// DHCP Option
+    /// Represents a DHCP option.
     /// </summary>
     public class DHCPOption
     {
         /// <summary>
-        /// DHCP Option Type
+        /// The type of the <see cref="DHCPOption"/>.
         /// </summary>
         public byte Type { get; set; }
 
         /// <summary>
-        /// DHCP Option Length
+        /// The length of the <see cref="DHCPOption"/>.
         /// </summary>
         public byte Length { get; set; }
 
         /// <summary>
-        /// DHCP Option Data
+        /// The raw data of the <see cref="DHCPOption"/>.
         /// </summary>
         public byte[] Data { get; set; }
     }
 
     /// <summary>
-    /// DHCPPacket class.
+    /// Represents a DHCP packet.
     /// </summary>
     public class DHCPPacket : UDPPacket
     {
-        int xID;
+        readonly int id;
 
         /// <summary>
-        /// DHCP handler.
+        /// Handles a single DHCP packet.
         /// </summary>
-        /// <param name="packetData">Packet data.</param>
+        /// <param name="packetData">The packet data.</param>
         /// <exception cref="OverflowException">Thrown if UDP_Data array length is greater than Int32.MaxValue.</exception>
-        /// <exception cref="sysIO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
         public static void DHCPHandler(byte[] packetData)
         {
-            var dhcp_packet = new DHCPPacket(packetData);
+            var dhcpPacket = new DHCPPacket(packetData);
 
-            var receiver = UdpClient.GetClient(dhcp_packet.DestinationPort);
-            if (receiver != null)
-            {
-                receiver.ReceiveData(dhcp_packet);
-            }
+            var receiver = UdpClient.GetClient(dhcpPacket.DestinationPort);
+            receiver?.ReceiveData(dhcpPacket);
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPPacket"/> class.
+        /// Initializes a new instance of the <see cref="DHCPPacket"/> class.
         /// </summary>
         internal DHCPPacket() : base()
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPPacket"/> class.
+        /// Initializes a new instance of the <see cref="DHCPPacket"/> class.
         /// </summary>
         /// <param name="rawData">Raw data.</param>
         public DHCPPacket(byte[] rawData)
@@ -75,7 +72,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPPacket"/> class.
+        /// Initializes a new instance of the <see cref="DHCPPacket"/> class.
         /// </summary>
         /// <param name="mac_src">Source MAC Address.</param>
         /// <param name="dhcpDataSize">DHCP Data size</param>
@@ -84,87 +81,84 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="DHCPPacket"/> class.
+        /// Initializes a new instance of the <see cref="DHCPPacket"/> class.
         /// </summary>
         /// <param name="client">Client IPv4 Address.</param>
         /// <param name="server">Server IPv4 Address.</param>
-        /// <param name="mac_src">Source MAC Address.</param>
+        /// <param name="sourceMAC">Source MAC Address.</param>
         /// <param name="dhcpDataSize">DHCP Data size</param>
         /// <exception cref="OverflowException">Thrown if data array length is greater than Int32.MaxValue.</exception>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        internal DHCPPacket(Address client, Address server, MACAddress mac_src, ushort dhcpDataSize)
+        internal DHCPPacket(Address client, Address server, MACAddress sourceMAC, ushort dhcpDataSize)
             : base(client, server, 68, 67, (ushort)(dhcpDataSize + 240), MACAddress.Broadcast)
         {
-            //Request
-            RawData[42] = 0x01;
+            RawData[42] = 0x01; // Request
+            RawData[43] = 0x01; // ethernet
+            RawData[44] = 0x06; // Length mac
+            RawData[45] = 0x00; // hops
 
-            //ethernet
-            RawData[43] = 0x01;
+            var rnd = new Random();
+            id = rnd.Next(0, Int32.MaxValue);
+            RawData[46] = (byte)((id >> 24) & 0xFF);
+            RawData[47] = (byte)((id >> 16) & 0xFF);
+            RawData[48] = (byte)((id >> 8) & 0xFF);
+            RawData[49] = (byte)((id >> 0) & 0xFF);
 
-            //Length mac
-            RawData[44] = 0x06;
-
-            //hops
-            RawData[45] = 0x00;
-
-            Random rnd = new Random();
-            xID = rnd.Next(0, Int32.MaxValue);
-            RawData[46] = (byte)((xID >> 24) & 0xFF);
-            RawData[47] = (byte)((xID >> 16) & 0xFF);
-            RawData[48] = (byte)((xID >> 8) & 0xFF);
-            RawData[49] = (byte)((xID >> 0) & 0xFF);
-
-            //second elapsed
+            // second elapsed
             RawData[50] = 0x00;
             RawData[51] = 0x00;
 
-            //option bootp
+            // option bootp
             RawData[52] = 0x00;
             RawData[53] = 0x00;
 
-            //client ip address
-            RawData[54] = client.address[0];
-            RawData[55] = client.address[1];
-            RawData[56] = client.address[2];
-            RawData[57] = client.address[3];
+            // client ip address
+            RawData[54] = client.Parts[0];
+            RawData[55] = client.Parts[1];
+            RawData[56] = client.Parts[2];
+            RawData[57] = client.Parts[3];
 
             for (int i = 0; i < 13; i++)
             {
                 RawData[58 + i] = 0x00;
             }
 
-            //Src mac
-            RawData[70] = mac_src.bytes[0];
-            RawData[71] = mac_src.bytes[1];
-            RawData[72] = mac_src.bytes[2];
-            RawData[73] = mac_src.bytes[3];
-            RawData[74] = mac_src.bytes[4];
-            RawData[75] = mac_src.bytes[5];
+            // Source MAC
+            RawData[70] = sourceMAC.bytes[0];
+            RawData[71] = sourceMAC.bytes[1];
+            RawData[72] = sourceMAC.bytes[2];
+            RawData[73] = sourceMAC.bytes[3];
+            RawData[74] = sourceMAC.bytes[4];
+            RawData[75] = sourceMAC.bytes[5];
 
-            //Fill 0
+            // Fill w/ 0s
             for (int i = 0; i < 202; i++)
             {
                 RawData[76 + i] = 0x00;
             }
 
-            //DHCP Magic cookie
+            // DHCP Magic cookie
             RawData[278] = 0x63;
             RawData[279] = 0x82;
             RawData[280] = 0x53;
             RawData[281] = 0x63;
 
-            InitFields();
+            InitializeFields();
         }
 
         /// <summary>
         /// Init DHCPPacket fields.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        protected override void InitializeFields()
         {
-            base.InitFields();
+            base.InitializeFields();
             MessageType = RawData[42];
-            Client = new Address(RawData, 58);
+
+            if (RawData[58] != 0)
+            {
+                Client = new Address(RawData, 58);
+            }
 
             if (RawData[282] != 0)
             {
@@ -184,23 +178,53 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                     i += option.Length;
                 }
+
+                foreach (var option in Options)
+                {
+                    if (option.Type == 1) //Mask
+                    {
+                        Subnet = new Address(option.Data, 0);
+                    }
+                    else if (option.Type == 3) //Router
+                    {
+                        Server = new Address(option.Data, 0);
+                    }
+                    else if (option.Type == 6) //DNS
+                    {
+                        DNS = new Address(option.Data, 0);
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Get DHCP message type
+        /// Gets the DHCP message type.
         /// </summary>
         internal byte MessageType { get; private set; }
 
         /// <summary>
-        /// Get Client IPv4 Address
+        /// Gets the client IPv4 address.
         /// </summary>
         internal Address Client { get; private set; }
 
         /// <summary>
-        /// Get DHCP Options
+        /// Gets the DHCP options.
         /// </summary>
         internal List<DHCPOption> Options { get; private set; }
 
+        /// <summary>
+        /// Get Subnet IPv4 Address
+        /// </summary>
+        internal Address Subnet { get; private set; }
+
+        /// <summary>
+        /// Get DNS IPv4 Address
+        /// </summary>
+        internal Address DNS { get; private set; }
+
+        /// <summary>
+        /// Get DHCP Server IPv4 Address
+        /// </summary>
+        internal Address Server { get; private set; }
     }
 }

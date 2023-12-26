@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Cosmos.HAL.BlockDevice;
-using Cosmos.System.FileSystem.FAT;
 
 namespace Cosmos.System.FileSystem.FAT
 {
@@ -42,23 +41,23 @@ namespace Cosmos.System.FileSystem.FAT
         /// <list type="bullet">
         /// <item>Thrown when aDevice is null.</item>
         /// <item>Thrown when FatFileSystem is null.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <list type="bullet">
         /// <item>Thrown when aRootPath is null.</item>
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="OverflowException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="OverflowException">Thrown on fatal error.</exception>
         /// <exception cref="Exception">
         /// <list type="bullet">
-        /// <item>Thrown on fatal error (contact support).</item>
+        /// <item>Thrown on fatal error.</item>
         /// <item>>FAT signature not found.</item>
         /// </list>
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
         public override FileSystem Create(Partition aDevice, string aRootPath, long aSize) => new FatFileSystem(aDevice, aRootPath, aSize);
     }
 }

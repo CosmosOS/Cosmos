@@ -5,36 +5,38 @@ using System.Text;
 namespace Cosmos.System.Graphics
 {
     /// <summary>
-    /// Image class.
+    /// Represents a raster image.
     /// </summary>
     public abstract class Image
     {
         /// <summary>
-        /// Get and set raw data (pixels array).
+        /// The raw data of the image. This array holds all of the pixel
+        /// values of the raster image.
         /// </summary>
-        public int[] rawData;
+        public int[] RawData;
 
         /// <summary>
-        /// Get and set image width.
+        /// The width of the image.
         /// </summary>
         public uint Width { get; protected set; }
 
         /// <summary>
-        /// Get and set image height.
+        /// The height of the image.
         /// </summary>
         public uint Height { get; protected set; }
 
         /// <summary>
-        /// Get and set image color depth.
+        /// The color depth of each pixel of the image - i.e, the amount
+        /// of bits per each pixel.
         /// </summary>
         public ColorDepth Depth { get; protected set; }
 
         /// <summary>
-        /// Create new instance of <see cref="Image"/> class.
+        /// Initializes a new instance of <see cref="Image"/> class.
         /// </summary>
-        /// <param name="width">Image width.</param>
-        /// <param name="height">Image height.</param>
-        /// <param name="color">Color depth.</param>
+        /// <param name="width">The width of the image.</param>
+        /// <param name="height">The height of the image.</param>
+        /// <param name="color">The color depth of each pixel.</param>
         protected Image(uint width, uint height, ColorDepth color)
         {
             Width = width;
@@ -48,6 +50,6 @@ namespace Cosmos.System.Graphics
     /// </summary>
     public enum ImageFormat
     {
-        bmp
-    } //Add more as more are supported
+        BMP
+    }
 }

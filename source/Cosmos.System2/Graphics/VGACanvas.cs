@@ -1,84 +1,68 @@
-﻿using System;
+using static Cosmos.HAL.Drivers.Video.VGADriver;
+using Cosmos.HAL.Drivers.Video;
 using System.Collections.Generic;
-using System.Text;
-using Cosmos.HAL;
 using System.Drawing;
-using static Cosmos.HAL.VGADriver;
+using System;
 
 namespace Cosmos.System.Graphics
 {
     /// <summary>
-    /// VGACanvas class. Used to control screen.
+    /// Defines a VGA canvas implementation.
     /// </summary>
     public class VGACanvas : Canvas
     {
-        /// <summary>
-        /// Private boolean whether VGA graphics mode is enabled or not
-        /// </summary>
-        bool _Enabled;
+        bool enabled;
+        readonly VGADriver driver;
 
         /// <summary>
-        /// The HAL VGA driver
+        /// The list of available resolutions under VGA.
         /// </summary>
-        private readonly VGADriver _VGADriver;
-
-        /// <summary>
-        /// VGA graphics mode Canvas constructor - see Canvas.cs
-        /// </summary>
-        /// <param name="aMode"></param>
-        public VGACanvas(Mode aMode) : base()
+        static readonly List<Mode> availableModes = new()
         {
-            Global.mDebugger.Send("Creating VGACanvas with mode");
-            _VGADriver = new VGADriver();
-            _VGADriver.SetGraphicsMode(ModeToScreenSize(aMode), (VGADriver.ColorDepth)(int)aMode.ColorDepth);
-            Mode = aMode;
+            new Mode(640, 480, ColorDepth.ColorDepth4),
+            new Mode(720, 480, ColorDepth.ColorDepth4),
+            new Mode(320, 200, ColorDepth.ColorDepth8)
+        };
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VGACanvas"/> class
+        /// with the given display mode.
+        /// </summary>
+        public VGACanvas(Mode mode) : base(mode)
+        {
+            driver = new VGADriver();
+            driver.SetGraphicsMode(ModeToScreenSize(mode), (VGADriver.ColorDepth)(int)mode.ColorDepth);
+            Mode = mode;
             Enabled = true;
         }
 
         /// <summary>
-        /// Creates a VGA graphics mode with the default mode
+        /// Initializes a new instance of the <see cref="VGACanvas"/> class
+        /// with the default display mode.
         /// </summary>
         public VGACanvas() : base()
         {
             Enabled = true;
-            Mode = DefaultGraphicMode;
-            Global.mDebugger.Send("Creating VGACanvas with standard mode");
-            _VGADriver = new VGADriver();
-            _VGADriver.SetGraphicsMode(ModeToScreenSize(DefaultGraphicMode), (VGADriver.ColorDepth)(int)DefaultGraphicMode.ColorDepth);
+            Mode = DefaultGraphicsMode;
+            driver = new VGADriver();
+            driver.SetGraphicsMode(ModeToScreenSize(DefaultGraphicsMode), (VGADriver.ColorDepth)(int)DefaultGraphicsMode.ColorDepth);
         }
 
-        /// <summary>
-        /// Name of the backend
-        /// </summary>
         public override string Name() => "VGACanvas";
 
-        /// <summary>
-        /// Gets or sets the VGA graphics mode
-        /// </summary>
         public override Mode Mode { get; set; }
 
-        /// <summary>
-        /// Clears the screen of all pixels
-        /// </summary>
-        /// <param name="aColor"></param>
         public override void Clear(int aColor)
         {
-            _VGADriver.DrawFilledRectangle(0, 0, _VGADriver.PixelWidth, _VGADriver.PixelHeight, (uint)aColor);
+            driver.DrawFilledRectangle(0, 0, driver.PixelWidth, driver.PixelHeight, (uint)aColor);
         }
 
-        /// <summary>
-        /// Clears the screen of all pixels
-        /// </summary>
-        /// <param name="aColor"></param>
         public override void Clear(Color aColor)
         {
-            var paletteIndex = _VGADriver.GetClosestColorInPalette(aColor);
-            _VGADriver.DrawFilledRectangle(0, 0, _VGADriver.PixelWidth, _VGADriver.PixelHeight, paletteIndex);
+            var paletteIndex = driver.GetClosestColorInPalette(aColor);
+            driver.DrawFilledRectangle(0, 0, driver.PixelWidth, driver.PixelHeight, paletteIndex);
         }
 
-        /// <summary>
-        /// Disables VGA graphics mode, parent method returns to 80x25 text mode
-        /// </summary>
         public override void Disable()
         {
             if (Enabled)
@@ -87,105 +71,37 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        /// <summary>
-        /// Draws an array of colors, specifiying X and Y coords
-        /// </summary>
-        /// <param name="aColors"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
-        public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Draws a filled rectangle
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aXStart"></param>
-        /// <param name="aYStart"></param>
-        /// <param name="aWidth"></param>
-        /// <param name="aHeight"></param>
         public override void DrawFilledRectangle(Color aColor, int aXStart, int aYStart, int aWidth, int aHeight)
         {
-            _VGADriver.DrawFilledRectangle(aXStart, aYStart, aWidth, aHeight, _VGADriver.GetClosestColorInPalette(aColor));
+            driver.DrawFilledRectangle(aXStart, aYStart, aWidth, aHeight, driver.GetClosestColorInPalette(aColor));
         }
 
-        /// <summary>
-        /// Draws a point
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
         public override void DrawPoint(Color aColor, int aX, int aY)
         {
-            _VGADriver.SetPixel((uint)aX, (uint)aY, aColor);
+            driver.SetPixel((uint)aX, (uint)aY, aColor);
         }
 
-        /// <summary>
-        /// Draws a point
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
         public void DrawPoint(uint aColor, int aX, int aY)
         {
-            _VGADriver.SetPixel((uint)aX, (uint)aY, aColor);
+            driver.SetPixel((uint)aX, (uint)aY, aColor);
         }
 
-        /// <summary>
-        /// Draws a point
-        /// </summary>
-        /// <param name="aColor"></param>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        public override void DrawPoint(Color aColor, float aX, float aY)
-        {
-            throw new NotImplementedException();
-        }
+        public override List<Mode> AvailableModes => availableModes;
 
-        /// <summary>
-        /// List of available resolutions
-        /// </summary>
-        private static readonly List<Mode> _AvailableModes = new List<Mode>
-        {
-            new Mode(640, 480, ColorDepth.ColorDepth4),
-            new Mode(720, 480, ColorDepth.ColorDepth4),
-            new Mode(320, 200, ColorDepth.ColorDepth8)
-        };
-
-        public override List<Mode> AvailableModes
-        {
-            get
-            {
-                return _AvailableModes;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the RGB value of a specified pixel
-        /// </summary>
-        /// <param name="aX"></param>
-        /// <param name="aY"></param>
-        /// <returns></returns>
         public override Color GetPointColor(int aX, int aY)
         {
-            return Color.FromArgb((int)_VGADriver.GetPixel((uint)aX, (uint)aY));
+            return Color.FromArgb((int)driver.GetPixel((uint)aX, (uint)aY));
         }
 
-        /// <summary>
-        /// The default graphics mode
-        /// </summary>
-        public override Mode DefaultGraphicMode => new Mode(640, 480, ColorDepth.ColorDepth4);
+        public override Mode DefaultGraphicsMode => new Mode(640, 480, ColorDepth.ColorDepth4);
 
         /// <summary>
-        /// Boolean value whether VGA is in graphics mode or not
+        /// Whether the canvas is active, and the display is currently in VGA
+        /// graphics mode.
         /// </summary>
-        public bool Enabled { get => _Enabled; private set => _Enabled = value; }
+        public bool Enabled { get => enabled; private set => enabled = value; }
 
-        private ScreenSize ModeToScreenSize(Mode aMode)
+        private static ScreenSize ModeToScreenSize(Mode aMode)
         {
             if (aMode.Width == 320 && aMode.Height == 200)
             {

@@ -34,7 +34,6 @@ Docs/log.txt
 *.docstates
 *.vsp
 *.pdb
-*.lock.json
 Thumbs.db
 build.force
 
@@ -55,3 +54,6 @@ Docs/~$RingsGen3.xlsx
 *.map
 /Resources/Dependencies/Dapper/DapperExtensions.StrongName.deps.json
 /Resources/Dependencies/Dapper/ref/DapperExtensions.StrongName.dll
+
+
+.idea/

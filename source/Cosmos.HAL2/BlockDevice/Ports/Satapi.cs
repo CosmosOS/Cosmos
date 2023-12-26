@@ -10,7 +10,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
 {
     public class SATAPI : StoragePort
     {
-        internal static Debugger mSATAPIDebugger = new Debugger("HAL", "SATAPI");
+        internal static Debugger mSATAPIDebugger = new("SATAPI");
 
         public PortRegisters mPortReg;
         public override PortType mPortType => PortType.SATAPI;

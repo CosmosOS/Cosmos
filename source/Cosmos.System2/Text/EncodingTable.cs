@@ -1,5 +1,4 @@
-﻿//#define COSMOSDEBUG
-using System.Text;
+﻿using System.Text;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.ExtendedASCII
@@ -8,61 +7,41 @@ namespace Cosmos.System.ExtendedASCII
      * Ideally we should use Dictionary or HashTable here but are yet not working in Cosmos so I have done
      * this replacement class for now...
      */
+
     /// <summary>
-    /// EncodingTable class. Used to manage codepage list.
+    /// Used to manage the codepage list.
     /// </summary>
     internal static class EncodingTable
     {
-        /// <summary>
-        /// Debugger instance of the "System" ring with the "EncodingTable" tag.
-        /// </summary>
-        private static Debugger mDebugger = new Debugger("System", "EncodingTable");
+        static readonly Debugger mDebugger = new("EncodingTable");
 
         /// <summary>
         /// Create new instance of the <see cref="EncodingTable"/> class.
         /// </summary>
         static EncodingTable()
         {
-            mDebugger.SendInternal("Inizializing Encoding Table");
-
-            Add(437, "IBM437", new CP437Enconding());
+            mDebugger.SendInternal("Initializing the encoding table...");
+            Add(437, "IBM437", new CP437Encoding());
             Add(858, "IBM0858", new CP858Enconding());
         }
 
         /// <summary>
-        /// Struct which used to hold description and encoding.
+        /// Used to hold the description and encoding.
         /// </summary>
-        private struct values
+        private struct DescriptionEncodingPair
         {
-            /// <summary>
-            /// Description.
-            /// </summary>
-            public string   desc;
-            /// <summary>
-            /// Encoding.
-            /// </summary>
-            public Encoding encoding;
+            public string Description;
+            public Encoding Encoding;
 
-            /// <summary>
-            /// Create new instance of the <see cref="values"/> struct.
-            /// </summary>
-            /// <param name="desc">Description.</param>
-            /// <param name="encoding">Encoding.</param>
-            public values(string desc, Encoding encoding)
+            public DescriptionEncodingPair(string desc, Encoding encoding)
             {
-                this.desc = desc;
-                this.encoding = encoding;
+                Description = desc;
+                Encoding = encoding;
             }
         };
 
-        /// <summary>
-        /// Max codepage cache size.
-        /// </summary>
         const int MaxCodepageChacheSize = 2048;
-        /// <summary>
-        /// Codepage cache.
-        /// </summary>
-        static values[] CodepageCache = new values[MaxCodepageChacheSize];
+        static readonly DescriptionEncodingPair[] CodepageCache = new DescriptionEncodingPair[MaxCodepageChacheSize];
 
         /// <summary>
         /// Add encoding to the encoding table.
@@ -72,38 +51,36 @@ namespace Cosmos.System.ExtendedASCII
         /// <param name="encoding">Encoding.</param>
         public static void Add(int codepage, string desc, Encoding encoding)
         {
-            mDebugger.SendInternal($"Adding codepage {codepage} desc {desc}");
-            CodepageCache[codepage] = new values(desc, encoding);
+            mDebugger.SendInternal($"Adding codepage {codepage} w/ description {desc}");
+            CodepageCache[codepage] = new DescriptionEncodingPair(desc, encoding);
         }
 
         /// <summary>
-        /// Get description, using codepage.
+        /// Gets the description of the given codepage.
         /// </summary>
-        /// <param name="codepage">Codepage.</param>
-        /// <returns>string value.</returns>
-        public static string GetDescription(int codepage) => CodepageCache[codepage].desc;
+        /// <param name="codepage">The codepage.</param>
+        public static string GetDescription(int codepage) => CodepageCache[codepage].Description;
 
         /// <summary>
-        /// Get encoding, using codepage.
+        /// Gets the encoding of the given codepage.
         /// </summary>
-        /// <param name="codepage">Codepage.</param>
-        /// <returns>Encoding value.</returns>
-        public static Encoding GetEncoding(int codepage) => CodepageCache[codepage].encoding;
+        /// <param name="codepage">The codepage.</param>
+        public static Encoding GetEncoding(int codepage) => CodepageCache[codepage].Encoding;
 
         /// <summary>
-        /// Get code page from description.
+        /// Get a code page by its description.
         /// </summary>
-        /// <param name="desc">Description.</param>
-        /// <returns>int value, -1 if not found.</returns>
+        /// <param name="desc">The description.</param>
+        /// <returns>The codepage, or -1 if not found.</returns>
         public static int GetCodePageFromDesc(string desc)
         {
             for (int idx = 0; idx < MaxCodepageChacheSize; idx++)
             {
-                if (CodepageCache[idx].desc == desc)
+                if (CodepageCache[idx].Description == desc) {
                     return idx;
+                }
             }
 
-            /* Not found! */
             return -1;
         }
     }
