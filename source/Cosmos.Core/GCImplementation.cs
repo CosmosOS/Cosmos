@@ -84,13 +84,6 @@ namespace Cosmos.Core
             {
                 memPtr = (byte*)largestBlock->Address;
                 memLength = largestBlock->Length;
-                if ((uint)memPtr < CPU.GetEndOfKernel() + 1024)
-                {
-                    memPtr = (byte*)CPU.GetEndOfKernel() + 1024;
-                    memPtr += RAT.PageSize - (uint)memPtr % RAT.PageSize;
-                    memLength = largestBlock->Length - ((uint)memPtr - (uint)largestBlock->Address);
-                    memLength += RAT.PageSize - memLength % RAT.PageSize;
-                }
             }
             else
             {
@@ -149,7 +142,7 @@ namespace Cosmos.Core
             if (RAT.GetPageType(aPtr) != 0)
             {
                 var rootCount = *(aPtr - 1) >> 1; // lowest bit is used to set if hit
-                *(aPtr - 1) = (ushort)((rootCount - 1) << 1); // loest bit can be zero since we shouldnt be doing this while gc is collecting
+                *(aPtr - 1) = (ushort)((rootCount - 1) << 1); // lowest bit can be zero since we shouldnt be doing this while gc is collecting
             }
         }
 

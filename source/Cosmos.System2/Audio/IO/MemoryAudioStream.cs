@@ -1,16 +1,14 @@
-﻿using Cosmos.Core;
-using Cosmos.HAL.Audio;
+﻿using Cosmos.HAL.Audio;
+using Cosmos.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Cosmos.System.Audio.IO {
+namespace Cosmos.System.Audio.IO
+{
     /// <summary>
     /// Represents an audio stream that reads from a byte array in memory.
     /// </summary>
-    public class MemoryAudioStream : SeekableAudioStream {
+    public class MemoryAudioStream : SeekableAudioStream
+    {
         readonly SampleFormat format;
         readonly uint sampleRate;
         readonly int sampleCount;
@@ -39,7 +37,8 @@ namespace Cosmos.System.Audio.IO {
             }
         }
 
-        public override uint SampleRate {
+        public override uint SampleRate
+        {
             get => sampleRate;
             set => throw new InvalidOperationException("Cannot change the sample rate of a MemoryAudioStream.");
         }
@@ -49,6 +48,7 @@ namespace Cosmos.System.Audio.IO {
         public override uint Length => (uint)sampleCount;
 
         public override bool Depleted => sampleCount <= Position;
+
         #endregion
 
         /// <summary>
@@ -58,17 +58,20 @@ namespace Cosmos.System.Audio.IO {
         /// <param name="waveFile">The target wave file.</param>
         public unsafe static MemoryAudioStream FromWave(byte[] waveFile)
         {
-            if(!ValidateValues(waveFile, 0, 0x52, 0x49, 0x46, 0x46)) {
+            if (!ValidateValues(waveFile, 0, 0x52, 0x49, 0x46, 0x46))
+            {
                 throw new ArgumentException("Invalid WAVE file - expected a RIFF header.", nameof(waveFile));
             }
 
             // chunkSize at offset 4 of size 4
-
-            if (!ValidateValues(waveFile, 8, 0x57, 0x41, 0x56, 0x45)) {
+            
+            if (!ValidateValues(waveFile, 8, 0x57, 0x41, 0x56, 0x45))
+            {
                 throw new ArgumentException("Invalid WAVE file - expected a WAVE format in the RIFF header.", nameof(waveFile));
             }
 
-            if (!ValidateValues(waveFile, 12, 0x66, 0x6D, 0x74, 0x20)) {
+            if (!ValidateValues(waveFile, 12, 0x66, 0x6D, 0x74, 0x20))
+            {
                 throw new ArgumentException("The first subchunk is expected to be the sample format.", nameof(waveFile));
             }
 
@@ -77,13 +80,15 @@ namespace Cosmos.System.Audio.IO {
             // Normally, this is fine, if the metadata is at the end of the chunk and we can safely ignore it.
             int metadataSize = BitConverter.ToInt32(waveFile, 16);
 
-            if (!ValidateValues(waveFile, 20, 0x01, 0x00)) {
+            if (!ValidateValues(waveFile, 20, 0x01, 0x00))
+            {
                 throw new ArgumentException("WAVE compression is not supported.", nameof(waveFile));
             }
 
             ushort numChannels = BitConverter.ToUInt16(waveFile, 22);
 
-            if (numChannels > byte.MaxValue) {
+            if (numChannels > byte.MaxValue)
+            {
                 throw new ArgumentException($"The maximum amount of channels for an AudioStream is 255 - the input contains {numChannels}.", nameof(waveFile));
             }
 
@@ -92,7 +97,8 @@ namespace Cosmos.System.Audio.IO {
             // blockAlign at offset 32 of size 2
             ushort bitsPerSample = BitConverter.ToUInt16(waveFile, 34);
 
-            var bitDepth = bitsPerSample switch {
+            var bitDepth = bitsPerSample switch
+            {
                 8 => AudioBitDepth.Bits8,
                 16 => AudioBitDepth.Bits16,
                 24 => AudioBitDepth.Bits24,
@@ -103,14 +109,16 @@ namespace Cosmos.System.Audio.IO {
             // ExtraParamSize and ExtraParams would be here for encodings different than PCM
             int dataStart = 20 + metadataSize;
 
-            if (!ValidateValues(waveFile, dataStart, 0x64, 0x61, 0x74, 0x61)) {
+            if (!ValidateValues(waveFile, dataStart, 0x64, 0x61, 0x74, 0x61))
+            {
                 throw new ArgumentException("Expected a 'data' block");
             }
 
             uint dataSize = BitConverter.ToUInt32(waveFile, dataStart + 4);
             byte[] data = new byte[dataSize];
 
-            fixed (byte* inputPtr = waveFile, outputPtr = data) {
+            fixed (byte* inputPtr = waveFile, outputPtr = data)
+            {
                 MemoryOperations.Copy(outputPtr, inputPtr + dataStart + 8, data.Length);
             }
 
@@ -125,8 +133,10 @@ namespace Cosmos.System.Audio.IO {
 
         private static bool ValidateValues(byte[] target, int offset, params byte[] values)
         {
-            for (int i = 0; i < values.Length; i++) {
-                if(target[i + offset] != values[i]) {
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (target[i + offset] != values[i])
+                {
                     return false;
                 }
             }
@@ -143,14 +153,16 @@ namespace Cosmos.System.Audio.IO {
             int samplesLeft = sampleCount - (int)Position;
             int actualCopySize = Math.Min(samplesLeft, buffer.Size);
 
-            if(cachedBuffer != buffer)
+            if (cachedBuffer != buffer)
             {
                 cachedWriter = new(buffer, format);
                 cachedBuffer = buffer;
             }
 
-            fixed (byte* dataPtr = data) {
-                for (int i = 0; i < actualCopySize; i++) {
+            fixed (byte* dataPtr = data)
+            {
+                for (int i = 0; i < actualCopySize; i++)
+                {
                     cachedWriter.Write(dataPtr + i * format.Size + Position * format.Size, i);
                 }
             }
@@ -170,7 +182,8 @@ namespace Cosmos.System.Audio.IO {
 
                 Position = Math.Min(Position + delta, Length);
             }
-            else {
+            else
+            {
                 Position += delta;
             }
 

@@ -39,7 +39,7 @@ namespace BasicTerminalShell
                     Console.WriteLine("help     - shows this help menu");
                     break;
                 default:
-                    // switch operator wokrs great
+                    // switch operator works great
                     Console.WriteLine($"\"{words[0]}\" is not a command");
                     break;
             }

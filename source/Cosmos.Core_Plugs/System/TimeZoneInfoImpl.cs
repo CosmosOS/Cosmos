@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IL2CPU.API.Attribs;
+﻿using IL2CPU.API.Attribs;
+using System;
 
 namespace Cosmos.Core_Plugs.System
 {
@@ -13,8 +9,7 @@ namespace Cosmos.Core_Plugs.System
         NoThrowOnInvalidTime = 0x2
     }
 
-
-    [Plug(typeof(global::System.TimeZoneInfo))]
+    [Plug(typeof(TimeZoneInfo))]
     class TimeZoneInfoImpl
     {
         public static TimeZoneInfo get_Local()

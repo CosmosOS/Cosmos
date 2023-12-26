@@ -43,8 +43,8 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
         public class PacketCommands
         {
-            public static byte[] ReadSector = { (byte)ATA_PIO.Cmd.Read, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
-            public static byte[] Unload = { (byte)ATA_PIO.Cmd.Eject, 0, 0, 0, 0x02, 0, 0, 0, 0, 0, 0, 0 };
+            public static byte[] ReadSector = { (byte)Cmd.Read, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
+            public static byte[] Unload = { (byte)Cmd.Eject, 0, 0, 0, 0x02, 0, 0, 0, 0, 0, 0, 0 };
             public static byte[] GetMaxLBA = { 0x25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         }
 
@@ -61,7 +61,7 @@ namespace Cosmos.HAL.BlockDevice
             mBlockSize = SectorSize;
             IO = new Core.IOGroup.ATA(!Primary);
             var p = BusPosition == BusPositionEnum.Master;
-            Ata.AtaDebugger.Send("ATAPI: Primary controller: " + this.Primary + " Bus postion: IsMaster: " + p);
+            ataDebugger.Send("ATAPI: Primary controller: " + Primary + " Bus postion: IsMaster: " + p);
 
             MaxLBA = GetMaxLBA();
             Init();
@@ -91,7 +91,7 @@ namespace Cosmos.HAL.BlockDevice
         /// <param name="aContext"></param>
         private void HandleIRQ(ref INTs.IRQContext aContext)
         {
-            Ata.AtaDebugger.Send("ATAPI IRQ");
+            ataDebugger.Send("ATAPI IRQ");
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Cosmos.HAL.BlockDevice
                 throw new NotImplementedException("Reading more than one sectors is not supported. SectorCount: " + SectorCount);
             }
 
-            Ata.AtaDebugger.Send("ATAPI: Reading block. Sector: " + SectorNum + " SectorCount: " + SectorCount);
+            ataDebugger.SendInternal("ATAPI: Reading block. Sector: " + SectorNum + " SectorCount: " + SectorCount);
 
 
             byte[] packet = new byte[12];
@@ -182,10 +182,10 @@ namespace Cosmos.HAL.BlockDevice
 
             //Send ATAPI packet command
             device.SendCmd(Cmd.Packet);
-            Ata.AtaDebugger.Send("ATAPI: Polling");
+            ataDebugger.SendInternal("ATAPI: Polling");
 
             Poll(true);
-            Ata.AtaDebugger.Send("ATAPI: Polling complete");
+            ataDebugger.SendInternal("ATAPI: Polling complete");
 
             //Send the command as words
             for (int i = 0; i < AtapiPacket.Length; i++)
@@ -221,7 +221,7 @@ namespace Cosmos.HAL.BlockDevice
         public void Eject()
         {
             ushort[] output = new ushort[12];
-            SendCmd(ATAPI.PacketCommands.Unload, SectorSize, ref output);
+            SendCmd(PacketCommands.Unload, SectorSize, ref output);
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
         /// <summary>
-        ///  The function returns the max LBA value of the ATAPI device. Code is based on https://forum.osdev.org/viewtopic.php?f=1&t=14604"
+        ///  The function returns the max LBA value of the ATAPI device. Code is based on <a href="https://forum.osdev.org/viewtopic.php?f=1&amp;t=14604">this</a>
         /// </summary>
         /// <returns>The maximum LBA</returns>
         private ulong GetMaxLBA()

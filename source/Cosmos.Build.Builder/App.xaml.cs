@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Setup.Configuration;
 using Cosmos.Build.Builder.Services;
 using Cosmos.Build.Builder.ViewModels;
 using Cosmos.Build.Builder.Views;
+using System.Text;
 
 namespace Cosmos.Build.Builder
 {
@@ -24,13 +25,17 @@ namespace Cosmos.Build.Builder
                 return;
             }
 
-            var configuration = new CommandLineBuilderConfiguration(e.Args);
-
-            BuilderConfiguration = configuration;
-
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             MainWindow = new MainWindow();
 
-            var visualStudioService = new VisualStudioService();
+            // ask for build configuration
+            OptionsDialog options = new();
+            options.ShowDialog();
+
+            BuilderConfiguration = options.BuildOptions;
+
+
+            VisualStudioService visualStudioService = new();
 
             var visualStudioInstances = visualStudioService.GetInstances();
 
@@ -41,15 +46,6 @@ namespace Cosmos.Build.Builder
             }
 
             ISetupInstance2 visualStudioInstance = null;
-
-            if (configuration.VsPath != null)
-            {
-                visualStudioInstance = visualStudioInstances.FirstOrDefault(
-                    i => String.Equals(
-                        Path.GetFullPath(configuration.VsPath),
-                        Path.GetFullPath(i.GetInstallationPath()),
-                        StringComparison.Ordinal));
-            }
 
             if (visualStudioInstance == null)
             {

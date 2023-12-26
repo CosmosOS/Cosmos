@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Cosmos.System.Helpers
 {
     /// <summary>
-    /// Array Helper class (contains useful functions about array manipulation).
+    /// Contains utility methods related to array manipulation.
     /// </summary>
     public class ArrayHelper
     {
         /// <summary>
-        /// Contatenate two byte arrays. https://stackoverflow.com/a/45531730
+        /// Contatenates two byte arrays.
         /// </summary>
-        /// <param name="first">First byte array.</param>
-        /// <param name="second">Byte array to concatenate.</param>
+        /// <param name="first">The first byte array.</param>
+        /// <param name="second">The byte array to concatenate.</param>
         public static byte[] Concat(byte[] first, byte[] second)
         {
             byte[] output;
@@ -32,21 +30,22 @@ namespace Cosmos.System.Helpers
                     output[i] = first[i];
                 }
             }
+
             for (int j = 0; j < second.Length; j++)
             {
                 output[alen + j] = second[j];
             }
+
             return output;
         }
 
         /// <summary>
-        /// Split byte array into chunks of a specified size.
+        /// Splits the specified byte array into chunks of a specified size.
         /// </summary>
-        /// <param name="buffer">Byte array to split.</param>
-        /// <param name="chunksize">Chunk size.</param>
+        /// <param name="buffer">The byte array to split.</param>
+        /// <param name="chunksize">The size of each chunk.</param>
         public static byte[][] ArraySplit(byte[] buffer, int chunksize = 1000)
         {
-            var size = buffer.Length;
             var chunkCount = (buffer.Length + chunksize - 1) / chunksize;
             var bufferArray = new byte[chunkCount][];
             int index = 0;
@@ -55,6 +54,7 @@ namespace Cosmos.System.Helpers
             {
                 bufferArray[i] = new byte[Math.Min(chunksize, buffer.Length - i * chunksize)];
             }
+
             for (var i = 0; i < chunkCount; i++)
             {
                 for (var j = 0; j < bufferArray[i].Length; j++)
@@ -63,6 +63,7 @@ namespace Cosmos.System.Helpers
                     index++;
                 }
             }
+
             return bufferArray;
         }
     }

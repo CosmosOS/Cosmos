@@ -50,7 +50,6 @@ namespace Cosmos.Compiler.Tests.TypeSystem
 
         protected override void BeforeRun()
         {
-            Console.WriteLine("Cosmos booted successfully. Starting Type tests now please wait...");
         }
 
         private void TestVTablesImpl()
@@ -141,6 +140,18 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             StaticTestClass.B.FieldA = 10;
             collected = Heap.Collect();
             Assert.AreEqual(0, collected, "Storing elements in static class keeps them referenced");
+
+            for (int i = 0; i < 10_000; i++)
+            {
+                _ = new object();
+            }
+            Heap.Collect();
+            uint heapSmallPages = RAT.GetPageCount((byte)RAT.PageType.HeapSmall);
+            int freed = HeapSmall.PruneSMT();
+            uint afterPrune = RAT.GetPageCount((byte)RAT.PageType.HeapSmall);
+            Assert.IsTrue(heapSmallPages >= afterPrune, "Running PruneSMT does not increase the number of pages in use");
+            Assert.AreEqual(freed, heapSmallPages - afterPrune, "PruneSMT returns the correct number of pages freed");
+
         }
 
         #region Test Methods
@@ -206,11 +217,40 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Heap.Collect();
             int nowAllocated = HeapSmall.GetAllocatedObjectCount();
             Assert.AreEqual(allocated, nowAllocated, "Concentating and writing strings does not leak objects");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            TestMethod7();
+            Heap.Collect();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "TestMethod7 does not leak string objects");
+
+            allocated = HeapSmall.GetAllocatedObjectCount();
+            TestMethod8();
+            Heap.Collect();
+            nowAllocated = HeapSmall.GetAllocatedObjectCount();
+            Assert.AreEqual(allocated, nowAllocated, "TestMethod8 does not leak any objects");
         }
 
         void TestMethod6()
         {
             Console.WriteLine("Test: " + 3 + " vs " + 5);
+        }
+
+        void TestMethod7()
+        {
+            string o = "";
+            for (int i = 0; i < 128; i++)
+            {
+                o += i + "|" + i * 2;
+            }
+        }
+
+        void TestMethod8()
+        {
+            for (int i = 0; i < 100000; i++)
+            {
+                new object();
+            }
         }
 
         #endregion

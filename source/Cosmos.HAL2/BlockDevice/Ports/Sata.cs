@@ -8,7 +8,7 @@ namespace Cosmos.HAL.BlockDevice.Ports
 {
     public class SATA : StoragePort
     {
-        internal static Debugger mSATADebugger = new Debugger("HAL", "SATA");
+        internal static Debugger mSATADebugger = new("SATA");
         public override BlockDeviceType Type
         {
             get

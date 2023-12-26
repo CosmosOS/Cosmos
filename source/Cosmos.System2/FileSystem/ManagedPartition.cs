@@ -1,17 +1,12 @@
 ﻿#define COSMOS_DEBUG
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
-using Cosmos.System.FileSystem.FAT;
-using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
 {
     public class ManagedPartition
     {
-        internal static Debugger PartitonDebugger = new Debugger("System", "Partiton");
+        internal static Debugger PartitonDebugger = new Debugger("Partiton");
         public readonly Partition Host;
         /// <summary>
         /// The root path of the file system. Example: 0:\
@@ -24,18 +19,15 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Does the partition have a known file system?
         /// </summary>
-        public bool HasFileSystem
-        {
-            get
-            {
-                return MountedFS != null;
-            }
+        public bool HasFileSystem => MountedFS != null;
+
+        public string LimitFS = null;
+
+        public ManagedPartition(Partition host, string limitFS = null) {
+            Host = host;
+            LimitFS = limitFS;
         }
 
-        public ManagedPartition(Partition host)
-        {
-            Host = host;
-        }
         /// <summary>
         /// Zeros out the entire partition
         /// </summary>

@@ -1,4 +1,7 @@
 # Levels
+
+**Warning** This article is for a older version of Cosmos and it doesn't work for current version.
+
 The security model of Cosmos will evolve and mature as
 Cosmos does, however the base model is presented here.
 

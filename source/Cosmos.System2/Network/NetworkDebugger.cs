@@ -1,94 +1,95 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using Cosmos.System.Network.Config;
-using Cosmos.System.Network.IPv4;
-using Cosmos.System.Network.IPv4.TCP;
 using Con = System.Console;
 
 namespace Cosmos.System.Network
 {
+    /// <summary>
+    /// Facilitates kernel debugging over IP.
+    /// </summary>
     public class NetworkDebugger
     {
-        /// <summary>
-        /// TCP Server.
-        /// </summary>
-        private TcpListener xListener = null;
+        private readonly TcpListener listener;
+        private NetworkStream stream;
+        private TcpClient client;
 
         /// <summary>
-        /// TCP Client.
+        /// The remote host IP address.
         /// </summary>
-        private TcpClient xClient = null;
+        public IPAddress Ip { get; set; }
 
         /// <summary>
-        /// Remote IP Address
-        /// </summary>
-        public Address Ip { get; set; }
-
-        /// <summary>
-        /// Port used
+        /// The port to use.
         /// </summary>
         public int Port { get; set; }
 
         /// <summary>
-        /// Create NetworkDebugger class (used to listen for a debugger connection)
+        /// Initializes a new instance of the <see cref="NetworkDebugger"/> class.
         /// </summary>
         /// <param name="port">Port used for TCP connection.</param>
         public NetworkDebugger(int port)
         {
             Port = port;
-            xListener = new TcpListener((ushort)port);
+            listener = new TcpListener(IPAddress.Any, (ushort)port);
         }
 
         /// <summary>
-        /// Create NetworkDebugger class (used to connect to a remote debugger)
+        /// Initializes a new instance of the <see cref="NetworkDebugger"/> class.
         /// </summary>
         /// <param name="ip">IP Address of the remote debugger.</param>
         /// <param name="port">Port used for TCP connection.</param>
-        public NetworkDebugger(Address ip, int port)
+        public NetworkDebugger(IPAddress ip, int port)
         {
             Ip = ip;
             Port = port;
-            xClient = new TcpClient(port);
+            client = new TcpClient(new IPEndPoint(Ip, port));
         }
 
         /// <summary>
-        /// Start debugger
+        /// Starts the debugger.
         /// </summary>
         public void Start()
         {
-            if (xClient == null)
+            if (client == null)
             {
-                xListener.Start();
+                listener.Start();
                 
                 Con.WriteLine("Waiting for remote debugger connection at " + NetworkConfiguration.CurrentAddress.ToString() + ":" + Port);
-                xClient = xListener.AcceptTcpClient(); //blocking
+                client = listener.AcceptTcpClient();
             }
-            else if (xListener == null)
+            else if (listener == null)
             {
-                xClient.Connect(Ip, Port);
+                client.Connect(Ip, Port);
             }
 
+            stream = client.GetStream();
+
             Send("--- Cosmos Network Debugger ---");
-            Send("Debugger Connected!");
+            Send("Debugger connected!");
         }
 
         /// <summary>
-        /// Send text to the debugger
+        /// Send text to the debugger.
         /// </summary>
         /// <param name="message">Text to send to the debugger.</param>
         public void Send(string message)
         {
-            xClient.Send(Encoding.ASCII.GetBytes("[" + DateTime.Now.ToString("HH:mm:ss") + "] - " + message + "\r\n"));
+            byte[] dataToSend = Encoding.ASCII.GetBytes("[" + DateTime.Now.ToString("HH:mm:ss") + "] - " + message + "\r\n");
+            stream.Write(dataToSend, 0, dataToSend.Length);
         }
 
         /// <summary>
-        /// Stop the debugger by closing TCP Connection
+        /// Stops the debugger by closing the TCP connection.
         /// </summary>
         public void Stop()
         {
             Con.WriteLine("Closing Debugger connection");
             Send("Closing...");
-            xClient.Close();
+            stream.Close();
+            client.Close();
         }
     }
 }

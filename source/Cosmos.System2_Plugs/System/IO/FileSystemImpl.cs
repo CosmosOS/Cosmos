@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using Cosmos.System.FileSystem.VFS;
+using Cosmos.System;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.IO
@@ -28,19 +28,47 @@ namespace Cosmos.System_Plugs.System.IO
             Directory.Delete(aDir, aRecursive);
         }
 
-        public static void DeleteFile(string aFile)
+        public static void DeleteFile(string fullPath)
         {
-            CosmosFileSystem.DeleteFile(aFile);
+            Global.Debugger.SendInternal($"DeleteFile : fullPath = {fullPath}");
+            VFSManager.DeleteFile(fullPath);
         }
 
-        public static void CopyFile(string aSource, string aDesintation, bool aOverwrite)
+        public static void CopyFile(string sourceFullPath, string destFullPath, bool overwrite)
         {
-            CosmosFileSystem.CopyFile(aSource, aDesintation, aOverwrite);
+            Global.Debugger.SendInternal($"CopyFile {sourceFullPath} into {destFullPath} with overwrite {overwrite}");
+
+            // The destination path may just be a directory into which the file should be copied.
+            // If it is, append the filename from the source onto the destination directory
+            if (Directory.Exists(destFullPath))
+            {
+                destFullPath = Path.Combine(destFullPath, Path.GetFileName(sourceFullPath));
+            }
+
+            // Copy the contents of the file from the source to the destination, creating the destination in the process
+            using (var src = new FileStream(sourceFullPath, FileMode.Open))
+            using (var dst = new FileStream(destFullPath, overwrite ? FileMode.Create : FileMode.CreateNew))
+            {
+                int xSize = (int)src.Length;
+                Global.Debugger.SendInternal($"size of {sourceFullPath} is {xSize} bytes");
+                byte[] content = new byte[xSize];
+                Global.Debugger.SendInternal($"content byte buffer allocated");
+                src.Read(content, 0, xSize);
+                Global.Debugger.SendInternal($"content byte buffer read");
+                dst.Write(content, 0, xSize);
+                Global.Debugger.SendInternal($"content byte buffer written");
+            }
         }
 
-        public static bool FileExists(string aFile)
+        public static bool FileExists(string fullPath)
         {
-            return CosmosFileSystem.FileExists(aFile);
+            if (fullPath == null)
+            {
+                return false;
+            }
+
+            Global.Debugger.SendInternal($"-- CosmosFileSystem.FileExists -- : fullPath = {fullPath}");
+            return VFSManager.FileExists(fullPath);
         }
     }
 }

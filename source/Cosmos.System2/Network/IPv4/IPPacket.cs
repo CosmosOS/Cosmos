@@ -1,12 +1,4 @@
-﻿/*
-* PROJECT:          Aura Operating System Development
-* CONTENT:          IPv4 Packet
-* PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
-*                   Port of Cosmos Code.
-*/
-
-using System;
-using Cosmos.HAL;
+﻿using System;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
 using Cosmos.System.Network.IPv4.TCP;
@@ -16,36 +8,40 @@ using Cosmos.System.Network.IPv4.UDP.DHCP;
 namespace Cosmos.System.Network.IPv4
 {
     /// <summary>
-    /// IPPacket class. See also: <seealso cref="EthernetPacket"/>.
+    /// Represents an IP (Internet Protocol) packet.
     /// </summary>
+    /// <remarks>
+    /// See also: <seealso cref="EthernetPacket"/>.
+    /// </remarks>
     public class IPPacket : EthernetPacket
     {
         protected byte ipHeaderLength;
-
         private static ushort sNextFragmentID;
 
         /// <summary>
-        /// IPv4 handler.
+        /// Handles a single IPv4 packet.
         /// </summary>
-        /// <param name="packetData">Packet data.</param>
-        /// <exception cref="sys.ArgumentOutOfRangeException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="sys.IO.IOException">Thrown on IO error.</exception>
-        /// <exception cref="sys.ArgumentException">Thrown on fatal error (contact support).</exception>
-        /// <exception cref="sys.OverflowException">Thrown if packetData array length is greater than Int32.MaxValue.</exception>
+        /// <param name="packetData">The raw data of the packet.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
+        /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
+        /// <exception cref="OverflowException">Thrown if packetData array length is greater than Int32.MaxValue.</exception>
         internal static void IPv4Handler(byte[] packetData)
         {
-            var ip_packet = new IPPacket(packetData);
+            var ipPacket = new IPPacket(packetData);
 
-            if (ip_packet.SourceIP == null)
+            if (ipPacket.SourceIP == null)
             {
-                Global.mDebugger.Send("SourceIP null in IPv4Handler!");
+                NetworkStack.Debugger.Send("SourceIP null in IPv4Handler!");
             }
-            ARPCache.Update(ip_packet.SourceIP, ip_packet.SourceMAC);
 
-            if (NetworkStack.AddressMap.ContainsKey(ip_packet.DestinationIP.Hash) == true ||
-                ip_packet.DestinationIP.address[3] == 255)
+            ARPCache.Update(ipPacket.SourceIP, ipPacket.SourceMAC);
+
+            if (NetworkStack.AddressMap.ContainsKey(ipPacket.DestinationIP.Hash) == true ||
+                ipPacket.DestinationIP.Parts[3] == 255 // this is wrong x.x.x.255 is not always broadcast
+                )
             {
-                switch (ip_packet.Protocol)
+                switch (ipPacket.Protocol)
                 {
                     case 1:
                         ICMPPacket.ICMPHandler(packetData);
@@ -58,14 +54,14 @@ namespace Cosmos.System.Network.IPv4
                         break;
                 }
             }
-            else if (NetworkStack.MACMap.ContainsKey(ip_packet.DestinationMAC.Hash))
+            else if (NetworkStack.MACMap.ContainsKey(ipPacket.DestinationMAC.Hash))
             {
                 DHCPPacket.DHCPHandler(packetData);
             }
         }
 
         /// <summary>
-        /// Get next IP fragment ID.
+        /// Gets the next IP fragment ID.
         /// </summary>
         public static ushort NextIPFragmentID => sNextFragmentID++;
 
@@ -86,12 +82,12 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Init IPPacket fields.
+        /// Initializes all internal fields.
         /// </summary>
-        /// <exception cref="sys.ArgumentException">Thrown if RawData is invalid or null.</exception>
-        protected override void InitFields()
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
+        protected override void InitializeFields()
         {
-            base.InitFields();
+            base.InitializeFields();
             IPVersion = (byte)((RawData[14] & 0xF0) >> 4);
             ipHeaderLength = (byte)(RawData[14] & 0x0F);
             TypeOfService = RawData[15];
@@ -108,7 +104,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Create new instance of the <see cref="IPPacket"/> class.
+        /// Initializes a new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="dataLength">Data length.</param>
         /// <param name="protocol">Protocol.</param>
@@ -120,7 +116,7 @@ namespace Cosmos.System.Network.IPv4
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="IPPacket"/> class.
+        /// Initializes a new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="dataLength">Data length.</param>
         /// <param name="protocol">Protocol.</param>
@@ -133,7 +129,7 @@ namespace Cosmos.System.Network.IPv4
         { }
 
         /// <summary>
-        /// Create new instance of the <see cref="IPPacket"/> class.
+        /// Initializes a new instance of the <see cref="IPPacket"/> class.
         /// </summary>
         /// <param name="srcMAC">Source MAC address.</param>
         /// <param name="destMAC">Destination MAC address.</param>
@@ -165,31 +161,29 @@ namespace Cosmos.System.Network.IPv4
             RawData[25] = 0x00;
             for (int b = 0; b < 4; b++)
             {
-                RawData[26 + b] = source.address[b];
-                RawData[30 + b] = dest.address[b];
+                RawData[26 + b] = source.Parts[b];
+                RawData[30 + b] = dest.Parts[b];
             }
             IPCRC = CalcIPCRC(20);
             RawData[24] = (byte)((IPCRC >> 8) & 0xFF);
             RawData[25] = (byte)((IPCRC >> 0) & 0xFF);
 
-            InitFields();
+            InitializeFields();
         }
 
         /// <summary>
-        /// Calcutale CRC.
+        /// Calculates the CRC of the packet.
         /// </summary>
-        /// <param name="offset">Offset.</param>
-        /// <param name="length">Length.</param>
-        /// <returns></returns>
+        /// <param name="offset">The offset, in bytes.</param>
+        /// <param name="length">The length, in bytes.</param>
         protected ushort CalcOcCRC(ushort offset, ushort length) => CalcOcCRC(RawData, offset, length);
 
         /// <summary>
-        /// Calcutale CRC.
+        /// Calculates the CRC of the packet.
         /// </summary>
-        /// <param name="buffer">Buffer.</param>
-        /// <param name="offset">Offset.</param>
-        /// <param name="length">Length.</param>
-        /// <returns>ushort value.</returns>
+        /// <param name="buffer">The buffer to use.</param>
+        /// <param name="offset">The offset, in bytes.</param>
+        /// <param name="length">The length, in bytes.</param>
         protected static ushort CalcOcCRC(byte[] buffer, ushort offset, int length)
         {
             return (ushort)~SumShortValues(buffer, offset, length);
@@ -215,82 +209,84 @@ namespace Cosmos.System.Network.IPv4
         }
 
         /// <summary>
-        /// Calcutale CRC.
+        /// Calculates the CRC of the packet.
         /// </summary>
-        /// <param name="headerLength">Header length.</param>
-        /// <returns>ushort value.</returns>
+        /// <param name="headerLength">The length of the header, in bytes.</param>
         protected ushort CalcIPCRC(ushort headerLength)
         {
             return CalcOcCRC(14, headerLength);
         }
 
         /// <summary>
-        /// Get IP version.
+        /// Gets the IP version of the packet.
         /// </summary>
         internal byte IPVersion { get; private set; }
+
         /// <summary>
-        /// Get header length.
+        /// Gets the length of the header, in bytes.
         /// </summary>
         internal ushort HeaderLength => (ushort)(ipHeaderLength * 4);
 
         /// <summary>
-        /// Get type of service.
+        /// Gets the type of service.
         /// </summary>
         internal byte TypeOfService { get; private set; }
 
         /// <summary>
-        /// Get IP length.
+        /// Gets the IP length of the packet.
         /// </summary>
         internal ushort IPLength { get; private set; }
+
         /// <summary>
-        /// Get fragment ID.
+        /// Gets the fragment ID.
         /// </summary>
         internal ushort FragmentID { get; private set; }
+
         /// <summary>
-        /// Get flags.
+        /// Gets the flags of the packet.
         /// </summary>
         internal byte IPFlags { get; private set; }
+
         /// <summary>
-        /// Get fragment offset.
+        /// Gets the fragment offset.
         /// </summary>
         internal ushort FragmentOffset { get; private set; }
+
         /// <summary>
-        /// Get TTL.
+        /// Gets the TTL (Time-To-Live) of the packet.
         /// </summary>
         internal byte TTL { get; private set; }
+
         /// <summary>
-        /// Get protocol.
+        /// Gets the protocol.
         /// </summary>
         internal byte Protocol { get; private set; }
+
         /// <summary>
-        /// Get IPCRC.
+        /// Gets the IPCRC.
         /// </summary>
         internal ushort IPCRC { get; private set; }
 
         /// <summary>
-        /// Get source IP.
+        /// Gets the source IP address.
         /// </summary>
         internal Address SourceIP { get; private set; }
 
         /// <summary>
-        /// Get destination IP.
+        /// Gets the destination IP address.
         /// </summary>
         internal Address DestinationIP { get; private set; }
 
         /// <summary>
-        /// Get data offset.
+        /// Gets the offset of the data.
         /// </summary>
         internal ushort DataOffset { get; private set; }
 
         /// <summary>
-        /// Get data length.
+        /// Gets the length of the data.
         /// </summary>
         internal ushort DataLength => (ushort)(IPLength - HeaderLength);
 
-        /// <summary>
-        /// To string.
-        /// </summary>
-        /// <returns>string value.</returns>
         public override string ToString()
         {
             return "IP Packet Src=" + SourceIP + ", Dest=" + DestinationIP + ", Protocol=" + Protocol + ", TTL=" + TTL + ", DataLen=" + DataLength;

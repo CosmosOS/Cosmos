@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETFramework,Version=v4.8": {
+      "Dapper.StrongName": {
+        "type": "Direct",
+        "requested": "[2.0.90, )",
+        "resolved": "2.0.90",
+        "contentHash": "oYmC8zT97TBlmNcU/xM54CJC6sgG+VUmUhRN5tg05P1Y3H4wx7vU+xBM6MgEJ21aXAXsTctchPs5TCsbRdIxJw=="
+      },
+      "Microsoft.CSharp": {
+        "type": "Direct",
+        "requested": "[4.7.0, )",
+        "resolved": "4.7.0",
+        "contentHash": "pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA=="
+      }
+    }
+  }
+}

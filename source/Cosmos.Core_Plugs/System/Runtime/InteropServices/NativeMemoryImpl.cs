@@ -2,10 +2,10 @@ using IL2CPU.API.Attribs;
 using Cosmos.Core.Memory;
 using Cosmos.Core;
 
-namespace System.Runtime.InteropServices
+namespace Cosmos.Core_Plugs.System.Runtime.InteropServices
 {
     [Plug("System.Runtime.InteropServices.NativeMemory, System.Private.CoreLib")]
-    public static unsafe class NativeMemory
+    public static unsafe class NativeMemoryImpl
 	{
         public static void* Realloc(void* ptr, nuint byteCount)
 		{

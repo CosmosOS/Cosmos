@@ -7,40 +7,33 @@ using System.Threading.Tasks;
 namespace Cosmos.System.Graphics
 {
     /// <summary>
-    /// Color depth. Available:
-    /// <list type="bullet">
-    /// <item>ColorDepth4 - EGA 16 colors</item>
-    /// <item>ColorDepth8 - VGA 256 colors</item>
-    /// <item>ColorDepth16 - 65535 colors</item>
-    /// <item>ColorDepth24 - 16,777,216 of colors</item>
-    /// <item>ColorDepth32 - 16,777,216 of colors (with transparency)</item>
-    /// </list>
+    /// Represents the color depth of the pixels of a graphics surface.
     /// </summary>
     public enum ColorDepth
     {
         /// <summary>
-        /// EGA 16 colors.
+        /// 4 bits per pixel; 16 colors.
         /// </summary>
-        ColorDepth4 = 4,   /* EGA 16 colors */
+        ColorDepth4 = 4,
 
         /// <summary>
-        /// VGA 256 colors.
+        /// 8 bits per pixel; 256 colors.
         /// </summary>
         ColorDepth8 = 8,   /* VGA 256 colors */
 
         /// <summary>
-        /// 65535 colors.
+        /// 16 bits per pixel; 65535 colors.
         /// </summary>
-        ColorDepth16 = 16, /* 65535 colors */
+        ColorDepth16 = 16,
 
         /// <summary>
-        /// 16,777,216 of colors.
+        /// 24 bits per pixel; 16,777,216 colors.
         /// </summary>
-        ColorDepth24 = 24, /* 16,777,216 of colors */
+        ColorDepth24 = 24,
 
         /// <summary>
-        /// 16,777,216 of colors (with transparency).
+        /// 32 bits per pixel; 16,777,216 of colors with transparency (alpha values).
         /// </summary>
-        ColorDepth32 = 32  /* 16,777,216 of colors (with transparency). Use this when in doubt :-) */
+        ColorDepth32 = 32
     }
 }

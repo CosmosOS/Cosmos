@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <PlatformTarget>x86</PlatformTarget>
         <Configurations>Debug;Release;TEST</Configurations>
     </PropertyGroup>
 
