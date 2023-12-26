@@ -78,7 +78,7 @@ namespace Cosmos.HAL
             //EHCI.InitDriver();
 
             Console.WriteLine("Starting Processor Scheduler");
-            mDebugger.Send("Processor Scheduler");
+            debugger.Send("Processor Scheduler");
             Core.Processing.ProcessorScheduler.Initialize();
 
             if (InitNetwork)
