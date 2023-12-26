@@ -47,6 +47,11 @@ namespace Cosmos.Core.Memory
 		/// <returns>New pointer with specified size while maintaining old data.</returns>
         public static byte* Realloc(byte* aPtr, uint newSize)
 		{
+            if (mMemeoryGate != null)
+            {
+                mMemeoryGate.Lock();
+            }
+
             // TODO: don't move memory position if there is enough space in the current one.
 
             // Get existing size
@@ -75,6 +80,12 @@ namespace Cosmos.Core.Memory
 
             // Free the old data and return
             Free(aPtr);
+
+            if (mMemeoryGate != null)
+            {
+                mMemeoryGate.Unlock();
+            }
+
             return ToReturn;
 		}
 
@@ -128,11 +139,6 @@ namespace Cosmos.Core.Memory
 
                 return ptr;
             }
-
-            if (mMemeoryGate != null)
-            {
-                mMemeoryGate.Unlock();
-            }
         }
 
         /// <summary>
@@ -159,6 +165,11 @@ namespace Cosmos.Core.Memory
         /// </exception>
         public static void Free(void* aPtr)
         {
+            if (mMemeoryGate != null)
+            {
+                mMemeoryGate.Lock();
+            }
+
             //TODO find a better way to remove the double look up here for GetPageType and then again in the
             // .Free methods which actually free the entries in the RAT.
             //Debugger.DoSendNumber(0x77);
@@ -177,6 +188,11 @@ namespace Cosmos.Core.Memory
                 default:
                     throw new Exception("Heap item not found in RAT.");
             }
+
+            if (mMemeoryGate != null)
+            {
+                mMemeoryGate.Unlock();
+            }
         }
 
         /// <summary>
@@ -185,6 +201,11 @@ namespace Cosmos.Core.Memory
         /// <returns>Number of objects freed</returns>
         public static int Collect()
         {
+            if (mMemeoryGate != null)
+            {
+                mMemeoryGate.Lock();
+            }
+
             //Disable interrupts: Prevent CPU exception when allocation is called from interrupt code
             CPU.DisableInterrupts();
 
@@ -321,6 +342,11 @@ namespace Cosmos.Core.Memory
 
 			//Enable interrupts back
 			CPU.EnableInterrupts();
+
+            if (mMemeoryGate != null)
+            {
+                mMemeoryGate.Unlock();
+            }
 
             return freed;
         }
