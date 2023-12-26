@@ -129,9 +129,9 @@ namespace Cosmos.Core_Asm
                     new LiteralAssemblerCode("mov fs, ax");
                     new LiteralAssemblerCode("mov gs, ax");
                     new LiteralAssemblerCode("mov eax, esp");
-                    XS.Set("static_field__Cosmos_Core_INTs_mStackContext", EAX, destinationIsIndirect: true);
+                    XS.Set("static_field__A1Cosmos_Core_INTs_mStackContext", EAX, destinationIsIndirect: true);
                     XS.Call(LabelName.Get(GetMethodDef(typeof(Cosmos.Core.Processing.ProcessorScheduler).Assembly, typeof(Cosmos.Core.Processing.ProcessorScheduler).FullName, "SwitchTask", true)));
-                    XS.Set(EAX, "static_field__Cosmos_Core_INTs_mStackContext", sourceIsIndirect: true);
+                    XS.Set(EAX, "static_field__A1Cosmos_Core_INTs_mStackContext", sourceIsIndirect: true);
                     new LiteralAssemblerCode("mov esp, eax");
                     new LiteralAssemblerCode("pop eax");
                     new LiteralAssemblerCode("mov gs, eax");
