@@ -18,7 +18,7 @@ namespace Cosmos.System_Plugs.System
                 return "0";
             }
 
-            string result = aThis > 0 ? string.Empty : "0";
+            string result = aThis == 0 ? "0" : string.Empty;
 
             switch (format[0])
             {
