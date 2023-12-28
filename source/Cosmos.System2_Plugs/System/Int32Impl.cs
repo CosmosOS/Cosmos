@@ -13,46 +13,48 @@ namespace Cosmos.System_Plugs.System
 
         public static string ToString(ref int aThis, string format)
         {
-            if (format.Equals("X"))
+            if (string.IsNullOrEmpty(format))
             {
-                string result = "";
+                return "0";
+            }
 
-                if(aThis == 0)
-                {
-                    result = "0";
-                }
+            string result = aThis > 0 ? string.Empty : "0";
 
-                while (aThis != 0)
-                {
-                    if (aThis % 16 < 10)
+            switch (format[0])
+            {
+                case 'X':
+                    int value = aThis;
+
+                    while (value != 0)
                     {
-                        result = aThis % 16 + result;
-                    }
-                    else
-                    {
-                        string temp = "";
-
-                        switch (aThis % 16)
+                        int remainder = value % 16;
+                        if (remainder < 10)
                         {
-                            case 10: temp = "A"; break;
-                            case 11: temp = "B"; break;
-                            case 12: temp = "C"; break;
-                            case 13: temp = "D"; break;
-                            case 14: temp = "E"; break;
-                            case 15: temp = "F"; break;
+                            result = remainder + result;
+                        }
+                        else
+                        {
+                            char temp = (char)('A' + (remainder - 10));
+                            result = temp + result;
                         }
 
-                        result = temp + result;
+                        value /= 16;
                     }
+                    break;
+                case 'D':
+                    result = aThis.ToString();
+                    break;
+                default:
+                    return aThis.ToString();
+            }
 
-                    aThis /= 16;
-                }
-
-                return result;
+            if (format.Length > 1)
+            {
+                return int.TryParse(format.AsSpan(1), out int number) ? result.PadLeft(number, '0') : aThis.ToString();
             }
             else
             {
-                return aThis.ToString();
+                return result;
             }
         }
 
