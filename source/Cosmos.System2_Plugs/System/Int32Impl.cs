@@ -1,3 +1,4 @@
+using System.Text;
 using Cosmos.Common;
 using IL2CPU.API.Attribs;
 
@@ -18,11 +19,17 @@ namespace Cosmos.System_Plugs.System
                 return "0";
             }
 
-            string result = aThis == 0 ? "0" : string.Empty;
+            StringBuilder sb = new();
 
             switch (format[0])
             {
                 case 'X':
+                    if (aThis == 0)
+                    {
+                        sb.Append('0');
+                        break;
+                    }
+
                     int value = aThis;
 
                     while (value != 0)
@@ -30,23 +37,25 @@ namespace Cosmos.System_Plugs.System
                         int remainder = value % 16;
                         if (remainder < 10)
                         {
-                            result = remainder + result;
+                            sb.Insert(0, remainder);
                         }
                         else
                         {
                             char temp = (char)('A' + (remainder - 10));
-                            result = temp + result;
+                            sb.Insert(0, temp);
                         }
 
                         value /= 16;
                     }
                     break;
                 case 'D':
-                    result = aThis.ToString();
+                    sb.Append(aThis);
                     break;
                 default:
                     return aThis.ToString();
             }
+
+            var result = sb.ToString();
 
             if (format.Length > 1)
             {
