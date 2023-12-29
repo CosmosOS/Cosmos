@@ -1,6 +1,5 @@
 ﻿//#define COSMOSDEBUG
 using System;
-using System.Drawing;
 using System.IO;
 using System.Security;
 
@@ -151,7 +150,7 @@ namespace Cosmos.System.Graphics
         /// <exception cref="PathTooLongException">Thrown if the specified path is exceed the system-defined max length.</exception>
         public Bitmap(string path, ColorOrder colorOrder = ColorOrder.BGR) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
         {
-            using FileStream fs = new FileStream(path, FileMode.Open);
+            using var fs = new FileStream(path, FileMode.Open);
             CreateBitmap(fs, colorOrder);
         }
 
@@ -373,16 +372,7 @@ namespace Cosmos.System.Graphics
                             pixel[3] = 0;
                         }
                     }
-
-                    // fix color mix bug
-
-                    long pixelPosition = x + (imageHeight - (y + 1)) * imageWidth;
-
-                    Color color = Color.FromArgb(BitConverter.ToInt32(pixel, 0));
-                    color = Color.FromArgb(255, color.G, color.R, color.A);
-
-                    RawData[pixelPosition] = color.ToArgb(); //This bits should be A, R, G, B but order is switched
-                    
+                    RawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0); //This bits should be A, R, G, B but order is switched
                 }
                 position += paddingPerRow;
             }
