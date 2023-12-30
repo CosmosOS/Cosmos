@@ -36,7 +36,7 @@ namespace Cosmos.HAL
 
         #region Properties
 
-        private bool HasScrollWheel => mouseID == 3 || mouseID == 4;
+        public bool HasScrollWheel => mouseID == 3 || mouseID == 4;
 
         public byte PS2Port { get; }
 
@@ -131,12 +131,15 @@ namespace Cosmos.HAL
                 {
                     mouseCycle++;
                 }
+            }else if (mouseCycle == 3) {
+                mouseByte[3] = IOPort.Read8(Core.IOGroup.PS2Controller.Data);
+                mouseCycle++;
             }
 
             // TODO: move conditions to the if statement when stack corruption detection
             //       works better for complex conditions
             var xTest1 = mouseCycle == 2 && !HasScrollWheel;
-            var xTest2 = mouseCycle == 3 && HasScrollWheel;
+            var xTest2 = mouseCycle == 4 && HasScrollWheel;
 
             if (xTest1 || xTest2)
             {
@@ -166,8 +169,15 @@ namespace Cosmos.HAL
 
                 if (HasScrollWheel)
                 {
-                    var xScrollWheelByte = mouseByte[3] & 0x0F;
-                    xScrollWheel = (xScrollWheelByte & 0b1000) == 0 ? xScrollWheelByte : xScrollWheelByte | ~0x0F;
+                    var xScrollWheelByte = mouseByte[3];
+
+                    xScrollWheel = xScrollWheelByte & 0b0000_0111;
+
+                    // If the 4th bit is set, the scroll wheel is negative
+                    if ((xScrollWheelByte & (1 << 4)) == 1 << 4) {
+                        // if we just negate the value it starts at -8 and goes to 0, but we want it to start at 0 and go to -8
+                        xScrollWheel = -(-xScrollWheel + 8);
+                    }
 
                     if (mouseID == 4)
                     {
