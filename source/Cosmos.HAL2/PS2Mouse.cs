@@ -171,13 +171,7 @@ namespace Cosmos.HAL
                 {
                     var xScrollWheelByte = mouseByte[3];
 
-                    xScrollWheel = xScrollWheelByte & 0b0000_0111;
-
-                    // If the 4th bit is set, the scroll wheel is negative
-                    if ((xScrollWheelByte & (1 << 4)) == 1 << 4) {
-                        // if we just negate the value it starts at -8 and goes to 0, but we want it to start at 0 and go to -8
-                        xScrollWheel = -(-xScrollWheel + 8);
-                    }
+                    xScrollWheel = (xScrollWheelByte & 0b1000) == 0 ? xScrollWheelByte : xScrollWheelByte | ~0x0F;
 
                     if (mouseID == 4)
                     {
