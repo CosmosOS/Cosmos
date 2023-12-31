@@ -48,7 +48,7 @@ The following is a non-exhaustive list of features that Cosmos offers:
 - A basic network interface
 - A basic audio interface
 
-> **Note**
+> [!NOTE]
 > Use [embeded resources](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html) instead of the VFS for now for assets.
 
 ## Setting it up
