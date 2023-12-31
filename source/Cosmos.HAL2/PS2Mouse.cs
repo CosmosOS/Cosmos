@@ -141,7 +141,7 @@ namespace Cosmos.HAL
             var xTest1 = mouseCycle == 2 && !HasScrollWheel;
             var xTest2 = mouseCycle == 4 && HasScrollWheel;
 
-            if (xTest1 || xTest2)
+            if ((mouseCycle == 2 && !HasScrollWheel) || (mouseCycle == 4 && HasScrollWheel))
             {
                 int xDeltaX = 0;
                 int xDeltaY = 0;
