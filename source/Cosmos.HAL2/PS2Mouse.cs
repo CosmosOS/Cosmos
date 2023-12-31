@@ -131,7 +131,9 @@ namespace Cosmos.HAL
                 {
                     mouseCycle++;
                 }
-            }else if (mouseCycle == 3) {
+            }
+            else if (mouseCycle == 3) 
+            {
                 mouseByte[3] = IOPort.Read8(Core.IOGroup.PS2Controller.Data);
                 mouseCycle++;
             }
