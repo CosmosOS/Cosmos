@@ -138,11 +138,6 @@ namespace Cosmos.HAL
                 mouseCycle++;
             }
 
-            // TODO: move conditions to the if statement when stack corruption detection
-            //       works better for complex conditions
-            var xTest1 = mouseCycle == 2 && !HasScrollWheel;
-            var xTest2 = mouseCycle == 4 && HasScrollWheel;
-
             if ((mouseCycle == 2 && !HasScrollWheel) || (mouseCycle == 4 && HasScrollWheel))
             {
                 int xDeltaX = 0;
