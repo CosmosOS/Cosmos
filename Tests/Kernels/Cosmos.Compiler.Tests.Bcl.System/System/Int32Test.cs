@@ -1,5 +1,6 @@
 ﻿using System;
-
+using System.Linq;
+using Cosmos.Common.Extensions;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -9,7 +10,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         public static void Execute()
         {
             bool efuse;
-            int value;
+            int value, tmp;
             string result;
             string expectedResult;
 
@@ -37,13 +38,37 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // actually the Hash Code of an Int32 is the same value
             Assert.IsTrue((resultAsInt == value), "Int32.GetHashCode() doesn't work");
 
-#if false
-            // Now let's try ToString() again but printed in hex (this test fails for now!)
-            result = value.ToString("X2");
-            expectedResult = "0x7FFFFFFF";
+            // Now let's try ToString() again but printed in hex
+            result = value.ToString("X");
+            expectedResult = "7FFFFFFF";
 
-            Assert.IsTrue((result == expectedResult), "Int32.ToString(X2) doesn't work");
-#endif
+            Assert.IsTrue((result == expectedResult), "Int32.ToString(X) brings incorrect result.");
+
+            // Ensure value is not overrided
+            Assert.IsTrue((value != 0), "Int32.ToString(X) overrides the value of the variable.");
+
+            tmp = value;
+            result = ToStringOld(ref tmp, "X");
+
+            // This is just to demostrates that the changed version bring correct results
+            Assert.IsTrue((result == expectedResult), "Int32.ToString(X) brings incorrect result");
+
+            // Demostrate how old version overrided the the variable value.
+            Assert.IsTrue((tmp == 0), "ToStringOld(X), did not override");
+
+            // Test results with another implementation of hex format
+            foreach (int i in Enumerable.Range(0,256))
+            {
+                result = i.ToString("X4");
+                expectedResult = i.ToHex(4);
+                Assert.IsTrue((result == expectedResult), "Int32.ToString(X) brings incorrect result.");
+            }
+
+            // Test Decimal format
+            value = 10;
+            expectedResult = "0010";
+            result = value.ToString("D4");
+            Assert.IsTrue((result == expectedResult), "Int32.ToString(D4) brings incorrect result.");
 
             // basic bit operations
 
@@ -234,6 +259,52 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         public static void ByRefTestMethod(ref int aParam)
         {
             aParam++;
+        }
+
+        // Original int32.ToString(format)
+        private static string ToStringOld(ref int aThis, string format)
+        {
+            if (format.Equals("X"))
+            {
+                string result = "";
+
+                if (aThis == 0)
+                {
+                    result = "0";
+                }
+
+                while (aThis != 0)
+                {
+                    if (aThis % 16 < 10)
+                    {
+                        result = aThis % 16 + result;
+                    }
+                    else
+                    {
+                        string temp = "";
+
+                        switch (aThis % 16)
+                        {
+                            case 10: temp = "A"; break;
+                            case 11: temp = "B"; break;
+                            case 12: temp = "C"; break;
+                            case 13: temp = "D"; break;
+                            case 14: temp = "E"; break;
+                            case 15: temp = "F"; break;
+                        }
+
+                        result = temp + result;
+                    }
+
+                    aThis /= 16;
+                }
+
+                return result;
+            }
+            else
+            {
+                return aThis.ToString();
+            }
         }
     }
 }
