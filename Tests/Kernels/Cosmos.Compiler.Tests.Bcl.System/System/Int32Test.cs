@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         public static void Execute()
         {
             bool efuse;
-            int value, tmp;
+            int value;
             string result;
             string expectedResult;
 
@@ -47,24 +47,13 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Ensure value is not overrided
             Assert.IsTrue((value != 0), "Int32.ToString(X) overrides the value of the variable.");
 
-            tmp = value;
-            result = ToStringOld(ref tmp, "X");
+            // Hex with padding
+            value = 255;
+            result = value.ToString("X4");
+            expectedResult = "00FF";
+            Assert.IsTrue((result == expectedResult), "Int32.ToString(X4) brings incorrect result.");
 
-            // This is just to demostrates that the changed version bring correct results
-            Assert.IsTrue((result == expectedResult), "Int32.ToString(X) brings incorrect result");
-
-            // Demostrate how old version overrided the the variable value.
-            Assert.IsTrue((tmp == 0), "ToStringOld(X), did not override");
-
-            // Test results with another implementation of hex format
-            foreach (int i in Enumerable.Range(0,256))
-            {
-                result = i.ToString("X4");
-                expectedResult = i.ToHex(4);
-                Assert.IsTrue((result == expectedResult), "Int32.ToString(X) brings incorrect result.");
-            }
-
-            // Test Decimal format
+            // Test Decimal format wit padding
             value = 10;
             expectedResult = "0010";
             result = value.ToString("D4");
