@@ -249,51 +249,5 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             aParam++;
         }
-
-        // Original int32.ToString(format)
-        private static string ToStringOld(ref int aThis, string format)
-        {
-            if (format.Equals("X"))
-            {
-                string result = "";
-
-                if (aThis == 0)
-                {
-                    result = "0";
-                }
-
-                while (aThis != 0)
-                {
-                    if (aThis % 16 < 10)
-                    {
-                        result = aThis % 16 + result;
-                    }
-                    else
-                    {
-                        string temp = "";
-
-                        switch (aThis % 16)
-                        {
-                            case 10: temp = "A"; break;
-                            case 11: temp = "B"; break;
-                            case 12: temp = "C"; break;
-                            case 13: temp = "D"; break;
-                            case 14: temp = "E"; break;
-                            case 15: temp = "F"; break;
-                        }
-
-                        result = temp + result;
-                    }
-
-                    aThis /= 16;
-                }
-
-                return result;
-            }
-            else
-            {
-                return aThis.ToString();
-            }
-        }
     }
 }
