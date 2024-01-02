@@ -337,10 +337,10 @@ namespace Cosmos.TestRunner.Core
 
         private void MakeIso(string objectFile, string isoFile)
         {
-            IsoMaker.Generate(objectFile, isoFile);
+            string response = IsoMaker.Generate(objectFile, isoFile);
             if (!File.Exists(isoFile))
             {
-                throw new Exception("Error building iso");
+                throw new Exception($"Error building iso: {response}");
             }
         }
     }
