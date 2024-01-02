@@ -6,6 +6,7 @@ using Cosmos.TestRunner;
 using IL2CPU.API.Attribs;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Sys = Cosmos.System;
 
 namespace Cosmos.Compiler.Tests.TypeSystem
@@ -305,6 +306,7 @@ namespace Cosmos.Compiler.Tests.TypeSystem
                 Assert.IsTrue(c != null, "Anonymous types are created correctly");
                 Assert.IsTrue(c.i == 1 && c.n == "Test", "Anonymous types have correct values");
 
+                TestPackedStruct();
                 TestVTablesImpl();
                 TestGarbageCollectorMethods();
                 TestGarbageCollector();
@@ -339,5 +341,48 @@ namespace Cosmos.Compiler.Tests.TypeSystem
             Assert.AreEqual("Int32", Type.GetType("System.Int32, System.Private.CoreLib").Name, "GetType works on Int32 with shortened assembly qualified name");
             Assert.AreEqual("Int32", Type.GetType("System.Int32").Name, "GetType works on Int32 with shortened assembly qualified name");
         }
+
+        PackedStruct GetPackedStruct()
+        {
+            return new PackedStruct()
+            {
+                a = 1,
+                b = 2,
+                c = 3,
+                d = 4,
+                e = 5,
+                f = 6
+            };
+        }
+
+        PackedStruct Re { get; set; }
+        private void TestPackedStruct()
+        {
+            Re = GetPackedStruct();
+
+            Assert.AreEqual(1, Re.a, "Correctly returned first field of struct");
+            Assert.AreEqual("1", Re.a.ToString(), "Correctly returned first field of struct as string");
+            Assert.AreEqual(2, Re.b, "Correctly returned second field of struct");
+            Assert.AreEqual("2", Re.b.ToString(), "Correctly returned second field of struct as string");
+            Assert.AreEqual(3, Re.c, "Correctly returned third field of struct");
+            Assert.AreEqual("3", Re.c.ToString(), "Correctly returned third field of struct as string");
+            Assert.AreEqual(4, Re.d, "Correctly returned fourth field of struct");
+            Assert.AreEqual("4", Re.d.ToString(), "Correctly returned fourth field of struct as string");
+            Assert.AreEqual(5, Re.e, "Correctly returned fifth field of struct");
+            Assert.AreEqual("5", Re.e.ToString(), "Correctly returned fifth field of struct as string");
+            Assert.AreEqual(6, Re.f, "Correctly returned sixth field of struct");
+            Assert.AreEqual("6", Re.f.ToString(), "Correctly returned sixth field of struct as string");
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct PackedStruct
+    {
+        public ushort a;
+        public uint b;
+        public ulong c;
+        public ushort d;
+        public ushort e;
+        public ulong f;
     }
 }
