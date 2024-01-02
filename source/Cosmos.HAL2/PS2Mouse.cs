@@ -36,7 +36,7 @@ namespace Cosmos.HAL
 
         #region Properties
 
-        private bool HasScrollWheel => mouseID == 3 || mouseID == 4;
+        public bool HasScrollWheel => mouseID == 3 || mouseID == 4;
 
         public byte PS2Port { get; }
 
@@ -132,13 +132,13 @@ namespace Cosmos.HAL
                     mouseCycle++;
                 }
             }
+            else if (mouseCycle == 3) 
+            {
+                mouseByte[3] = IOPort.Read8(Core.IOGroup.PS2Controller.Data);
+                mouseCycle++;
+            }
 
-            // TODO: move conditions to the if statement when stack corruption detection
-            //       works better for complex conditions
-            var xTest1 = mouseCycle == 2 && !HasScrollWheel;
-            var xTest2 = mouseCycle == 3 && HasScrollWheel;
-
-            if (xTest1 || xTest2)
+            if ((mouseCycle == 2 && !HasScrollWheel) || (mouseCycle == 4 && HasScrollWheel))
             {
                 int xDeltaX = 0;
                 int xDeltaY = 0;
@@ -166,7 +166,8 @@ namespace Cosmos.HAL
 
                 if (HasScrollWheel)
                 {
-                    var xScrollWheelByte = mouseByte[3] & 0x0F;
+                    var xScrollWheelByte = mouseByte[3];
+
                     xScrollWheel = (xScrollWheelByte & 0b1000) == 0 ? xScrollWheelByte : xScrollWheelByte | ~0x0F;
 
                     if (mouseID == 4)

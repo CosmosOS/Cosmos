@@ -38,6 +38,8 @@ namespace Cosmos.System
         private static int deltaX;
         private static int deltaY;
 
+        private static int scrollDelta;
+
         /// <summary>
         /// The X location of the mouse.
         /// </summary>
@@ -144,6 +146,18 @@ namespace Cosmos.System
             }
         }
 
+        /// <summary>
+        /// The 'delta' for the mouse scroll wheel. Needs to be manually reset.
+        /// </summary>
+        public static int ScrollDelta {
+            get {
+                return scrollDelta;
+            }
+            internal set => scrollDelta = value;
+        }
+
+        public static bool ScrollWheelPresent => mouseList.Exists(x => (x is PS2Mouse xPs2 && xPs2.HasScrollWheel));
+
         #endregion
 
         #region Methods
@@ -167,10 +181,19 @@ namespace Cosmos.System
             DeltaX = deltaX;
             DeltaY = deltaY;
 
+            ScrollDelta += scrollWheel;
+
             X = (uint)Math.Clamp(X + (MouseSensitivity * deltaX), 0, ScreenWidth - 1);
             Y = (uint)Math.Clamp(Y + (MouseSensitivity * deltaY), 0, ScreenHeight - 1);
             LastMouseState = MouseState;
             MouseState = (MouseState)mouseState;
+        }
+
+        /// <summary>
+        /// Reset the scroll delta to 0.
+        /// </summary>
+        public static void ResetScrollDelta() {
+            ScrollDelta = 0;
         }
 
         /// <summary>
