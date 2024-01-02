@@ -60,6 +60,16 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return StateMachine.Status == Status.ESTABLISHED;
         }
 
+        public static EndPoint get_LocalEndPoint(Socket aThis)
+        {
+            return _localEndPoint;
+        }
+
+        public static EndPoint get_RemoteEndPoint(Socket aThis)
+        {
+            return _remoteEndPoint;
+        }
+
         public static bool Poll(Socket aThis, int microSeconds, SelectMode mode)
         {
             return StateMachine.Status == Status.ESTABLISHED;
