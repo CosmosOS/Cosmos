@@ -152,6 +152,10 @@ jobs:
         run: |
           xcopy /Y /S "Cosmos\Resources\Bochs\*.*" "${env:ProgramFiles(x86)}\Bochs-2.6.8\"
 
+      - name: Build the Project
+        run: |
+          dotnet build "Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResults\${{ matrix.kernel }}-TestResult.trx" --filter "FullyQualifiedName~${{ matrix.kernel }}"
+      
       - name: Test - Cosmos
         env:
           CI: "True"
