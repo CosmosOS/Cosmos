@@ -5,23 +5,28 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.System.Network.IPv4.TCP;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.Net
 {
     [Plug(Target = typeof(IPAddress))]
+    [PlugField(FieldId = PrivateAddressFieldId, FieldType = typeof(uint))]
     public static class IPAddressImpl
     {
+        private const string PrivateAddressFieldId = "$$PrivateAddress$$";
+
         private const int IPv4AddressBytes = 4;
         private const int IPv6AddressBytes = 16;
-        private static uint PrivateAddress;
 
-        public static uint get_PrivateAddress(IPAddress aThis)
+        public static uint get_PrivateAddress(IPAddress aThis,
+            [FieldAccess(Name = PrivateAddressFieldId)] ref uint PrivateAddress)
         {
             return PrivateAddress;
         }
 
-        public static void set_PrivateAddress(IPAddress aThis, uint address)
+        public static void set_PrivateAddress(IPAddress aThis, uint address,
+            [FieldAccess(Name = PrivateAddressFieldId)] ref uint PrivateAddress)
         {
             PrivateAddress = address;
         }
@@ -35,7 +40,8 @@ namespace Cosmos.System_Plugs.System.Net
         {
         }
 
-        public static void Ctor(IPAddress aThis, long address)
+        public static void Ctor(IPAddress aThis, long address,
+            [FieldAccess(Name = PrivateAddressFieldId)] ref uint PrivateAddress)
         {
             PrivateAddress = (uint)address;
         }
@@ -50,7 +56,8 @@ namespace Cosmos.System_Plugs.System.Net
             Ctor(aThis, address.ToArray());
         }
 
-        public static void Ctor(IPAddress aThis, byte[] address)
+        public static void Ctor(IPAddress aThis, byte[] address,
+            [FieldAccess(Name = PrivateAddressFieldId)] ref uint PrivateAddress)
         {
             if (address.Length == IPv4AddressBytes)
             {
