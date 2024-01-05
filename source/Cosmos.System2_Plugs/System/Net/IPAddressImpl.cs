@@ -13,17 +13,16 @@ namespace Cosmos.System_Plugs.System.Net
     [Plug(Target = typeof(IPAddress))]
     public static class IPAddressImpl
     {
+        private static uint _addressOrScopeId;
         private const int IPv4AddressBytes = 4;
         private const int IPv6AddressBytes = 16;
 
-        public static uint get_PrivateAddress(IPAddress aThis,
-            [FieldAccess(Name = "System.UInt32 System.Net.IPAddress._addressOrScopeId")] ref uint _addressOrScopeId)
+        public static uint get_PrivateAddress(IPAddress aThis)
         {
             return _addressOrScopeId;
         }
 
-        public static void set_PrivateAddress(IPAddress aThis, uint address,
-            [FieldAccess(Name = "System.UInt32 System.Net.IPAddress._addressOrScopeId")] ref uint _addressOrScopeId)
+        public static void set_PrivateAddress(IPAddress aThis, uint address)
         {
             _addressOrScopeId = address;
         }
@@ -37,8 +36,7 @@ namespace Cosmos.System_Plugs.System.Net
         {
         }
 
-        public static void Ctor(IPAddress aThis, long address,
-            [FieldAccess(Name = "System.UInt32 System.Net.IPAddress._addressOrScopeId")] ref uint _addressOrScopeId)
+        public static void Ctor(IPAddress aThis, long address)
         {
             _addressOrScopeId = (uint)address;
         }
@@ -53,8 +51,7 @@ namespace Cosmos.System_Plugs.System.Net
             Ctor(aThis, address.ToArray());
         }
 
-        public static void Ctor(IPAddress aThis, byte[] address,
-            [FieldAccess(Name = "System.UInt32 System.Net.IPAddress._addressOrScopeId")] ref uint _addressOrScopeId)
+        public static void Ctor(IPAddress aThis, byte[] address)
         {
             if (address.Length == IPv4AddressBytes)
             {
