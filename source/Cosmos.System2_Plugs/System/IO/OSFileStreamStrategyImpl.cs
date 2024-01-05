@@ -28,5 +28,10 @@ namespace Cosmos.System_Plugs.System.IO
         {
             throw new NotImplementedException();
         }
+
+        public static long Seek(object aThis, long a, object origin)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
