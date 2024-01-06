@@ -19,17 +19,17 @@ namespace Cosmos.System_Plugs.System.IO
             throw new NotImplementedException();
         }
 
-        public static long Seek(object aThis, long offset, object origin)
-        {
-            throw new NotImplementedException();
-        }
-
         public static long get_Length(object aThis)
         {
             throw new NotImplementedException();
         }
 
         public static bool get_CanSeek(object aThis)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static long Seek(object aThis, long a, object origin)
         {
             throw new NotImplementedException();
         }
