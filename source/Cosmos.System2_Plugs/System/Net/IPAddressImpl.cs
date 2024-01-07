@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.System.Network.IPv4.TCP;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.Net
@@ -12,18 +13,18 @@ namespace Cosmos.System_Plugs.System.Net
     [Plug(Target = typeof(IPAddress))]
     public static class IPAddressImpl
     {
+        private static uint _addressOrScopeId;
         private const int IPv4AddressBytes = 4;
         private const int IPv6AddressBytes = 16;
-        private static uint PrivateAddress;
 
         public static uint get_PrivateAddress(IPAddress aThis)
         {
-            return PrivateAddress;
+            return _addressOrScopeId;
         }
 
         public static void set_PrivateAddress(IPAddress aThis, uint address)
         {
-            PrivateAddress = address;
+            _addressOrScopeId = address;
         }
 
         public static AddressFamily get_AddressFamily(IPAddress aThis)
@@ -37,7 +38,7 @@ namespace Cosmos.System_Plugs.System.Net
 
         public static void Ctor(IPAddress aThis, long address)
         {
-            PrivateAddress = (uint)address;
+            _addressOrScopeId = (uint)address;
         }
 
         public static void Ctor(IPAddress aThis, ReadOnlySpan<byte> address)
@@ -54,7 +55,7 @@ namespace Cosmos.System_Plugs.System.Net
         {
             if (address.Length == IPv4AddressBytes)
             {
-                PrivateAddress = (uint)((address[0] << 0) | (address[1] << 8) | (address[2] << 16) | (address[3] << 24));
+                _addressOrScopeId = (uint)((address[0] << 0) | (address[1] << 8) | (address[2] << 16) | (address[3] << 24));
             }
             else if (address.Length == IPv6AddressBytes)
             {

@@ -12,13 +12,12 @@ using IL2CPU.API.Attribs;
 namespace Cosmos.System_Plugs.System.Net.Sockets
 {
     [Plug(Target = typeof(Socket))]
+    [PlugField(FieldId = StateMachineFieldId, FieldType = typeof(Tcp))]
+    [PlugField(FieldId = EndPointFieldId, FieldType = typeof(IPEndPoint))]
     public static class SocketImpl
     {
-        private static Tcp StateMachine;
-        private static IPEndPoint EndPoint = null;
-
-        private static IPEndPoint _localEndPoint;
-        private static IPEndPoint _remoteEndPoint;
+        private const string StateMachineFieldId = "$$StateMachine$$";
+        private const string EndPointFieldId = "$$EndPoint$$";
 
         private const int MinPort = 49152;
         private const int MaxPort = 65535;
@@ -55,42 +54,63 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             }
         }
 
-        public static bool get_Connected(Socket aThis)
+        public static bool get_Connected(Socket aThis,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
             return StateMachine.Status == Status.ESTABLISHED;
         }
 
-        public static bool Poll(Socket aThis, int microSeconds, SelectMode mode)
+        public static EndPoint get_LocalEndPoint(Socket aThis,
+            [FieldAccess(Name = "System.Net.EndPoint System.Net.Sockets.Socket._localEndPoint")] ref EndPoint _localEndPoint)
+        {
+            return _localEndPoint;
+        }
+
+        public static EndPoint get_RemoteEndPoint(Socket aThis,
+            [FieldAccess(Name = "System.Net.EndPoint System.Net.Sockets.Socket._remoteEndPoint")] ref EndPoint _remoteEndPoint)
+        {
+            return _remoteEndPoint;
+        }
+
+        public static bool Poll(Socket aThis, int microSeconds, SelectMode mode,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
             return StateMachine.Status == Status.ESTABLISHED;
         }
 
-        public static void Bind(Socket aThis, EndPoint localEP)
+        public static void Bind(Socket aThis, EndPoint localEP,
+            [FieldAccess(Name = EndPointFieldId)] ref EndPoint EndPoint)
         {
             EndPoint = localEP as IPEndPoint;
         }
 
-        public static void Listen(Socket aThis)
+        public static void Listen(Socket aThis,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine,
+            [FieldAccess(Name = EndPointFieldId)] ref EndPoint EndPoint)
         {
-            Start();
+            Start(aThis, ref StateMachine, ref EndPoint);
         }
 
-        public static Socket Accept(Socket aThis)
+        public static Socket Accept(Socket aThis,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine,
+            [FieldAccess(Name = EndPointFieldId)] ref EndPoint EndPoint,
+            [FieldAccess(Name = "System.Net.EndPoint System.Net.Sockets.Socket._remoteEndPoint")] ref EndPoint _remoteEndPoint,
+            [FieldAccess(Name = "System.Net.EndPoint System.Net.Sockets.Socket._localEndPoint")] ref EndPoint _localEndPoint)
         {
             if (StateMachine == null)
             {
                 Cosmos.HAL.Global.debugger.Send("The TcpListener is not started, starting...");
 
-                Start();
+                Start(aThis, ref StateMachine, ref EndPoint);
             }
 
             if (StateMachine.Status == Status.CLOSED) // if TcpListener already accepted client, remove old one.
             {
                 Tcp.RemoveConnection(StateMachine.LocalEndPoint.Port, StateMachine.RemoteEndPoint.Port, StateMachine.LocalEndPoint.Address, StateMachine.RemoteEndPoint.Address);
-                Start();
+                Start(aThis, ref StateMachine, ref EndPoint);
             }
 
-            while (StateMachine.WaitStatus(Status.ESTABLISHED) != true);
+            while (StateMachine.WaitStatus(Status.ESTABLISHED) != true) ;
 
             _remoteEndPoint = new IPEndPoint(StateMachine.RemoteEndPoint.Address.ToUInt32(), StateMachine.RemoteEndPoint.Port);
             _localEndPoint = new IPEndPoint(StateMachine.LocalEndPoint.Address.ToUInt32(), StateMachine.LocalEndPoint.Port);
@@ -98,18 +118,24 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return aThis;
         }
 
-        private static void Start()
+        private static void Start(Socket aThis,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine,
+            [FieldAccess(Name = EndPointFieldId)] ref EndPoint EndPoint)
         {
-            StateMachine = new((ushort)EndPoint.Port, 0, Cosmos.System.Network.IPv4.Address.Zero, Cosmos.System.Network.IPv4.Address.Zero);
-            StateMachine.LocalEndPoint.Port = (ushort)EndPoint.Port;
+            StateMachine = new((ushort)((IPEndPoint)EndPoint).Port, 0, Cosmos.System.Network.IPv4.Address.Zero, Cosmos.System.Network.IPv4.Address.Zero);
+            StateMachine.LocalEndPoint.Port = (ushort)((IPEndPoint)EndPoint).Port;
             StateMachine.Status = Status.LISTEN;
 
             Tcp.Connections.Add(StateMachine);
         }
 
-        public static void Connect(Socket aThis, IPAddress address, int port)
+        public static void Connect(Socket aThis, IPAddress address, int port,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine,
+            [FieldAccess(Name = EndPointFieldId)] ref EndPoint EndPoint,
+            [FieldAccess(Name = "System.Net.EndPoint System.Net.Sockets.Socket._remoteEndPoint")] ref EndPoint _remoteEndPoint,
+            [FieldAccess(Name = "System.Net.EndPoint System.Net.Sockets.Socket._localEndPoint")] ref EndPoint _localEndPoint)
         {
-            Start();
+            Start(aThis, ref StateMachine, ref EndPoint);
 
             if (StateMachine.Status == Status.ESTABLISHED)
             {
@@ -117,7 +143,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
                 throw new Exception("Client must be closed before setting a new connection.");
             }
 
-            StateMachine.RemoteEndPoint.Address = Cosmos.System.Network.IPv4.Address.Parse(EndPoint.Address.ToString());
+            StateMachine.RemoteEndPoint.Address = Cosmos.System.Network.IPv4.Address.Parse(((IPEndPoint)EndPoint).Address.ToString());
             StateMachine.RemoteEndPoint.Port = (ushort)port;
             StateMachine.LocalEndPoint.Address = NetworkConfiguration.CurrentAddress;
             StateMachine.LocalEndPoint.Port = Tcp.GetDynamicPort();
@@ -153,12 +179,14 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             }
         }
 
-        public static int Send(Socket aThis, ReadOnlySpan<byte> buffer, SocketFlags socketFlags)
+        public static int Send(Socket aThis, ReadOnlySpan<byte> buffer, SocketFlags socketFlags,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
-            return Send(aThis, buffer.ToArray(), 0, buffer.Length, socketFlags); ;
+            return Send(aThis, buffer.ToArray(), 0, buffer.Length, socketFlags, ref StateMachine); ;
         }
 
-        public static int Send(Socket aThis, byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        public static int Send(Socket aThis, byte[] buffer, int offset, int size, SocketFlags socketFlags,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
             if (StateMachine.RemoteEndPoint.Address == null || StateMachine.RemoteEndPoint.Port == 0)
             {
@@ -195,7 +223,7 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
                     StateMachine.TCB.SndNxt += (uint)chunks[i].Length;
                     bytesSent += chunks[i].Length;
 
-                    WaitAck();
+                    WaitAck(ref StateMachine);
                 }
                 
                 bytesSent = size;
@@ -213,13 +241,14 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
 
                 bytesSent = size;
 
-                WaitAck();
+                WaitAck(ref StateMachine);
             }
 
             return bytesSent;
         }
 
-        private static void WaitAck()
+        private static void WaitAck(
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
             bool ackReceived = false;
             uint expectedAckNumber = StateMachine.TCB.SndNxt;
@@ -234,12 +263,14 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
         }
 
 
-        public static int Receive(Socket aThis, Span<byte> buffer, SocketFlags socketFlags)
+        public static int Receive(Socket aThis, Span<byte> buffer, SocketFlags socketFlags,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
-            return Receive(aThis, buffer.ToArray(), 0, buffer.Length, socketFlags);
+            return Receive(aThis, buffer.ToArray(), 0, buffer.Length, socketFlags, ref StateMachine);
         }
 
-        public static int Receive(Socket aThis, byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        public static int Receive(Socket aThis, byte[] buffer, int offset, int size, SocketFlags socketFlags,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
             if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
             {
@@ -266,12 +297,14 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             return bytesToCopy;
         }
 
-        public static void Close(Socket aThis)
+        public static void Close(Socket aThis,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
-            Close(aThis, 5000);
+            Close(aThis, 5000, ref StateMachine);
         }
 
-        public static void Close(Socket aThis, int timeout)
+        public static void Close(Socket aThis, int timeout,
+            [FieldAccess(Name = StateMachineFieldId)] ref Tcp StateMachine)
         {
             if (StateMachine == null)
             {

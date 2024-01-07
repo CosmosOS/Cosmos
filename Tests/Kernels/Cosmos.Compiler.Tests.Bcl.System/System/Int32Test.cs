@@ -1,5 +1,6 @@
 ﻿using System;
-
+using System.Linq;
+using Cosmos.Common.Extensions;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -37,13 +38,26 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // actually the Hash Code of an Int32 is the same value
             Assert.IsTrue((resultAsInt == value), "Int32.GetHashCode() doesn't work");
 
-#if false
-            // Now let's try ToString() again but printed in hex (this test fails for now!)
-            result = value.ToString("X2");
-            expectedResult = "0x7FFFFFFF";
+            // Now let's try ToString() again but printed in hex
+            result = value.ToString("X");
+            expectedResult = "7FFFFFFF";
 
-            Assert.IsTrue((result == expectedResult), "Int32.ToString(X2) doesn't work");
-#endif
+            Assert.IsTrue((result == expectedResult), "Int32.ToString(X) brings incorrect result.");
+
+            // Ensure value is not overrided
+            Assert.IsTrue((value != 0), "Int32.ToString(X) overrides the value of the variable.");
+
+            // Hex with padding
+            value = 255;
+            result = value.ToString("X4");
+            expectedResult = "00FF";
+            Assert.IsTrue((result == expectedResult), "Int32.ToString(X4) brings incorrect result.");
+
+            // Test Decimal format wit padding
+            value = 10;
+            expectedResult = "0010";
+            result = value.ToString("D4");
+            Assert.IsTrue((result == expectedResult), "Int32.ToString(D4) brings incorrect result.");
 
             // basic bit operations
 
