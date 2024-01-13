@@ -21,6 +21,10 @@ namespace Cosmos.System
         /// The underlying X cursor location field.
         /// </summary>
         protected int mX = 0;
+        /// <summary>
+        /// The underlying Cached X cursor location field.
+        /// </summary>
+        protected int cX = 0;
 
         /// <summary>
         /// The text cursor location in the X (horizontal) axis.
@@ -30,8 +34,58 @@ namespace Cosmos.System
             get => mX;
             set
             {
-                mX = value;
+                if (value < 0)
+                {
+                    if (mY > 0)
+                    {
+                        mY--;
+                    }
+
+                    mX = Cols - 1;
+                }
+                else if (value >= mText.Cols)
+                {
+                    cY = mY;
+                    DoLineFeed();
+                    mY = cY;
+                    mX = cX;
+                }
+                else
+                {
+
+                    mX = value;
+                }
                 UpdateCursor();
+            }
+        }
+
+        /// <summary>
+        /// The text cached cursor location in the X (horizontal) axis.
+        /// </summary>
+        public int CachedX
+        {
+            get => cX;
+            set
+            {
+                if (value < 0)
+                {
+                    if (cY > 0)
+                    {
+                        cY--;
+                    }
+
+                    cX = mText.Cols - 1;
+                }
+                else if(value >= mText.Cols)
+                {
+                    DoLineFeed();
+                    //UpdateCursorFromCache();
+                }
+                else
+                {
+                
+                    cX = value;
+                }
             }
         }
 
@@ -39,6 +93,10 @@ namespace Cosmos.System
         /// The underlying Y cursor location field.
         /// </summary>
         protected int mY = 0;
+        /// <summary>
+        /// The underlying Cached Y cursor location field
+        /// </summary>
+        protected int cY = 0;
 
         /// <summary>
         /// Get and set cursor location on Y axis.
@@ -48,8 +106,42 @@ namespace Cosmos.System
             get => mY;
             set
             {
-                mY = value;
+                if (value < 0)
+                {
+                    mY = 0;
+                }
+                else if (value >= mText.Rows)
+                {
+                    cY = mText.Rows - 1;
+                    DoLineFeed();
+                }
+                else
+                {
+                    cY = value;
+                }
                 UpdateCursor();
+            }
+        }
+
+        public int CachedY
+        {
+            get => cY;
+            set
+            {
+                if (value < 0)
+                {
+                    cY = 0;
+                }
+                else if (value >= mText.Rows)
+                {
+                    cY = mText.Rows - 1;
+                    DoLineFeed();
+                    UpdateCursorFromCache();
+                }
+                else
+                {
+                    cY = value;
+                }
             }
         }
 
@@ -109,6 +201,15 @@ namespace Cosmos.System
         /// </summary>
         protected void UpdateCursor()
         {
+            cX = mX;
+            cY = mY;
+            mText.SetCursorPos(mX, mY);
+        }
+
+        public void UpdateCursorFromCache()
+        {
+            mX = cX;
+            mY = cY;
             mText.SetCursorPos(mX, mY);
         }
 
