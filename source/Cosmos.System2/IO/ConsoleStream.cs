@@ -27,7 +27,7 @@ namespace Cosmos.System.IO
             Write(new ReadOnlySpan<byte>(buffer, offset, count));
         }
 
-        public override void WriteByte(byte value) => Write([value]);
+        public override void WriteByte(byte value) => Write(new byte[] { value });
 
         public override int Read(byte[] buffer, int offset, int count)
         {
