@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Cosmos.HAL;
+using Cosmos.System.IO;
+using static Cosmos.System.Console;
 
 namespace Cosmos.System
 {
@@ -16,6 +19,10 @@ namespace Cosmos.System
         private const byte CarriageReturn = (byte)'\r';
         private const byte Tab = (byte)'\t';
         private const byte Space = (byte)' ';
+        private const int WriteBufferSize = 256;
+        private const int NumberOfSpacesForTab = 4;
+
+        private SyncTextReader _stdInReader;
 
         /// <summary>
         /// The underlying X cursor location field.
@@ -79,7 +86,6 @@ namespace Cosmos.System
                 else if(value >= mText.Cols)
                 {
                     DoLineFeed();
-                    //UpdateCursorFromCache();
                 }
                 else
                 {
@@ -189,10 +195,12 @@ namespace Cosmos.System
         /// </summary>
         public void Clear()
         {
-            mText.Clear();
-            mX = 0;
-            mY = 0;
-            UpdateCursor();
+            if (!IsStdOutRedirected())
+            {
+                mText.Clear();
+                cX = cY = mX = mY = 0;
+                UpdateCursor();
+            }
         }
 
         //TODO: This is slow, batch it and only do it at end of updates
@@ -218,14 +226,13 @@ namespace Cosmos.System
         /// </summary>
         private void DoLineFeed()
         {
-            mY++;
-            mX = 0;
-            if (mY == mText.Rows)
+            cY++;
+            cX = 0;
+            if (cY == mText.Rows)
             {
                 mText.ScrollUp();
-                mY--;
+                cY--;
             }
-            UpdateCursor();
         }
 
         /// <summary>
@@ -234,8 +241,7 @@ namespace Cosmos.System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DoCarriageReturn()
         {
-            mX = 0;
-            UpdateCursor();
+            cX = 0;
         }
 
         /// <summary>
@@ -256,13 +262,23 @@ namespace Cosmos.System
         /// <param name="aChar">A char to write</param>
         public void Write(byte aChar)
         {
-            mText[mX, mY] = aChar;
-            mX++;
-            if (mX == mText.Cols)
+            Write(aChar, cX, cY);
+        }
+
+        /// <summary>
+        /// Write char to the console.
+        /// </summary>
+        /// <param name="aChar">A char to write.</param>
+        /// <param name="left">X axis position.</param>
+        /// <param name="top">Y axis position.</param>
+        public void Write(byte aChar, int left, int top)
+        {
+            mText[left, top] = aChar;
+            cX++;
+            if (cX == mText.Cols)
             {
                 DoLineFeed();
             }
-            UpdateCursor();
         }
 
         //TODO: Optimize this
@@ -272,7 +288,7 @@ namespace Cosmos.System
         /// </summary>
         /// <param name="aText">The byte array to write to the console.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Write(byte[] aText)
+        public void Write(ReadOnlySpan<byte> aText)
         {
             if (aText == null)
             {
@@ -281,6 +297,12 @@ namespace Cosmos.System
 
             for (int i = 0; i < aText.Length; i++)
             {
+                if (aText[i] == '\0')
+                {
+                    // Skipping Null chars given by StreamWriter
+                    continue;
+                }
+
                 switch (aText[i])
                 {
                     case LineFeed:
@@ -302,7 +324,6 @@ namespace Cosmos.System
                 }
             }
         }
-
         /// <summary>
         /// The foreground color of the displayed text.
         /// </summary>
@@ -340,6 +361,84 @@ namespace Cosmos.System
             }
         }
 
+        public Stream OpenStandardInput()
+        {
+            return new CosmosConsoleStream(FileAccess.Read);
+        }
+
+        public Stream OpenStandardOutput()
+        {
+            return new CosmosConsoleStream(FileAccess.Write);
+        }
+
+        public Stream OpenStandardError()
+        {
+            return new CosmosConsoleStream(FileAccess.Write);
+        }
+
+        public static bool IsStdInRedirected()
+        {
+            return global::System.Console.In switch
+            {
+                null => false /* only used on create, if GetOrCreateReader is changed then this may be not needed */,
+                SyncTextReader sync => !sync.IsStdIn,
+                StreamReader streamReader => streamReader.BaseStream is not Console.CosmosConsoleStream,
+                _ => true
+            };
+        }
+
+        public static bool IsStdOutRedirected()
+        {
+            return !(global::System.Console.Out is StreamWriter streamWriter
+                    && streamWriter.BaseStream is Console.CosmosConsoleStream);
+        }
+
+        public static bool IsStdErrorRedirected()
+        {
+            return !(global::System.Console.Error is StreamWriter streamWriter
+                    && streamWriter.BaseStream is Console.CosmosConsoleStream);
+        }
+
+        public TextReader GetOrCreateReader()
+        {
+            return StdInReader;
+        }
+        public TextWriter CreateOutputWriter(Stream outputStream) => outputStream == Stream.Null ?
+               TextWriter.Null :
+               (new StreamWriter(
+                   stream: outputStream,
+                   encoding: global::System.Console.OutputEncoding.RemovePreamble(),
+                   bufferSize: WriteBufferSize,
+                   leaveOpen: true)
+                {
+                    AutoFlush = true
+                });
+        public ConsoleKeyInfo ReadKey(bool intercept)
+        {
+            if (global::System.Console.IsInputRedirected)
+            {
+                // The biggest lie i have seen in my life...
+                throw new InvalidOperationException("Can not read console keys as input is redirected.");
+            }
+
+            ConsoleKeyInfo keyInfo = StdInReader.ReadKey(out bool previouslyProcessed);
+
+            if (!intercept && !previouslyProcessed && keyInfo.KeyChar != '\0')
+            {
+                global::System.Console.Write(keyInfo.KeyChar);
+            }
+            return keyInfo;
+        }
+
+        public void ResetInternalStdIn()
+        {
+            _stdInReader = null;
+        }
+
+        internal SyncTextReader StdInReader => _stdInReader ??= SyncTextReader
+                    .GetSynchronizedTextReader(new StdInReader(global::System.Console.InputEncoding));
+
+
         /// <summary>
         /// Get or sets the visibility of the cursor.
         /// </summary>
@@ -347,6 +446,17 @@ namespace Cosmos.System
         {
             get => mText.GetCursorVisible();
             set => mText.SetCursorVisible(value);
+        }
+    }
+    internal static class EncodingExtensions
+    {
+        public static Encoding RemovePreamble(this Encoding encoding)
+        {
+            if (encoding.Preamble.Length == 0)
+            {
+                return encoding;
+            }
+            return new ConsoleEncoding(encoding);
         }
     }
 }
