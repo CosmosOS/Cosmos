@@ -10,7 +10,7 @@ namespace Cosmos.System
     /// <summary>
     /// Represents the standard console output stream.
     /// </summary>
-    public class Console
+    public partial class Console
     {
         private const byte LineFeed = (byte)'\n';
         private const byte CarriageReturn = (byte)'\r';
