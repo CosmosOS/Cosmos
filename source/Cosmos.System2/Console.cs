@@ -250,10 +250,16 @@ namespace Cosmos.System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DoTab()
         {
-            Write(Space);
-            Write(Space);
-            Write(Space);
-            Write(Space);
+            // Calculate the remainder when CachedX is divided by the NumberOfSpacesForTab
+            int remainder = cX % NumberOfSpacesForTab;
+
+            // if remainder is 0 then we will do a complete new tab, otherwise we will do what needs to be done to complete a tab
+            remainder = (remainder == 0) ? NumberOfSpacesForTab : (NumberOfSpacesForTab - remainder);
+
+            for (int i = 0; i < remainder; i++)
+            {
+                Write(Space);
+            }
         }
 
         /// <summary>
