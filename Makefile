@@ -17,38 +17,47 @@ GIT = git
 DOTNET = dotnet
 
 GITFLAGS = clone --depth=1
-DOTNETFLAGS = -v:q -nologo
+DOTNETFLAGS = -nologo -v:q -c:Debug
+
+GREEN = \033[0;32m
+YELLOW = \033[1;33m
+DEFAULT = \033[0m
 
 .PHONY: all
 all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
+	@# Elapsed time is stored in a temporary file, deleted post-install.
+	@date +%s > _time_$@.txt
 	@$(MAKE) build
 	@$(MAKE) publish
 	@sudo $(MAKE) install
 	@$(MAKE) nuget-install
-	@echo "============================================"
-	@echo "| Cosmos has been installed successfully!  |"
-	@echo "============================================"
+	@printf "============================================\n"
+	@printf "| ${YELLOW}Cosmos${DEFAULT} has been installed successfully!  |\n"
+	@printf "============================================\n"
+	@printf "Took ${YELLOW}$$(($$(date +%s)-$$(cat  _time_$@.txt)))s${DEFAULT} to build\n"
+	@rm _time_$@.txt
 
 $(IL2CPU_DIR):
-	@echo "Cloning Cosmos/IL2CPU"
-	@$(GIT) $(GITFLAGS) --branch=$(IL2CPU_BRANCH) $(IL2CPU_URL) $(THISDIR)/../IL2CPU
+	@printf "Cloning ${GREEN}Cosmos/IL2CPU${DEFAULT}\n"
+	@$(GIT) $(GITFLAGS) --branch=$(IL2CPU_BRANCH) $(IL2CPU_URL) $(IL2CPU_DIR)
 
 $(XSHARP_DIR):
-	@echo "Cloning Cosmos/XSharp"
-	@$(GIT) $(GITFLAGS) --branch=$(XSHARP_BRANCH) $(XSHARP_URL) $(THISDIR)/../XSharp
+	@printf "Cloning ${GREEN}Cosmos/XSharp${DEFAULT}\n"
+	@$(GIT) $(GITFLAGS) --branch=$(XSHARP_BRANCH) $(XSHARP_URL) $(XSHARP_DIR)
 
 $(COMMON_DIR):
-	@echo "Cloning Cosmos/Common"
-	@$(GIT) $(GITFLAGS) --branch=$(COMMON_BRANCH) $(COMMON_URL) $(THISDIR)/../Common
+	@printf "Cloning ${GREEN}Cosmos/Common${DEFAULT}\n"
+	@$(GIT) $(GITFLAGS) --branch=$(COMMON_BRANCH) $(COMMON_URL) $(COMMON_DIR)
+
 
 .PHONY: build
 build:
-	@echo "Building IL2CPU"
+	@printf "Building ${GREEN}IL2CPU${DEFAULT}\n"
 	@$(DOTNET) clean $(IL2CPU_DIR)
 	@$(DOTNET) build $(IL2CPU_DIR) $(DOTNETFLAGS)
 	@$(DOTNET) pack $(IL2CPU_DIR) $(DOTNETFLAGS)
 
-	@echo "Building Cosmos"
+	@printf "Building ${GREEN}Cosmos${DEFAULT}\n"
 
 	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Common
 	@$(DOTNET) clean $(THISDIR)/source/Cosmos.Debug.Kernel
@@ -74,7 +83,7 @@ build:
 	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Build.Tasks $(DOTNETFLAGS)
 	@$(DOTNET) pack $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
 
-	@echo "Building X#"
+	@printf "Building ${GREEN}X#${DEFAULT}\n"
 	@$(DOTNET) clean $(XSHARP_DIR)/source/XSharp/XSharp
 	@$(DOTNET) clean $(XSHARP_DIR)/source/Spruce
 
@@ -84,23 +93,23 @@ build:
 
 .PHONY: publish
 publish:
-	@echo "Publishing IL2CPU"
+	@printf "Publishing ${GREEN}IL2CPU${DEFAULT}\n"
 	$(DOTNET) publish $(IL2CPU_DIR)/source/IL2CPU -r linux-x64 --self-contained $(DOTNETFLAGS)
 
-	@echo "Publishing Cosmos"
+	@printf "Publishing ${GREEN}Cosmos${DEFAULT}\n"
 	@$(DOTNET) publish $(THISDIR)/source/Cosmos.Core_Plugs $(DOTNETFLAGS)
 	@$(DOTNET) publish $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm $(DOTNETFLAGS)
 	@$(DOTNET) publish $(THISDIR)/source/Cosmos.HAL2 $(DOTNETFLAGS)
 	@$(DOTNET) publish $(THISDIR)/source/Cosmos.System2_Plugs $(DOTNETFLAGS)
 	@$(DOTNET) publish $(THISDIR)/source/Cosmos.Plugs $(DOTNETFLAGS)
 
-	@echo "Publishing X#"
+	@printf "Publishing ${GREEN}X#${DEFAULT}\n"
 	@$(DOTNET) publish $(XSHARP_DIR)/source/XSharp/XSharp $(DOTNETFLAGS)
 	@$(DOTNET) publish $(XSHARP_DIR)/source/Spruce $(DOTNETFLAGS)
 
 .PHONY: install
 install:
-	@echo "Installing to" $(DESTDIR)
+	@printf "Installing to ${YELLOW}$(DESTDIR)${DEFAULT}\n"
 	@mkdir -p $(DESTDIR)/Cosmos
 	@mkdir -p $(DESTDIR)/XSharp/DebugStub
 	@mkdir -p $(DESTDIR)/Build/ISO
@@ -126,11 +135,11 @@ install:
 	@cp -r $(THISDIR)/Build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
 	@cp -r $(THISDIR)/Build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
 	@cp -r $(THISDIR)/Build/syslinux/* $(DESTDIR)/Build/ISO/
-	@echo $(DESTDIR) > /etc/CosmosUserKit.cfg
+	@printf $(DESTDIR) > /etc/CosmosUserKit.cfg
 
 .PHONY: nuget-install
 nuget-install:
-	@echo "Installing Nuget packages"
+	@printf "Installing ${GREEN}Nuget packages${DEFAULT}\n"
 
 	@rm -r -f ~/.nuget/packages/cosmos.*/
 	@rm -r -f ~/.nuget/packages/il2cpu.*/
