@@ -8,6 +8,7 @@ using Cosmos.HAL;
 using Cosmos.System.IO;
 using static Cosmos.System.Console;
 
+#nullable enable
 namespace Cosmos.System
 {
     /// <summary>
@@ -22,7 +23,8 @@ namespace Cosmos.System
         private const int WriteBufferSize = 256;
         private const int NumberOfSpacesForTab = 4;
 
-        private SyncTextReader _stdInReader;
+        private SyncTextReader? _stdInReader;
+        private Stream? stdOut, stdIn, stdError;
 
         /// <summary>
         /// The underlying X cursor location field.
@@ -369,17 +371,17 @@ namespace Cosmos.System
 
         public Stream OpenStandardInput()
         {
-            return new CosmosConsoleStream(FileAccess.Read);
+            return stdIn ??= new CosmosConsoleStream(FileAccess.Read);
         }
 
         public Stream OpenStandardOutput()
         {
-            return new CosmosConsoleStream(FileAccess.Write);
+            return stdOut ??= new CosmosConsoleStream(FileAccess.Write);
         }
 
         public Stream OpenStandardError()
         {
-            return new CosmosConsoleStream(FileAccess.Write);
+            return stdError ??= new CosmosConsoleStream(FileAccess.Write);
         }
 
         public static bool IsStdInRedirected()
