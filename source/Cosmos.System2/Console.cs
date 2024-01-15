@@ -388,7 +388,6 @@ namespace Cosmos.System
             {
                 null => false /* only used on create, if GetOrCreateReader is changed then this may be not needed */,
                 SyncTextReader sync => !sync.IsStdIn,
-                StreamReader streamReader => streamReader.BaseStream is not Console.CosmosConsoleStream,
                 _ => true
             };
         }
