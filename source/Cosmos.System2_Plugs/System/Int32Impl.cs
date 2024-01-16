@@ -14,10 +14,12 @@ namespace Cosmos.System_Plugs.System
 
         public static string ToString(ref int aThis, string format)
         {
-            if (string.IsNullOrEmpty(format))
+            if(format == string.Empty)
             {
-                return "0";
+                return aThis.ToString();
             }
+
+            ArgumentNullException.ThrowIfNull(format, nameof(format));
 
             StringBuilder sb = new();
 
