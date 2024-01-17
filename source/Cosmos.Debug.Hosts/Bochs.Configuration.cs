@@ -36,7 +36,7 @@ namespace Cosmos.Debug.Hosts
                                      //+ "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
                                      + "cpu: count=1, ips=40000000, model=p4_prescott_celeron_336, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
                                      + "print_timestamps: enabled=0\n" + "port_e9_hack: enabled=0\n"
-                                     + "private_colormap: enabled=0\n" + "clock: sync=none, time0=local, rtc_sync=0\n"
+                                     + "private_colormap: enabled=0\n" + "clock: sync=realtime, time0=local, rtc_sync=0\n"
                                      + "# no cmosimage\n" + "# no loader\n" + "log: -\n" + "logprefix: %t%e%d\n"
                                      + "debug: action=ignore\n" + "info: action=report\n" + "error: action=report\n"
                                      + "panic: action=ask\n"
