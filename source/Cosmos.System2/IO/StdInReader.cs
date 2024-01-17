@@ -150,7 +150,7 @@ namespace Cosmos.System.IO
                     {
                         readLineSB.Append(current.KeyChar);
 
-                        Global.Console.Write(encoding.GetBytes(new char[1] { current.KeyChar })[0]);
+                        Global.Console.Write(encoding.GetBytes(new char[] { current.KeyChar }));
                         Global.Console.UpdateCursorFromCache();
                         currentCount++;
                     }
