@@ -5,6 +5,7 @@ using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.HAL.Network;
+using static Cosmos.HAL.PIT;
 
 namespace Cosmos.HAL
 {
@@ -12,13 +13,13 @@ namespace Cosmos.HAL
     {
         public static readonly Debugger debugger = new("Global");
 
-        public static PIT PIT = new();
+        public static PIT PIT;
         // Must be static init, other static inits rely on it not being null
 
         public static TextScreenBase TextScreen = new TextScreen();
         public static PCI Pci;
 
-        public static readonly PS2Controller PS2Controller = new();
+        public static PS2Controller PS2Controller;
 
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
@@ -46,13 +47,38 @@ namespace Cosmos.HAL
             // system level and not accessible from Core. Need to think about this
             // for the future.
             Console.Clear();
-            Console.WriteLine("Finding PCI Devices");
-            debugger.Send("PCI Devices");
-            PCI.Setup();
 
             Console.WriteLine("Starting ACPI");
             debugger.Send("ACPI Init");
             ACPI.Start();
+
+            Console.WriteLine("Starting PIT");
+            debugger.Send("PIT init");
+            PIT = new();
+
+            Global.debugger.Send("PIT START");
+
+            Global.PIT.Wait(10000); // PIT sleep for 10000ms
+
+            Global.debugger.Send("PIT END");
+
+            Console.WriteLine("Starting APIC");
+            debugger.Send("Local APIC Init");
+            LocalAPIC.Initialize();
+
+            Global.debugger.Send("PIT START");
+
+            Global.PIT.Wait(10000); // PIT sleep for 10000ms
+
+            Global.debugger.Send("PIT END");
+
+            Console.WriteLine("Finding PCI Devices");
+            debugger.Send("PCI Devices");
+            PCI.Setup();
+
+            Console.WriteLine("Starting PS/2");
+            debugger.Send("PS/2 init");
+            PS2Controller = new();
 
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
@@ -80,6 +106,12 @@ namespace Cosmos.HAL
             Console.WriteLine("Starting Processor Scheduler");
             debugger.Send("Processor Scheduler");
             Core.Processing.ProcessorScheduler.Initialize();
+
+            debugger.Send("Local APIC Timer Init");
+            ApicTimer.Initialize();
+            ApicTimer.Start();
+
+            Core.Processing.ProcessorScheduler.TickFrequency = ApicTimer.TickFrequency;
 
             if (InitNetwork)
             {

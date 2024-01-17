@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Core.Memory;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core.Processing
@@ -22,14 +23,6 @@ namespace Cosmos.Core.Processing
             context.parent = 0;
             ProcessContext.m_ContextList = context;
             ProcessContext.m_CurrentContext = context;
-
-            int divisor = 1193182 / 25;
-            IOPort.Write8(0x43, 0x06 | 0x30); // cmd
-            IOPort.Write8(0x40, (byte)divisor); // counter0
-            IOPort.Write8(0x40, (byte)(divisor >> 8));
-
-            IOPort.Write8(0xA1, 0x00); // pA1
-            IOPort.Write8(0xA1, 0x00); // p21
         }
 
         public static void EntryPoint()
@@ -40,11 +33,10 @@ namespace Cosmos.Core.Processing
             while (true) { } // remove from thread pool later
         }
 
-        public static int interruptCount;
+        public static uint TickFrequency = 1;
 
         public static void SwitchTask()
         {
-            interruptCount++;
             if (ProcessContext.m_CurrentContext != null)
             {
                 ProcessContext.Context ctx = ProcessContext.m_ContextList;
@@ -64,7 +56,9 @@ namespace Cosmos.Core.Processing
                 {
                     if (ctx.state == ProcessContext.Thread_State.WAITING_SLEEP)
                     {
-                        ctx.arg -= 1000 / 25;
+                        ctx.arg -= 1000 / (int)TickFrequency;
+                        Cosmos.Core.Global.debugger.Send("ctx.arg=" + ctx.arg);
+                        Cosmos.Core.Global.debugger.Send("TickFrequency=" + TickFrequency);
                         if (ctx.arg <= 0)
                         {
                             ctx.state = ProcessContext.Thread_State.ALIVE;
@@ -90,8 +84,8 @@ namespace Cosmos.Core.Processing
                 ProcessContext.m_CurrentContext.age = ProcessContext.m_CurrentContext.priority;
                 INTs.mStackContext = ProcessContext.m_CurrentContext.esp;
             }
-            Global.PIC.EoiMaster();
-            Global.PIC.EoiSlave();
+
+            LocalAPIC.EndOfInterrupt();
         }
     }
 }
