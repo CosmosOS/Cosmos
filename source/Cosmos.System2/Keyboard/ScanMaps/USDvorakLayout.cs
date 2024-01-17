@@ -47,7 +47,7 @@ namespace Cosmos.System.ScanMaps
             //Keys.Add(new KeyMapping(0x0C, '-', '_', '-', '-', '_', '-', ConsoleKeyEx.Minus));
             //Keys.Add(new KeyMapping(0x0D, '=', '+', '=', '=', '+', '=', ConsoleKeyEx.Equal));
             Keys.Add(new KeyMapping(0x0E, ConsoleKeyEx.Backspace));
-            Keys.Add(new KeyMapping(0x0F, ConsoleKeyEx.Tab));
+            Keys.Add(new KeyMapping(0x0F, '\t', ConsoleKeyEx.Tab));
             Keys.Add(new KeyMapping(0x10, '\'', '"', '\'', '\'', '"', '"', ConsoleKeyEx.Apostrophe)); //'q', 'Q', 'q', 'Q', 'q', 'Q', ConsoleKeyEx.Q));
             Keys.Add(new KeyMapping(0x11, ',', '<', ',', ',', '<', '<', ConsoleKeyEx.Comma)); //'w', 'W', 'w', 'W', 'w', 'W', ConsoleKeyEx.W));
             Keys.Add(new KeyMapping(0x12, '.', '>', '.', '.', '>', '>', ConsoleKeyEx.Period)); //'e', 'E', 'e', 'E', 'e', 'E', ConsoleKeyEx.E));
