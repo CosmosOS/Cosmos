@@ -34,7 +34,7 @@ namespace Cosmos.System.ScanMaps
             Keys.Add(new KeyMapping(0x0C, ')', '°', ')', '°', ')', '°', ConsoleKeyEx.Minus));
             Keys.Add(new KeyMapping(0x0D, '=', '+', '=', '+', '=', '+', ConsoleKeyEx.Equal));
             Keys.Add(new KeyMapping(0x0E, ConsoleKeyEx.Backspace));
-            Keys.Add(new KeyMapping(0x0F, ConsoleKeyEx.Tab));
+            Keys.Add(new KeyMapping(0x0F, '\t', ConsoleKeyEx.Tab));
             /*      QWERTYUIOP[] */
             Keys.Add(new KeyMapping(0x10, 'a', 'A', 'a', 'A', 'a', 'A', ConsoleKeyEx.A));
             Keys.Add(new KeyMapping(0x11, 'z', 'Z', 'z', 'Z', 'z', 'Z', ConsoleKeyEx.Z));
