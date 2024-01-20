@@ -61,10 +61,7 @@ namespace Cosmos.System
             // We must init Console before calling Inits.
             // This is part of the "minimal" boot to allow output.
             Debugger.Send("Creating the global console...");
-            if (textScreen != null)
-            {
-                Console = new Console(textScreen);
-            }
+            Console = new Console(textScreen);
 
             Debugger.Send("Initializing the Hardware Abstraction Layer (HAL)...");
             HAL.Global.Init(textScreen, initScrollWheel, initPS2, initNetwork, ideInit);

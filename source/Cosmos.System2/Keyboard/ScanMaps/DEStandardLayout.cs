@@ -39,7 +39,7 @@ namespace Cosmos.System.ScanMaps
             Keys.Add(new KeyMapping(0x0C, 'ß', '?', 'ß', 'ß', '?', 'ß', '\\', ConsoleKeyEx.Minus));
             Keys.Add(new KeyMapping(0x0D, '´', '`', '´', '´', '`', '´', ConsoleKeyEx.Equal));
             Keys.Add(new KeyMapping(0x0E, ConsoleKeyEx.Backspace));
-            Keys.Add(new KeyMapping(0x0F, ConsoleKeyEx.Tab));
+            Keys.Add(new KeyMapping(0x0F, '\t', ConsoleKeyEx.Tab));
             /* qwertzuiopü+         QWERTZUIOPÜ*        @_€________~ */
             Keys.Add(new KeyMapping(0x10, 'q', 'Q', 'q', 'Q', 'q', 'Q', '@', ConsoleKeyEx.Q));
             Keys.Add(new KeyMapping(0x11, 'w', 'W', 'w', 'W', 'w', 'W', ConsoleKeyEx.W));
