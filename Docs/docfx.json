@@ -14,6 +14,42 @@
                 }
             ],
             "dest": "obj/api"
+        },
+        {
+            "src": [
+                {
+                    "files": [
+                        "source/Cosmos.Core/Cosmos.Core.csproj",
+                        "source/Cosmos.Core_Asm/Cosmos.Core_Asm.csproj",
+                        "source/Cosmos.HAL2/Cosmos.HAL2.csproj",
+                        "source/Cosmos.System2/Cosmos.System2.csproj",
+                        "source/Cosmos.Debug.Kernel/Cosmos.Debug.Kernel.csproj",
+                    ],
+                    "exclude": [
+                        "**/bin/**",
+                        "**/obj/**"
+                    ],
+                    "src": "../"
+                }
+            ],
+            "dest": "obj/api/cosmos"
+        },
+        {
+            "src": [
+                {
+                    "files": [
+                        "source/Cosmos.Core_Plugs/Cosmos.Core_Plugs.csproj",
+                        "source/Cosmos.HAL2/Cosmos.HAL2.csproj",
+                        "source/Cosmos.System2_Plugs/Cosmos.System2_Plugs.csproj"
+                    ],
+                    "exclude": [
+                        "**/bin/**",
+                        "**/obj/**"
+                    ],
+                    "src": "../"
+                }
+            ],
+            "dest": "obj/api/plugs"
         }
     ],
     "build": {
@@ -24,6 +60,20 @@
                 ],
                 "src": "obj/api",
                 "dest": "api"
+            },
+            {
+                "files": [
+                    "**/*.yml"
+                ],
+                "src": "obj/api/cosmos",
+                "dest": "api/cosmos"
+            },
+            {
+                "files": [
+                    "**/*.yml"
+                ],
+                "src": "obj/api/plugs",
+                "dest": "api/plugs"
             },
             {
                 "files": [
