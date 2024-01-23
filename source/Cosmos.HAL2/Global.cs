@@ -52,29 +52,25 @@ namespace Cosmos.HAL
             debugger.Send("ACPI Init");
             ACPI.Start();
 
-            Console.WriteLine("Starting PIT");
-            debugger.Send("PIT init");
-            PIT = new();
-
-            Global.debugger.Send("PIT START");
-
-            Global.PIT.Wait(10000); // PIT sleep for 10000ms
-
-            Global.debugger.Send("PIT END");
+            Console.WriteLine("Finding PCI Devices");
+            debugger.Send("PCI Devices");
+            PCI.Setup();
 
             Console.WriteLine("Starting APIC");
             debugger.Send("Local APIC Init");
             LocalAPIC.Initialize();
 
-            Global.debugger.Send("PIT START");
+            Console.WriteLine("Starting PIT");
+            debugger.Send("PIT init");
+            PIT = new();
 
-            Global.PIT.Wait(10000); // PIT sleep for 10000ms
+            Console.WriteLine("Starting Processor Scheduler");
+            debugger.Send("Processor Scheduler");
+            Core.Processing.ProcessorScheduler.Initialize();
 
-            Global.debugger.Send("PIT END");
-
-            Console.WriteLine("Finding PCI Devices");
-            debugger.Send("PCI Devices");
-            PCI.Setup();
+            debugger.Send("Local APIC Timer Init");
+            ApicTimer.Initialize();
+            ApicTimer.Start();
 
             Console.WriteLine("Starting PS/2");
             debugger.Send("PS/2 init");
@@ -102,16 +98,6 @@ namespace Cosmos.HAL
             }
             AHCI.InitDriver();
             //EHCI.InitDriver();
-
-            Console.WriteLine("Starting Processor Scheduler");
-            debugger.Send("Processor Scheduler");
-            Core.Processing.ProcessorScheduler.Initialize();
-
-            debugger.Send("Local APIC Timer Init");
-            ApicTimer.Initialize();
-            ApicTimer.Start();
-
-            Core.Processing.ProcessorScheduler.TickFrequency = ApicTimer.TickFrequency;
 
             if (InitNetwork)
             {
