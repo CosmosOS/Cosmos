@@ -34,10 +34,10 @@ namespace Cosmos.Core.Processing
 
         public static void SwitchTask()
         {
-            CPU.DisableInterrupts();
-
             if (ProcessContext.m_CurrentContext != null)
             {
+                CPU.DisableInterrupts();
+
                 ProcessContext.Context ctx = ProcessContext.m_ContextList;
                 ProcessContext.Context last = ctx;
                 while (ctx != null)
@@ -55,7 +55,7 @@ namespace Cosmos.Core.Processing
                 {
                     if (ctx.state == ProcessContext.Thread_State.WAITING_SLEEP)
                     {
-                        ctx.arg -= 1; //Since Local APIC Frequency = 1000Hz remove 1ms per interrupt
+                        ctx.arg -= 10; //Since Local APIC Frequency = 100Hz remove 10ms per interrupt
                         if (ctx.arg <= 0)
                         {
                             ctx.state = ProcessContext.Thread_State.ALIVE;
@@ -80,9 +80,9 @@ namespace Cosmos.Core.Processing
                 }
                 ProcessContext.m_CurrentContext.age = ProcessContext.m_CurrentContext.priority;
                 INTs.mStackContext = ProcessContext.m_CurrentContext.esp;
-            }
 
-            CPU.EnableInterrupts();
+                CPU.EnableInterrupts();
+            }
 
             LocalAPIC.EndOfInterrupt();
         }

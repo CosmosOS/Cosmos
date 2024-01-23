@@ -24,7 +24,7 @@ namespace Cosmos.HAL
         /// </summary>
         public static void Initialize()
         {
-            Frequency = 1000;
+            Frequency = 100;
             BaseFrequency = EstimateBusSpeed();
 
             Global.debugger.Send("APIC timer frequency: " + Frequency + "Hz, Divisor: " + 16 + ", IRQ: 8");
