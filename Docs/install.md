@@ -58,6 +58,6 @@ cd ..
 3.  Wait for the install to progress. (**Tip:** At the end the installer may look like it is stalling, it is still doing something, just in the background)
 4.  VS will open with Cosmos loaded. You can now make changes to core assemblies of Cosmos. If you don't want to, you can close this VS window and create a new Cosmos project as with the user kit.
 
-For more information about Dev Kit, see [here](https://cosmosos.github.io/articles/Installation/DevKit.html)
+For more information about Dev Kit, see [here](articles/Installation/DevKit.html)
 
 Happy Cosmos-ing!

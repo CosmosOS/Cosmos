@@ -4,16 +4,33 @@
             "src": [
                 {
                     "files": [
-                        "Build.sln"
+                        "IL2CPU/source/IL2CPU/IL2CPU.csproj",
+                        "IL2CPU/source/IL2CPU.API/IL2CPU.API.csproj",
+                        "IL2CPU/source/Cosmos.IL2CPU/Cosmos.IL2CPU.csproj"
                     ],
                     "exclude": [
                         "**/bin/**",
                         "**/obj/**"
                     ],
-                    "src": "../"
+                    "src": "../../"
                 }
             ],
-            "dest": "obj/api"
+            "dest": "api/il2cpu"
+        },
+        {
+            "src": [
+                {
+                    "files": [
+                        "XSharp/source/XSharp/XSharp/XSharp.csproj"
+                    ],
+                    "exclude": [
+                        "**/bin/**",
+                        "**/obj/**"
+                    ],
+                    "src": "../../"
+                }
+            ],
+            "dest": "api/xsharp"
         },
         {
             "src": [
@@ -32,7 +49,7 @@
                     "src": "../"
                 }
             ],
-            "dest": "obj/api/cosmos"
+            "dest": "api/cosmos"
         },
         {
             "src": [
@@ -49,7 +66,7 @@
                     "src": "../"
                 }
             ],
-            "dest": "obj/api/plugs"
+            "dest": "api/plugs"
         }
     ],
     "build": {
@@ -58,21 +75,21 @@
                 "files": [
                     "**/*.yml"
                 ],
-                "src": "obj/api",
+                "src": "api",
                 "dest": "api"
             },
             {
                 "files": [
                     "**/*.yml"
                 ],
-                "src": "obj/api/cosmos",
+                "src": "api/cosmos",
                 "dest": "api/cosmos"
             },
             {
                 "files": [
                     "**/*.yml"
                 ],
-                "src": "obj/api/plugs",
+                "src": "api/plugs",
                 "dest": "api/plugs"
             },
             {
