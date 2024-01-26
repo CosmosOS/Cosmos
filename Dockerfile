@@ -3,7 +3,7 @@ FROM ubuntu:latest
 WORKDIR /Cosmos
 
 RUN apt-get update
-RUN apt-get install -y dotnet6 git make xorriso sudo
+RUN apt-get install -y dotnet6 git make xorriso sudo yasm binutils
 
 RUN git config --global pack.window 1
 
