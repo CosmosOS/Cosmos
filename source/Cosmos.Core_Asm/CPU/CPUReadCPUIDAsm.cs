@@ -15,20 +15,20 @@ namespace Cosmos.Core_Asm
 
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.Set(EAX, EBP, sourceDisplacement: CpuIdTypeArgOffset, sourceIsIndirect: true);
+            XS.Set(RAX, RBP, sourceDisplacement: CpuIdTypeArgOffset, sourceIsIndirect: true);
             XS.Cpuid();
 
-            XS.Set(EDI, EBP, sourceDisplacement: CpuIdEAXAddressArgOffset, sourceIsIndirect: true);
-            XS.Set(EDI, EAX, destinationIsIndirect: true);
+            XS.Set(RDI, RBP, sourceDisplacement: CpuIdEAXAddressArgOffset, sourceIsIndirect: true);
+            XS.Set(RDI, RAX, destinationIsIndirect: true);
 
-            XS.Set(EDI, EBP, sourceDisplacement: CpuIdEBXAddressArgOffset, sourceIsIndirect: true);
-            XS.Set(EDI, EBX, destinationIsIndirect: true);
+            XS.Set(RDI, RBP, sourceDisplacement: CpuIdEBXAddressArgOffset, sourceIsIndirect: true);
+            XS.Set(RDI, RBX, destinationIsIndirect: true);
 
-            XS.Set(EDI, EBP, sourceDisplacement: CpuIdECXAddressArgOffset, sourceIsIndirect: true);
-            XS.Set(EDI, ECX, destinationIsIndirect: true);
+            XS.Set(RDI, RBP, sourceDisplacement: CpuIdECXAddressArgOffset, sourceIsIndirect: true);
+            XS.Set(RDI, RCX, destinationIsIndirect: true);
 
-            XS.Set(EDI, EBP, sourceDisplacement: CpuIdEDXAddressArgOffset, sourceIsIndirect: true);
-            XS.Set(EDI, EDX, destinationIsIndirect: true);
+            XS.Set(RDI, RBP, sourceDisplacement: CpuIdEDXAddressArgOffset, sourceIsIndirect: true);
+            XS.Set(RDI, RDX, destinationIsIndirect: true);
         }
     }
 }

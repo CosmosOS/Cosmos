@@ -60,6 +60,8 @@ namespace Cosmos.Build.Tasks
 
         public string VBEResolution { get; set; }
 
+        public string TargetArchitecture { get; set; }
+
         #endregion
 
         protected override string ToolName => IsWindows() ? "IL2CPU.exe" : "IL2CPU";
@@ -86,7 +88,13 @@ namespace Cosmos.Build.Tasks
 
         protected override string GenerateResponseFileCommands()
         {
-            var args = new Dictionary<string, string>
+            // default to AMD64
+            if (string.IsNullOrEmpty(TargetArchitecture))
+            {
+                TargetArchitecture = "amd64";
+            }
+
+            List<KeyValuePair<string, string>> args = new Dictionary<string, string>
             {
                 ["KernelPkg"] = KernelPkg,
                 ["EnableDebug"] = DebugEnabled.ToString(),
@@ -103,7 +111,8 @@ namespace Cosmos.Build.Tasks
                 ["CompileVBEMultiboot"] = CompileVBEMultiboot.ToString(),
                 ["VBEResolution"] = VBEResolution.ToString(),
                 ["RemoveBootDebugOutput"] = RemoveBootDebugOutput.ToString(),
-                ["AllowComments"] = AllowComments.ToString()
+                ["AllowComments"] = AllowComments.ToString(),
+                ["TargetArchitecture"] = TargetArchitecture.ToString(),
             }.ToList();
 
             foreach (var reference in References)

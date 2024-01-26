@@ -39,10 +39,10 @@ namespace Cosmos.Core_Plugs
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
+            XS.FPU.FloatLoad(RBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
             XS.FPU.FloatRound();
-            XS.Sub(ESP, 8);
-            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+            XS.Sub(RSP, 8);
+            XS.FPU.FloatStoreAndPop(RSP, isIndirect: true, size: RegisterSize.Long64);
         }
     }
 
@@ -50,10 +50,10 @@ namespace Cosmos.Core_Plugs
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
+            XS.FPU.FloatLoad(RBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
             XS.FPU.FloatCosine();
-            XS.Sub(ESP, 8);
-            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+            XS.Sub(RSP, 8);
+            XS.FPU.FloatStoreAndPop(RSP, isIndirect: true, size: RegisterSize.Long64);
         }
     }
 
@@ -61,10 +61,10 @@ namespace Cosmos.Core_Plugs
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
+            XS.FPU.FloatLoad(RBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
             XS.FPU.FloatSine();
-            XS.Sub(ESP, 8);
-            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+            XS.Sub(RSP, 8);
+            XS.FPU.FloatStoreAndPop(RSP, isIndirect: true, size: RegisterSize.Long64);
         }
     }
 
@@ -72,11 +72,11 @@ namespace Cosmos.Core_Plugs
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.FPU.FloatLoad(EBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
+            XS.FPU.FloatLoad(RBP, destinationIsIndirect: true, displacement: 8, size: RegisterSize.Long64);
             XS.FPU.FloatTan();
-            XS.Sub(ESP, 8);
+            XS.Sub(RSP, 8);
             XS.FPU.FloatPop();
-            XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+            XS.FPU.FloatStoreAndPop(RSP, isIndirect: true, size: RegisterSize.Long64);
         }
     }
 }

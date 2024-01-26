@@ -18,25 +18,25 @@ namespace Cosmos.Core_Asm
         {
             // Arguments:
             //    Array aArray, RuntimeFieldHandle aFieldHandle
-            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 20); // array
-            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: 12);  // aFieldHandle
-            XS.Add(XSRegisters.EDI, 8);
-            XS.Push(XSRegisters.EDI, isIndirect: true); // element size
-            XS.Add(XSRegisters.EDI, 4);
-            XS.Set(XSRegisters.EAX, XSRegisters.EDI, sourceIsIndirect: true);
-            XS.Multiply(XSRegisters.ESP, isIndirect: true, size: XSRegisters.RegisterSize.Int32);
-            XS.Pop(XSRegisters.ECX);
-            XS.Set(XSRegisters.ECX, XSRegisters.EAX);
-            XS.Set(XSRegisters.EAX, 0);
-            XS.Add(XSRegisters.EDI, 4);
+            XS.Set(XSRegisters.RDI, XSRegisters.RBP, sourceDisplacement: 20); // array
+            XS.Set(XSRegisters.RSI, XSRegisters.RBP, sourceDisplacement: 12);  // aFieldHandle
+            XS.Add(XSRegisters.RDI, 8);
+            XS.Push(XSRegisters.RDI, isIndirect: true); // element size
+            XS.Add(XSRegisters.RDI, 4);
+            XS.Set(XSRegisters.RAX, XSRegisters.RDI, sourceIsIndirect: true);
+            XS.Multiply(XSRegisters.RSP, isIndirect: true, size: XSRegisters.RegisterSize.Long64);
+            XS.Pop(XSRegisters.RCX);
+            XS.Set(XSRegisters.RCX, XSRegisters.RAX);
+            XS.Set(XSRegisters.RAX, 0);
+            XS.Add(XSRegisters.RDI, 4);
 
             XS.Label(".StartLoop");
-            XS.Set(XSRegisters.DL, XSRegisters.ESI, sourceIsIndirect: true);
-            XS.Set(XSRegisters.EDI, XSRegisters.DL, destinationIsIndirect: true);
-            XS.Add(XSRegisters.EAX, 1);
-            XS.Add(XSRegisters.ESI, 1);
-            XS.Add(XSRegisters.EDI, 1);
-            XS.Compare(XSRegisters.EAX, XSRegisters.ECX);
+            XS.Set(XSRegisters.DL, XSRegisters.RSI, sourceIsIndirect: true);
+            XS.Set(XSRegisters.RDI, XSRegisters.DL, destinationIsIndirect: true);
+            XS.Add(XSRegisters.RAX, 1);
+            XS.Add(XSRegisters.RSI, 1);
+            XS.Add(XSRegisters.RDI, 1);
+            XS.Compare(XSRegisters.RAX, XSRegisters.RCX);
             XS.Jump(CPUx86.ConditionalTestEnum.Equal, ".EndLoop");
             XS.Jump(".StartLoop");
 

@@ -11,8 +11,8 @@ namespace Cosmos.Core_Asm
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
             XS.Rdtsc();
-            XS.Push(EDX);
-            XS.Push(EAX);
+            XS.Push(RDX);
+            XS.Push(RAX);
 
         }
     }

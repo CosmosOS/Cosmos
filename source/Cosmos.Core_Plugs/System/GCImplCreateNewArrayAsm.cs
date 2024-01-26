@@ -17,29 +17,29 @@ namespace Cosmos.Core_Plugs.System
             MethodBase xCtor = typeof(Array).GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)[0];
             string xCtorName = LabelName.Get(xCtor);
 
-            XS.Set(ECX, EBP, sourceDisplacement: 8); // size
-            XS.Set(EDX, EBP, sourceDisplacement: 12); // length
+            XS.Set(RCX, RBP, sourceDisplacement: 8); // size
+            XS.Set(RDX, RBP, sourceDisplacement: 12); // length
 
-            XS.Push(ECX);  // size of element
-            XS.Set(EAX, ECX);
-            XS.Multiply(EDX); // total element size
-            XS.Add(EAX, ObjectUtils.FieldDataOffset + 4); // total array size
-            XS.Push(EAX);
+            XS.Push(RCX);  // size of element
+            XS.Set(RAX, RCX);
+            XS.Multiply(RDX); // total element size
+            XS.Add(RAX, ObjectUtils.FieldDataOffset + 4); // total array size
+            XS.Push(RAX);
             XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
             XS.Label(".AfterAlloc");
-            XS.Pop(EAX);
-            XS.Pop(ESI);
-            XS.Push(EAX);
-            XS.Push(ESP, isIndirect: true);
-            XS.Push(ESP, isIndirect: true);
+            XS.Pop(RAX);
+            XS.Pop(RSI);
+            XS.Push(RAX);
+            XS.Push(RSP, isIndirect: true);
+            XS.Push(RSP, isIndirect: true);
             // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
-            XS.Pop(EAX);
-            XS.Set(EBX, xTypeID, sourceIsIndirect: true);  // array type id
-            XS.Set(EAX, EBX, destinationIsIndirect: true); // array type id
-            XS.Set(EAX, (uint)ObjectUtils.InstanceTypeEnum.Array, destinationDisplacement: 4, destinationIsIndirect: true);
-            XS.Set(EAX, ESI, destinationDisplacement: 8, destinationIsIndirect: true);
-            XS.Set(EAX, ECX);
+            XS.Pop(RAX);
+            XS.Set(RBX, xTypeID, sourceIsIndirect: true);  // array type id
+            XS.Set(RAX, RBX, destinationIsIndirect: true); // array type id
+            XS.Set(RAX, (uint)ObjectUtils.InstanceTypeEnum.Array, destinationDisplacement: 4, destinationIsIndirect: true);
+            XS.Set(RAX, RSI, destinationDisplacement: 8, destinationIsIndirect: true);
+            XS.Set(RAX, RCX);
             XS.Push(0);
             XS.Call(xCtorName);
             XS.Push(0);

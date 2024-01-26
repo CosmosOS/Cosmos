@@ -202,7 +202,8 @@
                 ToolExe="$(Il2cpuToolExe)"
                 CompileVBEMultiboot="$(CompileVBEMultiboot)"
 				AllowComments="$(AllowComments)"
-                VBEResolution="$(VBEResolution)"/>
+                VBEResolution="$(VBEResolution)"
+                TargetArchitecture="$(TargetArchitecture)"/>
 
     </Target>
 
@@ -227,7 +228,8 @@
               OutputFormat="$(BinFormat)"
               ToolPath="$(NasmToolPath)"
               ToolExe="$(NasmToolExe)"
-	      OptimizationLevel="$(OptimizationLevel)"/>
+              OptimizationLevel="$(OptimizationLevel)"
+              TargetArchitecture="$(TargetArchitecture)"/>
 
     </Target>
 
@@ -254,7 +256,8 @@
             DataAddress="0x1000000"
             Entry="Kernel_Start"
             ToolPath="$(LdToolPath)"
-            ToolExe="$(LdToolExe)" />
+            ToolExe="$(LdToolExe)"
+            TargetArchitecture="$(TargetArchitecture)"/>
 
     </Target>
 
@@ -367,12 +370,10 @@
 
         <Copy SourceFiles="@(_IsoFile)"
               DestinationFolder="$(IntermediateIsoDirectory)\boot\" />
-        
         <Copy SourceFiles="$(LiminePath)EFI\boot\BOOTAA64.EFI" DestinationFolder="$(IntermediateIsoDirectory)\EFI\boot\" />
         <Copy SourceFiles="$(LiminePath)EFI\boot\BOOTIA32.EFI" DestinationFolder="$(IntermediateIsoDirectory)\EFI\boot\" />
         <Copy SourceFiles="$(LiminePath)EFI\boot\BOOTRISCV64.EFI" DestinationFolder="$(IntermediateIsoDirectory)\EFI\boot\" />
         <Copy SourceFiles="$(LiminePath)EFI\boot\BOOTX64.EFI" DestinationFolder="$(IntermediateIsoDirectory)\EFI\boot\" />
-        
         <Copy SourceFiles="@(_IsoCustomFiles)"
               DestinationFolder="$(IntermediateIsoDirectory)%(RecursiveDir)"
 			        SkipUnchangedFiles="true"
@@ -381,14 +382,16 @@
 			        RetryDelayMilliseconds="300"/>
 
         <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
-                              Timeout="$(Timeout)"
-                              Condition="'$(CompressionType)' == 'Gzip'" />
+                            BinName="$([System.IO.Path]::GetFileName('$(BinGzFile)'))"
+                            Timeout="$(Timeout)"
+                            Condition="'$(CompressionType)' == 'Gzip'"
+                            TargetArchitecture="$(TargetArchitecture)"/>
 
         <CreateLimineConfig TargetDirectory="$(IntermediateIsoDirectory)"
-                              BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
-                              Timeout="$(Timeout)"
-                              Condition="'$(CompressionType)' == 'None'" />
+                            BinName="$([System.IO.Path]::GetFileName('$(BinFile)'))"
+                            Timeout="$(Timeout)"
+                            Condition="'$(CompressionType)' == 'None'"
+                            TargetArchitecture="$(TargetArchitecture)"/>
 
         <MakeIso IsoDirectory="$(IntermediateIsoDirectory)"
                  OutputFile="$(IsoFile)"

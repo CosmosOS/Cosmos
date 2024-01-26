@@ -22,13 +22,13 @@ namespace Cosmos.Core_Asm.MemoryOperations
         {
             /* First we copy dest, value and DestSize from EBP (stack) to 3 different registers */
             XS.Comment("Destination (int pointer)");
-            XS.Set(EAX, EBP, sourceDisplacement: DestDisplacement);
+            XS.Set(RAX, RBP, sourceDisplacement: DestDisplacement);
 
             XS.Comment("Value");
-            XS.Set(EBX, EBP, sourceDisplacement: ValueDisplacement);
+            XS.Set(RBX, RBP, sourceDisplacement: ValueDisplacement);
 
             XS.Comment("BlocksNum");
-            XS.Set(ECX, EBP, sourceDisplacement: BlocksNumDisplacement);
+            XS.Set(RCX, RBP, sourceDisplacement: BlocksNumDisplacement);
 
             /*
              * Now we need to copy 'value' (EBX) to an SSE register but we should not simply do a copy (!)
@@ -37,16 +37,16 @@ namespace Cosmos.Core_Asm.MemoryOperations
              * |value|value|value|value
              * luckily we don't need to do a loop for this there is the SSE3 instruction for this shufps
              */
-            XS.MoveD(XMM0, EBX);
+            XS.MoveD(XMM0, RBX);
             XS.SSE.Shufps(XMM0, XMM0, 0x0000); // This broadcast the first element of XMM0 on the other 3
 
             /* Do the 'loop' */
-            XS.Xor(EDI, EDI); // EDI is 0
+            XS.Xor(RDI, RDI); // EDI is 0
             XS.Label(".loop");
             //XS.SSE.MoveUPS(EAX, XMM0, destinationIsIndirect: true, destinationDisplacement: EDI);
             XS.LiteralCode("movups[EAX + EDI], XMM0");
-            XS.Add(EDI, 16);
-            XS.Sub(ECX, 1);
+            XS.Add(RDI, 16);
+            XS.Sub(RCX, 1);
             //XS.LiteralCode("jnz .loop");
             XS.Jump(ConditionalTestEnum.NotZero, ".loop");
 

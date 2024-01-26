@@ -9,7 +9,7 @@ namespace Cosmos.Core_Asm
     {
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            XS.Push(EBP);
+            XS.Push(RBP);
         }
     }
 }

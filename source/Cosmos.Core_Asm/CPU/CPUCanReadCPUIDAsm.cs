@@ -24,17 +24,17 @@ namespace Cosmos.Core_Asm
              * xor eax, ecx
              */
             XS.Pushfd();
-            XS.Pop(EAX);
-            XS.Set(ECX, EAX, destinationIsIndirect: true);
-            XS.Xor(EAX, 1 << 21, destinationIsIndirect: true);
-            XS.Push(EAX);
+            XS.Pop(RAX);
+            XS.Set(RCX, RAX, destinationIsIndirect: true);
+            XS.Xor(RAX, 1 << 21, destinationIsIndirect: true);
+            XS.Push(RAX);
             XS.Popfd();
             XS.Pushfd();
-            XS.Pop(EAX);
-            XS.Push(ECX);
+            XS.Pop(RAX);
+            XS.Push(RCX);
             XS.Popfd();
-            XS.Xor(EAX, ECX, destinationIsIndirect: true);
-            XS.Push(EAX);
+            XS.Xor(RAX, RCX, destinationIsIndirect: true);
+            XS.Push(RAX);
         }
     }
 }

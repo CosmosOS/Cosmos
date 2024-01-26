@@ -16,25 +16,25 @@ namespace Cosmos.Core_Asm.MemoryOperations
             XS.Comment("CALLED!");
 
             // Copy Src to ESI
-            XS.Set(ESI, EBP, sourceIsIndirect: true, sourceDisplacement: SrcDisplacement);
+            XS.Set(RSI, RBP, sourceIsIndirect: true, sourceDisplacement: SrcDisplacement);
             // Copy Dst to EDI
-            XS.Set(EDI, EBP, sourceIsIndirect: true, sourceDisplacement: DestDisplacement);
+            XS.Set(RDI, RBP, sourceIsIndirect: true, sourceDisplacement: DestDisplacement);
 
             // move 128 bytes of src to 8 XMM register
             // move first 16 bytes of data from src to registers
-            XS.SSE.MoveDQU(XMM0, ESI, sourceIsIndirect: true);
+            XS.SSE.MoveDQU(XMM0, RSI, sourceIsIndirect: true);
             // move second 16 bytes of data from src to registers
-            XS.SSE.MoveDQU(XMM1, ESI, sourceIsIndirect: true, sourceDisplacement: 16);
+            XS.SSE.MoveDQU(XMM1, RSI, sourceIsIndirect: true, sourceDisplacement: 16);
             // move third 16 bytes of data from src to registers
-            XS.SSE.MoveDQU(XMM2, ESI, sourceIsIndirect: true, sourceDisplacement: 32);
+            XS.SSE.MoveDQU(XMM2, RSI, sourceIsIndirect: true, sourceDisplacement: 32);
             // move fourth 16 bytes of data from src to registers
-            XS.SSE.MoveDQU(XMM3, ESI, sourceIsIndirect: true, sourceDisplacement: 48);
+            XS.SSE.MoveDQU(XMM3, RSI, sourceIsIndirect: true, sourceDisplacement: 48);
 
             // move data from registers to dest
-            XS.SSE.MoveDQU(EDI, XMM0, destinationIsIndirect: true);
-            XS.SSE.MoveDQU(EDI, XMM1, destinationIsIndirect: true, destinationDisplacement: 16);
-            XS.SSE.MoveDQU(EDI, XMM2, destinationIsIndirect: true, destinationDisplacement: 32);
-            XS.SSE.MoveDQU(EDI, XMM3, destinationIsIndirect: true, destinationDisplacement: 48);
+            XS.SSE.MoveDQU(RDI, XMM0, destinationIsIndirect: true);
+            XS.SSE.MoveDQU(RDI, XMM1, destinationIsIndirect: true, destinationDisplacement: 16);
+            XS.SSE.MoveDQU(RDI, XMM2, destinationIsIndirect: true, destinationDisplacement: 32);
+            XS.SSE.MoveDQU(RDI, XMM3, destinationIsIndirect: true, destinationDisplacement: 48);
         }
     }
 }

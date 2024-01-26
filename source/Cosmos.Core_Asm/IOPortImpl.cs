@@ -21,8 +21,8 @@ namespace Cosmos.Core_Asm
                 //TODO: This is a lot of work to write to a single port.
                 // We need to have some kind of inline ASM option that can
                 // emit a single out instruction
-                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
-                XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.Set(XSRegisters.RDX, XSRegisters.RBP, sourceDisplacement: 0x0C);
+                XS.Set(XSRegisters.RAX, XSRegisters.RBP, sourceDisplacement: 0x08);
                 XS.WriteToPortDX(XSRegisters.AL);
             }
         }
@@ -69,8 +69,8 @@ namespace Cosmos.Core_Asm
         {
             public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
-                XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.Set(XSRegisters.RDX, XSRegisters.RBP, sourceDisplacement: 0x0C);
+                XS.Set(XSRegisters.RAX, XSRegisters.RBP, sourceDisplacement: 0x08);
                 XS.WriteToPortDX(XSRegisters.AX);
             }
         }
@@ -86,8 +86,8 @@ namespace Cosmos.Core_Asm
         {
             public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
-                XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.Set(XSRegisters.RDX, XSRegisters.RBP, sourceDisplacement: 0x0C);
+                XS.Set(XSRegisters.RAX, XSRegisters.RBP, sourceDisplacement: 0x08);
                 XS.WriteToPortDX(XSRegisters.EAX);
             }
         }
@@ -103,12 +103,12 @@ namespace Cosmos.Core_Asm
         {
             public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.Set(XSRegisters.RDX, XSRegisters.RBP, sourceDisplacement: 0x08);
                 //TODO: Do we need to clear rest of EAX first?
                 //    MTW: technically not, as in other places, it _should_ be working with AL too..
-                XS.Set(XSRegisters.EAX, 0);
+                XS.Set(XSRegisters.RAX, 0);
                 XS.ReadFromPortDX(XSRegisters.AL);
-                XS.Push(XSRegisters.EAX);
+                XS.Push(XSRegisters.RAX);
             }
         }
 
@@ -152,10 +152,10 @@ namespace Cosmos.Core_Asm
         {
             public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
-                XS.Set(XSRegisters.EAX, 0);
+                XS.Set(XSRegisters.RDX, XSRegisters.RBP, sourceDisplacement: 0x08);
+                XS.Set(XSRegisters.RAX, 0);
                 XS.ReadFromPortDX(XSRegisters.AX);
-                XS.Push(XSRegisters.EAX);
+                XS.Push(XSRegisters.RAX);
             }
         }
 
@@ -170,9 +170,9 @@ namespace Cosmos.Core_Asm
         {
             public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.Set(XSRegisters.RDX, XSRegisters.RBP, sourceDisplacement: 0x08);
                 XS.ReadFromPortDX(XSRegisters.EAX);
-                XS.Push(XSRegisters.EAX);
+                XS.Push(XSRegisters.RAX);
             }
         }
 
