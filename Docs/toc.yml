@@ -7,11 +7,9 @@
 - name: Articles
   href: articles/
   homepage: articles/GettingStarted.md
-- name: API Documentation
-  items:
-  - name: Cosmos
-    href: obj/api/cosmos
-  - name: X#
-    href: obj/api/xsharp
-  - name: IL2CPU
-    href: obj/api/il2cpu
+- name: Cosmos
+  href: api/cosmos/
+- name: X#
+  href: api/xsharp/
+- name: IL2CPU
+  href: api/il2cpu/
