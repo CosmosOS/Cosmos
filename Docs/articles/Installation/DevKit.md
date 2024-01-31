@@ -27,9 +27,25 @@
 * Xorriso (`apt install xorriso`)
 * QEMU or any other virtual machine. See [Running](https://cosmosos.github.io/articles/Installation/Running.html) for more information.
 
-
 ###  Installation
 Run `make` to build Cosmos. Cosmos will clone all the required repos, build itself, and install it and it's nuget packages to the system automatically.
+
+## MacOS (Apple Silicon/Intel)
+There is currently hard to build on Apple Silicon Devices. So are going to build DevKit on Docker (Virtual Environment Service).
+
+### Prerequisites
+
+* Docker(`brew cask install docker`)
+* QEMU or any other virtual machine. See [Running](https://cosmosos.github.io/articles/Installation/Running.html) for more information.
+
+
+###  Installation
+First we need to set directory to the path of Cosmos source directory and build the Dockerfile:
+```
+cd /path/to/Cosmos/
+docker build -t cosmos .
+```
+This will take a while. If there is no error, you successfully installed Cosmos on a Virtual Environment!
 
 ## notes / FAQ
 
