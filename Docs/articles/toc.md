@@ -2,7 +2,7 @@
 
 # [Compiler](Compiler/il2cpu.md)
 
-# [Change Log](ChangeLog.md)
+# [Change Log](Changelog.md)
 
 # Debugger
 ## [Debug Commands](Debugger/DebugCommands.md)
