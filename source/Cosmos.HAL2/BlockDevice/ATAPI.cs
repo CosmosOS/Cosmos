@@ -134,7 +134,7 @@ namespace Cosmos.HAL.BlockDevice
 
             //Convert the buffer into bytes
             byte[] array = new byte[SectorSize];
-            int counter = 0;
+            /*int counter = 0;
             for (int i = 0; i < SectorSize / 2; i++)
             {
                 var item = buffer[i];
@@ -142,6 +142,15 @@ namespace Cosmos.HAL.BlockDevice
 
                 array[counter++] = bytes[0];
                 array[counter++] = bytes[1];
+            }*/
+
+            unsafe {
+                fixed (byte* ptr = array) {
+                    fixed (ushort* ptr2 = buffer) {
+                        byte* ptr3 = (byte*)ptr2;
+                        MemoryOperations.Copy(ptr, ptr3, SectorSize);
+                    }
+                }
             }
 
             //Return
