@@ -14,7 +14,6 @@ namespace Cosmos.System.Graphics
         bool enabled;
         readonly VGADriver driver;
 
-        #region Display
         /// <summary>
         /// Available VGA supported video modes.
         /// <para>
@@ -33,7 +32,6 @@ namespace Cosmos.System.Graphics
         /// </list>
         /// </para>
         /// </summary>
-        #endregion
         static readonly List<Mode> availableModes = new()
         {
             new Mode(640, 480, ColorDepth.ColorDepth4),
