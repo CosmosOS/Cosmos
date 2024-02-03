@@ -33,6 +33,7 @@ namespace Cosmos.System.Graphics
         /// </list>
         /// </para>
         /// </summary>
+        #endregion
         static readonly List<Mode> availableModes = new()
         {
             new Mode(640, 480, ColorDepth.ColorDepth4),
