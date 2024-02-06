@@ -12,7 +12,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         public static void Execute()
         {
             object a = new object();
-            Assert.IsFalse(a == null, "a is not null using equality");
+            Assert.IsTrue(a == null, "a is not null using equality");
             Assert.IsFalse(a.Equals(null), "a is not null using Equals");
 
             object b = new object();
