@@ -368,6 +368,24 @@ namespace Cosmos.Core
             }
         }
 
+        /// <summary>
+        /// Copy source int array to destination int array.
+        /// </summary>
+        /// <param name="dest">Destination int array.</param>
+        /// <param name="destOffset">Destination offset in int elements, not bytes.</param>
+        /// <param name="src">Source int array.</param>
+        /// <param name="srcOffset">Source offset in int elements, not bytes.</param>
+        /// <param name="count">Count of int elements to copy, not bytes.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Copy(int[] dest, int destOffset, int[] src, int srcOffset, int count)
+        {
+            fixed (int* destPtr = &dest[destOffset])
+            fixed (int* srcPtr = &src[srcOffset])
+            {
+                Copy(destPtr, srcPtr, count);
+            }
+        }
+
         #endregion Copy
     }
 }
