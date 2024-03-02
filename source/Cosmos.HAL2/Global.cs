@@ -26,7 +26,7 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="textScreen">Text screen.</param>
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
-        static public void Init(TextScreenBase textScreen, bool InitScrollWheel, bool InitPS2, bool InitNetwork, bool IDEInit)
+        static public void Init(TextScreenBase textScreen, bool InitPCI, bool InitACPI, bool InitScrollWheel, bool InitPS2, bool InitNetwork, bool IDEInit, bool SerialInit)
         {
             if (textScreen != null)
             {
@@ -45,14 +45,29 @@ namespace Cosmos.HAL
             //TODO: Since this is FCL, its "common". Otherwise it should be
             // system level and not accessible from Core. Need to think about this
             // for the future.
-            Console.Clear();
-            Console.WriteLine("Finding PCI Devices");
-            debugger.Send("PCI Devices");
-            PCI.Setup();
 
-            Console.WriteLine("Starting ACPI");
-            debugger.Send("ACPI Init");
-            ACPI.Start();
+            Console.Clear();
+            if (InitPCI)
+            {
+                Console.WriteLine("Finding PCI Devices");
+                debugger.Send("PCI Devices");
+                PCI.Setup();
+            }
+            else
+            {
+                debugger.Send("PCI driver disabled in User Kernel");
+            }
+
+            if (InitACPI || InitPS2)
+            {
+                Console.WriteLine("Starting ACPI");
+                debugger.Send("ACPI Init");
+                ACPI.Start();
+            }
+            else
+            {
+                debugger.Send("ACPI driver disabled in User Kernel");
+            }
 
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
@@ -85,10 +100,16 @@ namespace Cosmos.HAL
             {
                 debugger.Send("Network Driver disabled in User Kernel");
             }
-            Console.WriteLine("Enabling Serial Output on COM1");
-            SerialPort.Enable(COMPort.COM1, BaudRate.BaudRate38400);
+            if (SerialInit)
+            {
+                Console.WriteLine("Enabling Serial Output on COM1");
+                SerialPort.Enable(COMPort.COM1, BaudRate.BaudRate38400);
+            }
+            else
+            {
+                debugger.Send("Serial Output disabled in User Kernel");
+            }
             debugger.Send("Done initializing Cosmos.HAL.Global");
-
         }
 
         /// <summary>
