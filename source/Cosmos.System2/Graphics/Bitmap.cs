@@ -381,6 +381,23 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// resizes a specified image
+        /// </summary>
+        /// <param name="image">the original image</param>
+        /// <param name="NewW">the new width of the bitmap</param>
+        /// <param name="NewH">the new height of the bitmap</param>
+        /// <returns>resized image</returns>
+        public static Bitmap Resize(Bitmap image, uint NewW, uint NewH)
+        {
+            
+            Bitmap tmp = new Bitmap(1,1,image.Depth);
+            tmp.RawData = image.RawData;
+            tmp.Resize(NewW,NewH);
+            return tmp;
+
+        }
+
+        /// <summary>
         /// Saves the given image as a BMP file.
         /// </summary>
         /// <param name="path">The path to the file.</param>

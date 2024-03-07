@@ -399,7 +399,7 @@ namespace Cosmos.System.Graphics
         /// <param name="yCenter">The Y center coordinate.</param>
         /// <param name="xR">The X radius.</param>
         /// <param name="yR">The Y radius.</param>
-        public virtual void DrawFilledEllipse(Color color, int xCenter, int yCenter, int yR, int xR)
+        public virtual void DrawFilledEllipse(Color color, int xCenter, int yCenter, int xR, int yR)
         {
             for (int y = -yR; y <= yR; y++)
             {
@@ -641,9 +641,37 @@ namespace Cosmos.System.Graphics
                 for (int yi = 0; yi < image.Height; yi++)
                 {
                     color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
-                    DrawPoint(color, x + xi, y + yi);
+                    if (color.A >0)
+                    {
+                        DrawPoint(color, x + xi, y + yi);
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets a rectangle of pixels and stores it into a bitmap
+        /// </summary>
+        /// <param name="X">the x coordinate of the rectangle</param>
+        /// <param name="Y">the y coordinate of the rectangle</param>
+        /// <param name="W">the width of the rectangle</param>
+        /// <param name="H">the height of the rectangle</param>
+        /// <returns>bitmap</returns>
+        public Bitmap GetPixels(int X,int Y,ushort W,ushort H)
+        {
+
+            Bitmap tmp = new Bitmap(W,H,this.Mode.ColorDepth);
+
+            for (int x = X; x < W + X; x++)
+            {
+                for (int y = Y; y < H + Y; y++)
+                {
+                    tmp.SetPixel(GetPointColor(x,y),x - X,y - Y);
+                }
+            }
+
+            return tmp;
+
         }
 
         /// <summary>
