@@ -396,6 +396,31 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+/// Gets a rectangle of pixels and stores it into a bitmap
+/// </summary>
+/// <param name="X">the x coordinate of the rectangle</param>
+/// <param name="Y">the y coordinate of the rectangle</param>
+/// <param name="W">the width of the rectangle</param>
+/// <param name="H">the height of the rectangle</param>
+/// <returns>bitmap</returns>
+public static Bitmap FromCanvasRegion(Canvas canvas,int X, int Y, ushort W, ushort H)
+{
+
+    Bitmap tmp = new Bitmap(W, H, canvas.Mode.ColorDepth);
+
+    for (int x = X; x < W + X; x++)
+    {
+        for (int y = Y; y < H + Y; y++)
+        {
+            tmp.SetPixel(canvas.GetPointColor(x, y), x - X, y - Y);
+        }
+    }
+
+    return tmp;
+
+}
+
+        /// <summary>
         /// Saves the given image as a BMP file.
         /// </summary>
         /// <param name="path">The path to the file.</param>
