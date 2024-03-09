@@ -389,7 +389,6 @@ namespace Cosmos.System.Graphics
         /// <returns>resized image</returns>
         public static Bitmap Resize(Bitmap image, uint NewW, uint NewH)
         {
-            
             Bitmap tmp = new Bitmap(1,1,image.Depth);
             tmp.RawData = image.RawData;
             tmp.Resize(NewW,NewH);
