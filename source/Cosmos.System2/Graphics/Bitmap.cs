@@ -393,7 +393,6 @@ namespace Cosmos.System.Graphics
             tmp.RawData = image.RawData;
             tmp.Resize(NewW,NewH);
             return tmp;
-
         }
 
         /// <summary>
