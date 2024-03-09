@@ -641,7 +641,7 @@ namespace Cosmos.System.Graphics
                 for (int yi = 0; yi < image.Height; yi++)
                 {
                     color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
-                    if (color.A >0)
+                    if (color.A > 0)
                     {
                         DrawPoint(color, x + xi, y + yi);
                     }
