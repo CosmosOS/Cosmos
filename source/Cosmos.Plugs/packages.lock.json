@@ -1116,7 +1116,7 @@
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.IL2CPU": "[0.1.0-localbuild, )",
           "System.Reflection.TypeExtensions": "[4.7.0, )",
-          "XSharp": "[10.0.0, )"
+          "XSharp": "[0.1.0-localbuild, )"
         }
       },
       "cosmos.core_plugs": {
@@ -1127,7 +1127,7 @@
           "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "IgnoresAccessChecksToGenerator": "[0.5.0, )",
-          "XSharp": "[10.0.0, )"
+          "XSharp": "[0.1.0-localbuild, )"
         }
       },
       "cosmos.debug.kernel": {
@@ -1138,7 +1138,7 @@
         "dependencies": {
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "IL2CPU.API": "[0.1.0-localbuild, )",
-          "XSharp": "[10.0.0, )"
+          "XSharp": "[0.1.0-localbuild, )"
         }
       },
       "cosmos.hal2": {
@@ -1163,7 +1163,7 @@
           "System.Reflection.TypeExtensions": "[4.7.0, )",
           "System.Runtime.CompilerServices.Unsafe": "[5.0.0, )",
           "System.Runtime.Loader": "[4.3.0, )",
-          "XSharp": "[10.0.0, )"
+          "XSharp": "[0.1.0-localbuild, )"
         }
       },
       "cosmos.system2": {
@@ -1217,7 +1217,7 @@
       "xsharp": {
         "type": "Project",
         "dependencies": {
-          "Spruce": "[10.0.0, )"
+          "Spruce": "[0.1.0-localbuild, )"
         }
       }
     }
