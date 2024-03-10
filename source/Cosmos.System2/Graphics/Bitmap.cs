@@ -403,7 +403,7 @@ namespace Cosmos.System.Graphics
 /// <param name="W">the width of the rectangle</param>
 /// <param name="H">the height of the rectangle</param>
 /// <returns>bitmap</returns>
-public static Bitmap FromCanvasRegion(Canvas canvas,int X, int Y, ushort W, ushort H)
+public static Bitmap FromCanvasRegion(Canvas canvas, int X, int Y, ushort W, ushort H)
 {
 
     Bitmap tmp = new Bitmap(W, H, canvas.Mode.ColorDepth);
