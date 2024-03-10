@@ -52,11 +52,9 @@ namespace Cosmos.System.Graphics
         /// <param name="NewH">The new height of the bitmap</param>
         public void Resize(uint NewW, uint NewH)
         {
-
             this.RawData = ScaleImage(this, (int)NewW, (int)NewH);
             this.Width = NewW;
             this.Height = NewH;
-
         }
 
         /// <summary>
@@ -67,9 +65,7 @@ namespace Cosmos.System.Graphics
         /// <param name="Y">The y coordinate of the pixel</param>
         public void SetPixel(Color color,int X,int Y)
         {
-
             RawData[X + (Y * Width)] = color.ToArgb();
-
         }
 
         static int[] ScaleImage(Image image, int newWidth, int newHeight)
