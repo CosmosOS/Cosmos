@@ -381,7 +381,7 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Resizes a specified image
+        /// Resizes a specified Bitmap
         /// </summary>
         /// <param name="image">The original image</param>
         /// <param name="NewW">The new width of the bitmap</param>
