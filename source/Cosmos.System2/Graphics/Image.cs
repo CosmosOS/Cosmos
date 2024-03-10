@@ -46,10 +46,10 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// Resizes the bitmap
+        /// Resizes the Image
         /// </summary>
-        /// <param name="NewW">the new width of the bitmap</param>
-        /// <param name="NewH">the new height of the bitmap</param>
+        /// <param name="NewW">The new width of the bitmap</param>
+        /// <param name="NewH">The new height of the bitmap</param>
         public void Resize(uint NewW, uint NewH)
         {
 
@@ -60,11 +60,11 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// sets a pixel of the image
+        /// Sets a pixel of the image
         /// </summary>
-        /// <param name="color">the color of the pixel</param>
-        /// <param name="X">the x coordinate of the pixel</param>
-        /// <param name="Y">the y coordinate of the pixel</param>
+        /// <param name="color">The color of the pixel</param>
+        /// <param name="X">The x coordinate of the pixel</param>
+        /// <param name="Y">The y coordinate of the pixel</param>
         public void SetPixel(Color color,int X,int Y)
         {
 
