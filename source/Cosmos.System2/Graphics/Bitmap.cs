@@ -398,11 +398,11 @@ namespace Cosmos.System.Graphics
         /// <summary>
 /// Gets a rectangle of pixels and stores it into a bitmap
 /// </summary>
-/// <param name="X">the x coordinate of the rectangle</param>
-/// <param name="Y">the y coordinate of the rectangle</param>
-/// <param name="W">the width of the rectangle</param>
-/// <param name="H">the height of the rectangle</param>
-/// <returns>bitmap</returns>
+/// <param name="X">The x coordinate of the rectangle</param>
+/// <param name="Y">The y coordinate of the rectangle</param>
+/// <param name="W">The width of the rectangle</param>
+/// <param name="H">The height of the rectangle</param>
+/// <returns>Bitmap</returns>
 public static Bitmap FromCanvasRegion(Canvas canvas, int X, int Y, ushort W, ushort H)
 {
 
