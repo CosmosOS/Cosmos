@@ -1,5 +1,4 @@
 ﻿using XSharp.Assembler;
-using XSharp.Assembler.x86;
 using XSharp;
 using static XSharp.XSRegisters;
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.CIL;
+using Cosmos.IL2CPU.Cosmos;
 using IL2CPU.API;
 using XSharp;
 using XSharp.Assembler;

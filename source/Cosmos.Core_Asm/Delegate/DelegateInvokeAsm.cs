@@ -1,9 +1,9 @@
 using System;
 
 using IL2CPU.API;
-using Cosmos.IL2CPU;
-using Cosmos.IL2CPU.X86.IL;
-
+using Cosmos.IL2CPU.CIL.Instructions;
+using Cosmos.IL2CPU.CIL.Utils;
+using Cosmos.IL2CPU.Cosmos;
 using XSharp;
 using XSharp.Assembler;
 using x86 = XSharp.Assembler.x86;
