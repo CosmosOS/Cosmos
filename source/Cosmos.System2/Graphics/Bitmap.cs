@@ -381,12 +381,12 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
-        /// resizes a specified image
+        /// Resizes a specified image
         /// </summary>
-        /// <param name="image">the original image</param>
-        /// <param name="NewW">the new width of the bitmap</param>
-        /// <param name="NewH">the new height of the bitmap</param>
-        /// <returns>resized image</returns>
+        /// <param name="image">The original image</param>
+        /// <param name="NewW">The new width of the bitmap</param>
+        /// <param name="NewH">The new height of the bitmap</param>
+        /// <returns>Resized image</returns>
         public static Bitmap Resize(Bitmap image, uint NewW, uint NewH)
         {
             Bitmap tmp = new Bitmap(1,1,image.Depth);
