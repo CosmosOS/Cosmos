@@ -26,7 +26,7 @@ namespace Cosmos.HAL
         /// </summary>
         /// <param name="textScreen">Text screen.</param>
         /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
-        static public void Init(TextScreenBase textScreen, bool InitScrollWheel, bool InitPS2, bool InitNetwork, bool IDEInit)
+        static public void Init(TextScreenBase textScreen, bool InitScrollWheel, bool InitPS2, bool InitNetwork, bool IDEInit, bool InitSerial, bool InitPCI, bool InitACPI, bool InitAHCI)
         {
             if (textScreen != null)
             {
@@ -46,13 +46,28 @@ namespace Cosmos.HAL
             // system level and not accessible from Core. Need to think about this
             // for the future.
             Console.Clear();
-            Console.WriteLine("Finding PCI Devices");
-            debugger.Send("PCI Devices");
-            PCI.Setup();
 
-            Console.WriteLine("Starting ACPI");
-            debugger.Send("ACPI Init");
-            ACPI.Start();
+            if (InitPCI)
+            {
+                Console.WriteLine("Finding PCI Devices");
+                debugger.Send("PCI Devices");
+                PCI.Setup();
+            }
+            else
+            {
+                debugger.Send("PCI Devices will not be set up");
+            }
+
+            if (InitACPI)
+            {
+                Console.WriteLine("Starting ACPI");
+                debugger.Send("ACPI Init");
+                ACPI.Start();
+            }
+            else
+            {
+                debugger.Send("ACPI will not be initialized");
+            }
 
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
@@ -74,8 +89,18 @@ namespace Cosmos.HAL
             {
                 debugger.Send("IDE Driver disabled in User Kernel");
             }
-            AHCI.InitDriver();
+
+            if (InitAHCI)
+            {
+                AHCI.InitDriver();
+            }
+            else
+            {
+                debugger.Send("AHCI Driver disabled in User Kernel");
+            }
+
             //EHCI.InitDriver();
+
             if (InitNetwork)
             {
                 debugger.Send("Network Devices Init");
@@ -85,9 +110,17 @@ namespace Cosmos.HAL
             {
                 debugger.Send("Network Driver disabled in User Kernel");
             }
-            Console.WriteLine("Enabling Serial Output on COM1");
-            SerialPort.Enable(COMPort.COM1, BaudRate.BaudRate38400);
-            debugger.Send("Done initializing Cosmos.HAL.Global");
+
+            if (InitSerial)
+            {
+                Console.WriteLine("Enabling Serial Output on COM1");
+                SerialPort.Enable(COMPort.COM1, BaudRate.BaudRate38400);
+                debugger.Send("Done initializing Cosmos.HAL.Global");
+            }
+            else
+            {
+                debugger.Send("Serial will not be enabled");
+            }
 
         }
 
