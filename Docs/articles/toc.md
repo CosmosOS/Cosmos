@@ -2,10 +2,13 @@
 
 # [Compiler](Compiler/il2cpu.md)
 
+# [Change Log](Changelog.md)
+
 # Debugger
 ## [Debug Commands](Debugger/DebugCommands.md)
 
 # Installation
+## [User Kit](Installation/UserKit.md)
 ## [Dev Kit](Installation/DevKit.md)
 ## [Running](Installation/Running.md)
 

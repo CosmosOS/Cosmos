@@ -1,5 +1,15 @@
-﻿using System;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          DHCP - DHCP Core
+* PROGRAMMER(S):    Alexy DA CRUZ <dacruzalexy@gmail.com>
+*                   Valentin CHARBONNIER <valentinbreiz@gmail.com>
+*/
+
+using Cosmos.System.Network.IPv4;
+using System;
+using Cosmos.System.Network.IPv4.UDP.DNS;
 using Cosmos.System.Network.Config;
+using System.Collections.Generic;
 using Cosmos.HAL;
 
 namespace Cosmos.System.Network.IPv4.UDP.DHCP
@@ -9,7 +19,10 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
     /// </summary>
     public class DHCPClient : UdpClient
     {
-        private bool asked = false;
+        /// <summary>
+        /// Is DHCP ascked check variable
+        /// </summary>
+        private bool applied = false;
 
         /// <summary>
         /// Gets the IP address of the DHCP server.
@@ -28,6 +41,12 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         {
         }
 
+        /// <summary>
+        /// Receive data
+        /// </summary>
+        /// <param name="timeout">timeout value, default 5000ms</param>
+        /// <returns>time value (-1 = timeout)</returns>
+        /// <exception cref="InvalidOperationException">Thrown on fatal error (contact support).</exception>
         private int Receive(int timeout = 5000)
         {
             int second = 0;
@@ -48,23 +67,20 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
             var packet = new DHCPPacket(rxBuffer.Dequeue().RawData);
 
-            if (packet.MessageType == 2) // Boot Reply
+            if (packet.MessageType == 2) //Boot Reply
             {
-                if (packet.RawData[284] == 0x02) // Offer packet received
+                if (packet.RawData[284] == 0x02) //Offer packet received
                 {
                     NetworkStack.Debugger.Send("Offer received.");
                     return SendRequestPacket(packet.Client);
                 }
-                else if (packet.RawData[284] is 0x05 or 0x06) // ACK or NAK DHCP packet received
+                else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
                 {
-                    var ack = new DHCPAck(packet.RawData);
-                    if (asked)
+                    if (applied == false)
                     {
-                        Apply(ack, true);
-                    }
-                    else
-                    {
-                        Apply(ack);
+                        Apply(packet, true);
+
+                        Close();
                     }
                 }
             }
@@ -110,7 +126,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
                 OutgoingBuffer.AddPacket(dhcpDiscover);
                 NetworkStack.Update();
 
-                asked = true;
+                applied = false;
             }
 
             return Receive();
@@ -139,45 +155,44 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// </summary>
         /// <param name="message">Enable/Disable the displaying of messages about DHCP applying and conf. Disabled by default.
         /// </param>
-        private void Apply(DHCPAck packet, bool message = false)
+        private void Apply(DHCPPacket packet, bool message = false)
         {
-            NetworkStack.RemoveAllConfigIP();
-
-            //cf. Roadmap. (have to change this, because some network interfaces are not configured in dhcp mode) [have to be done in 0.5.x]
-            foreach (NetworkDevice networkDevice in NetworkDevice.Devices)
+            if (applied == false)
             {
-                // NOTE: @ascpixi: Why are we checking if ToString() returns null
-                //       *four* times...? Can this be removed?
-                if (packet.Client.ToString() == null ||
-                    packet.Client.ToString() == null ||
-                    packet.Client.ToString() == null ||
-                    packet.Client.ToString() == null)
+                NetworkStack.RemoveAllConfigIP();
+
+                //cf. Roadmap. (have to change this, because some network interfaces are not configured in dhcp mode) [have to be done in 0.5.x]
+                foreach (NetworkDevice networkDevice in NetworkDevice.Devices)
                 {
-                    throw new Exception("Parsing DHCP ACK Packet failed, can't apply network configuration.");
-                }
-                else
-                {
-                    if (message)
+                    if (packet.Client.ToString() == null)
                     {
-                        NetworkStack.Debugger.Send("[DHCP ACK][" + networkDevice.Name + "] Packet received, applying IP configuration...");
-                        NetworkStack.Debugger.Send("   IP Address  : " + packet.Client.ToString());
-                        NetworkStack.Debugger.Send("   Subnet mask : " + packet.Subnet.ToString());
-                        NetworkStack.Debugger.Send("   Gateway     : " + packet.Server.ToString());
-                        NetworkStack.Debugger.Send("   DNS server  : " + packet.DNS.ToString());
+                        throw new Exception("Parsing DHCP ACK Packet failed, can't apply network configuration.");
                     }
-
-                    IPConfig.Enable(networkDevice, packet.Client, packet.Subnet, packet.Server);
-                    DNSConfig.Add(packet.DNS);
-
-                    if (message)
+                    else
                     {
-                        NetworkStack.Debugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");
-                        asked = false;
+                        HAL.Global.debugger.Send("[DHCP ACK][" + networkDevice.Name + "] Packet received, applying IP configuration...");
+                        HAL.Global.debugger.Send("   IP Address  : " + packet.Client.ToString());
+                        HAL.Global.debugger.Send("   Subnet mask : " + packet.Subnet.ToString());
+                        HAL.Global.debugger.Send("   Gateway     : " + packet.Server.ToString());
+                        HAL.Global.debugger.Send("   DNS server  : " + packet.DNS.ToString());
+
+                        IPConfig.Enable(networkDevice, packet.Client, packet.Subnet, packet.Server);
+                        DNSConfig.Add(packet.DNS);
+
+                        HAL.Global.debugger.Send("[DHCP CONFIG][" + networkDevice.Name + "] IP configuration applied.");
+
+                        applied = true;
+
+                        return;
                     }
                 }
+
+                HAL.Global.debugger.Send("[DHCP CONFIG] No DHCP Config applied!");
             }
-
-            Close();
+            else
+            {
+                HAL.Global.debugger.Send("[DHCP CONFIG] DHCP already applied.");
+            }
         }
     }
 }

@@ -36,6 +36,7 @@ namespace Cosmos.Core.Memory
         /// </summary>
         public RootSMTBlock* LargerSize;
     }
+    // Changing the ordering will break SMTBlock* NextFreeBlock(SMTPage* aPage)
     public unsafe struct SMTBlock
     {
         /// <summary>
@@ -76,30 +77,13 @@ namespace Cosmos.Core.Memory
         #region SMT
 
         /// <summary>
-        /// Find the next free block in the smt
-        /// </summary>
-        /// <returns>Pointer to the start of block in the SMT. null if all SMT pages are full</returns>
-        private static SMTBlock* NextFreeBlock()
-        {
-            var page = SMT;
-            SMTBlock* pos = null;
-            while (page != null && pos == null)
-            {
-                pos = NextFreeBlock(page);
-                page = page->Next;
-            }
-            return pos;
-        }
-
-
-        /// <summary>
         /// Find the next free block in a page
         /// </summary>
         /// <returns>Pointer to the start of block in the SMT. null if all SMT pages are full</returns>
         private static SMTBlock* NextFreeBlock(SMTPage* aPage)
         {
-            var ptr = (SMTBlock*)aPage->First; // since both RootSMTBlock and SMTBlock have the same size (20) it doesnt matter if cast is wrong
-            while (ptr->PagePtr != null) // this would check Size if its actually a RootSMTBlock
+            SMTBlock* ptr = (SMTBlock*)aPage->First; // since both RootSMTBlock and SMTBlock have the same size (20) it doesnt matter if cast is wrong
+            while (ptr->PagePtr != null) // this would check Size if its actually a RootSMTBlock, which is always non-zero
             {
                 ptr += 1;
                 if (ptr >= (byte*)aPage + RAT.PageSize - 8)
@@ -134,17 +118,6 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Gets the last block in the SMT for objects of this size
-        /// </summary>
-        /// <param name="aSize"></param>
-        /// <returns></returns>
-        private static SMTBlock* GetLastBlock(uint aSize)
-        {
-            var page = GetLastPage();
-            return GetLastBlock(page, aSize);
-        }
-
-        /// <summary>
         /// Gets the last block on a certain page for objects of this size
         /// </summary>
         /// <param name="page">Page to search</param>
@@ -165,9 +138,14 @@ namespace Cosmos.Core.Memory
             return ptr;
         }
 
+        /// <summary>
+        /// Get the first block for this size on any SMT page, which has space left to allocate to
+        /// </summary>
+        /// <param name="aSize"></param>
+        /// <returns>Null if no more space on any block of this size</returns>
         private static SMTBlock* GetFirstWithSpace(uint aSize)
         {
-            var page = SMT;
+            SMTPage* page = SMT;
             SMTBlock* block = null;
             do
             {
@@ -178,43 +156,41 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Get the first block for this size, which has space left to allocate to
+        /// Get the first block for this size on this SMT page, which has space left to allocate to
         /// </summary>
         /// <param name="aSize"></param>
-        /// <returns></returns>
+        /// <returns>Null if no more space on this page</returns>
         private static SMTBlock* GetFirstWithSpace(SMTPage* aPage, uint aSize)
         {
-            return GetFirstWithSpace(aSize, GetFirstBlock(aPage, aSize));
+            return GetFirstWithSpace(GetFirstBlock(aPage, aSize), aSize);
         }
 
         /// <summary>
-        /// Get the first block for this size, which has space left to allocate to
+        /// Get the first block for this size in this SMT block chain, which has space left to allocate to
         /// </summary>
+        /// <param name="aRoot">The root node to start the search at</param>
         /// <param name="aSize"></param>
-        /// <param name="root">The root node to start the search at</param>
         /// <returns></returns>
-        private static SMTBlock* GetFirstWithSpace(uint aSize, RootSMTBlock* root)
+        private static SMTBlock* GetFirstWithSpace(RootSMTBlock* aRoot, uint aSize)
         {
-            SMTBlock* ptr = root->First;
-            if (ptr == null)
+            SMTBlock* ptr = aRoot->First;
+            if (ptr == null) // Can this ever happen?
             {
                 return null;
             }
-            var lptr = ptr;
-            while (ptr->SpacesLeft == 0 && ptr->NextBlock != null)
+            while (ptr->SpacesLeft == 0)
             {
-                lptr = ptr;
                 ptr = ptr->NextBlock;
-            }
-            if (ptr->SpacesLeft == 0 && ptr->NextBlock == null)
-            {
-                return null;
+                if (ptr == null)
+                {
+                    return null;
+                }
             }
             return ptr;
         }
 
         /// <summary>
-        /// Add a new root block for a certain size
+        /// Add a new root block for a certain size to a certain SMT page
         /// </summary>
         /// <param name="aSize">Size must be divisible by 2 otherwise Alloc breaks</param>
         private static void AddRootSMTBlock(SMTPage* aPage, uint aSize)
@@ -234,13 +210,13 @@ namespace Cosmos.Core.Memory
                 while (true) { }
             }
 
-            if (ptr->Size == 0)
+            if (ptr->Size == 0) // This is the first block to be allocated on the page
             {
                 ptr->Size = aSize;
             }
             else
             {
-                var block = (RootSMTBlock*)NextFreeBlock(aPage);    // we should actually check that this is not null
+                RootSMTBlock* block = (RootSMTBlock*)NextFreeBlock(aPage);    // we should actually check that this is not null
                                                                     //but we should also only call this code right at the beginning so it should be fine
                 block->Size = aSize;
                 ptr->LargerSize = block;
@@ -252,7 +228,7 @@ namespace Cosmos.Core.Memory
         /// Get the Last Page of the SMT
         /// </summary>
         /// <returns></returns>
-        private static SMTPage* GetLastPage()
+        private static SMTPage* GetSMTLastPage()
         {
             var page = SMT;
             while (page->Next != null)
@@ -283,19 +259,9 @@ namespace Cosmos.Core.Memory
             // 4 slots, ~1k ea
             uint xMaxItemSize = RAT.PageSize / 4 - PrefixItemBytes;
             // Word align it
-            xMaxItemSize = xMaxItemSize / sizeof(uint) * sizeof(uint);
-            InitSMT(xMaxItemSize);
-        }
+            mMaxItemSize = xMaxItemSize / sizeof(uint) * sizeof(uint);
 
-        /// <summary>
-        /// Init SMT (Size Map Table).
-        /// </summary>
-        /// <param name="aMaxItemSize">A max item size.</param>
-        static void InitSMT(uint aMaxItemSize)
-        {
-            mMaxItemSize = aMaxItemSize;
-            var page = InitSMTPage();
-            SMT = page;
+            SMT = InitSMTPage();
         }
 
         /// <summary>
@@ -304,8 +270,8 @@ namespace Cosmos.Core.Memory
         /// <returns></returns>
         private static SMTPage* InitSMTPage()
         {
-            var page = (SMTPage*)RAT.AllocPages(RAT.PageType.SMT, 1);
-            page->First = (RootSMTBlock*)(page + 1);
+            SMTPage* page = (SMTPage*)RAT.AllocPages(RAT.PageType.SMT, 1);
+            page->First = (RootSMTBlock*)page + 1;
 
             // TODO Change these sizes after further study and also when page size changes.
             // SMT can be grown as needed. Also can adjust and create new ones dynamicaly as it runs.
@@ -322,7 +288,8 @@ namespace Cosmos.Core.Memory
         }
 
         /// <summary>
-        /// Create a page with the size of an item and add it to the SMT at a certain page
+        /// Create a page with the size of an item and try add it to the SMT at a certain page
+        /// If the SMT page is full, it will be added to the first SMT page with space or a new SMT page is allocated
         /// </summary>
         /// <param name="aItemSize">Object size in bytes</param>
         /// <exception cref="Exception">Thrown if:
@@ -335,11 +302,12 @@ namespace Cosmos.Core.Memory
         /// </exception>
         static void CreatePage(SMTPage* aPage, uint aItemSize)
         {
-            var xPtr = (byte*)RAT.AllocPages(RAT.PageType.HeapSmall, 1);
+            byte* xPtr = (byte*)RAT.AllocPages(RAT.PageType.HeapSmall, 1);
             if (xPtr == null)
             {
                 return; // we failed to create the page, Alloc should still handle this case
             }
+
             uint xSlotSize = aItemSize + PrefixItemBytes;
             uint xItemCount = RAT.PageSize / xSlotSize;
             for (uint i = 0; i < xItemCount; i++)
@@ -351,24 +319,47 @@ namespace Cosmos.Core.Memory
             }
 
             //now add it to the smt
-            var parent = GetLastBlock(aPage, aItemSize);
-            var smtBlock = NextFreeBlock(aPage); //get the next free block in the smt
+            SMTBlock* parent = GetLastBlock(aPage, aItemSize);
+            SMTBlock* smtBlock = NextFreeBlock(aPage); //get the next free block in the smt
 
-            if (smtBlock == null) // we could not allocate a new block since the SMT table is all full
+            if (smtBlock == null) // we could not allocate a new block since the SMT table is all full on this page
             {
-                // we need to expand the SMT table by a page
-                var last = SMT;
-                while (last->Next != null)
+                // we now have two options:
+                // 1. there exists a later page in the chain, which has space
+                // 2. all SMT Pages are full and we need to allocate a new one
+
+                // first, check if we find a later page with space
+                SMTPage* currentSMTPage = aPage->Next;
+                while (currentSMTPage != null)
                 {
-                    last = last->Next;
+                    smtBlock = NextFreeBlock(currentSMTPage);
+                    if(smtBlock != null)
+                    {
+                        break;
+                    }
+                    currentSMTPage = currentSMTPage->Next;
                 }
-                last->Next = InitSMTPage();
-                parent = GetLastBlock(last->Next, aItemSize);
-                smtBlock = NextFreeBlock();
+
                 if (smtBlock == null)
                 {
-                    Debugger.SendKernelPanic(0x93);
-                    while (true) { };
+                    // we need to expand the SMT table by a page
+                    SMTPage* last = GetSMTLastPage();
+                    last->Next = InitSMTPage();
+                    aPage = last->Next;
+                    parent = GetLastBlock(aPage, aItemSize);
+                    smtBlock = NextFreeBlock(aPage);
+
+                    if (smtBlock == null)
+                    {
+                        Debugger.SendKernelPanic(0x93);
+                        while (true) { };
+                    }
+                }
+                else
+                {
+                    aPage = currentSMTPage;
+                    parent = GetLastBlock(aPage, aItemSize);
+                    // we have already found the smt block above
                 }
             }
 
@@ -376,12 +367,11 @@ namespace Cosmos.Core.Memory
             {
                 // there is already a block for the same size on the same page
                 parent->NextBlock = smtBlock;
-
             }
             else
             {
                 // in this case this is the first block of the size, so we can link it to root
-                var root = GetFirstBlock(aPage, aItemSize);
+                RootSMTBlock* root = GetFirstBlock(aPage, aItemSize);
                 root->First = smtBlock;
             }
 
@@ -396,10 +386,10 @@ namespace Cosmos.Core.Memory
         /// <returns>Byte pointer to the start of the block.</returns>
         public static byte* Alloc(ushort aSize)
         {
-            var pageBlock = GetFirstWithSpace(aSize);
+            SMTBlock* pageBlock = GetFirstWithSpace(aSize);
             if (pageBlock == null) // This happens when the page is full and we need to allocate a new page for this size
             {
-                CreatePage(GetLastPage(), GetRoundedSize(aSize));
+                CreatePage(SMT, GetRoundedSize(aSize)); // CreatePage will try add this page to any page of the SMT until it finds one with space
                 pageBlock = GetFirstWithSpace(aSize);
                 if (pageBlock == null)
                 {
@@ -444,7 +434,7 @@ namespace Cosmos.Core.Memory
         /// <param name="aPtr">A pointer to the start object.</param>
         public static void Free(void* aPtr)
         {
-            var heapObject = (ushort*)aPtr;
+            ushort* heapObject = (ushort*)aPtr;
             ushort size = heapObject[-2];
             if (size == 0)
             {
@@ -454,7 +444,7 @@ namespace Cosmos.Core.Memory
                 Debugger.SendKernelPanic(0x99);
             }
 
-            var allocated = (uint*)aPtr;
+            uint* allocated = (uint*)aPtr;
             allocated[-1] = 0; // zero both size and gc status at once
 
             // now zero the object so its ready for next allocation
@@ -462,7 +452,7 @@ namespace Cosmos.Core.Memory
             {
                 size = 4;
             }
-            var bytes = size / 4;
+            int bytes = size / 4;
             if (size % 4 != 0)
             {
                 bytes += 1;
@@ -473,32 +463,30 @@ namespace Cosmos.Core.Memory
             }
 
             // need to increase count in SMT again
-            var allocatedOnPage = RAT.GetPagePtr(aPtr);
-            var smtPage = SMT;
+            // todo: store this info somewhere so this can be done in constant time
+            byte* allocatedOnPage = RAT.GetPagePtr(aPtr);
+            SMTPage* smtPage = SMT;
             SMTBlock* blockPtr = null;
             while (smtPage != null)
             {
                 blockPtr = GetFirstBlock(smtPage, size)->First;
-                while (blockPtr != null && blockPtr->PagePtr != allocatedOnPage)
+                while (blockPtr != null)
                 {
+                    if(blockPtr->PagePtr == allocatedOnPage)
+                    {
+                        blockPtr->SpacesLeft++;
+                        return;
+                    }
                     blockPtr = blockPtr->NextBlock;
-                }
-                if(blockPtr->PagePtr == allocatedOnPage)
-                {
-                    break;
                 }
                 smtPage = smtPage->Next;
             }
 
-            if (blockPtr == null)
-            {
-                // this shouldnt happen
-                Debugger.DoSendNumber((uint)aPtr);
-                Debugger.DoSendNumber((uint)SMT);
-                Debugger.SendKernelPanic(0x98);
-                while (true) { }
-            }
-            blockPtr->SpacesLeft++;
+            // this shouldnt happen
+            Debugger.DoSendNumber((uint)aPtr);
+            Debugger.DoSendNumber((uint)SMT);
+            Debugger.SendKernelPanic(0x98);
+            while (true) { }
         }
 
         #region Statistics
@@ -555,6 +543,82 @@ namespace Cosmos.Core.Memory
             }
 
             return count;
+        }
+
+        #endregion
+
+        #region Cleanup
+
+        /// <summary>
+        /// This function will free all pages allocated for small objects which are emnpty
+        /// </summary>
+        /// <returns>Number of pages freed</returns>
+        public static int PruneSMT()
+        {
+            int freed = 0;
+            SMTPage* page = SMT;
+            while (page != null)
+            {
+                freed += PruneSMT(page);
+                page = page->Next;
+            }
+            return freed;
+        }
+
+        /// <summary>
+        /// Prune all empty pages allocated on a certain page
+        /// </summary>
+        /// <param name="aPage"></param>
+        /// <returns></returns>
+        private static int PruneSMT(SMTPage* aPage)
+        {
+            int freed = 0;
+            RootSMTBlock* ptr = (RootSMTBlock*)aPage->First; // since both RootSMTBlock and SMTBlock have the same size (20) it doesnt matter if cast is wrong
+            while(ptr != null)
+            {
+                freed += PruneSMT(ptr, ptr->Size);
+                ptr = ptr->LargerSize;
+            }
+            return freed;
+        }
+
+        /// <summary>
+        /// Prune all empty pages which are linked to root block for a certain size
+        /// The root block or first one following it will not be removed!
+        /// </summary>
+        /// <param name="aBlock"></param>
+        /// <param name="aSize"></param>
+        /// <returns></returns>
+        private static int PruneSMT(RootSMTBlock* aBlock, uint aSize)
+        {
+            int freed = 0;
+            int maxElements = (int)(RAT.PageSize / (aSize + PrefixItemBytes));
+            SMTBlock* prev = aBlock->First;
+            SMTBlock* block = prev->NextBlock;
+            while(block != null)
+            {
+                if (block->SpacesLeft == maxElements)
+                {
+                    // This block is currently empty so free it
+                    prev->NextBlock = block->NextBlock;
+                    RAT.Free(block->PagePtr);
+
+                    uint* toCleanUp = (uint*) block;
+                    block = prev->NextBlock;
+
+                    toCleanUp[0] = 0;
+                    toCleanUp[1] = 0;
+                    toCleanUp[2] = 0;
+
+                    freed++;
+                }
+                else
+                {
+                    prev = block;
+                    block = block->NextBlock;
+                }
+            }
+            return freed;
         }
 
         #endregion

@@ -107,7 +107,7 @@ namespace Cosmos.HAL.BlockDevice
                 throw new NotImplementedException("Reading more than one sectors is not supported. SectorCount: " + SectorCount);
             }
 
-            ataDebugger.Send("ATAPI: Reading block. Sector: " + SectorNum + " SectorCount: " + SectorCount);
+            ataDebugger.SendInternal("ATAPI: Reading block. Sector: " + SectorNum + " SectorCount: " + SectorCount);
 
 
             byte[] packet = new byte[12];
@@ -134,7 +134,7 @@ namespace Cosmos.HAL.BlockDevice
 
             //Convert the buffer into bytes
             byte[] array = new byte[SectorSize];
-            int counter = 0;
+            /*int counter = 0;
             for (int i = 0; i < SectorSize / 2; i++)
             {
                 var item = buffer[i];
@@ -142,6 +142,15 @@ namespace Cosmos.HAL.BlockDevice
 
                 array[counter++] = bytes[0];
                 array[counter++] = bytes[1];
+            }*/
+
+            unsafe {
+                fixed (byte* ptr = array) {
+                    fixed (ushort* ptr2 = buffer) {
+                        byte* ptr3 = (byte*)ptr2;
+                        MemoryOperations.Copy(ptr, ptr3, SectorSize);
+                    }
+                }
             }
 
             //Return
@@ -182,10 +191,10 @@ namespace Cosmos.HAL.BlockDevice
 
             //Send ATAPI packet command
             device.SendCmd(Cmd.Packet);
-            ataDebugger.Send("ATAPI: Polling");
+            ataDebugger.SendInternal("ATAPI: Polling");
 
             Poll(true);
-            ataDebugger.Send("ATAPI: Polling complete");
+            ataDebugger.SendInternal("ATAPI: Polling complete");
 
             //Send the command as words
             for (int i = 0; i < AtapiPacket.Length; i++)

@@ -1,6 +1,17 @@
-﻿using Cosmos.HAL.Network;
+﻿/*
+* PROJECT:          Aura Operating System Development
+* CONTENT:          DHCP Packet
+* PROGRAMMERS:      Alexy DA CRUZ <dacruzalexy@gmail.com>
+*                   Valentin CHARBONNIER <valentinbreiz@gmail.com>
+*/
+
+using Cosmos.HAL;
+using Cosmos.HAL.Network;
+using Cosmos.System.Network.IPv4;
+using Cosmos.System.Network.IPv4.UDP;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Cosmos.System.Network.IPv4.UDP.DHCP
 {
@@ -41,6 +52,7 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         public static void DHCPHandler(byte[] packetData)
         {
             var dhcpPacket = new DHCPPacket(packetData);
+
             var receiver = UdpClient.GetClient(dhcpPacket.DestinationPort);
             receiver?.ReceiveData(dhcpPacket);
         }
@@ -134,11 +146,19 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
             InitializeFields();
         }
 
+        /// <summary>
+        /// Init DHCPPacket fields.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
         protected override void InitializeFields()
         {
             base.InitializeFields();
             MessageType = RawData[42];
-            Client = new Address(RawData, 58);
+
+            if (RawData[58] != 0)
+            {
+                Client = new Address(RawData, 58);
+            }
 
             if (RawData[282] != 0)
             {
@@ -158,6 +178,22 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
 
                     i += option.Length;
                 }
+
+                foreach (var option in Options)
+                {
+                    if (option.Type == 1) //Mask
+                    {
+                        Subnet = new Address(option.Data, 0);
+                    }
+                    else if (option.Type == 3) //Router
+                    {
+                        Server = new Address(option.Data, 0);
+                    }
+                    else if (option.Type == 6) //DNS
+                    {
+                        DNS = new Address(option.Data, 0);
+                    }
+                }
             }
         }
 
@@ -175,5 +211,20 @@ namespace Cosmos.System.Network.IPv4.UDP.DHCP
         /// Gets the DHCP options.
         /// </summary>
         internal List<DHCPOption> Options { get; private set; }
+
+        /// <summary>
+        /// Get Subnet IPv4 Address
+        /// </summary>
+        internal Address Subnet { get; private set; }
+
+        /// <summary>
+        /// Get DNS IPv4 Address
+        /// </summary>
+        internal Address DNS { get; private set; }
+
+        /// <summary>
+        /// Get DHCP Server IPv4 Address
+        /// </summary>
+        internal Address Server { get; private set; }
     }
 }

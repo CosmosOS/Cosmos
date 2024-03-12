@@ -1,4 +1,4 @@
-﻿using static Cosmos.HAL.Drivers.Video.VGADriver;
+using static Cosmos.HAL.Drivers.Video.VGADriver;
 using Cosmos.HAL.Drivers.Video;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,7 +15,22 @@ namespace Cosmos.System.Graphics
         readonly VGADriver driver;
 
         /// <summary>
-        /// The list of available resolutions under VGA.
+        /// Available VGA supported video modes.
+        /// <para>
+        /// Low color pallete:
+        /// <list type="bullet">
+        /// <item>320x200x4.</item>
+        /// <item>640x480x2.</item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// Normal colors:
+        /// <list type="bullet">
+        /// <item>320x200x8.</item>
+        /// <item>640x480x4.</item>
+        /// <item>720x480x16.</item>
+        /// </list>
+        /// </para>
         /// </summary>
         static readonly List<Mode> availableModes = new()
         {
@@ -28,7 +43,7 @@ namespace Cosmos.System.Graphics
         /// Initializes a new instance of the <see cref="VGACanvas"/> class
         /// with the given display mode.
         /// </summary>
-        public VGACanvas(Mode mode) : base()
+        public VGACanvas(Mode mode) : base(mode)
         {
             driver = new VGADriver();
             driver.SetGraphicsMode(ModeToScreenSize(mode), (VGADriver.ColorDepth)(int)mode.ColorDepth);

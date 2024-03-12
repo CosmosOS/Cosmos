@@ -86,7 +86,7 @@ VMWare Workstation can be downloaded for free trial [here](https://www.vmware.co
 
 Not officially supported at this time, but can be done. Just use the ISO option above with debugging turned off.
 
-QEMU can be downloaded [here](https://qemu.weilnetz.de/w64/)
+QEMU can be downloaded [here](https://www.qemu.org/download/)
 
 ## Bochs
 

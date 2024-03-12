@@ -22,6 +22,9 @@ namespace Cosmos.System.Network.IPv4
         /// </summary>
         internal byte[] Parts = new byte[4];
 
+        public bool IsIpv4 => Parts.Length == 4;
+        public bool IsIpv6 => !IsIpv4;
+
         /// <summary>
         /// The <c>0.0.0.0</c> IP address.
         /// </summary>
@@ -31,6 +34,18 @@ namespace Cosmos.System.Network.IPv4
         /// The broadcast address <c>(255.255.255.255)</c>.
         /// </summary>
         public static readonly Address Broadcast = new(255, 255, 255, 255);
+
+        /// <summary>
+        /// Create new instance of the <see cref="Address"/> class, with specified IP address.
+        /// </summary>
+        /// <param name="address">Adress</param>
+        public Address(uint address)
+        {
+            Parts[0] = (byte)((address >> 24) & 0xFF);
+            Parts[1] = (byte)((address >> 16) & 0xFF);
+            Parts[2] = (byte)((address >> 8) & 0xFF);
+            Parts[3] = (byte)(address & 0xFF);
+        }
 
         /// <summary>
         /// Create new instance of the <see cref="Address"/> class, with specified IP address.
@@ -158,7 +173,7 @@ namespace Cosmos.System.Network.IPv4
         /// <summary>
         /// Convert this address to a 32-bit number.
         /// </summary>
-        private uint ToUInt32()
+        public uint ToUInt32()
         {
             return (uint)((Parts[0] << 24) | (Parts[1] << 16) | (Parts[2] << 8) | (Parts[3] << 0));
         }
@@ -195,5 +210,47 @@ namespace Cosmos.System.Network.IPv4
                 throw new ArgumentException("obj is not a IPv4Address", nameof(obj));
             }
         }
+
+        public override bool Equals(object obj)
+        {
+
+            if (obj == null && this == null)
+            {
+                return true;
+            }
+
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (this == null)
+            {
+                return false;
+            }
+
+            if (obj is Address address)
+            {
+                if (IsIpv4 != address.IsIpv4) // not same ip type so is false
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < Parts.Length; i++)
+                {
+                    if (Parts[i] != address.Parts[i])
+                    {
+                        return false; // ips dont match
+                    }
+                }
+
+                return true; // ip type and value match
+
+            }
+
+            return false; // obj is not an Address
+
+        }
+
     }
 }

@@ -18,6 +18,15 @@ namespace Cosmos.Core
         public static void Write8(int aPort, byte aData) => throw null;
 
         /// <summary>
+        /// Write many bytes to port with 400ns waits between each word
+        /// Plugged.
+        /// </summary>
+        /// <param name="aPort">A port to write to.</param>
+        /// <param name="aData">The data.</param>
+        [PlugMethod(PlugRequired = true)]
+        public static void WriteMany8WithWait(int aPort, byte[] aData) => throw null;
+
+        /// <summary>
         /// Write Word to port.
         /// Plugged.
         /// </summary>
@@ -69,27 +78,18 @@ namespace Cosmos.Core
         /// </summary>
         /// <param name="aData">Output data array.</param>
         /// <exception cref="System.OverflowException">Thrown if aData lenght is greater than Int32.MaxValue.</exception>
-        public static void Read8(int aPort, byte[] aData)
-        {
-            for (int i = 0; i < aData.Length / 2; i++)
-            {
-                var xValue = Read16(aPort);
-                aData[i * 2] = (byte)xValue;
-                aData[i * 2 + 1] = (byte)(xValue >> 8);
-            }
-        }
+        [PlugMethod(PlugRequired = true)]
+        public static void Read8(int aPort, byte[] aData) => throw null;
 
         /// <summary>
-        /// Read Word from base port.
+        /// Read Words from base port.
         /// </summary>
         /// <param name="aData">Output data array.</param>
         /// <exception cref="System.OverflowException">Thrown if aData lenght is greater than Int32.MaxValue.</exception>
+        [PlugMethod(PlugRequired = true)]
         public static void Read16(int aPort, ushort[] aData)
         {
-            for (int i = 0; i < aData.Length; i++)
-            {
-                aData[i] = Read16(aPort);
-            }
+            throw null;
         }
 
         /// <summary>

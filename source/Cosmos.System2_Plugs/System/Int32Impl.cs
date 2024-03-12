@@ -1,3 +1,4 @@
+using System.Text;
 using Cosmos.Common;
 using IL2CPU.API.Attribs;
 
@@ -13,46 +14,58 @@ namespace Cosmos.System_Plugs.System
 
         public static string ToString(ref int aThis, string format)
         {
-            if (format.Equals("X"))
+            if(format == string.Empty)
             {
-                string result = "";
+                return aThis.ToString();
+            }
 
-                if(aThis == 0)
-                {
-                    result = "0";
-                }
+            ArgumentNullException.ThrowIfNull(format, nameof(format));
 
-                while (aThis != 0)
-                {
-                    if (aThis % 16 < 10)
+            StringBuilder sb = new();
+
+            switch (format[0])
+            {
+                case 'X':
+                    if (aThis == 0)
                     {
-                        result = aThis % 16 + result;
+                        sb.Append('0');
+                        break;
                     }
-                    else
-                    {
-                        string temp = "";
 
-                        switch (aThis % 16)
+                    int value = aThis;
+
+                    while (value != 0)
+                    {
+                        int remainder = value % 16;
+                        if (remainder < 10)
                         {
-                            case 10: temp = "A"; break;
-                            case 11: temp = "B"; break;
-                            case 12: temp = "C"; break;
-                            case 13: temp = "D"; break;
-                            case 14: temp = "E"; break;
-                            case 15: temp = "F"; break;
+                            sb.Insert(0, remainder);
+                        }
+                        else
+                        {
+                            char temp = (char)('A' + (remainder - 10));
+                            sb.Insert(0, temp);
                         }
 
-                        result = temp + result;
+                        value /= 16;
                     }
+                    break;
+                case 'D':
+                    sb.Append(aThis);
+                    break;
+                default:
+                    return aThis.ToString();
+            }
 
-                    aThis /= 16;
-                }
+            var result = sb.ToString();
 
-                return result;
+            if (format.Length > 1)
+            {
+                return int.TryParse(format.AsSpan(1), out int number) ? result.PadLeft(number, '0') : aThis.ToString();
             }
             else
             {
-                return aThis.ToString();
+                return result;
             }
         }
 

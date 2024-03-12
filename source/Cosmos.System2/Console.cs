@@ -1,26 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Cosmos.HAL;
+using Cosmos.System.IO;
+using static Cosmos.System.Console;
 
+#nullable enable
 namespace Cosmos.System
 {
     /// <summary>
     /// Represents the standard console output stream.
     /// </summary>
-    public class Console
+    public partial class Console
     {
         private const byte LineFeed = (byte)'\n';
         private const byte CarriageReturn = (byte)'\r';
         private const byte Tab = (byte)'\t';
         private const byte Space = (byte)' ';
+        private const int WriteBufferSize = 256;
+        private const int NumberOfSpacesForTab = 4;
+
+        private SyncTextReader? _stdInReader;
+        private Stream? stdOut, stdIn, stdError;
 
         /// <summary>
         /// The underlying X cursor location field.
         /// </summary>
         protected int mX = 0;
+        /// <summary>
+        /// The underlying Cached X cursor location field.
+        /// </summary>
+        protected int cX = 0;
 
         /// <summary>
         /// The text cursor location in the X (horizontal) axis.
@@ -30,8 +43,57 @@ namespace Cosmos.System
             get => mX;
             set
             {
-                mX = value;
+                if (value < 0)
+                {
+                    if (mY > 0)
+                    {
+                        mY--;
+                    }
+
+                    mX = Cols - 1;
+                }
+                else if (value >= mText.Cols)
+                {
+                    cY = mY;
+                    DoLineFeed();
+                    mY = cY;
+                    mX = cX;
+                }
+                else
+                {
+
+                    mX = value;
+                }
                 UpdateCursor();
+            }
+        }
+
+        /// <summary>
+        /// The text cached cursor location in the X (horizontal) axis.
+        /// </summary>
+        public int CachedX
+        {
+            get => cX;
+            set
+            {
+                if (value < 0)
+                {
+                    if (cY > 0)
+                    {
+                        cY--;
+                    }
+
+                    cX = mText.Cols - 1;
+                }
+                else if(value >= mText.Cols)
+                {
+                    DoLineFeed();
+                }
+                else
+                {
+                
+                    cX = value;
+                }
             }
         }
 
@@ -39,6 +101,10 @@ namespace Cosmos.System
         /// The underlying Y cursor location field.
         /// </summary>
         protected int mY = 0;
+        /// <summary>
+        /// The underlying Cached Y cursor location field
+        /// </summary>
+        protected int cY = 0;
 
         /// <summary>
         /// Get and set cursor location on Y axis.
@@ -48,8 +114,42 @@ namespace Cosmos.System
             get => mY;
             set
             {
-                mY = value;
+                if (value < 0)
+                {
+                    mY = 0;
+                }
+                else if (value >= mText.Rows)
+                {
+                    cY = mText.Rows - 1;
+                    DoLineFeed();
+                }
+                else
+                {
+                    cY = value;
+                }
                 UpdateCursor();
+            }
+        }
+
+        public int CachedY
+        {
+            get => cY;
+            set
+            {
+                if (value < 0)
+                {
+                    cY = 0;
+                }
+                else if (value >= mText.Rows)
+                {
+                    cY = mText.Rows - 1;
+                    DoLineFeed();
+                    UpdateCursorFromCache();
+                }
+                else
+                {
+                    cY = value;
+                }
             }
         }
 
@@ -97,10 +197,12 @@ namespace Cosmos.System
         /// </summary>
         public void Clear()
         {
-            mText.Clear();
-            mX = 0;
-            mY = 0;
-            UpdateCursor();
+            if (!IsStdOutRedirected())
+            {
+                mText.Clear();
+                cX = cY = mX = mY = 0;
+                UpdateCursor();
+            }
         }
 
         //TODO: This is slow, batch it and only do it at end of updates
@@ -109,6 +211,15 @@ namespace Cosmos.System
         /// </summary>
         protected void UpdateCursor()
         {
+            cX = mX;
+            cY = mY;
+            mText.SetCursorPos(mX, mY);
+        }
+
+        public void UpdateCursorFromCache()
+        {
+            mX = cX;
+            mY = cY;
             mText.SetCursorPos(mX, mY);
         }
 
@@ -117,14 +228,13 @@ namespace Cosmos.System
         /// </summary>
         private void DoLineFeed()
         {
-            mY++;
-            mX = 0;
-            if (mY == mText.Rows)
+            cY++;
+            cX = 0;
+            if (cY == mText.Rows)
             {
                 mText.ScrollUp();
-                mY--;
+                cY--;
             }
-            UpdateCursor();
         }
 
         /// <summary>
@@ -133,8 +243,7 @@ namespace Cosmos.System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DoCarriageReturn()
         {
-            mX = 0;
-            UpdateCursor();
+            cX = 0;
         }
 
         /// <summary>
@@ -143,10 +252,16 @@ namespace Cosmos.System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DoTab()
         {
-            Write(Space);
-            Write(Space);
-            Write(Space);
-            Write(Space);
+            // Calculate the remainder when CachedX is divided by the NumberOfSpacesForTab
+            int remainder = cX % NumberOfSpacesForTab;
+
+            // if remainder is 0 then we will do a complete new tab, otherwise we will do what needs to be done to complete a tab
+            remainder = (remainder == 0) ? NumberOfSpacesForTab : (NumberOfSpacesForTab - remainder);
+
+            for (int i = 0; i < remainder; i++)
+            {
+                Write(Space);
+            }
         }
 
         /// <summary>
@@ -155,13 +270,23 @@ namespace Cosmos.System
         /// <param name="aChar">A char to write</param>
         public void Write(byte aChar)
         {
-            mText[mX, mY] = aChar;
-            mX++;
-            if (mX == mText.Cols)
+            Write(aChar, cX, cY);
+        }
+
+        /// <summary>
+        /// Write char to the console.
+        /// </summary>
+        /// <param name="aChar">A char to write.</param>
+        /// <param name="left">X axis position.</param>
+        /// <param name="top">Y axis position.</param>
+        public void Write(byte aChar, int left, int top)
+        {
+            mText[left, top] = aChar;
+            cX++;
+            if (cX == mText.Cols)
             {
                 DoLineFeed();
             }
-            UpdateCursor();
         }
 
         //TODO: Optimize this
@@ -171,7 +296,7 @@ namespace Cosmos.System
         /// </summary>
         /// <param name="aText">The byte array to write to the console.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Write(byte[] aText)
+        public void Write(ReadOnlySpan<byte> aText)
         {
             if (aText == null)
             {
@@ -180,6 +305,12 @@ namespace Cosmos.System
 
             for (int i = 0; i < aText.Length; i++)
             {
+                if (aText[i] == '\0')
+                {
+                    // Skipping Null chars given by StreamWriter
+                    continue;
+                }
+
                 switch (aText[i])
                 {
                     case LineFeed:
@@ -201,7 +332,6 @@ namespace Cosmos.System
                 }
             }
         }
-
         /// <summary>
         /// The foreground color of the displayed text.
         /// </summary>
@@ -239,6 +369,83 @@ namespace Cosmos.System
             }
         }
 
+        public Stream OpenStandardInput()
+        {
+            return stdIn ??= new CosmosConsoleStream(FileAccess.Read);
+        }
+
+        public Stream OpenStandardOutput()
+        {
+            return stdOut ??= new CosmosConsoleStream(FileAccess.Write);
+        }
+
+        public Stream OpenStandardError()
+        {
+            return stdError ??= new CosmosConsoleStream(FileAccess.Write);
+        }
+
+        public static bool IsStdInRedirected()
+        {
+            return global::System.Console.In switch
+            {
+                null => false /* only used on create, if GetOrCreateReader is changed then this may be not needed */,
+                SyncTextReader sync => !sync.IsStdIn,
+                _ => true
+            };
+        }
+
+        public static bool IsStdOutRedirected()
+        {
+            return !(global::System.Console.Out is StreamWriter streamWriter
+                    && streamWriter.BaseStream is Console.CosmosConsoleStream);
+        }
+
+        public static bool IsStdErrorRedirected()
+        {
+            return !(global::System.Console.Error is StreamWriter streamWriter
+                    && streamWriter.BaseStream is Console.CosmosConsoleStream);
+        }
+
+        public TextReader GetOrCreateReader()
+        {
+            return StdInReader;
+        }
+        public TextWriter CreateOutputWriter(Stream outputStream) => outputStream == Stream.Null ?
+               TextWriter.Null :
+               (new StreamWriter(
+                   stream: outputStream,
+                   encoding: global::System.Console.OutputEncoding.RemovePreamble(),
+                   bufferSize: WriteBufferSize,
+                   leaveOpen: true)
+                {
+                    AutoFlush = true
+                });
+        public ConsoleKeyInfo ReadKey(bool intercept)
+        {
+            if (global::System.Console.IsInputRedirected)
+            {
+                // The biggest lie i have seen in my life...
+                throw new InvalidOperationException("Can not read console keys as input is redirected.");
+            }
+
+            ConsoleKeyInfo keyInfo = StdInReader.ReadKey(out bool previouslyProcessed);
+
+            if (!intercept && !previouslyProcessed && keyInfo.KeyChar != '\0')
+            {
+                global::System.Console.Write(keyInfo.KeyChar);
+            }
+            return keyInfo;
+        }
+
+        public void ResetInternalStdIn()
+        {
+            _stdInReader = null;
+        }
+
+        internal SyncTextReader StdInReader => _stdInReader ??= SyncTextReader
+                    .GetSynchronizedTextReader(new StdInReader(global::System.Console.InputEncoding));
+
+
         /// <summary>
         /// Get or sets the visibility of the cursor.
         /// </summary>
@@ -246,6 +453,17 @@ namespace Cosmos.System
         {
             get => mText.GetCursorVisible();
             set => mText.SetCursorVisible(value);
+        }
+    }
+    internal static class EncodingExtensions
+    {
+        public static Encoding RemovePreamble(this Encoding encoding)
+        {
+            if (encoding.Preamble.Length == 0)
+            {
+                return encoding;
+            }
+            return new ConsoleEncoding(encoding);
         }
     }
 }

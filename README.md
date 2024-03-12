@@ -20,11 +20,7 @@
   <a href="https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt">
     <img src="https://img.shields.io/github/license/CosmosOS/Cosmos" />
   </a>
-
-  <a href="https://github.com/CosmosOS/Cosmos/issues">
-    <img src="https://img.shields.io/github/issues/CosmosOS/Cosmos" />
-  </a>
-
+  
   <a href="https://discord.com/invite/kwtBwv6jhD">
     <img src="https://img.shields.io/discord/833970409337913344" />
   </a>
@@ -45,24 +41,25 @@ In a project, Cosmos can be thought of as a compiler and a sort-of standard libr
 The following is a non-exhaustive list of features that Cosmos offers:
 
 - Low level assembly access and pointer memory control
-- A basic (and unstable at the moment) filesystem
+- A basic filesystem
 - Most features found in the .NET core library
 - A CPU/FPU accelerated math library
 - A basic graphics interface
 - A basic network interface
 - A basic audio interface
 
-> **Note**
+## Setting it up
 
-> Use [embeded resources](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html) instead of the FS for now.
-
-<hr/>
+Cosmos has an article [here](https://cosmosos.github.io/install.html) on how to do that.
 
 ## Documentation
 
-For instructions on how to install and use Cosmos, please visit the [Cosmos website](http://www.gocosmos.org).
-For documentation and technical information, see the [Cosmos Documentation](https://cosmosos.github.io).
+The Cosmos documentation can be found [here](https://cosmosos.github.io/api/Cosmos.Build.Common.html).
 
-If you have questions about how to use Cosmos, want to show off what you have made or have general questions, go check out [GitHub Discussions](https://github.com/CosmosOS/Cosmos/discussions). Alternatively, you can also join our [Discord server](https://discord.com/invite/kwtBwv6jhD)! If you think you found a bug in Cosmos, please check existing [issues](https://github.com/CosmosOS/Cosmos/issues) first before opening a new one. 
+If you still have any questions on how to use Cosmos, you can open a [discussion](https://github.com/CosmosOS/Cosmos/discussions) or you can join the [Discord server](https://discord.com/invite/kwtBwv6jhD)!
 
-</p>
+The devkit changelog can be found [here](https://cosmosos.github.io/articles/Changelog.html).
+
+## Reporting an issue
+
+If you think you found a bug in Cosmos, please check existing [issues](https://github.com/CosmosOS/Cosmos/issues) first before opening a new one. Do **not** open an issue if you need help with something in Cosmos that is not a bug, if you don't know how to code it's not a Cosmos issue for example.

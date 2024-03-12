@@ -1,0 +1,46 @@
+﻿<Window x:Class="Cosmos.Build.Builder.Views.OptionsDialog"
+        x:Name="optionsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Icon="/Cosmos.Build.Builder;component/Resources/Cosmos.ico"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        Title="Choose Build Options"
+        WindowStartupLocation="CenterScreen"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="MinWidth" Value="48" />
+            <Setter Property="Padding" Value="8,3" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="8"
+          MinWidth="400">
+
+        <StackPanel Grid.Row="0"
+                    Margin="8">
+
+            <CheckBox x:Name="chkBuildExtensions" IsChecked="True">Install Visual Studio Extensions</CheckBox>
+            <CheckBox x:Name="chkBuildUserkit">Build a userkit</CheckBox>
+
+            <StackPanel Grid.Row="2"
+                        HorizontalAlignment="Right"
+                        Margin="0,8,0,0"
+                        Orientation="Horizontal">
+                <Button Content="OK" Margin="0,0,5,0" Click="OkButton_Click"/>
+            </StackPanel>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>
