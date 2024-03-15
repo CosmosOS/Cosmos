@@ -1115,7 +1115,7 @@
           "System.Reflection.TypeExtensions": "[4.7.0, )",
           "System.Runtime.CompilerServices.Unsafe": "[5.0.0, )",
           "System.Runtime.Loader": "[4.3.0, )",
-          "XSharp": "[0.1.0-localbuild, )"
+          "XSharp": "[10.0.0, )"
         }
       },
       "dapperextensions.strongname": {
@@ -1150,7 +1150,7 @@
       "xsharp": {
         "type": "Project",
         "dependencies": {
-          "Spruce": "[0.1.0-localbuild, )"
+          "Spruce": "[10.0.0, )"
         }
       }
     }

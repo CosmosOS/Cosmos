@@ -28,7 +28,7 @@
       "xsharp": {
         "type": "Project",
         "dependencies": {
-          "Spruce": "[0.1.0-localbuild, )"
+          "Spruce": "[10.0.0, )"
         }
       }
     }
