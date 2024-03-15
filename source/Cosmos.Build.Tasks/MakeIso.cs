@@ -14,6 +14,9 @@ namespace Cosmos.Build.Tasks
         [Required]
         public string OutputFile { get; set; }
 
+        [Required]
+        public bool UseUEFI { get; set; }
+
         protected override string ToolName => IsWindows() ? "xorriso.exe" : "xorriso";
 
         protected override MessageImportance StandardErrorLoggingImportance => MessageImportance.High;
@@ -67,15 +70,24 @@ namespace Cosmos.Build.Tasks
             xBuilder.AppendSwitch("-l");
             xBuilder.AppendSwitch("-allow-lowercase");
             xBuilder.AppendSwitchIfNotNull("-o ", OutputFile);
-            xBuilder.AppendSwitch(" -b boot/limine-bios-cd.bin");
+            xBuilder.AppendSwitch("-b boot/limine-bios-cd.bin");
             xBuilder.AppendSwitch("-no-emul-boot");
             xBuilder.AppendSwitch("-boot-load-size 4");
             xBuilder.AppendSwitch("-boot-info-table");
-            xBuilder.AppendSwitch("--efi-boot boot/limine-uefi-cd.bin");
-            xBuilder.AppendSwitch("-efi-boot-part");
-            xBuilder.AppendSwitch("--efi-boot-image");
-            xBuilder.AppendFileNameIfNotNull(IsoDirectory.TrimEnd('\\', '/'));
 
+            if (UseUEFI)
+            {
+                Log.LogMessage(MessageImportance.High, "UEFI enabled.");
+                xBuilder.AppendSwitch("--efi-boot boot/limine-uefi-cd.bin");
+                xBuilder.AppendSwitch("-efi-boot-part");
+                xBuilder.AppendSwitch("--efi-boot-image");
+            }
+            else
+            {
+                Log.LogMessage(MessageImportance.High, "UEFI switches will not be added.");
+            }
+            
+            xBuilder.AppendFileNameIfNotNull(IsoDirectory.TrimEnd('\\', '/'));
             Log.LogMessage(MessageImportance.High, xBuilder.ToString());
 
             return xBuilder.ToString();
