@@ -1,20 +1,34 @@
 # Introduction
 
-The Cosmos Graphic Subsystem (CGS from now on) is based on the abstraction of Canvas that is an empty space in which the user of CGS can draw its content. CGS is not a widget toolkit as Winforms or Gnome / GTK but is thought to be more lower level and it will be the basic in which widget toolkits will be implemented. CGS hides the graphics driver (so far VGA, VBE and SVGAII) used and it is thought to be the universal way to draw on the screen in Cosmos.
+The Cosmos Graphic Subsystem *(abbr. CGS)* is based on the abstraction of Canvas that is an empty space in which the user of CGS can draw its content. CGS is not a widget toolkit like Winforms or Gnome / GTK, but is thought to be more lower level and is the basic foundation in which widget toolkits will be implemented. CGS hides the graphics driver (so far VGA, VBE and SVGAII) used and it is thought to be the universal way to draw on the screen in Cosmos.
 
 # FullScreenCanvas
 The `FullScreenCanvas` provides two methods to get a canvas instance for the screen. It automatically chooses the best available driver to use.
 
-`public static Canvas GetFullScreenCanvas(Mode mode)`: gets the instance of Canvas representing the complete screen in the specified mode
+`public static Canvas GetFullScreenCanvas(Mode mode)`: gets the instance of Canvas representing the complete screen in the specified mode. The modes currently available are as follows:
 
-`public static Canvas GetFullScreenCanvas()`: gets the instance of Canvas representing the complete screen in the best driver available on your platform
+```CSharp
+320x240, 32
+640x480, 32
+800x600, 32
+1024x768, 32
+1280x720, 32
+1280x768, 32
+1280x1024, 32
+1366x768, 32
+1680x1050, 32
+1920x1080, 32
+1920x1200, 32
+```
+
+`public static Canvas GetFullScreenCanvas()`: gets the instance of Canvas representing the complete screen in the best driver available on your platform.
 
 # Canvas
 
 ## List of Properties of the Canvas class
 
-`Mode`: get / set the mode of the video card to mode. It throws if the selected mode is not supported by the video card
-`DefaultGraphicMode`: default graphic mode this will change based on the underlying hardware
+`Mode`: get / set the mode of the video card to mode. It throws if the selected mode is not supported by the video card.\
+`DefaultGraphicMode`: default graphic mode this will change based on the underlying hardware\
 `AvailableModes`: list of the available modes supported this will change based on the underlying hardware
 
 ## List of Methods of the Canvas class
@@ -35,7 +49,7 @@ The `FullScreenCanvas` provides two methods to get a canvas instance for the scr
 
 
 Really simple right?
-# A working example (devkit only!)
+# A working example (DevKit only!)
 ```CSharp
 using System;
 using Sys = Cosmos.System;
@@ -64,7 +78,7 @@ namespace GraphicTest
                     243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148, 255, 10, 66, 148,
                     255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255,
                     0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, 0, 255, 243, 255, }, ColorDepth.ColorDepth32);
-
+        
         protected override void BeforeRun()
         {
             // If all works correctly you should not really see this :-)
@@ -122,14 +136,14 @@ namespace GraphicTest
 ```
 # Limitations of the current implementation
 
-1. Only 32 bit color depth is actually supported, the API provides methods to set a resolution with 24, 16, 8 and 4 bit but the low level Bochs driver has not yet implemented them. 
-If you use SVGAIICanvas, you can use 24 bit Color depth and if you use VGACanvas there are 3 modes: 320x200x8, 640x480x4 and 720x480x4.
+1. Only 32-bit color depth is actually supported. The API provides methods to set a resolution with 24, 16, 8 and 4 bit but the low level Bochs driver has not yet implemented them. 
+If you use SVGAIICanvas, you can use 24 bit Color depth, and if you use VGACanvas there are 3 modes: 320x200x8, 640x480x4 and 720x480x4.
 
 2. In addition, some other nice things could be implemented:
-    - Plugging System.Drawing functions for easier manipulation of colors
+    - Plugging System.Drawing functions for easier manipulation of colors.
+    - Plugging of System.Drawing functions for easier implementation of image conversion.
 
-3. CGS interacts badly with the uncaught exceptions and Kernel.Stop method: the screen will freeze without displaying any error message whatsoever. You must use the Sys.Power.Shutdown() function to properly shut down your computer.
+3. CGS interacts badly with uncaught exceptions and the Kernel.Stop method: the screen will freeze without displaying any error message whatsoever. You must use the Sys.Power.Shutdown() function to properly shut down your computer.
 
 # Old examples 
-
-In the web there are a lot of tutorials explaining how to use graphics in Cosmos, but most of them are outdated. Just remember that the new Mouse class is Sys.MouseManager and Pen has been replaced with Color.
+On the internet, there have been a lot of tutorials explaining how to use graphics in Cosmos, but most of them are outdated. Just remember that the new Mouse class is Sys.MouseManager and Pen has been replaced with Color.

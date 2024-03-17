@@ -1,10 +1,11 @@
 # File System
 
-In this article we will discuss about using Cosmos VFS (virtual file system).
-Cosmos VFS and the VFS manager classes, let you manage your file system.
+In this article, we will discuss about using Cosmos VFS (virtual file system).\
+Cosmos VFS and the VFSManager classes, let you manage your file system.
 
-**Attention**: **Always** format your drive with Cosmos and **only** Cosmos if you plan to use it with Cosmos. Using any other tool such as Parted, FDisk (or any other tool) might lead to weird things when using that drive with Cosmos' VFS. Those tools are much more advanced and might format and read/write to the disk differently than Cosmos.
-**WARNING!**: Please do **not** try this on actual hardware! It may cause **IRREPARBLE DAMAGE** to your data. It is recommended to use a virtual machine like VMware, Hyper-V, just to name a few.
+**Attention**: **Always** format your drive with Cosmos and **only** Cosmos if you plan to use it with Cosmos. Using any other tool such as Parted, FDisk, or any other tool might lead to weird things when using that drive with Cosmos' VFS. Those tools are much more advanced and might format and read/write to the disk differently than Cosmos.
+
+**WARNING!**: Please do **not** try this on actual hardware! It may cause **IRREPARBLE DAMAGE** to your data. It is recommended to use a virtual machine like VMware or VirtualBox, just to name a few.
 
 First, we should create and initialize an instance of the VFS, this will initialize the partition and files-system lists, as well as register the new VFS.
 This is essential for using the VFS.
@@ -21,13 +22,14 @@ Next, we register our VFS at the VFS manager, this will initiate the VFS and mak
 Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
 ```
 
-**Note**: From now on, we'll be using some plugged functions from ``System.IO``, so be sure to use that reference to your code. Alright, now, let's get started over some useful functions:
+**Note**: From now on, we'll be using some plugged functions from ``System.IO``, so be sure to use that reference to your code. Now, let's get started over some useful functions:
 
 ## Format disks
 
 **Note**: You don't have to format your drive if you're debugging your Cosmos project with VMWare. The build will automatically add an already formatted FAT32 VMDK file for your convenience.
 
-You can get all available disks using `VFSManager.GetDisks()`. The methods to get information about the disk or format it can be found under the [Disk](https://cosmosos.github.io/api/Cosmos.System.FileSystem.Disk.html) class. To format a disk use the [`FormatDisk(int index, string format, bool quick = true)`](https://cosmosos.github.io/api/Cosmos.System.FileSystem.Disk.html#Cosmos_System_FileSystem_Disk_FormatPartition_System_Int32_System_String_System_Boolean_)
+You can get all available disks using `VFSManager.GetDisks()`. The methods to get information about the disk or format it can be found under the [Disk](https://cosmosos.github.io/api/Cosmos.System.FileSystem.Disk.html) class. 
+To format a disk use the [`FormatDisk(int index, string format, bool quick = true)`](https://cosmosos.github.io/api/Cosmos.System.FileSystem.Disk.html#Cosmos_System_FileSystem_Disk_FormatPartition_System_Int32_System_String_System_Boolean_)
 method.
 
 
@@ -42,8 +44,8 @@ Console.WriteLine("Available Free Space: " + available_space);
 
 ![Free Space](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Free%20Space.PNG)
 
-You have probably noticed the "0:\" argument passed to this function, this is the id of the drive that we want to get available free space of.
-Cosmos using DOS drive naming system and this is why we use "0".
+You have probably noticed the "0:\" argument passed to this function, this is the ID of the drive that we want to get available free space of.
+Cosmos uses the DOS drive naming system, this is why we use "0".
 
 **Attention**: Typing "0:/" instead of "0:\\" might lead to errors, you've been warned.
 
@@ -59,7 +61,7 @@ var fs_type = fs.GetFileSystemType(@"0:\");
 Console.WriteLine("File System Type: " + fs_type);
 ```
 
-## Get files list
+## Get list of file
 
 We start by getting a list of files, using:
 
@@ -78,7 +80,7 @@ foreach (var file in files_list)
 
 ![Files List](https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/articles/Kernel/images/File%20System%20Files%20List.PNG)
 
-## Get directory listing (Files and directories)
+## Get directory listing (files and other directories)
 
 You can get files and directory listing by using this code: 
 
@@ -143,13 +145,13 @@ catch (Exception e)
 }
 ```
 
-## Create a new Directory
+## Create a new directory
 Here is a example of code of creating a new directory:
 
 ```C#
 try
 {
-    Directory.Create(@"0:\testing\");
+    Directory.Create(@"0:\testdirectory\");
 }
 catch (Exception e)
 {
@@ -165,7 +167,7 @@ You can also delete files or directories using this code:
 try
 {
     File.Delete(@"0:\testing.txt");
-    Directory.Delete(@"0:\testing\");
+    Directory.Delete(@"0:\testdirectory\");
 }
 catch (Exception e)
 {
@@ -192,7 +194,7 @@ catch (Exception e)
 
 ## Move a file
 
-Actually, File.Move() is not plugged in Cosmos, so you need to Copy the file and then delete the old file.
+File.Move() is not currently plugged in Cosmos, so you need to copy the file and then delete the old file.
 Here is an example Method:
 ```C#
 public static void MoveFile(string file, string newpath)
@@ -212,7 +214,7 @@ public static void MoveFile(string file, string newpath)
 
 ## Read all text from a specific file
 
-Now we will read a specific file from a given path.  
+Now, we will read a specific file from a given path.
 As usual, we'll do it in a try catch block.
 
 ```C#
@@ -230,7 +232,7 @@ catch (Exception e)
 
 # Read All bytes from a specific file
 
-As like the ReadAllText Method, ReadAllBytes should return all bytes the bytes from a file.
+As like the ReadAllText Method, ReadAllBytes should return all bytes the bytes from a file. You can use this to load files that include data and not just text.
 
 ```C#
 try

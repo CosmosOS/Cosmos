@@ -4,27 +4,20 @@
 
 Cosmos (C# Open Source Managed Operating System) is an operating system
 development kit which uses Visual Studio as its development environment.
-Despite C# in the name any .NET based language can be used including VB.NET,
+Despite C# in the name, any .NET based language can be used, including VB.NET,
 Fortran, Delphi Prism, IronPython, F# and more. Cosmos itself and the kernel
 routines are primarily written in C#, and thus the Cosmos name. Besides that,
-NOSMOS (.NET Open Source Managed Operating System) sounds stupid.
+NOSMOS (.NET Open Source Managed Operating System) sounds silly.
 
-Cosmos is not an operating system in the traditional sense, but instead it is
-an "Operating System Kit", or as I like to say "Operating System Legos".
-Cosmos lets you create operating systems just as Visual Studio and C# normally
-let you create applications. Most users can write and boot their own operating
-system in just a few minutes, all using Visual Studio. You can debug your operating system directly from Visual
-Studio using breakpoints.
+Cosmos diverts from traditional operating systems because it is not an operating system in the conventional sense; rather, it is an "Operating System Kit," similar to "Operating System Legos". With Cosmos, you have the flexibility to construct operating systems just as how Visual Studio and C# help you develop applications. Using Visual Studio, most users can swiftly write and boot their own operating system within minutes. Additionally, debugging your operating system directly from Visual Studio is a feature, allowing for efficient troubleshooting through breakpoints.
 
-Cosmos is available in two distributions, the developer kit (dev kit), and the user kit. The dev kit is designed for users who want to work on Cosmos itself.
-The user kit is designed for those who are interested in building their own
-operating system and doing some Cosmos work. The dev kit might be thought of
-as the Cosmos SDK. Most users should start off with the user kit as it is not
-so overwhelming like the dev kit. This article focuses on the user kit.
+Cosmos is available in two distributions, the developer kit (abbr. *DevKit*), and the user kit. 
+The DevKit was originally designed for those who want to work on Cosmos's core features, but now has superceded the inferior user kit due to having much more technical ability.
+The User Kit was designed for those who are interested in building their own operating system and doing some Cosmos work. Since the User Kit is so heavily outdated, it is often recommended to download the DevKit when installing. The documentation will cover both.
 
 ##  Writing your first Operating System
 
-Create a new project as you would any C# project, but select Cosmos as the project type.
+Once you have installed Cosmos (see other docs), you can create a new project as you would any C# project, but select Cosmos as the project type.
 
 ![](images/SNAG-0000.png)
 
@@ -39,8 +32,8 @@ console window, you will see the following:
 ![](images/SNAG-0003.png)
 
 This is your operating system running in VMware Player! Cosmos can of course
-also be booted in VMware Workstation, Hyper-V, Virtual PC, Bochs, or on real
-hardware. But by default Cosmos uses VMware Player because it is both free,
+also be booted in VMware Workstation, VirtualBox, Bochs, or on real
+hardware. But by default, Cosmos uses VMware Player because it is both free,
 and reliable. Cosmos can even debug in Visual Studio, even when running on
 another machine.
 
@@ -48,10 +41,10 @@ another machine.
 
 Debugging is a major issue with operating system development. The Cosmos team
 was not content enough to simply conquer building and deployment, we want to
-make developing operating system as easy as developing Windows applications.
+make developing operating systems as easy as developing Windows applications.
 Debugging a Cosmos based operating system should feel very familiar to you.
 Lets modify our project a little bit to show the effect, and set a breakpoint. 
-**Note that the debugger only works in Visual Studio, and not Linux**
+*Note that the debugger only works in Visual Studio, and not Linux!*
 
 ![](images/SNAG-0005.png)
 
@@ -59,20 +52,20 @@ Now run the project again.
 
 ![](images/SNAG-0007.png)
 
-Note that the execution stopped at "One"? That is becuase in Visual Studio our
+Notice how the execution stopped at "One"? That is becuase in Visual Studio our
 project has stopped on a breakpoint. Simply press F5 to continue just as you
 would in a normal application!
 
-In addition to breakpoints Cosmos also supports step into (F11) as well. Trace
+In addition to breakpoints, Cosmos also supports step into (F11) as well. Trace
 over (F10) is not supported yet.
 
 ##  Debugger Communication
 
 The debugger uses the serial port to communicate. Because of this, debugging
-only works wtih virtualization environments that support serial ports such as
+only works within virtualization environments that support serial ports, such as
 VMware. QEMU supports serial ports as well, but its serial port implementation
 is seriously broken on Windows and makes debugging impossible using QEMU. To
-debug on real hardware, you must use a physical serial cable. In the future
+debug on real hardware, you must use a physical serial cable. In the future,
 Cosmos will also support debugging over Ethernet.
 
 ##  Extra Debugging
@@ -109,7 +102,7 @@ Both functions will produce the same result.
 
 ##  Debug Output
 
-Debug strings can be output to the debug window of the host. Because Cosmos
+Debug strings can be outputted to the debug window of the host. Because Cosmos
 does not support watches yet, this functionality can be very useful for
 watching variable values and for performing tracing without breakpoints.
 
@@ -124,13 +117,13 @@ and it will appear in the Visual Studio output window.
 ##  What's the catch?
 
 There really is no catch. Everything we've shown here is functioning as seen.
-No mockups were used. However we still have a lot of work to go. Items of
-interest that are on our current task list include threads and networking. 
+No mockups were used. However, we still have a lot of work to do. Items of
+interest that are on our current task list include multithreading and x64 systems. 
 We have prototypes and experiments for each, but none have been rolled into 
 the mainline Cosmos development as of yet.
 
 ##  Obtaining Cosmos
 
-  * Cosmos Website - [http://www.GoCosmos.org](http://www.GoCosmos.org)
-  * Source Code - Both dev kit and user kit - [http://github.com/CosmosOS/Cosmos/](http://github.com/CosmosOS/Cosmos/)
+  * Cosmos website - [http://www.GoCosmos.org](http://www.GoCosmos.org)
+  * Source code - Both DevKit and User Kit - [http://github.com/CosmosOS/Cosmos/](http://github.com/CosmosOS/Cosmos/)
 

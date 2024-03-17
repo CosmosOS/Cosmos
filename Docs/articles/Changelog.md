@@ -1,4 +1,4 @@
-# Devkit changelog
+# DevKit changelog
 
 ## c5c087c697d106348adbcff86d5d43331500e648 (update then merged in)
 

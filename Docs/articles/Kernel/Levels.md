@@ -1,6 +1,6 @@
 # Levels
 
-**Warning** This article is for a older version of Cosmos and it doesn't work for current version.
+**Warning:** This article is for a older version of Cosmos, and as such, does not represent the current version included in the DevKit.
 
 The security model of Cosmos will evolve and mature as
 Cosmos does, however the base model is presented here.
