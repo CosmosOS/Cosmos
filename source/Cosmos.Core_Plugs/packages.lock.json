@@ -348,8 +348,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.5",
-        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg==",
+        "resolved": "4.8.6",
+        "contentHash": "2Ij/LCaTQRyAi5lAv7UUTV9R2FobC8xN9mE0fXBZohum/xLl8IZVmE98Rq5ugQHjCgTBRKqpXRb4ORulRdA6Ig==",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.7.0",
           "System.Security.Principal.Windows": "4.7.0",
@@ -1160,7 +1160,7 @@
           "SQLitePCLRaw.core": "[2.0.6, )",
           "SQLitePCLRaw.lib.e_sqlite3.linux": "[1.1.14, )",
           "System.ComponentModel.Annotations": "[5.0.0, )",
-          "System.Data.SqlClient": "[4.8.5, )",
+          "System.Data.SqlClient": "[4.8.6, )",
           "System.IO.MemoryMappedFiles": "[4.3.0, )",
           "System.Reflection.Metadata": "[5.0.0, )"
         }

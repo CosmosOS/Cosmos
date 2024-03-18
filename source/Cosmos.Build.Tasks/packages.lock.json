@@ -39,6 +39,15 @@
           "Microsoft.NETFramework.ReferenceAssemblies.net48": "1.0.3"
         }
       },
+      "Microsoft.NETFramework.ReferenceAssemblies": {
+        "type": "Direct",
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "vUc9Npcs14QsyOD01tnv/m8sQUnGTGOw1BCmKcv77LBJY7OxhJ+zJF7UD/sCL3lYNFuqmQEVlkfS4Quif6FyYg==",
+        "dependencies": {
+          "Microsoft.NETFramework.ReferenceAssemblies.net48": "1.0.3"
+        }
+      },
       "Dapper.StrongName": {
         "type": "Transitive",
         "resolved": "2.0.90",
@@ -164,8 +173,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.5",
-        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg=="
+        "resolved": "4.8.6",
+        "contentHash": "2Ij/LCaTQRyAi5lAv7UUTV9R2FobC8xN9mE0fXBZohum/xLl8IZVmE98Rq5ugQHjCgTBRKqpXRb4ORulRdA6Ig=="
       },
       "System.Diagnostics.Process": {
         "type": "Transitive",
@@ -309,7 +318,7 @@
           "SQLitePCLRaw.core": "[2.0.6, )",
           "SQLitePCLRaw.lib.e_sqlite3.linux": "[1.1.14, )",
           "System.ComponentModel.Annotations": "[5.0.0, )",
-          "System.Data.SqlClient": "[4.8.5, )",
+          "System.Data.SqlClient": "[4.8.6, )",
           "System.IO.MemoryMappedFiles": "[4.3.0, )",
           "System.Reflection.Metadata": "[5.0.0, )"
         }
@@ -337,8 +346,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.5",
-        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg=="
+        "resolved": "4.8.6",
+        "contentHash": "2Ij/LCaTQRyAi5lAv7UUTV9R2FobC8xN9mE0fXBZohum/xLl8IZVmE98Rq5ugQHjCgTBRKqpXRb4ORulRdA6Ig=="
       },
       "System.Diagnostics.Process": {
         "type": "Transitive",

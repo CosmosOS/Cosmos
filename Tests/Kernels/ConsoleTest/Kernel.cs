@@ -5,6 +5,7 @@ using Cosmos.System.Graphics;
 using System.Text;
 using Cosmos.System.ExtendedASCII;
 using Cosmos.System.ScanMaps;
+using System.IO;
 
 /*
  * Please note this is an atypical TestRunner:
@@ -32,6 +33,8 @@ namespace ConsoleTest
         {
             try
             {
+                TestStandardInOutError();
+
                 TestConsoleEncoding();
 
                 TestVGAResolutions();
@@ -134,6 +137,8 @@ namespace ConsoleTest
             Console.WriteLine("Press any key to terminate this test...");
 
             Console.ReadKey();
+
+
         }
 
         public void TestVGAResolutions()
@@ -166,6 +171,132 @@ namespace ConsoleTest
             Console.ReadKey();
             var cursor = Console.GetCursorPosition();
             Console.SetCursorPosition(cursor.Left, cursor.Top - 1);
+        }
+
+        public void TestStandardInOutError()
+        {
+            TestInstantiation();
+            TestRedirection();
+
+            Console.WriteLine("Let's put the StdOutput on a variable.");
+            Console.WriteLine("Hello World from Console!");
+            var stdout = Console.Out;
+            stdout.WriteLine("Hello World from variable!");
+
+            Console.Error.WriteLine("Hellow World from Console.Error!");
+            var stderr = Console.Error;
+            Console.WriteLine("Now the StdError");
+            stderr.WriteLine("Hellow World from stderr variable!");
+
+            Console.WriteLine("Now let's test reading.");
+            var line = Console.ReadLine();
+            Console.WriteLine($"You wrote {line}");
+            var stdin = Console.In;
+
+            Console.Write("Type Something Again: ");
+            line = stdin.ReadLine();
+            Console.WriteLine($"You wrote {line}");
+        }
+
+        public void TestInstantiation()
+        {
+            TextWriter stdout, stderror;
+            TextReader stdin;
+            stdout = new StreamWriter(
+                stream: Console.OpenStandardOutput(),
+                encoding: Console.OutputEncoding)
+            { AutoFlush = true };
+            stderror = new StreamWriter(
+                stream: Console.OpenStandardError(),
+                encoding: Console.OutputEncoding)
+            { AutoFlush = true };
+
+            stdin = new StreamReader(
+                stream: Console.OpenStandardInput(),
+                encoding: Console.InputEncoding
+                );
+
+            stdout.WriteLine("Hellow this test is to show that you can make standalone reference to  StdIn/Out/Error");
+            stderror.WriteLine("This two messages were writed from a standalone StdOut");
+            stderror.WriteLine("This is from StdError");
+
+            stdout.WriteLine("Now let's try reading from a standalone StdIn variable");
+            string line = stdin.ReadLine();
+            stdout.WriteLine($"You wrote {line}");
+        }
+        public void TestRedirection()
+        {
+            TextWriter redStdOut, redStdError;
+            TextReader redStdIn;
+            string expectedValue = "This is a redirected string";
+
+            Assert.IsFalse(Console.IsInputRedirected, "Standard Input was wrongly detected as redirected");
+            Assert.IsFalse(Console.IsErrorRedirected, "Standard Error was wrongly detected as redirected");
+            Assert.IsFalse(Console.IsOutputRedirected, "Standard Output was wrongly detected as redirected");
+
+            redStdOut = new StringWriter();
+            redStdError = StreamWriter.Null; // Empty Stream Writer.
+            redStdIn = new StringReader(expectedValue);
+
+            Console.SetIn(redStdIn);
+            Console.SetOut(redStdOut);
+            Console.SetError(redStdError);
+
+            Assert.IsTrue(Console.IsInputRedirected, "Standard Input was wrongly detected as NOT redirected");
+            Assert.IsTrue(Console.IsErrorRedirected, "Standard Error was wrongly detected as NOT redirected");
+            Assert.IsTrue(Console.IsOutputRedirected, "Standard Output was wrongly detected as NOT redirected");
+
+            // Now let's test that we can use the redirected versions.
+            Console.WriteLine("Hello world to redirected Out!");
+            Console.Error.WriteLine("Hellow world to redirected Error!");
+
+            string line = Console.ReadLine();
+
+            Assert.IsTrue(line == expectedValue, "Console.ReadLine brought unexpected Result.");
+
+            // Now Let's return to the true values;
+
+            // For StdOut and StdIn you can make a StreamWriter on your own or use the method on the System.Cosmos.Global.Console public field;
+            Console.SetOut(new StreamWriter(
+                stream: Console.OpenStandardOutput(),
+                encoding: Console.OutputEncoding)
+            { AutoFlush = true } // if you want the content to be writed inmediatly on the console, then AutoFlush should be true.
+            );
+            Assert.IsFalse(Console.IsOutputRedirected, "Standard Output was wrongly detected as redirected");
+            Console.SetOut(
+                Sys.Global.Console.CreateOutputWriter(
+                    Console.OpenStandardOutput())
+                );
+            Assert.IsFalse(Console.IsOutputRedirected, "Standard Output was wrongly detected as redirected");
+
+            // Now with Error
+            Console.SetError(new StreamWriter(
+                stream: Console.OpenStandardError(),
+                encoding: Console.OutputEncoding)
+            { AutoFlush = true } // if you want the content to be writed inmediatly on the console, then AutoFlush should be true.
+            );
+            Assert.IsFalse(Console.IsErrorRedirected, "Standard Error was wrongly detected as redirected");
+            Console.SetError(
+                Sys.Global.Console.CreateOutputWriter(
+                    Console.OpenStandardError())
+                );
+            Assert.IsFalse(Console.IsErrorRedirected, "Standard Error was wrongly detected as redirected");
+
+            // Different to Out and Error StdIn is never overrided by the methods SetIn and SetOut
+            // , SetIn will be considered as redirected if you use StreamReader (even if the stream is the console Stream)
+            // This is because the ReadKey comes from the internal implementation.
+            Console.SetIn(new StreamReader(
+                stream: Console.OpenStandardInput(),
+                encoding: Console.InputEncoding
+                ));
+            Assert.IsTrue(Console.IsInputRedirected, "Standard Input was wrongly detected as NOT redirected");
+
+            // If you want to get the orginal TextReader, you can do it by using this method.
+            Console.SetIn(Sys.Global.Console.GetOrCreateReader()); // Get or create the original Console Reader.
+            Assert.IsFalse(Console.IsInputRedirected, "Standard Input was wrongly detected as redirected");
+
+            // The field can actually be set to null, but it would be filled againg the next time that a read method from the console is called.
+            Sys.Global.Console.ResetInternalStdIn(); // This method is called when InputEncoding is changed.
         }
     }
 }

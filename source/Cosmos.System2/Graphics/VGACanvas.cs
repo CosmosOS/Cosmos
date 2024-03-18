@@ -15,7 +15,22 @@ namespace Cosmos.System.Graphics
         readonly VGADriver driver;
 
         /// <summary>
-        /// The list of available resolutions under VGA.
+        /// Available VGA supported video modes.
+        /// <para>
+        /// Low color pallete:
+        /// <list type="bullet">
+        /// <item>320x200x4.</item>
+        /// <item>640x480x2.</item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// Normal colors:
+        /// <list type="bullet">
+        /// <item>320x200x8.</item>
+        /// <item>640x480x4.</item>
+        /// <item>720x480x16.</item>
+        /// </list>
+        /// </para>
         /// </summary>
         static readonly List<Mode> availableModes = new()
         {

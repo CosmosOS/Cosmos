@@ -12,10 +12,9 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
     [Plug(Target = typeof(TcpListener))]
     public static class TcpListenerImpl
     {
-        private static Socket? _serverSocket;
-        private static IPEndPoint _serverSocketEP;
-
-        public static void Ctor(TcpListener aThis, IPEndPoint localEP)
+        public static void Ctor(TcpListener aThis, IPEndPoint localEP,
+            [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpListener._serverSocket")] ref Socket _serverSocket,
+            [FieldAccess(Name = "System.Net.IPEndPoint System.Net.Sockets.TcpListener._serverSocketEP")] ref IPEndPoint _serverSocketEP)
         {
             if (localEP == null)
             {
@@ -25,7 +24,9 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             _serverSocket = new Socket(_serverSocketEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        public static void Ctor(TcpListener aThis, IPAddress localaddr, int port)
+        public static void Ctor(TcpListener aThis, IPAddress localaddr, int port,
+            [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpListener._serverSocket")] ref Socket _serverSocket,
+            [FieldAccess(Name = "System.Net.IPEndPoint System.Net.Sockets.TcpListener._serverSocketEP")] ref IPEndPoint _serverSocketEP)
         {
             if (localaddr == null)
             {
@@ -37,7 +38,9 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             _serverSocket = new Socket(_serverSocketEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        public static void Start(TcpListener aThis)
+        public static void Start(TcpListener aThis,
+            [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpListener._serverSocket")] ref Socket _serverSocket,
+            [FieldAccess(Name = "System.Net.IPEndPoint System.Net.Sockets.TcpListener._serverSocketEP")] ref IPEndPoint _serverSocketEP)
         {
             _serverSocket!.Bind(_serverSocketEP);
 
@@ -52,10 +55,12 @@ namespace Cosmos.System_Plugs.System.Net.Sockets
             }
         }
 
-        public static TcpClient AcceptTcpClient(TcpListener aThis)
+        public static TcpClient AcceptTcpClient(TcpListener aThis,
+            [FieldAccess(Name = "System.Net.Sockets.Socket System.Net.Sockets.TcpListener._serverSocket")] ref Socket _serverSocket,
+            [FieldAccess(Name = "System.Net.IPEndPoint System.Net.Sockets.TcpListener._serverSocketEP")] ref IPEndPoint _serverSocketEP)
         {
+            TcpClient realClient = new();
             Socket acceptedSocket = _serverSocket!.Accept();
-            var realClient = new TcpClient();
             realClient.Client = acceptedSocket;
             return realClient;
         }
