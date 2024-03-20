@@ -1,4 +1,4 @@
-# Dev Kit Installation 
+# Dev Kit Installation
 
 ## Windows
 
@@ -6,7 +6,7 @@
 
 * (Free) source code of Development Kit from [Cosmos on GitHub](https://github.com/CosmosOS/Cosmos)
    * You must clone the repository using Git. For a detailed walkthrough, [see here](https://help.github.com/articles/fork-a-repo/).
-* (Free) [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/)  
+* (Free) [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/)
 * (Free) [InnoSetup](http://www.jrsoftware.org/isdl.php#qsp)
    * This is required to build the setup kit which is used to build and install the Visual Studio integration libaries for Cosmos.
    * During install it will ask you about optional components to install. Be sure you check "Install Inno Setup Preprocessor".
@@ -53,7 +53,7 @@ This will take a while. If there is no error, you successfully installed Cosmos 
 
 if you are using custom cosmos repos you will need to clone them all manually as the installer script will pull from https://github.com/CosmosOS/
 
-A tree diagram of the source should look like the following:   
+A tree diagram of the source should look like the following:
 
 <img src="https://raw.githubusercontent.com/CosmosOS/Cosmos/master/Docs/images/Dir.png" width="200">
 
@@ -71,6 +71,6 @@ you may need to clear you nuget cache try ``dotnet clean`` to clear the project 
 if you have more then 1 version of visual studio installed this can bug this follow "dotnet Project Templates" should fix it
 
 ### dotnet Project Templates
-If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install ./source/templates/csharp/` assuming you are currently in the Cosmos base directory.
-After installing the template use `dotnet new cosmosCSKernel -n {name}` to create a new Cosmos Kernel project. 
-The dotnet template can be removed at a later time using `dotnet new --uninstall ./source/templates/csharp/`.
+If you are using linux or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new install ./source/templates/csharp/` assuming you are currently in the Cosmos base directory.
+After installing the template use `dotnet new cosmosCSKernel -n {name}` to create a new Cosmos Kernel project.
+The dotnet template can be removed at a later time using `dotnet new uninstall ./source/templates/csharp/`.

@@ -16,21 +16,28 @@ COMMON_DIR = $(THISDIR)/../Common
 GIT = git
 DOTNET = dotnet
 
+BUILDMODE=Release
 GITFLAGS = clone --depth=1
-DOTNETFLAGS = -nologo -v:q -c:Debug
-
+DOTNETFLAGS = -nologo -v:q -c:$(BUILDMODE)
 GREEN = \033[0;32m
 YELLOW = \033[1;33m
 DEFAULT = \033[0m
 
+date = $(date +%F%T)
+
 .PHONY: all
 all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
+	@printf "${YELLOW}Cosmos${DEFAULT} DevKit Installer\n"
+	@printf "${date}\n"
 	@# Elapsed time is stored in a temporary file, deleted post-install.
 	@date +%s > _time_$@.txt
 	@$(MAKE) build
 	@$(MAKE) publish
 	@sudo $(MAKE) install
 	@$(MAKE) nuget-install
+	@$(MAKE) template-install
+	@printf "To create a Cosmos kernel, run \'dotnet new cosmosCSKernel -n \{name\}\''
+	@printf "Build log file saved to ${GREEN}$(THISDIR)/build${date}.log${DEFAULT}\n"
 	@printf "============================================\n"
 	@printf "| ${YELLOW}Cosmos${DEFAULT} has been installed successfully!  |\n"
 	@printf "============================================\n"
@@ -118,19 +125,19 @@ install:
 	@mkdir -p $(DESTDIR)/Build/VMware/Workstation
 	@mkdir -p $(DESTDIR)/Packages
 	@mkdir -p $(DESTDIR)/Kernel
-	@cp -r $(IL2CPU_DIR)/artifacts/Release/nupkg/*.nupkg $(DESTDIR)/Packages/
-	@cp -r $(THISDIR)/artifacts/Release/nupkg/*.nupkg $(DESTDIR)/Packages/
-	@cp -r $(XSHARP_DIR)/artifacts/Release/nupkg/*.nupkg $(DESTDIR)/Packages/
+	@cp -r $(IL2CPU_DIR)/artifacts/$(BUILDMODE)/nupkg/*.nupkg $(DESTDIR)/Packages/
+	@cp -r $(THISDIR)/artifacts/$(BUILDMODE)/nupkg/*.nupkg $(DESTDIR)/Packages/
+	@cp -r $(XSHARP_DIR)/artifacts/$(BUILDMODE)/nupkg/*.nupkg $(DESTDIR)/Packages/
 	@cp -r $(IL2CPU_DIR)/source/Cosmos.Core.DebugStub/*.xs $(DESTDIR)/XSharp/DebugStub/
 
 	@cp -r $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/
 	@cp -r $(THISDIR)/Artwork/Cosmos.ico $(DESTDIR)/
 
-	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Debug/*/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
-	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/$(BUILDMODE)/*/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
+	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/$(BUILDMODE)/*/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/$(BUILDMODE)/*/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/$(BUILDMODE)/*/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/$(BUILDMODE)/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
 
 	@cp -r $(THISDIR)/Build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/
 	@cp -r $(THISDIR)/Build/VMWare/Workstation/* $(DESTDIR)/Build/VMware/Workstation/
@@ -146,3 +153,11 @@ nuget-install:
 
 	@$(DOTNET) nuget remove source "Cosmos Local Package Feed" || true
 	@$(DOTNET) nuget add source $(DESTDIR)/Packages/ -n "Cosmos Local Package Feed"
+
+.PHONY: template-install
+template-install:
+	@printf "Installing ${GREEN}C# Template packages${DEFAULT}\n"
+	@-dotnet new uninstall $(THISDIR)/source/templates/csharp/
+	@printf "If the template was not installed, you can ignore this"
+	@dotnet new install $(THISDIR)/source/templates/csharp/
+#TODO: Uninstall
