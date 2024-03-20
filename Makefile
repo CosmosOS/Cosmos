@@ -23,12 +23,9 @@ GREEN = \033[0;32m
 YELLOW = \033[1;33m
 DEFAULT = \033[0m
 
-date = $(date +%F%T)
-
 .PHONY: all
 all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
 	@printf "${YELLOW}Cosmos${DEFAULT} DevKit Installer\n"
-	@printf "${date}\n"
 	@# Elapsed time is stored in a temporary file, deleted post-install.
 	@date +%s > _time_$@.txt
 	@$(MAKE) build
