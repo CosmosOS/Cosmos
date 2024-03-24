@@ -11,3 +11,5 @@ This is where IL2CPU comes in. IL2CPU takes the CIL code and translates it to pr
 At this point, IL2CPU performs some more magic before finally converting the entire file into a bootable binary file, which can be loaded by a bootloader on any system (Cosmos uses the [Limine bootloader](https://github.com/limine-bootloader/limine).
 
 As you might think, IL2CPU is a fundamental part of the development of Cosmos. IL2CPU is responsible for the final output, which is why most optimizations added are for IL2CPU.
+
+*Last updated on 24 March 2024.*

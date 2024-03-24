@@ -49,3 +49,5 @@ The final step is to link the plug implementation to the plug placeholder by add
 
 While plugs are usually used to overwrite existing methods in the .NET runtime, they can also be used to include assembly methods in your kernel.
 This is for example, done to implement the `void CPU.UpdateIDT(bool)` method in Cosmos. To do this for your own classes and methods is not more difficult than plugging any other method. Simply set target of the plug class to your own class and write the assembly plug as usual. As a reference you can look at [Cosmos.Core/CPU.cs](https://github.com/CosmosOS/Cosmos/blob/master/source/Cosmos.Core/CPU.cs), [Cosmos.Core_Asm/CPUImpl.cs](https://github.com/CosmosOS/Cosmos/blob/master/source/Cosmos.Core_Asm/CPUImpl.cs) and [CPUUpdateIDTAsm.cs]( https://github.com/CosmosOS/Cosmos/blob/master/source/Cosmos.Core_Asm/CPU/CPUUpdateIDTAsm.cs).
+
+*Last updated on 28 April 2023.*

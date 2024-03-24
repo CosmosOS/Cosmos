@@ -19,3 +19,5 @@ For example, if the project is called Kernel and the file is `Data\Text.txt`, th
 string fileContent = System.Text.Encoding.UTF8.GetString(file); //convert the byte array to string (assuming text data)
 Console.WriteLine(fileContent); //write it out
 ```
+
+*Last updated on 28 July 2023.*

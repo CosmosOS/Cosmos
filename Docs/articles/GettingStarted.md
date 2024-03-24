@@ -127,3 +127,4 @@ the mainline Cosmos development as of yet.
   * Cosmos website - [http://www.GoCosmos.org](http://www.GoCosmos.org)
   * Source code - Both DevKit and User Kit - [http://github.com/CosmosOS/Cosmos/](http://github.com/CosmosOS/Cosmos/)
 
+*Last updated on 24 March 2024.*

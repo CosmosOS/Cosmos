@@ -5,7 +5,7 @@ The Cosmos Graphic Subsystem *(abbr. CGS)* is based on the abstraction of Canvas
 # FullScreenCanvas
 The `FullScreenCanvas` provides two methods to get a canvas instance for the screen. It automatically chooses the best available driver to use.
 
-`public static Canvas GetFullScreenCanvas(Mode mode)`: gets the instance of Canvas representing the complete screen in the specified mode. The modes currently available are as follows:
+`public static Canvas GetFullScreenCanvas(Mode mode)`: gets the instance of Canvas representing the complete screen in the specified mode. Some modes that are currently available are as follows: *(depends on the backend used)*
 
 ```CSharp
 320x240, 32
@@ -147,3 +147,5 @@ If you use SVGAIICanvas, you can use 24 bit Color depth, and if you use VGACanva
 
 # Old examples 
 On the internet, there have been a lot of tutorials explaining how to use graphics in Cosmos, but most of them are outdated. Just remember that the new Mouse class is Sys.MouseManager and Pen has been replaced with Color.
+
+*Last updated on 28 July 2023.*

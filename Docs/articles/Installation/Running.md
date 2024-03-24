@@ -62,6 +62,7 @@ qemu-system-x86_64 -boot d -cdrom $ISO -m $MEMORY_SIZE -hda $HDD_IMAGE
 
 ## VirtualBox
 Create a virtual machine and use this [.vmdk](https://github.com/CosmosOS/Cosmos/blob/master/Build/VMWare/Workstation/Filesystem.vmdk?raw=true) as your HDD image.
+If you are utilizing audio, we recommend VirtualBox for the ability to use their AC97 driver.
 
 # Windows
 
@@ -85,12 +86,13 @@ VMWare Workstation (paid version) can be downloaded for a free trial [here](http
 ##  QEMU
 
 QEMU is not officially supported for Cosmos at this time, but can be used. Just use the ISO option above with debugging turned off.
+If you want to use graphical mode in QEMU (Canvas or SVGA-II), ensure that VBE multiboot is enabled in your project settings of Cosmos.
 
 QEMU can be downloaded [here](https://www.qemu.org/download/)
 
 ## Bochs
 
-Bochs is officially supported for Cosmos.
+Bochs is officially supported for Cosmos. As Bochs is a full emulation software, results vary and are often times slower than other virtualization platforms.
 
 Bochs can be downloaded [here](https://bochs.sourceforge.io/getcurrent.html)
 
@@ -115,3 +117,4 @@ Wait and your OS will boot up.
 Not supported at this time.
 
 
+*Last updated on 24 March 2024.*

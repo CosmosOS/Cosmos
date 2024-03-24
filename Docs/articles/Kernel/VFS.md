@@ -1,6 +1,6 @@
 # File System
 
-In this article, we will discuss about using Cosmos VFS (virtual file system).\
+In this article, we will discuss about using Cosmos VFS (virtual file system).
 Cosmos VFS and the VFSManager classes, let you manage your file system.
 
 **Attention**: **Always** format your drive with Cosmos and **only** Cosmos if you plan to use it with Cosmos. Using any other tool such as Parted, FDisk, or any other tool might lead to weird things when using that drive with Cosmos' VFS. Those tools are much more advanced and might format and read/write to the disk differently than Cosmos.
@@ -244,3 +244,5 @@ catch (Exception e)
     Console.WriteLine(e.ToString());
 }
 ```
+
+*Last updated on 2 November 2023.*

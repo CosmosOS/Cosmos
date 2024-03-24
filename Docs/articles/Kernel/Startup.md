@@ -17,3 +17,5 @@ You can override the `Kernel.Start()` method in your Kernel to suppress the stan
 > You override it the same way you do with other methods. An extremely simple base override in your Kernel would be: `protected override void Start() {}`
 
 The default `Kernel.Start()` method is located in `Cosmos\source\Cosmos.System2\Kernel.cs`. You can copy it and make modifications with your Kernel override.
+
+*Last updated on 20 May 2023.*

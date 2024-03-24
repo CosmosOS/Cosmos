@@ -81,3 +81,5 @@ The audio manager accepts a `Stream` and an `Output` property - the `Stream` is 
 
 > **Note**<br>
 - > When interfacing with audio devices, remember not to overload the system when supplying the audio samples. When mixing several streams of audio of different formats, for example, the system can get too overloaded, and this will result in audio crackle, or the system won't be able to respond to the audio device in time, resulting in the audio device stopping all output unexpectedly.
+
+*Last updated on 28 July 2023.*

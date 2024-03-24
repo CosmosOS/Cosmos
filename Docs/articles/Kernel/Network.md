@@ -200,3 +200,5 @@ using(var xClient = new DnsClient())
     Address destination = xClient.Receive(); //can set a timeout value
 }
 ```
+
+*Last updated on 24 March 2024.*

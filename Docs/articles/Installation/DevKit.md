@@ -13,7 +13,7 @@
 
 ###  Installation
 
-* Git clone the current source code of Cosmos and rename the folder to simply 'Cosmos'.
+* Git clone the current source code of Cosmos or download the source code directly from GitHub. If you downlaod the source code, you will need to rename the folder to simply 'Cosmos'.
 * Look in the downloaded sources and run **install-VS2022.bat** with admin privileges (UAC will ask for permission), needed for install in system directories.
 * When the installation is complete, Visual Studio will automatically open and you may begin programming with your new, modified copy of Cosmos.
 
@@ -75,3 +75,5 @@ If you have more than 1 version of Visual Studio *(such as both 2022 and 2019)*,
 ### dotnet Project Templates
 If you are using Linux, or prefer not using Visual Studio for your projects, you can install the dotnet project template using `dotnet new --install ./source/templates/csharp/` assuming you are currently in the Cosmos base directory. After installing the template, use `dotnet new cosmosCSKernel -n {name}` to create a new Cosmos Kernel project. 
 The dotnet template can be removed at a later time using `dotnet new --uninstall ./source/templates/csharp/`.
+
+*Last updated on 24 March 2024.*
