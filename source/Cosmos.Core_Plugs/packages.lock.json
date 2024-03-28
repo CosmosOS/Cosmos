@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net8.0": {
       "IgnoresAccessChecksToGenerator": {
         "type": "Direct",
         "requested": "[0.5.0, )",

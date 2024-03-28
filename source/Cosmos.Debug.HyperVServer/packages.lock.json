@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net8.0": {
       "Microsoft.PowerShell.3.ReferenceAssemblies": {
         "type": "Direct",
         "requested": "[1.0.0, )",

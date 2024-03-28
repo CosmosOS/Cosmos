@@ -117,10 +117,10 @@ install:
 	@cp -r $(THISDIR)/Artwork/XSharp/XSharp.ico $(DESTDIR)/XSharp/
 	@cp -r $(THISDIR)/Artwork/Cosmos.ico $(DESTDIR)/
 
-	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Debug/*/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
-	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
-	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Debug/*/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(IL2CPU_DIR)/source/IL2CPU/bin/Release/*/linux-x64/publish/* $(DESTDIR)/Build/IL2CPU/
+	@cp -r $(THISDIR)/source/Cosmos.Core_Plugs/bin/Release/*/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.System2_Plugs/bin/Release/*/publish/*.dll $(DESTDIR)/Kernel/
+	@cp -r $(THISDIR)/source/Cosmos.HAL2/bin/Release/*/publish/*.dll $(DESTDIR)/Kernel/
 	@cp -r $(THISDIR)/source/Cosmos.Debug.Kernel.Plugs.Asm/bin/Debug/netstandard2.0/publish/*.dll $(DESTDIR)/Kernel/
 
 	@cp -r $(THISDIR)/Build/HyperV/*.vhdx $(DESTDIR)/Build/HyperV/

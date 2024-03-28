@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net8.0": {
       "Dapper.StrongName": {
         "type": "Transitive",
         "resolved": "2.0.90",
@@ -1681,7 +1681,7 @@
         }
       }
     },
-    "net6.0/win-x86": {
+    "net8.0/win-x86": {
       "Microsoft.Win32.Primitives": {
         "type": "Transitive",
         "resolved": "4.3.0",
