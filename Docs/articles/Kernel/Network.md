@@ -1,18 +1,17 @@
 # Network
 
-In this article we will discuss about Networking on Cosmos, how to use the Network Stack, send and receive packets. For now, available protocols are **ARP**, **IPv4**, **TCP**, **UDP**, **ICMP**, **DHCP** and **DNS**. Note that Cosmos devkit must be installed for this article.
+In this article, we will discuss Networking on Cosmos, how to use the Network Stack, and send and receive packets. For now, available protocols are **ARP**, **IPv4**, **TCP**, **UDP**, **ICMP**, **DHCP** and **DNS**. Note that Cosmos DevKit must be installed for this article.
 
-All protocols here don't necessary support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository. 
+All protocols here don't necessarily support every feature described by their RFC and may have some bugs or architecture issues, if you find bugs or something abnormal please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository. 
 
 Each protocol has a Client class which can be used to receive and send data. If a Receive() method is blocking, the method will timeout after 5 seconds or use the value optionally set by parameter. Please note that all finished connections should be closed using Close().
 
-The Cosmos Network Stack mainly not uses classes and functions that are under .NET Core (except TCP). Everything described here will be under:
+The Cosmos Network Stack does not uses classes and functions that are under .NET Core (except TCP). Everything described here will be under:
 ```csharp
 using Cosmos.System.Network;
 ```
 
 Before anything, a Network Configuration must be set (local machine IPv4 address, subnet mask and gateway). It can be manually set with IPConfig.Enable or dynamically set through a DHCP server. For DHCP, Cosmos will ask to the DHCP server (usually default gateway) for an address in your local network.
-
 ### Manually set IPv4 Config
 ```csharp
 NetworkDevice nic = NetworkDevice.GetDeviceByName("eth0"); //get network device by name
@@ -32,7 +31,6 @@ using(var xClient = new DHCPClient())
 ```csharp
 Console.WriteLine(NetworkConfiguration.CurrentAddress.ToString());
 ```
-
 ## UDP
 Before playing with packets, we have to create a client and call Connect() to specify the remote machine address. After that the client will be able to send or listen for data.
 ```csharp
@@ -143,7 +141,7 @@ using(TcpClient client = new TcpClient())
 ```
 
 ## FTP
-Only server side is implemented in Cosmos. We recommand to use FileZilla as your FTP client.
+Only server-side FTP is implemented within Cosmos. We recommend to use FileZilla as your FTP client.
 
 **Your FTP client must enable active mode**. Since in Active Mode the server has to open TCP connections, **your computer firewall must be disabled** to accept incoming connection. An FTP connection is made of two TCP sockets. One for control connection (as a textual protocol) and one for data transmission. Data transmission sockets can be opened by the client (if it is in Passive Mode) or by the server (if in Active Mode). The Passive Mode is not supported yet due to current Cosmos TCP and multithreading limitation.
 
@@ -153,7 +151,7 @@ Install CosmosFtpServer package into your Cosmos kernel. For more information se
 
 ### FTP client configuration:
 
-Use Plain FTP with an Anonymous connection.
+Use Plain FTP with an anonymous connection:
 
 ![FTP client configuration](https://user-images.githubusercontent.com/18724279/121685499-4c71f380-cac0-11eb-8d08-6db1c0096e68.png)
 
@@ -193,7 +191,7 @@ DNS can be used to get an IP address from a Domain Name string. For now DNS can 
 ```csharp
 using(var xClient = new DnsClient())
 {
-    xClient.Connect(new Address(192, 168, 1, 254)); //DNS Server address
+    xClient.Connect(new Address(192, 168, 1, 254)); //DNS Server address. We recommend a Google or Cloudflare DNS, but you can use any you like!
 
     /** Send DNS ask for a single domain name **/
     xClient.SendAsk("github.com");
@@ -202,3 +200,5 @@ using(var xClient = new DnsClient())
     Address destination = xClient.Receive(); //can set a timeout value
 }
 ```
+
+*Last updated on 24 March 2024.*

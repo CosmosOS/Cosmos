@@ -12,9 +12,9 @@ This article provides an overview of how both Memory Allocation and the Garbage 
 
 #### Allocation
 
-Usually users should be allocating memory indirectly by using `new` or other standard methods provided by .Net to allocate new objects. In the cases, where you want to allocate a managed block of memory, which is not part of a certain .Net type, a `ManagedMemoryBlock` or `byte[]` should suffice. If this is not sufficient, one can use `uint GCImplementation.AllocNewObject(uint aSize)` to allocate a region of `aSize` bytes. The returned uint contains the memory address and can be converted to pointer if required. 
+Usually, users should be allocating memory indirectly by using `new` or other standard methods provided by .Net to allocate new objects. In the cases, where you want to allocate a managed block of memory, which is not part of a certain .NET type, a `ManagedMemoryBlock` or `byte[]` should suffice. If this is not sufficient, one can use `uint GCImplementation.AllocNewObject(uint aSize)` to allocate a region of `aSize` bytes. The returned uint contains the memory address and can be converted to pointer if required. 
 
-One can manually free an object using `Heap.Free(void* aPtr)` or `GCImplementation.Free(object aObj)`. It is recommended to not manually free .Net objects unless you know what you are doing since Cosmos does not always recognise when it is accessing already freed memory and this can lead to very weird bugs. 
+One can manually free an object using `Heap.Free(void* aPtr)` or `GCImplementation.Free(object aObj)`. It is recommended to not manually free .NET objects unless you know what you are doing, since Cosmos does not always recognise when it is accessing already freed memory. This can lead to very weird bugs. 
 
 #### Information
 
@@ -22,7 +22,7 @@ Cosmos provides a few methods to get information about the heap status:
 
  - `GCImplementation.GetAvailableRAM()` returns the size of the memory in MB available to the heap
  - `GCImplementation.GetUsedRAM()` provides a rough estimate of how many bytes are currently in use
- - `HeapSmall.GetAllocatedObjectCount()` returns the number of .Net objects currently allocated
+ - `HeapSmall.GetAllocatedObjectCount()` returns the number of .NET objects are currently allocated
  - `RAT.GetPageCount(byte aType)` returns how many pages of a certain type are allocated. The different type definitions are stored in `RAT.PageType`
 
 ### Internals
@@ -65,3 +65,5 @@ When `RAT.MinFreePages` is set to a positive value and the number of free pages 
 ### Internals
 
 The garbage collector uses the tracing approach, which means that during collection a graph of all reachable objects is created and all non-discovered objects are freed. The garbage collector will only check objects on pages which have a type where the `GCManaged` bit is set. The graph is created by starting from "root" objects which are either stored in static variables or part of the current stack. Each of these objects is "marked" and all objects referenced by this object are recursivly also "marked" and "swept". This is done using the methods `void Heap.MarkAndSweepObject(void* aPtr)` for objects and `void Heap.SweepTypedObject(uint* obj, uint type)` for structures. For this to work each allocated object holds a 1bit flag if the object was discovered during the marking phase and a 7bit value counter for the number of static references it has. The number of static references an object has is updated using `void GCImplementation.IncRootCount(ushort* aPtr)` and similar methods, which are called from the Stsfld opcode.
+
+*Last updated on 22 October 2023.*

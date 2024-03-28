@@ -1,8 +1,8 @@
 # Running
-Cosmos supports running on any Intel x86 environment. However for debugging
+Cosmos supports running on any Intel x86 environment. However, for debugging
 and ease of use, many virtual and physical setups have integrated support. If
 you do not see your environment, this does not mean Cosmos will not work. You
-can simply fall back to ISO which should work with any environment.
+can simply fall back to ISO, which should work with any environment.
 
 ##  ISO
 
@@ -11,17 +11,17 @@ mounted and booted by most virtualization technologies. In addition, a physical
 optical disk can be burned and used to boot physical hardware.
 
 # Linux/Posix
-### DISCLAIMER: This article assumes that you are using a debian based operating system
+**DISCLAIMER: This article assumes that you are using a Debian-based operating system!**
 
 ## QEMU
-Here you can use a generic run file, you can run it by using `sh run.sh -i <ISO> -m <memory size> -h <hdd image>`.
-It has to be at the root directory of the project
+Here you can use a generic run file, you can run it by using `sh run.sh -i <ISO> -m <memory size> -h <hdd image>`. It has to be at the root directory of the project.
 
 QEMU is required and can be installed with `apt-get install qemu-system`.
 
-To create an hdd image, you have to convert this [.vmdk](https://github.com/CosmosOS/Cosmos/blob/master/Build/VMWare/Workstation/Filesystem.vmdk?raw=true) file to a .img wich can then be used by QEMU using the following command
+To create an HDD image, you have to convert this [.vmdk](https://github.com/CosmosOS/Cosmos/blob/master/Build/VMWare/Workstation/Filesystem.vmdk?raw=true) file to a .img, which can then be used by QEMU using the following command
 `qemu-img convert -f vmdk -O raw Filesystem.vmdk cosmos.img`
 
+Here is the run.sh:
 `run.sh:`
 ```sh
 #!/bin/bash
@@ -60,8 +60,9 @@ dotnet build
 qemu-system-x86_64 -boot d -cdrom $ISO -m $MEMORY_SIZE -hda $HDD_IMAGE
 ```
 
-## Virtualbox
-Create a virtual machine and use this [.vmdk](https://github.com/CosmosOS/Cosmos/blob/master/Build/VMWare/Workstation/Filesystem.vmdk?raw=true) as HDD image
+## VirtualBox
+Create a virtual machine and use this [.vmdk](https://github.com/CosmosOS/Cosmos/blob/master/Build/VMWare/Workstation/Filesystem.vmdk?raw=true) as your HDD image.
+If you are utilizing audio, we recommend VirtualBox for the ability to use their AC97 driver.
 
 # Windows
 
@@ -80,17 +81,18 @@ VMWare Player can be downloaded [here](https://www.vmware.com/go/getplayer-win).
 
 ### VMWare Workstation
 
-VMWare Workstation can be downloaded for free trial [here](https://www.vmware.com/go/getworkstation-win).
+VMWare Workstation (paid version) can be downloaded for a free trial [here](https://www.vmware.com/go/getworkstation-win).
 
 ##  QEMU
 
-Not officially supported at this time, but can be done. Just use the ISO option above with debugging turned off.
+QEMU is not officially supported for Cosmos at this time, but can be used. Just use the ISO option above with debugging turned off.
+If you want to use graphical mode in QEMU (Canvas or SVGA-II), ensure that VBE multiboot is enabled in your project settings of Cosmos.
 
 QEMU can be downloaded [here](https://www.qemu.org/download/)
 
 ## Bochs
 
-Bochs is officially supported.
+Bochs is officially supported for Cosmos. As Bochs is a full emulation software, results vary and are often times slower than other virtualization platforms.
 
 Bochs can be downloaded [here](https://bochs.sourceforge.io/getcurrent.html)
 
@@ -99,7 +101,7 @@ Bochs can be downloaded [here](https://bochs.sourceforge.io/getcurrent.html)
 For PXE, no special software is required. Only an ethernet connection to your router. However, if you have a computer that does not support network booting, or if you must perform the action over WiFi, you may need to look at a PXE chainloader such as [gPXE](http://etherboot.org/wiki/).
 To run your Cosmos kernel in PXE you need to follow these steps:
 
-Step #1: disable Cosmos Remote Debugger, activate PXE and compilation in bin format.
+Step #1: Disable Cosmos Remote Debugger, activate PXE and compile in bin format.
 Go to Properties and copy these settings:
 
 ![image](https://user-images.githubusercontent.com/98218366/178479237-a22a7b5f-250e-432d-ba74-0da502e82f7b.png)
@@ -108,10 +110,11 @@ Boot the machine and connect it via Ethernet and will show this screen:
 
 ![image](https://user-images.githubusercontent.com/98218366/178479800-c70faa5d-1fab-4da4-8f27-05eefee89b75.png)
 
-Wait and your os will boot up.
+Wait and your OS will boot up.
 
-## Hyper-V
+## Hyper-V, VirtualPC
 
 Not supported at this time.
 
 
+*Last updated on 24 March 2024.*
