@@ -54,7 +54,7 @@ Cosmos has an article [here](https://cosmosos.github.io/install.html) on how to 
 
 ## Documentation
 
-The Cosmos documentation can be found [here](https://cosmosos.github.io/api/Cosmos.Build.Common.html).
+The Cosmos documentation can be found [here](https://cosmosos.github.io/index.html).
 
 If you still have any questions on how to use Cosmos, you can open a [discussion](https://github.com/CosmosOS/Cosmos/discussions) or you can join the [Discord server](https://discord.com/invite/kwtBwv6jhD)!
 
