@@ -7,7 +7,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static unsafe void Execute()
         {
-            // Till this moment (04/09/2024) the constructors, as any other method, is not included on the compilation result if never called,
+            // Till this moment (04/09/2024) the constructors, as any other method, are not included on the compilation result if never called,
             // so we need to call them before.
             Artesa dummy = new Artesa();
             WrappedLogger dummy2 = new WrappedLogger();
