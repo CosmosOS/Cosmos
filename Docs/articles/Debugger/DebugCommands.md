@@ -60,3 +60,5 @@ Max = 18;
 
 ## Debug channel
 We support channels, which are prefixed with anything prefixed with 192 and up. 192 is used for a debug view.
+
+*Last updated on 12 February 2020.*

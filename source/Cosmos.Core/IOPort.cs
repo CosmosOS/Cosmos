@@ -80,18 +80,16 @@ namespace Cosmos.Core
         /// <exception cref="System.OverflowException">Thrown if aData lenght is greater than Int32.MaxValue.</exception>
         [PlugMethod(PlugRequired = true)]
         public static void Read8(int aPort, byte[] aData) => throw null;
-        
+
         /// <summary>
-        /// Read Word from base port.
+        /// Read Words from base port.
         /// </summary>
         /// <param name="aData">Output data array.</param>
         /// <exception cref="System.OverflowException">Thrown if aData lenght is greater than Int32.MaxValue.</exception>
+        [PlugMethod(PlugRequired = true)]
         public static void Read16(int aPort, ushort[] aData)
         {
-            for (int i = 0; i < aData.Length; i++)
-            {
-                aData[i] = Read16(aPort);
-            }
+            throw null;
         }
 
         /// <summary>

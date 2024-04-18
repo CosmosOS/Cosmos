@@ -41,15 +41,12 @@ In a project, Cosmos can be thought of as a compiler and a sort-of standard libr
 The following is a non-exhaustive list of features that Cosmos offers:
 
 - Low level assembly access and pointer memory control
-- A basic (and unstable at the moment) filesystem
+- A basic filesystem
 - Most features found in the .NET core library
 - A CPU/FPU accelerated math library
 - A basic graphics interface
 - A basic network interface
 - A basic audio interface
-
-> [!NOTE]
-> Use [embeded resources](https://cosmosos.github.io/articles/Kernel/ManifestResouceStream.html) instead of the VFS for now for assets.
 
 ## Setting it up
 
@@ -57,7 +54,7 @@ Cosmos has an article [here](https://cosmosos.github.io/install.html) on how to 
 
 ## Documentation
 
-The Cosmos documentation can be found [here](https://cosmosos.github.io/api/Cosmos.Build.Common.html).
+The Cosmos documentation can be found [here](https://cosmosos.github.io/index.html).
 
 If you still have any questions on how to use Cosmos, you can open a [discussion](https://github.com/CosmosOS/Cosmos/discussions) or you can join the [Discord server](https://discord.com/invite/kwtBwv6jhD)!
 
