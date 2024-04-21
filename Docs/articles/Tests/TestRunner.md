@@ -27,3 +27,5 @@ To set the period before the TestRunner registers an error, change the line: `en
 
 ## Project Location
 The TestRunner Projects are located in ..\Tests\TestRunner
+
+*Last updated on 9 December 2022.*

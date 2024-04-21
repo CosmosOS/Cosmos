@@ -1,10 +1,9 @@
-# Installation
+# User Kit Installation
 
-for DevKit / linux see [DevKit](DevKit.md)
+for DevKit / running on Linux see [DevKit](DevKit.md)
 
 ### Prerequisites
   
-
 *   **Visual Studio 2022** - [Download](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx)
 *   **Visual Studio 2022 Workload: .NET Desktop** - .NET Desktop development
 *   **.NET 6.0** - [Download](https://www.microsoft.com/en-us/download/details.aspx?id=53321)
@@ -13,10 +12,9 @@ for DevKit / linux see [DevKit](DevKit.md)
   
 ### Installing Cosmos
  
-First, you need to choose between the User Kit and the Dev Kit. It is recommended that new users start with the User Kit but only move later to the Dev Kit if you need the latest features and want to contribute back to the main project. 
-The Dev Kit is the live source against which the Cosmos Team develops directly. The Dev Kit has the latest and greatest features, but at various times has known issues, and sometimes may not even build. Thus to use the Dev Kit be sure to join our support channels and inquire about the current status before using the Dev Kit or updating it. 
+First, you need to choose between the User Kit and the Dev Kit. It is recommended that any user start with the Dev Kit now due to the technical advancement of it - the User Kit is almost 2 years old in comparison! The DevKit is the live source code which the Cosmos Team develops directly, and as such, it has the latest and greatest features, but at various times has known issues, and sometimes may not even build. Thus, to use the DevKit, be sure to join our support channels and inquire about the current status before using the DevKit or updating it. 
   
-The User Kit is a snapshot stable version of Cosmos including a premade installer. The UserKit however is often quite a bit out of date compared to the DevKit and is only occasionally updated. The User Kit is a great easy way to get familiar with Cosmos, but active developers should transition to the Dev Kit after becoming very familiar with the UserKit, and expect some bugs here and there.
+The User Kit is a snapshot stable version of Cosmos including a premade installer. The UserKit however is often very out of date compared to the DevKit and is only occasionally updated. The User Kit is a great easy way to get familiar with Cosmos, but active developers should transition to the DevKit after becoming very familiar with the UserKit, and expect some bugs here and there.
   
 ### User Kit
   
@@ -25,3 +23,5 @@ The User Kit is a snapshot stable version of Cosmos including a premade installe
 3.  Click "Next" then "Install"
 4.  Wait for the install to progress. **Tip:** At the end the installer may look like it has stalled, but it is still doing something in the background. WAIT for the "Finish" button to become available.
 5.  Cosmos should now be installed. Follow other tutorials to find out how to create your first OS.
+
+*Last updated on 24 March 2024.*

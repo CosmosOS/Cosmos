@@ -40,6 +40,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 ConvertTests.Execute();
                 DateTimeTests.Execute();
                 TimeSpanTests.Execute();
+                ActivatorTests.Execute();
 
                 int count = Heap.Collect();
                 mDebugger.Send("Free");
