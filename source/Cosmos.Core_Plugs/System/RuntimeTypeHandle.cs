@@ -1,4 +1,5 @@
 using System;
+using Cosmos.Core;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System
@@ -179,6 +180,18 @@ namespace Cosmos.Core_Plugs.System
         public static int GetSlot(object method)
         {
             throw new NotImplementedException();
+        }
+
+        public static void RegisterCollectibleTypeDependency(object type, object? assembly)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        [PlugMethod(Signature = "System_Type____System_RuntimeTypeHandle_GetInterfaces_System_RuntimeType_")]
+        public static Type[] GetInterfaces(object runtimeType)
+        {
+            return ((CosmosRuntimeType)runtimeType).GetInterfaces();
         }
 
     }

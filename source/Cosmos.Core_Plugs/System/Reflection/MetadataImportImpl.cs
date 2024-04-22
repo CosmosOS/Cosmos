@@ -46,7 +46,7 @@ namespace Cosmos.Core_Plugs.System.Reflection
         [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetNamespace_System_IntPtr__System_Int32__System_Void##_")]
         public static unsafe void _GetNamespace(IntPtr scope, int mdToken, void** namesp)
         {
-
+            throw new NotImplementedException();
         }
 
         [PlugMethod(Signature = "System_Boolean__System_Reflection_MetadataImport__IsValidToken_System_IntPtr__System_Int32_")]
@@ -55,7 +55,49 @@ namespace Cosmos.Core_Plugs.System.Reflection
             throw new NotImplementedException();
         }
 
+
+        /// <summary>
+        /// i could not find this in the dotnet repo
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="token"></param>
+        /// <param name="t"></param>
+        /// <param name="output"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [PlugMethod(Signature = "System_Boolean__System_Reflection_MetadataImport__GetFieldOffset_System_IntPtr__System_Int32__System_Int32___System_Int32_")]
+        public static unsafe bool _GetFieldOffset(
+            IntPtr scope,
+            int typeTokenDef, int fieldTokenDef, out int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetFieldMarshal_System_IntPtr__System_Int32___System_Reflection_ConstArray_")]
+        public static void _GetFieldMarshal(IntPtr scope,
+            int fieldToken,
+            ref object fieldMarshal)// type is ConstArray
+        {
+            throw new NotImplementedException();
+        }
+
         public static void _GetParentToken(IntPtr aIntPtr, int aInt, ref int aInt1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void _GetMarshalAs(IntPtr pNativeType, int cNativeType, out int unmanagedType,
+            out int safeArraySubType, out string? safeArrayUserDefinedSubType,
+            out int arraySubType, out int sizeParamIndex, out int sizeConst, out string? marshalType,
+            out string? marshalCookie,
+            out int iidParamIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetPropertyProps_System_IntPtr__System_Int32__System_Void##___System_Int32___System_Reflection_ConstArray_")]
+        public static unsafe void _GetPropertyProps(IntPtr scope,
+            int mdToken, void** name, out int propertyAttributes, out object signature) //ConstArray
         {
             throw new NotImplementedException();
         }
