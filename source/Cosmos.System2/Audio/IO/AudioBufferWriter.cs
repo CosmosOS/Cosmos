@@ -1,6 +1,6 @@
-﻿using Cosmos.Core;
-using Cosmos.HAL.Audio;
+﻿using Cosmos.HAL.Audio;
 using System;
+using Cosmos.Core;
 
 namespace Cosmos.System.Audio.IO {
     /// <summary>

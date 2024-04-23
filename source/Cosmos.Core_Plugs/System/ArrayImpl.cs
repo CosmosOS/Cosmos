@@ -152,5 +152,24 @@ namespace Cosmos.Core_Plugs.System
         {
             return GCImpl.CreateNewArray((int)VTablesImpl.GetSize(((CosmosRuntimeType)type).mTypeId), size);
         }
+
+        // {!} work out if this is right
+        [PlugMethod(Signature = "System_Boolean__System_Array_IsSimpleCopy_System_Array__System_Array_")]
+        public static bool IsSimpleCopy(Array sourceArray, Array destinationArray)
+        {
+            return true;
+        }
+
+        // {!} this can be faster
+        [PlugMethod(Signature = "System_Void__System_Array_CopySlow_System_Array__System_Int32__System_Array__System_Int32__System_Int32_")]
+        public static void CopySlow(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex,
+            int length, bool reliable)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                destinationArray.SetValue(sourceArray.GetValue(sourceIndex + i), destinationIndex + i);
+            }
+        }
+
     }
 }

@@ -84,5 +84,24 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Int32__System_RuntimeMethodHandle_GetSlot_System_RuntimeMethodHandleInternal_")]
+        public static int GetSlot(object aRuntimeMethodHandleInternal)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Reflection_MethodImplAttributes__System_RuntimeMethodHandle_GetImplAttributes_System_IRuntimeMethodInfo_")]
+        public static MethodImplAttributes GetImplAttributes(object aIRuntimeMethodInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Int32__System_RuntimeMethodHandle_GetGenericParameterCount_System_RuntimeMethodHandleInternal_")]
+        public static int GetGenericParameterCount(object method) // RuntimeMethodHandleInternal
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
