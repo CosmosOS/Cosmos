@@ -13,10 +13,10 @@ namespace Cosmos.HAL.BlockDevice
         public class PartInfo
         {
             public readonly byte SystemID;
-            public readonly uint StartSector;
-            public readonly uint SectorCount;
+            public readonly ulong StartSector;
+            public readonly ulong SectorCount;
 
-            public PartInfo(byte aSystemID, uint aStartSector, uint aSectorCount)
+            public PartInfo(byte aSystemID, ulong aStartSector, ulong aSectorCount)
             {
                 SystemID = aSystemID;
                 StartSector = aStartSector;
@@ -30,7 +30,7 @@ namespace Cosmos.HAL.BlockDevice
             ParsePartition(aEBR, 462);
         }
 
-        protected void ParsePartition(byte[] aEBR, uint aLoc)
+        protected void ParsePartition(byte[] aEBR, int aLoc)
         {
             byte xSystemID = aEBR[aLoc + 4];
             // SystemID = 0 means no partition
@@ -41,8 +41,8 @@ namespace Cosmos.HAL.BlockDevice
             }
             else if (xSystemID != 0)
             {
-                uint xStartSector = BitConverter.ToUInt32(aEBR, (int)aLoc + 8);
-                uint xSectorCount = BitConverter.ToUInt32(aEBR, (int)aLoc + 12);
+                ulong xStartSector = BitConverter.ToUInt64(aEBR, aLoc + 8);
+                ulong xSectorCount = BitConverter.ToUInt64(aEBR, aLoc + 12);
 
                 var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
                 Partitions.Add(xPartInfo);
