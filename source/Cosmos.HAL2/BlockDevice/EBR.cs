@@ -30,7 +30,7 @@ namespace Cosmos.HAL.BlockDevice
             ParsePartition(aEBR, 462);
         }
 
-        protected void ParsePartition(byte[] aEBR, ulong aLoc)
+        protected void ParsePartition(byte[] aEBR, int aLoc) //This should be int. ToUInt64(byte[] value, int)!!
         {
             byte xSystemID = aEBR[aLoc + 4];
             // SystemID = 0 means no partition
