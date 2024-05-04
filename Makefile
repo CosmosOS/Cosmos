@@ -156,5 +156,5 @@ template-install:
 	@printf "Installing ${GREEN}C# Template packages${DEFAULT}\n"
 	@-dotnet new uninstall $(THISDIR)/source/templates/csharp/
 	@printf "If the template was not installed, you can ignore this"
-	@dotnet new install $(THISDIR)/source/templates/csharp/
+	@dotnet new -i $(THISDIR)/source/templates/csharp/
 #TODO: Uninstall
