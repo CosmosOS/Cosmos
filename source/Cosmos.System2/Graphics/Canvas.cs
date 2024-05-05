@@ -568,10 +568,11 @@ namespace Cosmos.System.Graphics
         public virtual void DrawImage(Image image, int x, int y)
         {
             Color color;
-
-            for (int xi = 0; xi < image.Width; xi++)
+            var maxWidth = Math.Min(image.Width, (int)Mode.Width - x);
+            var maxHeight = Math.Min(image.Height, (int)Mode.Height - y);
+            for (int xi = 0; xi < maxWidth; xi++)
             {
-                for (int yi = 0; yi < image.Height; yi++)
+                for (int yi = 0; yi < maxHeight; yi++)
                 {
                     color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
                     DrawPoint(color, x + xi, y + yi);
@@ -615,9 +616,11 @@ namespace Cosmos.System.Graphics
             Color color;
 
             int[] pixels = ScaleImage(image, w, h);
-            for (int xi = 0; xi < w; xi++)
+            var maxWidth = Math.Min(w, (int)Mode.Width - x);
+            var maxHeight = Math.Min(h, (int)Mode.Height - y);
+            for (int xi = 0; xi < maxWidth; xi++)
             {
-                for (int yi = 0; yi < h; yi++)
+                for (int yi = 0; yi < maxHeight; yi++)
                 {
                     color = Color.FromArgb(pixels[xi + (yi * w)]);
                     DrawPoint(color, x + xi, y + yi);
@@ -638,10 +641,11 @@ namespace Cosmos.System.Graphics
         public void DrawImageAlpha(Image image, int x, int y)
         {
             Color color;
-
-            for (int xi = 0; xi < image.Width; xi++)
+            var maxWidth = Math.Min(image.Width, (int)Mode.Width - x);
+            var maxHeight = Math.Min(image.Height, (int)Mode.Height - y);
+            for (int xi = 0; xi < maxWidth; xi++)
             {
-                for (int yi = 0; yi < image.Height; yi++)
+                for (int yi = 0; yi < maxHeight; yi++)
                 {
                     color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
                     DrawPoint(color, x + xi, y + yi);
