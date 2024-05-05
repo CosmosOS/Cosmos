@@ -1,5 +1,6 @@
 ﻿using System;
 using Cosmos.Core;
+using Cosmos.HAL.BlockDevice.Registers;
 
 namespace Cosmos.HAL.Drivers.Video.SVGAII
 {
@@ -161,6 +162,24 @@ namespace Cosmos.HAL.Drivers.Video.SVGAII
         {
             videoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
             Update(0, 0, width, height);
+        }
+
+        public void PartUpdate(uint x, uint y, uint Width, uint Height)
+        {
+            videoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
+            uint Offset = y * Width + x;
+            for (int i = 0; i < height; i++)
+            {
+                //videoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
+                //    videoMemory.Copy(Offset, videoMemory, i * (int)width, (int)width);
+                //    byte* xDest = (byte*)(Base + aDest);
+                //    byte* xSrc = (byte*)(Base + aSrc);
+                //    MemoryOperations.Copy(xDest, xSrc, (int)aCount);
+
+                videoMemory.Copy((uint)(i * Width) + Offset, videoMemory.ToArray(), i * (int)width, (int)width);
+            }
+
+            Update(x, y, Width, Height);
         }
 
         /// <summary>

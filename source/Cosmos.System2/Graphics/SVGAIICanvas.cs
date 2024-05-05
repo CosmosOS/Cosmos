@@ -310,6 +310,14 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)driver.GetPixel((uint)x, (uint)y));
         }
 
+        public override void UpdatePart(uint x, uint y, uint width, uint height)
+        {
+            driver.PartUpdate(x, y, width, height);
+        }
+
+
+
+
         public override void Display()
         {
             driver.DoubleBufferUpdate();

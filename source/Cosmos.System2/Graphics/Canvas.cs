@@ -117,7 +117,6 @@ namespace Cosmos.System.Graphics
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
         public abstract Color GetPointColor(int x, int y);
-
         /// <summary>
         /// Gets the index of the pixel at the given coordinates.
         /// </summary>
@@ -624,6 +623,10 @@ namespace Cosmos.System.Graphics
                     DrawPoint(color, x + xi, y + yi);
                 }
             }
+        }
+        public virtual void UpdatePart(uint x, uint y, uint width, uint height)
+        {
+           
         }
 
         /// <summary>

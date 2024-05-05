@@ -266,14 +266,15 @@ namespace Cosmos.System.Graphics
             var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
 
-            int xOffset = GetPointOffset(aX, aY);
-
+          //   int xOffset = GetPointOffset(aX, aY);
+            int xOffset = aY*(int)Mode.Width + aX;
             for (int i = 0; i < xHeight; i++)
             {
-                driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+               driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
             }
-        }
 
+        }
+        
         #endregion
 
         public override void Display()
