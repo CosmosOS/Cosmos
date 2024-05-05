@@ -157,30 +157,26 @@ namespace Cosmos.HAL.Drivers.Video.SVGAII
 
         /// <summary>
         /// Update video memory.
-        /// </summary>
+        /// </summary>S
         public void DoubleBufferUpdate()
         {
             videoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
             Update(0, 0, width, height);
         }
 
-        public void PartUpdate(uint x, uint y, uint Width, uint Height)
+        public void PartUpdate(uint x, uint y, uint UpdateWidth, uint UpdateHeight)
         {
-            videoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
-            uint Offset = y * Width + x;
-            for (int i = 0; i < height; i++)
+            uint Offset = y * width + x;
+            for (uint i = 0; i < UpdateHeight; i++)
             {
-                //videoMemory.MoveDown(FrameOffset, FrameSize, FrameSize);
-                //    videoMemory.Copy(Offset, videoMemory, i * (int)width, (int)width);
-                //    byte* xDest = (byte*)(Base + aDest);
-                //    byte* xSrc = (byte*)(Base + aSrc);
-                //    MemoryOperations.Copy(xDest, xSrc, (int)aCount);
+                videoMemory.MoveDown(FrameOffset + Offset, FrameSize + Offset, UpdateWidth);
+                Offset += UpdateHeight;
 
-                videoMemory.Copy((uint)(i * Width) + Offset, videoMemory.ToArray(), i * (int)width, (int)width);
             }
 
-            Update(x, y, Width, Height);
+            Update(x, y, UpdateWidth*2, UpdateHeight);
         }
+
 
         /// <summary>
         /// Set pixel.
