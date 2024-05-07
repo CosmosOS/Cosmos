@@ -381,6 +381,46 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Resizes a specified Bitmap
+        /// </summary>
+        /// <param name="image">The original image</param>
+        /// <param name="NewW">The new width of the bitmap</param>
+        /// <param name="NewH">The new height of the bitmap</param>
+        /// <returns>Resized image</returns>
+        public static Bitmap Resize(Bitmap image, uint NewW, uint NewH)
+        {
+            Bitmap tmp = new Bitmap(1,1,image.Depth);
+            tmp.RawData = image.RawData;
+            tmp.Resize(NewW,NewH);
+            return tmp;
+        }
+
+        /// <summary>
+/// Gets a rectangle of pixels and stores it into a bitmap
+/// </summary>
+/// <param name="X">The x coordinate of the rectangle</param>
+/// <param name="Y">The y coordinate of the rectangle</param>
+/// <param name="W">The width of the rectangle</param>
+/// <param name="H">The height of the rectangle</param>
+/// <returns>Bitmap</returns>
+public static Bitmap FromCanvasRegion(Canvas canvas, int X, int Y, ushort W, ushort H)
+{
+
+    Bitmap tmp = new Bitmap(W, H, canvas.Mode.ColorDepth);
+
+    for (int x = X; x < W + X; x++)
+    {
+        for (int y = Y; y < H + Y; y++)
+        {
+            tmp.SetPixel(canvas.GetPointColor(x, y), x - X, y - Y);
+        }
+    }
+
+    return tmp;
+
+}
+
+        /// <summary>
         /// Saves the given image as a BMP file.
         /// </summary>
         /// <param name="path">The path to the file.</param>
