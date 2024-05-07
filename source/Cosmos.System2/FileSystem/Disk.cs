@@ -20,7 +20,7 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// The size of the disk in bytes.
         /// </summary>
-        public int Size { get; }
+        public long Size { get; }
         /// <summary>
         /// List of partitions
         /// </summary>
@@ -30,10 +30,12 @@ namespace Cosmos.System.FileSystem
             {
                 List<ManagedPartition> converted = new();
 
-                if (Host.Type == BlockDeviceType.RemovableCD) {
+                if (Host.Type == BlockDeviceType.RemovableCD)
+                {
                     ManagedPartition part = new(new Partition(Host, 0, 1000000000), nameof(ISO9660FileSystemFactory)); // For some reason, BlockCount is always 0, so just put a large value here.
 
-                    if (mountedPartitions[0] != null) {
+                    if (mountedPartitions[0] != null)
+                    {
                         var data = mountedPartitions[0];
                         part.RootPath = data.RootPath;
                         part.MountedFS = data;
@@ -97,7 +99,7 @@ namespace Cosmos.System.FileSystem
                     parts.Add(new ManagedPartition(part));
                 }
             }
-            Size = (int)(mainBlockDevice.BlockCount * mainBlockDevice.BlockSize);
+            Size = (long)(mainBlockDevice.BlockCount * mainBlockDevice.BlockSize);
         }
         /// <summary>
         /// Mounts all of the partitions in the disk
@@ -156,10 +158,9 @@ namespace Cosmos.System.FileSystem
                 throw new Exception("Creating partitions with GPT style not yet supported!");
             }
 
-            int location;
-            int startingSector = 63;
-            uint amountOfSectors = (uint)(size * 1024 * 1024 / 512);
-            //TODO: Check if partition is too big
+            ulong location;
+            ulong startingSector = 63;
+            ulong amountOfSectors = ((ulong)size * 1024 * 1024 / 512);
 
             if (Partitions.Count == 0)
             {
@@ -169,7 +170,7 @@ namespace Cosmos.System.FileSystem
             else if (Partitions.Count == 1)
             {
                 location = 462;
-                startingSector = (int)(Partitions[0].Host.BlockSize + Partitions[0].Host.BlockCount);
+                startingSector = (ulong)(Partitions[0].Host.BlockSize + Partitions[0].Host.BlockCount);
             }
             else if (Partitions.Count == 2)
             {
@@ -215,7 +216,7 @@ namespace Cosmos.System.FileSystem
             mbrData[510] = boot[0];
             mbrData[511] = boot[1];
 
-            Partition partion = new(Host, (ulong)startingSector, amountOfSectors);
+            Partition partion = new(Host, startingSector, amountOfSectors);
 
             Partition.Partitions.Add(partion);
             parts.Add(new ManagedPartition(partion));
@@ -299,11 +300,12 @@ namespace Cosmos.System.FileSystem
 
             foreach (var item in FileSystemManager.RegisteredFileSystems)
             {
-                if(part.LimitFS != null && item.GetType().Name != part.LimitFS) {
+                if (part.LimitFS != null && item.GetType().Name != part.LimitFS)
+                {
                     Kernel.PrintDebug("Did not mount partition " + index + " as " + item.GetType().Name + " because the partition has been limited to being a " + part.LimitFS);
                     continue;
                 }
-                
+
                 if (item.IsType(part.Host))
                 {
                     Kernel.PrintDebug("Mounted partition.");
