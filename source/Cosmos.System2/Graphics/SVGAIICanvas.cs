@@ -84,11 +84,12 @@ namespace Cosmos.System.Graphics
         {
             var argb = color.ToArgb();
             var frameSize = (int)driver.FrameSize;
-
+            width = Math.Min(width, (int)mode.Width - xStart);
+            height = Math.Min(height, (int)mode.Height - yStart);
             // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
             for (int i = yStart; i < yStart + height; i++)
             {
-                driver.videoMemory.Fill(GetPointOffset(xStart, i) + (int)frameSize, width, argb);
+                driver.videoMemory.Fill(GetPointOffset(xStart, i) + frameSize, width, argb);
             }
         }
 
@@ -310,14 +311,6 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)driver.GetPixel((uint)x, (uint)y));
         }
 
-        public override void UpdatePart(uint x, uint y, uint width, uint height)
-        {
-            driver.PartUpdate(x, y, width, height);
-        }
-
-
-
-
         public override void Display()
         {
             driver.DoubleBufferUpdate();
@@ -362,7 +355,7 @@ namespace Cosmos.System.Graphics
             var maxHeight = Math.Min(height, (int)mode.Height - y);
             var frameSize = (int)driver.FrameSize;
             var data = image.RawData;
-            
+
             for (int i = 0; i < maxHeight; i++)
             {
                 driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, maxWidth);

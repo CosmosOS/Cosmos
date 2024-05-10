@@ -627,10 +627,6 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
-        public virtual void UpdatePart(uint x, uint y, uint width, uint height)
-        {
-           
-        }
 
         /// <summary>
         /// Draws an image with alpha blending.
