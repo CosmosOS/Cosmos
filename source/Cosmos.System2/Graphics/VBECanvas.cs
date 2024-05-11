@@ -265,11 +265,11 @@ namespace Cosmos.System.Graphics
             var xBitmap = aImage.RawData;
             var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
-            int xOffset = aY * (int)Mode.Width + aX;
             if (preventOffBoundPixels)
             {
                 var maxWidth = Math.Min(xWidth, (int)mode.Width - aX);
                 var maxHeight = Math.Min(xHeight, (int)mode.Height - aY);
+                int xOffset = aY * (int)Mode.Width + aX;
                 for (int i = 0; i < maxHeight; i++)
                 {
                     driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, maxWidth);
@@ -277,7 +277,8 @@ namespace Cosmos.System.Graphics
             }
             else
             {
-                for (int i = 0; i < xHeight; i++)
+                int xOffset = aY * xHeight + aX;
+                for (int i = 0; i < Mode.Height; i++)
                 {
                     driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
                 }

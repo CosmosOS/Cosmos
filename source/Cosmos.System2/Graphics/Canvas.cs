@@ -583,12 +583,11 @@ namespace Cosmos.System.Graphics
             }
             else
             {
-                var Width = image.Width;
-                for (int xi = 0; xi < Width; xi++)
+                for (int xi = 0; xi < image.Width; xi++)
                 {
                     for (int yi = 0; yi < image.Height; yi++)
                     {
-                        color = Color.FromArgb(image.RawData[xi + (yi * Width)]);
+                        color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
                         DrawPoint(color, x + xi, y + yi);
                     }
                 }
@@ -681,12 +680,11 @@ namespace Cosmos.System.Graphics
             }
             else
             {
-                var Width = image.Width;
-                for (int xi = 0; xi < Width; xi++)
+                for (int xi = 0; xi < image.Width; xi++)
                 {
                     for (int yi = 0; yi < image.Height; yi++)
                     {
-                        color = Color.FromArgb(image.RawData[xi + (yi * Width)]);
+                        color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
                         DrawPoint(color, x + xi, y + yi);
                     }
                 }
