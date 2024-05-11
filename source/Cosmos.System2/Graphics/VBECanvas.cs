@@ -260,17 +260,27 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override void DrawImage(Image aImage, int aX, int aY)
+        public override void DrawImage(Image aImage, int aX, int aY, bool preventOffBoundPixels = true)
         {
             var xBitmap = aImage.RawData;
             var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
-            var maxWidth = Math.Min(xWidth, (int)mode.Width - aX);
-            var maxHeight = Math.Min(xHeight, (int)mode.Height - aY);
             int xOffset = aY * (int)Mode.Width + aX;
-            for (int i = 0; i < maxHeight; i++)
+            if (preventOffBoundPixels)
             {
-                driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, maxWidth);
+                var maxWidth = Math.Min(xWidth, (int)mode.Width - aX);
+                var maxHeight = Math.Min(xHeight, (int)mode.Height - aY);
+                for (int i = 0; i < maxHeight; i++)
+                {
+                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, maxWidth);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < xHeight; i++)
+                {
+                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+                }
             }
 
         }
