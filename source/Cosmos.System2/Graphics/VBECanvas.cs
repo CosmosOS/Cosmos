@@ -248,9 +248,10 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight)
+        public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight, bool preventOffBoundPixels = true)
         {
             // ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
+            if(preventOffBoundPixels)
             aWidth = (int)(Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32);
             var color = aColor.ToArgb();
 

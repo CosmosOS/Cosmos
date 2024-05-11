@@ -80,12 +80,17 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)x, (uint)y, (uint)color.ToArgb());
         }
 
-        public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height)
+        public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             var argb = color.ToArgb();
             var frameSize = (int)driver.FrameSize;
+            if(preventOffBoundPixels)
+            {
+                width = Math.Min(width, (int)mode.Width - xStart);
+                height = Math.Min(height, (int)mode.Height - yStart);
+            }
 
-            // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
+
             for (int i = yStart; i < yStart + height; i++)
             {
                 driver.videoMemory.Fill(GetPointOffset(xStart, i) + (int)frameSize, width, argb);
@@ -352,7 +357,7 @@ namespace Cosmos.System.Graphics
             var height = (int)image.Height;
             var frameSize = (int)driver.FrameSize;
             var data = image.RawData;
-            if(preventOffBoundPixels)
+            if (preventOffBoundPixels)
             {
                 var maxWidth = Math.Min(width, (int)mode.Width - x);
                 var maxHeight = Math.Min(height, (int)mode.Height - y);

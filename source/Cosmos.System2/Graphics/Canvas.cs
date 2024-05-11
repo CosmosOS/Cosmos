@@ -529,13 +529,17 @@ namespace Cosmos.System.Graphics
         /// <param name="yStart">The starting point Y coordinate.</param>
         /// <param name="width">The width of the rectangle.</param>
         /// <param name="height">The height of the rectangle.</param>
-        public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height)
+        public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             if (height == -1)
             {
                 height = width;
             }
-
+            if (preventOffBoundPixels)
+            {
+                width = Math.Min(width, (int)Mode.Width - xStart);
+                height = Math.Min(height, (int)Mode.Height - yStart);
+            }
             for (int y = yStart; y < yStart + height; y++)
             {
                 DrawLine(color, xStart, y, xStart + width - 1, y);
