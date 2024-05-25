@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.Core
@@ -479,6 +479,22 @@ namespace Cosmos.Core
                 default:
                     return null;
             }
+        }
+
+        /// <summary>
+        /// Find the RSDT (Root System Description Table).
+        /// </summary>
+        /// <returns>Pointer to the RSDT if found, null otherwise.</returns>
+        public static uint* FindRSDT()
+        {
+            uint rsdpAddress = RSDPAddress();
+            if (rsdpAddress == 0)
+            {
+                return null;
+            }
+
+            RSDPtr* rsdp = (RSDPtr*)rsdpAddress;
+            return (uint*)rsdp->RsdtAddress;
         }
     }
 }
