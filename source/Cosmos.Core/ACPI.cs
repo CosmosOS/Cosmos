@@ -36,52 +36,62 @@ namespace Cosmos.Core
             public int RsdtAddress;
         };
 
-        // New Port I/O
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct DescriptionHeader
+        {
+            public fixed byte Signature[4];
+            public uint Length;
+            public byte Revision;
+            public byte Checksum;
+            public fixed byte OEMID[6];
+            public fixed byte OEMTableID[8];
+            public uint OEMRevision;
+            public uint CreatorID;
+            public uint CreatorRevision;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct APICHeader
+        {
+            public byte Type;
+            public byte Length;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct LocalAPIC
+        {
+            public byte Type;
+            public byte Length;
+            public byte ProcessorID;
+            public byte APICID;
+            public uint Flags;
+        }
+
         /// <summary>
-        /// IO port.
+        /// New Port I/O
         /// </summary>
         private static ushort smiIO, pm1aIO, pm1bIO;
 
-        // ACPI variables
         /// <summary>
-        /// SMI CMD.
+        /// ACPI variables
         /// </summary>
         private static int* SMI_CMD;
-        /// <summary>
-        /// ACPI ENABLE.
-        /// </summary>
         private static byte ACPI_ENABLE;
-        /// <summary>
-        /// ACPI DISABLE.
-        /// </summary>
         private static byte ACPI_DISABLE;
-        /// <summary>
-        /// PM1a CNT
-        /// </summary>
         private static int* PM1a_CNT;
-        /// <summary>
-        /// PM1b CNT
-        /// </summary>
         private static int* PM1b_CNT;
-        /// <summary>
-        /// SLP TYPa
-        /// </summary>
         private static short SLP_TYPa;
-        /// <summary>
-        /// SLP TYPb
-        /// </summary>
         private static short SLP_TYPb;
-        /// <summary>
-        /// SLP EN.
-        /// </summary>
         private static short SLP_EN;
-        /// <summary>
-        /// PM1 CNT LEN1
-        /// </summary>
         private static byte PM1_CNT_LEN;
 
         /// <summary>
-        /// Check ACPI header.
+        /// FACP
+        /// </summary>
+        private static byte* Facp = null;
+
+        /// <summary>
+        /// Check ACPI header
         /// </summary>
         /// <param name="ptr"></param>
         /// <param name="sig"></param>
@@ -92,76 +102,11 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// FACP.
+        /// Compare string to byte array
         /// </summary>
-        private static byte* Facp = null;
-        /// <summary>
-        /// FACP struct.
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        struct FACP
-        {
-            /// <summary>
-            /// Signature.
-            /// </summary>
-            public fixed byte Signature[4];
-            /// <summary>
-            /// Length.
-            /// </summary>
-            public int Length;
-
-            /// <summary>
-            /// Unused.
-            /// </summary>
-            public fixed byte unneded1[40 - 8];
-            /// <summary>
-            /// DSDT.
-            /// </summary>
-            public int* DSDT;
-            /// <summary>
-            /// Unused.
-            /// </summary>
-            public fixed byte unneded2[48 - 44];
-            /// <summary>
-            /// SMI CMD.
-            /// </summary>
-            public int* SMI_CMD;
-            /// <summary>
-            /// ACPI ENABLE.
-            /// </summary>
-            public byte ACPI_ENABLE;
-            /// <summary>
-            /// ACPI DISABLE.
-            /// </summary>
-            public byte ACPI_DISABLE;
-            /// <summary>
-            /// Unused.
-            /// </summary>
-            public fixed byte unneded3[64 - 54];
-            /// <summary>
-            /// PM1a CNT BLK.
-            /// </summary>
-            public int* PM1a_CNT_BLK;
-            /// <summary>
-            /// PM1b CNT BLK.
-            /// </summary>
-            public int* PM1b_CNT_BLK;
-            /// <summary>
-            /// Unused.
-            /// </summary>
-            public fixed byte unneded4[89 - 72];
-            /// <summary>
-            /// PM1 CNT LEN.
-            /// </summary>
-            public byte PM1_CNT_LEN;
-        };
-
-        /// <summary>
-        /// Compare string to byte array.
-        /// </summary>
-        /// <param name="c1">String.</param>
-        /// <param name="c2">Pointer to the head of the byte array.</param>
-        /// <returns>0 - identical, -1 different.</returns>
+        /// <param name="c1">String</param>
+        /// <param name="c2">Pointer to the head of the byte array</param>
+        /// <returns>0 - identical, -1 different</returns>
         static int Compare(string c1, byte* c2)
         {
             for (int i = 0; i < c1.Length; i++)
@@ -172,10 +117,10 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Check RSD checksum.
+        /// Check RSD checksum
         /// </summary>
-        /// <param name="address">Address to check.</param>
-        /// <returns>True if RSDT table checksum is good.</returns>
+        /// <param name="address">Address to check</param>
+        /// <returns>True if RSDT table checksum is good</returns>
         static bool Check_RSD(uint address)
         {
             byte sum = 0;
@@ -190,7 +135,7 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Start the ACPI.
+        /// Start the ACPI
         /// </summary>
         /// <param name="initialize">Initialize the ACPI. (default = true)</param>
         /// <param name="enable">Enable the ACPI. (default = true)</param>
@@ -208,9 +153,9 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Shutdown the ACPI.
+        /// Shutdown the ACPI
         /// </summary>
-        /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
+        /// <exception cref="System.IO.IOException">Thrown on IO error</exception>
         public static void Shutdown()
         {
             Console.Clear();
@@ -230,19 +175,19 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Reboot ACPI.
+        /// Reboot ACPI
         /// Not implemented.
         /// </summary>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
+        /// <exception cref="NotImplementedException">Thrown always</exception>
         public static void Reboot()
         {
             throw new NotImplementedException("ACPI Reset not implemented yet."); //TODO
         }
 
         /// <summary>
-        /// Initialize the ACPI.
+        /// Initialize the ACPI
         /// </summary>
-        /// <returns>true on success, false on failure.</returns>
+        /// <returns>true on success, false on failure</returns>
         private static bool Init()
         {
             byte* ptr = (byte*)RSDPAddress();
@@ -340,7 +285,7 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Enable ACPI.
+        /// Enable ACPI
         /// </summary>
         public static void Enable()
         {
@@ -348,7 +293,7 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Disable ACPI.
+        /// Disable ACPI
         /// </summary>
         public static void Disable()
         {
@@ -356,9 +301,9 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Get the RSDP address.
+        /// Get the RSDP address
         /// </summary>
-        /// <returns>uint value.</returns>
+        /// <returns>uint value</returns>
         private static unsafe uint RSDPAddress()
         {
             for (uint addr = 0xE0000; addr < 0x100000; addr += 4)
@@ -425,9 +370,9 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Get data from the FACP table.
+        /// Get data from the FACP table
         /// </summary>
-        /// <param name="number">Index number of the data to get.
+        /// <param name="number">Index number of the data to get
         /// <list type="bullet">
         /// <item>0 - ACPI ENABLE</item>
         /// <item>1 - ACPI DISABLE</item>
@@ -435,7 +380,7 @@ namespace Cosmos.Core
         /// <item>other - 0</item>
         /// </list>
         /// </param>
-        /// <returns>byte value.</returns>
+        /// <returns>byte value</returns>
         private static byte facpbget(int number)
         {
             switch (number)
@@ -452,9 +397,9 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Get pointer to the data on the FACP.
+        /// Get pointer to the data on the FACP
         /// </summary>
-        /// <param name="number">Index number of the data to get.
+        /// <param name="number">Index number of the data to get
         /// <list type="bullet">
         /// <item>0 - DSDT</item>
         /// <item>1 - SMI CMD</item>
@@ -463,7 +408,7 @@ namespace Cosmos.Core
         /// <item>other - null</item>
         /// </list>
         /// </param>
-        /// <returns>int pointer.</returns>
+        /// <returns>int pointer</returns>
         private static int* facpget(int number)
         {
             switch (number)
@@ -482,9 +427,9 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Get the address of the RSDT.
+        /// Get the address of the RSDT
         /// </summary>
-        /// <returns>Address of the RSDT or 0 if not found.</returns>
+        /// <returns>Address of the RSDT or 0 if not found</returns>
         public static uint GetRSDTAddress()
         {
             uint rsdpAddr = RSDPAddress();
@@ -498,9 +443,9 @@ namespace Cosmos.Core
         }
 
         /// <summary>
-        /// Get the contents of the RSDT.
+        /// Get the contents of the RSDT
         /// </summary>
-        /// <returns>Pointer to the RSDT contents or null if not found.</returns>
+        /// <returns>Pointer to the RSDT contents or null if not found</returns>
         public static byte* GetRSDTContents()
         {
             uint rsdtAddr = GetRSDTAddress();
@@ -510,6 +455,59 @@ namespace Cosmos.Core
             }
 
             return (byte*)rsdtAddr;
+        }
+
+        /// <summary>
+        /// Count the number of local APIC entries in the APIC table
+        /// </summary>
+        /// <returns>Number of local APIC entries</returns>
+        public static int CountLocalAPICEntries()
+        {
+            byte* rsdtContents = GetRSDTContents();
+            if (rsdtContents == null)
+            {
+                return 0;
+            }
+
+            var rsdtHeader = (DescriptionHeader*)rsdtContents;
+            int entriesCount = (rsdtHeader->Length - sizeof(DescriptionHeader)) / 4;
+            uint* tableEntries = (uint*)(rsdtContents + sizeof(DescriptionHeader));
+
+            for (int i = 0; i < entriesCount; i++)
+            {
+                byte* tablePtr = (byte*)tableEntries[i];
+                if (Compare("APIC", tablePtr) == 0)
+                {
+                    return CountAPICEntries(tablePtr);
+                }
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Count the number of APIC entries
+        /// </summary>
+        /// <param name="apicTable">Pointer to the APIC table</param>
+        /// <returns>Number of APIC entries</returns>
+        private static int CountAPICEntries(byte* apicTable)
+        {
+            var apicHeader = (DescriptionHeader*)apicTable;
+            int length = (int)apicHeader->Length;
+            int count = 0;
+            byte* ptr = apicTable + sizeof(DescriptionHeader);
+
+            while (ptr < apicTable + length)
+            {
+                var header = (APICHeader*)ptr;
+                if (header->Type == 0) // Type 0 indicates a Processor Local APIC
+                {
+                    count++;
+                }
+                ptr += header->Length;
+            }
+
+            return count;
         }
     }
 }
