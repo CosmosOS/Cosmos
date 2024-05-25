@@ -12,67 +12,156 @@ namespace Cosmos.Core
         /// RSD table struct.
         /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct RSDPtr
+        public unsafe struct RSDPtr
         {
+            /// <summary>
+            /// Signature.
+            /// </summary>
             public fixed byte Signature[8];
+            /// <summary>
+            /// CheckSum
+            /// </summary>
             public byte CheckSum;
+            /// <summary>
+            /// OemID
+            /// </summary>
             public fixed byte OemID[6];
+            /// <summary>
+            /// Revision
+            /// </summary>
             public byte Revision;
-            public uint RsdtAddress;
+            /// <summary>
+            /// RSDT Address
+            /// </summary>
+            public int RsdtAddress;
         };
 
-        /// <summary>
-        /// RSDT table struct.
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct RSDT
-        {
-            public fixed byte Signature[4];
-            public uint Length;
-            public byte Revision;
-            public byte Checksum;
-            public fixed byte OemID[6];
-            public fixed byte OemTableID[8];
-            public uint OemRevision;
-            public uint CreatorID;
-            public uint CreatorRevision;
-            public fixed uint Entry[1]; // Placeholder for the start of the array of pointers to other tables
-        }
-
         // New Port I/O
+        /// <summary>
+        /// IO port.
+        /// </summary>
         private static ushort smiIO, pm1aIO, pm1bIO;
 
         // ACPI variables
+        /// <summary>
+        /// SMI CMD.
+        /// </summary>
         private static int* SMI_CMD;
+        /// <summary>
+        /// ACPI ENABLE.
+        /// </summary>
         private static byte ACPI_ENABLE;
+        /// <summary>
+        /// ACPI DISABLE.
+        /// </summary>
         private static byte ACPI_DISABLE;
+        /// <summary>
+        /// PM1a CNT
+        /// </summary>
         private static int* PM1a_CNT;
+        /// <summary>
+        /// PM1b CNT
+        /// </summary>
         private static int* PM1b_CNT;
+        /// <summary>
+        /// SLP TYPa
+        /// </summary>
         private static short SLP_TYPa;
+        /// <summary>
+        /// SLP TYPb
+        /// </summary>
         private static short SLP_TYPb;
+        /// <summary>
+        /// SLP EN.
+        /// </summary>
         private static short SLP_EN;
+        /// <summary>
+        /// PM1 CNT LEN1
+        /// </summary>
         private static byte PM1_CNT_LEN;
 
-        private static byte* Facp = null;
+        /// <summary>
+        /// Check ACPI header.
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <param name="sig"></param>
+        /// <returns></returns>
+        static int acpiCheckHeader(byte* ptr, string sig)
+        {
+            return Compare(sig, ptr);
+        }
 
+        /// <summary>
+        /// FACP.
+        /// </summary>
+        private static byte* Facp = null;
+        /// <summary>
+        /// FACP struct.
+        /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct FACP
         {
+            /// <summary>
+            /// Signature.
+            /// </summary>
             public fixed byte Signature[4];
+            /// <summary>
+            /// Length.
+            /// </summary>
             public int Length;
+
+            /// <summary>
+            /// Unused.
+            /// </summary>
             public fixed byte unneded1[40 - 8];
+            /// <summary>
+            /// DSDT.
+            /// </summary>
             public int* DSDT;
+            /// <summary>
+            /// Unused.
+            /// </summary>
             public fixed byte unneded2[48 - 44];
+            /// <summary>
+            /// SMI CMD.
+            /// </summary>
             public int* SMI_CMD;
+            /// <summary>
+            /// ACPI ENABLE.
+            /// </summary>
             public byte ACPI_ENABLE;
+            /// <summary>
+            /// ACPI DISABLE.
+            /// </summary>
             public byte ACPI_DISABLE;
+            /// <summary>
+            /// Unused.
+            /// </summary>
             public fixed byte unneded3[64 - 54];
+            /// <summary>
+            /// PM1a CNT BLK.
+            /// </summary>
             public int* PM1a_CNT_BLK;
+            /// <summary>
+            /// PM1b CNT BLK.
+            /// </summary>
             public int* PM1b_CNT_BLK;
+            /// <summary>
+            /// Unused.
+            /// </summary>
             public fixed byte unneded4[89 - 72];
+            /// <summary>
+            /// PM1 CNT LEN.
+            /// </summary>
             public byte PM1_CNT_LEN;
         };
 
+        /// <summary>
+        /// Compare string to byte array.
+        /// </summary>
+        /// <param name="c1">String.</param>
+        /// <param name="c2">Pointer to the head of the byte array.</param>
+        /// <returns>0 - identical, -1 different.</returns>
         static int Compare(string c1, byte* c2)
         {
             for (int i = 0; i < c1.Length; i++)
@@ -82,6 +171,11 @@ namespace Cosmos.Core
             return 0;
         }
 
+        /// <summary>
+        /// Check RSD checksum.
+        /// </summary>
+        /// <param name="address">Address to check.</param>
+        /// <returns>True if RSDT table checksum is good.</returns>
         static bool Check_RSD(uint address)
         {
             byte sum = 0;
@@ -95,6 +189,11 @@ namespace Cosmos.Core
             return sum == 0;
         }
 
+        /// <summary>
+        /// Start the ACPI.
+        /// </summary>
+        /// <param name="initialize">Initialize the ACPI. (default = true)</param>
+        /// <param name="enable">Enable the ACPI. (default = true)</param>
         public static void Start(bool initialize = true, bool enable = true)
         {
             if (initialize)
@@ -108,6 +207,10 @@ namespace Cosmos.Core
             }
         }
 
+        /// <summary>
+        /// Shutdown the ACPI.
+        /// </summary>
+        /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
         public static void Shutdown()
         {
             Console.Clear();
@@ -126,11 +229,20 @@ namespace Cosmos.Core
             CPU.Halt();
         }
 
+        /// <summary>
+        /// Reboot ACPI.
+        /// Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Thrown always.</exception>
         public static void Reboot()
         {
-            throw new NotImplementedException("ACPI Reset not implemented yet.");
+            throw new NotImplementedException("ACPI Reset not implemented yet."); //TODO
         }
 
+        /// <summary>
+        /// Initialize the ACPI.
+        /// </summary>
+        /// <returns>true on success, false on failure.</returns>
         private static bool Init()
         {
             byte* ptr = (byte*)RSDPAddress();
@@ -227,16 +339,26 @@ namespace Cosmos.Core
             return false;
         }
 
+        /// <summary>
+        /// Enable ACPI.
+        /// </summary>
         public static void Enable()
         {
             smiIO = ACPI_ENABLE;
         }
 
+        /// <summary>
+        /// Disable ACPI.
+        /// </summary>
         public static void Disable()
         {
             smiIO = ACPI_DISABLE;
         }
 
+        /// <summary>
+        /// Get the RSDP address.
+        /// </summary>
+        /// <returns>uint value.</returns>
         private static unsafe uint RSDPAddress()
         {
             for (uint addr = 0xE0000; addr < 0x100000; addr += 4)
@@ -264,6 +386,11 @@ namespace Cosmos.Core
             return 0;
         }
 
+        /// <summary>
+        /// Check RSDT table
+        /// </summary>
+        /// <param name="ptr">A pointer to the RSDT</param>
+        /// <returns>RSDT table address</returns>
         private static uint* acpiCheckRSDPtr(uint* ptr)
         {
             string sig = "RSD PTR ";
@@ -297,6 +424,18 @@ namespace Cosmos.Core
             return null;
         }
 
+        /// <summary>
+        /// Get data from the FACP table.
+        /// </summary>
+        /// <param name="number">Index number of the data to get.
+        /// <list type="bullet">
+        /// <item>0 - ACPI ENABLE</item>
+        /// <item>1 - ACPI DISABLE</item>
+        /// <item>2 - PM1 CNT LEN</item>
+        /// <item>other - 0</item>
+        /// </list>
+        /// </param>
+        /// <returns>byte value.</returns>
         private static byte facpbget(int number)
         {
             switch (number)
@@ -312,6 +451,19 @@ namespace Cosmos.Core
             }
         }
 
+        /// <summary>
+        /// Get pointer to the data on the FACP.
+        /// </summary>
+        /// <param name="number">Index number of the data to get.
+        /// <list type="bullet">
+        /// <item>0 - DSDT</item>
+        /// <item>1 - SMI CMD</item>
+        /// <item>2 - PM1a</item>
+        /// <item>3 - PM1b</item>
+        /// <item>other - null</item>
+        /// </list>
+        /// </param>
+        /// <returns>int pointer.</returns>
         private static int* facpget(int number)
         {
             switch (number)
@@ -329,23 +481,35 @@ namespace Cosmos.Core
             }
         }
 
-        public static RSDT* FindRSDT()
+        /// <summary>
+        /// Get the address of the RSDT.
+        /// </summary>
+        /// <returns>Address of the RSDT or 0 if not found.</returns>
+        public static uint GetRSDTAddress()
         {
-            uint rsdpAddress = RSDPAddress();
-            if (rsdpAddress == 0)
+            uint rsdpAddr = RSDPAddress();
+            if (rsdpAddr == 0)
+            {
+                return 0;
+            }
+
+            var rsdp = (RSDPtr*)rsdpAddr;
+            return (uint)rsdp->RsdtAddress;
+        }
+
+        /// <summary>
+        /// Get the contents of the RSDT.
+        /// </summary>
+        /// <returns>Pointer to the RSDT contents or null if not found.</returns>
+        public static byte* GetRSDTContents()
+        {
+            uint rsdtAddr = GetRSDTAddress();
+            if (rsdtAddr == 0)
             {
                 return null;
             }
 
-            RSDPtr* rsdp = (RSDPtr*)rsdpAddress;
-            uint rsdtAddress = rsdp->RsdtAddress;
-
-            if (rsdtAddress == 0)
-            {
-                return null;
-            }
-
-            return (RSDT*)rsdtAddress;
+            return (byte*)rsdtAddr;
         }
     }
 }
