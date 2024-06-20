@@ -101,6 +101,14 @@ namespace Cosmos.System.Graphics
         public abstract void DrawPoint(Color color, int x, int y);
 
         /// <summary>
+        /// Sets the pixel at the given coordinates to the specified <paramref name="color"/>. without ToArgb()
+        /// </summary>
+        /// <param name="color">The color to draw with (raw argb).</param>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        public abstract void DrawRawPoint(uint color, int x, int y);
+
+        /// <summary>
         /// The name of the Canvas implementation.
         /// </summary>
         public abstract string Name();
@@ -117,6 +125,13 @@ namespace Cosmos.System.Graphics
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
         public abstract Color GetPointColor(int x, int y);
+
+        /// <summary>
+        /// Gets the color of the pixel at the given coordinates in ARGB.
+        /// </summary>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        public abstract int GetRawPointColor(int x, int y);
         /// <summary>
         /// Gets the index of the pixel at the given coordinates.
         /// </summary>
@@ -598,6 +613,29 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Draws the given image at the specified coordinates, cropped to maxWidth and maxHeight
+        /// </summary>
+        /// <param name="image">The image to draw.</param>
+        /// <param name="x">The origin X coordinate.</param>
+        /// <param name="y">The origin Y coordinate.</param>
+        /// <param name="maxWidth">Max image width to display</param>
+        /// <param name="maxHeight">Max image height to display</param>
+        public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        {
+
+        }
+
+        public virtual Bitmap GetImage(int x, int y, int width, int height)
+        {
+            Bitmap bitmap = new Bitmap((uint)x, (uint)y, ColorDepth.ColorDepth32);
+
+            for (int posy = y, desty = 0; posy < y + y; posy++, desty++)
+                for (int posx = x, destx = 0; posx < x + x; posx++, destx++)
+                    bitmap.RawData[desty * x + destx] = GetRawPointColor(posx, posy);
+            return bitmap;
+        }
+
         static int[] ScaleImage(Image image, int newWidth, int newHeight)
         {
             int[] pixels = image.RawData;
@@ -666,7 +704,7 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
-        public void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
+        public virtual void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
             if (preventOffBoundPixels)

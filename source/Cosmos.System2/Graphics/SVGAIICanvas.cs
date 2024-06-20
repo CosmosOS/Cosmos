@@ -80,6 +80,11 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)x, (uint)y, (uint)color.ToArgb());
         }
 
+        public override void DrawRawPoint(uint color, int x, int y)
+        {
+            driver.SetPixel((uint)x, (uint)y, color);
+        }
+
         public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             var argb = color.ToArgb();
@@ -94,6 +99,37 @@ namespace Cosmos.System.Graphics
             for (int i = yStart; i < yStart + height; i++)
             {
                 driver.videoMemory.Fill(GetPointOffset(xStart, i) + (int)frameSize, width, argb);
+            }
+        }
+
+        public override void DrawRectangle(Color color, int x, int y, int width, int height)
+        {
+            int rawColor = color.ToArgb();
+
+            /* Draw the top edge (A to B) */
+            for (int posX = x; posX < x + width; posX++)
+            {
+                DrawRawPoint((uint)rawColor, posX, y);
+            }
+
+            /* Draw the bottom edge (C to D) */
+            int newY = y + height;
+            for (int posX = x; posX < x + width; posX++)
+            {
+                DrawRawPoint((uint)rawColor, posX, newY);
+            }
+
+            /* Draw the left edge (A to C) */
+            for (int posY = y; posY < y + height; posY++)
+            {
+                DrawRawPoint((uint)rawColor, x, posY);
+            }
+
+            /* Draw the right edge (B to D) */
+            int newX = x + width;
+            for (int posY = y; posY < y + height; posY++)
+            {
+                DrawRawPoint((uint)rawColor, newX, posY);
             }
         }
 
@@ -315,6 +351,11 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)driver.GetPixel((uint)x, (uint)y));
         }
 
+        public override int GetRawPointColor(int x, int y)
+        {
+            return (int)driver.GetPixel((uint)x, (uint)y);
+        }
+
         public override void Display()
         {
             driver.DoubleBufferUpdate();
@@ -374,6 +415,34 @@ namespace Cosmos.System.Graphics
                     driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
                 }
             }
+        }
+
+        public override void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        {
+            var width = maxWidth;
+            var height = maxHeight;
+            var frameSize = (int)driver.FrameSize;
+            var data = image.RawData;
+            for (int i = 0; i < height; i++)
+            {
+                driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
+            }
+        }
+
+        public override Bitmap GetImage(int x, int y, int width, int height)
+        {
+            var frameSize = (int)driver.FrameSize;
+            int[] buffer = new int[width];
+            int[] all = new int[width * height];
+            for (int i = 0; i < height; i++)
+            {
+                driver.videoMemory.Get(GetPointOffset(x, y + i) + frameSize, buffer, 0, width);
+                buffer.CopyTo(all, width * i);
+            }
+            Bitmap toReturn = new Bitmap((uint)width, (uint)height, ColorDepth.ColorDepth32);
+            toReturn.RawData = all;
+
+            return toReturn;
         }
     }
 }
