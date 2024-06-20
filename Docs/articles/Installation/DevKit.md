@@ -31,7 +31,7 @@
 * QEMU or any other virtual machine. See [Running](https://cosmosos.github.io/articles/Installation/Running.html) for more information.
 
 ###  Installation
-Git cline the current source code of Cosmos.
+Git clone the current source code of Cosmos.
 Run `make` to build Cosmos. Cosmos will clone all the required repos, build itself, and install it and its nuget packages to the system automatically.
 
 ## MacOS (Apple Silicon/Intel)
@@ -39,7 +39,7 @@ It is currently difficult to build Cosmos on Apple Silicon Devices. So, we are g
 
 ### Prerequisites
 
-* Docker (`brew cask install docker`)
+* Docker (`brew install --cask docker`)
 * QEMU or any other virtual machine. See [Running](https://cosmosos.github.io/articles/Installation/Running.html) for more information.
 
 
