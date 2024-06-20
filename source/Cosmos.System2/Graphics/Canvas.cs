@@ -613,6 +613,19 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Draws the given image at the specified coordinates, cropped to maxWidth and maxHeight
+        /// </summary>
+        /// <param name="image">The image to draw.</param>
+        /// <param name="x">The origin X coordinate.</param>
+        /// <param name="y">The origin Y coordinate.</param>
+        /// <param name="maxWidth">Max image width to display</param>
+        /// <param name="maxHeight">Max image height to display</param>
+        public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        {
+
+        }
+
         public virtual Bitmap GetImage(int x, int y, int width, int height)
         {
             Bitmap bitmap = new Bitmap((uint)x, (uint)y, ColorDepth.ColorDepth32);
