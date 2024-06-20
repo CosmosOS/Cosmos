@@ -351,6 +351,11 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)driver.GetPixel((uint)x, (uint)y));
         }
 
+        public override int GetRawPointColor(int x, int y)
+        {
+            return (int)driver.GetPixel((uint)x, (uint)y);
+        }
+
         public override void Display()
         {
             driver.DoubleBufferUpdate();
@@ -411,6 +416,20 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
+        public override Bitmap GetImage(int x, int y, int width, int height)
+        {
+            var frameSize = (int)driver.FrameSize;
+            int[] buffer = new int[width];
+            int[] all = new int[width * height];
+            for (int i = 0; i < height; i++)
+            {
+                driver.videoMemory.Get(GetPointOffset(x, y + i) + frameSize, buffer, 0, width);
+                buffer.CopyTo(all, width * i);
+            }
+            Bitmap toReturn = new Bitmap((uint)width, (uint)height, ColorDepth.ColorDepth32);
+            toReturn.RawData = all;
 
+            return toReturn;
+        }
     }
 }

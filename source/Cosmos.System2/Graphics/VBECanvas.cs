@@ -361,6 +361,12 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)driver.GetVRAM(offset));
         }
 
+        public override int GetRawPointColor(int aX, int aY)
+        {
+            uint offset = (uint)GetPointOffset(aX, aY);
+            return (int)driver.GetVRAM(offset);
+        }
+
         #endregion
 
     }
