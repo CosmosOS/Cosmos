@@ -125,6 +125,13 @@ namespace Cosmos.System.Graphics
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
         public abstract Color GetPointColor(int x, int y);
+
+        /// <summary>
+        /// Gets the color of the pixel at the given coordinates in ARGB.
+        /// </summary>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        public abstract int GetRawPointColor(int x, int y);
         /// <summary>
         /// Gets the index of the pixel at the given coordinates.
         /// </summary>
@@ -604,6 +611,16 @@ namespace Cosmos.System.Graphics
                     }
                 }
             }
+        }
+
+        public virtual Bitmap GetImage(int x, int y, int width, int height)
+        {
+            Bitmap bitmap = new Bitmap((uint)x, (uint)y, ColorDepth.ColorDepth32);
+
+            for (int posy = y, desty = 0; posy < y + y; posy++, desty++)
+                for (int posx = x, destx = 0; posx < x + x; posx++, destx++)
+                    bitmap.RawData[desty * x + destx] = GetRawPointColor(posx, posy);
+            return bitmap;
         }
 
         static int[] ScaleImage(Image image, int newWidth, int newHeight)
