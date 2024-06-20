@@ -80,6 +80,11 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)x, (uint)y, (uint)color.ToArgb());
         }
 
+        public override void DrawRawPoint(uint color, int x, int y)
+        {
+            driver.SetPixel((uint)x, (uint)y, color);
+        }
+
         public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             var argb = color.ToArgb();

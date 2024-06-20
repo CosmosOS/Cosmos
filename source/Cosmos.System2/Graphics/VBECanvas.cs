@@ -234,6 +234,34 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public override void DrawRawPoint(uint aColor, int aX, int aY)
+        {
+            uint offset;
+
+            switch (Mode.ColorDepth)
+            {
+                case ColorDepth.ColorDepth32:
+                    offset = (uint)GetPointOffset(aX, aY);
+
+                    driver.SetVRAM(offset, (byte)((aColor >> 16) & 0xFF));
+                    driver.SetVRAM(offset + 1, (byte)((aColor >> 8) & 0xFF));
+                    driver.SetVRAM(offset + 2, (byte)(aColor & 0xFF));
+                    driver.SetVRAM(offset + 3, (byte)((aColor >> 24) & 0xFF));
+
+                    break;
+                case ColorDepth.ColorDepth24:
+                    offset = (uint)GetPointOffset(aX, aY);
+
+                    driver.SetVRAM(offset, (byte)((aColor >> 16) & 0xFF));
+                    driver.SetVRAM(offset + 1, (byte)((aColor >> 8) & 0xFF));
+                    driver.SetVRAM(offset + 2, (byte)(aColor & 0xFF));
+
+                    break;
+                default:
+                    throw new NotImplementedException("Drawing pixels with color depth " + (int)Mode.ColorDepth + " is not yet supported.");
+            }
+        }
+
         public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
         {
             ThrowIfCoordNotValid(aX, aY);

@@ -101,6 +101,14 @@ namespace Cosmos.System.Graphics
         public abstract void DrawPoint(Color color, int x, int y);
 
         /// <summary>
+        /// Sets the pixel at the given coordinates to the specified <paramref name="color"/>. without ToArgb()
+        /// </summary>
+        /// <param name="color">The color to draw with (raw argb).</param>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        public abstract void DrawRawPoint(uint color, int x, int y);
+
+        /// <summary>
         /// The name of the Canvas implementation.
         /// </summary>
         public abstract string Name();
