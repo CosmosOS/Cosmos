@@ -674,7 +674,7 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
-        public void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
+        public virtual void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
             if (preventOffBoundPixels)

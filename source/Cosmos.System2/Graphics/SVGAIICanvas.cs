@@ -102,6 +102,37 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public override void DrawRectangle(Color color, int x, int y, int width, int height)
+        {
+            int rawColor = color.ToArgb();
+
+            /* Draw the top edge (A to B) */
+            for (int posX = x; posX < x + width; posX++)
+            {
+                DrawRawPoint((uint)rawColor, posX, y);
+            }
+
+            /* Draw the bottom edge (C to D) */
+            int newY = y + height;
+            for (int posX = x; posX < x + width; posX++)
+            {
+                DrawRawPoint((uint)rawColor, posX, newY);
+            }
+
+            /* Draw the left edge (A to C) */
+            for (int posY = y; posY < y + height; posY++)
+            {
+                DrawRawPoint((uint)rawColor, x, posY);
+            }
+
+            /* Draw the right edge (B to D) */
+            int newX = x + width;
+            for (int posY = y; posY < y + height; posY++)
+            {
+                DrawRawPoint((uint)rawColor, newX, posY);
+            }
+        }
+
         //public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
         /// <summary>
         /// Available SVGA 2 supported video modes.
