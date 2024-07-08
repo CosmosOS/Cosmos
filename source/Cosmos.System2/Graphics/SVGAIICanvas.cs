@@ -104,32 +104,49 @@ namespace Cosmos.System.Graphics
 
         public override void DrawRectangle(Color color, int x, int y, int width, int height)
         {
-            int rawColor = color.ToArgb();
-
-            /* Draw the top edge (A to B) */
-            for (int posX = x; posX < x + width; posX++)
+            if(color.A < 255)
             {
-                DrawRawPoint((uint)rawColor, posX, y);
+                // Draw top edge from (x, y) to (x + width, y)
+                DrawLine(color, x, y, x + width, y);
+
+                // Draw left edge from (x, y) to (x, y + height)
+                DrawLine(color, x, y, x, y + height);
+
+                // Draw bottom edge from (x, y + height) to (x + width, y + height)
+                DrawLine(color, x, y + height, x + width, y + height);
+
+                // Draw right edge from (x + width, y) to (x + width, y + height)
+                DrawLine(color, x + width, y, x + width, y + height);
             }
-
-            /* Draw the bottom edge (C to D) */
-            int newY = y + height;
-            for (int posX = x; posX < x + width; posX++)
+            else
             {
-                DrawRawPoint((uint)rawColor, posX, newY);
-            }
+                int rawColor = color.ToArgb();
 
-            /* Draw the left edge (A to C) */
-            for (int posY = y; posY < y + height; posY++)
-            {
-                DrawRawPoint((uint)rawColor, x, posY);
-            }
+                /* Draw the top edge (A to B) */
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawRawPoint((uint)rawColor, posX, y);
+                }
 
-            /* Draw the right edge (B to D) */
-            int newX = x + width;
-            for (int posY = y; posY < y + height; posY++)
-            {
-                DrawRawPoint((uint)rawColor, newX, posY);
+                /* Draw the bottom edge (C to D) */
+                int newY = y + height;
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawRawPoint((uint)rawColor, posX, newY);
+                }
+
+                /* Draw the left edge (A to C) */
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawRawPoint((uint)rawColor, x, posY);
+                }
+
+                /* Draw the right edge (B to D) */
+                int newX = x + width;
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawRawPoint((uint)rawColor, newX, posY);
+                }
             }
         }
 
@@ -417,6 +434,14 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Draws a cropped image on the canvas at the specified position with maximum width and height.
+        /// </summary>
+        /// <param name="image">The image to be drawn.</param>
+        /// <param name="x">The x-coordinate of the top-left corner where the image will be drawn.</param>
+        /// <param name="y">The y-coordinate of the top-left corner where the image will be drawn.</param>
+        /// <param name="maxWidth">The maximum width of the cropped area.</param>
+        /// <param name="maxHeight">The maximum height of the cropped area.</param>
         public override void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
         {
             var width = maxWidth;
@@ -429,6 +454,14 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Retrieves a specified region of the canvas as a bitmap.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the top-left corner of the region.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the region.</param>
+        /// <param name="width">The width of the region to retrieve.</param>
+        /// <param name="height">The height of the region to retrieve.</param>
+        /// <returns>A bitmap containing the specified region of the canvas.</returns>
         public override Bitmap GetImage(int x, int y, int width, int height)
         {
             var frameSize = (int)driver.FrameSize;

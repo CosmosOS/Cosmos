@@ -279,8 +279,8 @@ namespace Cosmos.System.Graphics
         public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight, bool preventOffBoundPixels = true)
         {
             // ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
-            if(preventOffBoundPixels)
-            aWidth = (int)(Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32);
+            if (preventOffBoundPixels)
+                aWidth = (int)(Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32);
             var color = aColor.ToArgb();
 
             for (int i = aY; i < aY + aHeight; i++)
@@ -289,34 +289,59 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Draws a rectangle on the canvas with the specified color and dimensions.
+        /// </summary>
+        /// <param name="color">The color of the rectangle.</param>
+        /// <param name="x">The x-coordinate of the top-left corner of the rectangle.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the rectangle.</param>
+        /// <param name="width">The width of the rectangle.</param>
+        /// <param name="height">The height of the rectangle.</param>
         public override void DrawRectangle(Color color, int x, int y, int width, int height)
         {
-            int rawColor = color.ToArgb();
-
-            /* Draw the top edge (A to B) */
-            for (int posX = x; posX < x + width; posX++)
+            if (color.A < 255)
             {
-                DrawRawPoint((uint)rawColor, posX, y);
+                // Draw top edge from (x, y) to (x + width, y)
+                DrawLine(color, x, y, x + width, y);
+
+                // Draw left edge from (x, y) to (x, y + height)
+                DrawLine(color, x, y, x, y + height);
+
+                // Draw bottom edge from (x, y + height) to (x + width, y + height)
+                DrawLine(color, x, y + height, x + width, y + height);
+
+                // Draw right edge from (x + width, y) to (x + width, y + height)
+                DrawLine(color, x + width, y, x + width, y + height);
             }
-
-            /* Draw the bottom edge (C to D) */
-            int newY = y + height;
-            for (int posX = x; posX < x + width; posX++)
+            else
             {
-                DrawRawPoint((uint)rawColor, posX, newY);
-            }
+                int rawColor = color.ToArgb();
 
-            /* Draw the left edge (A to C) */
-            for (int posY = y; posY < y + height; posY++)
-            {
-                DrawRawPoint((uint)rawColor, x, posY);
-            }
+                /* Draw the top edge (A to B) */
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawRawPoint((uint)rawColor, posX, y);
+                }
 
-            /* Draw the right edge (B to D) */
-            int newX = x + width;
-            for (int posY = y; posY < y + height; posY++)
-            {
-                DrawRawPoint((uint)rawColor, newX, posY);
+                /* Draw the bottom edge (C to D) */
+                int newY = y + height;
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawRawPoint((uint)rawColor, posX, newY);
+                }
+
+                /* Draw the left edge (A to C) */
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawRawPoint((uint)rawColor, x, posY);
+                }
+
+                /* Draw the right edge (B to D) */
+                int newX = x + width;
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawRawPoint((uint)rawColor, newX, posY);
+                }
             }
         }
 

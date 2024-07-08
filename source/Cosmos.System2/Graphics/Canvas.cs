@@ -500,40 +500,17 @@ namespace Cosmos.System.Graphics
         /// <param name="height">The height of the rectangle.</param>
         public virtual void DrawRectangle(Color color, int x, int y, int width, int height)
         {
-            /*
-             * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
-             * vertex (we call these vertexes A, B, C, D as for geometric convention)
-             */
+            // Draw top edge from (x, y) to (x + width, y)
+            DrawLine(color, x, y, x + width, y);
 
-            /* The check of the validity of x and y are done in DrawLine() */
+            // Draw left edge from (x, y) to (x, y + height)
+            DrawLine(color, x, y, x, y + height);
 
-            /* The vertex A is where x,y are */
-            int xa = x;
-            int ya = y;
+            // Draw bottom edge from (x, y + height) to (x + width, y + height)
+            DrawLine(color, x, y + height, x + width, y + height);
 
-            /* The vertex B has the same y coordinate of A but x is moved of width pixels */
-            int xb = x + width;
-            int yb = y;
-
-            /* The vertex C has the same x coordiate of A but this time is y that is moved of height pixels */
-            int xc = x;
-            int yc = y + height;
-
-            /* The Vertex D has x moved of width pixels and y moved of height pixels */
-            int xd = x + width;
-            int yd = y + height;
-
-            /* Draw a line betwen A and B */
-            DrawLine(color, xa, ya, xb, yb);
-
-            /* Draw a line between A and C */
-            DrawLine(color, xa, ya, xc, yc);
-
-            /* Draw a line between B and D */
-            DrawLine(color, xb, yb, xd, yd);
-
-            /* Draw a line between C and D */
-            DrawLine(color, xc, yc, xd, yd);
+            // Draw right edge from (x + width, y) to (x + width, y + height)
+            DrawLine(color, x + width, y, x + width, y + height);
         }
 
         /// <summary>
@@ -626,6 +603,14 @@ namespace Cosmos.System.Graphics
 
         }
 
+        /// <summary>
+        /// Retrieves a specified region of the canvas as a bitmap.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the top-left corner of the region.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the region.</param>
+        /// <param name="width">The width of the region to retrieve.</param>
+        /// <param name="height">The height of the region to retrieve.</param>
+        /// <returns>A bitmap containing the specified region of the canvas.</returns>
         public virtual Bitmap GetImage(int x, int y, int width, int height)
         {
             Bitmap bitmap = new Bitmap((uint)x, (uint)y, ColorDepth.ColorDepth32);
@@ -636,6 +621,13 @@ namespace Cosmos.System.Graphics
             return bitmap;
         }
 
+        /// <summary>
+        /// Scales an image to the specified new width and height.
+        /// </summary>
+        /// <param name="image">The image to be scaled.</param>
+        /// <param name="newWidth">The width of the scaled image.</param>
+        /// <param name="newHeight">The height of the scaled image.</param>
+        /// <returns>An array of integers representing the scaled image's pixel data. (Raw bitmap data)</returns>
         static int[] ScaleImage(Image image, int newWidth, int newHeight)
         {
             int[] pixels = image.RawData;
