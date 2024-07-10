@@ -108,10 +108,6 @@ namespace Cosmos.Core_Plugs.System
                 return "The given path {0} is {1}";
             }
 
-            //Console.Write("Getting resource: '");
-            //Console.Write(aResource);
-            //Console.WriteLine("'");
-            //Console.ReadLine();
             return aKey;
         }
     }
