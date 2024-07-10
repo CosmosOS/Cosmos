@@ -86,8 +86,13 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override void DrawFilledRectangle(Color aColor, int aXStart, int aYStart, int aWidth, int aHeight)
+        public override void DrawFilledRectangle(Color aColor, int aXStart, int aYStart, int aWidth, int aHeight, bool preventOffBoundPixels = true)
         {
+            if (preventOffBoundPixels)
+            {
+                aWidth = Math.Min(aWidth, (int)Mode.Width - aXStart);
+                aHeight = Math.Min(aHeight, (int)Mode.Height - aYStart);
+            }
             driver.DrawFilledRectangle(aXStart, aYStart, aWidth, aHeight, driver.GetClosestColorInPalette(aColor));
         }
 

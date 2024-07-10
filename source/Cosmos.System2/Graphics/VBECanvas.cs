@@ -248,9 +248,10 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight)
+        public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight, bool preventOffBoundPixels = true)
         {
             // ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
+            if(preventOffBoundPixels)
             aWidth = (int)(Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32);
             var color = aColor.ToArgb();
 
@@ -260,18 +261,30 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override void DrawImage(Image aImage, int aX, int aY)
+        public override void DrawImage(Image aImage, int aX, int aY, bool preventOffBoundPixels = true)
         {
             var xBitmap = aImage.RawData;
             var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
-
-            int xOffset = GetPointOffset(aX, aY);
-
-            for (int i = 0; i < xHeight; i++)
+            if (preventOffBoundPixels)
             {
-                driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+                var maxWidth = Math.Min(xWidth, (int)mode.Width - aX);
+                var maxHeight = Math.Min(xHeight, (int)mode.Height - aY);
+                int xOffset = aY * (int)Mode.Width + aX;
+                for (int i = 0; i < maxHeight; i++)
+                {
+                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, maxWidth);
+                }
             }
+            else
+            {
+                int xOffset = aY * xHeight + aX;
+                for (int i = 0; i < Mode.Height; i++)
+                {
+                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+                }
+            }
+
         }
 
         #endregion

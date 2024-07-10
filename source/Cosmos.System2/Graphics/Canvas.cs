@@ -117,7 +117,6 @@ namespace Cosmos.System.Graphics
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
         public abstract Color GetPointColor(int x, int y);
-
         /// <summary>
         /// Gets the index of the pixel at the given coordinates.
         /// </summary>
@@ -530,13 +529,17 @@ namespace Cosmos.System.Graphics
         /// <param name="yStart">The starting point Y coordinate.</param>
         /// <param name="width">The width of the rectangle.</param>
         /// <param name="height">The height of the rectangle.</param>
-        public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height)
+        public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             if (height == -1)
             {
                 height = width;
             }
-
+            if (preventOffBoundPixels)
+            {
+                width = Math.Min(width, (int)Mode.Width - xStart);
+                height = Math.Min(height, (int)Mode.Height - yStart);
+            }
             for (int y = yStart; y < yStart + height; y++)
             {
                 DrawLine(color, xStart, y, xStart + width - 1, y);
@@ -566,16 +569,31 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The origin X coordinate.</param>
         /// <param name="y">The origin Y coordinate.</param>
-        public virtual void DrawImage(Image image, int x, int y)
+        public virtual void DrawImage(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
-
-            for (int xi = 0; xi < image.Width; xi++)
+            if (preventOffBoundPixels)
             {
-                for (int yi = 0; yi < image.Height; yi++)
+                var maxWidth = Math.Min(image.Width, (int)Mode.Width - x);
+                var maxHeight = Math.Min(image.Height, (int)Mode.Height - y);
+                for (int xi = 0; xi < maxWidth; xi++)
                 {
-                    color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
-                    DrawPoint(color, x + xi, y + yi);
+                    for (int yi = 0; yi < maxHeight; yi++)
+                    {
+                        color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
+                        DrawPoint(color, x + xi, y + yi);
+                    }
+                }
+            }
+            else
+            {
+                for (int xi = 0; xi < image.Width; xi++)
+                {
+                    for (int yi = 0; yi < image.Height; yi++)
+                    {
+                        color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
+                        DrawPoint(color, x + xi, y + yi);
+                    }
                 }
             }
         }
@@ -611,17 +629,33 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         /// <param name="w">The desired width to scale the image to before drawing.</param>
         /// <param name="h">The desired height to scale the image to before drawing</param>
-        public virtual void DrawImage(Image image, int x, int y, int w, int h)
+        public virtual void DrawImage(Image image, int x, int y, int w, int h, bool preventOffBoundPixels = true)
         {
             Color color;
 
             int[] pixels = ScaleImage(image, w, h);
-            for (int xi = 0; xi < w; xi++)
+            if (preventOffBoundPixels)
             {
-                for (int yi = 0; yi < h; yi++)
+                var maxWidth = Math.Min(w, (int)Mode.Width - x);
+                var maxHeight = Math.Min(h, (int)Mode.Height - y);
+                for (int xi = 0; xi < maxWidth; xi++)
                 {
-                    color = Color.FromArgb(pixels[xi + (yi * w)]);
-                    DrawPoint(color, x + xi, y + yi);
+                    for (int yi = 0; yi < maxHeight; yi++)
+                    {
+                        color = Color.FromArgb(pixels[xi + (yi * w)]);
+                        DrawPoint(color, x + xi, y + yi);
+                    }
+                }
+            }
+            else
+            {
+                for (int xi = 0; xi < w; xi++)
+                {
+                    for (int yi = 0; yi < h; yi++)
+                    {
+                        color = Color.FromArgb(pixels[xi + (yi * w)]);
+                        DrawPoint(color, x + xi, y + yi);
+                    }
                 }
             }
         }
@@ -632,16 +666,31 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
-        public void DrawImageAlpha(Image image, int x, int y)
+        public void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
-
-            for (int xi = 0; xi < image.Width; xi++)
+            if (preventOffBoundPixels)
             {
-                for (int yi = 0; yi < image.Height; yi++)
+                var maxWidth = Math.Min(image.Width, (int)Mode.Width - x);
+                var maxHeight = Math.Min(image.Height, (int)Mode.Height - y);
+                for (int xi = 0; xi < maxWidth; xi++)
                 {
-                    color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
-                    DrawPoint(color, x + xi, y + yi);
+                    for (int yi = 0; yi < maxHeight; yi++)
+                    {
+                        color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
+                        DrawPoint(color, x + xi, y + yi);
+                    }
+                }
+            }
+            else
+            {
+                for (int xi = 0; xi < image.Width; xi++)
+                {
+                    for (int yi = 0; yi < image.Height; yi++)
+                    {
+                        color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
+                        DrawPoint(color, x + xi, y + yi);
+                    }
                 }
             }
         }
