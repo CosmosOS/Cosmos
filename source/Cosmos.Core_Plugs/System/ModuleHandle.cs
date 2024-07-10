@@ -40,5 +40,12 @@ namespace Cosmos.Core_Plugs.System
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Void__System_ModuleHandle_GetPEKind_System_Runtime_CompilerServices_QCallModule__System_Int32#__System_Int32#_")]
+        public static void GetPEKind(object aThis, out int kind, out int machine)
+        {
+            kind = (int)global::System.Reflection.PortableExecutableKinds.NotAPortableExecutableImage;
+            machine = (int)global::System.Reflection.ImageFileMachine.I386;
+        }
     }
 }
