@@ -33,7 +33,7 @@ all: $(IL2CPU_DIR) $(XSHARP_DIR) $(COMMON_DIR)
 	@sudo $(MAKE) install
 	@$(MAKE) nuget-install
 	@$(MAKE) template-install
-	@printf "To create a Cosmos kernel, run \'dotnet new cosmosCSKernel -n \{name\}\''
+	@printf "To create a Cosmos kernel, run \'dotnet new cosmosCSKernel -n \{name\}\'"
 	@printf "Build log file saved to ${GREEN}$(THISDIR)/build${date}.log${DEFAULT}\n"
 	@printf "============================================\n"
 	@printf "| ${YELLOW}Cosmos${DEFAULT} has been installed successfully!  |\n"
@@ -155,6 +155,6 @@ nuget-install:
 template-install:
 	@printf "Installing ${GREEN}C# Template packages${DEFAULT}\n"
 	@-dotnet new uninstall $(THISDIR)/source/templates/csharp/
-	@printf "If the template was not installed, you can ignore this"
+	@printf "If the template was not installed, you can ignore this\n"
 	@dotnet new -i $(THISDIR)/source/templates/csharp/
 #TODO: Uninstall
