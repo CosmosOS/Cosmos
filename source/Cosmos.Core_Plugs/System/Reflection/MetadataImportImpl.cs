@@ -19,7 +19,7 @@ namespace Cosmos.Core_Plugs.System.Reflection
         }
         [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetMemberRefProps_System_IntPtr__System_Int32___System_Reflection_ConstArray_")]
         public static void _GetMemberRefProps(IntPtr scope,
-            int memberTokenRef,
+            int memberTokenRef,             
             out object signature)
         {
             throw new NotImplementedException();
@@ -98,6 +98,40 @@ namespace Cosmos.Core_Plugs.System.Reflection
         [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetPropertyProps_System_IntPtr__System_Int32__System_Void##___System_Int32___System_Reflection_ConstArray_")]
         public static unsafe void _GetPropertyProps(IntPtr scope,
             int mdToken, void** name, out int propertyAttributes, out object signature) //ConstArray
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetName_System_IntPtr__System_Int32__System_Void##_")]
+        public static unsafe void _getName(IntPtr scope, int mdToken, out object name)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetFieldDefProps_System_IntPtr__System_Int32___System_Int32_")]
+        public static unsafe void _GetFieldDefProps(IntPtr scope, int mdToken, out int fieldAttributes)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetEventProps_System_IntPtr__System_Int32__System_Void##___System_Int32_")]
+        public static unsafe void _GetEventProps(IntPtr scope, int mdToken, out void* name, out int eventAttributes)
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_Reflection_MetadataImport__GetSigOfFieldDef_System_IntPtr__System_Int32___System_Reflection_ConstArray_")]
+        public static unsafe int _GetSigOfFieldDef(IntPtr scope, int fieldToken, object fieldMarshal)
+        {
+            throw new NotImplementedException();
+        }
+        [PlugMethod(Signature = "System_String__System_Reflection_MetadataImport__GetDefaultValue_System_IntPtr__System_Int32___System_Int64___System_Int32___System_Int32_")]
+        public static unsafe int _GetDefaultValue(IntPtr scope,
+            int mdToken,
+            out long value,
+            out char* stringMetadataEncoding,
+            out int length,
+            out int corElementType)
         {
             throw new NotImplementedException();
         }

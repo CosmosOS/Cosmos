@@ -227,5 +227,68 @@ namespace Cosmos.Core_Plugs.System
         {
             return ((CosmosRuntimeType)runtimeType).GetInterfaces();
         }
+
+
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_GetNextIntroducedMethod__System_RuntimeMethodHandleInternal_")]
+        public static unsafe void GetNextIntroducedMethod(ref object method)  
+        {
+            throw new NotImplementedException();
+        }
+
+
+        [PlugMethod(Signature = "System_Boolean__System_RuntimeTypeHandle_GetFields_System_RuntimeType__System_IntPtr#__System_Int32#_")]
+        public static unsafe bool GetFields(object handle, IntPtr* result, int* count)  
+        {
+            throw new NotImplementedException();
+        }
+
+
+        [PlugMethod(Signature = "System_Void#__System_RuntimeTypeHandle__GetUtf8Name_System_RuntimeType_")]
+        public static unsafe void* _GetUtf8Name(object type)  
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_IRuntimeMethodInfo__System_RuntimeTypeHandle_GetDeclaringMethod_System_RuntimeType_")]
+        public static unsafe object GetDeclaringMethod(object type)  
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Int32__System_RuntimeTypeHandle_GetGenericVariableIndex_System_RuntimeType_")]
+        public static unsafe int GetGenericVariableIndex(object type)  
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_MakePointer_System_Runtime_CompilerServices_QCallTypeHandle__System_Runtime_CompilerServices_ObjectHandleOnStack_")]
+        public static unsafe void MakePointer(object handle, object type)  
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_MakeByRef_System_Runtime_CompilerServices_QCallTypeHandle__System_Runtime_CompilerServices_ObjectHandleOnStack_")]
+        public static unsafe void MakeByRef(object handle, object type)  
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Void__System_RuntimeTypeHandle_MakeArray_System_Runtime_CompilerServices_QCallTypeHandle__System_Runtime_CompilerServices_ObjectHandleOnStack_")]
+        public static unsafe void MakeArray(object handle, object type)  
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_RuntimeMethodHandleInternal__System_RuntimeTypeHandle_GetFirstIntroducedMethod_System_RuntimeType_")]
+        public static unsafe object GetFirstIntroducedMethod(object type)  
+        {
+            throw new NotImplementedException();
+        }
+
+        [PlugMethod(Signature = "System_Boolean__System_RuntimeTypeHandle_SatisfiesConstraints_System_RuntimeType__System_IntPtr#__System_Int32__System_IntPtr#__System_Int32__System_RuntimeType_")]
+        public static unsafe bool SatisfiesConstraints(object paramType, IntPtr* pTypeContext, int typeContextLength, IntPtr* pMethodContext, int methodContextLength, object toType)
+        {
+            throw new NotImplementedException();
+        }
     }
-}
+}       

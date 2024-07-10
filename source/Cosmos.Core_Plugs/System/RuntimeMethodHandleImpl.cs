@@ -103,5 +103,10 @@ namespace Cosmos.Core_Plugs.System
             throw new NotImplementedException();
         }
 
+        [PlugMethod(Signature = "System_Void#__System_RuntimeMethodHandle__GetUtf8Name_System_RuntimeMethodHandleInternal_")]
+        public static unsafe void* _GetUtf8Name(object type)  
+        {
+            throw new NotImplementedException();
+        }
     }
 }

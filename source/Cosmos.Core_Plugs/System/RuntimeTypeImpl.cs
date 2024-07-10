@@ -29,9 +29,15 @@ namespace Cosmos.Core_Plugs.System
             throw new NotImplementedException();
         }
 
-        public static FieldInfo[] GetFields(object aThis, BindingFlags aBindingFlags)
+        public static object CreateEnum(object rtType, long handle)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("RuntimeTypeImpl::CreateEnum unsupported");
+        }
+
+        [PlugMethod(Signature = "System_Boolean__System_RuntimeTypeHandle_IsInstanceOfType_System_RuntimeType__System_Object_")]
+        public static bool IsInstanceOfType(object rtType, object instance)
+        {
+            throw new NotImplementedException("RuntimeTypeImpl::IsInstanceOfType unsupported");
         }
     }
 }

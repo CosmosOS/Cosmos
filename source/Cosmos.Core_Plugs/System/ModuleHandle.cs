@@ -35,5 +35,10 @@ namespace Cosmos.Core_Plugs.System
             throw new NotImplementedException();
         }
 
+        [PlugMethod(Signature = "System_Int32__System_ModuleHandle_GetMDStreamVersion_System_Reflection_RuntimeModule_")]
+        public static int get_MDStreamVersion(object aThis)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
