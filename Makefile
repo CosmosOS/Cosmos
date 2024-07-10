@@ -154,7 +154,7 @@ nuget-install:
 .PHONY: template-install
 template-install:
 	@printf "Installing ${GREEN}C# Template packages${DEFAULT}\n"
-	@-dotnet new uninstall $(THISDIR)/source/templates/csharp/
+	@-dotnet new --uninstall $(THISDIR)/source/templates/csharp/
 	@printf "If the template was not installed, you can ignore this\n"
 	@dotnet new -i $(THISDIR)/source/templates/csharp/
 #TODO: Uninstall
