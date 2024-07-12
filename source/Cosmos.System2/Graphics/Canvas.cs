@@ -521,6 +521,7 @@ namespace Cosmos.System.Graphics
         /// <param name="yStart">The starting point Y coordinate.</param>
         /// <param name="width">The width of the rectangle.</param>
         /// <param name="height">The height of the rectangle.</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             if (height == -1)
@@ -561,6 +562,7 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The origin X coordinate.</param>
         /// <param name="y">The origin Y coordinate.</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawImage(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
@@ -659,6 +661,7 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         /// <param name="w">The desired width to scale the image to before drawing.</param>
         /// <param name="h">The desired height to scale the image to before drawing</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawImage(Image image, int x, int y, int w, int h, bool preventOffBoundPixels = true)
         {
             Color color;
@@ -696,6 +699,7 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
