@@ -31,7 +31,6 @@ namespace Cosmos.Core
             // Drag this stuff in to the compiler manually until we add the always include attrib
             Multiboot2.Init();
             INTs.Dummy();
-            Paging.Init();
 
             PIC = new PIC();
             CPU.UpdateIDT(true);

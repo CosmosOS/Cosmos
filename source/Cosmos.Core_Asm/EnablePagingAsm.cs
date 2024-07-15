@@ -13,15 +13,13 @@ namespace Cosmos.Core_Asm.Memory
 {
     class EnablePagingAsm : AssemblerMethod
     {
-        //static void DoEnable(uint addr)
-        //addr: EBP+8
         public override void AssembleNew(Assembler aAssembler, object aMethodInfo)
         {
-            //EAX: adddr
+            // Set PDPTR address to cr3 from addr argument
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
             XS.Set(XSRegisters.CR3, XSRegisters.EAX);
 
-            // Enable PSE
+            // Enable PAE and PSE
             new Mov
             {
                 DestinationReg = RegistersEnum.EAX,
@@ -31,7 +29,7 @@ namespace Cosmos.Core_Asm.Memory
             new Or()
             {
                 DestinationReg = RegistersEnum.EAX,
-                SourceValue = 0x00000010
+                SourceValue = (1 << 5) | (1 << 4)
             };
 
             new Mov

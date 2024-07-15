@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.Core.Memory;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core
 {
     public unsafe class Paging
     {
-        internal static uint* PageDirectory;
+        internal static ulong* PageDirectoryPointerTable;
         private static bool IsEnabled = false;
         public static void Init()
         {
@@ -20,38 +21,45 @@ namespace Cosmos.Core
             IsEnabled = true;
 
             var video = (byte*)0xB8000;
-            
+
             // Setup page tables
-            video[0] = (byte)'A';
+            video[0] = (byte)'!';
             video[1] = 0x0f;
 
-            PageDirectory = (uint*)new ManagedMemoryBlock(4096, 0x400000, true).Offset;
+            PageDirectoryPointerTable = (ulong*)new ManagedMemoryBlock(4 * sizeof(long), 0x20, true).Offset;
 
             // identity map kernel
-            for (ulong i = 0x2000000; i < 0x2500000; i += 0x400000)
+            for (ulong i = 0x2000000; i < 0x2500000; i += 0x200000)
             {
-                Map(i, i, PageSize._4MB, PageFlags.ReadWrite);
+                Map(i, i, PageSize._2MB, PageFlags.ReadWrite);
+            }
+
+            // identity map RAT
+            for (ulong i = (ulong)RAT.mRAT; i < (ulong)RAT.HeapEnd; i += 0x200000)
+            {
+                Map(i, i, PageSize._2MB, PageFlags.ReadWrite);
             }
 
             // identity map console
-            Map(0xB8000, 0xB8000, PageSize._4KB, PageFlags.ReadWrite);
+            Map(0xB8000, 0xB8000, PageSize._2MB, PageFlags.ReadWrite);
 
             // Enable paging
-            video[0] = (byte)'B';
+            video[0] = (byte)'E';
             video[1] = 0x0f;
 
-            DoEnable((uint)PageDirectory);
+            DoEnable((uint)PageDirectoryPointerTable);
 
             // Print C for now as memory manager would need rework
-            video[0] = (byte)'C';
+            video[0] = (byte)':';
             video[1] = 0x0f;
-            while (true) { }
+            video[1] = (byte)')';
+            video[2] = 0x0f;
         }
-        private static uint* GetNextLevel(uint* topLevel, ulong index, bool allocate)
+        private static ulong* GetNextLevel(ulong* topLevel, ulong index, bool allocate, ulong flags = 3)
         {
             if ((topLevel[index] & 1) != 0)
             {
-                return (uint*)((topLevel[index] & ~((uint)0xFFF)));
+                return (ulong*)((topLevel[index] & ~((ulong)0xFFF)));
             }
 
             if (!allocate)
@@ -59,24 +67,26 @@ namespace Cosmos.Core
                 return null;
             }
 
-            var nextLevel = (uint*)new ManagedMemoryBlock(4096, 0x400000, true).Offset;
-            topLevel[index] = (uint)nextLevel | 3;
+            var nextLevel = (ulong*)new ManagedMemoryBlock(512 * sizeof(ulong), 0x1000, true).Offset;
+            topLevel[index] = (ulong)nextLevel | flags;
             return nextLevel;
         }
         public static void Map(ulong PhysicalAddress, ulong VirtualAddress, PageSize size, PageFlags flags)
         {
-            var pml2Entry = VirtualAddress >> 22;
-            var pml1Entry = (VirtualAddress >> 12) & 0x03FF;
+            var pdpteIndex = (VirtualAddress >> 30) & 0x03; // 2 bits for PDPT
+            var pdeIndex = (VirtualAddress >> 21) & 0x1FF;  // 9 bits for PD
+            var pteIndex = (VirtualAddress >> 12) & 0x1FF;  // 9 bits for PT
 
-            if (size == PageSize._4MB)
+            var pdpte = GetNextLevel(PageDirectoryPointerTable, pdpteIndex, true, 1);
+            if (size == PageSize._2MB)
             {
-                PageDirectory[pml2Entry] = (uint)(PhysicalAddress | ((uint)PageFlags.Present | (uint)flags | (1 << 7)));
+                pdpte[pdeIndex] = (ulong)(PhysicalAddress | ((ulong)3 | (1 << 7)));
             }
             else if (size == PageSize._4KB)
             {
-                var pd = GetNextLevel(PageDirectory, pml2Entry, true);
-                //var pt = GetNextLevel(pd, pml1Entry, true);
-                pd[pml1Entry] = (uint)(PhysicalAddress | (uint)(PageFlags.Present | flags));
+                var pde = GetNextLevel(pdpte, pdeIndex, true);
+                var pt = GetNextLevel(pde, pteIndex, true);
+                pt[pteIndex] = (ulong)(PhysicalAddress | (ulong)(3));
             }
         }
 
@@ -94,12 +104,14 @@ namespace Cosmos.Core
 
     public enum PageSize
     {
-        _4MB,
+        _2MB,
         _4KB,
     }
     [Flags]
-    public enum PageFlags {
-        Present = 1,
-        ReadWrite = 2,
+    public enum PageFlags
+    {
+        Present = 1 << 0,
+        ReadWrite = 1 << 1,
+        Supervisor = 1 << 2
     }
 }
