@@ -888,10 +888,11 @@ namespace Cosmos.System.Graphics
         /// <param name="alpha">The alpha value.</param>
         public static Color AlphaBlend(Color to, Color from, byte alpha)
         {
-            byte R = (byte)(((to.R * alpha) + (from.R * (255 - alpha))) >> 8);
-            byte G = (byte)(((to.G * alpha) + (from.G * (255 - alpha))) >> 8);
-            byte B = (byte)(((to.B * alpha) + (from.B * (255 - alpha))) >> 8);
+            byte R = (byte)((to.R * alpha + from.R * (255 - alpha)) / 255);
+            byte G = (byte)((to.G * alpha + from.G * (255 - alpha)) / 255);
+            byte B = (byte)((to.B * alpha + from.B * (255 - alpha)) / 255);
             return Color.FromArgb(R, G, B);
         }
+
     }
 }
