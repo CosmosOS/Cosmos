@@ -172,6 +172,19 @@ namespace Cosmos.System_Plugs.System
             }
         }
 
+        public static void NextBytes(Random aThis, Span<byte> buffer)
+        {
+            if (buffer == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = (byte)(InternalSample() % (byte.MaxValue + 1));
+            }
+        }
+
         public static double NextDouble(Random aThis)
         {
             return Sample();
