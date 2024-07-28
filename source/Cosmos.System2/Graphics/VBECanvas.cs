@@ -403,6 +403,20 @@ namespace Cosmos.System.Graphics
             return (int)driver.GetVRAM(offset);
         }
 
+        public override Bitmap GetImage(int x, int y, int width, int height)
+        {
+            Bitmap bitmap = new((uint)width, (uint)height, ColorDepth.ColorDepth32);
+
+            for (int posy = y, desty = 0; posy < y + height; posy++, desty++)
+            {
+                for (int posx = x, destx = 0; posx < x + width; posx++, destx++)
+                {
+                    bitmap.RawData[desty * width + destx] = GetRawPointColor(posx, posy);
+                }
+            }
+            return bitmap;
+        }
+
         #endregion
 
     }

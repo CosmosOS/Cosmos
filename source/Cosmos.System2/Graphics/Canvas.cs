@@ -615,11 +615,15 @@ namespace Cosmos.System.Graphics
         /// <returns>A bitmap containing the specified region of the canvas.</returns>
         public virtual Bitmap GetImage(int x, int y, int width, int height)
         {
-            Bitmap bitmap = new Bitmap((uint)x, (uint)y, ColorDepth.ColorDepth32);
+            Bitmap bitmap = new ((uint)width, (uint)height, ColorDepth.ColorDepth32);
 
-            for (int posy = y, desty = 0; posy < y + y; posy++, desty++)
-                for (int posx = x, destx = 0; posx < x + x; posx++, destx++)
-                    bitmap.RawData[desty * x + destx] = GetRawPointColor(posx, posy);
+            for (int posy = y, desty = 0; posy < y + height; posy++, desty++)
+            {
+                for (int posx = x, destx = 0; posx < x + width; posx++, destx++)
+                {
+                    bitmap.RawData[desty * width + destx] = GetRawPointColor(posx, posy);
+                }
+            }
             return bitmap;
         }
 
