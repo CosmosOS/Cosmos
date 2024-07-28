@@ -23,7 +23,8 @@ namespace Cosmos.System.FileSystem
 
         public string LimitFS = null;
 
-        public ManagedPartition(Partition host, string limitFS = null) {
+        public ManagedPartition(Partition host, string limitFS = null)
+        {
             Host = host;
             LimitFS = limitFS;
         }

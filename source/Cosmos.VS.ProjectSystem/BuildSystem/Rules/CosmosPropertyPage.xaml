@@ -74,9 +74,15 @@
                   Category="Compile">
     </BoolProperty>
 
+    <BoolProperty Name="UseUEFI"
+                  DisplayName="Compile with UEFI"
+                  Description="Your OS will be compiled with UEFI support, which allows for booting on non-legacy systems. Enabling this may break legacy booting, and will cause tools such as Rufus and balenaEtcher to see your ISO as unbootable or missing a filesystem."
+                  Category="Compile">
+    </BoolProperty>
+
     <EnumProperty Name="OptimizationLevel"
 		  DisplayName="Optimization Level"
-                  Description="Choose the optimization level that you want to use."
+          Description="Choose the optimization level that you want to use."
 		  Category="Compile">
                   <EnumValue Name="0" DisplayName="O0"/>
                   <EnumValue Name="1" DisplayName="O1"/>
@@ -88,7 +94,7 @@
                     DisplayName="Bootloader Timeout"
                     Description="The time to wait (in seconds) before the bootloader automatically starts the kernel."
                     Category="Compile"
-		    Default="0">
+		            Default="0">
     </StringProperty>
 
     <StringProperty Name="VBEResolution"

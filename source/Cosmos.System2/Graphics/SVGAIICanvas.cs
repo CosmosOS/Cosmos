@@ -80,12 +80,17 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)x, (uint)y, (uint)color.ToArgb());
         }
 
-        public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height)
+        public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             var argb = color.ToArgb();
             var frameSize = (int)driver.FrameSize;
+            if(preventOffBoundPixels)
+            {
+                width = Math.Min(width, (int)mode.Width - xStart);
+                height = Math.Min(height, (int)mode.Height - yStart);
+            }
 
-            // For now write directly into video memory, once _xSVGADriver.Fill will be faster it will have to be changed
+
             for (int i = yStart; i < yStart + height; i++)
             {
                 driver.videoMemory.Fill(GetPointOffset(xStart, i) + (int)frameSize, width, argb);
@@ -346,16 +351,28 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override void DrawImage(Image image, int x, int y)
+        public override void DrawImage(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             var width = (int)image.Width;
             var height = (int)image.Height;
             var frameSize = (int)driver.FrameSize;
             var data = image.RawData;
-
-            for (int i = 0; i < height; i++)
+            if (preventOffBoundPixels)
             {
-                driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
+                var maxWidth = Math.Min(width, (int)mode.Width - x);
+                var maxHeight = Math.Min(height, (int)mode.Height - y);
+
+                for (int i = 0; i < maxHeight; i++)
+                {
+                    driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, maxWidth);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < height; i++)
+                {
+                    driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
+                }
             }
         }
     }
