@@ -89,7 +89,7 @@ namespace Cosmos.System.Graphics
         {
             var argb = color.ToArgb();
             var frameSize = (int)driver.FrameSize;
-            if(preventOffBoundPixels)
+            if (preventOffBoundPixels)
             {
                 width = Math.Min(width, (int)mode.Width - xStart);
                 height = Math.Min(height, (int)mode.Height - yStart);
@@ -104,7 +104,7 @@ namespace Cosmos.System.Graphics
 
         public override void DrawRectangle(Color color, int x, int y, int width, int height)
         {
-            if(color.A < 255)
+            if (color.A < 255)
             {
                 // Draw top edge from (x, y) to (x + width, y)
                 DrawLine(color, x, y, x + width, y);
@@ -415,14 +415,25 @@ namespace Cosmos.System.Graphics
             var height = (int)image.Height;
             var frameSize = (int)driver.FrameSize;
             var data = image.RawData;
+
             if (preventOffBoundPixels)
             {
                 var maxWidth = Math.Min(width, (int)mode.Width - x);
                 var maxHeight = Math.Min(height, (int)mode.Height - y);
+                var startX = Math.Max(0, x);
+                var startY = Math.Max(0, y);
+
+                var sourceX = Math.Max(0, -x);
+                var sourceY = Math.Max(0, -y);
+
+                // Adjust maxWidth and maxHeight if startX or startY were changed
+                maxWidth -= startX - x;
+                maxHeight -= startY - y;
 
                 for (int i = 0; i < maxHeight; i++)
                 {
-                    driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, maxWidth);
+                    int sourceIndex = (sourceY + i) * width + sourceX;
+                    driver.videoMemory.Copy(GetPointOffset(startX, startY + i) + frameSize, data, sourceIndex, maxWidth);
                 }
             }
             else
@@ -433,6 +444,8 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
+
+
 
         /// <summary>
         /// Draws a cropped image on the canvas at the specified position with maximum width and height.
