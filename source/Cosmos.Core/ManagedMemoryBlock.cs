@@ -154,6 +154,20 @@ namespace Cosmos.Core
             }
         }
 
+        public unsafe void Get(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            // TODO throw exception if aStart and aCount are not in bound. I've tried to do this but Bochs dies :-(
+            int* xSrc;
+            fixed (byte* aArrayPtr = memory)
+            {
+                xSrc = (int*)aArrayPtr + aStart;
+            }
+            fixed (int* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(aDataPtr + aIndex, xSrc, aCount);
+            }
+        }
+
         /// <summary>
         /// Copy MemoryBlock into ManagedMemoryBlock
         /// </summary>

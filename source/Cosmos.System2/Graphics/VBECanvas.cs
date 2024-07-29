@@ -3,6 +3,7 @@ using Cosmos.HAL.Drivers.Video;
 using Cosmos.Core.Multiboot;
 using System.Drawing;
 using System;
+using System.Net;
 
 namespace Cosmos.System.Graphics
 {
@@ -407,17 +408,28 @@ namespace Cosmos.System.Graphics
         {
             Bitmap bitmap = new((uint)width, (uint)height, ColorDepth.ColorDepth32);
 
-            for (int posy = y, desty = 0; posy < y + height; posy++, desty++)
+            int startX = Math.Max(0, x);
+            int startY = Math.Max(0, y);
+            int endX = Math.Min(x + width, (int)Mode.Width);
+            int endY = Math.Min(y + height, (int)Mode.Height);
+
+            int offsetX = Math.Max(0, -x);
+            int offsetY = Math.Max(0, -y);
+
+            int[] rawData = new int[width * height];
+
+            for (int posy = startY; posy < endY; posy++)
             {
-                for (int posx = x, destx = 0; posx < x + width; posx++, destx++)
-                {
-                    bitmap.RawData[desty * width + destx] = GetRawPointColor(posx, posy);
-                }
+                int srcOffset = posy * (int)Mode.Width + startX;
+                int destOffset = (posy - startY) * width;
+                driver.GetVRAM(srcOffset, rawData, destOffset, endX - startX);
             }
+
+            bitmap.RawData = rawData;
             return bitmap;
         }
 
-        #endregion
 
+        #endregion
     }
 }
