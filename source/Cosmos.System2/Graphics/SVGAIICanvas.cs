@@ -80,11 +80,16 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)x, (uint)y, (uint)color.ToArgb());
         }
 
+        public override void DrawRawPoint(uint color, int x, int y)
+        {
+            driver.SetPixel((uint)x, (uint)y, color);
+        }
+
         public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             var argb = color.ToArgb();
             var frameSize = (int)driver.FrameSize;
-            if(preventOffBoundPixels)
+            if (preventOffBoundPixels)
             {
                 width = Math.Min(width, (int)mode.Width - xStart);
                 height = Math.Min(height, (int)mode.Height - yStart);
@@ -94,6 +99,54 @@ namespace Cosmos.System.Graphics
             for (int i = yStart; i < yStart + height; i++)
             {
                 driver.videoMemory.Fill(GetPointOffset(xStart, i) + (int)frameSize, width, argb);
+            }
+        }
+
+        public override void DrawRectangle(Color color, int x, int y, int width, int height)
+        {
+            if (color.A < 255)
+            {
+                // Draw top edge from (x, y) to (x + width, y)
+                DrawLine(color, x, y, x + width, y);
+
+                // Draw left edge from (x, y) to (x, y + height)
+                DrawLine(color, x, y, x, y + height);
+
+                // Draw bottom edge from (x, y + height) to (x + width, y + height)
+                DrawLine(color, x, y + height, x + width, y + height);
+
+                // Draw right edge from (x + width, y) to (x + width, y + height)
+                DrawLine(color, x + width, y, x + width, y + height);
+            }
+            else
+            {
+                int rawColor = color.ToArgb();
+
+                /* Draw the top edge (A to B) */
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawRawPoint((uint)rawColor, posX, y);
+                }
+
+                /* Draw the bottom edge (C to D) */
+                int newY = y + height;
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawRawPoint((uint)rawColor, posX, newY);
+                }
+
+                /* Draw the left edge (A to C) */
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawRawPoint((uint)rawColor, x, posY);
+                }
+
+                /* Draw the right edge (B to D) */
+                int newX = x + width;
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawRawPoint((uint)rawColor, newX, posY);
+                }
             }
         }
 
@@ -315,6 +368,11 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)driver.GetPixel((uint)x, (uint)y));
         }
 
+        public override int GetRawPointColor(int x, int y)
+        {
+            return (int)driver.GetPixel((uint)x, (uint)y);
+        }
+
         public override void Display()
         {
             driver.DoubleBufferUpdate();
@@ -357,14 +415,25 @@ namespace Cosmos.System.Graphics
             var height = (int)image.Height;
             var frameSize = (int)driver.FrameSize;
             var data = image.RawData;
+
             if (preventOffBoundPixels)
             {
                 var maxWidth = Math.Min(width, (int)mode.Width - x);
                 var maxHeight = Math.Min(height, (int)mode.Height - y);
+                var startX = Math.Max(0, x);
+                var startY = Math.Max(0, y);
+
+                var sourceX = Math.Max(0, -x);
+                var sourceY = Math.Max(0, -y);
+
+                // Adjust maxWidth and maxHeight if startX or startY were changed
+                maxWidth -= startX - x;
+                maxHeight -= startY - y;
 
                 for (int i = 0; i < maxHeight; i++)
                 {
-                    driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, maxWidth);
+                    int sourceIndex = (sourceY + i) * width + sourceX;
+                    driver.videoMemory.Copy(GetPointOffset(startX, startY + i) + frameSize, data, sourceIndex, maxWidth);
                 }
             }
             else
@@ -374,6 +443,52 @@ namespace Cosmos.System.Graphics
                     driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
                 }
             }
+        }
+
+
+
+        /// <summary>
+        /// Draws a cropped image on the canvas at the specified position with maximum width and height.
+        /// </summary>
+        /// <param name="image">The image to be drawn.</param>
+        /// <param name="x">The x-coordinate of the top-left corner where the image will be drawn.</param>
+        /// <param name="y">The y-coordinate of the top-left corner where the image will be drawn.</param>
+        /// <param name="maxWidth">The maximum width of the cropped area.</param>
+        /// <param name="maxHeight">The maximum height of the cropped area.</param>
+        public override void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        {
+            var width = maxWidth;
+            var height = maxHeight;
+            var frameSize = (int)driver.FrameSize;
+            var data = image.RawData;
+            for (int i = 0; i < height; i++)
+            {
+                driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a specified region of the canvas as a bitmap.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the top-left corner of the region.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the region.</param>
+        /// <param name="width">The width of the region to retrieve.</param>
+        /// <param name="height">The height of the region to retrieve.</param>
+        /// <returns>A bitmap containing the specified region of the canvas.</returns>
+        public override Bitmap GetImage(int x, int y, int width, int height)
+        {
+            var frameSize = (int)driver.FrameSize;
+            int[] buffer = new int[width];
+            int[] all = new int[width * height];
+            for (int i = 0; i < height; i++)
+            {
+                driver.videoMemory.Get(GetPointOffset(x, y + i) + frameSize, buffer, 0, width);
+                buffer.CopyTo(all, width * i);
+            }
+            Bitmap toReturn = new Bitmap((uint)width, (uint)height, ColorDepth.ColorDepth32);
+            toReturn.RawData = all;
+
+            return toReturn;
         }
     }
 }

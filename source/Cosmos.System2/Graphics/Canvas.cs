@@ -101,6 +101,14 @@ namespace Cosmos.System.Graphics
         public abstract void DrawPoint(Color color, int x, int y);
 
         /// <summary>
+        /// Sets the pixel at the given coordinates to the specified <paramref name="color"/>. without ToArgb()
+        /// </summary>
+        /// <param name="color">The color to draw with (raw argb).</param>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        public abstract void DrawRawPoint(uint color, int x, int y);
+
+        /// <summary>
         /// The name of the Canvas implementation.
         /// </summary>
         public abstract string Name();
@@ -117,6 +125,13 @@ namespace Cosmos.System.Graphics
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
         public abstract Color GetPointColor(int x, int y);
+
+        /// <summary>
+        /// Gets the color of the pixel at the given coordinates in ARGB.
+        /// </summary>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        public abstract int GetRawPointColor(int x, int y);
         /// <summary>
         /// Gets the index of the pixel at the given coordinates.
         /// </summary>
@@ -485,40 +500,17 @@ namespace Cosmos.System.Graphics
         /// <param name="height">The height of the rectangle.</param>
         public virtual void DrawRectangle(Color color, int x, int y, int width, int height)
         {
-            /*
-             * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
-             * vertex (we call these vertexes A, B, C, D as for geometric convention)
-             */
+            // Draw top edge from (x, y) to (x + width, y)
+            DrawLine(color, x, y, x + width, y);
 
-            /* The check of the validity of x and y are done in DrawLine() */
+            // Draw left edge from (x, y) to (x, y + height)
+            DrawLine(color, x, y, x, y + height);
 
-            /* The vertex A is where x,y are */
-            int xa = x;
-            int ya = y;
+            // Draw bottom edge from (x, y + height) to (x + width, y + height)
+            DrawLine(color, x, y + height, x + width, y + height);
 
-            /* The vertex B has the same y coordinate of A but x is moved of width pixels */
-            int xb = x + width;
-            int yb = y;
-
-            /* The vertex C has the same x coordiate of A but this time is y that is moved of height pixels */
-            int xc = x;
-            int yc = y + height;
-
-            /* The Vertex D has x moved of width pixels and y moved of height pixels */
-            int xd = x + width;
-            int yd = y + height;
-
-            /* Draw a line betwen A and B */
-            DrawLine(color, xa, ya, xb, yb);
-
-            /* Draw a line between A and C */
-            DrawLine(color, xa, ya, xc, yc);
-
-            /* Draw a line between B and D */
-            DrawLine(color, xb, yb, xd, yd);
-
-            /* Draw a line between C and D */
-            DrawLine(color, xc, yc, xd, yd);
+            // Draw right edge from (x + width, y) to (x + width, y + height)
+            DrawLine(color, x + width, y, x + width, y + height);
         }
 
         /// <summary>
@@ -529,6 +521,7 @@ namespace Cosmos.System.Graphics
         /// <param name="yStart">The starting point Y coordinate.</param>
         /// <param name="width">The width of the rectangle.</param>
         /// <param name="height">The height of the rectangle.</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             if (height == -1)
@@ -569,6 +562,7 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The origin X coordinate.</param>
         /// <param name="y">The origin Y coordinate.</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawImage(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
@@ -598,6 +592,48 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        /// <summary>
+        /// Draws the given image at the specified coordinates, cropped to maxWidth and maxHeight
+        /// </summary>
+        /// <param name="image">The image to draw.</param>
+        /// <param name="x">The origin X coordinate.</param>
+        /// <param name="y">The origin Y coordinate.</param>
+        /// <param name="maxWidth">Max image width to display</param>
+        /// <param name="maxHeight">Max image height to display</param>
+        public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        {
+
+        }
+
+        /// <summary>
+        /// Retrieves a specified region of the canvas as a bitmap.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the top-left corner of the region.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the region.</param>
+        /// <param name="width">The width of the region to retrieve.</param>
+        /// <param name="height">The height of the region to retrieve.</param>
+        /// <returns>A bitmap containing the specified region of the canvas.</returns>
+        public virtual Bitmap GetImage(int x, int y, int width, int height)
+        {
+            Bitmap bitmap = new ((uint)width, (uint)height, ColorDepth.ColorDepth32);
+
+            for (int posy = y, desty = 0; posy < y + height; posy++, desty++)
+            {
+                for (int posx = x, destx = 0; posx < x + width; posx++, destx++)
+                {
+                    bitmap.RawData[desty * width + destx] = GetRawPointColor(posx, posy);
+                }
+            }
+            return bitmap;
+        }
+
+        /// <summary>
+        /// Scales an image to the specified new width and height.
+        /// </summary>
+        /// <param name="image">The image to be scaled.</param>
+        /// <param name="newWidth">The width of the scaled image.</param>
+        /// <param name="newHeight">The height of the scaled image.</param>
+        /// <returns>An array of integers representing the scaled image's pixel data. (Raw bitmap data)</returns>
         static int[] ScaleImage(Image image, int newWidth, int newHeight)
         {
             int[] pixels = image.RawData;
@@ -629,6 +665,7 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         /// <param name="w">The desired width to scale the image to before drawing.</param>
         /// <param name="h">The desired height to scale the image to before drawing</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawImage(Image image, int x, int y, int w, int h, bool preventOffBoundPixels = true)
         {
             Color color;
@@ -666,7 +703,8 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
-        public void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
+        public virtual void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
             if (preventOffBoundPixels)

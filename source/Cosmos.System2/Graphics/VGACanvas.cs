@@ -96,6 +96,37 @@ namespace Cosmos.System.Graphics
             driver.DrawFilledRectangle(aXStart, aYStart, aWidth, aHeight, driver.GetClosestColorInPalette(aColor));
         }
 
+        public override void DrawRectangle(Color color, int x, int y, int width, int height)
+        {
+            int rawColor = color.ToArgb();
+
+            /* Draw the top edge (A to B) */
+            for (int posX = x; posX < x + width; posX++)
+            {
+                DrawRawPoint((uint)rawColor, posX, y);
+            }
+
+            /* Draw the bottom edge (C to D) */
+            int newY = y + height;
+            for (int posX = x; posX < x + width; posX++)
+            {
+                DrawRawPoint((uint)rawColor, posX, newY);
+            }
+
+            /* Draw the left edge (A to C) */
+            for (int posY = y; posY < y + height; posY++)
+            {
+                DrawRawPoint((uint)rawColor, x, posY);
+            }
+
+            /* Draw the right edge (B to D) */
+            int newX = x + width;
+            for (int posY = y; posY < y + height; posY++)
+            {
+                DrawRawPoint((uint)rawColor, newX, posY);
+            }
+        }
+
         public override void DrawPoint(Color aColor, int aX, int aY)
         {
             driver.SetPixel((uint)aX, (uint)aY, aColor);
@@ -106,11 +137,21 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)aX, (uint)aY, aColor);
         }
 
+        public override void DrawRawPoint(uint aColor, int aX, int aY)
+        {
+            driver.SetPixel((uint)aX, (uint)aY, aColor);
+        }
+
         public override List<Mode> AvailableModes => availableModes;
 
         public override Color GetPointColor(int aX, int aY)
         {
             return Color.FromArgb((int)driver.GetPixel((uint)aX, (uint)aY));
+        }
+
+        public override int GetRawPointColor(int aX, int aY)
+        {
+            return (int)driver.GetPixel((uint)aX, (uint)aY);
         }
 
         public override Mode DefaultGraphicsMode => new Mode(640, 480, ColorDepth.ColorDepth4);
