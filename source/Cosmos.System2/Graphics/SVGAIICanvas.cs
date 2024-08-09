@@ -85,6 +85,45 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)x, (uint)y, color);
         }
 
+        public override void DrawRawPoint(int color, int x, int y)
+        {
+            driver.SetPixel((uint)x, (uint)y, (uint)color);
+        }
+
+        public override void DrawArray(Color[] colors, int x, int y, int width, int height)
+        {
+            ThrowIfCoordNotValid(x, y);
+            ThrowIfCoordNotValid(x + width, y + height);
+
+            for (int i = 0; i < x; i++)
+            {
+                for (int ii = 0; ii < y; ii++)
+                {
+                    DrawPoint(colors[i + (ii * width)], i, ii);
+                }
+            }
+        }
+
+        public override void DrawArray(int[] colors, int x, int y, int width, int height)
+        {
+            var frameSize = (int)driver.FrameSize;
+
+            for (int i = 0; i < height; i++)
+            {
+                driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, colors, i * width, width);
+            }
+        }
+
+        public override void DrawArray(int[] colors, int x, int y, int width, int height, int startIndex)
+        {
+            var frameSize = (int)driver.FrameSize;
+
+            for (int i = 0; i < height; i++)
+            {
+                driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, colors, i * width + startIndex, width);
+            }
+        }
+
         public override void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
             var argb = color.ToArgb();
@@ -446,7 +485,6 @@ namespace Cosmos.System.Graphics
         }
 
 
-
         /// <summary>
         /// Draws a cropped image on the canvas at the specified position with maximum width and height.
         /// </summary>
@@ -455,17 +493,42 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The y-coordinate of the top-left corner where the image will be drawn.</param>
         /// <param name="maxWidth">The maximum width of the cropped area.</param>
         /// <param name="maxHeight">The maximum height of the cropped area.</param>
-        public override void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        public override void CroppedDrawImage(Image image, int x, int y, int width, int height, bool preventOffBoundPixels = true)
         {
-            var width = maxWidth;
-            var height = maxHeight;
             var frameSize = (int)driver.FrameSize;
             var data = image.RawData;
-            for (int i = 0; i < height; i++)
+
+            if (preventOffBoundPixels)
             {
-                driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
+                var modeWidth = (int)mode.Width;
+                var modeHeight = (int)mode.Height;
+
+                var maxWidth = Math.Min(width, modeWidth - x);
+                var maxHeight = Math.Min(height, modeHeight - y);
+
+                var startX = Math.Max(0, -x);
+                var startY = Math.Max(0, -y);
+
+                var sourceWidth = maxWidth - startX;
+                var sourceHeight = maxHeight - startY;
+
+                for (int i = 0; i < sourceHeight; i++)
+                {
+                    int destY = y + startY + i;
+                    int destOffset = GetPointOffset(x + startX, destY) + frameSize;
+
+                    driver.videoMemory.Copy(destOffset, data, (startY + i) * width + startX, sourceWidth);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < height; i++)
+                {
+                    driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
+                }
             }
         }
+
 
         /// <summary>
         /// Retrieves a specified region of the canvas as a bitmap.

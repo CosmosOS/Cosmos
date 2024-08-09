@@ -263,6 +263,11 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public override void DrawRawPoint(int aColor, int aX, int aY)
+        {
+             DrawRawPoint((uint)aColor, aX, aY);
+        }
+
         public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
         {
             ThrowIfCoordNotValid(aX, aY);
@@ -274,6 +279,24 @@ namespace Cosmos.System.Graphics
                 {
                     DrawPoint(aColors[i + (ii * aWidth)], i, ii);
                 }
+            }
+        }
+
+        public override void DrawArray(int[] aColors, int aX, int aY, int aWidth, int aHeight)
+        {
+            for (int i = 0; i < aHeight; i++)
+            {
+                int destinationIndex = (aY + i) * (int)mode.Width + aX;
+                driver.CopyVRAM(destinationIndex, aColors, i * aWidth, aWidth);
+            }
+        }
+
+        public override void DrawArray(int[] aColors, int aX, int aY, int aWidth, int aHeight, int startIndex)
+        {
+            for (int i = 0; i < aHeight; i++)
+            {
+                int destinationIndex = (aY + i) * (int)mode.Width + aX;
+                driver.CopyVRAM(destinationIndex, aColors, i * aWidth, aWidth);
             }
         }
 
@@ -346,42 +369,80 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public override void DrawImage(Image aImage, int aX, int aY, bool preventOffBoundPixels = true)
+        public override void DrawImage(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
-            var xBitmap = aImage.RawData;
-            var xWidth = (int)aImage.Width;
-            var xHeight = (int)aImage.Height;
-            int xOffset = aY * (int)Mode.Width + aX;
+            var width = (int)image.Width;
+            var height = (int)image.Height;
+            var data = image.RawData;
 
-            if (!preventOffBoundPixels)
+            if (preventOffBoundPixels)
             {
-                for (int i = 0; i < xHeight; i++)
+                var maxWidth = Math.Min(width, (int)mode.Width - x);
+                var maxHeight = Math.Min(height, (int)mode.Height - y);
+                var startX = Math.Max(0, x);
+                var startY = Math.Max(0, y);
+
+                var sourceX = Math.Max(0, -x);
+                var sourceY = Math.Max(0, -y);
+
+                // Adjust maxWidth and maxHeight if startX or startY were changed
+                maxWidth -= startX - x;
+                maxHeight -= startY - y;
+
+                for (int i = 0; i < maxHeight; i++)
                 {
-                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+                    int sourceIndex = (sourceY + i) * width + sourceX;
+                    int destinationIndex = (startY + i) * (int)mode.Width + startX;
+                    driver.CopyVRAM(destinationIndex, data, sourceIndex, maxWidth);
                 }
             }
             else
             {
-                var maxWidth = Math.Min(xWidth, (int)mode.Width - aX);
-                var maxHeight = Math.Min(xHeight, (int)mode.Height - aY);
-                for (int i = 0; i < maxHeight; i++)
+                for (int i = 0; i < height; i++)
                 {
-                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, maxWidth);
+                    int destinationIndex = (y + i) * (int)mode.Width + x;
+                    driver.CopyVRAM(destinationIndex, data, i * width, width);
                 }
             }
         }
 
-        public override void CroppedDrawImage(Image aImage, int aX, int aY, int aWidth, int aHeight)
+        public override void CroppedDrawImage(Image aImage, int aX, int aY, int aWidth, int aHeight, bool preventOffBoundPixels = true)
         {
             var xBitmap = aImage.RawData;
             var xWidth = aWidth;
             var xHeight = aHeight;
-            int xOffset = aY * xHeight + aX;
-            for (int i = 0; i < Mode.Height; i++)
+
+            if (preventOffBoundPixels)
             {
-                driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+                var maxWidth = Math.Min(xWidth, (int)Mode.Width - aX);
+                var maxHeight = Math.Min(xHeight, (int)Mode.Height - aY);
+
+                var startX = Math.Max(0, aX);
+                var startY = Math.Max(0, aY);
+
+                var sourceX = Math.Max(0, -aX);
+                var sourceY = Math.Max(0, -aY);
+
+                maxWidth -= startX - aX;
+                maxHeight -= startY - aY;
+
+                for (int i = 0; i < maxHeight; i++)
+                {
+                    int sourceIndex = (sourceY + i) * xWidth + sourceX;
+                    int destinationIndex = (startY + i) * (int)Mode.Width + startX;
+                    driver.CopyVRAM(destinationIndex, xBitmap, sourceIndex, maxWidth);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < xHeight; i++)
+                {
+                    int destinationIndex = (aY + i) * (int)Mode.Width + aX;
+                    driver.CopyVRAM(destinationIndex, xBitmap, i * xWidth, xWidth);
+                }
             }
         }
+
 
         #endregion
 
