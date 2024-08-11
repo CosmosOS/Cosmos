@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.Core
@@ -8,6 +8,81 @@ namespace Cosmos.Core
     /// </summary>
     public unsafe class ACPI
     {
+        /// <summary>
+        /// MADT table struct.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct MADT
+        {
+            public fixed byte Signature[4];   // 'APIC'
+            public int Length;
+            public byte Revision;
+            public byte Checksum;
+            public fixed byte OemId[6];
+            public fixed byte OemTableId[8];
+            public int OemRevision;
+            public int CreatorId;
+            public int CreatorRevision;
+            public int LocalApicAddress;
+            public int Flags;
+        }
+
+        /// <summary>
+        /// MADT Entry Heady struct
+        /// </summary>
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct MADTEntryHeader
+        {
+            public byte EntryType;
+            public byte Length;
+        }
+
+        /// <summary>
+        /// MADT Entry Type struct
+        /// </summary>
+
+        public enum MADTEntryType : byte
+        {
+            ProcessorLocalApic = 0,
+            IoApic = 1,
+            InterruptSourceOverride = 2,
+            NmiSource = 3,
+            LocalApicNmi = 4,
+            LocalApicAddressOverride = 5,
+            IoSapic = 6,
+            LocalSapic = 7,
+            PlatformInterruptSources = 8,
+            ProcessorLocalX2Apic = 9,
+            LocalX2ApicNmi = 10
+        }
+
+        /// <summary>
+        /// Processor Local Apic Entry struct
+        /// </summary>
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct ProcessorLocalApicEntry
+        {
+            public MADTEntryHeader Header;
+            public byte AcpiProcessorId;
+            public byte ApicId;
+            public int Flags;
+        }
+
+        /// <summary>
+        /// IO Apic Entry struct
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct IoApicEntry
+        {
+            public MADTEntryHeader Header;
+            public byte IoApicId;
+            public byte Reserved;
+            public int IoApicAddress;
+            public int GlobalSystemInterruptBase;
+        }
+
         /// <summary>
         /// RSD table struct.
         /// </summary>
@@ -188,6 +263,44 @@ namespace Cosmos.Core
 
             return sum == 0;
         }
+        /// <summary>
+        /// Parse the MADT
+        /// </summary>
+
+        private static void ParseMADT(byte* madtPtr)
+        {
+            MADT* madt = (MADT*)madtPtr;
+
+            byte* madtEnd = madtPtr + madt->Length;
+            byte* entryPtr = madtPtr + sizeof(MADT);
+
+            while (entryPtr < madtEnd)
+            {
+                MADTEntryHeader* entryHeader = (MADTEntryHeader*)entryPtr;
+
+                switch ((MADTEntryType)entryHeader->EntryType)
+                {
+                    case MADTEntryType.ProcessorLocalApic:
+                        ProcessorLocalApicEntry* localApic = (ProcessorLocalApicEntry*)entryPtr;
+                        if ((localApic->Flags & 1) != 0) // CPU is enabled
+                        {
+                            Console.WriteLine($"Found CPU with APIC ID: {localApic->ApicId}");
+                            // Here you can add this APIC ID to a list or process it as needed.
+                        }
+                        break;
+
+                    case MADTEntryType.IoApic:
+                        IoApicEntry* ioApic = (IoApicEntry*)entryPtr;
+                        Console.WriteLine($"Found IO APIC with ID: {ioApic->IoApicId} at address: {ioApic->IoApicAddress:X}");
+                        break;
+
+                        // Handle other MADT entries if needed
+                }
+
+                entryPtr += entryHeader->Length;
+            }
+        }
+
 
         /// <summary>
         /// Start the ACPI.
@@ -246,98 +359,30 @@ namespace Cosmos.Core
         private static bool Init()
         {
             byte* ptr = (byte*)RSDPAddress();
-            int addr = 0;
+            int rsdtAddress = *(int*)(ptr + 16);
 
-            for (int i = 19; i >= 16; i--)
+            if (rsdtAddress == 0)
             {
-                addr += *(ptr + i);
-                addr = i == 16 ? addr : addr << 8;
+                return false;
             }
 
-            ptr = (byte*)addr;
-            ptr += 4; addr = 0;
+            byte* rsdt = (byte*)rsdtAddress;
+            int entryCount = (*(int*)(rsdt + 4) - 36) / 4;
 
-            for (int i = 3; i >= 0; i--)
+            for (int i = 0; i < entryCount; i++)
             {
-                addr += *(ptr + i);
-                addr = i == 0 ? addr : addr << 8;
-            }
+                int entryAddress = *(int*)(rsdt + 36 + (i * 4));
 
-            int length = addr;
-            ptr -= 4;
-
-            if (ptr != null && acpiCheckHeader(ptr, "RSDT") == 0)
-            {
-                addr = 0;
-                int entrys = length;
-                entrys = (entrys - 36) / 4;
-                ptr += 36;
-                byte* yeuse;
-
-                while (0 < entrys--)
+                if (Compare("APIC", (byte*)entryAddress) == 0)
                 {
-                    for (int i = 3; i >= 0; i--)
-                    {
-                        addr += *(ptr + i);
-                        addr = i == 0 ? addr : addr << 8;
-                    }
-
-                    yeuse = (byte*)addr;
-                    Facp = yeuse;
-
-                    if (acpiCheckHeader((byte*)facpget(0), "DSDT") == 0)
-                    {
-                        byte* S5Addr = (byte*)facpget(0) + 36;
-                        int dsdtLength = *(facpget(0) + 1) - 36;
-
-                        while (0 < dsdtLength--)
-                        {
-                            if (Compare("_S5_", S5Addr) == 0)
-                            {
-                                break;
-                            }
-                            S5Addr++;
-                        }
-
-                        if (dsdtLength > 0)
-                        {
-                            if ((*(S5Addr - 1) == 0x08 || (*(S5Addr - 2) == 0x08 && *(S5Addr - 1) == '\\')) && *(S5Addr + 4) == 0x12)
-                            {
-                                S5Addr += 5;
-                                S5Addr += ((*S5Addr & 0xC0) >> 6) + 2;
-                                if (*S5Addr == 0x0A)
-                                {
-                                    S5Addr++;
-                                }
-                                SLP_TYPa = (short)(*S5Addr << 10);
-                                S5Addr++;
-                                if (*S5Addr == 0x0A)
-                                {
-                                    S5Addr++;
-                                }
-                                SLP_TYPb = (short)(*S5Addr << 10);
-                                SMI_CMD = facpget(1);
-                                ACPI_ENABLE = facpbget(0);
-                                ACPI_DISABLE = facpbget(1);
-                                PM1a_CNT = facpget(2);
-                                PM1b_CNT = facpget(3);
-                                PM1_CNT_LEN = facpbget(3);
-                                SLP_EN = 1 << 13;
-
-                                smiIO = (ushort)SMI_CMD;
-                                pm1aIO = (ushort)PM1a_CNT;
-                                pm1bIO = (ushort)PM1b_CNT;
-
-                                return true;
-                            }
-                        }
-                    }
-                    ptr += 4;
+                    ParseMADT((byte*)entryAddress);
+                    return true;
                 }
             }
 
             return false;
         }
+
 
         /// <summary>
         /// Enable ACPI.
