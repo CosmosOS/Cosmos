@@ -296,7 +296,7 @@ namespace Cosmos.System.Graphics
             for (int i = 0; i < aHeight; i++)
             {
                 int destinationIndex = (aY + i) * (int)mode.Width + aX;
-                driver.CopyVRAM(destinationIndex, aColors, i * aWidth, aWidth);
+                driver.CopyVRAM(destinationIndex, aColors, i * aWidth + startIndex, aWidth);
             }
         }
 
