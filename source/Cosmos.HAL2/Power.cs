@@ -1,5 +1,6 @@
 using System;
 using Cosmos.Core;
+using MACPI.Cosmos.HAL.PCIE;
 
 namespace Cosmos.HAL
 {
@@ -24,7 +25,14 @@ namespace Cosmos.HAL
         [Obsolete("This method is not yet implemented.", error: true)]
         public static void ACPIReboot()
         {
-            ACPI.Reboot();
+            try
+            {
+                CPU.Reboot();
+            }
+            catch
+            {
+                ACPI.Shutdown();
+            }
         }
 
         /// <summary>
