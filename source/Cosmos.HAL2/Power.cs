@@ -21,8 +21,8 @@ namespace Cosmos.HAL
         /// <summary>
         /// Reboot the system using ACPI. Currently not implemented.
         /// </summary>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
-        [Obsolete("This method is not yet implemented.", error: true)]
+        //// <exception cref="NotImplementedException">Thrown always.</exception>
+        //[Obsolete("This method is not yet implemented.", error: true)] -- the method should work now no need to throw an exception
         public static void ACPIReboot()
         {
             try
